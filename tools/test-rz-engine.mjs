@@ -199,6 +199,19 @@ near('pue.dcie(1.5)', M.pue.dcie(1.5), 0.6667, 0.001);
     ok('sim.tornado ranks x above y', tor[0].key === 'x');
     const grid = M.sim.sensitivityGrid(inp => inp.a + inp.b, { a: 0, b: 0 }, 'a', { lo: 0, hi: 1 }, 'b', { lo: 0, hi: 1 }, 4);
     ok('sim.sensitivityGrid shape', grid.z.length === 5 && grid.z[0].length === 5);
+
+    // v2.1: categorical distribution — weighted discrete choice
+    const cat = M.sim.monteCarlo(s => (s.scn === 'boom' ? 2 : 1), { scn: { dist: 'categorical', choices: [{ value: 'boom', weight: 3 }, { value: 'bust', weight: 1 }] } }, 4000, 7);
+    ok('sim categorical ~75% boom (mean≈1.75)', cat.mean > 1.6 && cat.mean < 1.9, `mean=${cat.mean}`);
+    // v2.1: correlated normals — corr(a,b)=0.8 should make a+b more variable than uncorrelated
+    const corrHi = M.sim.monteCarlo(s => s.a + s.b, { a: { dist: 'normal', mean: 0, sd: 1 }, b: { dist: 'normal', mean: 0, sd: 1 } }, 6000, 11, { correlations: [{ a: 'a', b: 'b', rho: 0.8 }] });
+    const corrNo = M.sim.monteCarlo(s => s.a + s.b, { a: { dist: 'normal', mean: 0, sd: 1 }, b: { dist: 'normal', mean: 0, sd: 1 } }, 6000, 11);
+    const spread = r => r.p90 - r.p10;
+    ok('sim positive correlation widens a+b spread', spread(corrHi) > spread(corrNo) * 1.1, `corr=${spread(corrHi).toFixed(2)} indep=${spread(corrNo).toFixed(2)}`);
+    // backward-compat: omitting opts leaves the fast path deterministic
+    const bc1 = M.sim.monteCarlo(s => s.a, { a: { dist: 'uniform', min: 0, max: 1 } }, 500, 42);
+    const bc2 = M.sim.monteCarlo(s => s.a, { a: { dist: 'uniform', min: 0, max: 1 } }, 500, 42);
+    ok('sim no-opts path still deterministic', bc1.p50 === bc2.p50);
 }
 {
     const t = E.models.carbon.annualTonnes(10, 1.5, 'US');

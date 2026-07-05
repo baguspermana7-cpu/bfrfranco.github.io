@@ -11,6 +11,25 @@ release sections rather than semver.
 
 ---
 
+## v1.51.5 — 2026-07-05 (RZEngine v2.1.0 — correlated + scenario sim; TCO Monte-Carlo consolidated)
+
+**Added** (engine)
+- **`RZEngine.models.sim.monteCarlo` gained correlated variables + discrete scenarios** (engine
+  2.0.0 → 2.1.0, backward-compatible). New `categorical` distribution (`{choices:[{value,weight}]}`)
+  for weighted discrete draws, and an optional `opts.correlations:[{a,b,rho}]` imposing pairwise
+  correlation between normal keys (`z_b ← rho·z_a + √(1−rho²)·z_b`). When `opts` is omitted the RNG
+  path is byte-identical to v2.0, so the capex/opex/roi panels are unaffected. `tools/test-rz-engine.mjs`
+  now 79 assertions (added categorical, correlation-widens-spread, no-opts-determinism). Min re-built
+  with terser (parity-checked); cache-bust `2026-07-05-v21`.
+
+**Changed**
+- **TCO Monte-Carlo consolidated onto the shared engine.** Its simulation (correlated construction/power
+  at r=0.65 + 4 weighted macro scenarios: baseline / AI-boom / recession / power-crisis) now runs through
+  the seeded engine simulator, so the P5/P50/P95 are **reproducible** instead of jittering on every
+  recalculation. The cost model is unchanged — verified the engine path matches the prior inline model to
+  **0.1% on P50** — and a full inline `Math.random()` fallback remains. This completes the sim-engine
+  unification (capex/opex/roi already on the engine; tco needed the correlation+scenario support added here).
+
 ## v1.51.4 — 2026-07-05 (ROI calculator — Monte-Carlo now seeded/reproducible via shared engine)
 
 **Changed**

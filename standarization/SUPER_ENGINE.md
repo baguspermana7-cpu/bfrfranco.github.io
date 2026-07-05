@@ -309,8 +309,19 @@ These should be resolved by review comments before S0 starts.
 `RZEngine.data.version` → **2.0.0** (`meta.schemaVersion` 2.0.0). Shipped as staged,
 individually-verified changes, all backward-compatible (existing `models.*` signatures
 unchanged; every addition is a new key or an OPTIONAL param). Verified by
-`node tools/test-rz-engine.mjs` (76 assertions: model worked examples + data invariants +
-reachability + provenance).
+`node tools/test-rz-engine.mjs` (79 assertions: model worked examples + data invariants +
+reachability + provenance + sim capabilities).
+
+### v2.1.0 (2026-07-05) — `sim.monteCarlo` correlated + categorical draws
+`models.sim.monteCarlo(fn, distributions, iterations, seed, opts)` gained (backward-compatibly):
+- a **`categorical`** distribution — `{ dist:'categorical', choices:[{value, weight}] }` draws a discrete
+  value by weight (for macro-scenario selection);
+- an optional **`opts.correlations: [{ a, b, rho }]`** — imposes pairwise correlation between two NORMAL
+  keys (`z_b ← rho·z_a + √(1−rho²)·z_b`).
+When `opts` is omitted the RNG path is byte-identical to v2.0 (capex/opex/roi panels unaffected). This let
+**`tco-calculator`'s Monte-Carlo** (correlated construction/power r=0.65 + 4 macro scenarios) consolidate
+onto the shared seeded simulator — reproducible percentiles, model preserved (engine vs. old inline
+fallback match to 0.1% on P50). Engine bumped 2.0.0→2.1.0; min re-built with terser; cache-bust `2026-07-05-v21`.
 
 ### Rules now enforced
 

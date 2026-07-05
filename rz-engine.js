@@ -30,8 +30,8 @@
      * consumes it. Bump `version` and add a CHANGELOG entry on any change.
      * ==================================================================== */
     var DATA = {
-        version: '2.0.0',
-        lastUpdated: '2026-07-04',
+        version: '2.1.0',
+        lastUpdated: '2026-07-05',
         asOf: '2026-07',
 
         // v2.0 schema metadata (A1). `version` above tracks DATA content; `meta.schemaVersion`
@@ -39,9 +39,9 @@
         // that lives here, and every leaf value is registered in DATA.sources with a citation.
         meta: {
             schemaVersion: '2.0.0',
-            engineVersion: '2.0.0',
+            engineVersion: '2.1.0',
             asOf:          '2026-07',
-            lastReviewed:  '2026-07-04',
+            lastReviewed:  '2026-07-05',
             license:       'CC-BY-4.0 (data compilation) — see DATA.provenance for per-table sources'
         },
 
@@ -1093,14 +1093,24 @@
             sim: {
                 /**
                  * Monte-Carlo driver. `fn(sample)` maps a {key:value} sample → number.
-                 * `distributions` = { key: { dist:'normal'|'uniform'|'triangular', ...params } }.
+                 * `distributions` = { key: { dist:'normal'|'uniform'|'triangular'|'categorical', ...params } }.
+                 *   - normal:      { mean, sd }
+                 *   - uniform:     { min, max }
+                 *   - triangular:  { min, mode, max }
+                 *   - categorical: { choices: [{ value, weight }] }  → draws a value by weight
                  * Deterministic by default (seeded LCG) so results are reproducible across runs.
+                 *
+                 * opts (optional, backward-compatible): { correlations: [{ a, b, rho }] } imposes pairwise
+                 * correlation between two NORMAL keys (Cholesky-style: z_b ← rho·z_a + √(1−rho²)·z_b).
+                 * When opts is omitted the sampling path is byte-identical to the pre-2.1 driver.
+                 *
                  * Returns { p10, p50, p90, mean, min, max, samples }.
                  */
-                monteCarlo: function (fn, distributions, iterations, seed) {
+                monteCarlo: function (fn, distributions, iterations, seed, opts) {
                     iterations = iterations || 2000;
                     var s = (seed == null ? 123456789 : seed) >>> 0;
                     function rnd() { s = (1103515245 * s + 12345) >>> 0; return s / 4294967296; }
+                    function stdNormal() { var u = rnd(), u2 = rnd(); return Math.sqrt(-2 * Math.log(u || 1e-9)) * Math.cos(2 * Math.PI * u2); }
                     function draw(d) {
                         var u = rnd();
                         if (d.dist === 'uniform') return d.min + u * (d.max - d.min);
@@ -1110,18 +1120,48 @@
                             return u < c ? lo + Math.sqrt(u * (hi - lo) * (mo - lo))
                                          : hi - Math.sqrt((1 - u) * (hi - lo) * (hi - mo));
                         }
+                        if (d.dist === 'categorical') {
+                            var ch = d.choices || [];
+                            var totalW = 0, m; for (m = 0; m < ch.length; m++) totalW += (ch[m].weight == null ? 1 : ch[m].weight);
+                            var t = u * totalW, acc = 0;
+                            for (m = 0; m < ch.length; m++) { acc += (ch[m].weight == null ? 1 : ch[m].weight); if (t <= acc) return ch[m].value; }
+                            return ch.length ? ch[ch.length - 1].value : undefined;
+                        }
                         // normal (Box–Muller)
                         var u2 = rnd();
                         var z = Math.sqrt(-2 * Math.log(u || 1e-9)) * Math.cos(2 * Math.PI * u2);
                         return (d.mean || 0) + (d.sd || 1) * z;
                     }
                     var keys = Object.keys(distributions || {});
+                    var corr = (opts && opts.correlations && opts.correlations.length) ? opts.correlations : null;
                     var out = [];
-                    for (var i = 0; i < iterations; i++) {
-                        var sample = {};
-                        for (var k = 0; k < keys.length; k++) sample[keys[k]] = draw(distributions[keys[k]]);
-                        var v = fn(sample);
-                        if (isFinite(v)) out.push(v);
+                    var i, k, sample, v;
+                    if (!corr) {
+                        // Fast path — unchanged from the pre-2.1 driver (byte-identical RNG sequence).
+                        for (i = 0; i < iterations; i++) {
+                            sample = {};
+                            for (k = 0; k < keys.length; k++) sample[keys[k]] = draw(distributions[keys[k]]);
+                            v = fn(sample);
+                            if (isFinite(v)) out.push(v);
+                        }
+                    } else {
+                        // Correlated path — draw standard normals for normal keys, correlate, then scale.
+                        for (i = 0; i < iterations; i++) {
+                            sample = {};
+                            var z = {};
+                            for (k = 0; k < keys.length; k++) {
+                                var d = distributions[keys[k]];
+                                if (d.dist === 'normal' || d.dist == null) z[keys[k]] = stdNormal();
+                                else sample[keys[k]] = draw(d);
+                            }
+                            for (var c = 0; c < corr.length; c++) {
+                                var a = corr[c].a, bb = corr[c].b, rho = corr[c].rho;
+                                if (z[a] != null && z[bb] != null) z[bb] = rho * z[a] + Math.sqrt(Math.max(0, 1 - rho * rho)) * z[bb];
+                            }
+                            for (var kk in z) { var dn = distributions[kk] || {}; sample[kk] = (dn.mean || 0) + (dn.sd || 1) * z[kk]; }
+                            v = fn(sample);
+                            if (isFinite(v)) out.push(v);
+                        }
                     }
                     out.sort(function (a, b) { return a - b; });
                     var pct = function (p) { return out.length ? out[Math.min(out.length - 1, Math.floor(p * out.length))] : 0; };
@@ -1316,7 +1356,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-04-v2"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-05-v21"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

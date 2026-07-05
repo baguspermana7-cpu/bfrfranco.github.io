@@ -3814,78 +3814,102 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             var r = lastResults;
             var mkt = r.mkt;
             var iterations = 10000;
-            var results = { build: [], colo: [], cloud: [] };
-            var scenarioCounts = { baseline: 0, aiBoom: 0, recession: 0, powerCrisis: 0 };
 
             // Market-specific variance (emerging markets = higher variance)
             var mktVariance = mkt.variance || 0.12;
 
-            for (var i = 0; i < iterations; i++) {
-                // Select macro scenario for this iteration
-                var scenario = selectScenario();
-                var sKey = Object.keys(SCENARIOS).filter(function(k) { return SCENARIOS[k] === scenario; })[0];
-                scenarioCounts[sKey]++;
-
-                // Correlated random variables: power and construction are positively correlated (r=0.65)
-                var corr = correlatedRandom(0.65);
-                var conVar = 1 + corr.z1 * mktVariance * scenario.costMult;
-                var pwrVar = 1 + corr.z2 * mktVariance * scenario.costMult;
-
-                // Independent variables with market-specific variance
-                var occVar = 1 + (Math.random() - 0.5) * mktVariance * 1.5;
-                var colVar = 1 + (Math.random() - 0.5) * mktVariance * 2.0;
-                var demandVar = scenario.demandMult * (1 + (Math.random() - 0.5) * 0.10);
-
-                // Clamp to reasonable bounds
+            // One iteration's total for the WINNING option, given a sample of the stochastic drivers.
+            // This is the EXACT same model as before (correlated construction/power, macro-scenario
+            // demand/cost multipliers, market-specific variance) — factored into a pure function so it
+            // can be driven either by the shared engine's SEEDED simulator (reproducible) or the inline
+            // Math.random() fallback.
+            var winnerKey = r.winner.name.toLowerCase();
+            function iterationTotal(scenario, conVar, pwrVar, occVar, colVar, demandVar) {
                 conVar = Math.max(0.7, Math.min(1.5, conVar));
                 pwrVar = Math.max(0.7, Math.min(1.5, pwrVar));
                 occVar = Math.max(0.75, Math.min(1.25, occVar));
                 colVar = Math.max(0.7, Math.min(1.4, colVar));
-
-                // BUILD: capex + year-by-year opex with correlated variables
-                var bCapex = r.capex * conVar;
-                var bOpex = 0;
-                for (var y = 0; y < r.years; y++) {
-                    var yPwrRate = getMktProjection(mkt, 'powerCostByYear', y, r.powerRate * Math.pow(1.04, y));
-                    var yStfCost = getMktProjection(mkt, 'staffCostByYear', y, r.staffSalary * Math.pow(1.05, y));
-                    var yPwr = r.itMW * r.pue * 8760 * r.util * yPwrRate * 1000 * pwrVar;
-                    var ySt = r.buildStaffCount * yStfCost * occVar;
-                    var yMt = bCapex * 0.03 * Math.pow(1.03, y);
-                    var yIn = bCapex * 0.007;
-                    var yNt = r.itMW * 20000 * 12;
-                    var yOt = (yPwr + ySt + yMt + yIn + yNt) * 0.04;
-                    bOpex += yPwr + ySt + yMt + yIn + yNt + yOt;
-                }
-                results.build.push(bCapex + bOpex);
-
-                // COLO: year-by-year with demand scenario and market projections
-                var cTotal = r.coloSetup;
-                for (var y = 0; y < r.years; y++) {
-                    var sc = Math.pow(1 + r.growthRate * demandVar, y);
-                    var yColoP = getMktProjection(mkt, 'coloPriceByYear', y, mkt.coloKW * Math.pow(1 + r.coloEsc, y));
-                    cTotal += (r.itMW * 1000 * yColoP * 12 * colVar * sc)
-                        + (r.yr1ColoStaff * Math.pow(1.05, y) * occVar)
-                        + r.yr1ColoNetwork;
-                }
-                results.colo.push(cTotal);
-
-                // CLOUD: year-by-year with cloud pricing trajectory and demand scenario
-                var clTotal = 0;
-                for (var y = 0; y < r.years; y++) {
-                    var sc = Math.pow(1 + r.growthRate * demandVar, y);
-                    var cloudCumRate = 1;
-                    for (var cy = 0; cy <= y; cy++) {
-                        cloudCumRate *= (1 + getYearRate(PROJECTIONS.cloudPricingByYear, cy, 0.025));
+                var total, y, sc;
+                if (winnerKey === 'build') {
+                    var bCapex = r.capex * conVar, bOpex = 0;
+                    for (y = 0; y < r.years; y++) {
+                        var yPwrRate = getMktProjection(mkt, 'powerCostByYear', y, r.powerRate * Math.pow(1.04, y));
+                        var yStfCost = getMktProjection(mkt, 'staffCostByYear', y, r.staffSalary * Math.pow(1.05, y));
+                        var yPwr = r.itMW * r.pue * 8760 * r.util * yPwrRate * 1000 * pwrVar;
+                        var ySt = r.buildStaffCount * yStfCost * occVar;
+                        var yMt = bCapex * 0.03 * Math.pow(1.03, y);
+                        var yIn = bCapex * 0.007;
+                        var yNt = r.itMW * 20000 * 12;
+                        var yOt = (yPwr + ySt + yMt + yIn + yNt) * 0.04;
+                        bOpex += yPwr + ySt + yMt + yIn + yNt + yOt;
                     }
-                    var yc = r.yr1Cloud * cloudCumRate * sc * pwrVar;
-                    clTotal += yc * 1.27;
+                    total = bCapex + bOpex;
+                } else if (winnerKey === 'colo') {
+                    total = r.coloSetup;
+                    for (y = 0; y < r.years; y++) {
+                        sc = Math.pow(1 + r.growthRate * demandVar, y);
+                        var yColoP = getMktProjection(mkt, 'coloPriceByYear', y, mkt.coloKW * Math.pow(1 + r.coloEsc, y));
+                        total += (r.itMW * 1000 * yColoP * 12 * colVar * sc)
+                            + (r.yr1ColoStaff * Math.pow(1.05, y) * occVar)
+                            + r.yr1ColoNetwork;
+                    }
+                } else {
+                    total = 0;
+                    for (y = 0; y < r.years; y++) {
+                        sc = Math.pow(1 + r.growthRate * demandVar, y);
+                        var cloudCumRate = 1;
+                        for (var cy = 0; cy <= y; cy++) {
+                            cloudCumRate *= (1 + getYearRate(PROJECTIONS.cloudPricingByYear, cy, 0.025));
+                        }
+                        total += (r.yr1Cloud * cloudCumRate * sc * pwrVar) * 1.27;
+                    }
                 }
-                results.cloud.push(clTotal);
+                return total;
             }
 
-            // Best option distribution
-            var bestArr = results[r.winner.name.toLowerCase()];
-            bestArr.sort(function(a, b) { return a - b; });
+            var bestArr;
+            var E = window.RZEngine;
+            if (E && E.models && E.models.sim && typeof E.models.sim.monteCarlo === 'function') {
+                // SEEDED, engine-driven: categorical macro-scenario + correlated construction/power (r=0.65).
+                var scnChoices = Object.keys(SCENARIOS).map(function (k) { return { value: k, weight: SCENARIOS[k].prob }; });
+                var fn = function (sm) {
+                    var scenario = SCENARIOS[sm.scn] || SCENARIOS.baseline;
+                    return iterationTotal(
+                        scenario,
+                        1 + sm.conZ * mktVariance * scenario.costMult,
+                        1 + sm.pwrZ * mktVariance * scenario.costMult,
+                        1 + sm.occU * mktVariance * 1.5,
+                        1 + sm.colU * mktVariance * 2.0,
+                        scenario.demandMult * (1 + sm.dmdU * 0.10)
+                    );
+                };
+                var mc = E.models.sim.monteCarlo(fn, {
+                    scn:  { dist: 'categorical', choices: scnChoices },
+                    conZ: { dist: 'normal', mean: 0, sd: 1 },
+                    pwrZ: { dist: 'normal', mean: 0, sd: 1 },
+                    occU: { dist: 'uniform', min: -0.5, max: 0.5 },
+                    colU: { dist: 'uniform', min: -0.5, max: 0.5 },
+                    dmdU: { dist: 'uniform', min: -0.5, max: 0.5 }
+                }, iterations, 20260705, { correlations: [{ a: 'conZ', b: 'pwrZ', rho: 0.65 }] });
+                bestArr = mc.samples; // already sorted ascending
+            } else {
+                // Fallback — inline Math.random() (non-seeded), same model.
+                bestArr = [];
+                for (var i = 0; i < iterations; i++) {
+                    var scenario = selectScenario();
+                    var corr = correlatedRandom(0.65);
+                    bestArr.push(iterationTotal(
+                        scenario,
+                        1 + corr.z1 * mktVariance * scenario.costMult,
+                        1 + corr.z2 * mktVariance * scenario.costMult,
+                        1 + (Math.random() - 0.5) * mktVariance * 1.5,
+                        1 + (Math.random() - 0.5) * mktVariance * 2.0,
+                        scenario.demandMult * (1 + (Math.random() - 0.5) * 0.10)
+                    ));
+                }
+                bestArr.sort(function (a, b) { return a - b; });
+            }
+            iterations = bestArr.length || iterations;
 
             var p5 = bestArr[Math.floor(iterations * 0.05)];
             var p50 = bestArr[Math.floor(iterations * 0.50)];
@@ -4897,6 +4921,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
     <script src="rz-tracker.js" defer></script>
     <script src="auth.js?v=2026-05-09-v1" defer></script>
-<script src="rz-engine.min.js?v=2026-07-04-v2" defer></script>
+<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
 </body>
 </html>
