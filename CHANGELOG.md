@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.51.3 — 2026-07-05 (OPEX calculator — engine-powered Monte-Carlo uncertainty panel)
+
+**Added**
+- **OPEX Uncertainty & Sensitivity panel** on `opex-calculator.html` — same additive RZEngine v2.0
+  pattern as the CAPEX panel (v1.51.2). A 4,000-run seeded Monte-Carlo around the computed annual
+  OPEX, varying energy price (the dominant, volatile driver), PUE drift, and labor/maintenance
+  escalation → **P10 / P50 / P90** + histogram + a **sensitivity tornado** (energy price ranks first,
+  as expected). Does NOT touch the calculator's own cost model/data; renders on `window.load`, hides
+  gracefully if the engine is absent, dark-mode-safe. Verified 0 console errors both themes.
+
 ## v1.51.2 — 2026-07-05 (CAPEX calculator — engine-powered Monte-Carlo uncertainty panel)
 
 **Added**
