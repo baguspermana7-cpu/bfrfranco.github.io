@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.51.6 — 2026-07-05 (PUE calculator — partial-load PUE curve + water (WUE) panel)
+
+**Added**
+- **Partial-Load PUE & Water panel** on `pue-calculator.html` (free tier) — an additive readout powered by
+  RZEngine v2.0's previously-unconsumed `pue.partialLoadPUE` + `pue.wue` models. PUE is quoted at full IT
+  load, but data centers rarely run at 100% and fixed infrastructure overhead doesn't scale down — so the
+  panel shows the effective **PUE across 20–100% utilization** (e.g. a 1.46 design PUE degrades to ~1.72 at
+  50% load), plus a **WUE** (Water Use Effectiveness, L/kWh by cooling type) and annual water estimate, with
+  a small SVG curve. Additive only (does not touch the calculator's own PUE math), renders on `window.load`
+  after the deferred engine, hides gracefully if the engine is unavailable, dark-mode-safe. Placed in the
+  free results area (not the Pro-locked section). Verified 0 console errors both themes.
+
 ## v1.51.5 — 2026-07-05 (RZEngine v2.1.0 — correlated + scenario sim; TCO Monte-Carlo consolidated)
 
 **Added** (engine)

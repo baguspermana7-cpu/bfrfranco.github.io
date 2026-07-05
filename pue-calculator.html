@@ -980,6 +980,31 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                             <div id="recommendations"></div>
                         </div>
 
+                        <!-- ═══ Partial-Load PUE curve + Water (RZEngine v2, free) ═══ -->
+                        <div id="pueCurvePanel" style="display:none;margin-top:1rem;background:var(--bg-secondary);border:1px solid var(--bg-tertiary);border-radius:10px;padding:0.85rem 0.95rem;">
+                            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
+                                <i class="fas fa-wave-square" style="color:#06b6d4;"></i>
+                                <span style="font-weight:700;font-size:0.86rem;color:var(--text-primary);">Partial-Load PUE &amp; Water</span>
+                                <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-wave-square"></i> Partial-load PUE</div><div class="tooltip-desc">PUE is quoted at full IT load, but data centers rarely run at 100%. Fixed infrastructure overhead (cooling, UPS conversion) doesn't scale down with IT load, so PUE degrades at partial load. The curve shows your effective PUE from 20–100% utilization. WUE (Water Use Effectiveness) is the water companion for your cooling type. Powered by RZEngine v2.0.</div></div></span>
+                            </div>
+                            <div style="display:flex;gap:0.5rem;margin:0.5rem 0;flex-wrap:wrap;">
+                                <div style="flex:1;min-width:80px;text-align:center;background:var(--bg-primary);border-radius:7px;padding:0.45rem;">
+                                    <div style="font-size:0.58rem;text-transform:uppercase;letter-spacing:0.03em;color:var(--text-muted);">PUE @ 50% load</div>
+                                    <div id="pueAt50" style="font-size:0.95rem;font-weight:800;color:#f59e0b;font-family:'JetBrains Mono',monospace;">—</div>
+                                </div>
+                                <div style="flex:1;min-width:80px;text-align:center;background:var(--bg-primary);border-radius:7px;padding:0.45rem;">
+                                    <div style="font-size:0.58rem;text-transform:uppercase;letter-spacing:0.03em;color:var(--text-muted);">WUE</div>
+                                    <div id="wueVal" style="font-size:0.95rem;font-weight:800;color:#06b6d4;font-family:'JetBrains Mono',monospace;">—</div>
+                                </div>
+                                <div style="flex:1;min-width:80px;text-align:center;background:var(--bg-primary);border-radius:7px;padding:0.45rem;">
+                                    <div style="font-size:0.58rem;text-transform:uppercase;letter-spacing:0.03em;color:var(--text-muted);">Annual water</div>
+                                    <div id="waterVal" style="font-size:0.95rem;font-weight:800;color:#06b6d4;font-family:'JetBrains Mono',monospace;">—</div>
+                                </div>
+                            </div>
+                            <div id="pueCurveChart"></div>
+                            <div style="display:flex;justify-content:space-between;font-size:0.58rem;color:var(--text-muted);margin-top:0.15rem;"><span>20% load</span><span>PUE vs IT utilization</span><span>100%</span></div>
+                        </div>
+
                         <!-- PRO Metrics -->
                         <div class="pro-section locked" id="proResultsSection" style="margin-top:1.25rem;">
                             <div class="pro-overlay" onclick="handlePremiumTab()">
@@ -1232,6 +1257,40 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
         RZCalc.downloadCSV('pue-calculation-' + new Date().toISOString().slice(0, 10) + '.csv', header, rows);
     }
 
+    /**
+     * Additive partial-load PUE curve + Water (WUE) panel, powered by RZEngine v2.0's
+     * pue.partialLoadPUE + pue.wue models. PUE is quoted at full load but DCs rarely run
+     * at 100% — fixed overhead means PUE degrades at partial load. Hides gracefully if the
+     * engine is unavailable; never alters the calculator's own PUE result.
+     */
+    function renderPueCurve(designPUE, coolingType, itLoadKW) {
+        var panel = document.getElementById('pueCurvePanel');
+        if (!panel) return;
+        var E = window.RZEngine;
+        if (!E || !E.models || !E.models.pue || typeof E.models.pue.partialLoadPUE !== 'function' || !(designPUE > 0)) {
+            panel.style.display = 'none'; return;
+        }
+        // Map this page's cooling types → engine WUE cooling keys.
+        var wueKeyMap = { crac: 'air', crah: 'air', inrow: 'air', none: 'air', rdhx: 'rearDoor', dlc: 'directToChip', immersion: 'immersion' };
+        var wueKey = wueKeyMap[coolingType] || 'air';
+        // Curve: PUE across 20%–100% IT utilization.
+        var pts = [];
+        for (var lf = 0.2; lf <= 1.001; lf += 0.1) {
+            pts.push({ x: Math.round(lf * 100), y: +E.models.pue.partialLoadPUE(designPUE, lf).toFixed(3) });
+        }
+        document.getElementById('pueAt50').textContent = E.models.pue.partialLoadPUE(designPUE, 0.5).toFixed(2);
+        var wue = E.models.pue.wue(wueKey);
+        document.getElementById('wueVal').textContent = wue.toFixed(2) + ' L/kWh';
+        // WUE convention: L per kWh of IT energy. Annual water (m³) = wue × IT kWh / 1000.
+        var waterM3 = wue * (itLoadKW || 0) * 8760 / 1000;
+        var fmtW = function (n) { return n >= 1e6 ? (n / 1e6).toFixed(1) + 'M m³' : n >= 1e3 ? Math.round(n / 1e3) + 'K m³' : Math.round(n) + ' m³'; };
+        document.getElementById('waterVal').textContent = wue > 0 ? fmtW(waterM3) : '0 (air)';
+        if (E.charts && E.charts.roiLine) {
+            document.getElementById('pueCurveChart').innerHTML = E.charts.roiLine(pts, { width: 300, height: 120, accent: '#06b6d4' });
+        }
+        panel.style.display = 'block';
+    }
+
     function calculate() {
         // Production hardening: non-blocking input feedback (calc is defensive with
         // defaults, so we flag out-of-range inputs rather than gate the result).
@@ -1306,6 +1365,8 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
         // Update UI
         document.getElementById('pueValue').textContent = pue.toFixed(2);
         document.getElementById('dcieValue').textContent = dcie.toFixed(1) + '%';
+        // Additive (free): partial-load PUE curve + water (WUE) via RZEngine v2.0. Never breaks the calc.
+        try { renderPueCurve(pue, coolingType, itLoad); } catch (e) {}
         document.getElementById('totalPowerValue').textContent = fmt(Math.round(totalPower)) + ' kW';
         document.getElementById('coolingLoadValue').textContent = fmt(Math.round(coolingKW)) + ' kW';
         document.getElementById('upsLossValue').textContent = fmt(Math.round(upsLossKW)) + ' kW';
@@ -2205,6 +2266,12 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
     }
 
     // Initial calculation
+    // RZEngine loads with `defer`, so it isn't ready during the initial calculate() below.
+    // Re-run once on window.load so the additive partial-load PUE + WUE panel populates.
+    window.addEventListener('load', function () {
+        if (window.RZEngine && typeof calculate === 'function') { try { calculate(); } catch (e) {} }
+    });
+
     document.addEventListener('DOMContentLoaded', function() {
         calculate();
         updateNavbarAuthUI();
