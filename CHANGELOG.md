@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v1.51.4 — 2026-07-05 (ROI calculator — Monte-Carlo now seeded/reproducible via shared engine)
+
+**Changed**
+- **ROI Monte-Carlo consolidated onto `RZEngine.models.sim.monteCarlo`** (Pro panel). The inline
+  simulation used `Math.random()`, so the P5/P50/P95 and probability-of-positive **jittered on every
+  recalculation** — an awkward wart for a financial tool. It now routes through the shared engine's
+  SEEDED simulator, so the percentiles are **reproducible** run-to-run. The uncertainty model is
+  unchanged (revenue ±20%, occupancy ±15%, opex ±15%); the histogram render is unchanged; a full
+  inline `Math.random()` fallback remains if the engine is unavailable. Verified: same-input reruns now
+  return identical P5/P50/P95, 0 console errors.
+- **TCO Monte-Carlo intentionally left as-is** — its simulation uses correlated random variables
+  (construction/power r=0.65) and discrete macro-scenario selection (baseline / AI-boom / recession /
+  power-crisis) that the generic engine driver can't express; consolidating would have regressed the
+  model. Documented in the RZEngine↔calculator notes.
+
 ## v1.51.3 — 2026-07-05 (OPEX calculator — engine-powered Monte-Carlo uncertainty panel)
 
 **Added**

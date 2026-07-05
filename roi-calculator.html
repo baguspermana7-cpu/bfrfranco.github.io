@@ -1698,21 +1698,43 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
     // ══════════════════════════════════════════════════════════════
     function runMonteCarlo(baseCashflows) {
         var N = 10000;
-        var results = [];
         var dr = (parseFloat(document.getElementById('discountRate').value) || 10) / 100;
 
-        for (var i = 0; i < N; i++) {
-            var modifiedCF = baseCashflows.map(function(cf, idx) {
+        // Same uncertainty model as before (revenue ±20%, occupancy ±15%, opex ±15%), but routed
+        // through RZEngine v2.0's SEEDED simulator so the P5/P50/P95 are reproducible instead of
+        // jittering on every recalculation. Falls back to the inline Math.random() loop if the
+        // shared engine is unavailable.
+        var simModel = function (s) {
+            var modifiedCF = baseCashflows.map(function (cf, idx) {
                 if (idx === 0) return cf; // CAPEX stays fixed
-                var revenueVar = 0.8 + Math.random() * 0.4;   // +-20%
-                var opexVar = 0.85 + Math.random() * 0.3;      // -15% to +15%
-                var occVar = 0.85 + Math.random() * 0.3;       // +-15%
-                return cf * ((revenueVar + occVar) / 2) * (2 - opexVar);
+                return cf * ((s.revenue + s.occ) / 2) * (2 - s.opex);
             });
-            results.push(calcNPV(dr, modifiedCF));
+            return calcNPV(dr, modifiedCF);
+        };
+        var results;
+        var E = window.RZEngine;
+        if (E && E.models && E.models.sim && typeof E.models.sim.monteCarlo === 'function') {
+            var mc = E.models.sim.monteCarlo(simModel, {
+                revenue: { dist: 'uniform', min: 0.80, max: 1.20 },
+                occ:     { dist: 'uniform', min: 0.85, max: 1.15 },
+                opex:    { dist: 'uniform', min: 0.85, max: 1.15 }
+            }, N, 20260705);
+            results = mc.samples; // already sorted ascending
+        } else {
+            results = [];
+            for (var i = 0; i < N; i++) {
+                var modifiedCF = baseCashflows.map(function (cf, idx) {
+                    if (idx === 0) return cf;
+                    var revenueVar = 0.8 + Math.random() * 0.4;
+                    var opexVar = 0.85 + Math.random() * 0.3;
+                    var occVar = 0.85 + Math.random() * 0.3;
+                    return cf * ((revenueVar + occVar) / 2) * (2 - opexVar);
+                });
+                results.push(calcNPV(dr, modifiedCF));
+            }
+            results.sort(function (a, b) { return a - b; });
         }
-
-        results.sort(function(a, b) { return a - b; });
+        N = results.length || N;
         var p5 = results[Math.floor(N * 0.05)];
         var p50 = results[Math.floor(N * 0.50)];
         var p95 = results[Math.floor(N * 0.95)];
