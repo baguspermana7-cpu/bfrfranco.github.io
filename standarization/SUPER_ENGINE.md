@@ -323,6 +323,10 @@ When `opts` is omitted the RNG path is byte-identical to v2.0 (capex/opex/roi pa
 onto the shared seeded simulator — reproducible percentiles, model preserved (engine vs. old inline
 fallback match to 0.1% on P50). Engine bumped 2.0.0→2.1.0; min re-built with terser; cache-bust `2026-07-05-v21`.
 
+> **Adding an engine-powered panel to a calculator?** Follow the recipe + gotchas in
+> [`CALC_ENGINE_PANEL.md`](./CALC_ENGINE_PANEL.md) (defer/`window.load` timing, Pro-locked-container
+> trap, consolidating an inline Monte-Carlo onto `sim.monteCarlo` with a faithfulness check).
+
 ### Rules now enforced
 
 1. **No buried constants.** Every economically-material literal lives in `DATA`, never inside a
