@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v1.51.9 — 2026-07-05 (Articles — slop sweep 2: translucent boxes + prose highlights killed)
+
+**Changed** — owner: articles were still full of semi-transparent tinted boxes and text
+highlights ("AI design slop — doesn't match planb / the reference site"). The v1.50.19
+de-slop sweep only covered `[class*="-box"]`/`-note`; the bespoke per-article families
+survived (~1,300 translucent rules across 30 articles, 124 inline washes, gradient fills).
+Per plan-article-experience §03 + design.md §2/§3:
+- **Wash detection is now a runtime measurement**, not a class-name blanket:
+  `js/rz-article-editorial.js flattenWashes()` tags `-card/-panel/-block` surfaces whose
+  computed background is a translucent wash (alpha 0.02–0.5, or a gradient whose first
+  stop is a low-alpha tint) with `data-rz-flat`. Opaque instrument embeds (dark
+  calculator panels, diagram surfaces) measure alpha ≥ 0.5 and keep their skin; washes
+  nested inside opaque dark containers also stay (they composite as authored).
+- `css/rz-article-dark.css` flattens tagged surfaces to the editorial panel
+  (`--rz-art-panel` dark / #ffffff light) + 1px hairline + 8px radius, kills their
+  gradients, and normalises reading ink inside flattened light-mode cards (many were
+  dark-authored with `h5{color:#fff}`). Semantic 2px rails re-asserted.
+- Gradient fills killed unconditionally on callouts, chips/badges, and table chrome
+  (`thead/th/tr/td`).
+- **Prose text highlights killed**: `span[style*="background"]` inside p/li/headings and
+  `<mark>` render as plain text (emphasis = weight/color, never a wash).
+
+**Lesson (encoded in the code comments)**: translucent washes composite against their
+LOCAL container — a page-surface-colored opaque replacement breaks chips inside dark
+diagram panels (.flow-box); and a class-name blanket can't distinguish a slop wash from
+an instrument surface, but computed alpha can.
+
+**Verification** — before/after screenshots on the worst offenders (article-9/7/16/26,
+geopolitics-3) both themes; uiux-reviewer pass (its findings applied: rail re-assert,
+thead gradients, 8px radius, tokenised inks, transparent-wrapper guard); full gate suite
+green incl. audit-a11y 0/0, dark-coverage 114pp, interactions real-input.
+
 ## v1.51.8 — 2026-07-05 (Code-review fixes — engine sim + calculator panels)
 
 Addressed findings from an adversarial code review of the v1.51.0–v1.51.6 engine + calculator work

@@ -804,3 +804,73 @@ html[data-rz-register="editorial"] [class*="stat-label"]{
   font-family:'IBM Plex Mono',ui-monospace,monospace !important;
   text-transform:uppercase;letter-spacing:.055em;
 }
+
+/* ============================================================================
+   SLOP SWEEP 2 (v1.51.8) — owner 2026-07-05: articles are still full of
+   semi-transparent tinted boxes and text highlights. The v1.50.19 sweep only
+   caught [class*="-box"]/[class*="-note"]; the bespoke per-article families
+   (-card/-panel/-block), gradient fills, and inline highlight spans survived.
+   Per plan-article-experience §03 + design.md §2/§3: flat surfaces, 1px
+   hairlines, 2px rails, NO gradients, NO prose highlight washes.
+   Scoped to the editorial register reading column only.
+   ============================================================================ */
+
+/* 1 — no gradient fills anywhere in the reading column */
+html[data-rz-register="editorial"] .article-body [class*="-box"],
+html[data-rz-register="editorial"] .article-body [class*="-note"],
+html[data-rz-register="editorial"] .article-body [class*="badge"],
+html[data-rz-register="editorial"] .article-body [class*="chip"],
+html[data-rz-register="editorial"] .article-body tr,
+html[data-rz-register="editorial"] .article-body td,
+html[data-rz-register="editorial"] .article-body thead,
+html[data-rz-register="editorial"] .article-body th{
+  background-image:none !important;
+}
+
+/* 2 — structural surfaces with TRANSLUCENT washes = flat panel + hairline.
+   The editorial runtime tags them (data-rz-flat) by measuring computed
+   background alpha — opaque instrument embeds (dark calculators/diagram
+   panels) are untouched, translucent slop washes are flattened. */
+html[data-rz-register="editorial"] .article-body [data-rz-flat]{
+  background-color:var(--rz-art-panel,#16181D) !important;
+  background-image:none !important;
+  border:1px solid var(--rz-art-line,rgba(160,168,180,.14)) !important;
+  border-radius:8px !important;
+  box-shadow:none !important;
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body [data-rz-flat]{
+  background-color:#ffffff !important;
+  border:1px solid rgba(40,44,52,.12) !important;
+}
+
+/* 3 — (removed) the -box/-note wash stays the v1.50.19 color-mix-with-transparent:
+   it composites against the LOCAL container (diagram panels are dark in both
+   themes), so an opaque page-surface mix would break nested chips (.flow-box). */
+
+/* keep the tier-2 semantic rails the flatten border would otherwise erase */
+html[data-rz-register="editorial"] .article-body .ws-strat-card,
+html[data-rz-register="editorial"] .article-body .pfas-chem-block{
+  border-left:2px solid var(--cl, var(--rz-art-accent,#b45309)) !important;
+}
+
+/* 4 — prose text highlights are killed outright (emphasis = weight/color) */
+html[data-rz-register="editorial"] .article-body p span[style*="background"],
+html[data-rz-register="editorial"] .article-body li span[style*="background"],
+html[data-rz-register="editorial"] .article-body h2 span[style*="background"],
+html[data-rz-register="editorial"] .article-body h3 span[style*="background"],
+html[data-rz-register="editorial"] .article-body h4 span[style*="background"],
+html[data-rz-register="editorial"] .article-body mark{
+  background:transparent !important;
+  color:inherit !important;
+  padding:0 !important;
+  box-shadow:none !important;
+}
+/* 5 — many bespoke cards were authored dark-only (h5{color:#fff}, p{#94a3b8});
+   on the flattened white light-mode surface that ink is invisible. Normalise
+   reading ink inside flattened surfaces — accents stay on chips/badges/rails. */
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body [data-rz-flat] :is(h1,h2,h3,h4,h5,h6){
+  color:var(--rz-art-strong,#1a1d23) !important;
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body [data-rz-flat] :is(p,li,blockquote){
+  color:var(--rz-art-muted,#6b7280) !important;
+}

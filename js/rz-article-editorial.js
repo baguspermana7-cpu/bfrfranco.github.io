@@ -134,7 +134,47 @@
     });
   }
 
+  /* slop-sweep 2 (v1.51.8): tag bespoke card/panel/block surfaces whose authored
+     background is a TRANSLUCENT wash (0 < alpha < .9) so rz-article-dark.css can
+     flatten them to the editorial panel. Opaque instrument embeds (dark
+     calculator panels etc.) measure alpha 1 and are left alone. */
+  function flattenWashes(){
+    var body=document.querySelector('.article-body'); if(!body) return;
+    var sel='[class*="-card"],[class*="-panel"],[class*="-block"]';
+    function parseBg(el){
+      var m=(getComputedStyle(el).backgroundColor||'').match(/rgba?\(([\d.]+)[, ]+([\d.]+)[, ]+([\d.]+)(?:[,/ ]+([\d.]+))?\)/);
+      if(!m) return null;
+      return { a:m[4]===undefined?1:parseFloat(m[4]),
+               lum:0.299*m[1]+0.587*m[2]+0.114*m[3] };
+    }
+    [].forEach.call(body.querySelectorAll(sel),function(el){
+      if(el.hasAttribute('data-rz-flat')) return;
+      var c=el.className||'';
+      if(/rz-|code|formula|terminal|evidence|pro-|related/.test(c)) return;
+      var bg=parseBg(el); if(!bg) return;
+      var img=getComputedStyle(el).backgroundImage||'';
+      var isWash=(bg.a>0.02 && bg.a<0.5);
+      if(!isWash && bg.a<=0.02 && img.indexOf('gradient')>-1){
+        /* transparent bg-color + gradient fill: slop if the first stop is a
+           low-alpha tint; an opaque dark gradient is an instrument surface */
+        var gm=img.match(/rgba?\(([\d.]+)[, ]+([\d.]+)[, ]+([\d.]+)(?:[,/ ]+([\d.]+))?\)/);
+        if(gm && gm[4]!==undefined && parseFloat(gm[4])<0.5) isWash=true;
+      }
+      if(!isWash) return;
+      /* a wash INSIDE an opaque dark container (instrument embed, diagram
+         panel) composites correctly as authored — leave it alone */
+      var p=el.parentElement;
+      while(p && p!==body){
+        var pb=parseBg(p);
+        if(pb && pb.a>=0.5 && pb.lum<120) return;
+        p=p.parentElement;
+      }
+      el.setAttribute('data-rz-flat','');
+    });
+  }
+
   function init(){
+    try{ flattenWashes(); }catch(e){}
     try{ buildRail(); }catch(e){}
     try{ buildAnchors(); }catch(e){}
     try{ focusableScrollers(); }catch(e){}
