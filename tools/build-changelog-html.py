@@ -287,7 +287,7 @@ def render_entry(entry, is_current=False):
     <article class="{cls}" data-version-tier="{tier}" data-version="{ver}">
       <div class="changelog-meta">
         <span class="changelog-version-badge" style="--tier-color:{color};">{ver}</span>
-        <span class="changelog-tier-pill" style="background:{color}20;color:{color};border:1px solid {color}40;">{label}</span>
+        <span class="changelog-tier-pill" style="--tier-color:{color};background:{color}20;color:{color};border:1px solid {color}40;">{label}</span>
         <time class="changelog-date" datetime="{date}">{date_friendly}</time>
       </div>
       {caption_html}
@@ -494,7 +494,7 @@ def build_html(entries):
     }}
     .changelog-hero .cl-meta {{
       font-size: 0.82rem;
-      color: #64748b;
+      color: #94a3b8;
       font-family: 'JetBrains Mono', ui-monospace, monospace;
       margin-bottom: 2rem;
     }}
@@ -636,7 +636,7 @@ def build_html(entries):
 
     /* Date */
     .changelog-date {{
-      color: #64748b;
+      color: #94a3b8;
       font-size: 0.82rem;
       font-family: 'JetBrains Mono', monospace;
     }}
@@ -793,10 +793,31 @@ def build_html(entries):
     [data-theme="light"] .changelog-body {{ color: #334155; }}
     [data-theme="light"] .changelog-body code {{
       background: rgba(241,245,249,0.9);
-      color: #0d9488;
+      color: #0f766e;
     }}
     [data-theme="light"] .changelog-body ul li::before {{ background: #0d9488; }}
-    [data-theme="light"] .changelog-date {{ color: #94a3b8; }}
+    [data-theme="light"] .changelog-date {{ color: #64748b; }}
+    /* a11y (v1.51.2): light-mode gaps found by the full-site axe sweep */
+    [data-theme="light"] .changelog-body h3.cl-subhead,
+    [data-theme="light"] .changelog-body h4.cl-subhead {{
+      color: #1e293b;
+      border-bottom-color: rgba(0,0,0,0.08);
+    }}
+    [data-theme="light"] .changelog-body strong {{ color: #1e293b; }}
+    [data-theme="light"] .changelog-caption {{ color: #64748b; }}
+    [data-theme="light"] .changelog-version-badge,
+    [data-theme="light"] .changelog-tier-pill {{
+      color: color-mix(in srgb, var(--tier-color, #0f766e) 55%, #000) !important;
+    }}
+    [data-theme="light"] .cl-table th {{ background: rgba(226,232,240,0.8); color: #1e293b; }}
+    [data-theme="light"] .cl-table td {{ color: #475569; }}
+    [data-theme="light"] .cl-table th, [data-theme="light"] .cl-table td {{ border-color: rgba(0,0,0,0.1); }}
+    [data-theme="light"] .navbar .nav-link, [data-theme="light"] .navbar .nav-vibrate {{ color: #334155; }}
+    [data-theme="light"] .changelog-hero .cl-subtitle,
+    [data-theme="light"] .changelog-hero .cl-meta {{ color: #64748b; }}
+    [data-theme="light"] .cl-meta strong, [data-theme="light"] .cl-count-badge {{ color: #0f766e !important; }}
+    [data-theme="light"] .changelog-body a {{ color: #0f766e; border-bottom-color: rgba(15,118,110,0.4); }}
+    [data-theme="light"] .changelog-body pre code {{ color: #115e59; }}
     [data-theme="light"] .filter-chip {{
       background: rgba(248,250,252,0.9);
       border-color: rgba(0,0,0,0.1);

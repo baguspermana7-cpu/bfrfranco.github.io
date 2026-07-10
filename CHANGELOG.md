@@ -11,6 +11,25 @@ release sections rather than semver.
 
 ---
 
+## v1.51.7 — 2026-07-05 (Accessibility — full-site sweep part 1: changelog generator + checklists)
+
+**Changed** — first batch of the full-site axe sweep (106 pages beyond the gated 8-page set;
+11,334 critical/serious nodes found, heavily clustered):
+- **`tools/build-changelog-html.py`** (~5,700 nodes, half the site total, one generated page):
+  light-mode was missing overrides for subheads/strong/`code`/tables/dates/nav — the
+  dark-default colors bled through. Light/dark `.changelog-date` values were reversed.
+  Tier badges/pills now derive a darker light-mode color from `--tier-color` via
+  `color-mix`. changelog.html now audits 0/0 both themes — permanent for all future releases.
+- **`cdu-checklist.html` / `fire-checklist.html` / `geopolitics-1.html`** (~350 nodes): every
+  bare checklist checkbox gets an accessible name from its row text (tiny runtime; geopolitics
+  needed a MutationObserver — its kit checklist is JS-injected after DOMContentLoaded); chip
+  families (`.src.*`, `.cad.*`, `.crit.*`, status badges) darkened for light tints with dark
+  counterparts; table headers, print buttons, service-record inputs (`aria-label`), scrollable
+  table wrappers (`tabindex`), in-paragraph links underlined. All three pages now 0/0 both themes.
+
+Remaining sweep clusters (article-15, dc-market-tracker, achievements, cockpit pages, ~25 pages)
+tracked for follow-up batches.
+
 ## v1.51.6 — 2026-07-05 (PUE calculator — partial-load PUE curve + water (WUE) panel)
 
 **Added**

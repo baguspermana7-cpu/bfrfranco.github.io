@@ -55,20 +55,20 @@
         .ck-tbl td { padding:.6rem .8rem; border-bottom:1px solid var(--fc-border); color:var(--fc-text); vertical-align:top; font-variant-numeric:tabular-nums slashed-zero; }
         .ck-tbl tr:last-child td { border-bottom:none; }
         .src { font-family:'JetBrains Mono',monospace; font-size:.56rem; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; white-space:nowrap; }
-        .src.std { background:rgba(10,138,90,.14); color:#0a8a5a; border:1px solid rgba(10,138,90,.35); }
-        .src.typ { background:rgba(217,119,6,.16); color:#b45309; border:1px solid rgba(217,119,6,.35); }
+        .src.std { background:rgba(10,138,90,.14); color:#065f46; border:1px solid rgba(10,138,90,.35); }
+        .src.typ { background:rgba(217,119,6,.16); color:#92400e; border:1px solid rgba(217,119,6,.35); }
         [data-theme="dark"] .src.std { color:#34d399; } [data-theme="dark"] .src.typ { color:#fbbf24; }
         .ck-list { list-style:none; padding:0; margin:.6rem 0; }
         .ck-item { display:flex; gap:.6rem; align-items:flex-start; padding:.45rem .2rem; border-bottom:1px solid var(--fc-border); font-size:.9rem; line-height:1.5; }
         .ck-item input { margin-top:.2rem; width:16px; height:16px; accent-color:var(--fc-primary); flex-shrink:0; }
         .ck-item b { color:var(--fc-text); }
         .cad { font-family:'JetBrains Mono',monospace; font-size:.6rem; font-weight:700; padding:1px 6px; border-radius:4px; text-transform:uppercase; }
-        .cad.d { background:rgba(10,138,90,.16); color:#0a8a5a; } .cad.w { background:rgba(6,182,212,.16); color:#0891b2; }
-        .cad.m { background:rgba(217,119,6,.16); color:#b45309; } .cad.q { background:rgba(139,92,246,.16); color:#7c3aed; }
-        .cad.a { background:rgba(239,68,68,.16); color:#dc2626; }
+        .cad.d { background:rgba(10,138,90,.16); color:#065f46; } .cad.w { background:rgba(6,182,212,.16); color:#155e75; }
+        .cad.m { background:rgba(217,119,6,.16); color:#92400e; } .cad.q { background:rgba(139,92,246,.16); color:#7c3aed; }
+        .cad.a { background:rgba(239,68,68,.16); color:#b91c1c; }
         [data-theme="dark"] .cad.d{color:#34d399}[data-theme="dark"] .cad.w{color:#22d3ee}[data-theme="dark"] .cad.m{color:#fbbf24}[data-theme="dark"] .cad.q{color:#a78bfa}[data-theme="dark"] .cad.a{color:#f87171}
         .ck-callout { border:1px solid var(--fc-border); border-left:3px solid var(--fc-primary); border-radius:8px; background:var(--fc-inset); padding:.8rem 1rem; font-size:.88rem; line-height:1.6; margin:1rem 0; }
-        .ck-callout.danger { border-left-color:#dc2626; background:rgba(239,68,68,.06); }
+        .ck-callout.danger { border-left-color:#b91c1c; background:rgba(239,68,68,.06); }
         .ck-callout b { color:var(--fc-text); }
         .ck-toc { background:var(--fc-card); border:1px solid var(--fc-border); border-radius:10px; padding:1rem 1.2rem; margin:1.5rem 0; }
         .ck-toc h3 { font-size:.7rem; font-family:'JetBrains Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--fc-muted); margin:0 0 .5rem; }
@@ -94,7 +94,11 @@
             body { background:#fff; color:#000; } .ck-item input { -webkit-appearance:none; appearance:none; border:1.5px solid #000; border-radius:2px; }
             @page { margin:14mm; }
         }
-    </style>
+    [data-theme="dark"] button[onclick*="print"] { background:#b91c1c !important; border-color:#b91c1c !important; }
+:root:not([data-theme="dark"]) .ck-tbl th { color:#475569; }
+:root:not([data-theme="dark"]) { --fc-primary:#b91c1c; }
+[data-theme="dark"] .src.std { color:#34d399; }
+</style>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to content</a>
@@ -275,12 +279,12 @@
             <h2><span class="n">09</span> Printable service record</h2>
             <div class="form-card">
                 <div class="form-grid">
-                    <div><label>Site / facility</label><input type="text"></div>
-                    <div><label>Suppression zone / tag</label><input type="text"></div>
-                    <div><label>Agent &amp; cylinder serials</label><input type="text"></div>
-                    <div><label>Date</label><input type="date"></div>
-                    <div><label>Technician</label><input type="text"></div>
-                    <div><label>Service type</label><input type="text"></div>
+                    <div><label>Site / facility</label><input type="text" aria-label="Service record entry"></div>
+                    <div><label>Suppression zone / tag</label><input type="text" aria-label="Service record entry"></div>
+                    <div><label>Agent &amp; cylinder serials</label><input type="text" aria-label="Service record entry"></div>
+                    <div><label>Date</label><input type="date" aria-label="Service date"></div>
+                    <div><label>Technician</label><input type="text" aria-label="Service record entry"></div>
+                    <div><label>Service type</label><input type="text" aria-label="Service record entry"></div>
                 </div>
                 <ul class="ck-list" style="margin-top:.8rem;">
                     <li class="ck-item"><input type="checkbox"><span>Cylinder weight / pressure within design — value: ____________</span></li>
@@ -290,8 +294,8 @@
                     <li class="ck-item"><input type="checkbox"><span>Li-ion gas detection (H₂/CO) calibrated; exhaust verified</span></li>
                     <li class="ck-item"><input type="checkbox"><span>FACP normal; no outstanding trouble</span></li>
                 </ul>
-                <div><label>Findings / next service date</label><input type="text"></div>
-                <div class="form-grid" style="margin-top:.5rem;"><div><label>Technician signature</label><input type="text"></div><div><label>Supervisor sign-off</label><input type="text"></div></div>
+                <div><label>Findings / next service date</label><input type="text" aria-label="Service record entry"></div>
+                <div class="form-grid" style="margin-top:.5rem;"><div><label>Technician signature</label><input type="text" aria-label="Service record entry"></div><div><label>Supervisor sign-off</label><input type="text" aria-label="Service record entry"></div></div>
                 <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
                 <button class="btn-print ghost" onclick="document.querySelectorAll('.form-card input').forEach(function(i){i.type==='checkbox'?i.checked=false:i.value='';})">Clear form</button>
             </div>
@@ -318,5 +322,12 @@
     })();
     </script>
     <script src="auth.js?v=2026-05-09-v1" defer></script>
+<script>
+/* a11y (v1.51.2): name each bare checklist checkbox from its adjacent text */
+(function(){function n(){var c=document.querySelectorAll('input[type="checkbox"]:not([aria-label]):not([aria-labelledby])');
+[].forEach.call(c,function(cb){var s=cb.nextElementSibling,t=s&&(s.textContent||'').replace(/\s+/g,' ').trim();
+if(t)cb.setAttribute('aria-label',t.slice(0,140));});}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',n);else n();})();
+</script>
 </body>
 </html>
