@@ -927,6 +927,9 @@
                         ppaRate: opts.ppaRate, touMultiplier: opts.touMultiplier, demandChargeAnnual: opts.demandChargeAnnual
                     });
                     // A6-56: consume cooling efficiency — better climate/ΔT trims the cooling share of power.
+                    // CONSTRAINT: pass opts.climate ONLY with an architecture-DEFAULT `pue` (not a measured/
+                    // benchmarked value) — a calibrated pue already encodes cooling efficiency, so passing both
+                    // double-counts it. No current caller passes opts.climate.
                     if (opts.climate) {
                         var eff = RZEngine.models.opex.coolingEfficiency(opts.climate, opts.designDeltaT);
                         power = Math.round(power * (DATA.coolingClimate.fallback / eff));
@@ -1103,6 +1106,10 @@
                  * opts (optional, backward-compatible): { correlations: [{ a, b, rho }] } imposes pairwise
                  * correlation between two NORMAL keys (Cholesky-style: z_b ← rho·z_a + √(1−rho²)·z_b).
                  * When opts is omitted the sampling path is byte-identical to the pre-2.1 driver.
+                 * NOTE: correlations are applied in array order and z_b is mutated in place, so CHAINED
+                 * pairs (e.g. [{a:'A',b:'B'},{a:'B',b:'C'}]) produce implicit transitive correlation —
+                 * this is well-defined only for independent pairs. For >2 correlated variables use a
+                 * disjoint pair set. (Current callers use a single pair — exact.)
                  *
                  * Returns { p10, p50, p90, mean, min, max, samples }.
                  */
@@ -1389,7 +1396,9 @@
                 });
                 return RZEngine.charts._svg(w, h, inner);
             },
-            /** Tornado bars from sim.tornado() rows. */
+            /** Tornado bars from sim.tornado() rows. `row.key` is placed into an SVG <text> node
+             *  (which does NOT execute HTML), but callers MUST pass trusted/hardcoded labels — do
+             *  not feed unsanitised user input as a distribution key. */
             tornado: function (rows, opts) {
                 opts = opts || {}; var w = opts.width || 480, pad = 90, rh = 26, gap = 8;
                 if (!rows || !rows.length) return RZEngine.charts._svg(w, 40, '');

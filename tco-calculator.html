@@ -3911,9 +3911,11 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             }
             iterations = bestArr.length || iterations;
 
-            var p5 = bestArr[Math.floor(iterations * 0.05)];
-            var p50 = bestArr[Math.floor(iterations * 0.50)];
-            var p95 = bestArr[Math.floor(iterations * 0.95)];
+            // Clamp percentile indices to valid array bounds (matches the engine's pct() helper).
+            var pctIdx = function (q) { return bestArr[Math.min(iterations - 1, Math.floor(iterations * q))]; };
+            var p5 = pctIdx(0.05);
+            var p50 = pctIdx(0.50);
+            var p95 = pctIdx(0.95);
 
             el('mcP5').textContent = fmtM(p5);
             el('mcP50').textContent = fmtM(p50);

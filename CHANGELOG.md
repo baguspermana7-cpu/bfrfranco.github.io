@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.51.8 — 2026-07-05 (Code-review fixes — engine sim + calculator panels)
+
+Addressed findings from an adversarial code review of the v1.51.0–v1.51.6 engine + calculator work
+(0 critical, no XSS/secrets; these are the actionable correctness/consistency items):
+- **`pue-calculator.html`**: the `window.load` handler re-ran the ENTIRE `calculate()` (a redundant full
+  model recompute) just to populate the additive panel after the deferred engine loaded. Now it caches the
+  inputs and calls only `renderPueCurve(...)` — matching the targeted-render pattern already used by
+  capex/opex. Verified the panel still renders (0 errors).
+- **`tco-calculator.html`**: percentile accessors now clamp the index to `[0, N-1]` (the engine's `pct()`
+  convention) instead of a raw `Math.floor(N·q)` against the sample count — defensive against any future
+  case where filtered sample length differs from the nominal iteration count. MC values unchanged.
+- **`rz-engine.js`** (doc-only; minified twin byte-identical, no cache-bust): documented that
+  `sim.monteCarlo` `correlations` are applied sequentially (safe for disjoint pairs; chained pairs are
+  transitively correlated); documented the `opex.totalAnnual` `opts.climate` constraint (don't combine with
+  a calibrated PUE — double-counts cooling); documented that `charts.tornado` labels must be trusted
+  (placed into SVG `<text>`, which doesn't execute HTML, but callers must not pass raw user input).
+
 ## v1.51.7 — 2026-07-05 (Accessibility — full-site sweep part 1: changelog generator + checklists)
 
 **Changed** — first batch of the full-site axe sweep (106 pages beyond the gated 8-page set;

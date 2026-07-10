@@ -1366,6 +1366,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
         document.getElementById('pueValue').textContent = pue.toFixed(2);
         document.getElementById('dcieValue').textContent = dcie.toFixed(1) + '%';
         // Additive (free): partial-load PUE curve + water (WUE) via RZEngine v2.0. Never breaks the calc.
+        lastPueInputs = { designPUE: pue, coolingType: coolingType, itLoadKW: itLoad };
         try { renderPueCurve(pue, coolingType, itLoad); } catch (e) {}
         document.getElementById('totalPowerValue').textContent = fmt(Math.round(totalPower)) + ' kW';
         document.getElementById('coolingLoadValue').textContent = fmt(Math.round(coolingKW)) + ' kW';
@@ -2266,10 +2267,14 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
     }
 
     // Initial calculation
-    // RZEngine loads with `defer`, so it isn't ready during the initial calculate() below.
-    // Re-run once on window.load so the additive partial-load PUE + WUE panel populates.
+    // RZEngine loads with `defer`. If it wasn't ready when the panel first tried to render,
+    // re-render ONLY the additive panel on window.load from cached inputs — not the whole
+    // calculate() (avoids a redundant full model recompute; matches capex/opex).
+    var lastPueInputs = null;
     window.addEventListener('load', function () {
-        if (window.RZEngine && typeof calculate === 'function') { try { calculate(); } catch (e) {} }
+        if (window.RZEngine && lastPueInputs) {
+            try { renderPueCurve(lastPueInputs.designPUE, lastPueInputs.coolingType, lastPueInputs.itLoadKW); } catch (e) {}
+        }
     });
 
     document.addEventListener('DOMContentLoaded', function() {
