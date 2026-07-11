@@ -99,7 +99,7 @@
             --rz-cyan:         #00DDFF;
             --rz-red:          #FF3030;
             --rz-text-primary: #e8edf5;
-            --rz-text-muted:   #64748b;
+            --rz-text-muted:   #94a3b8;
             --rz-text-label:   #94a3b8;
             --rz-border-thin:  rgba(255, 255, 255, 0.07);
             --rz-border-mid:   rgba(255, 255, 255, 0.12);
@@ -452,9 +452,10 @@
 
         /* Locked state */
         .ach-card.ach-locked {
-            opacity: 0.5;
+            filter: grayscale(1);
         }
-        .ach-card.ach-locked:hover { opacity: 0.7; }
+        .ach-card.ach-locked .ach-card-icon { opacity: 0.45; }
+        .ach-card.ach-locked:hover { filter: grayscale(0.6); }
 
         .ach-card-top {
             display: flex;
@@ -764,7 +765,21 @@
             h1 { font-size: 1.4rem !important; }
             .ach-how-it-works { grid-template-columns: 1fr; }
         }
-    </style>
+    /* a11y (v1.51.10): page surface is dark-only — nav/cookie/stamp stay
+   dark-canvas colors in EVERY theme (unscoped on purpose: a light-scoped
+   selector would make the dark-coverage gate expect a light palette) */
+.navbar .nav-link,
+.navbar .nav-vibrate,
+.navbar .dropdown-menu a { color:#c8d0de; }
+[data-theme="dark"] p a[href$="privacy.html"], [data-theme="dark"] #cookieBanner a { color:#93c5fd !important; }
+.ach-faq-item dd a { text-decoration:underline; text-underline-offset:2px; }
+#cookieBanner a { color:#1d4ed8; }
+#cookieDecline { color:#475569; }
+[data-theme="dark"] #cookieDecline { color:#94a3b8; }
+/* stamp sits on the always-dark footer — keep dark stamp colors in light too */
+.rz-version-label { color:#9aa8bb !important; }
+.rz-version-num { color:#7dd3b0 !important; }
+</style>
     <script src="js/rz-version.js?v=2026-05-14" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
 </head>

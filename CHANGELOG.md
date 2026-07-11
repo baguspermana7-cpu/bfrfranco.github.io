@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v1.51.10 — 2026-07-05 (Accessibility — full-site sweep part 2: 22 pages to zero)
+
+**Changed** — second batch of the full-site axe sweep: 22 pages, ~2,900 critical/serious
+nodes → **0/0 both themes on every page** (verified per page with the axe probe):
+- **Cockpit pages** (accuracy gates re-run and green — datahall-calc 57/57, conv DoD,
+  probe 75/75): `datahallAI.html` (137 — muted `--t3` token both themes, light-theme
+  instrument accent var set, the `#dcCallouts` strip re-scoped as a dark-canvas island
+  with its own token set in light mode), `dc-conventional.html` (96 — per-theme accent
+  vars), `fuel-system.html` (85) + `datahall.html` (73) (`--text-dim`/`--txt-faint`
+  tokens).
+- **Tools/hubs**: `dc-market-tracker.html` (409 — `--dmt-text3` was inverted per theme;
+  light accent var split; CAGR chips; version stamp styled locally — the page loads no
+  styles.css), `achievements.html` (184 — locked-card dimming moved from `opacity:.5`
+  to `grayscale` + dimmed icon so text stays AA; dark-only page rules kept unscoped so
+  the dark-coverage gate treats it as dark-only), `cdu-comparison.html` (84),
+  `network-visualization-hub.html` (76 — neon token per-theme split),
+  `ltc-system-modelling-lab.html` (61 — `role="img"` containers with focusable children
+  → `role="group"`), `privacy.html` (46 — dark-only page, purple → indigo-300).
+- **Parallel agents** fixed 8 more against the same recipe + probe (verified by me):
+  `article-15.html` (732 — the site's worst page), `article-21/22`, `cdu-selection-guide`,
+  `asean-dc-report-2026`, `all-in-one-dashboard`, `infographic-dc-sustainability`,
+  `pln-sumatra-grid`.
+
+Remaining tail (~1,100 nodes over ~70 mostly-small pages incl. article-8/17/3/27/10/24/16,
+FF-3, tier-advisor, infographic-dc-cost-breakdown) tracked for part 3.
+
+**Verification** — per-page axe probe 0/0 ×22; dark-coverage CLEAN (114pp) both modes;
+audit-a11y gate CLEAN; js-syntax + script-tags CLEAN; cockpit engine tests green;
+article-15 screenshot-checked both themes.
+
 ## v1.51.9 — 2026-07-05 (Articles — slop sweep 2: translucent boxes + prose highlights killed)
 
 **Changed** — owner: articles were still full of semi-transparent tinted boxes and text

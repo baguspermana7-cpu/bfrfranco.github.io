@@ -111,7 +111,7 @@
             --dmt-bg3: #f1f5f9;
             --dmt-text: #1e293b;
             --dmt-text2: #475569;
-            --dmt-text3: #94a3b8;
+            --dmt-text3: #64748b;
             --dmt-border: #e2e8f0;
             --dmt-glass: rgba(255,255,255,0.85);
             --dmt-glass-border: rgba(13,148,136,0.1);
@@ -120,13 +120,22 @@
             --dmt-shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
         }
 
+        :root:not([data-theme="dark"]) {
+            --dmt-primary: #0f766e;
+            --dmt-amber: #92400e;
+            --dmt-violet: #6d28d9;
+            --dmt-red: #b91c1c;
+            --dmt-emerald: #047857;
+            --dmt-blue: #1d4ed8;
+            --dmt-accent: #0f766e;
+        }
         [data-theme="dark"] {
             --dmt-bg: #0f172a;
             --dmt-bg2: #1e293b;
             --dmt-bg3: #334155;
             --dmt-text: #f1f5f9;
             --dmt-text2: #cbd5e1;
-            --dmt-text3: #64748b;
+            --dmt-text3: #94a3b8;
             --dmt-border: #334155;
             --dmt-glass: rgba(15,23,42,0.85);
             --dmt-glass-border: rgba(45,212,191,0.15);
@@ -362,9 +371,9 @@
             padding: 3px 10px; border-radius: 50px; font-size: 0.68rem; font-weight: 700;
             font-family: 'JetBrains Mono', monospace; letter-spacing: 0.3px;
         }
-        .dmt-cagr-high { background: rgba(16,185,129,0.12); color: #10b981; }
-        .dmt-cagr-mid { background: rgba(245,158,11,0.12); color: #f59e0b; }
-        .dmt-cagr-low { background: rgba(148,163,184,0.15); color: var(--dmt-text3); }
+        .dmt-cagr-high { background: rgba(16,185,129,0.12); color: var(--dmt-emerald); }
+        .dmt-cagr-mid { background: rgba(245,158,11,0.12); color: var(--dmt-amber); }
+        .dmt-cagr-low { background: rgba(148,163,184,0.15); color: var(--dmt-text2); }
         .dmt-card-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; }
         .dmt-card-metric { text-align: center; }
         .dmt-cm-val { font-size: 1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--dmt-text); }
@@ -509,13 +518,13 @@
         /* FOOTER */
         .dmt-footer {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #94a3b8; padding: 3rem 2rem; margin-top: 3rem;
+            color: var(--dmt-text3); padding: 3rem 2rem; margin-top: 3rem;
         }
         .dmt-footer-inner {
             max-width: 1200px; margin: 0 auto;
             display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2rem; align-items: start;
         }
-        .dmt-footer a { color: #94a3b8; text-decoration: none; font-size: 0.8rem; }
+        .dmt-footer a { color: var(--dmt-text3); text-decoration: none; font-size: 0.8rem; }
         .dmt-footer a:hover { color: var(--dmt-accent); }
 
         /* COOKIE BANNER */
@@ -524,7 +533,7 @@
         .dmt-cookie-banner a { color: #2563eb; text-decoration: underline; }
         .dmt-cookie-actions { display: flex; gap: 0.5rem; }
         .dmt-cookie-accept { padding: 6px 16px; border-radius: 6px; border: none; background: var(--dmt-primary); color: white; font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: inherit; }
-        .dmt-cookie-decline { padding: 6px 16px; border-radius: 6px; border: 1px solid #d1d5db; background: white; color: #94a3b8; font-size: 0.8rem; font-weight: 500; cursor: pointer; font-family: inherit; }
+        .dmt-cookie-decline { padding: 6px 16px; border-radius: 6px; border: 1px solid #d1d5db; background: white; color: #64748b; font-size: 0.8rem; font-weight: 500; cursor: pointer; font-family: inherit; }
         /* v1.43.x dark-mode rollout — decline button was white on dark cookie bar */
         [data-theme="dark"] .dmt-cookie-decline { background: #1e293b; color: #cbd5e1; border-color: rgba(255,255,255,0.18); }
 
@@ -647,7 +656,7 @@
             color: var(--dmt-accent); text-transform: uppercase;
         }
         .dmt-market-card-link .meta {
-            font-size: 0.72rem; color: var(--dmt-text3); margin-top: 0.5rem;
+            font-size: 0.72rem; color: var(--dmt-text2); margin-top: 0.5rem;
         }
         .dmt-market-card-link.is-hub {
             border-left-color: var(--dmt-violet);
@@ -670,7 +679,19 @@
         .rz-restricted-card p { margin: 0 0 20px; color: #94a3b8; font-size: 0.9rem; line-height: 1.5; }
         .rz-restricted-card button { padding: 10px 22px; border: none; border-radius: 10px; background: linear-gradient(135deg,#0d9488,#14b8a6); color: #fff; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
         .rz-restricted-card button:hover { background: linear-gradient(135deg,#0f766e,#0d9488); }
-    </style>
+    /* a11y (v1.51.10): dark-side fixes the var swap cannot express */
+[data-theme="dark"] .dmt-privacy-badge { color:#2dd4bf; }
+:root:not([data-theme="dark"]) .dmt-privacy-badge { color:#0f766e; }
+[data-theme="dark"] button[onclick*="gatedAction"] { color:#f87171 !important; }
+:root:not([data-theme="dark"]) button[onclick*="gatedAction"] { color:var(--dmt-red) !important; }
+[data-theme="dark"] #dmtFreeWatermark { color:#a78bfa !important; }
+[data-theme="dark"] p a[href$="privacy.html"], [data-theme="dark"] p a[href$="terms.html"] { color:#2dd4bf !important; }
+.references-section > p { color:#94a3b8 !important; }
+[data-theme="dark"] #dmtCookieAccept { background:#0f766e !important; }
+/* page does not load styles.css — style the injected version stamp locally */
+.rz-version-num { color:#0a6e52 !important; } .rz-version-label { color:#5b6b82 !important; }
+[data-theme="dark"] .rz-version-num { color:#7dd3b0 !important; } [data-theme="dark"] .rz-version-label { color:#9aa8bb !important; }
+</style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>    <meta property="og:image:alt" content="Global Data Center Market Tracker | Live Capacity &amp; Growth Dashboard">
 
@@ -853,7 +874,7 @@
         <div class="dmt-section" id="dmtTableSection">
             <div class="dmt-section-title">Full Market Data</div>
             <div class="dmt-section-desc">Click column headers to sort. All capacity figures in MW.</div>
-            <div class="dmt-table-wrap">
+            <div class="dmt-table-wrap" tabindex="0" role="group" aria-label="Scrollable table">
                 <table class="dmt-table" id="dmtTable">
                     <thead>
                         <tr>
@@ -927,7 +948,7 @@
         </div>
 
         <!-- Free Watermark -->
-        <div id="dmtFreeWatermark" style="text-align:center;padding:8px 16px;margin-top:0.75rem;border-radius:8px;background:rgba(139,92,246,0.08);border:1px dashed rgba(139,92,246,0.25);font-size:0.7rem;color:#a78bfa;letter-spacing:0.3px;">
+        <div id="dmtFreeWatermark" style="text-align:center;padding:8px 16px;margin-top:0.75rem;border-radius:8px;background:rgba(139,92,246,0.08);border:1px dashed rgba(139,92,246,0.25);font-size:0.7rem;color:#6d28d9;letter-spacing:0.3px;">
             <i class="fas fa-crown" style="margin-right:4px;"></i> Upgrade to PRO for Monte Carlo forecasts, 5-year projections, tornado analysis &amp; strategic narrative
         </div>
 

@@ -52,7 +52,7 @@
     <style>
         :root { --cdu-primary:#06b6d4; --cdu-accent:#0891b2; --cdu-gold:#f59e0b; }
         [data-theme="dark"] { --cdu-bg:#0f172a; --cdu-card:#1e293b; --cdu-border:#334155; --cdu-text:#f1f5f9; --cdu-muted:#94a3b8; --cdu-inset:#0b1220; }
-        :root:not([data-theme="dark"]) { --cdu-bg:#f8fafc; --cdu-card:#ffffff; --cdu-border:#e2e8f0; --cdu-text:#0f172a; --cdu-muted:#64748b; --cdu-inset:#f1f5f9; }
+        :root:not([data-theme="dark"]) { --cdu-primary:#0e7490; --cdu-bg:#f8fafc; --cdu-card:#ffffff; --cdu-border:#e2e8f0; --cdu-text:#0f172a; --cdu-muted:#475569; --cdu-inset:#f1f5f9; }
 
         .cdu-hero { background:linear-gradient(135deg,#0c2733 0%,#0e4a5a 42%,#06b6d4 100%); padding:7.5rem 1.5rem 3.5rem; color:#fff; text-align:center; position:relative; overflow:hidden; }
         .cdu-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at 22% 78%,rgba(6,182,212,.4) 0%,transparent 52%),radial-gradient(circle at 78% 22%,rgba(245,158,11,.22) 0%,transparent 52%); z-index:0; }
@@ -74,8 +74,13 @@
 
         /* link-status legend + tags */
         .lstag { font-family:'JetBrains Mono',monospace; font-size:.6rem; font-weight:700; letter-spacing:.03em; padding:1px 6px; border-radius:4px; white-space:nowrap; display:inline-block; }
-        .lstag.v { background:rgba(16,185,129,.14); color:#10b981; border:1px solid rgba(16,185,129,.4); }
-        .lstag.p { background:rgba(245,158,11,.14); color:#d97706; border:1px solid rgba(245,158,11,.4); }
+        .lstag.v { background:rgba(16,185,129,.14); color:#065f46; border:1px solid rgba(16,185,129,.4); }
+        .lstag.p { background:rgba(245,158,11,.14); color:#92400e; border:1px solid rgba(245,158,11,.4); }
+        [data-theme="dark"] .lstag.v { color:#34d399; }
+        [data-theme="dark"] .lstag.p { color:#fbbf24; }
+        .lstag[style*="color:#a855f7"], .lstag[style*="color: #a855f7"] { color:#6d28d9 !important; }
+        [data-theme="dark"] .lstag[style*="color:#a855f7"], [data-theme="dark"] .lstag[style*="color: #a855f7"] { color:#c4b5fd !important; }
+        a[href$="cdu-checklist.html#water"] { text-decoration:underline; text-underline-offset:2px; }
         .legend { display:flex; gap:1rem; flex-wrap:wrap; font-size:.78rem; color:var(--cdu-muted); margin:.4rem 0 1.2rem; align-items:center; }
 
         /* type taxonomy cards */
@@ -162,8 +167,8 @@
         .rz-chart-canvas{ position:relative; height:300px; }
         .rz-chart-src{ font-family:'JetBrains Mono',monospace; font-size:.64rem; color:var(--cdu-muted); margin-top:.7rem; line-height:1.5; }
         .rz-chart-chip{ display:inline-block; font-weight:700; font-size:.58rem; letter-spacing:.04em; padding:1px 6px; border-radius:4px; margin-right:6px; background:rgba(120,130,145,.16); color:var(--cdu-muted); }
-        .rz-chart-chip.derived{ background:rgba(16,185,129,.14); color:#10b981; }
-        .rz-chart-chip.warn{ background:rgba(245,158,11,.16); color:#d97706; }
+        .rz-chart-chip.derived{ background:rgba(16,185,129,.14); color:#047857; }
+        .rz-chart-chip.warn{ background:rgba(245,158,11,.16); color:#92400e; }
         [data-theme="dark"] .rz-chart-chip.derived{ background:rgba(16,185,129,.18); color:#34d399; }
         [data-theme="dark"] .rz-chart-chip.warn{ background:rgba(245,158,11,.18); color:#fbbf24; }
     </style>
@@ -351,7 +356,7 @@
             <span><span class="lstag v">VERIFIED</span> page/PDF fetched, content matched</span>
             <span><span class="lstag p">VENDOR PORTAL</span> working product/docs page; deep PDF not auto-verifiable</span>
         </div>
-        <div class="tbl-wrap"><table class="cdu-tbl">
+        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cdu-tbl">
             <thead><tr><th>Model</th><th>Capacity</th><th>Type</th><th>Secondary flow</th><th>dP / head</th><th>Approach</th><th>Footprint · weight</th><th>Fluid · filter · conn · BMS · class</th><th>Links</th></tr></thead>
             <tbody>
                 <tr>
@@ -494,7 +499,7 @@
         <span class="cdu-kick">04 · Compare</span>
         <h2>In-rack CDUs</h2>
         <p class="lead">Rack-integrated units (typically 3U–4U) for per-rack or small-pod deployments and faster retrofits. Includes single-phase water CDUs and <b>two-phase</b> (dielectric direct-to-chip / waterless) options — the <span class="lstag" style="background:rgba(168,85,247,.14);color:#a855f7;border:1px solid rgba(168,85,247,.4);">2-PHASE</span> tag marks the latter.</p>
-        <div class="tbl-wrap"><table class="cdu-tbl">
+        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cdu-tbl">
             <thead><tr><th>Model</th><th>Capacity</th><th>Form</th><th>Secondary flow</th><th>dP / head</th><th>Approach</th><th>Dimensions · weight</th><th>Fluid · filter · conn · BMS · class</th><th>Links</th></tr></thead>
             <tbody>
                 <tr>
@@ -595,7 +600,7 @@
 
         <h3>2 · Pipe sizing (secondary)</h3>
         <p class="lead" style="margin-bottom:.5rem;">Size pipe for a velocity of <b>~1.5–3 m/s</b> (too slow → fouling/air; too fast → erosion + high dP). Nominal diameters below are at ≈ 2 m/s — always re-check the actual pressure drop over the run.</p>
-        <div class="tbl-wrap"><table class="cdu-tbl">
+        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cdu-tbl">
             <thead><tr><th>Secondary flow</th><th>≈ Heat @ 1.5 LPM/kW</th><th>Bore @ ~2 m/s</th><th>Nominal</th></tr></thead>
             <tbody>
                 <tr><td class="kw">50 L/min</td><td>~33 kW</td><td>~23 mm</td><td>DN25 (1″)</td></tr>

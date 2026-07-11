@@ -3314,7 +3314,7 @@
         .mode-help-btn {
             border: 1px solid rgba(148, 163, 184, 0.4);
             background: rgba(30, 64, 175, 0.14);
-            color: #93c5fd;
+            color: #1d4ed8;
             border-radius: 999px;
             font-size: 0.64rem;
             font-weight: 700;
@@ -4067,7 +4067,13 @@
         html:not([data-theme="dark"]) {
             --text-muted: #475569;
         }
-    </style>
+    /* a11y (v1.51.10) */
+[data-theme="dark"] .mode-help-btn { color:#93c5fd; }
+:root:not([data-theme="dark"]) [style*="color: #8b5cf6"], :root:not([data-theme="dark"]) [style*="color:#8b5cf6"] { color:#6d28d9 !important; }
+:root:not([data-theme="dark"]) div > a[href$="terms.html"], :root:not([data-theme="dark"]) div > a[href$="privacy.html"] { color:#6d28d9; }
+[data-theme="dark"] p a[href$="terms.html"], [data-theme="dark"] p a[href$="privacy.html"],
+[data-theme="dark"] div > a[href$="terms.html"], [data-theme="dark"] div > a[href$="privacy.html"] { color:#93c5fd !important; }
+</style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <script type="application/ld+json">
@@ -4699,7 +4705,7 @@
                             <h4><i class="fas fa-diagram-project"></i> Advanced Modelling Block Diagram</h4>
                             <p>Input profiles flow through thermal-hydraulic engine and produce quantified impact to efficiency, cost, and compliance.</p>
                         </div>
-                        <div class="diagram-canvas" role="img" aria-label="End-to-end modelling block diagram showing input validation, thermal and hydraulic solver, control gates, cost, and compliance layers">
+                        <div class="diagram-canvas" role="group" aria-label="End-to-end modelling block diagram showing input validation, thermal and hydraulic solver, control gates, cost, and compliance layers">
                             <svg class="diagram-svg" viewBox="0 0 1120 350" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <defs>
                                     <marker id="diagArrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
@@ -4803,7 +4809,7 @@
                             <h4><i class="fas fa-arrows-spin"></i> Control/Logic Feedback Diagram</h4>
                             <p>Shows how sensor confidence, controller tuning, and predictive logic affect plant behavior and KPI outcomes in closed loop.</p>
                         </div>
-                        <div class="diagram-canvas" role="img" aria-label="Control loop diagram for sensor-controller-actuator-feedback architecture with explicit decision gates">
+                        <div class="diagram-canvas" role="group" aria-label="Control loop diagram for sensor-controller-actuator-feedback architecture with explicit decision gates">
                             <svg class="diagram-svg" viewBox="0 0 1120 340" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <defs>
                                     <marker id="diagArrowCtrl" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
@@ -5294,7 +5300,7 @@
                             </div>
                         </div>
                         <div class="sankey-canvas">
-                            <svg id="energySankeySvg" class="sankey-svg" viewBox="0 0 860 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sankey chart of facility load distribution">
+                            <svg id="energySankeySvg" class="sankey-svg" viewBox="0 0 860 360" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Sankey chart of facility load distribution">
                                 <text x="18" y="28" fill="currentColor" opacity="0.7" font-size="12">Run model to render Sankey distribution.</text>
                             </svg>
                         </div>

@@ -113,7 +113,7 @@
     <link rel="stylesheet" href="styles.min.css?v=2026-07-04-a11y">
 
     <style>
-        :root { --ig-color: #06b6d4; --ig-light: #22d3ee; --ig-dark: #0891b2; --ig-bg: rgba(6,182,212,0.08); --ig-border: rgba(6,182,212,0.25); }
+        :root { --ig-color: #06b6d4; --ig-light: #22d3ee; --ig-dark: #0e7490; --ig-bg: rgba(6,182,212,0.08); --ig-border: rgba(6,182,212,0.25); }
 
         /* Hero */
         .ig-hero {
@@ -567,7 +567,7 @@
         .ig-share-btn svg { width: 18px; height: 18px; fill: currentColor; }
         .ig-share-btn.x-btn { background: #000; }
         .ig-share-btn.li-btn { background: #0077b5; }
-        .ig-share-btn.fb-btn { background: #1877f2; }
+        .ig-share-btn.fb-btn { background: #0f52ba; }
         .ig-share-btn.copy-btn { background: var(--ig-dark); }
         .ig-copy-toast {
             position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
@@ -671,7 +671,51 @@
     h1 { font-size: 1.4rem !important; }
 }
 
-    </style>
+/* v2026-07-10 — a11y color-contrast fixes (axe critical/serious). COLOR ONLY. */
+/* Light theme: darken too-light foregrounds on white/tinted backgrounds */
+html:not([data-theme="dark"]) .ig-gauge-val,
+html:not([data-theme="dark"]) .ig-calc-label span { color: #0e7490; }
+html:not([data-theme="dark"]) .ig-section-sub,
+html:not([data-theme="dark"]) .ig-gauge-sub,
+html:not([data-theme="dark"]) .ig-wue-unit,
+html:not([data-theme="dark"]) .ig-carbon-unit,
+html:not([data-theme="dark"]) .ig-calc-desc,
+html:not([data-theme="dark"]) .ig-score-label,
+html:not([data-theme="dark"]) .ig-score-recs li,
+html:not([data-theme="dark"]) .ig-sdg-text { color: #475569; }
+html:not([data-theme="dark"]) .ig-score-grade.excellent { color: #0e7490; }
+html:not([data-theme="dark"]) .ig-score-grade.good { color: #047857; }
+html:not([data-theme="dark"]) .ig-score-grade.average { color: #92400e; }
+html:not([data-theme="dark"]) .ig-score-grade.poor { color: #b91c1c; }
+/* Light: inline style="color:#hex" overrides (both spacing variants) */
+html:not([data-theme="dark"]) [style*="color: #10b981"], html:not([data-theme="dark"]) [style*="color:#10b981"] { color: #047857 !important; }
+html:not([data-theme="dark"]) [style*="color: #22d3ee"], html:not([data-theme="dark"]) [style*="color:#22d3ee"] { color: #0e7490 !important; }
+html:not([data-theme="dark"]) [style*="color: #06b6d4"], html:not([data-theme="dark"]) [style*="color:#06b6d4"] { color: #0e7490 !important; }
+html:not([data-theme="dark"]) [style*="color: #f59e0b"], html:not([data-theme="dark"]) [style*="color:#f59e0b"] { color: #92400e !important; }
+html:not([data-theme="dark"]) [style*="color: #d97706"], html:not([data-theme="dark"]) [style*="color:#d97706"] { color: #92400e !important; }
+html:not([data-theme="dark"]) [style*="color: #16a34a"], html:not([data-theme="dark"]) [style*="color:#16a34a"] { color: #166534 !important; }
+/* Light: JS-set score color serializes as rgb() */
+html:not([data-theme="dark"]) #scoreNum[style*="rgb(245, 158, 11)"] { color: #92400e !important; }
+html:not([data-theme="dark"]) #scoreNum[style*="rgb(6, 182, 212)"] { color: #0e7490 !important; }
+html:not([data-theme="dark"]) #scoreNum[style*="rgb(16, 185, 129)"] { color: #047857 !important; }
+html:not([data-theme="dark"]) #scoreNum[style*="rgb(239, 68, 68)"] { color: #b91c1c !important; }
+/* Dark theme: brighten too-dim grays / too-dark reds on dark backgrounds */
+[data-theme="dark"] .ig-section-sub,
+[data-theme="dark"] .ig-gauge-sub,
+[data-theme="dark"] .ig-wue-unit,
+[data-theme="dark"] .ig-carbon-unit,
+[data-theme="dark"] .ig-calc-desc,
+[data-theme="dark"] .ig-score-label,
+[data-theme="dark"] .ig-score-recs li,
+[data-theme="dark"] .ig-sdg-text { color: #94a3b8; }
+[data-theme="dark"] [style*="color: #b91c1c"], [data-theme="dark"] [style*="color:#b91c1c"] { color: #f87171 !important; }
+[data-theme="dark"] [style*="color: #334155"], [data-theme="dark"] [style*="color:#334155"] { color: #94a3b8 !important; }
+[data-theme="dark"] [style*="color: #64748b"], [data-theme="dark"] [style*="color:#64748b"] { color: #94a3b8 !important; }
+
+    /* a11y (v1.51.10) */
+#copyToast{background:#0e7490 !important}
+p > a[href$="glossary.html"]{text-decoration:underline !important;text-underline-offset:2px}
+</style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
 </head>

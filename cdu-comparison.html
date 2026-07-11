@@ -37,9 +37,9 @@
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"DC Solutions","item":"https://resistancezero.com/datacenter-solutions.html"},{"@type":"ListItem","position":3,"name":"CDU Guide","item":"https://resistancezero.com/cdu-selection-guide.html"},{"@type":"ListItem","position":4,"name":"CDU Deep Comparison"}]}
     </script>
     <style>
-        :root{ --cp-bg:#f8fafc; --cp-card:#ffffff; --cp-border:#e2e8f0; --cp-text:#0f172a; --cp-muted:#64748b; --cp-inset:#f1f5f9; --cp-accent:#0891b2;
+        :root{ --cp-bg:#f8fafc; --cp-card:#ffffff; --cp-border:#e2e8f0; --cp-text:#0f172a; --cp-muted:#475569; --cp-inset:#f1f5f9; --cp-accent:#0e7490;
             --cp-serif:'Fraunces',Georgia,serif; --cp-sans:'IBM Plex Sans',system-ui,sans-serif; --cp-mono:'IBM Plex Mono',ui-monospace,monospace; }
-        [data-theme="dark"]{ --cp-bg:#0E0F12; --cp-card:#16181D; --cp-border:rgba(160,168,180,.16); --cp-text:#F6F7F9; --cp-muted:#7E8590; --cp-inset:#1c1f25; --cp-accent:#E8B563; }
+        [data-theme="dark"]{ --cp-bg:#0E0F12; --cp-card:#16181D; --cp-border:rgba(160,168,180,.16); --cp-text:#F6F7F9; --cp-muted:#9AA3AF; --cp-inset:#1c1f25; --cp-accent:#E8B563; }
         body{ background:var(--cp-bg); color:var(--cp-text); font-family:var(--cp-sans); }
         .cp-hero{ position:relative; padding:7rem 1.5rem 2.4rem; overflow:hidden; border-bottom:1px solid var(--cp-border); }
         [data-theme="dark"] .cp-hero::before{ content:''; position:absolute; inset:0; background:radial-gradient(640px 300px at 84% -16%,rgba(232,181,99,.10),transparent 64%); pointer-events:none; }
@@ -61,10 +61,10 @@
         .cp-sec .lead{ color:var(--cp-muted); max-width:70ch; margin:.2rem 0 1.1rem; line-height:1.6; }
 
         .src{ font-family:var(--cp-mono); font-size:.54rem; font-weight:700; letter-spacing:.03em; padding:1px 5px; border-radius:4px; white-space:nowrap; text-transform:uppercase; vertical-align:middle; }
-        .src.std{ background:rgba(16,185,129,.14); color:#10b981; border:1px solid rgba(16,185,129,.4); }
-        .src.ven{ background:rgba(245,158,11,.14); color:#d97706; border:1px solid rgba(245,158,11,.4); }
-        .src.rep{ background:rgba(59,130,246,.14); color:#2563eb; border:1px solid rgba(59,130,246,.4); }
-        [data-theme="dark"] .src.rep{ color:#60a5fa; }
+        .src.std{ background:rgba(16,185,129,.14); color:#065f46; border:1px solid rgba(16,185,129,.4); }
+        .src.ven{ background:rgba(245,158,11,.14); color:#92400e; border:1px solid rgba(245,158,11,.4); }
+        .src.rep{ background:rgba(59,130,246,.14); color:#1d4ed8; border:1px solid rgba(59,130,246,.4); }
+        [data-theme="dark"] .src.rep{ color:#60a5fa; } [data-theme="dark"] .src.std{ color:#34d399; } [data-theme="dark"] .src.ven{ color:#fbbf24; }
         .legend{ display:flex; gap:.8rem; flex-wrap:wrap; margin:.2rem 0 1rem; font-size:.74rem; color:var(--cp-muted); align-items:center; }
 
         .tbl-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--cp-border); border-radius:8px;
@@ -108,7 +108,7 @@
         .rz-chart-src{ font-family:var(--cp-mono); font-size:.64rem; color:var(--cp-muted); margin-top:.7rem; line-height:1.5; }
         .rz-chart-chip{ display:inline-block; font-weight:700; font-size:.58rem; letter-spacing:.04em; padding:1px 6px; border-radius:4px; margin-right:6px; background:rgba(120,130,145,.16); color:var(--cp-muted); }
         .rz-chart-chip.derived{ background:rgba(16,185,129,.14); color:#10b981; }
-        .rz-chart-chip.warn{ background:rgba(245,158,11,.16); color:#d97706; }
+        .rz-chart-chip.warn{ background:rgba(245,158,11,.16); color:#92400e; }
         [data-theme="dark"] .rz-chart-chip.derived{ background:rgba(16,185,129,.18); color:#34d399; }
         [data-theme="dark"] .rz-chart-chip.warn{ background:rgba(245,158,11,.18); color:#fbbf24; }
     </style>
@@ -163,7 +163,7 @@
     <section class="cp-sec" id="issues"><div class="cp-wrap">
         <h2><span class="n">01</span> Worldwide common field issues &amp; failure modes</h2>
         <p class="lead">The three universal enemies of any cooling loop are <b>corrosion, mineral scale and microbiological fouling</b> <span class="src std">ASHRAE TC 9.9 5th ed.</span>. The CDU's core job is to hydraulically decouple the chip-side TCS loop from the facility FWS loop. Below are the failure modes operators actually report, with the prevention that addresses each. To size a loop and model its lifecycle cost (TCO/NPV, pump energy), use the <a href="cdu-calculator.html" style="color:var(--cdu-primary);font-weight:600;">CDU Calculator</a>.</p>
-        <div class="tbl-wrap"><table class="cp-tbl">
+        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cp-tbl">
             <thead><tr><th>Issue</th><th>Symptom</th><th>Root cause</th><th>Prevention</th></tr></thead>
             <tbody>
                 <tr><td class="sym">Leaks <span class="src rep">REP</span></td><td>Slow seepage / droplets at QDs, gaskets, plate-HX joints; most start small.</td><td>QD not fully seated, bypassed interlocks, debris in coupling, rushed swaps, pump-seal failure; unclear who owns wet connections.</td><td>Dry-break / dripless blind-mate couplers; drip trays + secondary containment; leak sensors at QDs/hoses/manifolds/low points; clear IT-vs-facilities boundary. <span class="src std">ASHRAE 5th ed. formalises dry-break QDs + segmented shutoff valves</span></td></tr>
@@ -188,7 +188,7 @@
         <h2><span class="n">02</span> Control systems &amp; BMS / DCIM integration</h2>
         <p class="lead">A CDU runs <b>two loops at once</b>: a <b>VFD pump loop</b> for hydraulic delivery and a <b>temperature loop</b> that modulates the primary control valve to hold secondary supply temp. The fullest public description of the actual algorithms is the Lenovo Neptune RM100 O&amp;M guide (built by Cooltera); DMTF Redfish + OCP anchor the standards layer.</p>
         <h3>How the loops are regulated <span class="src ven">VENDOR — Lenovo RM100</span></h3>
-        <div class="tbl-wrap"><table class="cp-tbl">
+        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cp-tbl">
             <thead><tr><th>Loop</th><th>Controls</th><th>Strategy / detail</th></tr></thead>
             <tbody>
                 <tr><td class="sym">Pump (VFD)</td><td><span class="mono">Flow</span> or <span class="mono">ΔP</span> control</td><td>Ramp pump speed until measured flow = setpoint, or until supply-return ΔP = setpoint (10 s scan to avoid oscillation). <b>ΔP control</b> is the common default for direct-to-chip with many parallel server branches (holds head as node valves open/close); flow control where a fixed total delivery is the target. Supply temp is <i>not</i> a pump-loop variable.</td></tr>
@@ -201,7 +201,7 @@
         </table></div>
 
         <h3>BMS / DCIM protocols actually supported (per vendor)</h3>
-        <div class="tbl-wrap"><table class="cp-tbl">
+        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cp-tbl">
             <thead><tr><th>Vendor / product</th><th>Modbus</th><th>BACnet</th><th>SNMP</th><th>Redfish</th><th>Notes</th></tr></thead>
             <tbody>
                 <tr><td class="sym">Vertiv XDU1350</td><td>RTU+TCP</td><td>—</td><td>Yes</td><td>—</td><td>CLI, web server, 7″ HMI</td></tr>
@@ -219,7 +219,7 @@
     <section class="cp-sec" id="aftersales"><div class="cp-wrap">
         <h2><span class="n">03</span> After-sales, support &amp; warranty</h2>
         <p class="lead">Serviceability and support are where deployments live or die over a 5–10 year life. Note two recent ownership moves that change the after-sales entity: <b>Boyd Thermal → Eaton</b> (CDU service is now Eaton's) and <b>Motivair → Schneider Electric</b> (75%). Published warranty <i>lengths</i> are rare — most vendors don't disclose them, so the table marks "n/d" honestly rather than guessing.</p>
-        <div class="tbl-wrap"><table class="cp-tbl">
+        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cp-tbl">
             <thead><tr><th>Vendor</th><th>Warranty (published only)</th><th>SLA / response</th><th>Serviceability</th><th>Remote monitoring</th></tr></thead>
             <tbody>
                 <tr><td class="sym">Vertiv</td><td>n/d (optional Prime Labor Warranty; length n/d)</td><td>Guaranteed Emergency Response tiers (hours n/d); agreements 1→5 yr</td><td>Redundant pumps, dual feeds, 50 µm filter, 7″ HMI</td><td>Proactive remote monitoring + leak algorithms</td></tr>
@@ -238,7 +238,7 @@
 
         <h3>Per-vendor published-spec &amp; capability matrix</h3>
         <p class="lead" style="margin-bottom:.6rem;">What each vendor actually publishes and supports — distilled from datasheet research. <span class="src ven">VENDOR</span> figures; ✓ = published/supported, — = not published, ~ = partial/implied. Differential pressure and ASHRAE water class are the most-suppressed specs industry-wide.</p>
-        <div class="tbl-wrap"><table class="cp-tbl cp-matrix">
+        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cp-tbl cp-matrix">
             <thead><tr><th>Vendor</th><th>Redfish</th><th>dP / head published</th><th>ASHRAE class</th><th>Hot-swap service</th><th>Secondary filtration</th><th>Notable</th></tr></thead>
             <tbody>
                 <tr><td class="sym">Vertiv</td><td>—</td><td>✓ (XDU1350: 2.44 bar)</td><td>✓ W3 / W45</td><td>~ (XDU070 pumps)</td><td>25–50 µm</td><td>Modbus/SNMP/CLI; 7″ HMI</td></tr>
@@ -260,7 +260,7 @@
     <section class="cp-sec" id="tco"><div class="cp-wrap">
         <h2><span class="n">04</span> TCO &amp; maintenance burden by type</h2>
         <p class="lead">No neutral $/kW CDU price is publicly sourceable — so this is a <b>relative</b> trade-off read, not a quote. The biggest single capex fork is whether the type needs a <b>facility-water plant</b> (L2L) or not (L2A / 2-phase). The biggest maintenance fork is <b>many small units vs few large ones</b>. High-temp water (W40/W45) is what turns direct-to-chip into near-free cooling — the facility loop can reject through a dry cooler / tower most or all hours, eliminating the mechanical chiller.</p>
-        <div class="tbl-wrap"><table class="cp-tbl">
+        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cp-tbl">
             <thead><tr><th>Type</th><th>CapEx</th><th>OpEx / efficiency</th><th>Density</th><th>Water (WUE)</th><th>Retrofit</th><th>Maint. burden</th><th>Redundancy / SPOF</th></tr></thead>
             <tbody>
                 <tr><td class="sym">In-rack</td><td class="mid">⚠ many units</td><td class="mid">⚠ good</td><td class="win">✅ 100–300 kW</td><td>depends</td><td class="win">✅ easy</td><td class="lose">❌ many small, high PM</td><td>✅ small domain / ❌ N+1 per rack costly</td></tr>
