@@ -52,6 +52,23 @@ volume), **float** (free-float health), **technical** (the gauge). A **preset** 
 5. **ta.js parity.** If `cf-worker/src/ta.js` changes, update `models.technical` to match and keep the parity
    test green (the client and server gauge must never diverge).
 
+## Accuracy — backtest harness `tools/backtest-fin-screener.mjs` (Phase 4)
+Walk-forward backtest of the **technical gauge** over real gateway `/candles` history (5Y weekly): at each
+step it scores the history-to-date and measures the forward return, bucketing by signal (Buy ≥60 / Sell ≤40
+/ Neutral) vs baseline. Needs network (hits the live Worker). **Honest scope + finding:** it backtests the
+price/technical gauge only — the fundamental factors (value/quality/dividend) can't be cheaply backtested (no
+free historical fundamentals). On a 15-ticker large-cap sample (~3k obs) the gauge showed **no clean forward
+edge** (mean-reversion dominates) — so the gauge is a **descriptive** read of current technicals, **not a
+predictor**. This is *why* the engine blends multiple factors and disclaims; the harness prints this verdict.
+
+## Free-float data (honest position)
+The `float` factor is first-class, but true numeric free-float is not on the free data tier. **US** has no
+free-float → `null`, shown "n/a", excluded from the blend (recorded in `confidence`). **ID** likewise stays
+`null` until a *sourced numeric* free-float dataset is wired — the StockMap app holds a **qualitative**
+ownership ledger (not clean percentages), and numbers are never fabricated (provenance rule). StockMap is
+intentionally "official-source-only" (no live data), so live FIN scoring is NOT grafted onto it; the engine
+instead borrows StockMap's float taxonomy (`floatBands`).
+
 ## Gate — `tools/test-fin-engine.mjs` (SHIP GATE, mirrors `test-rz-engine.mjs`)
 Node-vm load + assertions: worked examples (ratios/valuation/technical/score/risk), **ta.js parity**
 (dynamic-imports the real `ta.js`), data invariants (currencies resolvable, universes sourced, factor

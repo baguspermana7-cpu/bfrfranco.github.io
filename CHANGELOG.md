@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.52.1 — 2026-07-12 (FIN Engine — Phase 4: accuracy backtest + richer momentum)
+
+**Added**
+- **`tools/backtest-fin-screener.mjs`** — walk-forward backtest of the FIN Engine's technical gauge over real
+  gateway `/candles` history (5Y weekly); buckets forward returns by signal (Buy/Sell/Neutral) vs baseline
+  and prints an honest verdict. On a 15-ticker large-cap sample (~3k observations) the gauge showed **no
+  clean forward edge** (mean-reversion dominates) — confirming the gauge is a **descriptive** technical read,
+  **not a predictor**. Fundamental factors are out of scope (no free historical fundamentals). This is an
+  honesty check, not a strategy.
+- **Advisor scorecard — 1-month momentum:** `loadAdvisorScorecard` now derives `chg1m` from ~21 daily
+  `/candles` bars, so the Momentum factor blends day + 1-month change (was day-only).
+
+**Notes**
+- **StockMap not wired to live FIN scoring** (evaluated): the StockMap app is intentionally
+  "official-source-only" (no live data by design), and its free-float is a *qualitative* ownership ledger, not
+  clean numbers — grafting live scoring would break its methodology, and float numbers are never fabricated.
+  ID free-float stays "n/a" (honest) until a sourced numeric dataset exists. See `standarization/FIN_ENGINE.md`.
+
 ## v1.52.0 — 2026-07-11 (FIN Engine — the shared finance brain + smart screener + advisor scorecard)
 
 The finance sibling of RZ Engine. ONE shared, gate-tested, provenance-sourced brain (`fin-engine.js`) now
