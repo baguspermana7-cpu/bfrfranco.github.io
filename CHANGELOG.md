@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.51.15 — 2026-07-11 (Supabase — Save/reload scenarios on OPEX / ROI / TCO / PUE)
+
+**Added**
+- Rolled the **"☁ Save to my account"** + reloadable-scenario pattern (v1.51.14) to the remaining four
+  financial calculators — **OPEX, ROI, TCO, PUE**. Each gets the button next to Export CSV, a
+  `data-rz-calc` marker for auto-restore, and loads `rz-config.js` + `rz-scenario.js` + `rz-supabase.js`.
+- **`js/rz-scenario.js`** gained a shared `saveToAccount(calc, {msgEl})` orchestrator so per-page code is a
+  single button + a message div (no duplicated save logic).
+- Verified headlessly on all four: button present, client configured, inputs captured (14–26 per calc, no
+  auth fields), the open-handoff restores a field on reload, 0 console errors. Additive only (no existing
+  lines removed); dark-coverage CLEAN.
+
 ## v1.51.14 — 2026-07-11 (Supabase — reloadable saved scenarios)
 
 **Added**

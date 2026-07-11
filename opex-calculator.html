@@ -1500,7 +1500,7 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <link rel="stylesheet" href="css/rz-calc-editorial.css?v=1.43.55">
 </head>
-<body>
+<body data-rz-calc="opex">
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="page-background"></div>
@@ -2308,6 +2308,10 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
                     <button onclick="exportOpexCSV()" id="btnExportOpexCSV" style="padding:12px 8px;border-radius:10px;border:1px solid var(--glass-border);background:var(--bg-secondary);color:var(--text-secondary);cursor:pointer;font-weight:500;font-size:0.85rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px;grid-column:1/-1;">
                         <i class="fas fa-file-csv"></i> Export CSV
                     </button>
+                    <button onclick="rzScenario&&rzScenario.saveToAccount('opex',{msgEl:'acctSaveMsg'})" id="btnSaveAccount" style="padding:12px 8px;border-radius:10px;border:1px solid rgba(59,130,246,0.5);background:linear-gradient(135deg,rgba(59,130,246,0.16),rgba(37,99,235,0.06));color:#93c5fd;cursor:pointer;font-weight:700;font-size:0.85rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px;grid-column:1/-1;">
+                        <i class="fas fa-cloud"></i> Save to my account
+                    </button>
+                    <div id="acctSaveMsg" style="display:none;font-size:0.72rem;text-align:center;grid-column:1/-1;"></div>
                     <button onclick="clearOpexComparison()" id="btnClearOpex" style="display:none;padding:12px 8px;border-radius:10px;border:1px solid rgba(239,68,68,0.4);background:linear-gradient(135deg,rgba(239,68,68,0.1),rgba(239,68,68,0.03));color:#ef4444;cursor:pointer;font-weight:600;font-size:0.85rem;font-family:inherit;transition:all 0.3s;align-items:center;justify-content:center;gap:6px;grid-column:1/-1;">
                         <i class="fas fa-times-circle"></i> Clear Comparison
                     </button>
@@ -5694,5 +5698,9 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
 
 <script src="auth.js?v=2026-05-09-v1" defer></script>
 <script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<!-- Supabase save/reload scenario (additive) -->
+<script src="js/rz-config.js?v=2026-07-11"></script>
+<script src="js/rz-scenario.js?v=2026-07-11"></script>
+<script type="module" src="js/rz-supabase.js?v=2026-07-11"></script>
 </body>
 </html>

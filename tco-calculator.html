@@ -2129,7 +2129,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <link rel="stylesheet" href="css/rz-calc-editorial.css?v=1.43.55">
 </head>
-<body>
+<body data-rz-calc="tco">
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
     <a href="#tco-main-content" class="skip-link">Skip to main content</a>
     <div class="tco-page-background"></div>
@@ -2734,6 +2734,10 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         <button class="tco-action-btn tco-action-btn-reset" onclick="exportTcoCSV()">
                             <i class="fas fa-file-csv"></i> Export CSV
                         </button>
+                        <button id="btnSaveAccount" class="tco-action-btn" onclick="rzScenario&&rzScenario.saveToAccount('tco',{msgEl:'acctSaveMsg'})" style="border:1px solid rgba(59,130,246,0.5);background:linear-gradient(135deg,rgba(59,130,246,0.16),rgba(37,99,235,0.06));color:#93c5fd;">
+                            <i class="fas fa-cloud"></i> Save to my account
+                        </button>
+                        <div id="acctSaveMsg" style="display:none;font-size:0.72rem;text-align:center;flex-basis:100%;"></div>
                         <button class="tco-action-btn tco-action-btn-reset" onclick="resetInputs()">
                             <i class="fas fa-redo"></i> Reset
                         </button>
@@ -4924,5 +4928,9 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
     <script src="rz-tracker.js" defer></script>
     <script src="auth.js?v=2026-05-09-v1" defer></script>
 <script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<!-- Supabase save/reload scenario (additive) -->
+<script src="js/rz-config.js?v=2026-07-11"></script>
+<script src="js/rz-scenario.js?v=2026-07-11"></script>
+<script type="module" src="js/rz-supabase.js?v=2026-07-11"></script>
 </body>
 </html>
