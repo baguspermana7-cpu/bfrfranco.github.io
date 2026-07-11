@@ -11,7 +11,7 @@ import { fxLatest, fxHistory } from "./frankfurter.js";
 import { analyze } from "./ta.js";
 import {
   SECTOR_ETFS, FUTURES_PROXIES, BOND_ETFS, ECON_CURRENCIES,
-  SCREENER_UNIVERSE, TF_MAP,
+  SCREENER_UNIVERSE, IDX_UNIVERSE, TF_MAP,
 } from "./symbols.js";
 
 const r2 = (v) => (v == null || !isFinite(v) ? null : Math.round(v * 100) / 100);
@@ -160,53 +160,67 @@ export function analyzeEndpoint(request, env, url) {
   });
 }
 
-// GET /screener?minMcap&maxPe&sector&minDiv&dayChange&preset
-//   → [{sym,name,price,chgPct,marketCap,pe,sector,divYield}]
-// Yahoo spark = price/chgPct/vol for the whole universe (fast, keyless). Fundamentals
-// (mcap/pe/div/sector/name) are cached per-symbol in META_CACHE (30d); each request
-// fills up to 12 missing profiles so it stays within Worker subrequest limits and the
-// table is never empty (rows with unknown mcap are kept).
+// GET /screener?market=us|id&minMcap&maxPe&sector&minDiv&dayChange&preset
+//   → [{sym,name,price,chgPct,vol,marketCap,pe,sector,divYield}]
+// Yahoo spark = price/chgPct/vol for the whole universe (fast, keyless). For US, fundamentals
+// (mcap/pe/div/sector/name) are cached per-symbol in META_CACHE (30d); each request fills up to
+// 12 missing profiles so it stays within Worker subrequest limits and the table is never empty.
+// For ID (market=id), the universe is IDX `.JK` tickers — Finnhub free has no IDX coverage, so
+// fundamentals are skipped and name+sector come from the static IDX_UNIVERSE list; the client's
+// FIN Engine scores ID stocks on price/momentum/liquidity + its own sourced free-float dataset.
+// `vol` is returned so the client's Liquidity factor works. The client does the scoring/ranking.
 export async function screener(request, env, url) {
+  const market = (url.searchParams.get("market") || "us").toLowerCase();
+  const isID = market === "id";
+  const universe = isID ? IDX_UNIVERSE.map((x) => x.sym) : SCREENER_UNIVERSE;
+
   const minMcap = parseFloat(url.searchParams.get("minMcap")) || 0;
   const maxPe = parseFloat(url.searchParams.get("maxPe")) || Infinity;
   const minDiv = parseFloat(url.searchParams.get("minDiv")) || 0;
   const sector = (url.searchParams.get("sector") || "").trim().toLowerCase();
   const dayChange = (url.searchParams.get("dayChange") || "").trim();
 
-  const quotes = await yahooSpark(SCREENER_UNIVERSE);
-  const profiles = (await readJSON(env.META_CACHE, "screener:profiles")) || {};
-  const missing = SCREENER_UNIVERSE.filter((s) => !profiles[s]);
-  if (missing.length && env.FINNHUB_TOKEN) {
-    const take = missing.slice(0, 12);
-    const settled = await Promise.allSettled(take.map(async (s) => {
-      const [p, m] = await Promise.all([
-        finnhub.profile(s, env).catch(() => null),
-        finnhub.metric(s, env).catch(() => null),
-      ]);
-      return { s, p, m };
-    }));
-    let wrote = false;
-    for (const r of settled) {
-      if (r.status !== "fulfilled" || !r.value) continue;
-      const { s, p, m } = r.value;
-      const metric = (m && m.metric) || {};
-      profiles[s] = {
-        name: (p && p.name) || s,
-        mcap: p && p.marketCapitalization ? p.marketCapitalization * 1e6 : 0,
-        sector: (p && p.finnhubIndustry) || "",
-        pe: metric.peBasicExclExtraTTM || metric.peTTM || 0,
-        div: metric.dividendYieldIndicatedAnnual || metric.currentDividendYieldTTM || 0,
-      };
-      wrote = true;
+  const quotes = await yahooSpark(universe);
+
+  let profiles = {};
+  if (isID) {
+    // Static name/sector for IDX; no live fundamentals on free data.
+    IDX_UNIVERSE.forEach((x) => { profiles[x.sym] = { name: x.name, sector: x.sector, mcap: 0, pe: 0, div: 0 }; });
+  } else {
+    profiles = (await readJSON(env.META_CACHE, "screener:profiles")) || {};
+    const missing = SCREENER_UNIVERSE.filter((s) => !profiles[s]);
+    if (missing.length && env.FINNHUB_TOKEN) {
+      const take = missing.slice(0, 12);
+      const settled = await Promise.allSettled(take.map(async (s) => {
+        const [p, m] = await Promise.all([
+          finnhub.profile(s, env).catch(() => null),
+          finnhub.metric(s, env).catch(() => null),
+        ]);
+        return { s, p, m };
+      }));
+      let wrote = false;
+      for (const r of settled) {
+        if (r.status !== "fulfilled" || !r.value) continue;
+        const { s, p, m } = r.value;
+        const metric = (m && m.metric) || {};
+        profiles[s] = {
+          name: (p && p.name) || s,
+          mcap: p && p.marketCapitalization ? p.marketCapitalization * 1e6 : 0,
+          sector: (p && p.finnhubIndustry) || "",
+          pe: metric.peBasicExclExtraTTM || metric.peTTM || 0,
+          div: metric.dividendYieldIndicatedAnnual || metric.currentDividendYieldTTM || 0,
+        };
+        wrote = true;
+      }
+      if (wrote) await writeJSON(env.META_CACHE, "screener:profiles", profiles, 30 * 86400);
     }
-    if (wrote) await writeJSON(env.META_CACHE, "screener:profiles", profiles, 30 * 86400);
   }
 
-  const rows = SCREENER_UNIVERSE.map((s) => {
+  const rows = universe.map((s) => {
     const q = quotes[s.toUpperCase()] || {};
     const pf = profiles[s] || {};
     return {
-      sym: s, name: pf.name || s, price: r2(q.c) || 0, chgPct: r2(q.dp) || 0,
+      sym: s, name: pf.name || s, price: r2(q.c) || 0, chgPct: r2(q.dp) || 0, vol: q.v || 0,
       marketCap: pf.mcap || 0, pe: r2(pf.pe) || 0, sector: pf.sector || "", divYield: r2(pf.div) || 0,
     };
   }).filter((r) => r.price > 0)

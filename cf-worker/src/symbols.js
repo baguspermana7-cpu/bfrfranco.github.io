@@ -58,6 +58,37 @@ export const SCREENER_UNIVERSE = [
   "PLTR", "SQ", "UBER", "ABNB", "SNAP", "RBLX", "DDOG", "CRWD", "ZS", "NET",
 ];
 
+// Indonesian (IDX) universe — Yahoo `.JK` blue chips (LQ45 subset + StockMap sourced names).
+// Finnhub's free tier does not cover IDX, so the ID screener uses Yahoo price/volume only;
+// name+sector come from this static list (the client's FIN Engine mirrors it). Index: ^JKSE (IHSG).
+export const IDX_UNIVERSE = [
+  { sym: "BBCA.JK", name: "Bank Central Asia", sector: "Financials" },
+  { sym: "BBRI.JK", name: "Bank Rakyat Indonesia", sector: "Financials" },
+  { sym: "BMRI.JK", name: "Bank Mandiri", sector: "Financials" },
+  { sym: "BBNI.JK", name: "Bank Negara Indonesia", sector: "Financials" },
+  { sym: "TLKM.JK", name: "Telkom Indonesia", sector: "Communication" },
+  { sym: "ASII.JK", name: "Astra International", sector: "Consumer Disc." },
+  { sym: "UNTR.JK", name: "United Tractors", sector: "Industrials" },
+  { sym: "ICBP.JK", name: "Indofood CBP", sector: "Consumer Staples" },
+  { sym: "INDF.JK", name: "Indofood Sukses Makmur", sector: "Consumer Staples" },
+  { sym: "KLBF.JK", name: "Kalbe Farma", sector: "Healthcare" },
+  { sym: "SMGR.JK", name: "Semen Indonesia", sector: "Materials" },
+  { sym: "PGAS.JK", name: "Perusahaan Gas Negara", sector: "Energy" },
+  { sym: "PTBA.JK", name: "Bukit Asam", sector: "Energy" },
+  { sym: "ITMG.JK", name: "Indo Tambangraya Megah", sector: "Energy" },
+  { sym: "ANTM.JK", name: "Aneka Tambang", sector: "Materials" },
+  { sym: "INCO.JK", name: "Vale Indonesia", sector: "Materials" },
+  { sym: "TINS.JK", name: "Timah", sector: "Materials" },
+  { sym: "JSMR.JK", name: "Jasa Marga", sector: "Industrials" },
+  { sym: "AALI.JK", name: "Astra Agro Lestari", sector: "Consumer Staples" },
+  { sym: "AUTO.JK", name: "Astra Otoparts", sector: "Consumer Disc." },
+  { sym: "WIKA.JK", name: "Wijaya Karya", sector: "Industrials" },
+  { sym: "WTON.JK", name: "Wijaya Karya Beton", sector: "Industrials" },
+  { sym: "WEGE.JK", name: "Wijaya Karya Gedung", sector: "Industrials" },
+  { sym: "GIAA.JK", name: "Garuda Indonesia", sector: "Industrials" },
+  { sym: "BUMI.JK", name: "Bumi Resources", sector: "Energy" },
+];
+
 // Timeframe → Yahoo range/interval (used by /candles and /analyze).
 export const TF_MAP = {
   "1W": { range: "5d", interval: "15m" },
