@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.51.11 — 2026-07-05 (Accessibility — full-site sweep part 3a: four more articles to zero)
+
+**Changed** — `article-8.html` (113), `article-17.html` (100), `article-3.html` (82),
+`article-27.html` (80) → **0/0 both themes** (per-page axe probe). Notable roots:
+`--accent-purple`/`--opp-emerald`/`--accent-emerald` theme-token splits; article-27
+ghost strategy numbers were `#b45309` at `opacity:.35` (1.7:1) → solid `#a16207`
+(the achievements lesson: never de-emphasise text with opacity); TOC calculator badges
+fixed at the class source (`#10b981`→`#047857` behind white text); JS-set widget values
+(`#beforeAvg` etc.) overridden by id (inline styles lose to stylesheet `!important`);
+lever-table strongs got dark-tint-row bright pairs.
+
+Remaining part-3 tail: article-10/24/16, FF-3, tier-advisor, infographic-dc-cost-breakdown
++ ~60 small pages (~1,000 nodes).
+
 ## v1.51.10 — 2026-07-05 (Accessibility — full-site sweep part 2: 22 pages to zero)
 
 **Changed** — second batch of the full-site axe sweep: 22 pages, ~2,900 critical/serious
