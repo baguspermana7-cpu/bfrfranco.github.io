@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Supabase — Tes Koneksi & Auth (RZ)</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+           background:#0f172a; color:#e2e8f0; line-height:1.5; padding:24px; }
+    .wrap { max-width:520px; margin:0 auto; }
+    h1 { font-size:1.2rem; margin:0 0 4px; }
+    .sub { color:#94a3b8; font-size:0.85rem; margin:0 0 20px; }
+    .card { background:#1e293b; border:1px solid #334155; border-radius:12px; padding:18px; margin-bottom:16px; }
+    .card h2 { font-size:0.95rem; margin:0 0 12px; }
+    label { display:block; font-size:0.75rem; color:#94a3b8; margin:10px 0 4px; }
+    input { width:100%; padding:10px 12px; border-radius:8px; border:1px solid #334155;
+            background:#0f172a; color:#e2e8f0; font-size:0.9rem; }
+    button { padding:10px 16px; border-radius:8px; border:none; background:#3b82f6; color:#fff;
+             font-weight:600; font-size:0.85rem; cursor:pointer; margin:12px 6px 0 0; }
+    button.ghost { background:#334155; }
+    .status { font-family:"JetBrains Mono", ui-monospace, monospace; font-size:0.8rem;
+              padding:10px 12px; border-radius:8px; margin-top:10px; white-space:pre-wrap; word-break:break-word; }
+    .ok { background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.3); }
+    .err { background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.3); }
+    .muted { color:#64748b; font-size:0.72rem; margin-top:14px; }
+    code { background:#0f172a; padding:1px 5px; border-radius:4px; font-size:0.8em; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔌 Supabase — Tes Koneksi &amp; Login</h1>
+  <p class="sub">Halaman demo (tidak diindeks). Membuktikan Supabase Anda tersambung ke browser + auth email/password jalan.</p>
+
+  <div class="card">
+    <h2>1. Status koneksi</h2>
+    <div id="connStatus" class="status">Menghubungkan…</div>
+  </div>
+
+  <div class="card">
+    <h2>2. Daftar / Login (email + password)</h2>
+    <label>Email</label>
+    <input id="email" type="email" placeholder="kamu@email.com" autocomplete="email">
+    <label>Password (min. 6 karakter)</label>
+    <input id="password" type="password" placeholder="••••••" autocomplete="current-password">
+    <div>
+      <button id="btnSignup">Daftar</button>
+      <button id="btnLogin">Login</button>
+      <button id="btnLogout" class="ghost">Logout</button>
+    </div>
+    <div id="authStatus" class="status" style="display:none"></div>
+  </div>
+
+  <div class="card">
+    <h2>3. Sesi saat ini</h2>
+    <div id="sessionStatus" class="status">Belum login.</div>
+  </div>
+
+  <p class="muted">
+    Konfigurasi ada di bawah (URL + <code>anon/publishable</code> key — memang publik, aman di browser).
+    Kunci <code>service_role</code> TIDAK ada di sini dan tidak boleh ada di kode browser.
+  </p>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  // Publik — aman di kode browser (dilindungi Row Level Security di sisi database).
+  const SUPABASE_URL  = 'https://kffjaqkqwhvbqxdumyll.supabase.co';
+  const SUPABASE_ANON = 'sb_publishable_pALlKKusg565V6UFgLDmIA_yrbfUyZU';
+
+  const $ = (id) => document.getElementById(id);
+  const set = (el, msg, cls) => { el.style.display='block'; el.className='status ' + (cls||''); el.textContent = msg; };
+
+  let supabase;
+  try {
+    supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+    // A lightweight call that proves the client + key reach the project.
+    const { error } = await supabase.auth.getSession();
+    if (error) throw error;
+    set($('connStatus'), '✅ Tersambung ke Supabase.\nProject: ' + SUPABASE_URL, 'ok');
+  } catch (e) {
+    set($('connStatus'), '❌ Gagal menyambung: ' + (e.message || e), 'err');
+  }
+
+  async function refreshSession() {
+    const { data } = await supabase.auth.getSession();
+    if (data && data.session) {
+      set($('sessionStatus'), '✅ Login sebagai: ' + data.session.user.email +
+        '\nUser ID: ' + data.session.user.id, 'ok');
+    } else {
+      set($('sessionStatus'), 'Belum login.', '');
+    }
+  }
+  await refreshSession();
+  supabase.auth.onAuthStateChange(() => refreshSession());
+
+  $('btnSignup').onclick = async () => {
+    const email = $('email').value.trim(), password = $('password').value;
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) return set($('authStatus'), '❌ Daftar gagal: ' + error.message, 'err');
+    if (data.user && !data.session)
+      set($('authStatus'), '📧 Akun dibuat. Cek email untuk konfirmasi (atau matikan "Confirm email" di dashboard untuk tes cepat).', 'ok');
+    else set($('authStatus'), '✅ Terdaftar & langsung login.', 'ok');
+  };
+  $('btnLogin').onclick = async () => {
+    const email = $('email').value.trim(), password = $('password').value;
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) return set($('authStatus'), '❌ Login gagal: ' + error.message, 'err');
+    set($('authStatus'), '✅ Login berhasil.', 'ok');
+  };
+  $('btnLogout').onclick = async () => {
+    await supabase.auth.signOut();
+    set($('authStatus'), 'Sudah logout.', '');
+  };
+</script>
+</body>
+</html>
