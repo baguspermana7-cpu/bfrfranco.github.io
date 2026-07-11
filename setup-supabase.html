@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Setup Supabase + Cloudflare — Panduan</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+           background:#0f172a; color:#e2e8f0; line-height:1.6; }
+    .wrap { max-width:760px; margin:0 auto; padding:28px 20px 80px; }
+    h1 { font-size:1.5rem; margin:0 0 6px; }
+    .sub { color:#94a3b8; margin:0 0 28px; }
+    .step { background:#1e293b; border:1px solid #334155; border-radius:14px; padding:20px 22px; margin-bottom:22px; }
+    .step h2 { font-size:1.1rem; margin:0 0 4px; display:flex; align-items:center; gap:10px; }
+    .num { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px;
+           border-radius:50%; background:#3b82f6; color:#fff; font-size:0.9rem; font-weight:800; flex:none; }
+    .step .goal { color:#94a3b8; font-size:0.85rem; margin:0 0 14px; }
+    ol, ul { margin:8px 0 8px; padding-left:22px; }
+    li { margin:5px 0; }
+    b, strong { color:#f1f5f9; }
+    .kbd { background:#0b1220; border:1px solid #334155; border-radius:6px; padding:1px 7px; font-family:ui-monospace,monospace; font-size:0.85em; }
+    .codewrap { position:relative; margin:12px 0; }
+    pre { background:#0b1220; border:1px solid #334155; border-radius:10px; padding:14px 14px; overflow:auto;
+          font-family:"JetBrains Mono",ui-monospace,monospace; font-size:0.78rem; color:#cbd5e1; margin:0; max-height:280px; }
+    .copybtn { position:absolute; top:8px; right:8px; background:#3b82f6; color:#fff; border:none; border-radius:7px;
+               padding:6px 12px; font-size:0.75rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .copybtn.done { background:#16a34a; }
+    .val { display:flex; align-items:center; gap:10px; background:#0b1220; border:1px solid #334155; border-radius:9px;
+           padding:9px 12px; margin:8px 0; font-family:ui-monospace,monospace; font-size:0.82rem; }
+    .val code { flex:1; word-break:break-all; }
+    .val button { background:#334155; color:#e2e8f0; border:none; border-radius:6px; padding:5px 11px; font-size:0.72rem; cursor:pointer; font-weight:700; }
+    .val button.done { background:#16a34a; color:#fff; }
+    .ok { background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.3); border-radius:9px; padding:10px 13px; font-size:0.85rem; margin:12px 0; }
+    .warn { background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); border-radius:9px; padding:10px 13px; font-size:0.85rem; margin:12px 0; }
+    a { color:#60a5fa; }
+    .foot { color:#64748b; font-size:0.75rem; margin-top:20px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🚀 Setup ResistanceZero — Supabase &amp; Cloudflare</h1>
+  <p class="sub">Panduan sekali-jalan. Tiap kotak kode ada tombol <b>Copy</b> — klik, lalu paste. Kerjakan berurutan.</p>
+
+  <!-- STEP 1 -->
+  <div class="step">
+    <h2><span class="num">1</span> Aktifkan "Simpan Data" (jalankan SQL di Supabase)</h2>
+    <p class="goal">Membuat tabel database + keamanan (RLS). Ini yang bikin tombol "☁ Save to my account" berfungsi. ~1 menit.</p>
+    <ol>
+      <li>Buka Supabase → project <b>resistancezero0</b> → menu kiri <b>SQL Editor</b> → <b>+ New query</b>.</li>
+      <li>Klik <b>Copy</b> di bawah, paste ke editor, lalu klik <b>Run</b> (atau <span class="kbd">Ctrl+Enter</span>).</li>
+    </ol>
+    <div class="codewrap">
+      <button class="copybtn" data-copy="sql">Copy</button>
+      <pre id="sql">create table if not exists public.profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  email text, tier text not null default 'free', display_name text,
+  created_at timestamptz not null default now());
+alter table public.profiles enable row level security;
+drop policy if exists "profiles: read own" on public.profiles;
+drop policy if exists "profiles: update own" on public.profiles;
+drop policy if exists "profiles: insert own" on public.profiles;
+create policy "profiles: read own"   on public.profiles for select using (auth.uid() = id);
+create policy "profiles: insert own" on public.profiles for insert with check (auth.uid() = id);
+
+create table if not exists public.saved_scenarios (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  calc text not null, name text not null,
+  payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now());
+create index if not exists saved_scenarios_user_idx on public.saved_scenarios(user_id, created_at desc);
+alter table public.saved_scenarios enable row level security;
+drop policy if exists "scenarios: read own" on public.saved_scenarios;
+drop policy if exists "scenarios: insert own" on public.saved_scenarios;
+drop policy if exists "scenarios: update own" on public.saved_scenarios;
+drop policy if exists "scenarios: delete own" on public.saved_scenarios;
+create policy "scenarios: read own"   on public.saved_scenarios for select using (auth.uid() = user_id);
+create policy "scenarios: insert own" on public.saved_scenarios for insert with check (auth.uid() = user_id);
+create policy "scenarios: update own" on public.saved_scenarios for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "scenarios: delete own" on public.saved_scenarios for delete using (auth.uid() = user_id);
+
+create or replace function public.handle_new_user() returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.profiles (id, email, tier) values (new.id, new.email,
+    case when lower(new.email) in ('bagusdpermana7@gmail.com','bagus@resistancezero.com','admin@resistancezero.com') then 'root' else 'free' end)
+  on conflict (id) do nothing; return new;
+end; $$;
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created after insert on auth.users for each row execute function public.handle_new_user();
+
+insert into public.profiles (id, email, tier)
+select u.id, u.email, case when lower(u.email) in ('bagusdpermana7@gmail.com','bagus@resistancezero.com','admin@resistancezero.com') then 'root' else 'free' end
+from auth.users u on conflict (id) do nothing;</pre>
+    </div>
+    <div class="ok">✅ Berhasil kalau muncul tulisan hijau <b>"Success. No rows returned"</b>. (Aman diulang.)</div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step">
+    <h2><span class="num">2</span> Set alamat situs (Supabase Auth)</h2>
+    <p class="goal">Biar link konfirmasi/reset email mengarah ke situs Anda, bukan localhost.</p>
+    <ol>
+      <li>Supabase → <b>Authentication</b> → <b>URL Configuration</b>.</li>
+      <li>Di kolom <b>Site URL</b>, isi (copy di bawah) → <b>Save</b>.</li>
+    </ol>
+    <div class="val"><code id="siteurl">https://resistancezero.com</code><button data-copyval="siteurl">Copy</button></div>
+    <p style="font-size:0.82rem;color:#94a3b8;">(Opsional untuk tes cepat: Authentication → <b>Email</b> → matikan <b>"Confirm email"</b> supaya daftar langsung jadi. Nyalakan lagi nanti untuk production.)</p>
+  </div>
+
+  <!-- TEST -->
+  <div class="step">
+    <h2><span class="num">✓</span> Tes fitur Supabase (setelah Langkah 1 &amp; 2)</h2>
+    <ol>
+      <li>Buka <a href="account.html" target="_blank"><b>account.html</b></a> → <b>Log in</b> pakai akun Anda → muncul badge <b>root</b> (cyan).</li>
+      <li>Buka <a href="capex-calculator.html" target="_blank"><b>capex-calculator</b></a> → hitung → klik <b>☁ Save to my account</b> → muncul <b>"☁ Saved — open My Account"</b>.</li>
+      <li>Balik ke account.html → scenario muncul → klik <b>Open</b> → kebuka lagi di kalkulator dengan input ter-restore. 🎉</li>
+    </ol>
+    <div class="ok">Kalau ketiga ini jalan → <b>Supabase 100% aktif.</b> Tombol Save ada di 7 kalkulator: capex, opex, roi, tco, pue, cx, carbon.</div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step">
+    <h2><span class="num">3</span> Deploy Cloudflare Worker (Finance Terminal) — terpisah, opsional</h2>
+    <p class="goal">Menyembunyikan token Finnhub + menghilangkan proxy publik yang sering error. Semua lewat dashboard Cloudflare (browser).</p>
+    <ol>
+      <li>Cloudflare → <b>Workers &amp; Pages</b> → <b>Create</b> → <b>Import a repository</b> (hubungkan GitHub).</li>
+      <li>Pilih repo <b>bfrfranco.github.io</b> → set <b>Root directory</b> = <span class="kbd">cf-worker</span> → Deploy.</li>
+      <li>Setelah jadi: buka Worker → <b>Settings → Variables and Secrets</b> → tambah <b>Secret</b> bernama <span class="kbd">FINNHUB_TOKEN</span> (paste token Finnhub Anda di sini — bukan di chat).</li>
+      <li>Salin URL Worker (mis. <span class="kbd">https://rz-finance-gateway.xxx.workers.dev</span>), tes buka <span class="kbd">URL/healthz</span> → harus muncul <span class="kbd">{"ok":true,...}</span>.</li>
+      <li>Aktifkan di Finance Terminal: buka halaman finance terminal → DevTools (F12) → Console → paste (ganti URL):</li>
+    </ol>
+    <div class="codewrap">
+      <button class="copybtn" data-copy="cf">Copy</button>
+      <pre id="cf">localStorage.setItem('rz_ft_gw','https://GANTI-DENGAN-URL-WORKER-ANDA.workers.dev');
+localStorage.setItem('rz_ft_v2','1');
+location.reload();</pre>
+    </div>
+    <div class="warn">⚠️ Langkah 3 hanya perlu setelah Anda mau memakai Finance Terminal via gateway. Boleh dikerjakan nanti.</div>
+  </div>
+
+  <p class="foot">Halaman ini noindex (tidak muncul di Google). Nilai yang tampil (URL project, anon key) memang publik &amp; aman. Kunci rahasia (service_role / DB password / token Finnhub) TIDAK ada di sini — jangan pernah taruh di kode/chat.</p>
+</div>
+
+<script src="js/rz-version.js" defer></script>
+<script>
+  function flash(btn){ const t=btn.textContent; btn.textContent='✓ Copied'; btn.classList.add('done'); setTimeout(function(){ btn.textContent=t; btn.classList.remove('done'); }, 1400); }
+  document.querySelectorAll('[data-copy]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var el=document.getElementById(btn.getAttribute('data-copy'));
+      navigator.clipboard.writeText(el.textContent).then(function(){ flash(btn); });
+    });
+  });
+  document.querySelectorAll('[data-copyval]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var el=document.getElementById(btn.getAttribute('data-copyval'));
+      navigator.clipboard.writeText(el.textContent.trim()).then(function(){ flash(btn); });
+    });
+  });
+</script>
+</body>
+</html>

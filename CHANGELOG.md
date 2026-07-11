@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.51.20 — 2026-07-11 (Setup guide page)
+
+**Added**
+- **`setup-supabase.html`** (noindex) — a copy-paste, click-to-copy runbook for the owner: Step 1 run the
+  Supabase schema SQL, Step 2 set the Auth Site URL, a test checklist, and Step 3 the Cloudflare deploy.
+  Makes the remaining owner-gated steps friction-free (no copying long text from chat/terminal).
+
 ## v1.51.19 — 2026-07-11 (Supabase — carbon-footprint Save + account-link discoverability)
 
 **Added / Changed**
