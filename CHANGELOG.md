@@ -11,6 +11,29 @@ release sections rather than semver.
 
 ---
 
+## v1.51.22 — 2026-07-11 (Supabase — security hardening of accounts + tier management)
+
+**Security / robustness** — closed tier-escalation vectors and locked the accounts model down.
+Verified end-to-end on real PostgreSQL 16 (Docker): RLS isolation, RPC authorization, lockout
+guard, and all CHECK constraints exercised as both a normal and a root user.
+
+- **`profiles` now has NO client-writable path.** Removed the `insert own` policy (a user whose
+  row was missing could otherwise `INSERT ... tier='root'`) — rows are created ONLY by the
+  SECURITY DEFINER signup trigger. Tier is changed ONLY via a new **`admin_set_tier()` RPC**
+  (SECURITY DEFINER) that re-checks `is_root()` server-side, validates the tier whitelist,
+  touches **only** the `tier` column, and **refuses to demote the last root** (lockout guard).
+  The broad "root updates all" table policy is gone.
+- **DB-level `CHECK (tier in ('free','demo','pro','root'))`** on profiles — an invalid tier can
+  never be stored, even through a bug.
+- **`saved_scenarios` bounded**: CHECKs on `name` (≤120), `calc` (≤40), `payload` (≤64 KB) + a
+  per-user **200-row cap** trigger (storage-abuse defense).
+- **Client (`js/rz-supabase.js`)**: `setTier()` now calls the `admin_set_tier` RPC instead of a
+  direct table update. **rz-ops panel**: confirmation prompts before granting **root** or changing
+  your **own** tier (self-lockout warning), and a module-load-failure timeout so the panel reports
+  a clear error instead of hanging if the CDN is blocked.
+- **`supabase/schema.sql` + `setup-supabase.html`** updated to the full hardened schema
+  (idempotent — owner re-runs Step 1 once; it supersedes any earlier run).
+
 ## v1.51.21 — 2026-07-11 (Supabase — rz-ops "Supabase Accounts" panel + account-link pill)
 
 **Added**

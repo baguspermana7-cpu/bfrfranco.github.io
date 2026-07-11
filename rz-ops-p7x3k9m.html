@@ -3220,6 +3220,7 @@ async function loadSupaAccounts(){
     supaStatus('Loading…','#94a3b8');
     try{
         var user=await S.getUser();
+        window.__supaMe=user||null;
         if(!user){supaStatus('Not signed in. Open account.html and log in as a root user, then Refresh.','#fbbf24');if(listEl)listEl.innerHTML='<div style="padding:0.6rem 0"><a href="account.html" target="_blank" style="color:#67e8f9;text-decoration:underline;">Open account.html to sign in →</a></div>';return;}
         var res=await S.listAllProfiles();
         if(res.error){supaStatus('Error: '+rzEsc(res.error),'#f87171');if(listEl)listEl.innerHTML='';return;}
@@ -3256,7 +3257,12 @@ function renderSupaAccounts(rows,isRoot){
 async function changeSupaTier(userId,tier,selEl){
     var S=window.rzSupa;
     if(!S||!S.configured)return;
-    var prev=selEl?selEl.value:tier;
+    // Confirm sensitive changes: granting root is a privileged grant; changing your OWN row
+    // risks a lockout. Both are still enforced server-side (RPC + last-root guard) regardless.
+    var me=window.__supaMe;
+    var isSelf=me&&me.id===userId;
+    if(tier==='root'){ if(!window.confirm('Grant ROOT (full admin) to this account? This gives complete access to the Supabase Accounts panel.')){loadSupaAccounts();return;} }
+    if(isSelf&&tier!=='root'){ if(!window.confirm('You are about to change YOUR OWN tier away from root. If you are the last root you will be blocked; otherwise you may lose admin access. Continue?')){loadSupaAccounts();return;} }
     if(selEl)selEl.disabled=true;
     supaStatus('Updating tier…','#94a3b8');
     try{
@@ -3267,10 +3273,13 @@ async function changeSupaTier(userId,tier,selEl){
     }catch(e){supaStatus('Update failed: '+rzEsc(e&&e.message||e),'#f87171');if(selEl)selEl.disabled=false;}
 }
 // Auto-load the panel once the Supabase module has attached (it's a deferred ES module).
+// Falls back to a clear error if the module never loads (e.g. CDN blocked) instead of hanging.
 (function initSupaPanel(){
-    function go(){ if(document.getElementById('supaAccountsList')) loadSupaAccounts(); }
-    if(window.rzSupa&&window.rzSupa.configured) go();
-    else window.addEventListener('rz-supa-ready', go, {once:true});
+    var done=false;
+    function go(){ if(done)return; done=true; if(document.getElementById('supaAccountsList')) loadSupaAccounts(); }
+    if(window.rzSupa&&window.rzSupa.configured){ go(); return; }
+    window.addEventListener('rz-supa-ready', go, {once:true});
+    setTimeout(function(){ if(done)return; if(window.rzSupa&&window.rzSupa.configured){go();return;} done=true; supaStatus('Supabase module did not load (network/CDN blocked). Reload to retry.','#f87171'); }, 8000);
 })();
 
 // ═══════════════════════════════════════════════════════════════

@@ -46,25 +46,42 @@
 
   <!-- STEP 1 -->
   <div class="step">
-    <h2><span class="num">1</span> Aktifkan "Simpan Data" (jalankan SQL di Supabase)</h2>
-    <p class="goal">Membuat tabel database + keamanan (RLS). Ini yang bikin tombol "☁ Save to my account" berfungsi. ~1 menit.</p>
+    <h2><span class="num">1</span> Aktifkan "Simpan Data" + panel admin (jalankan SQL di Supabase)</h2>
+    <p class="goal">Membuat tabel database + keamanan berlapis (RLS + whitelist tier + RPC admin). Ini yang bikin tombol "☁ Save to my account" <b>dan</b> panel "Supabase Accounts" di rz-ops berfungsi. Aman diulang. ~1 menit.</p>
     <ol>
       <li>Buka Supabase → project <b>resistancezero0</b> → menu kiri <b>SQL Editor</b> → <b>+ New query</b>.</li>
       <li>Klik <b>Copy</b> di bawah, paste ke editor, lalu klik <b>Run</b> (atau <span class="kbd">Ctrl+Enter</span>).</li>
     </ol>
     <div class="codewrap">
       <button class="copybtn" data-copy="sql">Copy</button>
-      <pre id="sql">create table if not exists public.profiles (
+      <pre id="sql">-- FULL HARDENED SCHEMA (idempotent — safe to re-run; supersedes any earlier run).
+-- profiles has NO client insert/update path: rows are created only by the signup trigger,
+-- and tier is changed only by the admin_set_tier() RPC (root-checked, tier-only, lockout-safe).
+
+-- profiles + tier whitelist
+create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text, tier text not null default 'free', display_name text,
   created_at timestamptz not null default now());
-alter table public.profiles enable row level security;
-drop policy if exists "profiles: read own" on public.profiles;
-drop policy if exists "profiles: update own" on public.profiles;
-drop policy if exists "profiles: insert own" on public.profiles;
-create policy "profiles: read own"   on public.profiles for select using (auth.uid() = id);
-create policy "profiles: insert own" on public.profiles for insert with check (auth.uid() = id);
+alter table public.profiles drop constraint if exists profiles_tier_chk;
+alter table public.profiles add  constraint profiles_tier_chk check (tier in ('free','demo','pro','root'));
 
+-- is_root(): SECURITY DEFINER so it reads profiles without RLS (no recursion)
+create or replace function public.is_root() returns boolean
+language sql security definer stable set search_path = public as $$
+  select exists (select 1 from public.profiles where id = auth.uid() and tier = 'root');
+$$;
+
+alter table public.profiles enable row level security;
+drop policy if exists "profiles: read own"        on public.profiles;
+drop policy if exists "profiles: insert own"      on public.profiles;
+drop policy if exists "profiles: update own"      on public.profiles;
+drop policy if exists "profiles: root reads all"  on public.profiles;
+drop policy if exists "profiles: root updates all" on public.profiles;
+create policy "profiles: read own"       on public.profiles for select using (auth.uid() = id);
+create policy "profiles: root reads all" on public.profiles for select using (public.is_root());
+
+-- saved_scenarios + bounds
 create table if not exists public.saved_scenarios (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -72,6 +89,12 @@ create table if not exists public.saved_scenarios (
   payload jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now());
 create index if not exists saved_scenarios_user_idx on public.saved_scenarios(user_id, created_at desc);
+alter table public.saved_scenarios drop constraint if exists saved_scenarios_name_chk;
+alter table public.saved_scenarios add  constraint saved_scenarios_name_chk    check (char_length(name) between 1 and 120);
+alter table public.saved_scenarios drop constraint if exists saved_scenarios_calc_chk;
+alter table public.saved_scenarios add  constraint saved_scenarios_calc_chk    check (char_length(calc) between 1 and 40);
+alter table public.saved_scenarios drop constraint if exists saved_scenarios_payload_chk;
+alter table public.saved_scenarios add  constraint saved_scenarios_payload_chk check (pg_column_size(payload) &lt;= 65536);
 alter table public.saved_scenarios enable row level security;
 drop policy if exists "scenarios: read own" on public.saved_scenarios;
 drop policy if exists "scenarios: insert own" on public.saved_scenarios;
@@ -82,6 +105,16 @@ create policy "scenarios: insert own" on public.saved_scenarios for insert with 
 create policy "scenarios: update own" on public.saved_scenarios for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "scenarios: delete own" on public.saved_scenarios for delete using (auth.uid() = user_id);
 
+create or replace function public.enforce_scenario_limit() returns trigger language plpgsql as $$
+begin
+  if (select count(*) from public.saved_scenarios where user_id = new.user_id) &gt;= 200 then
+    raise exception 'saved scenario limit reached (200). Delete some to save more.';
+  end if; return new;
+end; $$;
+drop trigger if exists trg_scenario_limit on public.saved_scenarios;
+create trigger trg_scenario_limit before insert on public.saved_scenarios for each row execute function public.enforce_scenario_limit();
+
+-- signup trigger (creates each profile; owner emails = root) + backfill
 create or replace function public.handle_new_user() returns trigger language plpgsql security definer set search_path = public as $$
 begin
   insert into public.profiles (id, email, tier) values (new.id, new.email,
@@ -90,10 +123,26 @@ begin
 end; $$;
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created after insert on auth.users for each row execute function public.handle_new_user();
-
 insert into public.profiles (id, email, tier)
 select u.id, u.email, case when lower(u.email) in ('bagusdpermana7@gmail.com','bagus@resistancezero.com','admin@resistancezero.com') then 'root' else 'free' end
-from auth.users u on conflict (id) do nothing;</pre>
+from auth.users u on conflict (id) do nothing;
+
+-- admin_set_tier(): the ONLY way the app changes a tier — root-checked, tier-only, last-root safe
+create or replace function public.admin_set_tier(target uuid, new_tier text) returns public.profiles
+language plpgsql security definer set search_path = public as $$
+declare r public.profiles; target_tier text; root_count int;
+begin
+  if not public.is_root() then raise exception 'not authorized: root required'; end if;
+  if new_tier not in ('free','demo','pro','root') then raise exception 'invalid tier: %', new_tier; end if;
+  select tier into target_tier from public.profiles where id = target;
+  if target_tier is null then raise exception 'no such profile'; end if;
+  if target_tier = 'root' and new_tier &lt;&gt; 'root' then
+    select count(*) into root_count from public.profiles where tier = 'root';
+    if root_count &lt;= 1 then raise exception 'cannot demote the last root account'; end if;
+  end if;
+  update public.profiles set tier = new_tier where id = target returning * into r; return r;
+end; $$;
+revoke execute on function public.admin_set_tier(uuid, text) from anon;</pre>
     </div>
     <div class="ok">✅ Berhasil kalau muncul tulisan hijau <b>"Success. No rows returned"</b>. (Aman diulang.)</div>
   </div>
@@ -140,35 +189,10 @@ from auth.users u on conflict (id) do nothing;</pre>
 
   <!-- STEP: rz-ops admin panel -->
   <div class="step">
-    <h2><span class="num">2b</span> Aktifkan panel "Supabase Accounts" di rz-ops (kelola tier)</h2>
-    <p class="goal">Biar di admin console (rz-ops) Anda bisa <b>lihat semua akun asli</b> dari Supabase dan <b>ubah tier</b> (free/demo/pro/root) langsung dari dropdown. Aman: hanya akun <b>root</b> yang bisa lihat/ubah — dijaga oleh RLS di database, bukan oleh key rahasia.</p>
-    <ol>
-      <li>Supabase → <b>SQL Editor</b> → <b>+ New query</b>.</li>
-      <li>Klik <b>Copy</b> di bawah → paste → <b>Run</b>. (Aman diulang; kalau sudah pernah, tinggal jalankan lagi.)</li>
-    </ol>
-    <div class="codewrap">
-      <button class="copybtn" data-copy="rootsql">Copy</button>
-      <pre id="rootsql">-- Root admin: lihat + ubah tier siapa saja dari browser (rz-ops).
--- is_root() SECURITY DEFINER membaca profiles TANPA RLS → tidak rekursi.
-create or replace function public.is_root()
-returns boolean
-language sql
-security definer
-stable
-set search_path = public
-as $$
-  select exists (
-    select 1 from public.profiles
-    where id = auth.uid() and tier = 'root'
-  );
-$$;
-
-drop policy if exists "profiles: root reads all"   on public.profiles;
-drop policy if exists "profiles: root updates all" on public.profiles;
-create policy "profiles: root reads all"   on public.profiles for select using (public.is_root());
-create policy "profiles: root updates all" on public.profiles for update using (public.is_root()) with check (public.is_root());</pre>
-    </div>
-    <p style="font-size:0.82rem;color:#94a3b8;">Setelah Run: buka <a href="account.html" target="_blank"><b>account.html</b></a> → login sebagai root → lalu buka <b>rz-ops</b> → panel <b>"Supabase Accounts"</b> akan menampilkan semua akun + dropdown tier. Kalau belum login root, panel cuma menampilkan baris Anda sendiri.</p>
+    <h2><span class="num">2b</span> Panel "Supabase Accounts" di rz-ops (kelola tier)</h2>
+    <p class="goal">Fitur ini <b>sudah termasuk</b> di SQL Langkah 1 (fungsi <code>is_root()</code> + <code>admin_set_tier()</code>). Kalau Anda menjalankan Langkah 1 versi lama, cukup <b>jalankan ulang SQL Langkah 1</b> (aman diulang) untuk mengaktifkan panelnya + pengamanan terbaru.</p>
+    <p style="font-size:0.86rem;color:#cbd5e1;"><b>Keamanan:</b> hanya akun <b>root</b> yang bisa lihat semua akun &amp; ubah tier. Perubahan tier lewat RPC <code>admin_set_tier()</code> yang cuma menyentuh kolom <code>tier</code>, menolak menurunkan root terakhir, dan diverifikasi <code>is_root()</code> di server — password tidak pernah ditampilkan (ter-hash) dan key rahasia tidak pernah ada di browser.</p>
+    <p style="font-size:0.82rem;color:#94a3b8;">Setelah SQL Langkah 1 jalan: buka <a href="account.html" target="_blank"><b>account.html</b></a> → login sebagai root → buka <b>rz-ops</b> → panel <b>"Supabase Accounts"</b> menampilkan semua akun + dropdown tier. Kalau belum login root, panel cuma menampilkan baris Anda sendiri.</p>
   </div>
 
   <!-- STEP 3 -->

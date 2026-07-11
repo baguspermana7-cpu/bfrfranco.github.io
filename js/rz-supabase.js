@@ -145,12 +145,18 @@ const api = {
   async setTier(userId, tier) {
     if (!client) return { error: initError };
     if (['free', 'demo', 'pro', 'root'].indexOf(tier) === -1) return { error: 'invalid tier' };
-    // RLS "root updates all" is the only update policy on profiles → a non-root caller
-    // matches no policy and updates 0 rows (detected below). Root can change any tier.
-    const { data, error } = await client.from('profiles').update({ tier: tier }).eq('id', userId).select();
-    if (error) return { error: friendly(error) };
-    if (!data || !data.length) return { error: 'Not permitted — you must be signed in as a root user.' };
-    return { data: data[0], error: null };
+    // Route through the SECURITY DEFINER RPC admin_set_tier(): it re-checks is_root(),
+    // re-validates the tier, refuses to demote the last root, and can touch ONLY the tier
+    // column. `profiles` has NO client update policy at all — a direct table update would
+    // change 0 rows. A non-root caller gets a raised exception surfaced as `error` here.
+    const { data, error } = await client.rpc('admin_set_tier', { target: userId, new_tier: tier });
+    if (error) {
+      const msg = error.message || String(error);
+      if (/not authorized|root required/i.test(msg))
+        return { error: 'Not permitted — you must be signed in as a root user.' };
+      return { error: friendly(error) };
+    }
+    return { data, error: null };
   }
 };
 
