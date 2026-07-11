@@ -105,8 +105,8 @@
 
   <script src="js/rz-version.js" defer></script>
   <script src="js/rz-config.js"></script>
-  <script src="js/rz-scenario.js"></script>
-  <script type="module" src="js/rz-supabase.js"></script>
+  <script src="js/rz-scenario.js?v=2026-07-11b"></script>
+  <script type="module" src="js/rz-supabase.js?v=2026-07-11b"></script>
   <script type="module">
     const $ = (id) => document.getElementById(id);
     const show = (el, on) => el.classList.toggle('hidden', !on);
@@ -132,7 +132,7 @@
       // scenarios
       const list = $('scnList');
       const { data: rows, error: sErr } = await S.listScenarios();
-      if (sErr) { list.innerHTML = '<p class="err status">'+sErr+'</p>'; return; }
+      if (sErr) { list.innerHTML = '<p class="err status">'+escapeHtml(String(sErr))+'</p>'; return; }
       if (!rows.length) { list.innerHTML = '<p class="muted" style="font-size:0.85rem;">No saved scenarios yet. Open a calculator and click <b>☁ Save scenario</b>.</p>'; return; }
       list.innerHTML = '';
       rows.forEach(r => {
@@ -162,7 +162,7 @@
           window.rzScenario.openInCalc(row.calc, row.payload.inputs);
       });
     }
-    function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
     function fmtMoney(n){ n = Number(n)||0; return n>=1e9 ? '$'+(n/1e9).toFixed(2)+'B' : n>=1e6 ? '$'+(n/1e6).toFixed(1)+'M' : n>=1e3 ? '$'+Math.round(n/1e3)+'K' : '$'+Math.round(n); }
 
     $('btnSignup').onclick = async () => {

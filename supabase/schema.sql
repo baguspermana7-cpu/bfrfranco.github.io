@@ -19,11 +19,15 @@ create table if not exists public.profiles (
 alter table public.profiles enable row level security;
 
 drop policy if exists "profiles: read own"   on public.profiles;
-drop policy if exists "profiles: update own"  on public.profiles;
+drop policy if exists "profiles: update own"  on public.profiles;   -- removed: see note below
 drop policy if exists "profiles: insert own"  on public.profiles;
 create policy "profiles: read own"   on public.profiles for select using  (auth.uid() = id);
-create policy "profiles: update own" on public.profiles for update using  (auth.uid() = id) with check (auth.uid() = id);
 create policy "profiles: insert own" on public.profiles for insert with check (auth.uid() = id);
+-- NOTE: intentionally NO client update policy on profiles. `tier` is a privilege field —
+-- a plain "update own" policy would let any signed-in user run `update profiles set tier='root'`
+-- via the anon key (privilege escalation). Tier changes must be done server-side (admin SQL or a
+-- SECURITY DEFINER RPC). If per-user editing of a SAFE column (e.g. display_name) is needed later,
+-- add a column-scoped policy or a definer function that only touches that column — never `tier`.
 
 -- ---------- 2. saved_scenarios ----------
 create table if not exists public.saved_scenarios (

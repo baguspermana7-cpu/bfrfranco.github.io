@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.51.17 — 2026-07-11 (Supabase — security review fixes)
+
+Fixes from an adversarial security review of the new Supabase code (found before the schema was ever
+applied to the live project):
+- **CRITICAL — tier self-elevation removed.** The `profiles` RLS "update own" policy would have let any
+  signed-in user run `update profiles set tier='root'` via the anon key. Removed the client update policy
+  entirely (`supabase/schema.sql`); tier changes are server-side only. (The earlier SQL given to the owner
+  is superseded by this corrected version.)
+- **Escaped a database error string** before `innerHTML` in `account.html` + hardened `escapeHtml` to also
+  escape single quotes.
+- **Pinned the supabase-js CDN import** to an exact version (`@2.110.2`) in `js/rz-supabase.js`.
+- **Defense-in-depth `user_id` filters** on `listScenarios`/`deleteScenario` (RLS stays primary).
+- **`rz-scenario.js` now excludes `email` inputs by TYPE**, so credentials can never be captured into a
+  saved scenario.
+- Cache-bust `js/rz-supabase.js` + `js/rz-scenario.js` → `?v=2026-07-11b`.
+Verified: pinned client still connects (0 errors), capture excludes email; RLS + insert `user_id`-from-
+`auth.uid()` + trigger reviewed CLEAN.
+
 ## v1.51.16 — 2026-07-11 (Account page — version stamp)
 
 **Fixed**

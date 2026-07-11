@@ -14,7 +14,8 @@
 (function (w, d) {
   'use strict';
 
-  var EXCLUDE_TYPES = { password: 1, hidden: 1, file: 1, submit: 1, button: 1, image: 1 };
+  // email excluded by TYPE (not just by modal-ancestor) so credentials never leak into a saved scenario.
+  var EXCLUDE_TYPES = { password: 1, email: 1, hidden: 1, file: 1, submit: 1, button: 1, image: 1 };
 
   function isCapturable(el) {
     if (!el || !el.id) return false;

@@ -15,7 +15,9 @@
  *   <script type="module" src="js/rz-supabase.js"></script>
  *   // then: await window.rzSupa.ready; const u = await rzSupa.getUser();
  */
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+// Pinned to an exact version (auth-critical library — avoid silently loading a new patch).
+// Bump intentionally when upgrading.
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.2/+esm';
 
 const cfg = (typeof window !== 'undefined' && window.RZ_CONFIG) || {};
 const URL = cfg.SUPABASE_URL || '';
@@ -114,14 +116,18 @@ const api = {
     if (!client) return { data: [], error: initError };
     const user = await this.getUser();
     if (!user) return { data: [], error: 'not signed in' };
-    let q = client.from('saved_scenarios').select('*').order('created_at', { ascending: false });
+    // .eq('user_id') is defense-in-depth — RLS is the primary guard, but never rely on it alone.
+    let q = client.from('saved_scenarios').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
     if (calc) q = q.eq('calc', calc);
     const { data, error } = await q;
     return { data: data || [], error: friendly(error) };
   },
   async deleteScenario(id) {
     if (!client) return { error: initError };
-    const { error } = await client.from('saved_scenarios').delete().eq('id', id);
+    const user = await this.getUser();
+    if (!user) return { error: 'not signed in' };
+    // scope the delete to the caller's own rows (defense-in-depth alongside RLS)
+    const { error } = await client.from('saved_scenarios').delete().eq('id', id).eq('user_id', user.id);
     return { error: friendly(error) };
   }
 };
