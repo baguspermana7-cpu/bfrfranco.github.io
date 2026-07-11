@@ -10,7 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
 <!-- FIN Engine — shared finance brain (screener scoring + advisor scorecard). window.FINEngine -->
-<script src="../../fin-engine.min.js?v=2026-07-11-fin1"></script>
+<script src="../../fin-engine.min.js?v=2026-07-12-fin2"></script>
 <style>
 :root{--bg0:#0b1120;--bg1:#111827;--bg2:#1e293b;--bg3:#0f172a;--bd:#334155;--bd2:rgba(51,65,85,.4);--t1:#f1f5f9;--t2:#e2e8f0;--t3:#94a3b8;--t4:#64748b;--acc:#8b5cf6;--acc2:#a78bfa;--accbg:rgba(139,92,246,.1);--grn:#34d399;--grnbg:rgba(16,185,129,.15);--red:#f87171;--redbg:rgba(239,68,68,.15);--amb:#fbbf24;--ambbg:rgba(245,158,11,.15);--blu:#60a5fa;--blubg:rgba(96,165,250,.15);--cyn:#22d3ee;--sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;--mono:'JetBrains Mono',monospace;--r:14px;--rs:8px;--rx:6px}
 [data-theme="light"]{--bg0:#f8fafc;--bg1:#fff;--bg2:#fff;--bg3:#f1f5f9;--bd:#e2e8f0;--bd2:#f1f5f9;--t1:#1e293b;--t2:#334155;--t3:#64748b;--t4:#94a3b8}
@@ -883,7 +883,10 @@ async function loadAdvisorScorecard(containerId,sym,tf){
       floatPct:null,
       technical:analyze&&analyze.gauge?analyze.gauge.score:null
     };
-    var res=FINEngine.models.score.stock(stock,{preset:'balanced',market:market});
+    // Indonesian (.JK): Finnhub free has no fundamentals — fill from the FIN Engine's sourced
+    // free-float + issuer-disclosure snapshot (pe/pb/roe) so the scorecard isn't technical-only.
+    if(market==='ID')FINEngine.idxEnrich(sym,stock);
+    var res=FINEngine.models.score.stock(stock,{preset:market==='ID'?'idxBluechip':'balanced',market:market});
     renderAdvisorScorecard(containerId,res,sym);
   }catch(e){
     if(el)el.innerHTML='<div class="empty"><p>Scorecard unavailable.<\/p><\/div>';
@@ -3821,8 +3824,11 @@ async function runStockScreenV2(){
     // liquidity/float/technical). Map gateway fields → engine input; engine returns score/verdict/rank.
     let mapped=(Array.isArray(rows)?rows:[]).map(r=>({
       sym:r.sym,name:r.name||r.sym,price:r.price,chgPct:r.chgPct,
-      mcap:r.marketCap,pe:r.pe,vol:r.vol||0,sector:r.sector||'',divYield:r.divYield?r.divYield/100:null
+      mcap:r.marketCap>0?r.marketCap:null,pe:r.pe>0?r.pe:null,vol:r.vol||0,sector:r.sector||'',divYield:r.divYield?r.divYield/100:null
     }));
+    // Indonesian rows: enrich with the FIN Engine's sourced free-float + snapshot fundamentals
+    // (Finnhub free has no IDX coverage), so the Float/Value/Quality factors light up for .JK stocks.
+    if(market==='id'&&window.FINEngine&&FINEngine.idxEnrich){ mapped.forEach(r=>FINEngine.idxEnrich(r.sym,r)); }
     if(window.FINEngine&&FINEngine.models.score){
       mapped=FINEngine.models.score.rank(mapped,{preset:strategy,market:market});
     }

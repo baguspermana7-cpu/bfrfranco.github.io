@@ -165,6 +165,24 @@ Object.keys(D.factorWeights).forEach(p => {
     near('factorWeights ' + p + ' sums to 1', sum, 1, 0.001);
     Object.keys(w).forEach(k => ok('factorWeights ' + p + ' known factor ' + k, FACTORS.indexOf(k) !== -1));
 });
+// sourced IDX fundamentals — valid ranges + free-float lights up the float factor
+ok('idxFundamentals present', !!D.idxFundamentals && Object.keys(D.idxFundamentals).length >= 15);
+Object.keys(D.idxFundamentals).forEach(sym => {
+    const f = D.idxFundamentals[sym];
+    ok('idxFund ' + sym + ' .JK', /\.JK$/.test(sym));
+    if (f.freeFloat != null) ok('idxFund ' + sym + ' freeFloat 0..1', f.freeFloat > 0 && f.freeFloat <= 1);
+    if (f.pe != null) ok('idxFund ' + sym + ' pe>0', f.pe > 0);
+    ok('idxFund ' + sym + ' has asOf', !!f.asOf);
+});
+// idxEnrich fills floatPct so the Float factor scores for an IDX stock
+{
+    const enr = E.idxEnrich('BBCA.JK', { chgPct: 1, vol: 5e6 });
+    ok('idxEnrich fills floatPct', enr.floatPct === D.idxFundamentals['BBCA.JK'].freeFloat);
+    const scoredID = M.score.stock(enr, { preset: 'idxBluechip', market: 'id' });
+    ok('IDX float factor scores (not null)', scoredID.factors.float != null);
+    eq('idxEnrich no-op for US', E.idxEnrich('AAPL', { pe: 10 }).floatPct, undefined);
+    ok('idxEnrich does not overwrite provided value', E.idxEnrich('BBCA.JK', { floatPct: 0.9 }).floatPct === 0.9);
+}
 // every scoreBand referenced by a factor exists
 ['pe', 'pb', 'evEbitda', 'roe', 'netMargin', 'debtEquity', 'chgPct', 'divYield', 'mcap', 'vol', 'floatPct'].forEach(b =>
     ok('scoreBand ' + b + ' present', !!D.scoreBands[b]));

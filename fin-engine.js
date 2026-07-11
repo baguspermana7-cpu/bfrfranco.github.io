@@ -156,6 +156,31 @@
         // Free-float health bands (reuses the StockMap taxonomy).
         floatBands: { trap: 0.05, tight: 0.15, institutional: 0.35 },
 
+        // Sourced IDX fundamentals (free-float from issuer ownership disclosures; pe/pb/roe are
+        // issuer-disclosure SNAPSHOTS, per-ticker as-of — NOT live). Lets the Indonesian screener +
+        // scorecard score the Free-float (and some Value/Quality) factors, since Finnhub free has no
+        // IDX coverage. Values compiled from the StockMap sourced ledger. Missing fields → factor n/a.
+        idxFundamentals: {
+            'BBCA.JK': { freeFloat: 0.4506, pe: 22.1, pb: 4.8, roe: 0.214, asOf: '31 Dec 2024' },
+            'BBRI.JK': { freeFloat: 0.415, pe: 11.9, pb: 2.2, roe: 0.191, asOf: '31 Dec 2023' },
+            'TLKM.JK': { freeFloat: 0.439, pe: 10.8, pb: 1.8, roe: 0.165, asOf: '31 Dec 2024' },
+            'BMRI.JK': { freeFloat: 0.444, pe: 10.7, pb: 2.1, roe: 0.202, asOf: '30 Sep 2025' },
+            'BBNI.JK': { freeFloat: 0.406, pe: 9.8, pb: 1.4, roe: 0.151, asOf: '31 Jan 2026' },
+            'ASII.JK': { freeFloat: 0.4989, pe: 8.9, pb: 1.5, roe: 0.172, asOf: '28 Feb 2026' },
+            'TINS.JK': { freeFloat: 0.35, pe: 7.8, pb: 0.9, roe: 0.113, asOf: '2025' },
+            'ITMG.JK': { freeFloat: 0.3486, pe: 6.4, pb: 1.6, roe: 0.226, asOf: '31 Aug 2025' },
+            'GIAA.JK': { freeFloat: 0.0617, pb: 1.1, asOf: '2025' },
+            'INDF.JK': { freeFloat: 0.4991, asOf: 'Dec 2025' },
+            'ICBP.JK': { freeFloat: 0.1947, asOf: 'Mar 2025' },
+            'WTON.JK': { freeFloat: 0.3422, asOf: '2025' },
+            'WEGE.JK': { freeFloat: 0.30, asOf: '2025' },
+            'AUTO.JK': { freeFloat: 0.20, asOf: '2025' },
+            'AALI.JK': { freeFloat: 0.2032, asOf: 'Mar 2025' },
+            'WIKA.JK': { freeFloat: 0.0898, asOf: '2025' },
+            'SMGR.JK': { freeFloat: 0.486, asOf: '2025' },
+            'BUMI.JK': { freeFloat: 0.0206, pe: 7.2, pb: 1.1, roe: 0.084, asOf: '2025' }
+        },
+
         // Composite-score verdict thresholds (descriptive, not prescriptive).
         verdictBands: [
             { min: 75, label: 'Strong' },
@@ -177,6 +202,7 @@
             'scoreBands': { source: 'Engine methodology — normalization ranges from typical market distributions', asOf: '2026', method: 'min-max, log for size/liquidity' },
             'factorWeights': { source: 'Engine methodology — factor-investing style weights (Fama-French value/quality/momentum lineage)', asOf: '2026', method: 'weights per preset; re-normalized over available factors' },
             'floatBands': { source: 'StockMap free-float taxonomy (float-trap / tight / institutional)', asOf: '2026', unit: 'fraction of shares outstanding' },
+            'idxFundamentals': { source: 'StockMap sourced ledger — issuer disclosures (annual reports / IDX ownership pages)', asOf: '2024–2026 (per-ticker, see asOf)', unit: 'freeFloat fraction; pe/pb ratio; roe fraction', method: 'free-float from issuer ownership composition; pe/pb/roe are issuer-disclosure snapshots, not live' },
             'verdictBands': { source: 'Engine methodology — composite score → descriptive verdict', asOf: '2026', method: 'descriptive, not prescriptive' }
         },
 
@@ -655,10 +681,24 @@
     /* ====================================================================
      * Engine assembly
      * ==================================================================== */
+    // Merge sourced IDX fundamentals (free-float + snapshot pe/pb/roe) into a stock object, filling
+    // ONLY fields the caller left null/undefined. Returns the enriched object. No-op for non-.JK.
+    function idxEnrich(sym, stock) {
+        stock = stock || {};
+        var f = DATA.idxFundamentals[sym];
+        if (!f) return stock;
+        ['freeFloat', 'pe', 'pb', 'roe'].forEach(function (k) {
+            var target = k === 'freeFloat' ? 'floatPct' : k;
+            if ((stock[target] == null) && isNum(f[k])) stock[target] = f[k];
+        });
+        return stock;
+    }
+
     var FINEngine = {
         version: DATA.version,
         DISCLAIMER: DISCLAIMER,
         data: DATA,
+        idxEnrich: idxEnrich,
         models: {
             ratios: ratios,
             valuation: valuation,

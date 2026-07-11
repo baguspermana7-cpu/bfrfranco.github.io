@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.52.2 — 2026-07-12 (FIN Engine — sourced Indonesian free-float lights up the Float factor)
+
+The owner's headline "float screener" now has **real free-float data for Indonesian stocks** — sourced, not
+fabricated.
+
+**Added**
+- **`fin-engine.js` `DATA.idxFundamentals`** — sourced free-float (+ issuer-snapshot pe/pb/roe) for **18 IDX
+  blue chips** (`.JK`), compiled from the StockMap sourced ledger (issuer ownership disclosures / IDX pages,
+  per-ticker `asOf`), with a `DATA.sources` provenance entry. New `FINEngine.idxEnrich(sym, stock)` fills
+  these into a `.JK` stock (only where the caller left a field null).
+- **Finance Terminal** — the Indonesian screener + advisor scorecard now enrich `.JK` rows via `idxEnrich`,
+  so the **Float / Value / Quality** factors score with real data (e.g. BBCA.JK confidence 0.5 → 0.88, float
+  factor 89 from a sourced 45% free-float). Tickers without a sourced value keep float "n/a" (honest);
+  pe/pb/roe are issuer-disclosure snapshots (as-of), not live — never fabricated.
+- Engine gate `tools/test-fin-engine.mjs` extended (270 assertions): `idxFundamentals` ranges + provenance +
+  `idxEnrich` behavior. Min rebuilt (`?v=2026-07-12-fin2`).
+
 ## v1.52.1 — 2026-07-12 (FIN Engine — Phase 4: accuracy backtest + richer momentum)
 
 **Added**

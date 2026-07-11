@@ -62,12 +62,17 @@ edge** (mean-reversion dominates) — so the gauge is a **descriptive** read of 
 predictor**. This is *why* the engine blends multiple factors and disclaims; the harness prints this verdict.
 
 ## Free-float data (honest position)
-The `float` factor is first-class, but true numeric free-float is not on the free data tier. **US** has no
-free-float → `null`, shown "n/a", excluded from the blend (recorded in `confidence`). **ID** likewise stays
-`null` until a *sourced numeric* free-float dataset is wired — the StockMap app holds a **qualitative**
-ownership ledger (not clean percentages), and numbers are never fabricated (provenance rule). StockMap is
-intentionally "official-source-only" (no live data), so live FIN scoring is NOT grafted onto it; the engine
-instead borrows StockMap's float taxonomy (`floatBands`).
+The `float` factor is first-class. True numeric free-float is not on the *market-data* free tier, so:
+- **ID (Indonesian):** `DATA.idxFundamentals` carries **sourced** free-float (+ snapshot pe/pb/roe) for 18
+  IDX blue chips, compiled from the **StockMap sourced ledger** (issuer ownership disclosures / IDX pages,
+  per-ticker `asOf`). `FINEngine.idxEnrich(sym, stock)` fills these into a `.JK` stock (only where the caller
+  left them null) → the terminal's ID screener + scorecard score Float/Value/Quality with real data
+  (confidence rises accordingly). Tickers without a sourced value keep `floatPct=null` (honest "n/a") — the
+  pe/pb/roe are issuer-disclosure **snapshots** (as-of), NOT live. Numbers are never fabricated.
+- **US:** no free-float on free data → `null`, shown "n/a", excluded (recorded in `confidence`).
+
+StockMap itself is intentionally "official-source-only" (no live data), so live FIN scoring is NOT grafted
+onto it; the engine instead *borrows* StockMap's float taxonomy (`floatBands`) + its sourced free-float.
 
 ## Gate — `tools/test-fin-engine.mjs` (SHIP GATE, mirrors `test-rz-engine.mjs`)
 Node-vm load + assertions: worked examples (ratios/valuation/technical/score/risk), **ta.js parity**
