@@ -8,11 +8,21 @@ B-009 / B-010 / B-011 / B-012 at the root.
 Everything here is a **one-time owner task** (needs your Cloudflare account). The Worker
 code + endpoints are already built and tested locally (`npm test`).
 
-## 0. Prereqisites
+## 0. Prerequisites
 - A free Cloudflare account.
 - Your Finnhub API token (the 40-char key; a free key is fine — 55 req/min, the Worker
   caches so that's plenty). You can rotate to a fresh/private key here — the browser
   never sees it.
+
+Run the static preflight first (no wrangler/login/network needed) — it confirms the
+package is sound and reminds you of the pre-deploy steps:
+```bash
+cd cf-worker
+npm run preflight
+```
+It parses every worker module, checks the endpoint↔docs contract + secret hygiene, and
+warns if the KV ids in `wrangler.toml` are still placeholders. "READY" (or "READY with
+warnings" for the expected KV step) = good to proceed.
 
 ## 1. Log in
 ```bash
