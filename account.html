@@ -104,6 +104,7 @@
   </div>
 
   <script src="js/rz-config.js"></script>
+  <script src="js/rz-scenario.js"></script>
   <script type="module" src="js/rz-supabase.js"></script>
   <script type="module">
     const $ = (id) => document.getElementById(id);
@@ -137,16 +138,31 @@
         const el = document.createElement('div');
         el.className = 'scn';
         const when = new Date(r.created_at).toLocaleString();
+        const p = r.payload || {};
+        const sum = p.summary || {};
+        const hasInputs = !!(p.inputs && Object.keys(p.inputs).length);
+        let extra = '';
+        if (sum.total != null) extra = ' · total ' + fmtMoney(sum.total);
         el.innerHTML = '<div class="row"><div><div class="t">'+escapeHtml(r.name)+'</div>'
-          + '<div class="m">'+escapeHtml(r.calc)+' · '+when+'</div></div>'
-          + '<button class="danger" data-id="'+r.id+'">Delete</button></div>';
+          + '<div class="m">'+escapeHtml(r.calc)+' · '+when+extra+'</div></div>'
+          + '<div style="display:flex;gap:6px;">'
+          + (hasInputs ? '<button class="danger" style="border-color:rgba(59,130,246,0.5);color:#93c5fd;" data-open="'+r.id+'">Open</button>' : '')
+          + '<button class="danger" data-id="'+r.id+'">Delete</button></div></div>';
+        el._row = r;
         list.appendChild(el);
       });
-      list.querySelectorAll('button.danger').forEach(b => b.onclick = async () => {
+      list.querySelectorAll('button[data-id]').forEach(b => b.onclick = async () => {
         await S.deleteScenario(b.getAttribute('data-id')); render();
+      });
+      list.querySelectorAll('button[data-open]').forEach(b => b.onclick = () => {
+        const id = b.getAttribute('data-open');
+        const row = rows.find(x => x.id === id);
+        if (row && row.payload && row.payload.inputs && window.rzScenario)
+          window.rzScenario.openInCalc(row.calc, row.payload.inputs);
       });
     }
     function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+    function fmtMoney(n){ n = Number(n)||0; return n>=1e9 ? '$'+(n/1e9).toFixed(2)+'B' : n>=1e6 ? '$'+(n/1e6).toFixed(1)+'M' : n>=1e3 ? '$'+Math.round(n/1e3)+'K' : '$'+Math.round(n); }
 
     $('btnSignup').onclick = async () => {
       const { data, error } = await S.signUp($('email').value.trim(), $('password').value);

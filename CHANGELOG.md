@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.51.14 — 2026-07-11 (Supabase — reloadable saved scenarios)
+
+**Added**
+- **`js/rz-scenario.js`** — generic capture/restore of a calculator's input state: captures every
+  relevant `input/select/textarea` by id (excludes password/auth/modal fields), and restores by setting
+  values + dispatching `input`/`change` so the calculator recomputes. Auto-restores a pending scenario on
+  load via `<body data-rz-calc="…">` + a `localStorage.rz_open_scenario` handoff. Exposes
+  `window.rzScenario.{capture, restore, openInCalc}`.
+- **CAPEX** now saves the **full input state** (not just a display summary), so a saved scenario is
+  **reloadable**; `account.html` gained an **"Open"** button per scenario that reopens it in its calculator
+  with all inputs restored. Verified headlessly end-to-end (34 inputs captured — no auth fields; change +
+  restore reverts; the open handoff restores inputs on reload and clears the key), 0 console errors.
+
 ## v1.51.13 — 2026-07-11 (Supabase — real accounts + database, phase 1: config, client, account page)
 
 **Added** — additive foundation for real user accounts + per-user data (Supabase, Tokyo project). Does

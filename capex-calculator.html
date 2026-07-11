@@ -1155,7 +1155,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <link rel="stylesheet" href="css/rz-calc-editorial.css?v=1.43.55">
 </head>
-<body>
+<body data-rz-calc="capex">
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="page-background"></div>
@@ -5138,6 +5138,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
 <!-- Supabase: save this scenario to your account (additive; does not touch existing auth) -->
 <script src="js/rz-config.js?v=2026-07-11"></script>
+<script src="js/rz-scenario.js?v=2026-07-11"></script>
 <script type="module" src="js/rz-supabase.js?v=2026-07-11"></script>
 <script>
   // Save the current CAPEX result to the logged-in user's Supabase account.
@@ -5153,11 +5154,13 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
       if (!lastResult) { show('Run a calculation first.', false); return; }
       var r = lastResult;
       var name = (r.cityLabel ? r.cityLabel + ' · ' : '') + (r.itLoad || '?') + ' · ' + (r.tierInfo && r.tierInfo.tier ? r.tierInfo.tier : 'Tier') ;
-      // compact payload (avoid the heavy _config/_timeline/_raw internals)
-      var payload = { total: r.total, itLoad: r.itLoad, tier: r.tierInfo && r.tierInfo.tier,
+      // payload = a compact summary (for display) + the full input state (so the scenario is reloadable)
+      var summary = { total: r.total, itLoad: r.itLoad, tier: r.tierInfo && r.tierInfo.tier,
                       pue: r.pue, city: r.cityLabel, contingency: r.contingency, softCosts: r.softCosts,
                       fomTotal: r.fomTotal, annualEnergy: r.annualEnergy, year: r.yearLabel,
                       perKw: (r.total && r.itLoad) ? Math.round(r.total / (parseFloat(String(r.itLoad).replace(/[^0-9.]/g,'')) || 1)) : null };
+      var inputs = (window.rzScenario && window.rzScenario.capture) ? window.rzScenario.capture() : {};
+      var payload = { summary: summary, inputs: inputs };
       var res = await window.rzSupa.saveScenario('capex', name, payload);
       if (res.error) { show('Save failed: ' + res.error, false); return; }
       show('☁ Saved to your account — see it in My Account.', true);

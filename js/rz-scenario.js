@@ -1,0 +1,93 @@
+/**
+ * rz-scenario.js — save/restore a calculator's input state so a saved scenario can be
+ * reopened later. Generic: captures every relevant input/select/textarea on the page by
+ * `id` → value (no per-calculator field list needed), and restores by setting values +
+ * dispatching input/change so the calculator recomputes.
+ *
+ * Auth/modal fields are excluded (never capture passwords). Pairs with rz-supabase.js
+ * (which persists the captured map) and account.html (which triggers "Open").
+ *
+ * Auto-restore: a page sets `<body data-rz-calc="capex">`; on load, if
+ * localStorage.rz_open_scenario matches that calc, its inputs are restored then the key
+ * is cleared. Exposes window.rzScenario = { capture, restore, openInCalc }.
+ */
+(function (w, d) {
+  'use strict';
+
+  var EXCLUDE_TYPES = { password: 1, hidden: 1, file: 1, submit: 1, button: 1, image: 1 };
+
+  function isCapturable(el) {
+    if (!el || !el.id) return false;
+    var tag = el.tagName;
+    if (tag !== 'INPUT' && tag !== 'SELECT' && tag !== 'TEXTAREA') return false;
+    if (tag === 'INPUT' && EXCLUDE_TYPES[(el.type || '').toLowerCase()]) return false;
+    // Skip anything inside an auth/login modal (avoids capturing email/password).
+    if (el.closest && el.closest('#rzModalOverlay, .rz-modal-overlay, [id*="ogin"], [id*="odal"]')) return false;
+    return true;
+  }
+
+  /** Capture the page's input state → { id: {t, v} }. */
+  function capture(root) {
+    var scope = (typeof root === 'string' ? d.querySelector(root) : root) || d;
+    var out = {};
+    var els = scope.querySelectorAll('input[id], select[id], textarea[id]');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      if (!isCapturable(el)) continue;
+      var t = el.tagName === 'SELECT' ? 'select' : (el.type || 'text').toLowerCase();
+      if (t === 'checkbox') out[el.id] = { t: 'checkbox', v: !!el.checked };
+      else if (t === 'radio') { if (el.checked) out[el.id] = { t: 'radio', v: el.value }; }
+      else out[el.id] = { t: t, v: el.value };
+    }
+    return out;
+  }
+
+  function fire(el, type) { try { el.dispatchEvent(new Event(type, { bubbles: true })); } catch (e) {} }
+
+  /** Restore a captured map onto the page, triggering recompute. */
+  function restore(map) {
+    if (!map) return;
+    Object.keys(map).forEach(function (id) {
+      var el = d.getElementById(id);
+      if (!el) return;
+      var rec = map[id];
+      try {
+        if (rec.t === 'checkbox') { el.checked = !!rec.v; }
+        else if (rec.t === 'radio') {
+          var radios = d.getElementsByName(el.name || id);
+          for (var j = 0; j < radios.length; j++) radios[j].checked = (radios[j].value === rec.v);
+        } else { el.value = rec.v; }
+        fire(el, 'input'); fire(el, 'change');
+      } catch (e) {}
+    });
+  }
+
+  /** From account.html: stash a scenario's inputs and navigate to its calculator. */
+  function openInCalc(calc, inputs) {
+    try { w.localStorage.setItem('rz_open_scenario', JSON.stringify({ calc: calc, inputs: inputs, ts: Date.now() })); } catch (e) {}
+    var file = ({ capex: 'capex-calculator.html', opex: 'opex-calculator.html', roi: 'roi-calculator.html',
+                  tco: 'tco-calculator.html', pue: 'pue-calculator.html' })[calc] || (calc + '-calculator.html');
+    w.location.href = file;
+  }
+
+  /** On a calculator page, restore a pending "Open" scenario for this calc (once). */
+  function autoRestore() {
+    var calc = d.body && d.body.getAttribute('data-rz-calc');
+    if (!calc) return;
+    var raw;
+    try { raw = w.localStorage.getItem('rz_open_scenario'); } catch (e) { return; }
+    if (!raw) return;
+    var obj;
+    try { obj = JSON.parse(raw); } catch (e) { return; }
+    if (!obj || obj.calc !== calc || !obj.inputs) return;
+    try { w.localStorage.removeItem('rz_open_scenario'); } catch (e) {}
+    // Restore after the page's own init has run.
+    setTimeout(function () { restore(obj.inputs); }, 350);
+    setTimeout(function () { restore(obj.inputs); }, 900);
+  }
+
+  w.rzScenario = { capture: capture, restore: restore, openInCalc: openInCalc };
+
+  if (d.readyState === 'loading') w.addEventListener('DOMContentLoaded', autoRestore);
+  else autoRestore();
+})(typeof window !== 'undefined' ? window : this, typeof document !== 'undefined' ? document : null);
