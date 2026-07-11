@@ -77,6 +77,9 @@
 
   /** From account.html: stash a scenario's inputs and navigate to its calculator. */
   function openInCalc(calc, inputs) {
+    // calc is set by each calculator's own Save button (a known literal), but sanitize before it
+    // reaches location.href so a malformed stored value can never build an unexpected path.
+    if (!/^[a-z0-9-]{1,40}$/.test(String(calc || ''))) return;
     try { w.localStorage.setItem('rz_open_scenario', JSON.stringify({ calc: calc, inputs: inputs, ts: Date.now() })); } catch (e) {}
     var file = ({ capex: 'capex-calculator.html', opex: 'opex-calculator.html', roi: 'roi-calculator.html',
                   tco: 'tco-calculator.html', pue: 'pue-calculator.html' })[calc] || (calc + '-calculator.html');
@@ -93,6 +96,12 @@
     var obj;
     try { obj = JSON.parse(raw); } catch (e) { return; }
     if (!obj || obj.calc !== calc || !obj.inputs) return;
+    // Expire a stale pending scenario (e.g. the calc page never finished loading last time) so it
+    // can't silently overwrite the user's fresh inputs on a much later visit. 60-minute TTL.
+    if (obj.ts && (Date.now() - obj.ts) > 60 * 60 * 1000) {
+      try { w.localStorage.removeItem('rz_open_scenario'); } catch (e) {}
+      return;
+    }
     try { w.localStorage.removeItem('rz_open_scenario'); } catch (e) {}
     // Restore after the page's own init has run.
     setTimeout(function () { restore(obj.inputs); }, 350);
@@ -135,21 +144,29 @@
     if (!d.getElementById('rzAccountPillCss')) {
       var st = d.createElement('style');
       st.id = 'rzAccountPillCss';
+      // Industrial-instrument idiom (documentation/design.md): deep-slate surface, 1px hairline,
+      // instrument-cyan (#00DDFF, informational/secondary data), JetBrains Mono data-field label,
+      // 4px radius. NO glassmorphism blur, NO generic-blue — both are on the anti-pattern list.
       st.textContent =
-        '#rzAccountPill{position:fixed;left:14px;bottom:14px;z-index:1200;background:rgba(30,41,59,0.92);' +
-        'color:#93c5fd;border:1px solid rgba(59,130,246,0.45);border-radius:999px;padding:7px 14px;' +
-        "font:600 12px/1 system-ui,-apple-system,'Segoe UI',sans-serif;text-decoration:none;" +
-        'box-shadow:0 4px 14px rgba(0,0,0,0.35);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);' +
-        'display:inline-flex;align-items:center;gap:6px;transition:filter .15s;}' +
-        '#rzAccountPill:hover{filter:brightness(1.15);}' +
-        '@media(max-width:768px){#rzAccountPill{bottom:74px;}}';
+        '#rzAccountPill{position:fixed;left:16px;bottom:16px;z-index:1200;background:#111827;' +
+        'color:#00DDFF;border:1px solid rgba(0,221,255,0.34);border-radius:4px;padding:8px 12px;' +
+        "font-family:'JetBrains Mono','SF Mono','Cascadia Code','Consolas',monospace;font-size:10.5px;" +
+        'font-weight:500;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;' +
+        'box-shadow:0 2px 8px rgba(0,0,0,0.4);display:inline-flex;align-items:center;gap:8px;' +
+        'transition:border-color .15s,color .15s;}' +
+        '#rzAccountPill::before{content:"";width:6px;height:6px;border-radius:50%;background:#00DDFF;' +
+        'box-shadow:0 0 6px rgba(0,221,255,0.7);flex:0 0 auto;}' +
+        '#rzAccountPill:hover{border-color:rgba(0,221,255,0.7);color:#7fefff;}' +
+        '#rzAccountPill:focus-visible{outline:2px solid rgba(0,221,255,0.7);outline-offset:2px;}' +
+        '@media(max-width:768px){#rzAccountPill{bottom:76px;}}';
       (d.head || d.documentElement).appendChild(st);
     }
     var a = d.createElement('a');
     a.id = 'rzAccountPill';
     a.href = 'account.html';
-    a.title = 'View your saved scenarios';
-    a.textContent = '👤 My Account';
+    a.title = 'View your account and saved scenarios';
+    a.setAttribute('aria-label', 'My account and saved scenarios');
+    a.textContent = 'My Account';
     d.body.appendChild(a);
   }
 

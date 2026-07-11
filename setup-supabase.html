@@ -105,7 +105,7 @@ create policy "scenarios: insert own" on public.saved_scenarios for insert with 
 create policy "scenarios: update own" on public.saved_scenarios for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "scenarios: delete own" on public.saved_scenarios for delete using (auth.uid() = user_id);
 
-create or replace function public.enforce_scenario_limit() returns trigger language plpgsql as $$
+create or replace function public.enforce_scenario_limit() returns trigger language plpgsql set search_path = public as $$
 begin
   if (select count(*) from public.saved_scenarios where user_id = new.user_id) &gt;= 200 then
     raise exception 'saved scenario limit reached (200). Delete some to save more.';

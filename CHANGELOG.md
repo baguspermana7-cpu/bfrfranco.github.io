@@ -11,6 +11,32 @@ release sections rather than semver.
 
 ---
 
+## v1.51.23 — 2026-07-11 (Supabase — review fixes + UI/UX polish)
+
+Independent security + code review of v1.51.21–.22 (two review agents), then fixes + a UI/UX pass.
+The escalation/XSS vectors were confirmed **closed**; the items below are correctness, robustness,
+and design polish.
+
+**Review fixes**
+- **rz-ops panel**: derive root status from the caller's OWN profile row (by id) instead of a
+  row-count heuristic; the self-tier-change warning now re-reads a fresh user (with cached
+  fallback) so it can't silently misfire after a session change.
+- **`js/rz-supabase.js`**: `getProfile`/`listAllProfiles` now select an explicit column list (no
+  `select('*')`) and `listAllProfiles` is bounded with `.limit(1000)`.
+- **`js/rz-scenario.js`**: a pending "Open in calc" scenario now expires after 60 min (so a stale
+  one can't overwrite fresh inputs on a much later visit); `openInCalc` sanitizes the calc name
+  before it reaches `location.href`.
+- **`supabase/schema.sql`**: `enforce_scenario_limit()` gains `set search_path = public`
+  (defense-in-depth consistency with the other functions). Re-verified on real PostgreSQL 16.
+
+**UI/UX polish (per documentation/design.md — industrial-instrument idiom)**
+- **"My Account" pill** rebuilt to brand spec: deep-slate surface, 1px instrument-cyan hairline,
+  glowing status dot, JetBrains Mono uppercase label, 4px radius. Removed the glassmorphism blur
+  and generic-blue — both are on the design-system anti-pattern list.
+- **rz-ops "Supabase Accounts" panel**: instrument-style state banner (state-colored left border +
+  icon), a live account-count chip, mono-styled tier dropdowns, aligned table columns (header no
+  longer collides), and a clearer empty state.
+
 ## v1.51.22 — 2026-07-11 (Supabase — security hardening of accounts + tier management)
 
 **Security / robustness** — closed tier-escalation vectors and locked the accounts model down.

@@ -118,6 +118,16 @@
         .tier-badge.demo{background:rgba(245,158,11,0.18);color:#fbbf24}
         .tier-badge.educator{background:rgba(8,145,178,0.18);color:#67e8f9}
         .tier-badge.root{background:rgba(239,68,68,0.18);color:#fca5a5}
+        /* Supabase panel: instrument-style state banner (border-left color = state) */
+        .supa-status{display:flex;align-items:center;gap:9px;font-size:0.76rem;color:#cbd5e1;background:rgba(15,23,42,0.6);border:1px solid rgba(51,65,85,0.5);border-left:2px solid #334155;border-radius:4px;padding:8px 12px;line-height:1.35}
+        .supa-status i{flex:0 0 auto;font-size:0.8rem}
+        .supa-status a{color:#67e8f9;text-decoration:underline}
+        #supaAccountsList .cred-row select{font-family:'JetBrains Mono',monospace;background:#0b1220;color:#e2e8f0;border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:5px 8px;font-size:0.72rem;cursor:pointer;transition:border-color .15s}
+        #supaAccountsList .cred-row select:hover{border-color:rgba(34,211,238,0.55)}
+        #supaAccountsList .cred-row select:focus{outline:none;border-color:#22d3ee}
+        #supaAccountsList .cred-row select:disabled{opacity:0.5;cursor:progress}
+        body.light-mode .supa-status{background:#f8fafc;border-color:#e2e8f0;color:#475569}
+        body.light-mode #supaAccountsList .cred-row select{background:#fff;color:#1e293b;border-color:#e2e8f0}
         .status-dot{display:inline-flex;align-items:center;gap:6px}
         .status-dot::before{content:'';width:7px;height:7px;border-radius:50%}
         .status-dot.active::before{background:#34d399}
@@ -1010,12 +1020,12 @@
     <!-- Supabase Accounts (live, RLS root-only) -->
     <div class="card" style="margin-top:1rem;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;flex-wrap:wrap;gap:0.5rem;">
-            <div class="card-title" style="margin:0"><i class="fas fa-database" style="color:#22d3ee"></i> Supabase Accounts <span style="font-size:0.62rem;font-weight:700;color:#34d399;background:rgba(16,185,129,0.15);padding:2px 8px;border-radius:999px;">LIVE</span></div>
+            <div class="card-title" style="margin:0"><i class="fas fa-database" style="color:#22d3ee"></i> Supabase Accounts <span style="font-size:0.62rem;font-weight:700;color:#34d399;background:rgba(16,185,129,0.15);padding:2px 8px;border-radius:999px;">LIVE</span><span id="supaAccountsCount" style="display:none;font-family:'JetBrains Mono',monospace;font-size:0.62rem;font-weight:600;color:#22d3ee;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);padding:2px 8px;border-radius:4px;"></span></div>
             <button class="btn btn-ghost btn-sm" onclick="loadSupaAccounts()"><i class="fas fa-rotate"></i> Refresh</button>
         </div>
         <p style="font-size:0.72rem;color:#94a3b8;margin:0 0 0.75rem;">Real registered users from Supabase. Passwords are <b>never shown</b> (Supabase stores them hashed — that is correct &amp; secure). You can change a user's tier below. Requires you to be signed in as a <b>root</b> user (via <a href="account.html" target="_blank" style="color:#67e8f9;">account.html</a>).</p>
-        <div id="supaAccountsStatus" style="font-size:0.8rem;color:#94a3b8;margin-bottom:0.5rem;">Loading…</div>
-        <div class="tbl-overflow" id="supaAccountsList"></div>
+        <div id="supaAccountsStatus" class="supa-status" style="border-left-color:#334155;"><i class="fas fa-circle-notch fa-spin" style="color:#64748b"></i><span>Loading…</span></div>
+        <div class="tbl-overflow" id="supaAccountsList" style="margin-top:0.6rem;"></div>
     </div>
 </div>
 
@@ -3212,36 +3222,48 @@ function exportCredCSV(){const h='Name,Email,Password,Tier,Role';const r=getAllC
 // ═══════════════════════════════════════════════════════════════
 function rzEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 var SUPA_TIERS=['free','demo','pro','root'];
-function supaStatus(msg,color){var el=document.getElementById('supaAccountsStatus');if(el){el.textContent=msg;el.style.color=color||'#94a3b8';}}
+// Instrument-style state banner. state: 'loading'|'ok'|'warn'|'err'|'info'. `html`=true renders
+// trusted markup (e.g. a sign-in link); default treats msg as plain text (safe). Sets the
+// left-border + icon by state so the panel reads like a status line, not a colored sentence.
+var SUPA_STATE={loading:{c:'#64748b',i:'fa-circle-notch fa-spin'},ok:{c:'#34d399',i:'fa-circle-check'},warn:{c:'#fbbf24',i:'fa-triangle-exclamation'},err:{c:'#f87171',i:'fa-circle-xmark'},info:{c:'#22d3ee',i:'fa-circle-info'}};
+function supaStatus(msg,state,html){var el=document.getElementById('supaAccountsStatus');if(!el)return;var s=SUPA_STATE[state]||SUPA_STATE.info;el.style.borderLeftColor=s.c;var body=html?msg:rzEsc(msg);el.innerHTML='<i class="fas '+s.i+'" style="color:'+s.c+'"></i><span>'+body+'</span>';}
+function supaCount(txt){var el=document.getElementById('supaAccountsCount');if(el){if(txt){el.textContent=txt;el.style.display='inline-flex';}else{el.style.display='none';}}}
 async function loadSupaAccounts(){
     var listEl=document.getElementById('supaAccountsList');
     var S=window.rzSupa;
-    if(!S||!S.configured){supaStatus('Supabase not configured on this page.','#f87171');if(listEl)listEl.innerHTML='';return;}
-    supaStatus('Loading…','#94a3b8');
+    if(!S||!S.configured){supaCount('');supaStatus('Supabase not configured on this page.','err');if(listEl)listEl.innerHTML='';return;}
+    supaCount('');supaStatus('Loading…','loading');
     try{
         var user=await S.getUser();
         window.__supaMe=user||null;
-        if(!user){supaStatus('Not signed in. Open account.html and log in as a root user, then Refresh.','#fbbf24');if(listEl)listEl.innerHTML='<div style="padding:0.6rem 0"><a href="account.html" target="_blank" style="color:#67e8f9;text-decoration:underline;">Open account.html to sign in →</a></div>';return;}
+        if(!user){supaStatus('Not signed in. <a href="account.html" target="_blank">Open account.html</a> and log in as a root user, then Refresh.','warn',true);if(listEl)listEl.innerHTML='';return;}
         var res=await S.listAllProfiles();
-        if(res.error){supaStatus('Error: '+rzEsc(res.error),'#f87171');if(listEl)listEl.innerHTML='';return;}
+        if(res.error){supaStatus(res.error,'err');if(listEl)listEl.innerHTML='';return;}
         var rows=res.data||[];
-        var isRoot=rows.length>1||(rows[0]&&rows[0].tier==='root');
-        if(!isRoot){supaStatus('Signed in as '+rzEsc(user.email)+' — not a root account, so only your own row is visible. Tier changes require root.','#fbbf24');}
-        else{supaStatus('Signed in as '+rzEsc(user.email)+' (root). '+rows.length+' account'+(rows.length===1?'':'s')+'. Change a tier from the dropdown.','#34d399');}
+        // Derive root status from the CALLER'S OWN row (by id), never from row-count — the count
+        // heuristic could falsely present admin controls if RLS ever changed. (Server RPC still
+        // enforces root regardless; this only governs whether the dropdowns are shown.)
+        var myRow=null; for(var mi=0;mi<rows.length;mi++){ if(rows[mi]&&rows[mi].id===user.id){ myRow=rows[mi]; break; } }
+        var isRoot=!!(myRow&&myRow.tier==='root');
+        supaCount(rows.length+(rows.length===1?' account':' accounts'));
+        if(!isRoot){supaStatus('Signed in as '+user.email+' — not a root account, so only your own row is visible. Tier changes require root.','info');}
+        else{supaStatus('Signed in as '+user.email+' (root). Change a tier from the dropdown; changes apply instantly.','ok');}
         renderSupaAccounts(rows,isRoot);
-    }catch(e){supaStatus('Load failed: '+rzEsc(e&&e.message||e),'#f87171');if(listEl)listEl.innerHTML='';}
+    }catch(e){supaStatus('Load failed: '+(e&&e.message||e),'err');if(listEl)listEl.innerHTML='';}
 }
 function renderSupaAccounts(rows,isRoot){
     var listEl=document.getElementById('supaAccountsList');
     if(!listEl)return;
-    if(!rows.length){listEl.innerHTML='<div style="padding:0.6rem 0;color:#64748b">No accounts yet.</div>';return;}
-    var GRID='grid-template-columns:44px 1fr auto auto auto';
+    if(!rows.length){listEl.innerHTML='<div style="padding:0.8rem;color:#64748b;text-align:center;font-size:0.78rem"><i class="fas fa-inbox" style="opacity:0.6"></i>&nbsp; No accounts registered yet.</div>';return;}
+    // Fixed column widths so the header row and body rows align (auto-columns sized per-row,
+    // which made the header labels collide). Cols: avatar · email · tier badge · set-tier · created.
+    var GRID='grid-template-columns:44px minmax(0,1fr) 76px 120px 96px;gap:8px';
     var body=rows.map(function(p){
         var created=p.created_at?String(p.created_at).split('T')[0]:'—';
         var badge='<span class="tier-badge '+rzEsc(p.tier)+'">'+rzEsc((p.tier||'free').toUpperCase())+'</span>';
         var sel;
         if(isRoot){
-            sel='<select onchange="changeSupaTier(\''+rzEsc(p.id)+'\',this.value,this)" style="background:#0f172a;color:#e2e8f0;border:1px solid rgba(148,163,184,0.3);border-radius:6px;padding:4px 8px;font-size:0.75rem">'+
+            sel='<select aria-label="Change tier for '+rzEsc(p.email||'user')+'" onchange="changeSupaTier(\''+rzEsc(p.id)+'\',this.value,this)">'+
                 SUPA_TIERS.map(function(t){return '<option value="'+t+'"'+(t===p.tier?' selected':'')+'>'+t+'</option>';}).join('')+'</select>';
         }else{sel=badge;}
         return '<div class="cred-row" style="'+GRID+'">'+
@@ -3259,18 +3281,20 @@ async function changeSupaTier(userId,tier,selEl){
     if(!S||!S.configured)return;
     // Confirm sensitive changes: granting root is a privileged grant; changing your OWN row
     // risks a lockout. Both are still enforced server-side (RPC + last-root guard) regardless.
-    var me=window.__supaMe;
+    // Read a FRESH user for the self-check (session may have changed since the last load), and
+    // fall back to the cached one if that lookup fails, so the warning never silently misfires.
+    var me=null; try{ me=await S.getUser(); }catch(_e){} if(!me) me=window.__supaMe;
     var isSelf=me&&me.id===userId;
     if(tier==='root'){ if(!window.confirm('Grant ROOT (full admin) to this account? This gives complete access to the Supabase Accounts panel.')){loadSupaAccounts();return;} }
     if(isSelf&&tier!=='root'){ if(!window.confirm('You are about to change YOUR OWN tier away from root. If you are the last root you will be blocked; otherwise you may lose admin access. Continue?')){loadSupaAccounts();return;} }
     if(selEl)selEl.disabled=true;
-    supaStatus('Updating tier…','#94a3b8');
+    supaStatus('Updating tier…','loading');
     try{
         var res=await S.setTier(userId,tier);
-        if(res.error){supaStatus('Update failed: '+rzEsc(res.error),'#f87171');if(selEl)selEl.disabled=false;return;}
-        supaStatus('Tier updated to '+rzEsc(tier)+'. Refreshing…','#34d399');
+        if(res.error){supaStatus('Update failed: '+(res.error),'err');if(selEl)selEl.disabled=false;return;}
+        supaStatus('Tier updated to '+tier+'. Refreshing…','ok');
         loadSupaAccounts();
-    }catch(e){supaStatus('Update failed: '+rzEsc(e&&e.message||e),'#f87171');if(selEl)selEl.disabled=false;}
+    }catch(e){supaStatus('Update failed: '+(e&&e.message||e),'err');if(selEl)selEl.disabled=false;}
 }
 // Auto-load the panel once the Supabase module has attached (it's a deferred ES module).
 // Falls back to a clear error if the module never loads (e.g. CDN blocked) instead of hanging.
@@ -3279,7 +3303,7 @@ async function changeSupaTier(userId,tier,selEl){
     function go(){ if(done)return; done=true; if(document.getElementById('supaAccountsList')) loadSupaAccounts(); }
     if(window.rzSupa&&window.rzSupa.configured){ go(); return; }
     window.addEventListener('rz-supa-ready', go, {once:true});
-    setTimeout(function(){ if(done)return; if(window.rzSupa&&window.rzSupa.configured){go();return;} done=true; supaStatus('Supabase module did not load (network/CDN blocked). Reload to retry.','#f87171'); }, 8000);
+    setTimeout(function(){ if(done)return; if(window.rzSupa&&window.rzSupa.configured){go();return;} done=true; supaStatus('Supabase module did not load (network/CDN blocked). Reload to retry.','err'); }, 8000);
 })();
 
 // ═══════════════════════════════════════════════════════════════

@@ -101,6 +101,7 @@ create policy "scenarios: delete own" on public.saved_scenarios for delete using
 create or replace function public.enforce_scenario_limit()
 returns trigger
 language plpgsql
+set search_path = public
 as $$
 begin
   if (select count(*) from public.saved_scenarios where user_id = new.user_id) >= 200 then

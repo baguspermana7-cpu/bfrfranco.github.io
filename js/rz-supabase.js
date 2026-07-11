@@ -99,7 +99,8 @@ const api = {
     if (!client) return { data: null, error: initError };
     const user = await this.getUser();
     if (!user) return { data: null, error: 'not signed in' };
-    const { data, error } = await client.from('profiles').select('*').eq('id', user.id).maybeSingle();
+    // Pin the column list (don't select('*')) so a future column can't be exposed unintentionally.
+    const { data, error } = await client.from('profiles').select('id, email, tier, display_name, created_at').eq('id', user.id).maybeSingle();
     return { data, error: friendly(error) };
   },
 
@@ -138,8 +139,11 @@ const api = {
   async listAllProfiles() {
     if (!client) return { data: [], error: initError };
     if (!(await this.getUser())) return { data: [], error: 'not signed in' };
-    // RLS: root sees all rows; a non-root user sees only their own.
-    const { data, error } = await client.from('profiles').select('*').order('created_at', { ascending: true });
+    // RLS: root sees all rows; a non-root user sees only their own. Pinned column list (no '*')
+    // and a bounded limit so the admin panel can't be made to fetch an unbounded result set.
+    const { data, error } = await client.from('profiles')
+      .select('id, email, tier, display_name, created_at')
+      .order('created_at', { ascending: true }).limit(1000);
     return { data: data || [], error: friendly(error) };
   },
   async setTier(userId, tier) {
