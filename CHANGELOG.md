@@ -11,6 +11,12 @@ release sections rather than semver.
 
 ---
 
+## v1.51.16 — 2026-07-11 (Account page — version stamp)
+
+**Fixed**
+- `account.html` now loads `js/rz-version.js` so it carries the site version stamp (audit-version-stamp
+  gate). No functional change.
+
 ## v1.51.15 — 2026-07-11 (Supabase — Save/reload scenarios on OPEX / ROI / TCO / PUE)
 
 **Added**
