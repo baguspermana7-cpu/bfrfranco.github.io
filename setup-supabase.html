@@ -110,6 +110,23 @@ from auth.users u on conflict (id) do nothing;</pre>
     <p style="font-size:0.82rem;color:#94a3b8;">(Opsional untuk tes cepat: Authentication → <b>Email</b> → matikan <b>"Confirm email"</b> supaya daftar langsung jadi. Nyalakan lagi nanti untuk production.)</p>
   </div>
 
+  <!-- TROUBLESHOOT: Email not confirmed -->
+  <div class="step" style="border-color:rgba(245,158,11,0.4);">
+    <h2><span class="num" style="background:#f59e0b;">!</span> Login gagal "Email not confirmed"?</h2>
+    <p class="goal">Akun yang dibuat sebelum "Confirm email" dimatikan tetap ditandai belum-konfirmasi. Pilih SATU cara:</p>
+    <p style="font-weight:700;color:#f1f5f9;margin:4px 0;">Cara A — tanpa SQL (klik saja):</p>
+    <ol>
+      <li>Supabase → <b>Authentication → Users</b> → klik user Anda → scroll <b>Danger zone</b> → <b>Delete user</b>.</li>
+      <li>Balik ke <a href="account.html" target="_blank"><b>account.html</b></a> → klik <b>Sign up</b> (email+password sama) → langsung login (Confirm email sudah OFF). ✅</li>
+    </ol>
+    <p style="font-weight:700;color:#f1f5f9;margin:12px 0 4px;">Cara B — 1 baris SQL (akun tetap, klik Copy):</p>
+    <div class="codewrap">
+      <button class="copybtn" data-copy="confirmsql">Copy</button>
+      <pre id="confirmsql">update auth.users set email_confirmed_at = now() where email = 'bagusdpermana7@gmail.com';</pre>
+    </div>
+    <p style="font-size:0.82rem;color:#94a3b8;">SQL Editor → New query → Copy di atas → paste → Run → "Success. 1 row affected" → login lagi.</p>
+  </div>
+
   <!-- TEST -->
   <div class="step">
     <h2><span class="num">✓</span> Tes fitur Supabase (setelah Langkah 1 &amp; 2)</h2>
@@ -119,6 +136,39 @@ from auth.users u on conflict (id) do nothing;</pre>
       <li>Balik ke account.html → scenario muncul → klik <b>Open</b> → kebuka lagi di kalkulator dengan input ter-restore. 🎉</li>
     </ol>
     <div class="ok">Kalau ketiga ini jalan → <b>Supabase 100% aktif.</b> Tombol Save ada di 7 kalkulator: capex, opex, roi, tco, pue, cx, carbon.</div>
+  </div>
+
+  <!-- STEP: rz-ops admin panel -->
+  <div class="step">
+    <h2><span class="num">2b</span> Aktifkan panel "Supabase Accounts" di rz-ops (kelola tier)</h2>
+    <p class="goal">Biar di admin console (rz-ops) Anda bisa <b>lihat semua akun asli</b> dari Supabase dan <b>ubah tier</b> (free/demo/pro/root) langsung dari dropdown. Aman: hanya akun <b>root</b> yang bisa lihat/ubah — dijaga oleh RLS di database, bukan oleh key rahasia.</p>
+    <ol>
+      <li>Supabase → <b>SQL Editor</b> → <b>+ New query</b>.</li>
+      <li>Klik <b>Copy</b> di bawah → paste → <b>Run</b>. (Aman diulang; kalau sudah pernah, tinggal jalankan lagi.)</li>
+    </ol>
+    <div class="codewrap">
+      <button class="copybtn" data-copy="rootsql">Copy</button>
+      <pre id="rootsql">-- Root admin: lihat + ubah tier siapa saja dari browser (rz-ops).
+-- is_root() SECURITY DEFINER membaca profiles TANPA RLS → tidak rekursi.
+create or replace function public.is_root()
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.profiles
+    where id = auth.uid() and tier = 'root'
+  );
+$$;
+
+drop policy if exists "profiles: root reads all"   on public.profiles;
+drop policy if exists "profiles: root updates all" on public.profiles;
+create policy "profiles: root reads all"   on public.profiles for select using (public.is_root());
+create policy "profiles: root updates all" on public.profiles for update using (public.is_root()) with check (public.is_root());</pre>
+    </div>
+    <p style="font-size:0.82rem;color:#94a3b8;">Setelah Run: buka <a href="account.html" target="_blank"><b>account.html</b></a> → login sebagai root → lalu buka <b>rz-ops</b> → panel <b>"Supabase Accounts"</b> akan menampilkan semua akun + dropdown tier. Kalau belum login root, panel cuma menampilkan baris Anda sendiri.</p>
   </div>
 
   <!-- STEP 3 -->

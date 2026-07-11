@@ -91,4 +91,28 @@ select u.id, u.email,
 from auth.users u
 on conflict (id) do nothing;
 
+-- ---------- 5. root admin: read + change ANY tier from the browser (rz-ops console) ----------
+-- is_root() is SECURITY DEFINER so it reads `profiles` WITHOUT triggering RLS — this avoids the
+-- infinite recursion you'd get if a policy ON profiles queried profiles under RLS. It returns true
+-- only when the CURRENT caller (auth.uid()) is a root account. The rz-ops "Supabase Accounts" panel
+-- relies on these two policies; a non-root caller matches neither, so they can only see/edit their
+-- own row (via the "read own" / no-update rules above). No service_role key is ever shipped to the browser.
+create or replace function public.is_root()
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.profiles
+    where id = auth.uid() and tier = 'root'
+  );
+$$;
+
+drop policy if exists "profiles: root reads all"   on public.profiles;
+drop policy if exists "profiles: root updates all" on public.profiles;
+create policy "profiles: root reads all"   on public.profiles for select using (public.is_root());
+create policy "profiles: root updates all" on public.profiles for update using (public.is_root()) with check (public.is_root());
+
 -- Done. Verify: select id, email, tier from public.profiles;

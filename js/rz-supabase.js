@@ -129,6 +129,28 @@ const api = {
     // scope the delete to the caller's own rows (defense-in-depth alongside RLS)
     const { error } = await client.from('saved_scenarios').delete().eq('id', id).eq('user_id', user.id);
     return { error: friendly(error) };
+  },
+
+  /* ── Admin (root-only). Security is enforced ENTIRELY by RLS in the database
+   *    (the `is_root()` policies) — these helpers just call the API. A non-root
+   *    caller gets an empty result (read) or 0 rows updated (write); no service_role
+   *    key is ever used or shipped to the browser. ── */
+  async listAllProfiles() {
+    if (!client) return { data: [], error: initError };
+    if (!(await this.getUser())) return { data: [], error: 'not signed in' };
+    // RLS: root sees all rows; a non-root user sees only their own.
+    const { data, error } = await client.from('profiles').select('*').order('created_at', { ascending: true });
+    return { data: data || [], error: friendly(error) };
+  },
+  async setTier(userId, tier) {
+    if (!client) return { error: initError };
+    if (['free', 'demo', 'pro', 'root'].indexOf(tier) === -1) return { error: 'invalid tier' };
+    // RLS "root updates all" is the only update policy on profiles → a non-root caller
+    // matches no policy and updates 0 rows (detected below). Root can change any tier.
+    const { data, error } = await client.from('profiles').update({ tier: tier }).eq('id', userId).select();
+    if (error) return { error: friendly(error) };
+    if (!data || !data.length) return { error: 'Not permitted — you must be signed in as a root user.' };
+    return { data: data[0], error: null };
   }
 };
 

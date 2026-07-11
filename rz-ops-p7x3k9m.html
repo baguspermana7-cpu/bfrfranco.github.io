@@ -705,6 +705,9 @@
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <script src="js/rz-feature-flags.js?v=2026-05-14" defer></script>
+    <!-- Supabase (real accounts) — live "Supabase Accounts" panel, root-gated by RLS -->
+    <script src="js/rz-config.js?v=2026-07-11"></script>
+    <script type="module" src="js/rz-supabase.js?v=2026-07-11b"></script>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -1001,6 +1004,18 @@
             </div>
         </div>
         <div class="tbl-overflow" id="credentialsList"></div>
+        <p style="font-size:0.72rem;color:#94a3b8;margin:0.6rem 0 0;">These are the legacy hardcoded accounts (used for the site's Pro-gating). Passwords shown here are placeholders — the real Supabase accounts are below.</p>
+    </div>
+
+    <!-- Supabase Accounts (live, RLS root-only) -->
+    <div class="card" style="margin-top:1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;flex-wrap:wrap;gap:0.5rem;">
+            <div class="card-title" style="margin:0"><i class="fas fa-database" style="color:#22d3ee"></i> Supabase Accounts <span style="font-size:0.62rem;font-weight:700;color:#34d399;background:rgba(16,185,129,0.15);padding:2px 8px;border-radius:999px;">LIVE</span></div>
+            <button class="btn btn-ghost btn-sm" onclick="loadSupaAccounts()"><i class="fas fa-rotate"></i> Refresh</button>
+        </div>
+        <p style="font-size:0.72rem;color:#94a3b8;margin:0 0 0.75rem;">Real registered users from Supabase. Passwords are <b>never shown</b> (Supabase stores them hashed — that is correct &amp; secure). You can change a user's tier below. Requires you to be signed in as a <b>root</b> user (via <a href="account.html" target="_blank" style="color:#67e8f9;">account.html</a>).</p>
+        <div id="supaAccountsStatus" style="font-size:0.8rem;color:#94a3b8;margin-bottom:0.5rem;">Loading…</div>
+        <div class="tbl-overflow" id="supaAccountsList"></div>
     </div>
 </div>
 
@@ -3188,6 +3203,75 @@ function renderCredentials(){
 function togglePw(i){const allCreds=getAllCredentials();const el=document.getElementById('credPw'+i);const c=allCreds[i];if(!c)return;if(el.classList.contains('masked')){el.classList.remove('masked');el.classList.add('revealed');el.textContent=c.password}else{el.classList.remove('revealed');el.classList.add('masked');el.textContent='••••••••••'}}
 function toggleAllPasswords(){allPasswordsVisible=!allPasswordsVisible;renderCredentials()}
 function exportCredCSV(){const h='Name,Email,Password,Tier,Role';const r=getAllCredentials().map(c=>[c.name,c.email,c.password,c.tier,c.role].join(','));downloadCSV([h,...r].join('\n'),'rz_credentials_'+fmtDate(new Date())+'.csv')}
+
+// ═══════════════════════════════════════════════════════════════
+// SUPABASE ACCOUNTS (live) — real registered users from Supabase.
+// Read/write is gated ENTIRELY by RLS is_root() policies in the DB;
+// no service_role key ever touches the browser. A non-root (or logged
+// out) viewer sees only their own row / a sign-in prompt.
+// ═══════════════════════════════════════════════════════════════
+function rzEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+var SUPA_TIERS=['free','demo','pro','root'];
+function supaStatus(msg,color){var el=document.getElementById('supaAccountsStatus');if(el){el.textContent=msg;el.style.color=color||'#94a3b8';}}
+async function loadSupaAccounts(){
+    var listEl=document.getElementById('supaAccountsList');
+    var S=window.rzSupa;
+    if(!S||!S.configured){supaStatus('Supabase not configured on this page.','#f87171');if(listEl)listEl.innerHTML='';return;}
+    supaStatus('Loading…','#94a3b8');
+    try{
+        var user=await S.getUser();
+        if(!user){supaStatus('Not signed in. Open account.html and log in as a root user, then Refresh.','#fbbf24');if(listEl)listEl.innerHTML='<div style="padding:0.6rem 0"><a href="account.html" target="_blank" style="color:#67e8f9;text-decoration:underline;">Open account.html to sign in →</a></div>';return;}
+        var res=await S.listAllProfiles();
+        if(res.error){supaStatus('Error: '+rzEsc(res.error),'#f87171');if(listEl)listEl.innerHTML='';return;}
+        var rows=res.data||[];
+        var isRoot=rows.length>1||(rows[0]&&rows[0].tier==='root');
+        if(!isRoot){supaStatus('Signed in as '+rzEsc(user.email)+' — not a root account, so only your own row is visible. Tier changes require root.','#fbbf24');}
+        else{supaStatus('Signed in as '+rzEsc(user.email)+' (root). '+rows.length+' account'+(rows.length===1?'':'s')+'. Change a tier from the dropdown.','#34d399');}
+        renderSupaAccounts(rows,isRoot);
+    }catch(e){supaStatus('Load failed: '+rzEsc(e&&e.message||e),'#f87171');if(listEl)listEl.innerHTML='';}
+}
+function renderSupaAccounts(rows,isRoot){
+    var listEl=document.getElementById('supaAccountsList');
+    if(!listEl)return;
+    if(!rows.length){listEl.innerHTML='<div style="padding:0.6rem 0;color:#64748b">No accounts yet.</div>';return;}
+    var GRID='grid-template-columns:44px 1fr auto auto auto';
+    var body=rows.map(function(p){
+        var created=p.created_at?String(p.created_at).split('T')[0]:'—';
+        var badge='<span class="tier-badge '+rzEsc(p.tier)+'">'+rzEsc((p.tier||'free').toUpperCase())+'</span>';
+        var sel;
+        if(isRoot){
+            sel='<select onchange="changeSupaTier(\''+rzEsc(p.id)+'\',this.value,this)" style="background:#0f172a;color:#e2e8f0;border:1px solid rgba(148,163,184,0.3);border-radius:6px;padding:4px 8px;font-size:0.75rem">'+
+                SUPA_TIERS.map(function(t){return '<option value="'+t+'"'+(t===p.tier?' selected':'')+'>'+t+'</option>';}).join('')+'</select>';
+        }else{sel=badge;}
+        return '<div class="cred-row" style="'+GRID+'">'+
+            '<div><div class="cred-avatar" style="background:#22d3ee">'+rzEsc((p.email||'?').charAt(0).toUpperCase())+'</div></div>'+
+            '<div style="font-size:0.75rem;color:#94a3b8;word-break:break-all">'+rzEsc(p.email||'—')+'</div>'+
+            '<div>'+badge+'</div>'+
+            '<div>'+sel+'</div>'+
+            '<div style="font-size:0.72rem;color:#64748b">'+rzEsc(created)+'</div>'+
+        '</div>';
+    }).join('');
+    listEl.innerHTML='<div class="cred-row header" style="'+GRID+'"><div>#</div><div>Email</div><div>Tier</div><div>Set tier</div><div>Created</div></div>'+body;
+}
+async function changeSupaTier(userId,tier,selEl){
+    var S=window.rzSupa;
+    if(!S||!S.configured)return;
+    var prev=selEl?selEl.value:tier;
+    if(selEl)selEl.disabled=true;
+    supaStatus('Updating tier…','#94a3b8');
+    try{
+        var res=await S.setTier(userId,tier);
+        if(res.error){supaStatus('Update failed: '+rzEsc(res.error),'#f87171');if(selEl)selEl.disabled=false;return;}
+        supaStatus('Tier updated to '+rzEsc(tier)+'. Refreshing…','#34d399');
+        loadSupaAccounts();
+    }catch(e){supaStatus('Update failed: '+rzEsc(e&&e.message||e),'#f87171');if(selEl)selEl.disabled=false;}
+}
+// Auto-load the panel once the Supabase module has attached (it's a deferred ES module).
+(function initSupaPanel(){
+    function go(){ if(document.getElementById('supaAccountsList')) loadSupaAccounts(); }
+    if(window.rzSupa&&window.rzSupa.configured) go();
+    else window.addEventListener('rz-supa-ready', go, {once:true});
+})();
 
 // ═══════════════════════════════════════════════════════════════
 // MANUAL ACCOUNT MANAGEMENT

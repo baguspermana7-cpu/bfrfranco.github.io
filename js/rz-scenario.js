@@ -124,8 +124,38 @@
     } catch (e) { show('Save failed: ' + (e && e.message || e), false); }
   }
 
+  /**
+   * Inject a small, persistent "My Account" link on calculator pages so users can reach
+   * account.html any time (not only after a save). Only on pages with data-rz-calc; skips if
+   * already present. Positioned bottom-left, and lifted above the mobile share bottom-bar.
+   */
+  function injectAccountLink() {
+    if (!(d.body && d.body.getAttribute('data-rz-calc'))) return;
+    if (d.getElementById('rzAccountPill')) return;
+    if (!d.getElementById('rzAccountPillCss')) {
+      var st = d.createElement('style');
+      st.id = 'rzAccountPillCss';
+      st.textContent =
+        '#rzAccountPill{position:fixed;left:14px;bottom:14px;z-index:1200;background:rgba(30,41,59,0.92);' +
+        'color:#93c5fd;border:1px solid rgba(59,130,246,0.45);border-radius:999px;padding:7px 14px;' +
+        "font:600 12px/1 system-ui,-apple-system,'Segoe UI',sans-serif;text-decoration:none;" +
+        'box-shadow:0 4px 14px rgba(0,0,0,0.35);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);' +
+        'display:inline-flex;align-items:center;gap:6px;transition:filter .15s;}' +
+        '#rzAccountPill:hover{filter:brightness(1.15);}' +
+        '@media(max-width:768px){#rzAccountPill{bottom:74px;}}';
+      (d.head || d.documentElement).appendChild(st);
+    }
+    var a = d.createElement('a');
+    a.id = 'rzAccountPill';
+    a.href = 'account.html';
+    a.title = 'View your saved scenarios';
+    a.textContent = '👤 My Account';
+    d.body.appendChild(a);
+  }
+
   w.rzScenario = { capture: capture, restore: restore, openInCalc: openInCalc, saveToAccount: saveToAccount };
 
-  if (d.readyState === 'loading') w.addEventListener('DOMContentLoaded', autoRestore);
-  else autoRestore();
+  function onReady() { autoRestore(); injectAccountLink(); }
+  if (d.readyState === 'loading') w.addEventListener('DOMContentLoaded', onReady);
+  else onReady();
 })(typeof window !== 'undefined' ? window : this, typeof document !== 'undefined' ? document : null);

@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.51.21 — 2026-07-11 (Supabase — rz-ops "Supabase Accounts" panel + account-link pill)
+
+**Added**
+- **rz-ops admin console → "Supabase Accounts" (LIVE) panel** — lists the real registered users from
+  Supabase (email, tier, created date) and lets a **root** account change any user's tier from a dropdown
+  (free / demo / pro / root). Security is enforced **entirely by Row Level Security** in the database
+  (new `is_root()` SECURITY DEFINER function + "root reads all" / "root updates all" policies on
+  `profiles`) — **no `service_role` key ever reaches the browser**. A logged-out or non-root viewer sees
+  only a sign-in prompt / their own row. Loads `js/rz-config.js` + `js/rz-supabase.js` (module).
+- **`js/rz-supabase.js`** — added root-only admin helpers `listAllProfiles()` and `setTier(userId, tier)`
+  (both rely on the RLS policies; a non-root caller gets an empty read / 0-row update).
+- **`js/rz-scenario.js`** — persistent **"👤 My Account" pill** (bottom-left) injected on every calculator
+  page (`data-rz-calc`), so users can reach `account.html` any time, not only after a save.
+- **`supabase/schema.sql`** + **`setup-supabase.html`** (Step 2b) — the new `is_root()` function + root
+  policies, with a click-to-copy SQL block for the owner to run once.
+
 ## v1.51.20 — 2026-07-11 (Setup guide page)
 
 **Added**
