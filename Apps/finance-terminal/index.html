@@ -659,8 +659,11 @@ const CFG={
     'High Volume':{minVol:5e6},
     'Mega Cap':{minMcap:200e9}
   },
-  GW:(typeof localStorage!=='undefined' && localStorage.getItem('rz_ft_gw')) || 'https://rz-finance-gateway.PLACEHOLDER.workers.dev',
-  V2:(typeof localStorage!=='undefined' && localStorage.getItem('rz_ft_v2')==='1'),
+  // Deployed Cloudflare gateway (server-side Finnhub key + KV cache). Baked in so the terminal
+  // uses it by default — no manual localStorage step. Override with localStorage.rz_ft_gw if needed.
+  GW:(typeof localStorage!=='undefined' && localStorage.getItem('rz_ft_gw')) || 'https://rz-finance-gateway.resistancezero0us.workers.dev',
+  // V2 (gateway) is ON by default now that the gateway is live; disable with localStorage.rz_ft_v2='0'.
+  V2:(typeof localStorage==='undefined' || localStorage.getItem('rz_ft_v2')!=='0'),
 };
 
 /* ═══════════════════════════════════════════════════════════════

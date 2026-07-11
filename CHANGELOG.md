@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.51.25 — 2026-07-11 (Finance Terminal — Cloudflare gateway live by default)
+
+The `rz-finance-gateway` Cloudflare Worker is deployed (server-side Finnhub key + KV cache), so the
+Finance Terminal no longer depends on flaky public CORS proxies and never ships the API key.
+
+**Changed**
+- **`Apps/finance-terminal/index.html`** — baked the deployed gateway URL
+  (`rz-finance-gateway.resistancezero0us.workers.dev`) into `CFG.GW` and turned **V2 on by default**
+  (`CFG.V2`), so the terminal uses the gateway automatically — no manual `localStorage` step. Escape
+  hatches preserved: override the URL with `localStorage.rz_ft_gw`, disable V2 with
+  `localStorage.rz_ft_v2='0'`.
+- Verified live end-to-end against the deployed Worker: `/healthz` ok; `/sectors` (keyless Yahoo) and
+  `/q?syms=…` + `/candles` (Finnhub, server-side token) return real data; the terminal issues requests to
+  the gateway on load with 0 console errors. Fixes B-006/B-008/B-009/B-010/B-011/B-012 at the root.
+- **`cf-worker/`** (infra) — added `package-lock.json` (Cloudflare Workers Builds runs `npm ci`) and
+  `localhost:8099` + `www` to the gateway's `ALLOWED_ORIGINS`.
+
 ## v1.51.24 — 2026-07-11 (Supabase — rz-ops becomes the user-management controller)
 
 Make rz-ops the single admin console for the whole account system: **create accounts, reset passwords,
