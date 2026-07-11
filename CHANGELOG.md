@@ -11,6 +11,29 @@ release sections rather than semver.
 
 ---
 
+## v1.51.13 — 2026-07-11 (Supabase — real accounts + database, phase 1: config, client, account page)
+
+**Added** — additive foundation for real user accounts + per-user data (Supabase, Tokyo project). Does
+NOT touch the existing hardcoded `auth.js` login (that sitewide switch is a later, separate step).
+- **`js/rz-config.js`** — public `window.RZ_CONFIG` (Supabase project URL + anon/publishable key). These
+  are public by design; data is protected by Row Level Security, not key secrecy. `service_role`/DB
+  password never enter the repo.
+- **`js/rz-supabase.js`** — shared ES-module client (`window.rzSupa`): signUp/signIn/signInOAuth/signOut/
+  getUser/onChange + profile + saveScenario/listScenarios/deleteScenario. Isolated — never writes
+  `rz_premium_session`, so the live Pro-gating is untouched. Degrades gracefully if config/tables absent.
+- **`account.html`** (noindex) — real sign-up / log-in / log-out via Supabase; shows the user's profile +
+  tier badge + their saved scenarios (delete). Replaces the temporary `Apps/supabase-test.html` (removed).
+- **`supabase/schema.sql`** — owner runs once in the Supabase SQL Editor: `profiles` (per-user tier, auto-
+  created on signup via trigger + backfill) and `saved_scenarios` (jsonb payload), both with **RLS
+  policies** (own-rows-only). Idempotent.
+- **CAPEX calculator** — a **"☁ Save to my account"** button: signed-in users save the current result to
+  `saved_scenarios` (viewable in `account.html`); signed-out users are pointed to log in. Additive; the
+  compare-mode "Save A" and the Pro-gating are unchanged.
+
+Verified headlessly: client configures + connects (0 errors), account page renders logged-out correctly,
+capex button wires up and the logged-out path prompts login. Owner-gated to complete: run `schema.sql`,
+set Authentication → URL Configuration to `https://resistancezero.com`.
+
 ## v1.51.12 — 2026-07-05 (Accessibility — full-site sweep part 3b: last six large pages to zero)
 
 **Changed** — `article-10.html` (67), `article-24.html` (64), `article-16.html` (60),

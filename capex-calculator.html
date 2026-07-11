@@ -2246,6 +2246,11 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                             </button>
                         </div>
                     </div>
+                    <!-- Save to Supabase account (cross-device) — additive; independent of the compare "Save A" -->
+                    <button onclick="saveToAccount()" id="btnSaveAccount" style="width:100%;margin-top:0.5rem;padding:10px 8px;border-radius:10px;border:1px solid rgba(59,130,246,0.5);background:linear-gradient(135deg,rgba(59,130,246,0.16),rgba(37,99,235,0.06));color:#93c5fd;cursor:pointer;font-weight:700;font-size:0.78rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px;">
+                        <i class="fas fa-cloud"></i> <span id="btnSaveAccountLabel">Save to my account</span>
+                    </button>
+                    <div id="acctSaveMsg" style="display:none;margin-top:0.4rem;font-size:0.72rem;text-align:center;"></div>
                     <div class="rz-calc-validation" id="capexValidation" role="alert" aria-live="polite" hidden></div>
                     <!-- Saved indicator -->
                     <div id="savedIndicator" style="display:none;margin-top:0.5rem;padding:6px 10px;border-radius:8px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);font-size:0.7rem;color:#34d399;text-align:center;">
@@ -5130,5 +5135,34 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
 <script src="auth.js?v=2026-05-09-v1" defer></script>
 <script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+
+<!-- Supabase: save this scenario to your account (additive; does not touch existing auth) -->
+<script src="js/rz-config.js?v=2026-07-11"></script>
+<script type="module" src="js/rz-supabase.js?v=2026-07-11"></script>
+<script>
+  // Save the current CAPEX result to the logged-in user's Supabase account.
+  // Independent of the site's existing Pro-gating — any signed-in Supabase user can save.
+  async function saveToAccount() {
+    var msg = document.getElementById('acctSaveMsg');
+    var show = function (t, ok) { msg.style.display = 'block'; msg.style.color = ok ? '#34d399' : '#f87171'; msg.textContent = t; };
+    if (!window.rzSupa || !window.rzSupa.configured) { show('Cloud save unavailable (config missing).', false); return; }
+    try {
+      var user = await window.rzSupa.getUser();
+      if (!user) { show('Please log in first — opening your account…', false); setTimeout(function(){ window.open('account.html', '_blank'); }, 600); return; }
+      if (typeof lastResult === 'undefined' || !lastResult) { if (typeof calculateCosts === 'function') calculateCosts(); }
+      if (!lastResult) { show('Run a calculation first.', false); return; }
+      var r = lastResult;
+      var name = (r.cityLabel ? r.cityLabel + ' · ' : '') + (r.itLoad || '?') + ' · ' + (r.tierInfo && r.tierInfo.tier ? r.tierInfo.tier : 'Tier') ;
+      // compact payload (avoid the heavy _config/_timeline/_raw internals)
+      var payload = { total: r.total, itLoad: r.itLoad, tier: r.tierInfo && r.tierInfo.tier,
+                      pue: r.pue, city: r.cityLabel, contingency: r.contingency, softCosts: r.softCosts,
+                      fomTotal: r.fomTotal, annualEnergy: r.annualEnergy, year: r.yearLabel,
+                      perKw: (r.total && r.itLoad) ? Math.round(r.total / (parseFloat(String(r.itLoad).replace(/[^0-9.]/g,'')) || 1)) : null };
+      var res = await window.rzSupa.saveScenario('capex', name, payload);
+      if (res.error) { show('Save failed: ' + res.error, false); return; }
+      show('☁ Saved to your account — see it in My Account.', true);
+    } catch (e) { show('Save failed: ' + (e && e.message || e), false); }
+  }
+</script>
 </body>
 </html>

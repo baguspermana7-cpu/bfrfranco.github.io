@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>My Account — ResistanceZero</title>
+  <link rel="icon" href="assets/favicon.ico">
+  <style>
+    :root { color-scheme: dark; --bg:#0f172a; --surface:#1e293b; --surface2:#0b1220;
+            --border:#334155; --text:#e2e8f0; --muted:#94a3b8; --accent:#3b82f6; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+           background:var(--bg); color:var(--text); line-height:1.55; }
+    a { color:#60a5fa; }
+    .nav { display:flex; align-items:center; justify-content:space-between; padding:14px 22px;
+           border-bottom:1px solid var(--border); background:rgba(15,23,42,0.8); }
+    .nav .brand { font-weight:800; letter-spacing:0.02em; }
+    .nav a.back { font-size:0.85rem; color:var(--muted); text-decoration:none; }
+    .wrap { max-width:640px; margin:0 auto; padding:28px 20px 60px; }
+    h1 { font-size:1.35rem; margin:0 0 4px; }
+    .sub { color:var(--muted); font-size:0.9rem; margin:0 0 24px; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:14px;
+            padding:20px; margin-bottom:18px; }
+    .card h2 { font-size:1rem; margin:0 0 14px; display:flex; align-items:center; gap:8px; }
+    label { display:block; font-size:0.75rem; color:var(--muted); margin:12px 0 4px; }
+    input { width:100%; padding:11px 13px; border-radius:9px; border:1px solid var(--border);
+            background:var(--surface2); color:var(--text); font-size:0.92rem; }
+    button { padding:11px 18px; border-radius:9px; border:none; background:var(--accent); color:#fff;
+             font-weight:600; font-size:0.88rem; cursor:pointer; margin:14px 8px 0 0; transition:filter .15s; }
+    button:hover { filter:brightness(1.08); }
+    button.ghost { background:var(--border); }
+    button.danger { background:transparent; border:1px solid rgba(239,68,68,0.5); color:#f87171;
+                    padding:6px 12px; margin:0; font-size:0.78rem; }
+    button.oauth { background:#fff; color:#1f2937; }
+    .status { font-size:0.82rem; padding:10px 12px; border-radius:9px; margin-top:12px;
+              white-space:pre-wrap; word-break:break-word; }
+    .ok  { background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.3); }
+    .err { background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.3); }
+    .muted { color:var(--muted); }
+    .row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .badge { display:inline-block; font-size:0.7rem; font-weight:700; text-transform:uppercase;
+             letter-spacing:0.05em; padding:3px 10px; border-radius:999px; }
+    .badge.free { background:rgba(148,163,184,0.18); color:#cbd5e1; }
+    .badge.demo { background:rgba(139,92,246,0.18); color:#c4b5fd; }
+    .badge.pro  { background:rgba(59,130,246,0.18); color:#93c5fd; }
+    .badge.root { background:rgba(8,145,178,0.18); color:#67e8f9; }
+    .scn { border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:10px;
+           background:var(--surface2); }
+    .scn .t { font-weight:600; font-size:0.92rem; }
+    .scn .m { color:var(--muted); font-size:0.75rem; margin-top:2px; }
+    .hidden { display:none; }
+    .foot { color:var(--muted); font-size:0.72rem; margin-top:18px; }
+    code { background:var(--surface2); padding:1px 6px; border-radius:5px; font-size:0.85em; }
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <span class="brand">⚡ ResistanceZero</span>
+    <a class="back" href="index.html">← Back to site</a>
+  </div>
+
+  <div class="wrap">
+    <h1>My Account</h1>
+    <p class="sub">Real accounts &amp; saved data, powered by Supabase.</p>
+
+    <!-- Logged-OUT view -->
+    <div id="authCard" class="card">
+      <h2>🔐 Sign in / Sign up</h2>
+      <label>Email</label>
+      <input id="email" type="email" placeholder="you@email.com" autocomplete="email">
+      <label>Password (min. 6 characters)</label>
+      <input id="password" type="password" placeholder="••••••" autocomplete="current-password">
+      <div>
+        <button id="btnLogin">Log in</button>
+        <button id="btnSignup" class="ghost">Sign up</button>
+      </div>
+      <div id="authStatus" class="status hidden"></div>
+    </div>
+
+    <!-- Logged-IN view -->
+    <div id="profileCard" class="card hidden">
+      <h2>👤 Profile</h2>
+      <div class="row">
+        <div>
+          <div id="pEmail" style="font-weight:600;">—</div>
+          <div class="muted" style="font-size:0.78rem;margin-top:2px;">Access level: <span id="pTier" class="badge free">free</span></div>
+        </div>
+        <button id="btnLogout" class="ghost" style="margin:0;">Log out</button>
+      </div>
+    </div>
+
+    <!-- Saved scenarios -->
+    <div id="scnCard" class="card hidden">
+      <h2>💾 Saved scenarios</h2>
+      <div id="scnList"><p class="muted" style="font-size:0.85rem;">Loading…</p></div>
+    </div>
+
+    <p class="foot">
+      Your login is a real account stored securely in the project database. Data is protected by
+      Row Level Security — you can only ever see your own rows. This page uses only the public
+      <code>anon</code> key.
+    </p>
+  </div>
+
+  <script src="js/rz-config.js"></script>
+  <script type="module" src="js/rz-supabase.js"></script>
+  <script type="module">
+    const $ = (id) => document.getElementById(id);
+    const show = (el, on) => el.classList.toggle('hidden', !on);
+    const setStatus = (el, msg, cls) => { el.className = 'status ' + (cls || ''); el.textContent = msg; el.classList.remove('hidden'); };
+
+    await window.rzSupa.ready;
+    const S = window.rzSupa;
+    if (!S.configured) { setStatus($('authStatus'), '⚠ ' + (S.error || 'Supabase not configured'), 'err'); }
+
+    async function render() {
+      const user = await S.getUser();
+      show($('authCard'), !user);
+      show($('profileCard'), !!user);
+      show($('scnCard'), !!user);
+      if (!user) return;
+      $('pEmail').textContent = user.email;
+      // tier from profiles (falls back gracefully if the table isn't set up yet)
+      const { data: prof, error } = await S.getProfile();
+      const tier = (prof && prof.tier) || 'free';
+      const badge = $('pTier');
+      badge.textContent = tier;
+      badge.className = 'badge ' + (['free','demo','pro','root'].includes(tier) ? tier : 'free');
+      // scenarios
+      const list = $('scnList');
+      const { data: rows, error: sErr } = await S.listScenarios();
+      if (sErr) { list.innerHTML = '<p class="err status">'+sErr+'</p>'; return; }
+      if (!rows.length) { list.innerHTML = '<p class="muted" style="font-size:0.85rem;">No saved scenarios yet. Open a calculator and click <b>☁ Save scenario</b>.</p>'; return; }
+      list.innerHTML = '';
+      rows.forEach(r => {
+        const el = document.createElement('div');
+        el.className = 'scn';
+        const when = new Date(r.created_at).toLocaleString();
+        el.innerHTML = '<div class="row"><div><div class="t">'+escapeHtml(r.name)+'</div>'
+          + '<div class="m">'+escapeHtml(r.calc)+' · '+when+'</div></div>'
+          + '<button class="danger" data-id="'+r.id+'">Delete</button></div>';
+        list.appendChild(el);
+      });
+      list.querySelectorAll('button.danger').forEach(b => b.onclick = async () => {
+        await S.deleteScenario(b.getAttribute('data-id')); render();
+      });
+    }
+    function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+    $('btnSignup').onclick = async () => {
+      const { data, error } = await S.signUp($('email').value.trim(), $('password').value);
+      if (error) return setStatus($('authStatus'), '❌ ' + error, 'err');
+      if (data.user && !data.session) setStatus($('authStatus'), '📧 Account created — check your email to confirm, then log in.', 'ok');
+      else { setStatus($('authStatus'), '✅ Signed up.', 'ok'); render(); }
+    };
+    $('btnLogin').onclick = async () => {
+      const { error } = await S.signIn($('email').value.trim(), $('password').value);
+      if (error) return setStatus($('authStatus'), '❌ ' + error, 'err');
+      render();
+    };
+    $('btnLogout').onclick = async () => { await S.signOut(); render(); };
+
+    S.onChange(() => render());
+    render();
+  </script>
+</body>
+</html>
