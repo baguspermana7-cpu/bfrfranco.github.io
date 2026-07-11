@@ -74,6 +74,30 @@ pue, cx.
 - **Authentication → URL Configuration** → Site URL = `https://resistancezero.com`.
 - (For instant testing) Authentication → Email → disable "Confirm email"; re-enable for production.
 
+## Admin user-management — the `admin-users` Edge Function (v1.51.24)
+
+rz-ops is the account **controller**: root users create accounts, reset passwords, delete users, and
+migrate the legacy hardcoded accounts — all from the "Supabase Accounts" panel. These operations require
+the **`service_role`** key, which must never ship to the browser, so they run in a Supabase **Edge
+Function** at `supabase/functions/admin-users/index.ts` (Deno).
+
+- **Why Edge Function (not Cloudflare):** Supabase **auto-injects** `SUPABASE_URL` +
+  `SUPABASE_SERVICE_ROLE_KEY` into every Edge Function (`Deno.env`) — the key is never in the repo, never
+  in a browser, never handled by the owner (no secret to set).
+- **Auth gate (every request):** read the caller's `Authorization: Bearer` JWT (supabase-js attaches it to
+  `functions.invoke`), validate with `auth.getUser(token)`, then confirm the caller's `profiles.tier ===
+  'root'` using the service client. Non-root → 403. The service client is used only *after* this check.
+- **Actions:** `migrate_legacy` (idempotent), `create_user`, `reset_password`, `delete_user` (last-root +
+  self-delete guards). **Tier changes stay on the SQL `admin_set_tier()` RPC** (client-side, root-checked
+  in SQL) — the function only does the service_role-only ops. CORS locked to the site origins.
+- **Client:** `window.rzSupa.adminInvoke(action, payload)` + `adminMigrateLegacy/adminCreateUser/
+  adminResetPassword/adminDeleteUser`; degrades to a friendly "not deployed" message if the function is
+  absent. **Deploy** = Supabase Dashboard → Edge Functions → paste `index.ts` → Deploy (no CLI, no secret;
+  see `setup-supabase.html` Step 2c).
+- **Legacy migration:** `demo@`→demo, `educator@`→pro, `bagus@`/`admin@`→root (trigger), with their
+  existing passwords (owner's choice). `bagus@`/`admin@` use the password that is **public in `auth.js`**,
+  so the panel flags those rows (⚠ public pw) and the owner should Reset them immediately.
+
 ## §B4 — sitewide auth switch (LATER, separate ship)
 
 Flip the nav login on all 54 pages from hardcoded creds to Supabase by loading the existing drop-in

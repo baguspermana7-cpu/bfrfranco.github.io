@@ -11,6 +11,35 @@ release sections rather than semver.
 
 ---
 
+## v1.51.24 — 2026-07-11 (Supabase — rz-ops becomes the user-management controller)
+
+Make rz-ops the single admin console for the whole account system: **create accounts, reset passwords,
+delete users, and migrate the legacy hardcoded accounts** — without manual signup. The privileged
+operations require the `service_role` key, which must never ship to the browser, so they run in a new
+**Supabase Edge Function** (`supabase/functions/admin-users/index.ts`, Deno).
+
+**Added**
+- **`admin-users` Edge Function** — holds `service_role` server-side (auto-injected by Supabase; never in
+  the repo/browser/owner's hands). Every request validates the caller's JWT then confirms
+  `profiles.tier === 'root'` before doing anything; non-root → 403. Actions: `migrate_legacy`,
+  `create_user`, `reset_password`, `delete_user` (with last-root + self-delete guards). CORS locked to the
+  site origins. Type-checked with `deno check`; CORS + auth-gate smoke-tested.
+- **`js/rz-supabase.js`** — `adminInvoke()` + `adminMigrateLegacy/adminCreateUser/adminResetPassword/
+  adminDeleteUser` via `functions.invoke` (auto-attaches the root JWT); degrades to a clear "not deployed"
+  message if the function is absent.
+- **rz-ops "Supabase Accounts" panel** — root-only **Add account** form, **Migrate legacy** button, and
+  per-row **Reset password** / **Delete** actions; a ⚠ "public pw" flag on `bagus@`/`admin@` (their legacy
+  password is public in source) so they can be rotated in one click. Tier changes still use the
+  `admin_set_tier()` RPC.
+- **`setup-supabase.html`** — new **Step 2c**: deploy `admin-users` from the Supabase Dashboard (no CLI,
+  no secret to set), then migrate legacy accounts, plus a security callout to reset the root passwords.
+
+**Security** — reviewed by a security pass (Edge Function) + code review (client/panel): authz gate,
+service_role handling, and injection surface all sound. Applied hardening: generic error messages
+(no internal leakage) + server-side logging, UUID validation on `userId`, ≥12-char passwords for root
+accounts, module-scope clients, and robust "not deployed" error detection. Legacy accounts are migrated
+with their existing passwords (owner's explicit choice); the panel flags the public-password rows.
+
 ## v1.51.23 — 2026-07-11 (Supabase — review fixes + UI/UX polish)
 
 Independent security + code review of v1.51.21–.22 (two review agents), then fixes + a UI/UX pass.

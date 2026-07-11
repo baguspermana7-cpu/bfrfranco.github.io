@@ -161,7 +161,47 @@ const api = {
       return { error: friendly(error) };
     }
     return { data, error: null };
-  }
+  },
+
+  /* ── Admin user-management (root-only). These call the `admin-users` Edge Function,
+   *    which holds the service_role key server-side and re-verifies root before doing
+   *    anything. If the function isn't deployed yet, invoke() fails at the transport
+   *    layer — we surface a friendly "not deployed" message so the panel degrades
+   *    gracefully instead of throwing. ── */
+  async adminInvoke(action, payload) {
+    if (!client) return { error: initError };
+    try {
+      const { data, error } = await client.functions.invoke('admin-users', {
+        body: Object.assign({ action: action }, payload || {})
+      });
+      if (error) {
+        // FunctionsHttpError carries the JSON body we returned ({ok:false,error,message}).
+        let msg = error.message || String(error);
+        try {
+          const ctx = error.context;
+          if (ctx && typeof ctx.json === 'function') { const b = await ctx.json(); if (b && b.message) msg = b.message; }
+        } catch (e) {}
+        // "not deployed" only when the transport actually couldn't reach the function. `non-2xx`
+        // covers supabase-js's generic FunctionsHttpError wording for a 404.
+        if (/Failed to send|Failed to fetch|not found|non-2xx|404|NetworkError/i.test(msg))
+          return { error: 'Admin function not deployed yet — deploy `admin-users` (see setup-supabase.html Step 2c).' };
+        return { error: msg };
+      }
+      // Function returns { ok, data } | { ok:false, error, message }.
+      if (data && data.ok === false) return { error: data.message || data.error || 'Admin action failed.' };
+      return { data: data && data.data, error: null };
+    } catch (e) {
+      // Only treat genuine transport failures as "not deployed"; surface real JS errors so bugs aren't hidden.
+      var em = (e && e.message) || String(e);
+      if (/Failed to send|Failed to fetch|not found|non-2xx|404|NetworkError/i.test(em))
+        return { error: 'Admin function not deployed yet — deploy `admin-users` (see setup-supabase.html Step 2c).' };
+      return { error: em || 'Admin action failed.' };
+    }
+  },
+  adminMigrateLegacy() { return this.adminInvoke('migrate_legacy'); },
+  adminCreateUser(email, password, tier) { return this.adminInvoke('create_user', { email: email, password: password, tier: tier }); },
+  adminResetPassword(userId, newPassword) { return this.adminInvoke('reset_password', { userId: userId, newPassword: newPassword }); },
+  adminDeleteUser(userId) { return this.adminInvoke('delete_user', { userId: userId }); }
 };
 
 if (typeof window !== 'undefined') {

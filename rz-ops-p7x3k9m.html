@@ -717,7 +717,7 @@
     <script src="js/rz-feature-flags.js?v=2026-05-14" defer></script>
     <!-- Supabase (real accounts) — live "Supabase Accounts" panel, root-gated by RLS -->
     <script src="js/rz-config.js?v=2026-07-11"></script>
-    <script type="module" src="js/rz-supabase.js?v=2026-07-11b"></script>
+    <script type="module" src="js/rz-supabase.js?v=2026-07-11c"></script>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -1021,9 +1021,24 @@
     <div class="card" style="margin-top:1rem;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;flex-wrap:wrap;gap:0.5rem;">
             <div class="card-title" style="margin:0"><i class="fas fa-database" style="color:#22d3ee"></i> Supabase Accounts <span style="font-size:0.62rem;font-weight:700;color:#34d399;background:rgba(16,185,129,0.15);padding:2px 8px;border-radius:999px;">LIVE</span><span id="supaAccountsCount" style="display:none;font-family:'JetBrains Mono',monospace;font-size:0.62rem;font-weight:600;color:#22d3ee;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);padding:2px 8px;border-radius:4px;"></span></div>
-            <button class="btn btn-ghost btn-sm" onclick="loadSupaAccounts()"><i class="fas fa-rotate"></i> Refresh</button>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button id="supaAddBtn" class="btn btn-ghost btn-sm" onclick="toggleAddAccount()" style="display:none;"><i class="fas fa-user-plus"></i> Add account</button>
+                <button id="supaMigrateBtn" class="btn btn-ghost btn-sm" onclick="migrateLegacyAccounts()" style="display:none;"><i class="fas fa-arrows-rotate"></i> Migrate legacy</button>
+                <button class="btn btn-ghost btn-sm" onclick="loadSupaAccounts()"><i class="fas fa-rotate"></i> Refresh</button>
+            </div>
         </div>
-        <p style="font-size:0.72rem;color:#94a3b8;margin:0 0 0.75rem;">Real registered users from Supabase. Passwords are <b>never shown</b> (Supabase stores them hashed — that is correct &amp; secure). You can change a user's tier below. Requires you to be signed in as a <b>root</b> user (via <a href="account.html" target="_blank" style="color:#67e8f9;">account.html</a>).</p>
+        <p style="font-size:0.72rem;color:#94a3b8;margin:0 0 0.75rem;">Real registered users from Supabase. Passwords are <b>never shown</b> (Supabase stores them hashed — that is correct &amp; secure). As a <b>root</b> user you can create accounts, change tiers, reset passwords, and delete users here — the privileged actions run in the <code>admin-users</code> Edge Function (the service key never touches this page). Sign in via <a href="account.html" target="_blank" style="color:#67e8f9;">account.html</a>.</p>
+        <!-- Add-account form (root-only, hidden until toggled) -->
+        <div id="supaAddForm" style="display:none;background:rgba(15,23,42,0.55);border:1px solid rgba(51,65,85,0.5);border-radius:6px;padding:12px;margin-bottom:0.7rem;">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+                <label style="font-size:0.66rem;color:#94a3b8;display:flex;flex-direction:column;gap:3px;flex:1 1 200px;">EMAIL<input id="supaNewEmail" type="email" autocomplete="off" placeholder="user@example.com" style="background:#0b1220;color:#e2e8f0;border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:6px 8px;font-size:0.78rem;"></label>
+                <label style="font-size:0.66rem;color:#94a3b8;display:flex;flex-direction:column;gap:3px;flex:1 1 160px;">PASSWORD (min 8)<input id="supaNewPass" type="text" autocomplete="off" placeholder="min 8 characters" style="background:#0b1220;color:#e2e8f0;border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:6px 8px;font-size:0.78rem;font-family:'JetBrains Mono',monospace;"></label>
+                <label style="font-size:0.66rem;color:#94a3b8;display:flex;flex-direction:column;gap:3px;">TIER<select id="supaNewTier" style="background:#0b1220;color:#e2e8f0;border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:6px 8px;font-size:0.78rem;font-family:'JetBrains Mono',monospace;"><option value="free">free</option><option value="demo">demo</option><option value="pro">pro</option><option value="root">root</option></select></label>
+                <button class="btn btn-sm" onclick="submitAddAccount()" style="background:#22d3ee;color:#06202a;font-weight:700;"><i class="fas fa-check"></i> Create</button>
+                <button class="btn btn-ghost btn-sm" onclick="toggleAddAccount(false)">Cancel</button>
+            </div>
+            <p style="font-size:0.66rem;color:#64748b;margin:8px 0 0;">Account is created already confirmed (can log in immediately). The password is set by you and shown once here — it is stored hashed in Supabase.</p>
+        </div>
         <div id="supaAccountsStatus" class="supa-status" style="border-left-color:#334155;"><i class="fas fa-circle-notch fa-spin" style="color:#64748b"></i><span>Loading…</span></div>
         <div class="tbl-overflow" id="supaAccountsList" style="margin-top:0.6rem;"></div>
     </div>
@@ -3245,36 +3260,58 @@ async function loadSupaAccounts(){
         // enforces root regardless; this only governs whether the dropdowns are shown.)
         var myRow=null; for(var mi=0;mi<rows.length;mi++){ if(rows[mi]&&rows[mi].id===user.id){ myRow=rows[mi]; break; } }
         var isRoot=!!(myRow&&myRow.tier==='root');
+        // Root-only admin buttons (Add / Migrate). Server enforces root regardless.
+        var addBtn=document.getElementById('supaAddBtn'),migBtn=document.getElementById('supaMigrateBtn');
+        if(addBtn)addBtn.style.display=isRoot?'inline-flex':'none';
+        if(migBtn)migBtn.style.display=isRoot?'inline-flex':'none';
+        if(!isRoot)toggleAddAccount(false);
         supaCount(rows.length+(rows.length===1?' account':' accounts'));
         if(!isRoot){supaStatus('Signed in as '+user.email+' — not a root account, so only your own row is visible. Tier changes require root.','info');}
-        else{supaStatus('Signed in as '+user.email+' (root). Change a tier from the dropdown; changes apply instantly.','ok');}
+        else{supaStatus('Signed in as '+user.email+' (root). Manage tiers, passwords & accounts below.','ok');}
         renderSupaAccounts(rows,isRoot);
     }catch(e){supaStatus('Load failed: '+(e&&e.message||e),'err');if(listEl)listEl.innerHTML='';}
 }
+// Emails whose legacy password is public in auth.js — flag them so root can rotate the password.
+var SUPA_PUBLIC_PW={'bagus@resistancezero.com':1,'admin@resistancezero.com':1};
 function renderSupaAccounts(rows,isRoot){
     var listEl=document.getElementById('supaAccountsList');
     if(!listEl)return;
+    // Keep a lookup so the row action buttons can pass just the (safe) uuid and resolve the email.
+    window.__supaRows={};
     if(!rows.length){listEl.innerHTML='<div style="padding:0.8rem;color:#64748b;text-align:center;font-size:0.78rem"><i class="fas fa-inbox" style="opacity:0.6"></i>&nbsp; No accounts registered yet.</div>';return;}
-    // Fixed column widths so the header row and body rows align (auto-columns sized per-row,
-    // which made the header labels collide). Cols: avatar · email · tier badge · set-tier · created.
-    var GRID='grid-template-columns:44px minmax(0,1fr) 76px 120px 96px;gap:8px';
+    // Root sees admin columns (set-tier + actions); a non-root user only ever sees their own row.
+    var GRID=isRoot?'grid-template-columns:40px minmax(0,1fr) 64px 104px 82px 96px;gap:8px'
+                   :'grid-template-columns:40px minmax(0,1fr) 64px 82px;gap:8px';
     var body=rows.map(function(p){
+        window.__supaRows[p.id]=p;
         var created=p.created_at?String(p.created_at).split('T')[0]:'—';
         var badge='<span class="tier-badge '+rzEsc(p.tier)+'">'+rzEsc((p.tier||'free').toUpperCase())+'</span>';
-        var sel;
-        if(isRoot){
-            sel='<select aria-label="Change tier for '+rzEsc(p.email||'user')+'" onchange="changeSupaTier(\''+rzEsc(p.id)+'\',this.value,this)">'+
-                SUPA_TIERS.map(function(t){return '<option value="'+t+'"'+(t===p.tier?' selected':'')+'>'+t+'</option>';}).join('')+'</select>';
-        }else{sel=badge;}
+        var warn=SUPA_PUBLIC_PW[(p.email||'').toLowerCase()]
+            ? ' <span title="Password is public in source code — click Reset to rotate it" style="color:#fbbf24;font-size:0.68rem;white-space:nowrap;">&#9888; public pw</span>' : '';
+        var emailCell='<div style="font-size:0.75rem;color:#94a3b8;word-break:break-all">'+rzEsc(p.email||'—')+warn+'</div>';
+        if(!isRoot){
+            return '<div class="cred-row" style="'+GRID+'">'+
+                '<div><div class="cred-avatar" style="background:#22d3ee">'+rzEsc((p.email||'?').charAt(0).toUpperCase())+'</div></div>'+
+                emailCell+'<div>'+badge+'</div>'+
+                '<div style="font-size:0.72rem;color:#64748b">'+rzEsc(created)+'</div>'+
+            '</div>';
+        }
+        var sel='<select aria-label="Change tier for '+rzEsc(p.email||'user')+'" onchange="changeSupaTier(\''+rzEsc(p.id)+'\',this.value,this)">'+
+            SUPA_TIERS.map(function(t){return '<option value="'+t+'"'+(t===p.tier?' selected':'')+'>'+t+'</option>';}).join('')+'</select>';
+        var actions='<div style="display:flex;gap:4px;justify-content:flex-end">'+
+            '<button class="btn btn-ghost btn-sm" title="Reset password" onclick="resetSupaPassword(\''+rzEsc(p.id)+'\')" style="padding:4px 8px"><i class="fas fa-key"></i></button>'+
+            '<button class="btn btn-ghost btn-sm" title="Delete account" onclick="deleteSupaUser(\''+rzEsc(p.id)+'\')" style="padding:4px 8px;color:#fca5a5;border-color:rgba(239,68,68,0.35)"><i class="fas fa-trash"></i></button>'+
+        '</div>';
         return '<div class="cred-row" style="'+GRID+'">'+
             '<div><div class="cred-avatar" style="background:#22d3ee">'+rzEsc((p.email||'?').charAt(0).toUpperCase())+'</div></div>'+
-            '<div style="font-size:0.75rem;color:#94a3b8;word-break:break-all">'+rzEsc(p.email||'—')+'</div>'+
-            '<div>'+badge+'</div>'+
-            '<div>'+sel+'</div>'+
-            '<div style="font-size:0.72rem;color:#64748b">'+rzEsc(created)+'</div>'+
+            emailCell+'<div>'+badge+'</div>'+'<div>'+sel+'</div>'+
+            '<div style="font-size:0.72rem;color:#64748b">'+rzEsc(created)+'</div>'+actions+
         '</div>';
     }).join('');
-    listEl.innerHTML='<div class="cred-row header" style="'+GRID+'"><div>#</div><div>Email</div><div>Tier</div><div>Set tier</div><div>Created</div></div>'+body;
+    var header=isRoot
+        ? '<div class="cred-row header" style="'+GRID+'"><div>#</div><div>Email</div><div>Tier</div><div>Set tier</div><div>Created</div><div style="text-align:right">Actions</div></div>'
+        : '<div class="cred-row header" style="'+GRID+'"><div>#</div><div>Email</div><div>Tier</div><div>Created</div></div>';
+    listEl.innerHTML=header+body;
 }
 async function changeSupaTier(userId,tier,selEl){
     var S=window.rzSupa;
@@ -3295,6 +3332,62 @@ async function changeSupaTier(userId,tier,selEl){
         supaStatus('Tier updated to '+tier+'. Refreshing…','ok');
         loadSupaAccounts();
     }catch(e){supaStatus('Update failed: '+(e&&e.message||e),'err');if(selEl)selEl.disabled=false;}
+}
+// ── Admin user-management (root-only). These call rzSupa admin helpers → the admin-users
+//    Edge Function. If the function isn't deployed, they degrade to a clear message. ──
+function toggleAddAccount(show){
+    var f=document.getElementById('supaAddForm'); if(!f)return;
+    var vis=(show===undefined)?f.style.display==='none':!!show;
+    f.style.display=vis?'block':'none';
+    if(vis){var e=document.getElementById('supaNewEmail'); if(e)e.focus();}
+}
+async function submitAddAccount(){
+    var S=window.rzSupa; if(!S)return;
+    var email=((document.getElementById('supaNewEmail')||{}).value||'').trim();
+    var pass=((document.getElementById('supaNewPass')||{}).value||'');
+    var tier=(document.getElementById('supaNewTier')||{}).value||'free';
+    if(!email){supaStatus('Enter an email address.','warn');return;}
+    if(!/\S+@\S+\.\S+/.test(email)){supaStatus('Enter a valid email address.','warn');return;}
+    if(pass.length<8){supaStatus('Password must be at least 8 characters.','warn');return;}
+    supaStatus('Creating account…','loading');
+    var res=await S.adminCreateUser(email,pass,tier);
+    if(res.error){supaStatus('Create failed: '+res.error,'err');return;}
+    document.getElementById('supaNewEmail').value='';document.getElementById('supaNewPass').value='';
+    toggleAddAccount(false);
+    supaStatus('Account created: '+email+' ('+tier+'). It can log in immediately.','ok');
+    loadSupaAccounts();
+}
+async function migrateLegacyAccounts(){
+    var S=window.rzSupa; if(!S)return;
+    if(!window.confirm('Migrate the 4 legacy accounts (demo@, educator@, bagus@, admin@) into real Supabase accounts using their CURRENT passwords?\n\nNote: bagus@ and admin@ are ROOT and their legacy password is public in the source code — reset them right after (⚠ button on their row).'))return;
+    supaStatus('Migrating legacy accounts…','loading');
+    var res=await S.adminMigrateLegacy();
+    if(res.error){supaStatus('Migration failed: '+res.error,'err');return;}
+    var r=(res.data&&res.data.results)||[];
+    var summary=r.map(function(x){return (x.email||'').split('@')[0]+'='+x.status;}).join(', ');
+    supaStatus('Migration done — '+(summary||'no changes')+'. Reset the root passwords now (⚠ rows).','ok');
+    loadSupaAccounts();
+}
+async function resetSupaPassword(userId){
+    var S=window.rzSupa; if(!S)return;
+    var p=(window.__supaRows||{})[userId]; var email=(p&&p.email)||userId;
+    var np=window.prompt('New password for '+email+' (min 8 characters):');
+    if(np===null)return;
+    if(np.length<8){supaStatus('Password must be at least 8 characters.','warn');return;}
+    supaStatus('Resetting password…','loading');
+    var res=await S.adminResetPassword(userId,np);
+    if(res.error){supaStatus('Reset failed: '+res.error,'err');return;}
+    supaStatus('Password reset for '+email+'.','ok');
+}
+async function deleteSupaUser(userId){
+    var S=window.rzSupa; if(!S)return;
+    var p=(window.__supaRows||{})[userId]; var email=(p&&p.email)||userId;
+    if(!window.confirm('Delete account '+email+'?\n\nThis permanently removes the user and all their saved scenarios. This cannot be undone.'))return;
+    supaStatus('Deleting…','loading');
+    var res=await S.adminDeleteUser(userId);
+    if(res.error){supaStatus('Delete failed: '+res.error,'err');return;}
+    supaStatus('Deleted '+email+'.','ok');
+    loadSupaAccounts();
 }
 // Auto-load the panel once the Supabase module has attached (it's a deferred ES module).
 // Falls back to a clear error if the module never loads (e.g. CDN blocked) instead of hanging.
