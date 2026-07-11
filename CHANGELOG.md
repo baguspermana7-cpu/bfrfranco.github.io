@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.51.12 — 2026-07-05 (Accessibility — full-site sweep part 3b: last six large pages to zero)
+
+**Changed** — `article-10.html` (67), `article-24.html` (64), `article-16.html` (60),
+`FF-3.html` (70), `tier-advisor.html` (63), `infographic-dc-cost-breakdown.html` (63)
+→ **0/0 both themes** (per-page axe probe). Patterns: light/dark inline-style attr
+override pairs, JS-set widget values overridden by id, `--text-muted` dark token,
+disabled-look buttons moved off opacity, pro-overlay ink, dark reference sections,
+Facebook share button brand blue darkened behind white.
+
+All large pages from the full-site sweep are now at zero. Remaining: ~60 small pages
+(~650 nodes, avg ~10/page) for the final part.
+
 ## v1.51.11 — 2026-07-05 (Accessibility — full-site sweep part 3a: four more articles to zero)
 
 **Changed** — `article-8.html` (113), `article-17.html` (100), `article-3.html` (82),
