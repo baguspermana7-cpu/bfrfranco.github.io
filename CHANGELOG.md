@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.51.18 — 2026-07-11 (Supabase — cx calculator + idempotent restore + pattern doc)
+
+**Added / Changed**
+- **CX calculator** gains the **"☁ Save to my account"** button + reloadable scenarios (same pattern) —
+  now live on all six financial calculators (capex/opex/roi/tco/pue/cx).
+- **`js/rz-scenario.js` restore is now idempotent** — a field is only set + its `input`/`change` events
+  fired when its value actually differs from the target, so the second auto-restore pass is a no-op when
+  the first succeeds (addresses the review's double-recompute note). Verified: 0 events on same-value
+  restore, exactly 1 on a changed field. Cache-bust → `?v=2026-07-11c`.
+- **`standarization/SUPABASE_INTEGRATION.md`** — documents the architecture, the security model (RLS,
+  no client tier-update, pinned CDN, credential-capture exclusion), the per-calculator "add Save" recipe,
+  the owner-gated steps, and the §B4 sitewide-auth roadmap.
+
 ## v1.51.17 — 2026-07-11 (Supabase — security review fixes)
 
 Fixes from an adversarial security review of the new Supabase code (found before the schema was ever

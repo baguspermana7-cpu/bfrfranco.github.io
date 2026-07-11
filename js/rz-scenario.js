@@ -45,7 +45,12 @@
 
   function fire(el, type) { try { el.dispatchEvent(new Event(type, { bubbles: true })); } catch (e) {} }
 
-  /** Restore a captured map onto the page, triggering recompute. */
+  /**
+   * Restore a captured map onto the page, triggering recompute. Idempotent: a field is only
+   * set + its events fired when its current value actually DIFFERS from the target — so the
+   * second auto-restore pass (below) is a no-op if the first already applied, avoiding a
+   * gratuitous double recompute / flicker.
+   */
   function restore(map) {
     if (!map) return;
     Object.keys(map).forEach(function (id) {
@@ -53,12 +58,19 @@
       if (!el) return;
       var rec = map[id];
       try {
-        if (rec.t === 'checkbox') { el.checked = !!rec.v; }
-        else if (rec.t === 'radio') {
+        var changed = false;
+        if (rec.t === 'checkbox') {
+          if (el.checked !== !!rec.v) { el.checked = !!rec.v; changed = true; }
+        } else if (rec.t === 'radio') {
           var radios = d.getElementsByName(el.name || id);
-          for (var j = 0; j < radios.length; j++) radios[j].checked = (radios[j].value === rec.v);
-        } else { el.value = rec.v; }
-        fire(el, 'input'); fire(el, 'change');
+          for (var j = 0; j < radios.length; j++) {
+            var want = radios[j].value === rec.v;
+            if (radios[j].checked !== want) { radios[j].checked = want; changed = true; }
+          }
+        } else {
+          if (String(el.value) !== String(rec.v)) { el.value = rec.v; changed = true; }
+        }
+        if (changed) { fire(el, 'input'); fire(el, 'change'); }
       } catch (e) {}
     });
   }

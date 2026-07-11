@@ -682,7 +682,7 @@ a:hover{text-decoration:underline;}
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <link rel="stylesheet" href="css/rz-calc-editorial.css?v=1.43.55">
 </head>
-<body>
+<body data-rz-calc="cx">
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
 <!-- Navigation -->
@@ -741,8 +741,10 @@ a:hover{text-decoration:underline;}
       <button type="button" class="cx-share-btn" onclick="cxShareConfig()" title="Copy shareable link"><i class="fas fa-share-nodes"></i> Share</button>
       <button type="button" class="cx-btn-reset" onclick="cxReset()"><i class="fas fa-undo" style="margin-right:6px;"></i>Reset</button>
       <button type="button" class="cx-btn-pdf" onclick="cxExportPDF()" id="cxExportBtn"><i class="fas fa-file-pdf" style="margin-right:6px;"></i>Export PDF</button>
+      <button type="button" id="btnSaveAccount" onclick="rzScenario&&rzScenario.saveToAccount('cx',{msgEl:'acctSaveMsg'})" style="padding:12px 20px;border-radius:12px;border:1px solid rgba(59,130,246,0.5);background:linear-gradient(135deg,rgba(59,130,246,0.16),rgba(37,99,235,0.06));color:#93c5fd;font-weight:700;font-size:0.88rem;font-family:inherit;cursor:pointer;"><i class="fas fa-cloud" style="margin-right:6px;"></i>Save to my account</button>
       <button type="button" id="cxPremiumBtn" class="cx-premium-btn" onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:6px;"></i>Unlock Pro</button>
     </div>
+    <div id="acctSaveMsg" style="display:none;margin-top:6px;font-size:0.72rem;text-align:center;"></div>
   </div>
 
   <!-- Scenario Presets -->
@@ -6421,5 +6423,9 @@ function toggleCalcTheme() {
 <script src="rz-tracker.js" defer></script>
 <script src="auth.js?v=2026-05-09-v1" defer></script>
 <script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<!-- Supabase save/reload scenario (additive) -->
+<script src="js/rz-config.js?v=2026-07-11"></script>
+<script src="js/rz-scenario.js?v=2026-07-11c"></script>
+<script type="module" src="js/rz-supabase.js?v=2026-07-11b"></script>
 </body>
 </html>
