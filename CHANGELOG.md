@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v1.52.0 — 2026-07-11 (FIN Engine — the shared finance brain + smart screener + advisor scorecard)
+
+The finance sibling of RZ Engine. ONE shared, gate-tested, provenance-sourced brain (`fin-engine.js`) now
+powers every finance surface, the screener became **algorithmic (score + rank)**, and a per-stock
+**advisor-style scorecard** was added — plus **live Indonesian (IDX) data**. Educational analysis only —
+**not investment advice and not a licensed financial advisor** (every scored output carries the disclaimer).
+
+**Added**
+- **`fin-engine.js`** (+ reproducible `fin-engine.min.js`, gate `tools/test-fin-engine.mjs`,
+  `standarization/FIN_ENGINE.md`) — `window.FINEngine` with `models.ratios / valuation (DCF, Graham, DDM) /
+  technical / risk / score / portfolio`, sourced `DATA` (US+ID markets, universes incl IDX `.JK`, factor
+  weights, score bands) with full `DATA.sources` provenance. **`models.technical` is parity-tested
+  identical to the gateway's `cf-worker/src/ta.js`.** Gate: **200/200** (worked examples + ta.js parity +
+  invariants + provenance + disclaimer).
+- **`models.score`** — a transparent multi-factor algorithm (value · quality · momentum · dividend ·
+  liquidity · **free-float** · technical) with per-preset weights, re-normalized over available factors +
+  a `confidence` flag; the SAME model powers the screener ranking and the scorecard.
+- **Finance Terminal — smart screener:** replaced filter+sort-by-mcap with **score + rank + explain** (FIN
+  Score column, factor-weighted **Strategy** selector, **US/Indonesia market toggle**). Verified live: US 58
+  ranked, IDX 25 ranked.
+- **Finance Terminal — FIN Advisor Scorecard:** per-stock composite gauge + 7-factor breakdown + verdict +
+  plain-language reasons + confidence + disclaimer, on the stock-detail view; watchlist rows are clickable.
+- **Gateway (`cf-worker/`)** — `IDX_UNIVERSE` (Yahoo `.JK` blue chips) + `/screener?market=us|id` + `vol`
+  field (shipped separately, auto-deployed; Finnhub free lacks IDX so ID uses Yahoo + engine scoring).
+
+**Security / correctness** (reviewed: code + security):
+- FIN Engine, gateway, and scorecard confirmed clean. Fixed: sentinel-`0` guard in `normBand` (a missing
+  P/E no longer scores a perfect Value); `r.price` null-guard in the screener render; watchlist stored-XSS
+  (tickers sanitized at the add-source + `finSym()`/`safeUrl()`/`esc()` hardening across the terminal's
+  render sites — incl. pre-existing `javascript:`-scheme `href`s and unescaped ticker cells); market-case
+  normalization.
+
 ## v1.51.25 — 2026-07-11 (Finance Terminal — Cloudflare gateway live by default)
 
 The `rz-finance-gateway` Cloudflare Worker is deployed (server-side Finnhub key + KV cache), so the

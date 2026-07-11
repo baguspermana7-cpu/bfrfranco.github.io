@@ -9,6 +9,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
+<!-- FIN Engine — shared finance brain (screener scoring + advisor scorecard). window.FINEngine -->
+<script src="../../fin-engine.min.js?v=2026-07-11-fin1"></script>
 <style>
 :root{--bg0:#0b1120;--bg1:#111827;--bg2:#1e293b;--bg3:#0f172a;--bd:#334155;--bd2:rgba(51,65,85,.4);--t1:#f1f5f9;--t2:#e2e8f0;--t3:#94a3b8;--t4:#64748b;--acc:#8b5cf6;--acc2:#a78bfa;--accbg:rgba(139,92,246,.1);--grn:#34d399;--grnbg:rgba(16,185,129,.15);--red:#f87171;--redbg:rgba(239,68,68,.15);--amb:#fbbf24;--ambbg:rgba(245,158,11,.15);--blu:#60a5fa;--blubg:rgba(96,165,250,.15);--cyn:#22d3ee;--sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;--mono:'JetBrains Mono',monospace;--r:14px;--rs:8px;--rx:6px}
 [data-theme="light"]{--bg0:#f8fafc;--bg1:#fff;--bg2:#fff;--bg3:#f1f5f9;--bd:#e2e8f0;--bd2:#f1f5f9;--t1:#1e293b;--t2:#334155;--t3:#64748b;--t4:#94a3b8}
@@ -442,6 +444,7 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 <div class="card" style="margin-top:1rem"><div class="card-title"><i class="fas fa-chart-line"></i>Earnings History</div><div id="stockEarnings"></div></div>
 <!-- FT Phase 2 Task B — analytics panel (V2-gated; populated by loadAnalyticsPanel) -->
 <div class="card" id="stockAnalyticsPanel" style="margin-top:1rem;display:none"></div>
+<div class="card" id="stockAdvisorScorecard" style="margin-top:1rem;display:none"></div>
 <div class="compare-panel">
 <div class="card-title"><i class="fas fa-balance-scale"></i>Compare Stocks</div>
 <div style="display:flex;gap:8px;margin-bottom:8px"><input class="inp" id="compareInput" placeholder="Add symbol to compare..." style="width:160px" onkeydown="if(event.key==='Enter')addCompareStock()"><button class="btn btn-g btn-sm" onclick="addCompareStock()"><i class="fas fa-plus"></i></button></div>
@@ -515,6 +518,7 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 <div class="tbl-wrap"><table class="dtbl" id="screenerTable"><thead></thead><tbody></tbody></table></div>
 <div class="paging" id="screenerPaging"></div>
 <div style="margin-top:.75rem"><button class="btn btn-o btn-sm" onclick="exportScreenerCSV()"><i class="fas fa-download"></i>Export CSV</button></div>
+<p style="margin:.7rem 0 0;font-size:.68rem;color:var(--t4);font-style:italic;line-height:1.5"><i class="fas fa-circle-info" style="opacity:.7"></i> FIN Score is a transparent multi-factor read (value · quality · momentum · dividend · liquidity · float · technical) by the shared FIN Engine — <b>educational analysis only, not investment advice and not a licensed financial advisor</b>. Indonesian (.JK) stocks score on price/momentum/liquidity (fundamentals limited on free data).</p>
 </div>
 </div>
 
@@ -844,6 +848,66 @@ async function loadAnalyticsPanel(containerId,sym,tf){
   }catch(e){
     if(el)el.innerHTML='<div class="empty"><p>Analytics unavailable — <a href="#" onclick="event.preventDefault();loadAnalyticsPanel(\''+containerId+'\',\''+sym+'\',\''+(tf||'3M')+'\')">retry<\/a><\/p><\/div>';
   }
+}
+
+/* ═══ FIN Advisor Scorecard — the shared FIN Engine's composite read for one stock.
+   Combines fundamentals (S.stockProf/S.stockFin from Finnhub) + the technical gauge (/analyze)
+   into FINEngine.models.score.stock → gauge + factor breakdown + verdict + plain-language reasons.
+   Educational analysis only — not investment advice (disclaimer rendered from the engine). ═══ */
+async function loadAdvisorScorecard(containerId,sym,tf){
+  if(!CFG.V2||!sym||!window.FINEngine)return;
+  var el=document.getElementById(containerId);
+  if(el)el.innerHTML='<div class="empty"><p><span class="spinner"><\/span>Building FIN scorecard…<\/p><\/div>';
+  try{
+    var analyze=await gw('/analyze',{sym:sym,tf:tf||'3M'}).catch(function(){return null;});
+    var m=(S.stockFin&&S.stockFin.metric)||{}, p=S.stockProf||{}, q=S.stockQ||{};
+    var market=FINEngine.format.marketOf(sym);
+    function num(){for(var i=0;i<arguments.length;i++){var v=arguments[i];if(typeof v==='number'&&isFinite(v))return v;}return null;}
+    var pct=function(v){return (typeof v==='number'&&isFinite(v))?v/100:null;};
+    var stock={
+      pe:num(m.peBasicExclExtraTTM,m.peTTM,m.peNormalizedAnnual),
+      pb:num(m.pbAnnual,m.pbQuarterly),
+      evEbitda:num(m.evEbitdaTTM,m.evEbitdaAnnual),
+      roe:pct(num(m.roeTTM,m.roeRfy)),
+      netMargin:pct(num(m.netProfitMarginTTM,m.netProfitMarginAnnual)),
+      debtEquity:num(m['totalDebt/totalEquityQuarterly'],m['totalDebt/totalEquityAnnual']),
+      chgPct:num(q.dp),
+      divYield:pct(num(m.dividendYieldIndicatedAnnual,m.currentDividendYieldTTM)),
+      mcap:p.marketCapitalization?p.marketCapitalization*1e6:num(q.marketCap),
+      vol:num(q.v),
+      floatPct:null,
+      technical:analyze&&analyze.gauge?analyze.gauge.score:null
+    };
+    var res=FINEngine.models.score.stock(stock,{preset:'balanced',market:market});
+    renderAdvisorScorecard(containerId,res,sym);
+  }catch(e){
+    if(el)el.innerHTML='<div class="empty"><p>Scorecard unavailable.<\/p><\/div>';
+  }
+}
+function finFactorBar(label,val){
+  if(val==null)return '<div class="rz-ap-ind"><span>'+label+'<\/span><span class="c-t4">n/a<\/span><\/div>';
+  var col=val>=67?'var(--grn)':val>=45?'var(--amb)':'var(--red)';
+  return '<div class="rz-ap-ind"><span>'+label+'<\/span>'+
+    '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:52px;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden"><span style="display:block;width:'+val+'%;height:100%;background:'+col+'"><\/span><\/span>'+
+    '<span class="mono fw7" style="color:'+col+';min-width:20px;text-align:right">'+val+'<\/span><\/span><\/div>';
+}
+function renderAdvisorScorecard(containerId,res,sym){
+  var el=document.getElementById(containerId);if(!el)return;
+  if(!res||res.score==null){el.innerHTML='<div class="card-title"><i class="fas fa-gauge-high"></i>FIN Advisor Scorecard<\/div><div class="empty"><p>Not enough data to score '+esc(sym)+'.<\/p><\/div>';return;}
+  var col=(window.finVerdictColor?finVerdictColor(res.verdict):'var(--acc)');
+  var f=res.factors||{};
+  var bars=finFactorBar('Value',f.value)+finFactorBar('Quality',f.quality)+finFactorBar('Momentum',f.momentum)+
+    finFactorBar('Dividend',f.dividend)+finFactorBar('Liquidity',f.liquidity)+finFactorBar('Free-float',f.float)+finFactorBar('Technical',f.technical);
+  var reasons=(res.rationale||[]).map(function(t,i){var last=i===res.rationale.length-1;return '<li'+(last?' class="caveat"':'')+'>'+esc(t)+'<\/li>';}).join('');
+  el.innerHTML=
+    '<div class="card-title"><i class="fas fa-gauge-high" style="color:'+col+'"></i>FIN Advisor Scorecard'+
+      '<span class="rz-ap-chip" style="margin-left:8px;color:'+col+';border-color:'+col+'">'+esc(res.verdict)+'<\/span>'+
+      '<span class="c-t4" style="margin-left:auto;font-size:.66rem;font-weight:400">confidence '+Math.round((res.confidence||0)*100)+'%<\/span><\/div>'+
+    '<div class="rz-ap-panel"><div class="rz-ap-left">'+
+      '<div class="rz-ap-gauge">'+renderGaugeSvg(res.score,res.verdict)+'<\/div>'+
+      '<div style="text-align:center;font-size:.62rem;color:var(--t4);text-transform:uppercase;letter-spacing:.5px;margin-top:-6px">Composite FIN Score<\/div>'+
+      '<ul class="rz-ap-rationale">'+reasons+'<\/ul>'+
+    '<\/div><div class="rz-ap-right"><div class="rz-ap-grid" style="grid-template-columns:1fr">'+bars+'<\/div><\/div><\/div>';
 }
 
 const CORS_PROXIES=[
@@ -1266,7 +1330,7 @@ async function loadTickerTape(batchQ){
     let html='';
     quotes.forEach(q=>{
       const cls=chgClass(q.dp||q.d||0);
-      html+=`<span class="tape-item"><span class="tape-sym">${q.name||q.sym}</span><span class="tape-price">${fmtP(q.c,q.c>100?2:4)}</span><span class="tape-chg ${cls}">${q.dp!=null?(q.dp>0?'+':'')+fmtP(q.dp,2)+'%':''}</span></span>`;
+      html+=`<span class="tape-item"><span class="tape-sym">${esc(q.name||q.sym)}</span><span class="tape-price">${fmtP(q.c,q.c>100?2:4)}</span><span class="tape-chg ${cls}">${q.dp!=null?(q.dp>0?'+':'')+fmtP(q.dp,2)+'%':''}</span></span>`;
     });
     tape.innerHTML=html+html;
     S.indices=quotes.reduce((a,q)=>{a[q.sym]=q;return a},{});
@@ -1353,7 +1417,7 @@ function loadTickerTapeV2(bySym){
   let html='';
   quotes.forEach(function(q){
     const cls=chgClass(q.dp||q.d||0);
-    html+='<span class="tape-item"><span class="tape-sym">'+( q.name||q.sym)+'</span><span class="tape-price">'+fmtP(q.c,q.c>100?2:4)+'</span><span class="tape-chg '+cls+'">'+(q.dp!=null?(q.dp>0?'+':'')+fmtP(q.dp,2)+'%':'')+'</span></span>';
+    html+='<span class="tape-item"><span class="tape-sym">'+esc(q.name||q.sym)+'</span><span class="tape-price">'+fmtP(q.c,q.c>100?2:4)+'</span><span class="tape-chg '+cls+'">'+(q.dp!=null?(q.dp>0?'+':'')+fmtP(q.dp,2)+'%':'')+'</span></span>';
   });
   tape.innerHTML=html+html;
   S.indices=quotes.reduce(function(a,q){a[q.sym]=q;return a},{});
@@ -1450,7 +1514,7 @@ function renderMiniTable(id,data){
   const el=$(id);
   let html='<thead><tr><th>Symbol</th><th class="txt-r">Price</th><th class="txt-r">Change</th></tr></thead><tbody>';
   data.forEach(r=>{
-    html+=`<tr><td class="fw7 c-t1">${r.sym}</td><td class="txt-r mono">$${fmtP(r.c)}</td><td class="txt-r fw6" style="color:${chgColor(r.dp)}">${r.dp>0?'+':''}${fmtP(r.dp)}%</td></tr>`;
+    html+=`<tr><td class="fw7 c-t1">${esc(r.sym)}</td><td class="txt-r mono">$${fmtP(r.c)}</td><td class="txt-r fw6" style="color:${chgColor(r.dp)}">${r.dp>0?'+':''}${fmtP(r.dp)}%</td></tr>`;
   });
   el.innerHTML=html+'</tbody>';
 }
@@ -1489,13 +1553,18 @@ async function loadOverviewNews(){
     <div class="news-item">
       <div class="news-icon"><i class="fas fa-newspaper"></i></div>
       <div class="news-body">
-        <div class="news-title"><a href="${a.url}" target="_blank" rel="noopener">${esc(a.headline||'')}</a></div>
+        <div class="news-title"><a href="${safeUrl(a.url)}" target="_blank" rel="noopener">${esc(a.headline||'')}</a></div>
         <div class="news-meta"><span class="news-source">${esc(a.source||'')}</span><span>${fmtD(a.datetime)}</span></div>
       </div>
     </div>`).join('');
   }catch(e){el.innerHTML='<div class="loading-text">Error loading news</div>'}
 }
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+// Whitelist a ticker to a safe charset before it goes into an onclick='…' JS-string attribute
+// (esc() does not escape quotes). Tickers are only [A-Za-z0-9.^=-], so anything else is dropped.
+function finSym(s){return String(s==null?'':s).replace(/[^A-Za-z0-9.^=_-]/g,'')}
+// Reject javascript:/data: (and other non-http) schemes before putting a value in an href.
+function safeUrl(u){if(!u||typeof u!=='string')return '#';const s=u.trim();if(/^(https?:)?\/\//i.test(s)||s.startsWith('/')||s.startsWith('#'))return u;return '#'}
 
 /* ═══════════════════════════════════════════════════════════════
    SECTION 11: TAB 2 - STOCKS
@@ -1511,7 +1580,7 @@ function onStockSearch(val){
       const r=await fh('/search',{q:val});
       const results=(r.result||[]).slice(0,10);
       if(results.length===0){el.innerHTML='<div class="sr-item"><span class="sr-name">No results</span></div>';el.classList.add('show');return}
-      el.innerHTML=results.map(r=>`<div class="sr-item" onclick="selectStock('${r.symbol}')"><span class="sr-sym">${r.symbol}</span><span class="sr-name">${esc(r.description||'')}</span></div>`).join('');
+      el.innerHTML=results.map(r=>`<div class="sr-item" onclick="selectStock('${finSym(r.symbol)}')"><span class="sr-sym">${esc(r.symbol)}</span><span class="sr-name">${esc(r.description||'')}</span></div>`).join('');
       el.classList.add('show');
     }catch(e){el.classList.remove('show')}
   },300);
@@ -1582,6 +1651,8 @@ async function selectStock(sym){
   if(CFG.V2&&S.curStock){
     const ap=$('stockAnalyticsPanel');if(ap)ap.style.display='';
     loadAnalyticsPanel('stockAnalyticsPanel',S.curStock,S.stockTf||'3M');
+    const sc=$('stockAdvisorScorecard');if(sc)sc.style.display='';
+    loadAdvisorScorecard('stockAdvisorScorecard',S.curStock,S.stockTf||'3M');
   }
 }
 
@@ -1627,7 +1698,7 @@ function renderStockProfile(){
     {l:'Avg Volume',v:m['10DayAverageTradingVolume']?fmt(m['10DayAverageTradingVolume']*1e6):'--'},
     {l:'Day Range',v:'$'+fmtP(q.l)+' - $'+fmtP(q.h)}
   ];
-  $('stockProfile').innerHTML=`<div style="font-size:.78rem;line-height:1.9">${items.map(i=>`<div style="display:flex;justify-content:space-between"><span class="c-t4">${i.l}</span><span class="${i.c||'c-t1'} fw6">${i.v}</span></div>`).join('')}${p.weburl?`<div style="margin-top:6px"><a href="${p.weburl}" target="_blank" rel="noopener" style="font-size:.72rem"><i class="fas fa-external-link-alt"></i> Website</a></div>`:''}</div>`;
+  $('stockProfile').innerHTML=`<div style="font-size:.78rem;line-height:1.9">${items.map(i=>`<div style="display:flex;justify-content:space-between"><span class="c-t4">${i.l}</span><span class="${i.c||'c-t1'} fw6">${i.v}</span></div>`).join('')}${p.weburl?`<div style="margin-top:6px"><a href="${safeUrl(p.weburl)}" target="_blank" rel="noopener" style="font-size:.72rem"><i class="fas fa-external-link-alt"></i> Website</a></div>`:''}</div>`;
 }
 
 function renderInsiderTrades(){
@@ -1733,7 +1804,7 @@ function renderStockFinancials(){
 function renderStockPeers(){
   if(!S.stockPeers.length){$('stockPeers').innerHTML='<div class="empty"><p>No peer data available</p><p style="font-size:.7rem;color:var(--t4)">ETFs and some securities may not have peer data</p></div>';return}
   // Load peer quotes for comparison
-  $('stockPeers').innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">${S.stockPeers.map(p=>`<button class="btn btn-o btn-sm" onclick="selectStock('${p}')">${p}</button>`).join('')}</div>
+  $('stockPeers').innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">${S.stockPeers.map(p=>`<button class="btn btn-o btn-sm" onclick="selectStock('${finSym(p)}')">${esc(p)}</button>`).join('')}</div>
   <div id="peerComparison"><div class="loading-text"><span class="spinner"></span>Loading peer data...</div></div>`;
   loadPeerComparison();
 }
@@ -1746,7 +1817,7 @@ async function loadPeerComparison(){
     try{const q=await fh('/quote',{symbol:sym});rows.push({sym,c:q.c,dp:q.dp,d:q.d})}catch(e){}
   }
   if(!rows.length){el.innerHTML='';return}
-  el.innerHTML=`<table class="dtbl"><thead><tr><th>Peer</th><th class="txt-r">Price</th><th class="txt-r">Change</th></tr></thead><tbody>${rows.map(r=>`<tr style="cursor:pointer" onclick="selectStock('${r.sym}')"><td class="fw7 c-t1">${r.sym}</td><td class="txt-r mono">$${fmtP(r.c)}</td><td class="txt-r fw6" style="color:${chgColor(r.dp)}">${r.dp>0?'+':''}${fmtP(r.dp)}%</td></tr>`).join('')}</tbody></table>`;
+  el.innerHTML=`<table class="dtbl"><thead><tr><th>Peer</th><th class="txt-r">Price</th><th class="txt-r">Change</th></tr></thead><tbody>${rows.map(r=>`<tr style="cursor:pointer" onclick="selectStock('${finSym(r.sym)}')"><td class="fw7 c-t1">${esc(r.sym)}</td><td class="txt-r mono">$${fmtP(r.c)}</td><td class="txt-r fw6" style="color:${chgColor(r.dp)}">${r.dp>0?'+':''}${fmtP(r.dp)}%</td></tr>`).join('')}</tbody></table>`;
 }
 
 function initStockTfBar(){
@@ -1985,7 +2056,7 @@ function renderSecFilings(){
   el.innerHTML=`<div style="max-height:350px;overflow-y:auto">${filings.map(f=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd2);font-size:.75rem">
     <span class="badge ${typeColors[f.form]||'badge-o'}" style="min-width:50px;text-align:center">${esc(f.form||'--')}</span>
     <div style="flex:1;min-width:0">
-      <a href="${f.reportUrl||f.filingUrl||'#'}" target="_blank" rel="noopener" class="c-t1 fw5" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc((f.symbol||'')+' - '+(f.form||'Filing'))}</a>
+      <a href="${safeUrl(f.reportUrl||f.filingUrl||'#')}" target="_blank" rel="noopener" class="c-t1 fw5" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc((f.symbol||'')+' - '+(f.form||'Filing'))}</a>
       <div class="c-t4" style="font-size:.65rem">${f.filedDate||f.acceptedDate||'--'}</div>
     </div>
   </div>`).join('')}</div>`;
@@ -1996,7 +2067,7 @@ function renderCompanyNews(){
   const news=S.stockCompNews||[];
   if(!news.length){el.innerHTML='<div class="c-t4" style="font-size:.75rem">No recent company news</div>';return}
   el.innerHTML=`<div style="max-height:350px;overflow-y:auto">${news.map(n=>`<div style="padding:8px 0;border-bottom:1px solid var(--bd2);font-size:.75rem">
-    <a href="${n.url||'#'}" target="_blank" rel="noopener" class="c-t1 fw5" style="display:block;margin-bottom:2px;line-height:1.4">${esc(n.headline||'')}</a>
+    <a href="${safeUrl(n.url||'#')}" target="_blank" rel="noopener" class="c-t1 fw5" style="display:block;margin-bottom:2px;line-height:1.4">${esc(n.headline||'')}</a>
     <div style="display:flex;gap:8px;font-size:.65rem;color:var(--t4)">
       <span class="fw5">${esc(n.source||'')}</span>
       <span>${n.datetime?new Date(n.datetime*1000).toLocaleDateString():''}</span>
@@ -2411,20 +2482,38 @@ async function runCryptoScreen(){
   }catch(e){}
 }
 
+// FIN Engine verdict → colour (Strong/Favorable green · Neutral amber · Cautious/Weak red).
+function finVerdictColor(v){
+  return v==='Strong'?'var(--grn)':v==='Favorable'?'#5ec98a':v==='Neutral'?'var(--amb)':v==='Cautious'?'#e0913a':v==='Weak'?'var(--red)':'var(--t4)';
+}
+// Compact FIN Score cell: mini bar + number, coloured by verdict. '--' when unscored (e.g. V1 fallback).
+function finScoreCell(r){
+  if(r.score==null)return '<span class="c-t4">--</span>';
+  const col=finVerdictColor(r.verdict),conf=r.confidence!=null&&r.confidence<0.6?' data-lowconf':'';
+  const tip=(r.verdict||'')+(r.confidence!=null?' · confidence '+Math.round(r.confidence*100)+'%':'');
+  return `<div style="display:inline-flex;align-items:center;gap:6px;justify-content:flex-end" title="${tip}">
+    <div style="width:40px;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden"><div style="width:${r.score}%;height:100%;background:${col}"></div></div>
+    <span class="mono fw7" style="color:${col};min-width:20px"${conf}>${r.score}</span></div>`;
+}
 function renderScreenerResults(){
   const perPage=20;
   const start=(S.scrPage-1)*perPage;
   const page=S.scrResults.slice(start,start+perPage);
   const thead=$('screenerTable').querySelector('thead');
   const tbody=$('screenerTable').querySelector('tbody');
-  thead.innerHTML='<tr><th>Symbol</th><th>Name</th><th class="txt-r">Price</th><th class="txt-r">Change %</th><th class="txt-r">Market Cap</th></tr>';
-  tbody.innerHTML=page.map(r=>`<tr>
-    <td class="fw7 c-t1">${r.sym}</td>
+  thead.innerHTML='<tr><th style="width:34px">#</th><th>Symbol</th><th>Name</th><th class="txt-r">Price</th><th class="txt-r">Change %</th><th class="txt-r">Mkt Cap</th><th class="txt-r">FIN Score</th></tr>';
+  tbody.innerHTML=page.map(r=>{
+    const isID=/\.JK$/.test(r.sym), disp=r.sym.replace(/\.JK$/,'');
+    const px=(r.price==null)?'--':(isID?('Rp'+fmt(r.price)):('$'+(r.price>=1?fmtP(r.price):r.price.toFixed(6))));
+    return `<tr style="cursor:pointer" onclick="selectStock('${finSym(r.sym)}')" title="Open ${esc(disp)}">
+    <td class="c-t4 mono">${r.rank||''}</td>
+    <td class="fw7 c-t1">${esc(disp)}</td>
     <td class="c-t3">${esc(r.name)}</td>
-    <td class="txt-r mono">$${r.price>=1?fmtP(r.price):r.price.toFixed(6)}</td>
+    <td class="txt-r mono">${px}</td>
     <td class="txt-r fw6" style="color:${chgColor(r.chg)}">${r.chg!=null?(r.chg>0?'+':'')+fmtP(r.chg)+'%':'--'}</td>
-    <td class="txt-r mono">${fmt(r.mcap)}</td>
-  </tr>`).join('');
+    <td class="txt-r mono">${r.mcap?fmt(r.mcap):'<span class="c-t4">—</span>'}</td>
+    <td class="txt-r">${finScoreCell(r)}</td>
+  </tr>`;}).join('');
   const totalPages=Math.ceil(S.scrResults.length/perPage);
   $('screenerPaging').innerHTML=Array.from({length:totalPages},(_,i)=>`<button class="pg-btn${i+1===S.scrPage?' active':''}" onclick="S.scrPage=${i+1};renderScreenerResults()">${i+1}</button>`).join('');
   wireTable('screenerTable','screenerFilter'); // B-004 (sort+filter; idempotent)
@@ -2432,8 +2521,8 @@ function renderScreenerResults(){
 
 function exportScreenerCSV(){
   if(!S.scrResults.length)return;
-  let csv='Symbol,Name,Price,Change%,MarketCap\n';
-  S.scrResults.forEach(r=>{csv+=`${r.sym},"${r.name}",${r.price},${r.chg||0},${r.mcap}\n`});
+  let csv='Rank,Symbol,Name,Price,Change%,MarketCap,FINScore,Verdict\n';
+  S.scrResults.forEach(r=>{csv+=`${r.rank||''},${r.sym},"${r.name}",${r.price},${r.chg||0},${r.mcap},${r.score!=null?r.score:''},${r.verdict||''}\n`});
   downloadCSV(csv,'screener-'+new Date().toISOString().split('T')[0]+'.csv');
 }
 
@@ -2447,9 +2536,11 @@ function setWlMode(mode){
   if(mode==='watchlist')renderWatchlist();else{renderPortfolio();loadPortfolioAnalytics()}
 }
 
-function addToWatchlistDirect(sym){if(!S.wl.includes(sym)){S.wl.push(sym);saveLS(CFG.LS.WL,S.wl);wsSub(sym);loadWlPrices()}}
+// Sanitize a symbol to a valid ticker charset before it enters the watchlist (persisted to
+// localStorage + rendered into onclick attrs) — root fix for stored-XSS from user-typed tickers.
+function addToWatchlistDirect(sym){sym=finSym(sym);if(sym&&!S.wl.includes(sym)){S.wl.push(sym);saveLS(CFG.LS.WL,S.wl);wsSub(sym);loadWlPrices()}}
 function addToWatchlist(){
-  const sym=($('wlAddInput').value||'').toUpperCase().trim();
+  const sym=finSym(($('wlAddInput').value||'').toUpperCase().trim());
   if(!sym)return;
   if(!S.wl.includes(sym)){S.wl.push(sym);saveLS(CFG.LS.WL,S.wl);wsSub(sym);loadWlPrices()}
   $('wlAddInput').value='';
@@ -2479,13 +2570,13 @@ function renderWatchlist(){
   tbody.innerHTML=S.wl.map(sym=>{
     const p=S.wlPrices[sym]||{c:0,d:0,dp:0,name:sym};
     return`<tr>
-    <td class="fw7 c-t1">${sym}</td>
+    <td class="fw7 c-t1" style="cursor:pointer" title="Open ${esc(sym)}" onclick="switchTab('stocks');selectStock('${finSym(sym)}')">${esc(sym)}</td>
     <td class="c-t3">${esc(p.name||sym)}</td>
     <td class="txt-r mono fw6 c-t1">$${fmtP(p.c)}</td>
     <td class="txt-r fw6" style="color:${chgColor(p.d)}">${p.d>0?'+':''}${fmtP(p.d)}</td>
     <td class="txt-r fw6" style="color:${chgColor(p.dp)}">${p.dp>0?'+':''}${fmtP(p.dp)}%</td>
     <td class="txt-r mono">${p.live?'<span class="badge badge-g">LIVE</span>':''}</td>
-    <td class="txt-r"><button class="btn btn-r btn-sm" onclick="removeFromWatchlist('${sym}')"><i class="fas fa-times"></i></button></td>
+    <td class="txt-r"><button class="btn btn-r btn-sm" onclick="removeFromWatchlist('${finSym(sym)}')"><i class="fas fa-times"></i></button></td>
     </tr>`}).join('');
 }
 
@@ -2585,7 +2676,7 @@ function renderNewsItems(el,list){
     <div class="news-item">
       ${a.image?`<img src="${a.image}" alt="" style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`:'<div class="news-icon"><i class="fas fa-newspaper"></i></div>'}
       <div class="news-body">
-        <div class="news-title"><a href="${a.url}" target="_blank" rel="noopener">${esc(a.headline||'')}</a></div>
+        <div class="news-title"><a href="${safeUrl(a.url)}" target="_blank" rel="noopener">${esc(a.headline||'')}</a></div>
         <div style="font-size:.72rem;color:var(--t3);margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(a.summary||'')}</div>
         <div class="news-meta"><span class="news-source">${esc(a.source||'')}</span><span>${fmtD(a.datetime)}</span></div>
       </div>
@@ -2612,7 +2703,7 @@ async function loadNewsFeed(){
     <div class="news-item">
       ${a.image?`<img src="${a.image}" alt="" style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`:'<div class="news-icon"><i class="fas fa-newspaper"></i></div>'}
       <div class="news-body">
-        <div class="news-title"><a href="${a.url}" target="_blank" rel="noopener">${esc(a.headline||'')}</a></div>
+        <div class="news-title"><a href="${safeUrl(a.url)}" target="_blank" rel="noopener">${esc(a.headline||'')}</a></div>
         <div style="font-size:.72rem;color:var(--t3);margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(a.summary||'')}</div>
         <div class="news-meta"><span class="news-source">${esc(a.source||'')}</span><span>${fmtD(a.datetime)}</span></div>
       </div>
@@ -3663,6 +3754,8 @@ renderScreenerFilters=function(){
     <button class="btn btn-p btn-sm" onclick="runCryptoScreen()" style="align-self:flex-end"><i class="fas fa-search"></i>Screen</button>`;
   }else{
     $('screenerFilters').innerHTML=`
+    <div class="filter-group"><label>Market</label><select class="sel" id="scrMarket" onchange="window._scrMarket=this.value;runStockScreen()"><option value="us">🇺🇸 US</option><option value="id">🇮🇩 Indonesia</option></select></div>
+    <div class="filter-group"><label>Strategy (FIN Engine)</label><select class="sel" id="scrStrategy" onchange="window._scrStrategy=this.value;runStockScreen()"><option value="balanced">Balanced</option><option value="value">Value</option><option value="growth">Growth</option><option value="momentum">Momentum</option><option value="dividend">Dividend</option><option value="quality">Quality</option><option value="idxBluechip">IDX Bluechip</option></select></div>
     <div class="filter-group"><label>Min Market Cap</label><select class="sel" id="scrMinMcap"><option value="">Any</option><option value="200e9">$200B+</option><option value="10e9">$10B+</option><option value="2e9">$2B+</option><option value="300e6">$300M+</option></select></div>
     <div class="filter-group"><label>Max P/E</label><input class="inp" id="scrMaxPe" type="number" placeholder="e.g. 25" style="width:80px"></div>
     <div class="filter-group"><label>Sector</label><select class="sel" id="scrSector"><option value="">All</option><option value="Technology">Tech</option><option value="Healthcare">Healthcare</option><option value="Financial Services">Finance</option><option value="Consumer Cyclical">Consumer</option><option value="Industrials">Industrial</option><option value="Energy">Energy</option><option value="Communication Services">Comm</option></select></div>
@@ -3706,9 +3799,11 @@ async function runStockScreenV2(){
   const tb=$('screenerTable').querySelector('tbody');
   const th=$('screenerTable').querySelector('thead');
   th.innerHTML='';
-  tb.innerHTML='<tr><td colspan="5"><div class="skel" style="height:120px"></div></td></tr>';
+  tb.innerHTML='<tr><td colspan="7"><div class="skel" style="height:120px"></div></td></tr>';
   $('screenerCount').textContent='...';
-  const params={};
+  const market=window._scrMarket||'us';
+  const strategy=window._scrStrategy||(market==='id'?'idxBluechip':'balanced');
+  const params={market:market};
   if(window._scrPreset)params.preset=window._scrPreset;
   const minMcap=parseFloat($('scrMinMcap')?.value);if(minMcap>0)params.minMcap=minMcap;
   const maxPe=parseFloat($('scrMaxPe')?.value);if(maxPe>0)params.maxPe=maxPe;
@@ -3717,22 +3812,32 @@ async function runStockScreenV2(){
   const dayChg=$('scrDayChg')?.value||'';if(dayChg)params.dayChange=dayChg;
   try{
     const rows=await gw('/screener',params);
-    S.scrResults=(Array.isArray(rows)?rows:[]).map(r=>({
+    // FIN Engine scores + ranks the universe (multi-factor: value/quality/momentum/dividend/
+    // liquidity/float/technical). Map gateway fields → engine input; engine returns score/verdict/rank.
+    let mapped=(Array.isArray(rows)?rows:[]).map(r=>({
+      sym:r.sym,name:r.name||r.sym,price:r.price,chgPct:r.chgPct,
+      mcap:r.marketCap,pe:r.pe,vol:r.vol||0,sector:r.sector||'',divYield:r.divYield?r.divYield/100:null
+    }));
+    if(window.FINEngine&&FINEngine.models.score){
+      mapped=FINEngine.models.score.rank(mapped,{preset:strategy,market:market});
+    }
+    S.scrResults=mapped.map(r=>({
       sym:r.sym,name:r.name||r.sym,price:r.price,chg:r.chgPct,
-      mcap:r.marketCap,pe:r.pe,vol:0,sector:r.sector||'',divYield:r.divYield
+      mcap:r.mcap,pe:r.pe,vol:r.vol||0,sector:r.sector||'',divYield:r.divYield,
+      score:r.score,verdict:r.verdict,rank:r.rank,factors:r.factors,confidence:r.confidence
     }));
     S.scrPage=1;
     $('screenerCount').textContent=S.scrResults.length;
     if(!S.scrResults.length){
       th.innerHTML='';
-      tb.innerHTML='<tr><td colspan="5"><div class="empty"><i class="fas fa-filter"></i><p>No matches — adjust filters or pick another preset</p></div></td></tr>';
+      tb.innerHTML='<tr><td colspan="7"><div class="empty"><i class="fas fa-filter"></i><p>No matches — adjust filters or pick another preset</p></div></td></tr>';
       return;
     }
     renderScreenerResults();
   }catch(e){
     $('screenerCount').textContent='0';
     th.innerHTML='';
-    tb.innerHTML='<tr><td colspan="5"><div class="empty"><i class="fas fa-exclamation-triangle"></i><p>Screener unavailable — <a href="#" style="color:var(--acc)" onclick="event.preventDefault();runStockScreen()">Retry</a></p></div></td></tr>';
+    tb.innerHTML='<tr><td colspan="7"><div class="empty"><i class="fas fa-exclamation-triangle"></i><p>Screener unavailable — <a href="#" style="color:var(--acc)" onclick="event.preventDefault();runStockScreen()">Retry</a></p></div></td></tr>';
   }
 }
 // Enhanced stock screener with more filters
