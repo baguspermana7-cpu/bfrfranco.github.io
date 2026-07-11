@@ -109,6 +109,7 @@
     opts = opts || {};
     var msg = opts.msgEl && d.getElementById(opts.msgEl);
     function show(t, ok) { if (!msg) return; msg.style.display = 'block'; msg.style.color = ok ? '#34d399' : '#f87171'; msg.textContent = t; }
+    function showOk(html) { if (!msg) return; msg.style.display = 'block'; msg.style.color = '#34d399'; msg.innerHTML = html; }
     var S = w.rzSupa;
     if (!S || !S.configured) { show('Cloud save unavailable (config missing).', false); return; }
     try {
@@ -118,7 +119,8 @@
       var name = opts.name || (calc.toUpperCase() + ' · ' + new Date().toLocaleDateString());
       var res = await S.saveScenario(calc, name, { summary: opts.summary || {}, inputs: inputs });
       if (res.error) { show('Save failed: ' + res.error, false); return; }
-      show('☁ Saved to your account — see it in My Account.', true);
+      // Trusted, hardcoded content — safe to use innerHTML for the account link (discoverability).
+      showOk('☁ Saved — <a href="account.html" style="color:#67e8f9;text-decoration:underline;">open My Account</a>');
     } catch (e) { show('Save failed: ' + (e && e.message || e), false); }
   }
 

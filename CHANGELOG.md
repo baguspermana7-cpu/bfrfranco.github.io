@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.51.19 — 2026-07-11 (Supabase — carbon-footprint Save + account-link discoverability)
+
+**Added / Changed**
+- **carbon-footprint** gains the **"☁ Save to my account"** button + reloadable scenarios — now on all
+  seven calculators (capex/opex/roi/tco/pue/cx/carbon).
+- The save-success message now links to **My Account** (the account page was otherwise unlinked) — small
+  discoverability win. Content is hardcoded/trusted (safe innerHTML). Cache-bust rz-scenario.js → `?v=…d`.
+- Verified: carbon 0 errors + button present; capex/account unaffected; gates CLEAN.
+
 ## v1.51.18 — 2026-07-11 (Supabase — cx calculator + idempotent restore + pattern doc)
 
 **Added / Changed**

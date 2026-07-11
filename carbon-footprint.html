@@ -677,7 +677,7 @@ html:not([data-theme="dark"]) .cf-toolbar-btn.cf-btn-free { color:#475569 !impor
 html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !important; }
 </style>
 </head>
-<body>
+<body data-rz-calc="carbon">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="page-background"></div>
 
@@ -783,6 +783,8 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
             <button class="cf-btn-reset" onclick="resetDefaults()"><i class="fas fa-undo"></i> Reset</button>
             <button class="cf-btn-pdf disabled" id="btnExportPDF" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
             <button class="cf-btn-pdf" id="btnExportCSV" onclick="exportCarbonCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
+            <button id="btnSaveAccount" onclick="rzScenario&&rzScenario.saveToAccount('carbon',{msgEl:'acctSaveMsg'})" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(59,130,246,0.5);background:linear-gradient(135deg,rgba(59,130,246,0.16),rgba(37,99,235,0.06));color:#93c5fd;cursor:pointer;font-weight:700;font-size:0.82rem;font-family:inherit;"><i class="fas fa-cloud"></i> Save to my account</button>
+            <span id="acctSaveMsg" style="display:none;font-size:0.72rem;margin-left:8px;"></span>
         </div>
     </div>
     <div class="rz-calc-validation" id="carbonValidation" role="alert" aria-live="polite" hidden style="max-width:1400px;margin:0 auto 1rem;"></div>
@@ -2793,5 +2795,9 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
         }
     })();
     </script>
+<!-- Supabase save/reload scenario (additive) -->
+<script src="js/rz-config.js?v=2026-07-11"></script>
+<script src="js/rz-scenario.js?v=2026-07-11d"></script>
+<script type="module" src="js/rz-supabase.js?v=2026-07-11b"></script>
 </body>
 </html>
