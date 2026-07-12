@@ -74,6 +74,20 @@ The `float` factor is first-class. True numeric free-float is not on the *market
 StockMap itself is intentionally "official-source-only" (no live data), so live FIN scoring is NOT grafted
 onto it; the engine instead *borrows* StockMap's float taxonomy (`floatBands`) + its sourced free-float.
 
+## Factor Zoo + Investment Committee (v1.52.7 — deterministic adaptation of Vibe-Trading, NO LLM)
+- **`models.alphas`** — a deterministic Factor Zoo of well-known formulaic alphas (Jegadeesh-Titman 12-1
+  momentum, George-Hwang 52-week-high, low-volatility, short reversal, trend-vs-200d, volume trend, Amihud
+  illiquidity, alpha101 intraday strength). Each is a pure function of a candle series → `{value, score,
+  vote, label}`; literature cites live in `DATA.sources['alphas.*']`. `alphas.compute(candles)` → composite.
+- **`models.committee`** — the no-LLM "swarm": `run(stock, candles, opts)` executes 4 fixed rule-based
+  **panels** (Fundamental via `models.score` · Technical via `models.technical` · Quant via `models.alphas`
+  · Risk via volatility/drawdown/Amihud), each votes, then a weighted consensus (`COMMITTEE_WEIGHTS`,
+  re-normalized over panels present) → `{verdict, score, confidence, panels[], bullCase[], bearCase[],
+  disclaimer}`. The **bull/bear case** = the strongest supporting vs opposing signals across panels — a
+  deterministic stand-in for an agent debate. Descriptive, disclaimed; never a prediction (the backtest
+  confirms the technical gauge isn't predictive). The terminal scorecard renders this as an Investment
+  Committee. **Planned:** a Berkshire-style Value Gate panel + crypto market.
+
 ## Gate — `tools/test-fin-engine.mjs` (SHIP GATE, mirrors `test-rz-engine.mjs`)
 Node-vm load + assertions: worked examples (ratios/valuation/technical/score/risk), **ta.js parity**
 (dynamic-imports the real `ta.js`), data invariants (currencies resolvable, universes sourced, factor

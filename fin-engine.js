@@ -225,6 +225,15 @@
             'factorWeights': { source: 'Engine methodology — factor-investing style weights (Fama-French value/quality/momentum lineage)', asOf: '2026', method: 'weights per preset; re-normalized over available factors' },
             'floatBands': { source: 'StockMap free-float taxonomy (float-trap / tight / institutional)', asOf: '2026', unit: 'fraction of shares outstanding' },
             'idxFundamentals': { source: 'StockMap sourced ledger — issuer disclosures (annual reports / IDX ownership pages)', asOf: '2024–2026 (per-ticker, see asOf)', unit: 'freeFloat fraction; pe/pb ratio; roe fraction', method: 'free-float from issuer ownership composition; pe/pb/roe are issuer-disclosure snapshots, not live' },
+            'alphas.momentum_12_1': { source: 'Jegadeesh & Titman (1993), Returns to Buying Winners', asOf: '1993', method: 'return t-252→t-21 (12-1 momentum)' },
+            'alphas.reversal_1m': { source: 'Jegadeesh (1990), Evidence of Predictable Behavior of Security Returns', asOf: '1990', method: 'contrarian: −(1-month return)' },
+            'alphas.high_52w': { source: 'George & Hwang (2004), The 52-Week High and Momentum Investing', asOf: '2004', method: 'price ÷ trailing-252 high' },
+            'alphas.low_vol': { source: 'Ang, Hodrick, Xing & Zhang (2006), low-volatility anomaly', asOf: '2006', method: 'inverse realized volatility' },
+            'alphas.amihud_illiq': { source: 'Amihud (2002), Illiquidity and Stock Returns', asOf: '2002', method: 'mean(|ret|/dollar-volume)' },
+            'alphas.gap_strength': { source: 'Kakushadze (2016), 101 Formulaic Alphas (arXiv:1601.00991)', asOf: '2016', method: '(close−open)/(high−low)' },
+            'alphas.trend_200': { source: 'Standard trend-following (price vs 200-day MA + slope)', asOf: '2026', method: 'engine methodology' },
+            'alphas.vol_trend': { source: 'Volume-interest heuristic (5-day vs 60-day avg volume)', asOf: '2026', method: 'engine methodology' },
+            'committee': { source: 'Engine methodology — deterministic multi-panel consensus (adapts Vibe-Trading swarm pattern WITHOUT an LLM)', asOf: '2026', method: 'fundamental/technical/quant/risk panels vote → consensus + bull/bear case' },
             'verdictBands': { source: 'Engine methodology — composite score → descriptive verdict', asOf: '2026', method: 'descriptive, not prescriptive' }
         },
 
@@ -450,6 +459,88 @@
         bollinger: bollinger, stochastic: stochastic, atr: atr, gauge: function (candles) { return analyze(candles).gauge; }, analyze: analyze
     };
 
+    /* ── alphas: a deterministic Factor Zoo (the no-LLM adaptation of Vibe-Trading's factor library).
+     *    Each alpha is a PURE function of a daily candle series → { value, score(0-100), vote, label }.
+     *    Formulas are the well-known academic/quant factors; cites are in DATA.sources. No prediction is
+     *    promised — these are descriptive factor reads (see FINEngine.DISCLAIMER). ── */
+    function closesOf(candles) { return (candles || []).filter(function (k) { return k && isFinite(k.c); }).map(function (k) { return k.c; }); }
+    function retsFrom(closes) { var o = []; for (var i = 1; i < closes.length; i++) { if (closes[i - 1]) o.push(closes[i] / closes[i - 1] - 1); } return o; }
+    function voteFrom(score) { return score >= 60 ? 'bull' : score <= 40 ? 'bear' : 'neutral'; }
+    // Each factor: needs enough bars → else null. Bands chosen from typical equity distributions.
+    var alphas = {
+        // Jegadeesh-Titman 12-1 momentum: return from ~12m ago to ~1m ago (skip last month).
+        momentum_12_1: function (candles) {
+            var c = closesOf(candles); if (c.length < 252) return null;
+            var v = c[c.length - 21] / c[c.length - 252] - 1;
+            return { value: v, score: normBand(v, { lo: -0.30, hi: 0.50 }), vote: v > 0.05 ? 'bull' : v < -0.05 ? 'bear' : 'neutral', label: '12-1 momentum' };
+        },
+        // Short-term (1-month) reversal — contrarian: a sharp recent drop scores higher (bounce candidate).
+        reversal_1m: function (candles) {
+            var c = closesOf(candles); if (c.length < 22) return null;
+            var r = c[c.length - 1] / c[c.length - 22] - 1;
+            var s = normBand(-r, { lo: -0.15, hi: 0.15 });
+            return { value: r, score: s, vote: 'neutral', label: '1-month reversal' };
+        },
+        // George-Hwang 52-week-high: proximity of price to its trailing 1-year high.
+        high_52w: function (candles) {
+            var c = closesOf(candles); if (c.length < 60) return null;
+            var win = c.slice(-252), hi = Math.max.apply(null, win), px = c[c.length - 1];
+            var prox = hi > 0 ? px / hi : null; if (prox == null) return null;
+            return { value: prox, score: Math.round(clamp(prox, 0, 1) * 100), vote: prox > 0.95 ? 'bull' : prox < 0.70 ? 'bear' : 'neutral', label: '52-week-high proximity' };
+        },
+        // Low-volatility anomaly: lower realized vol scores higher.
+        low_vol: function (candles) {
+            var c = closesOf(candles); var r = retsFrom(c); if (r.length < 20) return null;
+            var vol = risk.volatility(r); if (vol == null) return null;
+            return { value: vol, score: normBand(vol, { lo: 0.10, hi: 0.60, invert: true }), vote: 'neutral', label: 'low volatility' };
+        },
+        // Trend vs 200-day average (+ direction). Above a rising SMA200 = healthy uptrend.
+        trend_200: function (candles) {
+            var c = closesOf(candles); if (c.length < 200) return null;
+            var s200 = sma(c, 200), px = c[c.length - 1]; if (!s200) return null;
+            var s200prev = sma(c.slice(0, c.length - 21), 200);
+            var above = px / s200 - 1, rising = s200prev ? (s200 > s200prev) : true;
+            var sc = normBand(above, { lo: -0.20, hi: 0.30 }); if (rising) sc = Math.min(100, sc + 8); else sc = Math.max(0, sc - 8);
+            return { value: above, score: sc, vote: voteFrom(sc), label: 'trend vs 200-day' };
+        },
+        // Volume trend: recent 5-day vs 60-day average volume (rising interest).
+        vol_trend: function (candles) {
+            var rows = (candles || []).filter(function (k) { return k && isFinite(k.v); });
+            if (rows.length < 60) return null;
+            var vs = rows.map(function (k) { return k.v; });
+            var recent = sma(vs, 5), base = sma(vs, 60); if (!base) return null;
+            var ratio = recent / base;
+            return { value: ratio, score: normBand(ratio, { lo: 0.5, hi: 2.5 }), vote: 'neutral', label: 'volume trend' };
+        },
+        // Amihud (2002) illiquidity: mean(|ret| / dollar-volume). Higher = more illiquid = risk → lower score.
+        amihud_illiq: function (candles) {
+            var rows = (candles || []).filter(function (k) { return k && isFinite(k.c) && isFinite(k.v) && k.v > 0; });
+            if (rows.length < 22) return null;
+            var acc = 0, n = 0;
+            for (var i = 1; i < rows.length; i++) { var r = Math.abs(rows[i].c / rows[i - 1].c - 1); acc += r / (rows[i].v * rows[i].c); n++; }
+            var illiq = n ? (acc / n) * 1e12 : null; if (illiq == null) return null;
+            return { value: illiq, score: normBand(illiq, { lo: 0, hi: 5, invert: true }), vote: illiq > 5 ? 'bear' : 'neutral', label: 'Amihud illiquidity' };
+        },
+        // alpha101-style intraday strength: (close-open)/(high-low) of the last bar.
+        gap_strength: function (candles) {
+            var rows = (candles || []).filter(function (k) { return k && isFinite(k.c) && isFinite(k.o); });
+            if (!rows.length) return null;
+            var k = rows[rows.length - 1], rng = (k.h - k.l);
+            var v = rng > 0 ? (k.c - k.o) / rng : 0;
+            return { value: v, score: Math.round(clamp((v + 1) / 2, 0, 1) * 100), vote: 'neutral', label: 'intraday strength' };
+        },
+        /** Run all applicable alphas → { items:{name:res}, composite(0-100), votes:{bull,bear,neutral} }. */
+        compute: function (candles) {
+            var self = this, items = {}, scores = [], votes = { bull: 0, bear: 0, neutral: 0 };
+            ['momentum_12_1', 'reversal_1m', 'high_52w', 'low_vol', 'trend_200', 'vol_trend', 'amihud_illiq', 'gap_strength'].forEach(function (k) {
+                var r = self[k](candles);
+                if (r && r.score != null) { items[k] = r; scores.push(r.score); votes[r.vote] = (votes[r.vote] || 0) + 1; }
+            });
+            var composite = scores.length ? Math.round(scores.reduce(function (a, b) { return a + b; }, 0) / scores.length) : null;
+            return { items: items, composite: composite, votes: votes };
+        }
+    };
+
     /* ── risk ── */
     var risk = {
         returns: function (closes) {
@@ -657,6 +748,108 @@
         }
     };
 
+    /* ── committee: the deterministic "Investment Committee". Adapts Vibe-Trading's multi-agent swarm
+     *    (analysts debate → consensus with a bull case + bear case) into fixed rule-based PANELS — NO LLM.
+     *    Every output is a descriptive, disclaimed read (never a prediction). ── */
+    var COMMITTEE_WEIGHTS = { Fundamental: 0.35, Technical: 0.25, Quant: 0.25, Risk: 0.15 };
+    function verdictFromScore(s) { return s == null ? null : verdictFor(s); }
+    var committee = {
+        /**
+         * @param stock  the fundamentals object (as for models.score.stock): pe,pb,roe,divYield,floatPct,…
+         * @param candles daily candle series (≈1Y) for the technical/quant/risk panels.
+         * @param opts   { preset, market }.
+         * Returns { verdict, score, confidence, panels:[…], bullCase:[…], bearCase:[…], disclaimer }.
+         */
+        run: function (stock, candles, opts) {
+            opts = opts || {}; stock = stock || {}; candles = candles || [];
+            var panels = [], bull = [], bear = [];
+
+            // ── Panel 1: Fundamental (reuses models.score) ──
+            var f = score.stock(stock, opts);
+            if (f.score != null) {
+                var fsig = [];
+                var flabels = { value: 'Value', quality: 'Quality', dividend: 'Dividend', float: 'Free-float' };
+                ['value', 'quality', 'dividend', 'float'].forEach(function (k) {
+                    var v = f.factors[k]; if (v == null) return;
+                    fsig.push(flabels[k] + ' ' + v);
+                    if (v >= 67) bull.push({ w: v, t: flabels[k] + ' is strong (' + v + '/100)' });
+                    else if (v <= 40) bear.push({ w: 100 - v, t: flabels[k] + ' is weak (' + v + '/100)' });
+                });
+                panels.push({ name: 'Fundamental', score: f.score, verdict: f.verdict, signals: fsig });
+            }
+
+            // ── Panel 2: Technical (reuses models.technical) ──
+            if (candles.length) {
+                var an = analyze(candles), g = an.gauge.score;
+                var tsig = [an.signals.trend, an.signals.momentum, 'MA ' + an.signals.ma_cross, an.signals.volatility + ' vol'];
+                panels.push({ name: 'Technical', score: g, verdict: verdictFromScore(g), signals: tsig });
+                if (an.signals.trend === 'Bullish') bull.push({ w: 70, t: 'Technical trend is bullish (price above the 50-day)' });
+                if (an.signals.trend === 'Bearish') bear.push({ w: 70, t: 'Technical trend is bearish (price below the 50-day)' });
+                if (/Golden/.test(an.signals.ma_cross)) bull.push({ w: 60, t: '20/50 golden cross' });
+                if (/Death/.test(an.signals.ma_cross)) bear.push({ w: 60, t: '20/50 death cross' });
+                if (an.signals.momentum === 'Overbought') bear.push({ w: 55, t: 'RSI overbought (pullback risk)' });
+                if (an.signals.momentum === 'Oversold') bull.push({ w: 55, t: 'RSI oversold (bounce candidate)' });
+            }
+
+            // ── Panel 3: Quant / Factor Zoo (models.alphas) ──
+            var az = alphas.compute(candles);
+            if (az.composite != null) {
+                var qsig = Object.keys(az.items).map(function (k) { return az.items[k].label + ' ' + az.items[k].score; });
+                panels.push({ name: 'Quant', score: az.composite, verdict: verdictFromScore(az.composite), signals: qsig });
+                Object.keys(az.items).forEach(function (k) {
+                    var it = az.items[k];
+                    if (it.vote === 'bull') bull.push({ w: it.score, t: it.label + ' is favorable (' + it.score + '/100)' });
+                    else if (it.vote === 'bear') bear.push({ w: 100 - it.score, t: it.label + ' is unfavorable (' + it.score + '/100)' });
+                });
+            }
+
+            // ── Panel 4: Risk (volatility + drawdown + illiquidity) ──
+            if (candles.length > 20) {
+                var closes = closesOf(candles), rets = retsFrom(closes);
+                var vol = risk.volatility(rets), mdd = risk.maxDrawdown(closes), illi = alphas.amihud_illiq(candles);
+                var volS = vol == null ? null : normBand(vol, { lo: 0.10, hi: 0.60, invert: true });
+                var mddS = mdd == null ? null : normBand(Math.abs(mdd), { lo: 0.10, hi: 0.60, invert: true });
+                var parts = [volS, mddS, illi && illi.score].filter(function (x) { return x != null; });
+                if (parts.length) {
+                    var rscore = Math.round(parts.reduce(function (a, b) { return a + b; }, 0) / parts.length);
+                    var rsig = [];
+                    if (vol != null) rsig.push('Volatility ' + Math.round(vol * 100) + '%/yr');
+                    if (mdd != null) rsig.push('Max drawdown ' + Math.round(mdd * 100) + '%');
+                    if (illi) rsig.push('Liquidity ' + (illi.score >= 60 ? 'deep' : illi.score >= 40 ? 'ok' : 'thin'));
+                    panels.push({ name: 'Risk', score: rscore, verdict: verdictFromScore(rscore), signals: rsig });
+                    if (vol != null && vol > 0.5) bear.push({ w: 60, t: 'High volatility (' + Math.round(vol * 100) + '%/yr)' });
+                    if (mdd != null && mdd < -0.4) bear.push({ w: 55, t: 'Deep max drawdown (' + Math.round(mdd * 100) + '%)' });
+                    if (illi && illi.score < 40) bear.push({ w: 50, t: 'Thin liquidity (Amihud)' });
+                }
+            }
+
+            // ── Consensus: weight the panels present; re-normalize over available weight ──
+            var num = 0, wsum = 0, wtot = 0;
+            for (var wk in COMMITTEE_WEIGHTS) { if (COMMITTEE_WEIGHTS.hasOwnProperty(wk)) wtot += COMMITTEE_WEIGHTS[wk]; }
+            panels.forEach(function (pn) { var w = COMMITTEE_WEIGHTS[pn.name] || 0; num += pn.score * w; wsum += w; });
+            var consensus = wsum > 0 ? Math.round(num / wsum) : null;
+            var confidence = wtot > 0 ? Math.round((wsum / wtot) * 100) / 100 : 0;
+
+            // top supporting / opposing signals (dedup by text, strongest first)
+            function top(list) {
+                var seen = {}, out = [];
+                list.sort(function (a, b) { return b.w - a.w; });
+                for (var i = 0; i < list.length && out.length < 4; i++) { if (!seen[list[i].t]) { seen[list[i].t] = 1; out.push(list[i].t); } }
+                return out;
+            }
+
+            return {
+                verdict: verdictFromScore(consensus),
+                score: consensus,
+                confidence: confidence,
+                panels: panels,
+                bullCase: top(bull),
+                bearCase: top(bear),
+                disclaimer: DISCLAIMER
+            };
+        }
+    };
+
     /* ====================================================================
      * IV. FORMAT
      * ==================================================================== */
@@ -727,6 +920,8 @@
             technical: technical,
             risk: risk,
             score: score,
+            alphas: alphas,
+            committee: committee,
             portfolio: portfolio
         },
         format: format,

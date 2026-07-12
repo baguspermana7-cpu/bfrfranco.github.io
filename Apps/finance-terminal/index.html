@@ -10,7 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
 <!-- FIN Engine — shared finance brain (screener scoring + advisor scorecard). window.FINEngine -->
-<script src="../../fin-engine.min.js?v=2026-07-12-fin3"></script>
+<script src="../../fin-engine.min.js?v=2026-07-12-fin4"></script>
 <style>
 :root{--bg0:#0b1120;--bg1:#111827;--bg2:#1e293b;--bg3:#0f172a;--bd:#334155;--bd2:rgba(51,65,85,.4);--t1:#f1f5f9;--t2:#e2e8f0;--t3:#94a3b8;--t4:#64748b;--acc:#8b5cf6;--acc2:#a78bfa;--accbg:rgba(139,92,246,.1);--grn:#34d399;--grnbg:rgba(16,185,129,.15);--red:#f87171;--redbg:rgba(239,68,68,.15);--amb:#fbbf24;--ambbg:rgba(245,158,11,.15);--blu:#60a5fa;--blubg:rgba(96,165,250,.15);--cyn:#22d3ee;--sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;--mono:'JetBrains Mono',monospace;--r:14px;--rs:8px;--rx:6px}
 [data-theme="light"]{--bg0:#f8fafc;--bg1:#fff;--bg2:#fff;--bg3:#f1f5f9;--bd:#e2e8f0;--bd2:#f1f5f9;--t1:#1e293b;--t2:#334155;--t3:#64748b;--t4:#94a3b8}
@@ -857,19 +857,18 @@ async function loadAnalyticsPanel(containerId,sym,tf){
 async function loadAdvisorScorecard(containerId,sym,tf){
   if(!CFG.V2||!sym||!window.FINEngine)return;
   var el=document.getElementById(containerId);
-  if(el)el.innerHTML='<div class="empty"><p><span class="spinner"><\/span>Building FIN scorecard…<\/p><\/div>';
+  if(el)el.innerHTML='<div class="empty"><p><span class="spinner"><\/span>Convening the FIN committee…<\/p><\/div>';
   try{
-    var analyze=await gw('/analyze',{sym:sym,tf:tf||'3M'}).catch(function(){return null;});
     var m=(S.stockFin&&S.stockFin.metric)||{}, p=S.stockProf||{}, q=S.stockQ||{};
     var market=FINEngine.format.marketOf(sym);
-    // Indonesian (.JK): the stock-detail quote comes from Finnhub, which has no IDX coverage — so pull
-    // the live quote (day change + volume) from the gateway (Yahoo) instead, else Momentum/Liquidity are blank.
+    // Indonesian (.JK): the stock-detail quote comes from Finnhub, which has no IDX coverage — pull the
+    // live quote (day change + volume) from the gateway (Yahoo) so Momentum/Liquidity aren't blank.
     if(market==='ID'){ try{ var qr=await gw('/q',{syms:sym}); var row=(Array.isArray(qr)?qr:(qr&&qr.data)||[])[0];
       if(row){ q={dp:row.chgPct,v:row.vol,c:row.price}; } }catch(_){} }
-    // 1-month % change enriches the Momentum factor (day + multi-day). Derived from ~21 daily bars.
-    var chg1m=null;
-    try{ var ck=await gw('/candles',{sym:sym,tf:'1M'}); var cs=(ck&&ck.candles)||(ck&&ck.data&&ck.data.candles)||[];
-      if(cs.length>=2){var f=cs[0].c,l=cs[cs.length-1].c;if(f>0)chg1m=(l/f-1)*100;} }catch(_){}
+    // 1Y daily candles power the Technical/Quant(alphas)/Risk panels; 1-month change enriches Momentum.
+    var candles=[];
+    try{ var ck=await gw('/candles',{sym:sym,tf:'1Y'}); candles=(ck&&ck.candles)||(ck&&ck.data&&ck.data.candles)||[]; }catch(_){}
+    var chg1m=null; if(candles.length>=22){var f=candles[candles.length-22].c,l=candles[candles.length-1].c;if(f>0)chg1m=(l/f-1)*100;}
     function num(){for(var i=0;i<arguments.length;i++){var v=arguments[i];if(typeof v==='number'&&isFinite(v))return v;}return null;}
     var pct=function(v){return (typeof v==='number'&&isFinite(v))?v/100:null;};
     var stock={
@@ -884,16 +883,15 @@ async function loadAdvisorScorecard(containerId,sym,tf){
       divYield:pct(num(m.dividendYieldIndicatedAnnual,m.currentDividendYieldTTM)),
       mcap:p.marketCapitalization?p.marketCapitalization*1e6:num(q.marketCap),
       vol:num(q.v),
-      floatPct:null,
-      technical:analyze&&analyze.gauge?analyze.gauge.score:null
+      floatPct:null
+      // technical is computed by the committee's Technical panel from candles (no double-count here)
     };
-    // Indonesian (.JK): Finnhub free has no fundamentals — fill from the FIN Engine's sourced
-    // free-float + issuer-disclosure snapshot (pe/pb/roe) so the scorecard isn't technical-only.
     if(market==='ID')FINEngine.idxEnrich(sym,stock);
-    var res=FINEngine.models.score.stock(stock,{preset:market==='ID'?'idxBluechip':'balanced',market:market});
+    // Deterministic Investment Committee: Fundamental + Technical + Quant(Factor-Zoo) + Risk → consensus.
+    var res=FINEngine.models.committee.run(stock,candles,{preset:market==='ID'?'idxBluechip':'balanced',market:market});
     renderAdvisorScorecard(containerId,res,sym);
   }catch(e){
-    if(el)el.innerHTML='<div class="empty"><p>Scorecard unavailable.<\/p><\/div>';
+    if(el)el.innerHTML='<div class="empty"><p>Committee unavailable.<\/p><\/div>';
   }
 }
 function finFactorBar(label,val){
@@ -905,21 +903,35 @@ function finFactorBar(label,val){
 }
 function renderAdvisorScorecard(containerId,res,sym){
   var el=document.getElementById(containerId);if(!el)return;
-  if(!res||res.score==null){el.innerHTML='<div class="card-title"><i class="fas fa-gauge-high"></i>FIN Advisor Scorecard<\/div><div class="empty"><p>Not enough data to score '+esc(sym)+'.<\/p><\/div>';return;}
+  if(!res||res.score==null){el.innerHTML='<div class="card-title"><i class="fas fa-people-group"></i>FIN Investment Committee<\/div><div class="empty"><p>Not enough data to convene the committee for '+esc(sym)+'.<\/p><\/div>';return;}
   var col=(window.finVerdictColor?finVerdictColor(res.verdict):'var(--acc)');
-  var f=res.factors||{};
-  var bars=finFactorBar('Value',f.value)+finFactorBar('Quality',f.quality)+finFactorBar('Momentum',f.momentum)+
-    finFactorBar('Dividend',f.dividend)+finFactorBar('Liquidity',f.liquidity)+finFactorBar('Free-float',f.float)+finFactorBar('Technical',f.technical);
-  var reasons=(res.rationale||[]).map(function(t,i){var last=i===res.rationale.length-1;return '<li'+(last?' class="caveat"':'')+'>'+esc(t)+'<\/li>';}).join('');
+  // Panel cards: each analyst panel's verdict + its key signals.
+  var panels=(res.panels||[]).map(function(pn){
+    var pc=(window.finVerdictColor?finVerdictColor(pn.verdict):'var(--acc)');
+    var sig=(pn.signals||[]).slice(0,4).map(function(s){return esc(s);}).join(' &middot; ');
+    return '<div style="background:var(--bg3);border:1px solid var(--bd);border-radius:6px;padding:8px 10px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:6px">'+
+        '<span class="fw7 c-t1" style="font-size:.76rem">'+esc(pn.name)+'<\/span>'+
+        '<span class="rz-ap-chip" style="color:'+pc+';border-color:'+pc+'">'+esc(pn.verdict||'—')+' '+pn.score+'<\/span><\/div>'+
+      '<div class="c-t4" style="font-size:.64rem;margin-top:4px;line-height:1.5">'+sig+'<\/div><\/div>';
+  }).join('');
+  function caseList(items,icon,color){
+    if(!items||!items.length)return '<li class="c-t4" style="list-style:none">—<\/li>';
+    return items.map(function(t){return '<li style="list-style:none;display:flex;gap:6px;align-items:flex-start;margin:3px 0"><i class="fas '+icon+'" style="color:'+color+';margin-top:3px;font-size:.7rem"><\/i><span>'+esc(t)+'<\/span><\/li>';}).join('');
+  }
   el.innerHTML=
-    '<div class="card-title"><i class="fas fa-gauge-high" style="color:'+col+'"></i>FIN Advisor Scorecard'+
+    '<div class="card-title"><i class="fas fa-people-group" style="color:'+col+'"></i>FIN Investment Committee'+
       '<span class="rz-ap-chip" style="margin-left:8px;color:'+col+';border-color:'+col+'">'+esc(res.verdict)+'<\/span>'+
-      '<span class="c-t4" style="margin-left:auto;font-size:.66rem;font-weight:400">confidence '+Math.round((res.confidence||0)*100)+'%<\/span><\/div>'+
+      '<span class="c-t4" style="margin-left:auto;font-size:.66rem;font-weight:400">'+(res.panels||[]).length+' panels &middot; confidence '+Math.round((res.confidence||0)*100)+'%<\/span><\/div>'+
     '<div class="rz-ap-panel"><div class="rz-ap-left">'+
       '<div class="rz-ap-gauge">'+renderGaugeSvg(res.score,res.verdict)+'<\/div>'+
-      '<div style="text-align:center;font-size:.62rem;color:var(--t4);text-transform:uppercase;letter-spacing:.5px;margin-top:-6px">Composite FIN Score<\/div>'+
-      '<ul class="rz-ap-rationale">'+reasons+'<\/ul>'+
-    '<\/div><div class="rz-ap-right"><div class="rz-ap-grid" style="grid-template-columns:1fr">'+bars+'<\/div><\/div><\/div>';
+      '<div style="text-align:center;font-size:.62rem;color:var(--t4);text-transform:uppercase;letter-spacing:.5px;margin-top:-6px">Committee Consensus<\/div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">'+
+        '<div><div style="font-size:.66rem;font-weight:700;color:var(--grn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Bull case<\/div><ul style="margin:0;padding:0;font-size:.72rem">'+caseList(res.bullCase,'fa-plus','var(--grn)')+'<\/ul><\/div>'+
+        '<div><div style="font-size:.66rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Bear case<\/div><ul style="margin:0;padding:0;font-size:.72rem">'+caseList(res.bearCase,'fa-minus','var(--red)')+'<\/ul><\/div>'+
+      '<\/div>'+
+    '<\/div><div class="rz-ap-right"><div style="display:grid;grid-template-columns:1fr;gap:8px">'+panels+'<\/div>'+
+      '<p style="font-size:.64rem;color:var(--t4);font-style:italic;margin:10px 0 0;line-height:1.5">'+esc(res.disclaimer||'')+'<\/p><\/div><\/div>';
 }
 
 const CORS_PROXIES=[
@@ -3781,17 +3793,39 @@ renderScreenerFilters=function(){
     <div class="filter-group"><label>24h Change</label><select class="sel" id="scrChg"><option value="">Any</option><option value="up">Positive</option><option value="down">Negative</option></select></div>
     <button class="btn btn-p btn-sm" onclick="runCryptoScreen()" style="align-self:flex-end"><i class="fas fa-search"></i>Screen</button>`;
   }else{
+    // Simplified default: just Market + Strategy(+plain description). The 5 fine filters live under
+    // "Advanced ▾" (hidden). The FIN Engine's score+rank does the heavy lifting, so few decisions are needed.
+    var strat=window._scrStrategy||'balanced', mkt=window._scrMarket||'us';
     $('screenerFilters').innerHTML=`
-    <div class="filter-group"><label>Market</label><select class="sel" id="scrMarket" onchange="window._scrMarket=this.value;runStockScreen()"><option value="us">🇺🇸 US</option><option value="id">🇮🇩 Indonesia</option></select></div>
-    <div class="filter-group"><label>Strategy (FIN Engine)</label><select class="sel" id="scrStrategy" onchange="window._scrStrategy=this.value;runStockScreen()"><option value="balanced">Balanced</option><option value="value">Value</option><option value="growth">Growth</option><option value="momentum">Momentum</option><option value="dividend">Dividend</option><option value="quality">Quality</option><option value="idxBluechip">IDX Bluechip</option></select></div>
-    <div class="filter-group"><label>Min Market Cap</label><select class="sel" id="scrMinMcap"><option value="">Any</option><option value="200e9">$200B+</option><option value="10e9">$10B+</option><option value="2e9">$2B+</option><option value="300e6">$300M+</option></select></div>
-    <div class="filter-group"><label>Max P/E</label><input class="inp" id="scrMaxPe" type="number" placeholder="e.g. 25" style="width:80px"></div>
-    <div class="filter-group"><label>Sector</label><select class="sel" id="scrSector"><option value="">All</option><option value="Technology">Tech</option><option value="Healthcare">Healthcare</option><option value="Financial Services">Finance</option><option value="Consumer Cyclical">Consumer</option><option value="Industrials">Industrial</option><option value="Energy">Energy</option><option value="Communication Services">Comm</option></select></div>
-    <div class="filter-group"><label>Min Div Yield %</label><input class="inp" id="scrMinDiv" type="number" placeholder="e.g. 2" step="0.1" style="width:70px"></div>
-    <div class="filter-group"><label>Day Change</label><select class="sel" id="scrDayChg"><option value="">Any</option><option value="up">Positive</option><option value="down">Negative</option><option value="big">Big Move (2%+)</option></select></div>
-    <button class="btn btn-p btn-sm" onclick="runStockScreen()" style="align-self:flex-end"><i class="fas fa-search"></i>Screen</button>`;
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;width:100%">
+      <div class="filter-group"><label>Market</label><select class="sel" id="scrMarket" onchange="window._scrMarket=this.value;runStockScreen()">${['us','id'].map(v=>`<option value="${v}"${v===mkt?' selected':''}>${v==='us'?'🇺🇸 US':'🇮🇩 Indonesia'}</option>`).join('')}</select></div>
+      <div class="filter-group" style="flex:1 1 220px"><label>Strategy</label><select class="sel" id="scrStrategy" style="width:100%" onchange="window._scrStrategy=this.value;updateStratDesc();runStockScreen()">${SCR_STRATS.map(s=>`<option value="${s.id}"${s.id===strat?' selected':''}>${s.name}</option>`).join('')}</select></div>
+      <button class="btn btn-p btn-sm" onclick="runStockScreen()" style="align-self:flex-end"><i class="fas fa-search"></i>Screen</button>
+      <button class="btn btn-o btn-sm" onclick="toggleScrAdvanced()" style="align-self:flex-end"><i class="fas fa-sliders"></i>Advanced</button>
+    </div>
+    <div id="scrStratDesc" style="width:100%;font-size:.7rem;color:var(--t4);margin-top:-2px"></div>
+    <div id="scrAdvanced" style="display:none;width:100%;gap:10px;flex-wrap:wrap;margin-top:4px;padding-top:8px;border-top:1px solid var(--bd)">
+      <div class="filter-group" style="display:inline-flex"><label>Min Market Cap</label><select class="sel" id="scrMinMcap"><option value="">Any</option><option value="200e9">$200B+</option><option value="10e9">$10B+</option><option value="2e9">$2B+</option><option value="300e6">$300M+</option></select></div>
+      <div class="filter-group" style="display:inline-flex"><label>Max P/E</label><input class="inp" id="scrMaxPe" type="number" placeholder="e.g. 25" style="width:80px"></div>
+      <div class="filter-group" style="display:inline-flex"><label>Sector</label><select class="sel" id="scrSector"><option value="">All</option><option value="Technology">Tech</option><option value="Healthcare">Healthcare</option><option value="Financial Services">Finance</option><option value="Consumer Cyclical">Consumer</option><option value="Industrials">Industrial</option><option value="Energy">Energy</option><option value="Communication Services">Comm</option></select></div>
+      <div class="filter-group" style="display:inline-flex"><label>Min Div Yield %</label><input class="inp" id="scrMinDiv" type="number" placeholder="e.g. 2" step="0.1" style="width:70px"></div>
+      <div class="filter-group" style="display:inline-flex"><label>Day Change</label><select class="sel" id="scrDayChg"><option value="">Any</option><option value="up">Positive</option><option value="down">Negative</option><option value="big">Big Move (2%+)</option></select></div>
+    </div>`;
+    updateStratDesc();
   }
 };
+// Plain-language strategy names + one-line descriptions (drives the Strategy dropdown + the hint under it).
+var SCR_STRATS=[
+  {id:'balanced',name:'Balanced',desc:'All factors weighted evenly — a well-rounded read.'},
+  {id:'value',name:'Value (cheap + solid)',desc:'Ranks cheap stocks that are also financially healthy.'},
+  {id:'quality',name:'Quality (strong businesses)',desc:'Favours high ROE, fat margins, low debt.'},
+  {id:'growth',name:'Growth (momentum + quality)',desc:'Rising price backed by quality fundamentals.'},
+  {id:'momentum',name:'Momentum (trending up)',desc:'Ranks by recent price strength + technicals.'},
+  {id:'dividend',name:'Dividend income',desc:'Highest, best-covered dividend yields.'},
+  {id:'idxBluechip',name:'IDX Blue Chips',desc:'Liquid Indonesian leaders (for the Indonesia market).'}
+];
+function updateStratDesc(){var el=document.getElementById('scrStratDesc');if(!el)return;var s=SCR_STRATS.filter(function(x){return x.id===(window._scrStrategy||'balanced');})[0];el.innerHTML=s?('<i class="fas fa-circle-info" style="opacity:.7"></i> '+esc(s.desc)):'';}
+function toggleScrAdvanced(){var a=document.getElementById('scrAdvanced');if(a)a.style.display=(a.style.display==='none'||!a.style.display)?'flex':'none';}
 
 // B-007 fix #1 (active-state): preset buttons never got an active class
 // on click. _scrActivatePreset highlights the clicked preset and
@@ -3813,8 +3847,8 @@ renderPresets=function(){
   if(S.scrMode==='crypto'){
     $('presetBar').innerHTML=['Top 50','DeFi','Gainers 24h','Losers 24h'].map(p=>`<button class="btn btn-o btn-sm" data-preset="${p}" onclick="_scrActivatePreset(this);runCryptoPreset('${p}')">${p}</button>`).join('');
   }else{
-    const presets=['Large Cap','Mega Cap','Value (P/E<15)','High Dividend','Growth','Small Cap','High Volume','Tech Giants','Big Movers'];
-    $('presetBar').innerHTML=presets.map(p=>`<button class="btn btn-o btn-sm" data-preset="${p}" onclick="_scrActivatePreset(this);runStockPreset('${p}')">${p}</button>`).join('');
+    // Old 9 filter-preset buttons removed — the Strategy dropdown replaces them (less confusing).
+    $('presetBar').innerHTML='';
   }
 };
 

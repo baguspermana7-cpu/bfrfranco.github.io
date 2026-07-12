@@ -11,6 +11,29 @@ release sections rather than semver.
 
 ---
 
+## v1.52.7 — 2026-07-12 (FIN Engine — Factor Zoo + Investment Committee + simpler screener)
+
+Adapts the DETERMINISTIC core of HKUDS/Vibe-Trading (a factor library + multi-agent consensus) into the
+FIN Engine — **no LLM**, hardcoded, gate-tested. Educational analysis only, **not investment advice**.
+
+**Added**
+- **`models.alphas`** — a deterministic Factor Zoo: momentum (Jegadeesh-Titman 12-1), 52-week-high
+  (George-Hwang), low-volatility, short reversal, trend-vs-200d, volume trend, Amihud illiquidity, and an
+  alpha101 intraday-strength — each a pure function of candles → value/score/vote, with literature cites in
+  `DATA.sources`.
+- **`models.committee`** — a deterministic **Investment Committee** (the no-LLM version of a multi-agent
+  swarm): four panels (Fundamental / Technical / Quant-Factor-Zoo / Risk) each vote → a weighted consensus
+  verdict + a **Bull case / Bear case** (strongest supporting vs opposing signals) + confidence + disclaimer.
+- **Terminal scorecard → Investment Committee view** — consensus gauge + the 4 panel cards + Bull/Bear +
+  disclaimer; runs over 1Y daily candles. Works for US and Indonesian (`.JK`) stocks.
+- **Simpler screener UX** — default view is now just **Market + Strategy** (with a plain-language one-line
+  description under it); the 9 redundant preset buttons are gone and the 5 fine filters collapse under
+  **"Advanced ▾"**. Fewer decisions, clearer labels.
+
+Gate `tools/test-fin-engine.mjs` → **329/329** (alpha worked examples + committee determinism/shape +
+ta.js parity + provenance + disclaimer). Headless-verified (committee renders US/ID, simplified screener,
+0 console errors). Follow-up (planned): Berkshire-style Value Gate + Bull/Bear debate depth + crypto market.
+
 ## v1.52.6 — 2026-07-12 (Accessibility — full-site sweep part 5: five calculators to zero)
 
 **Changed** — `infographic-pue-global`, `roi-calculator`, `opex-calculator`,

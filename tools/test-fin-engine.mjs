@@ -49,7 +49,7 @@ const M = E.models;
 
 /* ── deterministic candle fixture (enough for sma200) ── */
 const candles = [];
-for (let i = 0; i < 220; i++) {
+for (let i = 0; i < 260; i++) {
     const c = 100 + i * 0.2 + 10 * Math.sin(i / 8);
     candles.push({ t: 1700000000 + i * 86400, o: c, h: c * 1.01, l: c * 0.99, c: c, v: 1e6 });
 }
@@ -111,6 +111,40 @@ eq('score.rank #2 rank', ranked[1].rank, 2);
 const valuePreset = M.score.stock(good, { preset: 'value' });
 const momoPreset = M.score.stock(good, { preset: 'momentum' });
 ok('score presets differ', valuePreset.score !== momoPreset.score || valuePreset.confidence !== momoPreset.confidence);
+
+/* ── alphas (Factor Zoo) — deterministic formulaic factors over the candle fixture ── */
+{
+    const az = M.alphas.compute(candles);
+    ok('alphas.compute composite 0..100', az.composite >= 0 && az.composite <= 100);
+    ok('alphas.compute counts votes', (az.votes.bull + az.votes.bear + az.votes.neutral) >= 1);
+    const h52 = M.alphas.high_52w(candles);
+    ok('alphas.high_52w score 0..100', h52 && h52.score >= 0 && h52.score <= 100);
+    ok('alphas.high_52w value 0..1', h52 && h52.value > 0 && h52.value <= 1.001);
+    const mom = M.alphas.momentum_12_1(candles);
+    ok('alphas.momentum_12_1 present (>=252 bars)', mom != null);
+    ok('alphas.momentum vote valid', mom && ['bull', 'bear', 'neutral'].indexOf(mom.vote) >= 0);
+    ok('alphas.low_vol score 0..100', (M.alphas.low_vol(candles) || {}).score >= 0);
+    eq('alphas insufficient bars → null', M.alphas.momentum_12_1(candles.slice(0, 10)), null);
+}
+
+/* ── committee (deterministic Investment Committee) ── */
+{
+    const cstock = { pe: 12, pb: 2, roe: 0.2, netMargin: 0.15, debtEquity: 0.4, divYield: 0.02, mcap: 5e11, vol: 5e6, floatPct: 0.4 };
+    const c1 = M.committee.run(cstock, candles, { preset: 'balanced', market: 'us' });
+    const c2 = M.committee.run(cstock, candles, { preset: 'balanced', market: 'us' });
+    ok('committee score 0..100', c1.score >= 0 && c1.score <= 100);
+    eq('committee deterministic', c1.score, c2.score);
+    ok('committee has 4 panels', c1.panels.length === 4);
+    eq('committee panels order', c1.panels.map(p => p.name).join(','), 'Fundamental,Technical,Quant,Risk');
+    ok('committee every panel has score+signals', c1.panels.every(p => typeof p.score === 'number' && Array.isArray(p.signals)));
+    ok('committee verdict set', typeof c1.verdict === 'string' && c1.verdict.length > 0);
+    ok('committee confidence in (0,1]', c1.confidence > 0 && c1.confidence <= 1);
+    ok('committee has bull or bear case', c1.bullCase.length > 0 || c1.bearCase.length > 0);
+    ok('committee carries disclaimer', c1.disclaimer === E.DISCLAIMER);
+    const cNo = M.committee.run(cstock, [], { preset: 'balanced', market: 'us' });
+    ok('committee no-candles → fundamental only, confidence<1', cNo.panels.length === 1 && cNo.confidence < 1);
+    ok('committee alpha provenance sourced', !!D.sources['alphas.momentum_12_1'] && !!D.sources['committee']);
+}
 
 /* ── format ── */
 eq('format.ticker strips .JK', E.format.ticker('BBCA.JK'), 'BBCA');
