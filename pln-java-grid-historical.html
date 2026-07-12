@@ -131,6 +131,8 @@
             min-height: 100vh; line-height: 1.6;
         }
         a { color: var(--pjg-primary); }
+        /* a11y: version-stamp chip needs a darker blue on the light body */
+        html:not([data-theme="dark"]) .rz-version-num { color: #1d4ed8 !important; }
 
         /* ===== NAVBAR (exact mirror of pln-java-grid.html) ===== */
         .navbar {
@@ -562,7 +564,7 @@
                     <i class="fas fa-download"></i> Download CSV
                 </button>
             </div>
-            <div style="overflow-x:auto;">
+            <div style="overflow-x:auto;" tabindex="0" role="group" aria-label="Scrollable table">
                 <table class="pjg-summary-table" id="pjg-annual-table">
                     <thead>
                         <tr>

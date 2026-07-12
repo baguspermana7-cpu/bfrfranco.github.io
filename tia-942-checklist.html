@@ -181,7 +181,7 @@
         .tia-btn-free{background:transparent;color:#64748b}
         .tia-btn-free.active{background:linear-gradient(135deg,#10b981,#059669);color:white;box-shadow:0 2px 8px rgba(16,185,129,0.3)}
         .tia-btn-free:not(.active):hover{background:rgba(16,185,129,0.08);color:#059669}
-        .tia-btn-pro{background:transparent;color:#64748b}
+        .tia-btn-pro{background:transparent;color:#475569}
         .tia-btn-pro.active{background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;box-shadow:0 2px 8px rgba(139,92,246,0.3)}
         .tia-btn-pro:not(.active):hover{background:rgba(139,92,246,0.08);color:#8b5cf6}
         .tia-btn-pro.locked-hint{position:relative}
@@ -194,7 +194,7 @@
         .tia-btn-reset:hover{border-color:#10b981;color:#10b981;background:rgba(16,185,129,0.04)}
         .tia-btn-pdf{padding:0.55rem 1rem;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.04);color:#ef4444;cursor:pointer;font-weight:600;font-size:0.82rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;gap:6px}
         .tia-btn-pdf:hover{border-color:#ef4444;background:rgba(239,68,68,0.1);box-shadow:0 2px 8px rgba(239,68,68,0.15)}
-        .tia-btn-pdf.disabled{opacity:0.45;pointer-events:none}
+        .tia-btn-pdf.disabled{opacity:1;color:#b91c1c;pointer-events:none}
         .tia-mode-indicator{font-size:0.72rem;font-weight:700;letter-spacing:0.5px;padding:3px 10px;border-radius:50px;display:none}
         .tia-mode-indicator.free-active{display:inline-flex;background:rgba(16,185,129,0.1);color:#059669}
         .tia-mode-indicator.pro-active{display:inline-flex;background:rgba(139,92,246,0.1);color:#8b5cf6}
@@ -202,7 +202,7 @@
         /* Tier Selector */
         .tier-selector{max-width:1400px;margin:0 auto;padding:0 2rem 1.5rem}
         .tier-bar{display:flex;gap:0;background:#f1f5f9;border-radius:12px;padding:4px;border:1px solid #e2e8f0}
-        .tier-btn{flex:1;padding:0.6rem 1rem;border-radius:9px;border:none;cursor:pointer;font-weight:600;font-size:0.82rem;font-family:inherit;transition:all 0.25s;text-align:center;color:#64748b;background:transparent}
+        .tier-btn{flex:1;padding:0.6rem 1rem;border-radius:9px;border:none;cursor:pointer;font-weight:600;font-size:0.82rem;font-family:inherit;transition:all 0.25s;text-align:center;color:#475569;background:transparent}
         .tier-btn.active{background:white;color:var(--dark-green);box-shadow:var(--shadow-sm);border:1px solid rgba(16,185,129,0.2)}
         .tier-btn:not(.active):hover{background:rgba(16,185,129,0.06);color:#059669}
         .tier-num{font-weight:800;margin-right:4px}
@@ -212,7 +212,7 @@
         .dctype-label{font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;display:flex;align-items:center;gap:6px}
         .dctype-label i{color:var(--accent-emerald);font-size:0.8rem}
         .dctype-bar{display:flex;gap:0;background:#f1f5f9;border-radius:12px;padding:4px;border:1px solid #e2e8f0;flex-wrap:wrap}
-        .dctype-btn{flex:1;padding:0.5rem 0.75rem;border-radius:9px;border:none;cursor:pointer;font-weight:600;font-size:0.78rem;font-family:inherit;transition:all 0.25s;text-align:center;color:#64748b;background:transparent;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;min-width:0}
+        .dctype-btn{flex:1;padding:0.5rem 0.75rem;border-radius:9px;border:none;cursor:pointer;font-weight:600;font-size:0.78rem;font-family:inherit;transition:all 0.25s;text-align:center;color:#475569;background:transparent;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;min-width:0}
         .dctype-btn.active{background:white;color:#1e293b;box-shadow:var(--shadow-sm);border:1px solid rgba(16,185,129,0.2)}
         .dctype-btn:not(.active):hover{background:rgba(16,185,129,0.06);color:#059669}
         .dctype-btn i{font-size:0.72rem}
@@ -356,7 +356,28 @@
         .calc-disclaimer .disc-text { color: #475569 !important; }
         .calc-disclaimer .disc-text strong { color: #1e293b !important; }
         .calc-disclaimer .disc-text a { color: #2563eb !important; }
-        .calc-disclaimer .disc-fine { color: #64748b !important; }
+        .calc-disclaimer .disc-fine { color: #475569 !important; }
+        html:not([data-theme="dark"]) .disc-fine a { color: #1d4ed8 !important; }
+        [data-theme="dark"] .disc-fine a { color: #93c5fd !important; }
+        /* a11y dark: disclaimer text sits on a dark surface in dark mode */
+        [data-theme="dark"] .calc-disclaimer .disc-title { color: #e2e8f0 !important; }
+        /* a11y dark: pro-overlay was a white wash over dark content — flip to a dark wash */
+        [data-theme="dark"] .pro-overlay { background: rgba(10,13,18,0.85); }
+        [data-theme="dark"] .pro-overlay-title { color: #f1f5f9; }
+        [data-theme="dark"] .pro-overlay-desc { color: #94a3b8; }
+        [data-theme="dark"] .calc-disclaimer .disc-text { color: #94a3b8 !important; }
+        [data-theme="dark"] .calc-disclaimer .disc-text strong { color: #cbd5e1 !important; }
+        [data-theme="dark"] .calc-disclaimer .disc-text a { color: #93c5fd !important; }
+        [data-theme="dark"] .calc-disclaimer .disc-fine { color: #94a3b8 !important; }
+        [data-theme="dark"] [style*="color:#065f46"] { color: #6ee7b7 !important; }
+        /* a11y: score readouts (JS sets inline colors too light/dim for the light card) */
+        html:not([data-theme="dark"]) #scoreValue { color: #047857 !important; }
+        html:not([data-theme="dark"]) #scoreGrade { color: #475569 !important; }
+        /* a11y: mode indicator + selector buttons on the light bars */
+        html:not([data-theme="dark"]) .tia-mode-indicator.free-active { color: #047857; }
+        [data-theme="dark"] .tia-mode-indicator.free-active { color: #34d399; }
+        [data-theme="dark"] .tia-btn-pdf { color: #f87171; }
+        [data-theme="dark"] .tia-btn-pdf.disabled { color: #f87171; }
             /* Cookie Banner */
         .cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10002; display: flex; align-items: center; justify-content: center; gap: 1.5rem; padding: 1rem 2rem; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid rgba(0,0,0,0.08); box-shadow: 0 -2px 16px rgba(0,0,0,0.06); font-size: 0.85rem; color: #374151; transform: translateY(0); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); }
         .cookie-banner.hidden { transform: translateY(100%); pointer-events: none; }

@@ -415,6 +415,14 @@
 .skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
 .skip-link:focus{top:0}
 [data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
+/* a11y: shared login-modal contrast fixes (inline colors from auth.js template) */
+#rzModalForm a[href$="terms.html"], #rzModalForm a[href$="privacy.html"] { text-decoration: underline !important; }
+html:not([data-theme="dark"]) #rzModalForm a[href$="terms.html"],
+html:not([data-theme="dark"]) #rzModalForm a[href$="privacy.html"] { color:#6d28d9 !important; }
+[data-theme="dark"] #rzModalForm a[href$="terms.html"],
+[data-theme="dark"] #rzModalForm a[href$="privacy.html"] { color:#a78bfa !important; }
+[data-theme="dark"] #rzModalForm > div[style*="color:#475569"] { color:#94a3b8 !important; }
+html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
 </style>
 </head>
 <body class="locked">
@@ -488,7 +496,7 @@
             <span class="pill-emerald" style="padding:0.3rem 0.65rem;border-radius:999px;font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;">ISO Energy &amp; Governance Standards</span>
             <h1>ISO Energy &amp; Governance — Comprehensive Deep-Dive</h1>
             <p class="subtitle">From ISO 50001 energy management systems and ISO 30134 data center KPIs to ISO 27001 information security, ISO 22301 business continuity, and ISO 14001 environmental management — a complete technical reference for energy governance, certification, and continuous improvement in mission-critical facilities.</p>
-            <div class="mindmap-wrap" role="img" aria-label="ISO Energy and Governance Standards Mindmap">
+            <div class="mindmap-wrap" tabindex="0" role="img" aria-label="ISO Energy and Governance Standards Mindmap">
                 <svg viewBox="0 0 920 520" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <rect class="diag-box" x="340" y="220" width="240" height="70" rx="14"/>
                     <text class="diag-center" x="460" y="250" text-anchor="middle">ISO Energy</text>
@@ -577,7 +585,7 @@
 
         <!-- ========== Section 1: ISO 50001 Energy Management ========== -->
         <section class="section" id="sec-50001" data-nav-id="sec-50001">
-            <h2 class="section-title"><i class="fas fa-bolt"></i> ISO 50001 Energy Management <button class="deep-link" onclick="copyDeepLink('sec-50001')"><i class="fas fa-link"></i></button></h2>
+            <h2 class="section-title"><i class="fas fa-bolt"></i> ISO 50001 Energy Management <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-50001')"><i class="fas fa-link"></i></button></h2>
             <p class="section-intro">ISO 50001 provides a systematic framework for establishing an <span class="term-tooltip" data-tooltip="Energy Management System — a structured approach to managing energy use, consumption, and efficiency within an organization.">Energy Management System (EnMS)</span>. It uses the Plan-Do-Check-Act (PDCA) cycle to drive continuous improvement in energy performance, enabling data centers to reduce costs, lower carbon emissions, and demonstrate compliance with energy governance requirements.</p>
 
             <div class="accordion open">
@@ -626,7 +634,7 @@
                 <button class="accordion-header"><span class="acc-num">4</span> Energy Targets &amp; EnPIs <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p><strong>Energy Performance Indicators (EnPIs)</strong> are quantitative values or measures of energy performance defined by the organization. Typical data center EnPIs include:</p>
-                    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">EnPI</th><th scope="col">Formula</th><th scope="col">Target Range</th><th scope="col">Frequency</th></tr></thead><tbody>
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table"><thead><tr><th scope="col">EnPI</th><th scope="col">Formula</th><th scope="col">Target Range</th><th scope="col">Frequency</th></tr></thead><tbody>
                         <tr><td>PUE</td><td>Total Facility / IT Load</td><td class="highlight">&le; 1.4</td><td>Monthly</td></tr>
                         <tr><td>kWh per Rack</td><td>Total Energy / Rack Count</td><td>&le; 50,000 kWh/yr</td><td>Quarterly</td></tr>
                         <tr><td>Cooling Efficiency</td><td>Cooling Energy / IT Load</td><td>&le; 0.30</td><td>Monthly</td></tr>
@@ -681,7 +689,7 @@
 
         <!-- ========== Section 2: ISO 30134 DC KPIs ========== -->
         <section class="section" id="sec-30134" data-nav-id="sec-30134">
-            <h2 class="section-title"><i class="fas fa-chart-bar"></i> ISO 30134 DC KPIs <button class="deep-link" onclick="copyDeepLink('sec-30134')"><i class="fas fa-link"></i></button></h2>
+            <h2 class="section-title"><i class="fas fa-chart-bar"></i> ISO 30134 DC KPIs <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-30134')"><i class="fas fa-link"></i></button></h2>
             <p class="section-intro">ISO/IEC 30134 is a multi-part standard that defines key performance indicators for data centers. These KPIs provide a standardized way to measure, compare, and communicate the resource efficiency of data center operations — from energy and water to carbon emissions and renewable energy use.</p>
 
             <div class="accordion open">
@@ -689,7 +697,7 @@
                 <div class="accordion-body"><div class="accordion-content">
                     <p><strong>PUE (ISO/IEC 30134-2)</strong> is the most widely adopted data center efficiency metric. It measures the ratio of total facility energy to IT equipment energy.</p>
                     <p style="font-family:ui-monospace,monospace;font-size:0.9rem;text-align:center;padding:0.5rem;background:var(--kv-bg);border-radius:8px;border:1px solid var(--line);margin:0.5rem 0;"><strong>PUE = Total Facility Energy / IT Equipment Energy</strong></p>
-                    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">PUE Range</th><th scope="col">Rating</th><th scope="col">Typical Scenario</th></tr></thead><tbody>
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table"><thead><tr><th scope="col">PUE Range</th><th scope="col">Rating</th><th scope="col">Typical Scenario</th></tr></thead><tbody>
                         <tr><td class="highlight">1.0 – 1.2</td><td>Excellent</td><td>Best-in-class hyperscale, free cooling dominant</td></tr>
                         <tr><td>1.2 – 1.5</td><td>Good</td><td>Modern colocation with efficient cooling</td></tr>
                         <tr><td>1.5 – 2.0</td><td>Average</td><td>Older enterprise data centers, mixed cooling</td></tr>
@@ -745,7 +753,7 @@
                 <div class="accordion-body"><div class="accordion-content">
                     <p><strong>DCiE</strong> is the reciprocal of PUE, expressed as a percentage. While PUE is more commonly used, DCiE can be more intuitive for some stakeholders.</p>
                     <p style="font-family:ui-monospace,monospace;font-size:0.9rem;text-align:center;padding:0.5rem;background:var(--kv-bg);border-radius:8px;border:1px solid var(--line);margin:0.5rem 0;"><strong>DCiE = (IT Equipment Energy / Total Facility Energy) &times; 100%</strong></p>
-                    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">PUE</th><th scope="col">DCiE</th><th scope="col">Rating</th></tr></thead><tbody>
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table"><thead><tr><th scope="col">PUE</th><th scope="col">DCiE</th><th scope="col">Rating</th></tr></thead><tbody>
                         <tr><td>1.2</td><td class="highlight">83.3%</td><td>Excellent</td></tr>
                         <tr><td>1.5</td><td>66.7%</td><td>Good</td></tr>
                         <tr><td>2.0</td><td>50.0%</td><td>Poor</td></tr>
@@ -779,14 +787,14 @@
 
         <!-- ========== Section 3: ISO 27001 Physical Security ========== -->
         <section class="section" id="sec-27001" data-nav-id="sec-27001">
-            <h2 class="section-title"><i class="fas fa-lock"></i> ISO 27001 Physical Security <button class="deep-link" onclick="copyDeepLink('sec-27001')"><i class="fas fa-link"></i></button></h2>
+            <h2 class="section-title"><i class="fas fa-lock"></i> ISO 27001 Physical Security <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-27001')"><i class="fas fa-link"></i></button></h2>
             <p class="section-intro">ISO/IEC 27001 establishes the requirements for an <span class="term-tooltip" data-tooltip="Information Security Management System — a framework for managing sensitive company information and ensuring its confidentiality, integrity, and availability.">Information Security Management System (ISMS)</span>. Annex A.11 (Physical and Environmental Security) is particularly critical for data centers, addressing physical access control, equipment protection, and environmental threat mitigation.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> Access Control Zones (Annex A.11) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>Data centers should implement a <strong>layered security model</strong> with progressively restricted access zones:</p>
-                    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">Zone</th><th scope="col">Area</th><th scope="col">Access Method</th><th scope="col">Personnel</th></tr></thead><tbody>
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table"><thead><tr><th scope="col">Zone</th><th scope="col">Area</th><th scope="col">Access Method</th><th scope="col">Personnel</th></tr></thead><tbody>
                         <tr><td>Zone 1</td><td>Perimeter / Parking</td><td>Fence, gate, guards</td><td>All authorized visitors</td></tr>
                         <tr><td>Zone 2</td><td>Building Lobby</td><td>Badge + reception desk</td><td>Registered visitors</td></tr>
                         <tr><td>Zone 3</td><td>Operations Center</td><td>Badge + PIN</td><td>Facility staff</td></tr>
@@ -844,7 +852,7 @@
 
         <!-- ========== Section 4: ISO 22301 Business Continuity ========== -->
         <section class="section" id="sec-22301" data-nav-id="sec-22301">
-            <h2 class="section-title"><i class="fas fa-life-ring"></i> ISO 22301 Business Continuity <button class="deep-link" onclick="copyDeepLink('sec-22301')"><i class="fas fa-link"></i></button></h2>
+            <h2 class="section-title"><i class="fas fa-life-ring"></i> ISO 22301 Business Continuity <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-22301')"><i class="fas fa-link"></i></button></h2>
             <p class="section-intro">ISO 22301 specifies requirements for a <span class="term-tooltip" data-tooltip="Business Continuity Management System — a management framework that identifies potential threats and their impacts, and provides a process for building organizational resilience.">Business Continuity Management System (BCMS)</span>. For data centers, this means ensuring that critical IT services can be maintained or rapidly restored following a disruptive incident — whether power failure, natural disaster, cyberattack, or supply chain disruption.</p>
 
             <div class="accordion open">
@@ -865,7 +873,7 @@
                 <button class="accordion-header"><span class="acc-num">2</span> RTO &amp; RPO Definitions <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p><strong>Recovery Time Objective (RTO)</strong> is the target duration for restoring a service after disruption. <strong>Recovery Point Objective (RPO)</strong> is the maximum acceptable amount of data loss measured in time.</p>
-                    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">Tier</th><th scope="col">Service Type</th><th scope="col">RTO</th><th scope="col">RPO</th><th scope="col">Example</th></tr></thead><tbody>
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table"><thead><tr><th scope="col">Tier</th><th scope="col">Service Type</th><th scope="col">RTO</th><th scope="col">RPO</th><th scope="col">Example</th></tr></thead><tbody>
                         <tr><td>Tier 1</td><td>Mission-critical</td><td class="highlight">&lt; 15 min</td><td>0 (sync replication)</td><td>Financial trading, healthcare</td></tr>
                         <tr><td>Tier 2</td><td>Business-critical</td><td>1 – 4 hr</td><td>&lt; 1 hr</td><td>ERP, CRM, email</td></tr>
                         <tr><td>Tier 3</td><td>Important</td><td>4 – 24 hr</td><td>&lt; 4 hr</td><td>File shares, development</td></tr>
@@ -904,7 +912,7 @@
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">5</span> ISO 22301 vs ISO 27001 Comparison <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">Aspect</th><th scope="col">ISO 22301 (BCMS)</th><th scope="col">ISO 27001 (ISMS)</th></tr></thead><tbody>
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table"><thead><tr><th scope="col">Aspect</th><th scope="col">ISO 22301 (BCMS)</th><th scope="col">ISO 27001 (ISMS)</th></tr></thead><tbody>
                         <tr><td>Primary Focus</td><td>Business resilience &amp; recovery</td><td>Information confidentiality, integrity, availability</td></tr>
                         <tr><td>Key Process</td><td>BIA + recovery planning</td><td>Risk assessment + controls</td></tr>
                         <tr><td>Scope</td><td>All business disruptions</td><td>Information security threats</td></tr>
@@ -928,14 +936,14 @@
 
         <!-- ========== Section 5: ISO 14001 Environmental ========== -->
         <section class="section" id="sec-14001" data-nav-id="sec-14001">
-            <h2 class="section-title"><i class="fas fa-leaf"></i> ISO 14001 Environmental <button class="deep-link" onclick="copyDeepLink('sec-14001')"><i class="fas fa-link"></i></button></h2>
+            <h2 class="section-title"><i class="fas fa-leaf"></i> ISO 14001 Environmental <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-14001')"><i class="fas fa-link"></i></button></h2>
             <p class="section-intro">ISO 14001 provides a framework for an <span class="term-tooltip" data-tooltip="Environmental Management System — a structured approach to managing an organization's environmental responsibilities in a systematic manner.">Environmental Management System (EMS)</span> that helps organizations reduce their environmental footprint, comply with regulations, and demonstrate environmental stewardship. For data centers, this encompasses carbon emissions, water usage, waste management, and supply chain sustainability.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> Carbon Footprint (Scope 1/2/3) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>The <strong>GHG Protocol</strong> classifies emissions into three scopes:</p>
-                    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">Scope</th><th scope="col">Description</th><th scope="col">DC Examples</th><th scope="col">Typical Share</th></tr></thead><tbody>
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table"><thead><tr><th scope="col">Scope</th><th scope="col">Description</th><th scope="col">DC Examples</th><th scope="col">Typical Share</th></tr></thead><tbody>
                         <tr><td class="highlight">Scope 1</td><td>Direct emissions from owned sources</td><td>Diesel generators, refrigerant leaks</td><td>5 – 15%</td></tr>
                         <tr><td class="highlight">Scope 2</td><td>Indirect emissions from purchased energy</td><td>Grid electricity, purchased cooling</td><td>60 – 80%</td></tr>
                         <tr><td>Scope 3</td><td>Other indirect emissions in the value chain</td><td>Embodied carbon in servers, employee commuting</td><td>15 – 30%</td></tr>
@@ -986,7 +994,7 @@
 
         <!-- ========== Section 6: Energy Audit Framework ========== -->
         <section class="section" id="sec-audit" data-nav-id="sec-audit">
-            <h2 class="section-title"><i class="fas fa-search-dollar"></i> Energy Audit Framework <button class="deep-link" onclick="copyDeepLink('sec-audit')"><i class="fas fa-link"></i></button></h2>
+            <h2 class="section-title"><i class="fas fa-search-dollar"></i> Energy Audit Framework <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-audit')"><i class="fas fa-link"></i></button></h2>
             <p class="section-intro">A structured energy audit framework provides the foundation for identifying and quantifying energy conservation measures (ECMs). Whether conducted as part of ISO 50001 implementation, EN 16247 compliance, or standalone efficiency programs, the audit process follows a systematic approach from baseline measurement through savings verification.</p>
 
             <div class="accordion open">
@@ -1007,7 +1015,7 @@
                 <button class="accordion-header"><span class="acc-num">2</span> M&amp;V Plans (IPMVP) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>The <strong>International Performance Measurement and Verification Protocol (IPMVP)</strong> provides four options for quantifying savings:</p>
-                    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">Option</th><th scope="col">Method</th><th scope="col">Use Case</th><th scope="col">Accuracy</th></tr></thead><tbody>
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table"><thead><tr><th scope="col">Option</th><th scope="col">Method</th><th scope="col">Use Case</th><th scope="col">Accuracy</th></tr></thead><tbody>
                         <tr><td>Option A</td><td>Retrofit Isolation — Key Parameter</td><td>Single measure, partial measurement</td><td>Medium</td></tr>
                         <tr><td>Option B</td><td>Retrofit Isolation — All Parameters</td><td>Single measure, full measurement</td><td class="highlight">High</td></tr>
                         <tr><td>Option C</td><td>Whole Facility</td><td>Multiple measures, utility billing</td><td>Medium</td></tr>
@@ -1020,7 +1028,7 @@
                 <button class="accordion-header"><span class="acc-num">3</span> ECM Identification <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p><strong>Energy Conservation Measures (ECMs)</strong> are specific actions that reduce energy consumption. Common data center ECMs ranked by typical ROI:</p>
-                    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">ECM</th><th scope="col">Savings</th><th scope="col">CAPEX</th><th scope="col">Payback</th></tr></thead><tbody>
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table"><thead><tr><th scope="col">ECM</th><th scope="col">Savings</th><th scope="col">CAPEX</th><th scope="col">Payback</th></tr></thead><tbody>
                         <tr><td>Raise supply temperature to 25&deg;C</td><td class="highlight">5 – 15%</td><td>Minimal</td><td>&lt; 1 month</td></tr>
                         <tr><td>Hot/cold aisle containment</td><td>10 – 25%</td><td>$200–500/rack</td><td>6 – 18 months</td></tr>
                         <tr><td>VSD on cooling pumps &amp; fans</td><td>15 – 30%</td><td>$5K–15K/unit</td><td>12 – 24 months</td></tr>
@@ -1066,7 +1074,7 @@
 
         <!-- ========== Section 7: Continuous Improvement ========== -->
         <section class="section" id="sec-improve" data-nav-id="sec-improve">
-            <h2 class="section-title"><i class="fas fa-chart-line"></i> Continuous Improvement <button class="deep-link" onclick="copyDeepLink('sec-improve')"><i class="fas fa-link"></i></button></h2>
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> Continuous Improvement <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-improve')"><i class="fas fa-link"></i></button></h2>
             <p class="section-intro">Continuous improvement is the engine that drives sustained energy performance gains. By establishing KPI trending, formal review cadences, and a structured maturity model, organizations can move from reactive operations to proactive optimization and eventually to predictive, self-optimizing data center environments.</p>
 
             <div class="accordion open">
@@ -1087,7 +1095,7 @@
                 <button class="accordion-header"><span class="acc-num">2</span> Management Review Process <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>Formal management reviews ensure that energy performance remains a strategic priority:</p>
-                    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">Review Type</th><th scope="col">Frequency</th><th scope="col">Attendees</th><th scope="col">Key Outputs</th></tr></thead><tbody>
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table"><thead><tr><th scope="col">Review Type</th><th scope="col">Frequency</th><th scope="col">Attendees</th><th scope="col">Key Outputs</th></tr></thead><tbody>
                         <tr><td>Operational Review</td><td>Weekly</td><td>Facility Manager, Engineers</td><td>Action items, immediate corrections</td></tr>
                         <tr><td>Performance Review</td><td>Monthly</td><td>+Site Director, Energy Manager</td><td>KPI trends, ECM pipeline review</td></tr>
                         <tr><td>Management Review</td><td>Quarterly</td><td>+VP Operations, Finance</td><td>Budget allocation, strategic decisions</td></tr>
@@ -1115,7 +1123,7 @@
                 <button class="accordion-header"><span class="acc-num">4</span> Maturity Model (Level 1-5) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>The energy management maturity model provides a roadmap for organizational growth:</p>
-                    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">Level</th><th scope="col">Name</th><th scope="col">Description</th><th scope="col">Typical PUE</th></tr></thead><tbody>
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table"><thead><tr><th scope="col">Level</th><th scope="col">Name</th><th scope="col">Description</th><th scope="col">Typical PUE</th></tr></thead><tbody>
                         <tr><td>1</td><td>Initial</td><td>No formal energy management. Reactive only. No metering beyond utility bills.</td><td>&gt; 2.0</td></tr>
                         <tr><td>2</td><td>Managed</td><td>Basic metering installed. PUE tracked monthly. Some ECMs implemented.</td><td>1.6 – 2.0</td></tr>
                         <tr><td>3</td><td>Defined</td><td>Formal EnMS (ISO 50001). Sub-metering complete. M&amp;V plans in place.</td><td>1.4 – 1.6</td></tr>
@@ -1128,7 +1136,7 @@
 
         <!-- ========== Section 8: Certification Roadmap ========== -->
         <section class="section" id="sec-cert" data-nav-id="sec-cert">
-            <h2 class="section-title"><i class="fas fa-road"></i> Certification Roadmap <button class="deep-link" onclick="copyDeepLink('sec-cert')"><i class="fas fa-link"></i></button></h2>
+            <h2 class="section-title"><i class="fas fa-road"></i> Certification Roadmap <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-cert')"><i class="fas fa-link"></i></button></h2>
             <p class="section-intro">Achieving ISO certification demonstrates to customers, regulators, and stakeholders that your data center operates to internationally recognized standards. The certification journey typically takes 6-18 months depending on the standard, organizational readiness, and scope complexity.</p>
 
             <div class="accordion open">
@@ -1180,7 +1188,7 @@
                 <button class="accordion-header"><span class="acc-num">4</span> Surveillance &amp; Recertification <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>After initial certification, ongoing compliance is maintained through regular audits:</p>
-                    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">Audit Type</th><th scope="col">Timing</th><th scope="col">Scope</th><th scope="col">Duration</th></tr></thead><tbody>
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table"><thead><tr><th scope="col">Audit Type</th><th scope="col">Timing</th><th scope="col">Scope</th><th scope="col">Duration</th></tr></thead><tbody>
                         <tr><td>Surveillance 1</td><td>Year 1 (12 months)</td><td>Partial — key clauses &amp; selected processes</td><td>1-2 days</td></tr>
                         <tr><td>Surveillance 2</td><td>Year 2 (24 months)</td><td>Partial — remaining clauses &amp; processes</td><td>1-2 days</td></tr>
                         <tr><td class="highlight">Recertification</td><td>Year 3 (36 months)</td><td>Full — all requirements reviewed</td><td>2-4 days</td></tr>
@@ -1224,7 +1232,7 @@
 
         <!-- ========== Section 9: Cross-Reference ========== -->
         <section class="section" id="sec-xref" data-nav-id="sec-xref">
-            <h2 class="section-title"><i class="fas fa-exchange-alt"></i> Cross-Reference <button class="deep-link" onclick="copyDeepLink('sec-xref')"><i class="fas fa-link"></i></button></h2>
+            <h2 class="section-title"><i class="fas fa-exchange-alt"></i> Cross-Reference <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-xref')"><i class="fas fa-link"></i></button></h2>
             <p class="section-intro">ISO standards do not exist in isolation. Understanding how they map to and complement other frameworks helps organizations build integrated management systems and avoid duplicated effort.</p>
 
             <div class="accordion open">
@@ -1244,7 +1252,7 @@
                 <button class="accordion-header"><span class="acc-num">2</span> EN 50600-4 Series (DC KPIs) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p><strong>EN 50600-4</strong> is the European equivalent to ISO 30134, defining data center KPIs:</p>
-                    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">EN 50600 Part</th><th scope="col">KPI</th><th scope="col">ISO 30134 Equivalent</th></tr></thead><tbody>
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table"><thead><tr><th scope="col">EN 50600 Part</th><th scope="col">KPI</th><th scope="col">ISO 30134 Equivalent</th></tr></thead><tbody>
                         <tr><td>EN 50600-4-2</td><td>PUE</td><td>ISO/IEC 30134-2</td></tr>
                         <tr><td>EN 50600-4-3</td><td>REF (Renewable Energy Factor)</td><td>ISO/IEC 30134-3</td></tr>
                         <tr><td>EN 50600-4-4</td><td>ERF (Energy Reuse Factor)</td><td>—</td></tr>
@@ -1259,7 +1267,7 @@
                 <button class="accordion-header"><span class="acc-num">3</span> GRI / CDP / TCFD Frameworks <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>ISO standards provide the management system backbone for ESG reporting frameworks:</p>
-                    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">Framework</th><th scope="col">ISO Data Sources</th><th scope="col">Key Disclosures</th></tr></thead><tbody>
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table"><thead><tr><th scope="col">Framework</th><th scope="col">ISO Data Sources</th><th scope="col">Key Disclosures</th></tr></thead><tbody>
                         <tr><td>GRI 302 (Energy)</td><td>ISO 50001 EnPIs</td><td>Energy consumption, intensity, reduction</td></tr>
                         <tr><td>GRI 303 (Water)</td><td>ISO 30134-9 WUE</td><td>Water withdrawal, consumption, recycling</td></tr>
                         <tr><td>GRI 305 (Emissions)</td><td>ISO 14001 + 30134-8 CUE</td><td>Scope 1/2/3 GHG emissions</td></tr>
@@ -1285,7 +1293,7 @@
 
         <!-- ========== Section 10: Case Studies ========== -->
         <section class="section" id="sec-cases" data-nav-id="sec-cases">
-            <h2 class="section-title"><i class="fas fa-briefcase"></i> Case Studies <button class="deep-link" onclick="copyDeepLink('sec-cases')"><i class="fas fa-link"></i></button></h2>
+            <h2 class="section-title"><i class="fas fa-briefcase"></i> Case Studies <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-cases')"><i class="fas fa-link"></i></button></h2>
             <p class="section-intro">Real-world examples demonstrating the impact of ISO standard implementation in data center environments.</p>
 
             <div class="case-card">
@@ -1336,7 +1344,7 @@
 
         <!-- ========== Section 11: Interview Prep ========== -->
         <section class="section" id="sec-interview" data-nav-id="sec-interview">
-            <h2 class="section-title"><i class="fas fa-user-tie"></i> Interview Prep <button class="deep-link" onclick="copyDeepLink('sec-interview')"><i class="fas fa-link"></i></button></h2>
+            <h2 class="section-title"><i class="fas fa-user-tie"></i> Interview Prep <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-interview')"><i class="fas fa-link"></i></button></h2>
             <p class="section-intro">Common interview questions for data center engineering, operations, and sustainability roles focusing on ISO energy governance standards.</p>
 
             <div class="interview-grid">
@@ -1369,7 +1377,7 @@
 
         <!-- ========== Section 12: Abbreviations ========== -->
         <section class="section" id="sec-abbr" data-nav-id="sec-abbr">
-            <h2 class="section-title"><i class="fas fa-spell-check"></i> Abbreviations <button class="deep-link" onclick="copyDeepLink('sec-abbr')"><i class="fas fa-link"></i></button></h2>
+            <h2 class="section-title"><i class="fas fa-spell-check"></i> Abbreviations <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-abbr')"><i class="fas fa-link"></i></button></h2>
             <div class="abbr-grid">
                 <div class="abbr-item"><span class="abbr-key">ASHRAE</span><span class="abbr-val">American Society of Heating, Refrigerating and Air-Conditioning Engineers</span></div>
                 <div class="abbr-item"><span class="abbr-key">BCMS</span><span class="abbr-val">Business Continuity Management System</span></div>

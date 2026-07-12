@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v1.52.8 — 2026-07-12 (Accessibility — full-site sweep part 6: 31 more pages to zero)
+
+**Changed** — per-page axe probe 0/0 both themes on:
+- **10 articles** (1, 2, 4, 5, 6, 7, 9, 11, 12, 14 — parallel agents on the proven
+  recipe, all probe-verified): theme-token splits, JS-set KPI ids, badge backgrounds,
+  paired dark overrides; article-9's flattened panels got light-mode ink.
+- **6 grid/lab pages** (pln-java-grid-historical, geopolitics-2, ltc-iso-energy-governance,
+  tia-942-checklist, cdu-hub, network-compare): `--wire`/`--cdu-*` token splits, login-modal
+  overrides, icon-button names, 14+ scrollable wrappers focusable, pro-overlay flipped to
+  a dark wash.
+- **5 calculators** (spares, capex, carbon, tco, rfs-workbench) + **geopolitics /
+  geopolitics-3 / insights / terms / tools** + the **FF-1/FF-2/future-forward/
+  future-forward-1** series (series accents split per theme, series badge bg darkened).
+- Recurring roots this round: element-level `opacity` dims (tabs-group labels .6,
+  RZEngine-sim spans .8) — axe blends them into effective contrast, replaced with solid
+  colors; decorative JS-drawn sparkline SVGs marked via runtime; a self-inflicted
+  over-broad span rule on geopolitics narrowed (`:not([style*="color"])`).
+
+**Verification** — per-page probe 0/0 ×31; audit-a11y gate CLEAN; js-syntax +
+script-tags CLEAN. Remaining: ~10 small pages (ltc-ashrae/nfpa/ansi/uptime,
+standards-ltc-lab, article-18/19/20/23/25 partials, small pln-java-grid pages).
+
 ## v1.52.7 — 2026-07-12 (FIN Engine — Factor Zoo + Investment Committee + simpler screener)
 
 Adapts the DETERMINISTIC core of HKUDS/Vibe-Trading (a factor library + multi-agent consensus) into the

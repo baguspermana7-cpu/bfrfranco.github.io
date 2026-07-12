@@ -196,7 +196,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; back
 
 /* Tabs */
 .tabs-wrap { max-width: 1100px; margin: 0 auto 0; padding: 0 2rem; }
-.tabs-group-label { font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-muted); opacity: 0.6; padding: 0 4px; align-self: flex-end; margin-bottom: 4px; flex-shrink: 0; }
+.tabs-group-label { font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-muted); opacity: 1; padding: 0 4px; align-self: flex-end; margin-bottom: 4px; flex-shrink: 0; }
 .tabs-row { display: flex; gap: 4px; flex-wrap: wrap; padding-bottom: 0; border-bottom: 2px solid rgba(245,158,11,0.15); align-items: flex-end; }
 .tab-btn { padding: 9px 16px; border: 1px solid #e2e8f0; border-bottom: none; border-radius: 10px 10px 0 0; background: var(--bg-secondary); color: var(--text-muted); font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap; }
 .tab-btn:hover { color: var(--amber); border-color: rgba(245,158,11,0.3); }
@@ -1025,6 +1025,27 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
   .sc-mode-table td, .sc-exp-table td, .sc-lane-risk-table td { padding: 4px 5px; }
   .sc-tornado-label { min-width: 90px; font-size: 0.65rem; }
 }
+/* a11y (v1.52.7) */
+.tabs-group-label { color:#64748b !important; }
+[data-theme="dark"] .tabs-group-label { color:#b6c2d1 !important; }
+#tourStepCount[id] { color:#94a3b8 !important; }
+.tour-btn-skip { color:#94a3b8 !important; }
+a[href$="changelog.html"] { color:#94a3b8 !important; }
+[data-theme="dark"] .disc-fine { color:#94a3b8 !important; }
+
+[data-theme="dark"] .summary-strip-title, [data-theme="dark"] #tourStepCount, [data-theme="dark"] .crosslink-bar-label, [data-theme="dark"] .rfs-card-subtitle, [data-theme="dark"] .rfs-nav-subtitle, [data-theme="dark"] .scenario-bar-label, [data-theme="dark"] .rfs-archetype-desc, [data-theme="dark"] .use-when, [data-theme="dark"] .use-when strong, [data-theme="dark"] #rfsBreadcrumb span, [data-theme="dark"] #methodNote, [data-theme="dark"] #methodNoteCatalogCount, [data-theme="dark"] div > p { color:#94a3b8 !important; }
+.tabs-group-label { color:#64748b !important; }
+[data-theme="dark"] .tabs-group-label { color:#8b98ac !important; }
+[data-theme="dark"] .info-box summary, [data-theme="dark"] .module-summary-card .q { color:#fbbf24 !important; }
+#btnExportPDF { opacity:1 !important; }
+:root:not([data-theme="dark"]) #btnExportPDF { color:#b91c1c !important; }
+[data-theme="dark"] #btnExportPDF { color:#f8b4b4 !important; }
+[data-theme="dark"] a[href$="changelog.html"] { color:#94a3b8 !important; }
+[data-theme="dark"] #cookieBanner a { color:#93c5fd !important; }
+
+:root:not([data-theme="dark"]) [style*="color: #d97706"], :root:not([data-theme="dark"]) [style*="color:#d97706"], :root:not([data-theme="dark"]) #presetSelect, :root:not([data-theme="dark"]) .module-summary-card .q, :root:not([data-theme="dark"]) .info-box summary { color:#92400e !important; }
+[data-theme="dark"] [style*="color: #d97706"], [data-theme="dark"] [style*="color:#d97706"] { color:#fbbf24 !important; }
+.workflow-flowchart { }
 </style>
 <script src="js/rz-version.js?v=2026-05-09" defer></script>
 <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
@@ -1175,7 +1196,7 @@ html:not([data-theme="dark"]) .tab-btn:not(.active) { color:#475569 !important; 
       <i class="fas fa-project-diagram"></i> <strong>Workflow Overview</strong>
       <span style="color:var(--text-muted);font-weight:400;"> &mdash; how the 27 modules connect (analytical &rarr; operating engine &rarr; supply chain &rarr; reference)</span>
     </summary>
-    <div class="workflow-flowchart">
+    <div class="workflow-flowchart" tabindex="0" role="group" aria-label="Workflow flowchart">
       <svg viewBox="0 0 1200 440" xmlns="http://www.w3.org/2000/svg" class="workflow-svg" role="img" aria-label="Spares Engine workflow diagram showing 4 module groups and their connections">
         <!-- Group boxes -->
         <rect class="group-box" x="10" y="40" width="260" height="380" rx="10"/>
@@ -10837,6 +10858,11 @@ try {
 } catch(e) { console.warn('[CSE] v1.16.2 window export error:', e); }
 
 })(); // end IIFE
+</script>
+<script>
+(function(){function m(){[].forEach.call(document.querySelectorAll('svg:not([aria-label]):not([aria-hidden])'),function(s){s.setAttribute('aria-hidden','true');});}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',m);else m();
+if(window.MutationObserver)new MutationObserver(m).observe(document.documentElement,{childList:true,subtree:true});})();
 </script>
 </body>
 </html>
