@@ -1340,6 +1340,50 @@
         [data-theme="dark"] .model-card .model-desc { color:#94a3b8; }
         [data-theme="dark"] .model-card i { color:#94a3b8; }
         [data-theme="dark"] .model-card.active i { color:#10b981; }
+/* a11y (v1.52.4) */
+/* locked (blurred) previews: text transparent under the blur — axe's contrast
+   rule is visual and ignores aria-hidden; the preview is illegible by design */
+[aria-hidden="true"].charts-grid *, [aria-hidden="true"].scenario-section *, #opexCompareGrid[aria-hidden="true"] * { color:transparent !important; }
+:root:not([data-theme="dark"]) #freeCoolingHours { color:#495057 !important; }
+.chart-card .chart-title { color:#475569 !important; opacity:1 !important; }
+[data-theme="dark"] .chart-card .chart-title { color:#94a3b8 !important; }
+:root:not([data-theme="dark"]) #energyRate, :root:not([data-theme="dark"]) #coolingEnergyFactor { color:#495057 !important; }
+[data-theme="dark"] div > span[style*="rgb(124, 139, 159)"], [data-theme="dark"] [style*="#7c8b9f"], [data-theme="dark"] [style*="rgb(124, 139, 159)"] { color:#9aa8bb !important; }
+[data-theme="dark"] div > p { color:#94a3b8 !important; }
+/* accent vars: darker in light theme (inline var() usages inherit) */
+:root:not([data-theme="dark"]) { --accent-purple:#6d28d9; --accent-emerald:#047857; --accent-cyan:#0e7490; --accent-gold:#92400e; --accent-amber:#92400e; --accent-red:#b91c1c; --accent-blue:#1d4ed8; }
+[data-theme="dark"] { --accent-purple:#a5b4fc; }
+:root:not([data-theme="dark"]) [style*="rgb(139, 92, 246)"] { color:#6d28d9 !important; }
+[data-theme="dark"] [style*="rgb(139, 92, 246)"] { color:#a5b4fc !important; }
+:root:not([data-theme="dark"]) [style*="rgb(16, 185, 129)"] { color:#047857 !important; }
+:root:not([data-theme="dark"]) [style*="rgb(108, 117, 125)"] { color:#495057 !important; }
+:root:not([data-theme="dark"]) .chart-title { color:#475569 !important; }
+:root:not([data-theme="dark"]) #laborMult { color:#495057 !important; }
+[data-theme="dark"] div > p { color:#94a3b8; }
+[data-theme="dark"] #cookieDecline { color:#94a3b8 !important; }
+[data-theme="dark"] [style*="rgb(124, 139, 159)"] { color:#9aa8bb !important; }
+:root:not([data-theme="dark"]) [style*="color: #8b5cf6"], :root:not([data-theme="dark"]) [style*="color:#8b5cf6"] { color:#6d28d9 !important; }
+[data-theme="dark"] [style*="color: #8b5cf6"], [data-theme="dark"] [style*="color:#8b5cf6"] { color:#a5b4fc !important; }
+:root:not([data-theme="dark"]) [style*="color: #10b981"], :root:not([data-theme="dark"]) [style*="color:#10b981"] { color:#047857 !important; }
+:root:not([data-theme="dark"]) [style*="color: #6c757d"], :root:not([data-theme="dark"]) [style*="color:#6c757d"] { color:#495057 !important; }
+:root:not([data-theme="dark"]) #btnProMode { color:#475569 !important; }
+:root:not([data-theme="dark"]) #modeIndicator { color:#155e75 !important; }
+[data-theme="dark"] #modeIndicator { color:#22d3ee !important; }
+#btnExportPDF { opacity:1 !important; }
+:root:not([data-theme="dark"]) #btnExportPDF { color:#b91c1c !important; }
+[data-theme="dark"] #btnExportPDF { color:#f8b4b4 !important; }
+#cookieDecline { color:#475569 !important; }
+[data-theme="dark"] #cookieBanner a, [data-theme="dark"] .disc-text a { color:#93c5fd !important; }
+:root:not([data-theme="dark"]) .disc-fine a { color:#1d4ed8 !important; }
+:root:not([data-theme="dark"]) #countryInfo strong, :root:not([data-theme="dark"]) #climateInfo strong, :root:not([data-theme="dark"]) #opexUncPanel div { color:#495057 !important; }
+[data-theme="dark"] #opexP90 { color:#f87171 !important; }
+[data-theme="dark"] [style*="color: #a855f7"], [data-theme="dark"] [style*="color:#a855f7"] { color:#c4b5fd !important; }
+[data-theme="dark"] .scenario-title { color:#e2e8f0 !important; }
+[data-theme="dark"] [style*="color: #7c8b9f"] { color:#9aa8bb !important; }
+[data-theme="dark"] .charts-grid[aria-hidden="true"] .chart-title, [data-theme="dark"] .charts-grid .chart-title { color:#cbd5e1 !important; }
+/* the 6px blur already signals the locked preview — a .5 opacity dim on top
+   halves every child's effective contrast (axe blends parent opacity) */
+.charts-grid[aria-hidden="true"], .scenario-section[aria-hidden="true"], #opexCompareGrid[aria-hidden="true"] { opacity:.9 !important; }
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-calc-utils.js?v=2026-07-03" defer></script>
@@ -2294,7 +2338,7 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
                     <div id="opexHist" style="margin:0.2rem 0 0.3rem;"></div>
                     <div style="font-size:0.66rem;color:var(--text-muted);margin:0.5rem 0 0.25rem;font-weight:600;">Sensitivity — what moves annual OPEX most</div>
                     <div id="opexTornado"></div>
-                    <div style="font-size:0.6rem;color:var(--text-muted);margin-top:0.4rem;">P90/P10 spread <span id="opexSpread">—</span> · seeded &amp; reproducible · <span style="opacity:0.8;">RZEngine v2.0 sim</span></div>
+                    <div style="font-size:0.6rem;color:var(--text-muted);margin-top:0.4rem;">P90/P10 spread <span id="opexSpread">—</span> · seeded &amp; reproducible · <span>RZEngine v2.0 sim</span></div>
                 </div>
 
                 <!-- Action Toolbar (Save, Export, Clear) -->
@@ -2328,7 +2372,7 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
                         <div style="font-size:0.9rem;font-weight:700;color:var(--dark-blue);display:flex;align-items:center;gap:8px;margin-bottom:1rem;">
                             <i class="fas fa-columns" style="color:#10b981;"></i> Scenario Comparison
                         </div>
-                        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:stretch;" id="opexCompareGrid">
+                        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:stretch;" id="opexCompareGrid" aria-hidden="true">
                             <div id="opexScenarioACard" style="background:linear-gradient(135deg,#1e3a5f,#2d5a87);border-radius:14px;padding:1.25rem;color:white;"></div>
                             <div id="opexDeltaColumn" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0.5rem;gap:0.75rem;min-width:80px;"></div>
                             <div id="opexScenarioBCard" style="background:linear-gradient(135deg,#1a4731,#2d6a4f);border-radius:14px;padding:1.25rem;color:white;"></div>
@@ -2337,7 +2381,7 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
                 </div>
 
                 <!-- Charts -->
-                <div class="charts-grid">
+                <div class="charts-grid" aria-hidden="true">
                     <div class="chart-card fade-in">
                         <div class="chart-title">
                             <i class="fas fa-chart-pie"></i>
@@ -4192,6 +4236,8 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
                 btn.style.color = '#34d399';
                 btn.disabled = true;
                 btn.style.opacity = '0.5';
+                btn.setAttribute('aria-disabled','true');
+                btn.disabled = true;
                 btn.style.pointerEvents = 'none';
                 btn.style.cursor = 'default';
                 renderOpexComparison();
@@ -5540,10 +5586,12 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
                     cg.style.filter = 'blur(6px)';
                     cg.style.pointerEvents = 'none';
                     cg.style.opacity = '0.5';
+                    cg.setAttribute('aria-hidden','true');
                 } else {
                     cg.style.filter = 'none';
                     cg.style.pointerEvents = 'auto';
                     cg.style.opacity = '1';
+                    cg.removeAttribute('aria-hidden');
                 }
             });
 
@@ -5554,10 +5602,12 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
                     sc.style.filter = 'blur(6px)';
                     sc.style.pointerEvents = 'none';
                     sc.style.opacity = '0.5';
+                    sc.setAttribute('aria-hidden','true');
                 } else {
                     sc.style.filter = 'none';
                     sc.style.pointerEvents = 'auto';
                     sc.style.opacity = '1';
+                    sc.removeAttribute('aria-hidden');
                 }
             });
 
@@ -5568,10 +5618,12 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
                     compareGrid.style.filter = 'blur(4px)';
                     compareGrid.style.pointerEvents = 'none';
                     compareGrid.style.opacity = '0.5';
+                    compareGrid.setAttribute('aria-hidden','true');
                 } else {
                     compareGrid.style.filter = 'none';
                     compareGrid.style.pointerEvents = 'auto';
                     compareGrid.style.opacity = '1';
+                    compareGrid.removeAttribute('aria-hidden');
                 }
             }
 
@@ -5594,7 +5646,9 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
                 if (isFree) {
                     pdfBtn.setAttribute('data-orig-onclick', pdfBtn.getAttribute('onclick') || '');
                     pdfBtn.setAttribute('onclick', 'opexShowLogin()');
-                    pdfBtn.style.opacity = '0.6';
+                    /* a11y: the lock icon carries the gated state; an opacity dim
+                       pushes the label below AA while the button stays interactive */
+                    pdfBtn.style.opacity = '1';
                     pdfBtn.innerHTML = '<i class="fas fa-lock" style="font-size:0.65rem;margin-right:3px;color:#a78bfa;"></i> Export PDF';
                 } else {
                     pdfBtn.setAttribute('onclick', 'exportOpexPDF()');
@@ -5702,5 +5756,11 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
 <script src="js/rz-config.js?v=2026-07-11"></script>
 <script src="js/rz-scenario.js?v=2026-07-11d"></script>
 <script type="module" src="js/rz-supabase.js?v=2026-07-11c"></script>
+<script>
+/* a11y (v1.52.4): JS-drawn sparkline SVGs are decorative (values shown as text) */
+(function(){function m(){[].forEach.call(document.querySelectorAll('svg:not([aria-label]):not([aria-hidden])'),function(s){s.setAttribute('aria-hidden','true');});}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',m);else m();
+if(window.MutationObserver)new MutationObserver(m).observe(document.documentElement,{childList:true,subtree:true});})();
+</script>
 </body>
 </html>

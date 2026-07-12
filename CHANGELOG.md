@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v1.52.6 — 2026-07-12 (Accessibility — full-site sweep part 5: five calculators to zero)
+
+**Changed** — `infographic-pue-global`, `roi-calculator`, `opex-calculator`,
+`pue-calculator`, `cx-calculator` → **0/0 both themes** (per-page axe probe, ~250 nodes).
+Notable roots:
+- Calculator accent vars split per theme (`--accent-purple` etc. — inline `var()` usages
+  inherit the fix); muted tokens darkened at the variable, not per selector.
+- **PRO-gated locked previews**: the free-tier blur carried an `opacity:.5` dim that
+  halves every child's effective contrast (axe blends parent opacity — no text color can
+  pass under 0.5 on white). The 6px blur alone now signals the locked state
+  (opacity .9), locked sections carry `aria-hidden` from the markup (the async auth
+  gating applied it too late for any deterministic measurement), and the gated PDF
+  button keeps full-contrast text with the lock icon as the affordance.
+- JS-drawn sparkline SVGs marked decorative via a tiny runtime (`svg-img-alt`).
+- Probe upgraded: scrolls through the page (completes IntersectionObserver entrance
+  animations) and settles 1.4s before running axe.
+
+**Verification** — per-page probe 0/0 ×5; audit-a11y gate CLEAN; js-syntax +
+script-tags CLEAN.
+
 ## v1.52.5 — 2026-07-12 (FIN Engine — broader IDX universe + clean Indonesian stock detail)
 
 **Added / Changed**

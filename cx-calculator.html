@@ -169,7 +169,7 @@ a:hover{text-decoration:underline;}
 /* Input Grid */
 .cx-inputs{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
 .cx-input-group{display:flex;flex-direction:column;gap:6px;}
-.cx-input-group.cx-pro-input{opacity:0.5;position:relative;pointer-events:none;}
+.cx-input-group.cx-pro-input{opacity:0.9;filter:grayscale(1);position:relative;pointer-events:none;}
 .cx-input-group.cx-pro-input.unlocked{opacity:1;pointer-events:auto;}
 .cx-input-label{font-size:0.78rem;font-weight:600;color:#94a3b8;display:flex;align-items:center;gap:6px;}
 .cx-input-label .cx-pro-tag{font-size:0.6rem;padding:2px 6px;border-radius:4px;background:rgba(168,85,247,0.2);color:#a855f7;font-weight:700;letter-spacing:0.5px;}
@@ -631,6 +631,44 @@ a:hover{text-decoration:underline;}
 [data-theme="dark"] .cx-manual-table th { background:rgba(14,116,144,0.1); color:#22d3ee; border-color:rgba(148,163,184,0.08); }
 [data-theme="dark"] .cx-manual-table td { color:#cbd5e1; border-color:rgba(148,163,184,0.06); }
 [data-theme="dark"] .cx-currency-sel { background:rgba(30,41,59,0.6); color:#94a3b8; border-color:rgba(148,163,184,0.15); }
+/* a11y (v1.52.4) */
+[data-theme="dark"] a[href$="opex-calculator.html"], a[href$="opex-calculator.html"] { color:#34d399 !important; }
+#cxExportBtn { color:#f8b4b4 !important; }
+:root:not([data-theme="dark"]) #cxExportBtn { color:#b91c1c !important; }
+#cxGeneratorType { color:#cbd5e1 !important; }
+:root:not([data-theme="dark"]) #cxGeneratorType { color:#334155 !important; }
+[id^="cxProInput"] .cx-input-label { color:#94a3b8 !important; opacity:1 !important; }
+.cx-pro-tag { color:#c4b5fd !important; opacity:1 !important; }
+.cx-nav-subtitle { color:#94a3b8 !important; }
+[data-theme="dark"] div > p { color:#94a3b8; }
+[data-theme="dark"] a[href$="opex-calculator.html"] { color:#34d399 !important; }
+[data-theme="dark"] #cookieDecline { color:#94a3b8 !important; }
+/* accent vars: darker in light theme (inline var() usages inherit) */
+:root:not([data-theme="dark"]) { --accent-purple:#6d28d9; --accent-emerald:#047857; --accent-cyan:#0e7490; --accent-gold:#92400e; --accent-amber:#92400e; --accent-red:#b91c1c; --accent-blue:#1d4ed8; }
+[data-theme="dark"] { --accent-purple:#a5b4fc; }
+:root:not([data-theme="dark"]) [style*="rgb(139, 92, 246)"] { color:#6d28d9 !important; }
+[data-theme="dark"] [style*="rgb(139, 92, 246)"] { color:#a5b4fc !important; }
+:root:not([data-theme="dark"]) [style*="rgb(16, 185, 129)"] { color:#047857 !important; }
+:root:not([data-theme="dark"]) [style*="rgb(108, 117, 125)"] { color:#495057 !important; }
+:root:not([data-theme="dark"]) [style*="color: #8b5cf6"], :root:not([data-theme="dark"]) [style*="color:#8b5cf6"] { color:#6d28d9 !important; }
+[data-theme="dark"] [style*="color: #8b5cf6"], [data-theme="dark"] [style*="color:#8b5cf6"] { color:#a5b4fc !important; }
+:root:not([data-theme="dark"]) [style*="color: #10b981"], :root:not([data-theme="dark"]) [style*="color:#10b981"] { color:#047857 !important; }
+:root:not([data-theme="dark"]) [style*="color: #6c757d"], :root:not([data-theme="dark"]) [style*="color:#6c757d"] { color:#495057 !important; }
+:root:not([data-theme="dark"]) #btnProMode { color:#475569 !important; }
+:root:not([data-theme="dark"]) #modeIndicator { color:#155e75 !important; }
+[data-theme="dark"] #modeIndicator { color:#22d3ee !important; }
+#btnExportPDF { opacity:1 !important; }
+:root:not([data-theme="dark"]) #btnExportPDF { color:#b91c1c !important; }
+[data-theme="dark"] #btnExportPDF { color:#f8b4b4 !important; }
+#cookieDecline { color:#475569 !important; }
+[data-theme="dark"] #cookieBanner a, [data-theme="dark"] .disc-text a { color:#93c5fd !important; }
+:root:not([data-theme="dark"]) .disc-fine a { color:#1d4ed8 !important; }
+/* a11y final overrides */
+a[href$="opex-calculator.html"][href] { color:#34d399 !important; }
+#cxExportBtn[id] { color:#f8b4b4 !important; }
+#cxGeneratorType[id] { color:#cbd5e1 !important; }
+.cx-disc-fine[class] { color:#94a3b8 !important; }
+.cx-disc-fine a { text-decoration:underline !important; text-underline-offset:2px; color:#93c5fd !important; }
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-calc-utils.js?v=2026-07-03" defer></script>
@@ -677,6 +715,10 @@ a:hover{text-decoration:underline;}
         max-width: calc(100vw - 24px);
     }
 }
+/* a11y last-block overrides */
+:root:not([data-theme="dark"]) a[href$="opex-calculator.html"] { color:#34d399 !important; }
+:root:not([data-theme="dark"]) #cxExportBtn { color:#f8b4b4 !important; }
+:root:not([data-theme="dark"]) #cxGeneratorType { color:#cbd5e1 !important; }
 </style>
     <!-- PLAN02 E4 — editorial chrome (dark-only, chrome only) -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
