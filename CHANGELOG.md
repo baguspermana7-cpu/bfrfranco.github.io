@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.52.4 — 2026-07-12 (FIN Engine — Indonesian stock scorecard works end-to-end)
+
+**Fixed** — clicking an Indonesian (`.JK`) stock in the terminal now yields a meaningful FIN Advisor
+Scorecard. The stock-detail quote comes from Finnhub (no IDX coverage), so `loadAdvisorScorecard` now
+pulls the live quote (day change + volume) from the **gateway** (Yahoo `/q`) for `.JK` symbols. Combined
+with the sourced `idxFundamentals` (free-float + snapshot P/E/P/B/ROE) and the Yahoo-based `/analyze`
+technical gauge, an Indonesian scorecard now scores **Float + Value + Momentum + Technical** with real data
+(verified: BBCA.JK → Favorable, float not "n/a", momentum from live quote, disclaimer present).
+
 ## v1.52.3 — 2026-07-12 (Accessibility — full-site sweep part 4: shared footer links + 17 template-family pages)
 
 **Changed**

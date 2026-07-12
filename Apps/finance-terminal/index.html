@@ -862,6 +862,10 @@ async function loadAdvisorScorecard(containerId,sym,tf){
     var analyze=await gw('/analyze',{sym:sym,tf:tf||'3M'}).catch(function(){return null;});
     var m=(S.stockFin&&S.stockFin.metric)||{}, p=S.stockProf||{}, q=S.stockQ||{};
     var market=FINEngine.format.marketOf(sym);
+    // Indonesian (.JK): the stock-detail quote comes from Finnhub, which has no IDX coverage — so pull
+    // the live quote (day change + volume) from the gateway (Yahoo) instead, else Momentum/Liquidity are blank.
+    if(market==='ID'){ try{ var qr=await gw('/q',{syms:sym}); var row=(Array.isArray(qr)?qr:(qr&&qr.data)||[])[0];
+      if(row){ q={dp:row.chgPct,v:row.vol,c:row.price}; } }catch(_){} }
     // 1-month % change enriches the Momentum factor (day + multi-day). Derived from ~21 daily bars.
     var chg1m=null;
     try{ var ck=await gw('/candles',{sym:sym,tf:'1M'}); var cs=(ck&&ck.candles)||(ck&&ck.data&&ck.data.candles)||[];
