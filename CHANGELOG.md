@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.52.3 — 2026-07-12 (Accessibility — full-site sweep part 4: shared footer links + 17 template-family pages)
+
+**Changed**
+- **Shared `styles.css`**: the footer disclaimer's inline `#8b5cf6` terms/privacy links
+  (~40 pages, 3.7:1 light / 3.4:1 dark) recolored per theme + underlined — one shared
+  fix, `styles.min.css` re-minified and cache-busted site-wide.
+- **17 pages → 0/0 both themes** (per-page axe probe): all 5 `pillar-*` pages
+  (per-theme `--pillar-color` splits), all 9 `compare-*` pages (both sub-templates:
+  `--cmp-a/b` and `--cmp-accent` var splits, th backgrounds darkened behind white,
+  winner badges/verdicts), and the cockpit trio `fire-system` / `ict` / `EPMS_Telemetry`
+  (dark-only token brightening, icon-link accessible name, scrollable canvas/table
+  focus, `role="img"`→`group` on the interactive process diagram).
+- Partial agent progress landed on ~15 article/tool tail pages (counts reduced, not yet
+  zero — remaining ~600 nodes tracked for the final part).
+
+**Verification** — per-page probe 0/0 ×17; audit-a11y gate CLEAN; js-syntax +
+script-tags CLEAN across all 78 modified files.
+
 ## v1.52.2 — 2026-07-12 (FIN Engine — sourced Indonesian free-float lights up the Float factor)
 
 The owner's headline "float screener" now has **real free-float data for Indonesian stocks** — sourced, not

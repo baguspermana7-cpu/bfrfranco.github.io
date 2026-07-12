@@ -108,7 +108,7 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="styles.min.css?v=2026-07-04-a11y">
+    <link rel="stylesheet" href="styles.min.css?v=2026-07-05-a11y3">
 
     <style>
         :root { --cmp-primary: #f59e0b; --cmp-primary-light: rgba(245,158,11,0.1); --cmp-a: #f59e0b; --cmp-b: #8b5cf6; }
@@ -132,8 +132,8 @@
         .compare-table { width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 2rem; }
         .compare-table thead th { padding: 1rem; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
         .compare-table thead th:first-child { background: var(--cmp-card); color: var(--cmp-muted); text-align: left; }
-        .compare-table thead th:nth-child(2) { background: #f59e0b; color: #fff; }
-        .compare-table thead th:nth-child(3) { background: #8b5cf6; color: #fff; }
+        .compare-table thead th:nth-child(2) { background: #b45309; color: #fff; }
+        .compare-table thead th:nth-child(3) { background: #6d28d9; color: #fff; }
         .compare-table thead th:last-child { background: var(--cmp-card); color: var(--cmp-muted); }
         .compare-table td { padding: 0.875rem 1rem; border-bottom: 1px solid var(--cmp-border); background: var(--cmp-card); color: var(--cmp-text); font-size: 0.9rem; vertical-align: top; }
         .compare-table td:first-child { font-weight: 600; color: var(--cmp-muted); white-space: nowrap; }
@@ -164,8 +164,8 @@
         .calc-result-card.t4 { background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.3); }
         .calc-result-card .label { font-size: 0.8rem; color: var(--cmp-muted); text-transform: uppercase; font-weight: 600; }
         .calc-result-card .value { font-size: 1.5rem; font-weight: 800; margin-top: 0.25rem; }
-        .calc-result-card.t3 .value { color: #f59e0b; }
-        .calc-result-card.t4 .value { color: #8b5cf6; }
+        .calc-result-card.t3 .value { color: #92400e; }
+        .calc-result-card.t4 .value { color: #6d28d9; }
 
         .decision-box { background: var(--cmp-card); border: 2px solid var(--cmp-primary); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; }
         .decision-box h3 { color: var(--cmp-primary); margin-bottom: 1rem; font-size: 1.2rem; }
@@ -174,13 +174,13 @@
         .decision-card.a { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); }
         .decision-card.b { background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.2); }
         .decision-card h4 { font-size: 1rem; margin-bottom: 0.75rem; }
-        .decision-card.a h4 { color: #f59e0b; }
-        .decision-card.b h4 { color: #8b5cf6; }
+        .decision-card.a h4 { color: #92400e; }
+        .decision-card.b h4 { color: #6d28d9; }
         .decision-card ul { list-style: none; padding: 0; margin: 0; }
         .decision-card li { padding: 0.3rem 0; font-size: 0.9rem; color: var(--cmp-text); }
         .decision-card li::before { content: '\2713'; margin-right: 0.5rem; font-weight: 700; }
-        .decision-card.a li::before { color: #f59e0b; }
-        .decision-card.b li::before { color: #8b5cf6; }
+        .decision-card.a li::before { color: #92400e; }
+        .decision-card.b li::before { color: #6d28d9; }
 
         .faq-item { margin-bottom: 1rem; }
         .faq-item h3 { font-size: 1.05rem; color: var(--cmp-text); margin-bottom: 0.5rem; }
@@ -294,7 +294,19 @@
     h1 { font-size: 1.4rem !important; }
 }
 
-    </style>
+    /* a11y (v1.51.13): compare accents split per theme */
+:root:not([data-theme="dark"]) { --cmp-a:#92400e; --cmp-b:#6d28d9; --cmp-primary:#92400e; }
+[data-theme="dark"] { --cmp-a:#fbbf24; --cmp-b:#a78bfa; --cmp-primary:#fbbf24; }
+ /* th bgs follow the vars */
+[data-theme="dark"] #cookieBanner a, [data-theme="dark"] p > a[href$="privacy.html"] { color:#93c5fd !important; }
+/* a11y: dark pairs */
+:root:not([data-theme="dark"]) .t3 .label, :root:not([data-theme="dark"]) .t4 .label { color:#475569 !important; }
+[data-theme="dark"] .decision-card.a > h4 { color: var(--cmp-a) !important; }
+[data-theme="dark"] .decision-card.b > h4 { color: var(--cmp-b) !important; }
+[data-theme="dark"] .formula-card h4.pue { color:#34d399 !important; }
+[data-theme="dark"] .formula-card h4.dcie { color:#a78bfa !important; }
+[data-theme="dark"] .compare-table thead th:nth-child(2), [data-theme="dark"] .compare-table thead th:nth-child(3) { filter:none; }
+</style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
 </head>
@@ -308,25 +320,25 @@
                 <li class="nav-dropdown">
                     <a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
                     <ul class="dropdown-menu" role="menu">
-                        <li role="menuitem"><a href="datacenter-solutions.html" style="color: #06b6d4; font-weight: 600;">DC Solutions Hub</a></li>
+                        <li role="menuitem"><a href="datacenter-solutions.html" style="color: #0e7490; font-weight: 600;">DC Solutions Hub</a></li>
                         <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li role="menuitem"><a href="datahallAI.html" style="color: #8b5cf6;">DC AI/HPC</a></li>
+                        <li role="menuitem"><a href="datahallAI.html" style="color: #6d28d9;">DC AI/HPC</a></li>
                         <li role="menuitem"><a href="dc-conventional.html">DC Conventional</a></li>
                         <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li role="menuitem"><a href="tco-calculator.html" style="color: #4f46e5; font-weight: 600;">TCO Calculator</a></li>
-                        <li role="menuitem"><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
-                        <li role="menuitem"><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li role="menuitem"><a href="capex-calculator.html" style="color: #92400e;">CAPEX Calculator</a></li>
+                        <li role="menuitem"><a href="opex-calculator.html" style="color: #047857;">OPEX Calculator</a></li>
                         <li role="menuitem"><a href="roi-calculator.html" style="color: #3b82f6;">ROI Calculator</a></li>
                         <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li role="menuitem"><a href="dc-market-tracker.html" style="color: #0d9488; font-weight: 600;">DC Market</a></li>
-                        <li role="menuitem"><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
+                        <li role="menuitem"><a href="dcmoc/" style="color: #b91c1c; font-weight: 600;">DC MOC</a></li>
                     </ul>
                 </li>
                 <li class="nav-dropdown">
                     <a href="insights.html" class="nav-link">Insights <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
                     <ul class="dropdown-menu">
-                        <li><a href="articles.html" style="color:#06b6d4;font-weight:600;">Engineering Journal</a></li>
-                        <li><a href="geopolitics.html" style="color:#ef4444;">Global Analysis</a></li>
+                        <li><a href="articles.html" style="color: #0e7490;font-weight:600;">Engineering Journal</a></li>
+                        <li><a href="geopolitics.html" style="color: #b91c1c;">Global Analysis</a></li>
                         <li><a href="future-forward.html" style="color:#a855f7;">Future Forward</a></li>
                                 <li><a href="glossary.html" style="color: #14b8a6;">Glossary</a></li>
                         <li style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
@@ -385,7 +397,7 @@
                         <input type="number" id="mttr" value="4" min="0.1" step="0.1" placeholder="e.g. 4">
                     </div>
                 </div>
-                <button onclick="calcAvail()" style="padding:0.75rem 2rem;background:#f59e0b;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.95rem;">Calculate</button>
+                <button onclick="calcAvail()" style="padding:0.75rem 2rem;background:#b45309;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.95rem;">Calculate</button>
                 <div class="calc-result">
                     <div class="calc-result-card t3">
                         <div class="label">Tier III (N+1)</div>
@@ -495,7 +507,7 @@
     </main>
 
     <div style="max-width:900px;margin:2rem auto 0;padding:1rem 1.5rem;text-align:center;">
-        <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color:#8b5cf6;">Terms &amp; Disclaimer</a> | <a href="privacy.html" style="color:#8b5cf6;">Privacy Policy</a></p>
+        <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color: #6d28d9;">Terms &amp; Disclaimer</a> | <a href="privacy.html" style="color: #6d28d9;">Privacy Policy</a></p>
     </div>
 
     <footer class="footer footer-enhanced">

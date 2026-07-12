@@ -8030,3 +8030,16 @@ section {
 .rz-version-num { color:#0a6e52 !important; }
 [data-theme="dark"] .rz-version-num { color:#7dd3b0 !important; }
 p a[href$="terms.html"], p a[href$="privacy.html"], .footer p a { text-decoration: underline; text-underline-offset: 2px; }
+
+/* a11y (v1.51.13): the shared footer disclaimer carries inline #8b5cf6 terms/privacy
+   links on ~40 pages (3.7:1 on white, 3.4:1 on dark) — recolor per theme and make
+   them distinguishable without color. [style] guard = only the inline-styled ones. */
+:root:not([data-theme="dark"]) a[href$="terms.html"][style],
+:root:not([data-theme="dark"]) a[href$="privacy.html"][style] { color:#6d28d9 !important; }
+[data-theme="dark"] a[href$="terms.html"][style],
+[data-theme="dark"] a[href$="privacy.html"][style] { color:#a5b4fc !important; }
+a[href$="terms.html"][style], a[href$="privacy.html"][style],
+p a[href$="terms.html"], p a[href$="privacy.html"] {
+  text-decoration:underline !important;
+  text-underline-offset:2px;
+}

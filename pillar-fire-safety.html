@@ -151,7 +151,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="styles.min.css?v=2026-07-04-a11y">
+    <link rel="stylesheet" href="styles.min.css?v=2026-07-05-a11y3">
 
     <style>
         :root { --pillar-color: #ef4444; --pillar-light: #f87171; --pillar-dark: #dc2626; --pillar-bg: rgba(239,68,68,0.08); --pillar-border: rgba(239,68,68,0.25); }
@@ -401,7 +401,17 @@
     h1 { font-size: 1.4rem !important; }
 }
 
-    </style>
+    /* a11y (v1.51.13): pillar accent split per theme */
+:root:not([data-theme="dark"]) { --pillar-color:#b91c1c; }
+[data-theme="dark"] { --pillar-color:#f87171; }
+[data-theme="dark"] p > a[href$="privacy.html"], [data-theme="dark"] #cookieBanner a { color:#93c5fd !important; }
+:root:not([data-theme="dark"]) .fa-layer h4 .std { color:#065f46 !important; }
+.fa-step .k { color:#b91c1c !important; }
+[data-theme="dark"] .fa-step .k { color:#f87171 !important; }
+:root:not([data-theme="dark"]) [style*="color: #dc2626"], :root:not([data-theme="dark"]) [style*="color:#dc2626"] { color:#b91c1c !important; }
+:root:not([data-theme="dark"]) .warning-box b, :root:not([data-theme="dark"]) b[style] { color:#b91c1c !important; }
+[data-theme="dark"] .fa-cta { color:#f87171 !important; }
+</style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
 </head>
@@ -587,8 +597,8 @@
         [data-theme="dark"] .fa-layer .std { color:#34d399; }
         .fa-danger { border:1px solid rgba(239,68,68,.4); border-left:4px solid #dc2626; border-radius:10px; background:rgba(239,68,68,.06); padding:1rem 1.2rem; margin:1.2rem 0; font-size:.92rem; line-height:1.65; color:#0f172a; }
         [data-theme="dark"] .fa-danger { color:#f1f5f9; background:rgba(239,68,68,.1); }
-        .fa-danger b { color:#dc2626; } [data-theme="dark"] .fa-danger b { color:#f87171; }
-        .fa-cta { display:inline-block; margin-top:.4rem; font-family:'JetBrains Mono',monospace; font-size:.82rem; font-weight:600; color:#ef4444; text-decoration:none; }
+        .fa-danger b { color:#b91c1c; } [data-theme="dark"] .fa-danger b { color:#f87171; }
+        .fa-cta { display:inline-block; margin-top:.4rem; font-family:'JetBrains Mono',monospace; font-size:.82rem; font-weight:600; color:#b91c1c; text-decoration:none; }
         @media (max-width:768px){ .fa-flow { grid-template-columns:1fr 1fr; } .fa-sec { padding:1rem 1.2rem 0; } }
     </style>
     <section class="fa-sec">
