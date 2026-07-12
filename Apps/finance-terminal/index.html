@@ -519,7 +519,7 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 <div class="tbl-wrap"><table class="dtbl" id="screenerTable"><thead></thead><tbody></tbody></table></div>
 <div class="paging" id="screenerPaging"></div>
 <div style="margin-top:.75rem"><button class="btn btn-o btn-sm" onclick="exportScreenerCSV()"><i class="fas fa-download"></i>Export CSV</button></div>
-<p style="margin:.7rem 0 0;font-size:.68rem;color:var(--t4);font-style:italic;line-height:1.5"><i class="fas fa-circle-info" style="opacity:.7"></i> FIN Score is a transparent multi-factor read (value · quality · momentum · dividend · liquidity · float · technical) by the shared FIN Engine — <b>educational analysis only, not investment advice and not a licensed financial advisor</b>. Indonesian (.JK) stocks score on price/momentum/liquidity (fundamentals limited on free data).</p>
+<p id="screenerDisclaimer" style="margin:.7rem 0 0;font-size:.68rem;color:var(--t4);font-style:italic;line-height:1.5"><i class="fas fa-circle-info" style="opacity:.7"></i> FIN Score is a transparent multi-factor read (value · quality · momentum · dividend · liquidity · float · technical) by the shared FIN Engine — <b>educational analysis only, not investment advice and not a licensed financial advisor</b>. Indonesian (.JK) stocks score on price/momentum/liquidity (fundamentals limited on free data).</p>
 </div>
 </div>
 
@@ -757,13 +757,14 @@ function renderGaugeSvg(score,label){
   var t=(180-angle)*Math.PI/180;
   var endX=50+r*Math.cos(t);
   var endY=50-r*Math.sin(t);
-  // 7-band color: red <30 / amber 30-45 / grey 45-55 / mint 55-70 / green >70
-  var color=s<30?'#ef4444':s<45?'#fbbf24':s<55?'#94a3b8':s<70?'#7DDDB4':'#10b981';
+  // 7-band color (routed through the shared tokens so it never drifts from the chip palette):
+  // red <30 / amber 30-45 / grey 45-55 / mint 55-70 / green >70
+  var color=s<30?'var(--red)':s<45?'var(--amb)':s<55?'var(--t3)':s<70?'#7DDDB4':'var(--grn)';
   return '<svg viewBox="0 0 100 60" class="rz-ap-gauge-svg" aria-label="Buy/Sell gauge">'+
     '<path d="M10 50 A40 40 0 0 1 90 50" fill="none" stroke="rgba(148,163,184,.15)" stroke-width="6" stroke-linecap="round" />'+
     '<path d="M10 50 A40 40 0 0 1 '+endX.toFixed(2)+' '+endY.toFixed(2)+'" fill="none" stroke="'+color+'" stroke-width="6" stroke-linecap="round" />'+
     '<text x="50" y="42" text-anchor="middle" class="rz-ap-gauge-score" fill="'+color+'">'+s.toFixed(0)+'</text>'+
-    '<text x="50" y="55" text-anchor="middle" fill="#94a3b8" font-size="6" font-weight="600" letter-spacing="0.5">'+esc(String(label||'').toUpperCase())+'</text>'+
+    '<text x="50" y="55" text-anchor="middle" fill="var(--t3)" font-size="6" font-weight="600" letter-spacing="0.5">'+esc(String(label||'').toUpperCase())+'</text>'+
     '<\/svg>';
 }
 function signalChipClass(value){
@@ -868,7 +869,7 @@ async function loadAdvisorScorecard(containerId,sym,tf){
       if(row){ q={dp:row.chgPct,v:row.vol,c:row.price}; } }catch(_){} }
     // 1Y daily candles power the Technical/Quant(alphas)/Risk panels; 1-month change enriches Momentum.
     var candles=[];
-    try{ var ck=await gw('/candles',{sym:sym,tf:'1Y'}); candles=(ck&&ck.candles)||(ck&&ck.data&&ck.data.candles)||[]; }catch(_){}
+    try{ var ck=await gw('/candles',{sym:sym,tf:'1Y'}); candles=(ck&&ck.candles)||(ck&&ck.data&&ck.data.candles)||[]; }catch(_e){console.warn('[FIN] candles fetch failed for '+sym,_e);}
     var chg1m=null; if(candles.length>=22){var f=candles[candles.length-22].c,l=candles[candles.length-1].c;if(f>0)chg1m=(l/f-1)*100;}
     function num(){for(var i=0;i<arguments.length;i++){var v=arguments[i];if(typeof v==='number'&&isFinite(v))return v;}return null;}
     var pct=function(v){return (typeof v==='number'&&isFinite(v))?v/100:null;};
@@ -905,7 +906,7 @@ async function loadCryptoCommittee(containerId,sym){
   el.innerHTML='<div class="empty"><p><span class="spinner"><\/span>Convening the FIN committee…<\/p><\/div>';
   try{
     var candles=[];
-    try{ var ck=await gw('/candles',{sym:sym,tf:'1Y'}); candles=(ck&&ck.candles)||(ck&&ck.data&&ck.data.candles)||[]; }catch(_){}
+    try{ var ck=await gw('/candles',{sym:sym,tf:'1Y'}); candles=(ck&&ck.candles)||(ck&&ck.data&&ck.data.candles)||[]; }catch(_e){console.warn('[FIN] candles fetch failed for '+sym,_e);}
     // Empty stock → Fundamental/Value panels self-skip → technical-only committee.
     var res=FINEngine.models.committee.run({},candles,{preset:'momentum',market:'us'});
     renderAdvisorScorecard(containerId,res,sym,{crypto:true});
@@ -944,7 +945,13 @@ function renderAdvisorScorecard(containerId,res,sym,opts){
   if(vg&&vg.rating){
     var vgMap={pass:{c:'var(--grn)',bg:'var(--grnbg)',t:'PASS'},gray:{c:'var(--amb)',bg:'var(--ambbg)',t:'GRAY'},fail:{c:'var(--red)',bg:'var(--redbg)',t:'FAIL'}};
     var vm=vgMap[vg.rating]||vgMap.gray;
-    var mirror=(vg.mirrorTest||[]).slice(0,5).map(function(m){return '<li style="list-style:none;font-size:.7rem;color:var(--t2);margin:2px 0">'+esc(m)+'<\/li>';}).join('');
+    // Each mirror line is engine-prefixed with ✓ / ✗ / — — split it into a coloured glyph + text so the
+    // checklist hierarchy reads clearly (parity with the Bull/Bear lists' fa-plus/fa-minus).
+    var mirror=(vg.mirrorTest||[]).slice(0,5).map(function(m){
+      var g=m.charAt(0),rest=(g==='✓'||g==='✗'||g==='—')?m.slice(1).replace(/^\s+/,''):m;
+      var gc=g==='✓'?'var(--grn)':g==='✗'?'var(--red)':'var(--t4)';
+      return '<li style="list-style:none;font-size:.7rem;color:var(--t2);margin:3px 0;display:flex;gap:6px;align-items:flex-start"><span class="mono fw7" style="color:'+gc+';flex-shrink:0">'+esc(g)+'<\/span><span>'+esc(rest)+'<\/span><\/li>';
+    }).join('');
     vgHtml='<div style="margin-top:12px;background:var(--bg3);border:1px solid var(--bd);border-radius:6px;padding:10px">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px">'+
         '<span class="fw7 c-t1" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-shield-halved" style="margin-right:5px;color:'+vm.c+'"><\/i>Berkshire Value Gate<\/span>'+
@@ -953,12 +960,15 @@ function renderAdvisorScorecard(containerId,res,sym,opts){
       '<div class="c-t4" style="font-size:.6rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Mirror test<\/div>'+
       '<ul style="margin:0;padding:0">'+mirror+'<\/ul><\/div>';
   }
-  var convMap={High:'var(--grn)',Medium:'var(--amb)',Low:'var(--t4)'};
-  var convC=convMap[res.conviction]||'var(--t4)';
+  // Crypto is technical-only (no fundamentals/value gate) → conviction can never be "High", regardless of
+  // how the engine's grade-gate evolves. Clamp defensively so the intent is explicit at the UI boundary.
+  var convVal=res.conviction; if(isCrypto&&convVal==='High')convVal='Medium';
+  var convMap={High:'var(--grn)',Medium:'var(--amb)',Low:'var(--t3)'};
+  var convC=convMap[convVal]||'var(--t4)';
   el.innerHTML=
     '<div class="card-title"><i class="fa'+(isCrypto?'b fa-bitcoin':'s fa-people-group')+'" style="color:'+col+'"></i>FIN Investment Committee'+
       '<span class="rz-ap-chip" style="margin-left:8px;color:'+col+';border-color:'+col+'">'+esc(res.verdict)+'<\/span>'+
-      (res.conviction?'<span class="rz-ap-chip" style="margin-left:6px;color:'+convC+';border-color:'+convC+'">'+esc(res.conviction)+' conviction<\/span>':'')+
+      (convVal?'<span class="rz-ap-chip" style="margin-left:6px;color:'+convC+';border-color:'+convC+'">'+esc(convVal)+' conviction<\/span>':'')+
       '<span class="c-t4" style="margin-left:auto;font-size:.66rem;font-weight:400">'+(res.panels||[]).length+' panels &middot; confidence '+Math.round((res.confidence||0)*100)+'%'+(res.dataGrade?' &middot; grade '+esc(res.dataGrade):'')+'<\/span><\/div>'+cryptoNote+
     '<div class="rz-ap-panel"><div class="rz-ap-left">'+
       '<div class="rz-ap-gauge">'+renderGaugeSvg(res.score,res.verdict)+'<\/div>'+
@@ -1624,6 +1634,9 @@ function esc(s){const d=document.createElement('div');d.textContent=s;return d.i
 // Whitelist a ticker to a safe charset before it goes into an onclick='…' JS-string attribute
 // (esc() does not escape quotes). Tickers are only [A-Za-z0-9.^=-], so anything else is dropped.
 function finSym(s){return String(s==null?'':s).replace(/[^A-Za-z0-9.^=_-]/g,'')}
+// CoinGecko ids are lowercase hyphen slugs (bitcoin, shiba-inu). Tighter than finSym — NO dots —
+// so a malformed API id can't smuggle a `..` path-traversal into the /coins/<id> URL.
+function cgSlug(s){return String(s==null?'':s).toLowerCase().replace(/[^a-z0-9-]/g,'').slice(0,80)}
 // Reject javascript:/data: (and other non-http) schemes before putting a value in an href.
 function safeUrl(u){if(!u||typeof u!=='string')return '#';const s=u.trim();if(/^(https?:)?\/\//i.test(s)||s.startsWith('/')||s.startsWith('#'))return u;return '#'}
 
@@ -2481,6 +2494,10 @@ function setScreenerMode(mode){
   $('screenerTable').querySelector('thead').innerHTML='';
   $('screenerTable').querySelector('tbody').innerHTML='';
   $('screenerCount').textContent='0';
+  var sd=$('screenerDisclaimer');
+  if(sd)sd.innerHTML=(mode==='crypto')
+    ?'<i class="fas fa-triangle-exclamation" style="opacity:.8;color:var(--amb)"></i> Crypto FIN Score is a <b>technical-only</b> read (momentum · liquidity · volatility — no fundamentals or value gate) and crypto is <b>high-risk / highly volatile</b>. <b>Educational analysis only, not investment advice and not a licensed financial advisor.</b>'
+    :'<i class="fas fa-circle-info" style="opacity:.7"></i> FIN Score is a transparent multi-factor read (value · quality · momentum · dividend · liquidity · float · technical) by the shared FIN Engine — <b>educational analysis only, not investment advice and not a licensed financial advisor</b>. Indonesian (.JK) stocks score on price/momentum/liquidity (fundamentals limited on free data).';
 }
 
 function renderPresets(){
@@ -2546,14 +2563,14 @@ async function runCryptoScreen(){
   const minMcap=parseFloat($('scrMinMcap')?.value)||0;
   const chgFilter=$('scrChg')?.value||'';
   try{
-    let coins=CACHE.get('cg_markets_7d',300000);
-    if(!coins){coins=await cg('/coins/markets',{vs_currency:'usd',order:'market_cap_desc',per_page:100,page:1,price_change_percentage:'24h,7d'});CACHE.set('cg_markets_7d',coins)}
+    let coins=CACHE.get('cg_markets_30d',300000);
+    if(!coins){coins=await cg('/coins/markets',{vs_currency:'usd',order:'market_cap_desc',per_page:100,page:1,price_change_percentage:'24h,30d'});CACHE.set('cg_markets_30d',coins)}
     let mapped=(coins||[]).filter(c=>{
       if(minMcap&&c.market_cap<minMcap)return false;
       if(chgFilter==='up'&&c.price_change_percentage_24h<=0)return false;
       if(chgFilter==='down'&&c.price_change_percentage_24h>=0)return false;
       return true;
-    }).map(c=>({sym:c.symbol.toUpperCase(),name:c.name,price:c.current_price,chgPct:c.price_change_percentage_24h,chg1m:c.price_change_percentage_7d_in_currency,mcap:c.market_cap,vol:c.total_volume,img:c.image,id:c.id}));
+    }).map(c=>({sym:c.symbol.toUpperCase(),name:c.name,price:c.current_price,chgPct:c.price_change_percentage_24h,chg1m:c.price_change_percentage_30d_in_currency,mcap:c.market_cap,vol:c.total_volume,img:c.image,id:c.id}));
     // FIN Engine scores coins on the factors it CAN read for crypto — momentum + liquidity + volatility
     // (no fundamentals/value). Technical-only, re-normalized; confidence reflects the missing factors.
     if(window.FINEngine&&FINEngine.models.score){ mapped=FINEngine.models.score.rank(mapped,{preset:'momentum',market:'us'}); }
@@ -2586,8 +2603,9 @@ function renderScreenerResults(){
   tbody.innerHTML=page.map(r=>{
     const isID=/\.JK$/.test(r.sym), disp=r.sym.replace(/\.JK$/,'');
     const px=(r.price==null)?'--':(isID?('Rp'+fmt(r.price)):('$'+(r.price>=1?fmtP(r.price):r.price.toFixed(6))));
-    // Crypto rows open the coin detail (with its technical-only committee); stock rows open selectStock.
-    const click=(S.scrMode==='crypto'&&r.id)?`openCryptoDetail('${finSym(r.id)}')`:`selectStock('${finSym(r.sym)}')`;
+    // Crypto rows carry a CoinGecko id (stock rows never do) → open the coin detail + its technical-only
+    // committee; stock rows open selectStock. Keying on r.id (not S.scrMode) survives mode-state races.
+    const click=r.id?`openCryptoDetail('${cgSlug(r.id)}')`:`selectStock('${finSym(r.sym)}')`;
     return `<tr style="cursor:pointer" onclick="${click}" title="Open ${esc(disp)}">
     <td class="c-t4 mono">${r.rank||''}</td>
     <td class="fw7 c-t1">${esc(disp)}</td>
@@ -3259,8 +3277,11 @@ async function checkAlerts(){
    SECTION 22: CRYPTO DETAIL VIEW
    ═══════════════════════════════════════════════════════════════ */
 async function openCryptoDetail(coinId){
+  coinId=cgSlug(coinId);if(!coinId)return;
   $('cryptoDetail').style.display='block';
   $('cryptoDetailHeader').textContent='Loading...';
+  // Reset the per-coin committee card so a prior coin's result never lingers while this one loads.
+  var _cc=$('cryptoDetailCommittee');if(_cc){_cc.style.display='none';_cc.innerHTML='';}
   try{
     const [coin,chart]=await Promise.all([
       cg('/coins/'+coinId,{localization:'false',tickers:'false',community_data:'false',developer_data:'false'}),
@@ -3324,7 +3345,7 @@ async function openCryptoDetail(coinId){
     ].map(i=>`<div class="card" style="padding:10px;text-align:center"><div class="c-t4" style="font-size:.65rem;margin-bottom:2px">${i.l}</div><div class="${i.c} fw7">${i.v}</div></div>`).join('')}</div>`;
   }catch(e){$('cryptoDetailHeader').textContent='Error loading coin data';console.error(e)}
 }
-function closeCryptoDetail(){$('cryptoDetail').style.display='none';destroyChart('cryptoDetail')}
+function closeCryptoDetail(){$('cryptoDetail').style.display='none';destroyChart('cryptoDetail');var cc=$('cryptoDetailCommittee');if(cc){cc.style.display='none';cc.innerHTML='';}}
 function updCryptoConv(){const amt=parseFloat($('ccAmt').value)||0;$('ccResult').textContent='= $'+fmtP(amt*S._ccPrice)}
 
 /* ═══════════════════════════════════════════════════════════════

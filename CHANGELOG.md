@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v1.53.2 — 2026-07-12 (Finance Terminal — committee/crypto review polish: correctness + UIUX)
+
+### Fixed
+- **Crypto momentum fed the wrong period** — the screener mapped CoinGecko's 7-day change into the FIN
+  Engine's 1-month momentum field (`chg1m`); now requests and maps the true **30-day** change so the momentum
+  factor isn't skewed by short-window pumps.
+- **Tighter CoinGecko id sanitizer** — new `cgSlug()` (`[a-z0-9-]`, no dots) sanitizes coin ids at
+  `openCryptoDetail`, so a malformed API id can't smuggle a `..` path segment into the `/coins/<id>` URL
+  (defence-in-depth; `finSym` kept dots for tickers).
+- **Stale committee card** — the crypto detail modal now clears `#cryptoDetailCommittee` on open and close,
+  so a prior coin's committee never lingers while the next one loads.
+- **Screener row routing** now keys on the presence of a CoinGecko id (stock rows never carry one) instead of
+  the mutable `S.scrMode`, surviving mode-state races.
+- **Explicit crypto conviction cap** — the scorecard clamps conviction to at most **Medium** for crypto at the
+  UI boundary (technical-only → never "High"), independent of how the engine's grade-gate evolves.
+
+### Changed
+- **UIUX polish** (uiux review): Low-conviction chip lifted off `--t4` (was below AA at 0.62rem); Mirror-Test
+  lines now carry a colored ✓/✗/— glyph for checklist hierarchy parity with Bull/Bear; committee gauge color
+  stops routed through the shared `--grn/--amb/--red/--t3` tokens (kills the twin-green/twin-red drift).
+- Crypto screener footer now shows a **technical-only / high-risk** disclaimer (vs the stock multi-factor one).
+- Gateway candle-fetch failures now log a diagnostic warning instead of failing silently.
+
+Reviewed (code + security + uiux). Educational analysis only — not investment advice, not a licensed advisor;
+no price targets/position sizing. See `standarization/FIN_ENGINE.md`.
+
+---
+
 ## v1.53.1 — 2026-07-12 (Finance Terminal — crypto market: technical-only FIN committee + scored crypto screener)
 
 ### Added
