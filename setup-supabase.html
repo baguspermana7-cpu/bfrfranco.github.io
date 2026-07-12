@@ -37,7 +37,12 @@
     .warn { background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); border-radius:9px; padding:10px 13px; font-size:0.85rem; margin:12px 0; }
     a { color:#60a5fa; }
     .foot { color:#64748b; font-size:0.75rem; margin-top:20px; }
-  </style>
+  /* a11y (v1.52.10) */
+.foot { color:#94a3b8 !important; }
+.step h2 .num, button[data-copy] { background:#1d4ed8 !important; border-color:#1d4ed8 !important; }
+[data-theme="dark"] [style*="color: #64748b"], [data-theme="dark"] [style*="color:#64748b"], .setup-note { color:#94a3b8 !important; }
+:root:not([data-theme="dark"]) .setup-note { color:#475569 !important; }
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -54,7 +59,7 @@
     </ol>
     <div class="codewrap">
       <button class="copybtn" data-copy="sql">Copy</button>
-      <pre id="sql">-- FULL HARDENED SCHEMA (idempotent — safe to re-run; supersedes any earlier run).
+      <pre tabindex="0" id="sql">-- FULL HARDENED SCHEMA (idempotent — safe to re-run; supersedes any earlier run).
 -- profiles has NO client insert/update path: rows are created only by the signup trigger,
 -- and tier is changed only by the admin_set_tier() RPC (root-checked, tier-only, lockout-safe).
 
@@ -171,7 +176,7 @@ revoke execute on function public.admin_set_tier(uuid, text) from anon;</pre>
     <p style="font-weight:700;color:#f1f5f9;margin:12px 0 4px;">Cara B — 1 baris SQL (akun tetap, klik Copy):</p>
     <div class="codewrap">
       <button class="copybtn" data-copy="confirmsql">Copy</button>
-      <pre id="confirmsql">update auth.users set email_confirmed_at = now() where email = 'bagusdpermana7@gmail.com';</pre>
+      <pre tabindex="0" id="confirmsql">update auth.users set email_confirmed_at = now() where email = 'bagusdpermana7@gmail.com';</pre>
     </div>
     <p style="font-size:0.82rem;color:#94a3b8;">SQL Editor → New query → Copy di atas → paste → Run → "Success. 1 row affected" → login lagi.</p>
   </div>
@@ -206,7 +211,7 @@ revoke execute on function public.admin_set_tier(uuid, text) from anon;</pre>
     </ol>
     <div class="codewrap">
       <button class="copybtn" data-copy="edgecode">Copy</button>
-      <pre id="edgecode">// ============================================================================
+      <pre tabindex="0" id="edgecode">// ============================================================================
 // admin-users — Supabase Edge Function (Deno) for resistancezero.com
 //
 // The ONLY place the service_role key is used. Lets a signed-in ROOT user (from
@@ -410,7 +415,7 @@ Deno.serve(async (req: Request) =&gt; {
     </ol>
     <div class="codewrap">
       <button class="copybtn" data-copy="cf">Copy</button>
-      <pre id="cf">localStorage.setItem('rz_ft_gw','https://GANTI-DENGAN-URL-WORKER-ANDA.workers.dev');
+      <pre tabindex="0" id="cf">localStorage.setItem('rz_ft_gw','https://GANTI-DENGAN-URL-WORKER-ANDA.workers.dev');
 localStorage.setItem('rz_ft_v2','1');
 location.reload();</pre>
     </div>

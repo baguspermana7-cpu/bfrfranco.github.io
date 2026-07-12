@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.52.10 — 2026-07-12 (Accessibility — confirmation sweep residuals: site-wide zero verified)
+
+**Changed** — the post-completion full-site confirmation sweep (114 pages, scroll-through
+fidelity) surfaced 45 residual nodes on 8 pages, all fixed to 0/0:
+- Pages that entered the site during the sweep window: `setup-supabase.html`,
+  `account.html`, `article-9-paper.html` (white-on-`#3b82f6` buttons → `#1d4ed8`,
+  focusable `pre` blocks, footer gray).
+- `compare-ups-online-vs-offline.html` — missed from the compare-family batch (same
+  accent-split treatment as its 9 siblings).
+- Small residuals: `article-15` formula labels on the cream panel, `dc-conventional`
+  live badge one notch, `chiller-plant` scrollable section, `water-system`
+  (`--text-faint` token + cookie button; its live ticker blocks `networkidle2` —
+  measured with `load` + settle).
+
+**Every content page now measures 0 critical/serious axe violations in both themes**,
+confirmed by the full-site sweep (sole exclusions: 2 parallel-stream pages).
+
 ## v1.52.9 — 2026-07-12 (Accessibility — full-site sweep COMPLETE: final 12 pages to zero)
 
 **Changed** — the last pages of the site-wide axe sweep, per-page probe 0/0 both themes:
