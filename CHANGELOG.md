@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v1.53.0 — 2026-07-12 (FIN Engine — Berkshire Value Gate + conviction in the Investment Committee)
+
+### Added
+- **`fin-engine.js` `models.valueGate`** — a deterministic Buffett/Munger value screen (adapted from
+  xbtlin/ai-berkshire, **no LLM**): hard checks (ROE ≥ 15%, Debt/Equity ≤ 0.5, net margin ≥ 10%, P/E ≤ market
+  median, earnings-yield ≥ risk-free) + a sector-baseline **moat** heuristic (1–5★, durability bumps from
+  ROE/margin) + a weighted composite (valuation·0.30 / moat·0.25 / growth·0.20 / risk·0.15 / certainty·0.10)
+  → **Pass / Gray / Fail** with a ≤5-point **Mirror Test** rationale and an **A/B/C data grade**. A broken
+  balance sheet (D/E > 2) hard-caps the rating; no fundamental data → `null` (never guessed).
+- **Investment Committee `models.committee`** now convenes a **5th "Value (Berkshire)" panel** driven by
+  `valueGate` (present whenever fundamentals exist; skipped otherwise) and returns a descriptive
+  **`conviction`** (High / Medium / Low = consensus × confidence × panel agreement × data grade) plus the
+  surfaced `valueGate` verdict and `dataGrade`.
+- **Finance Terminal scorecard** renders the Berkshire Value Gate (Pass/Gray/Fail chip + moat + data grade +
+  Mirror Test) and shows the conviction + data grade in the committee header.
+
+### Changed
+- Committee weights rebalanced to seat the Value panel: Fundamental 0.25 / **Value 0.25** / Technical 0.20 /
+  Quant 0.20 / Risk 0.10.
+
+Educational analysis only — **not investment advice, not a licensed advisor**; every scored/committee/value-gate
+output carries `FINEngine.DISCLAIMER`. No price targets or position sizing (that would be personalized advice) —
+conviction and Pass/Gray/Fail are descriptive. Reviewed (code + security): thin-data moat floor, conviction
+data-grade gate, and full Mirror Test hardened; no XSS. Gate `tools/test-fin-engine.mjs` 354/354. See
+`standarization/FIN_ENGINE.md`.
+
+---
+
 ## v1.52.10 — 2026-07-12 (Accessibility — confirmation sweep residuals: site-wide zero verified)
 
 **Changed** — the post-completion full-site confirmation sweep (114 pages, scroll-through

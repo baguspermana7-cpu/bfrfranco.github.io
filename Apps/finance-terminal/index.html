@@ -10,7 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
 <!-- FIN Engine — shared finance brain (screener scoring + advisor scorecard). window.FINEngine -->
-<script src="../../fin-engine.min.js?v=2026-07-12-fin4"></script>
+<script src="../../fin-engine.min.js?v=2026-07-12-fin5"></script>
 <style>
 :root{--bg0:#0b1120;--bg1:#111827;--bg2:#1e293b;--bg3:#0f172a;--bd:#334155;--bd2:rgba(51,65,85,.4);--t1:#f1f5f9;--t2:#e2e8f0;--t3:#94a3b8;--t4:#64748b;--acc:#8b5cf6;--acc2:#a78bfa;--accbg:rgba(139,92,246,.1);--grn:#34d399;--grnbg:rgba(16,185,129,.15);--red:#f87171;--redbg:rgba(239,68,68,.15);--amb:#fbbf24;--ambbg:rgba(245,158,11,.15);--blu:#60a5fa;--blubg:rgba(96,165,250,.15);--cyn:#22d3ee;--sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;--mono:'JetBrains Mono',monospace;--r:14px;--rs:8px;--rx:6px}
 [data-theme="light"]{--bg0:#f8fafc;--bg1:#fff;--bg2:#fff;--bg3:#f1f5f9;--bd:#e2e8f0;--bd2:#f1f5f9;--t1:#1e293b;--t2:#334155;--t3:#64748b;--t4:#94a3b8}
@@ -919,17 +919,34 @@ function renderAdvisorScorecard(containerId,res,sym){
     if(!items||!items.length)return '<li class="c-t4" style="list-style:none">—<\/li>';
     return items.map(function(t){return '<li style="list-style:none;display:flex;gap:6px;align-items:flex-start;margin:3px 0"><i class="fas '+icon+'" style="color:'+color+';margin-top:3px;font-size:.7rem"><\/i><span>'+esc(t)+'<\/span><\/li>';}).join('');
   }
+  // Value Gate (Berkshire) block — Pass/Gray/Fail chip + moat + ≤5-point Mirror Test.
+  var vgHtml='';var vg=res.valueGate;
+  if(vg&&vg.rating){
+    var vgMap={pass:{c:'var(--grn)',bg:'var(--grnbg)',t:'PASS'},gray:{c:'var(--amb)',bg:'var(--ambbg)',t:'GRAY'},fail:{c:'var(--red)',bg:'var(--redbg)',t:'FAIL'}};
+    var vm=vgMap[vg.rating]||vgMap.gray;
+    var mirror=(vg.mirrorTest||[]).slice(0,5).map(function(m){return '<li style="list-style:none;font-size:.7rem;color:var(--t2);margin:2px 0">'+esc(m)+'<\/li>';}).join('');
+    vgHtml='<div style="margin-top:12px;background:var(--bg3);border:1px solid var(--bd);border-radius:6px;padding:10px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px">'+
+        '<span class="fw7 c-t1" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-shield-halved" style="margin-right:5px;color:'+vm.c+'"><\/i>Berkshire Value Gate<\/span>'+
+        '<span class="rz-ap-chip" style="background:'+vm.bg+';color:'+vm.c+';border-color:'+vm.c+'">'+vm.t+' '+(vg.score!=null?vg.score:'')+'<\/span><\/div>'+
+      '<div class="c-t4" style="font-size:.64rem;margin-bottom:5px">Moat '+vg.moat+'/5 (sector heuristic, not issuer-specific) &middot; data grade '+esc(vg.dataGrade||'—')+'<\/div>'+
+      '<div class="c-t4" style="font-size:.6rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Mirror test<\/div>'+
+      '<ul style="margin:0;padding:0">'+mirror+'<\/ul><\/div>';
+  }
+  var convMap={High:'var(--grn)',Medium:'var(--amb)',Low:'var(--t4)'};
+  var convC=convMap[res.conviction]||'var(--t4)';
   el.innerHTML=
     '<div class="card-title"><i class="fas fa-people-group" style="color:'+col+'"></i>FIN Investment Committee'+
       '<span class="rz-ap-chip" style="margin-left:8px;color:'+col+';border-color:'+col+'">'+esc(res.verdict)+'<\/span>'+
-      '<span class="c-t4" style="margin-left:auto;font-size:.66rem;font-weight:400">'+(res.panels||[]).length+' panels &middot; confidence '+Math.round((res.confidence||0)*100)+'%<\/span><\/div>'+
+      (res.conviction?'<span class="rz-ap-chip" style="margin-left:6px;color:'+convC+';border-color:'+convC+'">'+esc(res.conviction)+' conviction<\/span>':'')+
+      '<span class="c-t4" style="margin-left:auto;font-size:.66rem;font-weight:400">'+(res.panels||[]).length+' panels &middot; confidence '+Math.round((res.confidence||0)*100)+'%'+(res.dataGrade?' &middot; grade '+esc(res.dataGrade):'')+'<\/span><\/div>'+
     '<div class="rz-ap-panel"><div class="rz-ap-left">'+
       '<div class="rz-ap-gauge">'+renderGaugeSvg(res.score,res.verdict)+'<\/div>'+
       '<div style="text-align:center;font-size:.62rem;color:var(--t4);text-transform:uppercase;letter-spacing:.5px;margin-top:-6px">Committee Consensus<\/div>'+
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">'+
         '<div><div style="font-size:.66rem;font-weight:700;color:var(--grn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Bull case<\/div><ul style="margin:0;padding:0;font-size:.72rem">'+caseList(res.bullCase,'fa-plus','var(--grn)')+'<\/ul><\/div>'+
         '<div><div style="font-size:.66rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Bear case<\/div><ul style="margin:0;padding:0;font-size:.72rem">'+caseList(res.bearCase,'fa-minus','var(--red)')+'<\/ul><\/div>'+
-      '<\/div>'+
+      '<\/div>'+vgHtml+
     '<\/div><div class="rz-ap-right"><div style="display:grid;grid-template-columns:1fr;gap:8px">'+panels+'<\/div>'+
       '<p style="font-size:.64rem;color:var(--t4);font-style:italic;margin:10px 0 0;line-height:1.5">'+esc(res.disclaimer||'')+'<\/p><\/div><\/div>';
 }

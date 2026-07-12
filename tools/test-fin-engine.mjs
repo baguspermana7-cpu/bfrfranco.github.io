@@ -134,16 +134,50 @@ ok('score presets differ', valuePreset.score !== momoPreset.score || valuePreset
     const c2 = M.committee.run(cstock, candles, { preset: 'balanced', market: 'us' });
     ok('committee score 0..100', c1.score >= 0 && c1.score <= 100);
     eq('committee deterministic', c1.score, c2.score);
-    ok('committee has 4 panels', c1.panels.length === 4);
-    eq('committee panels order', c1.panels.map(p => p.name).join(','), 'Fundamental,Technical,Quant,Risk');
+    ok('committee has 5 panels', c1.panels.length === 5);
+    eq('committee panels order', c1.panels.map(p => p.name).join(','), 'Fundamental,Value,Technical,Quant,Risk');
     ok('committee every panel has score+signals', c1.panels.every(p => typeof p.score === 'number' && Array.isArray(p.signals)));
     ok('committee verdict set', typeof c1.verdict === 'string' && c1.verdict.length > 0);
     ok('committee confidence in (0,1]', c1.confidence > 0 && c1.confidence <= 1);
+    ok('committee conviction set', ['High', 'Medium', 'Low'].indexOf(c1.conviction) >= 0);
+    eq('committee conviction deterministic', c1.conviction, c2.conviction);
+    ok('committee surfaces valueGate', c1.valueGate && ['pass', 'gray', 'fail'].indexOf(c1.valueGate.rating) >= 0);
+    ok('committee dataGrade set', ['A', 'B', 'C'].indexOf(c1.dataGrade) >= 0);
     ok('committee has bull or bear case', c1.bullCase.length > 0 || c1.bearCase.length > 0);
     ok('committee carries disclaimer', c1.disclaimer === E.DISCLAIMER);
     const cNo = M.committee.run(cstock, [], { preset: 'balanced', market: 'us' });
-    ok('committee no-candles → fundamental only, confidence<1', cNo.panels.length === 1 && cNo.confidence < 1);
+    ok('committee no-candles → fundamental+value only, confidence<1', cNo.panels.length === 2 && cNo.confidence < 1);
     ok('committee alpha provenance sourced', !!D.sources['alphas.momentum_12_1'] && !!D.sources['committee']);
+    // Technical-only stock (no fundamentals) must NOT reach High conviction — data grade caps it.
+    const cTech = M.committee.run({}, candles, { preset: 'balanced', market: 'us' });
+    ok('committee technical-only → no valueGate, dataGrade null', cTech.valueGate === null && cTech.dataGrade === null);
+    ok('committee technical-only → conviction not High', cTech.conviction !== 'High');
+}
+
+/* ── valueGate (deterministic Berkshire value screen) ── */
+{
+    const passer = M.valueGate.run({ roe: 0.25, debtEquity: 0.3, netMargin: 0.2, pe: 12, sector: 'Technology' }, { market: 'us' });
+    ok('valueGate passer rating=pass', passer.rating === 'pass');
+    ok('valueGate passer score high', passer.score >= 65);
+    ok('valueGate passer dataGrade A', passer.dataGrade === 'A');
+    ok('valueGate passer moat 1..5', passer.moat >= 1 && passer.moat <= 5);
+    ok('valueGate passer mirrorTest ≤5', Array.isArray(passer.mirrorTest) && passer.mirrorTest.length <= 5 && passer.mirrorTest.length > 0);
+    ok('valueGate passer checks all pass', passer.checks.every(c => c.pass === true));
+    ok('valueGate carries disclaimer', passer.disclaimer === E.DISCLAIMER);
+
+    const failer = M.valueGate.run({ roe: 0.03, debtEquity: 1.8, netMargin: 0.02, pe: 45, sector: 'Energy' }, { market: 'us' });
+    ok('valueGate failer rating=fail', failer.rating === 'fail');
+    ok('valueGate failer score low', failer.score < 45);
+
+    const capped = M.valueGate.run({ roe: 0.30, debtEquity: 3.0, netMargin: 0.25, pe: 8, sector: 'Technology' }, { market: 'us' });
+    ok('valueGate D/E>2 hard-cap → not pass', capped.rating !== 'pass');
+
+    const noData = M.valueGate.run({ sector: 'Technology' }, { market: 'us' });
+    ok('valueGate no-data → rating null, grade C', noData.rating === null && noData.dataGrade === 'C');
+
+    const d1 = M.valueGate.run({ roe: 0.25, debtEquity: 0.3, netMargin: 0.2, pe: 12, sector: 'Technology' }, { market: 'us' });
+    eq('valueGate deterministic', JSON.stringify(d1.checks), JSON.stringify(passer.checks));
+    ok('valueGate provenance sourced', !!D.sources['valueGate'] && !!D.sources['peMedian'] && !!D.sources['moatBySector']);
 }
 
 /* ── format ── */

@@ -178,6 +178,23 @@
         // Free-float health bands (reuses the StockMap taxonomy).
         floatBands: { trap: 0.05, tight: 0.15, institutional: 0.35 },
 
+        // Berkshire-style value-gate config (adapted from xbtlin/ai-berkshire, deterministic).
+        valueGate: {
+            roeMin: 0.15,        // sustained ROE quality threshold
+            deMax: 0.5,          // Debt/Equity — quality businesses stay below this
+            marginMin: 0.10,     // healthy net margin
+            weights: { valuation: 0.30, moat: 0.25, growth: 0.20, risk: 0.15, certainty: 0.10 },
+            pass: 65, gray: 45   // composite score → pass ≥65, gray 45-64, fail <45
+        },
+        // Market P/E medians for the "PE below median" value check.
+        peMedian: { US: 20, ID: 15 },
+        // Baseline economic-moat score by sector (1-5) — heuristic proxy (durable-franchise sectors higher).
+        moatBySector: {
+            'Technology': 4, 'Consumer Staples': 4, 'Healthcare': 4, 'Communication': 3,
+            'Consumer Discretionary': 3, 'Financials': 3, 'Industrials': 3, 'Utilities': 3,
+            'Real Estate': 3, 'Energy': 2, 'Materials': 2, 'default': 3
+        },
+
         // Sourced IDX fundamentals (free-float from issuer ownership disclosures; pe/pb/roe are
         // issuer-disclosure SNAPSHOTS, per-ticker as-of — NOT live). Lets the Indonesian screener +
         // scorecard score the Free-float (and some Value/Quality) factors, since Finnhub free has no
@@ -234,6 +251,9 @@
             'alphas.trend_200': { source: 'Standard trend-following (price vs 200-day MA + slope)', asOf: '2026', method: 'engine methodology' },
             'alphas.vol_trend': { source: 'Volume-interest heuristic (5-day vs 60-day avg volume)', asOf: '2026', method: 'engine methodology' },
             'committee': { source: 'Engine methodology — deterministic multi-panel consensus (adapts Vibe-Trading swarm pattern WITHOUT an LLM)', asOf: '2026', method: 'fundamental/technical/quant/risk panels vote → consensus + bull/bear case' },
+            'valueGate': { source: 'xbtlin/ai-berkshire methodology + Buffett/Munger value criteria + Damodaran', asOf: '2026', method: 'ROE≥15% / D-E≤0.5 / margin / PE<median / moat → weighted composite → Pass/Gray/Fail (deterministic, no LLM; no price targets or position sizing)' },
+            'peMedian': { source: 'Long-run market P/E medians (S&P 500 ~US / IDX ~ID)', asOf: '2026', unit: 'ratio' },
+            'moatBySector': { source: 'Engine heuristic — durable-franchise proxy by GICS sector', asOf: '2026', method: '1-5 baseline; not a rating of a specific issuer' },
             'verdictBands': { source: 'Engine methodology — composite score → descriptive verdict', asOf: '2026', method: 'descriptive, not prescriptive' }
         },
 
@@ -712,6 +732,70 @@
         factorLabel: floatLabel
     };
 
+    /* ── valueGate: deterministic Buffett/Munger value screen (adapted from ai-berkshire, NO LLM).
+     *    Hard checks + a weighted composite → Pass/Gray/Fail, a "Mirror Test" (≤5 plain reasons), a moat
+     *    heuristic, and a data-grade. Descriptive only — NO price targets / position sizing. ── */
+    var valueGate = {
+        run: function (stock, opts) {
+            stock = stock || {}; opts = opts || {};
+            var vg = DATA.valueGate, market = (opts.market && String(opts.market).toUpperCase() === 'ID') ? 'ID' : 'US';
+            var peMed = DATA.peMedian[market] || DATA.peMedian.US;
+            var checks = [], mirror = [], have = 0, tot = 0;
+
+            function check(name, ok, detail) { tot++; if (ok != null) have++; checks.push({ name: name, pass: ok, detail: detail }); mirror.push((ok == null ? '— ' : (ok ? '✓ ' : '✗ ')) + detail); }
+            // Hard value checks (each null when its input is missing).
+            var roeOk = isNum(stock.roe) ? stock.roe >= vg.roeMin : null;
+            check('ROE ≥ 15%', roeOk, isNum(stock.roe) ? ('ROE ' + Math.round(stock.roe * 100) + '% ' + (roeOk ? '≥' : '<') + ' 15%') : 'ROE n/a');
+            var deOk = isNum(stock.debtEquity) ? stock.debtEquity <= vg.deMax : null;
+            check('Debt/Equity ≤ 0.5', deOk, isNum(stock.debtEquity) ? ('D/E ' + r2(stock.debtEquity) + ' ' + (deOk ? '≤' : '>') + ' 0.5') : 'D/E n/a');
+            var mgOk = isNum(stock.netMargin) ? stock.netMargin >= vg.marginMin : null;
+            check('Net margin ≥ 10%', mgOk, isNum(stock.netMargin) ? ('Margin ' + Math.round(stock.netMargin * 100) + '%') : 'margin n/a');
+            var peOk = isNum(stock.pe) && stock.pe > 0 ? stock.pe <= peMed : null;
+            check('P/E ≤ market median', peOk, (isNum(stock.pe) && stock.pe > 0) ? ('P/E ' + r2(stock.pe) + ' vs ' + peMed + ' median') : 'P/E n/a');
+            // Earnings yield vs a nominal risk-free proxy (from market riskFree).
+            var rf = (DATA.markets[market] || DATA.markets.US).riskFree;
+            var ey = (isNum(stock.pe) && stock.pe > 0) ? 1 / stock.pe : null;
+            var eyOk = ey == null ? null : ey >= rf;
+            check('Earnings yield ≥ risk-free', eyOk, ey == null ? 'yield n/a' : ('Earnings yield ' + Math.round(ey * 100) + '% vs rf ' + Math.round(rf * 100) + '%'));
+
+            // Moat (heuristic): sector baseline (1-5) + durability bumps from ROE/margin.
+            var moat = DATA.moatBySector[stock.sector] || DATA.moatBySector['default'];
+            if (isNum(stock.roe) && stock.roe >= 0.20) moat += 0.5;
+            if (isNum(stock.netMargin) && stock.netMargin >= 0.20) moat += 0.5;
+            moat = clamp(Math.round(moat * 2) / 2, 1, 5);
+
+            // Component scores (0-100), re-normalized over those with data.
+            var B = DATA.scoreBands;
+            var comp = {
+                valuation: factorValue(stock, B),
+                moat: Math.round((moat / 5) * 100),
+                growth: isNum(stock.roe) ? normBand(stock.roe, B.roe) : (isNum(stock.chgPct) ? normBand(stock.chgPct, B.chgPct) : null),
+                risk: isNum(stock.debtEquity) ? normBand(stock.debtEquity, B.debtEquity) : null,
+                certainty: null // set from data-grade below
+            };
+            // Data breadth = distinct fundamental INPUTS present (pe feeds two checks, so count inputs not checks).
+            var inputs = [isNum(stock.roe), isNum(stock.debtEquity), isNum(stock.netMargin), (isNum(stock.pe) && stock.pe > 0)].filter(function (x) { return x; }).length;
+            var dataGrade = inputs >= 4 ? 'A' : inputs >= 2 ? 'B' : 'C';
+            comp.certainty = dataGrade === 'A' ? 85 : dataGrade === 'B' ? 60 : 35;
+            // Thin data: moat (sector heuristic) + certainty must NOT act as a scoring floor with <2 real inputs.
+            if (inputs < 2) { comp.moat = null; comp.certainty = null; }
+
+            var W = vg.weights, num = 0, ws = 0;
+            for (var k in W) { if (W.hasOwnProperty(k) && comp[k] != null) { num += comp[k] * W[k]; ws += W[k]; } }
+            // Need at least one real fundamental input — moat+certainty alone can't judge value.
+            var scoreV = (inputs > 0 && ws > 0) ? Math.round(num / ws) : null;
+            // Hard-rule overrides: a broken balance sheet (D/E>2) OR too-thin data (<2 inputs) can't earn a Pass.
+            var capped = (isNum(stock.debtEquity) && stock.debtEquity > 2) || inputs < 2;
+            var rating = scoreV == null ? null
+                : (scoreV >= vg.pass ? (capped ? 'gray' : 'pass') : scoreV >= vg.gray ? 'gray' : 'fail');
+
+            return {
+                rating: rating, score: scoreV, checks: checks, moat: moat,
+                mirrorTest: mirror.slice(0, 5), dataGrade: dataGrade, components: comp, disclaimer: DISCLAIMER
+            };
+        }
+    };
+
     /* ── portfolio ── */
     var portfolio = {
         equalWeights: function (n) { if (!n || n <= 0) return []; var w = 1 / n, a = []; for (var i = 0; i < n; i++) a.push(w); return a; },
@@ -751,7 +835,7 @@
     /* ── committee: the deterministic "Investment Committee". Adapts Vibe-Trading's multi-agent swarm
      *    (analysts debate → consensus with a bull case + bear case) into fixed rule-based PANELS — NO LLM.
      *    Every output is a descriptive, disclaimed read (never a prediction). ── */
-    var COMMITTEE_WEIGHTS = { Fundamental: 0.35, Technical: 0.25, Quant: 0.25, Risk: 0.15 };
+    var COMMITTEE_WEIGHTS = { Fundamental: 0.25, Value: 0.25, Technical: 0.20, Quant: 0.20, Risk: 0.10 };
     function verdictFromScore(s) { return s == null ? null : verdictFor(s); }
     var committee = {
         /**
@@ -778,7 +862,19 @@
                 panels.push({ name: 'Fundamental', score: f.score, verdict: f.verdict, signals: fsig });
             }
 
-            // ── Panel 2: Technical (reuses models.technical) ──
+            // ── Panel 2: Value (Berkshire gate) — deterministic Buffett/Munger screen ──
+            var vg = valueGate.run(stock, opts);
+            if (vg.score != null) {
+                var vsig = vg.checks.filter(function (c) { return c.pass != null; }).map(function (c) { return c.detail; });
+                vsig.push('Moat ' + vg.moat + '/5');
+                panels.push({ name: 'Value', score: vg.score, verdict: verdictFromScore(vg.score), signals: vsig });
+                if (vg.rating === 'pass') bull.push({ w: 75, t: 'Passes the Berkshire value gate (quality + valuation)' });
+                else if (vg.rating === 'fail') bear.push({ w: 65, t: 'Fails the Berkshire value gate' });
+                if (vg.moat >= 4) bull.push({ w: 60, t: 'Wide moat (' + vg.moat + '/5)' });
+                else if (vg.moat <= 2) bear.push({ w: 50, t: 'Narrow moat (' + vg.moat + '/5)' });
+            }
+
+            // ── Panel 3: Technical (reuses models.technical) ──
             if (candles.length) {
                 var an = analyze(candles), g = an.gauge.score;
                 var tsig = [an.signals.trend, an.signals.momentum, 'MA ' + an.signals.ma_cross, an.signals.volatility + ' vol'];
@@ -791,7 +887,7 @@
                 if (an.signals.momentum === 'Oversold') bull.push({ w: 55, t: 'RSI oversold (bounce candidate)' });
             }
 
-            // ── Panel 3: Quant / Factor Zoo (models.alphas) ──
+            // ── Panel 4: Quant / Factor Zoo (models.alphas) ──
             var az = alphas.compute(candles);
             if (az.composite != null) {
                 var qsig = Object.keys(az.items).map(function (k) { return az.items[k].label + ' ' + az.items[k].score; });
@@ -803,7 +899,7 @@
                 });
             }
 
-            // ── Panel 4: Risk (volatility + drawdown + illiquidity) ──
+            // ── Panel 5: Risk (volatility + drawdown + illiquidity) ──
             if (candles.length > 20) {
                 var closes = closesOf(candles), rets = retsFrom(closes);
                 var vol = risk.volatility(rets), mdd = risk.maxDrawdown(closes), illi = alphas.amihud_illiq(candles);
@@ -838,13 +934,26 @@
                 return out;
             }
 
+            // ── Conviction (descriptive, NOT a position size): consensus × confidence × panel agreement ──
+            var side = consensus == null ? 0 : (consensus >= 55 ? 1 : consensus <= 45 ? -1 : 0);
+            var agree = 0;
+            panels.forEach(function (pn) { var s = pn.score >= 55 ? 1 : pn.score <= 45 ? -1 : 0; if (s === side && side !== 0) agree++; });
+            var agreement = panels.length ? agree / panels.length : 0;
+            // High conviction needs real fundamentals at a decent grade — no-data or grade-C caps at Medium.
+            var gradeOk = vg.score != null && vg.dataGrade !== 'C';
+            var conviction = (side !== 0 && confidence >= 0.6 && agreement >= 0.66 && gradeOk) ? 'High'
+                : (side !== 0 && confidence >= 0.4 && agreement >= 0.5) ? 'Medium' : 'Low';
+
             return {
                 verdict: verdictFromScore(consensus),
                 score: consensus,
                 confidence: confidence,
+                conviction: conviction,
                 panels: panels,
                 bullCase: top(bull),
                 bearCase: top(bear),
+                valueGate: (vg.score != null ? vg : null),
+                dataGrade: (vg.score != null ? vg.dataGrade : null),
                 disclaimer: DISCLAIMER
             };
         }
@@ -921,6 +1030,7 @@
             risk: risk,
             score: score,
             alphas: alphas,
+            valueGate: valueGate,
             committee: committee,
             portfolio: portfolio
         },

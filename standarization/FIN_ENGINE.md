@@ -86,7 +86,25 @@ onto it; the engine instead *borrows* StockMap's float taxonomy (`floatBands`) +
   disclaimer}`. The **bull/bear case** = the strongest supporting vs opposing signals across panels — a
   deterministic stand-in for an agent debate. Descriptive, disclaimed; never a prediction (the backtest
   confirms the technical gauge isn't predictive). The terminal scorecard renders this as an Investment
-  Committee. **Planned:** a Berkshire-style Value Gate panel + crypto market.
+  Committee.
+
+## Berkshire Value Gate + conviction (v1.53.0 — deterministic adaptation of ai-berkshire, NO LLM)
+- **`models.valueGate.run(stock, opts)`** — a deterministic Buffett/Munger value screen (adapted from
+  **xbtlin/ai-berkshire**): hard checks — **ROE ≥ 15%**, **Debt/Equity ≤ 0.5**, **net margin ≥ 10%**,
+  **P/E ≤ market median** (`DATA.peMedian`), **earnings-yield ≥ risk-free** — each `null` when its input is
+  missing; a sector-baseline **moat** heuristic (`DATA.moatBySector`, 1–5★ with durability bumps from
+  ROE/margin); a **weighted composite** (`DATA.valueGate.weights` = valuation·0.30 / moat·0.25 / growth·0.20
+  / risk·0.15 / certainty·0.10, re-normalized over components with data) → **Pass / Gray / Fail**. Returns
+  `{ rating, score, checks[], moat, mirrorTest[≤5], dataGrade:'A'|'B'|'C', components, disclaimer }`. A broken
+  balance sheet (**D/E > 2**) hard-caps the rating to at most Gray; **no fundamental data → `rating:null`**
+  (moat+certainty alone can't judge value — never guessed). All thresholds/weights/medians live in `DATA` with
+  `DATA.sources` provenance (ai-berkshire methodology + Buffett/Damodaran).
+- **`models.committee`** seats a **5th "Value (Berkshire)" panel** driven by `valueGate` (present whenever
+  fundamentals exist, skipped otherwise). Weights rebalanced: Fundamental 0.25 / **Value 0.25** / Technical
+  0.20 / Quant 0.20 / Risk 0.10. The run now returns a descriptive **`conviction`** (High / Medium / Low from
+  consensus × confidence × panel agreement × data grade) plus the surfaced `valueGate` + `dataGrade`. The
+  terminal scorecard shows the Pass/Gray/Fail chip + moat + Mirror Test + conviction + data grade. **Planned:**
+  crypto market (technical-only committee).
 
 ## Gate — `tools/test-fin-engine.mjs` (SHIP GATE, mirrors `test-rz-engine.mjs`)
 Node-vm load + assertions: worked examples (ratios/valuation/technical/score/risk), **ta.js parity**
