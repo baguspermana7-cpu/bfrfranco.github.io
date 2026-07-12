@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.52.5 — 2026-07-12 (FIN Engine — broader IDX universe + clean Indonesian stock detail)
+
+**Added / Changed**
+- **IDX universe broadened toward LQ45** — +22 `.JK` names (ADRO, AMRT, GOTO, ISAT, MDKA, UNVR, …) in
+  both `cf-worker/src/symbols.js` (gateway) and `fin-engine.js` `DATA.universes.ID`, kept in sync (~47
+  tickers). Gate 292/292; gateway auto-deploys.
+- **Indonesian stock detail now clean end-to-end** — selecting a `.JK` stock sources its live quote from the
+  gateway (Yahoo), shows the company name/sector from the engine universe, renders the price in **IDR (Rp)**
+  and the IDR price chart, and **hides the Finnhub-only cards** (rating/peers/insider/S&R/targets/dividends/
+  filings/news/earnings) that have no IDX data — so the view is the hero + chart + analytics gauge + FIN
+  Advisor Scorecard, not a wall of empty cards. `renderStockHero` is now currency-aware. US detail unchanged.
+
 ## v1.52.4 — 2026-07-12 (FIN Engine — Indonesian stock scorecard works end-to-end)
 
 **Fixed** — clicking an Indonesian (`.JK`) stock in the terminal now yields a meaningful FIN Advisor

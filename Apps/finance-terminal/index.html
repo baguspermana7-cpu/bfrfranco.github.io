@@ -10,7 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
 <!-- FIN Engine — shared finance brain (screener scoring + advisor scorecard). window.FINEngine -->
-<script src="../../fin-engine.min.js?v=2026-07-12-fin2"></script>
+<script src="../../fin-engine.min.js?v=2026-07-12-fin3"></script>
 <style>
 :root{--bg0:#0b1120;--bg1:#111827;--bg2:#1e293b;--bg3:#0f172a;--bd:#334155;--bd2:rgba(51,65,85,.4);--t1:#f1f5f9;--t2:#e2e8f0;--t3:#94a3b8;--t4:#64748b;--acc:#8b5cf6;--acc2:#a78bfa;--accbg:rgba(139,92,246,.1);--grn:#34d399;--grnbg:rgba(16,185,129,.15);--red:#f87171;--redbg:rgba(239,68,68,.15);--amb:#fbbf24;--ambbg:rgba(245,158,11,.15);--blu:#60a5fa;--blubg:rgba(96,165,250,.15);--cyn:#22d3ee;--sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;--mono:'JetBrains Mono',monospace;--r:14px;--rs:8px;--rx:6px}
 [data-theme="light"]{--bg0:#f8fafc;--bg1:#fff;--bg2:#fff;--bg3:#f1f5f9;--bd:#e2e8f0;--bd2:#f1f5f9;--t1:#1e293b;--t2:#334155;--t3:#64748b;--t4:#94a3b8}
@@ -1641,6 +1641,16 @@ async function selectStock(sym){
   S.stockFilings=(filings.status==='fulfilled'?(Array.isArray(filings.value)?filings.value:[]):[]).slice(0,15);
   S.stockCompNews=(compNews.status==='fulfilled'?(Array.isArray(compNews.value)?compNews.value:[]):[]).slice(0,10);
   S.stockEarnings=(earnings.status==='fulfilled'?(Array.isArray(earnings.value)?earnings.value:[]):[]).slice(0,12);
+  // Indonesian (.JK): Finnhub has no IDX coverage → source the live quote from the gateway (Yahoo)
+  // + name/sector from the FIN Engine universe. The Finnhub-only cards (rating/peers/insider/… ) have
+  // no ID data, so they're hidden below — the hero + chart + analytics + FIN scorecard carry the view.
+  const isID=/\.JK$/.test(sym);
+  if(isID&&window.FINEngine){
+    try{ const idq=await gw('/q',{syms:sym}); const row=(Array.isArray(idq)?idq:(idq&&idq.data)||[])[0];
+      if(row) S.stockQ={c:row.price,dp:row.chgPct,d:row.chg,pc:row.prevClose,v:row.vol}; }catch(_){}
+    const uni=(FINEngine.data.universes.ID||[]).filter(x=>x.sym===sym)[0]||{};
+    S.stockProf={name:uni.name||sym,exchange:'IDX',finnhubIndustry:uni.sector||'',country:'ID',currency:'IDR',marketCapitalization:0};
+  }
   renderStockHero();
   renderStockProfile();
   renderStockRating();
@@ -1653,6 +1663,12 @@ async function selectStock(sym){
   renderSecFilings();
   renderCompanyNews();
   renderEarningsHistory();
+  // ID (.JK): hide the Finnhub-only cards (no IDX data) so the detail is clean, not empty — the hero +
+  // price chart + analytics gauge + FIN Advisor Scorecard (all gateway/engine-driven) carry it. US: show all.
+  ['stockProfile','stockRating','stockFinancials','stockPeers','stockInsider','stockSR','stockTargets','stockDividends','stockFilings','stockNews','stockEarnings'].forEach(id=>{
+    const inner=$(id), card=inner&&inner.closest?inner.closest('.card'):null;
+    if(card) card.style.display=isID?'none':'';
+  });
   initStockTfBar();
   // Set default indicator toggles
   document.querySelectorAll('#indicatorToggles .btn').forEach(b=>b.classList.toggle('active',S.indicators[b.dataset.ind]));
@@ -1670,22 +1686,22 @@ async function selectStock(sym){
 
 function renderStockHero(){
   const q=S.stockQ,p=S.stockProf;
+  const isID=/\.JK$/.test(S.curStock||''), cur=isID?'Rp':'$';
+  const px=v=>(v==null||!isFinite(v))?'--':cur+(isID?fmt(v):fmtP(v));
+  const meta=isID
+    ? `<div class="stock-meta-item">Prev Close <span>${px(q.pc)}</span></div><div class="stock-meta-item">Volume <span>${q.v?fmt(q.v):'--'}</span></div><div class="stock-meta-item">Market <span>🇮🇩 IDX</span></div>`
+    : `<div class="stock-meta-item">Open <span>${px(q.o)}</span></div><div class="stock-meta-item">High <span>${px(q.h)}</span></div><div class="stock-meta-item">Low <span>${px(q.l)}</span></div><div class="stock-meta-item">Prev Close <span>${px(q.pc)}</span></div>`;
   $('stockHero').innerHTML=`
   <div class="stock-info">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-      ${p.logo?`<img src="${p.logo}" alt="" style="width:40px;height:40px;border-radius:8px;object-fit:contain;background:#fff">`:''}
-      <div><div class="stock-name">${esc(p.name||S.curStock)}</div><div class="stock-sym">${S.curStock} &middot; ${esc(p.exchange||'')}</div></div>
+      ${p.logo?`<img src="${safeUrl(p.logo)}" alt="" style="width:40px;height:40px;border-radius:8px;object-fit:contain;background:#fff">`:''}
+      <div><div class="stock-name">${esc(p.name||S.curStock)}</div><div class="stock-sym">${esc((S.curStock||'').replace(/\.JK$/,''))} &middot; ${esc(p.exchange||'')}</div></div>
     </div>
-    <div class="stock-price" style="color:${chgColor(q.dp)}">$${fmtP(q.c)} <span class="stock-change" style="color:${chgColor(q.dp)}">${q.d>0?'+':''}${fmtP(q.d)} (${q.dp>0?'+':''}${fmtP(q.dp)}%)</span></div>
-    <div class="stock-meta">
-      <div class="stock-meta-item">Open <span>$${fmtP(q.o)}</span></div>
-      <div class="stock-meta-item">High <span>$${fmtP(q.h)}</span></div>
-      <div class="stock-meta-item">Low <span>$${fmtP(q.l)}</span></div>
-      <div class="stock-meta-item">Prev Close <span>$${fmtP(q.pc)}</span></div>
-    </div>
+    <div class="stock-price" style="color:${chgColor(q.dp)}">${px(q.c)} <span class="stock-change" style="color:${chgColor(q.dp)}">${q.d>0?'+':''}${q.d!=null?(isID?fmt(q.d):fmtP(q.d)):'--'} (${q.dp>0?'+':''}${fmtP(q.dp)}%)</span></div>
+    <div class="stock-meta">${meta}</div>
   </div>
   <div style="display:flex;gap:8px">
-    <button class="btn btn-g btn-sm" onclick="addToWatchlistDirect('${S.curStock}')"><i class="fas fa-star"></i>Watch</button>
+    <button class="btn btn-g btn-sm" onclick="addToWatchlistDirect('${finSym(S.curStock)}')"><i class="fas fa-star"></i>Watch</button>
   </div>`;
 }
 
