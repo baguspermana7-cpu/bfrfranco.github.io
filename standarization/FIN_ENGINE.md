@@ -103,8 +103,21 @@ onto it; the engine instead *borrows* StockMap's float taxonomy (`floatBands`) +
   fundamentals exist, skipped otherwise). Weights rebalanced: Fundamental 0.25 / **Value 0.25** / Technical
   0.20 / Quant 0.20 / Risk 0.10. The run now returns a descriptive **`conviction`** (High / Medium / Low from
   consensus × confidence × panel agreement × data grade) plus the surfaced `valueGate` + `dataGrade`. The
-  terminal scorecard shows the Pass/Gray/Fail chip + moat + Mirror Test + conviction + data grade. **Planned:**
-  crypto market (technical-only committee).
+  terminal scorecard shows the Pass/Gray/Fail chip + moat + Mirror Test + conviction + data grade.
+
+## Crypto market (v1.53.1 — technical-only)
+Crypto has **no fundamentals**, so the engine treats it honestly as a **technical-only** asset class:
+- **Committee** — `models.committee.run({}, candles, {preset:'momentum'})` naturally yields a **Technical +
+  Quant (Factor Zoo) + Risk** committee: the Fundamental panel (`models.score`) and the Berkshire **Value**
+  panel both self-skip on empty fundamentals. `conviction` cannot reach **High** (no data grade). The terminal
+  renders this in the crypto detail modal (`loadCryptoCommittee`) with an explicit **high-risk / technical-only**
+  banner; candles come from the gateway `/candles` (Yahoo `BTC-USD`).
+- **Screener** — the Crypto screener mode runs `models.score.rank` over the CoinGecko universe; only the
+  factors crypto has (**momentum + liquidity + volatility/technical**) contribute, weights re-normalize, and
+  `confidence` reflects the absent value/quality/dividend/float factors. Each coin gets a FIN Score; clicking a
+  row opens the coin detail + its technical-only committee.
+- Crypto emphasizes the disclaimer (elevated volatility/risk) — descriptive signals, **never** advice, **no**
+  price targets or position sizing.
 
 ## Gate — `tools/test-fin-engine.mjs` (SHIP GATE, mirrors `test-rz-engine.mjs`)
 Node-vm load + assertions: worked examples (ratios/valuation/technical/score/risk), **ta.js parity**

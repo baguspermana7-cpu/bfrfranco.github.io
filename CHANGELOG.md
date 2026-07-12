@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v1.53.1 — 2026-07-12 (Finance Terminal — crypto market: technical-only FIN committee + scored crypto screener)
+
+### Added
+- **Crypto FIN Investment Committee** — the Finance Terminal's crypto detail modal now renders a
+  committee scorecard for the selected coin. Coins have no fundamentals, so the committee convenes
+  **Technical + Quant (Factor Zoo) + Risk** panels only (the Fundamental and Berkshire Value panels
+  self-skip on empty fundamentals); candles come from the gateway `/candles` (Yahoo `BTC-USD` etc.).
+  Rendered with an explicit **high-risk / technical-only** banner and `conviction` capped below High
+  (no fundamental data grade). New `loadCryptoCommittee()`.
+- **Scored crypto screener** — the Crypto screener mode now runs `FINEngine.models.score.rank` on the
+  CoinGecko universe (momentum + liquidity + volatility factors; value/quality/dividend/float absent →
+  re-normalized, `confidence` reflects the gap) so each coin gets a transparent **FIN Score** column,
+  and clicking a crypto row opens that coin's detail + technical-only committee.
+
+Educational analysis only — **not investment advice, not a licensed advisor**; every committee/score output
+carries `FINEngine.DISCLAIMER`, and crypto additionally flags elevated volatility/risk. No price targets or
+position sizing. See `standarization/FIN_ENGINE.md`.
+
+---
+
 ## v1.53.0 — 2026-07-12 (FIN Engine — Berkshire Value Gate + conviction in the Investment Committee)
 
 ### Added
