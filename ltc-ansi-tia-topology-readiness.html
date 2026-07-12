@@ -400,7 +400,17 @@
             .metric-grid, .reference-grid, .standards-grid { grid-template-columns: 1fr !important; }
             h1 { font-size: 1.4rem !important; }
         }
-    </style>
+    /* a11y: shared login-modal contrast fixes (inline colors from auth.js template) */
+#rzModalForm a[href$="terms.html"], #rzModalForm a[href$="privacy.html"] { text-decoration: underline !important; }
+html:not([data-theme="dark"]) #rzModalForm a[href$="terms.html"],
+html:not([data-theme="dark"]) #rzModalForm a[href$="privacy.html"] { color:#6d28d9 !important; }
+[data-theme="dark"] #rzModalForm a[href$="terms.html"],
+[data-theme="dark"] #rzModalForm a[href$="privacy.html"] { color:#a78bfa !important; }
+[data-theme="dark"] #rzModalForm > div[style*="color:#475569"] { color:#94a3b8 !important; }
+html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
+
+#rootLoginBtn { background:#6d28d9 !important; border-color:#6d28d9 !important; }
+</style>
     <!-- Structured Data - BreadcrumbList -->
     <script type="application/ld+json">
     {
@@ -513,7 +523,7 @@
             <h1>ANSI/TIA Data Center Topology — Comprehensive Deep-Dive</h1>
             <p class="subtitle">From TIA-942 infrastructure ratings and TIA-568 structured cabling to TIA-607 grounding and TIA-606 administration — a complete technical reference for data center physical layer design, redundancy architecture, and commissioning.</p>
 
-            <div class="mindmap-wrap" role="img" aria-label="ANSI/TIA Data Center Standards Mindmap">
+            <div class="mindmap-wrap" tabindex="0" role="group" aria-label="ANSI/TIA Data Center Standards Mindmap">
                 <svg viewBox="0 0 920 520" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <rect class="diag-box" x="355" y="220" width="210" height="70" rx="14"/>
                     <text class="diag-center" x="460" y="250" text-anchor="middle">ANSI/TIA &amp;</text>
@@ -603,7 +613,7 @@
                 <button class="accordion-header"><span class="acc-num">1</span> Overview &amp; Scope <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>TIA-942 was first published in 2005 by the Telecommunications Industry Association as the first standard specifically addressing data center infrastructure design. It covers site selection, architectural considerations, electrical systems, mechanical systems, telecommunications cabling, and fire protection.</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Edition</th><th scope="col">Year</th><th scope="col">Key Changes</th></tr></thead>
                         <tbody>
                             <tr><td>TIA-942</td><td>2005</td><td>Original standard; introduced 4-tier classification aligned with Uptime Institute concepts</td></tr>
@@ -618,7 +628,7 @@
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">2</span> Rating 1–4 Requirements Table <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Parameter</th><th scope="col">Rating 1</th><th scope="col">Rating 2</th><th scope="col">Rating 3</th><th scope="col">Rating 4</th></tr></thead>
                         <tbody>
                             <tr><td><strong>Distribution Paths</strong></td><td>1</td><td>1</td><td>1 active + 1 alternate</td><td>2 simultaneous active</td></tr>
@@ -636,7 +646,7 @@
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">3</span> Subsystem Requirements Matrix <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Subsystem</th><th scope="col">Rating 1</th><th scope="col">Rating 2</th><th scope="col">Rating 3</th><th scope="col">Rating 4</th></tr></thead>
                         <tbody>
                             <tr><td><strong>Telecom Entrance</strong></td><td>Single</td><td>Single</td><td>Dual (diverse)</td><td>Dual (diverse)</td></tr>
@@ -730,7 +740,7 @@
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">2</span> Copper Cabling — Cat5e through Cat8 <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Category</th><th scope="col">Max Frequency</th><th scope="col">Max Throughput</th><th scope="col">Max Channel</th><th scope="col">Typical Application</th></tr></thead>
                         <tbody>
                             <tr><td>Cat5e</td><td>100 MHz</td><td>1 Gbps</td><td class="unit-val" data-m="100">100 m</td><td>Legacy LAN, voice</td></tr>
@@ -749,7 +759,7 @@
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">3</span> Fiber Optic Specifications <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Type</th><th scope="col">Core</th><th scope="col">Wavelength</th><th scope="col">10G Distance</th><th scope="col">100G Distance</th><th scope="col">Application</th></tr></thead>
                         <tbody>
                             <tr><td><span class="term-tooltip" data-tooltip="OM3: Laser-optimized 50μm multimode fiber supporting 10G at 300m. Suitable for most intra-building data center links.">OM3</span></td><td>50 μm MM</td><td>850 nm</td><td class="unit-val" data-m="300">300 m</td><td class="unit-val" data-m="100">100 m</td><td>General backbone</td></tr>
@@ -765,7 +775,7 @@
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">4</span> Connectors &amp; Polarity <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Connector</th><th scope="col">Fiber Count</th><th scope="col">Typical Use</th><th scope="col">Density</th></tr></thead>
                         <tbody>
                             <tr><td><strong>LC Duplex</strong></td><td>2</td><td>10G/25G point-to-point</td><td>Standard</td></tr>
@@ -819,7 +829,7 @@
                 <button class="accordion-header"><span class="acc-num">2</span> Conduit Fill Ratios <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>Maximum conduit fill ratios per NEC Chapter 9 (referenced by TIA-569):</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Number of Cables</th><th scope="col">Maximum Fill %</th><th scope="col">Rationale</th></tr></thead>
                         <tbody>
                             <tr><td>1 cable</td><td class="highlight">53%</td><td>Easy pulling, heat dissipation</td></tr>
@@ -853,7 +863,7 @@
                 <button class="accordion-header"><span class="acc-num">4</span> Separation Requirements <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>Minimum separation between power and telecommunications cables to prevent electromagnetic interference (EMI):</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Power Source</th><th scope="col">Unshielded Data</th><th scope="col">Shielded Data</th><th scope="col">Fiber</th></tr></thead>
                         <tbody>
                             <tr><td>&lt; 2 kVA</td><td class="unit-val" data-m="0.127">127 mm</td><td class="unit-val" data-m="0.064">64 mm</td><td>No requirement</td></tr>
@@ -889,7 +899,7 @@
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">2</span> Conductor Sizing Table <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Application</th><th scope="col">Min Size (AWG)</th><th scope="col">Min Size (mm²)</th><th scope="col">Color</th><th scope="col">Notes</th></tr></thead>
                         <tbody>
                             <tr><td><strong>BCT to TMGB</strong></td><td>6 AWG</td><td>16 mm²</td><td>Green</td><td>Service entrance bond</td></tr>
@@ -959,7 +969,7 @@
                 <div class="accordion-body"><div class="accordion-content">
                     <p>TIA-606-C requires unique identifiers for every cable, pathway, and space. Standard format:</p>
                     <div class="callout callout-info"><i class="fas fa-tag"></i> <strong>Format:</strong> <code>[Building]-[Floor]-[Room]-[Rack]-[Port]</code></div>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Label</th><th scope="col">Meaning</th></tr></thead>
                         <tbody>
                             <tr><td><code>DC1-1F-MDA-R01-P24</code></td><td>DC1, 1st floor, MDA, Rack 01, Port 24</td></tr>
@@ -975,7 +985,7 @@
                 <button class="accordion-header"><span class="acc-num">3</span> Documentation &amp; DCIM Integration <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>TIA-606-C defines four classes of administration complexity:</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Class</th><th scope="col">Scope</th><th scope="col">Documentation Required</th></tr></thead>
                         <tbody>
                             <tr><td>Class 1</td><td>Single building</td><td>Cable records, patch panel schedules</td></tr>
@@ -1137,7 +1147,7 @@
                 <button class="accordion-header"><span class="acc-num">3</span> FMEA Table <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p><span class="term-tooltip" data-tooltip="FMEA (Failure Mode and Effects Analysis): Systematic methodology for identifying potential failure modes, their causes, effects, and mitigations. Uses RPN (Risk Priority Number) scoring to prioritize actions.">Failure Mode and Effects Analysis (FMEA)</span> scoring: Severity (1–10), Occurrence (1–10), Detection (1–10). RPN = S × O × D.</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Component</th><th scope="col">Failure Mode</th><th scope="col">S</th><th scope="col">O</th><th scope="col">D</th><th scope="col">RPN</th><th scope="col">Mitigation</th></tr></thead>
                         <tbody>
                             <tr><td>UPS Module</td><td>Output failure</td><td>9</td><td>3</td><td>2</td><td class="highlight">54</td><td>N+1 config + monitoring</td></tr>
@@ -1161,7 +1171,7 @@
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> FAT / SAT / IST Definitions <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Test Phase</th><th scope="col">Location</th><th scope="col">Scope</th><th scope="col">Duration</th><th scope="col">Pass Criteria</th></tr></thead>
                         <tbody>
                             <tr><td class="highlight"><span class="term-tooltip" data-tooltip="FAT (Factory Acceptance Test): Testing performed at the manufacturer's facility before equipment is shipped. Verifies component-level performance against specifications.">FAT</span></td><td>Manufacturer facility</td><td>Individual component</td><td>1–5 days</td><td>Meets datasheet specifications</td></tr>
@@ -1177,7 +1187,7 @@
                 <button class="accordion-header"><span class="acc-num">2</span> Witness Protocols <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>Each test phase should be witnessed by appropriate stakeholders:</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Test Phase</th><th scope="col">Required Witnesses</th><th scope="col">Documentation</th></tr></thead>
                         <tbody>
                             <tr><td>FAT</td><td>Owner's engineer, manufacturer QA</td><td>Test reports, photos, punch list</td></tr>
@@ -1191,7 +1201,7 @@
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">3</span> Test Matrices <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">System</th><th scope="col">Test Type</th><th scope="col">Frequency</th><th scope="col">Acceptance Criteria</th></tr></thead>
                         <tbody>
                             <tr><td>UPS</td><td>Load bank test</td><td>Annual</td><td>&lt; 5% deviation from rated output</td></tr>
@@ -1234,7 +1244,7 @@
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> EN 50600 Mapping <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">TIA-942 Rating</th><th scope="col">EN 50600 Availability Class</th><th scope="col">Key Differences</th></tr></thead>
                         <tbody>
                             <tr><td>Rating 1</td><td>Class 1</td><td>EN 50600 adds environmental class (E) and security class (S)</td></tr>
@@ -1263,7 +1273,7 @@
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">3</span> ASHRAE Cross-Reference <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">TIA Rating</th><th scope="col">Recommended ASHRAE Class</th><th scope="col">Cooling Redundancy</th></tr></thead>
                         <tbody>
                             <tr><td>Rating 1</td><td>A1 (recommended range)</td><td>N (no redundancy)</td></tr>
@@ -1278,7 +1288,7 @@
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">4</span> Uptime Tier Mapping <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Feature</th><th scope="col">TIA Rating 1</th><th scope="col">Uptime Tier I</th><th scope="col">TIA Rating 4</th><th scope="col">Uptime Tier IV</th></tr></thead>
                         <tbody>
                             <tr><td>Distribution Paths</td><td>1</td><td>1</td><td>2 active</td><td>2 active</td></tr>

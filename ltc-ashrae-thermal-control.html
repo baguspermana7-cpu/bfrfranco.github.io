@@ -873,7 +873,17 @@
             .metric-grid, .reference-grid, .standards-grid { grid-template-columns: 1fr !important; }
             h1 { font-size: 1.4rem !important; }
         }
-    </style>
+    /* a11y: shared login-modal contrast fixes (inline colors from auth.js template) */
+#rzModalForm a[href$="terms.html"], #rzModalForm a[href$="privacy.html"] { text-decoration: underline !important; }
+html:not([data-theme="dark"]) #rzModalForm a[href$="terms.html"],
+html:not([data-theme="dark"]) #rzModalForm a[href$="privacy.html"] { color:#6d28d9 !important; }
+[data-theme="dark"] #rzModalForm a[href$="terms.html"],
+[data-theme="dark"] #rzModalForm a[href$="privacy.html"] { color:#a78bfa !important; }
+[data-theme="dark"] #rzModalForm > div[style*="color:#475569"] { color:#94a3b8 !important; }
+html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
+
+#rootLoginBtn { background:#6d28d9 !important; border-color:#6d28d9 !important; }
+</style>
     <!-- Structured Data - BreadcrumbList -->
     <script type="application/ld+json">
     {
@@ -1030,7 +1040,7 @@
             <p class="subtitle">From TC 9.9 thermal guidelines and Standard 90.4 energy efficiency to Guideline 36 HVAC sequences — a complete technical reference for data center cooling design, environmental control, and commissioning aligned with Microsoft Azure program management scope.</p>
 
             <!-- SVG MINDMAP -->
-            <div class="mindmap-wrap" role="img" aria-label="ASHRAE Data Center Standards Mindmap">
+            <div class="mindmap-wrap" tabindex="0" role="group" aria-label="ASHRAE Data Center Standards Mindmap">
                 <svg viewBox="0 0 920 520" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <!-- Center node -->
                     <rect class="diag-box" x="355" y="220" width="210" height="70" rx="14"/>
@@ -1139,7 +1149,7 @@
                 <button class="accordion-header"><span class="acc-num">1</span> Overview &amp; Edition History <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>TC 9.9 was formed in 2004 to address the unique thermal requirements of data centers, which differ significantly from commercial office <span class="term-tooltip" data-tooltip="HVAC (Heating, Ventilation and Air Conditioning): Building climate control systems. Data center HVAC focuses on cooling (not heating) and maintains much tighter temperature/humidity tolerances than commercial buildings.">HVAC</span> design. The committee's flagship publication — <strong>Thermal Guidelines for Data Processing Environments</strong> — has gone through five major editions:</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Edition</th><th scope="col">Year</th><th scope="col">Key Changes</th></tr></thead>
                         <tbody>
                             <tr><td>1st</td><td>2004</td><td>Initial recommended envelope (A1 class only), 20–25 °C dry-bulb</td></tr>
@@ -1158,7 +1168,7 @@
                 <button class="accordion-header"><span class="acc-num">2</span> Air-Cooled Equipment Classes (A1–A4) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>Classes A1 through A4 define inlet air conditions for servers, storage, and networking equipment. A1 is the tightest envelope (enterprise-grade), while A4 represents hardened equipment designed for extreme environments. Temperature is measured as <span class="term-tooltip" data-tooltip="Dry-bulb temperature: The air temperature measured by a standard thermometer, not accounting for humidity or radiation effects.">dry-bulb</span> at the equipment air inlet.</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Parameter</th><th scope="col">A1 (Recommended)</th><th scope="col">A1 (Allowable)</th><th scope="col">A2</th><th scope="col">A3</th><th scope="col">A4</th></tr></thead>
                         <tbody>
                             <tr><td><strong>Dry-Bulb Low</strong></td><td>18 °C (64.4 °F)</td><td>15 °C (59 °F)</td><td>10 °C (50 °F)</td><td>5 °C (41 °F)</td><td>5 °C (41 °F)</td></tr>
@@ -1196,7 +1206,7 @@
                 <button class="accordion-header"><span class="acc-num">4</span> Liquid-Cooled Equipment Classes (W1–W5) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p><span class="term-tooltip" data-tooltip="W-Classes (W1–W5): ASHRAE liquid cooling equipment classes defining supply water temperature ranges. Higher numbers allow warmer supply temps, enabling more free cooling.">W-classes</span> define conditions for the liquid (typically water or water-glycol) supplied directly to IT equipment cooling systems. Higher W-classes allow warmer supply temperatures, enabling greater use of free cooling and waste heat recovery.</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Class</th><th scope="col">Supply Temp Range</th><th scope="col">Max Rate of Change</th><th scope="col">Primary Use Case</th></tr></thead>
                         <tbody>
                             <tr><td class="highlight">W1</td><td>2–17 °C (35.6–62.6 °F)</td><td>5 °C/hr</td><td>Chilled water, high-reliability enterprise</td></tr>
@@ -1298,7 +1308,7 @@
                 <button class="accordion-header"><span class="acc-num">6</span> Decision Guide — Which Class to Specify? <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>Use this decision framework when specifying ASHRAE thermal classes for a new deployment:</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Workload Type</th><th scope="col">Density</th><th scope="col">Location</th><th scope="col">Recommended Class</th></tr></thead>
                         <tbody>
                             <tr><td>Enterprise / financial</td><td>&lt; 10 kW/rack</td><td>Climate-controlled facility</td><td class="highlight">A1</td></tr>
@@ -1326,7 +1336,7 @@
                             <div class="calc-value" id="altResult">-2.0 °C</div>
                         </div>
                         <div style="margin-top:0.5rem;">
-                            <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">Class</th><th scope="col">Sea-Level Max</th><th scope="col">Derated Max</th></tr></thead>
+                            <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table"><thead><tr><th scope="col">Class</th><th scope="col">Sea-Level Max</th><th scope="col">Derated Max</th></tr></thead>
                             <tbody id="altTable">
                                 <tr><td>A1</td><td class="temp-val" data-c="32">32 °C</td><td id="altA1">30.0 °C</td></tr>
                                 <tr><td>A2</td><td class="temp-val" data-c="35">35 °C</td><td id="altA2">33.0 °C</td></tr>
@@ -1405,7 +1415,7 @@
                     <p><span class="term-tooltip" data-tooltip="MLC (Mechanical Load Component): Ratio of annual mechanical cooling energy to annual IT energy. Lower is better — target < 0.30 for efficient facilities.">MLC</span> quantifies the energy overhead of the mechanical cooling system relative to IT load. It captures chillers, cooling towers, CRAHs, pumps, and associated controls.</p>
                     <div class="callout callout-info"><i class="fas fa-calculator"></i> <strong>MLC = Annual Mechanical Energy (kWh) ÷ Annual IT Equipment Energy (kWh)</strong></div>
                     <p><strong>90.4 prescriptive MLC limits</strong> vary by climate zone and cooling type:</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Climate Zone</th><th scope="col">Air-Cooled Chiller</th><th scope="col">Water-Cooled Chiller</th><th scope="col">Evaporative / Free Cooling</th></tr></thead>
                         <tbody>
                             <tr><td>1A–2A (Hot/Humid)</td><td>0.58</td><td>0.42</td><td>0.34</td></tr>
@@ -1442,7 +1452,7 @@
                     <div class="callout callout-info"><i class="fas fa-calculator"></i> <strong>PUE = 1 + MLC + ELC</strong><br/>Example: MLC 0.30 + ELC 0.10 → PUE = 1.40</div>
                     <p><strong>ERE</strong> accounts for energy reuse (e.g., waste heat recovery for district heating):</p>
                     <div class="callout callout-green"><i class="fas fa-calculator"></i> <strong>ERE = PUE − (Reused Energy ÷ IT Energy)</strong><br/>A facility with PUE 1.20 that reuses 15% of IT energy: ERE = 1.20 − 0.15 = 1.05</div>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Metric</th><th scope="col">Excellent</th><th scope="col">Good</th><th scope="col">Average</th><th scope="col">Poor</th></tr></thead>
                         <tbody>
                             <tr><td class="highlight">PUE</td><td>&lt; 1.2</td><td>1.2–1.4</td><td>1.4–1.6</td><td>&gt; 1.6</td></tr>
@@ -1590,7 +1600,7 @@
                 <button class="accordion-header"><span class="acc-num">2</span> Airside Economizer Logic <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p><span class="term-tooltip" data-tooltip="Airside economizer: Uses outdoor air directly for cooling when ambient conditions are favorable, bypassing mechanical cooling. Can reduce cooling energy by 30-70% depending on climate.">Airside economizers</span> use outdoor air for free cooling when ambient conditions fall within the ASHRAE equipment class envelope. GL36 defines the switchover logic:</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Control Strategy</th><th scope="col">Switchover Condition</th><th scope="col">Best For</th></tr></thead>
                         <tbody>
                             <tr><td><strong>Dry-bulb</strong></td><td>OA temp &lt; return air temp (with deadband)</td><td>Dry climates (ASHRAE zones 3B–6B)</td></tr>
@@ -1660,7 +1670,7 @@
             <h2 class="section-title"><i class="fas fa-snowflake"></i> Cooling Technology Implementation Matrix</h2>
             <p class="section-intro">A comprehensive comparison of data center cooling technologies mapped to ASHRAE equipment classes, power density capabilities, efficiency metrics, and hyperscaler adoption status.</p>
 
-            <div class="table-wrap"><table class="data-table">
+            <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                 <thead><tr>
                     <th scope="col">Technology</th>
                     <th scope="col">ASHRAE Class</th>
@@ -1801,7 +1811,7 @@
                 <button class="accordion-header"><span class="acc-num">D</span> GPU/Accelerator Thermal Specifications <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>Modern AI accelerators drive ASHRAE class requirements. Here are the cooling specifications for current-generation hardware:</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Accelerator</th><th scope="col"><span class="term-tooltip" data-tooltip="TDP (Thermal Design Power): Maximum sustained heat output a component generates, in watts. Used to size cooling systems — a 700W TDP GPU requires at least 700W of cooling capacity.">TDP</span></th><th scope="col">Inlet Air Max</th><th scope="col">Recommended Cooling</th><th scope="col">ASHRAE Class</th></tr></thead>
                         <tbody>
                             <tr><td><strong>NVIDIA A100 (SXM)</strong></td><td class="temp-val" data-w="400">400W</td><td class="temp-val" data-c="35">35 °C</td><td>Air + heatsink</td><td>A2</td></tr>
@@ -1867,7 +1877,7 @@
                 <button class="accordion-header"><span class="acc-num">1</span> Gaseous Contamination — Copper &amp; Silver Coupon Classification <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>ASHRAE classifies gaseous contamination severity using <span class="term-tooltip" data-tooltip="Coupon testing: Reactive metal strips (copper and silver) exposed to the DC environment for 30 days, then analyzed for corrosion film thickness measured in angstroms (Å) per month.">reactive metal coupon testing</span>. Coupons are exposed to the data center environment for 30 days, then analyzed for corrosion thickness.</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Severity Level</th><th scope="col">Copper Corrosion Rate</th><th scope="col">Silver Corrosion Rate</th><th scope="col">Action Required</th></tr></thead>
                         <tbody>
                             <tr><td class="highlight">G1 (Mild)</td><td>&lt; 300 Å/month</td><td>&lt; 200 Å/month</td><td>Standard operation — no special filtration</td></tr>
@@ -1891,7 +1901,7 @@
                 <button class="accordion-header"><span class="acc-num">2</span> Particulate Contamination — ISO 14644-1 &amp; Filtration <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>ASHRAE TC 9.9 recommends that data center air quality meet <strong>ISO 14644-1 Class 8</strong> cleanliness levels (≤ 3,520,000 particles ≥ 0.5 μm per m³). This is comparable to a standard office environment — not a cleanroom, but significantly cleaner than outdoor air.</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Filter Rating</th><th scope="col">Efficiency (0.3–1 μm)</th><th scope="col">Application</th></tr></thead>
                         <tbody>
                             <tr><td>MERV 8</td><td>20–35%</td><td>Minimum for recirculation air</td></tr>
@@ -1942,7 +1952,7 @@
                 <button class="accordion-header"><span class="acc-num">1</span> ASHRAE 62.1 — Ventilation for Acceptable Indoor Air Quality <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p><span class="term-tooltip" data-tooltip="ASHRAE 62.1: Standard defining minimum ventilation rates and other measures for acceptable indoor air quality. Required for occupied spaces, not typically for unoccupied white space.">Standard 62.1</span> applies to occupied areas within data center facilities:</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Space Type</th><th scope="col">Outdoor Air Rate</th><th scope="col">Notes</th></tr></thead>
                         <tbody>
                             <tr><td><strong>NOC / Control Room</strong></td><td class="temp-val">5 CFM/person + 0.06 CFM/ft²</td><td>Office-equivalent ventilation; 24/7 occupancy</td></tr>
@@ -1997,7 +2007,7 @@
                 <button class="accordion-header"><span class="acc-num">1</span> Standard 180 — HVAC Inspection &amp; Maintenance <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>ASHRAE Standard 180 defines minimum maintenance requirements for commercial HVAC systems. For data centers, the critical maintenance intervals include:</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">System</th><th scope="col">Task</th><th scope="col">Frequency</th></tr></thead>
                         <tbody>
                             <tr><td><strong>Chillers</strong></td><td>Condenser/evaporator tube inspection, refrigerant charge check, oil analysis</td><td>Annually</td></tr>
@@ -2167,7 +2177,7 @@
                 <button class="accordion-header"><span class="acc-num">1</span> Microsoft Azure Data Center Generation Context <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>Azure data centers evolve through generational designs, each incorporating advances in cooling technology aligned with ASHRAE standards:</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Generation</th><th scope="col">Era</th><th scope="col">Cooling Approach</th><th scope="col">ASHRAE Class</th><th scope="col">Density</th></tr></thead>
                         <tbody>
                             <tr><td>Gen 1–3</td><td>2008–2014</td><td>Traditional chilled water, raised floor</td><td>A1</td><td>5–8 kW/rack</td></tr>
@@ -2186,7 +2196,7 @@
                 <button class="accordion-header"><span class="acc-num">2</span> Cooling Technology Selection Matrix <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>As a TPM, technology selection decisions are based on multiple weighted criteria. Use this framework to evaluate cooling architecture options:</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Criterion</th><th scope="col">Weight</th><th scope="col">Air Cooling</th><th scope="col">RDHx / DLC</th><th scope="col">Immersion</th></tr></thead>
                         <tbody>
                             <tr><td><strong>Density support</strong></td><td>25%</td><td>Low (≤25 kW)</td><td>High (≤100 kW)</td><td>Very High (≤300 kW)</td></tr>
@@ -2241,7 +2251,7 @@
                     </ul>
 
                     <p><strong>Deployment Timeline (typical greenfield):</strong></p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Phase</th><th scope="col">Duration</th><th scope="col">ASHRAE Touchpoints</th></tr></thead>
                         <tbody>
                             <tr><td><strong>Conceptual design</strong></td><td>2–3 months</td><td>Climate analysis, ASHRAE class selection, PUE targets</td></tr>
@@ -2286,7 +2296,7 @@
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">2</span> EN 50600 (European) Cross-Reference <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">ASHRAE Standard</th><th scope="col">EN 50600 Equivalent</th><th scope="col">Key Difference</th></tr></thead>
                         <tbody>
                             <tr><td>TC 9.9 Thermal Guidelines</td><td>EN 50600-2-3 (Environmental control)</td><td>EN uses Climate Class 1–4 (similar to A1–A4 mapping)</td></tr>
@@ -2314,7 +2324,7 @@
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">4</span> Uptime Tier vs. ASHRAE Cooling Redundancy <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Uptime Tier</th><th scope="col">Cooling Redundancy</th><th scope="col">ASHRAE 90.4 ELC Limit</th><th scope="col">Typical PUE Impact</th></tr></thead>
                         <tbody>
                             <tr><td><strong>Tier I</strong></td><td>N (no redundancy)</td><td>0.08</td><td>+0.00</td></tr>
@@ -2343,7 +2353,7 @@
                 <button class="accordion-header"><span class="acc-num">6</span> Refrigerant Transition Guide <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>The Kigali Amendment (2016) mandates HFC phase-down. Data center chillers must transition to low-GWP refrigerants:</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Refrigerant</th><th scope="col">GWP</th><th scope="col">Status</th><th scope="col">90.4 Impact</th></tr></thead>
                         <tbody>
                             <tr><td><strong>R-410A</strong></td><td>2,088</td><td>Phase-down by 2025-2030</td><td>Legacy equipment; declining availability</td></tr>
@@ -2435,7 +2445,7 @@
             <h2 class="section-title"><i class="fas fa-exclamation-circle"></i> Failure Mode Analysis — Exceeding ASHRAE Limits</h2>
             <p class="section-intro">What happens when environmental conditions exceed ASHRAE class limits? Understanding failure mechanisms helps prioritize monitoring and alarm strategies.</p>
 
-            <div class="table-wrap"><table class="data-table">
+            <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                 <thead><tr><th scope="col">Parameter</th><th scope="col">Exceedance</th><th scope="col">Failure Mechanism</th><th scope="col">Time to Impact</th><th scope="col">MTBF Reduction</th></tr></thead>
                 <tbody>
                     <tr><td><strong>Temperature</strong></td><td>+5 °C above max</td><td>CPU throttling, fan speed increase, thermal shutdown</td><td>Minutes</td><td>2× per 10 °C rise</td></tr>

@@ -11,6 +11,25 @@ release sections rather than semver.
 
 ---
 
+## v1.52.9 — 2026-07-12 (Accessibility — full-site sweep COMPLETE: final 12 pages to zero)
+
+**Changed** — the last pages of the site-wide axe sweep, per-page probe 0/0 both themes:
+- **6 LTC lab pages** (`ltc-ashrae/nfpa/ansi/uptime`, `standards-ltc-lab`, iso re-verified):
+  the shared auth-login-modal override block replicated from ltc-iso, `#rootLoginBtn`
+  backgrounds darkened behind white per page accent, all `.table-wrap`/`.mindmap-wrap`
+  scrollables keyboard-focusable (mindmaps `role="img"`→`group`, kept labels).
+- **5 articles** (18, 19, 20, 23, 25): verdict/decision-matrix chips split per theme,
+  KPI labels darkened, figcaptions brightened in dark, chart chips.
+- `dashboard.html` + the 5 small `pln-java-grid-*` pages verified already clean.
+
+**With this, every content page on the site measures 0 critical/serious axe violations
+in both themes** — from 11,334 flagged nodes when the full-site sweep began (v1.51.7).
+Exclusions: `ai-engineering-maintenance.html` + `cdu-mini-bms.html` (owned by a parallel
+work stream, ~61 nodes) — flagged for a follow-up there.
+
+**Verification** — per-page probe 0/0 ×12 this batch; js-syntax + script-tags CLEAN;
+full-site confirmation sweep re-run post-ship.
+
 ## v1.52.8 — 2026-07-12 (Accessibility — full-site sweep part 6: 31 more pages to zero)
 
 **Changed** — per-page axe probe 0/0 both themes on:

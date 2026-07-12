@@ -1933,7 +1933,19 @@
         html:not([data-theme="dark"]) {
             --text-muted: #475569;
         }
-    </style>
+    /* a11y: shared login-modal contrast fixes (inline colors from auth.js template) */
+#rzModalForm a[href$="terms.html"], #rzModalForm a[href$="privacy.html"] { text-decoration: underline !important; }
+html:not([data-theme="dark"]) #rzModalForm a[href$="terms.html"],
+html:not([data-theme="dark"]) #rzModalForm a[href$="privacy.html"] { color:#6d28d9 !important; }
+[data-theme="dark"] #rzModalForm a[href$="terms.html"],
+[data-theme="dark"] #rzModalForm a[href$="privacy.html"] { color:#a78bfa !important; }
+[data-theme="dark"] #rzModalForm > div[style*="color:#475569"] { color:#94a3b8 !important; }
+html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
+
+/* a11y (v1.52.9) */
+[data-theme="dark"] article p a, [data-theme="dark"] p > a { color:#93c5fd !important; }
+:root:not([data-theme="dark"]) .section-header > span { color:#92400e !important; }
+</style>
     <!-- Structured Data - BreadcrumbList -->
     <script type="application/ld+json">
     {

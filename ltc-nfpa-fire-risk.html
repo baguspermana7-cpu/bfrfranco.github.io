@@ -376,7 +376,17 @@
             .metric-grid, .reference-grid, .standards-grid { grid-template-columns: 1fr !important; }
             h1 { font-size: 1.4rem !important; }
         }
-    </style>
+    /* a11y: shared login-modal contrast fixes (inline colors from auth.js template) */
+#rzModalForm a[href$="terms.html"], #rzModalForm a[href$="privacy.html"] { text-decoration: underline !important; }
+html:not([data-theme="dark"]) #rzModalForm a[href$="terms.html"],
+html:not([data-theme="dark"]) #rzModalForm a[href$="privacy.html"] { color:#6d28d9 !important; }
+[data-theme="dark"] #rzModalForm a[href$="terms.html"],
+[data-theme="dark"] #rzModalForm a[href$="privacy.html"] { color:#a78bfa !important; }
+[data-theme="dark"] #rzModalForm > div[style*="color:#475569"] { color:#94a3b8 !important; }
+html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
+
+#rootLoginBtn { background:#b91c1c !important; border-color:#b91c1c !important; }
+</style>
     <!-- Structured Data - BreadcrumbList -->
     <script type="application/ld+json">
     {
@@ -488,7 +498,7 @@
             <span class="pill-red" style="padding:0.3rem 0.65rem;border-radius:999px;font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;">NFPA Fire &amp; Safety Standards</span>
             <h1>NFPA Fire &amp; Safety Risk — Comprehensive Deep-Dive</h1>
             <p class="subtitle">From NFPA 75 IT equipment protection and NFPA 2001 clean agent systems to NFPA 72 detection and NFPA 13 sprinklers — a complete technical reference for data center fire protection, life safety, and suppression system design.</p>
-            <div class="mindmap-wrap" role="img" aria-label="NFPA Data Center Fire Safety Mindmap">
+            <div class="mindmap-wrap" tabindex="0" role="group" aria-label="NFPA Data Center Fire Safety Mindmap">
                 <svg viewBox="0 0 920 520" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <rect class="diag-box" x="355" y="220" width="210" height="70" rx="14"/>
                     <text class="diag-center" x="460" y="250" text-anchor="middle">NFPA Fire</text>
@@ -628,7 +638,7 @@
                         <li><strong>Portable extinguishers:</strong> CO2 or clean agent rated (Class C minimum) — water-based extinguishers are prohibited near energized IT equipment</li>
                         <li><strong>Extinguisher placement:</strong> Within 50 ft travel distance, mounted at conspicuous locations near exits</li>
                     </ul>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">System Type</th><th scope="col">Agent</th><th scope="col">Discharge Time</th><th scope="col">IT Equipment Safe</th><th scope="col">Re-entry Time</th></tr></thead>
                         <tbody>
                             <tr><td>Clean Agent</td><td>FM-200 / Novec</td><td class="highlight">10 seconds</td><td class="highlight">Yes</td><td>Immediate</td></tr>
@@ -665,7 +675,7 @@
                 <button class="accordion-header"><span class="acc-num">1</span> Hazard Classification <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>NFPA 76 classifies telecom facility hazards into three categories based on equipment density, criticality, and fire load.</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Class</th><th scope="col">Description</th><th scope="col">Equipment Density</th><th scope="col">Protection Level</th></tr></thead>
                         <tbody>
                             <tr><td class="highlight">Class A</td><td>Essential / High Priority</td><td>High density</td><td class="highlight">Total flooding + VESDA</td></tr>
@@ -707,7 +717,7 @@
                 <button class="accordion-header"><span class="acc-num">4</span> Differences from NFPA 75 <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>While NFPA 75 and NFPA 76 share common fire protection principles, they differ in scope, hazard classification, and application.</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Attribute</th><th scope="col">NFPA 75</th><th scope="col">NFPA 76</th></tr></thead>
                         <tbody>
                             <tr><td>Primary Scope</td><td>IT equipment rooms</td><td class="highlight">Telecom facilities</td></tr>
@@ -786,7 +796,7 @@
                 <button class="accordion-header"><span class="acc-num">4</span> Design Concentration Comparison <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>The design concentration determines how much agent is needed to extinguish a fire in a given volume. Lower concentrations mean less agent and smaller storage requirements.</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Agent</th><th scope="col">Design Conc. (Class A)</th><th scope="col">NOAEL</th><th scope="col">Safety Margin</th><th scope="col">Storage per m&sup3;</th></tr></thead>
                         <tbody>
                             <tr><td>FM-200</td><td>7.0%</td><td>9.0%</td><td>2.0%</td><td>0.59 kg</td></tr>
@@ -863,7 +873,7 @@
                         <div class="kv-item"><div class="kv-label">Coverage Area</div><div class="kv-value">Up to 2000 m&sup2; per unit</div></div>
                     </div>
                     <p><strong>4 Alarm Levels:</strong></p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Level</th><th scope="col">Name</th><th scope="col">Typical Action</th><th scope="col">Sensitivity</th></tr></thead>
                         <tbody>
                             <tr><td>1</td><td>Alert</td><td>Notify operations team</td><td>0.025% obs/m</td></tr>
@@ -917,7 +927,7 @@
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">5</span> Detector Selection Table <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Type</th><th scope="col">Response Time</th><th scope="col">False Alarm Rate</th><th scope="col">Relative Cost</th><th scope="col">Best For</th></tr></thead>
                         <tbody>
                             <tr><td class="highlight">VESDA (Aspirating)</td><td class="highlight">&lt;30 sec</td><td class="highlight">Very Low</td><td>High ($$$)</td><td class="highlight">Data halls, critical IT rooms</td></tr>
@@ -954,7 +964,7 @@
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">2</span> Wet vs Dry Pipe Comparison <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Attribute</th><th scope="col">Wet Pipe</th><th scope="col">Dry Pipe</th><th scope="col">Pre-Action (Double)</th></tr></thead>
                         <tbody>
                             <tr><td>Pipe Contents</td><td>Water</td><td>Compressed air/N2</td><td class="highlight">Supervisory air</td></tr>
@@ -973,7 +983,7 @@
                 <button class="accordion-header"><span class="acc-num">3</span> Occupancy Classification <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>NFPA 13 classifies occupancies by fire hazard level, which determines sprinkler design density, spacing, and water supply requirements.</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Classification</th><th scope="col">Application</th><th scope="col">Design Density</th><th scope="col">Area of Operation</th></tr></thead>
                         <tbody>
                             <tr><td class="highlight">Ordinary Hazard Group 1</td><td class="highlight">Most DC white space</td><td class="highlight">0.15 GPM/ft&sup2;</td><td class="highlight">1500 ft&sup2;</td></tr>
@@ -1158,7 +1168,7 @@
                 <button class="accordion-header"><span class="acc-num">1</span> Fire Barriers <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>Fire-rated barriers separate data center spaces into compartments to limit fire spread and provide time for detection, suppression, and evacuation.</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Rating</th><th scope="col">Assembly Type</th><th scope="col">UL Design No.</th><th scope="col">Typical Use</th></tr></thead>
                         <tbody>
                             <tr><td class="highlight">1-Hour</td><td>Gypsum on steel studs</td><td>UL U305, U411</td><td class="highlight">IT room to corridor (NFPA 75 minimum)</td></tr>
@@ -1251,7 +1261,7 @@
                 <button class="accordion-header"><span class="acc-num">2</span> FM Global Data Sheets <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p><span class="term-tooltip" data-tooltip="FM Global: One of the world's largest commercial property insurers. Their data sheets provide loss prevention recommendations that often exceed code minimums.">FM Global</span> data sheets provide insurance-grade fire protection recommendations that frequently exceed code minimums.</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Data Sheet</th><th scope="col">Title</th><th scope="col">Key Requirements</th></tr></thead>
                         <tbody>
                             <tr><td class="highlight">DS 5-32</td><td>Data Centers and Related Facilities</td><td>Comprehensive DC fire protection, VESDA required, clean agent + pre-action</td></tr>
@@ -1269,7 +1279,7 @@
                 <button class="accordion-header"><span class="acc-num">3</span> UL Standards <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p>UL (Underwriters Laboratories) standards cover product testing and certification for fire protection equipment.</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Standard</th><th scope="col">Title</th><th scope="col">Application</th></tr></thead>
                         <tbody>
                             <tr><td>UL 2127</td><td>Inert Gas Clean Agent Systems</td><td>IG-541, IG-55, IG-100 system testing</td></tr>
@@ -1286,7 +1296,7 @@
                 <button class="accordion-header"><span class="acc-num">4</span> EN 50600-2-5 <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
                     <p><span class="term-tooltip" data-tooltip="EN 50600-2-5: European standard for data center facilities — Part 2-5: Security systems. Covers physical security including fire protection integration.">EN 50600-2-5</span> is the European standard for data center fire protection, part of the comprehensive EN 50600 series for data center design and operation.</p>
-                    <div class="table-wrap"><table class="data-table">
+                    <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Aspect</th><th scope="col">NFPA (US)</th><th scope="col">EN 50600 (EU)</th></tr></thead>
                         <tbody>
                             <tr><td>Primary Standard</td><td>NFPA 75 / 76</td><td>EN 50600-2-5</td></tr>
