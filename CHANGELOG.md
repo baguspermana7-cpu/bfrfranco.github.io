@@ -11,6 +11,41 @@ release sections rather than semver.
 
 ---
 
+## v1.54.1 — 2026-07-13 (Fix — remove availability card + Gemini watermark on profile photo)
+
+**Removed** — the Contact section availability line ("Open to operations & engineering
+work — usually replies within a day or two" + pulsing dot): read as job-seeking; the
+"Email me" CTA stays. CSS (`.contact-avail`/`.avail-dot`/`availPulse`) cleaned from
+`styles-index.css`, re-minified, cache-busted.
+
+**Fixed** — `assets/profile-photo.jpg` (About section, the photo by the 12+ metric)
+carried a Gemini sparkle watermark bottom-right; removed via masked inpaint
+(cv2 TELEA on the luminance-detected sparkle only — shoulder/background untouched),
+`profile-photo.webp` + `-sm.webp` regenerated from the clean image.
+
+## v1.54.0 — 2026-07-13 (Auth + Finance fixes: Supabase-aware shared login · rz-ops app deploy · seamless terminal)
+
+### Fixed
+- **Login now accepts the real (Supabase) password.** The shared Sign-In modal (`auth.js`) authenticated only
+  against a hardcoded user list, so a password changed in Supabase was rejected. `doLogin` is now
+  **Supabase-primary**: it lazy-loads the shared Supabase client on any page and calls `signInWithPassword`,
+  deriving tier from the profile row and role from the email allowlist, then writes the usual
+  `rz_premium_session` so site-wide gating unlocks. The demo account (`demo2026`) stays as an offline fallback.
+- **Security:** removed the hardcoded REAL-account passwords from `auth.js` — real accounts authenticate via
+  Supabase only (their passwords live in Supabase, already migrated); no real-account secret in source.
+- **rz-ops "Stock Investment" 404.** The DCA app's built `dist/` was `.gitignore`d and never deployed, so the
+  admin-console iframe 404'd. The build is now committed and served. (No data was ever lost — saved data lives
+  in origin-scoped `localStorage`, untouched by a dead link.)
+- **Finance Terminal stock search seamless.** The US stock detail required a client Finnhub key and hung
+  silently without one. Search + core quote/profile/metric now route through the keyless, cached **gateway**
+  first (client Finnhub is optional enrichment); you can always open a typed ticker (Enter or "Open →"), and
+  the view never sits on an infinite spinner — it renders from the gateway or shows a clear retry.
+
+Auth changes security-reviewed. Full experience overhaul (unified design system, pro terminal UIUX, account
+redesign) ships next as v1.55.0.
+
+---
+
 ## v1.53.3 — 2026-07-12 (Fix — dark-coverage gate on two dark-only pages)
 
 **Fixed** — `cx-calculator.html` + `setup-supabase.html` flagged "stuck-dark-in-light":
