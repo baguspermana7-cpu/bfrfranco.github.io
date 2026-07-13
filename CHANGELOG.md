@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.53.3 — 2026-07-12 (Fix — dark-coverage gate on two dark-only pages)
+
+**Fixed** — `cx-calculator.html` + `setup-supabase.html` flagged "stuck-dark-in-light":
+both are dark-only pages, but the a11y round added `:root:not([data-theme="dark"])`
+scoped rules, which the gate reads as a declared light palette. Rules unscoped (the
+dark-scoped variants keep winning on specificity); per-page axe probes remain 0/0.
+
 ## v1.53.2 — 2026-07-12 (Finance Terminal — committee/crypto review polish: correctness + UIUX)
 
 ### Fixed
