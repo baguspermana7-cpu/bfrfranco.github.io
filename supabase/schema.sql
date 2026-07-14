@@ -30,6 +30,16 @@ create table if not exists public.profiles (
 alter table public.profiles drop constraint if exists profiles_tier_chk;
 alter table public.profiles add  constraint profiles_tier_chk check (tier in ('free','demo','pro','root'));
 
+-- email must always be present (the admin panel + email-based logic depend on it). Idempotent:
+-- backfill any nulls, set a default, then enforce NOT NULL. Safe to re-run.
+update public.profiles set email = '' where email is null;
+alter table public.profiles alter column email set default '';
+alter table public.profiles alter column email set not null;
+
+-- Least-privilege: no authenticated user should be able to create objects in the public schema.
+-- No-op on newer Supabase projects (already revoked); safe on older ones.
+revoke create on schema public from public;
+
 -- is_root() must exist BEFORE the "root reads all" policy below references it.
 -- SECURITY DEFINER so it reads `profiles` WITHOUT triggering RLS — this avoids the infinite
 -- recursion you'd get if a policy ON profiles queried profiles under RLS. STABLE + pinned
@@ -60,8 +70,10 @@ drop policy if exists "profiles: root reads all"  on public.profiles;
 drop policy if exists "profiles: root updates all" on public.profiles;  -- REMOVED (replaced by admin_set_tier RPC)
 
 -- Reads: a user sees their own row; a root sees every row (for the rz-ops accounts panel).
-create policy "profiles: read own"       on public.profiles for select using (auth.uid() = id);
-create policy "profiles: root reads all" on public.profiles for select using (public.is_root());
+-- `(select auth.uid())` / `(select is_root())` are wrapped so PostgreSQL evaluates them ONCE per
+-- statement (initPlan-cached) instead of per row — the Supabase RLS performance best-practice.
+create policy "profiles: read own"       on public.profiles for select using ((select auth.uid()) = id);
+create policy "profiles: root reads all" on public.profiles for select using ((select public.is_root()));
 -- NOTE: intentionally NO insert/update/delete policy on profiles. Creation = trigger only;
 -- tier changes = admin_set_tier() RPC only. This closes tier self-escalation completely.
 
@@ -91,16 +103,19 @@ drop policy if exists "scenarios: read own"   on public.saved_scenarios;
 drop policy if exists "scenarios: insert own" on public.saved_scenarios;
 drop policy if exists "scenarios: update own" on public.saved_scenarios;
 drop policy if exists "scenarios: delete own" on public.saved_scenarios;
-create policy "scenarios: read own"   on public.saved_scenarios for select using (auth.uid() = user_id);
-create policy "scenarios: insert own" on public.saved_scenarios for insert with check (auth.uid() = user_id);
-create policy "scenarios: update own" on public.saved_scenarios for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
-create policy "scenarios: delete own" on public.saved_scenarios for delete using (auth.uid() = user_id);
+-- `(select auth.uid())` wrapped → evaluated once per statement (cached), not per row.
+create policy "scenarios: read own"   on public.saved_scenarios for select using ((select auth.uid()) = user_id);
+create policy "scenarios: insert own" on public.saved_scenarios for insert with check ((select auth.uid()) = user_id);
+create policy "scenarios: update own" on public.saved_scenarios for update using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
+create policy "scenarios: delete own" on public.saved_scenarios for delete using ((select auth.uid()) = user_id);
 
--- Per-user row cap (storage-abuse defense). Runs as invoker → the count is itself RLS-scoped
--- to the user's own rows, which is exactly what we want to bound.
+-- Per-user row cap (storage-abuse defense). SECURITY DEFINER + pinned search_path so the count is
+-- UNCONDITIONAL (all of the user's rows), independent of the RLS policy state — the cap holds even if
+-- an RLS policy is ever changed. Scoped explicitly by `where user_id = new.user_id`.
 create or replace function public.enforce_scenario_limit()
 returns trigger
 language plpgsql
+security definer
 set search_path = public
 as $$
 begin

@@ -44,10 +44,12 @@ const ALLOWED_ORIGINS = new Set([
 // via the signup trigger; demo/educator tiers are set here after creation.
 // SECURITY: after running migrate_legacy once, reset the bagus@/admin@ passwords (the panel's
 // ⚠/Reset button) and consider removing this array + the migrate_legacy case on the next deploy.
+// Migration already run + all four accounts exist in Supabase with rotated passwords. This seed is
+// retained only as a structural reference; NO real passwords are kept in source. To re-seed, set the
+// placeholders to real values in a LOCAL untracked copy, run migrate_legacy once, then revert.
 const LEGACY = [
-  { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'demo' },
-  { email: 'educator@resistancezero.com', password: 'educator2026', tier: 'pro' },
-  // Migration already run + root passwords rotated in Supabase. Real passwords NOT kept in source.
+  { email: 'demo@resistancezero.com', password: '<SET_LOCALLY_TO_MIGRATE>', tier: 'demo' },
+  { email: 'educator@resistancezero.com', password: '<SET_LOCALLY_TO_MIGRATE>', tier: 'pro' },
   { email: 'bagus@resistancezero.com', password: '<ROTATED_IN_DASHBOARD>', tier: 'root' },
   { email: 'admin@resistancezero.com', password: '<ROTATED_IN_DASHBOARD>', tier: 'root' },
 ];
