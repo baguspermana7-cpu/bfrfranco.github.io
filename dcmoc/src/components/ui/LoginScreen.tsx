@@ -8,14 +8,21 @@ export function LoginScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [busy, setBusy] = useState(false);
     const login = useAuthStore((s) => s.login);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (busy) return;
         setError('');
-        const success = login(email, password);
-        if (!success) {
-            setError('Invalid email or password.');
+        setBusy(true);
+        try {
+            const success = await login(email, password);
+            if (!success) {
+                setError('Invalid email or password.');
+            }
+        } finally {
+            setBusy(false);
         }
     };
 
@@ -62,9 +69,10 @@ export function LoginScreen() {
 
                     <button
                         type="submit"
-                        className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-bold rounded-lg transition-colors shadow-lg shadow-cyan-900/50"
+                        disabled={busy}
+                        className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-60 disabled:cursor-wait text-white text-sm font-bold rounded-lg transition-colors shadow-lg shadow-cyan-900/50"
                     >
-                        Sign In
+                        {busy ? 'Signing in…' : 'Sign In'}
                     </button>
                 </form>
 

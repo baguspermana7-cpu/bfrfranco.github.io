@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.54.6 — 2026-07-14 (Security: DCMOC hardcoded password removed — Supabase-primary login)
+
+### Security
+- **DCMOC (Next.js app) no longer embeds the real root password.** `dcmoc/src/store/auth.ts` shipped a
+  hardcoded `ACCOUNTS` list (the last live copy of the old shared password after the v1.54.4 site-wide
+  dedup). Login is now Supabase-primary like the rest of the site: root-email allowlist gate, then the
+  shared `js/rz-config.js` + `js/rz-supabase.js` client (lazy-loaded, same origin) verifies the real
+  password via `signInWithPassword`. An existing sitewide root session (`rz_premium_session`) is adopted
+  seamlessly — already-signed-in root users skip the DCMOC login screen. App rebuilt (`next build`,
+  static export redeployed to `dcmoc/`); stale build chunks pruned.
+
+### Verification
+- Headless: login screen renders, old hardcoded password REJECTED, 0 page errors, site root session
+  auto-adopted. `grep` of source + built bundle: 0 occurrences of the old credential.
+
+---
+
 ## v1.54.5 — 2026-07-14 (Cookie engine: final 2 pages migrated · banner above tier gates)
 
 ### Changed
