@@ -1232,6 +1232,10 @@
         }
 
         function cagrClass(c) {
+            // Delegate the band thresholds to the shared engine when loaded (single source), fallback inline.
+            if (window.RZEngine && RZEngine.models && RZEngine.models.market && RZEngine.models.market.cagrBand) {
+                return 'dmt-cagr-' + RZEngine.models.market.cagrBand(c);
+            }
             if (c >= 0.20) return 'dmt-cagr-high';
             if (c >= 0.10) return 'dmt-cagr-mid';
             return 'dmt-cagr-low';
@@ -2053,6 +2057,11 @@
 
         waitForEngine(function() {
             MARKETS = RZEngine.data.markets;
+            // Adopt the shared market-viz constants (single source in rz-engine.js) when available.
+            if (RZEngine.data.marketViz) {
+                if (RZEngine.data.marketViz.maturityColors) MATURITY_COLORS = RZEngine.data.marketViz.maturityColors;
+                if (RZEngine.data.marketViz.regionColors) REGION_COLORS = RZEngine.data.marketViz.regionColors;
+            }
             renderCards();
             renderTable();
             waitForLeaflet(function() { initLeafletMap(); });
@@ -2111,7 +2120,7 @@
 
     <script src="rz-tracker.js" defer></script>
     <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-14-mkt" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14b" defer></script>
 
 <!-- Root-only Gate Overlay -->
 <div class="rz-restricted-overlay" id="rzRestrictedOverlay" role="alertdialog" aria-labelledby="rzRestrictedTitle">

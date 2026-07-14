@@ -301,6 +301,16 @@ if (D.regionsCountry) {
     eq('market.summary NA count', na.count, 6);
     eq('market.regions() = canonical 5-set', JSON.stringify(M.market.regions()), JSON.stringify(REGIONS));
     ok("DATA.sources['markets'] registered", !!(D.sources && D.sources['markets'] && D.sources['markets'].source && D.sources['markets'].asOf));
+    // marketViz — single source for the DC map/cards colour + CAGR bands (shared across pages)
+    ok('DATA.marketViz present', !!(D.marketViz && D.marketViz.maturityColors && D.marketViz.regionColors));
+    eq('market.colorByMaturity(established)', M.market.colorByMaturity('established'), '#0d9488');
+    eq('market.colorByRegion(Europe)', M.market.colorByRegion('Europe'), '#0d9488');
+    eq('market.colorByMaturity(unknown) → fallback', M.market.colorByMaturity('zzz'), D.marketViz.fallback);
+    eq('market.cagrBand(0.22) high', M.market.cagrBand(0.22), 'high');
+    eq('market.cagrBand(0.12) mid', M.market.cagrBand(0.12), 'mid');
+    eq('market.cagrBand(0.05) low', M.market.cagrBand(0.05), 'low');
+    ok('every market region resolves a colour', keys.every(k => M.market.colorByRegion(D.markets[k].region) !== D.marketViz.fallback));
+    ok("DATA.sources['marketViz'] registered", !!(D.sources && D.sources['marketViz']));
 }
 
 /* ============================================================

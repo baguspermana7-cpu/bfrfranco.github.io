@@ -272,6 +272,17 @@
             'queretaro': { name: 'Quer\u00e9taro', lat: 20.6, lng: -100.4, operational: 200, construction: 100, planned: 300, maturity: 'growing', players: ['Equinix', 'KIO Networks', 'Ascenty'], powerCost: 0.070, vacancy: 4.0, coloPrice: 135, cagr: 0.20, region: 'Latin America' }
         },
 
+        /* Market-viz mapping — single source for the map/cards/charts across DC pages (maturity + region →
+         * accent colour, CAGR thresholds). UI-layer constants live here so "edit once → re-flows everywhere". */
+        marketViz: {
+            maturityColors: { established: '#0d9488', growing: '#f59e0b', emerging: '#8b5cf6' },
+            regionColors: {
+                'North America': '#3b82f6', 'Europe': '#0d9488', 'Asia Pacific': '#f59e0b',
+                'Latin America': '#10b981', 'Middle East & Africa': '#8b5cf6'
+            },
+            cagrHigh: 0.20, cagrMid: 0.10, fallback: '#64748b'
+        },
+
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
@@ -297,6 +308,7 @@
             'coolingTypes':           { source: 'ASHRAE TC9.9 liquid-cooling taxonomy', asOf: '2026' },
             'tiers':                  { source: 'Uptime Institute Tier Standard (Topology)', asOf: '2026', unit: 'availability + capex mult' },
             'roles':                  { source: 'Engine role taxonomy', asOf: '2026' },
+            'marketViz':              { source: 'Engine UI mapping — maturity/region accent colours + CAGR bands (single source for DC map/cards)', asOf: '2026', method: 'presentation constants; not economically-material' },
             'discountDefaults':       { source: 'Damodaran regional WACC + country risk 2026', asOf: '2026', unit: 'fraction' },
             'mepPctOfCapex':          { source: 'JLL / industry MEP cost share 2026', asOf: '2026', unit: 'fraction of raw capex' },
             'modularPremiumPct':      { source: 'Modular DC vendor bid analysis 2026', asOf: '2026', unit: 'fraction vs stick-built' },
@@ -547,6 +559,22 @@
                     });
                     if (out.operational > 0) out.pipelineRatio = (out.construction + out.planned) / out.operational;
                     return out;
+                },
+                /** Accent colour for a maturity label (established/growing/emerging) → DATA.marketViz. */
+                colorByMaturity: function (maturity) {
+                    var v = DATA.marketViz;
+                    return (v.maturityColors && v.maturityColors[maturity]) || v.fallback;
+                },
+                /** Accent colour for a region label → DATA.marketViz. */
+                colorByRegion: function (region) {
+                    var v = DATA.marketViz;
+                    return (v.regionColors && v.regionColors[region]) || v.fallback;
+                },
+                /** CAGR band label ('high' ≥20% / 'mid' ≥10% / 'low') for a fractional CAGR. */
+                cagrBand: function (cagr) {
+                    var v = DATA.marketViz;
+                    if (!(typeof cagr === 'number')) return 'low';
+                    return cagr >= v.cagrHigh ? 'high' : cagr >= v.cagrMid ? 'mid' : 'low';
                 }
             },
             workforce: {
