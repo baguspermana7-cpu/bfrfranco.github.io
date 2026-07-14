@@ -11,6 +11,54 @@ release sections rather than semver.
 
 ---
 
+## v1.55.0 — 2026-07-14 (Finance-suite design system · Account Center · pro terminal intelligent layer · StockMap dark)
+
+### Added
+- **`css/rz-finance-suite.css` — ONE design language for the finance/admin suite.** Canonical `--fs-*`
+  tokens (deep-slate surfaces, 1px hairlines, IBM Plex Sans + tabular JetBrains Mono, violet suite accent)
+  + shell classes (`.fs-card/.fs-chip/.fs-btn/.fs-num/.fs-skel`). A surface opts in with
+  `<html data-rz-suite>`; the file remaps that surface's local var names onto the shared tokens —
+  **edit once, every surface re-skins**. Adopted by rz-ops, Finance Terminal, account.html, StockMap
+  (all 7 prototype pages), and the DCA app (at build). Contract: `standarization/FINANCE_SUITE_STANDARD.md`.
+- **account.html rebuilt as Account Center**: Profile (email/tier/member-since), Security with
+  **self-service password change** (new `rzSupa.changePassword` → `supabase.auth.updateUser`), saved
+  scenarios (kept), theme preference, planned rows (API keys / billing / connected apps). Flat
+  instrument cards, skeleton loaders, RLS-safe.
+- **Finance Terminal intelligent layer promoted to HEADLINE (C2)**: the FIN Investment Committee
+  scorecard + technical analytics now lead the stock workspace (above the chart, was buried at page
+  bottom); hero gains deterministic **signal chips** (Committee/Conviction/Technical/Risk/Value-Gate —
+  explainable via tooltip, click scrolls to the full scorecard) + a **52-week range bar**; skeleton
+  loaders replace the lone spinner; keyboard-first search (`S` focuses symbol search — `/` and
+  `Ctrl+K` stay with the sitewide palette — `↑/↓/Enter/Esc` navigate results). Descriptive signals
+  only; the not-investment-advice disclaimer stays gate-level.
+
+### Changed
+- **StockMap/IDR Stocks rethemed dark + made comprehensible**: light+serif+orange → RZ dark instrument
+  theme via token remap (serif display retired to IBM Plex Sans); plain-language explainer strip
+  ("official-source-only" = every number sourced or shown as “–”, never guessed); cryptic labels
+  renamed (Visible Coverage / Not Visible / Concentration / Local %). Fixed two pre-existing bugs:
+  300px horizontal overflow on app.html and index.html sections permanently invisible (scroll-reveal
+  had no JS driver). Data + methodology untouched.
+- **DCA app** dark/light palettes aligned to the canonical tokens (ThemeContext + chart series);
+  rebuilt and redeployed `Apps/dca-app/dist`.
+- rz-ops style block tokenized to `var(--fs-*)` (443 refs; `body.light-mode` rules keep literals —
+  that page's light mode is class-based); typography moved to the suite token (IBM Plex Sans).
+
+### Fixed (uiux-review round)
+- White-text-on-`#8b5cf6` AA failures: StockMap CTAs/active-tabs forced to violet-700 `#6d28d9` at the
+  token layer; DCA "Save & Connect" gradient → solid `#6d28d9` (gradient-button anti-pattern removed).
+- Light theme now flips signal + accent tokens to darkened AA variants (`#059669/#dc2626/#b45309/#2563eb/#0e7490`, accent `#6d28d9`).
+- Terminal skeleton shimmer honours `prefers-reduced-motion`; `.fs-num` gets slashed-zero.
+
+### Verification
+- Probes ALL PASS: terminal C2 drive (stubbed gateway; keyboard flow, headline scorecard, chips,
+  disclaimer), account signed-in/password/theme (stubbed Supabase), StockMap + DCA dark screenshots.
+- Gates CLEAN: js-syntax, script-tags, a11y (8pp × 2 themes), dark-coverage (116pp both modes).
+- uiux-review: 3 contrast blockers found → fixed → re-verified. Accent exception logged in
+  design.md §15 Decision Log.
+
+---
+
 ## v1.54.7 — 2026-07-14 (Security hygiene: redact the rotated password string from the public changelog)
 
 **Security** — the v1.54.4 changelog entry quoted the old (now-rotated) root password literal, which shipped

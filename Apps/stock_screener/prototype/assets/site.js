@@ -276,7 +276,7 @@
           draggable: true,
           label: {
             show: true,
-            color: "#5c5850",
+            color: utils.chartTheme.text,
             fontFamily: "JetBrains Mono, monospace",
             fontSize: 10
           },
@@ -288,12 +288,12 @@
             ...node,
             symbolSize: node.symbolSize || node.value,
             itemStyle: {
-              color: node.category === 0 ? "#e55300" : node.category === 1 ? "#2563eb" : node.category === 2 ? "#1a8754" : "#7c3aed"
+              color: node.category === 0 ? utils.chartTheme.accent : node.category === 1 ? utils.chartTheme.blue : node.category === 2 ? utils.chartTheme.green : utils.chartTheme.violet
             }
           })),
           links: scenario.links,
           lineStyle: {
-            color: "rgba(0,0,0,0.12)",
+            color: utils.chartTheme.edge,
             width: 1.5
           }
         }
@@ -341,8 +341,29 @@
     }
   }
 
+  function initScrollReveal() {
+    // styles.css ships .scroll-reveal { opacity: 0 } — without this driver the
+    // landing sections below the hero never become visible.
+    const targets = document.querySelectorAll(".scroll-reveal");
+    if (!targets.length) return;
+    if (!("IntersectionObserver" in window)) {
+      targets.forEach((el) => el.classList.add("is-visible"));
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          io.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.05 });
+    targets.forEach((el) => io.observe(el));
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     attachSearch("#landing-search-input", "#landing-search-results");
+    initScrollReveal();
     renderLandingStats();
     renderFeatureCards();
     renderCoveragePanels();

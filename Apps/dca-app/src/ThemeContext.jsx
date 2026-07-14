@@ -7,74 +7,74 @@ import { createContext, useContext, useState, useEffect, useMemo } from "react";
    ══════════════════════════════════════════════ */
 
 const darkColors = {
-  // Backgrounds — matched to admin console (#0b1120)
-  bg:   "transparent",
-  sf:   "#0f172a",
-  sf2:  "#1a2340",
-  sf3:  "#1e293b",
+  // Backgrounds — RZ finance-suite canonical tokens (css/rz-finance-suite.css)
+  bg:   "#0b1120",   // page (--fs-bg0)
+  sf:   "#1e293b",   // card / surface (--fs-bg2)
+  sf2:  "#0f172a",   // inset / well (--fs-bg3)
+  sf3:  "#334155",   // raised
   // Borders
-  bd:   "#1e293b",
-  bd2:  "#334155",
+  bd:   "#334155",   // 1px hairline (--fs-bd)
+  bd2:  "#475569",
   // Accent & semantic
-  acc:  "#3b82f6",
-  accH: "#60a5fa",
-  grn:  "#22c55e",
-  grnH: "#4ade80",
-  red:  "#ef4444",
-  redH: "#f87171",
-  amb:  "#eab308",
-  ambH: "#facc15",
+  acc:  "#8b5cf6",
+  accH: "#a78bfa",
+  grn:  "#34d399",
+  grnH: "#6ee7b7",
+  red:  "#f87171",
+  redH: "#fca5a5",
+  amb:  "#fbbf24",
+  ambH: "#fcd34d",
   pur:  "#8b5cf6",
   purH: "#a78bfa",
-  cyn:  "#06b6d4",
-  cynH: "#22d3ee",
+  cyn:  "#22d3ee",
+  cynH: "#67e8f9",
   pnk:  "#f472b6",
   // Text
-  t1:   "#e8ecf4",
-  t2:   "#8b97ad",
-  t3:   "#475569",
+  t1:   "#f1f5f9",   // bright (--fs-t1)
+  t2:   "#94a3b8",   // muted (--fs-t3)
+  t3:   "#64748b",   // dim (--fs-t4)
   // Input
-  inp:  "#0b1120",
+  inp:  "#0f172a",
   // Overlay
   ov:   "rgba(0,0,0,0.5)",
   // Shadow
   sh:   "0 2px 8px rgba(0,0,0,0.3)",
   sh2:  "0 8px 24px rgba(0,0,0,0.25)",
   // Chart tooltip
-  ttBg: "#0f172a",
+  ttBg: "#1e293b",
   // Gradient overlay for cards
-  grd:  "linear-gradient(135deg, rgba(59,130,246,0.06) 0%, transparent 50%)",
+  grd:  "linear-gradient(135deg, rgba(139,92,246,0.06) 0%, transparent 50%)",
 };
 
 const lightColors = {
-  // Backgrounds — warm whites & soft grays
-  bg:   "#f7f8fb",
-  sf:   "#ffffff",
-  sf2:  "#f0f2f7",
-  sf3:  "#e8ebf0",
+  // Backgrounds — RZ finance-suite canonical light tokens
+  bg:   "#f8fafc",   // page (--fs-bg0)
+  sf:   "#ffffff",   // card / surface
+  sf2:  "#f1f5f9",   // inset / well (--fs-bg3)
+  sf3:  "#e2e8f0",
   // Borders
-  bd:   "#d8dde6",
-  bd2:  "#c4cbd8",
-  // Accent & semantic — slightly deeper in light mode for contrast
-  acc:  "#2563eb",
-  accH: "#1d4ed8",
-  grn:  "#16a34a",
-  grnH: "#15803d",
-  red:  "#dc2626",
-  redH: "#b91c1c",
-  amb:  "#ca8a04",
-  ambH: "#a16207",
-  pur:  "#7c3aed",
-  purH: "#6d28d9",
-  cyn:  "#0891b2",
-  cynH: "#0e7490",
+  bd:   "#e2e8f0",   // hairline (--fs-bd)
+  bd2:  "#cbd5e1",
+  // Accent & semantic — canonical accents; darker hover for contrast on white
+  acc:  "#8b5cf6",
+  accH: "#7c3aed",
+  grn:  "#34d399",
+  grnH: "#10b981",
+  red:  "#f87171",
+  redH: "#ef4444",
+  amb:  "#fbbf24",
+  ambH: "#f59e0b",
+  pur:  "#8b5cf6",
+  purH: "#7c3aed",
+  cyn:  "#22d3ee",
+  cynH: "#06b6d4",
   pnk:  "#ec4899",
   // Text — dark text on light backgrounds
-  t1:   "#111827",
-  t2:   "#4b5563",
-  t3:   "#9ca3af",
+  t1:   "#0f172a",   // bright (--fs-t1 light)
+  t2:   "#475569",   // muted (--fs-t3 light)
+  t3:   "#64748b",   // dim (--fs-t4 light)
   // Input
-  inp:  "#f3f4f6",
+  inp:  "#f1f5f9",
   // Overlay
   ov:   "rgba(0,0,0,0.15)",
   // Shadow
@@ -83,7 +83,7 @@ const lightColors = {
   // Chart tooltip
   ttBg: "#ffffff",
   // Gradient overlay for cards
-  grd:  "linear-gradient(135deg, rgba(37,99,235,0.03) 0%, transparent 50%)",
+  grd:  "linear-gradient(135deg, rgba(139,92,246,0.03) 0%, transparent 50%)",
 };
 
 const ThemeContext = createContext();
@@ -119,7 +119,7 @@ export function ThemeProvider({ children }) {
     // Set meta theme-color for mobile browser chrome
     const meta = document.querySelector('meta[name="theme-color"]') || document.createElement("meta");
     meta.name = "theme-color";
-    meta.content = mode === "dark" ? "#06080e" : "#f7f8fb";
+    meta.content = mode === "dark" ? "#0b1120" : "#f8fafc";
     if (!meta.parentNode) document.head.appendChild(meta);
   }, [mode]);
 

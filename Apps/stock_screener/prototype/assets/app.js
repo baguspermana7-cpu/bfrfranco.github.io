@@ -102,9 +102,9 @@
 
     const items = [
       { id: "overview-section", label: "Overview", note: "Source status" },
-      { id: "priority-section", label: "Priority Queue", note: "Decision mode" },
-      { id: "screener-section", label: "Float Screener", note: "Sourced rows" },
-      { id: "network-section", label: "Network", note: "Issuer overlap" },
+      { id: "priority-section", label: "Priority Ranking", note: "Ranked ideas" },
+      { id: "screener-section", label: "Free Float Screener", note: "Sourced rows" },
+      { id: "network-section", label: "Ownership Network", note: "Who owns what" },
       { id: "source-section", label: "Source Ledger", note: "As-of dates" },
       { id: "saved-section", label: "Saved Tickers", note: "Local storage" }
     ];
@@ -609,11 +609,11 @@
     const cards = [
       { label: "Avg Free Float", value: formatPct(avgFloat) },
       { label: "Avg Strategic Held", value: formatPct(avgStrategic) },
-      { label: "Avg Blind Spot", value: formatPct(avgBlindSpot) },
-      { label: "Avg HHI", value: avgHHI.toFixed(0) },
+      { label: "Avg Not Visible", value: formatPct(avgBlindSpot) },
+      { label: "Avg Concentration", value: avgHHI.toFixed(0) },
       { label: "High Risk", value: String(highRisk) },
-      { label: "Alloc A", value: String(allocationAccumulate) },
-      { label: "Multi A", value: String(multibaggerAccumulate) },
+      { label: "Allocation: Accumulate", value: String(allocationAccumulate) },
+      { label: "Multibagger: Accumulate", value: String(multibaggerAccumulate) },
       { label: "Rows", value: String(rows.length) }
     ];
 
@@ -826,14 +826,14 @@
 
     chart.setOption({
       tooltip: { trigger: "item" },
-      color: ["#e55300", "#1a8754", "#2563eb", "#7c3aed"],
+      color: [utils.chartTheme.accent, utils.chartTheme.green, utils.chartTheme.blue, utils.chartTheme.violet],
       series: [
         {
           type: "pie",
           radius: ["45%", "72%"],
           label: {
             formatter: "{b}",
-            color: "#5c5850",
+            color: utils.chartTheme.text,
             fontFamily: "JetBrains Mono, monospace",
             fontSize: 10
           },
@@ -967,7 +967,7 @@
             moveOverlap: "shiftY"
           },
           label: {
-            color: "#5c5850",
+            color: utils.chartTheme.text,
             fontFamily: "JetBrains Mono, monospace",
             fontSize: 10,
             position: "right"
@@ -977,7 +977,7 @@
             label: {
               show: shouldShowNodeLabel(node),
               formatter: node.name,
-              color: "#5c5850",
+              color: utils.chartTheme.text,
               fontFamily: "JetBrains Mono, monospace",
               fontSize: node.kind === "ticker" ? 11 : 10
             },
@@ -987,11 +987,11 @@
               }
             },
             itemStyle: {
-              color: node.category === 0 ? "#e55300" : node.category === 1 ? "#2563eb" : node.category === 2 ? "#1a8754" : "#7c3aed"
+              color: node.category === 0 ? utils.chartTheme.accent : node.category === 1 ? utils.chartTheme.blue : node.category === 2 ? utils.chartTheme.green : utils.chartTheme.violet
             }
           })),
           links: scenario.links,
-          lineStyle: { color: "rgba(0,0,0,0.12)", curveness: 0.1, opacity: 0.7 }
+          lineStyle: { color: utils.chartTheme.edge, curveness: 0.1, opacity: 0.7 }
         }
       ]
     }, true);
@@ -1232,32 +1232,32 @@
         },
         legend: {
           top: 0,
-          textStyle: { color: "#5c5850", fontFamily: "JetBrains Mono, monospace", fontSize: 10 }
+          textStyle: { color: utils.chartTheme.text, fontFamily: "JetBrains Mono, monospace", fontSize: 10 }
         },
         grid: { left: 50, right: 16, top: 34, bottom: 24 },
         xAxis: {
           type: "value",
           max: 100,
-          axisLabel: { color: "#9c9890", fontFamily: "JetBrains Mono, monospace", fontSize: 10 }
+          axisLabel: { color: utils.chartTheme.muted, fontFamily: "JetBrains Mono, monospace", fontSize: 10 }
         },
         yAxis: {
           type: "category",
           data: sectorRows.map((row) => row.sector),
-          axisLabel: { color: "#5c5850", fontFamily: "JetBrains Mono, monospace", fontSize: 10 }
+          axisLabel: { color: utils.chartTheme.text, fontFamily: "JetBrains Mono, monospace", fontSize: 10 }
         },
         series: [
           {
             name: "Local",
             type: "bar",
             stack: "ownership",
-            itemStyle: { color: "#1a8754" },
+            itemStyle: { color: utils.chartTheme.green },
             data: sectorRows.map((row) => row.local)
           },
           {
             name: "Foreign",
             type: "bar",
             stack: "ownership",
-            itemStyle: { color: "#2563eb" },
+            itemStyle: { color: utils.chartTheme.blue },
             data: sectorRows.map((row) => row.foreign)
           }
         ]

@@ -1,13 +1,14 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-rz-suite="stockmap">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>StockMap App</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/styles.css?v=20260316m">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/styles.css?v=20260714">
+  <link rel="stylesheet" href="../../../css/rz-finance-suite.css?v=2026-07-14">
 </head>
 <body data-page="app">
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -49,7 +50,10 @@
                 </div>
                 <div class="eyebrow">Sourced Coverage</div>
               </div>
-              <div class="app-mini-stats" id="app-top-stats"></div>
+              <div class="explainer-strip">
+                <span><strong>What is StockMap?</strong> It maps who really owns each Indonesian (IDX) listed stock &mdash; how much is held by strategic owners, and how much is genuinely left for the public to trade (the &ldquo;free float&rdquo;). <strong>Official-source-only</strong> means every number here comes from an official source (IDX filings, KSEI records, company reports). If we can&rsquo;t source a number, the cell shows &ldquo;&ndash;&rdquo; instead of a guess.</span>
+              </div>
+              <div class="app-mini-stats" id="app-top-stats" style="margin-top:14px"></div>
               <article class="app-card" style="padding:14px;margin-top:14px">
                 <div class="panel-head"><span class="panel-stripe" style="background:var(--green)"></span><span>Ask StockMap</span></div>
                 <div class="form-grid" style="margin-top:14px">
@@ -84,12 +88,12 @@
             </section>
 
             <section class="app-card reveal" id="priority-section">
-              <div class="panel-head"><span class="panel-stripe" style="background:var(--violet)"></span><span>Ownership Priority Queue</span></div>
+              <div class="panel-head"><span class="panel-stripe" style="background:var(--violet)"></span><span>Ownership Priority Ranking</span></div>
               <div class="app-topbar" style="margin-top:14px">
                 <div class="eyebrow" id="priority-note">Ownership-first ordering only. This is not valuation or earnings advice.</div>
                 <div class="app-tab-row" id="priority-mode-tabs">
-                  <button class="app-tab is-active" id="priority-mode-allocation" type="button">Allocation Mode</button>
-                  <button class="app-tab" id="priority-mode-multibagger" type="button">Multibagger Mode</button>
+                  <button class="app-tab is-active" id="priority-mode-allocation" type="button" title="Steady portfolio buys: favors stable, well-covered names">Allocation Mode</button>
+                  <button class="app-tab" id="priority-mode-multibagger" type="button" title="High risk, high reward: hunts names with re-rating potential">Multibagger Mode</button>
                 </div>
               </div>
               <div class="snapshot-grid analytics-grid" id="priority-stat-grid" style="margin-top:14px"></div>
@@ -155,7 +159,7 @@
                 <button class="app-tab" data-tab="below15" type="button">5-15%</button>
                 <button class="app-tab is-active" data-tab="mid" type="button">15-50%</button>
                 <button class="app-tab" data-tab="high" type="button">&gt;50%</button>
-                <button class="app-tab" data-tab="all" type="button">All Sourced</button>
+                <button class="app-tab" data-tab="all" type="button">All (sourced only)</button>
               </div>
               <div class="snapshot-grid analytics-grid" id="float-analytics-grid" style="margin-top:14px"></div>
               <div class="table-wrap" style="margin-top:14px">
@@ -166,15 +170,15 @@
                       <th scope="col" data-sort-key="company">Company</th>
                       <th scope="col" data-sort-key="sector">Sector</th>
                       <th scope="col" data-sort-key="holder">Largest Strategic Holder</th>
-                      <th scope="col" class="right" data-sort-key="totalHeld">Strategic Held</th>
-                      <th scope="col" class="right" data-sort-key="freeFloat">Free Float</th>
-                      <th scope="col" class="right" data-sort-key="visibleHeld">Visible Cov.</th>
-                      <th scope="col" class="right" data-sort-key="blindSpot">Blind Spot</th>
-                      <th scope="col" class="right" data-sort-key="hhi">HHI</th>
-                      <th scope="col" class="right" data-sort-key="localPct">L/F</th>
+                      <th scope="col" class="right" data-sort-key="totalHeld" title="Share of the company locked up by strategic owners (founders, government, parent companies)">Strategic Held</th>
+                      <th scope="col" class="right" data-sort-key="freeFloat" title="Share genuinely available for the public to trade">Free Float</th>
+                      <th scope="col" class="right" data-sort-key="visibleHeld" title="Share of ownership we can see in official filings">Visible Coverage</th>
+                      <th scope="col" class="right" data-sort-key="blindSpot" title="Share of ownership NOT visible in official filings">Not Visible</th>
+                      <th scope="col" class="right" data-sort-key="hhi" title="Concentration index (HHI) &mdash; higher means ownership sits in fewer hands">Concentration</th>
+                      <th scope="col" class="right" data-sort-key="localPct" title="Share held by local (Indonesian) investors, where nationality is disclosed">Local %</th>
                       <th scope="col" class="right" data-sort-key="risk">Risk</th>
-                      <th scope="col" data-sort-key="allocationScore">Alloc</th>
-                      <th scope="col" data-sort-key="multibaggerScore">Multi</th>
+                      <th scope="col" data-sort-key="allocationScore" title="Allocation Mode score: fit for steady portfolio buys">Allocation</th>
+                      <th scope="col" data-sort-key="multibaggerScore" title="Multibagger Mode score: high-risk re-rating potential">Multibagger</th>
                       <th scope="col" data-sort-key="signalSummary">Signal</th>
                     </tr>
                   </thead>
@@ -299,8 +303,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-  <script src="./assets/mock-data.js?v=20260316m"></script>
-  <script src="./assets/utils.js?v=20260316m"></script>
-  <script src="./assets/app.js?v=20260316m"></script>
+  <script src="./assets/mock-data.js?v=20260714"></script>
+  <script src="./assets/utils.js?v=20260714"></script>
+  <script src="./assets/app.js?v=20260714"></script>
 </body>
 </html>

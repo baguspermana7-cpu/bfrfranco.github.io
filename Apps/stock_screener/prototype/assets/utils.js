@@ -19,6 +19,33 @@
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
   const round2 = (value) => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
 
+  // Chart palette resolved from the suite design tokens (rz-finance-suite.css
+  // remap on <html data-rz-suite="stockmap">) so canvas charts follow the theme.
+  const chartTheme = (function () {
+    const styles = getComputedStyle(document.documentElement);
+    const token = (name, fallback) => (styles.getPropertyValue(name) || "").trim() || fallback;
+    const dark = document.documentElement.hasAttribute("data-rz-suite");
+    return {
+      text: token("--text-dim", "#5c5850"),
+      muted: token("--text-muted", "#9c9890"),
+      accent: token("--accent", "#e55300"),
+      green: token("--green", "#1a8754"),
+      blue: token("--blue", "#2563eb"),
+      red: token("--red", "#dc2626"),
+      violet: token("--violet", "#7c3aed"),
+      edge: dark ? "rgba(148, 163, 184, 0.28)" : "rgba(0, 0, 0, 0.12)",
+      neutral: dark ? "rgba(148, 163, 184, 0.45)" : "rgba(92, 88, 80, 0.45)"
+    };
+  })();
+
+  // Alpha variant of a token hex color (chart edge lines, heat fills).
+  const alphaColor = (hex, alpha) => {
+    const m = /^#([0-9a-f]{6})$/i.exec(String(hex).trim());
+    if (!m) return hex;
+    const n = parseInt(m[1], 16);
+    return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+  };
+
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (char) => ESCAPE_MAP[char]);
   }
@@ -100,14 +127,14 @@
     const alpha = Math.min(0.96, 0.28 + magnitude * 0.055);
 
     if (change > 0) {
-      return `rgba(26, 135, 84, ${alpha})`;
+      return alphaColor(chartTheme.green, alpha);
     }
 
     if (change < 0) {
-      return `rgba(185, 28, 28, ${alpha})`;
+      return alphaColor(chartTheme.red, alpha);
     }
 
-    return "rgba(92, 88, 80, 0.45)";
+    return chartTheme.neutral;
   }
 
   function levenshtein(a, b) {
@@ -747,8 +774,8 @@
         target: `ticker:${position.ticker}`,
         value: position.pctValue,
         relationType: "Focus stake",
-        lineStyle: { width: Math.max(1.5, Math.min(7, position.pctValue / 8)), color: "rgba(229,83,0,0.62)" },
-        label: { show: position.pctValue >= 8, formatter: formatPct(position.pctValue), color: "#5c5850", fontSize: 10 }
+        lineStyle: { width: Math.max(1.5, Math.min(7, position.pctValue / 8)), color: alphaColor(chartTheme.accent, 0.62) },
+        label: { show: position.pctValue >= 8, formatter: formatPct(position.pctValue), color: chartTheme.text, fontSize: 10 }
       });
 
       evidence.push({
@@ -781,7 +808,7 @@
           target: `ticker:${position.ticker}`,
           value: blindSpotEvidence.pctValue,
           relationType: "Blind spot",
-          lineStyle: { width: Math.max(1, Math.min(4, blindSpotEvidence.pctValue / 12)), color: "rgba(124,58,237,0.36)" },
+          lineStyle: { width: Math.max(1, Math.min(4, blindSpotEvidence.pctValue / 12)), color: alphaColor(chartTheme.violet, 0.36) },
           label: { show: false }
         });
       }
@@ -806,7 +833,7 @@
             relationType: "Strategic co-holder",
             lineStyle: {
               width: Math.max(1.2, Math.min(5, (floatRow.totalHeld || 0) / 12)),
-              color: "rgba(26,135,84,0.48)"
+              color: alphaColor(chartTheme.green, 0.48)
             },
             label: { show: false }
           });
@@ -857,7 +884,7 @@
             relationType,
             lineStyle: {
               width: Math.max(1.2, Math.min(5, row.pctValue / 12)),
-              color: row.strategic ? "rgba(26,135,84,0.48)" : "rgba(37,99,235,0.42)"
+              color: row.strategic ? alphaColor(chartTheme.green, 0.48) : alphaColor(chartTheme.blue, 0.42)
             },
             label: { show: false }
           });
@@ -964,9 +991,9 @@
           relationType,
           lineStyle: {
             width: Math.max(1.5, Math.min(7, row.pctValue / 8)),
-            color: row.strategic ? "rgba(26,135,84,0.55)" : "rgba(37,99,235,0.44)"
+            color: row.strategic ? alphaColor(chartTheme.green, 0.55) : alphaColor(chartTheme.blue, 0.44)
           },
-          label: { show: row.pctValue >= 10, formatter: formatPct(row.pctValue), color: "#5c5850", fontSize: 10 }
+          label: { show: row.pctValue >= 10, formatter: formatPct(row.pctValue), color: chartTheme.text, fontSize: 10 }
         });
 
         evidence.push({
@@ -1003,7 +1030,7 @@
               target: `ticker:${position.ticker}`,
               value: position.pctValue,
               relationType: "Linked holding",
-              lineStyle: { width: Math.max(1, Math.min(4.5, position.pctValue / 12)), color: "rgba(125,90,230,0.34)" },
+              lineStyle: { width: Math.max(1, Math.min(4.5, position.pctValue / 12)), color: alphaColor(chartTheme.violet, 0.34) },
               label: { show: false }
             });
 
@@ -1037,7 +1064,7 @@
       target: `ticker:${entity.id}`,
       value: metrics.hiddenFloat,
       relationType: "Blind spot",
-      lineStyle: { width: Math.max(1, Math.min(4, metrics.hiddenFloat / 12)), color: "rgba(124,58,237,0.36)" },
+      lineStyle: { width: Math.max(1, Math.min(4, metrics.hiddenFloat / 12)), color: alphaColor(chartTheme.violet, 0.36) },
       label: { show: false }
     });
 
@@ -1211,6 +1238,7 @@
 
   window.StockMapUtils = {
     $,
+    chartTheme,
     $$,
     buildAiAnswer,
     buildSignalSummary,

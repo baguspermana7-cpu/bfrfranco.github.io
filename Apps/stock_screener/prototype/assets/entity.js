@@ -372,14 +372,14 @@
     }
     pieChart.setOption({
       tooltip: { trigger: "item" },
-      color: ["#1a8754", "#2563eb", "#e55300", "#7c3aed", "#dc2626"],
+      color: [utils.chartTheme.green, utils.chartTheme.blue, utils.chartTheme.accent, utils.chartTheme.violet, utils.chartTheme.red],
       series: [
         {
           type: "pie",
           radius: ["45%", "72%"],
           label: {
             formatter: "{b}",
-            color: "#5c5850",
+            color: utils.chartTheme.text,
             fontFamily: "JetBrains Mono, monospace",
             fontSize: 10
           },
@@ -412,7 +412,7 @@
         axisLabel: {
           interval: 0,
           rotate: 30,
-          color: "#5c5850",
+          color: utils.chartTheme.text,
           fontFamily: "JetBrains Mono, monospace",
           fontSize: 9
         }
@@ -420,7 +420,7 @@
       yAxis: {
         type: "value",
         axisLabel: {
-          color: "#9c9890",
+          color: utils.chartTheme.muted,
           fontFamily: "JetBrains Mono, monospace",
           fontSize: 10
         }
@@ -429,7 +429,7 @@
         {
           type: "bar",
           data: barRows.map((row) => row.value),
-          itemStyle: { color: "#e55300", borderRadius: [6, 6, 0, 0] }
+          itemStyle: { color: utils.chartTheme.accent, borderRadius: [6, 6, 0, 0] }
         }
       ]
     });

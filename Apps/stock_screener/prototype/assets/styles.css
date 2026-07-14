@@ -34,10 +34,7 @@ html {
 
 body {
   margin: 0;
-  background:
-    radial-gradient(circle at top left, rgba(229, 83, 0, 0.07), transparent 24%),
-    radial-gradient(circle at top right, rgba(37, 99, 235, 0.06), transparent 22%),
-    linear-gradient(180deg, #f8f6f2 0%, #f3f0ea 100%);
+  background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -66,19 +63,19 @@ img {
   display: block;
   text-align: center;
   padding: 8px 14px;
-  background: linear-gradient(90deg, #fff3eb 0%, #ffe8d6 50%, #fff3eb 100%);
+  background: var(--accent-soft);
   color: var(--accent);
   text-decoration: none;
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.02em;
-  border-bottom: 1px solid rgba(229, 83, 0, 0.12);
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .nav {
   backdrop-filter: blur(10px);
-  background: rgba(248, 246, 242, 0.82);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+  border-bottom: 1px solid var(--border);
 }
 
 .nav-inner,
@@ -179,7 +176,7 @@ img {
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 7px 12px;
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--surface-soft);
   font-size: 11px;
   font-family: var(--font-mono);
   letter-spacing: 0.08em;
@@ -206,7 +203,7 @@ img {
 .hero h1 em,
 .page-hero h1 em {
   color: var(--accent);
-  font-style: italic;
+  font-style: inherit;
 }
 
 .hero-sub,
@@ -253,7 +250,7 @@ img {
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  background: rgba(255, 255, 255, 0.76);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
   overflow: hidden;
@@ -326,7 +323,7 @@ img {
 }
 
 .feature-card.is-new {
-  border-color: rgba(229, 83, 0, 0.34);
+  border-color: color-mix(in srgb, var(--accent) 34%, transparent);
   position: relative;
 }
 
@@ -420,7 +417,7 @@ img {
 .surface-block {
   width: min(1200px, 100%);
   margin: 24px auto 0;
-  background: #fafaf7;
+  background: var(--surface-soft);
   border: 1px solid var(--border);
   border-radius: 16px;
   box-shadow: var(--shadow);
@@ -617,27 +614,27 @@ img {
 
 .tone-accent {
   color: var(--accent);
-  background: rgba(229, 83, 0, 0.08);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
 .tone-blue {
   color: var(--blue);
-  background: rgba(37, 99, 235, 0.08);
+  background: color-mix(in srgb, var(--blue) 8%, transparent);
 }
 
 .tone-green {
   color: var(--green);
-  background: rgba(26, 135, 84, 0.08);
+  background: color-mix(in srgb, var(--green) 8%, transparent);
 }
 
 .tone-red {
   color: var(--red);
-  background: rgba(220, 38, 38, 0.08);
+  background: color-mix(in srgb, var(--red) 8%, transparent);
 }
 
 .tone-violet {
   color: var(--violet);
-  background: rgba(124, 58, 237, 0.08);
+  background: color-mix(in srgb, var(--violet) 8%, transparent);
 }
 
 .mono {
@@ -675,7 +672,7 @@ img {
   position: sticky;
   top: 0;
   z-index: 2;
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--surface);
   backdrop-filter: blur(8px);
 }
 
@@ -687,7 +684,7 @@ img {
 }
 
 .table tbody tr:hover td {
-  background: rgba(229, 83, 0, 0.025);
+  background: color-mix(in srgb, var(--accent) 2%, transparent);
 }
 
 .table .right {
@@ -706,7 +703,7 @@ img {
   min-height: 120px;
   margin: -120px -18px -18px;
   padding-bottom: 18px;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--surface));
+  background: linear-gradient(to bottom, transparent, var(--surface));
 }
 
 .tab-row,
@@ -744,6 +741,27 @@ img {
   text-align: center;
 }
 
+.explainer-strip {
+  margin: 14px auto 0;
+  max-width: 860px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  text-align: left;
+  border: 1px solid var(--border-mid);
+  border-left: 2px solid var(--accent);
+  border-radius: 10px;
+  background: var(--surface-soft);
+  padding: 12px 14px;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.explainer-strip strong {
+  color: var(--text);
+}
+
 .chart-shell,
 .graph-shell {
   width: 100%;
@@ -768,8 +786,8 @@ img {
   width: min(860px, 100%);
   margin: 0 auto;
   text-align: center;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 247, 241, 0.92));
-  border: 1px solid rgba(229, 83, 0, 0.14);
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--accent) 14%, transparent);
   border-radius: 20px;
   padding: 36px 26px;
   box-shadow: var(--shadow);
@@ -803,7 +821,7 @@ img {
 }
 
 .pt-node-future {
-  background: #d8d1c8;
+  background: var(--border-mid);
 }
 
 .pt-line {
@@ -812,7 +830,7 @@ img {
 }
 
 .pt-line-inactive {
-  background: #d8d1c8;
+  background: var(--border-mid);
 }
 
 .pt-labels {
@@ -861,7 +879,7 @@ img {
 }
 
 .pt-badge-next {
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--surface-soft);
   color: var(--text-dim);
 }
 
@@ -1009,7 +1027,7 @@ img {
 }
 
 .formula {
-  border: 1px solid rgba(229, 83, 0, 0.18);
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
   background: var(--accent-soft);
   border-radius: 12px;
   padding: 18px;
@@ -1109,6 +1127,12 @@ img {
   gap: 14px;
 }
 
+/* grid items default to min-width:auto — a wide table's min-content would
+   blow the implicit track instead of scrolling inside .table-wrap */
+.app-main > * {
+  min-width: 0;
+}
+
 .sidebar-title {
   font-family: var(--font-serif);
   font-size: 28px;
@@ -1140,7 +1164,7 @@ img {
 
 .sidebar-item:hover,
 .sidebar-item.is-active {
-  border-color: rgba(229, 83, 0, 0.24);
+  border-color: color-mix(in srgb, var(--accent) 24%, transparent);
   background: var(--accent-soft);
 }
 
@@ -1196,7 +1220,7 @@ img {
   overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.88);
+  background: var(--surface);
 }
 
 .decision-chip-row {
@@ -1253,9 +1277,9 @@ img {
 }
 
 .callout {
-  border: 1px solid rgba(229, 83, 0, 0.16);
+  border: 1px solid color-mix(in srgb, var(--accent) 16%, transparent);
   border-radius: 14px;
-  background: linear-gradient(180deg, rgba(255, 243, 235, 0.85), rgba(255, 255, 255, 0.95));
+  background: var(--surface-soft);
   padding: 16px;
 }
 
@@ -1294,8 +1318,8 @@ img {
 
 .entity-hero {
   margin-top: 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 247, 241, 0.9));
-  border: 1px solid rgba(229, 83, 0, 0.12);
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);
   border-radius: 22px;
   padding: 28px;
   box-shadow: var(--shadow);
@@ -1369,7 +1393,7 @@ img {
 }
 
 .entity-metric {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--surface-soft);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 14px;
@@ -1515,8 +1539,8 @@ img {
 }
 
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(229, 83, 0, 0.2); }
-  50% { box-shadow: 0 0 0 8px rgba(229, 83, 0, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 20%, transparent); }
+  50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 0%, transparent); }
 }
 
 @keyframes countUp {
@@ -1549,7 +1573,7 @@ img {
 .feature-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.10), 0 8px 16px rgba(0, 0, 0, 0.06);
-  border-color: rgba(229, 83, 0, 0.18);
+  border-color: color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
 .preview-card:hover,
@@ -1569,7 +1593,7 @@ img {
 .entity-related-card:hover {
   transform: translateX(4px);
   background: var(--accent-soft);
-  border-color: rgba(229, 83, 0, 0.2);
+  border-color: color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
 /* ═══════════════════════════════════════════════
@@ -1588,14 +1612,14 @@ img {
 .hero-cta:hover,
 .primary-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(229, 83, 0, 0.25);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 
 .nav-cta:active,
 .hero-cta:active,
 .primary-btn:active {
   transform: translateY(0) scale(0.97);
-  box-shadow: 0 2px 8px rgba(229, 83, 0, 0.15);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 15%, transparent);
 }
 
 /* Shimmer effect on CTA */
@@ -1628,7 +1652,7 @@ img {
 }
 
 .table tbody tr:hover {
-  background: rgba(229, 83, 0, 0.03);
+  background: color-mix(in srgb, var(--accent) 3%, transparent);
 }
 
 .table tbody tr:not(.blur-row):hover td {
@@ -1704,8 +1728,8 @@ img {
 .search-input:focus,
 .app-search-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(229, 83, 0, 0.08);
-  background: #fff;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 8%, transparent);
+  background: var(--surface);
 }
 
 .search-results {
@@ -1742,7 +1766,7 @@ img {
 
 .tab.is-active,
 .app-tab.is-active {
-  box-shadow: 0 4px 12px rgba(229, 83, 0, 0.2);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 20%, transparent);
   transform: translateY(-1px);
 }
 
@@ -1813,7 +1837,7 @@ img {
   border-radius: 50%;
   background: var(--red);
   animation: pulseGlow 2s ease infinite;
-  box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.3);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--red) 30%, transparent);
 }
 
 .risk-medium::before {
@@ -1873,12 +1897,12 @@ img {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.12);
+  background: var(--border-mid);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.22);
+  background: rgba(148, 163, 184, 0.45);
 }
 
 /* ═══════════════════════════════════════════════
@@ -2004,7 +2028,7 @@ input:focus-visible {
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(229, 83, 0, 0.06), transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 6%, transparent), transparent 70%);
   pointer-events: none;
 }
 
@@ -2032,7 +2056,7 @@ input:focus-visible {
 
 .cd-box:hover {
   transform: translateY(-2px);
-  border-color: rgba(229, 83, 0, 0.18);
+  border-color: color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
 /* ═══════════════════════════════════════════════
@@ -2065,7 +2089,7 @@ input:focus-visible {
 }
 
 .callout:hover {
-  border-color: rgba(229, 83, 0, 0.28);
+  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
 }
 
 /* ═══════════════════════════════════════════════
@@ -2076,13 +2100,13 @@ input:focus-visible {
   padding: 14px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.03), rgba(37, 99, 235, 0.03));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--violet) 3%, transparent), color-mix(in srgb, var(--blue) 3%, transparent));
   transition: transform 0.25s ease, border-color 0.25s ease;
 }
 
 .spotlight-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(124, 58, 237, 0.2);
+  border-color: color-mix(in srgb, var(--violet) 20%, transparent);
 }
 
 .spotlight-icon {
@@ -2092,7 +2116,7 @@ input:focus-visible {
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: rgba(124, 58, 237, 0.08);
+  background: color-mix(in srgb, var(--violet) 8%, transparent);
   color: var(--violet);
   font-size: 14px;
   margin-bottom: 8px;
@@ -2141,7 +2165,7 @@ input:focus-visible {
 }
 
 .aff-banner:hover {
-  background: linear-gradient(90deg, #ffe8d6 0%, #ffd4b0 50%, #ffe8d6 100%);
+  background: var(--accent-soft);
 }
 
 /* ═══════════════════════════════════════════════
@@ -2190,7 +2214,7 @@ input:focus-visible {
 
 .feature-card:hover .feature-icon {
   transform: scale(1.08);
-  background: rgba(229, 83, 0, 0.12);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 /* ═══════════════════════════════════════════════
@@ -2209,7 +2233,7 @@ input:focus-visible {
 .entity-metric:hover,
 .snapshot:hover {
   transform: translateY(-2px);
-  border-color: rgba(229, 83, 0, 0.15);
+  border-color: color-mix(in srgb, var(--accent) 15%, transparent);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
@@ -2225,7 +2249,7 @@ input:focus-visible {
 
 .list-row:hover {
   padding-left: 6px;
-  background: rgba(229, 83, 0, 0.02);
+  background: color-mix(in srgb, var(--accent) 2%, transparent);
 }
 
 /* ═══════════════════════════════════════════════
@@ -2263,7 +2287,7 @@ input:focus-visible {
    ═══════════════════════════════════════════════ */
 
 ::selection {
-  background: rgba(229, 83, 0, 0.15);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
   color: var(--text);
 }
 

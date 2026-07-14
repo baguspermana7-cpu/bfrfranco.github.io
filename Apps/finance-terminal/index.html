@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="dark" data-rz-suite>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Finance Terminal</title>
 <link rel="icon" type="image/png" href="../../assets/Favicon.png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../css/rz-finance-suite.css?v=2026-07-14">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
 <!-- FIN Engine — shared finance brain (screener scoring + advisor scorecard). window.FINEngine -->
@@ -154,7 +155,7 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 .search-results{position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--bd);border-radius:0 0 var(--rs) var(--rs);max-height:300px;overflow-y:auto;z-index:50;display:none}
 .search-results.show{display:block}
 .sr-item{padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:.8rem}
-.sr-item:hover{background:var(--accbg)}
+.sr-item:hover,.sr-item.active{background:var(--accbg)}
 .sr-sym{font-weight:700;color:var(--t1)}.sr-name{color:var(--t3);font-size:.72rem}
 
 /* STOCK DETAIL */
@@ -220,6 +221,7 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 
 /* LOADING */
 .skel{background:linear-gradient(90deg,var(--bg2) 25%,var(--bd2) 50%,var(--bg2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--rx);height:16px;margin-bottom:6px}
+@media (prefers-reduced-motion:reduce){.skel{animation:none}}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .loading-text{text-align:center;color:var(--t4);padding:3rem;font-size:.85rem}
 .spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--bd);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;vertical-align:middle}
@@ -398,12 +400,15 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 <!-- TAB 2: STOCKS -->
 <div class="panel" id="panel-stocks">
 <div class="search-wrap" style="margin-bottom:1.25rem">
-<div class="inp-icon"><i class="fas fa-search"></i><input class="inp" id="stockSearch" placeholder="Search ticker or company..." style="width:100%" oninput="onStockSearch(this.value)" onfocus="onStockSearch(this.value)" onkeydown="if(event.key==='Enter'&&this.value.trim())selectStock(finSym(this.value.trim().toUpperCase()))"></div>
+<div class="inp-icon"><i class="fas fa-search"></i><input class="inp" id="stockSearch" placeholder="Search ticker or company…  (press S)" style="width:100%" oninput="onStockSearch(this.value)" onfocus="onStockSearch(this.value)" onkeydown="stockSearchKey(event)" aria-label="Search stocks"></div>
 <div class="search-results" id="stockSearchResults"></div>
 </div>
 <div id="stockDetail" style="display:none">
 <div class="stock-hero" id="stockHero"></div>
 <div class="tf-bar" id="stockTfBar"></div>
+<!-- FIN intelligent layer — HEADLINE analysis (C2): the committee read leads the workspace -->
+<div class="card" id="stockAdvisorScorecard" style="margin-bottom:1rem;display:none"></div>
+<div class="card" id="stockAnalyticsPanel" style="margin-bottom:1rem;display:none"></div>
 <div class="g23">
 <div class="card"><div class="card-title"><i class="fas fa-chart-area"></i>Price Chart <span id="stockChartInfo" class="c-t4" style="font-size:.65rem;margin-left:auto;font-weight:400"></span></div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
@@ -442,9 +447,6 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 <div class="card"><div class="card-title"><i class="fas fa-newspaper"></i>Company News</div><div id="stockNews"><div class="c-t4" style="font-size:.75rem">Loading...</div></div></div>
 </div>
 <div class="card" style="margin-top:1rem"><div class="card-title"><i class="fas fa-chart-line"></i>Earnings History</div><div id="stockEarnings"></div></div>
-<!-- FT Phase 2 Task B — analytics panel (V2-gated; populated by loadAnalyticsPanel) -->
-<div class="card" id="stockAnalyticsPanel" style="margin-top:1rem;display:none"></div>
-<div class="card" id="stockAdvisorScorecard" style="margin-top:1rem;display:none"></div>
 <div class="compare-panel">
 <div class="card-title"><i class="fas fa-balance-scale"></i>Compare Stocks</div>
 <div style="display:flex;gap:8px;margin-bottom:8px"><input class="inp" id="compareInput" placeholder="Add symbol to compare..." style="width:160px" onkeydown="if(event.key==='Enter')addCompareStock()"><button class="btn btn-g btn-sm" onclick="addCompareStock()"><i class="fas fa-plus"></i></button></div>
@@ -892,6 +894,7 @@ async function loadAdvisorScorecard(containerId,sym,tf){
     // Deterministic Investment Committee: Fundamental + Technical + Quant(Factor-Zoo) + Risk → consensus.
     var res=FINEngine.models.committee.run(stock,candles,{preset:market==='ID'?'idxBluechip':'balanced',market:market});
     renderAdvisorScorecard(containerId,res,sym);
+    if(sym===S.curStock)renderHeroSignals(res);
   }catch(e){
     if(el)el.innerHTML='<div class="empty"><p>Committee unavailable.<\/p><\/div>';
   }
@@ -1661,6 +1664,7 @@ function onStockSearch(val){
         catch(_){ if(S.fhKey){ const r2=await fh('/search',{q:val}); results=(r2.result||[]).slice(0,10); } } }
       else if(S.fhKey){ const r=await fh('/search',{q:val}); results=(r.result||[]).slice(0,10); }
     }catch(e){ results=[]; }
+    srIdx=-1;
     if(results.length===0){ el.innerHTML=_openAnyway(val); el.classList.add('show'); return; }
     el.innerHTML=results.map(r=>`<div class="sr-item" onclick="selectStock('${finSym(r.symbol)}')"><span class="sr-sym">${esc(r.symbol)}</span><span class="sr-name">${esc(r.description||'')}</span></div>`).join('');
     el.classList.add('show');
@@ -1689,7 +1693,8 @@ async function selectStock(sym){
   $('stockDetail').style.display='block';
   S.curStock=sym;
   // Show loading state
-  $('stockHero').innerHTML='<div class="loading-text"><span class="spinner"></span>Loading '+esc(sym)+'...</div>';
+  $('stockHero').innerHTML='<div style="flex:1;min-width:240px"><div class="skel" style="width:220px;height:20px"></div><div class="skel" style="width:170px;height:32px;margin-top:10px"></div><div class="skel" style="width:300px;height:13px;margin-top:10px"></div></div>';
+  ['stockProfile','stockFinancials','stockRating','stockPeers'].forEach(function(id){var n=$(id);if(n)n.innerHTML='<div class="skel"></div><div class="skel" style="width:80%"></div><div class="skel" style="width:60%"></div>';});
   // Core (quote/profile/metric) via keyless gateway (or fh fallback) — always resolves, never key-blocked.
   const core=await stockCore(sym);
   S.stockQ=core.quote||{};
@@ -1771,6 +1776,62 @@ async function selectStock(sym){
   }
 }
 
+/* ── C2: 52-week position bar (deterministic, from already-fetched metric) ── */
+function hero52w(){
+  const q=S.stockQ||{},m=(S.stockFin&&S.stockFin.metric)||{};
+  const hi=m['52WeekHigh'],lo=m['52WeekLow'],c=q.c;
+  if(!(isFinite(hi)&&isFinite(lo)&&isFinite(c)&&hi>lo))return '';
+  const pos=Math.max(0,Math.min(1,(c-lo)/(hi-lo)))*100;
+  const cur=/\.JK$/.test(S.curStock||'')?'Rp':'$';
+  return '<div style="margin-top:8px;max-width:340px" title="Where the current price sits in the 52-week range">'+
+    '<div style="display:flex;justify-content:space-between;font-size:.62rem;color:var(--t4);margin-bottom:3px" class="mono"><span>52W '+cur+fmtP(lo)+'</span><span>'+cur+fmtP(hi)+'</span></div>'+
+    '<div style="position:relative;height:5px;background:var(--bg3);border-radius:3px">'+
+      '<span style="position:absolute;left:0;top:0;bottom:0;width:'+pos.toFixed(1)+'%;background:linear-gradient(90deg,var(--bd),var(--t4));border-radius:3px"></span>'+
+      '<span style="position:absolute;left:'+pos.toFixed(1)+'%;top:-3px;width:2px;height:11px;background:var(--t1);border-radius:1px;transform:translateX(-1px)"></span>'+
+    '</div></div>';
+}
+/* ── C2: deterministic signal chips in the hero — the committee's read at a glance.
+   Populated by renderAdvisorScorecard (same FIN Engine result, no extra fetch). Each chip
+   is explainable via title; click scrolls to the full scorecard. Descriptive, not advice. ── */
+function renderHeroSignals(res){
+  const el=document.getElementById('heroSignals');
+  if(!el||!res||res.score==null){if(el)el.innerHTML='';return;}
+  const chips=[];
+  const vc=window.finVerdictColor?finVerdictColor(res.verdict):'var(--acc)';
+  chips.push({t:'Committee '+(res.verdict||'—')+' '+res.score,c:vc,tip:'FIN Investment Committee consensus (5 analyst panels) — descriptive 0-100 score, not advice'});
+  if(res.conviction)chips.push({t:'Conviction '+res.conviction,c:'var(--t3)',tip:'How strongly the panels agree'});
+  (res.panels||[]).forEach(function(pn){
+    if(/Technical|Risk/i.test(pn.name||'')){
+      chips.push({t:pn.name+' '+(pn.verdict||'—'),c:window.finVerdictColor?finVerdictColor(pn.verdict):'var(--t3)',tip:(pn.signals||[]).slice(0,3).join(' · ')||pn.name+' panel read'});
+    }
+  });
+  if(res.valueGate&&res.valueGate.rating){
+    const vg=res.valueGate.rating,vgc=vg==='pass'?'var(--grn)':vg==='fail'?'var(--red)':'var(--amb)';
+    chips.push({t:'Value Gate '+vg.toUpperCase(),c:vgc,tip:'Deterministic Berkshire-style quality screen (moat + mirror test)'});
+  }
+  el.innerHTML=chips.map(function(ch){
+    return '<button class="rz-ap-chip" style="color:'+ch.c+';border-color:'+ch.c+';background:transparent;cursor:pointer" title="'+esc(ch.tip)+'" onclick="document.getElementById(\'stockAdvisorScorecard\').scrollIntoView({behavior:\'smooth\',block:\'start\'})">'+esc(ch.t)+'</button>';
+  }).join('');
+}
+/* ── C2: keyboard-first search — ArrowUp/Down navigate results, Enter opens, Esc closes; "/" focuses ── */
+let srIdx=-1;
+function stockSearchKey(e){
+  const el=$('stockSearchResults');const items=el?el.querySelectorAll('.sr-item'):[];
+  if(e.key==='ArrowDown'&&items.length){e.preventDefault();srIdx=Math.min(srIdx+1,items.length-1);srHi(items);}
+  else if(e.key==='ArrowUp'&&items.length){e.preventDefault();srIdx=Math.max(srIdx-1,0);srHi(items);}
+  else if(e.key==='Enter'){
+    if(srIdx>=0&&items[srIdx])items[srIdx].click();
+    else{const v=e.target.value.trim();if(v)selectStock(finSym(v.toUpperCase()));}
+  }
+  else if(e.key==='Escape'){el.classList.remove('show');srIdx=-1;}
+}
+function srHi(items){items.forEach(function(it,i){it.classList.toggle('active',i===srIdx);});if(items[srIdx])items[srIdx].scrollIntoView({block:'nearest'});}
+document.addEventListener('keydown',function(e){
+  /* "s" = symbol search ("/" belongs to the sitewide command palette) */
+  if((e.key==='s'||e.key==='S')&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||'')){
+    e.preventDefault();switchTab('stocks');const si=$('stockSearch');if(si)si.focus();
+  }
+});
 function renderStockHero(){
   const q=S.stockQ,p=S.stockProf;
   const isID=/\.JK$/.test(S.curStock||''), cur=isID?'Rp':'$';
@@ -1786,6 +1847,8 @@ function renderStockHero(){
     </div>
     <div class="stock-price" style="color:${chgColor(q.dp)}">${px(q.c)} <span class="stock-change" style="color:${chgColor(q.dp)}">${q.d>0?'+':''}${q.d!=null?(isID?fmt(q.d):fmtP(q.d)):'--'} (${q.dp>0?'+':''}${fmtP(q.dp)}%)</span></div>
     <div class="stock-meta">${meta}</div>
+    <div id="heroSignals" class="rz-ap-chips" style="justify-content:flex-start;margin-top:8px"></div>
+    ${hero52w()}
   </div>
   <div style="display:flex;gap:8px">
     <button class="btn btn-g btn-sm" onclick="addToWatchlistDirect('${finSym(S.curStock)}')"><i class="fas fa-star"></i>Watch</button>

@@ -7,21 +7,21 @@ import { useResponsive } from "./useResponsive";
    ETF DATABASE — historical data calibrated
    ══════════════════════════════════════════════ */
 const DB = {
-  VOO:  { nm:"Vanguard S&P 500",         cat:"Large Blend",   r:14.86, d:1.3, er:.03, b:1.00, dd:-24.5, c:"#2563eb",
+  VOO:  { nm:"Vanguard S&P 500",         cat:"Large Blend",   r:14.86, d:1.3, er:.03, b:1.00, dd:-24.5, c:"#60a5fa",
     hist:{2015:1.31,2016:12.17,2017:21.77,2018:-4.50,2019:31.35,2020:18.29,2021:28.78,2022:-18.19,2023:26.32,2024:24.98,2025:17.82} },
-  QQQ:  { nm:"Invesco Nasdaq-100",       cat:"Large Growth",  r:18.30, d:0.6, er:.20, b:1.15, dd:-33.0, c:"#7c3aed",
+  QQQ:  { nm:"Invesco Nasdaq-100",       cat:"Large Growth",  r:18.30, d:0.6, er:.20, b:1.15, dd:-33.0, c:"#8b5cf6",
     hist:{2015:9.45,2016:7.10,2017:32.66,2018:-0.12,2019:38.98,2020:48.40,2021:27.42,2022:-32.58,2023:54.85,2024:25.58,2025:24.80} },
-  SCHD: { nm:"Schwab Dividend Equity",   cat:"Dividend Value", r:11.00, d:3.5, er:.06, b:.80, dd:-16.0, c:"#059669",
+  SCHD: { nm:"Schwab Dividend Equity",   cat:"Dividend Value", r:11.00, d:3.5, er:.06, b:.80, dd:-16.0, c:"#34d399",
     hist:{2015:-1.42,2016:16.43,2017:15.47,2018:-5.56,2019:27.18,2020:2.40,2021:29.87,2022:-3.23,2023:3.67,2024:12.09,2025:9.80} },
-  VTI:  { nm:"Vanguard Total Market",    cat:"Total Market",  r:14.50, d:1.3, er:.03, b:1.02, dd:-25.0, c:"#d97706",
+  VTI:  { nm:"Vanguard Total Market",    cat:"Total Market",  r:14.50, d:1.3, er:.03, b:1.02, dd:-25.0, c:"#fbbf24",
     hist:{2015:0.40,2016:12.68,2017:21.19,2018:-5.13,2019:30.80,2020:20.95,2021:25.72,2022:-19.53,2023:26.07,2024:23.87,2025:17.00} },
-  VIG:  { nm:"Vanguard Div Appreciation",cat:"Div Growth",    r:12.00, d:1.8, er:.06, b:.85, dd:-18.0, c:"#db2777",
+  VIG:  { nm:"Vanguard Div Appreciation",cat:"Div Growth",    r:12.00, d:1.8, er:.06, b:.85, dd:-18.0, c:"#f472b6",
     hist:{2015:-0.83,2016:10.98,2017:20.94,2018:-2.01,2019:29.58,2020:15.48,2021:23.68,2022:-9.84,2023:14.52,2024:17.75,2025:13.50} },
-  SPY:  { nm:"SPDR S&P 500 Trust",       cat:"Large Blend",   r:14.77, d:1.2, er:.09, b:1.00, dd:-24.5, c:"#6d28d9",
+  SPY:  { nm:"SPDR S&P 500 Trust",       cat:"Large Blend",   r:14.77, d:1.2, er:.09, b:1.00, dd:-24.5, c:"#a78bfa",
     hist:{2015:1.25,2016:12.00,2017:21.70,2018:-4.56,2019:31.22,2020:18.37,2021:28.75,2022:-18.17,2023:26.19,2024:24.89,2025:17.70} },
-  VGT:  { nm:"Vanguard Info Tech",       cat:"Sector Tech",   r:19.00, d:0.6, er:.10, b:1.20, dd:-34.0, c:"#0891b2",
+  VGT:  { nm:"Vanguard Info Tech",       cat:"Sector Tech",   r:19.00, d:0.6, er:.10, b:1.20, dd:-34.0, c:"#22d3ee",
     hist:{2015:5.90,2016:13.70,2017:38.78,2018:-0.30,2019:48.00,2020:46.00,2021:30.30,2022:-33.70,2023:50.10,2024:24.20,2025:22.00} },
-  SPLG: { nm:"SPDR S&P 500 Low Cost",   cat:"Large Blend",   r:14.80, d:1.3, er:.02, b:1.00, dd:-24.5, c:"#ea580c",
+  SPLG: { nm:"SPDR S&P 500 Low Cost",   cat:"Large Blend",   r:14.80, d:1.3, er:.02, b:1.00, dd:-24.5, c:"#fb923c",
     hist:{2015:1.30,2016:12.10,2017:21.70,2018:-4.52,2019:31.30,2020:18.30,2021:28.70,2022:-18.20,2023:26.30,2024:24.95,2025:17.80} },
 };
 
@@ -228,8 +228,8 @@ const Tip=({title,text,formula,cs,children})=>{
       whiteSpace:"normal",wordWrap:"break-word",fontFamily:cs.f,textTransform:"none",letterSpacing:"normal",
     }}>
       {title&&<div style={{fontSize:"0.82rem",fontWeight:700,color:cs.acc,marginBottom:6}}>{title}</div>}
-      <div style={{fontSize:"0.78rem",color:cs.isDark?"#cbd5e1":"#4b5563",lineHeight:1.5,marginBottom:formula?8:0}}>{text}</div>
-      {formula&&<div style={{fontSize:"0.72rem",color:cs.isDark?"#94a3b8":"#9ca3af",paddingTop:6,
+      <div style={{fontSize:"0.78rem",color:cs.isDark?"#e2e8f0":"#475569",lineHeight:1.5,marginBottom:formula?8:0}}>{text}</div>
+      {formula&&<div style={{fontSize:"0.72rem",color:cs.isDark?"#94a3b8":"#64748b",paddingTop:6,
         borderTop:`1px solid ${cs.isDark?"rgba(255,255,255,0.1)":"rgba(0,0,0,0.1)"}`,fontStyle:"italic"}}>{formula}</div>}
     </div>
   </>;
@@ -623,7 +623,7 @@ export default function App(){
           <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}>
             {fhKey&&<button onClick={()=>setShowKeyModal(false)} style={{padding:"8px 16px",borderRadius:8,border:`1px solid ${cs.bd}`,background:"transparent",color:cs.t3,fontSize:12,cursor:"pointer"}}>Cancel</button>}
             <button onClick={()=>{if(!fhKeyInput.trim())return;setFinnhubKey(fhKeyInput.trim());setFhKey(fhKeyInput.trim());setShowKeyModal(false);}}
-              style={{padding:"8px 20px",borderRadius:8,border:"none",background:`linear-gradient(135deg,${cs.acc},${cs.acc}cc)`,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer"}}>Save & Connect</button>
+              style={{padding:"8px 20px",borderRadius:8,border:"none",background:"#6d28d9",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer"}}>Save & Connect</button>
           </div>
           <div style={{fontSize:10,color:cs.t4||cs.t3,marginTop:10,opacity:0.6}}>Free tier: 60 calls/min, ~15 min delayed quotes. No credit card required.</div>
         </div>
@@ -857,7 +857,7 @@ export default function App(){
               return<div style={chartTip}>
                 <div style={{fontWeight:700,color:d.color,marginBottom:2}}>{d.name}</div>
                 <div>{d.value}% allocation</div>
-                <div style={{fontSize:"0.72rem",color:cs.isDark?"#94a3b8":"#9ca3af"}}>{DB[d.name]?.nm}</div>
+                <div style={{fontSize:"0.72rem",color:cs.isDark?"#94a3b8":"#64748b"}}>{DB[d.name]?.nm}</div>
               </div>;
             }}/>
           </PieChart></ResponsiveContainer></div>}
@@ -1166,10 +1166,10 @@ export default function App(){
               return<div style={chartTip}>
                 <div style={{fontWeight:700,color:isH?cs.grn:d.isNow?cs.red:cs.acc,marginBottom:4,fontSize:"0.82rem"}}>{d.lbl} {isH?"(Actual)":d.isNow?"(Current)":"(Projected)"}</div>
                 <div style={{display:"grid",gridTemplateColumns:"auto auto",gap:"2px 10px"}}>
-                  <span style={{color:cs.isDark?"#94a3b8":"#9ca3af"}}>Portfolio:</span><span style={{color:isH?cs.grn:cs.acc,fontWeight:600}}>{$(val)}</span>
-                  <span style={{color:cs.isDark?"#94a3b8":"#9ca3af"}}>Invested:</span><span>{$(d.inv)}</span>
-                  {d.inv>0&&val>0&&<><span style={{color:cs.isDark?"#94a3b8":"#9ca3af"}}>P&L:</span><span style={{color:val>=d.inv?cs.grn:cs.red,fontWeight:600}}>{val>=d.inv?"+":""}{$(val-d.inv)} ({P((val-d.inv)/d.inv*100)})</span></>}
-                  {d.divMo>0&&<><span style={{color:cs.isDark?"#94a3b8":"#9ca3af"}}>Div/mo:</span><span style={{color:cs.cyn}}>{$(d.divMo,1)}</span></>}
+                  <span style={{color:cs.isDark?"#94a3b8":"#64748b"}}>Portfolio:</span><span style={{color:isH?cs.grn:cs.acc,fontWeight:600}}>{$(val)}</span>
+                  <span style={{color:cs.isDark?"#94a3b8":"#64748b"}}>Invested:</span><span>{$(d.inv)}</span>
+                  {d.inv>0&&val>0&&<><span style={{color:cs.isDark?"#94a3b8":"#64748b"}}>P&L:</span><span style={{color:val>=d.inv?cs.grn:cs.red,fontWeight:600}}>{val>=d.inv?"+":""}{$(val-d.inv)} ({P((val-d.inv)/d.inv*100)})</span></>}
+                  {d.divMo>0&&<><span style={{color:cs.isDark?"#94a3b8":"#64748b"}}>Div/mo:</span><span style={{color:cs.cyn}}>{$(d.divMo,1)}</span></>}
                 </div>
               </div>;
             }}/>
@@ -1221,7 +1221,7 @@ export default function App(){
               return<div style={chartTip}>
                 <div style={{fontWeight:700,color:cs.cyn,marginBottom:2}}>{d.lbl}</div>
                 <div>Dividend: <b style={{color:cs.cyn}}>{$(d.divMo,1)}/mo</b></div>
-                <div style={{color:cs.isDark?"#94a3b8":"#9ca3af",marginTop:2}}>Annual: {$(d.divMo*12,0)}</div>
+                <div style={{color:cs.isDark?"#94a3b8":"#64748b",marginTop:2}}>Annual: {$(d.divMo*12,0)}</div>
               </div>;
             }}/>
             <Bar dataKey="divMo" fill={cs.cyn} radius={[2,2,0,0]}/>

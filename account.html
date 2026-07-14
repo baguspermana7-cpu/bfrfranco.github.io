@@ -1,60 +1,85 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="dark" data-rz-suite>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
-  <title>My Account — ResistanceZero</title>
+  <title>Account — ResistanceZero</title>
   <link rel="icon" href="assets/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/rz-finance-suite.css?v=2026-07-14">
   <style>
-    :root { color-scheme: dark; --bg:#0f172a; --surface:#1e293b; --surface2:#0b1220;
-            --border:#334155; --text:#e2e8f0; --muted:#94a3b8; --accent:#3b82f6; }
     * { box-sizing: border-box; }
-    body { margin:0; font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-           background:var(--bg); color:var(--text); line-height:1.55; }
-    a { color:#60a5fa; }
+    body { margin:0; font-family:var(--fs-sans); background:var(--fs-bg0); color:var(--fs-t2); line-height:1.55; }
+    a { color:var(--fs-blu); }
+
     .nav { display:flex; align-items:center; justify-content:space-between; padding:14px 22px;
-           border-bottom:1px solid var(--border); background:rgba(15,23,42,0.8); }
-    .nav .brand { font-weight:800; letter-spacing:0.02em; }
-    .nav a.back { font-size:0.85rem; color:var(--muted); text-decoration:none; }
-    .wrap { max-width:640px; margin:0 auto; padding:28px 20px 60px; }
-    h1 { font-size:1.35rem; margin:0 0 4px; }
-    .sub { color:var(--muted); font-size:0.9rem; margin:0 0 24px; }
-    .card { background:var(--surface); border:1px solid var(--border); border-radius:14px;
-            padding:20px; margin-bottom:18px; }
-    .card h2 { font-size:1rem; margin:0 0 14px; display:flex; align-items:center; gap:8px; }
-    label { display:block; font-size:0.75rem; color:var(--muted); margin:12px 0 4px; }
-    input { width:100%; padding:11px 13px; border-radius:9px; border:1px solid var(--border);
-            background:var(--surface2); color:var(--text); font-size:0.92rem; }
-    button { padding:11px 18px; border-radius:9px; border:none; background:var(--accent); color:#fff;
-             font-weight:600; font-size:0.88rem; cursor:pointer; margin:14px 8px 0 0; transition:filter .15s; }
-    button:hover { filter:brightness(1.08); }
-    button.ghost { background:var(--border); }
-    button.danger { background:transparent; border:1px solid rgba(239,68,68,0.5); color:#f87171;
-                    padding:6px 12px; margin:0; font-size:0.78rem; }
-    button.oauth { background:#fff; color:#1f2937; }
-    .status { font-size:0.82rem; padding:10px 12px; border-radius:9px; margin-top:12px;
-              white-space:pre-wrap; word-break:break-word; }
-    .ok  { background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.3); }
-    .err { background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.3); }
-    .muted { color:var(--muted); }
+           border-bottom:1px solid var(--fs-bd); background:var(--fs-bg1); position:sticky; top:0; z-index:10; }
+    .nav .brand { font-weight:700; letter-spacing:0.02em; color:var(--fs-t1); }
+    .nav a.back { font-size:0.85rem; color:var(--fs-t3); text-decoration:none; }
+    .nav a.back:hover { color:var(--fs-t2); }
+
+    .wrap { max-width:960px; margin:0 auto; padding:28px 20px 60px; }
+    h1 { font-size:1.35rem; margin:0 0 4px; color:var(--fs-t1); }
+    .sub { color:var(--fs-t3); font-size:0.9rem; margin:0 0 24px; }
+
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start; }
+    @media (max-width:760px){ .grid { grid-template-columns:1fr; } }
+    .span2 { grid-column:1 / -1; }
+
+    .card { background:var(--fs-bg2); border:1px solid var(--fs-bd); border-radius:var(--fs-r); padding:20px; }
+    .card h2 { font-size:0.78rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em;
+               color:var(--fs-t3); margin:0 0 16px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+
+    label { display:block; font-size:0.75rem; color:var(--fs-t3); margin:12px 0 4px; }
+    input { width:100%; padding:10px 13px; border-radius:var(--fs-rs); border:1px solid var(--fs-bd);
+            background:var(--fs-bg3); color:var(--fs-t1); font-size:0.92rem; font-family:var(--fs-sans); }
+    input:focus { outline:2px solid var(--fs-acc); outline-offset:1px; }
+    .btnrow { margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; }
+
+    .status { font-size:0.82rem; padding:10px 12px; border-radius:var(--fs-rs); margin-top:12px;
+              white-space:pre-wrap; word-break:break-word; border:1px solid transparent; }
+    .ok  { background:var(--fs-grnbg); color:var(--fs-grn); border-color:rgba(16,185,129,0.3); }
+    .err { background:var(--fs-redbg); color:var(--fs-red); border-color:rgba(239,68,68,0.3); }
+    .muted { color:var(--fs-t3); }
+
+    .kv { display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+          padding:9px 0; border-bottom:1px solid var(--fs-bd2); font-size:0.88rem; }
+    .kv:last-child { border-bottom:none; }
+    .kv .k { color:var(--fs-t3); font-size:0.78rem; }
+    .kv .v { color:var(--fs-t1); text-align:right; }
+    .kv .v.mono { font-family:var(--fs-mono); font-variant-numeric:tabular-nums; font-size:0.82rem; }
+
+    .badge { display:inline-block; font-size:0.68rem; font-weight:700; text-transform:uppercase;
+             letter-spacing:0.06em; padding:3px 10px; border-radius:999px; font-family:var(--fs-mono); }
+    .badge.free { background:rgba(148,163,184,0.18); color:var(--fs-t3); }
+    .badge.demo { background:var(--fs-accbg); color:var(--fs-acc2); }
+    .badge.pro  { background:var(--fs-blubg); color:var(--fs-blu); }
+    .badge.root { background:rgba(8,145,178,0.18); color:var(--fs-cyn); }
+
+    .scn { border:1px solid var(--fs-bd); border-radius:10px; padding:12px 14px; margin-bottom:10px;
+           background:var(--fs-bg3); }
+    .scn .t { font-weight:600; font-size:0.92rem; color:var(--fs-t1); }
+    .scn .m { color:var(--fs-t3); font-size:0.75rem; margin-top:2px; font-family:var(--fs-mono); }
     .row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .badge { display:inline-block; font-size:0.7rem; font-weight:700; text-transform:uppercase;
-             letter-spacing:0.05em; padding:3px 10px; border-radius:999px; }
-    .badge.free { background:rgba(148,163,184,0.18); color:#cbd5e1; }
-    .badge.demo { background:rgba(139,92,246,0.18); color:#c4b5fd; }
-    .badge.pro  { background:rgba(59,130,246,0.18); color:#93c5fd; }
-    .badge.root { background:rgba(8,145,178,0.18); color:#67e8f9; }
-    .scn { border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:10px;
-           background:var(--surface2); }
-    .scn .t { font-weight:600; font-size:0.92rem; }
-    .scn .m { color:var(--muted); font-size:0.75rem; margin-top:2px; }
+
+    button.link { background:transparent; border:1px solid var(--fs-bd); color:var(--fs-t3);
+                  padding:5px 12px; border-radius:var(--fs-rx); font-size:0.75rem; cursor:pointer; font-family:var(--fs-sans); }
+    button.link:hover { color:var(--fs-t1); border-color:var(--fs-t4); }
+    button.link.open { color:var(--fs-blu); border-color:rgba(96,165,250,0.4); }
+    button.link.del { color:var(--fs-red); border-color:rgba(239,68,68,0.4); }
+
+    .future { display:flex; align-items:center; justify-content:space-between; gap:10px;
+              padding:10px 0; border-bottom:1px solid var(--fs-bd2); font-size:0.85rem; color:var(--fs-t3); }
+    .future:last-child { border-bottom:none; }
+    .future .soon { font:600 0.62rem/1.8 var(--fs-mono); letter-spacing:0.08em; text-transform:uppercase;
+                    color:var(--fs-t4); border:1px solid var(--fs-bd); border-radius:999px; padding:0 8px; }
+
     .hidden { display:none; }
-    .foot { color:var(--muted); font-size:0.72rem; margin-top:18px; }
-    code { background:var(--surface2); padding:1px 6px; border-radius:5px; font-size:0.85em; }
-  /* a11y (v1.52.10) */
-#btnLogin { background:#1d4ed8 !important; border-color:#1d4ed8 !important; }
-</style>
+    .foot { color:var(--fs-t4); font-size:0.72rem; margin-top:22px; }
+    code { background:var(--fs-bg3); padding:1px 6px; border-radius:5px; font-size:0.85em; font-family:var(--fs-mono); }
+    .skelrow { height:14px; margin:10px 0; }
+  </style>
 </head>
 <body>
   <div class="nav">
@@ -63,39 +88,80 @@
   </div>
 
   <div class="wrap">
-    <h1>My Account</h1>
-    <p class="sub">Real accounts &amp; saved data, powered by Supabase.</p>
+    <h1>Account Center</h1>
+    <p class="sub">Your real account &amp; saved data, powered by Supabase. Row Level Security — you only ever see your own rows.</p>
 
     <!-- Logged-OUT view -->
-    <div id="authCard" class="card">
-      <h2>🔐 Sign in / Sign up</h2>
-      <label>Email</label>
+    <div id="authCard" class="card" style="max-width:480px;">
+      <h2>Sign in / Sign up</h2>
+      <label for="email">Email</label>
       <input id="email" type="email" placeholder="you@email.com" autocomplete="email">
-      <label>Password (min. 6 characters)</label>
+      <label for="password">Password (min. 6 characters)</label>
       <input id="password" type="password" placeholder="••••••" autocomplete="current-password">
-      <div>
-        <button id="btnLogin">Log in</button>
-        <button id="btnSignup" class="ghost">Sign up</button>
+      <div class="btnrow">
+        <button id="btnLogin" class="fs-btn primary">Log in</button>
+        <button id="btnSignup" class="fs-btn">Sign up</button>
       </div>
       <div id="authStatus" class="status hidden"></div>
     </div>
 
     <!-- Logged-IN view -->
-    <div id="profileCard" class="card hidden">
-      <h2>👤 Profile</h2>
-      <div class="row">
-        <div>
-          <div id="pEmail" style="font-weight:600;">—</div>
-          <div class="muted" style="font-size:0.78rem;margin-top:2px;">Access level: <span id="pTier" class="badge free">free</span></div>
-        </div>
-        <button id="btnLogout" class="ghost" style="margin:0;">Log out</button>
-      </div>
-    </div>
+    <div id="accountGrid" class="grid hidden">
 
-    <!-- Saved scenarios -->
-    <div id="scnCard" class="card hidden">
-      <h2>💾 Saved scenarios</h2>
-      <div id="scnList"><p class="muted" style="font-size:0.85rem;">Loading…</p></div>
+      <div class="card" id="profileCard">
+        <h2>Profile <span id="pTier" class="badge free">free</span></h2>
+        <div id="profileSkel">
+          <div class="fs-skel skelrow" style="width:70%"></div>
+          <div class="fs-skel skelrow" style="width:45%"></div>
+          <div class="fs-skel skelrow" style="width:55%"></div>
+        </div>
+        <div id="profileBody" class="hidden">
+          <div class="kv"><span class="k">Email</span><span class="v" id="pEmail">—</span></div>
+          <div class="kv"><span class="k">Access level</span><span class="v" id="pTierTxt">—</span></div>
+          <div class="kv"><span class="k">Member since</span><span class="v mono" id="pSince">—</span></div>
+        </div>
+      </div>
+
+      <div class="card" id="securityCard">
+        <h2>Security</h2>
+        <label for="newPw">New password (min. 6 characters)</label>
+        <input id="newPw" type="password" placeholder="••••••" autocomplete="new-password">
+        <label for="newPw2">Confirm new password</label>
+        <input id="newPw2" type="password" placeholder="••••••" autocomplete="new-password">
+        <div class="btnrow">
+          <button id="btnChangePw" class="fs-btn primary">Change password</button>
+          <button id="btnLogout" class="fs-btn">Sign out</button>
+        </div>
+        <div id="pwStatus" class="status hidden"></div>
+      </div>
+
+      <div class="card span2" id="scnCard">
+        <h2>Saved scenarios <span id="scnCount" class="fs-chip">—</span></h2>
+        <div id="scnList">
+          <div class="fs-skel skelrow"></div>
+          <div class="fs-skel skelrow" style="width:80%"></div>
+        </div>
+        <p class="muted" style="font-size:0.75rem;margin:12px 0 0;">
+          Finance Terminal watchlist &amp; portfolio are stored on this device —
+          open the <a href="Apps/finance-terminal/index.html">Finance Terminal</a> to manage them.
+        </p>
+      </div>
+
+      <div class="card" id="prefCard">
+        <h2>Preferences</h2>
+        <div class="kv">
+          <span class="k">Theme</span>
+          <span class="v"><button id="btnTheme" class="link" aria-label="Toggle color theme">🌙 Dark</button></span>
+        </div>
+      </div>
+
+      <div class="card" id="futureCard">
+        <h2>Coming to your account</h2>
+        <div class="future"><span>API keys</span><span class="soon">planned</span></div>
+        <div class="future"><span>Plan &amp; billing</span><span class="soon">planned</span></div>
+        <div class="future"><span>Connected apps</span><span class="soon">planned</span></div>
+      </div>
+
     </div>
 
     <p class="foot">
@@ -108,11 +174,20 @@
   <script src="js/rz-version.js" defer></script>
   <script src="js/rz-config.js"></script>
   <script src="js/rz-scenario.js?v=2026-07-11d"></script>
-  <script type="module" src="js/rz-supabase.js?v=2026-07-11c"></script>
+  <script type="module" src="js/rz-supabase.js?v=2026-07-14"></script>
   <script type="module">
     const $ = (id) => document.getElementById(id);
     const show = (el, on) => el.classList.toggle('hidden', !on);
     const setStatus = (el, msg, cls) => { el.className = 'status ' + (cls || ''); el.textContent = msg; el.classList.remove('hidden'); };
+
+    /* theme preference (shared `theme` key, same as the rest of the site) */
+    function applyTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+      try { localStorage.setItem('theme', t); } catch (e) {}
+      $('btnTheme').textContent = t === 'dark' ? '🌙 Dark' : '☀️ Light';
+    }
+    applyTheme((() => { try { return localStorage.getItem('theme') || 'dark'; } catch (e) { return 'dark'; } })());
+    $('btnTheme').onclick = () => applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 
     await window.rzSupa.ready;
     const S = window.rzSupa;
@@ -121,20 +196,26 @@
     async function render() {
       const user = await S.getUser();
       show($('authCard'), !user);
-      show($('profileCard'), !!user);
-      show($('scnCard'), !!user);
+      show($('accountGrid'), !!user);
       if (!user) return;
-      $('pEmail').textContent = user.email;
-      // tier from profiles (falls back gracefully if the table isn't set up yet)
-      const { data: prof, error } = await S.getProfile();
+
+      /* profile */
+      const { data: prof } = await S.getProfile();
       const tier = (prof && prof.tier) || 'free';
       const badge = $('pTier');
       badge.textContent = tier;
       badge.className = 'badge ' + (['free','demo','pro','root'].includes(tier) ? tier : 'free');
-      // scenarios
+      $('pEmail').textContent = user.email;
+      $('pTierTxt').textContent = tier;
+      $('pSince').textContent = new Date((prof && prof.created_at) || user.created_at).toLocaleDateString();
+      show($('profileSkel'), false);
+      show($('profileBody'), true);
+
+      /* scenarios */
       const list = $('scnList');
       const { data: rows, error: sErr } = await S.listScenarios();
       if (sErr) { list.innerHTML = '<p class="err status">'+escapeHtml(String(sErr))+'</p>'; return; }
+      $('scnCount').textContent = rows.length;
       if (!rows.length) { list.innerHTML = '<p class="muted" style="font-size:0.85rem;">No saved scenarios yet. Open a calculator and click <b>☁ Save scenario</b>.</p>'; return; }
       list.innerHTML = '';
       rows.forEach(r => {
@@ -149,9 +230,8 @@
         el.innerHTML = '<div class="row"><div><div class="t">'+escapeHtml(r.name)+'</div>'
           + '<div class="m">'+escapeHtml(r.calc)+' · '+when+extra+'</div></div>'
           + '<div style="display:flex;gap:6px;">'
-          + (hasInputs ? '<button class="danger" style="border-color:rgba(59,130,246,0.5);color:#93c5fd;" data-open="'+r.id+'">Open</button>' : '')
-          + '<button class="danger" data-id="'+r.id+'">Delete</button></div></div>';
-        el._row = r;
+          + (hasInputs ? '<button class="link open" data-open="'+r.id+'">Open</button>' : '')
+          + '<button class="link del" data-id="'+r.id+'">Delete</button></div></div>';
         list.appendChild(el);
       });
       list.querySelectorAll('button[data-id]').forEach(b => b.onclick = async () => {
@@ -167,6 +247,7 @@
     function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
     function fmtMoney(n){ n = Number(n)||0; return n>=1e9 ? '$'+(n/1e9).toFixed(2)+'B' : n>=1e6 ? '$'+(n/1e6).toFixed(1)+'M' : n>=1e3 ? '$'+Math.round(n/1e3)+'K' : '$'+Math.round(n); }
 
+    /* auth */
     $('btnSignup').onclick = async () => {
       const { data, error } = await S.signUp($('email').value.trim(), $('password').value);
       if (error) return setStatus($('authStatus'), '❌ ' + error, 'err');
@@ -179,6 +260,19 @@
       render();
     };
     $('btnLogout').onclick = async () => { await S.signOut(); render(); };
+
+    /* self-service password change */
+    $('btnChangePw').onclick = async () => {
+      const pw = $('newPw').value, pw2 = $('newPw2').value;
+      if (pw.length < 6) return setStatus($('pwStatus'), '❌ Password must be at least 6 characters.', 'err');
+      if (pw !== pw2) return setStatus($('pwStatus'), '❌ Passwords do not match.', 'err');
+      $('btnChangePw').disabled = true;
+      const { error } = await S.changePassword(pw);
+      $('btnChangePw').disabled = false;
+      if (error) return setStatus($('pwStatus'), '❌ ' + error, 'err');
+      $('newPw').value = ''; $('newPw2').value = '';
+      setStatus($('pwStatus'), '✅ Password changed. Use the new password next time you sign in.', 'ok');
+    };
 
     S.onChange(() => render());
     render();

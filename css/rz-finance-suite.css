@@ -1,0 +1,228 @@
+/* ============================================================================
+   rz-finance-suite.css — ONE shared design language for the finance/admin suite
+   (v1.55.0). Canonical tokens for: rz-ops shell, Finance Terminal, account.html,
+   StockMap/IDR Stocks (Apps/stock_screener/prototype), DCA app (via ThemeContext
+   at build). EDIT THIS FILE ONCE → every surface re-skins ("auto update").
+
+   Contract (see standarization/FINANCE_SUITE_STANDARD.md):
+   - A surface opts in with <html data-rz-suite> and loads this file AFTER its
+     own stylesheet. §2 then remaps the surface's LOCAL var names onto the
+     shared --fs-* tokens, so its existing rules consume unified values.
+   - Palette = the Finance Terminal vocabulary (deep-slate surfaces, 1px
+     hairlines, tabular JetBrains Mono numerics) — the RZ instrument aesthetic
+     per documentation/design.md. Color signals state, never decoration.
+   - Never hardcode a suite color in an adopting page; use the tokens.
+   ============================================================================ */
+
+/* ── §1 Canonical tokens ─────────────────────────────────────────────────── */
+html[data-rz-suite] {
+  /* surfaces (deep slate — SCADA-dark, not gray) */
+  --fs-bg0: #0b1120;            /* page */
+  --fs-bg1: #111827;            /* header / rails */
+  --fs-bg2: #1e293b;            /* card */
+  --fs-bg3: #0f172a;            /* inset / well */
+  --fs-bd:  #334155;            /* 1px hairline */
+  --fs-bd2: rgba(51, 65, 85, .4);
+
+  /* text tiers */
+  --fs-t1: #f1f5f9;
+  --fs-t2: #e2e8f0;
+  --fs-t3: #94a3b8;
+  --fs-t4: #64748b;
+
+  /* accent (suite identity — matches terminal + rz-ops today) */
+  --fs-acc:   #8b5cf6;
+  --fs-acc2:  #a78bfa;
+  --fs-accbg: rgba(139, 92, 246, .1);
+
+  /* signal colors — state, not brand */
+  --fs-grn: #34d399;  --fs-grnbg: rgba(16, 185, 129, .15);
+  --fs-red: #f87171;  --fs-redbg: rgba(239, 68, 68, .15);
+  --fs-amb: #fbbf24;  --fs-ambbg: rgba(245, 158, 11, .15);
+  --fs-blu: #60a5fa;  --fs-blubg: rgba(96, 165, 250, .15);
+  --fs-cyn: #22d3ee;
+
+  /* type — brand per design.md; Inter kept as fallback for legacy surfaces */
+  --fs-sans: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --fs-mono: 'JetBrains Mono', monospace;
+
+  /* radii */
+  --fs-r: 14px;   /* card */
+  --fs-rs: 8px;   /* control */
+  --fs-rx: 6px;   /* chip */
+}
+
+html[data-rz-suite][data-theme="light"] {
+  --fs-bg0: #f8fafc;
+  --fs-bg1: #ffffff;
+  --fs-bg2: #ffffff;
+  --fs-bg3: #f1f5f9;
+  --fs-bd:  #e2e8f0;
+  --fs-bd2: rgba(148, 163, 184, .35);
+  --fs-t1: #0f172a;
+  --fs-t2: #1e293b;
+  --fs-t3: #475569;
+  --fs-t4: #64748b;
+  /* light-mode signal + accent variants — the dark 300/400-level hues fall to
+     ~1.9-2.5:1 on white; these darkened stops pass AA as text (design.md ramp) */
+  --fs-acc:  #6d28d9;
+  --fs-acc2: #7c3aed;
+  --fs-grn: #059669;  --fs-grnbg: rgba(5, 150, 105, .12);
+  --fs-red: #dc2626;  --fs-redbg: rgba(220, 38, 38, .10);
+  --fs-amb: #b45309;  --fs-ambbg: rgba(180, 83, 7, .12);
+  --fs-blu: #2563eb;  --fs-blubg: rgba(37, 99, 235, .10);
+  --fs-cyn: #0e7490;
+}
+
+/* ── §2 Local-name remaps (surface adoption layer) ───────────────────────────
+   Each block re-points a surface's existing var names at the canonical tokens.
+   html[data-rz-suite] (0,1,1) outranks the page's own :root (0,1,0), so these
+   win regardless of stylesheet order. */
+
+/* Finance Terminal (Apps/finance-terminal) — canonical names, direct map */
+html[data-rz-suite] {
+  --bg0: var(--fs-bg0); --bg1: var(--fs-bg1); --bg2: var(--fs-bg2); --bg3: var(--fs-bg3);
+  --bd: var(--fs-bd); --bd2: var(--fs-bd2);
+  --t1: var(--fs-t1); --t2: var(--fs-t2); --t3: var(--fs-t3); --t4: var(--fs-t4);
+  --acc: var(--fs-acc); --acc2: var(--fs-acc2); --accbg: var(--fs-accbg);
+  --grn: var(--fs-grn); --grnbg: var(--fs-grnbg);
+  --red: var(--fs-red); --redbg: var(--fs-redbg);
+  --amb: var(--fs-amb); --ambbg: var(--fs-ambbg);
+  --blu: var(--fs-blu); --blubg: var(--fs-blubg);
+  --cyn: var(--fs-cyn);
+  --sans: var(--fs-sans); --mono: var(--fs-mono);
+  --r: var(--fs-r); --rs: var(--fs-rs); --rx: var(--fs-rx);
+}
+
+/* account.html vocabulary */
+html[data-rz-suite] {
+  --bg: var(--fs-bg0);
+  --surface: var(--fs-bg2);
+  --surface2: var(--fs-bg3);
+  --border: var(--fs-bd);
+  --text: var(--fs-t2);
+  --muted: var(--fs-t3);
+  --accent: var(--fs-acc);
+}
+
+/* StockMap / IDR Stocks (Apps/stock_screener/prototype) vocabulary.
+   Flips the whole app dark: its assets/styles.css consumes these names. */
+html[data-rz-suite="stockmap"] {
+  --bg: var(--fs-bg0);
+  --bg-alt: var(--fs-bg1);
+  --surface: var(--fs-bg2);
+  --surface-soft: var(--fs-bg3);
+  --border: rgba(148, 163, 184, .16);
+  --border-mid: rgba(148, 163, 184, .28);
+  --text: var(--fs-t1);
+  --text-dim: var(--fs-t3);
+  --text-muted: var(--fs-t4);
+  --accent: var(--fs-acc);
+  --accent-hover: var(--fs-acc2);
+  --accent-soft: var(--fs-accbg);
+  --green: var(--fs-grn);
+  --blue: var(--fs-blu);
+  --red: var(--fs-red);
+  --violet: var(--fs-acc2);
+  /* retire the serif display face — every StockMap font token lands on the
+     suite stacks (headings included; pages load IBM Plex Sans + JetBrains Mono) */
+  --font-serif: var(--fs-sans);
+  --font-sans: var(--fs-sans);
+  --font-mono: var(--fs-mono);
+  color-scheme: dark;
+}
+html[data-rz-suite="stockmap"] body {
+  font-family: var(--fs-sans);
+}
+/* white-text-on-accent controls: --fs-acc (#8b5cf6) fails AA for white text —
+   force the violet-700 fill the suite standard mandates */
+html[data-rz-suite="stockmap"] :is(.nav-cta, .hero-cta, .primary-btn, .tab.is-active, .app-tab.is-active, .new-tag) {
+  background: #6d28d9;
+  border-color: #6d28d9;
+}
+html[data-rz-suite="stockmap"] :is(.nav-cta, .hero-cta, .primary-btn):hover {
+  background: #7c3aed;
+  border-color: #7c3aed;
+}
+/* StockMap display type was italic serif; on the instrument theme it becomes
+   upright semi-bold sans. One grouped rule — components stay untouched. */
+html[data-rz-suite="stockmap"] :is(h1, h2, h3, .logo, .sidebar-title,
+  .stat-num, .mini-stat-value, .method-stat-value, .entity-metric strong,
+  .pt-price, .cd-num) {
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+html[data-rz-suite="stockmap"] :is(.hero h1, .page-hero h1, .entity-hero h1, .section-title) {
+  line-height: 1.08;
+}
+
+/* ── §3 Shared shell components (new work builds on these) ───────────────── */
+html[data-rz-suite] .fs-card {
+  background: var(--fs-bg2);
+  border: 1px solid var(--fs-bd);
+  border-radius: var(--fs-r);
+  padding: 1.25rem;
+}
+html[data-rz-suite] .fs-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: 2px 10px;
+  border: 1px solid var(--fs-bd);
+  border-radius: 999px;
+  font: 600 .72rem/1.6 var(--fs-mono);
+  letter-spacing: .04em;
+  color: var(--fs-t3);
+  background: var(--fs-bg3);
+}
+html[data-rz-suite] .fs-chip.grn { color: var(--fs-grn); background: var(--fs-grnbg); border-color: transparent; }
+html[data-rz-suite] .fs-chip.red { color: var(--fs-red); background: var(--fs-redbg); border-color: transparent; }
+html[data-rz-suite] .fs-chip.amb { color: var(--fs-amb); background: var(--fs-ambbg); border-color: transparent; }
+html[data-rz-suite] .fs-chip.acc { color: var(--fs-acc2); background: var(--fs-accbg); border-color: transparent; }
+html[data-rz-suite] .fs-num {
+  font-family: var(--fs-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'zero' 1;
+}
+html[data-rz-suite] .fs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  padding: 8px 16px;
+  border-radius: var(--fs-rs);
+  border: 1px solid var(--fs-bd);
+  background: var(--fs-bg3);
+  color: var(--fs-t2);
+  font: 600 .82rem var(--fs-sans);
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+html[data-rz-suite] .fs-btn:hover { border-color: var(--fs-t4); }
+html[data-rz-suite] .fs-btn.primary {
+  /* violet-700, not --fs-acc: white-on-#8b5cf6 is ~3.9:1 (fails AA); #6d28d9 passes */
+  background: #6d28d9;
+  border-color: #6d28d9;
+  color: #fff;
+}
+html[data-rz-suite] .fs-btn.primary:hover { background: #7c3aed; border-color: #7c3aed; }
+html[data-rz-suite] .fs-skel {
+  position: relative;
+  overflow: hidden;
+  background: var(--fs-bg3);
+  border-radius: var(--fs-rx);
+  min-height: 1em;
+}
+html[data-rz-suite] .fs-skel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(148, 163, 184, .12), transparent);
+  animation: fs-shimmer 1.4s infinite;
+}
+@keyframes fs-shimmer { to { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) {
+  html[data-rz-suite] .fs-skel::after { animation: none; }
+}

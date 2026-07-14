@@ -93,6 +93,14 @@ const api = {
     const { error } = await client.auth.signOut();
     return { error: friendly(error) };
   },
+  /** Self-service password change for the signed-in user (Supabase Auth). */
+  async changePassword(newPassword) {
+    if (!client) return { error: initError };
+    const user = await this.getUser();
+    if (!user) return { error: 'not signed in' };
+    const { data, error } = await client.auth.updateUser({ password: newPassword });
+    return { data, error: friendly(error) };
+  },
 
   /* ── Profile (tier lives here; RLS = own row only) ── */
   async getProfile() {
