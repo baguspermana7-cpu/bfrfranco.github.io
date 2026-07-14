@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v1.54.2 — 2026-07-14 (Auth + Finance fixes: Supabase-aware shared login · seamless terminal)
+
+### Fixed
+- **Login now accepts the real (Supabase) password.** The shared Sign-In modal (`auth.js`) authenticated only
+  against a hardcoded user list, so a password changed in Supabase was rejected. `doLogin` is now
+  **Supabase-primary**: it lazy-loads the shared Supabase client on any page and calls `signInWithPassword`,
+  deriving tier from the profile row and role from the email allowlist, then writes the usual
+  `rz_premium_session` so site-wide gating unlocks. Demo (`demo2026`) stays as an offline fallback (only for
+  emails actually in the offline set — a failed real-account login no longer runs the demo check).
+- **Security:** removed the hardcoded REAL-account passwords from `auth.js` — real accounts authenticate via
+  Supabase only (already migrated); no real-account secret in `auth.js`. Security-reviewed (no critical/high).
+- **Finance Terminal stock search seamless.** The US stock detail required a client Finnhub key and hung
+  silently without one. Search + core quote/profile/metric now route through the keyless, cached **gateway**
+  first (client Finnhub = optional enrichment); you can always open a typed ticker (Enter or "Open →"), and
+  the view renders from the gateway instead of an infinite spinner.
+
+The rz-ops "Stock Investment" 404 (DCA build now committed) shipped in v1.54.1. The full experience overhaul
+(unified design system, pro terminal UIUX, account redesign) and the site-wide login-modal dedup ship next.
+
+---
+
 ## v1.54.1 — 2026-07-13 (Fix — remove availability card + Gemini watermark on profile photo)
 
 **Removed** — the Contact section availability line ("Open to operations & engineering

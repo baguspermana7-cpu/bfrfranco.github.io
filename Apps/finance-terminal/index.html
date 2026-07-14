@@ -398,7 +398,7 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 <!-- TAB 2: STOCKS -->
 <div class="panel" id="panel-stocks">
 <div class="search-wrap" style="margin-bottom:1.25rem">
-<div class="inp-icon"><i class="fas fa-search"></i><input class="inp" id="stockSearch" placeholder="Search ticker or company..." style="width:100%" oninput="onStockSearch(this.value)" onfocus="onStockSearch(this.value)"></div>
+<div class="inp-icon"><i class="fas fa-search"></i><input class="inp" id="stockSearch" placeholder="Search ticker or company..." style="width:100%" oninput="onStockSearch(this.value)" onfocus="onStockSearch(this.value)" onkeydown="if(event.key==='Enter'&&this.value.trim())selectStock(finSym(this.value.trim().toUpperCase()))"></div>
 <div class="search-results" id="stockSearchResults"></div>
 </div>
 <div id="stockDetail" style="display:none">
@@ -1644,23 +1644,44 @@ function safeUrl(u){if(!u||typeof u!=='string')return '#';const s=u.trim();if(/^
    SECTION 11: TAB 2 - STOCKS
    ═══════════════════════════════════════════════════════════════ */
 let searchTimeout=null;
+// Always let the user open a typed symbol — even if the search API is down or no key is set (seamless).
+function _openAnyway(val){
+  const s=finSym((val||'').trim().toUpperCase());
+  return '<div class="sr-item" onclick="selectStock(\''+s+'\')"><span class="sr-sym">'+esc(s)+'</span><span class="sr-name">Open '+esc(s)+' &rarr;</span></div>';
+}
 function onStockSearch(val){
   clearTimeout(searchTimeout);
   const el=$('stockSearchResults');
   if(!val||val.length<1){el.classList.remove('show');return}
-  if(!S.fhKey){el.innerHTML='<div class="sr-item"><span class="sr-name">Enter Finnhub API key first</span></div>';el.classList.add('show');return}
   searchTimeout=setTimeout(async()=>{
+    let results=[];
     try{
-      const r=await fh('/search',{q:val});
-      const results=(r.result||[]).slice(0,10);
-      if(results.length===0){el.innerHTML='<div class="sr-item"><span class="sr-name">No results</span></div>';el.classList.add('show');return}
-      el.innerHTML=results.map(r=>`<div class="sr-item" onclick="selectStock('${finSym(r.symbol)}')"><span class="sr-sym">${esc(r.symbol)}</span><span class="sr-name">${esc(r.description||'')}</span></div>`).join('');
-      el.classList.add('show');
-    }catch(e){el.classList.remove('show')}
+      // Keyless gateway search first (server-side Finnhub, cached); fall back to client fh only if a key exists.
+      if(CFG.V2){ try{ const r=await gw('/search',{q:val}); results=((r&&r.result)||[]).slice(0,10); }
+        catch(_){ if(S.fhKey){ const r2=await fh('/search',{q:val}); results=(r2.result||[]).slice(0,10); } } }
+      else if(S.fhKey){ const r=await fh('/search',{q:val}); results=(r.result||[]).slice(0,10); }
+    }catch(e){ results=[]; }
+    if(results.length===0){ el.innerHTML=_openAnyway(val); el.classList.add('show'); return; }
+    el.innerHTML=results.map(r=>`<div class="sr-item" onclick="selectStock('${finSym(r.symbol)}')"><span class="sr-sym">${esc(r.symbol)}</span><span class="sr-name">${esc(r.description||'')}</span></div>`).join('');
+    el.classList.add('show');
   },300);
 }
 document.addEventListener('click',e=>{if(!e.target.closest('.search-wrap'))$('stockSearchResults').classList.remove('show')});
 
+// Core quote/profile/metric — keyless GATEWAY first (server-side Finnhub, KV-cached), client fh() only as a
+// fallback when a user key is set. Guarantees the stock detail loads with NO Finnhub key configured.
+async function stockCore(sym){
+  if(CFG.V2){
+    const [q,p,m]=await Promise.allSettled([gw('/quote',{symbol:sym}),gw('/profile',{symbol:sym}),gw('/metric',{symbol:sym})]);
+    const quote=q.status==='fulfilled'?q.value:null;
+    if(quote&&quote.c!=null) return {quote:quote,profile:(p.status==='fulfilled'&&p.value)||{},metric:(m.status==='fulfilled'&&m.value)||{}};
+  }
+  if(S.fhKey){
+    const [q,p,m]=await Promise.allSettled([fh('/quote',{symbol:sym}),fh('/stock/profile2',{symbol:sym}),fh('/stock/metric',{symbol:sym,metric:'all'})]);
+    return {quote:(q.status==='fulfilled'&&q.value)||{},profile:(p.status==='fulfilled'&&p.value)||{},metric:(m.status==='fulfilled'&&m.value)||{}};
+  }
+  return {quote:{},profile:{},metric:{}};
+}
 async function selectStock(sym){
   $('stockSearchResults').classList.remove('show');
   $('stockSearch').value=sym;
@@ -1668,41 +1689,44 @@ async function selectStock(sym){
   $('stockDetail').style.display='block';
   S.curStock=sym;
   // Show loading state
-  $('stockHero').innerHTML='<div class="loading-text"><span class="spinner"></span>Loading '+sym+'...</div>';
-  // Load all data in parallel — include insider + support/resistance + targets + dividends + filings + news + earnings
-  const [quote,profile,peers,rec,fin,insider,sr,targets,divs,filings,compNews,earnings]=await Promise.allSettled([
-    fh('/quote',{symbol:sym}),
-    fh('/stock/profile2',{symbol:sym}),
-    fh('/stock/peers',{symbol:sym}),
-    fh('/stock/recommendation',{symbol:sym}),
-    fh('/stock/metric',{symbol:sym,metric:'all'}),
-    fh('/stock/insider-transactions',{symbol:sym}).catch(()=>({data:[]})),
-    fh('/scan/support-resistance',{symbol:sym,resolution:'D'}).catch(()=>({levels:[]})),
-    fh('/stock/price-target',{symbol:sym}).catch(()=>({})),
-    fh('/stock/dividend',{symbol:sym,from:'2020-01-01',to:new Date().toISOString().slice(0,10)}).catch(()=>[]),
-    fh('/stock/filings',{symbol:sym,from:'2023-01-01',to:new Date().toISOString().slice(0,10)}).catch(()=>[]),
-    fh('/company-news',{symbol:sym,from:new Date(Date.now()-30*86400000).toISOString().slice(0,10),to:new Date().toISOString().slice(0,10)}).catch(()=>[]),
-    fh('/stock/earnings',{symbol:sym}).catch(()=>[])
-  ]);
-  S.stockQ=quote.status==='fulfilled'?quote.value:{};
-  const rawProf=profile.status==='fulfilled'?profile.value:{};
-  const metricData=fin.status==='fulfilled'?fin.value:{};
+  $('stockHero').innerHTML='<div class="loading-text"><span class="spinner"></span>Loading '+esc(sym)+'...</div>';
+  // Core (quote/profile/metric) via keyless gateway (or fh fallback) — always resolves, never key-blocked.
+  const core=await stockCore(sym);
+  S.stockQ=core.quote||{};
+  const rawProf=core.profile||{};
+  const metricData=core.metric||{};
   const m=metricData?.metric||{};
-  if(!rawProf.name&&S.stockQ.c>0){
-    rawProf.name=sym;rawProf.exchange='US';
-    rawProf.marketCapitalization=m.marketCapitalization||0;
-  }
+  if(!rawProf.name){ rawProf.name=sym; rawProf.exchange=rawProf.exchange||'US'; if(!rawProf.marketCapitalization)rawProf.marketCapitalization=m.marketCapitalization||0; }
   S.stockProf=rawProf;
-  S.stockPeers=(peers.status==='fulfilled'?peers.value:[]).filter(p=>p!==sym).slice(0,12);
-  S.stockRec=(rec.status==='fulfilled'?rec.value:[]).slice(0,6);
   S.stockFin=metricData;
-  S.stockInsider=(insider.status==='fulfilled'?(insider.value?.data||[]):[]).slice(0,10);
-  S.stockSR=sr.status==='fulfilled'?(sr.value?.levels||[]):[];
-  S.stockTargets=targets.status==='fulfilled'?targets.value:{};
-  S.stockDivs=(divs.status==='fulfilled'?(Array.isArray(divs.value)?divs.value:[]):[]).slice(0,20);
-  S.stockFilings=(filings.status==='fulfilled'?(Array.isArray(filings.value)?filings.value:[]):[]).slice(0,15);
-  S.stockCompNews=(compNews.status==='fulfilled'?(Array.isArray(compNews.value)?compNews.value:[]):[]).slice(0,10);
-  S.stockEarnings=(earnings.status==='fulfilled'?(Array.isArray(earnings.value)?earnings.value:[]):[]).slice(0,12);
+  // Finnhub-only enrichment cards (peers/rec/insider/SR/targets/divs/filings/news/earnings) need a CLIENT
+  // key — the gateway doesn't expose them. Without a key, skip cleanly (cards render empty, not broken).
+  let peers=[],rec=[],insider=[],sr=[],targets={},divs=[],filings=[],compNews=[],earnings=[];
+  if(S.fhKey){
+    const R=await Promise.allSettled([
+      fh('/stock/peers',{symbol:sym}),
+      fh('/stock/recommendation',{symbol:sym}),
+      fh('/stock/insider-transactions',{symbol:sym}).catch(()=>({data:[]})),
+      fh('/scan/support-resistance',{symbol:sym,resolution:'D'}).catch(()=>({levels:[]})),
+      fh('/stock/price-target',{symbol:sym}).catch(()=>({})),
+      fh('/stock/dividend',{symbol:sym,from:'2020-01-01',to:new Date().toISOString().slice(0,10)}).catch(()=>[]),
+      fh('/stock/filings',{symbol:sym,from:'2023-01-01',to:new Date().toISOString().slice(0,10)}).catch(()=>[]),
+      fh('/company-news',{symbol:sym,from:new Date(Date.now()-30*86400000).toISOString().slice(0,10),to:new Date().toISOString().slice(0,10)}).catch(()=>[]),
+      fh('/stock/earnings',{symbol:sym}).catch(()=>[])
+    ]);
+    const v=i=>R[i].status==='fulfilled'?R[i].value:null;
+    peers=v(0)||[];rec=v(1)||[];insider=(v(2)&&v(2).data)||[];sr=(v(3)&&v(3).levels)||[];targets=v(4)||{};
+    divs=Array.isArray(v(5))?v(5):[];filings=Array.isArray(v(6))?v(6):[];compNews=Array.isArray(v(7))?v(7):[];earnings=Array.isArray(v(8))?v(8):[];
+  }
+  S.stockPeers=peers.filter(p=>p!==sym).slice(0,12);
+  S.stockRec=rec.slice(0,6);
+  S.stockInsider=insider.slice(0,10);
+  S.stockSR=sr;
+  S.stockTargets=targets;
+  S.stockDivs=divs.slice(0,20);
+  S.stockFilings=filings.slice(0,15);
+  S.stockCompNews=compNews.slice(0,10);
+  S.stockEarnings=earnings.slice(0,12);
   // Indonesian (.JK): Finnhub has no IDX coverage → source the live quote from the gateway (Yahoo)
   // + name/sector from the FIN Engine universe. The Finnhub-only cards (rating/peers/insider/… ) have
   // no ID data, so they're hidden below — the hero + chart + analytics + FIN scorecard carry the view.
@@ -1725,12 +1749,13 @@ async function selectStock(sym){
   renderSecFilings();
   renderCompanyNews();
   renderEarningsHistory();
-  // ID (.JK): hide the Finnhub-only cards (no IDX data) so the detail is clean, not empty — the hero +
-  // price chart + analytics gauge + FIN Advisor Scorecard (all gateway/engine-driven) carry it. US: show all.
-  ['stockProfile','stockRating','stockFinancials','stockPeers','stockInsider','stockSR','stockTargets','stockDividends','stockFilings','stockNews','stockEarnings'].forEach(id=>{
-    const inner=$(id), card=inner&&inner.closest?inner.closest('.card'):null;
-    if(card) card.style.display=isID?'none':'';
-  });
+  // Profile + Financials come from the gateway (keyless) → always show. The rest are Finnhub-only
+  // enrichment: hide for ID (.JK) OR when no client key is set — so the detail is clean, not empty. Hero +
+  // price chart + analytics gauge + FIN committee (gateway/engine-driven) carry the view.
+  const gwCards=['stockProfile','stockFinancials'];
+  const fhOnlyCards=['stockRating','stockPeers','stockInsider','stockSR','stockTargets','stockDividends','stockFilings','stockNews','stockEarnings'];
+  gwCards.forEach(id=>{ const inner=$(id),card=inner&&inner.closest?inner.closest('.card'):null; if(card) card.style.display=isID?'none':''; });
+  fhOnlyCards.forEach(id=>{ const inner=$(id),card=inner&&inner.closest?inner.closest('.card'):null; if(card) card.style.display=(isID||!S.fhKey)?'none':''; });
   initStockTfBar();
   // Set default indicator toggles
   document.querySelectorAll('#indicatorToggles .btn').forEach(b=>b.classList.toggle('active',S.indicators[b.dataset.ind]));

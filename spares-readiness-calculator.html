@@ -4524,7 +4524,7 @@ html:not([data-theme="dark"]) .tab-btn:not(.active) { color:#475569 !important; 
 </footer>
 
 <!-- Scripts -->
-<script src="auth.js?v=2026-05-09-v1" defer></script>
+<script src="auth.js?v=2026-07-13" defer></script>
 <script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
 <script src="script.min.js?v=2026-07-04-a11y2" defer></script>
 
@@ -9227,6 +9227,12 @@ function tourShow() {
     tt.style.transform = 'translate(-50%, -50%)';
   }
   tt.style.display = 'block';
+  /* re-clamp with the tooltip's REAL height (rect is zero while display:none) */
+  var ttRect = tt.getBoundingClientRect();
+  if (ttRect.bottom > window.innerHeight - 10) {
+    tt.style.top = Math.max(10, window.innerHeight - ttRect.height - 10) + 'px';
+  }
+  if (parseFloat(tt.style.top) < 10) tt.style.top = '10px';
 }
 
 function tourNext() {

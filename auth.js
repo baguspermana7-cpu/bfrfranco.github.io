@@ -290,12 +290,12 @@
         });
     }
 
-    /* ───────── Valid Users ───────── */
+    /* ───────── Valid Users ─────────
+       OFFLINE / DEMO fallback ONLY. Real accounts (bagus/admin/educator) authenticate against Supabase —
+       their passwords live in Supabase (migrated), NEVER in this repo. The demo account stays here so the
+       site remains usable offline / if Supabase is unreachable. (No real-account secret in source.) */
     var VALID_USERS = [
-        { email: 'demo@resistancezero.com',     password: 'demo2026',        tier: 'demo',     role: 'demo' },
-        { email: 'educator@resistancezero.com', password: 'educator2026',    tier: 'pro',      role: 'educator' },
-        { email: 'bagus@resistancezero.com',    password: 'RZ@Premium2026!', tier: 'pro',      role: 'root' },
-        { email: 'admin@resistancezero.com',    password: 'RZ@Premium2026!', tier: 'pro',      role: 'root' }
+        { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'demo', role: 'demo' }
     ];
 
     /* Also check manually-created accounts stored in localStorage by admin */
@@ -306,6 +306,34 @@
         } catch (e) { return []; }
     }
 
+    /* Lazy-load the shared Supabase client (config + module) on demand, so the ONE shared login modal is
+       Supabase-aware on EVERY page without adding the module to 105 pages. Resolves to window.rzSupa or null. */
+    function ensureSupabase() {
+        if (window.rzSupa && window.rzSupa.ready) return window.rzSupa.ready;
+        if (window.__rzSupaLoading) return window.__rzSupaLoading;
+        window.__rzSupaLoading = new Promise(function (resolve) {
+            function loadModule() {
+                var m = document.createElement('script');
+                m.type = 'module';
+                m.src = '/js/rz-supabase.js?v=2026-07-13';
+                m.onload = function () {
+                    var r = (window.rzSupa && window.rzSupa.ready) ? window.rzSupa.ready : Promise.resolve(window.rzSupa || null);
+                    r.then(resolve).catch(function () { resolve(window.rzSupa || null); });
+                };
+                m.onerror = function () { resolve(null); };
+                document.head.appendChild(m);
+            }
+            if (window.RZ_CONFIG) { loadModule(); return; }
+            var c = document.createElement('script');
+            c.src = '/js/rz-config.js?v=2026-07-13';
+            c.onload = loadModule;
+            c.onerror = function () { resolve(null); };
+            document.head.appendChild(c);
+        });
+        return window.__rzSupaLoading;
+    }
+
+    /* demo/manual offline fallback only (real accounts go through Supabase). */
     function findUser(email, password) {
         var e = email.toLowerCase().trim();
         var p = password.trim();
@@ -746,36 +774,56 @@
                 return;
             }
 
-            var user = findUser(email, password);
-            if (!user) {
-                /* v1.29.0 — same stale-cache rescue link on legacy path */
-                if (errorEl) {
-                    errorEl.innerHTML = 'Invalid email or password. ' +
-                        '<a href="#" onclick="event.preventDefault();if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()});});}if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});}localStorage.removeItem(\'rz_premium_session\');localStorage.removeItem(\'rz_auth_v2\');localStorage.removeItem(\'rz_auth_gw\');localStorage.removeItem(\'rz_auth_csrf\');setTimeout(function(){location.reload()},500);return false;" style="color:#a78bfa;text-decoration:underline;cursor:pointer">Try fresh reload</a>';
-                    errorEl.classList.add('show');
-                }
-                return;
+            var rescueLink = ' <a href="#" onclick="event.preventDefault();if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()});});}if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});}localStorage.removeItem(\'rz_premium_session\');localStorage.removeItem(\'rz_auth_v2\');localStorage.removeItem(\'rz_auth_gw\');localStorage.removeItem(\'rz_auth_csrf\');setTimeout(function(){location.reload()},500);return false;" style="color:#a78bfa;text-decoration:underline;cursor:pointer">Try fresh reload</a>';
+            function _showErr(msg) { if (!errorEl) return; errorEl.innerHTML = msg + rescueLink; errorEl.classList.add('show'); }
+            function _finish(u) {
+                if (errorEl) { errorEl.classList.remove('show'); errorEl.textContent = ''; }
+                setSession(u.email, u.tier, u.role);
+                if (formEl) formEl.style.display = 'none';
+                if (tierLabel) tierLabel.textContent = 'Access Activated';
+                if (successEl) successEl.classList.add('show');
+                updateAuthUI();
+                window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: u.email, tier: u.tier, role: u.role || detectRole(u.email), action: 'login' } }));
+                setTimeout(function () {
+                    window._rzAuth.hideModal();
+                    var path = window.location.pathname.toLowerCase();
+                    if (path.indexOf('capex-calculator') !== -1 || path.indexOf('opex-calculator') !== -1) { window.location.reload(); }
+                }, 1500);
             }
 
-            /* Success */
-            setSession(user.email, user.tier, user.role);
-            if (formEl) formEl.style.display = 'none';
-            if (tierLabel) tierLabel.textContent = 'Access Activated';
-            if (successEl) successEl.classList.add('show');
-            updateAuthUI();
-
-            /* Dispatch custom event for page-specific handlers */
-            window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: user.email, tier: user.tier, role: user.role || detectRole(user.email), action: 'login' } }));
-
-            /* Auto-close modal after delay */
-            setTimeout(function () {
-                window._rzAuth.hideModal();
-                /* If on a calculator page, reload to apply gating */
-                var path = window.location.pathname.toLowerCase();
-                if (path.indexOf('capex-calculator') !== -1 || path.indexOf('opex-calculator') !== -1) {
-                    window.location.reload();
+            /* Supabase-PRIMARY: real accounts authenticate against Supabase (source of truth post-migration);
+               tier comes from the profile row, role from the email allowlist (detectRole — not a secret).
+               The hardcoded demo/manual accounts are an OFFLINE fallback only. */
+            var emailNorm = email.toLowerCase().trim();
+            ensureSupabase().then(function (supa) {
+                if (supa && supa.configured) {
+                    return supa.signIn(email, password).then(function (res) {
+                        if (res && res.error) {
+                            /* Only fall through to the offline demo/manual set for emails that are actually in
+                               it — never run findUser for a real (Supabase) account that just failed auth. */
+                            var eN = email.toLowerCase().trim();
+                            var known = VALID_USERS.some(function (u) { return u.email === eN; })
+                                || getManualAccounts().some(function (u) { return String(u.email || '').toLowerCase() === eN; });
+                            if (known) { var demoA = findUser(email, password); if (demoA) { _finish(demoA); return; } }
+                            _showErr('Invalid email or password.');
+                            return;
+                        }
+                        return supa.getProfile().then(function (pr) {
+                            var tier = (pr && pr.data && pr.data.tier) || 'pro';
+                            _finish({ email: emailNorm, tier: tier, role: detectRole(emailNorm) });
+                        }).catch(function () {
+                            _finish({ email: emailNorm, tier: 'pro', role: detectRole(emailNorm) });
+                        });
+                    });
                 }
-            }, 1500);
+                /* Supabase unreachable/unconfigured → offline demo/manual fallback */
+                var demoB = findUser(email, password);
+                if (demoB) { _finish(demoB); return; }
+                _showErr('Auth service unavailable — please retry.');
+            }).catch(function () {
+                var demoC = findUser(email, password);
+                if (demoC) { _finish(demoC); } else { _showErr('Auth service unavailable — please retry.'); }
+            });
         },
 
         logout: function () {
