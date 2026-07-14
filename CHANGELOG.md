@@ -11,6 +11,33 @@ release sections rather than semver.
 
 ---
 
+## v1.54.3 — 2026-07-14 (Shared cookie-consent engine · spares tour overlay fix)
+
+### Added
+- **`js/rz-cookie-consent.js` — the ONE shared cookie-consent engine** (`window.__rzCookieConsent` guard,
+  self-injected CSS + banner markup, legacy-markup adoption, `rz_cookie_consent` localStorage key with
+  legacy `cookieConsent` migration, GA disable on decline, `rz-cookie-consent` CustomEvent on decision,
+  `window.RZ_COOKIE_TEXT` localization hook used by `/id/` pages). Rolled out by
+  `tools/rollout-cookie-consent.py` — replaced 115 per-page inline copies (3 markup/CSS variants) with
+  one `<script defer>` tag. Per-page head GA gating snippets untouched (same key, pre-GA-load).
+
+### Fixed
+- **spares-readiness-calculator: dark screen after cookie Accept.** Root cause was NOT the cookie banner —
+  the guided tour auto-launched 1.2s after first visit; its spotlight paints a full-page scrim, the tooltip
+  could render off-viewport, and the overlay had `pointer-events:none` (no dismiss). Now
+  (`tools/fix-spares-tour.py`): tour waits for the cookie-consent decision (`rz-cookie-consent` event)
+  before auto-launching; target is scrolled into view before spotlight measurement; tooltip is clamped
+  into the viewport using its real rendered height; Escape and overlay-click end the tour.
+- spares was also the only page whose banner missed the initial `hidden` class — moot now that the shared
+  engine owns banner state.
+
+### Verification
+- `tools/_cookie_e2e.mjs` 17/17 PASS (first-visit accept + tour sequencing + tooltip-in-viewport + Escape,
+  returning-visitor no-banner ×4 pages, EPMS decline + GA disable, `/id/` Indonesian text + legacy-key
+  migration). Gates: audit-js-syntax, audit-script-tags, audit-a11y — all CLEAN.
+
+---
+
 ## v1.54.2 — 2026-07-14 (Auth + Finance fixes: Supabase-aware shared login · seamless terminal)
 
 ### Fixed

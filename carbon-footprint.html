@@ -447,17 +447,7 @@
         .cf-benchmark-tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.15); border-radius: 50px; font-size: 0.68rem; font-weight: 600; color: var(--medium-green); }
 
         /* ═══ COOKIE BANNER ═══ */
-        .cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10002; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 2rem; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-top: 1px solid #e5e7eb; font-size: 0.85rem; color: #374151; transform: translateY(0); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); }
-        .cookie-banner.hidden { transform: translateY(100%); pointer-events: none; }
-        .cookie-banner p { margin: 0; line-height: 1.5; }
-        .cookie-banner a { color: var(--dark-green); text-decoration: underline; }
-        .cookie-actions { display: flex; gap: 0.75rem; align-items: center; flex-shrink: 0; }
-        .cookie-accept { padding: 8px 20px; border-radius: 8px; border: none; background: var(--primary-gradient); color: white; font-weight: 600; font-size: 0.82rem; cursor: pointer; font-family: inherit; transition: all 0.2s; }
-        .cookie-accept:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
-        .cookie-decline { padding: 8px 20px; border-radius: 8px; border: 1px solid #d1d5db; background: white; color: #94a3b8; font-weight: 500; font-size: 0.8rem; cursor: pointer; font-family: inherit; transition: all 0.2s; }
-        .cookie-decline:hover { background: #f3f4f6; color: #374151; }
         @media (max-width: 768px) {
-            .cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; }
         }
 
         /* ═══ SCROLL TO TOP ═══ */
@@ -479,7 +469,6 @@
         /* ═══ PRINT STYLES ═══ */
         @media print {
             body { background: white !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .navbar, .hero, .cf-toolbar, .cf-login-overlay, .nav-back, footer, .tooltip-trigger, .pro-overlay, .pro-badge, .preset-bar, .cookie-banner, .scroll-top-btn { display: none !important; }
             .main-content { padding-top: 0 !important; }
             .calculator-section { padding: 0 !important; }
             .calculator-grid { display: block !important; }
@@ -507,7 +496,6 @@
             .nav-user-email { display: none; }
             .nav-login-btn .nav-login-text { display: none; }
             .nav-login-btn { padding: 8px 12px; }
-            .cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; }
         }
 
         /* ═══ RESPONSIVE: 600px ═══ */
@@ -583,9 +571,6 @@
         [data-theme="dark"] .calc-disclaimer .disc-text strong { color:#f1f5f9 !important; }
         [data-theme="dark"] .calc-disclaimer .disc-text a { color:#22c55e !important; }
         [data-theme="dark"] .calc-disclaimer .disc-fine { color:#94a3b8 !important; }
-        [data-theme="dark"] .cookie-banner { background:#1e293b; border-color:#334155; color:#cbd5e1; }
-        [data-theme="dark"] .cookie-decline { border-color:#334155; color:#94a3b8; background:#1e293b; }
-        [data-theme="dark"] .cookie-decline:hover { background:#334155; color:#f1f5f9; }
         [data-theme="dark"] .range-wrap input[type="range"] { background:#334155; }
         [data-theme="dark"] .range-value { color:#22c55e; }
         [data-theme="dark"] .preset-btn { border-color:rgba(34,197,94,0.3); background:rgba(34,197,94,0.05); color:#22c55e; }
@@ -637,6 +622,7 @@ button[onclick^="setPreset"] { background:#166534 !important; border-color:#1665
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-calc-utils.js?v=2026-07-03" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-07-12" defer></script>
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
 <style id="rz-mobile-v18">
 /* v1.8.0 — mobile responsive patch */
@@ -1445,14 +1431,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
         </div>
     </div>
 
-    <!-- ═══ COOKIE BANNER ═══ -->
-    <div class="cookie-banner hidden" id="cookieBanner" role="region" aria-label="Cookie notice">
-        <p>We use cookies for analytics. <a href="privacy.html">Learn more</a></p>
-        <div class="cookie-actions">
-            <button class="cookie-accept" id="cookieAccept">Accept</button>
-            <button class="cookie-decline" id="cookieDecline">Decline</button>
-        </div>
-    </div>
+    
 
     <!-- ═══ SCROLL TO TOP ═══ -->
     <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
@@ -2798,23 +2777,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
     }
     </script>
     <script src="rz-tracker.js" defer></script>
-    <script>
-    (function(){
-        var cb = document.getElementById('cookieBanner');
-        var consent = localStorage.getItem('rz_cookie_consent');
-        if (!consent && cb) cb.classList.remove('hidden');
-        var acceptBtn = document.getElementById('cookieAccept');
-        var declineBtn = document.getElementById('cookieDecline');
-        if (acceptBtn) acceptBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','accepted'); cb.classList.add('hidden'); });
-        if (declineBtn) declineBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','declined'); cb.classList.add('hidden'); window['ga-disable-G-GED7FX8RTV'] = true; });
-        var sBtn = document.getElementById('scrollTopBtn');
-        if (sBtn) {
-            var ticking = false;
-            window.addEventListener('scroll', function(){ if(!ticking){window.requestAnimationFrame(function(){sBtn.classList.toggle('visible',window.scrollY>500);ticking=false;});ticking=true;} });
-            sBtn.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); });
-        }
-    })();
-    </script>
+    
 <!-- Supabase save/reload scenario (additive) -->
 <script src="js/rz-config.js?v=2026-07-11"></script>
 <script src="js/rz-scenario.js?v=2026-07-11d"></script>

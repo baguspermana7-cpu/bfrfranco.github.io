@@ -1524,7 +1524,6 @@
         :root:not([data-theme="dark"]) td strong[style*="accent-amber"] { color: #92400e !important; }
         :root:not([data-theme="dark"]) .src-ref { color: #0e7490; }
         :root:not([data-theme="dark"]) .conclusion-box p[style*="94a3b8"] { color: #475569 !important; }
-        [data-theme="dark"] .cookie-banner a { color: #93c5fd !important; }
 </style>
     <link rel="preload" as="image" href="assets/article-2-cover.jpg">
     <!-- Chart.js for data visualizations -->
@@ -1537,6 +1536,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-07-12" defer></script>
 <style id="rz-mobile-v18">
 /* v1.8.0 — mobile responsive patch */
 @media (max-width: 768px) {
@@ -2703,7 +2703,6 @@
                 <button onclick="alarmDoLogin()" style="padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#dc2626,#ef4444);color:white;font-size:0.95rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 12px rgba(239,68,68,0.3);">
                     <i class="fas fa-unlock" style="margin-right:8px;"></i>Sign In
                 </button>
-                <p style="text-align:center;font-size:0.75rem;color:#94a3b8;margin:0;">Demo Account: demo@resistancezero.com / demo2026</p>
 <p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
             </div>
         </div>
@@ -3083,25 +3082,15 @@
         window.alarmCloseLogin = function() { document.getElementById('alarmLoginModal').classList.remove('show'); document.getElementById('alarmLoginError').style.display = 'none'; };
         document.getElementById('alarmLoginModal').addEventListener('click', function(e) { if (e.target === this) alarmCloseLogin(); });
 
+        // Login is handled by the shared Supabase auth modal (auth.js).
+        // On success it writes rz_premium_session + dispatches rz-auth-change,
+        // which the listener below reacts to (applyAlarmGating). This delegates
+        // to that modal and removes the legacy hardcoded credential check.
         window.alarmDoLogin = function() {
-            var email = document.getElementById('alarmLoginEmail').value.trim().toLowerCase();
-            var password = document.getElementById('alarmLoginPassword').value;
-            var errEl = document.getElementById('alarmLoginError');
-            if (!email || !password) { errEl.textContent = 'Please enter email and password'; errEl.style.display = 'block'; return; }
-            var validUsers = [
-                { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro' },
-                { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' },
-                { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' }
-            ];
-            var match = validUsers.find(function(u) { return u.email === email && u.password === password; });
-            if (match) {
-                localStorage.setItem('rz_premium_session', JSON.stringify({ email: match.email, tier: match.tier, role: (match.email === 'admin@resistancezero.com' || match.email === 'bagus@resistancezero.com') ? 'root' : 'pro', expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() }));
-                alarmIsPremium = true;
+            if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
                 alarmCloseLogin();
-                applyAlarmGating();
-                alarmUpdateNavAuth();
-                switchAlarmMode('pro');
-            } else { errEl.textContent = 'Invalid email or password'; errEl.style.display = 'block'; document.getElementById('alarmLoginPassword').value = ''; }
+                window._rzAuth.showModal();
+            }
         };
 
         window.alarmLogout = function() {
@@ -3984,64 +3973,14 @@ function finalizeMC(results, N) {
 <script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
 <script src="rz-tracker.js" defer></script>
 
-<!-- Cookie Consent Banner -->
-<div class="cookie-banner hidden" id="cookieBanner" role="region" aria-label="Cookie notice">
-    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
-    <div class="cookie-actions">
-        <button class="cookie-accept" id="cookieAccept">Accept</button>
-        <button class="cookie-decline" id="cookieDecline">Decline</button>
-    </div>
-</div>
+
 
 <!-- Scroll to Top -->
 <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
 
-<script>
-(function(){
-    // Cookie Banner
-    var cb = document.getElementById('cookieBanner');
-    var consent = localStorage.getItem('rz_cookie_consent');
-    if (!consent && cb) {
-        cb.classList.remove('hidden');
-    }
-    var acceptBtn = document.getElementById('cookieAccept');
-    var declineBtn = document.getElementById('cookieDecline');
-    if (acceptBtn) acceptBtn.addEventListener('click', function(){
-        localStorage.setItem('rz_cookie_consent', 'accepted');
-        cb.classList.add('hidden');
-    });
-    if (declineBtn) declineBtn.addEventListener('click', function(){
-        localStorage.setItem('rz_cookie_consent', 'declined');
-        cb.classList.add('hidden');
-        // Disable GA
-        window['ga-disable-G-GED7FX8RTV'] = true;
-    });
 
-    // Scroll to Top
-    var sBtn = document.getElementById('scrollTopBtn');
-    if (sBtn) {
-        var ticking = false;
-        window.addEventListener('scroll', function(){
-            if (!ticking) {
-                window.requestAnimationFrame(function(){
-                    if (window.scrollY > 500) {
-                        sBtn.classList.add('visible');
-                    } else {
-                        sBtn.classList.remove('visible');
-                    }
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        });
-        sBtn.addEventListener('click', function(){
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    }
-})();
-</script>
 
 </body>
 </html>

@@ -1240,6 +1240,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-07-12" defer></script>
 <style id="rz-mobile-v18">
 /* v1.8.0 — mobile responsive patch */
 @media (max-width: 768px) {
@@ -2297,9 +2298,6 @@
                         <input type="password" class="login-input" id="loginPass" placeholder="Password" aria-label="Password">
                         <button class="login-submit" id="loginSubmit" onclick="handleLogin()">Sign In</button>
                         <div class="login-error" id="loginError">Invalid credentials. Please try again.</div>
-                        <div class="login-hint">
-                            <span>Demo Account:</span> <code>demo@resistancezero.com</code> / <code>demo2026</code>
-                        </div>
 <p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
                     </div>
                 </div>
@@ -3256,20 +3254,14 @@
         window.showLoginModal = showLoginModal;
         window.hideLoginModal = hideLoginModal;
 
+        // Login is handled by the shared Supabase auth modal (auth.js).
+        // On success it writes rz_premium_session + dispatches rz-auth-change,
+        // which the listener below reacts to (applyGating/switchCalcMode). This
+        // delegates to that modal and removes the legacy hardcoded credential check.
         function handleLogin(){
-            var email=$('loginEmail').value.trim().toLowerCase();
-            var pass=$('loginPass').value;
-            if ((email === 'demo@resistancezero.com' && pass === 'demo2026') || ((email === 'bagus@resistancezero.com' || email === 'admin@resistancezero.com') && pass === 'RZ@Premium2026!')){
-                isPremium=true;
-                var exp=new Date(); exp.setDate(exp.getDate()+30);
-                localStorage.setItem('rz_premium_session',JSON.stringify({email:email,tier:'pro',role: (['admin@resistancezero.com','bagus@resistancezero.com'].indexOf(email)!==-1?'root':'pro'), expires:exp.toISOString()}));
+            if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
                 hideLoginModal();
-                // Notify auth.js to update navbar
-                window.dispatchEvent(new CustomEvent('rz-auth-change',{detail:{email:email,tier:'pro',role:'pro',action:'login'}}));
-                var badge=$('proBadge'); if(badge){badge.textContent='ACTIVE';badge.style.background='linear-gradient(135deg,#10b981,#059669)';}
-                switchCalcMode('pro');
-            } else {
-                $('loginError').style.display='block';
+                window._rzAuth.showModal();
             }
         }
         window.handleLogin = handleLogin;
@@ -3369,64 +3361,14 @@
 <script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
 <script src="rz-tracker.js" defer></script>
 
-<!-- Cookie Consent Banner -->
-<div class="cookie-banner hidden" id="cookieBanner" role="region" aria-label="Cookie notice">
-    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
-    <div class="cookie-actions">
-        <button class="cookie-accept" id="cookieAccept">Accept</button>
-        <button class="cookie-decline" id="cookieDecline">Decline</button>
-    </div>
-</div>
+
 
 <!-- Scroll to Top -->
 <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
 
-<script>
-(function(){
-    // Cookie Banner
-    var cb = document.getElementById('cookieBanner');
-    var consent = localStorage.getItem('rz_cookie_consent');
-    if (!consent && cb) {
-        cb.classList.remove('hidden');
-    }
-    var acceptBtn = document.getElementById('cookieAccept');
-    var declineBtn = document.getElementById('cookieDecline');
-    if (acceptBtn) acceptBtn.addEventListener('click', function(){
-        localStorage.setItem('rz_cookie_consent', 'accepted');
-        cb.classList.add('hidden');
-    });
-    if (declineBtn) declineBtn.addEventListener('click', function(){
-        localStorage.setItem('rz_cookie_consent', 'declined');
-        cb.classList.add('hidden');
-        // Disable GA
-        window['ga-disable-G-GED7FX8RTV'] = true;
-    });
 
-    // Scroll to Top
-    var sBtn = document.getElementById('scrollTopBtn');
-    if (sBtn) {
-        var ticking = false;
-        window.addEventListener('scroll', function(){
-            if (!ticking) {
-                window.requestAnimationFrame(function(){
-                    if (window.scrollY > 500) {
-                        sBtn.classList.add('visible');
-                    } else {
-                        sBtn.classList.remove('visible');
-                    }
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        });
-        sBtn.addEventListener('click', function(){
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    }
-})();
-</script>
 
 </body>
 </html>

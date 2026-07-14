@@ -313,6 +313,7 @@
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-07-12" defer></script>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -578,71 +579,9 @@
         </div>
     </footer>
 
-    <!-- Cookie Consent Banner -->
-    <div class="cookie-banner hidden" id="cookieBanner" role="region" aria-label="Cookie notice">
-        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
-        <div class="cookie-actions">
-            <button class="cookie-accept" id="cookieAccept">Accept</button>
-            <button class="cookie-decline" id="cookieDecline">Decline</button>
-        </div>
-    </div>
+    
 
-    <script>
-    (function(){
-        // Dark mode toggle
-        var toggle = document.getElementById('themeToggle');
-        var theme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', theme);
-        if (toggle) toggle.addEventListener('click', function(){
-            var current = document.documentElement.getAttribute('data-theme');
-            var next = current === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('theme', next);
-        });
-
-        // Hamburger menu
-        var hamburger = document.querySelector('.hamburger');
-        var navMenu = document.querySelector('.nav-menu');
-        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
-            hamburger.classList.toggle('active');
-            navMenu.classList.toggle('active');
-            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
-        });
-
-        // Accordion toggle
-        document.querySelectorAll('.accordion-header').forEach(function(header){
-            header.addEventListener('click', function(){
-                var acc = this.parentElement;
-                var body = acc.querySelector('.accordion-body');
-                var content = acc.querySelector('.accordion-content');
-                if (acc.classList.contains('active')) {
-                    acc.classList.remove('active');
-                    body.style.maxHeight = null;
-                } else {
-                    acc.classList.add('active');
-                    body.style.maxHeight = content.scrollHeight + 'px';
-                }
-            });
-        });
-
-        // Smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(function(a){
-            a.addEventListener('click', function(e){
-                var target = document.querySelector(this.getAttribute('href'));
-                if (target) { e.preventDefault(); target.scrollIntoView({ behavior:'smooth' }); }
-            });
-        });
-
-        // Cookie Banner
-        var cb = document.getElementById('cookieBanner');
-        var consent = localStorage.getItem('rz_cookie_consent');
-        if (!consent && cb) cb.classList.remove('hidden');
-        var acceptBtn = document.getElementById('cookieAccept');
-        var declineBtn = document.getElementById('cookieDecline');
-        if (acceptBtn) acceptBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','accepted'); cb.classList.add('hidden'); });
-        if (declineBtn) declineBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','declined'); cb.classList.add('hidden'); window['ga-disable-G-GED7FX8RTV']=true; });
-    })();
-    </script>
+    
     <script src="auth.js?v=2026-07-13" defer></script>
 </body>
 </html>

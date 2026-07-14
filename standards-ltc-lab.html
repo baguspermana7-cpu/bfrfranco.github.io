@@ -1691,63 +1691,13 @@
             color: #94a3b8;
         }
 
-        .cookie-banner {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 10002;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            padding: 0.9rem 1.2rem;
-            background: rgba(255, 255, 255, 0.95);
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
-            box-shadow: 0 -2px 18px rgba(0, 0, 0, 0.08);
-            font-size: 0.83rem;
-            color: #334155;
-            transition: transform 0.35s ease;
-        }
 
-        [data-theme="dark"] .cookie-banner {
-            background: rgba(10, 15, 29, 0.95);
-            color: #cbd5e1;
-            border-top-color: rgba(148, 163, 184, 0.2);
-        }
 
-        .cookie-banner.hidden {
-            transform: translateY(120%);
-            pointer-events: none;
-        }
 
-        .cookie-banner a {
-            color: #2563eb;
-            text-decoration: underline;
-        }
 
-        .cookie-actions {
-            display: flex;
-            gap: 0.6rem;
-            flex-shrink: 0;
-        }
 
         .cookie-accept,
-        .cookie-decline {
-            border: 1px solid #cbd5e1;
-            border-radius: 7px;
-            padding: 0.42rem 0.8rem;
-            font-size: 0.75rem;
-            cursor: pointer;
-            background: #fff;
-        }
 
-        .cookie-accept {
-            border-color: #2563eb;
-            background: #2563eb;
-            color: #fff;
-            font-weight: 700;
-        }
 
         @media (max-width: 1180px) {
             .standards-grid {
@@ -1835,11 +1785,6 @@
                 grid-template-columns: 1fr;
             }
 
-            .cookie-banner {
-                flex-direction: column;
-                text-align: center;
-                gap: 0.55rem;
-            }
         }
     
         /* v1.8.0 — mobile sim/lab responsive patch */
@@ -1967,7 +1912,8 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
     }
     </script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
-    <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>    <meta property="og:image" content="https://resistancezero.com/assets/og/standards-ltc-lab.webp">    <meta property="og:image:width" content="1200">    <meta property="og:image:height" content="630">    <meta property="og:image:alt" content="Root Engineering Lab | Standards Deep-Dive Landing">    <meta name="twitter:image" content="https://resistancezero.com/assets/og/standards-ltc-lab.webp">    <meta name="twitter:card" content="summary_large_image">
+    <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-07-12" defer></script>    <meta property="og:image" content="https://resistancezero.com/assets/og/standards-ltc-lab.webp">    <meta property="og:image:width" content="1200">    <meta property="og:image:height" content="630">    <meta property="og:image:alt" content="Root Engineering Lab | Standards Deep-Dive Landing">    <meta name="twitter:image" content="https://resistancezero.com/assets/og/standards-ltc-lab.webp">    <meta name="twitter:card" content="summary_large_image">
 
 
 
@@ -2190,13 +2136,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         </div>
     </div>
 
-    <div class="cookie-banner hidden" id="cookieBanner" role="region" aria-label="Cookie notice">
-        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
-        <div class="cookie-actions">
-            <button class="cookie-accept" id="cookieAccept">Accept</button>
-            <button class="cookie-decline" id="cookieDecline">Decline</button>
-        </div>
-    </div>
+    
 
     <script>
         (function initTheme() {
@@ -2238,73 +2178,6 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
     <script src="auth.js?v=2026-07-13" defer></script>
     <script src="rz-tracker.js" defer></script>
 
-    <script>
-        (function tierFeatureGate() {
-            /* Task 3-bis (educator-tier): replaces the legacy root-only gate
-               with the 4-tier matrix in rz-feature-flags.js. Pro + Educator
-               + Root pass; Demo + Free see the upgrade modal. Falls back to
-               a direct localStorage read when auth.js is not yet loaded. */
-            function applyGate() {
-                if (window._rzAuth && typeof window._rzAuth.enforceTierFeatureAccess === 'function') {
-                    window._rzAuth.enforceTierFeatureAccess('standards-ltc-lab');
-                } else {
-                    try {
-                        var s = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
-                        var t = s && s.tier;
-                        var r = s && s.role;
-                        var passes = !!s && (t === 'pro' || t === 'root' || r === 'root' || r === 'pro' || r === 'educator');
-                        document.body.classList.toggle('locked', !passes);
-                    } catch (e) {
-                        document.body.classList.add('locked');
-                    }
-                }
-            }
-
-            var loginBtn = document.getElementById('rootLoginBtn');
-            if (loginBtn) {
-                loginBtn.addEventListener('click', function() {
-                    if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
-                        window._rzAuth.showModal();
-                    } else {
-                        (window.showToast||alert)('Login module is not ready yet.');
-                    }
-                });
-            }
-
-            window.addEventListener('rz-auth-change', function() {
-                setTimeout(applyGate, 50);
-            });
-            window.addEventListener('storage', function(e){ if (e.key === 'rz_premium_session') applyGate(); });
-
-            applyGate();
-            setTimeout(applyGate, 60);
-            setTimeout(applyGate, 550);
-            setTimeout(applyGate, 1600);
-        })();
-
-        (function cookieBanner() {
-            var banner = document.getElementById('cookieBanner');
-            var accepted = localStorage.getItem('rz_cookie_consent');
-            if (!accepted && banner) banner.classList.remove('hidden');
-
-            var accept = document.getElementById('cookieAccept');
-            var decline = document.getElementById('cookieDecline');
-
-            if (accept) {
-                accept.addEventListener('click', function() {
-                    localStorage.setItem('rz_cookie_consent', 'accepted');
-                    banner.classList.add('hidden');
-                });
-            }
-
-            if (decline) {
-                decline.addEventListener('click', function() {
-                    localStorage.setItem('rz_cookie_consent', 'declined');
-                    banner.classList.add('hidden');
-                    window['ga-disable-G-GED7FX8RTV'] = true;
-                });
-            }
-        })();
-    </script>
+    
 </body>
 </html>

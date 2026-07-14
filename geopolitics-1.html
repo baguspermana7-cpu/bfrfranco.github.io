@@ -1048,7 +1048,6 @@
 [data-theme="dark"] .table-source a[style], [data-theme="dark"] .table-source a { color:#34d399 !important; }
 :root:not([data-theme="dark"]) [style*="color:#8b5cf6"], :root:not([data-theme="dark"]) [style*="color: #8b5cf6"] { color:#6d28d9 !important; }
 [data-theme="dark"] [style*="color:#8b5cf6"], [data-theme="dark"] [style*="color: #8b5cf6"] { color:#a5b4fc !important; }
-[data-theme="dark"] #cookieBanner a, [data-theme="dark"] .cookie-banner a { color:#93c5fd; }
 [data-theme="dark"] .status-badge.none, [data-theme="dark"] span.none { color:#b6c2d1 !important; }
 [data-theme="dark"] .article-nav a, [data-theme="dark"] button[onclick*="print"] { color:#34d399 !important; }
 [data-theme="dark"] [style*="color: #047857"], [data-theme="dark"] [style*="color:#047857"] { color:#34d399 !important; }
@@ -1056,6 +1055,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-07-12" defer></script>
     <script>(function(){var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
 </head>
 <body>
@@ -3496,64 +3496,14 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     function copyLink(){const b=document.querySelector('.share-btn.copy'),c=b.querySelector('.copy-icon'),k=b.querySelector('.check-icon');navigator.clipboard.writeText(window.location.href).then(()=>{b.classList.add('copied');c.style.display='none';k.style.display='block';b.setAttribute('data-tooltip','Copied!');setTimeout(()=>{b.classList.remove('copied');c.style.display='block';k.style.display='none';b.setAttribute('data-tooltip','Copy link')},2000)})}
     </script>
 
-<!-- Cookie Consent Banner -->
-<div class="cookie-banner hidden" id="cookieBanner" role="region" aria-label="Cookie notice">
-    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
-    <div class="cookie-actions">
-        <button class="cookie-accept" id="cookieAccept">Accept</button>
-        <button class="cookie-decline" id="cookieDecline">Decline</button>
-    </div>
-</div>
+
 
 <!-- Scroll to Top -->
 <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
 
-<script>
-(function(){
-    // Cookie Banner
-    var cb = document.getElementById('cookieBanner');
-    var consent = localStorage.getItem('rz_cookie_consent');
-    if (!consent && cb) {
-        cb.classList.remove('hidden');
-    }
-    var acceptBtn = document.getElementById('cookieAccept');
-    var declineBtn = document.getElementById('cookieDecline');
-    if (acceptBtn) acceptBtn.addEventListener('click', function(){
-        localStorage.setItem('rz_cookie_consent', 'accepted');
-        cb.classList.add('hidden');
-    });
-    if (declineBtn) declineBtn.addEventListener('click', function(){
-        localStorage.setItem('rz_cookie_consent', 'declined');
-        cb.classList.add('hidden');
-        // Disable GA
-        window['ga-disable-G-GED7FX8RTV'] = true;
-    });
 
-    // Scroll to Top
-    var sBtn = document.getElementById('scrollTopBtn');
-    if (sBtn) {
-        var ticking = false;
-        window.addEventListener('scroll', function(){
-            if (!ticking) {
-                window.requestAnimationFrame(function(){
-                    if (window.scrollY > 500) {
-                        sBtn.classList.add('visible');
-                    } else {
-                        sBtn.classList.remove('visible');
-                    }
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        });
-        sBtn.addEventListener('click', function(){
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    }
-})();
-</script>
 
 <script>
 /* a11y (v1.51.2): name each bare checklist checkbox from its row text.

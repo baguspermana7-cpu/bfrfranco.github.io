@@ -379,20 +379,12 @@
         [data-theme="dark"] .tia-btn-pdf { color: #f87171; }
         [data-theme="dark"] .tia-btn-pdf.disabled { color: #f87171; }
             /* Cookie Banner */
-        .cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10002; display: flex; align-items: center; justify-content: center; gap: 1.5rem; padding: 1rem 2rem; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid rgba(0,0,0,0.08); box-shadow: 0 -2px 16px rgba(0,0,0,0.06); font-size: 0.85rem; color: #374151; transform: translateY(0); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); }
-        .cookie-banner.hidden { transform: translateY(100%); pointer-events: none; }
-        .cookie-banner p { margin: 0; line-height: 1.5; }
-        .cookie-banner a { color: #2563eb; text-decoration: underline; }
-        .cookie-actions { display: flex; gap: 0.75rem; align-items: center; flex-shrink: 0; }
-        .cookie-accept { padding: 0.45rem 1.2rem; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-        .cookie-accept:hover { background: #1d4ed8; }
-        .cookie-decline { padding: 0.45rem 1.2rem; background: transparent; color: #94a3b8; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
-        .cookie-decline:hover { background: #f3f4f6; color: #374151; }
-        @media (max-width: 768px) { .cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; } }
-        @media print { .cookie-banner { display: none; } }
+        @media (max-width: 768px) {}
+        @media print {}
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-07-12" defer></script>
     <!-- Structured Data - HowTo -->
     <script type="application/ld+json">
     {
@@ -1759,24 +1751,7 @@
     </script>
     <script src="rz-tracker.js" defer></script>
 
-    <!-- Cookie Consent Banner -->
-    <div class="cookie-banner hidden" id="cookieBanner" role="region" aria-label="Cookie notice">
-        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
-        <div class="cookie-actions">
-            <button class="cookie-accept" id="cookieAccept">Accept</button>
-            <button class="cookie-decline" id="cookieDecline">Decline</button>
-        </div>
-    </div>
-    <script>
-    (function(){
-        var cb = document.getElementById('cookieBanner');
-        var consent = localStorage.getItem('rz_cookie_consent');
-        if (!consent && cb) cb.classList.remove('hidden');
-        var acceptBtn = document.getElementById('cookieAccept');
-        var declineBtn = document.getElementById('cookieDecline');
-        if (acceptBtn) acceptBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','accepted'); cb.classList.add('hidden'); });
-        if (declineBtn) declineBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','declined'); cb.classList.add('hidden'); window['ga-disable-G-GED7FX8RTV'] = true; });
-    })();
-    </script>
+    
+    
 </body>
 </html>

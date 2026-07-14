@@ -336,31 +336,38 @@ When creating a new article (e.g., article-19.html):
 
 ---
 
-## Feature 28: Cookie Consent Banner
+## Feature 28: Cookie Consent Banner — SHARED ENGINE (v1.54.3)
 
 ### How It Works
-- Fixed banner at `bottom: 0`, full width, `z-index: 10002` (above everything)
-- Glass-morphic background (`backdrop-filter: blur(12px)`)
-- Starts hidden (`.hidden` class); shown if `localStorage.getItem('rz_cookie_consent')` is null
-- **Accept**: Sets `rz_cookie_consent = 'accepted'`, hides banner
-- **Decline**: Sets `rz_cookie_consent = 'declined'`, hides banner, disables GA (`window['ga-disable-G-GED7FX8RTV'] = true`)
-- Slide animation via `transform: translateY(100%)`
+**One shared engine: `js/rz-cookie-consent.js`** (`<script src="js/rz-cookie-consent.js?v=…" defer>`).
+It self-injects the banner markup (`#cookieBanner.rz-cookie-banner`) + CSS (`<style id="rz-cookie-css">`)
+and owns all state. NEVER re-add a per-page inline banner/handler/CSS — 115 divergent inline copies
+(3 markup/CSS variants) were removed in v1.54.3 by `tools/rollout-cookie-consent.py`.
 
-### CSS Classes
+- Guard `window.__rzCookieConsent` (double-load safe)
+- Starts hidden; shown only if `localStorage.getItem('rz_cookie_consent')` is null (legacy `cookieConsent` key migrated on read)
+- **Accept**: `rz_cookie_consent = 'accepted'`, hides banner
+- **Decline**: `rz_cookie_consent = 'declined'`, hides banner, disables GA (`window['ga-disable-G-GED7FX8RTV'] = true`)
+- On any decision dispatches `rz-cookie-consent` CustomEvent on `document` (detail = value) —
+  first-visit features (e.g. spares guided tour) MUST sequence on this event instead of racing the banner
+- Adopts legacy `#cookieBanner` markup if a page still carries one (adds `hidden`, binds all button variants)
+- **Localization**: define `window.RZ_COOKIE_TEXT = {msg, more, accept, decline, policyHref}` inline BEFORE
+  the script tag (`/id/` pages do this in Indonesian)
+- Per-page `<head>` GA gating snippets read the same key pre-GA-load and stay inline — leave them
+
+### CSS Classes (injected by the engine)
 | Class | Purpose |
 |-------|---------|
-| `.cookie-banner` | Fixed banner container |
-| `.cookie-banner.hidden` | Hidden state (translateY 100%) |
-| `.cookie-actions` | Button group (flex row) |
-| `.cookie-accept` | Primary blue accept button |
-| `.cookie-decline` | Secondary decline button |
+| `.rz-cookie-banner` | Fixed bottom banner container |
+| `.rz-cookie-banner.hidden` | Hidden state (translateY 100%, pointer-events none) |
+| `#cookieAccept` / `#cookieDecline` | Action buttons (blue accept / muted decline, dark-theme aware) |
 
 ### localStorage Key
-- **Key**: `rz_cookie_consent`
-- **Values**: `'accepted'` or `'declined'`
+- **Key**: `rz_cookie_consent` — values `'accepted'` or `'declined'` (legacy `cookieConsent` auto-migrated)
 
 ### Deployed On
-All HTML pages including standalone calculators. Standalone calculator pages that don't load `styles.css` have cookie CSS inlined in their `<style>` block (added 2026-02-26). Pages tier-advisor.html and tia-942-checklist.html had cookie HTML+JS+CSS added (were previously missing entirely).
+Every page (root + `/id/`). E2E harness: `tools/_cookie_e2e.mjs` (first-visit accept/decline, GA disable,
+returning-visitor, `/id/` localization, legacy-key migration, spares tour sequencing).
 
 ---
 

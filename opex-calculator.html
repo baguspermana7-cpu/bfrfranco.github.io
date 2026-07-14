@@ -1242,17 +1242,8 @@
         .calc-disclaimer .disc-text a { color: #2563eb !important; }
         .calc-disclaimer .disc-fine { color: #64748b !important; }
             /* Cookie Banner */
-        .cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10002; display: flex; align-items: center; justify-content: center; gap: 1.5rem; padding: 1rem 2rem; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid rgba(0,0,0,0.08); box-shadow: 0 -2px 16px rgba(0,0,0,0.06); font-size: 0.85rem; color: #374151; transform: translateY(0); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); }
-        .cookie-banner.hidden { transform: translateY(100%); pointer-events: none; }
-        .cookie-banner p { margin: 0; line-height: 1.5; }
-        .cookie-banner a { color: #2563eb; text-decoration: underline; }
-        .cookie-actions { display: flex; gap: 0.75rem; align-items: center; flex-shrink: 0; }
-        .cookie-accept { padding: 0.45rem 1.2rem; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-        .cookie-accept:hover { background: #1d4ed8; }
-        .cookie-decline { padding: 0.45rem 1.2rem; background: transparent; color: #94a3b8; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
-        .cookie-decline:hover { background: #f3f4f6; color: #374151; }
-        @media (max-width: 768px) { .cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; } }
-        @media print { .cookie-banner { display: none; } }
+        @media (max-width: 768px) {}
+        @media print {}
         /* ─── Dark Mode ─────────────────────────────────── */
         [data-theme="dark"] { --bg-primary:#0f172a; --bg-secondary:#1e293b; --bg-tertiary:#334155; --text-primary:#f1f5f9; --text-secondary:#cbd5e1; --text-muted:#94a3b8; --glass-bg:rgba(15,23,42,0.92); --glass-border:rgba(16,185,129,0.2); --shadow-sm:0 2px 4px rgba(0,0,0,0.3); --shadow-md:0 4px 12px rgba(0,0,0,0.4); --shadow-lg:0 8px 30px rgba(0,0,0,0.5); }
         [data-theme="dark"] body { background:#0f172a; }
@@ -1281,9 +1272,6 @@
         [data-theme="dark"] .nav-dd-header { border-color:#334155; }
         [data-theme="dark"] .nav-dd-email { color:#94a3b8; }
         [data-theme="dark"] .nav-dd-logout:hover { background:rgba(239,68,68,0.1); }
-        [data-theme="dark"] .cookie-banner { background:#1e293b; border-color:#334155; color:#cbd5e1; }
-        [data-theme="dark"] .cookie-decline { border-color:#334155; color:#94a3b8; }
-        [data-theme="dark"] .cookie-decline:hover { background:#334155; color:#f1f5f9; }
         .nav-theme-btn { display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:8px; border:1px solid var(--glass-border); background:transparent; color:var(--text-secondary); cursor:pointer; transition:all 0.25s; font-size:0.9rem; padding:0; }
         .nav-theme-btn:hover { border-color:#10b981; color:#10b981; background:rgba(16,185,129,0.08); }
         [data-theme="dark"] .nav-theme-btn { color:#34d399; }
@@ -1388,6 +1376,7 @@
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-calc-utils.js?v=2026-07-03" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-07-12" defer></script>
     <!-- Structured Data - FAQPage -->
     <script type="application/ld+json">
     {
@@ -5325,31 +5314,7 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
     </script>
 
     <!-- Login Modal -->
-    <div class="login-overlay" id="opexLoginModal">
-        <div class="login-box">
-            <button class="login-close" onclick="opexCloseLogin()">&times;</button>
-            <div style="text-align:center;margin-bottom:1.5rem;">
-                <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#7c3aed,#a855f7);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
-                    <i class="fas fa-crown" style="font-size:1.4rem;color:#fff;"></i>
-                </div>
-                <h3 style="color:#f1f5f9;font-size:1.2rem;margin:0 0 4px;">Unlock OPEX PRO</h3>
-                <p style="color:#64748b;font-size:0.82rem;margin:0;">Full breakdowns, $/kW metrics, PDF export & more</p>
-            </div>
-            <div id="opexLoginError" style="display:none;padding:10px 14px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;font-size:0.8rem;margin-bottom:12px;"></div>
-            <input type="email" id="opexLoginEmail" class="login-input" placeholder="Email address" onkeydown="if(event.key==='Enter')opexDoLogin()" aria-label="Email address">
-            <input type="password" id="opexLoginPassword" class="login-input" placeholder="Password" onkeydown="if(event.key==='Enter')opexDoLogin()" aria-label="Password">
-            <button class="login-submit" onclick="opexDoLogin()">
-                <i class="fas fa-sign-in-alt" style="margin-right:6px;"></i>Login
-            </button>
-            <div style="text-align:center;margin-top:12px;">
-<div style="margin-top:12px;padding:10px 12px;border-radius:8px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);font-size:0.78rem;color:#64748b;line-height:1.6;">
-                    <span style="color:#8b5cf6;font-weight:600;">Demo Account:</span><br>
-                    <code style="background:rgba(139,92,246,0.1);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#7c3aed;">demo@resistancezero.com</code> / <code style="background:rgba(139,92,246,0.1);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#7c3aed;">demo2026</code>
-                </div>
-                <p class="disc-fine" style="font-size:0.68rem;color:#64748b;margin-top:12px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
-            </div>
-        </div>
-    </div>
+    <!-- Login handled by shared auth.js modal (window._rzAuth.showModal) -->
 
     <!-- Free Watermark -->
     <div id="opexFreeWatermark" onclick="opexShowLogin()">
@@ -5404,67 +5369,9 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
             }
         });
 
-        // Expose functions globally
+        // Expose functions globally — login handled by shared auth.js modal
         window.opexShowLogin = function() {
-            document.getElementById('opexLoginModal').classList.add('show');
-            setTimeout(function() { document.getElementById('opexLoginEmail').focus(); }, 100);
-        };
-        window.opexCloseLogin = function() {
-            document.getElementById('opexLoginModal').classList.remove('show');
-            document.getElementById('opexLoginError').style.display = 'none';
-        };
-        // Close modal on overlay click
-        document.getElementById('opexLoginModal').addEventListener('click', function(e) {
-            if (e.target === this) opexCloseLogin();
-        });
-
-        window.opexDoLogin = function() {
-            var email = document.getElementById('opexLoginEmail').value.trim().toLowerCase();
-            var password = document.getElementById('opexLoginPassword').value;
-            var errEl = document.getElementById('opexLoginError');
-
-            if (!email || !password) {
-                errEl.textContent = 'Please enter email and password';
-                errEl.style.display = 'block';
-                return;
-            }
-
-            var match = null;
-            // S1 pilot: prefer RZEngine.auth
-            if (window.RZEngine && window.RZEngine.auth) {
-                match = window.RZEngine.auth.validateLogin(email, password);
-                if (match) {
-                    window.RZEngine.auth.setSession(match.email, match.tier, match.role);
-                    window.RZEngine.auth.dispatchAuthChange('login', { email: match.email, tier: match.tier, role: match.role });
-                }
-            } else {
-                // Legacy fallback
-                var validUsers = [
-                    { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro' },
-                    { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' },
-                    { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' }
-                ];
-                var m = validUsers.find(function(u) { return u.email === email && u.password === password; });
-                if (m) {
-                    match = { email: m.email, tier: m.tier, role: (m.email === 'admin@resistancezero.com' || m.email === 'bagus@resistancezero.com') ? 'root' : 'pro' };
-                    localStorage.setItem('rz_premium_session', JSON.stringify({
-                        email: match.email, tier: match.tier, role: match.role, expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-                    }));
-                    window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: match.email, tier: match.tier, role: match.role, action: 'login' } }));
-                }
-            }
-
-            if (match) {
-                opexIsPremium = true;
-                opexUserTier = match.tier;
-                opexCloseLogin();
-                opexActivatePremium();
-            } else {
-                errEl.textContent = 'Invalid email or password';
-                errEl.style.display = 'block';
-                document.getElementById('opexLoginPassword').value = '';
-                document.getElementById('opexLoginPassword').focus();
-            }
+            if (window._rzAuth) { _rzAuth.showModal(); }
         };
 
         window.opexHandlePremiumTab = function() {
@@ -5691,64 +5598,14 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
     </script>
 <script src="rz-tracker.js" defer></script>
 
-<!-- Cookie Consent Banner -->
-<div class="cookie-banner hidden" id="cookieBanner" role="region" aria-label="Cookie notice">
-    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
-    <div class="cookie-actions">
-        <button class="cookie-accept" id="cookieAccept">Accept</button>
-        <button class="cookie-decline" id="cookieDecline">Decline</button>
-    </div>
-</div>
+
 
 <!-- Scroll to Top -->
 <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
 
-<script>
-(function(){
-    // Cookie Banner
-    var cb = document.getElementById('cookieBanner');
-    var consent = localStorage.getItem('rz_cookie_consent');
-    if (!consent && cb) {
-        cb.classList.remove('hidden');
-    }
-    var acceptBtn = document.getElementById('cookieAccept');
-    var declineBtn = document.getElementById('cookieDecline');
-    if (acceptBtn) acceptBtn.addEventListener('click', function(){
-        localStorage.setItem('rz_cookie_consent', 'accepted');
-        cb.classList.add('hidden');
-    });
-    if (declineBtn) declineBtn.addEventListener('click', function(){
-        localStorage.setItem('rz_cookie_consent', 'declined');
-        cb.classList.add('hidden');
-        // Disable GA
-        window['ga-disable-G-GED7FX8RTV'] = true;
-    });
 
-    // Scroll to Top
-    var sBtn = document.getElementById('scrollTopBtn');
-    if (sBtn) {
-        var ticking = false;
-        window.addEventListener('scroll', function(){
-            if (!ticking) {
-                window.requestAnimationFrame(function(){
-                    if (window.scrollY > 500) {
-                        sBtn.classList.add('visible');
-                    } else {
-                        sBtn.classList.remove('visible');
-                    }
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        });
-        sBtn.addEventListener('click', function(){
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    }
-})();
-</script>
 
 <script src="auth.js?v=2026-07-13" defer></script>
 <script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>

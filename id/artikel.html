@@ -312,19 +312,6 @@
         }
 
         /* ═══ Cookie Banner ═══ */
-        .cookie-banner {
-            position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
-            background: var(--rz-card-bg); border-top: 1px solid var(--rz-card-border);
-            padding: 1rem 2rem; display: flex; align-items: center;
-            justify-content: space-between; gap: 1rem;
-            box-shadow: 0 -4px 16px rgba(0,0,0,0.1);
-        }
-        .cookie-banner.hidden { display: none; }
-        .cookie-banner p { font-size: 0.85rem; margin: 0; }
-        .cookie-banner a { color: var(--rz-accent); text-decoration: underline; }
-        .cookie-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
-        .cookie-accept { background: var(--rz-accent); color: #0f172a; border: none; padding: 0.5rem 1.25rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
-        .cookie-decline { background: transparent; color: var(--rz-text-muted); border: 1px solid var(--rz-card-border); padding: 0.5rem 1.25rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer; }
 
         /* ═══ Responsive ═══ */
         @media (max-width: 768px) {
@@ -339,11 +326,12 @@
             .hero h1 { font-size: 1.85rem; }
             .articles-grid { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr; }
-            .cookie-banner { flex-direction: column; text-align: center; }
         }
     </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09" defer></script>
+    <script>window.RZ_COOKIE_TEXT={msg:"Kami menggunakan cookie untuk analitik guna meningkatkan pengalaman Anda.",more:"Pelajari lebih lanjut",accept:"Terima",decline:"Tolak",policyHref:"../privacy.html"};</script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-12" defer></script>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -620,63 +608,8 @@
 
     <script src="../auth.js?v=20260324b" defer></script>
 
-    <!-- Cookie Consent Banner -->
-    <div class="cookie-banner hidden" id="cookieBanner">
-        <p>Kami menggunakan cookie untuk analitik guna meningkatkan pengalaman Anda. <a href="../privacy.html">Pelajari lebih lanjut</a></p>
-        <div class="cookie-actions">
-            <button class="cookie-accept" id="cookieAccept">Terima</button>
-            <button class="cookie-decline" id="cookieDecline">Tolak</button>
-        </div>
-    </div>
+    
 
-    <script>
-    (function(){
-        // Theme toggle
-        var toggle = document.getElementById('themeToggle');
-        var saved = localStorage.getItem('theme');
-        if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme:dark)').matches)) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
-        toggle.addEventListener('click', function(){
-            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            localStorage.setItem('theme', isDark ? 'light' : 'dark');
-        });
-
-        // Hamburger
-        var hamburger = document.getElementById('hamburger');
-        var navMenu = document.getElementById('navMenu');
-        hamburger.addEventListener('click', function(){
-            navMenu.classList.toggle('open');
-            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('open'));
-        });
-
-        // Category filter
-        var catBtns = document.querySelectorAll('.category-btn');
-        var cards = document.querySelectorAll('.article-card');
-        catBtns.forEach(function(btn){
-            btn.addEventListener('click', function(){
-                catBtns.forEach(function(b){ b.classList.remove('active'); });
-                btn.classList.add('active');
-                var cat = btn.getAttribute('data-cat');
-                cards.forEach(function(card){
-                    if (cat === 'all' || card.getAttribute('data-category') === cat) {
-                        card.style.display = '';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            });
-        });
-
-        // Cookie banner
-        var banner = document.getElementById('cookieBanner');
-        var accept = document.getElementById('cookieAccept');
-        var decline = document.getElementById('cookieDecline');
-        if (!localStorage.getItem('cookieConsent')) { banner.classList.remove('hidden'); }
-        accept.addEventListener('click', function(){ localStorage.setItem('cookieConsent','accepted'); banner.classList.add('hidden'); });
-        decline.addEventListener('click', function(){ localStorage.setItem('cookieConsent','declined'); banner.classList.add('hidden'); });
-    })();
-    </script>
+    
 </body>
 </html>

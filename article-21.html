@@ -674,6 +674,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-07-12" defer></script>
     <script>(function(){var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
 </head>
 <body>
@@ -1609,35 +1610,9 @@ function copyLink(){navigator.clipboard.writeText(shareUrl).then(function(){var 
 <script src="auth.js?v=2026-07-13" defer></script>
 <script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
 
-<!-- Cookie Consent Banner -->
-<div class="cookie-banner hidden" id="cookieBanner" role="region" aria-label="Cookie notice">
-    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
-    <div class="cookie-actions">
-        <button class="cookie-accept" id="cookieAccept">Accept</button>
-        <button class="cookie-decline" id="cookieDecline">Decline</button>
-    </div>
-</div>
 
-<script>
-(function(){
-    var cb = document.getElementById('cookieBanner');
-    var consent = localStorage.getItem('rz_cookie_consent');
-    if (!consent && cb) {
-        cb.classList.remove('hidden');
-    }
-    var acceptBtn = document.getElementById('cookieAccept');
-    var declineBtn = document.getElementById('cookieDecline');
-    if (acceptBtn) acceptBtn.addEventListener('click', function(){
-        localStorage.setItem('rz_cookie_consent', 'accepted');
-        if (cb) cb.classList.add('hidden');
-    });
-    if (declineBtn) declineBtn.addEventListener('click', function(){
-        localStorage.setItem('rz_cookie_consent', 'declined');
-        if (cb) cb.classList.add('hidden');
-        window['ga-disable-G-GED7FX8RTV'] = true;
-    });
-})();
-</script>
+
+
 
 </body>
 </html>
