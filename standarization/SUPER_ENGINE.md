@@ -379,3 +379,20 @@ sanity-check that dcmoc's cities in that region stay within the new regional ran
 they fall outside it. The two are intentionally different resolutions of the same reality. Future
 work (optional): a shared upstream `data/engine/*.json` that RZEngine consumes coarsely and dcmoc
 refines per-city — one provenance root without flattening dcmoc's granularity.
+
+
+## AA. v2.2.0 — Part F: shared DC MARKET intelligence (2026-07-14)
+
+`DATA.markets` — 25 global DC markets (operational/construction/planned MW, maturity,
+operators, market-level powerCost $/kWh, vacancy %, colo $/kW/mo, CAGR, region) moved
+out of dc-market-tracker.html's inline literal into the engine: ONE source of truth,
+edit here → tracker + every consumer re-flow. `models.market.summary(region?)` +
+`models.market.regions()` are gate-pinned (tools/test-rz-engine.mjs §2f, totals
+17,640 / 6,310 / 19,750 MW at asOf 2026-04).
+
+IMPORTANT: `markets[*].powerCost` (market-level industrial/DC rate) is intentionally
+NOT the same fact as `regions[*].powerKwh` (macro calculator blend) — different
+denominators; both provenance-registered. Do not "reconcile" them to equality.
+
+dc-market-tracker.html now populates its `MARKETS` via `waitForEngine()` (engine loads
+defer) — never re-add an inline market literal there.

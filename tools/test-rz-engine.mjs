@@ -271,6 +271,39 @@ if (D.regionsCountry) {
 }
 
 /* ============================================================
+ * 2f. PART F — DC MARKET intelligence (DATA.markets + models.market)
+ * ============================================================ */
+{
+    const REGIONS = ['Asia Pacific', 'Europe', 'Latin America', 'Middle East & Africa', 'North America'];
+    ok('DATA.markets present', !!D.markets && typeof D.markets === 'object');
+    const keys = Object.keys(D.markets || {});
+    eq('DATA.markets count', keys.length, 25);
+    const REQ = ['name', 'lat', 'lng', 'operational', 'construction', 'planned', 'maturity', 'players', 'powerCost', 'vacancy', 'coloPrice', 'cagr', 'region'];
+    const badField = keys.filter(k => REQ.some(f => D.markets[k][f] == null));
+    ok('every market carries all required fields', badField.length === 0, badField.join(', '));
+    const badRegion = keys.filter(k => !REGIONS.includes(D.markets[k].region));
+    ok('every market region in the canonical 5-set', badRegion.length === 0, badRegion.join(', '));
+    const badPower = keys.filter(k => !(D.markets[k].powerCost >= 0.03 && D.markets[k].powerCost <= 0.30));
+    ok('market powerCost within plausibility band 0.03-0.30 $/kWh', badPower.length === 0, badPower.join(', '));
+    const badVac = keys.filter(k => !(D.markets[k].vacancy >= 0 && D.markets[k].vacancy <= 15));
+    ok('market vacancy within 0-15%', badVac.length === 0, badVac.join(', '));
+    const badPlayers = keys.filter(k => !Array.isArray(D.markets[k].players) || D.markets[k].players.length < 1);
+    ok('every market lists >=1 operator', badPlayers.length === 0, badPlayers.join(', '));
+    // worked examples — pinned totals (update intentionally with any data refresh)
+    const g = M.market.summary();
+    eq('market.summary global count', g.count, 25);
+    eq('market.summary global operational MW', g.operational, 17640);
+    eq('market.summary global construction MW', g.construction, 6310);
+    eq('market.summary global planned MW', g.planned, 19750);
+    near('market.summary global pipelineRatio', g.pipelineRatio, 1.4773, 0.001);
+    const na = M.market.summary('North America');
+    eq('market.summary NA operational MW', na.operational, 7740);
+    eq('market.summary NA count', na.count, 6);
+    eq('market.regions() = canonical 5-set', JSON.stringify(M.market.regions()), JSON.stringify(REGIONS));
+    ok("DATA.sources['markets'] registered", !!(D.sources && D.sources['markets'] && D.sources['markets'].source && D.sources['markets'].asOf));
+}
+
+/* ============================================================
  * 3. PROVENANCE (soft until A1 lands the sidecar; hard after)
  * ============================================================ */
 if (D.sources) {

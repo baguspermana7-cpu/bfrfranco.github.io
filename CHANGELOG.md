@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v1.56.0 — 2026-07-14 (Part F: shared DC market engine · suite polish)
+
+### Added
+- **RZEngine v2.2.0 — `DATA.markets`**: the 25-market global DC dataset (capacity MW
+  operational/construction/planned, maturity, operators, market-level power cost, vacancy,
+  colo pricing, CAGR, region) moved from dc-market-tracker.html's inline literal into the
+  shared engine, provenance-registered (CBRE/JLL/Cushman & Wakefield/Synergy, asOf 2026-04).
+  New `models.market.summary(region?)` + `models.market.regions()` helpers. **Edit the engine
+  once → the tracker and every future DC-intelligence consumer re-flow** (the same
+  update-once contract as the finance suite). Gate: `tools/test-rz-engine.mjs` grew to
+  95 asserts (§2f field/band/region invariants + pinned capacity totals).
+- Market-level `powerCost` vs macro `regions.*.powerKwh` documented as DIFFERENT facts
+  (different denominators) in `standarization/SUPER_ENGINE.md` §AA — deliberately not equalized.
+
+### Changed
+- dc-market-tracker.html reads `RZEngine.data.markets` via an engine-wait gate (deferred
+  script order safe; clean failure message if the engine ever fails to load). Inline
+  literal deleted. `rz-engine.min.js` rebuilt (terser) + `?v=` bumped on all 50 loader pages.
+- Finance-suite polish (uiux follow-ups from v1.55.0): terminal `.btn-p/.btn-g/.btn-r` +
+  header logo gradients flattened to solid AA fills with 1px borders; rz-ops sidebar avatar
+  gradient → solid violet-700, residual `#1f2937` hairlines tokenized to `var(--fs-bd2)`.
+
+### Verification
+- Engine gate 95/95 GREEN; tracker probe ALL PASS (25 cards + 25 rows + map from engine,
+  v2.2.0 reaches page, 0 errors); js-syntax + script-tags CLEAN; rz-ops + terminal smoke PASS.
+
+---
+
 ## v1.55.0 — 2026-07-14 (Finance-suite design system · Account Center · pro terminal intelligent layer · StockMap dark)
 
 ### Added

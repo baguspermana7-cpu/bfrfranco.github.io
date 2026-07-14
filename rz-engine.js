@@ -30,8 +30,8 @@
      * consumes it. Bump `version` and add a CHANGELOG entry on any change.
      * ==================================================================== */
     var DATA = {
-        version: '2.1.0',
-        lastUpdated: '2026-07-05',
+        version: '2.2.0',
+        lastUpdated: '2026-07-14',
         asOf: '2026-07',
 
         // v2.0 schema metadata (A1). `version` above tracks DATA content; `meta.schemaVersion`
@@ -237,9 +237,45 @@
         discountDefaults: { global: 0.09, US: 0.085, EU: 0.075, APAC: 0.11, LATAM: 0.13,
                             ID: 0.12, SG: 0.07, JP: 0.04, IN: 0.115, MY: 0.09 },
 
+
+        /* ── Part F: shared DC MARKET intelligence (single source of truth for
+         * dc-market-tracker + any DC-intelligence consumer — edit HERE, all re-flow).
+         * Units: operational/construction/planned = MW · powerCost = $/kWh (market-level
+         * industrial/DC rate — intentionally more granular than the macro blends in
+         * DATA.regions[*].powerKwh, which stay the calculator defaults) · vacancy = % ·
+         * coloPrice = $/kW/month retail colo · cagr = fraction (2025-2030). */
+        markets: {
+            'n-virginia': { name: 'Northern Virginia', lat: 38.9, lng: -77.4, operational: 4040, construction: 1100, planned: 5500, maturity: 'established', players: ['AWS', 'Microsoft', 'Google', 'Equinix', 'Digital Realty', 'QTS'], powerCost: 0.065, vacancy: 1.4, coloPrice: 215, cagr: 0.25, region: 'North America' },
+            'dallas': { name: 'Dallas/Fort Worth', lat: 32.8, lng: -96.8, operational: 1200, construction: 600, planned: 2000, maturity: 'established', players: ['CyrusOne', 'DataBank', 'TierPoint', 'Flexential'], powerCost: 0.055, vacancy: 2.1, coloPrice: 160, cagr: 0.22, region: 'North America' },
+            'phoenix': { name: 'Phoenix', lat: 33.4, lng: -112.0, operational: 800, construction: 500, planned: 1500, maturity: 'established', players: ['Microsoft', 'Google', 'CyrusOne', 'Stream'], powerCost: 0.058, vacancy: 3.5, coloPrice: 150, cagr: 0.20, region: 'North America' },
+            'chicago': { name: 'Chicago', lat: 41.9, lng: -87.6, operational: 700, construction: 300, planned: 800, maturity: 'established', players: ['Equinix', 'Digital Realty', 'QTS'], powerCost: 0.072, vacancy: 2.8, coloPrice: 175, cagr: 0.15, region: 'North America' },
+            'silicon-valley': { name: 'Silicon Valley', lat: 37.4, lng: -122.0, operational: 600, construction: 200, planned: 500, maturity: 'established', players: ['Equinix', 'CoreSite', 'Vantage'], powerCost: 0.095, vacancy: 1.8, coloPrice: 250, cagr: 0.08, region: 'North America' },
+            'toronto': { name: 'Toronto', lat: 43.7, lng: -79.4, operational: 400, construction: 200, planned: 600, maturity: 'growing', players: ['Equinix', 'Allied REIT', 'Cologix'], powerCost: 0.085, vacancy: 4.2, coloPrice: 155, cagr: 0.18, region: 'North America' },
+            'london': { name: 'London', lat: 51.5, lng: -0.1, operational: 1500, construction: 400, planned: 1200, maturity: 'established', players: ['Equinix', 'NTT', 'Virtus', 'Digital Realty'], powerCost: 0.170, vacancy: 2.5, coloPrice: 200, cagr: 0.10, region: 'Europe' },
+            'frankfurt': { name: 'Frankfurt', lat: 50.1, lng: 8.7, operational: 900, construction: 300, planned: 800, maturity: 'established', players: ['Equinix', 'NTT', 'Interxion', 'e-shelter'], powerCost: 0.150, vacancy: 5.1, coloPrice: 195, cagr: 0.10, region: 'Europe' },
+            'amsterdam': { name: 'Amsterdam', lat: 52.4, lng: 4.9, operational: 600, construction: 150, planned: 400, maturity: 'established', players: ['Equinix', 'Digital Realty', 'NorthC'], powerCost: 0.130, vacancy: 7.2, coloPrice: 180, cagr: 0.08, region: 'Europe' },
+            'paris': { name: 'Paris', lat: 48.9, lng: 2.3, operational: 450, construction: 200, planned: 500, maturity: 'growing', players: ['Equinix', 'Data4', 'Interxion'], powerCost: 0.140, vacancy: 4.0, coloPrice: 190, cagr: 0.12, region: 'Europe' },
+            'dublin': { name: 'Dublin', lat: 53.3, lng: -6.3, operational: 400, construction: 100, planned: 300, maturity: 'growing', players: ['Microsoft', 'AWS', 'Google', 'Echelon'], powerCost: 0.155, vacancy: 3.8, coloPrice: 185, cagr: 0.06, region: 'Europe' },
+            'singapore': { name: 'Singapore', lat: 1.3, lng: 103.8, operational: 850, construction: 150, planned: 500, maturity: 'established', players: ['Equinix', 'Digital Realty', 'NTT', 'ST Telemedia'], powerCost: 0.180, vacancy: 0.8, coloPrice: 390, cagr: 0.12, region: 'Asia Pacific' },
+            'tokyo': { name: 'Tokyo', lat: 35.7, lng: 139.7, operational: 1200, construction: 400, planned: 800, maturity: 'established', players: ['NTT', 'Equinix', 'KDDI', 'IIJ'], powerCost: 0.160, vacancy: 1.2, coloPrice: 270, cagr: 0.08, region: 'Asia Pacific' },
+            'hong-kong': { name: 'Hong Kong', lat: 22.3, lng: 114.2, operational: 500, construction: 100, planned: 300, maturity: 'established', players: ['NTT', 'Equinix', 'SUNeVision', 'Digital Realty'], powerCost: 0.145, vacancy: 2.0, coloPrice: 280, cagr: 0.06, region: 'Asia Pacific' },
+            'sydney': { name: 'Sydney', lat: -33.9, lng: 151.2, operational: 600, construction: 250, planned: 500, maturity: 'established', players: ['Equinix', 'NextDC', 'AirTrunk', 'Macquarie'], powerCost: 0.140, vacancy: 3.2, coloPrice: 180, cagr: 0.14, region: 'Asia Pacific' },
+            'mumbai': { name: 'Mumbai', lat: 19.1, lng: 72.9, operational: 500, construction: 300, planned: 800, maturity: 'growing', players: ['NTT', 'STT GDC', 'Adani Connex', 'Yotta'], powerCost: 0.085, vacancy: 6.0, coloPrice: 125, cagr: 0.20, region: 'Asia Pacific' },
+            'jakarta': { name: 'Jakarta', lat: -6.2, lng: 106.8, operational: 350, construction: 200, planned: 500, maturity: 'growing', players: ['NTT', 'DCI Indonesia', 'SpaceDC', 'Princeton Digital'], powerCost: 0.080, vacancy: 4.5, coloPrice: 160, cagr: 0.18, region: 'Asia Pacific' },
+            'seoul': { name: 'Seoul', lat: 37.6, lng: 127.0, operational: 700, construction: 200, planned: 400, maturity: 'established', players: ['KT', 'Samsung SDS', 'Naver', 'LG'], powerCost: 0.095, vacancy: 2.5, coloPrice: 210, cagr: 0.10, region: 'Asia Pacific' },
+            'kuala-lumpur': { name: 'Kuala Lumpur', lat: 3.1, lng: 101.7, operational: 250, construction: 150, planned: 400, maturity: 'growing', players: ['AIMS', 'YTL', 'Bridge DC', 'Keppel'], powerCost: 0.060, vacancy: 5.5, coloPrice: 140, cagr: 0.22, region: 'Asia Pacific' },
+            'sao-paulo': { name: 'S\u00e3o Paulo', lat: -23.5, lng: -46.6, operational: 400, construction: 150, planned: 300, maturity: 'growing', players: ['Equinix', 'Ascenty', 'ODATA', 'Digital Realty'], powerCost: 0.100, vacancy: 5.0, coloPrice: 165, cagr: 0.16, region: 'Latin America' },
+            'santiago': { name: 'Santiago', lat: -33.4, lng: -70.6, operational: 100, construction: 50, planned: 150, maturity: 'emerging', players: ['ODATA', 'Ascenty', 'GTD'], powerCost: 0.090, vacancy: 8.0, coloPrice: 145, cagr: 0.18, region: 'Latin America' },
+            'dubai': { name: 'Dubai', lat: 25.2, lng: 55.3, operational: 200, construction: 100, planned: 400, maturity: 'growing', players: ['Khazna', 'Gulf Data Hub', 'Moro Hub'], powerCost: 0.065, vacancy: 3.0, coloPrice: 220, cagr: 0.25, region: 'Middle East & Africa' },
+            'johannesburg': { name: 'Johannesburg', lat: -26.2, lng: 28.0, operational: 150, construction: 80, planned: 200, maturity: 'emerging', players: ['Teraco', 'Africa Data Centres', 'Vantage'], powerCost: 0.075, vacancy: 6.0, coloPrice: 170, cagr: 0.20, region: 'Middle East & Africa' },
+            'nairobi': { name: 'Nairobi', lat: -1.3, lng: 36.8, operational: 50, construction: 30, planned: 100, maturity: 'emerging', players: ['PAIX', 'iColo', 'Africa Data Centres'], powerCost: 0.115, vacancy: 10.0, coloPrice: 200, cagr: 0.25, region: 'Middle East & Africa' },
+            'queretaro': { name: 'Quer\u00e9taro', lat: 20.6, lng: -100.4, operational: 200, construction: 100, planned: 300, maturity: 'growing', players: ['Equinix', 'KIO Networks', 'Ascenty'], powerCost: 0.070, vacancy: 4.0, coloPrice: 135, cagr: 0.20, region: 'Latin America' }
+        },
+
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
+            'markets': { source: 'CBRE Global DC Market 2025 + JLL Outlook 2025 + Cushman & Wakefield 2025 + Synergy Research 2024 (capacity/vacancy/colo/pipeline per market); market-level powerCost from utility filings (PJM, ERCOT, Dominion, IMDA et al.)', asOf: '2026-04', method: 'per-market figures; NOT interchangeable with regions.*.powerKwh macro blends (different denominators)' },
             'regions.US.powerKwh':    { source: 'US EIA industrial electricity + DC PPA blend', asOf: '2026', unit: '$/kWh' },
             'regions.EU.powerKwh':    { source: 'Eurostat non-household electricity (normalized post-crisis)', asOf: '2026', unit: '$/kWh' },
             'regions.APAC.powerKwh':  { source: 'IEA/regional utility filings (blended)', asOf: '2026', unit: '$/kWh' },
@@ -486,6 +522,33 @@
         // Math models — domain-specific calculations sharing engine constants.
         // S2 ships workforce + roi + forecast. capex/opex/tco/pue follow in S4/S6.
         models: {
+            /* ── Part F: DC market intelligence helpers over DATA.markets ── */
+            market: {
+                /** All distinct region labels in DATA.markets (sorted). */
+                regions: function () {
+                    var seen = {};
+                    Object.keys(DATA.markets).forEach(function (k) { seen[DATA.markets[k].region] = 1; });
+                    return Object.keys(seen).sort();
+                },
+                /**
+                 * Capacity totals across DATA.markets, optionally one region.
+                 * Returns { count, operational, construction, planned, pipelineRatio } —
+                 * pipelineRatio = (construction + planned) / operational (growth pressure, dimensionless).
+                 */
+                summary: function (region) {
+                    var out = { count: 0, operational: 0, construction: 0, planned: 0, pipelineRatio: null };
+                    Object.keys(DATA.markets).forEach(function (k) {
+                        var mkt = DATA.markets[k];
+                        if (region && mkt.region !== region) return;
+                        out.count += 1;
+                        out.operational += mkt.operational;
+                        out.construction += mkt.construction;
+                        out.planned += mkt.planned;
+                    });
+                    if (out.operational > 0) out.pipelineRatio = (out.construction + out.planned) / out.operational;
+                    return out;
+                }
+            },
             workforce: {
                 /**
                  * Annual hires required to close the staffing gap by target year, including
@@ -1362,7 +1425,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-05-v21"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-14-mkt"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string
