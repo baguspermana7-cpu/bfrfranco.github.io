@@ -67,7 +67,7 @@
   function injectCss() {
     if (document.getElementById('rz-cookie-css')) return;
     var css = [
-      '.rz-cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:10002;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:1rem;padding:.85rem 1.5rem;',
+      '.rz-cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:100001;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:1rem;padding:.85rem 1.5rem;',
       'background:rgba(255,255,255,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(0,0,0,.08);box-shadow:0 -2px 16px rgba(0,0,0,.06);',
       'font-size:.85rem;color:#374151;transform:translateY(0);transition:transform .4s cubic-bezier(.4,0,.2,1);}',
       '.rz-cookie-banner.hidden{transform:translateY(100%);pointer-events:none;}',

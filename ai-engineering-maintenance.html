@@ -68,6 +68,7 @@
 
     <script src="js/rz-version.js?v=2026-05-23" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
 
     <style>
         :root {
@@ -383,11 +384,6 @@
         .d-text-section { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; fill: var(--muted); text-transform: uppercase; }
 
         /* Cookie banner */
-        .cookie-banner { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10002; display: flex; align-items: center; justify-content: center; gap: 0.85rem; padding: 0.7rem 1rem; background: rgba(15,23,42,0.95); border-top: 1px solid var(--line); color: var(--text-body); font-size: 0.78rem; }
-        .cookie-banner.hidden { display: none; }
-        .cookie-banner a { color: var(--cyan); }
-        .cookie-actions button { padding: 0.4rem 0.7rem; border-radius: 6px; border: 1px solid var(--line); background: rgba(148,163,184,0.1); color: var(--text); font-size: 0.78rem; cursor: pointer; font-family: inherit; margin-left: 0.35rem; }
-        .cookie-banner .cookie-accept { background: var(--cyan); color: #0f172a; border: none; }
 
         /* v1.8.0 — mobile responsive patch */
         @media (max-width: 768px) {
@@ -418,7 +414,6 @@
             .topbar { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
         }
         @media print {
-            .navbar, .section-nav, .root-gate, .cookie-banner, .topbar { display: none !important; }
             body { background: #fff !important; color: #000 !important; }
             body.locked .wrap { filter: none !important; pointer-events: auto !important; user-select: auto !important; }
             .section, .hero { box-shadow: none !important; border-color: #ccc !important; background: #fff !important; break-inside: avoid; }
@@ -1495,11 +1490,7 @@
         </div>
     </div>
 
-    <!-- Cookie banner -->
-    <div class="cookie-banner hidden" id="cookieBanner">
-        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
-        <div class="cookie-actions"><button class="cookie-accept" id="cookieAccept">Accept</button><button id="cookieDecline">Decline</button></div>
-    </div>
+    
 
     <script src="js/rz-feature-flags.js?v=2026-05-14" defer></script>
     <script src="auth.js?v=2026-07-13" defer></script>
@@ -1510,8 +1501,6 @@
     (function(){var b=document.getElementById('hamburgerBtn'),m=document.getElementById('navMenu');if(b&&m)b.addEventListener('click',function(){m.classList.toggle('active');b.setAttribute('aria-expanded',m.classList.contains('active'));});})();
     /* Page-access tier gate */
     (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('ai-engineering-maintenance');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var t=s&&s.tier,r=s&&s.role;var passes=!!s&&(t==='pro'||t==='root'||r==='root'||r==='pro'||r==='educator');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
-    /* Cookie banner */
-    (function(){var b=document.getElementById('cookieBanner'),a=localStorage.getItem('rz_cookie_consent');if(!a&&b)b.classList.remove('hidden');var ac=document.getElementById('cookieAccept'),dc=document.getElementById('cookieDecline');if(ac)ac.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','accepted');b.classList.add('hidden');});if(dc)dc.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','declined');b.classList.add('hidden');window['ga-disable-G-GED7FX8RTV']=true;});})();
     /* Section nav scroll-spy */
     (function(){var secs=document.querySelectorAll('[data-nav-id]'),pills=document.querySelectorAll('.nav-pill');if(!secs.length)return;var obs=new IntersectionObserver(function(entries){entries.forEach(function(en){if(en.isIntersecting){var id=en.target.getAttribute('data-nav-id');pills.forEach(function(p){p.classList.toggle('active',p.getAttribute('href')==='#'+id);});}});},{rootMargin:'-120px 0px -60% 0px',threshold:0});secs.forEach(function(s){obs.observe(s);});pills.forEach(function(p){p.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector('[data-nav-id="'+this.getAttribute('href').slice(1)+'"]');if(t){var y=t.getBoundingClientRect().top+window.pageYOffset-110;window.scrollTo({top:y,behavior:'smooth'});}});});})();
     /* Version stamp */

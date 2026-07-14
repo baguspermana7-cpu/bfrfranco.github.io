@@ -19,9 +19,9 @@ Usage: python3 tools/rollout-cookie-consent.py [--apply]  (default: dry run)
 """
 import os, re, sys, glob
 
-TAG = '2026-07-12'
+TAG = '2026-07-14'
 APPLY = '--apply' in sys.argv
-EXCLUDE = {'ai-engineering-maintenance.html', 'cdu-mini-bms.html'}
+EXCLUDE = set()  # ai-engineering-maintenance + cdu-mini-bms migrated 2026-07-14 after parallel work landed
 
 ID_TEXT = ('<script>window.RZ_COOKIE_TEXT={msg:"Kami menggunakan cookie untuk analitik '
            'guna meningkatkan pengalaman Anda.",more:"Pelajari lebih lanjut",'

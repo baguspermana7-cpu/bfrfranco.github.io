@@ -11,6 +11,25 @@ release sections rather than semver.
 
 ---
 
+## v1.54.5 — 2026-07-14 (Cookie engine: final 2 pages migrated · banner above tier gates)
+
+### Changed
+- **Cookie-consent rollout complete (117/117 pages)**: `ai-engineering-maintenance.html` +
+  `cdu-mini-bms.html` migrated to the shared `js/rz-cookie-consent.js` engine (were deferred while
+  parallel work owned them; cdu-mini-bms previously had no banner at all). Dead legacy inline handler
+  removed from ai-engineering-maintenance.
+
+### Fixed
+- **Banner unclickable on tier-gated pages**: `.rz-cookie-banner` z-index raised 10002 → 100001 so the
+  consent buttons sit above `.root-gate` overlays (z 99999) — anonymous visitors on pro/root-gated pages
+  could see the banner but the gate scrim ate the click. Engine `?v=` cache-busted on all 117 pages.
+
+### Verification
+- Headless probe both pages: engine banner shows first visit, Accept hides + stores, 0 page errors.
+  Gates: audit-js-syntax, audit-script-tags — CLEAN.
+
+---
+
 ## v1.54.4 — 2026-07-14 (Security: site-wide login dedup — every page on the one shared Supabase modal, hardcoded passwords removed)
 
 ### Security / Changed
