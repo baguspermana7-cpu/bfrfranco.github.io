@@ -1815,7 +1815,6 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
             <input type="password" id="pfasLoginPass" placeholder="Password" aria-label="Password">
             <button class="pfas-login-submit" onclick="pfasHandleLogin()">Unlock Pro Analysis</button>
             <div class="pfas-login-error" id="pfasLoginError">Invalid credentials. Please try again.</div>
-            <div class="pfas-login-demo">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
             <div class="pfas-login-terms">By signing in you agree to our <a href="terms.html">Terms</a> &amp; <a href="privacy.html">Privacy Policy</a></div>
         </div>
     </div>
@@ -2239,44 +2238,12 @@ function copyLink() {
         pfasSetMode('pro');
     }
 
-    // ===== AUTH ===== (S1 pilot: delegate to RZEngine.auth, with fallback)
+    // ===== AUTH ===== Login is handled by the shared auth.js modal; the
+    // rz-auth-change listener below unlocks Pro on successful login.
     window.pfasHandleLogin = function() {
-        var email = (document.getElementById('pfasLoginEmail').value || '').trim().toLowerCase();
-        var pass = document.getElementById('pfasLoginPass').value || '';
-        var matched = null;
-
-        if (window.RZEngine && window.RZEngine.auth) {
-            matched = window.RZEngine.auth.validateLogin(email, pass);
-            if (matched) {
-                window.RZEngine.auth.setSession(matched.email, matched.tier, matched.role);
-                window.RZEngine.auth.dispatchAuthChange('login', { email: matched.email, tier: matched.tier });
-            }
-        } else {
-            // Legacy fallback
-            var VALID = [
-                { email: 'demo@resistancezero.com', password: 'demo2026' },
-                { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!' },
-                { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!' }
-            ];
-            var found = VALID.some(function(u) { return u.email === email && u.password === pass; });
-            if (found) {
-                matched = { email: email, tier: 'pro' };
-                localStorage.setItem('rz_premium_session', JSON.stringify({
-                    email: email, tier: 'pro',
-                    expires: new Date(Date.now() + 30 * 86400000).toISOString()
-                }));
-                window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: email, tier: 'pro', action: 'login' } }));
-            }
-        }
-
-        if (matched) {
-            isPremium = true;
+        if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
             pfasHideLogin();
-            unlockPanels();
-            pfasSetMode('pro');
-        } else {
-            var errEl = document.getElementById('pfasLoginError');
-            if (errEl) errEl.style.display = 'block';
+            window._rzAuth.showModal();
         }
     };
 
@@ -2946,6 +2913,6 @@ function copyLink() {
 </script>
 
 <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14" defer></script>
 </body>
 </html>

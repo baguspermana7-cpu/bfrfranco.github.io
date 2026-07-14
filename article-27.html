@@ -1528,7 +1528,6 @@
             <input type="password" id="wsLoginPass" placeholder="Password" aria-label="Password">
             <button class="ws-login-submit" onclick="wsHandleLogin()">Unlock Pro Analysis</button>
             <div class="ws-login-error" id="wsLoginError">Invalid credentials. Please try again.</div>
-            <div class="ws-login-demo">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
             <div class="ws-login-terms">By signing in you agree to our <a href="terms.html">Terms</a> &amp; <a href="privacy.html">Privacy Policy</a></div>
         </div>
     </div>
@@ -1880,12 +1879,8 @@
 (function() {
     'use strict';
 
-    // ===== AUTH =====
-    var VALID_USERS = [
-        {e:'demo@resistancezero.com', p:'demo2026'},
-        {e:'admin@resistancezero.com', p:'RZ@Premium2026!'},
-        {e:'premium@resistancezero.com', p:'RZ@Premium2026!'}
-    ];
+    // ===== AUTH ===== Login is handled by the shared auth.js modal; the
+    // legacy hardcoded user table has been removed.
     var SESSION_KEY = 'rz_premium_session';
     var SESSION_EXPIRY = 30 * 24 * 60 * 60 * 1000;
     var isPro = false;
@@ -2390,24 +2385,12 @@
     function wsShowLogin() { var el = document.getElementById('wsLoginOverlay'); if(el) el.classList.add('open'); }
     function wsHideLogin() { var el = document.getElementById('wsLoginOverlay'); if(el) el.classList.remove('open'); }
 
+    // Login is handled by the shared auth.js modal; the rz-auth-change
+    // listener below unlocks Pro on successful login.
     function wsHandleLogin() {
-        var email = document.getElementById('wsLoginEmail').value.trim().toLowerCase();
-        var pass = document.getElementById('wsLoginPass').value;
-        var errEl = document.getElementById('wsLoginError');
-        var match = VALID_USERS.find(function(u){ return u.e === email && u.p === pass; });
-        if (match) {
-            // Write auth.js-compatible session format (expires:ISOString) so navbar + IIFE share it
-            var expiresDate = new Date(Date.now() + SESSION_EXPIRY);
-            var session = { email: email, tier: 'pro', role: 'admin', expires: expiresDate.toISOString() };
-            try { localStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch(e){}
+        if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
             wsHideLogin();
-            wsSetMode('pro');
-            // Notify navbar (auth.js) and any other listeners on the page
-            try {
-                window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { action: 'login', email: email, tier: 'pro' } }));
-            } catch(e){}
-        } else {
-            if (errEl) { errEl.style.display = 'block'; setTimeout(function(){ errEl.style.display='none'; }, 3000); }
+            window._rzAuth.showModal();
         }
     }
 

@@ -2253,7 +2253,6 @@
                         <input type="password" id="hfxLoginPass" placeholder="Password" aria-label="Password">
                         <button class="hfx-login-submit" type="button" id="hfxLoginSubmit">Unlock Pro Analysis</button>
                         <div class="hfx-login-error" id="hfxLoginError">Invalid credentials.</div>
-                        <div class="hfx-login-demo">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
                         <div style="text-align:center;margin-top:10px;font-size:0.68rem;color:#475569;line-height:1.5;">
                             By signing in, you agree to our <a href="terms.html" style="color:#8b5cf6;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#8b5cf6;text-decoration:none;">Privacy Policy</a>
                         </div>
@@ -3023,22 +3022,13 @@ window.hfxHandleLogin = window.hfxHandleLogin || function(){};
         if (overlay) overlay.classList.remove('active');
     };
 
+    // Login is handled by the shared Supabase auth modal (auth.js). On success
+    // it writes rz_premium_session + dispatches rz-auth-change, which the
+    // existing listener below (applyMode) reveals the Pro panels on.
     window.hfxHandleLogin = function() {
-        var email = (byId('hfxLoginEmail').value || '').trim().toLowerCase();
-        var pass = (byId('hfxLoginPass').value || '').trim();
-        var error = byId('hfxLoginError');
-        if ((email === 'demo@resistancezero.com' && pass === 'demo2026') ||
-            ((email === 'bagus@resistancezero.com' || email === 'admin@resistancezero.com') && pass === 'RZ@Premium2026!')) {
-            var expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-            localStorage.setItem('rz_premium_session', JSON.stringify({ email: email, tier: 'pro', role: 'pro', expires: expires }));
-            window.dispatchEvent(new Event('rz-auth-change'));
+        if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
             window.hfxHideLogin();
-            applyMode();
-            return;
-        }
-        if (error) {
-            error.style.display = 'block';
-            error.textContent = 'Invalid credentials. Use the demo account shown below.';
+            window._rzAuth.showModal();
         }
     };
 

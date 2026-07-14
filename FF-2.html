@@ -2568,7 +2568,6 @@
                         <input type="password" id="tgsLoginPass" placeholder="Password" aria-label="Password">
                         <button class="tgs-login-submit" type="button" id="tgsLoginSubmit">Unlock Pro Analysis</button>
                         <div class="tgs-login-error" id="tgsLoginError">Invalid credentials.</div>
-                        <div class="tgs-login-demo">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
                         <div style="text-align:center;margin-top:10px;font-size:0.68rem;color:#475569;line-height:1.5;">
                             By signing in, you agree to our <a href="terms.html" style="color:#f59e0b;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#f59e0b;text-decoration:none;">Privacy Policy</a>
                         </div>
@@ -3314,27 +3313,13 @@ window.tgsHandleLogin = window.tgsHandleLogin || function(){};
         if (overlay) overlay.classList.remove('active');
     };
 
+    // Login is handled by the shared Supabase auth modal (auth.js). On success
+    // it writes rz_premium_session + dispatches rz-auth-change, which the
+    // existing listener below (applyMode) reveals the Pro panels on.
     window.tgsHandleLogin = function() {
-        var email = ((byId('tgsLoginEmail') || {}).value || '').trim().toLowerCase();
-        var pass  = ((byId('tgsLoginPass')  || {}).value || '').trim();
-        var error = byId('tgsLoginError');
-
-        if (
-            (email === 'demo@resistancezero.com' && pass === 'demo2026') ||
-            ((email === 'bagus@resistancezero.com' || email === 'admin@resistancezero.com') && pass === 'RZ@Premium2026!')
-        ) {
-            var expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-            localStorage.setItem('rz_premium_session', JSON.stringify({ email: email, tier: 'pro', role: 'pro', expires: expires }));
-            window.dispatchEvent(new Event('rz-auth-change'));
+        if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
             window.tgsHideLogin();
-            state.authed = true;
-            applyMode();
-            return;
-        }
-
-        if (error) {
-            error.style.display = 'block';
-            error.textContent = 'Invalid credentials. Try demo@resistancezero.com / demo2026.';
+            window._rzAuth.showModal();
         }
     };
 

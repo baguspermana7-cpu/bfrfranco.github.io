@@ -813,37 +813,8 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
     </main>
 
     <!-- Login Modal -->
-    <div id="loginModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:99999;align-items:center;justify-content:center;">
-        <div style="background:white;border-radius:20px;padding:2.5rem;max-width:420px;width:90%;box-shadow:0 25px 60px rgba(0,0,0,0.3);position:relative;animation:modalSlideIn 0.3s ease;">
-            <button onclick="closeLoginModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.2rem;color:#94a3b8;cursor:pointer;padding:4px;">&times;</button>
-            <div style="text-align:center;margin-bottom:1.5rem;">
-                <div style="width:56px;height:56px;background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;"><i class="fas fa-crown" style="color:white;font-size:1.3rem;"></i></div>
-                <h3 style="font-size:1.3rem;font-weight:700;color:#1e293b;margin-bottom:0.25rem;">Sign In</h3>
-                <p style="font-size:0.85rem;color:#64748b;">Access calculators, tools, and analytical content.</p>
-            </div>
-            <div id="loginError" style="display:none;padding:10px 14px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#dc2626;font-size:0.8rem;margin-bottom:1rem;text-align:center;">Invalid credentials</div>
-            <div style="display:flex;flex-direction:column;gap:1rem;">
-                <div>
-                    <label style="display:block;font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:6px;">Email</label>
-                    <input type="email" id="loginEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.3s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'" aria-label="your@email.com">
-                </div>
-                <div>
-                    <label style="display:block;font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:6px;">Password</label>
-                    <input type="password" id="loginPassword" placeholder="Enter password" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.3s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'" onkeydown="if(event.key==='Enter')attemptLogin()" aria-label="Enter password">
-                </div>
-                <button onclick="attemptLogin()" style="padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#8b5cf6,#a855f7);color:white;font-size:0.95rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 12px rgba(139,92,246,0.3);"><i class="fas fa-unlock" style="margin-right:8px;"></i>Sign In</button>
-            </div>
-            <div style="text-align:center;margin-top:1.25rem;padding-top:1rem;border-top:1px solid #f1f5f9;">
-                <p style="font-size:0.75rem;color:#94a3b8;">Features: Regional compliance, Monte Carlo, cost estimates, PDF export</p>
-<div class="demo-creds" style="margin-top:12px;padding:10px 12px;border-radius:8px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);font-size:0.78rem;color:#64748b;line-height:1.6;">
-                    <span style="color:#8b5cf6;font-weight:600;">Demo Account:</span><br>
-                    <code style="background:rgba(139,92,246,0.1);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#7c3aed;">demo@resistancezero.com</code> / <code style="background:rgba(139,92,246,0.1);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#7c3aed;">demo2026</code>
-                </div>
-                <p class="disc-fine" style="font-size:0.68rem;color:#64748b;margin-top:12px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
-            </div>
-        </div>
-    </div>
-    
+    <!-- Login handled by shared auth.js modal (window._rzAuth.showModal) -->
+
         <!-- Independence Disclaimer -->
         <div style="max-width:900px;margin:2rem auto 0;padding:1rem 1.5rem;text-align:center;">
             <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color:#8b5cf6;">Terms &amp; Disclaimer</a></p>
@@ -1804,7 +1775,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
         // Footer
         html+='<div style="text-align:center;margin-top:20px;padding-top:12px;border-top:2px solid #8b5cf6;font-size:8px;color:#94a3b8;">resistancezero.com &middot; Generated '+dateStr+' &middot; All calculations performed client-side &middot; Tier Advisor v1.0 &middot; &copy; 2026 Bagus Dwi Permana</div>';
         html+='<script src="auth.js?v=2026-07-13" defer><\/script>';
-        html+='<script src="rz-engine.min.js?v=2026-07-05-v21" defer><\/script>';
+        html+='<script src="rz-engine.min.js?v=2026-07-14" defer><\/script>';
         html+='</body></html>';
         w.document.write(html);
         w.document.close();
@@ -1835,34 +1806,8 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
 
     function handlePremiumTab() {
         if (isPremiumUser) { setMode('pro'); return; }
-        var modal = document.getElementById('loginModal');
-        modal.style.display = 'flex';
-        document.getElementById('loginError').style.display = 'none';
-        document.getElementById('loginEmail').value = '';
-        document.getElementById('loginPassword').value = '';
-        setTimeout(function(){ document.getElementById('loginEmail').focus(); }, 100);
-    }
-    function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
-    document.getElementById('loginModal').addEventListener('click', function(e) { if (e.target === this) closeLoginModal(); });
-    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLoginModal(); });
-
-    function attemptLogin() {
-        var email = document.getElementById('loginEmail').value.trim();
-        var password = document.getElementById('loginPassword').value;
-        var errorEl = document.getElementById('loginError');
-        if (!email || !password) { errorEl.textContent = 'Please enter email and password'; errorEl.style.display = 'block'; return; }
-        var validUsers = [{ email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro' },{ email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' },{ email: 'admin@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' }];
-        var match = validUsers.find(function(u) { return u.email === email && u.password === password; });
-        if (match) {
-            var expDate = new Date(); expDate.setDate(expDate.getDate() + 30);
-            localStorage.setItem('rz_premium_session', JSON.stringify({ email: match.email, tier: match.tier, role: (match.email === 'admin@resistancezero.com' || match.email === 'bagus@resistancezero.com') ? 'root' : 'pro', expires: expDate.toISOString() }));
-            isPremiumUser = true; userTier = match.tier;
-            closeLoginModal(); activatePremiumUI();
-            window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: match.email, tier: match.tier, role: (match.email === 'admin@resistancezero.com' || match.email === 'bagus@resistancezero.com') ? 'root' : 'pro', action: 'login' } }));
-        } else {
-            errorEl.textContent = 'Invalid email or password'; errorEl.style.display = 'block';
-            document.getElementById('loginPassword').value = ''; document.getElementById('loginPassword').focus();
-        }
+        // Show shared auth.js login modal (dispatches rz-auth-change on success)
+        if (window._rzAuth) { _rzAuth.showModal(); }
     }
 
     function activatePremiumUI() {
@@ -1996,8 +1941,6 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
 
     // v1.17.2 STABILIZATION: expose inline-onclick handlers on window
     try {
-      window.attemptLogin       = attemptLogin;
-      window.closeLoginModal    = closeLoginModal;
       window.debouncedCalculate = debouncedCalculate;
       window.exportPDF          = exportPDF;
       window.handlePremiumTab   = handlePremiumTab;

@@ -299,11 +299,10 @@
     var SESSION_KEY = 'rz_premium_session';
     var SESSION_DAYS = 30;
 
+    // OFFLINE/DEMO fallback only. Real accounts authenticate via Supabase (auth.js) — their passwords
+    // live in Supabase (migrated), NEVER in this repo. No real-account secret in source.
     var VALID_USERS = [
-        { email: 'demo@resistancezero.com',    password: 'demo2026',          tier: 'pro', role: 'demo' },
-        { email: 'bagus@resistancezero.com',   password: 'RZ@Premium2026!',   tier: 'pro', role: 'admin' },
-        { email: 'admin@resistancezero.com',   password: 'RZ@Premium2026!',   tier: 'pro', role: 'admin' },
-        { email: 'premium@resistancezero.com', password: 'RZ@Premium2026!',   tier: 'pro', role: 'premium' }
+        { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro', role: 'demo' }
     ];
 
     /**

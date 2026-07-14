@@ -3010,7 +3010,6 @@ Where LMTD (Log Mean Temperature Difference) requires:
                         <input type="password" class="hvac-login-input" id="hvacLoginPass" placeholder="Password" aria-label="Password">
                         <div class="hvac-login-error" id="hvacLoginError">Invalid credentials</div>
                         <button class="hvac-login-submit" onclick="hvacDoLogin()">Sign In</button>
-                        <div class="hvac-login-demo">Demo Account: demo@resistancezero.com / demo2026</div>
 <p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
                     </div>
                 </div>
@@ -4499,19 +4498,12 @@ Where LMTD (Log Mean Temperature Difference) requires:
             document.getElementById('hvacLoginOverlay').classList.remove('visible');
             document.getElementById('hvacLoginError').style.display = 'none';
         };
+        // Login is handled by the shared Supabase auth modal (auth.js). On success
+        // it dispatches rz-auth-change, which the listener below reveals Pro on.
         window.hvacDoLogin = function() {
-            var email = document.getElementById('hvacLoginEmail').value.trim();
-            var pass = document.getElementById('hvacLoginPass').value;
-            if ((email === 'demo@resistancezero.com' && pass === 'demo2026') || ((email === 'bagus@resistancezero.com' || email === 'admin@resistancezero.com') && pass === 'RZ@Premium2026!')) {
-                var session = { email: email, tier: 'pro', role: (['admin@resistancezero.com','bagus@resistancezero.com'].indexOf(email)!==-1?'root':'pro'), expires: new Date(Date.now() + 30*24*60*60*1000).toISOString() };
-                localStorage.setItem('rz_premium_session', JSON.stringify(session));
-                isAuthenticated = true;
-                unlockPanels();
+            if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
                 hvacHideLogin();
-                hvacSetMode('pro');
-                window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: session }));
-            } else {
-                document.getElementById('hvacLoginError').style.display = 'block';
+                window._rzAuth.showModal();
             }
         };
 
@@ -4846,9 +4838,15 @@ Where LMTD (Log Mean Temperature Difference) requires:
             }
 
             // Listen for auth changes from other tabs/articles
-            window.addEventListener('rz-auth-change', function() {
+            window.addEventListener('rz-auth-change', function(e) {
                 checkAuth();
-                if (isAuthenticated && proMode) updateHvacProPanels();
+                // On a shared-modal login, reveal Pro exactly as the old login branch did.
+                if (isAuthenticated && e && e.detail && e.detail.action !== 'logout') {
+                    unlockPanels();
+                    hvacSetMode('pro');
+                } else if (isAuthenticated && proMode) {
+                    updateHvacProPanels();
+                }
             });
             window.addEventListener('storage', function(e) {
                 if (e.key === 'rz_premium_session') {
@@ -4898,7 +4896,7 @@ Where LMTD (Log Mean Temperature Difference) requires:
 <!-- Search: shared js/rz-command-palette.js -->
 <script src="js/rz-command-palette.js?v=1.50.37" defer></script>
 <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

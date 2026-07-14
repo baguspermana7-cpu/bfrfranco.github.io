@@ -2649,9 +2649,6 @@
             <input type="email" class="login-input" id="debtLoginEmail" placeholder="Email address" aria-label="Email address">
             <input type="password" class="login-input" id="debtLoginPass" placeholder="Password" aria-label="Password">
             <button class="login-submit" onclick="debtHandleLogin()"><i class="fas fa-unlock" style="margin-right:8px;"></i>Sign In</button>
-            <div style="margin-top:1rem;font-size:0.72rem;color:#64748b;text-align:center;">
-                Demo Account: demo@resistancezero.com / demo2026
-            </div>
 <p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
         </div>
     </div>
@@ -3572,18 +3569,14 @@
             document.getElementById('debtLoginOverlay').classList.remove('active');
         };
 
+        // Login is handled by the shared Supabase auth modal (auth.js). On
+        // success it writes rz_premium_session + dispatches rz-auth-change,
+        // which the listener below reveals Pro on. This delegates to that modal
+        // and removes the legacy hardcoded credential check.
         window.debtHandleLogin = function() {
-            var email = document.getElementById('debtLoginEmail').value.trim();
-            var pass = document.getElementById('debtLoginPass').value;
-            if ((email === 'demo@resistancezero.com' && pass === 'demo2026') || ((email === 'bagus@resistancezero.com' || email === 'admin@resistancezero.com') && pass === 'RZ@Premium2026!')) {
-                var session = { email: email, tier: 'pro', role: (['admin@resistancezero.com','bagus@resistancezero.com'].indexOf(email)!==-1?'root':'pro'), expires: new Date(Date.now() + 30*86400000).toISOString() };
-                localStorage.setItem('rz_premium_session', JSON.stringify(session));
-                isDebtPremium = true;
+            if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
                 debtHideLogin();
-                switchDebtMode('pro');
-                window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: email, tier: 'pro', role: 'pro', action: 'login' } }));
-            } else {
-                (window.showToast||alert)('Invalid credentials. Use demo@resistancezero.com / demo2026');
+                window._rzAuth.showModal();
             }
         };
 
@@ -3861,7 +3854,7 @@ document.querySelectorAll('.tooltip-trigger').forEach(function(trigger) {
 /* v1.9.1: subscribeNewsletter() moved to script.js (global, mailto: based) */
 </script>
 <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

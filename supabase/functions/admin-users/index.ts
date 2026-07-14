@@ -47,8 +47,9 @@ const ALLOWED_ORIGINS = new Set([
 const LEGACY = [
   { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'demo' },
   { email: 'educator@resistancezero.com', password: 'educator2026', tier: 'pro' },
-  { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!', tier: 'root' },
-  { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!', tier: 'root' },
+  // Migration already run + root passwords rotated in Supabase. Real passwords NOT kept in source.
+  { email: 'bagus@resistancezero.com', password: '<ROTATED_IN_DASHBOARD>', tier: 'root' },
+  { email: 'admin@resistancezero.com', password: '<ROTATED_IN_DASHBOARD>', tier: 'root' },
 ];
 
 function corsHeaders(origin: string | null): Record<string, string> {

@@ -2455,48 +2455,36 @@ function handleAdminLogin(e){
     btnTxt.innerHTML='<i class="fas fa-spinner fa-spin"></i> Authenticating...';
     errEl.style.display='none';
 
-    // Check admin accounts
-    var valid=false;
-    if(ADMIN_EMAILS.includes(email)&&pass==='RZ@Premium2026!') valid=true;
-
-    setTimeout(function(){
-    if(!valid){
-        errEl.innerHTML='<i class="fas fa-exclamation-circle"></i> Invalid email or password.';
-        errEl.style.display='block';
-        btn.disabled=false;
-        btnTxt.textContent='Sign In';
+    // Authenticate against Supabase (real accounts) — admin access requires the ADMIN_EMAILS allowlist.
+    // No hardcoded password in source; the admin's password lives in Supabase (already migrated).
+    var _fail=function(msg){
+        errEl.innerHTML='<i class="fas fa-exclamation-circle"></i> '+(msg||'Invalid email or password.');
+        errEl.style.display='block'; btn.disabled=false; btnTxt.textContent='Sign In';
         document.getElementById('adminLoginPassword').focus();
-        return;
-    }
-
-    // Store session (30 days if remember, 24h if not)
-    var remember=document.getElementById('loginRemember').checked;
-    var expiry=remember ? 30*86400000 : 86400000;
-    localStorage.setItem('rz_premium_session',JSON.stringify({
-        email:email,tier:'pro',role:'root',
-       expires:new Date(Date.now()+expiry).toISOString()
-    }));
-    window.dispatchEvent(new CustomEvent('rz-auth-change',{detail:{email:email,tier:'pro',role:'root',action:'login'}}));
-
-    // Show dashboard
-    errEl.style.display='none';
-    document.getElementById('loginPage').style.display='none';
-    document.getElementById('sidebar').style.display='flex';
-    document.getElementById('main-content').style.display='block';
-    adminEmail=email;
-    document.getElementById('sidebarAvatar').textContent=email.charAt(0).toUpperCase();
-    document.getElementById('sidebarName').textContent=email.split('@')[0];
-    _applySidebarRole('root','pro');
-
-    // Init dashboard
-    allUsers=generateUsers();
-    loadManualAccounts();
-    filteredUsers=[...allUsers];
-    activities=generateActivities();
-    applySort();renderKPIs();renderDashboardCharts();renderRevenue();
-    renderTable();renderCredentials();renderFeatures();renderBenchmarks();
-    renderAudit();renderSubscribers();renderSettings();renderMayar();renderActivity();
-    },600);
+    };
+    var _success=function(){
+        var remember=document.getElementById('loginRemember').checked;
+        var expiry=remember ? 30*86400000 : 86400000;
+        localStorage.setItem('rz_premium_session',JSON.stringify({email:email,tier:'pro',role:'root',expires:new Date(Date.now()+expiry).toISOString()}));
+        window.dispatchEvent(new CustomEvent('rz-auth-change',{detail:{email:email,tier:'pro',role:'root',action:'login'}}));
+        errEl.style.display='none';
+        document.getElementById('loginPage').style.display='none';
+        document.getElementById('sidebar').style.display='flex';
+        document.getElementById('main-content').style.display='block';
+        adminEmail=email;
+        document.getElementById('sidebarAvatar').textContent=email.charAt(0).toUpperCase();
+        document.getElementById('sidebarName').textContent=email.split('@')[0];
+        _applySidebarRole('root','pro');
+        allUsers=generateUsers();loadManualAccounts();filteredUsers=[...allUsers];activities=generateActivities();
+        applySort();renderKPIs();renderDashboardCharts();renderRevenue();
+        renderTable();renderCredentials();renderFeatures();renderBenchmarks();
+        renderAudit();renderSubscribers();renderSettings();renderMayar();renderActivity();
+    };
+    if(!ADMIN_EMAILS.includes(email)){ setTimeout(function(){_fail('Not authorized for admin access.');},300); return false; }
+    (window.rzSupa&&window.rzSupa.ready?window.rzSupa.ready:Promise.resolve(window.rzSupa||null)).then(function(S){
+        if(!S||!S.configured){ _fail('Auth service unavailable — please retry.'); return; }
+        return S.signIn(email,pass).then(function(res){ if(res&&res.error){ _fail('Invalid email or password.'); return; } _success(); });
+    }).catch(function(){ _fail('Auth service unavailable — please retry.'); });
     return false;
 }
 function adminLogout(){if(!confirm('Logout?'))return;localStorage.removeItem('rz_premium_session');location.href='index.html'}

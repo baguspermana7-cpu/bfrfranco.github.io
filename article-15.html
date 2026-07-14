@@ -3399,7 +3399,6 @@ function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySel
         <input type="password" id="mclLoginPass" placeholder="Password" aria-label="Password">
         <button class="mcl-login-submit" onclick="mclDoLogin()">Sign In</button>
         <div class="mcl-login-error" id="mclLoginError">Invalid credentials. Please try again.</div>
-        <div class="demo-hint">Demo Account: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
 <p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
     </div>
 </div>
@@ -4227,17 +4226,13 @@ function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySel
         document.getElementById('mclLoginOverlay').classList.remove('active');
     };
 
+    // Login is handled by the shared Supabase auth modal (auth.js). On success
+    // it writes rz_premium_session + dispatches rz-auth-change, which the
+    // existing listener below reveals the Pro panels on.
     window.mclDoLogin = function() {
-        var email = document.getElementById('mclLoginEmail').value.trim().toLowerCase();
-        var pass = document.getElementById('mclLoginPass').value;
-        if ((email === 'demo@resistancezero.com' && pass === 'demo2026') || ((email === 'bagus@resistancezero.com' || email === 'admin@resistancezero.com') && pass === 'RZ@Premium2026!')) {
-            var session = { email: email, tier: 'pro', role: (['admin@resistancezero.com','bagus@resistancezero.com'].indexOf(email)!==-1?'root':'pro'), expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() };
-            localStorage.setItem('rz_premium_session', JSON.stringify(session));
-            window.dispatchEvent(new Event('rz-auth-change'));
+        if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
             mclHideLogin();
-            mclUnlockPanels();
-        } else {
-            document.getElementById('mclLoginError').style.display = 'block';
+            window._rzAuth.showModal();
         }
     };
 
@@ -4526,7 +4521,7 @@ function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySel
 <!-- Search: shared js/rz-command-palette.js -->
 <script src="js/rz-command-palette.js?v=1.50.37" defer></script>
 <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

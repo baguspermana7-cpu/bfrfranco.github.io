@@ -2688,7 +2688,6 @@
                         <input type="password" id="iecLoginPass" placeholder="Password" style="width:100%;padding:0.65rem 0.85rem;border:1px solid #e2e8f0;border-radius:8px;font-size:0.85rem;margin-bottom:0.85rem;box-sizing:border-box;" aria-label="Password">
                         <button class="iec-login-submit" type="button" id="iecLoginSubmit" style="width:100%;padding:0.7rem;background:#0891b2;color:#fff;border:none;border-radius:8px;font-size:0.88rem;font-weight:600;cursor:pointer;transition:background 0.2s;">Unlock Pro Analysis</button>
                         <div class="iec-login-error" id="iecLoginError" style="display:none;color:#ef4444;font-size:0.78rem;text-align:center;margin-top:0.65rem;">Invalid credentials.</div>
-                        <div class="iec-login-demo" style="text-align:center;margin-top:0.85rem;font-size:0.75rem;color:#64748b;">Demo: <code style="background:#f1f5f9;padding:0.15rem 0.4rem;border-radius:4px;font-size:0.72rem;">demo@resistancezero.com</code> / <code style="background:#f1f5f9;padding:0.15rem 0.4rem;border-radius:4px;font-size:0.72rem;">demo2026</code></div>
                         <div style="text-align:center;margin-top:10px;font-size:0.68rem;color:#475569;line-height:1.5;">
                             By signing in, you agree to our <a href="terms.html" style="color:#0891b2;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#0891b2;text-decoration:none;">Privacy Policy</a>
                         </div>
@@ -4171,38 +4170,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (overlay) overlay.classList.remove('active');
     };
 
+    /* Login is handled by the shared auth.js modal; the rz-auth-change
+       listener below unlocks Pro on successful login. */
     window.iecHandleLogin = function() {
-        var email = ((byId('iecLoginEmail') || {}).value || '').trim().toLowerCase();
-        var pass  = ((byId('iecLoginPass')  || {}).value || '').trim();
-        var error = byId('iecLoginError');
-
-        /* ── MUST match Valid Credentials table exactly ── */
-        var VALID = [
-            { email: 'demo@resistancezero.com',  password: 'demo2026' },
-            { email: 'bagus@resistancezero.com',  password: 'RZ@Premium2026!' },
-            { email: 'admin@resistancezero.com',  password: 'RZ@Premium2026!' }
-        ];
-        var found = VALID.some(function(u) {
-            return u.email.toLowerCase() === email && u.password === pass;
-        });
-
-        if (found) {
-            var expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-            localStorage.setItem('rz_premium_session', JSON.stringify({
-                email: email, tier: 'pro', role: 'pro', expires: expires
-            }));
-            window.dispatchEvent(new CustomEvent('rz-auth-change', {
-                detail: { email: email, tier: 'pro', action: 'login' }
-            }));
+        if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
             window.iecHideLogin();
-            state.authed = true;
-            applyMode();
-            return;
-        }
-
-        if (error) {
-            error.style.display = 'block';
-            error.textContent = 'Invalid credentials. Try demo@resistancezero.com / demo2026.';
+            window._rzAuth.showModal();
         }
     };
 

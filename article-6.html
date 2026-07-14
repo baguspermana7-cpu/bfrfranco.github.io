@@ -2363,7 +2363,6 @@
                         <input type="password" id="rcaLoginPass" placeholder="Password" aria-label="Password">
                         <div id="rcaLoginError" style="color: #ef4444; font-size: 0.78rem; margin-bottom: 0.5rem; display: none;"></div>
                         <button class="login-submit" onclick="rcaHandleLogin()">Sign In</button>
-                        <div class="demo-hint">Demo Account: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
 <p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
                     </div>
                 </div>
@@ -2941,7 +2940,7 @@
 /* v1.9.1: subscribeNewsletter() moved to script.js (global, mailto: based) */
 </script>
 <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 <!-- RCA Pro Mode JS -->
@@ -3502,20 +3501,12 @@
         document.getElementById('rcaLoginOverlay').classList.remove('active');
         document.getElementById('rcaLoginError').style.display = 'none';
     };
+    // Login is handled by the shared Supabase auth modal (auth.js). On success
+    // it dispatches rz-auth-change, which the listener above reveals Pro on.
     window.rcaHandleLogin = function() {
-        var email = document.getElementById('rcaLoginEmail').value.trim();
-        var pass = document.getElementById('rcaLoginPass').value;
-        if ((email === 'demo@resistancezero.com' && pass === 'demo2026') || ((email === 'bagus@resistancezero.com' || email === 'admin@resistancezero.com') && pass === 'RZ@Premium2026!')) {
-            var session = { email: email, tier: 'pro', role: (['admin@resistancezero.com','bagus@resistancezero.com'].indexOf(email)!==-1?'root':'pro'), expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() };
-            localStorage.setItem('rz_premium_session', JSON.stringify(session));
-            rcaProUnlocked = true;
-            unlockRcaPanels();
+        if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
             rcaHideLogin();
-            window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: session }));
-        } else {
-            var err = document.getElementById('rcaLoginError');
-            err.textContent = 'Invalid credentials. Use the demo account below.';
-            err.style.display = 'block';
+            window._rzAuth.showModal();
         }
     };
     window.rcaResetDefaults = function() {

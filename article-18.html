@@ -2137,7 +2137,6 @@
         <input type="password" id="aifLoginPass" placeholder="Password" aria-label="Password">
         <button class="aif-login-submit" onclick="aifHandleLogin()">Sign In</button>
         <div class="aif-login-error" id="aifLoginError">Invalid credentials.</div>
-        <div class="aif-login-demo">Demo Account: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
         <p style="font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">
             By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#60a5fa;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#60a5fa;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.
         </p>
@@ -2187,20 +2186,13 @@ var mcChartInstance = null, tcoChartInstance = null, tornadoChartInstance = null
 function aifShowLogin() { document.getElementById('aifLoginOverlay').classList.add('show'); }
 function aifHideLogin() { document.getElementById('aifLoginOverlay').classList.remove('show'); }
 
+// Login is handled by the shared Supabase auth modal (auth.js). On success it
+// writes rz_premium_session + dispatches rz-auth-change, which the existing
+// listener below reveals the Pro panels on.
 function aifHandleLogin() {
-    var email = document.getElementById('aifLoginEmail').value.trim();
-    var pass = document.getElementById('aifLoginPass').value;
-    if ((email === 'demo@resistancezero.com' && pass === 'demo2026') || ((email === 'bagus@resistancezero.com' || email === 'admin@resistancezero.com') && pass === 'RZ@Premium2026!')) {
-        localStorage.setItem('rz_premium_session', JSON.stringify({ email: email, tier: 'pro', role: (['admin@resistancezero.com','bagus@resistancezero.com'].indexOf(email)!==-1?'root':'pro'), expires: new Date(Date.now() + 30*86400000).toISOString() }));
-        window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: email, tier: 'pro', role: 'pro', action: 'login' } }));
-        aifPremium = true;
+    if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
         aifHideLogin();
-        aifUnlockPanels();
-        aifSetMode('pro');
-    } else {
-        var err = document.getElementById('aifLoginError');
-        err.style.display = 'block';
-        setTimeout(function() { err.style.display = 'none'; }, 3000);
+        window._rzAuth.showModal();
     }
 }
 
@@ -3011,7 +3003,7 @@ if (aifPremium) { aifUnlockPanels(); }
 <!-- Search: shared js/rz-command-palette.js -->
 <script src="js/rz-command-palette.js?v=1.50.37" defer></script>
 <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14" defer></script>
 
 
 

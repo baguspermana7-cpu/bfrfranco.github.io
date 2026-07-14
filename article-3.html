@@ -2780,9 +2780,6 @@
             </div>
             <button onclick="maintDoLogin()" style="width:100%;padding:12px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:600;cursor:pointer;transition:transform .2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">Sign In</button>
             <div id="maintLoginError" style="display:none;margin-top:.75rem;padding:8px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;color:#dc2626;font-size:.8rem;text-align:center;"></div>
-            <div style="margin-top:1rem;padding:12px;background:#f0fdf4;border-radius:10px;text-align:center;">
-                <p style="margin:0;font-size:.78rem;color:#166534;"><i class="fas fa-flask" style="margin-right:4px;"></i> <strong>Demo Account:</strong> demo@resistancezero.com / demo2026</p>
-            </div>
 <p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
         </div>
     </div>
@@ -2819,11 +2816,8 @@
     /* ===== STATE ===== */
     var maintMode = 'free';
     var maintIsPremium = false;
-    var MAINT_USERS = {
-        'demo@resistancezero.com': {pw:'demo2026',name:'Demo User',tier:'pro',role:'pro'},
-        'admin@resistancezero.com': {pw:'RZ@Premium2026!',name:'Admin',tier:'pro',role:'root'},
-        'bagus@resistancezero.com': {pw:'RZ@Premium2026!',name:'Bagus Permana',tier:'pro',role:'root'}
-    };
+    // Legacy hardcoded user table removed — login is handled by the shared
+    // Supabase auth modal (auth.js).
 
     /* ===== MATH HELPERS ===== */
     var FF = {High:0.55, Medium:0.70, Low:0.85};
@@ -3039,24 +3033,10 @@
     /* ===== AUTH ===== */
     window.maintShowLogin=function(){document.getElementById('maintLoginModal').style.display='flex';};
     window.maintCloseLogin=function(){document.getElementById('maintLoginModal').style.display='none';document.getElementById('maintLoginError').style.display='none';};
+    // Login is handled by the shared Supabase auth modal (auth.js). On success
+    // it dispatches rz-auth-change, which the listener below reveals Pro on.
     window.maintDoLogin=function(){
-        var email=document.getElementById('maintLoginEmail').value.trim().toLowerCase();
-        var pass=document.getElementById('maintLoginPass').value;
-        var user=MAINT_USERS[email];
-        if(user&&user.pw===pass){
-            maintIsPremium=true;
-            var exp=new Date();exp.setDate(exp.getDate()+30);localStorage.setItem('rz_premium_session',JSON.stringify({email:email,tier:user.tier, role: (email === 'admin@resistancezero.com' || email === 'bagus@resistancezero.com') ? 'root' : 'pro', expires:exp.toISOString()}));
-            maintCloseLogin();
-            maintMode='pro';
-            document.querySelectorAll('.maint-mode-btn').forEach(function(b){b.classList.toggle('active',b.dataset.mode==='pro');});
-            var pp=document.getElementById('maintProPanels');if(pp)pp.style.display='block';
-            var pi=document.getElementById('maintProInputs');if(pi)pi.style.display='block';
-            applyMaintGating();
-            maintUpdateNavAuth(user.name);
-            updateMaintCalculator();
-        }else{
-            var err=document.getElementById('maintLoginError');err.textContent='Invalid credentials. Try demo@resistancezero.com / demo2026';err.style.display='block';
-        }
+        if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){maintCloseLogin();window._rzAuth.showModal();}
     };
     window.maintLogout=function(){
         maintIsPremium=false;maintMode='free';
@@ -3912,7 +3892,7 @@ function finalizeMC3(r, N) {
 })();
 </script>
 <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

@@ -2663,27 +2663,23 @@ function wcSetMode(mode) {
 }
 
 function wcShowLogin() {
-    document.getElementById('wcLoginOverlay').classList.add('show');
+    if (wcPremium) return;
+    if (window._rzAuth && typeof window._rzAuth.showModal === 'function') { window._rzAuth.showModal(); }
 }
 function wcHideLogin() {
     document.getElementById('wcLoginOverlay').classList.remove('show');
     document.getElementById('wcLoginError').style.display = 'none';
 }
-function wcHandleLogin() {
-    var email = document.getElementById('wcLoginEmail').value.trim();
-    var pass = document.getElementById('wcLoginPass').value;
-    if (email === 'demo@resistancezero.com' && pass === 'demo2026') {
-        var session = { tier: 'pro', email: email, expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() };
-        localStorage.setItem('rz_premium_session', JSON.stringify(session));
+// Shared Supabase-aware modal writes rz_premium_session + dispatches rz-auth-change → re-gate here.
+window.addEventListener('rz-auth-change', function (e) {
+    if (e.detail && e.detail.action === 'login') {
         wcPremium = true;
-        wcHideLogin();
         wcUnlockPanels();
         wcSetMode('pro');
-        window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: session }));
-    } else {
-        document.getElementById('wcLoginError').style.display = 'block';
+    } else if (e.detail && e.detail.action === 'logout') {
+        wcPremium = false;
     }
-}
+});
 function wcUnlockPanels() {
     document.querySelectorAll('.wc-pro-panel.gated').forEach(function(p) {
         p.classList.remove('gated');
@@ -2917,6 +2913,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14" defer></script>
 </body>
 </html>

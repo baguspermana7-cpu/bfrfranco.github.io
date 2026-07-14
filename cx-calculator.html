@@ -1273,37 +1273,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
 </footer>
 
 <!-- Auth Modal -->
-<div class="cx-modal-backdrop" id="cxLoginModal">
-  <div class="cx-modal">
-    <button onclick="cxCloseModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.2rem;color:#94a3b8;cursor:pointer;">&times;</button>
-    <div style="text-align:center;margin-bottom:1.5rem;">
-      <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#8b5cf6,#a855f7);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;"><i class="fas fa-crown" style="color:white;font-size:1.3rem;"></i></div>
-      <h3 style="font-size:1.3rem;font-weight:700;color:#1e293b;margin-bottom:0.25rem;">Sign In</h3>
-      <p style="font-size:0.85rem;color:#64748b;">Access advanced analytics, Monte Carlo, and PDF export.</p>
-    </div>
-    <div id="cxLoginError" style="display:none;padding:10px 14px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#dc2626;font-size:0.8rem;margin-bottom:1rem;text-align:center;">Invalid credentials</div>
-    <div style="display:flex;flex-direction:column;gap:1rem;">
-      <div>
-        <label style="display:block;font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:6px;">Email</label>
-        <input type="email" id="cxLoginEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'" aria-label="your@email.com">
-      </div>
-      <div>
-        <label style="display:block;font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:6px;">Password</label>
-        <input type="password" id="cxLoginPassword" placeholder="Enter password" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'" onkeydown="if(event.key==='Enter')cxAttemptLogin()" aria-label="Enter password">
-      </div>
-      <button onclick="cxAttemptLogin()" style="padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#8b5cf6,#a855f7);color:white;font-size:0.95rem;font-weight:600;font-family:inherit;cursor:pointer;"><i class="fas fa-unlock" style="margin-right:8px;"></i>Sign In</button>
-    </div>
-    <div style="text-align:center;margin-top:1.25rem;padding-top:1rem;border-top:1px solid #f1f5f9;">
-      <div style="margin-top:8px;padding:10px 12px;border-radius:8px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);font-size:0.78rem;color:#64748b;line-height:1.6;">
-        <span style="color:#8b5cf6;font-weight:600;">Demo Account:</span><br>
-        <code style="background:rgba(139,92,246,0.1);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#7c3aed;">demo@resistancezero.com</code> / <code style="background:rgba(139,92,246,0.1);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#7c3aed;">demo2026</code>
-      </div>
-      <div style="text-align:center;margin-top:10px;font-size:0.68rem;color:#475569;line-height:1.5;">
-          By signing in, you agree to our <a href="terms.html" style="color:#8b5cf6;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#8b5cf6;text-decoration:none;">Privacy Policy</a>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- Login handled by shared auth.js modal (window._rzAuth.showModal) -->
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -5504,12 +5474,7 @@ function cxGenRiskNarrative(inp,score){
   return text;
 }
 
-// --- AUTH (Standard: rz_premium_session, 3 users, rz-auth-change) ---
-var CX_VALID_USERS=[
-  {email:'demo@resistancezero.com',password:'demo2026',tier:'pro',role:'pro'},
-  {email:'bagus@resistancezero.com',password:'RZ@Premium2026!',tier:'pro',role:'root'},
-  {email:'admin@resistancezero.com',password:'RZ@Premium2026!',tier:'pro',role:'root'}
-];
+// --- AUTH (Standard: rz_premium_session, shared auth.js modal, rz-auth-change) ---
 
 // Check existing session on page load
 (function cxCheckSession(){
@@ -5575,48 +5540,8 @@ function cxDeactivatePremiumUI(){
 
 function cxHandlePremium(){
   if(cxIsPremium)return;
-  document.getElementById('cxLoginModal').classList.add('active');
-}
-function cxCloseModal(){document.getElementById('cxLoginModal').classList.remove('active');}
-
-function cxAttemptLogin(){
-  var email=document.getElementById('cxLoginEmail').value.trim().toLowerCase();
-  var pass=document.getElementById('cxLoginPassword').value;
-  if(!email||!pass){
-    document.getElementById('cxLoginError').textContent='Please enter email and password.';
-    document.getElementById('cxLoginError').style.display='block';
-    return;
-  }
-  // S1 pilot: prefer RZEngine.auth
-  var match = null;
-  if (window.RZEngine && window.RZEngine.auth) {
-    match = window.RZEngine.auth.validateLogin(email, pass);
-    if (match) {
-      window.RZEngine.auth.setSession(match.email, match.tier, match.role);
-      window.RZEngine.auth.dispatchAuthChange('login', { email: match.email, tier: match.tier, role: match.role });
-    }
-  } else {
-    // Legacy fallback
-    var m = CX_VALID_USERS.find(function(u){return u.email===email&&u.password===pass;});
-    if (m) {
-      match = { email: m.email, tier: m.tier, role: m.role };
-      var expDate = new Date(); expDate.setDate(expDate.getDate()+30);
-      localStorage.setItem('rz_premium_session', JSON.stringify({
-        email: match.email, tier: match.tier, role: match.role, expires: expDate.toISOString()
-      }));
-      window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: match.email, tier: match.tier, role: match.role, action: 'login' } }));
-    }
-  }
-  if (match) {
-    cxIsPremium = true;
-    cxCloseModal();
-    cxActivatePremiumUI();
-    document.getElementById('cxLoginError').style.display = 'none';
-    if (cxLastResults) cxCalculate();
-  } else {
-    document.getElementById('cxLoginError').textContent='Invalid credentials. Check email and password.';
-    document.getElementById('cxLoginError').style.display='block';
-  }
+  // Show shared auth.js login modal (dispatches rz-auth-change on success)
+  if(window._rzAuth){_rzAuth.showModal();}
 }
 
 function cxLogout(){
@@ -5626,11 +5551,6 @@ function cxLogout(){
   cxDeactivatePremiumUI();
   window.dispatchEvent(new CustomEvent('rz-auth-change',{detail:{action:'logout'}}));
 }
-
-// Close modal on backdrop click
-document.getElementById('cxLoginModal').addEventListener('click',function(e){
-  if(e.target===this)cxCloseModal();
-});
 
 // --- FAQ RENDER ---
 var _cxFaqRendered=false;
@@ -6280,7 +6200,7 @@ document.addEventListener('keydown',function(e){
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT'||e.target.tagName==='TEXTAREA')return;
   if(e.target.closest('.cx-modal'))return;
   if(e.key==='Enter')cxCalculate();
-  if(e.key==='Escape'){cxCloseModal();cxCloseDrawer();}
+  if(e.key==='Escape'){cxCloseDrawer();}
   if(e.key==='?'||e.key==='/'){e.preventDefault();cxSwitchMode('faq');}
   if(e.key==='m'&&!e.ctrlKey&&!e.metaKey){cxSwitchMode('manual');}
   if(e.key==='f'&&!e.ctrlKey&&!e.metaKey){cxSwitchMode('free');}
@@ -6400,10 +6320,8 @@ window.addEventListener('scroll',function(){cxScrollBtn.style.display=window.scr
 
 // v1.17.2 STABILIZATION: expose inline-onclick handlers on window
 try {
-  window.cxAttemptLogin        = cxAttemptLogin;
   window.cxCalculate           = cxCalculate;
   window.cxCloseDrawer         = cxCloseDrawer;
-  window.cxCloseModal          = cxCloseModal;
   window.cxCollapseAllGantt    = cxCollapseAllGantt;
   window.cxDrawerTab           = cxDrawerTab;
   window.cxExpandAllGantt      = cxExpandAllGantt;
@@ -6465,7 +6383,7 @@ function toggleCalcTheme() {
 
 <script src="rz-tracker.js" defer></script>
 <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14" defer></script>
 <!-- Supabase save/reload scenario (additive) -->
 <script src="js/rz-config.js?v=2026-07-11"></script>
 <script src="js/rz-scenario.js?v=2026-07-11d"></script>

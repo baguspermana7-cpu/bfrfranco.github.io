@@ -661,7 +661,7 @@
         function kpi(l,v){ return '<div class="cc-pp-kpi"><div class="l">'+l+'</div><div class="v">'+v+'</div></div>'; }
 
         function setMode(m){
-            if(m==='pro' && !isPremium()){ $('ccModal').classList.add('show'); return; }
+            if(m==='pro' && !isPremium()){ if(window._rzAuth && typeof window._rzAuth.showModal==='function'){ window._rzAuth.showModal(); } return; }
             mode=m;
             $('ccFree').classList.toggle('active', m==='free');
             $('ccPro').classList.toggle('active', m==='pro');
@@ -670,16 +670,6 @@
             else { sec.classList.add('locked'); }
         }
         window.__cduProRefresh = function(){ if(mode==='pro' && isPremium()){ computePro(); } };
-
-        function doLogin(){
-            var e=($('ccEmail').value||'').trim().toLowerCase(), p=$('ccPass').value||'';
-            if(e==='demo@resistancezero.com' && p==='demo2026'){
-                localStorage.setItem('rz_premium_session', JSON.stringify({email:e,tier:'pro',expires:Date.now()+86400000}));
-                $('ccModal').classList.remove('show');
-                try{ window.dispatchEvent(new CustomEvent('rz-auth-change',{detail:{action:'login'}})); }catch(_){}
-                setMode('pro');
-            } else { $('ccErr').style.display='block'; }
-        }
 
         function exportPDF(){
             var w=window.open('','_blank'); if(!w) return;       // open FIRST, before heavy work
@@ -708,10 +698,13 @@
             $('ccPro').addEventListener('click',function(){ setMode('pro'); });
             $('ccProOverlay').addEventListener('click',function(){ setMode('pro'); });
             $('ccPdf').addEventListener('click', exportPDF);
-            $('ccLogin').addEventListener('click', doLogin);
             $('ccModalX').addEventListener('click',function(){ $('ccModal').classList.remove('show'); });
             $('ccModal').addEventListener('click',function(e){ if(e.target===$('ccModal')) $('ccModal').classList.remove('show'); });
-            window.addEventListener('rz-auth-change',function(ev){ if(ev.detail && ev.detail.action==='logout'){ setMode('free'); } });
+            // Shared Supabase-aware modal writes rz_premium_session + dispatches rz-auth-change → re-gate here.
+            window.addEventListener('rz-auth-change',function(ev){
+                if(ev.detail && ev.detail.action==='login'){ setMode('pro'); }
+                else if(ev.detail && ev.detail.action==='logout'){ setMode('free'); }
+            });
         }
         if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
     })();

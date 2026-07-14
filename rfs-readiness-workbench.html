@@ -3378,7 +3378,7 @@ var RfsUI = {
 
     switchTab: function(tab) {
         if (this.PRO_TABS.indexOf(tab) !== -1 && !isPremiumUser) {
-            document.getElementById('rfsLoginModal').classList.add('open');
+            if (window._rzAuth && typeof window._rzAuth.showModal === 'function') { window._rzAuth.showModal(); }
             return;
         }
         this.activeTab = tab;
@@ -6008,37 +6008,17 @@ function handleProMode() {
         document.getElementById('rfsBtnFree').classList.remove('active');
         return;
     }
-    document.getElementById('rfsLoginModal').classList.add('open');
-    setTimeout(function(){ document.getElementById('rfsLoginEmail').focus(); }, 100);
+    if (window._rzAuth && typeof window._rzAuth.showModal === 'function') { window._rzAuth.showModal(); }
 }
 function rfsCloseLoginModal() { document.getElementById('rfsLoginModal').classList.remove('open'); }
-function rfsAttemptLogin() {
-    var email = document.getElementById('rfsLoginEmail').value.trim();
-    var pw = document.getElementById('rfsLoginPassword').value;
-    var err = document.getElementById('rfsLoginError');
-    if (!email || !pw) { err.textContent='Enter email and password'; err.style.display='block'; return; }
-    var users = [
-        {email:'demo@resistancezero.com',password:'demo2026',tier:'pro'},
-        {email:'bagus@resistancezero.com',password:'RZ@Premium2026!',tier:'pro'},
-        {email:'admin@resistancezero.com',password:'RZ@Premium2026!',tier:'pro'}
-    ];
-    var match = users.find(function(u){return u.email===email && u.password===pw;});
-    if (match) {
-        var exp = new Date(); exp.setDate(exp.getDate()+30);
-        localStorage.setItem('rz_premium_session', JSON.stringify({
-            email:match.email, tier:match.tier,
-            role:(match.email==='admin@resistancezero.com'||match.email==='bagus@resistancezero.com')?'root':'pro',
-            expires:exp.toISOString()
-        }));
-        isPremiumUser = true; userTier = match.tier;
-        rfsCloseLoginModal();
-        rfsActivatePremiumUI();
-        RfsUI.showToast('Premium activated!', 'success');
-    } else {
-        err.textContent='Invalid email or password'; err.style.display='block';
-        document.getElementById('rfsLoginPassword').value='';
+// Shared Supabase-aware modal writes rz_premium_session + dispatches rz-auth-change → re-gate here.
+window.addEventListener('rz-auth-change', function (e) {
+    if (e.detail && e.detail.action === 'login') {
+        isPremiumUser = true; userTier = e.detail.tier || 'pro'; rfsActivatePremiumUI();
+    } else if (e.detail && e.detail.action === 'logout') {
+        isPremiumUser = false; userTier = 'free';
     }
-}
+});
 function rfsActivatePremiumUI() {
     isPremiumUser = true;
     document.getElementById('rfsBtnPro').classList.add('active');
@@ -6167,6 +6147,6 @@ RfsUI.init();
 </script>
 
 <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14" defer></script>
 </body>
 </html>

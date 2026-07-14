@@ -260,8 +260,9 @@ const ALLOWED_ORIGINS = new Set([
 const LEGACY = [
   { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'demo' },
   { email: 'educator@resistancezero.com', password: 'educator2026', tier: 'pro' },
-  { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!', tier: 'root' },
-  { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!', tier: 'root' },
+  // Migration already run + root passwords rotated in Supabase. Real passwords are NOT kept in source.
+  { email: 'bagus@resistancezero.com', password: '<ROTATED_IN_DASHBOARD>', tier: 'root' },
+  { email: 'admin@resistancezero.com', password: '<ROTATED_IN_DASHBOARD>', tier: 'root' },
 ];
 
 function corsHeaders(origin: string | null): Record&lt;string, string&gt; {
@@ -398,7 +399,7 @@ Deno.serve(async (req: Request) =&gt; {
     </div>
     <p style="font-size:0.82rem;color:#94a3b8;">Setelah <b>Deployed</b> (hijau): buka <b>rz-ops</b> → login root → kartu <b>Supabase Accounts</b> → klik <b>Migrate legacy</b>. 4 akun (demo@, educator@, bagus@, admin@) langsung jadi akun Supabase asli dengan password lamanya.</p>
     <div class="step" style="border-color:rgba(245,158,11,0.4);margin:12px 0 0;padding:12px 14px;">
-      <p style="margin:0;font-size:0.84rem;color:#fbbf24;"><b>&#9888; Penting keamanan:</b> password <code>bagus@</code> &amp; <code>admin@</code> (root) = <code>RZ@Premium2026!</code> itu <b>publik</b> di source code. Setelah migrasi, langsung klik ikon <b>&#128273; Reset</b> di baris <code>bagus@</code> dan <code>admin@</code> untuk ganti password baru — kalau tidak, siapa pun bisa login sebagai root.</p>
+      <p style="margin:0;font-size:0.84rem;color:#fbbf24;"><b>&#9888; Penting keamanan:</b> password root lama <b>sudah dihapus dari source code</b> (migrasi selesai + password sudah dirotasi di Supabase). Kalau belum pernah ganti, buka <b>rz-ops</b> → kartu <b>Supabase Accounts</b> → ikon <b>&#128273; Reset</b> di baris <code>bagus@</code> / <code>admin@</code>. Real password tidak pernah disimpan di repo.</p>
     </div>
   </div>
 

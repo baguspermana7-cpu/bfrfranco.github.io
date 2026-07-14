@@ -1410,32 +1410,17 @@
 
     function handlePremiumTab() {
         if (isPremiumUser) return;
-        document.getElementById('loginModal').style.display = 'flex';
-        document.getElementById('loginError').style.display = 'none';
-        document.getElementById('loginEmail').value = '';
-        document.getElementById('loginPassword').value = '';
-        setTimeout(function() { document.getElementById('loginEmail').focus(); }, 100);
+        if (window._rzAuth && typeof window._rzAuth.showModal === 'function') { window._rzAuth.showModal(); }
     }
 
-    function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
-    document.getElementById('loginModal').addEventListener('click', function(e) { if (e.target === this) closeLoginModal(); });
-    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLoginModal(); });
-
-    function attemptLogin() {
-        var email = document.getElementById('loginEmail').value.trim();
-        var password = document.getElementById('loginPassword').value;
-        var errorEl = document.getElementById('loginError');
-        if (!email || !password) { errorEl.textContent = 'Please enter email and password'; errorEl.style.display = 'block'; return; }
-        var validUsers = [{ email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro' },{ email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' },{ email: 'admin@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' }];
-        var match = validUsers.find(function(u) { return u.email === email && u.password === password; });
-        if (match) {
-            var expDate = new Date(); expDate.setDate(expDate.getDate() + 30);
-            localStorage.setItem('rz_premium_session', JSON.stringify({ email: match.email, tier: match.tier, role: (match.email === 'admin@resistancezero.com' || match.email === 'bagus@resistancezero.com') ? 'root' : 'pro', expires: expDate.toISOString() }));
-            isPremiumUser = true; userTier = match.tier;
-            closeLoginModal(); activatePremiumUI();
-            window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: match.email, tier: match.tier, role: (match.email === 'admin@resistancezero.com' || match.email === 'bagus@resistancezero.com') ? 'root' : 'pro', action: 'login' } }));
-        } else { errorEl.textContent = 'Invalid credentials'; errorEl.style.display = 'block'; }
-    }
+    // Shared Supabase-aware modal writes rz_premium_session + dispatches rz-auth-change → re-gate here.
+    window.addEventListener('rz-auth-change', function (e) {
+        if (e.detail && e.detail.action === 'login') {
+            isPremiumUser = true; userTier = e.detail.tier || 'pro'; activatePremiumUI();
+        } else if (e.detail && e.detail.action === 'logout') {
+            isPremiumUser = false; userTier = 'free';
+        }
+    });
 
     function activatePremiumUI() {
         document.querySelectorAll('.pro-section').forEach(function(s) { s.classList.remove('locked'); });
@@ -1680,7 +1665,7 @@
         html += '<h2>Methodology</h2><p style="font-size:10px;color:#94a3b8;">Compliance scored using weighted item assessment per ANSI/TIA-942-B standard. Items filtered by facility type ('+dcTypeLabel+') and tier level ('+currentTier+'). Category weights: Electrical (1.5×), Mechanical (1.3×), Fire (1.1×), Site/Telecom (1.0×), Security (0.9×). Grade scale: A+ ≥95%, A ≥85%, B ≥75%, C ≥65%, D ≥50%, F &lt;50%. Monte Carlo simulation uses 10,000 iterations with ±15% weight variance.</p>';
         html += '<div class="pdf-footer">resistancezero.com · Generated '+dateStr+' · All calculations performed client-side · No data transmitted<br>TIA-942 Compliance Checklist v1.0 — Bagus Dwi Permana Portfolio</div>';
         html += '<script src="auth.js?v=2026-07-13" defer><\/script>';
-        html += '<script src="rz-engine.min.js?v=2026-07-05-v21" defer><\/script>';
+        html += '<script src="rz-engine.min.js?v=2026-07-14" defer><\/script>';
         html += '</body></html>';
         w.document.write(html); w.document.close();
         setTimeout(function() { w.print(); }, 500);
@@ -1728,8 +1713,6 @@
     // Functions are declared in a bare script block and are globally accessible,
     // but we expose them explicitly for static auditors and future-proofing.
     try {
-      window.attemptLogin       = attemptLogin;
-      window.closeLoginModal    = closeLoginModal;
       window.exportPDF          = exportPDF;
       window.handlePremiumTab   = handlePremiumTab;
       window.logoutPremium      = logoutPremium;

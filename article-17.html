@@ -2639,7 +2639,6 @@
                     <input type="password" id="seaLoginPass" placeholder="Password" aria-label="Password">
                     <button class="sea-login-submit" onclick="seaHandleLogin()">Sign In</button>
                     <div class="sea-login-error" id="seaLoginError">Invalid credentials.</div>
-                    <div class="sea-login-demo">Demo Account: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
                     <p style="font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#10b981;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#10b981;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
                 </div>
             </div>
@@ -3152,20 +3151,13 @@ var seaPremium=seaSession&&new Date(seaSession.expires)>new Date();
 // Auth
 function seaShowLogin(){document.getElementById('seaLoginOverlay').classList.add('show')}
 function seaHideLogin(){document.getElementById('seaLoginOverlay').classList.remove('show')}
+// Login is handled by the shared Supabase auth modal (auth.js). On success it
+// writes rz_premium_session + dispatches rz-auth-change, which the existing
+// listener below reveals the Pro panels on.
 function seaHandleLogin(){
-    var email=document.getElementById('seaLoginEmail').value.trim();
-    var pass=document.getElementById('seaLoginPass').value;
-    if ((email === 'demo@resistancezero.com' && pass === 'demo2026') || ((email === 'bagus@resistancezero.com' || email === 'admin@resistancezero.com') && pass === 'RZ@Premium2026!')){
-        localStorage.setItem('rz_premium_session',JSON.stringify({email:email,tier:'pro',role: (['admin@resistancezero.com','bagus@resistancezero.com'].indexOf(email)!==-1?'root':'pro'), expires:new Date(Date.now()+30*86400000).toISOString()}));
-        window.dispatchEvent(new CustomEvent('rz-auth-change',{detail:{email:email,tier:'pro',role:'pro',action:'login'}}));
-        seaPremium=true;
+    if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){
         seaHideLogin();
-        seaUnlockPanels();
-        seaSetMode('pro');
-    } else {
-        var err=document.getElementById('seaLoginError');
-        err.style.display='block';
-        setTimeout(function(){err.style.display='none'},3000);
+        window._rzAuth.showModal();
     }
 }
 window.addEventListener('rz-auth-change',function(e){
@@ -3837,7 +3829,7 @@ if(seaPremium){seaUnlockPanels()}
     /* v1.9.1: subscribeNewsletter() moved to script.js (global, mailto: based) */
     </script>
 <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

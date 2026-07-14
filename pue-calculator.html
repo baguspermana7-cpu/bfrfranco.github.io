@@ -1803,13 +1803,16 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
 
     function handlePremiumTab() {
         if (isPremiumUser) return;
-        const modal = document.getElementById('loginModal');
-        modal.style.display = 'flex';
-        document.getElementById('loginError').style.display = 'none';
-        document.getElementById('loginEmail').value = '';
-        document.getElementById('loginPassword').value = '';
-        setTimeout(() => document.getElementById('loginEmail').focus(), 100);
+        if (window._rzAuth && typeof window._rzAuth.showModal === 'function') { window._rzAuth.showModal(); }
     }
+    // Shared Supabase-aware modal writes rz_premium_session + dispatches rz-auth-change → re-gate here.
+    window.addEventListener('rz-auth-change', function (e) {
+        if (e.detail && e.detail.action === 'login') {
+            isPremiumUser = true; userTier = e.detail.tier || 'pro'; activatePremiumUI();
+        } else if (e.detail && e.detail.action === 'logout') {
+            isPremiumUser = false; userTier = 'free'; if (typeof setMode === 'function') setMode('free');
+        }
+    });
 
     function setMode(mode) {
         if (mode === 'pro' && !isPremiumUser) { handlePremiumTab(); return; }
@@ -1864,46 +1867,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
         calculate();
     }
 
-    function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
-    document.getElementById('loginModal').addEventListener('click', function(e) { if (e.target === this) closeLoginModal(); });
-    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLoginModal(); });
-
-    function attemptLogin() {
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        const errorEl = document.getElementById('loginError');
-        if (!email || !password) { errorEl.textContent = 'Please enter email and password'; errorEl.style.display = 'block'; return; }
-
-        let match = null;
-        if (window.RZEngine && window.RZEngine.auth) {
-            match = window.RZEngine.auth.validateLogin(email, password);
-            if (match) {
-                window.RZEngine.auth.setSession(match.email, match.tier, match.role);
-                window.RZEngine.auth.dispatchAuthChange('login', { email: match.email, tier: match.tier, role: match.role });
-            }
-        } else {
-            // Legacy fallback
-            const validUsers = [{ email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro' },{ email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' },{ email: 'admin@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' }];
-            const m = validUsers.find(u => u.email === email && u.password === password);
-            if (m) {
-                match = { email: m.email, tier: m.tier, role: (m.email === 'admin@resistancezero.com' || m.email === 'bagus@resistancezero.com') ? 'root' : 'pro' };
-                var expDate = new Date(); expDate.setDate(expDate.getDate() + 30);
-                localStorage.setItem('rz_premium_session', JSON.stringify({ email: match.email, tier: match.tier, role: match.role, expires: expDate.toISOString() }));
-                window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: match.email, tier: match.tier, role: match.role, action: 'login' } }));
-            }
-        }
-        if (match) {
-            isPremiumUser = true;
-            userTier = match.tier;
-            closeLoginModal();
-            activatePremiumUI();
-        } else {
-            errorEl.textContent = 'Invalid email or password';
-            errorEl.style.display = 'block';
-            document.getElementById('loginPassword').value = '';
-            document.getElementById('loginPassword').focus();
-        }
-    }
+    // Inline login removed — the shared Supabase-aware modal (auth.js, _rzAuth.showModal) handles auth.
 
     function activatePremiumUI() {
         // Update toolbar buttons
@@ -2342,7 +2306,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
 
 
 <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14" defer></script>
 <!-- Supabase save/reload scenario (additive) -->
 <script src="js/rz-config.js?v=2026-07-11"></script>
 <script src="js/rz-scenario.js?v=2026-07-11d"></script>

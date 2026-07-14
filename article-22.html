@@ -1546,7 +1546,6 @@
             <input type="password" id="a22LoginPass" placeholder="Password" aria-label="Password">
             <button class="a22-login-submit" onclick="a22DoLogin()">Sign In</button>
             <div class="a22-login-error" id="a22LoginError">Invalid credentials. Please try again.</div>
-            <div class="a22-login-demo">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
             <div class="a22-login-terms">By signing in you agree to our <a href="terms.html" style="color:#0891b2;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#0891b2;text-decoration:none;">Privacy Policy</a>.</div>
         </div>
     </div>
@@ -1883,24 +1882,12 @@
         document.getElementById('a22LoginError').style.display = 'none';
     };
 
+    /* Login is handled by the shared auth.js modal; the rz-auth-change
+       listener below unlocks Pro on successful login. */
     window.a22DoLogin = function() {
-        var u = document.getElementById('a22LoginEmail').value.trim();
-        var p = document.getElementById('a22LoginPass').value.trim();
-        /* Use same credentials as auth.js */
-        var users = [
-            { email: 'demo@resistancezero.com', password: 'demo2026' },
-            { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!' },
-            { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!' }
-        ];
-        var found = users.some(function(acc) { return acc.email.toLowerCase() === u.toLowerCase() && acc.password === p; });
-        if (found) {
-            unlockPro();
+        if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
             a22CloseLogin();
-            a22Calculate();
-        } else {
-            var err = document.getElementById('a22LoginError');
-            err.textContent = 'Invalid credentials. Try demo@resistancezero.com / demo2026';
-            err.style.display = 'block';
+            window._rzAuth.showModal();
         }
     };
 
@@ -2568,6 +2555,6 @@ function copyLink(){navigator.clipboard.writeText(shareUrl).then(function(){var 
 <script src="js/rz-article-toc.js?v=1.50.42" defer></script>
 
 <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14" defer></script>
 </body>
 </html>

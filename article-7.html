@@ -2465,7 +2465,6 @@
                             <input type="password" id="resLoginPassword" placeholder="Password" style="width:100%;padding:0.65rem 0.75rem;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#fff;margin-bottom:0.65rem;font-size:0.9rem;box-sizing:border-box;" aria-label="Password">
                             <div id="resLoginError" style="color:#ef4444;font-size:0.8rem;margin-bottom:0.5rem;display:none;"></div>
                             <button onclick="resHandleLogin()" style="width:100%;padding:0.7rem;border:none;border-radius:6px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-weight:600;cursor:pointer;font-size:0.95rem;">Sign In</button>
-                            <p style="margin:0.75rem 0 0;color:rgba(255,255,255,0.4);font-size:0.75rem;text-align:center;">Demo Account: demo@resistancezero.com / demo2026</p>
 <p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
                         </div>
                     </div>
@@ -3129,19 +3128,12 @@
             if (err) err.style.display = 'none';
         };
 
+        // Login is handled by the shared Supabase auth modal (auth.js). On success
+        // it dispatches rz-auth-change, which the cross-article listener below reveals Pro on.
         window.resHandleLogin = function() {
-            var email = document.getElementById('resLoginEmail').value.trim().toLowerCase();
-            var pass = document.getElementById('resLoginPassword').value;
-            var err = document.getElementById('resLoginError');
-
-            if ((email === 'demo@resistancezero.com' && pass === 'demo2026') || ((email === 'bagus@resistancezero.com' || email === 'admin@resistancezero.com') && pass === 'RZ@Premium2026!')) {
-                var session = { email: email, tier: 'pro', role: (['admin@resistancezero.com','bagus@resistancezero.com'].indexOf(email)!==-1?'root':'pro'), expires: new Date(Date.now() + 30*24*60*60*1000).toISOString() };
-                localStorage.setItem('rz_premium_session', JSON.stringify(session));
-                window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: session }));
-                unlockPro();
+            if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
                 resHideLogin();
-            } else {
-                if (err) { err.textContent = 'Invalid credentials. Try demo account.'; err.style.display = 'block'; }
+                window._rzAuth.showModal();
             }
         };
 
@@ -3939,7 +3931,7 @@
 /* v1.9.1: subscribeNewsletter() moved to script.js (global, mailto: based) */
 </script>
 <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

@@ -11,6 +11,29 @@ release sections rather than semver.
 
 ---
 
+## v1.54.4 — 2026-07-14 (Security: site-wide login dedup — every page on the one shared Supabase modal, hardcoded passwords removed)
+
+### Security / Changed
+- **Removed the hardcoded `RZ@Premium2026!` password from the entire live codebase.** ~35 pages carried their
+  OWN inline login (calculators via `attemptLogin`/`validUsers`, articles via the `ws*`/`wc*` gate, dc-market-tracker)
+  that checked a hardcoded password — shadowing the shared modal and leaking the (now-rotated) real password in
+  source. Every one now routes its login trigger to the shared **Supabase-aware** modal (`_rzAuth.showModal()`),
+  with the inline credential check + secret-bearing user arrays deleted; each page's `rz-auth-change` listener
+  re-gates premium on login (added where missing).
+- **rz-ops admin console** login rewritten to authenticate via **Supabase** (`rzSupa.signIn`) gated on the
+  ADMIN_EMAILS allowlist — no hardcoded admin password.
+- **Shared `rz-engine.js`** (`RZEngine.auth.VALID_USERS`) and **`auth.min.js`** reduced to the demo-only offline
+  fallback; real accounts authenticate via Supabase. Min twins reproducibly rebuilt (`terser`); `rz-engine.min.js`
+  gate 79/79. Setup-supabase + the admin-users Edge Function source seeds neutralized to placeholders (migration
+  already run + passwords rotated).
+- Cache-bust: `auth.js` / `rz-engine.min.js` / `auth.min.js` `?v` bumped site-wide.
+
+The demo account (`demo2026`, public) stays as the offline fallback. Verified headless: converted pages re-gate
+premium on shared-modal login. **Follow-up:** the separate DCMOC Next.js app still embeds the old password in its
+built chunks (needs its own rebuild); noted for a later pass.
+
+---
+
 ## v1.54.3 — 2026-07-14 (Shared cookie-consent engine · spares tour overlay fix)
 
 ### Added

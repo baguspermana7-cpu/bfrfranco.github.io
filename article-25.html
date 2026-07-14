@@ -1579,7 +1579,6 @@
             <input type="password" id="pjmLoginPass" placeholder="Password" autocomplete="current-password" aria-label="Password">
             <button class="pjm-login-submit" id="pjmLoginSubmit" type="button">Unlock Pro Analysis</button>
             <div class="pjm-login-error" id="pjmLoginError">Invalid credentials.</div>
-            <div class="pjm-login-demo" style="margin-top:0.75rem;font-size:0.72rem;color:#94a3b8;text-align:center;">Demo: <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">demo@resistancezero.com</code> / <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">demo2026</code></div>
             <div style="text-align:center;margin-top:10px;font-size:0.68rem;color:#475569;line-height:1.5;">By signing in, you agree to our <a href="terms.html" style="color:#b45309;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#b45309;text-decoration:none;">Privacy Policy</a></div>
         </div>
     </div>
@@ -1876,32 +1875,23 @@
     document.getElementById('pjmLoginOverlay').addEventListener('click', function(e) {
         if (e.target === this) this.classList.remove('active');
     });
+    /* Login is handled by the shared auth.js modal; the rz-auth-change
+       listener below unlocks Pro on successful login. */
     document.getElementById('pjmLoginSubmit').addEventListener('click', function() {
-        var email = document.getElementById('pjmLoginEmail').value.trim();
-        var pass = document.getElementById('pjmLoginPass').value;
-        var VALID = [
-            { email: 'demo@resistancezero.com', password: 'demo2026' },
-            { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!' },
-            { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!' }
-        ];
-        var found = VALID.some(function(u) {
-            return u.email.toLowerCase() === email.toLowerCase() && u.password === pass;
-        });
-        if (found) {
-            localStorage.setItem('rz_premium_session', JSON.stringify({
-                email: email,
-                tier: 'pro',
-                expires: new Date(Date.now() + 30 * 86400000).toISOString()
-            }));
+        if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
+            document.getElementById('pjmLoginOverlay').classList.remove('active');
+            window._rzAuth.showModal();
+        }
+    });
+    window.addEventListener('rz-auth-change', function(e) {
+        if (e.detail && e.detail.action === 'login') {
             state.proUnlocked = true;
             document.getElementById('pjmLoginOverlay').classList.remove('active');
             syncUI();
             window.pjmCalculate();
-            window.dispatchEvent(new CustomEvent('rz-auth-change', {
-                detail: { email: email, tier: 'pro', action: 'login' }
-            }));
-        } else {
-            document.getElementById('pjmLoginError').style.display = 'block';
+        } else if (e.detail && e.detail.action === 'logout') {
+            state.proUnlocked = false;
+            syncUI();
         }
     });
     document.getElementById('pjmLoginPass').addEventListener('keydown', function(e) {
@@ -2487,6 +2477,6 @@ function copyLink(){navigator.clipboard.writeText(shareUrl).then(function(){var 
 <script src="js/rz-article-toc.js?v=1.50.42" defer></script>
 
 <script src="auth.js?v=2026-07-13" defer></script>
-<script src="rz-engine.min.js?v=2026-07-05-v21" defer></script>
+<script src="rz-engine.min.js?v=2026-07-14" defer></script>
 </body>
 </html>
