@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v1.56.1 — 2026-07-14 (a11y: site-wide program 100% — final 2 pages + shared login modal)
+
+### Fixed
+- **Site-wide WCAG-AA program COMPLETE — zero exclusions.** The 2 pages deferred from the
+  v1.50.40→v1.52.9 round (parallel-owned then) are now 0/0 both themes:
+  - **cdu-mini-bms.html** (48 violations): light-theme signal palette darkened for ≥4.5:1 on the
+    tinted insets (cyan #155e75 / green #065f46 / amber #92400e / red #b91c1c — hue families kept);
+    pressed segment buttons → white ink on darkened fills (dark theme keeps dark ink on its neon
+    hues); dark muted text lightened; note links underlined; **P&ID nested-interactive solved
+    properly** — the zoom wrapper is only focusable when it has no interactive children, the
+    instrument-bubble buttons stay real buttons in the a11y tree (keyboard zoom still works via
+    bubbling; functional probe PASS).
+  - **ai-engineering-maintenance.html** (7): scrollable architecture diagrams focusable.
+- **Shared login modal (auth.js)**: "Terms & Privacy" legal links were `#8b5cf6` non-underlined
+  (fails AA on both themes, visible on every tier-gated page) → new `.rz-modal-legal` class,
+  underlined, `#a78bfa` dark / `#6d28d9` light; legal text readable both themes. `auth.min.js`
+  rebuilt; `auth.js ?v=` unified to `2026-07-14a` on all 122 loader pages (caught 14 stragglers
+  still pinned to Feb/Mar versions).
+
+### Verification
+- axe 0/0 both themes on both pages; cdu functional probe ALL PASS (instrument Enter-select,
+  keyboard zoom, layout wrapper focus); js-syntax + script-tags CLEAN.
+
+---
+
 ## v1.56.0 — 2026-07-14 (Part F: shared DC market engine · suite polish)
 
 ### Added

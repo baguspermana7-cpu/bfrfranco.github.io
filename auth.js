@@ -449,6 +449,10 @@
             '[data-theme="light"] .rz-modal h3{color:#1e293b;}',
             '[data-theme="light"] .rz-modal .rz-modal-sub{color:#64748b;}',
             '[data-theme="light"] .rz-modal label{color:#475569;}',
+            '.rz-modal .rz-modal-legal{color:#94a3b8;}',
+            '.rz-modal .rz-modal-legal a{color:#a78bfa;text-decoration:underline;text-underline-offset:2px;}',
+            '[data-theme="light"] .rz-modal .rz-modal-legal{color:#475569;}',
+            '[data-theme="light"] .rz-modal .rz-modal-legal a{color:#6d28d9;}',
             '[data-theme="light"] .rz-modal input[type="email"],[data-theme="light"] .rz-modal input[type="password"]{background:#f1f5f9;border-color:#e2e8f0;color:#1e293b;}',
             '[data-theme="light"] .rz-modal input:focus{border-color:rgba(139,92,246,0.5);background:#fff;}',
             '[data-theme="light"] .rz-modal-close{background:rgba(0,0,0,0.05);color:#64748b;}',
@@ -509,8 +513,8 @@
                     '<input type="password" id="rzModalPassword" name="password" placeholder="Enter password" autocomplete="current-password" required>' +
                     '<button type="submit" class="rz-submit-btn" id="rzModalSubmit">Sign In</button>' +
                     '</form>' +
-                    '<div style="text-align:center;margin-top:12px;font-size:0.68rem;color:#475569;line-height:1.5;">' +
-                        'By signing in, you agree to our <a href="terms.html" style="color:#8b5cf6;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#8b5cf6;text-decoration:none;">Privacy Policy</a>' +
+                    '<div class="rz-modal-legal" style="text-align:center;margin-top:12px;font-size:0.68rem;line-height:1.5;">' +
+                        'By signing in, you agree to our <a href="terms.html">Terms</a> &amp; <a href="privacy.html">Privacy Policy</a>' +
                     '</div>' +
                     '<div class="rz-demo-hint" style="text-align:center;margin-top:14px;padding:10px 12px;border-radius:8px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.25);font-size:0.78rem;color:#94a3b8;line-height:1.5;">' +
                         '<span class="rz-demo-label" style="color:#a78bfa;font-weight:600;">Demo Account:</span><br>' +

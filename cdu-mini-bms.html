@@ -41,11 +41,12 @@
         :root{
             --bm-bg:#f4f6f8; --bm-panel:#ffffff; --bm-border:#d8dee6; --bm-text:#0f172a; --bm-muted:#5b6675;
             --bm-inset:#eef1f5; --bm-grid:rgba(8,145,178,.06);
-            --bm-cyan:#0891b2; --bm-green:#0a8a5a; --bm-amber:#b45309; --bm-red:#dc2626; --bm-blue:#2563eb;
+            /* a11y (v1.56.1): darkened for >=4.5:1 on the tinted insets (#eef1f5/#d7ebf2/#d8ece5) */
+            --bm-cyan:#155e75; --bm-green:#065f46; --bm-amber:#92400e; --bm-red:#b91c1c; --bm-blue:#1d4ed8;
             --bm-mono:'JetBrains Mono',ui-monospace,monospace; --bm-sans:'IBM Plex Sans',system-ui,sans-serif;
         }
         [data-theme="dark"]{
-            --bm-bg:#0E0F12; --bm-panel:#15171C; --bm-border:rgba(140,150,165,.18); --bm-text:#EAEEF3; --bm-muted:#828B98;
+            --bm-bg:#0E0F12; --bm-panel:#15171C; --bm-border:rgba(140,150,165,.18); --bm-text:#EAEEF3; --bm-muted:#9AA3B0;
             --bm-inset:#1b1e24; --bm-grid:rgba(43,232,255,.05);
             --bm-cyan:#2BE8FF; --bm-green:#22F5A8; --bm-amber:#F5C84B; --bm-red:#FF5C5C; --bm-blue:#5BA8FF;
         }
@@ -72,8 +73,9 @@
         .seg button{ font-family:var(--bm-mono); font-size:.7rem; font-weight:600; padding:.4rem .7rem; border-radius:6px;
             border:1px solid var(--bm-border); background:var(--bm-inset); color:var(--bm-muted); cursor:pointer; transition:all .15s; min-height:34px; }
         .seg button:hover{ color:var(--bm-text); border-color:var(--bm-cyan); }
-        .seg button[aria-pressed="true"]{ background:var(--bm-cyan); border-color:var(--bm-cyan); color:#05222b; }
+        .seg button[aria-pressed="true"]{ background:var(--bm-cyan); border-color:var(--bm-cyan); color:#fff; }
         [data-theme="dark"] .seg button[aria-pressed="true"]{ color:#05222b; }
+        [data-theme="dark"] .seg.scen button[data-scen="normal"][aria-pressed="true"]{ color:#04241a; }
         .seg.scen button[aria-pressed="true"]{ background:var(--bm-amber); border-color:var(--bm-amber); color:#1c1407; }
 
         /* cockpit grid */
@@ -126,7 +128,7 @@
         .alarmbar .ab-chip.warn{ background:rgba(180,83,9,.16); color:var(--bm-amber); }
         .alarmbar .ab-chip.alarm{ background:rgba(220,38,38,.16); color:var(--bm-red); }
         /* scenario chip severity — Normal reads neutral-green, faults amber */
-        .seg.scen button[data-scen="normal"][aria-pressed="true"]{ background:var(--bm-green); border-color:var(--bm-green); color:#04241a; }
+        .seg.scen button[data-scen="normal"][aria-pressed="true"]{ background:var(--bm-green); border-color:var(--bm-green); color:#fff; }
         .tile .spark{ width:100%; height:15px; display:block; margin-top:4px; }
         .tile .spark polyline{ fill:none; stroke:var(--bm-cyan); stroke-width:1.1; opacity:.85; vector-effect:non-scaling-stroke; }
         .tile .spark .fillarea{ fill:var(--bm-cyan); opacity:.08; stroke:none; }
@@ -164,7 +166,7 @@
         /* Phase 2 — simulation controls */
         .sim-speed{ display:inline-flex; gap:2px; margin-left:4px; }
         .seg .spd{ min-width:36px; padding:.4rem .5rem; }
-        .seg .spd[aria-pressed="true"]{ background:var(--bm-cyan); border-color:var(--bm-cyan); color:#05222b; }
+        .seg .spd[aria-pressed="true"]{ background:var(--bm-cyan); border-color:var(--bm-cyan); color:#fff; }
         #simState{ font-size:.58rem; }
         #simState.st-paused{ background:rgba(180,83,9,.16); color:var(--bm-amber); }
         #simStep[disabled]{ opacity:.4; cursor:not-allowed; }
@@ -228,7 +230,7 @@
         .zoom-ctl{ position:absolute; top:8px; right:8px; z-index:6; display:flex; gap:3px; background:var(--bm-panel); border:1px solid var(--bm-border); border-radius:7px; padding:3px; opacity:.9; }
         .zoom-ctl button{ width:28px; height:28px; min-height:28px; border:1px solid var(--bm-border); background:var(--bm-inset); color:var(--bm-text); border-radius:5px; cursor:pointer; font-size:.85rem; line-height:1; font-family:var(--bm-mono); padding:0; }
         .zoom-ctl button:hover{ border-color:var(--bm-cyan); color:var(--bm-cyan); }
-        .zoom-ctl .zlvl{ display:inline-flex; align-items:center; justify-content:center; min-width:34px; font-family:var(--bm-mono); font-size:.6rem; color:var(--bm-muted); }
+        .zoom-ctl .zlvl{ display:inline-flex; align-items:center; justify-content:center; min-width:34px; font-family:var(--bm-mono); font-size:.6rem; color:var(--bm-text); }
 
         /* SVG schematic styling */
         .sch-eq{ fill:var(--bm-inset); stroke:var(--bm-cyan); stroke-width:1.4; }
@@ -259,6 +261,7 @@
 
         .bm-note{ border:1px dashed var(--bm-border); border-radius:10px; background:var(--bm-inset); padding:1rem 1.2rem; font-size:.8rem; color:var(--bm-muted); line-height:1.6; margin:1.4rem 0; }
         .bm-note b{ color:var(--bm-text); }
+        .bm-note a, .bm-foot a{ color:var(--bm-cyan); text-decoration:underline; text-underline-offset:2px; }
         .bm-links{ display:flex; gap:.6rem; flex-wrap:wrap; margin:.4rem 0 1.4rem; }
         .bm-links a{ font-family:var(--bm-mono); font-size:.72rem; padding:.45rem .8rem; border:1px solid var(--bm-border); border-radius:7px; color:var(--bm-cyan); text-decoration:none; }
         .bm-links a:hover{ border-color:var(--bm-cyan); }
@@ -565,7 +568,7 @@
 
         function pidSVG(t){
             var slow=curScen==='lowflow', fcls='flow '+(slow?'slow':'on'), pumpAon=curScen!=='pumpfail';
-            var h='<svg viewBox="0 0 500 388" role="img" aria-label="CDU piping and instrumentation diagram">';
+            var h='<svg viewBox="0 0 500 388" role="group" aria-label="CDU piping and instrumentation diagram — instrument bubbles are buttons that jump to the live reading">';
             // ===== heat-reject side (left) =====
             if(t.arch==='L2L'){
                 h+='<text class="sch-sub" x="6" y="14">FACILITY WATER · FWS</text>';
@@ -931,8 +934,15 @@
         function makeZoomable(box){
             var panel=box.closest('.panel'); if(!panel) return;
             panel.classList.add('zoomable');
-            box.setAttribute('tabindex','0');
-            box.setAttribute('aria-label','Schematic — scroll to zoom, drag to pan, 0 to reset');
+            // Only the container itself is focusable when it has NO interactive children —
+            // a focusable wrapper around the P&ID's instrument buttons is nested-interactive.
+            // (Keyboard zoom still works there: +/-/0 keydown bubbles up from the buttons,
+            // and the zoom-ctl cluster is plain <button>s.)
+            if (!box.querySelector('a,button,[role="button"],[tabindex]')) {
+                box.setAttribute('tabindex','0');
+                box.setAttribute('role','img');
+                box.setAttribute('aria-label','Schematic — scroll to zoom, drag to pan, 0 to reset');
+            }
             var scale=1, tx=0, ty=0, drag=false, sx=0, sy=0, stx=0, sty=0;
             // zoom control cluster
             var ctl=document.createElement('div'); ctl.className='zoom-ctl';
@@ -982,6 +992,6 @@
         simStart(); simUI();
     })();
     </script>
-    <script src="auth.js?v=2026-07-13" defer></script>
+    <script src="auth.js?v=2026-07-14a" defer></script>
 </body>
 </html>
