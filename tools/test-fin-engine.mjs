@@ -180,6 +180,27 @@ ok('score presets differ', valuePreset.score !== momoPreset.score || valuePreset
     ok('valueGate provenance sourced', !!D.sources['valueGate'] && !!D.sources['peMedian'] && !!D.sources['moatBySector']);
 }
 
+/* ── portfolio concentration (HHI) ── */
+{
+    const P = M.portfolio;
+    const equal10 = P.concentration(Array(10).fill(1));
+    ok('concentration 10-equal HHI≈0.10', Math.abs(equal10.hhi - 0.10) < 0.001);
+    ok('concentration 10-equal effectiveN≈10', Math.abs(equal10.effectiveN - 10) < 0.1);
+    ok('concentration 10-equal flag diversified', equal10.flag === 'diversified');
+    const conc = P.concentration([60, 20, 10, 10]); // top 60% of book
+    ok('concentration topWeight 0.6', Math.abs(conc.topWeight - 0.6) < 0.001);
+    ok('concentration heavy → concentrated', conc.flag === 'concentrated');
+    const mod = P.concentration([25, 20, 20, 20, 15]); // HHI≈0.205, top 25% → moderate (not concentrated)
+    ok('concentration moderate flag', mod.flag === 'moderate');
+    eq('concentration empty → null', P.concentration([]), null);
+    eq('concentration all-zero → null', P.concentration([0, 0]), null);
+    const d1 = P.concentration([60, 20, 10, 10]), d2 = P.concentration([60, 20, 10, 10]);
+    eq('concentration deterministic', JSON.stringify(d1), JSON.stringify(d2));
+    ok('concentration normalizes unnormalized weights', Math.abs(P.concentration([6, 2, 1, 1]).topWeight - 0.6) < 0.001);
+    ok('portfolioBands provenance sourced', !!D.sources['portfolioBands']);
+    ok('portfolioBands values present', D.portfolioBands.hhiHigh > 0 && D.portfolioBands.topWeightHigh > 0);
+}
+
 /* ── format ── */
 eq('format.ticker strips .JK', E.format.ticker('BBCA.JK'), 'BBCA');
 eq('format.marketOf .JK', E.format.marketOf('BBCA.JK'), 'ID');

@@ -194,6 +194,9 @@
             'Consumer Discretionary': 3, 'Financials': 3, 'Industrials': 3, 'Utilities': 3,
             'Real Estate': 3, 'Energy': 2, 'Materials': 2, 'default': 3
         },
+        // Portfolio concentration thresholds (Herfindahl HHI + top-position weight). HHI = Σ wᵢ²;
+        // effective #positions = 1/HHI. A 10-equal-name book has HHI 0.10; ≤4 effective names ≈ HHI 0.25.
+        portfolioBands: { hhiWarn: 0.18, hhiHigh: 0.25, topWeightWarn: 0.25, topWeightHigh: 0.40, corrHigh: 0.80 },
 
         // Sourced IDX fundamentals (free-float from issuer ownership disclosures; pe/pb/roe are
         // issuer-disclosure SNAPSHOTS, per-ticker as-of — NOT live). Lets the Indonesian screener +
@@ -254,6 +257,7 @@
             'valueGate': { source: 'xbtlin/ai-berkshire methodology + Buffett/Munger value criteria + Damodaran', asOf: '2026', method: 'ROE≥15% / D-E≤0.5 / margin / PE<median / moat → weighted composite → Pass/Gray/Fail (deterministic, no LLM; no price targets or position sizing)' },
             'peMedian': { source: 'Long-run market P/E medians (S&P 500 ~US / IDX ~ID)', asOf: '2026', unit: 'ratio' },
             'moatBySector': { source: 'Engine heuristic — durable-franchise proxy by GICS sector', asOf: '2026', method: '1-5 baseline; not a rating of a specific issuer' },
+            'portfolioBands': { source: 'Herfindahl-Hirschman Index (Herfindahl 1950 / Hirschman) + Markowitz (1952) diversification', asOf: '2026', method: 'HHI=Σwᵢ²; effective N=1/HHI; concentration/correlation FLAGS only — descriptive, no trade sizing' },
             'verdictBands': { source: 'Engine methodology — composite score → descriptive verdict', asOf: '2026', method: 'descriptive, not prescriptive' }
         },
 
@@ -829,6 +833,23 @@
                 }
             }
             return cnt === 0 ? null : Math.round((1 - sum / cnt) * 100) / 100;
+        },
+        /** Concentration from position value-weights: Herfindahl HHI (Σwᵢ²), top-position weight, effective
+         *  #positions (1/HHI), and a descriptive flag vs DATA.portfolioBands. Weights need not sum to 1
+         *  (normalized here). Returns null if empty. Structural math only — NOT a rebalance instruction. */
+        concentration: function (weights) {
+            if (!weights || !weights.length) return null;
+            var w = weights.map(function (x) { return Math.max(0, x || 0); });
+            var tot = w.reduce(function (a, b) { return a + b; }, 0);
+            if (tot <= 0) return null;
+            var f = w.map(function (x) { return x / tot; });
+            var hhi = f.reduce(function (a, b) { return a + b * b; }, 0);
+            var top = f.reduce(function (a, b) { return Math.max(a, b); }, 0);
+            var B = DATA.portfolioBands;
+            var flag = (top >= B.topWeightHigh || hhi >= B.hhiHigh) ? 'concentrated'
+                : (top >= B.topWeightWarn || hhi >= B.hhiWarn) ? 'moderate' : 'diversified';
+            return { hhi: Math.round(hhi * 1000) / 1000, topWeight: Math.round(top * 1000) / 1000,
+                effectiveN: hhi > 0 ? Math.round((1 / hhi) * 10) / 10 : null, flag: flag };
         }
     };
 
