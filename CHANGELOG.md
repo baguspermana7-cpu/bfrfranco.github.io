@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.54.7 — 2026-07-14 (Security hygiene: redact the rotated password string from the public changelog)
+
+**Security** — the v1.54.4 changelog entry quoted the old (now-rotated) root password literal, which shipped
+into the public `/changelog.html`. Redacted to "the hardcoded (now-rotated) root password" and regenerated.
+The old shared password now has **zero** occurrences anywhere in the live codebase.
+
+---
+
 ## v1.54.6 — 2026-07-14 (Security: DCMOC hardcoded password removed — Supabase-primary login)
 
 ### Security
@@ -50,7 +58,7 @@ release sections rather than semver.
 ## v1.54.4 — 2026-07-14 (Security: site-wide login dedup — every page on the one shared Supabase modal, hardcoded passwords removed)
 
 ### Security / Changed
-- **Removed the hardcoded `RZ@Premium2026!` password from the entire live codebase.** ~35 pages carried their
+- **Removed the hardcoded (now-rotated) root password from the entire live codebase.** ~35 pages carried their
   OWN inline login (calculators via `attemptLogin`/`validUsers`, articles via the `ws*`/`wc*` gate, dc-market-tracker)
   that checked a hardcoded password — shadowing the shared modal and leaking the (now-rotated) real password in
   source. Every one now routes its login trigger to the shared **Supabase-aware** modal (`_rzAuth.showModal()`),
