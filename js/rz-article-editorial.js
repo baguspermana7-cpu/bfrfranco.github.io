@@ -173,7 +173,18 @@
     });
   }
 
+  function explainTerms(){
+    /* RZExplain (v1.59.0): make glossary terms in the article body hoverable —
+       first occurrence per term, capped; engine + DB load lazily so articles
+       that don't ship the scripts stay untouched. */
+    if(!window.RZExplain||!window.RZ_EXPLAIN_DB) return;
+    var body=document.querySelector('.article-body,article,main');
+    if(!body) return;
+    try{ RZExplain.scanText(body, 40); }catch(e){}
+  }
   function init(){
+    if('requestIdleCallback' in window) requestIdleCallback(explainTerms,{timeout:3000});
+    else setTimeout(explainTerms,1200);
     try{ flattenWashes(); }catch(e){}
     try{ buildRail(); }catch(e){}
     try{ buildAnchors(); }catch(e){}

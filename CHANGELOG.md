@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v1.59.0 — 2026-07-17 (RZExplain: the sitewide explanation engine — every parameter explains itself)
+
+### Added
+- **RZExplain** (`js/rz-explain.js` + generated `js/rz-explain-db.js`): ONE shared tooltip/explanation
+  engine for every surface. Hover/focus/tap any wired parameter, menu, submenu or tab → a rich panel
+  (super-detailed body, formula block, typical-range table, source chip, related-term chips).
+  **Content is centralized, never hardcoded per page** (owner mandate): the knowledge DB is GENERATED
+  by `tools/build-explain-db.py` from glossary.html's 354 terms + `tools/explain-extra.json`
+  (140 curated engineering/finance entries) = **481 entries**.
+- **Nested terms** (owner mandate): terms mentioned INSIDE a tooltip body (e.g. "DSCR", "Occupancy
+  Ramp") are themselves hoverable — the panel navigates with a ← back breadcrumb. Two-pass alias
+  matching so markup can never leak into bodies.
+- **A11y-first** (the old pattern had none): focusable triggers + aria-describedby, Escape closes,
+  hover-intent, touch tap, viewport clamp with real rendered size, mobile bottom-sheet,
+  reduced-motion honoured.
+- **Adopted v1**: capex-calculator (**37 inline hardcoded tooltips REMOVED**, legacy tooltip
+  JS/CSS deleted — scan-wired to the DB), pue-calculator, glossary.html (354 term names cross-hover),
+  **37 article/editorial pages** (glossary terms come alive in prose — first occurrence, idle-callback),
+  Finance Terminal (12 tabs), **DCMOC** (24 tabs + Equity-IRR Sensitivity variables + WACC/Equity-IRR/
+  DSCR/NPV/Payback KPIs via new `Explain.tsx` consuming the same DB; rebuilt + redeployed).
+- Docs: `standarization/EXPLAIN_ENGINE_STANDARD.md` (contract), `EXPLAIN_ROLLOUT.md` (45+ legacy
+  tooltip families mapped, DEPRECATED), CLAUDE.md shared-modules row + new gate
+  `node tools/test-explain-db.mjs`, CONTENT_LINKAGE handoff, UI_FEATURES Feature 32.
+
+### Verification
+- Explain probe ALL PASS (rich panel, nested navigation + breadcrumb, keyboard + Escape, glossary
+  cross-hover 300+, article-13 40 live terms); capex probe 21/21 still PASS; DB gate 10/10
+  (well-formed, deterministic, priority keys); DCMOC probe 13/13; a11y 8pp×2 CLEAN;
+  dark-coverage 116pp CLEAN; js-syntax/script-tags CLEAN.
+
+---
+
 ## v1.58.0 — 2026-07-16 (Cooling Physics Program: deep-sea water cooling + refrigerant engine + capex/DCMOC shared backend)
 
 ### Added

@@ -1854,3 +1854,17 @@ Shared module **`js/rz-command-palette.js`** is the standard search+command impl
 - Rollout state: **COMPLETE (v1.50.27)** — the shared module is the ONLY search implementation site-wide
   (40 pages). All 29 former inline Fuse copies ("Feature 21: Global Search" blocks) were removed in v1.50.27.
   New pages: just include `js/rz-command-palette.js` (defer); never re-add an inline copy.
+
+
+## Feature 32: RZExplain — sitewide explanation tooltips (v1.59.0)
+
+ONE engine (`js/rz-explain.js`) + ONE generated knowledge DB (`js/rz-explain-db.js`, 481 entries:
+354 glossary + 140+ curated) explain every parameter/menu/tab on hover/focus/tap. Nested terms:
+aliases inside a tooltip body (e.g. "DSCR") are themselves hoverable with a breadcrumb back.
+Adoption: `data-explain="key"` explicit, `data-explain-scan` container auto-wiring, or
+`RZExplain.scanText()` for prose (articles — first occurrence per term). Full contract:
+`standarization/EXPLAIN_ENGINE_STANDARD.md`; migration map: `EXPLAIN_ROLLOUT.md`.
+
+**DEPRECATED**: all per-page tooltip families (`.tooltip-trigger`/`.tooltip-content` (removed from
+capex v1.59.0), `.tco-tooltip-*`, `.calc-tooltip`, `.mcl-tooltip-*`, +40 others). No new instances —
+add content to the DB instead.

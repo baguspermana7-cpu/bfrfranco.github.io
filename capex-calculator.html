@@ -500,145 +500,9 @@
         }
 
         /* Tooltip Styles - Fixed positioning to escape overflow */
-        .tooltip-trigger {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px;
-            height: 16px;
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            border-radius: 50%;
-            font-size: 10px;
-            color: var(--accent-gold);
-            cursor: help;
-            margin-left: auto;
-            transition: all 0.3s;
-            flex-shrink: 0;
-        }
 
-        .tooltip-trigger:hover {
-            background: rgba(245, 158, 11, 0.2);
-            transform: scale(1.1);
-        }
 
-        /* Global tooltip container */
-        #tooltip-container {
-            position: fixed;
-            width: 320px;
-            max-width: calc(100vw - 40px);
-            padding: 16px;
-            background: linear-gradient(135deg, #1e3a5f, #2d5a87);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
-            z-index: 999999;
-            pointer-events: none;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.15s ease;
-            color: white;
-            font-size: 12px;
-            line-height: 1.5;
-        }
-
-        #tooltip-container.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        #tooltip-container .tooltip-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: #fbbf24;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        #tooltip-container .tooltip-desc {
-            color: rgba(255,255,255,0.9);
-            margin-bottom: 10px;
-        }
-
-        #tooltip-container .tooltip-table {
-            width: 100%;
-            font-size: 11px;
-            border-collapse: collapse;
-        }
-
-        #tooltip-container .tooltip-table th {
-            text-align: left;
-            color: rgba(255,255,255,0.6);
-            padding: 4px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        #tooltip-container .tooltip-table td {
-            padding: 4px 0;
-        }
-
-        #tooltip-container .tooltip-table td:last-child {
-            text-align: right;
-            color: #22d3ee;
-        }
-
-        /* Hide inline tooltip content */
-        .tooltip-trigger .tooltip-content {
-            display: none;
-        }
-
-        .tooltip-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--accent-amber);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .tooltip-desc {
-            font-size: 11px;
-            color: rgba(255,255,255,0.9);
-            line-height: 1.5;
-            margin-bottom: 10px;
-        }
-
-        .tooltip-table {
-            width: 100%;
-            font-size: 10px;
-            border-collapse: collapse;
-        }
-
-        .tooltip-table th {
-            text-align: left;
-            color: rgba(255,255,255,0.6);
-            font-weight: 500;
-            padding: 4px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .tooltip-table td {
-            padding: 4px 0;
-            color: white;
-        }
-
-        .tooltip-table td:last-child {
-            text-align: right;
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--accent-cyan);
-        }
-
-        .tooltip-impact {
-            margin-top: 10px;
-            padding: 8px;
-            background: rgba(245, 158, 11, 0.15);
-            border-radius: 6px;
-            font-size: 10px;
-            color: var(--accent-amber);
-        }
+        /* Legacy tooltip CSS removed v1.59.0 — RZExplain owns tooltips (js/rz-explain.js) */
 
         .input-field {
             background: var(--bg-secondary);
@@ -1068,6 +932,8 @@ button[onclick^="setPreset"] { background:#166534 !important; border-color:#1665
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-calc-utils.js?v=2026-07-03" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-07-16" defer></script>
+    <script src="js/rz-explain.js?v=2026-07-16" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
     <!-- Structured Data - FAQPage -->
@@ -1248,7 +1114,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
         </section>
 
         <!-- Calculator -->
-        <section class="calculator-section">
+        <section class="calculator-section" data-explain-scan>
             <!-- Mode Tabs -->
             <div id="capexModeTabs" style="display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;max-width:1400px;margin-left:auto;margin-right:auto;">
                 <button type="button" class="capex-mode-btn active" data-mode="simple" onclick="switchCapexMode('simple')" style="padding:0.6rem 1.2rem;border-radius:10px;border:1px solid rgba(245,158,11,0.4);background:rgba(245,158,11,0.15);color:#f59e0b;cursor:pointer;font-weight:600;font-size:0.9rem;font-family:inherit;transition:all 0.3s;">
@@ -1357,7 +1223,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                     body { background: white !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                     .navbar, .hero, .brief-section, #capexModeTabs, #loginModal, .nav-back, footer,
                     #freeWatermark, #btnSaveA, #btnExportPDF, #btnClearCompare, #scenarioBBanner,
-                    .tooltip-trigger, .gated-badge { display: none !important; }
                     .main-content { padding-top: 0 !important; }
                     .calculator-section { padding: 0 !important; }
                     .simulator-container { display: block !important; max-width: 100% !important; }
@@ -1377,7 +1242,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
             <div class="simulator-container">
                 <!-- Input Side -->
-                <div class="simulator-inputs">
+                <div class="simulator-inputs" data-explain-scan>
                     <!-- Scenario B indicator (shown after Save Scenario A) -->
                     <div id="scenarioBBanner" style="display:none;padding:10px 16px;border-radius:10px;background:linear-gradient(135deg,rgba(52,211,153,0.15),rgba(16,185,129,0.08));border:1.5px solid rgba(16,185,129,0.4);margin-bottom:0.75rem;display:none;align-items:center;gap:10px;">
                         <span style="width:28px;height:28px;border-radius:8px;background:rgba(52,211,153,0.2);color:#34d399;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;flex-shrink:0;">B</span>
@@ -1390,38 +1255,12 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-bolt"></i> IT Load (kW)
-                                <span class="tooltip-trigger">?
-                                    <div class="tooltip-content">
-                                        <div class="tooltip-title"><i class="fas fa-bolt"></i> IT Load (kW)</div>
-                                        <div class="tooltip-desc">Total power consumption of all IT equipment including servers, storage arrays, and network devices.</div>
-                                        <table class="tooltip-table">
-                                            <tr><th scope="col">Category</th><th scope="col">Range</th></tr>
-                                            <tr><td>Small / Edge</td><td>100-500 kW</td></tr>
-                                            <tr><td>Medium</td><td>500-2,000 kW</td></tr>
-                                            <tr><td>Large</td><td>2-10 MW</td></tr>
-                                            <tr><td>Hyperscale</td><td>10+ MW</td></tr>
-                                        </table>
-                                    </div>
-                                </span>
                             </label>
                             <input type="number" class="input-field" id="itLoad" value="1000" min="100" max="100000" aria-label="It Load">
                         </div>
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-gas-pump"></i> Fuel Autonomy (hours)
-                                <span class="tooltip-trigger">?
-                                    <div class="tooltip-content">
-                                        <div class="tooltip-title"><i class="fas fa-gas-pump"></i> Fuel Autonomy</div>
-                                        <div class="tooltip-desc">Duration generators can operate without refueling during utility power outage.</div>
-                                        <table class="tooltip-table">
-                                            <tr><th scope="col">Tier Level</th><th scope="col">Typical Hours</th></tr>
-                                            <tr><td>Minimum</td><td>8 hours</td></tr>
-                                            <tr><td>Standard</td><td>24 hours</td></tr>
-                                            <tr><td>Tier III</td><td>48 hours</td></tr>
-                                            <tr><td>Mission Critical</td><td>72+ hours</td></tr>
-                                        </table>
-                                    </div>
-                                </span>
                             </label>
                             <input type="number" class="input-field" id="fuelHours" value="48" min="8" max="168" aria-label="Fuel Hours">
                         </div>
@@ -1431,19 +1270,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-building"></i> Building Type
-                                <span class="tooltip-trigger">?
-                                    <div class="tooltip-content">
-                                        <div class="tooltip-title"><i class="fas fa-building"></i> Building Type</div>
-                                        <div class="tooltip-desc">The type of structure affects construction costs significantly. Purpose-built facilities are optimized for data centers.</div>
-                                        <table class="tooltip-table">
-                                            <tr><th scope="col">Type</th><th scope="col">Cost Factor</th></tr>
-                                            <tr><td>Warehouse Conversion</td><td>0.70x (lowest)</td></tr>
-                                            <tr><td>Modular / Prefab</td><td>0.85x</td></tr>
-                                            <tr><td>Purpose-Built</td><td>1.00x (baseline)</td></tr>
-                                            <tr><td>High-Rise Multi-Story</td><td>1.40x (highest)</td></tr>
-                                        </table>
-                                    </div>
-                                </span>
                             </label>
                             <select class="input-field" id="buildingType" aria-label="Building Type">
                                 <option value="warehouse">Warehouse Conversion (0.70x)</option>
@@ -1455,20 +1281,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-mountain"></i> Seismic Zone
-                                <span class="tooltip-trigger">?
-                                    <div class="tooltip-content">
-                                        <div class="tooltip-title"><i class="fas fa-mountain"></i> Seismic Zone</div>
-                                        <div class="tooltip-desc">Earthquake risk zones require additional structural reinforcement. Indonesia is typically Zone 2-4.</div>
-                                        <table class="tooltip-table">
-                                            <tr><th scope="col">Zone</th><th scope="col">Cost Impact</th></tr>
-                                            <tr><td>Zone 0 - No Risk</td><td>+0%</td></tr>
-                                            <tr><td>Zone 1 - Low</td><td>+3%</td></tr>
-                                            <tr><td>Zone 2 - Moderate</td><td>+6%</td></tr>
-                                            <tr><td>Zone 3 - High</td><td>+10%</td></tr>
-                                            <tr><td>Zone 4 - Very High</td><td>+15%</td></tr>
-                                        </table>
-                                    </div>
-                                </span>
                             </label>
                             <select class="input-field" id="seismicZone" aria-label="Seismic Zone">
                                 <option value="zone0">Zone 0 - No Seismic Risk</option>
@@ -1483,19 +1295,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                     <div class="input-group">
                         <label class="input-label">
                             <i class="fas fa-server"></i> Rack Density
-                            <span class="tooltip-trigger">?
-                                <div class="tooltip-content">
-                                    <div class="tooltip-title"><i class="fas fa-server"></i> Rack Density</div>
-                                    <div class="tooltip-desc">Power consumption per rack affects cooling requirements and infrastructure costs. AI/HPC racks require specialized cooling.</div>
-                                    <table class="tooltip-table">
-                                        <tr><th scope="col">Density</th><th scope="col">Cooling Needs</th></tr>
-                                        <tr><td>Standard (5-7 kW)</td><td>Air cooling adequate</td></tr>
-                                        <tr><td>Medium (10-15 kW)</td><td>Enhanced airflow</td></tr>
-                                        <tr><td>High (20-30 kW)</td><td>In-row or RDHX required</td></tr>
-                                        <tr><td>AI/HPC (50-100 kW)</td><td>Direct liquid cooling</td></tr>
-                                    </table>
-                                </div>
-                            </span>
                         </label>
                         <div class="radio-group">
                             <div class="radio-option">
@@ -1520,19 +1319,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                     <div class="input-group">
                         <label class="input-label">
                             <i class="fas fa-snowflake"></i> Cooling Type
-                            <span class="tooltip-trigger">?
-                                <div class="tooltip-content">
-                                    <div class="tooltip-title"><i class="fas fa-snowflake"></i> Cooling Type</div>
-                                    <div class="tooltip-desc">Cooling technology affects both CAPEX and operational efficiency. Higher density requires more advanced cooling.</div>
-                                    <table class="tooltip-table">
-                                        <tr><th scope="col">Type</th><th scope="col">Best For</th></tr>
-                                        <tr><td>Air (CRAC/CRAH)</td><td>Standard &lt;10 kW/rack</td></tr>
-                                        <tr><td>In-Row Precision</td><td>Medium 10-20 kW/rack</td></tr>
-                                        <tr><td>RDHX (Rear Door)</td><td>High 20-40 kW/rack</td></tr>
-                                        <tr><td>DLC (Direct Liquid)</td><td>AI/HPC 50+ kW/rack</td></tr>
-                                    </table>
-                                </div>
-                            </span>
                         </label>
                         <div class="radio-group">
                             <div class="radio-option">
@@ -1557,12 +1343,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         <label style="display:flex;align-items:center;gap:0.55rem;margin-top:0.8rem;padding:0.6rem 0.75rem;border:1px solid rgba(14,165,233,0.35);border-radius:10px;cursor:pointer;background:rgba(14,165,233,0.06);">
                             <input type="checkbox" id="deepSeaEnable" onchange="toggleDeepSea()" style="width:16px;height:16px;accent-color:#0ea5e9;">
                             <span style="font-size:0.85rem;font-weight:600;"><i class="fas fa-water" style="color:#0ea5e9;"></i> Deep Sea Water Cooling System</span>
-                            <span class="tooltip-trigger" style="font-size:0.6rem;">?
-                                <div class="tooltip-content">
-                                    <div class="tooltip-title"><i class="fas fa-water"></i> Deep Sea Water Cooling</div>
-                                    <div class="tooltip-desc">Chiller-less primary cooling: deep seawater (4–6 °C at 800–1000 m) rejects heat via titanium plate HX across 3 separated loops (rack CDU → facility water → seawater). Hybrid trim-chiller backup for warm events/maintenance. Physics computed by RZEngine — PUE ≤ 1.15, WUE ≈ 0.</div>
-                                </div>
-                            </span>
                         </label>
                         <div id="deepSeaConfig" style="display:none;margin-top:0.6rem;padding:0.75rem;border:1px dashed rgba(14,165,233,0.35);border-radius:10px;">
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
@@ -1590,12 +1370,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         <div style="margin-top:0.8rem;">
                             <label class="input-label" for="refrigerantType" style="font-size:0.8rem;">
                                 <i class="fas fa-flask"></i> Refrigerant
-                                <span class="tooltip-trigger" style="font-size:0.6rem;">?
-                                    <div class="tooltip-content">
-                                        <div class="tooltip-title"><i class="fas fa-flask"></i> Refrigerant Type</div>
-                                        <div class="tooltip-desc">Drives chiller/CRAC cycle efficiency (COP), Scope-1 leakage carbon (GWP), ASHRAE 34 safety class and mitigation capex. "Auto" picks the industry-typical refrigerant for the selected cooling type.</div>
-                                    </div>
-                                </span>
                             </label>
                             <select class="input-field" id="refrigerantType" onchange="calculateCosts()" aria-label="Refrigerant type">
                                 <option value="auto" selected>Auto (by cooling type)</option>
@@ -1615,19 +1389,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                     <div class="input-group">
                         <label class="input-label">
                             <i class="fas fa-shield-alt"></i> Redundancy
-                            <span class="tooltip-trigger">?
-                                <div class="tooltip-content">
-                                    <div class="tooltip-title"><i class="fas fa-shield-alt"></i> Redundancy Level</div>
-                                    <div class="tooltip-desc">Higher redundancy = higher uptime but significantly more cost. 2N doubles infrastructure.</div>
-                                    <table class="tooltip-table">
-                                        <tr><th scope="col">Level</th><th scope="col">Uptime SLA</th></tr>
-                                        <tr><td>N (Basic)</td><td>99.671% (~28.8hr/yr)</td></tr>
-                                        <tr><td>N+1 (Standard)</td><td>99.982% (~1.6hr/yr)</td></tr>
-                                        <tr><td>2N (Full)</td><td>99.995% (~26min/yr)</td></tr>
-                                        <tr><td>2N+1 (Premium)</td><td>99.9995% (~2.6min/yr)</td></tr>
-                                    </table>
-                                </div>
-                            </span>
                         </label>
                         <div class="radio-group">
                             <div class="radio-option">
@@ -1653,20 +1414,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-fire-extinguisher"></i> Fire Suppression
-                                <span class="tooltip-trigger">?
-                                    <div class="tooltip-content">
-                                        <div class="tooltip-title"><i class="fas fa-fire-extinguisher"></i> Fire Suppression</div>
-                                        <div class="tooltip-desc">Clean agent fire suppression systems that don't damage IT equipment.</div>
-                                        <table class="tooltip-table">
-                                            <tr><th scope="col">Agent</th><th scope="col">Notes</th></tr>
-                                            <tr><td>FM200/HFC-227ea</td><td>Common, being phased out</td></tr>
-                                            <tr><td>Novec 1230</td><td>Low GWP, safest choice</td></tr>
-                                            <tr><td>Inergen (IG-541)</td><td>Inert gas, unlimited</td></tr>
-                                            <tr><td>Nitrogen Inerting</td><td>For sealed rooms</td></tr>
-                                            <tr><td>Water Mist</td><td>Green alternative</td></tr>
-                                        </table>
-                                    </div>
-                                </span>
                             </label>
                             <select class="input-field" id="fireType" aria-label="Fire Type">
                                 <option value="fm200">FM200 / HFC-227ea</option>
@@ -1679,19 +1426,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-bell"></i> Fire Alarm System
-                                <span class="tooltip-trigger">?
-                                    <div class="tooltip-content">
-                                        <div class="tooltip-title"><i class="fas fa-bell"></i> Fire Alarm System</div>
-                                        <div class="tooltip-desc">Early detection is critical for data centers. VESDA provides earliest warning.</div>
-                                        <table class="tooltip-table">
-                                            <tr><th scope="col">Type</th><th scope="col">Detection Time</th></tr>
-                                            <tr><td>Conventional</td><td>Late stage smoke</td></tr>
-                                            <tr><td>Addressable</td><td>Point location ID</td></tr>
-                                            <tr><td>VESDA</td><td>Pre-combustion</td></tr>
-                                            <tr><td>Hybrid</td><td>Best of both</td></tr>
-                                        </table>
-                                    </div>
-                                </span>
                             </label>
                             <select class="input-field" id="alarmType" aria-label="Alarm Type">
                                 <option value="conventional">Conventional</option>
@@ -1706,19 +1440,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-battery-full"></i> UPS Type
-                                <span class="tooltip-trigger">?
-                                    <div class="tooltip-content">
-                                        <div class="tooltip-title"><i class="fas fa-battery-full"></i> UPS Type</div>
-                                        <div class="tooltip-desc">Uninterruptible Power Supply provides backup during generator startup (10-15 seconds).</div>
-                                        <table class="tooltip-table">
-                                            <tr><th scope="col">Type</th><th scope="col">Best For</th></tr>
-                                            <tr><td>Standalone</td><td>Small, fixed capacity</td></tr>
-                                            <tr><td>Modular</td><td>Scalable, N+1 within</td></tr>
-                                            <tr><td>Distributed/Rack</td><td>Edge, distributed</td></tr>
-                                            <tr><td>Rotary UPS</td><td>Ultra-reliable, diesel</td></tr>
-                                        </table>
-                                    </div>
-                                </span>
                             </label>
                             <select class="input-field" id="upsType" aria-label="UPS Type">
                                 <option value="standalone">Standalone</option>
@@ -1730,19 +1451,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-plug"></i> Generator Type
-                                <span class="tooltip-trigger">?
-                                    <div class="tooltip-content">
-                                        <div class="tooltip-title"><i class="fas fa-plug"></i> Generator Type</div>
-                                        <div class="tooltip-desc">Backup power generation fuel type affects maintenance and sustainability.</div>
-                                        <table class="tooltip-table">
-                                            <tr><th scope="col">Fuel</th><th scope="col">Notes</th></tr>
-                                            <tr><td>Diesel</td><td>Standard, reliable</td></tr>
-                                            <tr><td>Natural Gas</td><td>Lower emissions</td></tr>
-                                            <tr><td>Dual Fuel</td><td>Flexibility</td></tr>
-                                            <tr><td>HVO/Biodiesel</td><td>90% lower CO2</td></tr>
-                                        </table>
-                                    </div>
-                                </span>
                             </label>
                             <select class="input-field" id="genType" aria-label="Gen Type">
                                 <option value="diesel" selected>Diesel</option>
@@ -1757,20 +1465,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-globe"></i> Region
-                                <span class="tooltip-trigger">?
-                                    <div class="tooltip-content">
-                                        <div class="tooltip-title"><i class="fas fa-globe"></i> Region</div>
-                                        <div class="tooltip-desc">Geographic region sets the base cost multiplier. Select a city below for precise market-level pricing from T&amp;T DCCI 2025 and C&amp;W 2025.</div>
-                                        <table class="tooltip-table">
-                                            <tr><th scope="col">Region</th><th scope="col">Default Mult.</th></tr>
-                                            <tr><td>Americas</td><td>1.00x (baseline)</td></tr>
-                                            <tr><td>EMEA - Europe</td><td>1.15x</td></tr>
-                                            <tr><td>Middle East</td><td>0.90x</td></tr>
-                                            <tr><td>APAC</td><td>0.85x (varies widely)</td></tr>
-                                        </table>
-                                        <div class="tooltip-impact">Select a specific city for precise $/W pricing</div>
-                                    </div>
-                                </span>
                             </label>
                             <select class="input-field" id="locationFactor" aria-label="Location Factor">
                                 <option value="americas" selected>Americas (1.00x)</option>
@@ -1782,21 +1476,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         <div class="input-group">
                             <label class="input-label">
                                 <i class="fas fa-city"></i> City / Market
-                                <span class="tooltip-trigger">?
-                                    <div class="tooltip-content">
-                                        <div class="tooltip-title"><i class="fas fa-city"></i> City-Specific $/W Cost</div>
-                                        <div class="tooltip-desc">Metro-level construction cost per watt. Overrides the generic region multiplier with precise market data from industry reports.</div>
-                                        <table class="tooltip-table">
-                                            <tr><th scope="col">City</th><th scope="col">$/W (2025)</th></tr>
-                                            <tr><td>Tokyo</td><td>$15.20</td></tr>
-                                            <tr><td>Zurich</td><td>$14.50</td></tr>
-                                            <tr><td>Dallas, TX</td><td>$14.30</td></tr>
-                                            <tr><td>Warsaw</td><td>$9.00</td></tr>
-                                            <tr><td>Chennai</td><td>$6.20</td></tr>
-                                        </table>
-                                        <div class="tooltip-impact">Sources: Turner &amp; Townsend DCCI 2025, Cushman &amp; Wakefield 2025</div>
-                                    </div>
-                                </span>
                             </label>
                             <select class="input-field" id="cityMarket" aria-label="City Market">
                                 <option value="none">-- Select City (optional) --</option>
@@ -1815,22 +1494,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                             <div class="input-group">
                                 <label class="input-label">
                                     <i class="fas fa-calendar"></i> Projection Year
-                                    <span class="tooltip-trigger">?
-                                        <div class="tooltip-content">
-                                            <div class="tooltip-title"><i class="fas fa-calendar"></i> Year Escalation</div>
-                                            <div class="tooltip-desc">Cost escalation based on industry trends. 7% CAGR 2020-2025 (T&T), decelerating as supply chains normalize.</div>
-                                            <table class="tooltip-table">
-                                                <tr><th scope="col">Year</th><th scope="col">Multiplier</th></tr>
-                                                <tr><td>2025 (baseline)</td><td>1.000x</td></tr>
-                                                <tr><td>2026</td><td>1.060x (+6.0%)</td></tr>
-                                                <tr><td>2027</td><td>1.115x (+5.5%)</td></tr>
-                                                <tr><td>2028</td><td>1.165x (+4.5%)</td></tr>
-                                                <tr><td>2029</td><td>1.210x (+3.8%)</td></tr>
-                                                <tr><td>2030</td><td>1.250x (+3.3%)</td></tr>
-                                            </table>
-                                            <div class="tooltip-impact">Sources: JLL 2026 Outlook, Turner & Townsend DCCI 2025, Avid Solutions 2026-2030 projections</div>
-                                        </div>
-                                    </span>
                                 </label>
                                 <select class="input-field" id="projYear" aria-label="Proj Year">
                                     <option value="2025" selected>2025 (Baseline)</option>
@@ -1852,13 +1515,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.9rem;font-weight:500;color:var(--text-secondary);">
                                     <input type="checkbox" id="includeFOM" style="width:18px;height:18px;accent-color:#3b82f6;cursor:pointer;" aria-label="Include FOM">
                                     Include Front-of-Meter Costs
-                                    <span class="tooltip-trigger">?
-                                        <div class="tooltip-content">
-                                            <div class="tooltip-title"><i class="fas fa-plug"></i> Front-of-Meter</div>
-                                            <div class="tooltip-desc">Costs for grid interconnection, substation, transformer, switchgear — typically borne by data center operator per utility agreement.</div>
-                                            <div class="tooltip-impact">Per Mark Lewis (VP Engineering): "Don't forget front-of-meter — transformer, substation, switchgear, and utility's 9% return on investment."</div>
-                                        </div>
-                                    </span>
                                 </label>
                             </div>
                             <div id="fomInputs" style="display:none;flex-direction:column;gap:1rem;">
@@ -1896,18 +1552,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <div class="input-group">
                                     <label class="input-label">
                                         <i class="fas fa-chart-line"></i> Market Conditions
-                                        <span class="tooltip-trigger">?
-                                            <div class="tooltip-content">
-                                                <div class="tooltip-title"><i class="fas fa-chart-line"></i> Market Conditions</div>
-                                                <div class="tooltip-desc">Current supply-demand dynamics affect pricing. Seller's market = contractors charge premiums due to high demand.</div>
-                                                <table class="tooltip-table">
-                                                    <tr><th scope="col">Condition</th><th scope="col">Impact</th></tr>
-                                                    <tr><td>Buyer's Market</td><td>-5% (overcapacity)</td></tr>
-                                                    <tr><td>Balanced</td><td>0% (baseline)</td></tr>
-                                                    <tr><td>Seller's Market</td><td>+10% (high demand)</td></tr>
-                                                </table>
-                                            </div>
-                                        </span>
                                     </label>
                                     <select class="input-field" id="marketCondition" aria-label="Market Condition">
                                         <option value="buyer">Buyer's Market (-5%)</option>
@@ -1918,19 +1562,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <div class="input-group">
                                     <label class="input-label">
                                         <i class="fas fa-truck"></i> Delivery Method
-                                        <span class="tooltip-trigger">?
-                                            <div class="tooltip-content">
-                                                <div class="tooltip-title"><i class="fas fa-truck"></i> Delivery Method</div>
-                                                <div class="tooltip-desc">Project delivery approach affects cost structure and timeline.</div>
-                                                <table class="tooltip-table">
-                                                    <tr><th scope="col">Method</th><th scope="col">Impact</th></tr>
-                                                    <tr><td>Design-Bid-Build</td><td>Baseline</td></tr>
-                                                    <tr><td>Design-Build</td><td>-3% (integrated)</td></tr>
-                                                    <tr><td>Modular-Prefab</td><td>-8% (factory-built)</td></tr>
-                                                    <tr><td>EPC Turnkey</td><td>+5% (single source)</td></tr>
-                                                </table>
-                                            </div>
-                                        </span>
                                     </label>
                                     <select class="input-field" id="deliveryMethod" aria-label="Delivery Method">
                                         <option value="dbb" selected>Design-Bid-Build (baseline)</option>
@@ -1943,18 +1574,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                             <div class="input-group" style="margin-top:1rem;">
                                 <label class="input-label">
                                     <i class="fas fa-hard-hat"></i> Contractor Availability
-                                    <span class="tooltip-trigger">?
-                                        <div class="tooltip-content">
-                                            <div class="tooltip-title"><i class="fas fa-hard-hat"></i> Contractor Availability</div>
-                                            <div class="tooltip-desc">Labor market tightness. Per Matt Pacione: location-specific labor costs drive significant variance.</div>
-                                            <table class="tooltip-table">
-                                                <tr><th scope="col">Availability</th><th scope="col">Premium</th></tr>
-                                                <tr><td>High Availability</td><td>+0%</td></tr>
-                                                <tr><td>Normal</td><td>+3%</td></tr>
-                                                <tr><td>Tight Market</td><td>+8%</td></tr>
-                                            </table>
-                                        </div>
-                                    </span>
                                 </label>
                                 <select class="input-field" id="contractorAvail" aria-label="Contractor Avail">
                                     <option value="high">High Availability (+0%)</option>
@@ -1994,19 +1613,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <div class="input-group">
                                     <label class="input-label">
                                         <i class="fas fa-ethernet"></i> Power Distribution
-                                        <span class="tooltip-trigger">?
-                                            <div class="tooltip-content">
-                                                <div class="tooltip-title"><i class="fas fa-ethernet"></i> Power Distribution Method</div>
-                                                <div class="tooltip-desc">How power is distributed from switchgear to PDUs. Busway is standard for large facilities; underground conduit adds civil costs but better for campus layouts.</div>
-                                                <table class="tooltip-table">
-                                                    <tr><th scope="col">Method</th><th scope="col">Cost Impact</th></tr>
-                                                    <tr><td>Overhead Cable Tray</td><td>-8% (cheapest, less flexible)</td></tr>
-                                                    <tr><td>Busway</td><td>Baseline (industry standard)</td></tr>
-                                                    <tr><td>Underground Conduit</td><td>+15% (cable pits, trenching)</td></tr>
-                                                    <tr><td>Mixed (Bus + Underground)</td><td>+8% (campus/multi-building)</td></tr>
-                                                </table>
-                                            </div>
-                                        </span>
                                     </label>
                                     <select class="input-field" id="powerDistribution" aria-label="Power Distribution">
                                         <option value="overhead">Overhead Cable Tray (-8%)</option>
@@ -2018,18 +1624,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <div class="input-group">
                                     <label class="input-label">
                                         <i class="fas fa-random"></i> Transformer Type
-                                        <span class="tooltip-trigger">?
-                                            <div class="tooltip-content">
-                                                <div class="tooltip-title"><i class="fas fa-random"></i> MV/LV Transformer</div>
-                                                <div class="tooltip-desc">Dry-type is common indoors; oil-filled is cheaper but requires containment and fire separation. Cast-resin is premium indoor option.</div>
-                                                <table class="tooltip-table">
-                                                    <tr><th scope="col">Type</th><th scope="col">Cost Impact</th></tr>
-                                                    <tr><td>Oil-Filled (outdoor)</td><td>-10% (cheapest, needs bund)</td></tr>
-                                                    <tr><td>Dry-Type</td><td>Baseline (indoor standard)</td></tr>
-                                                    <tr><td>Cast Resin</td><td>+12% (premium, low fire risk)</td></tr>
-                                                </table>
-                                            </div>
-                                        </span>
                                     </label>
                                     <select class="input-field" id="transformerType" aria-label="Transformer Type">
                                         <option value="oil">Oil-Filled Outdoor (-10%)</option>
@@ -2042,18 +1636,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <div class="input-group">
                                     <label class="input-label">
                                         <i class="fas fa-plug"></i> PDU Type
-                                        <span class="tooltip-trigger">?
-                                            <div class="tooltip-content">
-                                                <div class="tooltip-title"><i class="fas fa-plug"></i> Power Distribution Unit</div>
-                                                <div class="tooltip-desc">Basic PDUs distribute power only. Intelligent PDUs add per-outlet monitoring, switching, and DCIM integration — critical for high-density racks.</div>
-                                                <table class="tooltip-table">
-                                                    <tr><th scope="col">Type</th><th scope="col">Cost per Rack</th></tr>
-                                                    <tr><td>Basic Metered</td><td>~$800/rack</td></tr>
-                                                    <tr><td>Intelligent (monitored)</td><td>~$1,500/rack</td></tr>
-                                                    <tr><td>Intelligent + Switched</td><td>~$2,500/rack</td></tr>
-                                                </table>
-                                            </div>
-                                        </span>
                                     </label>
                                     <select class="input-field" id="pduType" aria-label="Pdu Type">
                                         <option value="basic">Basic Metered ($800/rack)</option>
@@ -2064,18 +1646,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <div class="input-group">
                                     <label class="input-label">
                                         <i class="fas fa-network-wired"></i> Structured Cabling
-                                        <span class="tooltip-trigger">?
-                                            <div class="tooltip-content">
-                                                <div class="tooltip-title"><i class="fas fa-network-wired"></i> Structured Cabling System</div>
-                                                <div class="tooltip-desc">Backbone and horizontal cabling type. Fiber backbone with copper drops is standard; all-fiber is premium for high-density/AI facilities.</div>
-                                                <table class="tooltip-table">
-                                                    <tr><th scope="col">Type</th><th scope="col">Cost per Rack</th></tr>
-                                                    <tr><td>Cat6A Copper</td><td>~$600/rack</td></tr>
-                                                    <tr><td>Hybrid (Fiber + Cat6A)</td><td>~$1,200/rack</td></tr>
-                                                    <tr><td>All-Fiber (OM4/OS2)</td><td>~$2,000/rack</td></tr>
-                                                </table>
-                                            </div>
-                                        </span>
                                     </label>
                                     <select class="input-field" id="cablingType" aria-label="Cabling Type">
                                         <option value="copper">Cat6A Copper ($600/rack)</option>
@@ -2095,19 +1665,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <div class="input-group">
                                     <label class="input-label">
                                         <i class="fas fa-layer-group"></i> Floor Construction
-                                        <span class="tooltip-trigger">?
-                                            <div class="tooltip-content">
-                                                <div class="tooltip-title"><i class="fas fa-layer-group"></i> Raised Floor vs Slab</div>
-                                                <div class="tooltip-desc">Raised floor allows under-floor air distribution and cable routing but adds $25-50/sqft. Slab with overhead is increasingly popular for high-density deployments.</div>
-                                                <table class="tooltip-table">
-                                                    <tr><th scope="col">Type</th><th scope="col">Cost Impact</th></tr>
-                                                    <tr><td>Slab (overhead services)</td><td>-5% on building</td></tr>
-                                                    <tr><td>Raised Floor 600mm</td><td>Baseline</td></tr>
-                                                    <tr><td>Raised Floor 900mm</td><td>+6% on building</td></tr>
-                                                    <tr><td>Raised Floor 1200mm</td><td>+12% (high airflow)</td></tr>
-                                                </table>
-                                            </div>
-                                        </span>
                                     </label>
                                     <select class="input-field" id="floorType" aria-label="Floor Type">
                                         <option value="slab">Slab / Overhead (-5%)</option>
@@ -2119,18 +1676,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <div class="input-group">
                                     <label class="input-label">
                                         <i class="fas fa-hard-hat"></i> Site Condition
-                                        <span class="tooltip-trigger">?
-                                            <div class="tooltip-content">
-                                                <div class="tooltip-title"><i class="fas fa-hard-hat"></i> Site Preparation</div>
-                                                <div class="tooltip-desc">Greenfield = raw land needing full civil work. Brownfield = existing industrial site needing some demo. Retrofit = converting existing building.</div>
-                                                <table class="tooltip-table">
-                                                    <tr><th scope="col">Condition</th><th scope="col">Site Cost</th></tr>
-                                                    <tr><td>Greenfield (raw land)</td><td>+5-8% for grading/utilities</td></tr>
-                                                    <tr><td>Brownfield</td><td>Baseline</td></tr>
-                                                    <tr><td>Retrofit / Conversion</td><td>+10-20% for demo/adaptation</td></tr>
-                                                </table>
-                                            </div>
-                                        </span>
                                     </label>
                                     <select class="input-field" id="siteCondition" aria-label="Site Condition">
                                         <option value="greenfield">Greenfield (+6%)</option>
@@ -2143,18 +1688,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <div class="input-group">
                                     <label class="input-label">
                                         <i class="fas fa-shield-alt"></i> Security Level
-                                        <span class="tooltip-trigger">?
-                                            <div class="tooltip-content">
-                                                <div class="tooltip-title"><i class="fas fa-shield-alt"></i> Physical Security</div>
-                                                <div class="tooltip-desc">Security infrastructure including fencing, CCTV, access control, bollards, mantrap, vehicle barriers, and SOC. Enterprise+ adds biometrics, 24/7 SOC, and anti-vehicle barriers.</div>
-                                                <table class="tooltip-table">
-                                                    <tr><th scope="col">Level</th><th scope="col">$/kW Impact</th></tr>
-                                                    <tr><td>Standard</td><td>Baseline (CCTV+access)</td></tr>
-                                                    <tr><td>Enterprise</td><td>+2% (biometric+mantrap)</td></tr>
-                                                    <tr><td>High Security</td><td>+5% (SOC+barriers+K12)</td></tr>
-                                                </table>
-                                            </div>
-                                        </span>
                                     </label>
                                     <select class="input-field" id="securityLevel" aria-label="Security Level">
                                         <option value="standard" selected>Standard (CCTV + Access Control)</option>
@@ -2165,18 +1698,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <div class="input-group">
                                     <label class="input-label">
                                         <i class="fas fa-satellite-dish"></i> Fiber Entry
-                                        <span class="tooltip-trigger">?
-                                            <div class="tooltip-content">
-                                                <div class="tooltip-title"><i class="fas fa-satellite-dish"></i> Fiber / Connectivity</div>
-                                                <div class="tooltip-desc">Number of diverse fiber entry paths. Dual-diverse is standard for Tier III+. Multi-carrier meet-me room adds connectivity value but costs more.</div>
-                                                <table class="tooltip-table">
-                                                    <tr><th scope="col">Entry</th><th scope="col">Cost</th></tr>
-                                                    <tr><td>Single Path</td><td>~$150K</td></tr>
-                                                    <tr><td>Dual Diverse</td><td>~$350K</td></tr>
-                                                    <tr><td>Multi-Path + MMR</td><td>~$600K</td></tr>
-                                                </table>
-                                            </div>
-                                        </span>
                                     </label>
                                     <select class="input-field" id="fiberEntry" aria-label="Fiber Entry">
                                         <option value="single">Single Path ($150K)</option>
@@ -2196,19 +1717,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <div class="input-group">
                                     <label class="input-label">
                                         <i class="fas fa-certificate"></i> Green Certification
-                                        <span class="tooltip-trigger">?
-                                            <div class="tooltip-content">
-                                                <div class="tooltip-title"><i class="fas fa-certificate"></i> LEED / BREEAM</div>
-                                                <div class="tooltip-desc">Green building certification adds 2-8% to construction costs for materials, energy modeling, commissioning, and documentation, but reduces long-term OPEX.</div>
-                                                <table class="tooltip-table">
-                                                    <tr><th scope="col">Level</th><th scope="col">Cost Premium</th></tr>
-                                                    <tr><td>None</td><td>0%</td></tr>
-                                                    <tr><td>LEED Silver</td><td>+2%</td></tr>
-                                                    <tr><td>LEED Gold</td><td>+4%</td></tr>
-                                                    <tr><td>LEED Platinum</td><td>+8%</td></tr>
-                                                </table>
-                                            </div>
-                                        </span>
                                     </label>
                                     <select class="input-field" id="greenCert" aria-label="Green Cert">
                                         <option value="none" selected>None</option>
@@ -2220,18 +1728,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <div class="input-group">
                                     <label class="input-label">
                                         <i class="fas fa-solar-panel"></i> On-Site Renewable
-                                        <span class="tooltip-trigger">?
-                                            <div class="tooltip-content">
-                                                <div class="tooltip-title"><i class="fas fa-solar-panel"></i> On-Site Generation</div>
-                                                <div class="tooltip-desc">On-site solar PV or battery energy storage (BESS). Reduces grid dependency but adds CAPEX. BESS can also serve as UPS reserve.</div>
-                                                <table class="tooltip-table">
-                                                    <tr><th scope="col">Option</th><th scope="col">Cost Addition</th></tr>
-                                                    <tr><td>None</td><td>$0</td></tr>
-                                                    <tr><td>Rooftop Solar</td><td>~$1.2M/MW</td></tr>
-                                                    <tr><td>Solar + BESS</td><td>~$2.5M/MW</td></tr>
-                                                </table>
-                                            </div>
-                                        </span>
                                     </label>
                                     <select class="input-field" id="renewableOption" aria-label="Renewable Option" onchange="toggleRenewableSizing();calculateCosts()">
                                         <option value="none" selected>None</option>
@@ -2261,12 +1757,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                     <div class="results-header">
                         <span class="results-title"><i class="fas fa-chart-pie"></i> Cost Breakdown <span id="advInfoBadge" style="display:none;font-size:0.65rem;background:rgba(245,158,11,0.2);color:#fbbf24;padding:2px 8px;border-radius:6px;font-weight:500;margin-left:6px;"></span></span>
                         <div class="results-total">
-                            <div class="total-label">Total CAPEX <span class="tooltip-trigger" style="font-size: 0.7rem;">?
-                                <div class="tooltip-content">
-                                    <div class="tooltip-title"><i class="fas fa-dollar-sign"></i> Total CAPEX</div>
-                                    <div class="tooltip-desc">Capital Expenditure - Total upfront investment required to build the data center including construction, equipment, and commissioning.</div>
-                                </div>
-                            </span></div>
+                            <div class="total-label">Total CAPEX</div>
                             <div class="total-value" id="totalCost">$12,500,000</div>
                         </div>
                     </div>
@@ -2304,12 +1795,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                     </div>
 
                     <div class="per-kw-display" id="perKwSection" onclick="if(!isPremiumUser)handlePremiumTab()">
-                        <span class="per-kw-label">Cost per kW IT Load <span class="tooltip-trigger" style="font-size: 0.7rem;">?
-                            <div class="tooltip-content">
-                                <div class="tooltip-title"><i class="fas fa-calculator"></i> Cost per kW</div>
-                                <div class="tooltip-desc">Industry benchmark metric: Total CAPEX divided by IT Load capacity. Typical ranges: $8,000-15,000/kW for Tier III, $15,000-25,000/kW for Tier IV.</div>
-                            </div>
-                        </span>
+                        <span class="per-kw-label">Cost per kW IT Load
                         <span id="perKwGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()"><i class="fas fa-crown"></i> PRO</span>
                         </span>
                         <span class="per-kw-value" id="perKwCost">$12,500/kW</span>
@@ -2317,42 +1803,22 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
                     <div class="metrics-row">
                         <div class="metric-box">
-                            <div class="metric-label">Tier Classification <span class="tooltip-trigger" style="font-size: 0.6rem;">?
-                                <div class="tooltip-content">
-                                    <div class="tooltip-title"><i class="fas fa-layer-group"></i> Uptime Tier</div>
-                                    <div class="tooltip-desc">Uptime Institute classification based on redundancy level: Tier I (N) = 99.671%, Tier II = 99.741%, Tier III (N+1) = 99.982%, Tier IV (2N) = 99.995%.</div>
-                                </div>
-                            </span></div>
+                            <div class="metric-label">Tier Classification</div>
                             <div class="metric-value tier" id="tierClass">Tier III</div>
                         </div>
                         <div class="metric-box">
-                            <div class="metric-label">Estimated PUE <span class="tooltip-trigger" style="font-size: 0.6rem;">?
-                                <div class="tooltip-content">
-                                    <div class="tooltip-title"><i class="fas fa-leaf"></i> Power Usage Effectiveness</div>
-                                    <div class="tooltip-desc">PUE = Total Facility Power ÷ IT Equipment Power. Industry average: 1.55. Efficient DC: 1.2-1.4. Best-in-class: &lt;1.2. Lower is better.</div>
-                                </div>
-                            </span></div>
+                            <div class="metric-label">Estimated PUE</div>
                             <div class="metric-value pue" id="pueValue">1.45</div>
                         </div>
                     </div>
 
                     <div class="metrics-row">
                         <div class="metric-box">
-                            <div class="metric-label">Expected Uptime <span class="tooltip-trigger" style="font-size: 0.6rem;">?
-                                <div class="tooltip-content">
-                                    <div class="tooltip-title"><i class="fas fa-clock"></i> Expected Uptime</div>
-                                    <div class="tooltip-desc">Percentage of time the facility is expected to be operational per year. 99.982% = ~1.6 hours downtime/year. 99.995% = ~26 minutes/year.</div>
-                                </div>
-                            </span></div>
+                            <div class="metric-label">Expected Uptime</div>
                             <div class="metric-value uptime" id="uptimeValue">99.982%</div>
                         </div>
                         <div class="metric-box" id="energySection" onclick="if(!isPremiumUser)handlePremiumTab()">
-                            <div class="metric-label">Annual Energy <span class="tooltip-trigger" style="font-size: 0.6rem;">?
-                                <div class="tooltip-content">
-                                    <div class="tooltip-title"><i class="fas fa-plug"></i> Annual Energy Cost</div>
-                                    <div class="tooltip-desc">Estimated yearly electricity cost based on IT Load × PUE × 8,760 hours × electricity rate. This is an OPEX cost, not included in CAPEX.</div>
-                                </div>
-                            </span> <span id="energyGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()"><i class="fas fa-crown"></i> PRO</span></div>
+                            <div class="metric-label">Annual Energy <span id="energyGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()"><i class="fas fa-crown"></i> PRO</span></div>
                             <div class="metric-value energy" id="energyCost">$1.2M</div>
                         </div>
                     </div>
@@ -2405,12 +1871,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">
                             <i class="fas fa-chart-area" style="color:#8b5cf6;"></i>
                             <span style="font-weight:700;font-size:0.9rem;color:var(--text-primary);">Cost Uncertainty &amp; Sensitivity</span>
-                            <span class="tooltip-trigger" style="font-size:0.7rem;">?
-                                <div class="tooltip-content">
-                                    <div class="tooltip-title"><i class="fas fa-dice"></i> Monte-Carlo range</div>
-                                    <div class="tooltip-desc">A 4,000-run Monte-Carlo simulation around your point estimate, varying construction cost (bid spread), multi-year escalation, and scope growth. P10/P50/P90 = optimistic / most-likely / conservative total CAPEX. The tornado ranks which driver moves the total most. Powered by RZEngine v2.0.</div>
-                                </div>
-                            </span>
                         </div>
                         <div style="display:flex;gap:0.5rem;margin:0.6rem 0 0.5rem;flex-wrap:wrap;">
                             <div style="flex:1;min-width:90px;text-align:center;background:var(--bg-primary);border-radius:8px;padding:0.5rem;">
@@ -2856,7 +2316,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             advPanel.style.display = mode === 'advanced' ? 'flex' : 'none';
             calculateCosts();
             // Re-init tooltips for newly visible elements
-            setTimeout(() => initTooltipSystem(), 50);
+            /* initTooltipSystem removed v1.59.0 — RZExplain owns tooltips */
         }
 
         // FOM toggle
@@ -3403,7 +2863,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
         // Initial calculation
         populateCityDropdown();
         calculateCosts();
-        initTooltipSystem();
 
         // RZEngine loads with `defer`, so it isn't ready during the initial calculateCosts()
         // above. Once the page (and deferred engine) finishes loading, render the additive
@@ -4719,47 +4178,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
         }
 
         // Global Tooltip System
-        function initTooltipSystem() {
-            const tooltipEl = document.createElement('div');
-            tooltipEl.id = 'tooltip-container';
-            document.body.appendChild(tooltipEl);
-
-            document.querySelectorAll('.tooltip-trigger').forEach(trigger => {
-                const content = trigger.querySelector('.tooltip-content');
-                if (!content) return;
-
-                trigger.addEventListener('mouseenter', () => {
-                    tooltipEl.innerHTML = content.innerHTML;
-
-                    const rect = trigger.getBoundingClientRect();
-                    const tooltipWidth = 320;
-                    const tooltipHeight = tooltipEl.offsetHeight || 200;
-                    const padding = 15;
-
-                    let left = rect.right + padding;
-                    let top = rect.top + rect.height / 2;
-
-                    if (left + tooltipWidth > window.innerWidth - 20) {
-                        left = rect.left - tooltipWidth - padding;
-                    }
-                    if (left < 20) left = 20;
-
-                    top = top - tooltipHeight / 2;
-                    if (top < 20) top = 20;
-                    if (top + tooltipHeight > window.innerHeight - 20) {
-                        top = window.innerHeight - tooltipHeight - 20;
-                    }
-
-                    tooltipEl.style.left = left + 'px';
-                    tooltipEl.style.top = top + 'px';
-                    tooltipEl.classList.add('visible');
-                });
-
-                trigger.addEventListener('mouseleave', () => {
-                    tooltipEl.classList.remove('visible');
-                });
-            });
-        }
+        /* legacy initTooltipSystem removed v1.59.0 — RZExplain (js/rz-explain.js) owns all tooltips */
 
         // ═══════════════════════════════════════════
         // PREMIUM OUTPUT RENDERING

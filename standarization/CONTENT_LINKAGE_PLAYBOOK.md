@@ -107,3 +107,5 @@ This file + `~/.claude/.../memory/` is the handoff. A new session/agent
 picking up content or feature work reads §1–§4 first. When a linkage class
 not listed here is discovered, ADD it here in the same change (this doc is
 itself under the §3 "every change" rule).
+
+- **New/edited glossary term or calculator parameter** → run `python3 tools/build-explain-db.py` (regenerates js/rz-explain-db.js) + `node tools/test-explain-db.mjs`; curated parameter explanations live in `tools/explain-extra.json`.

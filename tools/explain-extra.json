@@ -1,0 +1,2968 @@
+{
+ "version": "1.0.0",
+ "entries": {
+  "it-load": {
+   "t": "IT Load",
+   "d": "The total electrical power drawn by the IT equipment itself — servers, storage arrays, and network devices — excluding cooling and power-delivery overhead. It is the sizing anchor for the whole facility: cooling capacity, UPS, generators, and Total CAPEX all scale from it, and PUE is defined relative to it. Small/edge sites run 100–500 kW, hyperscale campuses exceed 10 MW; the capex calculator accepts 100 kW to 100 MW.",
+   "u": "kW",
+   "table": [
+    [
+     "Category",
+     "Range"
+    ],
+    [
+     "Small / Edge",
+     "100–500 kW"
+    ],
+    [
+     "Medium",
+     "500–2,000 kW"
+    ],
+    [
+     "Large",
+     "2–10 MW"
+    ],
+    [
+     "Hyperscale",
+     "10+ MW"
+    ]
+   ],
+   "rel": [
+    "total-capex",
+    "pue",
+    "cost-per-kw",
+    "rack-density"
+   ],
+   "aliases": [
+    "IT Load (kW)",
+    "IT Load",
+    "IT load"
+   ]
+  },
+  "fuel-autonomy": {
+   "t": "Fuel Autonomy",
+   "d": "How long the backup generators can run at full facility load without refueling during a utility outage. It is driven by on-site tank capacity versus generator fuel burn, and it directly supports the Tier classification: Uptime Institute Tier III expects 48 hours minimum, while mission-critical sites carry 72+ hours plus refueling contracts. More autonomy means larger tanks, more fuel-polishing systems, and higher Generator Type CAPEX.",
+   "u": "hours",
+   "table": [
+    [
+     "Tier Level",
+     "Typical Hours"
+    ],
+    [
+     "Minimum",
+     "8 hours"
+    ],
+    [
+     "Standard",
+     "24 hours"
+    ],
+    [
+     "Tier III",
+     "48 hours"
+    ],
+    [
+     "Mission Critical",
+     "72+ hours"
+    ]
+   ],
+   "rel": [
+    "generator-type",
+    "tier-class",
+    "redundancy"
+   ],
+   "aliases": [
+    "Fuel Autonomy (hours)",
+    "Fuel Autonomy",
+    "fuel autonomy"
+   ]
+  },
+  "building-type": {
+   "t": "Building Type",
+   "d": "The type of structure that houses the data hall, which swings construction cost by a factor of two. Warehouse conversions are cheapest (0.70x) because the shell exists; modular/prefab runs 0.85x with faster schedules; purpose-built is the 1.00x baseline optimized for load paths, floor loading, and cooling; high-rise multi-story is costliest (1.40x) due to structural steel, vertical riser distribution, and craneage. The choice also shifts build time (modular ~0.6x, high-rise ~1.4x of baseline schedule), which interacts with Year Escalation.",
+   "table": [
+    [
+     "Type",
+     "Cost Factor"
+    ],
+    [
+     "Warehouse Conversion",
+     "0.70x (lowest)"
+    ],
+    [
+     "Modular / Prefab",
+     "0.85x"
+    ],
+    [
+     "Purpose-Built",
+     "1.00x (baseline)"
+    ],
+    [
+     "High-Rise Multi-Story",
+     "1.40x (highest)"
+    ]
+   ],
+   "rel": [
+    "total-capex",
+    "year-escalation",
+    "site-condition"
+   ],
+   "aliases": [
+    "Building Type",
+    "building type"
+   ]
+  },
+  "seismic-zone": {
+   "t": "Seismic Zone",
+   "d": "The earthquake-risk classification of the site, which dictates structural reinforcement: base isolation, braced racks, seismically rated cable tray and piping restraints. Cost impact ranges from +0% in Zone 0 to +15% in Zone 4 (very high risk); Indonesia is typically Zone 2–4. It also affects equipment anchorage specs for UPS Type and Generator Type gear and feeds the Disaster Risk assessment.",
+   "table": [
+    [
+     "Zone",
+     "Cost Impact"
+    ],
+    [
+     "Zone 0 - No Risk",
+     "+0%"
+    ],
+    [
+     "Zone 1 - Low",
+     "+3%"
+    ],
+    [
+     "Zone 2 - Moderate",
+     "+6%"
+    ],
+    [
+     "Zone 3 - High",
+     "+10%"
+    ],
+    [
+     "Zone 4 - Very High",
+     "+15%"
+    ]
+   ],
+   "rel": [
+    "total-capex",
+    "tab-disaster",
+    "site-condition"
+   ],
+   "aliases": [
+    "Seismic Zone",
+    "seismic zone"
+   ]
+  },
+  "rack-density": {
+   "t": "Rack Density",
+   "d": "Power consumption per rack, the single strongest driver of the cooling architecture. Standard racks at 5–7 kW are fine on air cooling; 10–15 kW needs enhanced airflow or in-row units; 20–30 kW requires in-row or rear-door heat exchangers (RDHX); AI/HPC racks at 50–100 kW demand direct liquid cooling (DLC). Higher density shrinks White Space per megawatt but concentrates heat, raising Cooling Type CAPEX per rack while lowering building cost per kW.",
+   "u": "kW/rack",
+   "table": [
+    [
+     "Density",
+     "Cooling Needs"
+    ],
+    [
+     "Standard (5-7 kW)",
+     "Air cooling adequate"
+    ],
+    [
+     "Medium (10-15 kW)",
+     "Enhanced airflow"
+    ],
+    [
+     "High (20-30 kW)",
+     "In-row or RDHX required"
+    ],
+    [
+     "AI/HPC (50-100 kW)",
+     "Direct liquid cooling"
+    ]
+   ],
+   "rel": [
+    "cooling-type",
+    "white-space",
+    "rack-density-kw-m2",
+    "pdu-type"
+   ],
+   "aliases": [
+    "Rack Density",
+    "rack density",
+    "kW/rack"
+   ]
+  },
+  "cooling-type": {
+   "t": "Cooling Type",
+   "d": "The heat-rejection technology, which affects both CAPEX and operational efficiency (PUE). Air cooling via CRAC/CRAH units serves standard racks under 10 kW; in-row precision units handle 10–20 kW; RDHX (rear-door heat exchangers) cover 20–40 kW; DLC (direct liquid cooling) is required for AI/HPC racks at 50+ kW. The choice sets the Refrigerant path (chiller/CRAC vs chiller-less), the achievable PUE, and build schedule (liquid ~1.3x, Deep Sea Water Cooling ~1.45x of baseline cooling schedule).",
+   "table": [
+    [
+     "Type",
+     "Best For"
+    ],
+    [
+     "Air (CRAC/CRAH)",
+     "Standard <10 kW/rack"
+    ],
+    [
+     "In-Row Precision",
+     "Medium 10-20 kW/rack"
+    ],
+    [
+     "RDHX (Rear Door)",
+     "High 20-40 kW/rack"
+    ],
+    [
+     "DLC (Direct Liquid)",
+     "AI/HPC 50+ kW/rack"
+    ]
+   ],
+   "rel": [
+    "rack-density",
+    "pue",
+    "refrigerant",
+    "deep-sea-water-cooling"
+   ],
+   "aliases": [
+    "Cooling Type",
+    "cooling type",
+    "CRAC",
+    "CRAH",
+    "RDHX",
+    "Direct Liquid Cooling",
+    "DLC"
+   ]
+  },
+  "redundancy": {
+   "t": "Redundancy Level",
+   "d": "How many spare capacity paths the power and cooling systems carry: N is need-only, N+1 adds one spare module, 2N duplicates the entire plant, 2N+1 duplicates plus a spare. Higher redundancy buys uptime — N gives 99.671% (~28.8 hr/yr down), N+1 gives 99.982% (~1.6 hr/yr), 2N gives 99.995% (~26 min/yr) — but 2N roughly doubles the electrical and mechanical infrastructure cost. Redundancy is the primary determinant of the Tier Classification and Expected Uptime shown in the results.",
+   "table": [
+    [
+     "Level",
+     "Uptime SLA"
+    ],
+    [
+     "N (Basic)",
+     "99.671% (~28.8hr/yr)"
+    ],
+    [
+     "N+1 (Standard)",
+     "99.982% (~1.6hr/yr)"
+    ],
+    [
+     "2N (Full)",
+     "99.995% (~26min/yr)"
+    ],
+    [
+     "2N+1 (Premium)",
+     "99.9995% (~2.6min/yr)"
+    ]
+   ],
+   "rel": [
+    "tier-class",
+    "uptime-sla",
+    "n-plus-1-redundancy",
+    "total-capex"
+   ],
+   "aliases": [
+    "Redundancy",
+    "Redundancy Level",
+    "N+1",
+    "2N",
+    "2N+1"
+   ]
+  },
+  "fire-suppression": {
+   "t": "Fire Suppression",
+   "d": "Clean-agent suppression systems designed to extinguish fire without damaging live IT equipment (no water dump on servers). FM200/HFC-227ea is common but being phased out on GWP grounds; Novec 1230 is the low-GWP, safest mainstream choice; Inergen (IG-541) is an inert-gas system with no residue; nitrogen inerting suits permanently sealed rooms; water mist is the green alternative for support spaces. Works alongside the Fire Alarm System — detection triggers release, so early VESDA sensing reduces discharge events.",
+   "table": [
+    [
+     "Agent",
+     "Notes"
+    ],
+    [
+     "FM200/HFC-227ea",
+     "Common, being phased out"
+    ],
+    [
+     "Novec 1230",
+     "Low GWP, safest choice"
+    ],
+    [
+     "Inergen (IG-541)",
+     "Inert gas, unlimited"
+    ],
+    [
+     "Water Mist",
+     "Green alternative"
+    ]
+   ],
+   "rel": [
+    "fire-alarm",
+    "gwp"
+   ],
+   "aliases": [
+    "Fire Suppression",
+    "FM200",
+    "Novec 1230",
+    "Inergen"
+   ]
+  },
+  "fire-alarm": {
+   "t": "Fire Alarm System",
+   "d": "The detection layer that triggers Fire Suppression — in a data center, minutes of early warning are worth millions in avoided discharge and downtime. Conventional systems detect late-stage smoke only; addressable systems identify the exact point location; VESDA (aspirating smoke detection) continuously samples air and catches pre-combustion particles before visible smoke; hybrid VESDA + addressable combines earliest warning with precise location. Tier III+ facilities typically specify VESDA in white space.",
+   "table": [
+    [
+     "Type",
+     "Detection Time"
+    ],
+    [
+     "Conventional",
+     "Late stage smoke"
+    ],
+    [
+     "Addressable",
+     "Point location ID"
+    ],
+    [
+     "VESDA",
+     "Pre-combustion"
+    ],
+    [
+     "Hybrid",
+     "Best of both"
+    ]
+   ],
+   "rel": [
+    "fire-suppression",
+    "tier-class"
+   ],
+   "aliases": [
+    "Fire Alarm System",
+    "Fire Alarm",
+    "VESDA"
+   ]
+  },
+  "ups-type": {
+   "t": "UPS Type (Uninterruptible Power Supply)",
+   "d": "The battery/rotary system that bridges the 10–15 second gap between a utility outage and generator pickup — the heartbeat of ride-through power. Standalone units suit small fixed capacity; modular UPS scales in blocks and can carry N+1 within the frame; distributed/rack UPS fits edge deployments; rotary (diesel-coupled flywheel) UPS is the ultra-reliable option that merges UPS and generator. The choice interacts with Redundancy topology (N+1 vs 2N paths) and on-site BESS, which can double as UPS reserve.",
+   "table": [
+    [
+     "Type",
+     "Best For"
+    ],
+    [
+     "Standalone",
+     "Small, fixed capacity"
+    ],
+    [
+     "Modular",
+     "Scalable, N+1 within"
+    ],
+    [
+     "Distributed/Rack",
+     "Edge, distributed"
+    ],
+    [
+     "Rotary UPS",
+     "Ultra-reliable, diesel"
+    ]
+   ],
+   "rel": [
+    "generator-type",
+    "redundancy",
+    "onsite-renewable"
+   ],
+   "aliases": [
+    "UPS Type",
+    "UPS",
+    "Uninterruptible Power Supply"
+   ]
+  },
+  "generator-type": {
+   "t": "Generator Type",
+   "d": "The backup power generation fuel choice, affecting maintenance regime, emissions, and sustainability posture. Diesel is the reliable industry standard; natural gas cuts local emissions but depends on pipeline availability during regional events; dual-fuel offers flexibility; HVO/biodiesel achieves roughly 90% lower lifecycle CO2 and is a drop-in decarbonization lever that improves the Carbon/ESG picture. Sizing pairs with Fuel Autonomy (tank hours) and Redundancy (N+1 or 2N generator sets).",
+   "table": [
+    [
+     "Fuel",
+     "Notes"
+    ],
+    [
+     "Diesel",
+     "Standard, reliable"
+    ],
+    [
+     "Natural Gas",
+     "Lower emissions"
+    ],
+    [
+     "Dual Fuel",
+     "Flexibility"
+    ],
+    [
+     "HVO/Biodiesel",
+     "90% lower CO2"
+    ]
+   ],
+   "rel": [
+    "fuel-autonomy",
+    "redundancy",
+    "tab-fuel-gen",
+    "tab-carbon"
+   ],
+   "aliases": [
+    "Generator Type",
+    "generator type",
+    "HVO",
+    "Biodiesel"
+   ]
+  },
+  "region-location": {
+   "t": "Region",
+   "d": "The geographic region that sets the base construction-cost multiplier before any city-level override: Americas is the 1.00x baseline, EMEA-Europe runs 1.15x, Middle East 0.90x, and APAC averages 0.85x but varies widely (Tokyo and Singapore are among the world's most expensive markets). Region also drives permitting timelines and labor market conditions. Selecting a specific City / Market replaces this generic multiplier with precise $/W data from Turner & Townsend DCCI 2025 and Cushman & Wakefield 2025.",
+   "table": [
+    [
+     "Region",
+     "Default Mult."
+    ],
+    [
+     "Americas",
+     "1.00x (baseline)"
+    ],
+    [
+     "EMEA - Europe",
+     "1.15x"
+    ],
+    [
+     "Middle East",
+     "0.90x"
+    ],
+    [
+     "APAC",
+     "0.85x (varies widely)"
+    ]
+   ],
+   "rel": [
+    "city-market",
+    "total-capex",
+    "contractor-availability"
+   ],
+   "aliases": [
+    "Region",
+    "APAC",
+    "EMEA"
+   ]
+  },
+  "city-market": {
+   "t": "City / Market ($/W)",
+   "d": "Metro-level construction cost per watt of IT capacity, which overrides the generic Region multiplier with published market data. The spread is large: Tokyo ~$15.20/W and Zurich ~$14.50/W at the top, Dallas ~$14.30/W, down to Warsaw ~$9.00/W and Chennai ~$6.20/W. Cost per Watt is the industry's headline benchmarking unit and maps directly to Cost per kW (multiply by 1,000). Sources: Turner & Townsend DCCI 2025, Cushman & Wakefield 2025.",
+   "u": "$/W",
+   "table": [
+    [
+     "City",
+     "$/W (2025)"
+    ],
+    [
+     "Tokyo",
+     "$15.20"
+    ],
+    [
+     "Zurich",
+     "$14.50"
+    ],
+    [
+     "Dallas, TX",
+     "$14.30"
+    ],
+    [
+     "Warsaw",
+     "$9.00"
+    ],
+    [
+     "Chennai",
+     "$6.20"
+    ]
+   ],
+   "s": "Turner & Townsend DCCI 2025, Cushman & Wakefield 2025",
+   "rel": [
+    "region-location",
+    "cost-per-kw",
+    "benchmark-percentile"
+   ],
+   "aliases": [
+    "City / Market",
+    "City-Specific $/W Cost",
+    "$/W"
+   ]
+  },
+  "year-escalation": {
+   "t": "Year Escalation (Construction Cost Inflation)",
+   "d": "Multi-year construction cost inflation applied to future project start dates. Data center construction ran ~7% CAGR from 2020–2025 (Turner & Townsend) driven by equipment lead times and labor scarcity, and is projected to decelerate as supply chains normalize: 2026 +6.0%, 2027 cumulative 1.115x, through 2030 at 1.250x of the 2025 baseline. Escalation compounds with build duration, so slower Building Type or Delivery Method choices absorb more of it.",
+   "table": [
+    [
+     "Year",
+     "Multiplier"
+    ],
+    [
+     "2025 (baseline)",
+     "1.000x"
+    ],
+    [
+     "2026",
+     "1.060x (+6.0%)"
+    ],
+    [
+     "2028",
+     "1.165x (+4.5%)"
+    ],
+    [
+     "2030",
+     "1.250x (+3.3%)"
+    ]
+   ],
+   "s": "JLL 2026 Outlook, Turner & Townsend DCCI 2025, Avid Solutions 2026-2030 projections",
+   "rel": [
+    "escalation",
+    "total-capex",
+    "market-condition"
+   ],
+   "aliases": [
+    "Projection Year",
+    "Year Escalation",
+    "cost escalation"
+   ]
+  },
+  "front-of-meter": {
+   "t": "Front-of-Meter Costs",
+   "d": "Grid-side infrastructure the operator often pays for under the utility agreement even though it sits before the revenue meter: interconnection, Substation, transformer, and switchgear, plus the utility's regulated Rate of Return (typically ~9%) on that investment. These costs are frequently forgotten in early budgets yet can add millions — 'Don't forget front-of-meter: transformer, substation, switchgear, and the utility's 9% return on investment' (Mark Lewis, VP Engineering). Transformer Lead Time (18–36 months) often gates the whole project schedule.",
+   "rel": [
+    "substation-type",
+    "transformer-lead",
+    "utility-rate",
+    "total-capex"
+   ],
+   "aliases": [
+    "Front-of-Meter",
+    "Include Front-of-Meter Costs",
+    "front of meter"
+   ]
+  },
+  "substation-type": {
+   "t": "Substation Type",
+   "d": "The grid connection point sizing. A shared utility substation costs $0.5–1.5M but caps capacity and expansion; a dedicated 33kV substation ($3–5M) is typical for 5–30 MW campuses; dedicated 132kV+ ($5–10M+) is required for hyperscale loads and gives the operator control over reliability. Part of the Front-of-Meter cost block, and the voltage class drives Transformer Lead Time exposure.",
+   "table": [
+    [
+     "Type",
+     "Cost"
+    ],
+    [
+     "Shared Utility",
+     "$0.5-1.5M"
+    ],
+    [
+     "Dedicated 33kV",
+     "$3-5M"
+    ],
+    [
+     "Dedicated 132kV+",
+     "$5-10M+"
+    ]
+   ],
+   "rel": [
+    "front-of-meter",
+    "transformer-lead",
+    "tab-grid"
+   ],
+   "aliases": [
+    "Substation Type",
+    "substation"
+   ]
+  },
+  "transformer-lead": {
+   "t": "Transformer Lead Time",
+   "d": "The procurement wait for large power transformers, currently one of the industry's worst supply-chain bottlenecks. Standard delivery is 18–24 months; extended market conditions push 24–36 months and add ~15% cost; emergency expedited procurement adds ~30%. Because the transformer often sits on the project critical path, lead time interacts with Year Escalation (longer builds absorb more inflation) and can dominate the Capacity Plan timeline.",
+   "table": [
+    [
+     "Scenario",
+     "Impact"
+    ],
+    [
+     "Standard",
+     "18-24 mo"
+    ],
+    [
+     "Extended",
+     "24-36 mo, +15%"
+    ],
+    [
+     "Emergency",
+     "expedited, +30%"
+    ]
+   ],
+   "rel": [
+    "front-of-meter",
+    "substation-type",
+    "year-escalation",
+    "tab-capacity"
+   ],
+   "aliases": [
+    "Transformer Lead Time",
+    "transformer lead time"
+   ]
+  },
+  "utility-rate": {
+   "t": "Utility Rate of Return",
+   "d": "The regulated return (typically 7–12%, commonly ~9%) a utility earns on Front-of-Meter infrastructure it builds on the operator's behalf, passed through in the interconnection agreement or tariff. A higher allowed return raises the effective cost of grid-supplied capacity and can tip the economics toward On-Site Renewables or a dedicated Substation owned outright.",
+   "u": "%",
+   "rel": [
+    "front-of-meter",
+    "substation-type",
+    "onsite-renewable"
+   ],
+   "aliases": [
+    "Utility Rate of Return",
+    "utility rate of return"
+   ]
+  },
+  "market-condition": {
+   "t": "Market Conditions",
+   "d": "Current supply-demand dynamics in the construction market at bid time. In a buyer's market (overcapacity) pricing drops ~5%; balanced is the baseline; in a seller's market — the norm during the AI build-out — contractors charge ~+10% premiums because order books are full. Compounds with Contractor Availability and Year Escalation; timing a bid into a cooler market is one of the few free CAPEX levers.",
+   "table": [
+    [
+     "Condition",
+     "Impact"
+    ],
+    [
+     "Buyer's Market",
+     "-5% (overcapacity)"
+    ],
+    [
+     "Balanced",
+     "0% (baseline)"
+    ],
+    [
+     "Seller's Market",
+     "+10% (high demand)"
+    ]
+   ],
+   "rel": [
+    "contractor-availability",
+    "year-escalation",
+    "delivery-method"
+   ],
+   "aliases": [
+    "Market Conditions",
+    "market conditions",
+    "Seller's Market",
+    "Buyer's Market"
+   ]
+  },
+  "delivery-method": {
+   "t": "Delivery Method",
+   "d": "The contracting structure for design and construction, which shifts both cost and risk allocation. Design-Bid-Build is the baseline (full owner control, sequential schedule); Design-Build integrates the two and saves ~3%; modular-prefab moves work into the factory for ~-8% and faster schedules; EPC turnkey costs ~+5% for single-source responsibility but transfers delivery risk to the contractor. The right choice depends on the owner's in-house Project Management capability and risk appetite.",
+   "table": [
+    [
+     "Method",
+     "Impact"
+    ],
+    [
+     "Design-Bid-Build",
+     "Baseline"
+    ],
+    [
+     "Design-Build",
+     "-3% (integrated)"
+    ],
+    [
+     "Modular-Prefab",
+     "-8% (factory-built)"
+    ],
+    [
+     "EPC Turnkey",
+     "+5% (single source)"
+    ]
+   ],
+   "rel": [
+    "pm-fee",
+    "design-fee",
+    "market-condition",
+    "building-type"
+   ],
+   "aliases": [
+    "Delivery Method",
+    "Design-Bid-Build",
+    "Design-Build",
+    "EPC Turnkey"
+   ]
+  },
+  "contractor-availability": {
+   "t": "Contractor Availability",
+   "d": "Labor-market tightness in the chosen metro, a major source of regional cost variance — location-specific labor costs drive significant spread between otherwise identical builds (per Matt Pacione). High availability adds no premium, normal markets ~+3%, and tight markets (multiple hyperscale projects competing for the same electricians and pipefitters) ~+8%. Correlates strongly with Market Conditions and the City / Market cost level.",
+   "table": [
+    [
+     "Availability",
+     "Premium"
+    ],
+    [
+     "High Availability",
+     "+0%"
+    ],
+    [
+     "Normal",
+     "+3%"
+    ],
+    [
+     "Tight Market",
+     "+8%"
+    ]
+   ],
+   "rel": [
+    "market-condition",
+    "city-market",
+    "tab-talent"
+   ],
+   "aliases": [
+    "Contractor Availability",
+    "contractor availability"
+   ]
+  },
+  "design-fee": {
+   "t": "Design & Engineering Fee",
+   "d": "Architecture, MEP engineering, and specialty consulting fees, typically 5–12% of construction cost (8% is a common midpoint for mission-critical work, higher than commercial buildings because of redundancy engineering and commissioning documentation). Complex Cooling Type choices (DLC, Deep Sea Water Cooling) and high Redundancy push toward the top of the range. Booked as a soft cost alongside the Project Management fee and Contingency.",
+   "u": "% of construction cost",
+   "rel": [
+    "pm-fee",
+    "contingency",
+    "delivery-method"
+   ],
+   "aliases": [
+    "Design & Engineering",
+    "Design Fee",
+    "design fee"
+   ]
+  },
+  "pm-fee": {
+   "t": "Project Management Fee",
+   "d": "Owner's project management and construction management cost, typically 3–8% of construction value (5% midpoint). Covers schedule control, vendor coordination, quality assurance, and commissioning oversight — cheap insurance on a project where a missed Transformer Lead Time or failed integrated systems test costs far more. Lower when using EPC turnkey Delivery Method (contractor absorbs coordination), higher for multi-phase Capacity Plan builds.",
+   "u": "% of construction cost",
+   "rel": [
+    "design-fee",
+    "delivery-method",
+    "contingency"
+   ],
+   "aliases": [
+    "Project Management",
+    "PM Fee",
+    "project management fee"
+   ]
+  },
+  "contingency": {
+   "t": "Contingency",
+   "d": "The budget reserve for unknowns — design development, scope growth, market movement, and site surprises — typically 5–20% of estimated cost (10% is standard for well-defined projects; early-stage or novel-technology builds like Deep Sea Water Cooling carry 15%+). Contingency is exactly what the Monte-Carlo P10/P50/P90 range quantifies: if your P90 sits far above your point estimate, your contingency is telling you it is too thin.",
+   "u": "% of estimated cost",
+   "rel": [
+    "monte-carlo",
+    "p10-p50-p90",
+    "design-fee",
+    "total-capex"
+   ],
+   "aliases": [
+    "Contingency",
+    "contingency reserve"
+   ]
+  },
+  "power-distribution": {
+   "t": "Power Distribution Method",
+   "d": "How power travels from switchgear to the PDUs on the floor. Overhead cable tray is cheapest (-8%) but less flexible for moves and changes; busway (busbar trunking) is the industry-standard baseline for large facilities with tap-off flexibility; underground conduit adds ~+15% for cable pits and trenching but suits campus layouts; mixed bus + underground (+8%) fits multi-building sites. Interacts with Floor Construction (underfloor routing needs raised floor).",
+   "table": [
+    [
+     "Method",
+     "Cost Impact"
+    ],
+    [
+     "Overhead Cable Tray",
+     "-8% (cheapest, less flexible)"
+    ],
+    [
+     "Busway",
+     "Baseline (industry standard)"
+    ],
+    [
+     "Underground Conduit",
+     "+15% (cable pits, trenching)"
+    ],
+    [
+     "Mixed (Bus + Underground)",
+     "+8% (campus/multi-building)"
+    ]
+   ],
+   "rel": [
+    "pdu-type",
+    "floor-type",
+    "cabling-type"
+   ],
+   "aliases": [
+    "Power Distribution",
+    "Power Distribution Method",
+    "Busway"
+   ]
+  },
+  "transformer-type": {
+   "t": "MV/LV Transformer Type",
+   "d": "The medium-voltage to low-voltage step-down transformer construction. Oil-filled outdoor units are ~10% cheaper but require oil containment bunds and fire separation distances; dry-type is the standard indoor choice; cast-resin is the premium indoor option (+12%) with the lowest fire risk and best tolerance of humid or dusty environments. Distinct from the large grid transformers counted under Front-of-Meter.",
+   "table": [
+    [
+     "Type",
+     "Cost Impact"
+    ],
+    [
+     "Oil-Filled (outdoor)",
+     "-10% (cheapest, needs bund)"
+    ],
+    [
+     "Dry-Type",
+     "Baseline (indoor standard)"
+    ],
+    [
+     "Cast Resin",
+     "+12% (premium, low fire risk)"
+    ]
+   ],
+   "rel": [
+    "front-of-meter",
+    "power-distribution"
+   ],
+   "aliases": [
+    "Transformer Type",
+    "MV/LV Transformer",
+    "Dry-Type",
+    "Cast Resin"
+   ]
+  },
+  "pdu-type": {
+   "t": "PDU Type (Power Distribution Unit)",
+   "d": "The rack-level power strips that feed servers. Basic metered PDUs (~$800/rack) only distribute and show aggregate load; intelligent monitored PDUs (~$1,500/rack) add per-outlet metering feeding DCIM/CBM analytics; intelligent + switched (~$2,500/rack) adds remote outlet control for stranded-capacity recovery and remote reboot. Per-outlet visibility becomes critical at high Rack Density where a single overloaded circuit can trip a whole AI pod.",
+   "table": [
+    [
+     "Type",
+     "Cost per Rack"
+    ],
+    [
+     "Basic Metered",
+     "~$800/rack"
+    ],
+    [
+     "Intelligent (monitored)",
+     "~$1,500/rack"
+    ],
+    [
+     "Intelligent + Switched",
+     "~$2,500/rack"
+    ]
+   ],
+   "rel": [
+    "rack-density",
+    "power-distribution",
+    "tab-cbm"
+   ],
+   "aliases": [
+    "PDU Type",
+    "PDU",
+    "Power Distribution Unit"
+   ]
+  },
+  "cabling-type": {
+   "t": "Structured Cabling System",
+   "d": "Backbone and horizontal network cabling. Cat6A copper (~$600/rack) suits standard enterprise; hybrid fiber backbone + Cat6A drops (~$1,200/rack) is the mainstream standard; all-fiber OM4/OS2 (~$2,000/rack) is the premium choice for high-density and AI facilities where 400G+ east-west fabrics dominate. AI clusters can spend more on optics and cabling per rack than on power distribution, so density strategy (Rack Density) drives this line item.",
+   "table": [
+    [
+     "Type",
+     "Cost per Rack"
+    ],
+    [
+     "Cat6A Copper",
+     "~$600/rack"
+    ],
+    [
+     "Hybrid (Fiber + Cat6A)",
+     "~$1,200/rack"
+    ],
+    [
+     "All-Fiber (OM4/OS2)",
+     "~$2,000/rack"
+    ]
+   ],
+   "rel": [
+    "fiber-entry",
+    "rack-density"
+   ],
+   "aliases": [
+    "Structured Cabling",
+    "Structured Cabling System",
+    "Cat6A",
+    "OM4"
+   ]
+  },
+  "floor-type": {
+   "t": "Floor Construction (Raised Floor vs Slab)",
+   "d": "Whether the data hall uses an access (raised) floor or slab-on-grade with overhead services. Raised floor enables under-floor air distribution and cable routing but adds $25–50/sqft; 600 mm is the baseline, 900 mm adds ~+6% and 1200 mm ~+12% on the building for high-airflow designs. Slab with overhead distribution saves ~5% and is increasingly popular for high Rack Density deployments where air comes from in-row or liquid loops rather than under the floor.",
+   "table": [
+    [
+     "Type",
+     "Cost Impact"
+    ],
+    [
+     "Slab (overhead services)",
+     "-5% on building"
+    ],
+    [
+     "Raised Floor 600mm",
+     "Baseline"
+    ],
+    [
+     "Raised Floor 900mm",
+     "+6% on building"
+    ],
+    [
+     "Raised Floor 1200mm",
+     "+12% (high airflow)"
+    ]
+   ],
+   "rel": [
+    "cooling-type",
+    "power-distribution",
+    "rack-density"
+   ],
+   "aliases": [
+    "Floor Construction",
+    "Raised Floor",
+    "raised floor",
+    "slab"
+   ]
+  },
+  "site-condition": {
+   "t": "Site Condition (Greenfield / Brownfield / Retrofit)",
+   "d": "The starting state of the land or building. Greenfield (raw land) adds +5–8% for grading, drainage, and utility extensions; brownfield (existing industrial site) is the baseline needing some demolition; retrofit/conversion of an existing building adds +10–20% for demolition, structural adaptation, and working around as-built surprises. Interacts with Building Type — a warehouse conversion is by definition a retrofit play trading shell savings against adaptation cost.",
+   "table": [
+    [
+     "Condition",
+     "Site Cost"
+    ],
+    [
+     "Greenfield (raw land)",
+     "+5-8% for grading/utilities"
+    ],
+    [
+     "Brownfield",
+     "Baseline"
+    ],
+    [
+     "Retrofit / Conversion",
+     "+10-20% for demo/adaptation"
+    ]
+   ],
+   "rel": [
+    "building-type",
+    "seismic-zone"
+   ],
+   "aliases": [
+    "Site Condition",
+    "Site Preparation",
+    "Greenfield",
+    "Brownfield",
+    "Retrofit"
+   ]
+  },
+  "security-level": {
+   "t": "Physical Security Level",
+   "d": "The physical security infrastructure package: fencing, CCTV, access control, bollards, mantraps, vehicle barriers, and a security operations center (SOC). Standard (CCTV + access control) is baseline; enterprise adds ~+2% for biometrics and mantraps; high security adds ~+5% for a 24/7 SOC, anti-vehicle K12 barriers, and layered perimeters. Colocation and Hyperscaler Pre-Lease customers frequently mandate specific levels, and Compliance regimes (SOC 2, ISO 27001) audit against them.",
+   "table": [
+    [
+     "Level",
+     "Impact"
+    ],
+    [
+     "Standard",
+     "Baseline (CCTV+access)"
+    ],
+    [
+     "Enterprise",
+     "+2% (biometric+mantrap)"
+    ],
+    [
+     "High Security",
+     "+5% (SOC+barriers+K12)"
+    ]
+   ],
+   "rel": [
+    "tab-compliance",
+    "hyperscaler-prelease"
+   ],
+   "aliases": [
+    "Security Level",
+    "Physical Security"
+   ]
+  },
+  "fiber-entry": {
+   "t": "Fiber Entry (Connectivity)",
+   "d": "The number of physically diverse fiber paths into the building. A single path (~$150K) is a single point of failure; dual diverse entry (~$350K) is the standard for Tier III+ so one backhoe cannot sever connectivity; multi-path with a carrier meet-me room (~$600K) adds interconnection revenue potential and carrier density that raises Colocation Pricing power. Network diversity mirrors the power Redundancy philosophy — no single point of failure.",
+   "table": [
+    [
+     "Entry",
+     "Cost"
+    ],
+    [
+     "Single Path",
+     "~$150K"
+    ],
+    [
+     "Dual Diverse",
+     "~$350K"
+    ],
+    [
+     "Multi-Path + MMR",
+     "~$600K"
+    ]
+   ],
+   "rel": [
+    "cabling-type",
+    "redundancy",
+    "colocation-pricing"
+   ],
+   "aliases": [
+    "Fiber Entry",
+    "Fiber / Connectivity",
+    "Meet-Me Room"
+   ]
+  },
+  "green-certification": {
+   "t": "Green Certification (LEED / BREEAM)",
+   "d": "Third-party green building certification, adding 2–8% to construction cost for sustainable materials, energy modeling, enhanced commissioning, and documentation: LEED Silver ~+2%, Gold ~+4%, Platinum ~+8% (BREEAM Very Good/Outstanding are the European equivalents). The premium buys lower long-term OPEX (better PUE and WUE by design), easier permitting in strict jurisdictions, and ESG credibility that Hyperscaler Pre-Lease tenants increasingly require.",
+   "table": [
+    [
+     "Level",
+     "Cost Premium"
+    ],
+    [
+     "None",
+     "0%"
+    ],
+    [
+     "LEED Silver",
+     "+2%"
+    ],
+    [
+     "LEED Gold",
+     "+4%"
+    ],
+    [
+     "LEED Platinum",
+     "+8%"
+    ]
+   ],
+   "rel": [
+    "pue",
+    "wue",
+    "tab-carbon",
+    "hyperscaler-prelease"
+   ],
+   "aliases": [
+    "Green Certification",
+    "LEED",
+    "BREEAM",
+    "LEED / BREEAM"
+   ]
+  },
+  "onsite-renewable": {
+   "t": "On-Site Renewable Generation",
+   "d": "On-site solar PV and/or battery energy storage (BESS) reducing grid dependency at the cost of added CAPEX: rooftop solar runs roughly $1.2M/MW installed, solar + BESS roughly $2.5M/MW. BESS (screening basis ~$180/kWh installed, ~88% round-trip efficiency) can double as UPS reserve and peak-shaving asset. On-site generation improves CUE (carbon intensity) and hedges the electricity rate behind the Annual Energy Cost, but land take (~1.2 ha/MWp for solar) usually caps it well below full facility load.",
+   "table": [
+    [
+     "Option",
+     "Cost Addition"
+    ],
+    [
+     "None",
+     "$0"
+    ],
+    [
+     "Rooftop Solar",
+     "~$1.2M/MW"
+    ],
+    [
+     "Solar + BESS",
+     "~$2.5M/MW"
+    ]
+   ],
+   "s": "Lazard LCOE+ 2025, IRENA 2024, BNEF BESS 2026 (screening-grade)",
+   "rel": [
+    "annual-energy-cost",
+    "cue",
+    "ups-type",
+    "tab-carbon"
+   ],
+   "aliases": [
+    "On-Site Renewable",
+    "On-Site Generation",
+    "BESS",
+    "Rooftop Solar"
+   ]
+  },
+  "total-capex": {
+   "t": "Total CAPEX (Capital Expenditure)",
+   "d": "The total upfront investment required to build the data center: construction, electrical and mechanical equipment, fit-out, soft costs (Design Fee, Project Management, Contingency), and commissioning. It scales primarily with IT Load, Redundancy, Cooling Type, and location (Region, City / Market), then gets adjusted by escalation and market factors. Total CAPEX divided by IT capacity gives Cost per kW, the industry benchmark; it also anchors every downstream financial metric — Equity IRR, DSCR, NPV, and Payback Period all start from this number.",
+   "f": "Total CAPEX = sum(construction + equipment + fit-out + soft costs) x location x escalation x market factors",
+   "u": "USD",
+   "rel": [
+    "cost-per-kw",
+    "it-load",
+    "capex",
+    "equity-irr",
+    "npv"
+   ],
+   "aliases": [
+    "Total CAPEX",
+    "total CAPEX"
+   ]
+  },
+  "cost-per-kw": {
+   "t": "Cost per kW (of IT Load)",
+   "d": "The industry benchmark unit cost: Total CAPEX divided by IT Load capacity. Typical ranges are $8,000–15,000/kW for Tier III facilities and $15,000–25,000/kW for Tier IV; AI/liquid-cooled builds trend higher on mechanical scope but can be lower per kW at very high Rack Density because the building shrinks. Comparing your figure against the City / Market $/W anchors and Benchmark Percentile tells you instantly whether an estimate is credible.",
+   "f": "Cost per kW = Total CAPEX / IT Load (kW)",
+   "u": "$/kW",
+   "table": [
+    [
+     "Class",
+     "Typical Range"
+    ],
+    [
+     "Tier III",
+     "$8,000-15,000/kW"
+    ],
+    [
+     "Tier IV",
+     "$15,000-25,000/kW"
+    ]
+   ],
+   "rel": [
+    "total-capex",
+    "it-load",
+    "city-market",
+    "benchmark-percentile"
+   ],
+   "aliases": [
+    "Cost per kW IT Load",
+    "Cost per kW",
+    "$/kW"
+   ]
+  },
+  "tier-class": {
+   "t": "Tier Classification (Uptime Institute)",
+   "d": "The Uptime Institute's four-level availability classification, determined chiefly by Redundancy topology: Tier I (N) = 99.671% availability, Tier II = 99.741%, Tier III (N+1, concurrently maintainable) = 99.982%, Tier IV (2N, fault tolerant) = 99.995%. Each tier step roughly means an order-of-magnitude less annual downtime but materially more CAPEX — Tier IV can cost 1.5–2x a Tier II per kW. Tier III is the commercial colocation standard; the tier you build should match the revenue and SLA model, not exceed it.",
+   "table": [
+    [
+     "Tier",
+     "Availability"
+    ],
+    [
+     "Tier I (N)",
+     "99.671%"
+    ],
+    [
+     "Tier II",
+     "99.741%"
+    ],
+    [
+     "Tier III (N+1)",
+     "99.982%"
+    ],
+    [
+     "Tier IV (2N)",
+     "99.995%"
+    ]
+   ],
+   "s": "Uptime Institute Tier Standard",
+   "rel": [
+    "redundancy",
+    "uptime-sla",
+    "fuel-autonomy"
+   ],
+   "aliases": [
+    "Tier Classification",
+    "Uptime Tier",
+    "Tier III",
+    "Tier IV"
+   ]
+  },
+  "uptime-sla": {
+   "t": "Expected Uptime (Availability SLA)",
+   "d": "The percentage of the year the facility is expected to be operational, set by the Redundancy level and Tier Classification. 99.982% (Tier III) allows about 1.6 hours of downtime per year; 99.995% (Tier IV) about 26 minutes; adding another nine multiplies infrastructure cost. Contractual SLA breaches typically trigger service credits, so the gap between designed availability and sold SLA is a real risk position quantified in the Risk Analysis module.",
+   "u": "%",
+   "table": [
+    [
+     "Availability",
+     "Downtime/yr"
+    ],
+    [
+     "99.671%",
+     "~28.8 hours"
+    ],
+    [
+     "99.982%",
+     "~1.6 hours"
+    ],
+    [
+     "99.995%",
+     "~26 minutes"
+    ],
+    [
+     "99.9995%",
+     "~2.6 minutes"
+    ]
+   ],
+   "rel": [
+    "tier-class",
+    "redundancy",
+    "tab-risk"
+   ],
+   "aliases": [
+    "Expected Uptime",
+    "Uptime SLA",
+    "availability SLA"
+   ]
+  },
+  "annual-energy-cost": {
+   "t": "Annual Energy Cost",
+   "d": "Estimated yearly electricity spend: IT Load x PUE x 8,760 hours x the electricity rate. It is an OPEX item, not part of CAPEX, and over a 10–15 year horizon it typically exceeds the original build cost — which is why a 0.1 PUE improvement or an On-Site Renewable hedge moves TCO more than most construction savings. Feeds directly into NOI and therefore DSCR in the financing model.",
+   "f": "Annual Energy = IT Load (kW) x PUE x 8,760 h x $/kWh",
+   "u": "USD/yr",
+   "rel": [
+    "pue",
+    "opex",
+    "tco",
+    "onsite-renewable",
+    "noi"
+   ],
+   "aliases": [
+    "Annual Energy",
+    "Annual Energy Cost",
+    "annual electricity cost"
+   ]
+  },
+  "deep-sea-water-cooling": {
+   "t": "Deep Sea Water Cooling (DSWC)",
+   "d": "Chiller-less primary cooling that rejects heat into cold deep seawater (4–6 °C drawn from 800–1000 m depth) through a Titanium Plate Heat Exchanger, organized as a Three-Loop Architecture (rack CDU → closed facility water → open seawater). Because the ocean does the refrigeration, compressor energy disappears: design PUE ≤ 1.15 and WUE ≈ 0 (no evaporative water use), with a Trim Chiller kept as hybrid backup for warm events and maintenance. Reference basis: a 150 MW AI data center rejecting 172.5 MW of heat needs 8.625 m³/s (31,050 m³/h) of Seawater Flow at the 5 °C design ΔT, moved by 4+1 pumps of 2.9 m³/s at 60 m head (~2,000 kW each).",
+   "f": "Flow = Heat (W) / (rho x cp x deltaT); poster basis: 172.5e6 / (4000 x 1000/... ) -> 8.625 m3/s at deltaT 5 C",
+   "s": "150 MW AI DC deep-sea cooling reference architecture (2026); Makai Ocean Engineering SWAC studies; NOAA World Ocean Atlas temperature profiles",
+   "rel": [
+    "intake-depth",
+    "seawater-delta-t",
+    "three-loop-architecture",
+    "titanium-phe",
+    "trim-chiller",
+    "seawater-flow",
+    "ppue",
+    "wue"
+   ],
+   "aliases": [
+    "Deep Sea Water Cooling System",
+    "Deep Sea Water Cooling",
+    "deep sea cooling",
+    "SWAC"
+   ]
+  },
+  "intake-depth": {
+   "t": "Intake Depth",
+   "d": "How deep the seawater intake sits, which sets the source temperature and therefore the whole cooling capability: typical tropical/subtropical profiles give ~4 °C at 1100 m+, 5 °C at 900 m, 6 °C at 700 m, 8 °C at 500 m, 11 °C at 300 m, and ~16 °C at the surface. The design target of 4–6 °C means intakes at 800–1000 m; going shallower saves HDPE Marine Pipeline cost but warms the source, shrinking the Titanium PHE approach margin and forcing more Trim Chiller hours. Depth also increases Pump Head via longer pipeline friction.",
+   "u": "m",
+   "table": [
+    [
+     "Depth",
+     "Typical Temp"
+    ],
+    [
+     "1100 m+",
+     "4.0 °C"
+    ],
+    [
+     "900 m",
+     "5.0 °C"
+    ],
+    [
+     "700 m",
+     "6.0 °C"
+    ],
+    [
+     "500 m",
+     "8.0 °C"
+    ],
+    [
+     "300 m",
+     "11.0 °C"
+    ]
+   ],
+   "s": "NOAA World Ocean Atlas typical tropical/subtropical profiles",
+   "rel": [
+    "deep-sea-water-cooling",
+    "hdpe-marine-pipeline",
+    "pump-head",
+    "trim-chiller"
+   ],
+   "aliases": [
+    "Intake Depth (m)",
+    "Intake Depth",
+    "intake depth"
+   ]
+  },
+  "seawater-delta-t": {
+   "t": "Seawater ΔT (Temperature Rise)",
+   "d": "How much the seawater warms passing through the heat exchanger — the design value is 5 °C, which is also the common environmental discharge limit (ΔT ≤ 5 °C at the Outfall Diffuser mixing zone). ΔT and Seawater Flow trade off directly: halving ΔT doubles the required flow, pump power, and pipeline size, while pushing ΔT above the permit limit risks the discharge consent. The reference design moves 8.625 m³/s at exactly 5 °C to reject 172.5 MW.",
+   "f": "Q (heat) = rho x cp x Flow x deltaT",
+   "u": "°C",
+   "rel": [
+    "seawater-flow",
+    "outfall-diffuser",
+    "deep-sea-water-cooling",
+    "entrainment"
+   ],
+   "aliases": [
+    "Seawater ΔT (°C)",
+    "Seawater ΔT",
+    "seawater delta T"
+   ]
+  },
+  "trim-chiller": {
+   "t": "Trim Chiller (Hybrid Backup)",
+   "d": "A conventional chiller plant sized at a fraction of total load (design basis 35% capacity) that runs only during warm-water events, peak excursions, or seawater-system maintenance — roughly 300 hours per year in the reference design, at ~$260k per MWth installed. It converts Deep Sea Water Cooling from a single-point-of-failure bet into an N+1 hybrid: the ocean carries the base load, the trim plant guarantees the SLA. Because it runs so few hours, its Refrigerant choice (typically ultra-low-GWP R-1234ze) has minimal Scope-1 impact.",
+   "u": "% of cooling load",
+   "rel": [
+    "deep-sea-water-cooling",
+    "n-plus-1-redundancy",
+    "refrigerant",
+    "r1234ze"
+   ],
+   "aliases": [
+    "Trim Chiller Capacity (%)",
+    "Trim Chiller",
+    "trim chiller"
+   ]
+  },
+  "titanium-phe": {
+   "t": "Titanium Plate Heat Exchanger (PHE)",
+   "d": "The barrier between the corrosive open seawater loop and the clean closed facility-water loop, built from Titanium Grade 2 plates — the only mainstream material that survives decades of warm chloride exposure without pitting. Design approach temperature is 2.0 °C (range 1.5–2.5 °C): tighter approach means colder facility water but more plate area and cost (~$95k per MWth). Configured N+1 in parallel banks so individual units can be opened for cleaning without dropping the Three-Loop Architecture.",
+   "u": "$/MWth",
+   "rel": [
+    "deep-sea-water-cooling",
+    "three-loop-architecture",
+    "n-plus-1-redundancy",
+    "seawater-filtration"
+   ],
+   "aliases": [
+    "Titanium PHE",
+    "titanium plate heat exchanger",
+    "Titanium Gr2 PHE",
+    "plate heat exchanger"
+   ]
+  },
+  "seawater-flow": {
+   "t": "Seawater Flow",
+   "d": "The volume of seawater pumped through the system, fixed by physics: Flow = Heat / (density x specific heat x ΔT). The 150 MW reference (172.5 MW total heat with electrical losses) needs 8.625 m³/s = 31,050 m³/h at the 5 °C Seawater ΔT — comparable to a small river. Flow determines everything downstream: pump count and Pump Head, HDPE Marine Pipeline diameter, Seawater Filtration sizing ($260 per m³/h), and the Entrainment footprint at the intake.",
+   "f": "Flow (m3/s) = Heat (MW) x 1e6 / (rho x cp x deltaT); poster: 172.5 / (4.0 x 5) = 8.625 m3/s",
+   "u": "m³/s",
+   "rel": [
+    "seawater-delta-t",
+    "pump-head",
+    "hdpe-marine-pipeline",
+    "seawater-filtration",
+    "entrainment"
+   ],
+   "aliases": [
+    "Seawater Flow",
+    "seawater flow rate"
+   ]
+  },
+  "pump-head": {
+   "t": "Pump Head (Seawater Pumping)",
+   "d": "The total pressure the seawater pumps must develop, combining static lift (~15 m base) plus pipeline friction (~12 m per km of pipeline). The reference design uses 4 duty + 1 standby pumps rated 2.9 m³/s at 60 m head, roughly 2,000 kW each — pumping is the dominant energy user in a chiller-less system and the main term in its pPUE. Efficiencies stack multiplicatively (pump 0.87 x motor 0.96 x VFD 0.97 ≈ 0.81; poster basis uses 0.85 combined), so every point of pump efficiency bought at CAPEX time pays back for 25+ years.",
+   "f": "Pump power (W) = rho x g x Head x Flow / eff_total",
+   "u": "m",
+   "rel": [
+    "seawater-flow",
+    "ppue",
+    "hdpe-marine-pipeline",
+    "n-plus-1-redundancy"
+   ],
+   "aliases": [
+    "Pump Head",
+    "pump head",
+    "seawater pumps"
+   ]
+  },
+  "ppue": {
+   "t": "pPUE (Partial Power Usage Effectiveness)",
+   "d": "PUE measured for one subsystem or zone rather than the whole facility — for Deep Sea Water Cooling, the cooling pPUE counts seawater pump power, facility-water loop pumps (~38% of seawater pump power), and CDU pumps (~10%) against IT load. Because there are no compressors, cooling pPUE lands far below chiller plants and holds the facility PUE at ≤ 1.15 (including ~5% electrical distribution losses). Comparing pPUE across subsystems shows exactly where the overhead watts go.",
+   "f": "pPUE = (subsystem overhead energy + IT energy) / IT energy",
+   "rel": [
+    "pue",
+    "pump-head",
+    "deep-sea-water-cooling",
+    "partial-load-pue"
+   ],
+   "aliases": [
+    "pPUE",
+    "partial PUE"
+   ]
+  },
+  "three-loop-architecture": {
+   "t": "Three-Loop Architecture (TCS / FWS / Seawater)",
+   "d": "The separation of the cooling chain into three isolated hydraulic loops: the Technology Cooling System (rack CDU loop, direct-to-chip at 20–25 °C), the closed Facility Water System (clean treated water, ~10 bar design), and the open seawater loop. Each boundary crossing happens in a heat exchanger — the Titanium PHE at the seawater boundary — so corrosive, biologically active seawater never approaches the IT equipment, and a leak in any loop is contained. This layering costs approach temperature (each HX adds ~2 °C) but is what makes ocean cooling insurable and maintainable.",
+   "rel": [
+    "deep-sea-water-cooling",
+    "titanium-phe",
+    "cooling-type"
+   ],
+   "aliases": [
+    "Three-Loop Architecture",
+    "3 separated loops",
+    "TCS",
+    "FWS",
+    "facility water system"
+   ]
+  },
+  "hdpe-marine-pipeline": {
+   "t": "HDPE Marine Pipeline",
+   "d": "The high-density polyethylene intake and outfall pipelines running from shore to depth — HDPE because it is corrosion-immune, flexible for seabed contours, and can be float-and-sink installed. Marine installation runs about 3x the onshore pipeline cost (industry range 2.5–4x); unit costs scale with flow, from ~$2.2M/km at ≤3 m³/s up to ~$7.5M/km at 20 m³/s, and the system needs 2 lines (intake + outfall) plus an intake structure (~$4.5M) and Outfall Diffuser (~$1.8M). Pipeline length to reach Intake Depth is typically the largest single CAPEX line in a Deep Sea Water Cooling build.",
+   "u": "$/km",
+   "table": [
+    [
+     "Flow",
+     "Cost per km"
+    ],
+    [
+     "≤3 m³/s",
+     "~$2.2M"
+    ],
+    [
+     "≤6 m³/s",
+     "~$3.4M"
+    ],
+    [
+     "≤10 m³/s",
+     "~$4.8M"
+    ],
+    [
+     "≤20 m³/s",
+     "~$7.5M"
+    ]
+   ],
+   "rel": [
+    "intake-depth",
+    "outfall-diffuser",
+    "seawater-flow",
+    "marine-opex"
+   ],
+   "aliases": [
+    "Pipeline to Shore (km)",
+    "HDPE marine pipeline",
+    "marine pipeline"
+   ]
+  },
+  "seawater-filtration": {
+   "t": "Seawater Filtration",
+   "d": "The multi-stage screening train that keeps marine life and debris out of the Titanium PHE: coarse 50 mm bars → fine 5 mm screens → traveling screens → 200 µm disc filters → 50 µm auto-backwash, configured N+1 so cleaning never interrupts flow. Sized at roughly $260 per m³/h of Seawater Flow (about $8M for the 31,050 m³/h reference). Filtration performance directly controls HX fouling rates and therefore Marine OPEX (cleaning frequency, chlorination dosing).",
+   "u": "$ per m³/h",
+   "rel": [
+    "titanium-phe",
+    "seawater-flow",
+    "entrainment",
+    "marine-opex",
+    "n-plus-1-redundancy"
+   ],
+   "aliases": [
+    "Seawater Filtration",
+    "seawater filtration",
+    "traveling screen"
+   ]
+  },
+  "outfall-diffuser": {
+   "t": "Outfall Diffuser",
+   "d": "The multi-port discharge structure (~$1.8M reference cost) that returns warmed seawater to the ocean while rapidly mixing it to meet the environmental limit — typically ΔT ≤ 5 °C at the edge of the mixing zone. Port sizing, spacing, and discharge depth are set by dilution modeling in the environmental permit; a well-designed diffuser is what keeps the thermal plume from stressing local ecosystems and keeps the discharge consent defensible. Paired with the intake structure at the other end of the HDPE Marine Pipeline.",
+   "rel": [
+    "seawater-delta-t",
+    "hdpe-marine-pipeline",
+    "entrainment"
+   ],
+   "aliases": [
+    "Outfall Diffuser",
+    "outfall diffuser",
+    "diffuser"
+   ]
+  },
+  "entrainment": {
+   "t": "Entrainment (Marine Impact)",
+   "d": "The drawing of small marine organisms — larvae, eggs, plankton — into the intake flow, the primary ecological concern of any large seawater system moving 31,050 m³/h. Mitigations include low intake approach velocities, deep placement (the 800–1000 m Intake Depth is naturally less biologically productive than surface waters), and fine Seawater Filtration screens with fish-return provisions. Entrainment and thermal-plume studies are core to the environmental impact assessment that permits the project.",
+   "rel": [
+    "intake-depth",
+    "seawater-filtration",
+    "outfall-diffuser"
+   ],
+   "aliases": [
+    "Entrainment",
+    "entrainment"
+   ]
+  },
+  "n-plus-1-redundancy": {
+   "t": "N+1 Redundancy (Marine Systems)",
+   "d": "One spare unit beyond the count needed for full load, applied throughout the Deep Sea Water Cooling design: pumps 4+1 (the +1 is design margin beyond the hydraulic minimum), filters N+1, Titanium PHE banks N+1 in parallel, Trim Chillers N+1, while power and controls run 2N. This lets any single pump, screen, or heat-exchanger be serviced with the system at full capacity — the marine equivalent of the electrical Redundancy that defines the facility Tier Classification.",
+   "rel": [
+    "redundancy",
+    "deep-sea-water-cooling",
+    "trim-chiller",
+    "titanium-phe"
+   ],
+   "aliases": [
+    "N+1 pumps",
+    "N+1 redundancy"
+   ]
+  },
+  "marine-opex": {
+   "t": "Marine OPEX",
+   "d": "The recurring cost of operating the seawater side: maintenance at ~3% of marine CAPEX per year, anti-biofouling chlorination dosing (~$6.5 per m³/h of flow per year), and annual ROV pipeline inspection (~$350k/yr). Pumps run at roughly 0.85 load factor, so pumping electricity is the other big line — together these replace the chiller maintenance and refrigerant costs of a conventional plant. Marine OPEX is usually well below the compressor energy it displaces, which is what makes the PUE ≤ 1.15 economics work over the asset life.",
+   "u": "USD/yr",
+   "rel": [
+    "deep-sea-water-cooling",
+    "hdpe-marine-pipeline",
+    "seawater-filtration",
+    "opex"
+   ],
+   "aliases": [
+    "Marine OPEX",
+    "marine maintenance",
+    "ROV inspection"
+   ]
+  },
+  "refrigerant": {
+   "t": "Refrigerant",
+   "d": "The working fluid in chillers and CRAC units, and a triple-impact choice: it drives cycle efficiency (COP), Scope-1 leakage emissions (via GWP), and safety-mitigation CAPEX (via the ASHRAE 34 Safety Class). Regulation is forcing the transition — the US AIM Act restricts GWP > 700 in new equipment from 2025 and the EU F-Gas Regulation targets GWP > 150 — pushing the industry from R-410A and R-134a toward A2L blends and ultra-low-GWP HFOs like R-1234ze. The calculator's 'Auto' mode picks the industry-typical refrigerant for the selected Cooling Type (e.g. R-410A for CRAC, R-134a for RDHX chillers, R-1234ze for Deep Sea trim plants).",
+   "s": "GWP100 per IPCC AR4; ASHRAE Standard 34 safety classes",
+   "rel": [
+    "gwp",
+    "cop",
+    "ashrae-34-safety-class",
+    "cooling-type",
+    "trim-chiller"
+   ],
+   "aliases": [
+    "Refrigerant",
+    "Refrigerant Type",
+    "refrigerant"
+   ]
+  },
+  "gwp": {
+   "t": "GWP (Global Warming Potential, AR4)",
+   "d": "How many times more warming one kilogram of a gas causes than one kilogram of CO2 over 100 years (IPCC AR4 values used sitewide). Legacy refrigerants are heavy: R-410A = 2088, R-134a = 1430; transition fluids sit mid-range (R-513A = 631); next-generation options are near zero (R-1234ze = 7, R-290 propane = 3, R-717 ammonia = 0). GWP x annual leak rate x refrigerant charge gives the Scope-1 carbon from cooling, and GWP thresholds are the regulatory trigger — AIM Act bans GWP > 700 in new equipment from 2025, EU F-Gas targets GWP > 150.",
+   "f": "Scope-1 leakage tCO2e/yr = charge (kg) x leak rate (%/yr) x GWP / 1000",
+   "s": "IPCC AR4 GWP100",
+   "rel": [
+    "refrigerant",
+    "r410a",
+    "r134a",
+    "r1234ze",
+    "tab-carbon"
+   ],
+   "aliases": [
+    "GWP",
+    "Global Warming Potential"
+   ]
+  },
+  "ashrae-34-safety-class": {
+   "t": "ASHRAE 34 Safety Class",
+   "d": "The standard two-character refrigerant safety code: the letter grades toxicity (A = lower, B = higher) and the number grades flammability (1 = none, 2L = mildly flammable with low burning velocity, 2 = flammable, 3 = highly flammable). A1 fluids (R-134a, R-410A, R-1233zd) need no special mitigation; A2L fluids add ~3% equipment cost for leak detection and ventilation; B2L (ammonia) and A3 (propane) require machine-room isolation or strict charge limits, adding 6–7%. The class therefore converts directly into mitigation CAPEX in the refrigerant impact model.",
+   "table": [
+    [
+     "Class",
+     "Meaning"
+    ],
+    [
+     "A1",
+     "Non-flammable, lower toxicity"
+    ],
+    [
+     "A2L",
+     "Mildly flammable"
+    ],
+    [
+     "B2L",
+     "Toxic, mildly flammable"
+    ],
+    [
+     "A3",
+     "Highly flammable"
+    ]
+   ],
+   "s": "ASHRAE Standard 34",
+   "rel": [
+    "a2l",
+    "b2l",
+    "refrigerant",
+    "r290-propane"
+   ],
+   "aliases": [
+    "ASHRAE 34",
+    "safety class",
+    "ASHRAE 34 safety class"
+   ]
+  },
+  "a2l": {
+   "t": "A2L (Mildly Flammable Refrigerants)",
+   "d": "The ASHRAE 34 class for refrigerants with low toxicity and mild flammability (low burning velocity, hard to ignite) — the class most of the industry is migrating to, including R-32, R-454B, and the HFO R-1234ze. A2L systems require leak detection, ventilation interlocks, and charge-limit compliance per ASHRAE 15/IEC 60335, modeled as a ~3% equipment cost premium. The trade is regulatory durability: A2L fluids clear the AIM Act and EU F-Gas GWP thresholds that are eliminating A1 legacy HFCs like R-410A.",
+   "rel": [
+    "ashrae-34-safety-class",
+    "r1234ze",
+    "refrigerant",
+    "gwp"
+   ],
+   "aliases": [
+    "A2L",
+    "mildly flammable"
+   ]
+  },
+  "b2l": {
+   "t": "B2L (Toxic, Mildly Flammable)",
+   "d": "The ASHRAE 34 class combining higher toxicity with mild flammability — in practice this means R-717 Ammonia, the zero-GWP industrial refrigerant. B2L systems demand dedicated machine-room isolation, gas detection, emergency ventilation, and occupied-space charge limits per IIAR and EN 378, modeled as a ~7% capex premium. The payoff is the best cycle efficiency in the database (COP index 1.04) with literally zero direct Global Warming Potential.",
+   "rel": [
+    "ashrae-34-safety-class",
+    "r717-ammonia",
+    "gwp"
+   ],
+   "aliases": [
+    "B2L"
+   ]
+  },
+  "cop": {
+   "t": "COP (Coefficient of Performance)",
+   "d": "Cooling delivered per unit of electrical input — a chiller with COP 6.5 (the water-cooled baseline in the engine) moves 6.5 kW of heat per kW of compressor power. Refrigerant choice shifts COP by a few percent either way (indexed to R-134a = 1.00: ammonia 1.04, R-32 1.02, R-410A 0.95, R-1234ze 0.96), which compounds over 8,760 hours a year into real PUE and Annual Energy Cost differences. Higher COP also shrinks the heat-rejection plant needed per MW of IT.",
+   "f": "COP = cooling output (kWth) / electrical input (kWe)",
+   "rel": [
+    "refrigerant",
+    "pue",
+    "annual-energy-cost"
+   ],
+   "aliases": [
+    "COP",
+    "Coefficient of Performance",
+    "copIndex"
+   ]
+  },
+  "r410a": {
+   "t": "R-410A",
+   "d": "The dominant legacy refrigerant in DX CRAC units and packaged air conditioning — non-flammable A1, but with GWP 2088, among the worst climate profiles in service. The US AIM Act restricts GWP > 700 in new equipment from 2025 and the EU F-Gas phase-down is squeezing supply, so new builds should treat R-410A as end-of-life technology; R-454B is its designated successor in new DX equipment. Typical modeled leak rate 4%/yr with 0.15 kg charge per kWth — the highest Scope-1 leakage burden in the database.",
+   "table": [
+    [
+     "Property",
+     "Value"
+    ],
+    [
+     "GWP (AR4)",
+     "2088"
+    ],
+    [
+     "Safety class",
+     "A1"
+    ],
+    [
+     "COP index",
+     "0.95"
+    ],
+    [
+     "Typical leak",
+     "4%/yr"
+    ]
+   ],
+   "rel": [
+    "gwp",
+    "ashrae-34-safety-class",
+    "refrigerant",
+    "cop"
+   ],
+   "aliases": [
+    "R-410A",
+    "R410A"
+   ]
+  },
+  "r134a": {
+   "t": "R-134a",
+   "d": "The baseline centrifugal-chiller refrigerant (COP index 1.00 — everything else is measured against it), non-flammable A1 with GWP 1430. It remains common in large water-cooled chillers but is being phased down under the Kigali Amendment HFC schedule; R-513A is the low-GWP drop-in replacement (~3% capacity/efficiency penalty) and R-1234ze the clean-sheet successor. Typical modeled leak rate 3%/yr with 0.20 kg charge per kWth.",
+   "table": [
+    [
+     "Property",
+     "Value"
+    ],
+    [
+     "GWP (AR4)",
+     "1430"
+    ],
+    [
+     "Safety class",
+     "A1"
+    ],
+    [
+     "COP index",
+     "1.00 (baseline)"
+    ]
+   ],
+   "rel": [
+    "r513a",
+    "r1234ze",
+    "gwp",
+    "cop"
+   ],
+   "aliases": [
+    "R-134a",
+    "R134a"
+   ]
+  },
+  "r513a": {
+   "t": "R-513A",
+   "d": "A lower-GWP azeotropic blend (GWP 631, non-flammable A1) designed as a drop-in replacement for R-134a in existing chillers, accepting roughly a 3% capacity/efficiency penalty (COP index 0.97). It is the pragmatic retrofit path: no equipment change, no flammability mitigation, and a 56% GWP cut — though it still exceeds the EU F-Gas GWP > 150 trajectory, making it transitional rather than final. New equipment increasingly skips straight to R-1234ze.",
+   "table": [
+    [
+     "Property",
+     "Value"
+    ],
+    [
+     "GWP (AR4)",
+     "631"
+    ],
+    [
+     "Safety class",
+     "A1"
+    ],
+    [
+     "COP index",
+     "0.97"
+    ]
+   ],
+   "rel": [
+    "r134a",
+    "r1234ze",
+    "gwp"
+   ],
+   "aliases": [
+    "R-513A",
+    "R513A"
+   ]
+  },
+  "r1234ze": {
+   "t": "R-1234ze(E)",
+   "d": "An ultra-low-GWP hydrofluoroolefin (HFO) with GWP 7 — effectively future-proof against both the AIM Act and EU F-Gas thresholds — used in centrifugal and screw chillers. It is mildly flammable (A2L, ~3% mitigation capex) with a small efficiency penalty (COP index 0.96) and a low 2%/yr modeled leak rate. It is the engine's auto-pick for Deep Sea Water Cooling Trim Chillers, where the few hundred annual run-hours make its near-zero climate footprint essentially free.",
+   "table": [
+    [
+     "Property",
+     "Value"
+    ],
+    [
+     "GWP (AR4)",
+     "7"
+    ],
+    [
+     "Safety class",
+     "A2L"
+    ],
+    [
+     "COP index",
+     "0.96"
+    ]
+   ],
+   "rel": [
+    "a2l",
+    "gwp",
+    "trim-chiller",
+    "refrigerant"
+   ],
+   "aliases": [
+    "R-1234ze(E)",
+    "R-1234ze",
+    "R1234ze",
+    "HFO"
+   ]
+  },
+  "r717-ammonia": {
+   "t": "R-717 (Ammonia)",
+   "d": "The zero-GWP industrial refrigerant with the best cycle efficiency in the database (COP index 1.04) and a century of industrial track record. Its constraint is toxicity: safety class B2L requires machine-room isolation, gas detection, and occupied-space charge limits per IIAR and EN 378, modeled as a ~7% capex premium. Compelling for large central plants where the machine room is remote from white space and the efficiency gain compounds across megawatts.",
+   "table": [
+    [
+     "Property",
+     "Value"
+    ],
+    [
+     "GWP (AR4)",
+     "0"
+    ],
+    [
+     "Safety class",
+     "B2L"
+    ],
+    [
+     "COP index",
+     "1.04"
+    ],
+    [
+     "Capex premium",
+     "+7%"
+    ]
+   ],
+   "rel": [
+    "b2l",
+    "gwp",
+    "cop"
+   ],
+   "aliases": [
+    "R-717 Ammonia",
+    "R-717",
+    "R717",
+    "ammonia"
+   ]
+  },
+  "r290-propane": {
+   "t": "R-290 (Propane)",
+   "d": "Natural-refrigerant propane: GWP 3, excellent efficiency (COP index 1.00), and the smallest charge requirement in the database (0.05 kg/kWth). The catch is class A3 — highly flammable — which imposes strict charge limits and confines it to outdoor or rooftop packaged units well away from occupied space, modeled as a ~6% capex premium. Attractive for modular outdoor chiller farms where the flammability zoning is free.",
+   "table": [
+    [
+     "Property",
+     "Value"
+    ],
+    [
+     "GWP (AR4)",
+     "3"
+    ],
+    [
+     "Safety class",
+     "A3"
+    ],
+    [
+     "COP index",
+     "1.00"
+    ],
+    [
+     "Capex premium",
+     "+6%"
+    ]
+   ],
+   "rel": [
+    "ashrae-34-safety-class",
+    "gwp",
+    "cop"
+   ],
+   "aliases": [
+    "R-290 Propane",
+    "R-290",
+    "R290",
+    "propane"
+   ]
+  },
+  "pue": {
+   "t": "PUE (Power Usage Effectiveness)",
+   "d": "The headline data center efficiency metric: total facility power divided by IT equipment power, so 1.0 is theoretical perfection and everything above it is overhead (mostly cooling, then distribution losses). Industry average sits around 1.55; efficient facilities run 1.2–1.4; best-in-class free-cooled or Deep Sea Water Cooling designs achieve below 1.2 (the DSWC reference designs to ≤ 1.15). Every 0.1 of PUE on a 10 MW facility is roughly 8.76 GWh/yr — PUE feeds straight into Annual Energy Cost, CUE, and the Carbon/ESG story.",
+   "f": "PUE = Total Facility Power / IT Equipment Power",
+   "table": [
+    [
+     "Class",
+     "PUE"
+    ],
+    [
+     "Industry average",
+     "~1.55"
+    ],
+    [
+     "Efficient",
+     "1.2-1.4"
+    ],
+    [
+     "Best-in-class",
+     "<1.2"
+    ],
+    [
+     "Deep-sea design",
+     "≤1.15"
+    ]
+   ],
+   "rel": [
+    "dcie",
+    "partial-load-pue",
+    "ppue",
+    "annual-energy-cost",
+    "cue",
+    "deep-sea-water-cooling"
+   ],
+   "aliases": [
+    "PUE",
+    "Power Usage Effectiveness",
+    "Estimated PUE"
+   ]
+  },
+  "wue": {
+   "t": "WUE (Water Usage Effectiveness)",
+   "d": "Liters of water consumed per kWh of IT energy — the water twin of PUE, driven almost entirely by evaporative cooling (cooling towers, adiabatic pre-coolers). Evaporative plants commonly run 1–2 L/kWh, which for a 10 MW site is tens of millions of liters a year; closed-loop, air-cooled, and Deep Sea Water Cooling designs achieve WUE ≈ 0 because nothing evaporates. Increasingly a permitting and ESG gate in water-stressed regions, reported alongside PUE and CUE.",
+   "f": "WUE = Annual Water Consumption (L) / IT Energy (kWh)",
+   "u": "L/kWh",
+   "rel": [
+    "pue",
+    "cue",
+    "deep-sea-water-cooling",
+    "green-certification"
+   ],
+   "aliases": [
+    "WUE",
+    "Water Usage Effectiveness"
+   ]
+  },
+  "cue": {
+   "t": "CUE (Carbon Usage Effectiveness)",
+   "d": "The carbon intensity of the facility's compute: total CO2 emissions from energy divided by IT energy, equal to PUE multiplied by the grid's carbon intensity. Two identical 1.3-PUE facilities can differ 20x in CUE depending on whether the grid is hydro/nuclear or coal — which is why siting and On-Site Renewable procurement move carbon more than another PUE decimal. Core metric of the Carbon/ESG module alongside Scope-1 refrigerant and Generator Type fuel emissions.",
+   "f": "CUE = Total CO2 (kg) / IT Energy (kWh) = PUE x grid carbon intensity",
+   "u": "kgCO2/kWh",
+   "rel": [
+    "pue",
+    "onsite-renewable",
+    "tab-carbon",
+    "gwp"
+   ],
+   "aliases": [
+    "CUE",
+    "Carbon Usage Effectiveness"
+   ]
+  },
+  "dcie": {
+   "t": "DCiE (Data Center Infrastructure Efficiency)",
+   "d": "The reciprocal of PUE expressed as a percentage: IT power divided by total facility power. A PUE of 1.55 equals DCiE 65%; PUE 1.15 equals DCiE 87%. It carries identical information to PUE but reads intuitively as 'what share of my electricity actually reaches the servers' — useful when presenting efficiency to non-technical stakeholders.",
+   "f": "DCiE = (IT Power / Total Facility Power) x 100% = 100% / PUE",
+   "u": "%",
+   "rel": [
+    "pue"
+   ],
+   "aliases": [
+    "DCiE",
+    "Data Center Infrastructure Efficiency"
+   ]
+  },
+  "partial-load-pue": {
+   "t": "Partial-Load PUE",
+   "d": "PUE measured at less than design IT load — and almost always worse than nameplate, because fixed overheads (transformers, always-on fans, UPS losses) spread over fewer IT kilowatts. A facility rated PUE 1.3 at full load may run 1.6+ at 30% occupancy, which is exactly the early years of an Occupancy Ramp; this is why modeled Annual Energy Cost should use load-dependent PUE curves, not the brochure number. Modular plant deployment (adding cooling and UPS blocks with load) is the standard mitigation.",
+   "rel": [
+    "pue",
+    "occupancy-ramp",
+    "annual-energy-cost",
+    "ppue"
+   ],
+   "aliases": [
+    "Partial-Load PUE",
+    "partial load PUE"
+   ]
+  },
+  "white-space": {
+   "t": "White Space",
+   "d": "The floor area that holds IT racks — the revenue-generating footprint, as opposed to Support Space (electrical rooms, cooling plant, corridors, loading). White space requirement falls as Rack Density rises: an AI hall at 50–100 kW/rack needs a fraction of the floor of a 5 kW/rack enterprise hall for the same megawatts. Colocation Pricing and facility economics are quoted per kW far more than per square meter precisely because power, not floor, is the scarce resource.",
+   "u": "m²",
+   "rel": [
+    "support-space",
+    "rack-density",
+    "rack-density-kw-m2",
+    "colocation-pricing"
+   ],
+   "aliases": [
+    "White Space",
+    "white space"
+   ]
+  },
+  "rack-density-kw-m2": {
+   "t": "Area Power Density",
+   "d": "IT power per square meter of White Space, combining rack power and rack spacing — legacy enterprise halls run 1–2 kW/m², modern colocation 2–4 kW/m², and AI/HPC liquid-cooled halls can exceed 10 kW/m². Higher density shrinks the building (cheaper shell per MW) but concentrates structural floor loading (liquid-cooled racks can exceed 1,500 kg) and cooling distribution. The engine's space model derives hall area from IT Load, Rack Density, and layout allowances.",
+   "u": "kW/m²",
+   "rel": [
+    "rack-density",
+    "white-space",
+    "floor-type"
+   ],
+   "aliases": [
+    "kW/m²",
+    "area power density",
+    "power density"
+   ]
+  },
+  "support-space": {
+   "t": "Support Space",
+   "d": "All non-IT floor area: electrical rooms, UPS and battery rooms, cooling plant, generator yards, fuel storage, network entry rooms, corridors, loading docks, and offices. Support space commonly equals or exceeds the White Space itself — higher Redundancy (2N duplicates plant rooms) and on-site fuel for long Fuel Autonomy both inflate it. It earns no direct revenue, so efficient support-space ratio is a real design KPI in the space model.",
+   "u": "m²",
+   "rel": [
+    "white-space",
+    "redundancy",
+    "fuel-autonomy"
+   ],
+   "aliases": [
+    "Support Space",
+    "support space"
+   ]
+  },
+  "dscr": {
+   "t": "DSCR (Debt Service Coverage Ratio)",
+   "d": "Net Operating Income divided by annual debt service (principal + interest) — the lender's primary covenant metric answering 'how comfortably does the project pay its loan'. Data center project finance typically requires minimum DSCR of 1.20–1.40x, with hyperscale pre-leased assets achieving cheaper debt at lower thresholds; a DSCR below 1.0 means the project cannot cover its debt from operations. It is squeezed from both sides: NOI (via Occupancy Ramp, Revenue per kW, OPEX Growth) and leverage (via the Debt Ratio and interest rate), and it caps how much debt the Capital Structure can carry.",
+   "f": "DSCR = NOI / Annual Debt Service",
+   "table": [
+    [
+     "Level",
+     "Meaning"
+    ],
+    [
+     "<1.0x",
+     "Cannot service debt"
+    ],
+    [
+     "1.2x",
+     "Typical covenant floor"
+    ],
+    [
+     "1.4x+",
+     "Comfortable"
+    ],
+    [
+     "2.0x+",
+     "Under-levered"
+    ]
+   ],
+   "rel": [
+    "noi",
+    "debt-ratio-leverage",
+    "equity-irr",
+    "occupancy-ramp",
+    "tab-invest"
+   ],
+   "aliases": [
+    "DSCR",
+    "Debt Service Coverage Ratio"
+   ]
+  },
+  "equity-irr": {
+   "t": "Equity IRR (Internal Rate of Return to Equity)",
+   "d": "The annualized return on the equity slice of the capital stack, after debt service — the number sponsors and investors actually underwrite. Leverage amplifies it: if the Project IRR exceeds the cost of debt, raising the Debt Ratio lifts Equity IRR (and its risk); typical stabilized data center deals target low-to-mid teens Equity IRR, with development-risk deals in the high teens to twenties. Highly sensitive to the Exit EV/EBITDA Multiple, Occupancy Ramp speed, and Revenue per kW — the Sensitivity Matrix and Monte Carlo modules quantify exactly how much.",
+   "f": "IRR: rate where NPV of levered equity cash flows (incl. Terminal Value) = 0",
+   "u": "%",
+   "rel": [
+    "project-irr",
+    "debt-ratio-leverage",
+    "exit-ev-ebitda-multiple",
+    "terminal-value",
+    "dscr",
+    "npv"
+   ],
+   "aliases": [
+    "Equity IRR",
+    "equity IRR",
+    "levered IRR"
+   ]
+  },
+  "project-irr": {
+   "t": "Project IRR (Unlevered IRR)",
+   "d": "The internal rate of return on total invested capital before any financing — the project's intrinsic economics independent of how it is funded. Comparing Project IRR against WACC is the go/no-go test (a 12% hurdle is a common data center screen); the gap between Project IRR and the cost of debt is what leverage converts into extra Equity IRR. Because it strips out capital-structure choices, it is the right metric for ranking sites in the Portfolio module.",
+   "f": "IRR: rate where NPV of unlevered project cash flows = 0",
+   "u": "%",
+   "rel": [
+    "equity-irr",
+    "wacc",
+    "npv",
+    "tab-portfolio"
+   ],
+   "aliases": [
+    "Project IRR",
+    "unlevered IRR"
+   ]
+  },
+  "exit-ev-ebitda-multiple": {
+   "t": "Exit EV/EBITDA Multiple",
+   "d": "The valuation multiple assumed when the asset is sold or refinanced at the end of the hold: Enterprise Value = exit-year EBITDA x the multiple. Stabilized data centers have traded in the mid-teens to 20x+ EV/EBITDA in recent cycles depending on tenant quality (Hyperscaler Pre-Lease commands premium multiples), market, and growth. Because the exit often represents the majority of total equity proceeds, Equity IRR is acutely sensitive to this single assumption — always stress it in the Sensitivity Matrix.",
+   "f": "Exit Enterprise Value = Exit-Year EBITDA x Multiple",
+   "u": "x",
+   "rel": [
+    "ebitda",
+    "terminal-value",
+    "equity-irr",
+    "cap-rate",
+    "sensitivity-matrix"
+   ],
+   "aliases": [
+    "Exit EV/EBITDA Multiple",
+    "EV/EBITDA",
+    "exit multiple"
+   ]
+  },
+  "debt-ratio-leverage": {
+   "t": "Debt Ratio (Leverage)",
+   "d": "The share of Total CAPEX funded by debt rather than equity — data center project finance commonly runs 50–70% loan-to-cost, with stabilized refinancings going higher. More leverage magnifies Equity IRR when the project outearns its interest rate, but it also thins the DSCR cushion and raises default risk in downside scenarios; lenders size the loan to whichever binds first, the LTC cap or the DSCR covenant. The Investment module's Capital Structure and Debt Amortization Schedule show the mechanics.",
+   "f": "Debt Ratio = Debt / (Debt + Equity)",
+   "u": "%",
+   "rel": [
+    "dscr",
+    "equity-irr",
+    "wacc",
+    "tab-invest"
+   ],
+   "aliases": [
+    "Debt Ratio",
+    "leverage",
+    "loan-to-cost",
+    "Capital Structure"
+   ]
+  },
+  "occupancy-ramp": {
+   "t": "Occupancy Ramp",
+   "d": "The year-by-year fill schedule from opening day to stabilized occupancy — typically 2–4 years for colocation, or nearly instant with a Hyperscaler Pre-Lease. The ramp shape dominates early cash flows: slow fill means years of fixed OPEX and debt service against partial Revenue per kW, depressed DSCR, and worse Partial-Load PUE. It is one of the highest-impact variables in the Tornado Chart, and editable per-year in the DCMOC financial model.",
+   "u": "% occupied per year",
+   "rel": [
+    "revenue-per-kw",
+    "dscr",
+    "partial-load-pue",
+    "hyperscaler-prelease",
+    "tornado-chart"
+   ],
+   "aliases": [
+    "Occupancy Ramp",
+    "occupancy ramp",
+    "fill rate"
+   ]
+  },
+  "revenue-per-kw": {
+   "t": "Revenue per kW",
+   "d": "The top-line pricing unit of the data center business: monthly (or annual) revenue per kW of contracted IT capacity. Retail colocation commonly achieves $100–250/kW/month depending on market and service level, while wholesale and Hyperscaler Pre-Lease deals run materially lower per kW but with long terms, built-in Escalation, and near-zero vacancy. Together with the Occupancy Ramp it defines revenue; against OPEX it defines NOI and EBITDA — it is a top driver in every Sensitivity Matrix.",
+   "u": "$/kW/month",
+   "rel": [
+    "colocation-pricing",
+    "occupancy-ramp",
+    "noi",
+    "escalation",
+    "sensitivity-matrix"
+   ],
+   "aliases": [
+    "Revenue per kW",
+    "Revenue/kW",
+    "$/kW/month"
+   ]
+  },
+  "opex-growth": {
+   "t": "OPEX Growth",
+   "d": "The annual escalation rate applied to operating costs — energy, staffing, Maintenance, insurance — typically modeled at 2–4%/yr. The margin story lives in the spread between OPEX Growth and revenue Escalation: contracts that escalate at CPI while energy costs spike compress NOI and DSCR over the hold. Energy usually dominates the OPEX stack, so a power-price hedge or On-Site Renewable can matter more than every other cost line combined.",
+   "u": "%/yr",
+   "rel": [
+    "opex",
+    "escalation",
+    "noi",
+    "annual-energy-cost"
+   ],
+   "aliases": [
+    "OPEX Growth",
+    "opex growth",
+    "cost escalation rate"
+   ]
+  },
+  "npv": {
+   "t": "NPV (Net Present Value)",
+   "d": "The sum of all project cash flows discounted back to today at the discount rate (usually WACC), minus the initial investment — the direct dollar answer to 'does this create value'. Positive NPV means the project earns more than its cost of capital; the equivalent rate form of the same test is comparing Project IRR to the hurdle. Unlike IRR, NPV handles non-conventional cash flows cleanly and scales with project size, which is why the Financial module's Sensitivity Matrix reports both NPV and IRR per cell.",
+   "f": "NPV = sum( CF_t / (1 + r)^t ) - Initial Investment",
+   "u": "USD",
+   "rel": [
+    "wacc",
+    "project-irr",
+    "payback-period",
+    "terminal-value",
+    "sensitivity-matrix"
+   ],
+   "aliases": [
+    "NPV",
+    "Net Present Value"
+   ]
+  },
+  "payback-period": {
+   "t": "Payback Period",
+   "d": "How many years until cumulative cash inflows recover the initial investment — the simplest capital-recovery metric. Data center builds typically pay back in 6–10 years undiscounted depending on Revenue per kW and Occupancy Ramp speed. Its weakness is ignoring the time value of money and everything after breakeven (including Terminal Value); use the Discounted Payback and NPV alongside it rather than instead of them.",
+   "f": "Payback = years until cumulative cash flow >= initial investment",
+   "u": "years",
+   "rel": [
+    "discounted-payback",
+    "npv",
+    "total-capex"
+   ],
+   "aliases": [
+    "Payback Period",
+    "payback period",
+    "payback"
+   ]
+  },
+  "discounted-payback": {
+   "t": "Discounted Payback Period",
+   "d": "The payback calculation with each year's cash flow discounted at the cost of capital first — the honest version of the Payback Period, always longer than the simple one. It answers 'when has the project repaid its capital including the return that capital had to earn'. A project whose discounted payback never arrives within the horizon has negative NPV by construction.",
+   "f": "Discounted Payback = years until sum( CF_t / (1+r)^t ) >= initial investment",
+   "u": "years",
+   "rel": [
+    "payback-period",
+    "npv",
+    "wacc"
+   ],
+   "aliases": [
+    "Discounted Payback",
+    "discounted payback"
+   ]
+  },
+  "wacc": {
+   "t": "WACC (Weighted Average Cost of Capital)",
+   "d": "The blended required return across the capital stack: cost of equity weighted by the equity share plus after-tax cost of debt weighted by the Debt Ratio. It is the standard discount rate for NPV and the natural hurdle for Project IRR; data center WACCs commonly land in the 7–10% range depending on leverage, rates, and asset risk. Because debt is cheaper than equity (and interest is tax-deductible), leverage lowers WACC — up to the point where financial risk starts raising both components.",
+   "f": "WACC = E/(D+E) x Re + D/(D+E) x Rd x (1 - tax)",
+   "u": "%",
+   "rel": [
+    "npv",
+    "project-irr",
+    "debt-ratio-leverage",
+    "cap-rate"
+   ],
+   "aliases": [
+    "WACC",
+    "Weighted Average Cost of Capital",
+    "discount rate"
+   ]
+  },
+  "cap-rate": {
+   "t": "Cap Rate (Capitalization Rate)",
+   "d": "NOI divided by asset value — the real-estate market's shorthand for pricing income streams, and the inverse cousin of the EV/EBITDA multiple. Stabilized data centers have traded at cap rates in the 5–7% range in recent cycles, tighter (lower) for long-leased hyperscale assets and wider for retail colocation with shorter contracts. Cap-rate movement between entry and exit is a silent but powerful driver of Equity IRR: 100 bps of expansion can erase years of NOI growth.",
+   "f": "Cap Rate = NOI / Asset Value",
+   "u": "%",
+   "rel": [
+    "noi",
+    "exit-ev-ebitda-multiple",
+    "terminal-value",
+    "equity-irr"
+   ],
+   "aliases": [
+    "Cap Rate",
+    "cap rate",
+    "capitalization rate"
+   ]
+  },
+  "noi": {
+   "t": "NOI (Net Operating Income)",
+   "d": "Revenue minus operating expenses, before debt service, income tax, Depreciation, and capital expenditure — the clean measure of what the asset itself earns. NOI is the numerator of both DSCR (lender view) and the Cap Rate valuation (buyer view), making it the single most consequential line in the operating model. It is built from Revenue per kW x occupancy minus the OPEX stack, so the Occupancy Ramp and energy costs move it directly.",
+   "f": "NOI = Operating Revenue - Operating Expenses (before debt, tax, depreciation)",
+   "u": "USD/yr",
+   "rel": [
+    "dscr",
+    "cap-rate",
+    "ebitda",
+    "revenue-per-kw",
+    "opex"
+   ],
+   "aliases": [
+    "NOI",
+    "Net Operating Income"
+   ]
+  },
+  "ebitda": {
+   "t": "EBITDA",
+   "d": "Earnings Before Interest, Taxes, Depreciation, and Amortization — the operating cash-generation proxy used for valuation (Exit EV/EBITDA Multiple) and leverage metrics (debt/EBITDA). For a data center it is nearly identical to NOI, differing mainly in corporate overhead treatment; stabilized facilities commonly run 50–65% EBITDA margins because the cost base is dominated by pass-through or contracted items. Exit-year EBITDA times the exit multiple is usually the largest single cash flow in the deal.",
+   "f": "EBITDA = Revenue - OPEX (before interest, tax, depreciation, amortization)",
+   "u": "USD/yr",
+   "rel": [
+    "noi",
+    "exit-ev-ebitda-multiple",
+    "terminal-value",
+    "depreciation"
+   ],
+   "aliases": [
+    "EBITDA"
+   ]
+  },
+  "sensitivity-matrix": {
+   "t": "Sensitivity Matrix (Two-Way Data Table)",
+   "d": "A grid that recomputes the model across simultaneous variations of two drivers — in the DCMOC Financial module, CAPEX variation (rows) against Revenue per kW variation (columns), with each cell showing NPV / IRR. It reveals interaction effects a one-variable-at-a-time Tornado Chart misses (e.g. high CAPEX is survivable only if revenue also lands high), and shows how close the deal sits to its breakeven frontier. The disciplined workflow: tornado to find the top two drivers, then a sensitivity matrix on exactly those.",
+   "rel": [
+    "tornado-chart",
+    "monte-carlo",
+    "npv",
+    "revenue-per-kw",
+    "total-capex"
+   ],
+   "aliases": [
+    "Sensitivity Matrix",
+    "sensitivity matrix",
+    "sensitivity analysis"
+   ]
+  },
+  "monte-carlo": {
+   "t": "Monte-Carlo Simulation",
+   "d": "Thousands of model runs (the capex calculator uses 4,000, seeded and reproducible) with the uncertain inputs — construction bid spread, multi-year Escalation, scope growth, or in the DCMOC financial version revenue and cost drivers — drawn randomly from probability distributions each time. The output is a distribution rather than a point estimate, summarized as P10/P50/P90 percentiles: your Contingency should cover the gap between the point estimate and where P90 lands. Powered by RZEngine v2.0 in the capex calculator; the DCMOC Monte Carlo tab applies the same method to IRR and NPV.",
+   "rel": [
+    "p10-p50-p90",
+    "tornado-chart",
+    "contingency",
+    "sensitivity-matrix",
+    "tab-montecarlo"
+   ],
+   "aliases": [
+    "Monte-Carlo",
+    "Monte Carlo",
+    "Monte-Carlo range",
+    "Monte Carlo simulation"
+   ]
+  },
+  "tornado-chart": {
+   "t": "Tornado Chart",
+   "d": "A ranked bar chart showing how much the output (Total CAPEX, NPV, or IRR) moves when each input swings across its plausible range, one variable at a time, holding the rest at base case — widest bar on top, hence the tornado shape. It answers the only question that matters in early-stage estimating: which two or three assumptions deserve real diligence money. In the capex calculator it ranks construction cost spread, escalation, and scope growth; pair it with the Sensitivity Matrix for the interaction view.",
+   "rel": [
+    "monte-carlo",
+    "sensitivity-matrix",
+    "p10-p50-p90"
+   ],
+   "aliases": [
+    "Tornado Chart",
+    "tornado chart",
+    "tornado diagram"
+   ]
+  },
+  "p10-p50-p90": {
+   "t": "P10 / P50 / P90 Percentiles",
+   "d": "Three points on the Monte-Carlo output distribution: P10 = only 10% of simulated outcomes come in below this (optimistic case), P50 = the median (most-likely), P90 = 90% of outcomes fall below it (conservative case — for a cost metric, only 10% of scenarios exceed it). Lenders and investment committees typically underwrite at P90 cost and P50-or-worse revenue; the P90/P10 spread is a direct measure of how uncertain the estimate really is. If your budget sits at P50 with no Contingency, you have roughly a coin-flip of overrunning.",
+   "table": [
+    [
+     "Percentile",
+     "Reading (cost metric)"
+    ],
+    [
+     "P10",
+     "Optimistic — 10% chance of coming in lower"
+    ],
+    [
+     "P50",
+     "Median / most-likely"
+    ],
+    [
+     "P90",
+     "Conservative — 90% of outcomes below"
+    ]
+   ],
+   "rel": [
+    "monte-carlo",
+    "contingency",
+    "tornado-chart"
+   ],
+   "aliases": [
+    "P10",
+    "P50",
+    "P90",
+    "P10/P50/P90"
+   ]
+  },
+  "capex": {
+   "t": "CAPEX (Capital Expenditure)",
+   "d": "One-time investment in long-lived assets: land, building, electrical and mechanical plant, fit-out, and commissioning. CAPEX is capitalized on the balance sheet and recovered through Depreciation over asset lives (5–39 years by category), unlike OPEX which is expensed as incurred. The CAPEX/OPEX split shapes taxes, TCO, and financing — lenders fund CAPEX against future NOI, which is the whole project-finance construct.",
+   "u": "USD",
+   "rel": [
+    "total-capex",
+    "opex",
+    "depreciation",
+    "tco"
+   ],
+   "aliases": [
+    "CAPEX",
+    "Capital Expenditure",
+    "capital expenditure"
+   ]
+  },
+  "opex": {
+   "t": "OPEX (Operating Expenditure)",
+   "d": "The recurring cost of running the facility: electricity (usually 40–60% of the stack — see Annual Energy Cost), staffing, Maintenance contracts, water, insurance, security, and property taxes. OPEX compounds at the OPEX Growth rate and, over a 10–15 year hold, typically exceeds the original CAPEX — which is why efficiency (PUE) and maintenance strategy dominate lifetime economics. Revenue minus OPEX is NOI, the engine of every valuation and coverage metric.",
+   "u": "USD/yr",
+   "rel": [
+    "capex",
+    "annual-energy-cost",
+    "opex-growth",
+    "noi",
+    "tco",
+    "tab-maint"
+   ],
+   "aliases": [
+    "OPEX",
+    "Operating Expenditure",
+    "operating expenses"
+   ]
+  },
+  "tco": {
+   "t": "TCO (Total Cost of Ownership)",
+   "d": "The all-in lifetime cost of the facility: CAPEX plus the present value of every year of OPEX, refresh capital, and end-of-life costs over the analysis horizon (typically 10–15 years). TCO is the fair basis for comparing design alternatives that trade capital against operations — Deep Sea Water Cooling or a better PUE costs more up front and wins on TCO; a cheap build with poor efficiency loses. Discounting at WACC keeps the comparison honest across time.",
+   "f": "TCO = CAPEX + sum( OPEX_t / (1+r)^t ) over horizon",
+   "u": "USD",
+   "rel": [
+    "capex",
+    "opex",
+    "annual-energy-cost",
+    "wacc",
+    "pue"
+   ],
+   "aliases": [
+    "TCO",
+    "Total Cost of Ownership"
+   ]
+  },
+  "escalation": {
+   "t": "Escalation",
+   "d": "Contractual or assumed annual price growth applied to a cash-flow line — construction cost escalation (see Year Escalation, ~7% CAGR 2020–2025 decelerating toward ~3.3% by 2030), lease revenue escalators (commonly 2–3%/yr or CPI-linked in Colocation Pricing), and OPEX Growth. The spread between revenue escalation and cost escalation determines whether margins expand or compress over the hold, so model them separately rather than assuming one inflation number.",
+   "u": "%/yr",
+   "rel": [
+    "year-escalation",
+    "opex-growth",
+    "colocation-pricing",
+    "revenue-per-kw"
+   ],
+   "aliases": [
+    "Escalation",
+    "escalation rate",
+    "escalator"
+   ]
+  },
+  "colocation-pricing": {
+   "t": "Colocation Pricing",
+   "d": "How multi-tenant data center capacity is sold: retail colocation prices per kW per month (commonly $100–250/kW/mo with cross-connects and remote hands on top), while wholesale prices per kW or per MW on multi-year terms at lower unit rates. Pricing power tracks market vacancy, power availability, and connectivity (a Fiber Entry meet-me room adds interconnection revenue). Contract Escalation clauses and term length determine how durable today's Revenue per kW is against OPEX Growth.",
+   "u": "$/kW/month",
+   "rel": [
+    "revenue-per-kw",
+    "hyperscaler-prelease",
+    "escalation",
+    "fiber-entry"
+   ],
+   "aliases": [
+    "Colocation Pricing",
+    "colocation pricing",
+    "colo pricing"
+   ]
+  },
+  "hyperscaler-prelease": {
+   "t": "Hyperscaler Pre-Lease",
+   "d": "A long-term lease (often 10–15 years) signed with a hyperscale cloud or AI tenant before or during construction, typically for the entire building. It transforms the risk profile: the Occupancy Ramp collapses to near-instant, lenders accept higher Debt Ratios at lower rates because DSCR is contractually visible, and exit buyers pay premium EV/EBITDA multiples for the covenant. The trade-off is lower Revenue per kW than retail colocation and concentration risk in a single credit.",
+   "rel": [
+    "occupancy-ramp",
+    "dscr",
+    "exit-ev-ebitda-multiple",
+    "colocation-pricing",
+    "debt-ratio-leverage"
+   ],
+   "aliases": [
+    "Hyperscaler Pre-Lease",
+    "pre-lease",
+    "hyperscale lease"
+   ]
+  },
+  "tax-holiday": {
+   "t": "Tax Holiday / Incentives",
+   "d": "Government incentives that reduce or defer taxes for qualifying data center investments: corporate income tax holidays (Indonesia offers up to 20 years for large pioneer-industry investments), sales/VAT exemptions on equipment, accelerated Depreciation, and free-trade-zone benefits. Incentives can move after-tax Equity IRR by several points and materially shift country rankings — which is why the DCMOC Tax & Incentives module computes an effective tax-rate timeline and NPV-normalized incentive ranking per country.",
+   "rel": [
+    "depreciation",
+    "equity-irr",
+    "tab-tax",
+    "tab-benchmark"
+   ],
+   "aliases": [
+    "Tax Holiday",
+    "tax holiday",
+    "tax incentives",
+    "Tax & Incentives"
+   ]
+  },
+  "depreciation": {
+   "t": "Depreciation",
+   "d": "The accounting allocation of CAPEX over asset useful lives — building shell 30–39 years, electrical and mechanical plant 10–20, IT and controls 3–7 — via straight-line or declining-balance methods. It is a non-cash expense that shields income from tax (the depreciation tax shield), so accelerated schedules and Tax Holiday interactions pull real cash value forward. The DCMOC Asset Lifecycle module models category-level depreciation, book value decay, and replacement timing across the projection horizon.",
+   "u": "USD/yr",
+   "rel": [
+    "capex",
+    "tax-holiday",
+    "ebitda",
+    "tab-asset-lifecycle"
+   ],
+   "aliases": [
+    "Depreciation",
+    "depreciation"
+   ]
+  },
+  "terminal-value": {
+   "t": "Terminal Value",
+   "d": "The assumed value of the asset at the end of the explicit forecast, typically exit-year EBITDA times the Exit EV/EBITDA Multiple (or NOI divided by an exit Cap Rate — the same idea in real-estate form). It frequently represents 40–60% of total present value in a 10-year model, which means the 'answer' is heavily an assumption about the future sale market. Stress the exit multiple in the Sensitivity Matrix before trusting any Equity IRR.",
+   "f": "Terminal Value = Exit EBITDA x Exit Multiple (or NOI / exit cap rate)",
+   "u": "USD",
+   "rel": [
+    "exit-ev-ebitda-multiple",
+    "cap-rate",
+    "equity-irr",
+    "npv"
+   ],
+   "aliases": [
+    "Terminal Value",
+    "terminal value",
+    "exit value"
+   ]
+  },
+  "cash-flow-waterfall": {
+   "t": "Cash Flow Waterfall",
+   "d": "The strict priority ladder by which each period's cash is distributed: operating costs first, then senior debt service (interest, then scheduled principal), then reserves and covenants, and only then equity distributions — often further split by sponsor/investor promote tiers. The waterfall is why DSCR matters: debt eats before equity does, so thin coverage years mean zero distributions even when EBITDA is positive. The Investment module's amortization schedule and coverage charts trace this ladder year by year.",
+   "rel": [
+    "dscr",
+    "debt-ratio-leverage",
+    "equity-irr",
+    "noi"
+   ],
+   "aliases": [
+    "Cash Flow Waterfall",
+    "cash flow waterfall",
+    "distribution waterfall"
+   ]
+  },
+  "benchmark-percentile": {
+   "t": "Benchmark Percentile",
+   "d": "Where a metric sits relative to a reference population — for example, a Cost per kW at the 30th percentile of the City / Market dataset means 70% of comparable builds cost more. Percentile framing is how the DCMOC Benchmarks module scores countries across cost, energy, connectivity, talent, and risk categories, converting raw numbers into rankings a board can act on. Beware population definition: a 'cheap' P20 build against Tier IV comparables may be a P80 build against Tier II ones.",
+   "rel": [
+    "cost-per-kw",
+    "city-market",
+    "tab-benchmark"
+   ],
+   "aliases": [
+    "Benchmark Percentile",
+    "percentile ranking"
+   ]
+  },
+  "tab-sim": {
+   "t": "SIM — Simulation Dashboard",
+   "d": "DCMOC's default operations-simulation view: models the facility's operating envelope including overtime and regulatory labor analysis (Indonesia PP 35/2021), environmental physics (power-law load/temperature effects), and risk-and-downtime exposure by Tier level. The launching point that feeds the Staffing, Maintenance, and Financial modules.",
+   "rel": [
+    "tab-staff",
+    "tab-maint",
+    "tab-risk",
+    "tier-class"
+   ],
+   "aliases": [
+    "SIM",
+    "Simulation Dashboard"
+   ]
+  },
+  "tab-staff": {
+   "t": "Staffing",
+   "d": "Models the operations headcount: detailed role breakdown with monthly costs, shift-pattern coverage, and a 5-year cost projection in USD. Staffing is a top-three OPEX line after energy, and Tier Classification drives minimum-coverage rules (24/7 shifts for Tier III+).",
+   "rel": [
+    "opex",
+    "tab-talent",
+    "tab-sim"
+   ],
+   "aliases": [
+    "Staffing",
+    "Staff Model Config"
+   ]
+  },
+  "tab-maint": {
+   "t": "Maintenance",
+   "d": "Plans preventive and corrective maintenance: event intensity by month (heatmap — darker means more events), per-system maintenance strategies with descriptions, and work-order views. Maintenance discipline is what converts designed Redundancy into actual Expected Uptime; deferred maintenance shows up later as Risk Analysis exposure.",
+   "rel": [
+    "opex",
+    "tab-cbm",
+    "tab-risk",
+    "uptime-sla"
+   ],
+   "aliases": [
+    "Maintenance"
+   ]
+  },
+  "tab-risk": {
+   "t": "Risk Analysis",
+   "d": "Catalogs and scores operational risks — equipment failure modes, single points of failure, downtime exposure — with per-risk descriptions and mitigation status. Quantified downtime risk closes the loop between the engineering choices (Redundancy, Tier) and the financial model (lost revenue per outage hour).",
+   "rel": [
+    "tab-disaster",
+    "uptime-sla",
+    "redundancy",
+    "tab-sim"
+   ],
+   "aliases": [
+    "Risk Analysis"
+   ]
+  },
+  "tab-report": {
+   "t": "Report",
+   "d": "Compiles the full analysis into an exportable report and lets you compare two saved scenarios side-by-side, including shift-model comparison recommendations. The executive-summary layer over every other module's output.",
+   "rel": [
+    "tab-sim",
+    "tab-finance"
+   ],
+   "aliases": [
+    "Report"
+   ]
+  },
+  "tab-capex": {
+   "t": "CAPEX Config",
+   "d": "Configures the capital-cost model inside DCMOC — build cost per kW, phasing, and category breakdowns — with a generated narrative explaining the estimate. Mirrors the standalone capex calculator's logic and feeds Total CAPEX into the Financial and Investment modules.",
+   "rel": [
+    "total-capex",
+    "cost-per-kw",
+    "tab-finance",
+    "tab-invest"
+   ],
+   "aliases": [
+    "CAPEX Config"
+   ]
+  },
+  "tab-carbon": {
+   "t": "Carbon / ESG",
+   "d": "Models the facility's emissions footprint across scenarios: grid-electricity carbon (Scope 2, driven by PUE and grid intensity — see CUE), generator fuel and refrigerant leakage (Scope 1, driven by Generator Type and GWP), and decarbonization scenario descriptions. The ESG evidence base behind Green Certification and investor reporting.",
+   "rel": [
+    "cue",
+    "gwp",
+    "generator-type",
+    "green-certification",
+    "onsite-renewable"
+   ],
+   "aliases": [
+    "Carbon / ESG",
+    "Carbon/ESG"
+   ]
+  },
+  "tab-finance": {
+   "t": "Financial",
+   "d": "The core project-finance model: cash flows, NPV and IRR, and a two-way Sensitivity Matrix of CAPEX variation (rows) versus Revenue per kW variation (columns) with NPV / IRR shown per cell. Where the engineering configuration becomes an investment case.",
+   "rel": [
+    "npv",
+    "project-irr",
+    "sensitivity-matrix",
+    "revenue-per-kw",
+    "tab-invest"
+   ],
+   "aliases": [
+    "Financial"
+   ]
+  },
+  "tab-invest": {
+   "t": "Investment",
+   "d": "The levered view of the deal: Capital Structure (debt/equity split), the Debt Amortization Schedule, and the Debt Service Coverage Ratio (DSCR) tracked year by year against covenant levels. This is where the Debt Ratio, Equity IRR, and the Cash Flow Waterfall live.",
+   "rel": [
+    "dscr",
+    "debt-ratio-leverage",
+    "equity-irr",
+    "cash-flow-waterfall"
+   ],
+   "aliases": [
+    "Investment"
+   ]
+  },
+  "tab-benchmark": {
+   "t": "Benchmarks",
+   "d": "Country-level benchmark analysis scoring markets across categorized criteria (cost, energy, connectivity, risk, talent) with per-category detail. Converts raw market data into Benchmark Percentile rankings for site-selection decisions.",
+   "rel": [
+    "benchmark-percentile",
+    "city-market",
+    "tab-talent",
+    "tab-grid"
+   ],
+   "aliases": [
+    "Benchmarks"
+   ]
+  },
+  "tab-montecarlo": {
+   "t": "Monte Carlo",
+   "d": "Runs a configurable Monte-Carlo Simulation on the selected country's financial model: adjust variable distributions, run thousands of trials, and read the outcome distribution as P10/P50/P90 bands for IRR and NPV. The probabilistic reality-check on the deterministic Financial tab.",
+   "rel": [
+    "monte-carlo",
+    "p10-p50-p90",
+    "tornado-chart",
+    "tab-finance"
+   ],
+   "aliases": []
+  },
+  "tab-portfolio": {
+   "t": "Portfolio",
+   "d": "Compares 2+ candidate sites side-by-side on a radar chart and metric table — import the current configuration or add blank site templates. The multi-site ranking view where unlevered Project IRR is the fair comparison basis.",
+   "rel": [
+    "project-irr",
+    "tab-benchmark",
+    "benchmark-percentile"
+   ],
+   "aliases": [
+    "Portfolio"
+   ]
+  },
+  "tab-capacity": {
+   "t": "Capacity Plan",
+   "d": "Plans phased capacity build-out: phase configuration, a build-timeline Gantt chart, and a narrative of when each megawatt tranche lands. Phasing matches CAPEX deployment to the Occupancy Ramp so capital is not stranded ahead of demand — Transformer Lead Time is usually the gating item.",
+   "rel": [
+    "occupancy-ramp",
+    "transformer-lead",
+    "tab-phased-finance"
+   ],
+   "aliases": [
+    "Capacity Plan"
+   ]
+  },
+  "tab-phased-finance": {
+   "t": "Phased Finance",
+   "d": "The financial model of the phased build: blended cash flow across phases and an investment decision matrix against a 12% hurdle rate, with narrative. Shows whether later phases stand on their own economics or ride on phase-1 infrastructure.",
+   "rel": [
+    "tab-capacity",
+    "project-irr",
+    "npv"
+   ],
+   "aliases": [
+    "Phased Finance"
+   ]
+  },
+  "tab-tax": {
+   "t": "Tax & Incentives",
+   "d": "Models country tax regimes and incentives: a tax-rate timeline (standard vs effective under a Tax Holiday), free-trade-zone listings, and an NPV-normalized incentive value ranking. Effective-tax deltas of this size routinely re-rank countries in the Portfolio comparison.",
+   "rel": [
+    "tax-holiday",
+    "depreciation",
+    "tab-benchmark"
+   ],
+   "aliases": []
+  },
+  "tab-disaster": {
+   "t": "Disaster Risk",
+   "d": "Natural-hazard exposure per country shown as a risk radar (earthquake, flood, typhoon, volcanic) with costed mitigation options. Complements the Seismic Zone input in the capex model — hazard drives both construction premium and insurance OPEX.",
+   "rel": [
+    "seismic-zone",
+    "tab-risk",
+    "tab-grid"
+   ],
+   "aliases": [
+    "Disaster Risk"
+   ]
+  },
+  "tab-grid": {
+   "t": "Grid Reliability",
+   "d": "Scores utility-grid dependability by country and computes the annual grid-risk cost breakdown: outage frequency/duration converted into generator run-hours, fuel burn, and downtime exposure. Weak grids shift the design toward longer Fuel Autonomy and heavier Generator Type investment.",
+   "rel": [
+    "fuel-autonomy",
+    "generator-type",
+    "tab-fuel-gen",
+    "tab-benchmark"
+   ],
+   "aliases": [
+    "Grid Reliability"
+   ]
+  },
+  "tab-talent": {
+   "t": "Talent Index",
+   "d": "Scores the availability of qualified data center operations and engineering talent by country, with factor-level analysis. Talent scarcity inflates the Staffing cost model and construction-phase Contractor Availability premiums.",
+   "rel": [
+    "tab-staff",
+    "contractor-availability",
+    "tab-benchmark"
+   ],
+   "aliases": [
+    "Talent Index"
+   ]
+  },
+  "tab-compliance": {
+   "t": "Compliance",
+   "d": "Auto-generates the regulatory requirement checklist per country (Module 41) and scores compliance coverage — data-protection law, building and environmental permits, sector certifications — with per-item notes. Compliance gaps are schedule and licensing risk, not just paperwork.",
+   "rel": [
+    "tab-benchmark",
+    "security-level"
+   ],
+   "aliases": [
+    "Compliance"
+   ]
+  },
+  "tab-asset-lifecycle": {
+   "t": "Asset Lifecycle",
+   "d": "Tracks every asset category through its useful life: category-level Depreciation expense per year (bar widths proportional to annual totals), declining book value versus cumulative replacement spend, and configurable depreciation method over the projection horizon. The refresh-capital planning view that keeps late-hold cash flows honest.",
+   "rel": [
+    "depreciation",
+    "capex",
+    "tab-cbm"
+   ],
+   "aliases": [
+    "Asset Lifecycle"
+   ]
+  },
+  "tab-cbm": {
+   "t": "CBM / DCIM (Condition-Based Maintenance)",
+   "d": "Module 43 — evaluates BMS/DCIM sensor investment against failure-avoidance savings: sensor categories with count formulas, coverage economics, and payback. Condition-based maintenance replaces calendar-based Maintenance intervals with actual equipment health data, cutting both cost and surprise failures; intelligent PDU Type telemetry is one of its data feeds.",
+   "rel": [
+    "tab-maint",
+    "pdu-type",
+    "tab-asset-lifecycle"
+   ],
+   "aliases": [
+    "CBM / DCIM",
+    "CBM",
+    "DCIM"
+   ]
+  },
+  "tab-fuel-gen": {
+   "t": "Fuel & Generator",
+   "d": "Module 44 — diesel generator sizing, fuel consumption, and cost modeling: liters per year at the modeled run profile, priced at each country's diesel price including tax. Connects Grid Reliability (how often generators run) with Fuel Autonomy (how much tankage) into an annual OPEX number.",
+   "rel": [
+    "generator-type",
+    "fuel-autonomy",
+    "tab-grid"
+   ],
+   "aliases": [
+    "Fuel & Generator"
+   ]
+  },
+  "tab-strategic": {
+   "t": "Strategic Planning",
+   "d": "Long-horizon capacity strategy: projects demand growth against installed capacity and flags when expansion is needed within the planning horizon (or confirms none is). The bridge from a single-site Capacity Plan to a multi-year, multi-phase investment roadmap.",
+   "rel": [
+    "tab-capacity",
+    "tab-phased-finance",
+    "tab-portfolio"
+   ],
+   "aliases": [
+    "Strategic Planning"
+   ]
+  },
+  "tab-faq": {
+   "t": "FAQ / Manual",
+   "d": "The in-app manual: explains each DCMOC module, its inputs, assumptions, and data vintage, with per-item descriptions. Start here to understand what each tab computes and which numbers are estimate-grade versus sourced.",
+   "rel": [
+    "tab-sim",
+    "tab-report"
+   ],
+   "aliases": [
+    "FAQ",
+    "FAQ / Manual",
+    "Open FAQ / Manual"
+   ]
+  },
+  "ft-overview": {
+   "t": "Overview (Finance Terminal)",
+   "d": "The market-at-a-glance dashboard: major indices, top movers, sector snapshot, and headline economic prints in one view. The launch pad before drilling into Stocks, Sectors, or Economy tabs.",
+   "rel": [
+    "ft-stocks",
+    "ft-sectors",
+    "ft-economy"
+   ],
+   "aliases": [
+    "Overview"
+   ]
+  },
+  "ft-stocks": {
+   "t": "Stocks",
+   "d": "Individual equity view: quotes, candlestick charts with technical indicators (RSI, moving averages, MACD), and the FIN Investment Committee scorecard combining Value Gate screening with conviction scoring. Covers US and Indonesian (IDX .JK) markets. Educational analysis only — not investment advice.",
+   "rel": [
+    "ft-screener",
+    "ft-watchlist",
+    "ft-sectors"
+   ],
+   "aliases": [
+    "Stocks"
+   ]
+  },
+  "ft-forex": {
+   "t": "Forex",
+   "d": "Foreign-exchange rates and history for major and Asian pairs (USD/IDR and peers), with charting. Currency moves matter directly to data center economics: CAPEX is largely USD-denominated equipment while revenue may be local-currency.",
+   "rel": [
+    "ft-economy",
+    "ft-overview"
+   ],
+   "aliases": [
+    "Forex"
+   ]
+  },
+  "ft-crypto": {
+   "t": "Crypto",
+   "d": "Cryptocurrency market data with candle charts and a technical-only committee analysis (Technical + Quant + Risk panels) plus a momentum-scored crypto screener. Fundamentals are intentionally excluded — crypto has no earnings to value. Educational only, not investment advice.",
+   "rel": [
+    "ft-screener",
+    "ft-stocks"
+   ],
+   "aliases": [
+    "Crypto"
+   ]
+  },
+  "ft-commodities": {
+   "t": "Commodities",
+   "d": "Prices and charts for energy, metals, and agricultural commodities. Energy commodities (natural gas, crude) and metals (copper, aluminum) are leading indicators for data center OPEX and construction costs respectively.",
+   "rel": [
+    "ft-futures",
+    "ft-economy"
+   ],
+   "aliases": [
+    "Commodities"
+   ]
+  },
+  "ft-screener": {
+   "t": "Screener",
+   "d": "Filters the US or Indonesian stock universe by fundamentals and technicals, ranked by the FIN Engine composite score (value, quality, momentum, risk factors). The systematic top-of-funnel that feeds candidates into the Stocks committee analysis and your Watchlist.",
+   "rel": [
+    "ft-stocks",
+    "ft-watchlist"
+   ],
+   "aliases": [
+    "Screener"
+   ]
+  },
+  "ft-watchlist": {
+   "t": "Watchlist",
+   "d": "Your saved symbols with live quotes in one tracking view — the personal shortlist built from Screener results and Stocks research. Pair with Alerts to get notified on price triggers instead of watching the tape.",
+   "rel": [
+    "ft-alerts",
+    "ft-screener",
+    "ft-stocks"
+   ],
+   "aliases": [
+    "Watchlist"
+   ]
+  },
+  "ft-news": {
+   "t": "News",
+   "d": "Aggregated market news headlines across equities, macro, and crypto. Headlines drive short-term price action; cross-reference against the Economy calendar to separate noise from scheduled catalysts.",
+   "rel": [
+    "ft-economy",
+    "ft-overview"
+   ],
+   "aliases": [
+    "News"
+   ]
+  },
+  "ft-sectors": {
+   "t": "Sectors",
+   "d": "Performance heat view of the 11 GICS sectors (technology, energy, financials, utilities, etc.), showing where money is rotating. Sector breadth confirms or contradicts index-level moves on the Overview tab.",
+   "rel": [
+    "ft-overview",
+    "ft-stocks"
+   ],
+   "aliases": [
+    "Sectors"
+   ]
+  },
+  "ft-economy": {
+   "t": "Economy",
+   "d": "Macro indicators dashboard: rates, inflation prints, employment, GDP, and central-bank data. The macro regime sets the discount-rate backdrop — the same force that moves equity valuations also moves data center WACC and Cap Rate assumptions.",
+   "rel": [
+    "ft-overview",
+    "ft-futures",
+    "wacc"
+   ],
+   "aliases": [
+    "Economy"
+   ]
+  },
+  "ft-futures": {
+   "t": "Futures",
+   "d": "Index and commodity futures quotes — the 24-hour risk signal that trades before and after cash markets open. Overnight futures direction is the standard read on how the cash session will open.",
+   "rel": [
+    "ft-commodities",
+    "ft-overview"
+   ],
+   "aliases": [
+    "Futures"
+   ]
+  },
+  "ft-alerts": {
+   "t": "Alerts",
+   "d": "Price-trigger notifications on your chosen symbols: set a level, get alerted when it crosses. Turns the Watchlist from a page you check into a system that checks for you.",
+   "rel": [
+    "ft-watchlist",
+    "ft-stocks"
+   ],
+   "aliases": [
+    "Alerts"
+   ]
+  }
+ }
+}

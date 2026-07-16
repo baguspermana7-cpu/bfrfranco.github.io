@@ -46,6 +46,7 @@ import clsx from 'clsx';
 import { getPUE } from '@/constants/pue';
 import { useAuthStore } from '@/store/auth';
 import { LoginScreen } from '@/components/ui/LoginScreen';
+import { Explain } from '@/components/ui/Explain';
 
 interface ShellProps {
     children: React.ReactNode;
@@ -224,20 +225,26 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                                         Country Intelligence
                                     </div>
                                 )}
-                                <button
-                                    onClick={() => { actions.setActiveTab(item.id); setSidebarOpen(false); }}
-                                    aria-current={activeTab === item.id ? 'page' : undefined}
-                                    className={clsx(
-                                        "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
-                                        "hover:bg-slate-200/50 dark:hover:bg-slate-800/50",
-                                        activeTab === item.id
-                                            ? "bg-slate-200 dark:bg-slate-800 text-cyan-700 dark:text-cyan-400 border border-slate-300/50 dark:border-slate-700/50"
-                                            : "text-slate-600 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400"
-                                    )}
-                                >
-                                    <item.icon className="w-4 h-4" aria-hidden="true" />
-                                    {item.label}
-                                </button>
+                                {/* RZExplain: tooltip trigger is its own <button>, so it
+                                    sits BESIDE the nav button (nested buttons are invalid
+                                    HTML). Renders nothing when the DB/key is absent. */}
+                                <div className="flex items-center">
+                                    <button
+                                        onClick={() => { actions.setActiveTab(item.id); setSidebarOpen(false); }}
+                                        aria-current={activeTab === item.id ? 'page' : undefined}
+                                        className={clsx(
+                                            "flex-1 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
+                                            "hover:bg-slate-200/50 dark:hover:bg-slate-800/50",
+                                            activeTab === item.id
+                                                ? "bg-slate-200 dark:bg-slate-800 text-cyan-700 dark:text-cyan-400 border border-slate-300/50 dark:border-slate-700/50"
+                                                : "text-slate-600 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400"
+                                        )}
+                                    >
+                                        <item.icon className="w-4 h-4" aria-hidden="true" />
+                                        {item.label}
+                                    </button>
+                                    <Explain k={`tab-${item.id}`} />
+                                </div>
                             </React.Fragment>
                         ))}
                     </nav>
@@ -292,13 +299,16 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                         )}
                     </button>
 
-                    <button
-                        onClick={() => actions.setActiveTab('faq')}
-                        className="flex items-center gap-3 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 w-full transition-colors rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-800/50"
-                    >
-                        <HelpCircle className="w-4 h-4" />
-                        FAQ
-                    </button>
+                    <div className="flex items-center">
+                        <button
+                            onClick={() => actions.setActiveTab('faq')}
+                            className="flex items-center gap-3 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 flex-1 transition-colors rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-800/50"
+                        >
+                            <HelpCircle className="w-4 h-4" />
+                            FAQ
+                        </button>
+                        <Explain k="tab-faq" />
+                    </div>
 
                     <div className="flex items-center justify-between px-3 py-2 mt-1 border-t border-slate-200 dark:border-slate-800 pt-3">
                         <div className="text-[10px] text-slate-500 truncate">

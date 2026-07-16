@@ -8,6 +8,7 @@ import { calculateFinancials, defaultOccupancyRamp, FinancialResult } from '@/mo
 import { calculateRevenue, defaultRevenueOccupancy, RevenueResult } from '@/modules/analytics/RevenueEngine';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { Explain } from '@/components/ui/Explain';
 import { TrendingUp, DollarSign, Clock, Percent, BarChart3, ArrowUpRight, ArrowDownRight, Calculator, Receipt, Repeat, HandCoins, FileText } from 'lucide-react';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer, ReferenceLine,
@@ -540,7 +541,7 @@ const FinancialDashboard = () => {
                         <CardContent className="pt-4">
                             <div className="flex items-center gap-1.5 mb-1">
                                 <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                                <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">NPV</span><Tooltip content="Net Present Value — sum of all discounted future cashflows minus initial investment. Positive = value-creating project." />
+                                <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">NPV</span><Tooltip content="Net Present Value — sum of all discounted future cashflows minus initial investment. Positive = value-creating project." /><Explain k="npv" />
                             </div>
                             <div className={`text-2xl font-bold ${result.npv >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                                 {fmtMoney(result.npv)}
@@ -570,7 +571,7 @@ const FinancialDashboard = () => {
                         <CardContent className="pt-4">
                             <div className="flex items-center gap-1.5 mb-1">
                                 <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                                <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Payback</span><Tooltip content="Simple payback period — years until cumulative net cashflow turns positive. Discounted payback accounts for time value of money." />
+                                <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Payback</span><Tooltip content="Simple payback period — years until cumulative net cashflow turns positive. Discounted payback accounts for time value of money." /><Explain k="payback-period" />
                             </div>
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">{result.paybackPeriodYears} <span className="text-sm text-slate-500 dark:text-slate-400">yrs</span></div>
                             <div className="text-xs text-slate-500 mt-1">Discounted: {result.discountedPaybackYears} yrs</div>

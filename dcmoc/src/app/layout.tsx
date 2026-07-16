@@ -35,6 +35,10 @@ export default function RootLayout({
             bundles, so window.RZEngine exists when store modules evaluate.
             Consumed via src/lib/rz-engine.ts (with local fallbacks). */}
         <script src="/rz-engine.min.js?v=2026-07-15-dsc" defer></script>
+        {/* Shared RZExplain knowledge DB (window.RZ_EXPLAIN_DB, 481 entries) —
+            consumed via src/lib/explain.ts + <Explain k="..."/> (SSR-guarded,
+            renders nothing when absent). */}
+        <script src="/js/rz-explain-db.js?v=2026-07-16" defer></script>
       </head>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
