@@ -1,12 +1,13 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useCapexStore } from '@/store/capex';
 import { useSimulationStore } from '@/store/simulation';
 import { COUNTRIES } from '@/constants/countries';
+import { rzModels } from '@/lib/rz-engine';
 import {
     Calculator, Building, Zap, Server, BarChart3,
     Settings, Calendar, MapPin, DollarSign, Activity, TrendingUp,
-    Flame, Fuel, Leaf, Shield, Cable, Layers, HardDrive, Lock, Globe2
+    Flame, Fuel, Leaf, Shield, Cable, Layers, HardDrive, Lock, Globe2, Waves
 } from 'lucide-react';
 import GanttChart from '@/components/visualizations/GanttChart';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -32,6 +33,18 @@ const CapexDashboard = () => {
     const { selectedCountry, actions, inputs: simInputs } = useSimulationStore();
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
+    // Deep Sea Water Cooling (shared RZEngine v2.3.0 models.cooling.deepSea) —
+    // component-local, DISPLAY-LEVEL only: never mutates the store CAPEX math.
+    const [deepSea, setDeepSea] = useState(false);
+    const deepSeaModel = rzModels().cooling?.deepSea;
+    const ds = useMemo(() => {
+        if (!deepSea || typeof deepSeaModel !== 'function') return null;
+        try {
+            return deepSeaModel({ itLoadMw: inputs.itLoad / 1000, pueTarget: 1.15 });
+        } catch {
+            return null;
+        }
+    }, [deepSea, deepSeaModel, inputs.itLoad]);
 
     // Sync country from simulation store
     useEffect(() => {
@@ -173,6 +186,16 @@ const CapexDashboard = () => {
                                 <option value="rdhx">Rear Door Heat Exchanger</option>
                                 <option value="liquid">Direct Liquid Cooling</option>
                             </select>
+                            {typeof deepSeaModel === 'function' && (
+                                <div className="flex items-center gap-2 pt-1">
+                                    <input type="checkbox" id="capex-deepsea" checked={deepSea}
+                                        onChange={() => setDeepSea(!deepSea)} className="accent-cyan-600" />
+                                    <label htmlFor="capex-deepsea" className="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                                        <Waves className="w-3 h-3 text-cyan-600 dark:text-cyan-400" /> Deep Sea Water Cooling
+                                        <Tooltip content="Chiller-less deep-sea water cooling study (shared RZEngine v2.3.0 model): 3-loop seawater heat rejection via titanium PHE, WUE ≈ 0. Display-level add-on — does not alter the base CAPEX calculation." />
+                                    </label>
+                                </div>
+                            )}
                         </div>
 
                         {/* ─── BUILDING ─── */}
@@ -589,6 +612,39 @@ const CapexDashboard = () => {
                         </CardContent>
                     </Card>
                 </div>
+
+                {/* Deep Sea Water Cooling summary (RZEngine model, display-level) */}
+                {ds && (
+                    <Card data-testid="deepsea-card" className="bg-cyan-50 dark:bg-cyan-950/30 border-cyan-100 dark:border-cyan-800">
+                        <CardContent className="pt-4 pb-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <Waves className="w-4 h-4 text-cyan-700 dark:text-cyan-400" />
+                                <h4 className="font-semibold text-cyan-900 dark:text-cyan-200 text-sm">Deep Sea Water Cooling — shared RZEngine study</h4>
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400">Design PUE</div>
+                                    <div className="text-lg font-bold text-cyan-700 dark:text-cyan-300">{typeof ds.pue === 'number' ? ds.pue.toFixed(3) : '—'}</div>
+                                </div>
+                                <div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400">Seawater Flow</div>
+                                    <div className="text-lg font-bold text-slate-700 dark:text-slate-200">{fmt(ds.flow?.m3h ?? 0)} m³/h</div>
+                                </div>
+                                <div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400">Deep-Sea CAPEX</div>
+                                    <div className="text-lg font-bold text-slate-700 dark:text-slate-200">{fmtMoney(ds.capex?.total ?? 0)}</div>
+                                </div>
+                                <div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400">WUE</div>
+                                    <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">≈ 0 L/kWh</div>
+                                </div>
+                            </div>
+                            <div className="text-xs text-cyan-800 dark:text-cyan-300 mt-3 pt-2 border-t border-cyan-100 dark:border-cyan-900">
+                                Line item — Deep Sea Water Cooling: +{fmtMoney(ds.capex?.total ?? 0)} → adjusted total {fmtMoney(total + (ds.capex?.total ?? 0))} (display-level study; base CAPEX math unchanged)
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* Narrative */}
                 <Card className="bg-indigo-50 dark:bg-indigo-950/30 border-indigo-100 dark:border-indigo-800">

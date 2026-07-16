@@ -1,4 +1,15 @@
 
+/* ─── SHARED-ENGINE DELEGATION (RZEngine v2.3.0 DATA.capexDetail) ───────────
+ * The 9 same-name multiplier tables (redundancy/cooling/rack/building/seismic/
+ * fireSuppression/fireAlarm/ups/gen) plus yearEscalation + substationCosts
+ * (shape-adapted: engine stores plain numbers, DCMOC {mult,note}/{base,label})
+ * are read from the engine at calc time, with the capex-data.ts locals as
+ * fallbacks. Per SUPER_ENGINE.md §Z.3, DCMOC's FINER-grained data stays LOCAL
+ * and is NOT delegated: costFactors (A7 2025 bases — engine provenance says
+ * explicitly NOT merged), cityData, CountryProfile constructionIndex,
+ * locationMultipliers, permitRegionMult, testingRedundancyMult.
+ * ──────────────────────────────────────────────────────────────────────── */
+import { rzData } from './rz-engine';
 import {
     costFactors,
     redundancyMultipliers,
@@ -88,16 +99,18 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
         substationType, utilityRate, greenCert, renewableOption
     } = input;
 
-    // 1. Determine Base Multipliers
-    const redMult = redundancyMultipliers[redundancy] || 1.0;
-    const coolMult = coolingMultipliers[coolingType] || 1.0;
-    const rackMult = rackMultipliers[rackType] || 1.0;
-    const buildMult = buildingMultipliers[buildingType] || 1.0;
-    const seismicMult = seismicMultipliers['zone2'] || 1.0; // Defaulting to Zone 2 for now
-    const fireSupMult = fireSuppressionMultipliers[fireType] || 1.0;
-    const alarmMult = fireAlarmMultipliers[alarmType] || 1.0;
-    const upsMult = upsMultipliers[upsType] || 1.0;
-    const genMult = genMultipliers[genType] || 1.0;
+    // 1. Determine Base Multipliers — engine DATA.capexDetail tables first
+    // (same names), locals from capex-data.ts as fallback (see header note).
+    const cd = rzData().capexDetail ?? {};
+    const redMult = (cd.redundancyMult ?? redundancyMultipliers)[redundancy] || 1.0;
+    const coolMult = (cd.coolingMult ?? coolingMultipliers)[coolingType] || 1.0;
+    const rackMult = (cd.rackMult ?? rackMultipliers)[rackType] || 1.0;
+    const buildMult = (cd.buildingMult ?? buildingMultipliers)[buildingType] || 1.0;
+    const seismicMult = (cd.seismicMult ?? seismicMultipliers)['zone2'] || 1.0; // Defaulting to Zone 2 for now
+    const fireSupMult = (cd.fireSuppressionMult ?? fireSuppressionMultipliers)[fireType] || 1.0;
+    const alarmMult = (cd.fireAlarmMult ?? fireAlarmMultipliers)[alarmType] || 1.0;
+    const upsMult = (cd.upsMult ?? upsMultipliers)[upsType] || 1.0;
+    const genMult = (cd.genMult ?? genMultipliers)[genType] || 1.0;
     const fuelMult = 1 + (fuelHours - 24) * 0.008;
 
     // Location & Year Logic
@@ -128,7 +141,8 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
         locMult = city.perW / 13.0;
     }
 
-    const yearMult = yearEscalation[projYear]?.mult || 1.0;
+    // Shape-adapted: engine yearEscalation is a plain number, local is {mult,note}
+    const yearMult = cd.yearEscalation?.[projYear] ?? yearEscalation[projYear]?.mult ?? 1.0;
     const globalMult = yearMult; // Simplified for now
 
     // 2. Calculate Hard Costs
@@ -185,7 +199,8 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
     // 5. FOM
     let fomTotal = 0;
     if (includeFOM) {
-        const subCost = substationCosts[substationType]?.base || 1000000;
+        // Shape-adapted: engine substationCosts is a plain number, local is {base,label}
+        const subCost = cd.substationCosts?.[substationType] ?? substationCosts[substationType]?.base ?? 1000000;
         const gridConnection = itLoad * 0.001 * 500000;
         const switchgear = itLoad * 0.001 * 300000;
         const utilRateVal = utilityRate / 100;

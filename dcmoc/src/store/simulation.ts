@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { COUNTRIES, CountryProfile } from '@/constants/countries';
+import { rzData } from '@/lib/rz-engine';
 
 export interface SimulationState {
     selectedCountry: CountryProfile | null;
@@ -56,7 +57,11 @@ export const useSimulationStore = create<SimulationState>((set) => ({
         shiftModel: '8h',
         includeLongShiftPermit: false,
         aqiOverride: null,
-        turnoverRate: 0.15, // Default 15%
+        // Default from engine DATA.attritionFactors.voluntaryAttritionAvg (0.25,
+        // DataX Connect 2024 baseline) — same-fact reconciliation vs old 0.15
+        // local; 0.15 remains the engine-absent fallback. Safe at module scope:
+        // the head-defer engine script executes before Next's body bundles.
+        turnoverRate: rzData().attritionFactors?.voluntaryAttritionAvg ?? 0.15,
         itLoad: 2500, // Default 2.5MW Data Hall
         buildingSize: 1500, // Default 1500m2 for 2.5MW
         coolingType: 'air', // Default CRAC

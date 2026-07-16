@@ -1,5 +1,15 @@
 // ─── CARBON FOOTPRINT / ESG ENGINE ──────────────────────────
 // Calculates CO₂ emissions based on grid mix, PUE, and IT load
+//
+// SHARED-ENGINE DELEGATION (RZEngine v2.3.0, with local fallbacks):
+//   - Refrigerant physics (charge kg/kWth, leak %/yr, GWP AR4) come from
+//     DATA.refrigerants via a cooling-type → refrigerant-key auto-map.
+//   - Carbon offset price comes from DATA.carbon.offsetPrice — same-fact
+//     reconciliation: engine $35/tCO₂e (2026 voluntary blend) vs $45 local.
+//   - DIESEL_EMISSION_FACTOR + CARBON_TAX_RATE_USD stay LOCAL: they belong
+//     to DCMOC's own Scope-1 genset / EU-ETS exposure model.
+
+import { rzData } from '@/lib/rz-engine';
 
 export interface CarbonResult {
     // Core metrics
@@ -62,19 +72,40 @@ export interface CarbonInputs {
 // - EU ETS allowance: ~EUR 55-70/tCO₂ (2025 average ~EUR 63 → ~$68)
 // - IEA global grid average: ~0.49 kgCO₂/kWh (2024 IEA Electricity Report)
 // - Uptime 2025 industry average PUE: ~1.58 (slightly rising with AI workloads)
-const CARBON_OFFSET_PRICE_USD = 45;   // $/tCO₂ (2025 voluntary market, Ecosystem Marketplace / MSCI)
+const CARBON_OFFSET_PRICE_USD_FALLBACK = 45;   // $/tCO₂ fallback — engine DATA.carbon.offsetPrice ($35, 2026 blend) wins when loaded
 const CARBON_TAX_RATE_USD = 68;       // $/tCO₂ (EU ETS 2025-2026, EUR 63 avg → ~$68)
 const DIESEL_EMISSION_FACTOR = 2.68;  // kgCO₂ per liter diesel (DEFRA 2025 — unchanged)
 const DIESEL_CONSUMPTION_RATE = 0.3;  // liters per kW per hour (typical genset at 75% load)
 const INDUSTRY_AVG_PUE = 1.58;        // Global average PUE (Uptime Institute 2025)
 const INDUSTRY_AVG_CARBON = 0.49;     // kgCO₂/kWh global average (IEA Electricity 2024-2025)
 
-// Refrigerant GWP factors by cooling type
+// Refrigerant GWP factors by cooling type — LOCAL FALLBACK ONLY.
+// Live values come from engine DATA.refrigerants via the auto-map below.
 const REFRIGERANT_DATA: Record<string, { chargeKgPerKw: number; leakRatePct: number; gwp: number }> = {
     air:    { chargeKgPerKw: 0.15, leakRatePct: 0.05, gwp: 2088 },  // R-410A typical CRAC
     inrow:  { chargeKgPerKw: 0.12, leakRatePct: 0.04, gwp: 2088 },  // R-410A in-row
     rdhx:   { chargeKgPerKw: 0.08, leakRatePct: 0.03, gwp: 1430 },  // R-134a or R-410A
     liquid: { chargeKgPerKw: 0.03, leakRatePct: 0.02, gwp: 675 },   // R-32 or low-GWP
+};
+
+// Cooling type → engine refrigerant key (DATA.refrigerants). Liquid maps to
+// R-454B (primary R-410A replacement in new DX/DLC trim equipment).
+const REFRIGERANT_KEY_BY_COOLING: Record<string, string> = {
+    air: 'R410A', inrow: 'R410A', rdhx: 'R134a', liquid: 'R454B',
+};
+
+/** Engine-backed refrigerant lookup with local fallback (shape-adapted). */
+const getRefrigerantData = (coolingType: string): { chargeKgPerKw: number; leakRatePct: number; gwp: number } => {
+    const key = REFRIGERANT_KEY_BY_COOLING[coolingType] ?? REFRIGERANT_KEY_BY_COOLING.air;
+    const engine = rzData().refrigerants?.[key];
+    if (engine && typeof engine.gwp === 'number') {
+        return {
+            chargeKgPerKw: engine.chargeKgPerKwth,
+            leakRatePct: engine.leakPctYr,
+            gwp: engine.gwp,
+        };
+    }
+    return REFRIGERANT_DATA[coolingType] || REFRIGERANT_DATA.air;
 };
 
 // ─── MAIN CALCULATION ───────────────────────────────────────
@@ -98,8 +129,8 @@ export const calculateCarbonFootprint = (inputs: CarbonInputs): CarbonResult => 
     const dieselLiters = itLoadKw * DIESEL_CONSUMPTION_RATE * annualGenTestHours * hvoFactor;
     const scope1Generators = (dieselLiters * DIESEL_EMISSION_FACTOR) / 1000; // tCO₂/yr
 
-    // A15: Refrigerant leakage Scope 1
-    const refData = REFRIGERANT_DATA[coolingType] || REFRIGERANT_DATA.air;
+    // A15: Refrigerant leakage Scope 1 (engine DATA.refrigerants, local fallback)
+    const refData = getRefrigerantData(coolingType);
     const totalCoolingKw = itLoadKw * (pue - 1); // Cooling capacity approx
     const refrigerantCharge = totalCoolingKw * refData.chargeKgPerKw;
     const annualLeakKg = refrigerantCharge * refData.leakRatePct;
@@ -122,8 +153,10 @@ export const calculateCarbonFootprint = (inputs: CarbonInputs): CarbonResult => 
 
     const netEmissions = totalEmissions * (1 - renewableReductionPct / 100);
 
-    // Financial impact
-    const carbonOffsetCost = netEmissions * CARBON_OFFSET_PRICE_USD;
+    // Financial impact — offset price from engine DATA.carbon.offsetPrice ($35),
+    // local $45 fallback (same-fact reconciliation, v2.3.0)
+    const offsetPrice = rzData().carbon?.offsetPrice ?? CARBON_OFFSET_PRICE_USD_FALLBACK;
+    const carbonOffsetCost = netEmissions * offsetPrice;
     const carbonTaxExposure = netEmissions * CARBON_TAX_RATE_USD;
 
     // Benchmarks

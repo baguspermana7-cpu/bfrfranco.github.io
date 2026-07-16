@@ -1,4 +1,16 @@
 
+/* ─── DELEGATION STATUS vs shared RZEngine v2.3.0 (see CapexEngine.ts) ──────
+ * FALLBACK-ONLY (engine DATA.capexDetail wins at calc time when loaded):
+ *   redundancyMultipliers, coolingMultipliers, rackMultipliers,
+ *   buildingMultipliers, seismicMultipliers, fireSuppressionMultipliers,
+ *   fireAlarmMultipliers, upsMultipliers, genMultipliers,
+ *   yearEscalation (engine: plain number), substationCosts (engine: plain number).
+ * STAYS LOCAL (DCMOC finer-grained / different model shape — SUPER_ENGINE §Z.3):
+ *   costFactors (A7 2025 bases; engine provenance: NOT merged), cityData,
+ *   locationMultipliers, permitRegionMult, testingRedundancyMult,
+ *   equipmentBrands.
+ * ──────────────────────────────────────────────────────────────────────── */
+
 // A7: Updated CAPEX base costs to 2025 market rates ($/kW)
 // Sources: Turner & Townsend 2025, C&W 2025, JLL Construction Benchmark
 export const costFactors = {

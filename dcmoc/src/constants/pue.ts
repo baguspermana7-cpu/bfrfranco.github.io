@@ -1,18 +1,23 @@
 // ─── CANONICAL PUE VALUES ────────────────────────────────────
-// Single source of truth for Power Usage Effectiveness by cooling type.
-// Updated to 2026 values (Uptime Institute 2025 / ASHRAE TC 9.9 / industry benchmarks).
-// Air-cooled median ~1.4-1.5; in-row ~1.25-1.3; RDHx ~1.15-1.2; liquid/immersion ~1.05-1.1
-// AI/HPC liquid-cooled best-in-class facilities achieving 1.08-1.12 in 2025.
+// DELEGATED to shared RZEngine v2.3.0 (DATA.pueMatrix, Uptime Global PUE
+// Survey 2026, tier x cooling): DCMOC reads the tier-3 column at calc time.
+// Same-fact reconciliation: engine liquid tier3 = 1.15 (was 1.08 local).
+// The local table below is a FALLBACK ONLY for when the engine is absent.
+
+import { rzData } from '@/lib/rz-engine';
 
 export const PUE_BY_COOLING: Record<string, number> = {
-    air: 1.42,    // Typical CRAC/CRAH air-cooled, updated 2026 — median Tier III
-    inrow: 1.27,  // In-row close-coupled cooling, hot/cold aisle containment
-    rdhx: 1.18,   // Rear-door heat exchanger, passive/active
-    liquid: 1.08, // Direct liquid cooling (DLC) / immersion; AI/HPC clusters
+    air: 1.42,    // Typical CRAC/CRAH air-cooled — fallback (engine tier3: 1.50)
+    inrow: 1.27,  // In-row close-coupled cooling — matches engine tier3
+    rdhx: 1.18,   // Rear-door heat exchanger — matches engine tier3
+    liquid: 1.08, // Direct liquid cooling — fallback (engine tier3: 1.15)
 };
 
 export const DEFAULT_PUE = 1.42;
 
 export function getPUE(coolingType: string): number {
+    // Engine-owned tier-3 PUE (DATA.pueMatrix[type].tier3), local fallback.
+    const enginePue = rzData().pueMatrix?.[coolingType]?.tier3;
+    if (typeof enginePue === 'number') return enginePue;
     return PUE_BY_COOLING[coolingType] ?? DEFAULT_PUE;
 }

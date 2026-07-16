@@ -30,6 +30,11 @@ export default function RootLayout({
         <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
         <meta httpEquiv="Pragma" content="no-cache" />
         <meta httpEquiv="Expires" content="0" />
+        {/* Shared RZEngine v2.3.0 (site root — absolute path is NOT rewritten by
+            basePath). Defer in <head> executes before Next's deferred body
+            bundles, so window.RZEngine exists when store modules evaluate.
+            Consumed via src/lib/rz-engine.ts (with local fallbacks). */}
+        <script src="/rz-engine.min.js?v=2026-07-15-dsc" defer></script>
       </head>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
