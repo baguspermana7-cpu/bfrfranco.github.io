@@ -236,7 +236,9 @@ window.RZ_FEATURE_FLAGS = {
 
   /* ── DCMOC (Next.js subapp at /dcmoc/) ─────────────────────────────────── */
   'dcmoc': {
-    'page-access':             { free: false, demo: false, pro: true, root: true  },
+    /* DCMOC is ROOT-ONLY: the DCMOC Next.js app enforces root (dcmoc/src/store/auth.ts →
+       ROOT_EMAILS) and auth.js nav-locks /dcmoc via ROOT_ONLY_PATHS. page-access matches. */
+    'page-access':             { free: false, demo: false, pro: false, root: true  },
     'advanced-mode':           { free: false, demo: true,  pro: true, root: true  },
     'pdf-export':              { free: false, demo: true,  pro: true, root: true  },
     'pdf-watermark-removed':   { free: false, demo: false, pro: true, root: true  },

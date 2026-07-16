@@ -30,8 +30,8 @@
      * consumes it. Bump `version` and add a CHANGELOG entry on any change.
      * ==================================================================== */
     var DATA = {
-        version: '2.2.0',
-        lastUpdated: '2026-07-14',
+        version: '2.3.0',
+        lastUpdated: '2026-07-15',
         asOf: '2026-07',
 
         // v2.0 schema metadata (A1). `version` above tracks DATA content; `meta.schemaVersion`
@@ -87,6 +87,9 @@
             immersionTier3:    1.04
         },
         pueMatrix: {
+            /* inrow/rdhx rows added v2.3.0 so capex-calculator + DCMOC granularity is engine-owned */
+            inrow:     { tier2: 1.34, tier3: 1.27, tier4: 1.22 },
+            rdhx:      { tier2: 1.24, tier3: 1.18, tier4: 1.14 },
             air:       { tier2: 1.62, tier3: 1.50, tier4: 1.44 },
             liquid:    { tier2: 1.22, tier3: 1.15, tier4: 1.10 },
             immersion: { tier2: 1.07, tier3: 1.04, tier4: 1.03 }
@@ -182,7 +185,7 @@
                 ID: 12, SG: 18, JP: 30, IN: 10, MY: 14
             },
             embodiedPerMw: 3200,   // tCO₂e embodied in construction per MW (concrete+steel+MEP)
-            offsetPrice:   18       // $/tCO₂e voluntary offset
+            offsetPrice:   35       // $/tCO₂e voluntary market 2026 blend (was 18; DCMOC used 45 — reconciled v2.3.0)
         },
 
         // Water use efficiency baseline (L/kWh) by cooling type + water price ($/m³) by region.
@@ -283,9 +286,222 @@
             cagrHigh: 0.20, cagrMid: 0.10, fallback: '#64748b'
         },
 
+
+        /* ══ v2.3.0 — DATA.capexDetail: the DETAILED capex model lifted from
+         * capex-calculator.html (inline :2465-2557) so capex-calculator + DCMOC share ONE
+         * source. Values keep the calculator's calibration lineage: the per-kW factors are
+         * anchored to the sourced city $/W table below (locMult = perW/4.65). Golden-parity
+         * fixtures (tools/fixtures/capex-golden.json) lock the migration. ══ */
+        capexDetail: {
+            /* $/kW IT by category */
+            costFactors: {
+                building: 800, seismic: 100, electrical: 1200, ups: 600, generator: 400,
+                cooling: 700, fireSuppression: 150, fireAlarm: 80, bms: 120, network: 250,
+                security: 80, commissioning: 120, testing: 90, permits: 60
+            },
+            redundancyMult: { n: 1.0, n1: 1.25, '2n': 1.85, '2n1': 2.1 },
+            coolingMult: { air: 1.0, inrow: 1.2, rdhx: 1.35, liquid: 1.6 },
+            rackMult: { standard: 1.0, medium: 1.1, high: 1.3, ai: 1.9 },
+            rackKw: { standard: 6, medium: 12.5, high: 25, ai: 75 },
+            buildingMult: { warehouse: 0.7, modular: 0.85, purpose: 1.0, highrise: 1.4 },
+            seismicMult: { zone0: 0.2, zone1: 1.0, zone2: 2.5, zone3: 5.0, zone4: 8.0 },
+            fireSuppressionMult: { fm200: 1.0, novec: 1.3, inergen: 1.2, n2: 1.8, water: 0.6 },
+            fireAlarmMult: { conventional: 0.6, addressable: 1.0, vesda: 1.8, hybrid: 2.2 },
+            upsMult: { standalone: 0.9, modular: 1.0, distributed: 1.2, rotary: 1.5 },
+            genMult: { diesel: 1.0, gas: 1.15, dualfuel: 1.3, hvo: 1.2 },
+            locationMult: { sea: 0.65, india: 0.55, china: 0.7, japan: 1.1, australia: 1.05, europe: 1.15, usa: 1.0, mena: 0.90 },
+            regionGroupDefaults: {
+                americas: { internalRegion: 'usa', multiplier: 1.00 },
+                emea: { internalRegion: 'europe', multiplier: 1.15 },
+                apac: { internalRegion: 'sea', multiplier: 0.85 },
+                middle_east: { internalRegion: 'mena', multiplier: 0.90 }
+            },
+            cityAnchorPerW: 4.65,   /* locMult = city.perW / cityAnchorPerW */
+            cityCapexPerW: {
+                silicon_valley: { perW: 13.30, region: 'usa', label: 'Silicon Valley' },
+                new_jersey: { perW: 12.90, region: 'usa', label: 'New Jersey / NYC' },
+                virginia: { perW: 13.40, region: 'usa', label: 'Virginia / NOVA' },
+                dallas: { perW: 14.30, region: 'usa', label: 'Dallas, TX' },
+                phoenix: { perW: 13.40, region: 'usa', label: 'Phoenix, AZ' },
+                chicago: { perW: 13.20, region: 'usa', label: 'Chicago, IL' },
+                san_antonio: { perW: 9.30, region: 'usa', label: 'San Antonio, TX' },
+                toronto: { perW: 11.80, region: 'usa', label: 'Toronto, Canada' },
+                sao_paulo: { perW: 8.50, region: 'usa', label: 'São Paulo, Brazil' },
+                queretaro: { perW: 8.00, region: 'usa', label: 'Querétaro, Mexico' },
+                london: { perW: 12.00, region: 'europe', label: 'London, UK' },
+                frankfurt: { perW: 11.60, region: 'europe', label: 'Frankfurt, Germany' },
+                amsterdam: { perW: 11.80, region: 'europe', label: 'Amsterdam, Netherlands' },
+                stockholm: { perW: 10.50, region: 'europe', label: 'Stockholm, Sweden' },
+                lisbon: { perW: 10.80, region: 'europe', label: 'Lisbon, Portugal' },
+                dublin: { perW: 11.50, region: 'europe', label: 'Dublin, Ireland' },
+                paris: { perW: 12.20, region: 'europe', label: 'Paris, France' },
+                madrid: { perW: 10.20, region: 'europe', label: 'Madrid, Spain' },
+                milan: { perW: 11.00, region: 'europe', label: 'Milan, Italy' },
+                warsaw: { perW: 9.00, region: 'europe', label: 'Warsaw, Poland' },
+                zurich: { perW: 14.50, region: 'europe', label: 'Zurich, Switzerland' },
+                oslo: { perW: 11.50, region: 'europe', label: 'Oslo, Norway' },
+                brussels: { perW: 11.20, region: 'europe', label: 'Brussels, Belgium' },
+                dubai: { perW: 10.50, region: 'mena', label: 'Dubai, UAE' },
+                riyadh: { perW: 9.80, region: 'mena', label: 'Riyadh, Saudi Arabia' },
+                doha: { perW: 11.00, region: 'mena', label: 'Doha, Qatar' },
+                tokyo: { perW: 15.20, region: 'japan', label: 'Tokyo, Japan' },
+                singapore: { perW: 14.53, region: 'sea', label: 'Singapore' },
+                hong_kong: { perW: 13.80, region: 'china', label: 'Hong Kong' },
+                seoul: { perW: 9.50, region: 'japan', label: 'Seoul, South Korea' },
+                sydney: { perW: 12.30, region: 'australia', label: 'Sydney, Australia' },
+                malaysia: { perW: 11.37, region: 'sea', label: 'Malaysia / Johor' },
+                jakarta: { perW: 11.21, region: 'sea', label: 'Jakarta, Indonesia' },
+                mumbai: { perW: 6.64, region: 'india', label: 'Mumbai, India' },
+                chennai: { perW: 6.20, region: 'india', label: 'Chennai, India' },
+                taipei: { perW: 10.00, region: 'china', label: 'Taipei, Taiwan' },
+                bangkok: { perW: 8.50, region: 'sea', label: 'Bangkok, Thailand' }
+            },
+            yearEscalation: { 2025: 1.000, 2026: 1.060, 2027: 1.115, 2028: 1.165, 2029: 1.210, 2030: 1.250 },
+            substationCosts: { shared: 1000000, dedicated_33kv: 4000000, dedicated_132kv: 7500000 },
+            fom: { gridConnectionPerMw: 500000, switchgearPerMw: 300000,
+                   transformerLeadMult: { standard: 1.0, extended: 1.15, emergency: 1.30 } },
+            marketConditionMult: { buyer: 0.95, balanced: 1.0, seller: 1.10 },
+            deliveryMethodMult: { dbb: 1.0, db: 0.97, modular: 0.92, epc: 1.05 },
+            contractorAvailMult: { high: 1.0, normal: 1.03, tight: 1.08 },
+            powerDistMult: { overhead: 0.92, busway: 1.0, underground: 1.15, mixed: 1.08 },
+            transformerTypeMult: { oil: 0.90, dry: 1.0, cast_resin: 1.12 },
+            pduCostPerRack: { basic: 800, intelligent: 1500, switched: 2500 },
+            cablingCostPerRack: { copper: 600, hybrid: 1200, fiber: 2000 },
+            floorTypeMult: { slab: 0.95, raised_600: 1.0, raised_900: 1.06, raised_1200: 1.12 },
+            siteConditionMult: { greenfield: 1.06, brownfield: 1.0, retrofit: 1.15 },
+            securityLevelMult: { standard: 1.0, enterprise: 1.5, high: 2.2 },
+            fiberEntryCost: { single: 150000, dual: 350000, multi: 600000 },
+            greenCertMult: { none: 1.0, silver: 1.02, gold: 1.04, platinum: 1.08 },
+            renewableCostPerMw: { none: 0, solar: 1200000, solar_bess: 2500000 },
+            permitRegionMult: {
+                sea: { permits: 1.3, testing: 0.8 }, india: { permits: 1.4, testing: 0.7 },
+                china: { permits: 1.5, testing: 0.9 }, japan: { permits: 1.8, testing: 1.5 },
+                australia: { permits: 1.6, testing: 1.3 }, europe: { permits: 1.7, testing: 1.4 },
+                usa: { permits: 1.0, testing: 1.0 }, mena: { permits: 1.2, testing: 0.9 }
+            },
+            testingRedundancyMult: { n: 0.7, n1: 1.0, '2n': 1.5, '2n1': 1.8 },
+            fuelMultPerHourOver24: 0.008,
+            softCostDefaults: { designPct: 8, pmPct: 5, contingencyPct: 10, simpleContingencyPct: 5 },
+            pueByCoolingRack: {   /* design PUE matrix used by the detailed calculator */
+                air:    { standard: 1.8, medium: 1.7, high: 1.6, ai: 1.5 },
+                inrow:  { standard: 1.6, medium: 1.5, high: 1.45, ai: 1.4 },
+                rdhx:   { standard: 1.45, medium: 1.4, high: 1.35, ai: 1.3 },
+                liquid: { standard: 1.3, medium: 1.25, high: 1.2, ai: 1.15 }
+            },
+            wueByCooling: { air: 0.0, inrow: 1.8, rdhx: 0.3, liquid: 0.1 },
+            energyRateByLocation: { sea: 0.08, india: 0.07, usa: 0.10, other: 0.12 },
+            /* Rack-density → floor-space model (owner mandate 2026-07-15). Rules of thumb:
+             * 600 mm racks at hot/cold-aisle pitch; higher density widens service aisles;
+             * DLC/deep-sea rows add in-row CDU + manifold clearance; support space (UPS,
+             * battery, switchgear, cooling galleries, corridors) scales with redundancy. */
+            space: {
+                rackFootprintM2: { standard: 2.5, medium: 2.8, high: 3.2, ai: 4.2 },
+                liquidRowFactor: 1.08,          /* in-row CDU + manifolds for liquid/rdhx/deep-sea */
+                supportRatioByRedundancy: { n: 0.55, n1: 0.75, '2n': 1.05, '2n1': 1.2 },
+                adminFixedM2: 300, adminPerRackM2: 0.15,
+                targetHallM2: 1500,             /* typical single data-hall white space */
+                racksPerRow: 20
+            },
+            timelineBase: {
+                n: { design: 4, permit: 3, civil: 8, mep: 6, commission: 2 },
+                n1: { design: 5, permit: 3, civil: 10, mep: 8, commission: 3 },
+                '2n': { design: 6, permit: 4, civil: 12, mep: 10, commission: 4 },
+                '2n1': { design: 7, permit: 4, civil: 14, mep: 12, commission: 5 }
+            },
+            buildingTimeMult: { warehouse: 0.7, modular: 0.6, purpose: 1.0, highrise: 1.4 },
+            coolingTimeMult: { air: 1.0, inrow: 1.05, rdhx: 1.15, liquid: 1.3, deepsea: 1.45 },
+            permitTimeMult: { sea: 1.2, india: 1.4, china: 1.3, japan: 1.5, australia: 1.3, europe: 1.4, usa: 1.0, mena: 1.1 }
+        },
+
+        /* ══ v2.3.0 — DATA.deepSeaCooling: chiller-less deep-sea water cooling physics.
+         * Design basis: the 150 MW AI DC reference architecture (owner poster, 2026) —
+         * 3 separated loops (TCS rack CDU → FWS closed → seawater open), titanium Gr2 PHE,
+         * intake 800-1000 m @ 4-6 °C, ΔT 5 °C, N+1 pumps/filters/HX, trim chillers backup.
+         * Poster reproduces with mode:'poster' (cp 4.0, ρ 1000); default 'accurate' uses
+         * seawater properties at S≈35, 5 °C. ══ */
+        deepSeaCooling: {
+            seawater: {
+                rhoKgM3: 1025, cpJKgK: 3985,
+                posterRhoKgM3: 1000, posterCpJKgK: 4000,
+                designDeltaTC: 5, deltaTEnvMaxC: 5,
+                /* NOAA WOA-grade typical deep-water temps (tropical/subtropical margins) */
+                intakeTempByDepth: [
+                    { minDepthM: 1100, tC: 4.0 }, { minDepthM: 900, tC: 5.0 },
+                    { minDepthM: 700, tC: 6.0 }, { minDepthM: 500, tC: 8.0 },
+                    { minDepthM: 300, tC: 11.0 }, { minDepthM: 0, tC: 16.0 }
+                ]
+            },
+            hx: { approachC: 2.0, approachRangeC: [1.5, 2.5], designPressureBarFw: 10,
+                  costPerMwth: 95000, material: 'Titanium Grade 2' },
+            pump: { effPump: 0.87, effMotor: 0.96, effVfd: 0.97,
+                    maxPerPumpM3s: 3.0, baseStaticHeadM: 15, frictionHeadMPerKm: 12,
+                    fwLoopPowerFraction: 0.38, cduPowerFraction: 0.10,
+                    /* reference-poster pump spec (mode:'poster' reproduces exactly):
+                     * rated 2.9 m3/s @ 60 m, ~2,000 kW each, 4 duty + 1 standby (design
+                     * margin beyond hydraulic minimum), combined efficiency 0.85 */
+                    poster: { ratedPerPumpM3s: 2.9, headM: 60, effTotal: 0.85, dutyMargin: 1 } },
+            pipeline: { costPerKmByFlow: [
+                    { maxM3s: 3, usd: 2200000 }, { maxM3s: 6, usd: 3400000 },
+                    { maxM3s: 10, usd: 4800000 }, { maxM3s: 20, usd: 7500000 }
+                ], marineInstallMult: 3.0, lines: 2 /* intake + outfall */,
+                diffuserCost: 1800000, intakeStructureCost: 4500000 },
+            filtration: { costPerM3h: 260, stages: 'coarse 50mm → fine 5mm → traveling screen → disc 200µm → auto-backwash 50µm', redundancy: 'N+1' },
+            trimChiller: { capacityFraction: 0.35, hoursPerYear: 300, costPerMwth: 260000 },
+            controls: { costFixed: 2500000 /* BMS integration, AI optimization, 2N controllers */ },
+            elecLossFraction: 0.05,   /* UPS/distribution losses share of IT for PUE build-up */
+            opex: { marineMaintPctOfMarineCapex: 0.03, chlorinationPerM3hYr: 6.5,
+                    rovInspectionYr: 350000, pumpLoadFactor: 0.85 },
+            contingencyPct: 0.15,
+            redundancy: { pumps: 'N+1', filters: 'N+1', hx: 'N+1 parallel', chillers: 'N+1', power: '2N', controls: '2N' }
+        },
+
+        /* ══ v2.3.0 — DATA.refrigerants: chiller/CRAC refrigerant database.
+         * GWP100 = IPCC AR4 (matches values already published on this site: 2088/1430/675/7).
+         * copIndex = relative cycle efficiency at water-cooled chiller conditions,
+         * R-134a centrifugal = 1.00 baseline (AHRI/manufacturer typical — estimate-grade).
+         * safety = ASHRAE 34. capexMult = flammability/toxicity mitigation premium. ══ */
+        refrigerants: {
+            R410A:   { label: 'R-410A',      gwp: 2088, safety: 'A1',  copIndex: 0.95, chargeKgPerKwth: 0.15, leakPctYr: 0.04, capexMult: 1.00, apps: ['crac', 'chiller'], note: 'US AIM Act restricts GWP>700 in new equipment from 2025; EU F-Gas phase-down' },
+            R134a:   { label: 'R-134a',      gwp: 1430, safety: 'A1',  copIndex: 1.00, chargeKgPerKwth: 0.20, leakPctYr: 0.03, capexMult: 1.00, apps: ['chiller'], note: 'Kigali HFC phase-down; baseline centrifugal-chiller refrigerant' },
+            R513A:   { label: 'R-513A',      gwp: 631,  safety: 'A1',  copIndex: 0.97, chargeKgPerKwth: 0.20, leakPctYr: 0.03, capexMult: 1.00, apps: ['chiller'], note: 'Lower-GWP drop-in for R-134a (~3% capacity/efficiency penalty)' },
+            R32:     { label: 'R-32',        gwp: 675,  safety: 'A2L', copIndex: 1.02, chargeKgPerKwth: 0.12, leakPctYr: 0.03, capexMult: 1.03, apps: ['crac'], note: 'Mildly flammable (A2L) — ventilation/leak-detection mitigation' },
+            R454B:   { label: 'R-454B',      gwp: 466,  safety: 'A2L', copIndex: 0.98, chargeKgPerKwth: 0.13, leakPctYr: 0.03, capexMult: 1.03, apps: ['crac', 'chiller'], note: 'Primary R-410A replacement in new DX equipment' },
+            R1234ze: { label: 'R-1234ze(E)', gwp: 7,    safety: 'A2L', copIndex: 0.96, chargeKgPerKwth: 0.20, leakPctYr: 0.02, capexMult: 1.03, apps: ['chiller'], note: 'Ultra-low-GWP HFO; EU F-Gas-proof; centrifugal/screw chillers' },
+            R1233zd: { label: 'R-1233zd(E)', gwp: 1,    safety: 'A1',  copIndex: 1.02, chargeKgPerKwth: 0.22, leakPctYr: 0.015, capexMult: 1.02, apps: ['chiller'], note: 'Low-pressure centrifugal; non-flammable ultra-low GWP' },
+            R717:    { label: 'R-717 (ammonia)', gwp: 0, safety: 'B2L', copIndex: 1.04, chargeKgPerKwth: 0.10, leakPctYr: 0.02, capexMult: 1.07, apps: ['chiller'], note: 'Zero GWP, excellent efficiency; toxicity — machine-room isolation, occupied-space charge limits (IIAR/EN 378)' },
+            R290:    { label: 'R-290 (propane)', gwp: 3, safety: 'A3', copIndex: 1.00, chargeKgPerKwth: 0.05, leakPctYr: 0.02, capexMult: 1.06, apps: ['chiller'], note: 'Highly flammable (A3) — strict charge limits; outdoor/rooftop packaged' }
+        },
+        refrigerantBaseline: 'R134a',
+        refrigerantAutoByCooling: { air: 'R410A', inrow: 'R410A', rdhx: 'R134a', liquid: null, deepsea: 'R1234ze' },
+        chillerBaseCopWaterCooled: 6.5,
+
+        /* ══ v2.3.0 — DATA.energy: screening-grade on-site renewables + BESS module.
+         * Answers 'BESS/solar/wind: engine ini atau terpisah?' → INSIDE RZEngine (one
+         * provenance regime, same consumers). Screening-level economics — NOT an
+         * interconnection or reliability study. ══ */
+        energy: {
+            solar: { capexPerMwp: { US: 950000, EU: 900000, APAC: 780000, LATAM: 850000, ID: 800000, SG: 1050000, JP: 1100000, IN: 650000, MY: 780000 },
+                     cfByRegion: { US: 0.24, EU: 0.14, APAC: 0.17, LATAM: 0.22, ID: 0.17, SG: 0.15, JP: 0.15, IN: 0.20, MY: 0.16 },
+                     opexPctYr: 0.015, lifeYears: 30, landHaPerMwp: 1.2 },
+            windOnshore: { capexPerMw: 1500000, cfByRegion: { US: 0.36, EU: 0.30, APAC: 0.28, LATAM: 0.38, ID: 0.24, SG: 0.0, JP: 0.26, IN: 0.28, MY: 0.20 },
+                           opexPctYr: 0.025, lifeYears: 25 },
+            windOffshore: { capexPerMw: 3800000, cfByRegion: { US: 0.44, EU: 0.45, APAC: 0.40, LATAM: 0.45, ID: 0.35, SG: 0.0, JP: 0.38, IN: 0.35, MY: 0.30 },
+                            opexPctYr: 0.035, lifeYears: 25 },
+            bess: { capexPerKwh: 180, roundtripEff: 0.88, cycleLife: 6000, opexPctYr: 0.02, lifeYears: 15 },
+            solarDaylightFraction: 0.42   /* fraction of 24h a tracking-adjusted array meaningfully produces */
+        },
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
+            'capexDetail': { source: 'Turner & Townsend DCCI 2025 + Cushman & Wakefield DC Cost Guide 2025 (city $/W anchor table) + JLL 2026 escalation; category factors calibrated to the anchor (locMult = perW/4.65) — lineage: capex-calculator inline model, lifted v2.3.0', asOf: '2025', method: 'budgetary estimate-grade; NOT detailed engineering' },
+            'capexDetail.costFactors.electrical': { source: 'calculator lineage 1200 $/kW (DCMOC A7 2025 used 1550 for a different model shape — NOT merged; engine detailed model is the shared source from v2.3.0)', asOf: '2025', unit: '$/kW IT' },
+            'deepSeaCooling': { source: 'Design basis: 150 MW AI DC deep-sea cooling reference architecture (owner, 2026) — chiller-less primary + hybrid trim backup; seawater properties: TEOS-10/IOC tables at S=35, 5 °C; intake-temp bands: NOAA World Ocean Atlas typical tropical/subtropical profiles; SWAC cost scaling: Makai Ocean Engineering SWAC studies + Hawaii/InterContinental SWAC projects (public figures), HDPE marine pipeline install multipliers 2.5-4x onshore', asOf: '2026', method: 'poster mode reproduces the reference (cp 4.0, rho 1000): 172.5 MW / (4.0*5) = 8.625 m3/s = 31,050 m3/h, 4+1 pumps 2.9 m3/s @ 60 m ≈ 2.0 MW each; accurate mode uses rho 1025 / cp 3985' },
+            'refrigerants': { source: 'GWP100 IPCC AR4 (consistent with sitewide published values); ASHRAE 34 safety classes; copIndex: AHRI/manufacturer typical relative cycle efficiency at water-cooled chiller conditions (R-134a=1.00) — estimate-grade; charge/leak: GHG Protocol + EPA GreenChill typical ranges', asOf: '2026', method: 'copIndex and charge/leak are screening estimates, not equipment selections' },
+            'energy': { source: 'Lazard LCOE+ 2025 (solar/wind capex+CF ranges), IRENA Renewable Power Generation Costs 2024 (APAC/ID), BNEF BESS pack+BOS 2026 ~$180/kWh installed', asOf: '2026', method: 'screening-grade; not an interconnection/reliability study' },
+            'carbon.offsetPrice': { source: 'Voluntary carbon market 2026 blend (nature-based + engineered mid-range); reconciles DCMOC $45 vs legacy $18', asOf: '2026', unit: '$/tCO2e' },
+            'capexDetail.space': { source: 'Industry planning rules of thumb: 600mm racks at hot/cold-aisle pitch (Uptime/ASHRAE TC9.9 layout guidance); support-to-white-space ratios by redundancy from published DC space programs (white space typically 40-50% of gross); DLC rows +~8% for in-row CDU + manifolds', asOf: '2026', method: 'screening-grade space program, not an architectural layout' },
+            'pueMatrix.inrow': { source: 'Uptime Institute Global Survey 2026 close-coupled cohort', asOf: '2026' },
+            'pueMatrix.rdhx': { source: 'Uptime Institute Global Survey 2026 rear-door cohort', asOf: '2026' },
             'markets': { source: 'CBRE Global DC Market 2025 + JLL Outlook 2025 + Cushman & Wakefield 2025 + Synergy Research 2024 (capacity/vacancy/colo/pipeline per market); market-level powerCost from utility filings (PJM, ERCOT, Dominion, IMDA et al.)', asOf: '2026-04', method: 'per-market figures; NOT interchangeable with regions.*.powerKwh macro blends (different denominators)' },
             'regions.US.powerKwh':    { source: 'US EIA industrial electricity + DC PPA blend', asOf: '2026', unit: '$/kWh' },
             'regions.EU.powerKwh':    { source: 'Eurostat non-household electricity (normalized post-crisis)', asOf: '2026', unit: '$/kWh' },
@@ -534,6 +750,226 @@
         // Math models — domain-specific calculations sharing engine constants.
         // S2 ships workforce + roi + forecast. capex/opex/tco/pue follow in S4/S6.
         models: {
+            /* ══ v2.3.0 — cooling physics: deep-sea water cooling + refrigerant impact ══ */
+            cooling: {
+                /** Intake temperature (°C) for a given depth from the sourced bands. */
+                intakeTempForDepth: function (depthM) {
+                    var bands = DATA.deepSeaCooling.seawater.intakeTempByDepth;
+                    for (var i = 0; i < bands.length; i++) if (depthM >= bands[i].minDepthM) return bands[i].tC;
+                    return bands[bands.length - 1].tC;
+                },
+                /**
+                 * Chiller-less deep-sea water cooling design (3-loop: rack CDU → facility water →
+                 * seawater via titanium PHE; hybrid trim-chiller backup). Design basis: the 150 MW
+                 * reference architecture — mode 'poster' reproduces its numbers exactly (cp 4.0,
+                 * ρ 1000); default 'accurate' uses real seawater properties. Budgetary
+                 * estimate-grade, NOT detailed marine engineering.
+                 * @param {object} a { itLoadMw, pueTarget=1.15, deltaTC=5, depthM=900, pipelineKm=3,
+                 *   intakeTempC?, trimFraction?, region='US', mode='accurate' }
+                 */
+                deepSea: function (a) {
+                    a = a || {};
+                    var D = DATA.deepSeaCooling, SW = D.seawater;
+                    var it = Math.max(0.1, a.itLoadMw || 10);
+                    var pueTarget = a.pueTarget || 1.15;
+                    var dT = a.deltaTC || SW.designDeltaTC;
+                    var depth = a.depthM || 900;
+                    var km = a.pipelineKm != null ? a.pipelineKm : 3;
+                    var poster = a.mode === 'poster';
+                    var rho = poster ? SW.posterRhoKgM3 : SW.rhoKgM3;
+                    var cp = poster ? SW.posterCpJKgK : SW.cpJKgK;
+                    var region = a.region || 'US';
+
+                    var heatMw = it * pueTarget;                      // total heat rejected (poster convention)
+                    var kgps = (heatMw * 1e6) / (cp * dT);
+                    var m3s = kgps / rho;
+                    var m3h = m3s * 3600;
+
+                    var intakeT = a.intakeTempC != null ? a.intakeTempC : this.intakeTempForDepth(depth);
+                    var returnT = intakeT + dT;
+
+                    /* pumps: N+1; duty count from per-pump ceiling; head = static + friction·km.
+                     * mode:'poster' reproduces the reference spec: rated 2.9 m3/s @ 60 m,
+                     * duty = hydraulic minimum + 1 design-margin pump (4 for 150 MW). */
+                    var P = D.pump;
+                    var duty, perPumpM3s, headM, perPumpKw, swPumpMw;
+                    if (poster) {
+                        var PP = P.poster;
+                        duty = Math.ceil(m3s / PP.ratedPerPumpM3s) + PP.dutyMargin;
+                        perPumpM3s = PP.ratedPerPumpM3s;
+                        headM = PP.headM;
+                        perPumpKw = (rho * 9.81 * perPumpM3s * headM) / PP.effTotal / 1000;
+                        /* facility power draw follows the hydraulic REQUIREMENT, not rated sum */
+                        swPumpMw = ((rho * 9.81 * m3s * headM) / PP.effTotal) / 1e6;
+                    } else {
+                        duty = Math.max(2, Math.ceil(m3s / P.maxPerPumpM3s));
+                        perPumpM3s = m3s / duty;
+                        headM = P.baseStaticHeadM + P.frictionHeadMPerKm * km;
+                        var eff = P.effPump * P.effMotor * P.effVfd;
+                        perPumpKw = (rho * 9.81 * perPumpM3s * headM) / eff / 1000;
+                        swPumpMw = (perPumpKw * duty) / 1000;
+                    }
+                    var fwPumpMw = swPumpMw * P.fwLoopPowerFraction;
+                    var cduMw = it * P.cduPowerFraction * 0.1;        // CDU pumps ≈ 1% of IT
+                    var coolingMw = swPumpMw + fwPumpMw + cduMw;
+                    var pPUE = coolingMw / it;
+                    var pue = 1 + pPUE + D.elecLossFraction;
+
+                    /* capex */
+                    var pipeBands = D.pipeline.costPerKmByFlow, perKmBase = pipeBands[pipeBands.length - 1].usd;
+                    for (var i = 0; i < pipeBands.length; i++) if (m3s <= pipeBands[i].maxM3s) { perKmBase = pipeBands[i].usd; break; }
+                    var pipeline = perKmBase * km * D.pipeline.lines * D.pipeline.marineInstallMult;
+                    var intakeStructure = D.pipeline.intakeStructureCost + D.pipeline.diffuserCost;
+                    var phe = heatMw * D.hx.costPerMwth * 2;          // N+1 parallel → ~2× duty bank
+                    var pumpStation = duty * 1.25 * perPumpKw * 900;  // (duty+standby)·$/kW installed
+                    var filtration = m3h * D.filtration.costPerM3h;
+                    var trimFraction = a.trimFraction != null ? a.trimFraction : D.trimChiller.capacityFraction;
+                    var trimChillers = heatMw * trimFraction * D.trimChiller.costPerMwth;
+                    var controls = D.controls.costFixed;
+                    var marineSub = pipeline + intakeStructure;
+                    var sub = marineSub + phe + pumpStation + filtration + trimChillers + controls;
+                    var contingency = sub * D.contingencyPct;
+                    var capexTotal = sub + contingency;
+
+                    /* baseline comparison: what the same MW of liquid-cooled heat rejection costs */
+                    var baselinePerMw = (DATA.capexPerMw.liquidCooledTier3 || 13000000) * 0.22; // cooling share of build
+                    var baselineCoolingCapex = it * baselinePerMw;
+
+                    /* opex */
+                    var lf = D.opex.pumpLoadFactor;
+                    var pumpMwhYr = coolingMw * DATA.hoursPerYear * lf;
+                    var powerPrice = (DATA.regions[region] && DATA.regions[region].powerKwh) ||
+                                     (DATA.regionsCountry[region] && DATA.regionsCountry[region].powerKwh) || 0.09;
+                    var pumpCostYr = pumpMwhYr * 1000 * powerPrice;
+                    var maintenance = marineSub * D.opex.marineMaintPctOfMarineCapex;
+                    var chlorination = m3h * D.opex.chlorinationPerM3hYr;
+                    var trimMwhYr = heatMw * trimFraction / 4.5 * D.trimChiller.hoursPerYear; // COP≈4.5 trim duty
+                    var opexYr = pumpCostYr + maintenance + chlorination + D.opex.rovInspectionYr + trimMwhYr * 1000 * powerPrice;
+
+                    var warnings = [];
+                    if (depth < 500) warnings.push('Intake shallower than 500 m: seawater too warm for fully chiller-less operation — expect heavy trim-chiller duty.');
+                    if (km > 8) warnings.push('Pipeline over 8 km: marine capex and pumping head dominate — verify site bathymetry economics.');
+                    if (it < 5) warnings.push('Below ~5 MW IT the fixed marine works make deep-sea cooling uneconomical vs conventional.');
+
+                    return {
+                        mode: poster ? 'poster' : 'accurate',
+                        heatRejectedMw: Math.round(heatMw * 100) / 100,
+                        flow: { kgps: Math.round(kgps), m3s: Math.round(m3s * 1000) / 1000, m3h: Math.round(m3h) },
+                        intakeTempC: intakeT, returnTempC: returnT, deltaTC: dT, depthM: depth,
+                        pumps: { duty: duty, standby: 1, perPumpM3s: Math.round(perPumpM3s * 100) / 100,
+                                 headM: headM, perPumpKw: Math.round(perPumpKw), totalMw: Math.round(swPumpMw * 100) / 100 },
+                        fwPumpMw: Math.round(fwPumpMw * 100) / 100, cduMw: Math.round(cduMw * 100) / 100,
+                        coolingMw: Math.round(coolingMw * 100) / 100,
+                        pPUE: Math.round(pPUE * 1000) / 1000,
+                        pue: Math.round(pue * 1000) / 1000,
+                        wue: 0,
+                        capex: { pipeline: Math.round(pipeline), intakeStructure: Math.round(intakeStructure),
+                                 phe: Math.round(phe), pumpStation: Math.round(pumpStation),
+                                 filtration: Math.round(filtration), trimChillers: Math.round(trimChillers),
+                                 controls: controls, contingency: Math.round(contingency),
+                                 total: Math.round(capexTotal), perMw: Math.round(capexTotal / it),
+                                 vsBaselineCooling: Math.round(capexTotal - baselineCoolingCapex) },
+                        opex: { pumpMwhYr: Math.round(pumpMwhYr), pumpCostYr: Math.round(pumpCostYr),
+                                maintenance: Math.round(maintenance), chlorination: Math.round(chlorination),
+                                rovInspection: D.opex.rovInspectionYr, trimChillerMwhYr: Math.round(trimMwhYr),
+                                totalYr: Math.round(opexYr) },
+                        env: { deltaTCompliant: dT <= SW.deltaTEnvMaxC,
+                               note: 'Low-entrainment intake + multiport diffuser outfall; controlled ΔT ≤ ' + SW.deltaTEnvMaxC + ' °C.' },
+                        redundancy: D.redundancy,
+                        warnings: warnings
+                    };
+                },
+                /**
+                 * Refrigerant impact for a chiller/CRAC application: efficiency vs the R-134a
+                 * baseline, Scope-1 leakage carbon, safety class + mitigation capex.
+                 * @param {string} key DATA.refrigerants key  @param {object} c { chillerMwth,
+                 *   region='US', hoursPerYear?, loadFactor=0.5, baseCop? }
+                 */
+                refrigerant: function (key, c) {
+                    c = c || {};
+                    var R = DATA.refrigerants[key];
+                    if (!R) return null;
+                    var base = DATA.refrigerants[DATA.refrigerantBaseline];
+                    var mwth = c.chillerMwth || 1;
+                    var cop = (c.baseCop || DATA.chillerBaseCopWaterCooled) * R.copIndex;
+                    var hrs = c.hoursPerYear || DATA.hoursPerYear;
+                    var lf = c.loadFactor != null ? c.loadFactor : 0.5;
+                    var mwhYr = (mwth * lf * hrs) / cop;
+                    var mwhBaseline = (mwth * lf * hrs) / ((c.baseCop || DATA.chillerBaseCopWaterCooled) * base.copIndex);
+                    var chargeKg = mwth * 1000 * R.chargeKgPerKwth;
+                    var leakKgYr = chargeKg * R.leakPctYr;
+                    var tco2eYr = (leakKgYr * R.gwp) / 1000;
+                    var region = c.region || 'US';
+                    var cprice = DATA.carbon.carbonPrice[region] != null ? DATA.carbon.carbonPrice[region] : DATA.carbon.carbonPrice.US;
+                    var flags = [];
+                    if (R.gwp > 700) flags.push('US AIM Act: GWP > 700 restricted in new equipment from 2025.');
+                    if (R.gwp > 150) flags.push('EU F-Gas: GWP > 150 phased out for new chillers (2027-2032 schedule).');
+                    if (R.safety === 'A2L') flags.push('A2L mildly flammable: leak detection + ventilation per ASHRAE 15 / ISO 5149.');
+                    if (R.safety === 'B2L') flags.push('B2L toxic (ammonia): machine-room isolation, occupied-space charge limits (IIAR-2 / EN 378).');
+                    if (R.safety === 'A3') flags.push('A3 highly flammable: strict charge limits; outdoor/rooftop packaged units.');
+                    return {
+                        key: key, label: R.label, gwp: R.gwp, safety: R.safety,
+                        cop: Math.round(cop * 100) / 100, copIndex: R.copIndex,
+                        annualMwh: Math.round(mwhYr),
+                        energyDeltaVsBaselinePct: Math.round((mwhYr / mwhBaseline - 1) * 1000) / 10,
+                        chargeKg: Math.round(chargeKg), leakKgYr: Math.round(leakKgYr * 10) / 10,
+                        tco2eYr: Math.round(tco2eYr * 100) / 100,
+                        carbonCostYr: Math.round(tco2eYr * cprice),
+                        capexMult: R.capexMult, complianceFlags: flags, note: R.note
+                    };
+                }
+            },
+
+            /* ══ v2.3.0 — screening-grade on-site renewables + BESS ══ */
+            energy: {
+                /** Simple LCOE ($/MWh): (capex·CRF + opex) / annual MWh. Screening-grade. */
+                lcoe: function (tech, region, opts) {
+                    opts = opts || {};
+                    var E = DATA.energy[tech];
+                    if (!E) return null;
+                    var capexPerMw = (E.capexPerMwp && (E.capexPerMwp[region] || E.capexPerMwp.US)) || E.capexPerMw;
+                    var cf = (E.cfByRegion && (E.cfByRegion[region] != null ? E.cfByRegion[region] : E.cfByRegion.US)) || 0;
+                    if (!cf) return null;
+                    var r = opts.wacc != null ? opts.wacc : (DATA.discountDefaults[region] || DATA.discountDefaults.global);
+                    var n = E.lifeYears;
+                    var crf = (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                    var mwhYr = 8760 * cf;
+                    return Math.round(((capexPerMw * crf + capexPerMw * E.opexPctYr) / mwhYr) * 100) / 100;
+                },
+                /**
+                 * Hybrid coverage screen for a DC: how much of the IT-load energy an on-site
+                 * solar + wind + BESS mix covers. Deterministic day/night simplification —
+                 * screening-level, NOT an interconnection or reliability study.
+                 */
+                hybridScreen: function (a) {
+                    a = a || {};
+                    var region = a.region || 'US';
+                    var loadMwh = (a.itLoadMw || 1) * 8760;
+                    var sCf = DATA.energy.solar.cfByRegion[region] != null ? DATA.energy.solar.cfByRegion[region] : DATA.energy.solar.cfByRegion.US;
+                    var wCf = DATA.energy.windOnshore.cfByRegion[region] != null ? DATA.energy.windOnshore.cfByRegion[region] : DATA.energy.windOnshore.cfByRegion.US;
+                    var solarMwh = (a.solarMwp || 0) * 8760 * sCf;
+                    var windMwh = (a.windMw || 0) * 8760 * wCf;
+                    var dayFrac = DATA.energy.solarDaylightFraction;
+                    var solarDirect = Math.min(solarMwh, loadMwh * dayFrac);
+                    var solarSurplus = Math.max(0, solarMwh - solarDirect);
+                    var bessShift = Math.min(solarSurplus, (a.bessMwh || 0) * 300 * DATA.energy.bess.roundtripEff / 1000 * 1000);
+                    var windDirect = Math.min(windMwh, Math.max(0, loadMwh - solarDirect - bessShift));
+                    var covered = Math.min(loadMwh, solarDirect + bessShift + windDirect);
+                    var gen = solarMwh + windMwh;
+                    var lcoeS = this.lcoe('solar', region), lcoeW = this.lcoe('windOnshore', region);
+                    var blended = gen > 0 ? Math.round((((solarMwh * (lcoeS || 0)) + (windMwh * (lcoeW || 0))) / gen) * 100) / 100 : null;
+                    var gf = DATA.carbon.gridFactor[region] != null ? DATA.carbon.gridFactor[region] : DATA.carbon.gridFactor.US;
+                    return {
+                        coverageFraction: Math.round((covered / loadMwh) * 1000) / 1000,
+                        coveredMwhYr: Math.round(covered), curtailedMwhYr: Math.round(Math.max(0, gen - covered)),
+                        gridResidualMwhYr: Math.round(loadMwh - covered),
+                        blendedLcoe: blended,
+                        carbonOffsetTonnesYr: Math.round(covered * gf),
+                        landHa: Math.round((a.solarMwp || 0) * DATA.energy.solar.landHaPerMwp * 10) / 10,
+                        method: 'screening-level day/night simplification — not an interconnection or reliability study'
+                    };
+                }
+            },
             /* ── Part F: DC market intelligence helpers over DATA.markets ── */
             market: {
                 /** All distinct region labels in DATA.markets (sorted). */
@@ -848,6 +1284,248 @@
             },
 
             capex: {
+
+                /**
+                 * v2.3.0 — the DETAILED budgetary capex model (lineage: capex-calculator.html
+                 * inline engine; golden-parity locked by tools/fixtures/capex-golden.json).
+                 * All constants live in DATA.capexDetail. Exact math preserved — including the
+                 * legacy energy-rate quirk (rate keyed on the DISPLAY region value, which never
+                 * matches 'sea'/'india'/'usa', so it lands on the 0.12 fallback; documented,
+                 * fix = deliberate future reconciliation).
+                 * @param {object} inp mirrors the calculator's inputs (itLoadKw, rackType,
+                 *   coolingType, redundancy, fuelHours, buildingType, seismicZone, fireType,
+                 *   alarmType, upsType, genType, location, city, advanced:{...}|null,
+                 *   deepSea:{...}|null, refrigerant?)
+                 */
+                detailed: function (inp) {
+                    inp = inp || {};
+                    var CD = DATA.capexDetail;
+                    var itLoad = inp.itLoadKw || 1000;
+                    var rackType = inp.rackType || 'standard';
+                    var coolingType = inp.coolingType || 'air';
+                    var redundancy = inp.redundancy || 'n1';
+                    var fuelHours = inp.fuelHours || 48;
+                    var buildingType = inp.buildingType || 'purpose';
+                    var seismicZone = inp.seismicZone || 'zone2';   /* page DOM default */
+                    var fireType = inp.fireType || 'novec';
+                    var alarmType = inp.alarmType || 'addressable';
+                    var upsType = inp.upsType || 'modular';
+                    var genType = inp.genType || 'diesel';
+                    var location = inp.location || 'americas';
+                    var adv = inp.advanced || null;
+
+                    var redMult = CD.redundancyMult[redundancy];
+                    var coolMult = CD.coolingMult[coolingType] || 1.0;
+                    var rackMult = CD.rackMult[rackType];
+                    var buildMult = CD.buildingMult[buildingType];
+                    var seismicMult = CD.seismicMult[seismicZone];
+                    var fireSupMult = CD.fireSuppressionMult[fireType];
+                    var alarmMult = CD.fireAlarmMult[alarmType];
+                    var upsM = CD.upsMult[upsType];
+                    var genM = CD.genMult[genType];
+                    var regionDefault = CD.regionGroupDefaults[location] || CD.regionGroupDefaults.americas;
+                    var locMult = regionDefault.multiplier;
+                    var effectiveRegion = regionDefault.internalRegion;
+                    var fuelMult = 1 + (fuelHours - 24) * CD.fuelMultPerHourOver24;
+
+                    var cityLabel = '';
+                    if (inp.city && inp.city !== 'none' && CD.cityCapexPerW[inp.city]) {
+                        var city = CD.cityCapexPerW[inp.city];
+                        cityLabel = city.label;
+                        effectiveRegion = city.region;
+                        locMult = city.perW / CD.cityAnchorPerW;
+                    }
+
+                    var yearMult = 1.0, yearLabel = '2025';
+                    var marketMult = 1.0, deliveryMult = 1.0, contractorMult = 1.0;
+                    var designPct = 0, pmPct = 0, contingencyPct = CD.softCostDefaults.simpleContingencyPct;
+                    var fomTotal = 0, fomIncluded = false;
+                    var powerDistM = 1.0, transformerM = 1.0, pduPerRack = 0, cablingPerRack = 0;
+                    var floorM = 1.0, siteM = 1.0, securityM = 1.0, fiberCost = 0;
+                    var greenM = 1.0, renewableCost = 0;
+
+                    if (adv) {
+                        yearLabel = String(adv.projYear || '2025');
+                        yearMult = CD.yearEscalation[yearLabel] || 1.0;
+                        marketMult = CD.marketConditionMult[adv.marketCondition || 'balanced'];
+                        deliveryMult = CD.deliveryMethodMult[adv.deliveryMethod || 'dbb'];
+                        contractorMult = CD.contractorAvailMult[adv.contractorAvail || 'normal'];
+                        designPct = adv.designFee != null ? adv.designFee : 0;
+                        pmPct = adv.pmFee != null ? adv.pmFee : 0;
+                        contingencyPct = adv.contingency != null ? adv.contingency : CD.softCostDefaults.contingencyPct;
+                        fomIncluded = !!adv.includeFOM;
+                        if (fomIncluded) {
+                            var subCost = CD.substationCosts[adv.substationType || 'shared'] *
+                                          CD.fom.transformerLeadMult[adv.transformerLead || 'standard'];
+                            var gridConnection = itLoad * 0.001 * CD.fom.gridConnectionPerMw;
+                            var switchgear = itLoad * 0.001 * CD.fom.switchgearPerMw;
+                            fomTotal = (subCost + gridConnection + switchgear) * (1 + (adv.utilityRate != null ? adv.utilityRate : 9) / 100);
+                            fomTotal *= yearMult;
+                        }
+                        powerDistM = CD.powerDistMult[adv.powerDistribution] || 1.0;
+                        transformerM = CD.transformerTypeMult[adv.transformerType] || 1.0;
+                        pduPerRack = CD.pduCostPerRack[adv.pduType] || 1500;
+                        cablingPerRack = CD.cablingCostPerRack[adv.cablingType] || 1200;
+                        floorM = CD.floorTypeMult[adv.floorType] || 1.0;
+                        siteM = CD.siteConditionMult[adv.siteCondition] || 1.0;
+                        securityM = CD.securityLevelMult[adv.securityLevel] || 1.0;
+                        fiberCost = CD.fiberEntryCost[adv.fiberEntry] || 350000;
+                        greenM = CD.greenCertMult[adv.greenCert] || 1.0;
+                        renewableCost = (CD.renewableCostPerMw[adv.renewableOption] || 0) * (itLoad / 1000);
+                    }
+
+                    var costs = {};
+                    var total = 0;
+                    var advGlobalMult = adv ? yearMult * marketMult * deliveryMult * contractorMult : 1.0;
+                    var pr = CD.permitRegionMult[effectiveRegion] || CD.permitRegionMult.usa;
+
+                    Object.keys(CD.costFactors).forEach(function (key) {
+                        var multiplier = locMult;
+                        if (key === 'building') multiplier *= buildMult * rackMult * floorM * siteM;
+                        else if (key === 'seismic') multiplier *= seismicMult * buildMult;
+                        else if (key === 'electrical') multiplier *= redMult * rackMult * powerDistM * transformerM;
+                        else if (key === 'ups') multiplier *= redMult * rackMult * upsM;
+                        else if (key === 'generator') multiplier *= redMult * fuelMult * genM;
+                        else if (key === 'cooling') multiplier *= coolMult * rackMult;
+                        else if (key === 'fireSuppression') multiplier *= fireSupMult;
+                        else if (key === 'fireAlarm') multiplier *= alarmMult;
+                        else if (key === 'security') multiplier *= securityM;
+                        else if (key === 'commissioning') multiplier *= redMult;
+                        else if (key === 'testing') multiplier *= pr.testing * (CD.testingRedundancyMult[redundancy] || 1.0);
+                        else if (key === 'permits') multiplier *= pr.permits;
+                        costs[key] = CD.costFactors[key] * itLoad * multiplier * advGlobalMult;
+                        total += costs[key];
+                    });
+
+                    var racks = Math.ceil(itLoad / CD.rackKw[rackType]);
+                    if (adv) {
+                        var pduTotal = racks * pduPerRack * advGlobalMult * locMult;
+                        costs.electrical += pduTotal; total += pduTotal;
+                        var cablingTotal = racks * cablingPerRack * advGlobalMult * locMult;
+                        costs.network += cablingTotal; total += cablingTotal;
+                        if (fiberCost > 0) { costs.network += fiberCost * advGlobalMult; total += fiberCost * advGlobalMult; }
+                    }
+
+                    var softCosts = {};
+                    if (adv) {
+                        if (designPct > 0) softCosts.design = total * (designPct / 100);
+                        if (pmPct > 0) softCosts.pm = total * (pmPct / 100);
+                    }
+                    var softTotal = 0;
+                    Object.keys(softCosts).forEach(function (k) { softTotal += softCosts[k]; });
+                    total += softTotal;
+
+                    if (adv && greenM > 1.0) total += total * (greenM - 1.0);
+
+                    var contingency = total * (contingencyPct / 100);
+                    total += contingency;
+                    if (fomIncluded) total += fomTotal;
+                    if (adv && renewableCost > 0) total += renewableCost * advGlobalMult;
+
+                    var pue = CD.pueByCoolingRack[coolingType] ? CD.pueByCoolingRack[coolingType][rackType] : 1.5;
+                    var wue = CD.wueByCooling[coolingType] != null ? CD.wueByCooling[coolingType] : 0;
+                    /* legacy quirk preserved (see JSDoc): rate keyed on DISPLAY region value */
+                    var energyRate = location === 'sea' ? 0.08 : location === 'india' ? 0.07 : location === 'usa' ? 0.10 : CD.energyRateByLocation.other;
+                    var annualEnergy = itLoad * pue * 8760 * energyRate;
+
+                    /* deep-sea override: physics replaces the lookup PUE + adds its capex/opex */
+                    var deepSea = null;
+                    if (inp.deepSea) {
+                        var dsIn = inp.deepSea === true ? {} : inp.deepSea;
+                        deepSea = RZEngine.models.cooling.deepSea({
+                            itLoadMw: itLoad / 1000, pueTarget: dsIn.pueTarget || 1.15,
+                            deltaTC: dsIn.deltaTC, depthM: dsIn.depthM, pipelineKm: dsIn.pipelineKm,
+                            intakeTempC: dsIn.intakeTempC, trimFraction: dsIn.trimFraction,
+                            region: dsIn.region || 'US', mode: dsIn.mode
+                        });
+                        pue = deepSea.pue;
+                        wue = 0;
+                        annualEnergy = itLoad * pue * 8760 * energyRate;
+                        costs.deepSeaCooling = deepSea.capex.total;
+                        total += deepSea.capex.total;
+                    }
+
+                    /* refrigerant impact (chiller/CRAC path; auto-mapped when not user-selected) */
+                    var refrigerant = null;
+                    var refKey = inp.refrigerant && inp.refrigerant !== 'auto' ? inp.refrigerant
+                               : DATA.refrigerantAutoByCooling[inp.deepSea ? 'deepsea' : coolingType];
+                    if (refKey && DATA.refrigerants[refKey]) {
+                        var chillerMwth = inp.deepSea
+                            ? (itLoad / 1000) * (deepSea ? (inp.deepSea.trimFraction != null ? inp.deepSea.trimFraction : DATA.deepSeaCooling.trimChiller.capacityFraction) : 0.35) * 1.15
+                            : (itLoad / 1000) * (pue - 1 + 0.85);
+                        refrigerant = RZEngine.models.cooling.refrigerant(refKey, {
+                            chillerMwth: Math.max(0.1, chillerMwth),
+                            region: effectiveRegion === 'usa' ? 'US' : effectiveRegion === 'europe' ? 'EU' : 'APAC',
+                            loadFactor: inp.deepSea ? 0.05 : 0.5
+                        });
+                        if (refrigerant && refrigerant.capexMult > 1 && costs.cooling) {
+                            var refPremium = costs.cooling * (refrigerant.capexMult - 1);
+                            costs.cooling += refPremium; total += refPremium;
+                            refrigerant.capexPremium = Math.round(refPremium);
+                        }
+                    }
+
+                    /* rack density + white space (all-inputs aware: density, cooling, redundancy) */
+                    var SP = CD.space;
+                    var fpBase = SP.rackFootprintM2[rackType] || 2.5;
+                    var liquidRow = (inp.deepSea || coolingType === 'liquid' || coolingType === 'rdhx') ? SP.liquidRowFactor : 1.0;
+                    var rackFootprint = fpBase * liquidRow;
+                    var whiteSpaceM2 = Math.ceil(racks * rackFootprint);
+                    var supportM2 = Math.ceil(whiteSpaceM2 * (SP.supportRatioByRedundancy[redundancy] || 0.75));
+                    var adminM2 = Math.ceil(SP.adminFixedM2 + racks * SP.adminPerRackM2);
+                    var grossM2 = whiteSpaceM2 + supportM2 + adminM2;
+                    var space = {
+                        racks: racks,
+                        rackDensityKw: CD.rackKw[rackType],
+                        rackFootprintM2: Math.round(rackFootprint * 100) / 100,
+                        rackRows: Math.ceil(racks / SP.racksPerRow),
+                        whiteSpaceM2: whiteSpaceM2,
+                        whiteSpaceKwPerM2: Math.round((itLoad / whiteSpaceM2) * 10) / 10,
+                        supportSpaceM2: supportM2,
+                        adminM2: adminM2,
+                        grossM2: grossM2,
+                        grossSqft: Math.round(grossM2 * 10.7639),
+                        whiteSpacePctOfGross: Math.round((whiteSpaceM2 / grossM2) * 1000) / 10,
+                        suggestedHalls: Math.max(1, Math.ceil(whiteSpaceM2 / SP.targetHallM2))
+                    };
+
+                    return {
+                        costs: costs, total: total, perKw: total / itLoad, space: space,
+                        softCosts: softCosts, contingency: contingency, fomTotal: fomTotal,
+                        racks: racks, pue: pue, wue: wue, annualEnergy: annualEnergy,
+                        cityLabel: cityLabel, effectiveRegion: effectiveRegion, yearLabel: yearLabel,
+                        deepSea: deepSea, refrigerant: refrigerant,
+                        timeline: RZEngine.models.capex.timelineDetailed(redundancy, buildingType,
+                            inp.deepSea ? 'deepsea' : coolingType, effectiveRegion, itLoad)
+                    };
+                },
+                /** Timeline port of the calculator's computeTimeline() — parallel-phase model. */
+                timelineDetailed: function (redundancy, buildingType, coolingType, effectiveRegion, itLoad) {
+                    var CD = DATA.capexDetail;
+                    var base = CD.timelineBase[redundancy] || CD.timelineBase.n1;
+                    var bMult = CD.buildingTimeMult[buildingType] || 1.0;
+                    var cMult = CD.coolingTimeMult[coolingType] || 1.0;
+                    var pMult = CD.permitTimeMult[effectiveRegion] || 1.0;
+                    var lMult = itLoad <= 1000 ? 0.55 : itLoad <= 2000 ? 0.65 : itLoad <= 5000 ? 0.8 :
+                                itLoad <= 10000 ? 1.0 : itLoad <= 25000 ? 1.15 : itLoad <= 50000 ? 1.3 : 1.5;
+                    var design = Math.max(2, Math.ceil(base.design * lMult));
+                    var permit = Math.max(2, Math.ceil(base.permit * pMult));
+                    var procurement = Math.max(2, Math.ceil(base.mep * 0.4 * cMult * lMult));
+                    var civil = Math.max(2, Math.ceil(base.civil * bMult * lMult));
+                    var mep = Math.max(2, Math.ceil(base.mep * cMult * lMult));
+                    var commission = Math.max(1, Math.ceil(base.commission * cMult * Math.max(0.7, lMult)));
+                    var permitStart = 1;
+                    var designPermitEnd = Math.max(design, permitStart + permit);
+                    var procStart = Math.max(1, design - Math.ceil(procurement * 0.3));
+                    var procEnd = procStart + procurement;
+                    var civilStart = designPermitEnd;
+                    var civilEnd = civilStart + civil;
+                    var mepStart = Math.max(procEnd, civilStart + Math.ceil(civil * 0.5));
+                    var mepEnd = mepStart + mep;
+                    var commStart = Math.max(mepEnd, civilEnd);
+                    return { design: design, permit: permit, procurement: procurement, civil: civil,
+                             mep: mep, commission: commission, totalMonths: commStart + commission };
+                },
                 /**
                  * Regional cost index (relative build-cost multiplier) built from land + construction
                  * labor + a materials constant, normalized to the US. Falls back to `salaryMult` when a
@@ -1453,7 +2131,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-14-mkt"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-15-dsc"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string
@@ -1648,4 +2326,6 @@
     };
 
     root.RZEngine = RZEngine;
+    /* v2.3.0 — CommonJS export so Node consumers (DCMOC build, test harness) can require() */
+    if (typeof module !== 'undefined' && module.exports) module.exports = RZEngine;
 })(typeof window !== 'undefined' ? window : this);

@@ -314,6 +314,112 @@ if (D.regionsCountry) {
 }
 
 /* ============================================================
+ * 2g. v2.3.0 — DEEP-SEA WATER COOLING (poster worked examples EXACT)
+ * ============================================================ */
+{
+    const ds = M.cooling.deepSea({ itLoadMw: 150, pueTarget: 1.15, mode: 'poster' });
+    near('deepSea poster heat rejected', ds.heatRejectedMw, 172.5, 0.0001);
+    near('deepSea poster flow m3/s (poster EXACT)', ds.flow.m3s, 8.625, 0.0001);
+    eq('deepSea poster flow m3/h', ds.flow.m3h, 31050);
+    eq('deepSea poster pumps 4 duty + 1 standby', ds.pumps.duty + '+' + ds.pumps.standby, '4+1');
+    near('deepSea poster per-pump 2.9 m3/s', ds.pumps.perPumpM3s, 2.9, 0.001);
+    eq('deepSea poster head 60 m', ds.pumps.headM, 60);
+    ok('deepSea poster per-pump ~2,000 kW (1950-2050)', ds.pumps.perPumpKw >= 1950 && ds.pumps.perPumpKw <= 2050, 'got ' + ds.pumps.perPumpKw);
+    ok('deepSea poster PUE <= 1.15', ds.pue <= 1.15, 'got ' + ds.pue);
+    eq('deepSea WUE = 0', ds.wue, 0);
+    ok('deepSea poster intake 4-6C @900m', ds.intakeTempC >= 4 && ds.intakeTempC <= 6);
+    ok('deepSea poster return 9-11C', ds.returnTempC >= 9 && ds.returnTempC <= 11);
+    ok('deepSea env deltaT compliant', ds.env.deltaTCompliant === true);
+
+    const da = M.cooling.deepSea({ itLoadMw: 150, pueTarget: 1.15 });
+    ok('deepSea accurate flow 8.4-8.5 m3/s (rho 1025, cp 3985)', da.flow.m3s >= 8.4 && da.flow.m3s <= 8.5, 'got ' + da.flow.m3s);
+    const cap = da.capex;
+    const sum = cap.pipeline + cap.intakeStructure + cap.phe + cap.pumpStation + cap.filtration + cap.trimChillers + cap.controls + cap.contingency;
+    ok('deepSea capex breakdown sums to total', Math.abs(sum - cap.total) <= 5, sum + ' vs ' + cap.total);
+    ok('deepSea capex total > 0 and perMw sane ($0.3M-$3M/MW)', cap.perMw > 300000 && cap.perMw < 3000000, '' + cap.perMw);
+    ok('deepSea opex total > 0', da.opex.totalYr > 0);
+    ok('deepSea shallow warning fires', M.cooling.deepSea({ itLoadMw: 20, depthM: 300 }).warnings.length >= 1);
+}
+
+/* ============================================================
+ * 2h. v2.3.0 — REFRIGERANTS (invariants + worked example)
+ * ============================================================ */
+{
+    const REQ = ['label', 'gwp', 'safety', 'copIndex', 'chargeKgPerKwth', 'leakPctYr', 'capexMult'];
+    const keys = Object.keys(D.refrigerants);
+    ok('refrigerants: 9 entries', keys.length === 9, '' + keys.length);
+    const bad = keys.filter(k => REQ.some(f => D.refrigerants[k][f] == null));
+    ok('every refrigerant carries all fields', bad.length === 0, bad.join(','));
+    eq('R410A GWP (AR4, sitewide-consistent)', D.refrigerants.R410A.gwp, 2088);
+    eq('R134a GWP', D.refrigerants.R134a.gwp, 1430);
+    eq('R513A GWP', D.refrigerants.R513A.gwp, 631);
+    eq('R717 ammonia GWP zero', D.refrigerants.R717.gwp, 0);
+    eq('R717 safety B2L', D.refrigerants.R717.safety, 'B2L');
+    const r = M.cooling.refrigerant('R513A', { chillerMwth: 10 });
+    ok('R513A energy delta ~+3% vs R134a', r.energyDeltaVsBaselinePct > 2 && r.energyDeltaVsBaselinePct < 4, '' + r.energyDeltaVsBaselinePct);
+    ok('R513A tCO2e/yr > 0 and < R134a-equivalent', r.tco2eYr > 0);
+    const am = M.cooling.refrigerant('R717', { chillerMwth: 10 });
+    eq('ammonia leakage carbon = 0 (GWP 0)', am.tco2eYr, 0);
+    ok('ammonia compliance flags include B2L note', am.complianceFlags.some(f => /B2L/.test(f)));
+    ok('unknown refrigerant -> null', M.cooling.refrigerant('R9999', {}) === null);
+}
+
+/* ============================================================
+ * 2i. v2.3.0 — ENERGY (screening lcoe + hybrid)
+ * ============================================================ */
+{
+    const l = M.energy.lcoe('solar', 'ID');
+    ok('solar ID LCOE in plausible band $40-120/MWh', l >= 40 && l <= 120, '' + l);
+    ok('offshore wind LCOE > onshore', M.energy.lcoe('windOffshore', 'EU') > M.energy.lcoe('windOnshore', 'EU'));
+    const h = M.energy.hybridScreen({ itLoadMw: 10, region: 'ID', solarMwp: 30, bessMwh: 40 });
+    ok('hybrid coverage in (0,1]', h.coverageFraction > 0 && h.coverageFraction <= 1, '' + h.coverageFraction);
+    ok('hybrid covered+residual = load', Math.abs(h.coveredMwhYr + h.gridResidualMwhYr - 10 * 8760) <= 2);
+    ok('hybrid carbon offset > 0', h.carbonOffsetTonnesYr > 0);
+    ok('hybrid declares screening method', /screening/.test(h.method));
+}
+
+/* ============================================================
+ * 2j. v2.3.0 — CAPEX DETAILED: golden parity vs pre-refactor calculator
+ * ============================================================ */
+{
+    const fs = await import('node:fs');
+    const G = JSON.parse(fs.readFileSync(new URL('./fixtures/capex-golden.json', import.meta.url), 'utf8'));
+    function mapInputs(f) {
+        const i = f.inputs, a = f.advInputs || {};
+        const inp = { itLoadKw: parseInt(i.itLoad) || 1000, rackType: i.rackType, coolingType: i.coolingType,
+            redundancy: i.redundancy, fuelHours: parseInt(i.fuelHours) || 48, buildingType: i.buildingType,
+            seismicZone: i.seismicZone, fireType: i.fireType, alarmType: i.alarmType, upsType: i.upsType,
+            genType: i.genType, location: i.locationFactor, city: i.cityMarket };
+        if (f.advanced) inp.advanced = { projYear: a.projYear || '2025', marketCondition: a.marketCondition || 'balanced',
+            deliveryMethod: a.deliveryMethod || 'dbb', contractorAvail: a.contractorAvail || 'normal',
+            designFee: 8, pmFee: 5, contingency: 10, utilityRate: 9,
+            includeFOM: !!a.includeFOM, substationType: a.substationType || 'shared', transformerLead: a.transformerLead || 'standard',
+            powerDistribution: a.powerDistribution || 'busway', transformerType: a.transformerType || 'dry',
+            pduType: a.pduType || 'intelligent', cablingType: a.cablingType || 'hybrid', floorType: a.floorType || 'raised_600',
+            siteCondition: a.siteCondition || 'brownfield', securityLevel: a.securityLevel || 'standard',
+            fiberEntry: a.fiberEntry || 'dual', greenCert: a.greenCert || 'none', renewableOption: a.renewableOption || 'none' };
+        return inp;
+    }
+    Object.keys(G).filter(k => !k.startsWith('_')).forEach(name => {
+        const f = G[name], r = M.capex.detailed(mapInputs(f)), g = f.result;
+        ok('golden parity ' + name + ' total EXACT', Math.abs(r.total - g.total) < 1, r.total + ' vs ' + g.total);
+        ok('golden parity ' + name + ' pue', Math.abs(r.pue - g.pue) < 0.001);
+        ok('golden parity ' + name + ' racks', r.racks === g.racks);
+        ok('golden parity ' + name + ' annualEnergy', Math.abs(r.annualEnergy - g.annualEnergy) < 1);
+    });
+    /* space model invariants */
+    const sp = M.capex.detailed({ itLoadKw: 20000, rackType: 'ai', coolingType: 'liquid', redundancy: '2n' }).space;
+    ok('space: white space 40-50% of gross', sp.whiteSpacePctOfGross >= 38 && sp.whiteSpacePctOfGross <= 52, '' + sp.whiteSpacePctOfGross);
+    ok('space: AI density 12-20 kW/m2 white space', sp.whiteSpaceKwPerM2 >= 12 && sp.whiteSpaceKwPerM2 <= 20, '' + sp.whiteSpaceKwPerM2);
+    ok('space: gross > white+support', sp.grossM2 > sp.whiteSpaceM2 + sp.supportSpaceM2 - 1);
+    /* deep-sea integrated path */
+    const dsd = M.capex.detailed({ itLoadKw: 150000, rackType: 'ai', redundancy: '2n1', deepSea: { depthM: 900, pipelineKm: 3, mode: 'poster' } });
+    ok('detailed+deepSea: PUE physics-driven <= 1.15', dsd.pue <= 1.15, '' + dsd.pue);
+    ok('detailed+deepSea: deepSeaCooling cost line present', dsd.costs.deepSeaCooling > 0);
+    ok('detailed+deepSea: auto refrigerant = R-1234ze (trim chillers)', dsd.refrigerant && dsd.refrigerant.key === 'R1234ze');
+}
+
+/* ============================================================
  * 3. PROVENANCE (soft until A1 lands the sidecar; hard after)
  * ============================================================ */
 if (D.sources) {
