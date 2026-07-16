@@ -209,7 +209,160 @@ const api = {
   adminMigrateLegacy() { return this.adminInvoke('migrate_legacy'); },
   adminCreateUser(email, password, tier) { return this.adminInvoke('create_user', { email: email, password: password, tier: tier }); },
   adminResetPassword(userId, newPassword) { return this.adminInvoke('reset_password', { userId: userId, newPassword: newPassword }); },
-  adminDeleteUser(userId) { return this.adminInvoke('delete_user', { userId: userId }); }
+  adminDeleteUser(userId) { return this.adminInvoke('delete_user', { userId: userId }); },
+
+  /* ══════════════════════════════════════════════════════════════════════════
+   * Schema v3 helpers — per-user data + entitlements + audit + newsletter.
+   * RLS scopes every row to the caller; `.eq('user_id', user.id)` is defense-in-depth.
+   * Column lists are pinned (never select('*')) so a future column can't leak.
+   * All return the same { data, error } envelope; never throw.
+   * ══════════════════════════════════════════════════════════════════════════ */
+
+  /* internal: generic own-row helpers to keep the per-user tables DRY + consistent. */
+  async _ownList(table, cols, order) {
+    if (!client) return { data: [], error: initError };
+    const user = await this.getUser();
+    if (!user) return { data: [], error: 'not signed in' };
+    const { data, error } = await client.from(table).select(cols)
+      .eq('user_id', user.id).order(order || 'updated_at', { ascending: false });
+    return { data: data || [], error: friendly(error) };
+  },
+  async _ownInsert(table, row, cols) {
+    if (!client) return { error: initError };
+    const user = await this.getUser();
+    if (!user) return { error: 'Silakan login dulu untuk menyimpan.' };
+    const q = client.from(table).insert(Object.assign({ user_id: user.id }, row));
+    const { data, error } = cols ? await q.select(cols).single() : await q.select().single();
+    return { data, error: friendly(error) };
+  },
+  async _ownUpdate(table, id, patch, cols) {
+    if (!client) return { error: initError };
+    const user = await this.getUser();
+    if (!user) return { error: 'not signed in' };
+    const q = client.from(table).update(patch).eq('id', id).eq('user_id', user.id);
+    const { data, error } = cols ? await q.select(cols).single() : await q.select().single();
+    return { data, error: friendly(error) };
+  },
+  async _ownDelete(table, id) {
+    if (!client) return { error: initError };
+    const user = await this.getUser();
+    if (!user) return { error: 'not signed in' };
+    const { error } = await client.from(table).delete().eq('id', id).eq('user_id', user.id);
+    return { error: friendly(error) };
+  },
+
+  /* ── Finance Terminal: watchlists / portfolios / price alerts ── */
+  listWatchlists() { return this._ownList('watchlists', 'id, name, items, created_at, updated_at'); },
+  saveWatchlist(name, items) { return this._ownInsert('watchlists', { name: name, items: items || [] }, 'id, name, items, created_at, updated_at'); },
+  updateWatchlist(id, patch) { return this._ownUpdate('watchlists', id, patch, 'id, name, items, updated_at'); },
+  deleteWatchlist(id) { return this._ownDelete('watchlists', id); },
+
+  listPortfolios() { return this._ownList('portfolios', 'id, name, positions, cash, created_at, updated_at'); },
+  savePortfolio(name, positions, cash) { return this._ownInsert('portfolios', { name: name, positions: positions || [], cash: cash || 0 }, 'id, name, positions, cash, updated_at'); },
+  updatePortfolio(id, patch) { return this._ownUpdate('portfolios', id, patch, 'id, name, positions, cash, updated_at'); },
+  deletePortfolio(id) { return this._ownDelete('portfolios', id); },
+
+  listAlerts() { return this._ownList('price_alerts', 'id, symbol, target_price, direction, status, created_at, triggered_at', 'created_at'); },
+  saveAlert(symbol, targetPrice, direction) { return this._ownInsert('price_alerts', { symbol: symbol, target_price: targetPrice, direction: direction }, 'id, symbol, target_price, direction, status, created_at'); },
+  updateAlert(id, patch) { return this._ownUpdate('price_alerts', id, patch, 'id, symbol, status'); },
+  deleteAlert(id) { return this._ownDelete('price_alerts', id); },
+
+  /* ── Bookmarks ── */
+  listBookmarks() { return this._ownList('bookmarks', 'id, page_key, section_id, label, created_at', 'created_at'); },
+  saveBookmark(pageKey, sectionId, label) { return this._ownInsert('bookmarks', { page_key: pageKey, section_id: sectionId, label: label }, 'id, page_key, section_id, label, created_at'); },
+  deleteBookmark(id) { return this._ownDelete('bookmarks', id); },
+
+  /* ── Generic per-user key/value state (upsert on (user_id,key)) — calculator drafts,
+   *    DCA state, FT prefs. Replaces scattered localStorage keys with cross-device sync. ── */
+  async getAppState(key) {
+    if (!client) return { data: null, error: initError };
+    const user = await this.getUser();
+    if (!user) return { data: null, error: 'not signed in' };
+    const { data, error } = await client.from('app_state').select('state, updated_at')
+      .eq('user_id', user.id).eq('key', key).maybeSingle();
+    return { data: (data && data.state) || null, error: friendly(error) };
+  },
+  async setAppState(key, state) {
+    if (!client) return { error: initError };
+    const user = await this.getUser();
+    if (!user) return { error: 'not signed in' };
+    const { data, error } = await client.from('app_state')
+      .upsert({ user_id: user.id, key: key, state: state }, { onConflict: 'user_id,key' })
+      .select('state, updated_at').single();
+    return { data, error: friendly(error) };
+  },
+
+  /* ── Observability: audit log (write via SECURITY DEFINER RPC; actor forced to auth.uid()) ── */
+  async logEvent(action, targetType, targetId, meta) {
+    if (!client) return { error: initError };
+    const { data, error } = await client.rpc('log_event', {
+      p_action: action, p_target_type: targetType || null, p_target_id: targetId || null, p_meta: meta || {}
+    });
+    return { data, error: friendly(error) };
+  },
+  async listAuditLog(limit) {
+    if (!client) return { data: [], error: initError };
+    if (!(await this.getUser())) return { data: [], error: 'not signed in' };
+    // RLS: a user sees own events; root sees all. Pinned columns + bounded limit.
+    const { data, error } = await client.from('audit_log')
+      .select('id, actor_id, action, target_type, target_id, meta, created_at')
+      .order('created_at', { ascending: false }).limit(Math.min(limit || 100, 500));
+    return { data: data || [], error: friendly(error) };
+  },
+
+  /* ── Newsletter (public, validated server-side by subscribe_newsletter) ── */
+  async subscribeNewsletter(email, source) {
+    if (!client) return { error: initError };
+    const { data, error } = await client.rpc('subscribe_newsletter', { p_email: email, p_source: source || null });
+    return { data, error: friendly(error) };
+  },
+  async listSubscribers(limit) { // root-only (RLS)
+    if (!client) return { data: [], error: initError };
+    if (!(await this.getUser())) return { data: [], error: 'not signed in' };
+    const { data, error } = await client.from('newsletter_subscribers')
+      .select('id, email, status, source, created_at')
+      .order('created_at', { ascending: false }).limit(Math.min(limit || 500, 2000));
+    return { data: data || [], error: friendly(error) };
+  },
+
+  /* ── Entitlements: feature overrides (public read; root write) + educator allowlist (root) ── */
+  async getFeatureOverrides() {
+    if (!client) return { data: [], error: initError };
+    const { data, error } = await client.from('feature_overrides')
+      .select('page_key, feature_key, tier, enabled, updated_at');
+    return { data: data || [], error: friendly(error) };
+  },
+  async setFeatureOverride(pageKey, featureKey, tier, enabled) {
+    if (!client) return { error: initError };
+    const user = await this.getUser();
+    if (!user) return { error: 'not signed in' };
+    // RLS: only root may write; a non-root caller updates 0 rows / gets denied.
+    const { data, error } = await client.from('feature_overrides')
+      .upsert({ page_key: pageKey, feature_key: featureKey, tier: tier, enabled: !!enabled, updated_by: user.id },
+        { onConflict: 'page_key,feature_key,tier' })
+      .select('page_key, feature_key, tier, enabled').single();
+    return { data, error: friendly(error) };
+  },
+  async listEducators() { // root-only (RLS)
+    if (!client) return { data: [], error: initError };
+    if (!(await this.getUser())) return { data: [], error: 'not signed in' };
+    const { data, error } = await client.from('educator_allowlist').select('email, added_at').order('added_at', { ascending: false });
+    return { data: data || [], error: friendly(error) };
+  },
+  async addEducator(email) {
+    if (!client) return { error: initError };
+    const user = await this.getUser();
+    if (!user) return { error: 'not signed in' };
+    const { data, error } = await client.from('educator_allowlist')
+      .upsert({ email: email, added_by: user.id }, { onConflict: 'email' }).select('email').single();
+    return { data, error: friendly(error) };
+  },
+  async removeEducator(email) {
+    if (!client) return { error: initError };
+    if (!(await this.getUser())) return { error: 'not signed in' };
+    const { error } = await client.from('educator_allowlist').delete().eq('email', email);
+    return { error: friendly(error) };
+  }
 };
 
 if (typeof window !== 'undefined') {
