@@ -213,14 +213,18 @@
             return String(href).toLowerCase().split('#')[0].split('?')[0];
         }
     }
-    /* DC pages (dcmoc, datahallai, dc-conventional) were converted from the
-       hard-block ROOT_ONLY_PATHS list to the 4-tier feature-flag matrix.
-       They are now gated by enforceTierFeatureAccess() + the `page-access`
-       feature on each page entry in rz-feature-flags.js. /dc-market and
-       /dc-market-tracker.html remain root-only (out of educator scope). */
+    /* datahallai + dc-conventional were converted from the hard-block ROOT_ONLY_PATHS
+       list to the 4-tier feature-flag matrix (gated by enforceTierFeatureAccess() +
+       the `page-access` feature in rz-feature-flags.js).
+       ROOT-ONLY here (nav lock + click intercept):
+        - /dc-market, /dc-market-tracker.html (out of educator scope).
+        - /dcmoc — the DCMOC app is a separate Next.js SPA that enforces root itself
+          (dcmoc/src/store/auth.ts → ROOT_EMAILS); a resistancezero page-gate can't run
+          inside it, so the nav must lock it the same way. Prefix match covers /dcmoc/ + /dcmoc/index.html. */
     var ROOT_ONLY_PATHS = [
         '/dc-market',
-        '/dc-market-tracker.html'
+        '/dc-market-tracker.html',
+        '/dcmoc'
     ];
     function isRootOnlyHref(href) {
         var path = normalizePathFromHref(href);
