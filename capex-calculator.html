@@ -1552,6 +1552,64 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <label for="coolLiquid">DLC<small>Direct Liquid</small></label>
                             </div>
                         </div>
+
+                        <!-- ═══ v1.58.0 — Deep Sea Water Cooling (chiller-less, engine physics) ═══ -->
+                        <label style="display:flex;align-items:center;gap:0.55rem;margin-top:0.8rem;padding:0.6rem 0.75rem;border:1px solid rgba(14,165,233,0.35);border-radius:10px;cursor:pointer;background:rgba(14,165,233,0.06);">
+                            <input type="checkbox" id="deepSeaEnable" onchange="toggleDeepSea()" style="width:16px;height:16px;accent-color:#0ea5e9;">
+                            <span style="font-size:0.85rem;font-weight:600;"><i class="fas fa-water" style="color:#0ea5e9;"></i> Deep Sea Water Cooling System</span>
+                            <span class="tooltip-trigger" style="font-size:0.6rem;">?
+                                <div class="tooltip-content">
+                                    <div class="tooltip-title"><i class="fas fa-water"></i> Deep Sea Water Cooling</div>
+                                    <div class="tooltip-desc">Chiller-less primary cooling: deep seawater (4–6 °C at 800–1000 m) rejects heat via titanium plate HX across 3 separated loops (rack CDU → facility water → seawater). Hybrid trim-chiller backup for warm events/maintenance. Physics computed by RZEngine — PUE ≤ 1.15, WUE ≈ 0.</div>
+                                </div>
+                            </span>
+                        </label>
+                        <div id="deepSeaConfig" style="display:none;margin-top:0.6rem;padding:0.75rem;border:1px dashed rgba(14,165,233,0.35);border-radius:10px;">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+                                <div>
+                                    <label class="input-label" for="dsDepth" style="font-size:0.72rem;">Intake Depth (m)</label>
+                                    <input class="input-field" type="number" id="dsDepth" value="900" min="300" max="1200" step="50" oninput="calculateCosts()" aria-label="Intake depth meters">
+                                </div>
+                                <div>
+                                    <label class="input-label" for="dsPipeline" style="font-size:0.72rem;">Pipeline to Shore (km)</label>
+                                    <input class="input-field" type="number" id="dsPipeline" value="3" min="0.5" max="15" step="0.5" oninput="calculateCosts()" aria-label="Pipeline length kilometers">
+                                </div>
+                                <div>
+                                    <label class="input-label" for="dsDeltaT" style="font-size:0.72rem;">Seawater ΔT (°C)</label>
+                                    <input class="input-field" type="number" id="dsDeltaT" value="5" min="3" max="7" step="0.5" oninput="calculateCosts()" aria-label="Seawater delta T">
+                                </div>
+                                <div>
+                                    <label class="input-label" for="dsTrimPct" style="font-size:0.72rem;">Trim Chiller Capacity (%)</label>
+                                    <input class="input-field" type="number" id="dsTrimPct" value="35" min="0" max="100" step="5" oninput="calculateCosts()" aria-label="Trim chiller capacity percent">
+                                </div>
+                            </div>
+                            <div id="dsIntakeNote" style="font-size:0.68rem;color:var(--text-secondary);margin-top:0.5rem;"></div>
+                        </div>
+
+                        <!-- ═══ v1.58.0 — Refrigerant selection (chiller/CRAC path) ═══ -->
+                        <div style="margin-top:0.8rem;">
+                            <label class="input-label" for="refrigerantType" style="font-size:0.8rem;">
+                                <i class="fas fa-flask"></i> Refrigerant
+                                <span class="tooltip-trigger" style="font-size:0.6rem;">?
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title"><i class="fas fa-flask"></i> Refrigerant Type</div>
+                                        <div class="tooltip-desc">Drives chiller/CRAC cycle efficiency (COP), Scope-1 leakage carbon (GWP), ASHRAE 34 safety class and mitigation capex. "Auto" picks the industry-typical refrigerant for the selected cooling type.</div>
+                                    </div>
+                                </span>
+                            </label>
+                            <select class="input-field" id="refrigerantType" onchange="calculateCosts()" aria-label="Refrigerant type">
+                                <option value="auto" selected>Auto (by cooling type)</option>
+                                <option value="R410A">R-410A (GWP 2088, A1)</option>
+                                <option value="R134a">R-134a (GWP 1430, A1)</option>
+                                <option value="R513A">R-513A low-GWP (GWP 631, A1)</option>
+                                <option value="R32">R-32 (GWP 675, A2L)</option>
+                                <option value="R454B">R-454B (GWP 466, A2L)</option>
+                                <option value="R1234ze">R-1234ze(E) HFO (GWP 7, A2L)</option>
+                                <option value="R1233zd">R-1233zd(E) (GWP 1, A1)</option>
+                                <option value="R717">R-717 Ammonia (GWP 0, B2L)</option>
+                                <option value="R290">R-290 Propane (GWP 3, A3)</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="input-group">
@@ -2175,11 +2233,21 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                             </div>
                                         </span>
                                     </label>
-                                    <select class="input-field" id="renewableOption" aria-label="Renewable Option">
+                                    <select class="input-field" id="renewableOption" aria-label="Renewable Option" onchange="toggleRenewableSizing();calculateCosts()">
                                         <option value="none" selected>None</option>
                                         <option value="solar">Rooftop Solar (~$1.2M/MW)</option>
                                         <option value="solar_bess">Solar + Battery Storage (~$2.5M/MW)</option>
                                     </select>
+                                    <div id="renewSizing" style="display:none;margin-top:0.5rem;gap:0.5rem;grid-template-columns:1fr 1fr;">
+                                        <div>
+                                            <label class="input-label" for="renewSolarMwp" style="font-size:0.7rem;">Solar (MWp)</label>
+                                            <input class="input-field" type="number" id="renewSolarMwp" value="10" min="0" max="500" step="1" oninput="calculateCosts()" aria-label="Solar MWp">
+                                        </div>
+                                        <div>
+                                            <label class="input-label" for="renewBessMwh" style="font-size:0.7rem;">BESS (MWh)</label>
+                                            <input class="input-field" type="number" id="renewBessMwh" value="20" min="0" max="2000" step="5" oninput="calculateCosts()" aria-label="BESS MWh">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2287,6 +2355,49 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                             </span> <span id="energyGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()"><i class="fas fa-crown"></i> PRO</span></div>
                             <div class="metric-value energy" id="energyCost">$1.2M</div>
                         </div>
+                    </div>
+
+                    <!-- ═══ v1.58.0 — Deep Sea Water Cooling design output (engine physics) ═══ -->
+                    <div id="deepSeaPanel" style="display:none;margin-top:1rem;background:var(--bg-secondary);border:1px solid rgba(14,165,233,0.35);border-radius:12px;padding:1rem 1.1rem;">
+                        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;flex-wrap:wrap;">
+                            <i class="fas fa-water" style="color:#0ea5e9;"></i>
+                            <span style="font-weight:700;font-size:0.9rem;color:var(--text-primary);">Deep Sea Water Cooling — Engineering Design</span>
+                            <span id="dsEnvChip" style="font-size:0.62rem;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(16,185,129,0.15);color:#059669;">ΔT ≤ 5 °C COMPLIANT</span>
+                            <span style="font-size:0.62rem;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(14,165,233,0.15);color:#0284c7;">WUE ≈ 0</span>
+                        </div>
+                        <div id="dsGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.5rem;font-size:0.78rem;"></div>
+                        <div id="dsCapexRows" style="margin-top:0.7rem;"></div>
+                        <div id="dsWarnings" style="margin-top:0.5rem;font-size:0.72rem;color:#b45309;"></div>
+                        <div style="font-size:0.62rem;color:var(--text-secondary);margin-top:0.6rem;font-style:italic;">3 separated loops: rack CDU (D2C 20–25 °C) → facility water (closed) → seawater (open, titanium Gr2 PHE). N+1 pumps/filters/HX · trim chillers backup · budgetary estimate, not detailed marine engineering.</div>
+                    </div>
+
+                    <!-- ═══ v1.58.0 — Rack density & white space (engine space model) ═══ -->
+                    <div id="spacePanel" style="display:none;margin-top:1rem;background:var(--bg-secondary);border:1px solid var(--bg-tertiary);border-radius:12px;padding:1rem 1.1rem;">
+                        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                            <i class="fas fa-ruler-combined" style="color:#8b5cf6;"></i>
+                            <span style="font-weight:700;font-size:0.9rem;color:var(--text-primary);">Rack Density &amp; White Space</span>
+                        </div>
+                        <div id="spaceGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.5rem;font-size:0.78rem;"></div>
+                    </div>
+
+                    <!-- ═══ v1.58.0 — Refrigerant impact ═══ -->
+                    <div id="refrigerantPanel" style="display:none;margin-top:1rem;background:var(--bg-secondary);border:1px solid var(--bg-tertiary);border-radius:12px;padding:1rem 1.1rem;">
+                        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                            <i class="fas fa-flask" style="color:#14b8a6;"></i>
+                            <span style="font-weight:700;font-size:0.9rem;color:var(--text-primary);">Refrigerant Impact</span>
+                        </div>
+                        <div id="refGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.5rem;font-size:0.78rem;"></div>
+                        <div id="refFlags" style="margin-top:0.5rem;font-size:0.7rem;color:var(--text-secondary);"></div>
+                    </div>
+
+                    <!-- ═══ v1.58.0 — On-site renewables screen ═══ -->
+                    <div id="renewPanel" style="display:none;margin-top:1rem;background:var(--bg-secondary);border:1px solid var(--bg-tertiary);border-radius:12px;padding:1rem 1.1rem;">
+                        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                            <i class="fas fa-solar-panel" style="color:#f97316;"></i>
+                            <span style="font-weight:700;font-size:0.9rem;color:var(--text-primary);">On-Site Renewables Screen</span>
+                        </div>
+                        <div id="renewGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.5rem;font-size:0.78rem;"></div>
+                        <div style="font-size:0.62rem;color:var(--text-secondary);margin-top:0.5rem;font-style:italic;">Screening-level day/night simplification — not an interconnection or reliability study.</div>
                     </div>
 
                     <!-- ═══ Uncertainty & Sensitivity (RZEngine v2 Monte-Carlo) ═══ -->
@@ -2461,42 +2572,34 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
     </footer>
 
     <script>
-        // Cost Simulator Logic
-        const costFactors = {
-            building: { base: 800, label: 'Building & Civil', icon: 'fa-building', color: '#64748b' },
-            seismic: { base: 100, label: 'Seismic Protection', icon: 'fa-mountain', color: '#78716c' },
-            electrical: { base: 1200, label: 'Electrical (MV/LV)', icon: 'fa-bolt', color: '#3b82f6' },
-            ups: { base: 600, label: 'UPS Systems', icon: 'fa-battery-full', color: '#8b5cf6' },
-            generator: { base: 400, label: 'Generator & Fuel', icon: 'fa-gas-pump', color: '#f59e0b' },
-            cooling: { base: 700, label: 'Cooling Systems', icon: 'fa-snowflake', color: '#06b6d4' },
-            fireSuppression: { base: 150, label: 'Fire Suppression', icon: 'fa-fire-extinguisher', color: '#ef4444' },
-            fireAlarm: { base: 80, label: 'Fire Alarm System', icon: 'fa-bell', color: '#f97316' },
-            bms: { base: 120, label: 'BMS / DCIM', icon: 'fa-desktop', color: '#10b981' },
-            network: { base: 250, label: 'Network Infra', icon: 'fa-network-wired', color: '#a855f7' },
-            security: { base: 80, label: 'Security Systems', icon: 'fa-shield-alt', color: '#6366f1' },
-            commissioning: { base: 120, label: 'Cx Agent & Startup', icon: 'fa-clipboard-check', color: '#14b8a6' },
-            testing: { base: 90, label: 'Testing & Compliance', icon: 'fa-certificate', color: '#0ea5e9' },
-            permits: { base: 60, label: 'Permits & Approvals', icon: 'fa-file-contract', color: '#84cc16' }
+        // Cost Simulator Logic — v1.58.0: ALL numeric cost tables live in RZEngine
+        // (rz-engine.js DATA.capexDetail, shared with DCMOC). This page keeps only
+        // PRESENTATION metadata; the computation delegates to RZEngine.models.capex.detailed
+        // (golden-parity locked: tools/fixtures/capex-golden.json).
+        const costMeta = {
+            building: { label: 'Building & Civil', icon: 'fa-building', color: '#64748b' },
+            seismic: { label: 'Seismic Protection', icon: 'fa-mountain', color: '#78716c' },
+            electrical: { label: 'Electrical (MV/LV)', icon: 'fa-bolt', color: '#3b82f6' },
+            ups: { label: 'UPS Systems', icon: 'fa-battery-full', color: '#8b5cf6' },
+            generator: { label: 'Generator & Fuel', icon: 'fa-gas-pump', color: '#f59e0b' },
+            cooling: { label: 'Cooling Systems', icon: 'fa-snowflake', color: '#06b6d4' },
+            deepSeaCooling: { label: 'Deep Sea Water Cooling', icon: 'fa-water', color: '#0ea5e9' },
+            fireSuppression: { label: 'Fire Suppression', icon: 'fa-fire-extinguisher', color: '#ef4444' },
+            fireAlarm: { label: 'Fire Alarm System', icon: 'fa-bell', color: '#f97316' },
+            bms: { label: 'BMS / DCIM', icon: 'fa-desktop', color: '#10b981' },
+            network: { label: 'Network Infra', icon: 'fa-network-wired', color: '#a855f7' },
+            security: { label: 'Security Systems', icon: 'fa-shield-alt', color: '#6366f1' },
+            commissioning: { label: 'Cx Agent & Startup', icon: 'fa-clipboard-check', color: '#14b8a6' },
+            testing: { label: 'Testing & Compliance', icon: 'fa-certificate', color: '#0ea5e9' },
+            permits: { label: 'Permits & Approvals', icon: 'fa-file-contract', color: '#84cc16' }
         };
+        // Backward-compat alias for the PDF/premium helpers that read costFactors[key].label
+        const costFactors = costMeta;
+        // Regional permitting context (presentation only — numeric multipliers live in the engine)
+        const permitRegionLabels = { sea: 'PUPR/BKPM permits, AMDAL, SLF, PLN approval', india: 'MoEF clearance, CEA, state DISCOM, fire NOC', china: 'NDRC approval, environmental impact, fire bureau', japan: 'Building Standards Act, fire prevention, seismic cert', australia: 'DA/CC approval, NCC compliance, fire safety', europe: 'EIA, energy efficiency directive, CE marking', usa: 'AHJ permits, NFPA 75/76, UL/ETL listing', mena: 'Municipality permit, civil defense, DEWA/SEC/Kahramaa approval' };
+        const rgDefaults = () => (window.RZEngine && RZEngine.data.capexDetail.regionGroupDefaults) || { americas: { internalRegion: 'usa' } };
 
-        const redundancyMultipliers = { n: 1.0, n1: 1.25, '2n': 1.85, '2n1': 2.1 };
-        const coolingMultipliers = { air: 1.0, inrow: 1.2, rdhx: 1.35, liquid: 1.6 };
-        const rackMultipliers = { standard: 1.0, medium: 1.1, high: 1.3, ai: 1.9 };
-        const buildingMultipliers = { warehouse: 0.7, modular: 0.85, purpose: 1.0, highrise: 1.4 };
-        const seismicMultipliers = { zone0: 0.2, zone1: 1.0, zone2: 2.5, zone3: 5.0, zone4: 8.0 };
-        const fireSuppressionMultipliers = { fm200: 1.0, novec: 1.3, inergen: 1.2, n2: 1.8, water: 0.6 };
-        const fireAlarmMultipliers = { conventional: 0.6, addressable: 1.0, vesda: 1.8, hybrid: 2.2 };
-        const upsMultipliers = { standalone: 0.9, modular: 1.0, distributed: 1.2, rotary: 1.5 };
-        const genMultipliers = { diesel: 1.0, gas: 1.15, dualfuel: 1.3, hvo: 1.2 };
-        const locationMultipliers = { sea: 0.65, india: 0.55, china: 0.7, japan: 1.1, australia: 1.05, europe: 1.15, usa: 1.0, mena: 0.90 };
 
-        // Display region → internal region mapping + default multiplier
-        const regionGroupDefaults = {
-            americas:    { internalRegion: 'usa',    multiplier: 1.00 },
-            emea:        { internalRegion: 'europe', multiplier: 1.15 },
-            apac:        { internalRegion: 'sea',    multiplier: 0.85 },
-            middle_east: { internalRegion: 'mena',   multiplier: 0.90 }
-        };
 
         // ═══ ADVANCED MODE DATA ═══
         // City-specific cost per Watt ($/W, 2025 baseline)
@@ -2562,45 +2665,8 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             dedicated_33kv: { base: 4000000, label: 'Dedicated 33kV' },
             dedicated_132kv: { base: 7500000, label: 'Dedicated 132kV+' }
         };
-        const transformerLeadMult = { standard: 1.0, extended: 1.15, emergency: 1.30 };
-        const marketConditionMult = { buyer: 0.95, balanced: 1.0, seller: 1.10 };
-        const deliveryMethodMult = { dbb: 1.0, db: 0.97, modular: 0.92, epc: 1.05 };
-        const contractorAvailMult = { high: 1.0, normal: 1.03, tight: 1.08 };
 
-        // Electrical distribution multipliers (applied to electrical cost category)
-        const powerDistMult = { overhead: 0.92, busway: 1.0, underground: 1.15, mixed: 1.08 };
-        const transformerTypeMult = { oil: 0.90, dry: 1.0, cast_resin: 1.12 };
-        // PDU cost per rack (added as flat cost to electrical)
-        const pduCostPerRack = { basic: 800, intelligent: 1500, switched: 2500 };
-        // Structured cabling cost per rack (added as flat cost to network)
-        const cablingCostPerRack = { copper: 600, hybrid: 1200, fiber: 2000 };
-        // Floor construction multipliers (applied to building cost)
-        const floorTypeMult = { slab: 0.95, raised_600: 1.0, raised_900: 1.06, raised_1200: 1.12 };
-        // Site condition multipliers (applied to building cost)
-        const siteConditionMult = { greenfield: 1.06, brownfield: 1.0, retrofit: 1.15 };
-        // Security multipliers (applied to security cost)
-        const securityLevelMult = { standard: 1.0, enterprise: 1.5, high: 2.2 };
-        // Fiber entry fixed costs
-        const fiberEntryCost = { single: 150000, dual: 350000, multi: 600000 };
-        // Green cert multipliers (applied to total)
-        const greenCertMult = { none: 1.0, silver: 1.02, gold: 1.04, platinum: 1.08 };
-        // On-site renewable fixed costs (per MW of IT load)
-        const renewableCostPerMW = { none: 0, solar: 1200000, solar_bess: 2500000 };
 
-        // Permit & compliance cost multipliers by region
-        // Higher = stricter regulations, more permits, longer processes
-        const permitRegionMult = {
-            sea: { permits: 1.3, testing: 0.8, label: 'PUPR/BKPM permits, AMDAL, SLF, PLN approval' },
-            india: { permits: 1.4, testing: 0.7, label: 'MoEF clearance, CEA, state DISCOM, fire NOC' },
-            china: { permits: 1.5, testing: 0.9, label: 'NDRC approval, environmental impact, fire bureau' },
-            japan: { permits: 1.8, testing: 1.5, label: 'Building Standards Act, fire prevention, seismic cert' },
-            australia: { permits: 1.6, testing: 1.3, label: 'DA/CC approval, NCC compliance, fire safety' },
-            europe: { permits: 1.7, testing: 1.4, label: 'EIA, energy efficiency directive, CE marking' },
-            usa: { permits: 1.0, testing: 1.0, label: 'AHJ permits, NFPA 75/76, UL/ETL listing' },
-            mena: { permits: 1.2, testing: 0.9, label: 'Municipality permit, civil defense, DEWA/SEC/Kahramaa approval' }
-        };
-        // Testing standards by redundancy (more redundancy = more IST/ISST testing)
-        const testingRedundancyMult = { n: 0.7, n1: 1.0, '2n': 1.5, '2n1': 1.8 };
 
         // ═══ PREMIUM: EQUIPMENT BRAND DATABASE ═══
         const equipmentBrands = {
@@ -2683,18 +2749,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
         const rackKw = { standard: 6, medium: 12.5, high: 25, ai: 75 };
         const rackFootprint = 2.5; // m² per rack (including aisle)
 
-        // Base timeline by redundancy (months)
-        const timelineBase = {
-            n: { design: 4, permit: 3, civil: 8, mep: 6, commission: 2 },
-            n1: { design: 5, permit: 3, civil: 10, mep: 8, commission: 3 },
-            '2n': { design: 6, permit: 4, civil: 12, mep: 10, commission: 4 },
-            '2n1': { design: 7, permit: 4, civil: 14, mep: 12, commission: 5 }
-        };
-
-        // Timeline adjustment multipliers
-        const buildingTimeMult = { warehouse: 0.7, modular: 0.6, purpose: 1.0, highrise: 1.4 };
-        const coolingTimeMult = { air: 1.0, inrow: 1.05, rdhx: 1.15, liquid: 1.3 }; // DLC needs more MEP time
-        const permitTimeMult = { sea: 1.2, india: 1.4, china: 1.3, japan: 1.5, australia: 1.3, europe: 1.4, usa: 1.0, mena: 1.1 };
         // IT load scale: >10MW = +20%, >50MW = +40%
         function loadScaleMult(itLoad) {
             if (itLoad <= 1000) return 0.55;   // micro/edge DC
@@ -2726,10 +2780,11 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
         // Compute timeline from all inputs
         function computeTimeline(redundancy, buildingType, coolingType, effectiveRegion, itLoad) {
-            const base = timelineBase[redundancy] || timelineBase['n1'];
-            const bMult = buildingTimeMult[buildingType] || 1.0;
-            const cMult = coolingTimeMult[coolingType] || 1.0;
-            const pMult = permitTimeMult[effectiveRegion] || 1.0;
+            const CDt = (window.RZEngine && RZEngine.data.capexDetail) || {};
+            const base = (CDt.timelineBase || {})[redundancy] || { design: 5, permit: 3, civil: 10, mep: 8, commission: 3 };
+            const bMult = (CDt.buildingTimeMult || {})[buildingType] || 1.0;
+            const cMult = (CDt.coolingTimeMult || {})[coolingType] || 1.0;
+            const pMult = (CDt.permitTimeMult || {})[effectiveRegion] || 1.0;
             const lMult = loadScaleMult(itLoad);
 
             // Phase durations (months)
@@ -2841,12 +2896,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             '2n1': { tier: 'Tier IV', uptime: '99.995%' }
         };
 
-        const pueMapping = {
-            air: { standard: 1.8, medium: 1.7, high: 1.6, ai: 1.5 },
-            inrow: { standard: 1.6, medium: 1.5, high: 1.45, ai: 1.4 },
-            rdhx: { standard: 1.45, medium: 1.4, high: 1.35, ai: 1.3 },
-            liquid: { standard: 1.3, medium: 1.25, high: 1.2, ai: 1.15 }
-        };
 
         function getSelectedValue(name) {
             const selected = document.querySelector(`input[name="${name}"]:checked`);
@@ -2887,173 +2936,80 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             const genType = document.getElementById('genType').value;
             const location = document.getElementById('locationFactor').value;
 
-            const redMult = redundancyMultipliers[redundancy];
-            const coolMult = coolingMultipliers[coolingType];
-            const rackMult = rackMultipliers[rackType];
-            const buildMult = buildingMultipliers[buildingType];
-            const seismicMult = seismicMultipliers[seismicZone];
-            const fireSupMult = fireSuppressionMultipliers[fireType];
-            const alarmMult = fireAlarmMultipliers[alarmType];
-            const upsMult = upsMultipliers[upsType];
-            const genMult = genMultipliers[genType];
-            const regionDefault = regionGroupDefaults[location] || regionGroupDefaults.americas;
-            let locMult = regionDefault.multiplier;
-            let effectiveRegion = regionDefault.internalRegion;
-            const fuelMult = 1 + (fuelHours - 24) * 0.008;
-
-            // City-specific override (works in both Simple and Advanced modes)
-            let cityLabel = '';
-            const cityVal = document.getElementById('cityMarket').value;
-            if (cityVal !== 'none' && cityData[cityVal]) {
-                const city = cityData[cityVal];
-                cityLabel = city.label;
-                effectiveRegion = city.region;
-                locMult = city.perW / 4.65;
+            // ═══ v1.58.0 — DELEGATED CORE: all math lives in RZEngine.models.capex.detailed ═══
+            if (!window.RZEngine || !RZEngine.models || !RZEngine.models.capex.detailed) {
+                setTimeout(calculateCosts, 150);   // engine loads defer; retry until ready
+                return;
             }
-
-            // Advanced mode adjustments
+            const CD = RZEngine.data.capexDetail;
             const isAdv = capexMode === 'advanced';
-            let yearMult = 1.0, yearLabel = '2025';
-            let marketMult = 1.0, deliveryMult = 1.0, contractorMult = 1.0;
-            let designPct = 0, pmPct = 0, contingencyPct = 5;
-            let fomTotal = 0, fomIncluded = false;
-            let powerDistM = 1.0, transformerM = 1.0, pduPerRack = 0, cablingPerRack = 0;
-            let floorM = 1.0, siteM = 1.0, securityM = 1.0, fiberCost = 0;
-            let greenM = 1.0, renewableCost = 0;
+            const cityVal = document.getElementById('cityMarket').value;
 
+            let advOpts = null;
+            let designPct = 0, pmPct = 0, contingencyPct = CD.softCostDefaults.simpleContingencyPct;
+            let fomIncluded = false, greenM = 1.0, renewableCost = 0, yearMult = 1.0, yearLabel = '2025';
+            let advGlobalMult = 1.0;
             if (isAdv) {
-                // Year escalation
                 yearLabel = document.getElementById('projYear').value;
-                yearMult = yearEscalation[yearLabel].mult;
-
-                // Market factors
-                marketMult = marketConditionMult[document.getElementById('marketCondition').value];
-                deliveryMult = deliveryMethodMult[document.getElementById('deliveryMethod').value];
-                contractorMult = contractorAvailMult[document.getElementById('contractorAvail').value];
-
-                // Professional fees
                 designPct = parseFloat(document.getElementById('designFee').value);
                 pmPct = parseFloat(document.getElementById('pmFee').value);
                 contingencyPct = parseInt(document.getElementById('contingencyAdv').value);
-
-                // Front-of-meter
                 fomIncluded = document.getElementById('includeFOM').checked;
-                if (fomIncluded) {
-                    const subType = document.getElementById('substationType').value;
-                    const transLead = document.getElementById('transformerLead').value;
-                    const utilRate = parseFloat(document.getElementById('utilityRate').value) / 100;
-                    const subCost = substationCosts[subType].base * transformerLeadMult[transLead];
-                    const gridConnection = itLoad * 0.001 * 500000; // ~$500K per MW
-                    const switchgear = itLoad * 0.001 * 300000; // ~$300K per MW
-                    fomTotal = (subCost + gridConnection + switchgear) * (1 + utilRate);
-                    fomTotal *= yearMult;
-                }
-
-                // Electrical distribution
-                powerDistM = powerDistMult[document.getElementById('powerDistribution').value] || 1.0;
-                transformerM = transformerTypeMult[document.getElementById('transformerType').value] || 1.0;
-                pduPerRack = pduCostPerRack[document.getElementById('pduType').value] || 1500;
-                cablingPerRack = cablingCostPerRack[document.getElementById('cablingType').value] || 1200;
-
-                // Site & civil
-                floorM = floorTypeMult[document.getElementById('floorType').value] || 1.0;
-                siteM = siteConditionMult[document.getElementById('siteCondition').value] || 1.0;
-                securityM = securityLevelMult[document.getElementById('securityLevel').value] || 1.0;
-                fiberCost = fiberEntryCost[document.getElementById('fiberEntry').value] || 350000;
-
-                // Sustainability
-                greenM = greenCertMult[document.getElementById('greenCert').value] || 1.0;
-                renewableCost = renewableCostPerMW[document.getElementById('renewableOption').value] * (itLoad / 1000) || 0;
+                advOpts = {
+                    projYear: yearLabel,
+                    marketCondition: document.getElementById('marketCondition').value,
+                    deliveryMethod: document.getElementById('deliveryMethod').value,
+                    contractorAvail: document.getElementById('contractorAvail').value,
+                    designFee: designPct, pmFee: pmPct, contingency: contingencyPct,
+                    includeFOM: fomIncluded,
+                    substationType: document.getElementById('substationType').value,
+                    transformerLead: document.getElementById('transformerLead').value,
+                    utilityRate: parseFloat(document.getElementById('utilityRate').value),
+                    powerDistribution: document.getElementById('powerDistribution').value,
+                    transformerType: document.getElementById('transformerType').value,
+                    pduType: document.getElementById('pduType').value,
+                    cablingType: document.getElementById('cablingType').value,
+                    floorType: document.getElementById('floorType').value,
+                    siteCondition: document.getElementById('siteCondition').value,
+                    securityLevel: document.getElementById('securityLevel').value,
+                    fiberEntry: document.getElementById('fiberEntry').value,
+                    greenCert: document.getElementById('greenCert').value,
+                    renewableOption: document.getElementById('renewableOption').value
+                };
+                yearMult = CD.yearEscalation[yearLabel] || 1.0;
+                greenM = CD.greenCertMult[advOpts.greenCert] || 1.0;
+                renewableCost = (CD.renewableCostPerMw[advOpts.renewableOption] || 0) * (itLoad / 1000);
+                advGlobalMult = yearMult * (CD.marketConditionMult[advOpts.marketCondition] || 1) *
+                                (CD.deliveryMethodMult[advOpts.deliveryMethod] || 1) *
+                                (CD.contractorAvailMult[advOpts.contractorAvail] || 1);
             }
 
-            const costs = {};
-            let total = 0;
-            const advGlobalMult = isAdv ? yearMult * marketMult * deliveryMult * contractorMult : 1.0;
+            // Deep-sea water cooling option (v1.58.0) — physics path in the engine
+            const dsOn = !!(document.getElementById('deepSeaEnable') && document.getElementById('deepSeaEnable').checked);
+            const dsCfg = dsOn ? {
+                depthM: parseInt(document.getElementById('dsDepth').value) || 900,
+                pipelineKm: parseFloat(document.getElementById('dsPipeline').value) || 3,
+                deltaTC: parseFloat(document.getElementById('dsDeltaT').value) || 5,
+                trimFraction: (parseInt(document.getElementById('dsTrimPct').value) || 35) / 100,
+                pueTarget: 1.15
+            } : null;
+            const refSel = document.getElementById('refrigerantType') ? document.getElementById('refrigerantType').value : 'auto';
 
-            for (const [key, factor] of Object.entries(costFactors)) {
-                let multiplier = locMult;
+            const R = RZEngine.models.capex.detailed({
+                itLoadKw: itLoad, rackType, coolingType, redundancy, fuelHours,
+                buildingType, seismicZone, fireType, alarmType, upsType, genType,
+                location, city: cityVal, advanced: advOpts,
+                deepSea: dsCfg, refrigerant: refSel
+            });
 
-                if (key === 'building') {
-                    multiplier *= buildMult * rackMult * floorM * siteM;
-                } else if (key === 'seismic') {
-                    multiplier *= seismicMult * buildMult;
-                } else if (key === 'electrical') {
-                    multiplier *= redMult * rackMult * powerDistM * transformerM;
-                } else if (key === 'ups') {
-                    multiplier *= redMult * rackMult * upsMult;
-                } else if (key === 'generator') {
-                    multiplier *= redMult * fuelMult * genMult;
-                } else if (key === 'cooling') {
-                    multiplier *= coolMult * rackMult;
-                } else if (key === 'fireSuppression') {
-                    multiplier *= fireSupMult;
-                } else if (key === 'fireAlarm') {
-                    multiplier *= alarmMult;
-                } else if (key === 'security') {
-                    multiplier *= securityM;
-                } else if (key === 'commissioning') {
-                    multiplier *= redMult; // more redundancy = more Cx scope
-                } else if (key === 'testing') {
-                    const regionTest = permitRegionMult[effectiveRegion] || permitRegionMult.usa;
-                    const redTest = testingRedundancyMult[redundancy] || 1.0;
-                    multiplier *= regionTest.testing * redTest;
-                } else if (key === 'permits') {
-                    const regionPermit = permitRegionMult[effectiveRegion] || permitRegionMult.usa;
-                    multiplier *= regionPermit.permits;
-                }
-
-                costs[key] = factor.base * itLoad * multiplier * advGlobalMult;
-                total += costs[key];
-            }
-
-            // Add per-rack fixed costs (PDU + structured cabling) in advanced mode
-            const racks = Math.ceil(itLoad / rackKw[rackType]);
-            if (isAdv) {
-                const pduTotal = racks * pduPerRack * advGlobalMult * locMult;
-                costs['electrical'] += pduTotal;
-                total += pduTotal;
-
-                const cablingTotal = racks * cablingPerRack * advGlobalMult * locMult;
-                costs['network'] += cablingTotal;
-                total += cablingTotal;
-
-                // Add fiber entry cost
-                if (fiberCost > 0) {
-                    costs['network'] += fiberCost * advGlobalMult;
-                    total += fiberCost * advGlobalMult;
-                }
-            }
-
-            // Soft costs (advanced)
-            let softCosts = {};
-            if (isAdv) {
-                if (designPct > 0) {
-                    softCosts.design = total * (designPct / 100);
-                }
-                if (pmPct > 0) {
-                    softCosts.pm = total * (pmPct / 100);
-                }
-            }
-            const softTotal = Object.values(softCosts).reduce((a, b) => a + b, 0);
-            total += softTotal;
-
-            // Green certification premium (applied to subtotal)
-            if (isAdv && greenM > 1.0) {
-                const greenPremium = total * (greenM - 1.0);
-                total += greenPremium;
-            }
-
-            // Contingency
-            const contingency = total * (contingencyPct / 100);
-            total += contingency;
-
-            // Add FOM
-            if (fomIncluded) total += fomTotal;
-
-            // Add on-site renewable costs
-            if (isAdv && renewableCost > 0) {
-                total += renewableCost * advGlobalMult;
-            }
+            const costs = R.costs;
+            let total = R.total;
+            const softCosts = R.softCosts;
+            const contingency = R.contingency;
+            const fomTotal = R.fomTotal;
+            const racks = R.racks;
+            const cityLabel = R.cityLabel;
+            const effectiveRegion = R.effectiveRegion;
 
             // ═══ UPDATE UI ═══
             document.getElementById('totalCost').textContent = formatCurrency(total);
@@ -3063,18 +3019,18 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             document.getElementById('tierClass').textContent = tierInfo.tier;
             document.getElementById('uptimeValue').textContent = tierInfo.uptime;
 
-            const pue = pueMapping[coolingType][rackType];
+            const pue = R.pue;
             document.getElementById('pueValue').textContent = pue.toFixed(2);
 
-            const energyRate = location === 'sea' ? 0.08 : location === 'india' ? 0.07 : location === 'usa' ? 0.10 : 0.12;
-            const annualEnergy = itLoad * pue * 8760 * energyRate;
+            const annualEnergy = R.annualEnergy;
             document.getElementById('energyCost').textContent = formatCurrency(annualEnergy);
 
             // Expose exact internals for the golden-parity harness (tools/_capex_probe.mjs) —
             // instrumentation only, no math. The engine-delegation refactor must reproduce these.
             window.__capexLast = { costs: Object.assign({}, costs), total: total, softCosts: softCosts,
                 contingency: contingency, fomTotal: fomTotal, racks: racks, pue: pue,
-                annualEnergy: annualEnergy, tier: tierInfo.tier, perKw: total / itLoad };
+                annualEnergy: annualEnergy, tier: tierInfo.tier, perKw: total / itLoad,
+                space: R.space, deepSea: R.deepSea, refrigerant: R.refrigerant };
 
             // ═══ RENDER BREAKDOWN ═══
             const breakdownEl = document.getElementById('costBreakdown');
@@ -3090,7 +3046,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
             const sortedCosts = Object.entries(costs).sort((a, b) => b[1] - a[1]);
             for (const [key, cost] of sortedCosts) {
-                const factor = costFactors[key];
+                const factor = costMeta[key] || { label: key, icon: 'fa-cube', color: '#94a3b8' };
                 const percent = ((cost / total) * 100).toFixed(1);
                 const barWidth = (cost / maxCost) * 100;
                 breakdownEl.innerHTML += `
@@ -3198,7 +3154,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                 substationType: fomIncluded ? substationLabels[document.getElementById('substationType').value] : '—',
                 transformerLead: fomIncluded ? transformerLeadLabels[document.getElementById('transformerLead').value] : '—',
                 utilityRate: fomIncluded ? document.getElementById('utilityRate').value + '%' : '—',
-                effectiveRegion: (permitRegionMult[effectiveRegion] || permitRegionMult.usa).label.split(',')[0],
+                effectiveRegion: effectiveRegion,
                 powerDistribution: isAdv ? { overhead:'Overhead Cable Tray', busway:'Busway', underground:'Underground Conduit', mixed:'Mixed Bus+Underground' }[document.getElementById('powerDistribution').value] : 'Busway (default)',
                 transformerType: isAdv ? { oil:'Oil-Filled Outdoor', dry:'Dry-Type Indoor', cast_resin:'Cast Resin' }[document.getElementById('transformerType').value] : 'Dry-Type (default)',
                 pduType: isAdv ? { basic:'Basic Metered', intelligent:'Intelligent Monitored', switched:'Intelligent + Switched' }[document.getElementById('pduType').value] : 'Intelligent (default)',
@@ -3212,18 +3168,125 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             };
 
             // Pre-compute timeline & ESG for A/B comparison persistence
-            const _timeline = computeTimeline(redundancy, buildingType, coolingType, effectiveRegion, itLoad);
+            const _timeline = computeTimeline(redundancy, buildingType, dsOn ? 'deepsea' : coolingType, effectiveRegion, itLoad);
             const _raw = { redundancy, buildingType, coolingType, rackType, upsType, genType, fireType, location, effectiveRegion };
 
-            const result = { total, costs, contingency, softCosts, fomTotal, fomIncluded, itLoad, pue, tierInfo, annualEnergy, yearLabel, cityLabel, contingencyPct, designPct, pmPct, _config, _timeline, _raw };
+            const result = { total, costs, contingency, softCosts, fomTotal, fomIncluded, itLoad, pue, tierInfo, annualEnergy, yearLabel, cityLabel, contingencyPct, designPct, pmPct, _config, _timeline, _raw, space: R.space, deepSea: R.deepSea, refrigerant: R.refrigerant, wue: R.wue };
             lastResult = result;
             // Auto-update comparison if saved
             if (savedScenario) renderComparison();
             // Apply feature gating after render
             if (typeof applyFeatureGating === 'function') applyFeatureGating();
             if (typeof renderPremiumOutput === 'function') renderPremiumOutput();
+            try { renderEnginePanels(result); } catch (e) { /* additive panels — never break the calc */ }
             try { renderUncertainty(result); } catch (e) { /* additive panel — never break the calc */ }
             return result;
+        }
+
+        // ═══ v1.58.0 — deep-sea / space / refrigerant / renewables panel renderers ═══
+        function toggleDeepSea() {
+            const on = document.getElementById('deepSeaEnable').checked;
+            document.getElementById('deepSeaConfig').style.display = on ? 'block' : 'none';
+            if (on) {
+                const note = document.getElementById('dsIntakeNote');
+                if (note && window.RZEngine) {
+                    const d = parseInt(document.getElementById('dsDepth').value) || 900;
+                    note.textContent = 'Intake temperature at ' + d + ' m ≈ ' + RZEngine.models.cooling.intakeTempForDepth(d) + ' °C (NOAA WOA typical profile). Rack side pairs best with DLC / rear-door cooling.';
+                }
+            }
+            calculateCosts();
+        }
+        function toggleRenewableSizing() {
+            const sel = document.getElementById('renewableOption');
+            const box = document.getElementById('renewSizing');
+            if (box) box.style.display = (sel && sel.value !== 'none') ? 'grid' : 'none';
+        }
+        function _kv(label, value) {
+            return '<div style="background:var(--bg-primary);border:1px solid var(--bg-tertiary);border-radius:8px;padding:0.5rem 0.6rem;"><div style="font-size:0.62rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</div><div style="font-weight:700;font-family:\'JetBrains Mono\',monospace;font-size:0.85rem;color:var(--text-primary);">' + value + '</div></div>';
+        }
+        function renderEnginePanels(result) {
+            // Deep-sea design panel
+            const dsp = document.getElementById('deepSeaPanel');
+            if (dsp) {
+                const ds = result.deepSea;
+                if (ds) {
+                    dsp.style.display = 'block';
+                    document.getElementById('dsGrid').innerHTML =
+                        _kv('Heat Rejected', ds.heatRejectedMw.toLocaleString() + ' MW') +
+                        _kv('Seawater Flow', ds.flow.m3s + ' m³/s') +
+                        _kv('Flow (hourly)', ds.flow.m3h.toLocaleString() + ' m³/h') +
+                        _kv('Intake / Return', ds.intakeTempC + ' / ' + ds.returnTempC + ' °C') +
+                        _kv('Pumps (N+1)', ds.pumps.duty + '+' + ds.pumps.standby + ' × ' + ds.pumps.perPumpM3s + ' m³/s') +
+                        _kv('Pump Head / Power', ds.pumps.headM + ' m · ' + ds.pumps.perPumpKw.toLocaleString() + ' kW ea') +
+                        _kv('Cooling Power', ds.coolingMw + ' MW') +
+                        _kv('PUE (physics)', ds.pue.toFixed(3)) +
+                        _kv('Deep-Sea CAPEX', formatCurrency(ds.capex.total)) +
+                        _kv('vs Conventional', (ds.capex.vsBaselineCooling >= 0 ? '+' : '−') + formatCurrency(Math.abs(ds.capex.vsBaselineCooling))) +
+                        _kv('Pumping Energy', ds.opex.pumpMwhYr.toLocaleString() + ' MWh/yr') +
+                        _kv('Marine OPEX', formatCurrency(ds.opex.totalYr) + '/yr');
+                    const cap = ds.capex;
+                    const rows = [['Intake + outfall pipeline (HDPE, marine install)', cap.pipeline], ['Intake structure + diffuser', cap.intakeStructure], ['Titanium Gr2 plate HX (N+1)', cap.phe], ['Seawater pump station (N+1, VFD)', cap.pumpStation], ['5-stage filtration (N+1)', cap.filtration], ['Trim chillers (backup, N+1)', cap.trimChillers], ['Controls / BMS integration (2N)', cap.controls], ['Marine contingency (15%)', cap.contingency]];
+                    document.getElementById('dsCapexRows').innerHTML = '<div style="font-size:0.68rem;color:var(--text-secondary);margin-bottom:0.3rem;font-weight:700;">DEEP-SEA CAPEX BREAKDOWN</div>' + rows.map(r => '<div style="display:flex;justify-content:space-between;font-size:0.74rem;padding:2px 0;border-bottom:1px dashed var(--bg-tertiary);color:var(--text-primary);"><span>' + r[0] + '</span><span style="font-family:\'JetBrains Mono\',monospace;font-weight:600;">' + formatCurrency(r[1]) + '</span></div>').join('');
+                    document.getElementById('dsWarnings').innerHTML = (ds.warnings || []).map(w => '<div>⚠ ' + w + '</div>').join('');
+                    const chip = document.getElementById('dsEnvChip');
+                    if (chip) { chip.textContent = ds.env.deltaTCompliant ? 'ΔT ≤ 5 °C COMPLIANT' : 'ΔT EXCEEDS ENV LIMIT'; chip.style.background = ds.env.deltaTCompliant ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'; chip.style.color = ds.env.deltaTCompliant ? '#059669' : '#dc2626'; }
+                } else dsp.style.display = 'none';
+            }
+            // Space panel (always on — owner mandate: rack density + white space)
+            const spp = document.getElementById('spacePanel');
+            if (spp && result.space) {
+                const sp = result.space;
+                spp.style.display = 'block';
+                document.getElementById('spaceGrid').innerHTML =
+                    _kv('Racks', sp.racks.toLocaleString() + ' × ' + sp.rackDensityKw + ' kW') +
+                    _kv('Rack Rows', sp.rackRows + ' (' + sp.rackFootprintM2 + ' m²/rack)') +
+                    _kv('White Space', sp.whiteSpaceM2.toLocaleString() + ' m²') +
+                    _kv('Density', sp.whiteSpaceKwPerM2 + ' kW/m²') +
+                    _kv('Support Space', sp.supportSpaceM2.toLocaleString() + ' m²') +
+                    _kv('Gross Building', sp.grossM2.toLocaleString() + ' m² (' + sp.grossSqft.toLocaleString() + ' ft²)') +
+                    _kv('White Space %', sp.whiteSpacePctOfGross + '% of gross') +
+                    _kv('Suggested Halls', sp.suggestedHalls + ' × ~1,500 m²');
+            }
+            // Refrigerant panel
+            const rfp = document.getElementById('refrigerantPanel');
+            if (rfp) {
+                const rf = result.refrigerant;
+                if (rf) {
+                    rfp.style.display = 'block';
+                    document.getElementById('refGrid').innerHTML =
+                        _kv('Refrigerant', rf.label) +
+                        _kv('GWP₁₀₀ (AR4)', rf.gwp.toLocaleString()) +
+                        _kv('Safety (ASHRAE 34)', rf.safety) +
+                        _kv('Chiller COP', rf.cop) +
+                        _kv('Energy vs R-134a', (rf.energyDeltaVsBaselinePct >= 0 ? '+' : '') + rf.energyDeltaVsBaselinePct + '%') +
+                        _kv('Charge', rf.chargeKg.toLocaleString() + ' kg') +
+                        _kv('Leakage', rf.leakKgYr + ' kg/yr → ' + rf.tco2eYr + ' tCO₂e/yr') +
+                        _kv('Carbon Cost', formatCurrency(rf.carbonCostYr) + '/yr');
+                    document.getElementById('refFlags').innerHTML = (rf.complianceFlags || []).map(f => '<div>• ' + f + '</div>').join('') + (rf.capexPremium ? '<div>• Mitigation capex premium: ' + formatCurrency(rf.capexPremium) + '</div>' : '');
+                } else rfp.style.display = 'none';
+            }
+            // Renewables screen
+            const rnp = document.getElementById('renewPanel');
+            if (rnp && window.RZEngine) {
+                const opt = document.getElementById('renewableOption');
+                const on = capexMode === 'advanced' && opt && opt.value !== 'none';
+                if (on) {
+                    const regionCode = result._raw && (result._raw.effectiveRegion === 'usa' ? 'US' : result._raw.effectiveRegion === 'europe' ? 'EU' : result._raw.effectiveRegion === 'india' ? 'IN' : result._raw.effectiveRegion === 'japan' ? 'JP' : result._raw.effectiveRegion === 'sea' ? 'ID' : 'APAC') || 'US';
+                    const h = RZEngine.models.energy.hybridScreen({
+                        itLoadMw: result.itLoad / 1000, region: regionCode,
+                        solarMwp: parseFloat((document.getElementById('renewSolarMwp') || {}).value) || 0,
+                        bessMwh: parseFloat((document.getElementById('renewBessMwh') || {}).value) || 0
+                    });
+                    rnp.style.display = 'block';
+                    document.getElementById('renewGrid').innerHTML =
+                        _kv('Coverage', (h.coverageFraction * 100).toFixed(1) + '% of IT energy') +
+                        _kv('Covered', h.coveredMwhYr.toLocaleString() + ' MWh/yr') +
+                        _kv('Grid Residual', h.gridResidualMwhYr.toLocaleString() + ' MWh/yr') +
+                        _kv('Solar LCOE (blend)', h.blendedLcoe != null ? '$' + h.blendedLcoe + '/MWh' : 'n/a') +
+                        _kv('Carbon Offset', h.carbonOffsetTonnesYr.toLocaleString() + ' tCO₂e/yr') +
+                        _kv('Land', h.landHa + ' ha');
+                } else rnp.style.display = 'none';
+            }
         }
 
         /**
@@ -3482,6 +3545,91 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
         }
 
         // ═══ SUSTAINABILITY HTML BUILDER (for PDF) ═══
+        /* v1.58.0 — ADDITIVE PDF sections for the engine blocks. Never replaces existing
+           tables; appended after Sustainability. Renders nothing when a block is absent. */
+        function buildEngineBlocksHTML(result, cellS, hdrS) {
+            let html = '';
+            const ds = result.deepSea;
+            if (ds) {
+                html += '<h3 style="font-size:13px;margin:14px 0 6px;color:#0e7490;">🌊 Deep Sea Water Cooling System — Engineering Design</h3>' +
+                '<table style="width:100%;border-collapse:collapse;font-size:11px;">' +
+                '<tr style="background:#0e7490;color:white;"><th style="' + hdrS + '" colspan="2" scope="col">Input Parameters</th></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Intake Depth</td><td style="' + cellS + '">' + ds.depthM + ' m (intake ' + ds.intakeTempC + ' °C, NOAA WOA profile)</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Pipeline to Shore</td><td style="' + cellS + '">' + (document.getElementById('dsPipeline') ? document.getElementById('dsPipeline').value : '3') + ' km (HDPE, intake + outfall, marine install)</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Seawater ΔT</td><td style="' + cellS + '">' + ds.deltaTC + ' °C (return ' + ds.returnTempC + ' °C)</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Trim Chiller Capacity</td><td style="' + cellS + '">' + (document.getElementById('dsTrimPct') ? document.getElementById('dsTrimPct').value : '35') + '% of heat rejection (backup / warm events)</td></tr>' +
+                '<tr style="background:#0e7490;color:white;"><th style="' + hdrS + '" colspan="2" scope="col">Calculated Design Parameters</th></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Heat Rejected</td><td style="' + cellS + '">' + ds.heatRejectedMw.toLocaleString() + ' MW (IT × PUE target)</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Required Seawater Flow</td><td style="' + cellS + '">' + ds.flow.m3s + ' m³/s = ' + ds.flow.m3h.toLocaleString() + ' m³/h (' + ds.flow.kgps.toLocaleString() + ' kg/s)</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Seawater Pumps</td><td style="' + cellS + '">' + ds.pumps.duty + ' duty + ' + ds.pumps.standby + ' standby (N+1), ' + ds.pumps.perPumpM3s + ' m³/s @ ' + ds.pumps.headM + ' m, ' + ds.pumps.perPumpKw.toLocaleString() + ' kW each, VFD</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Cooling Power / pPUE</td><td style="' + cellS + '">' + ds.coolingMw + ' MW (seawater ' + ds.pumps.totalMw + ' + FW ' + ds.fwPumpMw + ' + CDU ' + ds.cduMw + ') · pPUE ' + ds.pPUE + '</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">PUE (physics) / WUE</td><td style="' + cellS + '">' + ds.pue.toFixed(3) + ' / ≈ 0 L/kWh (no evaporation)</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Heat Exchanger</td><td style="' + cellS + '">Titanium Grade 2 plate & frame, approach 1.5–2.5 °C, 10 bar FW, N+1 parallel</td></tr>' +
+                '<tr><td style="' + cellS + 'font-weight:600;">Filtration</td><td style="' + cellS + '">Coarse 50 mm → fine 5 mm → traveling screen → disc 200 µm → auto-backwash 50 µm (N+1)</td></tr>' +
+                '<tr style="background:#0e7490;color:white;"><th style="' + hdrS + '" colspan="2" scope="col">Deep-Sea CAPEX Breakdown</th></tr>' +
+                '<tr><td style="' + cellS + '">Intake + outfall pipeline</td><td style="' + cellS + '">' + formatCurrency(ds.capex.pipeline) + '</td></tr>' +
+                '<tr><td style="' + cellS + '">Intake structure + diffuser</td><td style="' + cellS + '">' + formatCurrency(ds.capex.intakeStructure) + '</td></tr>' +
+                '<tr><td style="' + cellS + '">Titanium plate HX (N+1)</td><td style="' + cellS + '">' + formatCurrency(ds.capex.phe) + '</td></tr>' +
+                '<tr><td style="' + cellS + '">Seawater pump station</td><td style="' + cellS + '">' + formatCurrency(ds.capex.pumpStation) + '</td></tr>' +
+                '<tr><td style="' + cellS + '">5-stage filtration</td><td style="' + cellS + '">' + formatCurrency(ds.capex.filtration) + '</td></tr>' +
+                '<tr><td style="' + cellS + '">Trim chillers (backup)</td><td style="' + cellS + '">' + formatCurrency(ds.capex.trimChillers) + '</td></tr>' +
+                '<tr><td style="' + cellS + '">Controls / BMS (2N)</td><td style="' + cellS + '">' + formatCurrency(ds.capex.controls) + '</td></tr>' +
+                '<tr><td style="' + cellS + '">Marine contingency (15%)</td><td style="' + cellS + '">' + formatCurrency(ds.capex.contingency) + '</td></tr>' +
+                '<tr style="font-weight:700;"><td style="' + cellS + '">Deep-Sea Total (' + formatCurrency(ds.capex.perMw) + '/MW)</td><td style="' + cellS + '">' + formatCurrency(ds.capex.total) + '</td></tr>' +
+                '<tr><td style="' + cellS + '">Δ vs conventional cooling</td><td style="' + cellS + '">' + (ds.capex.vsBaselineCooling >= 0 ? '+' : '−') + formatCurrency(Math.abs(ds.capex.vsBaselineCooling)) + '</td></tr>' +
+                '<tr><td style="' + cellS + '">Marine OPEX</td><td style="' + cellS + '">' + formatCurrency(ds.opex.totalYr) + '/yr (pumping ' + ds.opex.pumpMwhYr.toLocaleString() + ' MWh/yr, cleaning, ROV, chlorination)</td></tr>' +
+                '<tr><td style="' + cellS + '">Environmental</td><td style="' + cellS + '">' + (ds.env.deltaTCompliant ? '✓ ΔT ≤ 5 °C compliant' : '✗ ΔT exceeds limit') + ' · ' + ds.env.note + '</td></tr>' +
+                '</table>';
+            }
+            const sp = result.space;
+            if (sp) {
+                html += '<h3 style="font-size:13px;margin:14px 0 6px;color:#6d28d9;">📐 Rack Density & White Space Program</h3>' +
+                '<table style="width:100%;border-collapse:collapse;font-size:11px;">' +
+                '<tr style="background:#4c1d95;color:white;"><th style="' + hdrS + '" scope="col">Parameter</th><th style="' + hdrS + '" scope="col">Value</th></tr>' +
+                '<tr><td style="' + cellS + '">Racks / density</td><td style="' + cellS + '">' + sp.racks.toLocaleString() + ' racks × ' + sp.rackDensityKw + ' kW (' + sp.rackRows + ' rows, ' + sp.rackFootprintM2 + ' m²/rack incl. aisles)</td></tr>' +
+                '<tr><td style="' + cellS + '">White space</td><td style="' + cellS + '">' + sp.whiteSpaceM2.toLocaleString() + ' m² @ ' + sp.whiteSpaceKwPerM2 + ' kW/m²</td></tr>' +
+                '<tr><td style="' + cellS + '">Support space (MEP/UPS/cooling)</td><td style="' + cellS + '">' + sp.supportSpaceM2.toLocaleString() + ' m² (scales with redundancy)</td></tr>' +
+                '<tr><td style="' + cellS + '">Admin / circulation</td><td style="' + cellS + '">' + sp.adminM2.toLocaleString() + ' m²</td></tr>' +
+                '<tr style="font-weight:700;"><td style="' + cellS + '">Gross building</td><td style="' + cellS + '">' + sp.grossM2.toLocaleString() + ' m² (' + sp.grossSqft.toLocaleString() + ' ft²) — white space ' + sp.whiteSpacePctOfGross + '%</td></tr>' +
+                '<tr><td style="' + cellS + '">Suggested data halls</td><td style="' + cellS + '">' + sp.suggestedHalls + ' × ~1,500 m²</td></tr>' +
+                '</table>';
+            }
+            const rf = result.refrigerant;
+            if (rf) {
+                html += '<h3 style="font-size:13px;margin:14px 0 6px;color:#0f766e;">🧪 Selected Refrigerant Impact</h3>' +
+                '<table style="width:100%;border-collapse:collapse;font-size:11px;">' +
+                '<tr style="background:#134e4a;color:white;"><th style="' + hdrS + '" scope="col">Parameter</th><th style="' + hdrS + '" scope="col">Value</th></tr>' +
+                '<tr><td style="' + cellS + '">Refrigerant</td><td style="' + cellS + '">' + rf.label + ' — ASHRAE 34 class ' + rf.safety + ', GWP₁₀₀ ' + rf.gwp.toLocaleString() + ' (AR4)</td></tr>' +
+                '<tr><td style="' + cellS + '">Chiller COP / energy</td><td style="' + cellS + '">' + rf.cop + ' (' + (rf.energyDeltaVsBaselinePct >= 0 ? '+' : '') + rf.energyDeltaVsBaselinePct + '% energy vs R-134a baseline)</td></tr>' +
+                '<tr><td style="' + cellS + '">Charge / leakage</td><td style="' + cellS + '">' + rf.chargeKg.toLocaleString() + ' kg charge · ' + rf.leakKgYr + ' kg/yr leak → ' + rf.tco2eYr + ' tCO₂e/yr (Scope 1) · ' + formatCurrency(rf.carbonCostYr) + '/yr carbon cost</td></tr>' +
+                (rf.capexPremium ? '<tr><td style="' + cellS + '">Mitigation capex</td><td style="' + cellS + '">' + formatCurrency(rf.capexPremium) + ' (' + rf.safety + ' safety systems)</td></tr>' : '') +
+                '<tr><td style="' + cellS + '">Compliance</td><td style="' + cellS + '">' + (rf.complianceFlags || []).join(' · ') + '</td></tr>' +
+                '<tr><td style="' + cellS + '">Note</td><td style="' + cellS + '">' + rf.note + '</td></tr>' +
+                '</table>';
+            }
+            if (capexMode === 'advanced' && window.RZEngine) {
+                const opt = document.getElementById('renewableOption');
+                if (opt && opt.value !== 'none') {
+                    const raw = result._raw || {};
+                    const regionCode = raw.effectiveRegion === 'usa' ? 'US' : raw.effectiveRegion === 'europe' ? 'EU' : raw.effectiveRegion === 'india' ? 'IN' : raw.effectiveRegion === 'japan' ? 'JP' : raw.effectiveRegion === 'sea' ? 'ID' : 'APAC';
+                    const h = RZEngine.models.energy.hybridScreen({
+                        itLoadMw: result.itLoad / 1000, region: regionCode,
+                        solarMwp: parseFloat((document.getElementById('renewSolarMwp') || {}).value) || 0,
+                        bessMwh: parseFloat((document.getElementById('renewBessMwh') || {}).value) || 0
+                    });
+                    html += '<h3 style="font-size:13px;margin:14px 0 6px;color:#c2410c;">☀️ On-Site Renewables Screen</h3>' +
+                    '<table style="width:100%;border-collapse:collapse;font-size:11px;">' +
+                    '<tr style="background:#7c2d12;color:white;"><th style="' + hdrS + '" scope="col">Parameter</th><th style="' + hdrS + '" scope="col">Value</th></tr>' +
+                    '<tr><td style="' + cellS + '">Coverage of IT energy</td><td style="' + cellS + '">' + (h.coverageFraction * 100).toFixed(1) + '% (' + h.coveredMwhYr.toLocaleString() + ' MWh/yr covered, ' + h.gridResidualMwhYr.toLocaleString() + ' MWh/yr grid residual)</td></tr>' +
+                    '<tr><td style="' + cellS + '">Blended LCOE / land</td><td style="' + cellS + '">' + (h.blendedLcoe != null ? '$' + h.blendedLcoe + '/MWh' : 'n/a') + ' · ' + h.landHa + ' ha</td></tr>' +
+                    '<tr><td style="' + cellS + '">Carbon offset</td><td style="' + cellS + '">' + h.carbonOffsetTonnesYr.toLocaleString() + ' tCO₂e/yr</td></tr>' +
+                    '<tr><td style="' + cellS + '">Method</td><td style="' + cellS + '">' + h.method + '</td></tr>' +
+                    '</table>';
+                }
+            }
+            return html;
+        }
+
         function buildSustainabilityHTML(result, coolingType, effReg, racks, floorM2, annualMWh, cellS, hdrS) {
             const emFactor = gridEmissionFactor[effReg] || 0.4;
             const co2Tons = annualMWh * emFactor;
@@ -3521,7 +3669,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             const buildingType = document.getElementById('buildingType').value;
             const locVal = document.getElementById('locationFactor').value;
             const cityVal2 = document.getElementById('cityMarket') ? document.getElementById('cityMarket').value : 'none';
-            const effReg = (cityVal2 !== 'none' && cityData[cityVal2]) ? cityData[cityVal2].region : (regionGroupDefaults[locVal] || regionGroupDefaults.americas).internalRegion;
+            const effReg = (cityVal2 !== 'none' && cityData[cityVal2]) ? cityData[cityVal2].region : (rgDefaults()[locVal] || rgDefaults().americas).internalRegion;
 
             const racks = Math.ceil(result.itLoad / rackKw[rackType]);
             const floorM2 = Math.ceil(racks * rackFootprint);
@@ -3544,7 +3692,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             coolOpts.forEach(c => { eqRows += `<tr><td style="${cellS}">Cooling</td><td style="${cellS}font-weight:600;">${c.brand} ${c.model}</td><td style="${cellS}">${c.range || '—'}</td><td style="${cellS}color:#94a3b8;">${c.note}</td></tr>`; });
             genOpts.forEach(g => { eqRows += `<tr><td style="${cellS}">Generator</td><td style="${cellS}font-weight:600;">${g.brand} ${g.model}</td><td style="${cellS}">${g.range}</td><td style="${cellS}color:#94a3b8;">${g.note}</td></tr>`; });
             eqRows += `<tr><td style="${cellS}">Fire Suppression</td><td style="${cellS}font-weight:600;">${fireInfo.agent}</td><td style="${cellS}">${fireInfo.density} / ${fireInfo.discharge}</td><td style="${cellS}color:#94a3b8;">${fireInfo.note}</td></tr>`;
-            const pdfRegionInfo = permitRegionMult[effReg] || permitRegionMult.usa;
+            const pdfRegionInfo = { label: permitRegionLabels[effReg] || permitRegionLabels.usa };
             eqRows += `<tr><td style="${cellS}">Permits & Compliance</td><td style="${cellS}font-weight:600;">${effReg.toUpperCase()} region</td><td style="${cellS}">—</td><td style="${cellS}color:#94a3b8;">${pdfRegionInfo.label}</td></tr>`;
 
             // Total capacity metrics
@@ -3715,6 +3863,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                 <!-- Sustainability & Efficiency -->
                 <h3 style="font-size:13px;color:#1e3a5f;border-bottom:1px solid #e5e7eb;padding-bottom:4px;margin:16px 0 8px;">Sustainability & Efficiency</h3>
                 ${buildSustainabilityHTML(result, coolingType, effReg, racks, floorM2, annualMWh, cellS, hdrS)}
+                ${buildEngineBlocksHTML(result, cellS, hdrS)}
                 `}
             </div>`;
         }
@@ -4053,6 +4202,30 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                 ['Result', 'PUE', txt('pueValue'), '', ''],
                 ['Result', 'Annual energy cost', txt('energyCost'), '', '']
             ];
+            // v1.58.0 — engine blocks (additive)
+            var L = window.__capexLast || {};
+            if (document.getElementById('refrigerantType')) rows.push(['Input', 'Refrigerant', selText('refrigerantType'), '', '']);
+            if (L.space) rows.push(
+                ['Result', 'Racks', L.space.racks, 'racks', L.space.rackDensityKw + ' kW/rack'],
+                ['Result', 'White space', L.space.whiteSpaceM2, 'm2', L.space.whiteSpaceKwPerM2 + ' kW/m2'],
+                ['Result', 'Support space', L.space.supportSpaceM2, 'm2', ''],
+                ['Result', 'Gross building', L.space.grossM2, 'm2', L.space.whiteSpacePctOfGross + '% white space'],
+                ['Result', 'Suggested halls', L.space.suggestedHalls, '', '~1500 m2 each']);
+            if (L.deepSea) rows.push(
+                ['Input', 'Deep-sea intake depth', txt('dsDepth'), 'm', ''],
+                ['Input', 'Deep-sea pipeline', txt('dsPipeline'), 'km', ''],
+                ['Input', 'Seawater dT', txt('dsDeltaT'), 'C', ''],
+                ['Input', 'Trim chiller capacity', txt('dsTrimPct'), '%', ''],
+                ['Result', 'DS heat rejected', L.deepSea.heatRejectedMw, 'MW', ''],
+                ['Result', 'DS seawater flow', L.deepSea.flow.m3h, 'm3/h', L.deepSea.flow.m3s + ' m3/s'],
+                ['Result', 'DS pumps', L.deepSea.pumps.duty + '+' + L.deepSea.pumps.standby, '', L.deepSea.pumps.perPumpKw + ' kW each @ ' + L.deepSea.pumps.headM + ' m'],
+                ['Result', 'DS PUE (physics)', L.deepSea.pue, '', 'WUE ~0'],
+                ['Result', 'DS capex', Math.round(L.deepSea.capex.total), 'USD', ''],
+                ['Result', 'DS marine opex', Math.round(L.deepSea.opex.totalYr), 'USD/yr', '']);
+            if (L.refrigerant) rows.push(
+                ['Result', 'Refrigerant selected', L.refrigerant.label, '', 'GWP ' + L.refrigerant.gwp + ', ' + L.refrigerant.safety],
+                ['Result', 'Refrigerant COP', L.refrigerant.cop, '', L.refrigerant.energyDeltaVsBaselinePct + '% vs R-134a'],
+                ['Result', 'Refrigerant leakage', L.refrigerant.tco2eYr, 'tCO2e/yr', '']);
             var header = ['# CAPEX calculation — resistancezero.com (educational reference)',
                 '# Generated ' + new Date().toISOString(), '', 'Section,Field,Value,Unit,Note'];
             RZCalc.downloadCSV('capex-' + new Date().toISOString().slice(0, 10) + '.csv', header, rows);
@@ -4534,7 +4707,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                     <p>This report is a general-purpose estimate. Actual costs depend on site-specific engineering, local regulations, and procurement strategy.</p>
                     <p style="margin-top:4px;">Generated by Data Center CAPEX Calculator · resistancezero.com · &copy; ${now.getFullYear()} Bagus Dwi Permana${isPremiumUser ? ' · PRO Report' : ''}</p>
                 </div>
-<script src="auth.js?v=2026-07-14a" defer><\/script>
+<script src="auth.js?v=2026-07-16b" defer><\/script>
 <script src="rz-engine.min.js?v=2026-07-15-dsc" defer><\/script>
 </body></html>`;
 
@@ -4613,7 +4786,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             const buildingType = document.getElementById('buildingType').value;
             const location = document.getElementById('locationFactor').value;
             const cityVal = document.getElementById('cityMarket') ? document.getElementById('cityMarket').value : 'none';
-            const effRegion = (cityVal !== 'none' && cityData[cityVal]) ? cityData[cityVal].region : (regionGroupDefaults[location] || regionGroupDefaults.americas).internalRegion;
+            const effRegion = (cityVal !== 'none' && cityData[cityVal]) ? cityData[cityVal].region : (rgDefaults()[location] || rgDefaults().americas).internalRegion;
             const phases = r._timeline || computeTimeline(redundancy, buildingType, coolingType, effRegion, itLoad);
             const totalMonths = phases.totalMonths;
 
@@ -4630,7 +4803,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
             // 3. Construction Timeline (Gantt-style bars with parallel model)
             const tlEl = document.getElementById('timelineChart');
-            const regionLabel = (permitRegionMult[effRegion] || permitRegionMult.usa).label.split(',')[0];
+            const regionLabel = (permitRegionLabels[effRegion] || permitRegionLabels.usa).split(',')[0];
             const buildLabel = { warehouse: 'Warehouse', modular: 'Modular/Prefab', purpose: 'Purpose-Built', highrise: 'High-Rise' }[buildingType] || '';
             const icons = ['fa-drafting-compass', 'fa-file-alt', 'fa-truck', 'fa-hard-hat', 'fa-wrench', 'fa-clipboard-check'];
             const notes = [
@@ -4993,7 +5166,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
 
 
-<script src="auth.js?v=2026-07-14a" defer></script>
+<script src="auth.js?v=2026-07-16b" defer></script>
 <script src="rz-engine.min.js?v=2026-07-15-dsc" defer></script>
 
 <!-- Supabase: save this scenario to your account (additive; does not touch existing auth) -->
@@ -5018,7 +5191,10 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
       var summary = { total: r.total, itLoad: r.itLoad, tier: r.tierInfo && r.tierInfo.tier,
                       pue: r.pue, city: r.cityLabel, contingency: r.contingency, softCosts: r.softCosts,
                       fomTotal: r.fomTotal, annualEnergy: r.annualEnergy, year: r.yearLabel,
-                      perKw: (r.total && r.itLoad) ? Math.round(r.total / (parseFloat(String(r.itLoad).replace(/[^0-9.]/g,'')) || 1)) : null };
+                      perKw: (r.total && r.itLoad) ? Math.round(r.total / (parseFloat(String(r.itLoad).replace(/[^0-9.]/g,'')) || 1)) : null,
+                      space: r.space || null,
+                      deepSea: r.deepSea ? { pue: r.deepSea.pue, capexTotal: r.deepSea.capex.total, flowM3h: r.deepSea.flow.m3h } : null,
+                      refrigerant: r.refrigerant ? { key: r.refrigerant.key, gwp: r.refrigerant.gwp, tco2eYr: r.refrigerant.tco2eYr } : null };
       var inputs = (window.rzScenario && window.rzScenario.capture) ? window.rzScenario.capture() : {};
       var payload = { summary: summary, inputs: inputs };
       var res = await window.rzSupa.saveScenario('capex', name, payload);
