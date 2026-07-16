@@ -809,7 +809,16 @@
                             var known = VALID_USERS.some(function (u) { return u.email === eN; })
                                 || getManualAccounts().some(function (u) { return String(u.email || '').toLowerCase() === eN; });
                             if (known) { var demoA = findUser(email, password); if (demoA) { _finish(demoA); return; } }
-                            _showErr('Invalid email or password.');
+                            /* Surface WHAT Supabase actually rejected so the fix is obvious, instead of a
+                               generic "invalid". Supabase gives the same message for wrong-pw and no-such-user. */
+                            var em = String((res.error && res.error.message) || res.error || '').toLowerCase();
+                            if (/not confirmed|confirm/.test(em)) {
+                                _showErr('Email belum dikonfirmasi. Cek inbox untuk link konfirmasi, atau konfirmasi lewat setup-supabase.html.');
+                            } else if (/invalid login|invalid credentials/.test(em)) {
+                                _showErr('Email/password salah — atau akun ini belum ada di Supabase. Reset password-nya di Supabase → Authentication → Users, atau daftar di account.html.');
+                            } else {
+                                _showErr('Login gagal: ' + (em || 'invalid email or password') + '.');
+                            }
                             return;
                         }
                         return supa.getProfile().then(function (pr) {
