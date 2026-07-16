@@ -129,3 +129,26 @@ weights sum ~1), provenance audit, and disclaimer presence. Keep it green on eve
   scorecard (`FINEngine.models.score.stock`), both loading `fin-engine.min.js?v=…`.
 - `Apps/stock_screener/prototype` (StockMap) — Phase 4, same scoring.
 - Any future finance page reuses the same engine — never re-implement finance math per page.
+
+
+## Portfolio Doctor + Compare committee (2026-07-14, v1.57.0)
+
+**Engine**: `DATA.portfolioBands` (HHI warn .18 / high .25, top-weight .25/.40, corrHigh .80 —
+Herfindahl + Markowitz provenance) + `models.portfolio.concentration(weights)` → {hhi, topWeight,
+effectiveN (1/HHI), flag}. Gate-tested (368 asserts).
+
+**Terminal Portfolio tab — `#portDoctor` card** (rendered by `renderPortfolioDoctor` inside
+`loadPortfolioAnalytics`, reusing its 1-year candles): value-weighted committee consensus per holding
+(technical/quant/risk panels — no per-holding fundamentals fetched), per-holding score/verdict/conviction
+table, concentration read (HHI + effective positions), diversification score, highly-correlated pairs
+(≥ corrHigh). **Descriptive flags ONLY — no trade prescriptions / target weights / position sizing**;
+`FINEngine.DISCLAIMER` rendered.
+
+**Compare panel** — FIN committee row per compared symbol (score/verdict/conviction/Value-Gate/top
+bull/top bear) from the already-fetched 3-month candles, keyless; window labeled; disclaimed.
+
+**Build discipline reminder (paid for)**: any `fin-engine.js` change REQUIRES `terser fin-engine.js -c -m
+-o fin-engine.min.js` + `?v=` bump — the terminal loads the MIN twin; a stale min made
+`DATA.portfolioBands` undefined at runtime while the gate (which reads fin-engine.js) stayed green.
+
+Probe: `tools/_portdoctor_probe.mjs` (offline: gateway stub + deterministic yahooCandles override).

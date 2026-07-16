@@ -11,7 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
 <!-- FIN Engine — shared finance brain (screener scoring + advisor scorecard). window.FINEngine -->
-<script src="../../fin-engine.min.js?v=2026-07-12-fin5"></script>
+<script src="../../fin-engine.min.js?v=2026-07-14-pd"></script>
 <style>
 :root{--bg0:#0b1120;--bg1:#111827;--bg2:#1e293b;--bg3:#0f172a;--bd:#334155;--bd2:rgba(51,65,85,.4);--t1:#f1f5f9;--t2:#e2e8f0;--t3:#94a3b8;--t4:#64748b;--acc:#8b5cf6;--acc2:#a78bfa;--accbg:rgba(139,92,246,.1);--grn:#34d399;--grnbg:rgba(16,185,129,.15);--red:#f87171;--redbg:rgba(239,68,68,.15);--amb:#fbbf24;--ambbg:rgba(245,158,11,.15);--blu:#60a5fa;--blubg:rgba(96,165,250,.15);--cyn:#22d3ee;--sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;--mono:'JetBrains Mono',monospace;--r:14px;--rs:8px;--rx:6px}
 [data-theme="light"]{--bg0:#f8fafc;--bg1:#fff;--bg2:#fff;--bg3:#f1f5f9;--bd:#e2e8f0;--bd2:#f1f5f9;--t1:#1e293b;--t2:#334155;--t3:#64748b;--t4:#94a3b8}
@@ -561,6 +561,8 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 <div class="card"><div class="card-title"><i class="fas fa-chart-area"></i>Performance Chart</div><div style="position:relative;height:220px"><canvas id="portPerfChart"></canvas></div></div>
 </div>
 <div class="card" style="margin-top:1rem" id="portCorrelationCard"><div class="card-title"><i class="fas fa-project-diagram"></i>Correlation Matrix</div><div id="portCorrelation"></div></div>
+<!-- Portfolio Doctor (FIN Phase B) — aggregate committee read of the whole book; descriptive only -->
+<div class="card" style="margin-top:1rem" id="portDoctorCard"><div class="card-title"><i class="fas fa-stethoscope"></i>Portfolio Doctor — FIN Committee</div><div id="portDoctor"><div class="c-t4" style="font-size:.75rem">Add holdings to convene the committee.</div></div></div>
 </div>
 </div>
 
@@ -3439,6 +3441,79 @@ function updCryptoConv(){const amt=parseFloat($('ccAmt').value)||0;$('ccResult')
 /* ═══════════════════════════════════════════════════════════════
    SECTION 23: PORTFOLIO ANALYTICS
    ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ Portfolio Doctor (FIN Phase B) — aggregate committee read of the WHOLE book.
+   Descriptive structural analysis only: value-weighted committee consensus per holding
+   (technical/quant/risk panels — no per-holding fundamentals fetched), Herfindahl
+   concentration vs DATA.portfolioBands, diversification (1 - avg pairwise corr),
+   highly-correlated pairs. NO trade prescriptions / target weights / position sizing. ═══ */
+function barsFromYahoo(d){
+  if(!d||!d.t)return [];
+  return d.t.map(function(t,i){return {t:t,o:d.o[i],h:d.h[i],l:d.l[i],c:d.c[i],v:d.v[i]};});
+}
+async function renderPortfolioDoctor(candles){
+  const el=$('portDoctor');if(!el)return;
+  if(!window.FINEngine){el.innerHTML='<div class="c-t4" style="font-size:.75rem">FIN Engine unavailable.</div>';return;}
+  if(!S.port.length){el.innerHTML='<div class="c-t4" style="font-size:.75rem">Add holdings to convene the committee.</div>';return;}
+  el.innerHTML='<div class="empty"><p><span class="spinner"><\/span>Convening the committee across your holdings…<\/p><\/div>';
+  try{
+    const P=FINEngine.models.portfolio,B=FINEngine.data.portfolioBands;
+    // value weight per unique ticker
+    const byTk={};S.port.forEach(function(h){const v=h.qty*((S._portPrices&&S._portPrices[h.tk])||h.price);byTk[h.tk]=(byTk[h.tk]||0)+v});
+    const tks=Object.keys(byTk);
+    const totW=tks.reduce(function(a,t){return a+byTk[t];},0)||1;
+    const conc=P.concentration(tks.map(function(t){return byTk[t];}));
+    // returns per ticker (for diversification + correlated pairs)
+    const retByTk={};
+    tks.forEach(function(tk){const d=candles[tk];if(!d||!d.c||d.c.length<30)return;const r=[];for(let i=1;i<d.c.length;i++)r.push((d.c[i]-d.c[i-1])/d.c[i-1]);retByTk[tk]=r;});
+    const div=P.diversification(Object.keys(retByTk).map(function(k){return retByTk[k];}));
+    const hotPairs=[];
+    const rtks=Object.keys(retByTk);
+    for(let i=0;i<rtks.length;i++)for(let j=i+1;j<rtks.length;j++){
+      const c=P.correlation(retByTk[rtks[i]],retByTk[rtks[j]]);
+      if(c!=null&&c>=B.corrHigh)hotPairs.push(rtks[i]+' & '+rtks[j]+' (corr '+c.toFixed(2)+')');
+    }
+    // per-holding committee (candles-only read), value-weighted consensus
+    let wScore=0,wCov=0;const perRows=[];
+    tks.forEach(function(tk){
+      const d=candles[tk];if(!d)return;
+      let res=null;
+      try{res=FINEngine.models.committee.run({},barsFromYahoo(d),{preset:'balanced',market:FINEngine.format.marketOf(tk)});}catch(e){}
+      if(res&&res.score!=null){
+        const w=byTk[tk]/totW;
+        wScore+=res.score*w;wCov+=w;
+        perRows.push({tk:tk,w:w,score:res.score,verdict:res.verdict||'—',conviction:res.conviction||'—'});
+      }
+    });
+    perRows.sort(function(a,b){return b.w-a.w;});
+    const aggScore=wCov>0?Math.round(wScore/wCov):null;
+    const aggCol=aggScore==null?'var(--t4)':aggScore>=60?'var(--grn)':aggScore>=45?'var(--amb)':'var(--red)';
+    // descriptive flags
+    const flags=[];
+    if(conc){
+      const topTk=perRows.length?perRows[0].tk:tks[0];
+      if(conc.flag==='concentrated')flags.push('⚠ Concentrated: top position ('+esc(topTk)+') is '+(conc.topWeight*100).toFixed(0)+'% of the book (HHI '+conc.hhi.toFixed(2)+', ≈'+conc.effectiveN+' effective positions).');
+      else if(conc.flag==='moderate')flags.push('Moderate concentration: top position '+(conc.topWeight*100).toFixed(0)+'%, HHI '+conc.hhi.toFixed(2)+' (≈'+conc.effectiveN+' effective positions).');
+      else flags.push('Diversified by weight: HHI '+conc.hhi.toFixed(2)+' ≈ '+conc.effectiveN+' effective positions.');
+    }
+    hotPairs.slice(0,3).forEach(function(pr){flags.push('⚠ Move together: '+esc(pr)+' — diversification benefit is limited between them.');});
+    if(div!=null)flags.push('Diversification score '+div.toFixed(2)+' (1 − average pairwise correlation).');
+    const rowsHtml=perRows.map(function(r){
+      const c=r.score>=60?'var(--grn)':r.score>=45?'var(--amb)':'var(--red)';
+      return '<tr><td class="fw7 c-t1">'+esc(r.tk)+'<\/td><td class="txt-r mono">'+(r.w*100).toFixed(1)+'%<\/td>'+
+        '<td class="txt-r mono fw7" style="color:'+c+'">'+r.score+'<\/td><td class="txt-r" style="color:'+c+'">'+esc(r.verdict)+'<\/td><td class="txt-r c-t3">'+esc(r.conviction)+'<\/td><\/tr>';
+    }).join('');
+    el.innerHTML=
+      '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">'+
+        '<span class="rz-ap-chip" style="color:'+aggCol+';border-color:'+aggCol+';font-size:.72rem">Committee (value-weighted) '+(aggScore==null?'—':aggScore)+'<\/span>'+
+        (conc?'<span class="rz-ap-chip '+(conc.flag==='concentrated'?'bad':conc.flag==='moderate'?'warn':'ok')+'">'+esc(conc.flag)+'<\/span>':'')+
+        '<span class="c-t4" style="font-size:.64rem">1-year candles · technical/quant/risk panels per holding (fundamentals not fetched here)<\/span>'+
+      '<\/div>'+
+      '<div class="tbl-wrap"><table class="dtbl" style="font-size:.72rem"><thead><tr><th>Holding<\/th><th class="txt-r">Weight<\/th><th class="txt-r">Score<\/th><th class="txt-r">Verdict<\/th><th class="txt-r">Conviction<\/th><\/tr><\/thead><tbody>'+rowsHtml+'<\/tbody><\/table><\/div>'+
+      '<ul style="list-style:none;margin:10px 0 0;padding:0;font-size:.74rem;line-height:1.6">'+flags.map(function(f){return '<li style="padding:3px 0;border-bottom:1px solid var(--bd2)">'+f+'<\/li>';}).join('')+'<\/ul>'+
+      '<div class="c-t4" style="font-size:.62rem;margin-top:10px;font-style:italic">'+esc(FINEngine.DISCLAIMER||'Educational structural analysis of what you hold — not investment advice.')+' No trade prescriptions, target weights, or position sizing.<\/div>';
+  }catch(e){el.innerHTML='<div class="c-t4" style="font-size:.75rem">Portfolio Doctor unavailable.<\/div>';}
+}
 async function loadPortfolioAnalytics(){
   if(!S.port.length||S.port.length<1)return;
   const el=$('portRiskMetrics');if(!el)return;
@@ -3539,6 +3614,7 @@ async function loadPortfolioAnalytics(){
     }
     $('portCorrelation').innerHTML=`<div class="tbl-wrap">${corrHtml}</tbody></table></div>`;
   }else{$('portCorrelation').innerHTML='<div class="c-t4" style="font-size:.75rem">Add 2+ holdings for correlation</div>'}
+  renderPortfolioDoctor(candles);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3863,12 +3939,13 @@ async function loadCompareChart(){
   if(!S.compareSyms.length)return;
   const syms=[S.curStock,...S.compareSyms].filter(Boolean);
   const colors=['#8b5cf6','#34d399','#f87171','#60a5fa','#fbbf24','#22d3ee'];
-  const datasets=[];const quotes={};
+  const datasets=[];const quotes={};const cmpCandles={};
   let labels=[];
   for(let i=0;i<syms.length;i++){
     try{
       const d=await yahooCandles(syms[i],'3mo','1d');
       if(!d)continue;
+      cmpCandles[syms[i]]=d;
       if(S.fhKey){try{const q=await fh('/quote',{symbol:syms[i]});quotes[syms[i]]=q}catch(e){}}
       // Normalize to % change from first day
       const base=d.c[0];
@@ -3885,6 +3962,25 @@ async function loadCompareChart(){
       plugins:{legend:{display:true,position:'top',labels:{color:cc.text,font:{size:10},boxWidth:12}},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>ctx.dataset.label+': '+(ctx.raw>=0?'+':'')+fmtP(ctx.raw,1)+'%'}}},
       scales:{x:{grid:{color:cc.grid,drawOnChartArea:false},ticks:{color:cc.text,maxTicksLimit:8,font:{size:9}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:9}}}}}
   });
+  // FIN committee per compared symbol (Phase C) — candles-only, keyless, descriptive
+  if(window.FINEngine){
+    let cRows='';
+    for(const sym of syms){
+      const d=cmpCandles[sym];if(!d)continue;
+      let res=null;
+      try{res=FINEngine.models.committee.run({},barsFromYahoo(d),{preset:'balanced',market:FINEngine.format.marketOf(sym)});}catch(e){}
+      if(!res||res.score==null)continue;
+      const c=res.score>=60?'var(--grn)':res.score>=45?'var(--amb)':'var(--red)';
+      const vg=res.valueGate&&res.valueGate.rating?res.valueGate.rating.toUpperCase():'—';
+      const bull=(res.bullCase&&res.bullCase[0])||'—';
+      const bear=(res.bearCase&&res.bearCase[0])||'—';
+      cRows+=`<tr><td class="fw7 c-t1">${esc(sym)}</td><td class="txt-r mono fw7" style="color:${c}">${res.score}</td><td style="color:${c}">${esc(res.verdict||'—')}</td><td class="c-t3">${esc(res.conviction||'—')}</td><td class="c-t3">${esc(vg)}</td><td class="c-grn" style="font-size:.66rem">${esc(bull)}</td><td class="c-red" style="font-size:.66rem">${esc(bear)}</td></tr>`;
+    }
+    if(cRows){
+      $('compareTable').innerHTML='<div class="c-t4" style="font-size:.64rem;margin:8px 0 4px">FIN committee — 3-month window, technical/quant/risk panels only. Descriptive, not advice.</div>'+
+        '<div class="tbl-wrap"><table class="dtbl" style="font-size:.7rem"><thead><tr><th>Symbol</th><th class="txt-r">Score</th><th>Verdict</th><th>Conviction</th><th>Value Gate</th><th>Top bull</th><th>Top bear</th></tr></thead><tbody>'+cRows+'</tbody></table></div>';
+    }
+  }
   // Comparison table
   if(Object.keys(quotes).length>1){
     let tbl='<table class="dtbl" style="margin-top:8px;font-size:.72rem"><thead><tr><th>Symbol</th><th class="txt-r">Price</th><th class="txt-r">Day %</th><th class="txt-r">Open</th><th class="txt-r">High</th><th class="txt-r">Low</th></tr></thead><tbody>';
@@ -3892,7 +3988,7 @@ async function loadCompareChart(){
       const q=quotes[sym];if(!q)continue;
       tbl+=`<tr><td class="fw7 c-t1">${sym}</td><td class="txt-r mono">$${fmtP(q.c)}</td><td class="txt-r fw6" style="color:${chgColor(q.dp)}">${q.dp>0?'+':''}${fmtP(q.dp)}%</td><td class="txt-r mono c-t4">$${fmtP(q.o)}</td><td class="txt-r mono c-grn">$${fmtP(q.h)}</td><td class="txt-r mono c-red">$${fmtP(q.l)}</td></tr>`;
     }
-    $('compareTable').innerHTML=tbl+'</tbody></table>';
+    $('compareTable').insertAdjacentHTML('beforeend',tbl+'</tbody></table>');
   }
 }
 

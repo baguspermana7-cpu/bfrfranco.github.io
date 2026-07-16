@@ -11,6 +11,40 @@ release sections rather than semver.
 
 ---
 
+## v1.57.0 — 2026-07-14 (FIN Portfolio Doctor + Compare committee — advisor concept complete)
+
+### Added
+- **Portfolio Doctor** (Finance Terminal → Portfolio tab): the FIN committee now reads your WHOLE book —
+  value-weighted committee consensus across holdings (technical/quant/risk panels per holding),
+  per-holding score/verdict/conviction table, **concentration** (Herfindahl HHI + top-position weight +
+  effective positions vs sourced `DATA.portfolioBands`), **diversification score**
+  (1 − avg pairwise correlation), and highly-correlated pair flags (≥ 0.80). Reuses the analytics
+  panel's already-fetched 1-year candles — no extra network. **Descriptive structural analysis only:
+  no trade prescriptions, target weights, or position sizing** (disclaimer rendered from the engine).
+- **Compare committee**: the Compare panel now shows a FIN committee row per compared symbol
+  (score, verdict, conviction, Value-Gate, top bull/bear) from the already-fetched candles — keyless,
+  window labeled, disclaimed. The old quote table (needs a Finnhub key) appends below when available.
+- Engine (`fin-engine.js`, committed this session): `DATA.portfolioBands` + `models.portfolio.concentration`
+  with Herfindahl/Markowitz provenance; gate 368/368 GREEN.
+
+### Fixed
+- **`fin-engine.min.js` was stale** — the terminal loads the MIN twin, so the new engine data was
+  undefined at runtime while the source gate stayed green. Rebuilt (terser) + `?v=` bumped; build
+  discipline noted in `standarization/FIN_ENGINE.md`.
+
+### Chore
+- `.gitignore`: other-project dumps (`Dunia-Emosi/` 7.1 GB, `Apps/dunia-emosi/`) + local artefacts
+  (`.playwright-cli/`, `tools/__pycache__/`, `deno.lock`) — never committable to a Pages repo.
+- QA probes now tracked in `tools/`: `_a11y_one.mjs`, `_a11y_full.mjs`, `_portdoctor_probe.mjs`,
+  `_uiux_audit_probe.mjs`, `_uiux_dcai_probe.mjs`.
+
+### Verification
+- Offline probe ALL PASS (doctor chip + 3 holding rows + HHI/diversification/flags + disclaimer;
+  compare committee 3 rows + Value-Gate + disclaimer; 0 page errors). FIN gate 368/368;
+  js-syntax + script-tags CLEAN.
+
+---
+
 ## v1.56.1 — 2026-07-14 (a11y: site-wide program 100% — final 2 pages + shared login modal)
 
 ### Fixed
