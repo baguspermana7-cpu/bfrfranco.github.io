@@ -11,6 +11,42 @@ release sections rather than semver.
 
 ---
 
+## v1.58.0 — 2026-07-16 (Cooling Physics Program: deep-sea water cooling + refrigerant engine + capex/DCMOC shared backend)
+
+### Added
+- **RZEngine v2.3.0 — deep-sea water cooling physics** (`DATA.deepSeaCooling` + `models.cooling.deepSea`):
+  chiller-less 3-loop architecture (rack CDU → facility water → seawater via titanium Gr2 plate HX,
+  hybrid trim-chiller backup, 5-stage filtration, N+1/2N redundancy). Reference-poster mode reproduces
+  the 150 MW design EXACTLY: 172.5 MW rejected → 8.625 m³/s = 31,050 m³/h seawater, 4+1 pumps rated
+  2.9 m³/s @ 60 m ≈ 2,008 kW each, PUE ≤ 1.15, WUE ≈ 0; accurate mode uses real seawater properties
+  (ρ 1025, cp 3.985). Full sourced capex/opex breakdown + environmental compliance + validity warnings.
+- **Refrigerant database** (`DATA.refrigerants`, 9 fluids: R-410A/R-134a/R-513A/R-32/R-454B/R-1234ze(E)/
+  R-1233zd(E)/R-717 ammonia/R-290) + `models.cooling.refrigerant`: cycle-efficiency index vs R-134a,
+  Scope-1 leakage tCO₂e + carbon cost, ASHRAE 34 safety class + compliance flags (AIM Act, EU F-Gas,
+  IIAR), mitigation capex multiplier.
+- **`DATA.capexDetail` + `models.capex.detailed`** — the full budgetary capex model (14 cost factors,
+  10 multiplier matrices, 37-city $/W anchors, escalation, FOM, soft costs, timeline) moved OUT of
+  capex-calculator.html into the engine — **one source shared by the calculator and DCMOC**.
+  Golden-parity locked: 7/7 pre-refactor configs reproduce EXACT (tools/fixtures/capex-golden.json).
+  New **space model**: rack density → white space m² / kW·m⁻² / support-by-redundancy / gross /
+  suggested halls.
+- **`models.energy`** (screening-grade solar/wind/BESS: LCOE + hybrid coverage screen) — the answer to
+  "BESS/solar/wind engine terpisah?": same engine, new namespace.
+- **capex-calculator**: Deep Sea Water Cooling tick + config (depth/pipeline/ΔT/trim) + full engineering
+  output panel; refrigerant selector (9 + auto); rack-density & white-space panel; on-site renewables
+  screen; **PDF report additive sections for every new input/output/calculated parameter** (owner
+  mandate — existing tables untouched); CSV + saved-scenario payload extended.
+- **DCMOC** consumes the shared engine (`src/lib/rz-engine.ts` wrapper + selective §Z.3 delegation;
+  reconciled: liquid PUE 1.08→1.15, carbon offset $45→$35, turnover 15%→25%; city $/W + CountryProfile
+  granularity kept local); deep-sea toggle in its CAPEX tab; rebuilt + redeployed.
+
+### Verification
+- Engine gate 173/173 GREEN (poster worked examples EXACT, refrigerant/energy invariants, golden parity);
+  capex probe 21/21; DCMOC probe (engine v2.3.0 in-app, 0 errors); js-syntax/script-tags CLEAN;
+  axe 0/0 capex both themes. Docs: SUPER_ENGINE.md §BB.
+
+---
+
 ## v1.57.0 — 2026-07-14 (FIN Portfolio Doctor + Compare committee — advisor concept complete)
 
 ### Added

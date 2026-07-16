@@ -396,3 +396,16 @@ denominators; both provenance-registered. Do not "reconcile" them to equality.
 
 dc-market-tracker.html now populates its `MARKETS` via `waitForEngine()` (engine loads
 defer) — never re-add an inline market literal there.
+
+
+## BB. v2.3.0 — Cooling Physics Program (2026-07-16)
+
+Owner program: deep-sea water cooling + refrigerant DB + capex/DCMOC shared engine + compact energy module.
+
+- **`DATA.deepSeaCooling` + `models.cooling.deepSea`** — chiller-less 3-loop design (rack CDU → FWS → seawater via titanium Gr2 PHE, trim-chiller backup). `mode:'poster'` reproduces the 150 MW reference EXACTLY (172.5 MW → 8.625 m³/s = 31,050 m³/h; 4+1 pumps rated 2.9 m³/s @ 60 m ≈ 2,008 kW; PUE ≤ 1.15); default 'accurate' uses ρ 1025 / cp 3985. Gate §2g.
+- **`DATA.refrigerants` (9) + `models.cooling.refrigerant`** — GWP100 AR4 (sitewide-consistent), ASHRAE 34, copIndex vs R-134a, Scope-1 leakage → carbon cost, compliance flags, mitigation capexMult. Gate §2h. NOTE: datahallAI/chiller-plant R-1234ze COP 6.8 = SITE-SPECIFIC nameplate (Carrier 19XR) — not overridden by these industry defaults.
+- **`DATA.capexDetail` + `models.capex.detailed`** — the FULL budgetary capex model lifted from capex-calculator.html; page + DCMOC delegate. **GOLDEN-PARITY regime: tools/fixtures/capex-golden.json + gate §2j — any intentional value change must update fixtures + CHANGELOG in the same commit.** Includes `space` model (rack density → white space/support/gross). Legacy energy-rate quirk documented in the model JSDoc.
+- **`DATA.energy` + `models.energy`** — screening-grade solar/wind/BESS (lcoe, hybridScreen). Decision: INSIDE RZEngine, not a separate engine.
+- **DCMOC wiring (§Z.3 applied)** — `dcmoc/src/lib/rz-engine.ts` wrapper; delegated: pueMatrix, refrigerants, carbon prices, attrition, 11 capex tables. Kept local: city $/W table, CountryProfile, permit multipliers (finer granularity). Reconciled same-facts: liquid PUE 1.08→1.15, offset $45→$35, turnover 15%→25%.
+- CommonJS export added to the UMD tail (`module.exports`) for Node/DCMOC consumers.
+- **Min-twin discipline reminder (paid for twice)**: any rz-engine.js/fin-engine.js change REQUIRES terser rebuild + `?v=` bump — pages load the MIN twin; a stale min leaves new DATA undefined at runtime while the source gate stays green.
