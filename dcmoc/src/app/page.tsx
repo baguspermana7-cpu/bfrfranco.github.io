@@ -29,6 +29,7 @@ import { ScenarioComparisonPanel } from '@/components/modules/ScenarioComparison
 import StrategicPlanningDashboard from '@/components/modules/StrategicPlanningDashboard';
 import { ExecutiveDashboard } from '@/components/modules/ExecutiveDashboard';
 import { ReliabilityDashboard } from '@/components/modules/ReliabilityDashboard';
+import { RequirementsDashboard, SiteIntelDashboard, ArchitectureDashboard, ConstructionDashboard, CommissioningDashboard, AssetIntelDashboard } from '@/components/modules/NewEngineDashboards';
 import { useScenarioStore } from '@/store/scenario';
 import { Wrench, ShieldAlert, FileText, Calculator, Activity } from 'lucide-react';
 
@@ -46,6 +47,18 @@ export default function Home() {
         return <ExecutiveDashboard />;
       case 'reliability':
         return <ReliabilityDashboard />;
+      case 'requirements':
+        return <RequirementsDashboard />;
+      case 'site':
+        return <SiteIntelDashboard />;
+      case 'architecture':
+        return <ArchitectureDashboard />;
+      case 'construction':
+        return <ConstructionDashboard />;
+      case 'commissioning':
+        return <CommissioningDashboard />;
+      case 'asset-health':
+        return <AssetIntelDashboard />;
       case 'sim':
         return <SimulationDashboard />;
       case 'capex':
