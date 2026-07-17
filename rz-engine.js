@@ -558,6 +558,19 @@
                 { min: 0,  status: 'Critical', label: 'Replace / high risk' }
             ]
         },
+        /* ══ v2.4.0 — DATA.construction: Construction schedule (Layer 6). Canonical DC
+         * build phase sequence + overlap (fast-track) factors + milestone anchors.
+         * Turns per-phase durations (e.g. from models.capex timeline) into a Gantt-
+         * ready schedule + critical path + milestone dates. ══ */
+        construction: {
+            /* Ordered build phases + the fraction each may overlap its predecessor
+             * (0 = strictly sequential, 0.3 = 30% fast-track overlap). */
+            phaseOrder: ['design', 'permit', 'procurement', 'civil', 'mep', 'commission'],
+            phaseLabels: { design: 'Design', permit: 'Permitting', procurement: 'Procurement', civil: 'Civil & Structure', mep: 'MEP Fit-out', commission: 'Commissioning' },
+            overlap: { design: 0, permit: 0.2, procurement: 0.5, civil: 0.1, mep: 0.3, commission: 0 },
+            /* Milestone anchors → the phase whose END marks the milestone. */
+            milestones: { permitApproved: 'permit', groundbreak: 'civil', topOut: 'civil', powerOn: 'mep', rfs: 'commission' }
+        },
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
@@ -607,7 +620,8 @@
             'reliability':            { source: 'IEEE 493 (Gold Book) typical component MTBF/MTTR + Uptime Institute Tier Standard availability targets', asOf: '2026', unit: 'hours (MTBF/MTTR) + availability fraction', method: 'screening-grade RAM inputs; NOT a certified reliability/FMEA study' },
             'site':                   { source: 'DC site-selection factor weighting (power + grid + seismic + talent + tax + carbon + flood + latency + water) — engine heuristic informed by 451/CBRE/Uptime site-selection criteria', asOf: '2026', unit: 'weights (fraction, sum=1) + grade bands', method: 'transparent weighted-factor screen; factor inputs are caller-supplied 0-1 goodness scores' },
             'commissioning':          { source: 'Standard DC commissioning sequence (ASHRAE Guideline 0 / BCxA + Uptime Cx) — L1–L5 levels + IST/SAT/FAT + punchlist; weights are an engine readiness heuristic', asOf: '2026', unit: 'weights (fraction, sum=1) + readiness %', method: 'weighted completion index; NOT a Cx authority sign-off' },
-            'asset':                  { source: 'ASHRAE Equipment Life Expectancy + manufacturer service-life data (design lives); health-index weighting is an engine asset-management heuristic (remaining-life + condition + duty)', asOf: '2026', unit: 'years (design life) + weights (fraction, sum=1) + health %', method: 'screening health index; NOT a vibration/thermographic condition survey' }
+            'asset':                  { source: 'ASHRAE Equipment Life Expectancy + manufacturer service-life data (design lives); health-index weighting is an engine asset-management heuristic (remaining-life + condition + duty)', asOf: '2026', unit: 'years (design life) + weights (fraction, sum=1) + health %', method: 'screening health index; NOT a vibration/thermographic condition survey' },
+            'construction':           { source: 'Canonical DC build phase sequence (design→permit→procurement→civil→MEP→commissioning) + typical fast-track overlap factors — engine scheduling heuristic', asOf: '2026', unit: 'months (durations) + overlap fractions', method: 'CPM-style forward pass with per-phase overlap; screening schedule, NOT a resource-loaded programme' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.
@@ -2253,6 +2267,38 @@
                         remainingYears: +(life - age).toFixed(1), designLifeYears: life,
                         remainingFraction: +remainingFrac.toFixed(3)
                     };
+                }
+            },
+
+            /* ── v2.4.0: construction schedule model — Layer 6 ── */
+            construction: {
+                /** Build a Gantt-ready schedule from per-phase durations (months).
+                 *  durations = { design, permit, ... } (missing → 0). Applies each
+                 *  phase's overlap fraction against its predecessor (fast-track).
+                 *  Returns rows [{key,label,startMonth,endMonth,months}], totalMonths,
+                 *  and milestone month markers. */
+                schedule: function (durations) {
+                    durations = durations || {};
+                    var order = DATA.construction.phaseOrder, ov = DATA.construction.overlap, L = DATA.construction.phaseLabels;
+                    var rows = [], cursor = 0, prevEnd = 0, endByKey = {};
+                    for (var i = 0; i < order.length; i++) {
+                        var k = order[i];
+                        var dur = +durations[k] || 0;
+                        // start = predecessor end minus allowed overlap of THIS phase
+                        var start = i === 0 ? 0 : Math.max(0, prevEnd - (ov[k] || 0) * dur);
+                        var end = start + dur;
+                        rows.push({ key: k, label: L[k], startMonth: +start.toFixed(1), endMonth: +end.toFixed(1), months: +dur.toFixed(1) });
+                        endByKey[k] = end;
+                        prevEnd = end; cursor = Math.max(cursor, end);
+                    }
+                    var milestones = {};
+                    var ms = DATA.construction.milestones;
+                    for (var m in ms) { if (ms.hasOwnProperty(m)) milestones[m] = endByKey[ms[m]] != null ? +endByKey[ms[m]].toFixed(1) : null; }
+                    return { rows: rows, totalMonths: +cursor.toFixed(1), milestones: milestones };
+                },
+                /** Convenience: schedule directly from a models.capex timeline object. */
+                fromTimeline: function (timeline) {
+                    return RZEngine.models.construction.schedule(timeline || {});
                 }
             }
         },

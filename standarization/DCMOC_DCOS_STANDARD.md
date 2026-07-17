@@ -135,9 +135,15 @@ local math before its engine parity passes.
   (Healthy/Monitor/Plan/Critical) + remaining years; `designLife`, `status`) +
   `DATA.asset` (design lives by class, weights sum=1, status bands) +
   `DATA.sources['asset']`. `test-rz-engine.mjs` 214/0 green.
-- **REMAINING new engines:** Construction (L6), Requirements (L1), Architecture
-  (L3), Knowledge Engine. Group-2 promotions + DCMOC consumption (dashboards/PDFs
-  per engine) + backend follow.
+- **Construction (Layer 6)** — SHIPPED engine-side: `RZEngine.models.construction`
+  (`schedule(durations)` CPM-style forward pass with per-phase fast-track overlap
+  → Gantt rows [{key,label,startMonth,endMonth,months}] + totalMonths + milestone
+  markers {permitApproved,groundbreak,topOut,powerOn,rfs}; `fromTimeline`) +
+  `DATA.construction` (phaseOrder, labels, overlap, milestones) + sources.
+  `test-rz-engine.mjs` 223/0 green. (Feeds the capex Gantt restore, bug #260.)
+- **REMAINING new engines:** Requirements (L1), Architecture (L3), Knowledge
+  Engine. Group-2 promotions + DCMOC consumption (dashboards/PDFs per engine) +
+  backend follow.
 
 ## Status (2026-07-17)
 - Bridge (§2): DONE (parallel session, f7a12cc7). REUSED.

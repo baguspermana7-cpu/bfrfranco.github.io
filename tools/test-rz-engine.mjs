@@ -302,6 +302,26 @@ near('pue.dcie(1.5)', M.pue.dcie(1.5), 0.6667, 0.001);
     near('asset.weights sum = 1', awsum, 1, 1e-9);
 }
 {
+    /* ── construction schedule model — Layer 6 ── */
+    const CN = E.models.construction;
+    // strictly sequential when no overlap applies (design has overlap 0; permit 0.2)
+    const seq = CN.schedule({ design: 4, permit: 0, procurement: 0, civil: 0, mep: 0, commission: 0 });
+    eq('construction design starts at 0', seq.rows[0].startMonth, 0);
+    eq('construction design ends at 4', seq.rows[0].endMonth, 4);
+    // full schedule: total >= longest single phase, rows in phase order
+    const full = CN.schedule({ design: 4, permit: 3, procurement: 6, civil: 8, mep: 6, commission: 3 });
+    eq('construction 6 rows', full.rows.length, 6);
+    eq('construction rows ordered', full.rows.map(r => r.key).join(','), D.construction.phaseOrder.join(','));
+    ok('construction totalMonths > 0', full.totalMonths > 0);
+    // overlap pulls total below the strict sum
+    const strictSum = 4 + 3 + 6 + 8 + 6 + 3;
+    ok('construction fast-track total < strict sum', full.totalMonths < strictSum);
+    ok('construction rfs milestone = commission end', full.milestones.rfs === full.rows[5].endMonth);
+    ok('construction powerOn <= rfs', full.milestones.powerOn <= full.milestones.rfs);
+    // fromTimeline convenience
+    ok('construction.fromTimeline works', CN.fromTimeline({ design: 2, permit: 2 }).totalMonths > 0);
+}
+{
     const svg = E.charts.histogram([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     ok('charts.histogram returns <svg>', typeof svg === 'string' && svg.indexOf('<svg') === 0 && svg.indexOf('<rect') > 0);
     const tor = E.charts.tornado(M.sim.tornado(inp => inp.x, { x: 1 }, { x: { lo: 0, hi: 2 } }));
