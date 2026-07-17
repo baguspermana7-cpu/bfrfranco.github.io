@@ -606,6 +606,20 @@
                 { min: 35, band: 'Moderate' }, { min: 0, band: 'Standard' }
             ]
         },
+        /* ══ v2.4.0 — DATA.maintenance: maintenance-strategy economics (Group-2 promotion
+         * from DCMOC MaintenanceStrategyEngine). Single source for the reactive/planned/
+         * predictive cost drivers + model (in-house/hybrid/vendor) blend. ══ */
+        maintenance: {
+            vendorPremium: 1.35,                 /* vendor labor costs 35% more */
+            modelInternalPortion: { 'in-house': 1.0, 'hybrid': 0.6, 'vendor': 0.10 },
+            reactiveFailureMult: 3.5,            /* reactive failures vs planned baseline */
+            predictiveTaskReduction: 0.25,       /* CBM cuts 25% of planned tasks */
+            predictiveFailureReduction: 0.70,    /* CBM avoids 70% of unplanned failures */
+            downtime: { plannedMinAvg: 45, reactiveMinAvg: 90, plannedProb: 0.01, reactiveProb: 0.03 },
+            expectedFailuresPerYear: { tier4: 1.2, default: 2.5 },
+            reactiveEmergencyPartUsd: 2500,      /* avg emergency part */
+            reactiveFixHours: 6                  /* avg emergency fix labor */
+        },
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
@@ -658,7 +672,8 @@
             'asset':                  { source: 'ASHRAE Equipment Life Expectancy + manufacturer service-life data (design lives); health-index weighting is an engine asset-management heuristic (remaining-life + condition + duty)', asOf: '2026', unit: 'years (design life) + weights (fraction, sum=1) + health %', method: 'screening health index; NOT a vibration/thermographic condition survey' },
             'construction':           { source: 'Canonical DC build phase sequence (design→permit→procurement→civil→MEP→commissioning) + typical fast-track overlap factors — engine scheduling heuristic', asOf: '2026', unit: 'months (durations) + overlap fractions', method: 'CPM-style forward pass with per-phase overlap; screening schedule, NOT a resource-loaded programme' },
             'requirements':           { source: 'DC project brief required-field set + workload density/cooling profiles (AI/HPC/cloud/colo/enterprise/edge) — engine intake heuristic informed by Uptime/OCP rack-density guidance', asOf: '2026', unit: 'field list + kW/rack + cooling/tier defaults', method: 'completeness + profile defaults; not a design basis' },
-            'architecture':           { source: 'Canonical DC design disciplines (electrical/mechanical/cooling/fire/security/network/building/structural/BMS) + relative design-complexity multipliers by cooling/tier/redundancy — engine heuristic', asOf: '2026', unit: 'discipline list + complexity multipliers → 0-100 index', method: 'normalized complexity screen; NOT a design deliverable' }
+            'architecture':           { source: 'Canonical DC design disciplines (electrical/mechanical/cooling/fire/security/network/building/structural/BMS) + relative design-complexity multipliers by cooling/tier/redundancy — engine heuristic', asOf: '2026', unit: 'discipline list + complexity multipliers → 0-100 index', method: 'normalized complexity screen; NOT a design deliverable' },
+            'maintenance':            { source: 'DC O&M strategy economics — reactive/planned/predictive failure + downtime multipliers + in-house/hybrid/vendor labor blend; lifted from DCMOC MaintenanceStrategyEngine (RCM/CBM industry conventions)', asOf: '2026', unit: 'multipliers + minutes + $/part', method: 'screening O&M cost model; NOT a vendor quote' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.
@@ -2413,6 +2428,38 @@
                     return A.disciplines.map(function (d) {
                         return { key: d, label: A.disciplineLabels[d], driver: drivers[d] || '' };
                     });
+                }
+            },
+
+            /* ── v2.4.0: maintenance strategy model — Layer 8 (Group-2 promotion) ── */
+            maintenance: {
+                /** Blended labor cost multiplier for a maintenance delivery model:
+                 *  internalPortion at 1.0 + vendorPortion at the vendor premium. */
+                modelMult: function (maintenanceModel) {
+                    var M = DATA.maintenance;
+                    var internal = M.modelInternalPortion[maintenanceModel];
+                    if (internal == null) internal = M.modelInternalPortion['in-house'];
+                    return +(internal + (1 - internal) * M.vendorPremium).toFixed(4);
+                },
+                /** Expected unplanned failures/year for a tier (T4 rides lower). */
+                expectedFailures: function (tier) {
+                    return tier === 4 ? DATA.maintenance.expectedFailuresPerYear.tier4
+                                      : DATA.maintenance.expectedFailuresPerYear.default;
+                },
+                /** Reactive failures = planned baseline × reactiveFailureMult. */
+                reactiveFailures: function (plannedFailures) {
+                    return +((plannedFailures || 0) * DATA.maintenance.reactiveFailureMult).toFixed(3);
+                },
+                /** Predictive residual failures after CBM failure-reduction. */
+                predictiveFailures: function (plannedFailures) {
+                    return +((plannedFailures || 0) * (1 - DATA.maintenance.predictiveFailureReduction)).toFixed(3);
+                },
+                /** Annual downtime cost for a strategy. costPerMinute = $/min of outage. */
+                downtimeCost: function (strategy, failures, costPerMinute) {
+                    var d = DATA.maintenance.downtime;
+                    var minAvg = strategy === 'reactive' ? d.reactiveMinAvg : d.plannedMinAvg;
+                    var prob = strategy === 'reactive' ? d.reactiveProb : d.plannedProb;
+                    return Math.round((failures || 0) * minAvg * (costPerMinute || 0) * prob);
                 }
             }
         },

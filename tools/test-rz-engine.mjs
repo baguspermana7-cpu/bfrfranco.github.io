@@ -360,6 +360,22 @@ near('pue.dcie(1.5)', M.pue.dcie(1.5), 0.6667, 0.001);
     ok('architecture disciplines have labels+drivers', disc.every(d => d.label && d.driver));
 }
 {
+    /* ── maintenance strategy model — Layer 8 (Group-2 promotion) ── */
+    const MN = E.models.maintenance;
+    eq('maintenance.modelMult in-house = 1', MN.modelMult('in-house'), 1);
+    // vendor: 0.10 + 0.90*1.35 = 1.315
+    near('maintenance.modelMult vendor', MN.modelMult('vendor'), 0.10 + 0.90 * 1.35, 1e-4);
+    ok('maintenance vendor mult > in-house', MN.modelMult('vendor') > MN.modelMult('in-house'));
+    eq('maintenance.expectedFailures T4', MN.expectedFailures(4), D.maintenance.expectedFailuresPerYear.tier4);
+    eq('maintenance.expectedFailures T3', MN.expectedFailures(3), D.maintenance.expectedFailuresPerYear.default);
+    // reactive = planned x 3.5
+    near('maintenance.reactiveFailures 2.5 -> 8.75', MN.reactiveFailures(2.5), 2.5 * 3.5, 1e-6);
+    // predictive residual = planned x (1-0.70)
+    near('maintenance.predictiveFailures 2.5 -> 0.75', MN.predictiveFailures(2.5), 2.5 * 0.30, 1e-6);
+    // reactive downtime cost > planned for same failures + cost/min
+    ok('maintenance reactive downtime > planned', MN.downtimeCost('reactive', 3, 1000) > MN.downtimeCost('planned', 3, 1000));
+}
+{
     const svg = E.charts.histogram([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     ok('charts.histogram returns <svg>', typeof svg === 'string' && svg.indexOf('<svg') === 0 && svg.indexOf('<rect') > 0);
     const tor = E.charts.tornado(M.sim.tornado(inp => inp.x, { x: 1 }, { x: { lo: 0, hi: 2 } }));

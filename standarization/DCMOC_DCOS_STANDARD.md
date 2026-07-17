@@ -153,6 +153,17 @@ local math before its engine parity passes.
   promotions + DCMOC consumption (dashboards/PDFs per engine) + backend follow.
   **7 of 8 new DC-OS Layer engines authored engine-side.**
 
+## Group-2 promotions (§3 / R3) — progress
+- **Maintenance (Layer 8)** — SHIPPED engine-side (1st of 9): `RZEngine.models.maintenance`
+  (`modelMult(model)` in-house/hybrid/vendor labor blend, `expectedFailures(tier)`,
+  `reactiveFailures`/`predictiveFailures`, `downtimeCost(strategy,...)`) +
+  `DATA.maintenance` (vendorPremium 1.35, reactiveFailureMult 3.5, predictive
+  reductions, downtime avgs/probs, expected failures/tier) lifted from DCMOC
+  MaintenanceStrategyEngine + `DATA.sources['maintenance']`. `test-rz-engine.mjs`
+  248/0. DCMOC MaintenanceStrategyEngine to CONSUME `DATA.maintenance` (replace
+  inline literals) = next increment. REMAINING Group-2: Carbon-rich, Compliance,
+  Tax, Risk-geo, Capacity, Grid, Fuel, Asset-lifecycle.
+
 ## Status (2026-07-17)
 - Bridge (§2): DONE (parallel session, f7a12cc7). REUSED.
 - Financial wiring (§3): DONE — IRR+NPV engine-sourced, parity 0-diff, fallback kept.
