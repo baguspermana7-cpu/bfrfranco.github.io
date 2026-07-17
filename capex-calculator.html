@@ -1803,22 +1803,22 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
                     <div class="metrics-row">
                         <div class="metric-box">
-                            <div class="metric-label">Tier Classification</div>
+                            <div class="metric-label" data-explain="tier">Tier Classification</div>
                             <div class="metric-value tier" id="tierClass">Tier III</div>
                         </div>
                         <div class="metric-box">
-                            <div class="metric-label">Estimated PUE</div>
+                            <div class="metric-label" data-explain="pue">Estimated PUE</div>
                             <div class="metric-value pue" id="pueValue">1.45</div>
                         </div>
                     </div>
 
                     <div class="metrics-row">
                         <div class="metric-box">
-                            <div class="metric-label">Expected Uptime</div>
+                            <div class="metric-label" data-explain="uptime">Expected Uptime</div>
                             <div class="metric-value uptime" id="uptimeValue">99.982%</div>
                         </div>
                         <div class="metric-box" id="energySection" onclick="if(!isPremiumUser)handlePremiumTab()">
-                            <div class="metric-label">Annual Energy <span id="energyGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()"><i class="fas fa-crown"></i> PRO</span></div>
+                            <div class="metric-label" data-explain="annual-energy">Annual Energy <span id="energyGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()"><i class="fas fa-crown"></i> PRO</span></div>
                             <div class="metric-value energy" id="energyCost">$1.2M</div>
                         </div>
                     </div>
@@ -2662,7 +2662,11 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             if (box) box.style.display = (sel && sel.value !== 'none') ? 'grid' : 'none';
         }
         function _kv(label, value) {
-            return '<div style="background:var(--bg-primary);border:1px solid var(--bg-tertiary);border-radius:8px;padding:0.5rem 0.6rem;"><div style="font-size:0.62rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</div><div style="font-weight:700;font-family:\'JetBrains Mono\',monospace;font-size:0.85rem;color:var(--text-primary);">' + value + '</div></div>';
+            // #262: slug the label to an RZExplain key (DB keys are slugs, e.g.
+            // "white-space", "rack-density") so every generated parameter carries a
+            // tooltip trigger. RZExplain renders nothing when the key is absent.
+            var _ek = label.toLowerCase().replace(/%/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            return '<div style="background:var(--bg-primary);border:1px solid var(--bg-tertiary);border-radius:8px;padding:0.5rem 0.6rem;"><div class="metric-label" data-explain="' + _ek + '" style="font-size:0.62rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</div><div style="font-weight:700;font-family:\'JetBrains Mono\',monospace;font-size:0.85rem;color:var(--text-primary);">' + value + '</div></div>';
         }
         function renderEnginePanels(result) {
             // Deep-sea design panel
@@ -4310,6 +4314,11 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
             // Report date
             document.getElementById('premReportDate').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            // #262: re-wire RZExplain tooltips over the freshly-rendered generated
+            // parameters (White Space, Rack Density, PUE, etc.) — scan picks up the
+            // .metric-label / label elements now present in the DOM.
+            if (window.RZExplain) { try { window.RZExplain.attach && window.RZExplain.attach(document.body); window.RZExplain.scan && window.RZExplain.scan(document.body); } catch (e) { } }
         }
 
         // ═══════════════════════════════════════════
