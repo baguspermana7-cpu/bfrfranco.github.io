@@ -129,6 +129,15 @@ local math before its engine parity passes.
   Ready + open-item list + renormalized coverage; `status(index)`) + `DATA.commissioning`
   (weights sum=1, labels, status bands) + `DATA.sources['commissioning']`.
   `test-rz-engine.mjs` 203/0 green.
+- **Asset Intelligence (Layer 9)** — SHIPPED engine-side: `RZEngine.models.asset`
+  (`healthIndex({assetClass|designLifeYears, ageYears, condition, duty})` →
+  remaining-life + condition + inverse-duty weighted → 0-100 health + status
+  (Healthy/Monitor/Plan/Critical) + remaining years; `designLife`, `status`) +
+  `DATA.asset` (design lives by class, weights sum=1, status bands) +
+  `DATA.sources['asset']`. `test-rz-engine.mjs` 214/0 green.
+- **REMAINING new engines:** Construction (L6), Requirements (L1), Architecture
+  (L3), Knowledge Engine. Group-2 promotions + DCMOC consumption (dashboards/PDFs
+  per engine) + backend follow.
 
 ## Status (2026-07-17)
 - Bridge (§2): DONE (parallel session, f7a12cc7). REUSED.

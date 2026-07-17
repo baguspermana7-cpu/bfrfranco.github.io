@@ -541,6 +541,23 @@
                 { min: 0,  status: 'Not Ready', label: 'Not ready' }
             ]
         },
+        /* ══ v2.4.0 — DATA.asset: Asset Intelligence (Layer 9). Design lives by asset
+         * class + health-index weights + status bands. Powers the asset digital
+         * passport / health index. ══ */
+        asset: {
+            /* Typical design life (years) by asset class — manufacturer/ASHRAE service life. */
+            designLifeYears: { ups: 12, battery: 8, generator: 25, crac: 15, chiller: 20, pdu: 20, switchgear: 25, transformer: 30, bms: 10, fireSuppression: 15 },
+            /* Health-index factor weights (sum = 1): remaining-life dominates, then
+             * observed condition, then duty/criticality stress. */
+            weights: { remainingLife: 0.5, condition: 0.35, duty: 0.15 },
+            /* Health % → status band. */
+            statusBands: [
+                { min: 80, status: 'Healthy', label: 'Healthy' },
+                { min: 60, status: 'Monitor', label: 'Monitor' },
+                { min: 40, status: 'Plan', label: 'Plan replacement' },
+                { min: 0,  status: 'Critical', label: 'Replace / high risk' }
+            ]
+        },
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
@@ -589,7 +606,8 @@
             'hoursPerYear':           { source: 'Calendar constant (non-leap)', asOf: 'const', unit: 'h/yr' },
             'reliability':            { source: 'IEEE 493 (Gold Book) typical component MTBF/MTTR + Uptime Institute Tier Standard availability targets', asOf: '2026', unit: 'hours (MTBF/MTTR) + availability fraction', method: 'screening-grade RAM inputs; NOT a certified reliability/FMEA study' },
             'site':                   { source: 'DC site-selection factor weighting (power + grid + seismic + talent + tax + carbon + flood + latency + water) — engine heuristic informed by 451/CBRE/Uptime site-selection criteria', asOf: '2026', unit: 'weights (fraction, sum=1) + grade bands', method: 'transparent weighted-factor screen; factor inputs are caller-supplied 0-1 goodness scores' },
-            'commissioning':          { source: 'Standard DC commissioning sequence (ASHRAE Guideline 0 / BCxA + Uptime Cx) — L1–L5 levels + IST/SAT/FAT + punchlist; weights are an engine readiness heuristic', asOf: '2026', unit: 'weights (fraction, sum=1) + readiness %', method: 'weighted completion index; NOT a Cx authority sign-off' }
+            'commissioning':          { source: 'Standard DC commissioning sequence (ASHRAE Guideline 0 / BCxA + Uptime Cx) — L1–L5 levels + IST/SAT/FAT + punchlist; weights are an engine readiness heuristic', asOf: '2026', unit: 'weights (fraction, sum=1) + readiness %', method: 'weighted completion index; NOT a Cx authority sign-off' },
+            'asset':                  { source: 'ASHRAE Equipment Life Expectancy + manufacturer service-life data (design lives); health-index weighting is an engine asset-management heuristic (remaining-life + condition + duty)', asOf: '2026', unit: 'years (design life) + weights (fraction, sum=1) + health %', method: 'screening health index; NOT a vibration/thermographic condition survey' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.
@@ -2197,6 +2215,44 @@
                     var index = present > 0 ? +(100 * weighted / present).toFixed(1) : 0;
                     var s = RZEngine.models.commissioning.status(index);
                     return { index: index, status: s.status, label: s.label, breakdown: breakdown, open: open, coverage: +present.toFixed(3) };
+                }
+            },
+
+            /* ── v2.4.0: asset intelligence (health index) model — Layer 9 ── */
+            asset: {
+                /** Design life (years) for an asset class, else null. */
+                designLife: function (assetClass) {
+                    var d = DATA.asset.designLifeYears[assetClass];
+                    return d != null ? d : null;
+                },
+                /** Health status for a 0-100 health index. */
+                status: function (health) {
+                    var bands = DATA.asset.statusBands;
+                    for (var i = 0; i < bands.length; i++) {
+                        if (health >= bands[i].min) return { status: bands[i].status, label: bands[i].label };
+                    }
+                    return { status: 'Critical', label: bands[bands.length - 1].label };
+                },
+                /** Asset health index. Inputs: { assetClass|designLifeYears, ageYears,
+                 *  condition (0-1, 1=as-new), duty (0-1 load/stress, 0=light) }. Remaining-
+                 *  life fraction + condition + inverse-duty → 0-100 health + status +
+                 *  remaining years. */
+                healthIndex: function (inp) {
+                    inp = inp || {};
+                    var life = inp.designLifeYears != null ? inp.designLifeYears : RZEngine.models.asset.designLife(inp.assetClass);
+                    if (life == null || life <= 0) life = 15;
+                    var age = Math.max(0, inp.ageYears || 0);
+                    var remainingFrac = Math.max(0, Math.min(1, (life - age) / life));
+                    var condition = inp.condition != null ? Math.max(0, Math.min(1, inp.condition)) : remainingFrac;
+                    var duty = inp.duty != null ? Math.max(0, Math.min(1, inp.duty)) : 0.5;
+                    var W = DATA.asset.weights;
+                    var health = +(100 * (W.remainingLife * remainingFrac + W.condition * condition + W.duty * (1 - duty))).toFixed(1);
+                    var s = RZEngine.models.asset.status(health);
+                    return {
+                        health: health, status: s.status, label: s.label,
+                        remainingYears: +(life - age).toFixed(1), designLifeYears: life,
+                        remainingFraction: +remainingFrac.toFixed(3)
+                    };
                 }
             }
         },

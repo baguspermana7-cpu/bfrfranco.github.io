@@ -282,6 +282,26 @@ near('pue.dcie(1.5)', M.pue.dcie(1.5), 0.6667, 0.001);
     near('commissioning.weights sum = 1', cwsum, 1, 1e-9);
 }
 {
+    /* ── asset intelligence (health index) model — Layer 9 ── */
+    const A = E.models.asset;
+    eq('asset.designLife ups', A.designLife('ups'), D.asset.designLifeYears.ups);
+    eq('asset.designLife unknown = null', A.designLife('nope'), null);
+    // brand-new asset (age 0), perfect condition, light duty → ~100 health, Healthy
+    const fresh = A.healthIndex({ assetClass: 'ups', ageYears: 0, condition: 1, duty: 0 });
+    ok('asset fresh health >= 95', fresh.health >= 95);
+    eq('asset fresh status Healthy', fresh.status, 'Healthy');
+    eq('asset fresh remainingYears = designLife', fresh.remainingYears, D.asset.designLifeYears.ups);
+    // fully-aged asset (age = life), poor condition, heavy duty → low health, Critical
+    const old = A.healthIndex({ assetClass: 'ups', ageYears: D.asset.designLifeYears.ups, condition: 0, duty: 1 });
+    near('asset end-of-life health = 0', old.health, 0, 1e-6);
+    eq('asset end-of-life status Critical', old.status, 'Critical');
+    ok('asset health monotonic in age', A.healthIndex({ assetClass: 'crac', ageYears: 2, condition: 0.9, duty: 0.5 }).health > A.healthIndex({ assetClass: 'crac', ageYears: 12, condition: 0.9, duty: 0.5 }).health);
+    eq('asset.status 82 Healthy', A.status(82).status, 'Healthy');
+    eq('asset.status 50 Plan', A.status(50).status, 'Plan');
+    let awsum = 0; for (const k in D.asset.weights) awsum += D.asset.weights[k];
+    near('asset.weights sum = 1', awsum, 1, 1e-9);
+}
+{
     const svg = E.charts.histogram([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     ok('charts.histogram returns <svg>', typeof svg === 'string' && svg.indexOf('<svg') === 0 && svg.indexOf('<rect') > 0);
     const tor = E.charts.tornado(M.sim.tornado(inp => inp.x, { x: 1 }, { x: { lo: 0, hi: 2 } }));
