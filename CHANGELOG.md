@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.60.1 — 2026-07-17 (index: neutralize contact-section copy)
+
+### Changed
+- Contact section copy read as a service offer ("…how I can help transform your operations?") —
+  contradicting the site's own terms.html declaration that the platform offers no consulting and is a
+  personal educational project. Reworded to the knowledge-exchange register: "Let's Talk Engineering —
+  Questions about an article, a calculator, or the engineering behind them? …". twitter:description's
+  "Let's connect!" tail dropped (now factual, matching the meta description). "Email me" CTA and the
+  direct-contact block unchanged (v1.54.1 precedent). Sitewide grep: zero remaining occurrences.
+
+---
+
 ## v1.60.0 — 2026-07-17 (RZExplain rollout: 24 more pages migrated · glossary in the command palette)
 
 ### Added
