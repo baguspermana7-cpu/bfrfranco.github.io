@@ -620,6 +620,17 @@
             reactiveEmergencyPartUsd: 2500,      /* avg emergency part */
             reactiveFixHours: 6                  /* avg emergency fix labor */
         },
+        /* ══ v2.4.0 — DATA.fuelGen: backup generator + diesel economics (Group-2
+         * promotion from DCMOC FuelGenEngine). Sizing + fuel storage/consumption. ══ */
+        fuelGen: {
+            genEfficiencyLPerKwh: 0.27,          /* EPA Tier 4 Final diesel @ 75% load */
+            loadFactor: 0.75,
+            fuelStorageHoursByTier: { 2: 48, 3: 72, 4: 96 },   /* Uptime backup autonomy */
+            dieselPriceDefaultPerLiter: 1.05,
+            fuelTaxRateDefault: 0.05,
+            storageLimitLitersDefault: 50000,
+            test: { monthlyTestHours: 2, annualFullLoadTestHours: 4 }
+        },
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
@@ -673,7 +684,8 @@
             'construction':           { source: 'Canonical DC build phase sequence (design→permit→procurement→civil→MEP→commissioning) + typical fast-track overlap factors — engine scheduling heuristic', asOf: '2026', unit: 'months (durations) + overlap fractions', method: 'CPM-style forward pass with per-phase overlap; screening schedule, NOT a resource-loaded programme' },
             'requirements':           { source: 'DC project brief required-field set + workload density/cooling profiles (AI/HPC/cloud/colo/enterprise/edge) — engine intake heuristic informed by Uptime/OCP rack-density guidance', asOf: '2026', unit: 'field list + kW/rack + cooling/tier defaults', method: 'completeness + profile defaults; not a design basis' },
             'architecture':           { source: 'Canonical DC design disciplines (electrical/mechanical/cooling/fire/security/network/building/structural/BMS) + relative design-complexity multipliers by cooling/tier/redundancy — engine heuristic', asOf: '2026', unit: 'discipline list + complexity multipliers → 0-100 index', method: 'normalized complexity screen; NOT a design deliverable' },
-            'maintenance':            { source: 'DC O&M strategy economics — reactive/planned/predictive failure + downtime multipliers + in-house/hybrid/vendor labor blend; lifted from DCMOC MaintenanceStrategyEngine (RCM/CBM industry conventions)', asOf: '2026', unit: 'multipliers + minutes + $/part', method: 'screening O&M cost model; NOT a vendor quote' }
+            'maintenance':            { source: 'DC O&M strategy economics — reactive/planned/predictive failure + downtime multipliers + in-house/hybrid/vendor labor blend; lifted from DCMOC MaintenanceStrategyEngine (RCM/CBM industry conventions)', asOf: '2026', unit: 'multipliers + minutes + $/part', method: 'screening O&M cost model; NOT a vendor quote' },
+            'fuelGen':                { source: 'EPA Tier 4 Final diesel genset fuel rate (~0.27 L/kWh @ 75%) + Uptime backup-autonomy hours by tier (48/72/96h); lifted from DCMOC FuelGenEngine', asOf: '2026', unit: 'L/kWh + hours + $/L', method: 'screening sizing; NOT a genset selection' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.
@@ -2460,6 +2472,35 @@
                     var minAvg = strategy === 'reactive' ? d.reactiveMinAvg : d.plannedMinAvg;
                     var prob = strategy === 'reactive' ? d.reactiveProb : d.plannedProb;
                     return Math.round((failures || 0) * minAvg * (costPerMinute || 0) * prob);
+                }
+            },
+
+            /* ── v2.4.0: fuel & generator model — Group-2 promotion ── */
+            fuel: {
+                /** Diesel consumption (L/h) for a drawn load (kW). */
+                consumptionLPerHour: function (loadKw) {
+                    return +((loadKw || 0) * DATA.fuelGen.genEfficiencyLPerKwh).toFixed(2);
+                },
+                /** Backup autonomy hours for a tier. */
+                storageHours: function (tier) {
+                    return DATA.fuelGen.fuelStorageHoursByTier[tier] != null
+                        ? DATA.fuelGen.fuelStorageHoursByTier[tier]
+                        : DATA.fuelGen.fuelStorageHoursByTier[3];
+                },
+                /** Required on-site fuel storage (L) = autonomy hours × full-load L/h. */
+                storageLiters: function (loadKw, tier) {
+                    return Math.round(RZEngine.models.fuel.storageHours(tier) * RZEngine.models.fuel.consumptionLPerHour(loadKw));
+                },
+                /** Annual maintenance-test fuel (L): monthly + annual full-load tests. */
+                annualTestFuelLiters: function (loadKw) {
+                    var t = DATA.fuelGen.test;
+                    var hrs = t.monthlyTestHours * 12 + t.annualFullLoadTestHours;
+                    return Math.round(hrs * RZEngine.models.fuel.consumptionLPerHour(loadKw));
+                },
+                /** Annual fuel cost ($) for a runtime-hours scenario at a $/L price. */
+                annualFuelCost: function (loadKw, runtimeHours, pricePerLiter) {
+                    var price = pricePerLiter != null ? pricePerLiter : DATA.fuelGen.dieselPriceDefaultPerLiter;
+                    return Math.round(RZEngine.models.fuel.consumptionLPerHour(loadKw) * (runtimeHours || 0) * price);
                 }
             }
         },

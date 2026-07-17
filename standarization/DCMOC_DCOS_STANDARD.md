@@ -161,8 +161,14 @@ local math before its engine parity passes.
   reductions, downtime avgs/probs, expected failures/tier) lifted from DCMOC
   MaintenanceStrategyEngine + `DATA.sources['maintenance']`. `test-rz-engine.mjs`
   248/0. DCMOC MaintenanceStrategyEngine to CONSUME `DATA.maintenance` (replace
-  inline literals) = next increment. REMAINING Group-2: Carbon-rich, Compliance,
-  Tax, Risk-geo, Capacity, Grid, Fuel, Asset-lifecycle.
+  inline literals) = next increment.
+- **Fuel & Generator** — SHIPPED engine-side (2nd of 9): `RZEngine.models.fuel`
+  (`consumptionLPerHour(loadKw)`, `storageHours(tier)`, `storageLiters(loadKw,tier)`,
+  `annualTestFuelLiters`, `annualFuelCost`) + `DATA.fuelGen` (0.27 L/kWh EPA Tier 4,
+  autonomy 48/72/96h by tier, diesel $/L, test hours) + `DATA.sources['fuelGen']`,
+  lifted from DCMOC FuelGenEngine. `test-rz-engine.mjs` 254/0.
+  REMAINING Group-2: Carbon-rich, Compliance, Tax, Risk-geo, Capacity, Grid,
+  Asset-lifecycle.
 
 ## Status (2026-07-17)
 - Bridge (§2): DONE (parallel session, f7a12cc7). REUSED.

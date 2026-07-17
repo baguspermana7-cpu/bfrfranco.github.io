@@ -376,6 +376,20 @@ near('pue.dcie(1.5)', M.pue.dcie(1.5), 0.6667, 0.001);
     ok('maintenance reactive downtime > planned', MN.downtimeCost('reactive', 3, 1000) > MN.downtimeCost('planned', 3, 1000));
 }
 {
+    /* ── fuel & generator model — Group-2 promotion ── */
+    const FL = E.models.fuel;
+    // 1000 kW × 0.27 L/kWh = 270 L/h
+    near('fuel.consumptionLPerHour 1000kW', FL.consumptionLPerHour(1000), 270, 1e-6);
+    eq('fuel.storageHours T4', FL.storageHours(4), D.fuelGen.fuelStorageHoursByTier[4]);
+    ok('fuel storage T4 > T2', FL.storageHours(4) > FL.storageHours(2));
+    // storage L = 96h × 270 L/h = 25920 for T4 @ 1MW
+    near('fuel.storageLiters 1000kW T4', FL.storageLiters(1000, 4), 96 * 270, 1);
+    // annual test fuel = (2*12 + 4) h × 270 = 28 × 270 = 7560
+    near('fuel.annualTestFuelLiters 1000kW', FL.annualTestFuelLiters(1000), 28 * 270, 1);
+    // annual fuel cost = 270 L/h × 100h × $1.05 = 28350
+    near('fuel.annualFuelCost 1000kW 100h', FL.annualFuelCost(1000, 100, 1.05), Math.round(270 * 100 * 1.05), 1);
+}
+{
     const svg = E.charts.histogram([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     ok('charts.histogram returns <svg>', typeof svg === 'string' && svg.indexOf('<svg') === 0 && svg.indexOf('<rect') > 0);
     const tor = E.charts.tornado(M.sim.tornado(inp => inp.x, { x: 1 }, { x: { lo: 0, hi: 2 } }));
