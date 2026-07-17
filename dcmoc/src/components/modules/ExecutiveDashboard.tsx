@@ -10,10 +10,15 @@
 
 import React from 'react';
 import { useSimulationStore } from '@/store/simulation';
+import { useCapexStore } from '@/store/capex';
 import { useDashboardData } from '@/components/dashboard/useDashboardData';
 import { DashTopBar } from '@/components/dashboard/DashTopBar';
 import { KpiCard } from '@/components/dashboard/KpiCard';
 import { LifecycleStrip } from '@/components/dashboard/LifecycleStrip';
+import { ProjectSummary } from '@/components/dashboard/ProjectSummary';
+import { CapacityArchOverview } from '@/components/dashboard/CapacityArchOverview';
+import { FinancialSnapshot } from '@/components/dashboard/FinancialSnapshot';
+import { ScenarioComparison } from '@/components/dashboard/ScenarioComparison';
 import { decide, type DecisionContext, type DecisionResult } from '@/lib/decision';
 import { Cpu, Server, Building, Repeat, Gauge, TrendingUp, CircleDot, ArrowRight, Sparkles } from 'lucide-react';
 
@@ -23,6 +28,10 @@ const fmtUsd = (n: number | null) => n == null ? '—' : n >= 1e9 ? `$${(n / 1e9
 
 export function ExecutiveDashboard() {
     const { actions } = useSimulationStore();
+    const capexResults = useCapexStore((s) => s.results);
+    const runCapex = useCapexStore((s) => s.runCalculation);
+    // Populate the roll-up with real CAPEX on first view.
+    React.useEffect(() => { if (!capexResults) runCapex(); }, [capexResults, runCapex]);
     const d = useDashboardData();
     const [tab, setTab] = React.useState('Executive Overview');
     const go = (t?: string) => { if (t) actions.setActiveTab(t as TabId); };
@@ -68,7 +77,17 @@ export function ExecutiveDashboard() {
             {/* Row 2 — Lifecycle strip */}
             <LifecycleStrip onOpen={go} />
 
-            {/* AI Recommendations (Layer 13) — interim; full panel grid lands in P2/P3 */}
+            {/* Row 3 — project summary · capacity+financial · scenarios */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                <ProjectSummary d={d} />
+                <div className="space-y-3">
+                    <CapacityArchOverview d={d} />
+                    <FinancialSnapshot costs={d.capexCosts} total={d.capexTotal} />
+                </div>
+                <ScenarioComparison d={d} />
+            </div>
+
+            {/* AI Recommendations (Layer 13) — interim; full panel grid lands in P3 */}
             <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/80 p-4">
                 <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="w-4 h-4 text-cyan-400" />
