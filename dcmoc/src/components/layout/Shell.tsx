@@ -48,6 +48,9 @@ import {
     ShieldCheck,
     BrainCircuit,
     ChevronRight,
+    Flame,
+    Waves,
+    Package,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { getPUE } from '@/constants/pue';
@@ -144,6 +147,10 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
         { label: 'CBM / DCIM', icon: Activity, id: 'cbm', section: 'planning' },
         { label: 'Strategic Planning', icon: MapPin, id: 'strategic', section: 'planning' },
         { label: 'Fuel & Generator', icon: Fuel, id: 'fuel-gen' },
+        { label: 'Tier Classification', icon: ShieldCheck, id: 'tier' },
+        { label: 'Fire Suppression', icon: Flame, id: 'fire' },
+        { label: 'CDU / Liquid Cooling', icon: Waves, id: 'cdu' },
+        { label: 'Spares Optimization', icon: Package, id: 'spares' },
         { label: 'Report', icon: FileText, id: 'report' },
     ];
 
@@ -153,14 +160,14 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
     const ENGINE_GROUPS: { num: number; label: string; icon: LucideIcon; childIds: (typeof activeTab)[] }[] = [
         { num: 1, label: 'Requirements', icon: ClipboardCheck, childIds: ['requirements', 'sim'] },
         { num: 2, label: 'Site Intelligence', icon: MapPin, childIds: ['site', 'tax', 'disaster', 'grid', 'talent', 'compliance'] },
-        { num: 3, label: 'Architecture', icon: Boxes, childIds: ['architecture'] },
-        { num: 4, label: 'Capacity Planning', icon: Layers, childIds: ['capacity', 'fuel-gen'] },
+        { num: 3, label: 'Architecture', icon: Boxes, childIds: ['architecture', 'fire'] },
+        { num: 4, label: 'Capacity Planning', icon: Layers, childIds: ['capacity', 'fuel-gen', 'cdu'] },
         { num: 5, label: 'CAPEX Engine', icon: Building, childIds: ['capex'] },
         { num: 6, label: 'Construction', icon: HardHat, childIds: ['construction', 'phased-finance'] },
         { num: 7, label: 'Commissioning', icon: CheckCircle2, childIds: ['commissioning'] },
         { num: 8, label: 'Operations', icon: Wrench, childIds: ['staff', 'maint'] },
-        { num: 9, label: 'Asset Intelligence', icon: Activity, childIds: ['asset-health', 'asset-lifecycle', 'cbm'] },
-        { num: 10, label: 'Reliability', icon: ShieldCheck, childIds: ['risk', 'reliability'] },
+        { num: 9, label: 'Asset Intelligence', icon: Activity, childIds: ['asset-health', 'asset-lifecycle', 'cbm', 'spares'] },
+        { num: 10, label: 'Reliability', icon: ShieldCheck, childIds: ['risk', 'reliability', 'tier'] },
         { num: 11, label: 'Sustainability', icon: Leaf, childIds: ['carbon'] },
         { num: 12, label: 'Financial', icon: TrendingUp, childIds: ['finance', 'invest', 'montecarlo', 'portfolio', 'benchmark', 'strategic'] },
         { num: 13, label: 'AI Decision Engine', icon: BrainCircuit, childIds: [] },

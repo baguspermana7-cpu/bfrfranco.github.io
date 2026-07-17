@@ -21,6 +21,7 @@ release sections rather than semver.
   - `models.spares.eoq()` + `reorderPoint()` — EOQ `√(2DS/H)` + reorder point.
   - `models.decision.recommend()` — **Layer-13 deterministic decision brain** in the engine (mirrors the DCMOC provider): always-on, never-empty, explainable recommendations (PUE/availability/cost-band/financial/density/schedule/site rules + objective ranking + disclaimer).
 - All 5 registered on the `cf-worker /calc` allow-list (backend-served, anti-theft). `tools/test-rz-engine.mjs` +10 asserts → **321/0**.
+- **DCMOC surfaces the 4 new pillars** (`DesignToolsDashboards.tsx`): Tier Classification (Reliability group), Fire Suppression (Architecture), CDU/Liquid Cooling (Capacity), Spares Optimization (Asset) — each engine-real + input-driven, in the sidebar under its lifecycle engine.
 
 ### Changed
 - `rz-engine.min.js` rebuilt (terser). Reference-parity 126/0.

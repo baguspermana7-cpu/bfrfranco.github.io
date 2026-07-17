@@ -30,6 +30,7 @@ import StrategicPlanningDashboard from '@/components/modules/StrategicPlanningDa
 import { ExecutiveDashboard } from '@/components/modules/ExecutiveDashboard';
 import { ReliabilityDashboard } from '@/components/modules/ReliabilityDashboard';
 import { RequirementsDashboard, SiteIntelDashboard, ArchitectureDashboard, ConstructionDashboard, CommissioningDashboard, AssetIntelDashboard } from '@/components/modules/NewEngineDashboards';
+import { TierDashboard, FireDashboard, CduDashboard, SparesDashboard } from '@/components/modules/DesignToolsDashboards';
 import { useScenarioStore } from '@/store/scenario';
 import { Wrench, ShieldAlert, FileText, Calculator, Activity } from 'lucide-react';
 
@@ -125,6 +126,14 @@ export default function Home() {
         return <FaqDashboard />;
       case 'strategic':
         return <StrategicPlanningDashboard />;
+      case 'tier':
+        return <TierDashboard />;
+      case 'fire':
+        return <FireDashboard />;
+      case 'cdu':
+        return <CduDashboard />;
+      case 'spares':
+        return <SparesDashboard />;
       case 'projects':
       case 'templates':
       case 'data-library':
