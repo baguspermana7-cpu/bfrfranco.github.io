@@ -571,6 +571,41 @@
             /* Milestone anchors → the phase whose END marks the milestone. */
             milestones: { permitApproved: 'permit', groundbreak: 'civil', topOut: 'civil', powerOn: 'mep', rfs: 'commission' }
         },
+        /* ══ v2.4.0 — DATA.requirements: Requirements intake (Layer 1). Required-field
+         * set for a fundable brief + use-case density/cooling profiles. Drives the
+         * intake completeness score + sensible defaults per workload. ══ */
+        requirements: {
+            /* Fields a complete, fundable project brief must carry. */
+            required: ['itLoadKw', 'targetTier', 'region', 'useCase', 'budgetUsd', 'deadlineMonths'],
+            optional: ['customer', 'contractType', 'landAreaM2', 'codDate', 'utilityPartner'],
+            /* Use-case profiles → typical rack density (kW/rack) + recommended cooling
+             * + tier floor. AI/HPC push liquid cooling + higher tier. */
+            useCaseProfiles: {
+                ai:         { label: 'AI / GPU training', rackKw: 60, cooling: 'liquid', tierFloor: 3 },
+                hpc:        { label: 'HPC', rackKw: 45, cooling: 'rdhx', tierFloor: 3 },
+                cloud:      { label: 'Hyperscale cloud', rackKw: 20, cooling: 'inrow', tierFloor: 3 },
+                colo:       { label: 'Colocation', rackKw: 12, cooling: 'inrow', tierFloor: 3 },
+                enterprise: { label: 'Enterprise', rackKw: 8, cooling: 'air', tierFloor: 2 },
+                edge:       { label: 'Edge', rackKw: 10, cooling: 'air', tierFloor: 2 }
+            }
+        },
+        /* ══ v2.4.0 — DATA.architecture: Architecture disciplines + design-complexity
+         * (Layer 3). Canonical discipline list + cooling/tier complexity multipliers
+         * → a normalized design-complexity index. ══ */
+        architecture: {
+            disciplines: ['electrical', 'mechanical', 'cooling', 'fire', 'security', 'network', 'building', 'structural', 'bms'],
+            disciplineLabels: { electrical: 'Electrical', mechanical: 'Mechanical', cooling: 'Cooling', fire: 'Fire & Life Safety', security: 'Security', network: 'Network', building: 'Building', structural: 'Structural', bms: 'BMS / DCIM' },
+            /* Relative design complexity by cooling architecture + tier + redundancy. */
+            coolingComplexity: { air: 1.0, inrow: 1.3, rdhx: 1.6, liquid: 2.0, immersion: 2.4 },
+            tierComplexity: { 2: 1.0, 3: 1.4, 4: 1.9 },
+            redundancyComplexity: { 'n': 1.0, 'n1': 1.2, '2n': 1.6, '2n1': 1.9 },
+            /* Max product (immersion x T4 x 2N+1) used to normalize to 0-100. */
+            complexityMax: 2.4 * 1.9 * 1.9,
+            complexityBands: [
+                { min: 75, band: 'Very High' }, { min: 55, band: 'High' },
+                { min: 35, band: 'Moderate' }, { min: 0, band: 'Standard' }
+            ]
+        },
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
@@ -621,7 +656,9 @@
             'site':                   { source: 'DC site-selection factor weighting (power + grid + seismic + talent + tax + carbon + flood + latency + water) — engine heuristic informed by 451/CBRE/Uptime site-selection criteria', asOf: '2026', unit: 'weights (fraction, sum=1) + grade bands', method: 'transparent weighted-factor screen; factor inputs are caller-supplied 0-1 goodness scores' },
             'commissioning':          { source: 'Standard DC commissioning sequence (ASHRAE Guideline 0 / BCxA + Uptime Cx) — L1–L5 levels + IST/SAT/FAT + punchlist; weights are an engine readiness heuristic', asOf: '2026', unit: 'weights (fraction, sum=1) + readiness %', method: 'weighted completion index; NOT a Cx authority sign-off' },
             'asset':                  { source: 'ASHRAE Equipment Life Expectancy + manufacturer service-life data (design lives); health-index weighting is an engine asset-management heuristic (remaining-life + condition + duty)', asOf: '2026', unit: 'years (design life) + weights (fraction, sum=1) + health %', method: 'screening health index; NOT a vibration/thermographic condition survey' },
-            'construction':           { source: 'Canonical DC build phase sequence (design→permit→procurement→civil→MEP→commissioning) + typical fast-track overlap factors — engine scheduling heuristic', asOf: '2026', unit: 'months (durations) + overlap fractions', method: 'CPM-style forward pass with per-phase overlap; screening schedule, NOT a resource-loaded programme' }
+            'construction':           { source: 'Canonical DC build phase sequence (design→permit→procurement→civil→MEP→commissioning) + typical fast-track overlap factors — engine scheduling heuristic', asOf: '2026', unit: 'months (durations) + overlap fractions', method: 'CPM-style forward pass with per-phase overlap; screening schedule, NOT a resource-loaded programme' },
+            'requirements':           { source: 'DC project brief required-field set + workload density/cooling profiles (AI/HPC/cloud/colo/enterprise/edge) — engine intake heuristic informed by Uptime/OCP rack-density guidance', asOf: '2026', unit: 'field list + kW/rack + cooling/tier defaults', method: 'completeness + profile defaults; not a design basis' },
+            'architecture':           { source: 'Canonical DC design disciplines (electrical/mechanical/cooling/fire/security/network/building/structural/BMS) + relative design-complexity multipliers by cooling/tier/redundancy — engine heuristic', asOf: '2026', unit: 'discipline list + complexity multipliers → 0-100 index', method: 'normalized complexity screen; NOT a design deliverable' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.
@@ -2299,6 +2336,83 @@
                 /** Convenience: schedule directly from a models.capex timeline object. */
                 fromTimeline: function (timeline) {
                     return RZEngine.models.construction.schedule(timeline || {});
+                }
+            },
+
+            /* ── v2.4.0: requirements intake model — Layer 1 ── */
+            requirements: {
+                /** Use-case profile (density/cooling/tier defaults), or null. */
+                profile: function (useCase) {
+                    var p = DATA.requirements.useCaseProfiles[(useCase || '').toLowerCase()];
+                    return p || null;
+                },
+                /** Intake completeness: fraction of required fields present + the
+                 *  missing list + a ready flag. A value is "present" if non-null,
+                 *  non-empty, and (for numbers) > 0. */
+                completeness: function (intake) {
+                    intake = intake || {};
+                    var req = DATA.requirements.required, have = [], missing = [];
+                    for (var i = 0; i < req.length; i++) {
+                        var k = req[i], v = intake[k];
+                        var present = v != null && v !== '' && !(typeof v === 'number' && !(v > 0));
+                        if (present) have.push(k); else missing.push(k);
+                    }
+                    var pct = +(100 * have.length / req.length).toFixed(1);
+                    return { pct: pct, have: have, missing: missing, ready: missing.length === 0 };
+                },
+                /** Validate a brief: completeness + a coarse tier-floor check for the
+                 *  use case. Returns { completeness, flags:[...], recommendedTierFloor }. */
+                validate: function (intake) {
+                    intake = intake || {};
+                    var comp = RZEngine.models.requirements.completeness(intake);
+                    var prof = RZEngine.models.requirements.profile(intake.useCase);
+                    var flags = [];
+                    if (prof && intake.targetTier != null && intake.targetTier < prof.tierFloor) {
+                        flags.push({ level: 'warn', field: 'targetTier', message: 'Target Tier ' + intake.targetTier + ' is below the ' + prof.label + ' recommended floor (Tier ' + prof.tierFloor + ')' });
+                    }
+                    return { completeness: comp, flags: flags, recommendedTierFloor: prof ? prof.tierFloor : null, profile: prof };
+                }
+            },
+
+            /* ── v2.4.0: architecture disciplines + complexity model — Layer 3 ── */
+            architecture: {
+                /** Complexity band for a 0-100 index. */
+                band: function (index) {
+                    var b = DATA.architecture.complexityBands;
+                    for (var i = 0; i < b.length; i++) { if (index >= b[i].min) return b[i].band; }
+                    return 'Standard';
+                },
+                /** Normalized design-complexity index (0-100) from cooling x tier x
+                 *  redundancy multipliers. */
+                complexity: function (inp) {
+                    inp = inp || {};
+                    var A = DATA.architecture;
+                    var c = A.coolingComplexity[inp.coolingType] || 1.0;
+                    var t = A.tierComplexity[inp.tier] || 1.0;
+                    var r = A.redundancyComplexity[inp.redundancy] || 1.0;
+                    var index = +(100 * (c * t * r) / A.complexityMax).toFixed(1);
+                    if (index > 100) index = 100;
+                    return { index: index, band: RZEngine.models.architecture.band(index), drivers: { cooling: c, tier: t, redundancy: r } };
+                },
+                /** Discipline spec summary: each canonical discipline + its primary
+                 *  driver for the given inputs. */
+                disciplines: function (inp) {
+                    inp = inp || {};
+                    var A = DATA.architecture;
+                    var drivers = {
+                        electrical: 'Tier ' + (inp.tier || '?') + ' / ' + (inp.redundancy || 'N') + ' redundancy',
+                        mechanical: (inp.coolingType || 'air') + ' cooling',
+                        cooling: (inp.coolingType || 'air'),
+                        fire: 'clean-agent + VESDA (Tier ' + (inp.tier || '?') + ')',
+                        security: 'multi-layer (Tier ' + (inp.tier || '?') + ')',
+                        network: 'redundant fabric',
+                        building: 'purpose-built shell',
+                        structural: (inp.coolingType === 'immersion' ? 'high floor loading (immersion)' : 'standard floor loading'),
+                        bms: 'BMS + DCIM integration'
+                    };
+                    return A.disciplines.map(function (d) {
+                        return { key: d, label: A.disciplineLabels[d], driver: drivers[d] || '' };
+                    });
                 }
             }
         },

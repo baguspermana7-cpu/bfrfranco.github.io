@@ -141,9 +141,17 @@ local math before its engine parity passes.
   markers {permitApproved,groundbreak,topOut,powerOn,rfs}; `fromTimeline`) +
   `DATA.construction` (phaseOrder, labels, overlap, milestones) + sources.
   `test-rz-engine.mjs` 223/0 green. (Feeds the capex Gantt restore, bug #260.)
-- **REMAINING new engines:** Requirements (L1), Architecture (L3), Knowledge
-  Engine. Group-2 promotions + DCMOC consumption (dashboards/PDFs per engine) +
-  backend follow.
+- **Requirements (Layer 1)** — SHIPPED: `RZEngine.models.requirements`
+  (`completeness(intake)` required-field %, `profile(useCase)` density/cooling/tier
+  defaults for ai/hpc/cloud/colo/enterprise/edge, `validate(intake)` tier-floor
+  flags) + `DATA.requirements` + sources. 233/0.
+- **Architecture (Layer 3)** — SHIPPED: `RZEngine.models.architecture`
+  (`complexity({coolingType,tier,redundancy})` normalized 0-100 design-complexity
+  index + band, `disciplines(inp)` canonical discipline spec + drivers) +
+  `DATA.architecture` + sources. 240/0.
+- **REMAINING new engines:** Knowledge Engine (Supabase-backed). Group-2
+  promotions + DCMOC consumption (dashboards/PDFs per engine) + backend follow.
+  **7 of 8 new DC-OS Layer engines authored engine-side.**
 
 ## Status (2026-07-17)
 - Bridge (§2): DONE (parallel session, f7a12cc7). REUSED.

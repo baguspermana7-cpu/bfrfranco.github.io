@@ -322,6 +322,44 @@ near('pue.dcie(1.5)', M.pue.dcie(1.5), 0.6667, 0.001);
     ok('construction.fromTimeline works', CN.fromTimeline({ design: 2, permit: 2 }).totalMonths > 0);
 }
 {
+    /* ── requirements intake model — Layer 1 ── */
+    const RQ = E.models.requirements;
+    eq('requirements.profile ai rackKw', RQ.profile('ai').rackKw, D.requirements.useCaseProfiles.ai.rackKw);
+    eq('requirements.profile unknown = null', RQ.profile('zzz'), null);
+    // full brief → 100% complete, ready
+    const full = RQ.completeness({ itLoadKw: 5000, targetTier: 3, region: 'ID', useCase: 'ai', budgetUsd: 3e8, deadlineMonths: 24 });
+    near('requirements full completeness = 100', full.pct, 100, 1e-6);
+    ok('requirements full ready', full.ready === true);
+    eq('requirements full no missing', full.missing.length, 0);
+    // empty → 0, not ready, all missing
+    const empty = RQ.completeness({});
+    near('requirements empty = 0', empty.pct, 0, 1e-6);
+    eq('requirements empty missing all', empty.missing.length, D.requirements.required.length);
+    // zero itLoad counts as missing (not > 0)
+    ok('requirements itLoad=0 missing', RQ.completeness({ itLoadKw: 0 }).missing.includes('itLoadKw'));
+    // validate: AI at Tier 2 flags below-floor
+    const v = RQ.validate({ useCase: 'ai', targetTier: 2, itLoadKw: 5000, region: 'ID', budgetUsd: 1e8, deadlineMonths: 20 });
+    ok('requirements validate flags AI Tier2 below floor', v.flags.some(f => f.field === 'targetTier'));
+    eq('requirements recommendedTierFloor ai', v.recommendedTierFloor, D.requirements.useCaseProfiles.ai.tierFloor);
+}
+{
+    /* ── architecture disciplines + complexity model — Layer 3 ── */
+    const AR = E.models.architecture;
+    // immersion + T4 + 2N+1 = the max → 100 / Very High
+    const max = AR.complexity({ coolingType: 'immersion', tier: 4, redundancy: '2n1' });
+    near('architecture max complexity = 100', max.index, 100, 1e-6);
+    eq('architecture max band Very High', max.band, 'Very High');
+    // air + T2 + N = the floor
+    const min = AR.complexity({ coolingType: 'air', tier: 2, redundancy: 'n' });
+    ok('architecture min complexity < max', min.index < max.index);
+    ok('architecture liquid > air complexity', AR.complexity({ coolingType: 'liquid', tier: 3, redundancy: '2n' }).index > AR.complexity({ coolingType: 'air', tier: 3, redundancy: '2n' }).index);
+    eq('architecture.band 60 High', AR.band(60), 'High');
+    // disciplines returns all canonical disciplines
+    const disc = AR.disciplines({ coolingType: 'liquid', tier: 4, redundancy: '2n' });
+    eq('architecture disciplines count', disc.length, D.architecture.disciplines.length);
+    ok('architecture disciplines have labels+drivers', disc.every(d => d.label && d.driver));
+}
+{
     const svg = E.charts.histogram([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     ok('charts.histogram returns <svg>', typeof svg === 'string' && svg.indexOf('<svg') === 0 && svg.indexOf('<rect') > 0);
     const tor = E.charts.tornado(M.sim.tornado(inp => inp.x, { x: 1 }, { x: { lo: 0, hi: 2 } }));
