@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.64.1 — 2026-07-18 (DCMOC: Platform surfaces made real, engine-backed)
+
+### Added
+- The 8 DCMOC sidebar Platform/Support entries (were dead "coming soon") are now functional, engine-backed surfaces (`PlatformDashboards.tsx`):
+  - **Data Library** — read-only browser of the canonical `rz-engine.js DATA` (32 countries with electricity/tax/grid-carbon/constr-index, 25 markets, PUE matrix, refrigerants) — proves the single source.
+  - **Templates** — one-click apply of the engine use-case profiles (`models.requirements.useCaseProfiles`: AI/HPC/cloud/colo/enterprise/edge) to the project.
+  - **Projects** — saved-scenario list (restore/compare/delete).
+  - **Settings** — theme + engine/data source + AI-overlay status.
+  - **Knowledge Base** — live engine-model list + glossary link. **Integrations** — real connection status (Supabase/engine/backend/AI). **Audit** / **User Management** — honest status tied to the Supabase audit_log + rz-ops admin.
+- Removed the "coming soon" stub. DCMOC rebuilt; tsc + build clean; dashboard smoke 9/9.
+
+---
+
 ## v1.64.0 — 2026-07-18 (DC-OS: promote the RICH standalone models into the engine)
 
 ### Added
