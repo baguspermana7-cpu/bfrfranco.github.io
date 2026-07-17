@@ -52,7 +52,7 @@ export const MODULE_SOURCES: Record<NavId, ModuleSource> = {
     portfolio: { engine: 'RZEngine', fn: 'models.roi', label: 'Portfolio — aggregates engine-sourced (RZEngine.models.roi) per-project financials.', status: 'partial' },
     'phased-finance': { engine: 'RZEngine', fn: 'models.roi', label: 'Phased Finance — phased NPV/IRR computed by the shared RZEngine (models.roi).', status: 'partial' },
     benchmark: { engine: 'RZEngine', fn: 'models.roi / data.markets', label: 'Benchmarks — financial metrics via RZEngine.models.roi; market data via RZEngine.data.markets (fuller market wiring scheduled).', status: 'partial' },
-    tax: { engine: 'RZEngine', fn: 'models.roi (after-tax cashflows)', label: 'Tax & Incentives — after-tax NPV/IRR via the shared RZEngine (models.roi); the incentive rule-set is local (promotion to models.tax scheduled).', status: 'partial' },
+    tax: { engine: 'RZEngine', fn: 'data.tax / models.tax + models.roi', label: 'Tax & Incentives — US bonus depreciation + IRA solar ITC + domestic-content rates sourced from RZEngine.data.tax; after-tax NPV/IRR via models.roi. Per-country corporate tax stays local.', status: 'partial' },
 
     // ── not yet wired (scheduled — see plan phases) ───────────────────────────
     sim: { engine: null, fn: '—', label: 'Staff Model Config — master inputs; staffing math scheduled to source from RZEngine.models.workforce.', status: 'local' },

@@ -5,17 +5,22 @@
 
 import { CountryProfile } from '@/constants/countries';
 import { calculateIRR } from './FinancialEngine';
+import { rzData } from '@/lib/rz-engine';
+
+// Engine-sourced US tax-incentive rates (RZEngine DATA.tax) with local fallbacks
+// parity-identical to the former literals.
+const _tax = (rzData().tax || {}) as { usBonusDepreciation2026?: number; iraSolarItc?: number; iraDomesticContentBonus?: number };
 
 // ─── US BONUS DEPRECIATION PHASE-DOWN (IRA / TCJA 2026) ─────
 // TCJA set 100% bonus dep for 2017-2022, then phases down:
 // 2023: 80%, 2024: 60%, 2025: 40%, 2026: 20%, 2027+: 0%
-export const US_BONUS_DEPRECIATION_2026 = 0.20; // 20% in 2026
+export const US_BONUS_DEPRECIATION_2026 = _tax.usBonusDepreciation2026 ?? 0.20; // engine-sourced (20% in 2026)
 
 // IRA Section 48C Investment Tax Credit — on-site solar/storage at DC
 // Domestic content bonus: +10%, Energy community bonus: +10%
 // Base ITC for on-site solar: 30% (IRA extended through 2032)
-export const IRA_SOLAR_ITC = 0.30;
-export const IRA_DOMESTIC_CONTENT_BONUS = 0.10;
+export const IRA_SOLAR_ITC = _tax.iraSolarItc ?? 0.30;
+export const IRA_DOMESTIC_CONTENT_BONUS = _tax.iraDomesticContentBonus ?? 0.10;
 
 // State-level DC incentives (selected major markets, 2025-2026)
 export const STATE_DC_INCENTIVES: Record<string, { name: string; value: number; type: string }> = {
