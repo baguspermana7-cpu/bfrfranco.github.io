@@ -509,6 +509,22 @@
             /* Redundancy config → number of parallel paths for a component group. */
             redundancyPaths: { 'n': 1, 'n1': 2, '2n': 2, '2n1': 3 }
         },
+        /* ══ v2.4.0 — DATA.site: Site Intelligence scoring (Layer 2). Weighted
+         * site-selection factor model → 0-100 Site Score + grade. Weights are a
+         * transparent DC site-selection heuristic (power + grid dominate). ══ */
+        site: {
+            /* Factor weights (sum = 1.0). Each factor is a 0-1 goodness score
+             * (1 = best). power/grid dominate DC site selection. */
+            weights: { power: 0.18, grid: 0.15, seismic: 0.12, talent: 0.12, tax: 0.10, carbon: 0.10, flood: 0.08, latency: 0.08, water: 0.07 },
+            /* Score → letter grade bands. */
+            gradeBands: [
+                { min: 85, grade: 'A', label: 'Prime' },
+                { min: 70, grade: 'B', label: 'Strong' },
+                { min: 55, grade: 'C', label: 'Viable' },
+                { min: 40, grade: 'D', label: 'Marginal' },
+                { min: 0,  grade: 'E', label: 'Challenged' }
+            ]
+        },
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
@@ -555,7 +571,8 @@
             'refresh':                { source: 'Typical enterprise IT refresh cycle', asOf: '2026', unit: 'years / fraction' },
             'workforceParams':        { source: 'Engine model tuning', asOf: '2026' },
             'hoursPerYear':           { source: 'Calendar constant (non-leap)', asOf: 'const', unit: 'h/yr' },
-            'reliability':            { source: 'IEEE 493 (Gold Book) typical component MTBF/MTTR + Uptime Institute Tier Standard availability targets', asOf: '2026', unit: 'hours (MTBF/MTTR) + availability fraction', method: 'screening-grade RAM inputs; NOT a certified reliability/FMEA study' }
+            'reliability':            { source: 'IEEE 493 (Gold Book) typical component MTBF/MTTR + Uptime Institute Tier Standard availability targets', asOf: '2026', unit: 'hours (MTBF/MTTR) + availability fraction', method: 'screening-grade RAM inputs; NOT a certified reliability/FMEA study' },
+            'site':                   { source: 'DC site-selection factor weighting (power + grid + seismic + talent + tax + carbon + flood + latency + water) — engine heuristic informed by 451/CBRE/Uptime site-selection criteria', asOf: '2026', unit: 'weights (fraction, sum=1) + grade bands', method: 'transparent weighted-factor screen; factor inputs are caller-supplied 0-1 goodness scores' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.
@@ -2097,6 +2114,40 @@
                         return self.parallelAvailability(self.availability(c.mtbf, c.mttr), paths);
                     });
                     return self.seriesAvailability(groups);
+                }
+            },
+
+            /* ── v2.4.0: site intelligence model — Layer 2 ── */
+            site: {
+                /** Letter grade for a 0-100 site score. */
+                grade: function (score) {
+                    var bands = DATA.site.gradeBands;
+                    for (var i = 0; i < bands.length; i++) {
+                        if (score >= bands[i].min) return { grade: bands[i].grade, label: bands[i].label };
+                    }
+                    return { grade: 'E', label: bands[bands.length - 1].label };
+                },
+                /** Weighted Site Score from 0-1 goodness factors (1 = best). Only the
+                 *  supplied factors count; weights are renormalized over present
+                 *  factors so a partial set still scores fairly. Returns score 0-100,
+                 *  grade, per-factor breakdown, and the list of missing factors. */
+                score: function (factors) {
+                    factors = factors || {};
+                    var W = DATA.site.weights;
+                    var breakdown = [];
+                    var present = 0, weighted = 0, missing = [];
+                    for (var k in W) {
+                        if (!W.hasOwnProperty(k)) continue;
+                        var v = factors[k];
+                        if (v == null || isNaN(v)) { missing.push(k); continue; }
+                        var val = Math.max(0, Math.min(1, v));
+                        present += W[k];
+                        weighted += W[k] * val;
+                        breakdown.push({ key: k, weight: W[k], value: +val.toFixed(3), contribution: +(W[k] * val).toFixed(4) });
+                    }
+                    var score = present > 0 ? +(100 * weighted / present).toFixed(1) : 0;
+                    var g = RZEngine.models.site.grade(score);
+                    return { score: score, grade: g.grade, label: g.label, breakdown: breakdown, missing: missing, coverage: +present.toFixed(3) };
                 }
             }
         },

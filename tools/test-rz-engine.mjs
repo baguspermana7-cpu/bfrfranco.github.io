@@ -241,6 +241,28 @@ near('pue.dcie(1.5)', M.pue.dcie(1.5), 0.6667, 0.001);
     ok('reliability.systemAvailability in (0,1]', sys2N > 0 && sys2N <= 1);
 }
 {
+    /* ── site intelligence model — Layer 2 ── */
+    const S = E.models.site;
+    // all-perfect factors → 100 / grade A
+    const perfect = S.score({ power: 1, grid: 1, seismic: 1, talent: 1, tax: 1, carbon: 1, flood: 1, latency: 1, water: 1 });
+    near('site.score all-perfect = 100', perfect.score, 100, 1e-6);
+    eq('site.score all-perfect grade A', perfect.grade, 'A');
+    eq('site.score all-perfect no missing', perfect.missing.length, 0);
+    // all-zero → 0 / grade E
+    const zero = S.score({ power: 0, grid: 0, seismic: 0, talent: 0, tax: 0, carbon: 0, flood: 0, latency: 0, water: 0 });
+    near('site.score all-zero = 0', zero.score, 0, 1e-6);
+    eq('site.score all-zero grade E', zero.grade, 'E');
+    // partial set renormalizes: only power=0.5 present → 50
+    const partial = S.score({ power: 0.5 });
+    near('site.score partial {power:0.5} = 50', partial.score, 50, 1e-6);
+    eq('site.score partial missing count', partial.missing.length, Object.keys(D.site.weights).length - 1);
+    ok('site.score coverage < 1 for partial', partial.coverage < 1);
+    eq('site.grade 72 = B', S.grade(72).grade, 'B');
+    // weights sum to 1
+    let wsum = 0; for (const k in D.site.weights) wsum += D.site.weights[k];
+    near('site.weights sum = 1', wsum, 1, 1e-9);
+}
+{
     const svg = E.charts.histogram([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     ok('charts.histogram returns <svg>', typeof svg === 'string' && svg.indexOf('<svg') === 0 && svg.indexOf('<rect') > 0);
     const tor = E.charts.tornado(M.sim.tornado(inp => inp.x, { x: 1 }, { x: { lo: 0, hi: 2 } }));

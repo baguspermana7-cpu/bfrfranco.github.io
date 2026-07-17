@@ -116,6 +116,13 @@ local math before its engine parity passes.
   `v2.4.0`; `terser` min rebuilt; `node tools/test-rz-engine.mjs` 183/0 green
   (incl. new reliability worked examples). DCMOC Reliability dashboard + PDF
   consumption = next increment (bump `layout.tsx ?v=` then).
+- **Site Intelligence (Layer 2)** — SHIPPED engine-side: `RZEngine.models.site`
+  (`score(factors)` weighted 0-1 goodness factors → 0-100 Site Score + grade +
+  per-factor breakdown + renormalized partial coverage; `grade(score)`) +
+  `DATA.site` (weights sum=1: power/grid/seismic/talent/tax/carbon/flood/latency/
+  water + grade bands A–E) + `DATA.sources['site']`. `test-rz-engine.mjs` 193/0
+  green. DCMOC Site Intelligence rollup (from tax/disaster/grid/talent/compliance)
+  = next increment.
 
 ## Status (2026-07-17)
 - Bridge (§2): DONE (parallel session, f7a12cc7). REUSED.
