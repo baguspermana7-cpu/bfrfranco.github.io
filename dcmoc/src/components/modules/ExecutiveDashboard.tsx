@@ -19,6 +19,11 @@ import { ProjectSummary } from '@/components/dashboard/ProjectSummary';
 import { CapacityArchOverview } from '@/components/dashboard/CapacityArchOverview';
 import { FinancialSnapshot } from '@/components/dashboard/FinancialSnapshot';
 import { ScenarioComparison } from '@/components/dashboard/ScenarioComparison';
+import { CashFlowRoi } from '@/components/dashboard/CashFlowRoi';
+import { RiskHeatMap, type RiskItem } from '@/components/dashboard/RiskHeatMap';
+import { KpiEfficiencyRow } from '@/components/dashboard/KpiEfficiencyRow';
+import { DataFlowRail, QuickActions, AlertsPanel, type Alert } from '@/components/dashboard/DashboardExtras';
+import GanttChart from '@/components/visualizations/GanttChart';
 import { decide, type DecisionContext, type DecisionResult } from '@/lib/decision';
 import { Cpu, Server, Building, Repeat, Gauge, TrendingUp, CircleDot, ArrowRight, Sparkles } from 'lucide-react';
 
@@ -42,6 +47,19 @@ export function ExecutiveDashboard() {
     const ebitdaSeries = cf.map((c) => c.ebitda);
     const fcfSeries = cf.map((c) => c.cumulativeCashflow);
     const capacitySeries = (d.itLoadMw ? (useSimulationStore.getState().inputs.occupancyRamp || []) : []).map((o) => o * d.itLoadMw);
+
+    // Engine-derived risks + alerts (rule-based on real outputs, not fabricated)
+    const risks: RiskItem[] = [];
+    if (d.availabilityPct != null && d.availabilityTarget != null && d.availabilityPct < d.availabilityTarget) risks.push({ id: 'A', label: 'Availability below tier target', prob: 2, impact: 4 });
+    if (d.pue > 1.4) risks.push({ id: 'C', label: 'Cooling efficiency (PUE) high', prob: 3, impact: 2 });
+    if (d.timelineMonths != null && d.timelineMonths > 30) risks.push({ id: 'S', label: 'Long build schedule', prob: 2, impact: 3 });
+    if (d.architecture && d.architecture.index > 70) risks.push({ id: 'X', label: 'High design complexity', prob: 3, impact: 3 });
+    if (risks.length === 0) risks.push({ id: 'R', label: 'Residual operational risk', prob: 1, impact: 2 });
+
+    const alerts: Alert[] = [];
+    if (d.availabilityPct != null && d.availabilityTarget != null && d.availabilityPct < d.availabilityTarget) alerts.push({ level: 'warn', title: 'Power availability risk', detail: `System ${d.availabilityPct}% below Tier ${d.tier} target ${d.availabilityTarget}%` });
+    if (d.pue > 1.4) alerts.push({ level: 'info', title: 'Cooling efficiency optimization', detail: `PUE ${d.pue.toFixed(2)} — liquid cooling could lower it` });
+    if (d.timelineMonths != null && d.timelineMonths > 30) alerts.push({ level: 'warn', title: 'Construction schedule', detail: `${d.timelineMonths} mo build — consider modular/phased delivery` });
 
     // AI recommendations (Layer 13)
     const [ai, setAi] = React.useState<DecisionResult | null>(null);
@@ -87,29 +105,52 @@ export function ExecutiveDashboard() {
                 <ScenarioComparison d={d} />
             </div>
 
-            {/* AI Recommendations (Layer 13) — interim; full panel grid lands in P3 */}
-            <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/80 p-4">
-                <div className="flex items-center gap-2 mb-3">
-                    <Sparkles className="w-4 h-4 text-cyan-400" />
-                    <h2 className="text-sm font-bold text-slate-900 dark:text-white">AI Recommendations</h2>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-slate-400">Layer 13 · deterministic</span>
+            {/* Row 4 — schedule · cash-flow · risk heat map */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/80 p-4">
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Schedule &amp; Milestones</h2>
+                    {capexResults?.timeline?.phases?.length ? (
+                        <div className="max-h-[190px] overflow-auto text-xs"><GanttChart phases={capexResults.timeline.phases} subPhases={capexResults.timeline.subPhases || []} totalMonths={capexResults.timeline.totalMonths} /></div>
+                    ) : <p className="text-xs text-slate-500">Run the CAPEX engine for the build schedule.</p>}
                 </div>
-                {ai ? (
-                    <>
-                        <p className="text-sm text-slate-700 dark:text-slate-200 mb-2">{ai.summary}</p>
-                        <div className="space-y-1.5">
-                            {ai.recommendations.slice(0, 4).map((r, i) => (
-                                <div key={i} className="flex items-start gap-2 text-xs">
-                                    <ArrowRight className="w-3.5 h-3.5 text-cyan-400 mt-0.5 shrink-0" />
-                                    <span><span className="font-semibold text-slate-800 dark:text-slate-100">{r.title}</span><span className="text-slate-500 dark:text-slate-400"> — {r.detail}</span>
-                                        <span className="ml-1 text-[10px] text-emerald-500">({Math.round(r.confidence * 100)}%)</span></span>
-                                </div>
-                            ))}
-                            {ai.recommendations.length === 0 && <p className="text-xs text-slate-500">No constraint flags — configuration within typical envelopes.</p>}
-                        </div>
-                        <p className="mt-2 text-[10px] text-slate-500 border-t border-white/10 pt-2">{ai.disclaimer}</p>
-                    </>
-                ) : <p className="text-xs text-slate-500">Computing…</p>}
+                <CashFlowRoi financial={d.financial} />
+                <RiskHeatMap risks={risks} />
+            </div>
+
+            {/* Row 5 — alerts · AI recommendations */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <AlertsPanel alerts={alerts} />
+                <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/80 p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                        <Sparkles className="w-4 h-4 text-cyan-400" />
+                        <h2 className="text-sm font-bold text-slate-900 dark:text-white">AI Recommendations</h2>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-slate-400">Layer 13</span>
+                    </div>
+                    {ai ? (
+                        <>
+                            <p className="text-xs text-slate-700 dark:text-slate-200 mb-2">{ai.summary}</p>
+                            <div className="space-y-1.5">
+                                {ai.recommendations.slice(0, 3).map((r, i) => (
+                                    <div key={i} className="flex items-start gap-2 text-[11px]">
+                                        <ArrowRight className="w-3.5 h-3.5 text-cyan-400 mt-0.5 shrink-0" />
+                                        <span><span className="font-semibold text-slate-800 dark:text-slate-100">{r.title}</span><span className="text-slate-500 dark:text-slate-400"> — {r.detail}</span>
+                                            <span className="ml-1 text-[10px] text-emerald-500">({Math.round(r.confidence * 100)}%)</span></span>
+                                    </div>
+                                ))}
+                                {ai.recommendations.length === 0 && <p className="text-[11px] text-slate-500">No constraint flags.</p>}
+                            </div>
+                        </>
+                    ) : <p className="text-xs text-slate-500">Computing…</p>}
+                </div>
+            </div>
+
+            {/* Row 6 — efficiency KPIs · data flow · quick actions */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <KpiEfficiencyRow d={d} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <DataFlowRail />
+                    <QuickActions />
+                </div>
             </div>
         </div>
     );
