@@ -182,8 +182,15 @@ local math before its engine parity passes.
   (replacement years + per-event $ (costPerKw×kW) + total nominal) + `DATA.asset.lifecycle`
   (UPS-VRLA/Li-Ion, generator, CRAC, fire, PDU, BMS intervals + $/kW) lifted from
   DCMOC CapexEngine lifecycle. `test-rz-engine.mjs` 276/0.
-  REMAINING Group-2 (country-data-heavy — model small, data large, stays in country
-  profiles): Compliance, Tax, Risk-geo. Carbon-rich = parallel-owned (skip).
+- **Tax Incentives** — SHIPPED engine-side (6th of 9): `RZEngine.models.tax`
+  (`bonusDepreciationShield(capex,taxRate)`, `solarItc(solarCapex,domesticContent)`,
+  `stateSalesTaxSaving(cost,stateCode)`, `importDuty(cost,country)`) + `DATA.tax`
+  (US bonus dep 20% + IRA ITC 30%+10% + VA/TX/NV/OH/AZ state exemptions + import
+  duty) + `DATA.sources['tax']`. Per-country corporate tax stays in country
+  profiles. `test-rz-engine.mjs` 284/0.
+  REMAINING Group-2 (country-data-heavy — 50+ country tables that legitimately
+  stay in DCMOC country profiles): Compliance, Risk-geo. Carbon-rich = parallel-
+  owned (skip). **Formula-clean Group-2 promotions COMPLETE.**
 
 ## Status (2026-07-17)
 - Bridge (§2): DONE (parallel session, f7a12cc7). REUSED.

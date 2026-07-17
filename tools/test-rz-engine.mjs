@@ -428,6 +428,22 @@ near('pue.dcie(1.5)', M.pue.dcie(1.5), 0.6667, 0.001);
     ok('site accepts grid score', E.models.site.score({ grid: GR.score(99.95) }).score >= 0);
 }
 {
+    /* ── tax incentives model — Group-2 promotion ── */
+    const TX = E.models.tax;
+    // bonus dep shield = 100M × 0.20 × 0.21 = 4.2M
+    near('tax.bonusDepreciationShield 100M @21%', TX.bonusDepreciationShield(100e6, 0.21), Math.round(100e6 * 0.20 * 0.21), 1);
+    // solar ITC 10M base = 3M; with domestic content = 4M
+    near('tax.solarItc 10M base', TX.solarItc(10e6, false), Math.round(10e6 * 0.30), 1);
+    near('tax.solarItc 10M +domestic', TX.solarItc(10e6, true), Math.round(10e6 * 0.40), 1);
+    ok('tax domestic ITC > base', TX.solarItc(10e6, true) > TX.solarItc(10e6, false));
+    // state sales tax VA 6%
+    near('tax.stateSalesTaxSaving VA 50M', TX.stateSalesTaxSaving(50e6, 'US-VA'), Math.round(50e6 * 0.06), 1);
+    eq('tax.stateSalesTaxSaving unknown = 0', TX.stateSalesTaxSaving(50e6, 'US-ZZ'), 0);
+    // import duty ID 7.5%
+    near('tax.importDuty ID 20M', TX.importDuty(20e6, 'ID'), Math.round(20e6 * 0.075), 1);
+    eq('tax.importDuty unknown = 0', TX.importDuty(20e6, 'ZZ'), 0);
+}
+{
     const svg = E.charts.histogram([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     ok('charts.histogram returns <svg>', typeof svg === 'string' && svg.indexOf('<svg') === 0 && svg.indexOf('<rect') > 0);
     const tor = E.charts.tornado(M.sim.tornado(inp => inp.x, { x: 1 }, { x: { lo: 0, hi: 2 } }));

@@ -681,6 +681,23 @@
             scoreFloorUptime: 98.0,
             scoreCeilUptime: 99.99
         },
+        /* ══ v2.4.0 — DATA.tax: tax incentives (Group-2 promotion from DCMOC
+         * TaxIncentiveEngine). US federal (bonus depreciation, IRA ITC) + state DC
+         * sales-tax exemptions + representative import duty. Per-country corporate
+         * tax stays in the country profiles. ══ */
+        tax: {
+            usBonusDepreciation2026: 0.20,       /* 20% bonus depreciation (TCJA phase-down) */
+            iraSolarItc: 0.30,                   /* IRA §48 base ITC through 2032 */
+            iraDomesticContentBonus: 0.10,       /* +10% domestic-content adder */
+            stateIncentives: {
+                'US-VA': { name: 'Virginia Data Center sales-tax exemption', value: 0.06, type: 'sales_tax_exemption' },
+                'US-TX': { name: 'Texas DC equipment sales-tax exemption', value: 0.0825, type: 'sales_tax_exemption' },
+                'US-NV': { name: 'Nevada sales/use tax abatement (partial)', value: 0.04, type: 'sales_tax_exemption' },
+                'US-OH': { name: 'Ohio IT equipment sales-tax exemption', value: 0.0575, type: 'sales_tax_exemption' },
+                'US-AZ': { name: 'Arizona TPT exemption', value: 0.056, type: 'sales_tax_exemption' }
+            },
+            importDutyByCountry: { ID: 0.075, IN: 0.075, US: 0.03 }   /* representative; full set in country profiles */
+        },
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
@@ -737,7 +754,8 @@
             'maintenance':            { source: 'DC O&M strategy economics — reactive/planned/predictive failure + downtime multipliers + in-house/hybrid/vendor labor blend; lifted from DCMOC MaintenanceStrategyEngine (RCM/CBM industry conventions)', asOf: '2026', unit: 'multipliers + minutes + $/part', method: 'screening O&M cost model; NOT a vendor quote' },
             'fuelGen':                { source: 'EPA Tier 4 Final diesel genset fuel rate (~0.27 L/kWh @ 75%) + Uptime backup-autonomy hours by tier (48/72/96h); lifted from DCMOC FuelGenEngine', asOf: '2026', unit: 'L/kWh + hours + $/L', method: 'screening sizing; NOT a genset selection' },
             'capacity':               { source: 'Multi-phase DC build-out templates (small/medium/large) + occupancy ramp; lifted from DCMOC CapacityPlanningEngine', asOf: '2026', unit: 'kW per phase + months + occupancy fraction', method: 'planning templates; adjust per project' },
-            'gridReliability':        { source: 'Utility grid reliability bands (SAIDI-informed uptime tiers) + 0-1 grid score mapping; lifted from DCMOC GridReliabilityEngine — per-country uptime stays in the country profiles', asOf: '2026', unit: 'uptime % + outage hours + 0-1 score', method: 'screening; NOT a utility interconnection study' }
+            'gridReliability':        { source: 'Utility grid reliability bands (SAIDI-informed uptime tiers) + 0-1 grid score mapping; lifted from DCMOC GridReliabilityEngine — per-country uptime stays in the country profiles', asOf: '2026', unit: 'uptime % + outage hours + 0-1 score', method: 'screening; NOT a utility interconnection study' },
+            'tax':                    { source: 'US TCJA bonus depreciation (20% 2026 phase-down) + IRA §48 solar ITC (30% + 10% domestic-content) + state DC sales-tax exemptions (VA/TX/NV/OH/AZ) + representative import duty; lifted from DCMOC TaxIncentiveEngine', asOf: '2026', unit: 'fractions (rates)', method: 'US-federal + state incentives; NOT tax advice; per-country corporate tax in country profiles' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.
@@ -2617,6 +2635,30 @@
                     var G = DATA.gridReliability;
                     var s = (uptimePct - G.scoreFloorUptime) / (G.scoreCeilUptime - G.scoreFloorUptime);
                     return +Math.max(0, Math.min(1, s)).toFixed(3);
+                }
+            },
+
+            /* ── v2.4.0: tax incentives model — Group-2 promotion ── */
+            tax: {
+                /** Year-1 tax shield ($) from US bonus depreciation on a CAPEX base. */
+                bonusDepreciationShield: function (capex, taxRate) {
+                    return Math.round((capex || 0) * DATA.tax.usBonusDepreciation2026 * (taxRate || 0));
+                },
+                /** IRA solar ITC credit ($) on on-site solar CAPEX; +domestic-content
+                 *  adder when domesticContent is true. */
+                solarItc: function (solarCapex, domesticContent) {
+                    var rate = DATA.tax.iraSolarItc + (domesticContent ? DATA.tax.iraDomesticContentBonus : 0);
+                    return Math.round((solarCapex || 0) * rate);
+                },
+                /** State sales-tax saving ($) on equipment for a US state code. */
+                stateSalesTaxSaving: function (equipmentCost, stateCode) {
+                    var inc = DATA.tax.stateIncentives[stateCode];
+                    return inc ? Math.round((equipmentCost || 0) * inc.value) : 0;
+                },
+                /** Import duty ($) for a representative country (else 0). */
+                importDuty: function (equipmentCost, country) {
+                    var r = DATA.tax.importDutyByCountry[(country || '').toUpperCase()];
+                    return r != null ? Math.round((equipmentCost || 0) * r) : 0;
                 }
             }
         },
