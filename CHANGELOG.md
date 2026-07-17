@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.64.4 — 2026-07-18 (DCMOC: engine tooltips + hover on the KPI efficiency row)
+
+### Changed
+- KpiEfficiencyRow (PUE/WUE/CUE/Availability/LCC) now has hover-lift + engine-sourced <Explain> tooltips (glossary keys pue/wue/cue/availability/tco). Completes the metric-tooltip sweep across the dashboard's main panels.
+
+---
+
 ## v1.64.3 — 2026-07-18 (DCMOC dashboard UIUX: lifecycle colors + engine tooltips + live data-flow)
 
 ### Fixed
