@@ -167,8 +167,13 @@ local math before its engine parity passes.
   `annualTestFuelLiters`, `annualFuelCost`) + `DATA.fuelGen` (0.27 L/kWh EPA Tier 4,
   autonomy 48/72/96h by tier, diesel $/L, test hours) + `DATA.sources['fuelGen']`,
   lifted from DCMOC FuelGenEngine. `test-rz-engine.mjs` 254/0.
-  REMAINING Group-2: Carbon-rich, Compliance, Tax, Risk-geo, Capacity, Grid,
-  Asset-lifecycle.
+  REMAINING Group-2: Carbon-rich, Compliance, Tax, Risk-geo, Grid, Asset-lifecycle.
+- **Capacity** — SHIPPED engine-side (3rd of 9): `RZEngine.models.capacity`
+  (`preset(small|medium|large)` phase templates + attached ramp, `totalMw(phases)`,
+  `occupancyAt(ramp,year)`) + `DATA.capacity` (defaultRamp [.3,.6,.85,.95], steady
+  0.95, small/medium/large phase presets) + `DATA.sources['capacity']`, lifted from
+  DCMOC CapacityPlanningEngine. `test-rz-engine.mjs` 261/0.
+  REMAINING Group-2: Carbon-rich, Compliance, Tax, Risk-geo, Grid, Asset-lifecycle.
 
 ## Status (2026-07-17)
 - Bridge (§2): DONE (parallel session, f7a12cc7). REUSED.

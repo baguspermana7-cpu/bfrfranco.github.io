@@ -390,6 +390,19 @@ near('pue.dcie(1.5)', M.pue.dcie(1.5), 0.6667, 0.001);
     near('fuel.annualFuelCost 1000kW 100h', FL.annualFuelCost(1000, 100, 1.05), Math.round(270 * 100 * 1.05), 1);
 }
 {
+    /* ── capacity planning model — Group-2 promotion ── */
+    const CP = E.models.capacity;
+    const med = CP.preset('medium');
+    eq('capacity.preset medium 3 phases', med.length, 3);
+    ok('capacity.preset attaches ramp', Array.isArray(med[0].occupancyRamp) && med[0].occupancyRamp.length === D.capacity.defaultRamp.length);
+    eq('capacity.preset unknown = null', CP.preset('zzz'), null);
+    // medium total = 2000 + 10000 + 20000 = 32000 kW = 32 MW
+    near('capacity.totalMw medium', CP.totalMw(med), 32, 1e-6);
+    eq('capacity.occupancyAt year0', CP.occupancyAt(D.capacity.defaultRamp, 0), 0.3);
+    eq('capacity.occupancyAt steady (year 9)', CP.occupancyAt(D.capacity.defaultRamp, 9), 0.95);
+    eq('capacity.occupancyAt negative = 0', CP.occupancyAt(D.capacity.defaultRamp, -1), 0);
+}
+{
     const svg = E.charts.histogram([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     ok('charts.histogram returns <svg>', typeof svg === 'string' && svg.indexOf('<svg') === 0 && svg.indexOf('<rect') > 0);
     const tor = E.charts.tornado(M.sim.tornado(inp => inp.x, { x: 1 }, { x: { lo: 0, hi: 2 } }));

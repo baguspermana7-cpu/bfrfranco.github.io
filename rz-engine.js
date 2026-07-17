@@ -631,6 +631,29 @@
             storageLimitLitersDefault: 50000,
             test: { monthlyTestHours: 2, annualFullLoadTestHours: 4 }
         },
+        /* ══ v2.4.0 — DATA.capacity: multi-phase build-out presets (Group-2 promotion
+         * from DCMOC CapacityPlanningEngine). Occupancy ramp + phase templates. ══ */
+        capacity: {
+            defaultRamp: [0.3, 0.6, 0.85, 0.95],   /* per-year occupancy fill */
+            steadyOccupancy: 0.95,
+            presets: {
+                small: [
+                    { id: 'p1', label: 'Phase 1', itLoadKw: 1000, startMonth: 0, buildMonths: 14 },
+                    { id: 'p2', label: 'Phase 2', itLoadKw: 2000, startMonth: 18, buildMonths: 12 },
+                    { id: 'p3', label: 'Phase 3', itLoadKw: 5000, startMonth: 36, buildMonths: 10 }
+                ],
+                medium: [
+                    { id: 'p1', label: 'Phase 1', itLoadKw: 2000, startMonth: 0, buildMonths: 18 },
+                    { id: 'p2', label: 'Phase 2', itLoadKw: 10000, startMonth: 20, buildMonths: 14 },
+                    { id: 'p3', label: 'Phase 3', itLoadKw: 20000, startMonth: 40, buildMonths: 12 }
+                ],
+                large: [
+                    { id: 'p1', label: 'Phase 1', itLoadKw: 5000, startMonth: 0, buildMonths: 22 },
+                    { id: 'p2', label: 'Phase 2', itLoadKw: 20000, startMonth: 24, buildMonths: 16 },
+                    { id: 'p3', label: 'Phase 3', itLoadKw: 50000, startMonth: 44, buildMonths: 14 }
+                ]
+            }
+        },
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
@@ -685,7 +708,8 @@
             'requirements':           { source: 'DC project brief required-field set + workload density/cooling profiles (AI/HPC/cloud/colo/enterprise/edge) — engine intake heuristic informed by Uptime/OCP rack-density guidance', asOf: '2026', unit: 'field list + kW/rack + cooling/tier defaults', method: 'completeness + profile defaults; not a design basis' },
             'architecture':           { source: 'Canonical DC design disciplines (electrical/mechanical/cooling/fire/security/network/building/structural/BMS) + relative design-complexity multipliers by cooling/tier/redundancy — engine heuristic', asOf: '2026', unit: 'discipline list + complexity multipliers → 0-100 index', method: 'normalized complexity screen; NOT a design deliverable' },
             'maintenance':            { source: 'DC O&M strategy economics — reactive/planned/predictive failure + downtime multipliers + in-house/hybrid/vendor labor blend; lifted from DCMOC MaintenanceStrategyEngine (RCM/CBM industry conventions)', asOf: '2026', unit: 'multipliers + minutes + $/part', method: 'screening O&M cost model; NOT a vendor quote' },
-            'fuelGen':                { source: 'EPA Tier 4 Final diesel genset fuel rate (~0.27 L/kWh @ 75%) + Uptime backup-autonomy hours by tier (48/72/96h); lifted from DCMOC FuelGenEngine', asOf: '2026', unit: 'L/kWh + hours + $/L', method: 'screening sizing; NOT a genset selection' }
+            'fuelGen':                { source: 'EPA Tier 4 Final diesel genset fuel rate (~0.27 L/kWh @ 75%) + Uptime backup-autonomy hours by tier (48/72/96h); lifted from DCMOC FuelGenEngine', asOf: '2026', unit: 'L/kWh + hours + $/L', method: 'screening sizing; NOT a genset selection' },
+            'capacity':               { source: 'Multi-phase DC build-out templates (small/medium/large) + occupancy ramp; lifted from DCMOC CapacityPlanningEngine', asOf: '2026', unit: 'kW per phase + months + occupancy fraction', method: 'planning templates; adjust per project' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.
@@ -2501,6 +2525,31 @@
                 annualFuelCost: function (loadKw, runtimeHours, pricePerLiter) {
                     var price = pricePerLiter != null ? pricePerLiter : DATA.fuelGen.dieselPriceDefaultPerLiter;
                     return Math.round(RZEngine.models.fuel.consumptionLPerHour(loadKw) * (runtimeHours || 0) * price);
+                }
+            },
+
+            /* ── v2.4.0: capacity planning model — Group-2 promotion ── */
+            capacity: {
+                /** Phase preset (small|medium|large) with the default ramp attached. */
+                preset: function (size) {
+                    var p = DATA.capacity.presets[size];
+                    if (!p) return null;
+                    return p.map(function (ph) {
+                        var out = {}; for (var k in ph) out[k] = ph[k];
+                        out.occupancyRamp = DATA.capacity.defaultRamp.slice();
+                        return out;
+                    });
+                },
+                /** Total ultimate IT capacity (MW) across phases. */
+                totalMw: function (phases) {
+                    var kw = 0; (phases || []).forEach(function (p) { kw += (p.itLoadKw || 0); });
+                    return +(kw / 1000).toFixed(2);
+                },
+                /** Occupancy fraction at a given year of a ramp (holds steady after). */
+                occupancyAt: function (ramp, year) {
+                    var r = ramp && ramp.length ? ramp : DATA.capacity.defaultRamp;
+                    if (year < 0) return 0;
+                    return year < r.length ? r[year] : r[r.length - 1];
                 }
             }
         },
