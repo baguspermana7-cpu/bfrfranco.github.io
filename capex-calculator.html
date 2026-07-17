@@ -4234,6 +4234,11 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                 redundancy === '2n1' ? 'Full IST/ISST' : redundancy === '2n' ? 'IST required' : ''
             ];
             let tlHTML = '';
+            // Improved Gantt: month-scale axis header
+            const _gStep = totalMonths <= 18 ? 3 : totalMonths <= 30 ? 6 : 12;
+            let _axis = '';
+            for (let m = 0; m <= totalMonths; m += _gStep) { _axis += `<span style="flex:1;font-size:0.55rem;color:#64748b;text-align:left;">M${m}</span>`; }
+            tlHTML += `<div style="display:grid;grid-template-columns:140px 1fr 50px;gap:8px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,0.08);"><div style="font-size:0.55rem;color:#64748b;font-weight:600;">PHASE</div><div style="display:flex;">${_axis}</div><div style="font-size:0.55rem;color:#64748b;text-align:right;">DUR</div></div>`;
             phases.phases.forEach((p, i) => {
                 const leftPct = (p.start / totalMonths * 100).toFixed(1);
                 const widthPct = ((p.end - p.start) / totalMonths * 100).toFixed(1);
@@ -4259,6 +4264,17 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             if (savedPct > 0) {
                 tlHTML += `<div style="font-size:0.55rem;color:#94a3b8;text-align:right;margin-top:2px;">Parallel model saves ~${savedPct}% vs serial execution</div>`;
             }
+            // Improved Gantt: milestone diamonds (Design → COD)
+            const _find = (re) => { const p = phases.phases.find(x => re.test(x.name)); return p ? p.end : null; };
+            const _ms = [
+                { m: _find(/design/i) ?? phases.design ?? 0, label: 'Design ✓', color: '#8b5cf6' },
+                { m: _find(/permit/i) ?? 0, label: 'Permits ✓', color: '#f59e0b' },
+                { m: _find(/civil|construction|building/i) ?? 0, label: 'Building', color: '#3b82f6' },
+                { m: _find(/mep|fit-?out/i) ?? 0, label: 'MEP ✓', color: '#10b981' },
+                { m: totalMonths, label: 'COD / RFS', color: '#ec4899' },
+            ].filter(x => x.m > 0);
+            const _msHTML = _ms.map(x => `<div style="position:absolute;left:${(x.m / totalMonths * 100).toFixed(1)}%;transform:translateX(-50%);text-align:center;top:0;"><div style="width:9px;height:9px;background:${x.color};transform:rotate(45deg);margin:0 auto;box-shadow:0 0 6px ${x.color}80;"></div><div style="font-size:0.5rem;color:${x.color};white-space:nowrap;margin-top:3px;font-weight:600;">${x.label}<br><span style="color:#64748b;">M${x.m}</span></div></div>`).join('');
+            tlHTML += `<div style="display:grid;grid-template-columns:140px 1fr 50px;gap:8px;margin-top:10px;align-items:start;"><div style="font-size:0.55rem;color:#64748b;font-weight:600;">MILESTONES</div><div style="position:relative;height:34px;">${_msHTML}</div><div></div></div>`;
             tlEl.innerHTML = tlHTML;
 
             // 5. Sustainability Metrics (region-specific)
