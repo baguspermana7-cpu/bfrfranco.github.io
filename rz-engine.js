@@ -698,6 +698,28 @@
             },
             importDutyByCountry: { ID: 0.075, IN: 0.075, US: 0.03 }   /* representative; full set in country profiles */
         },
+        /* ══ v2.4.0 — DATA.geoRisk: natural-hazard risk scoring (Group-2 promotion from
+         * DCMOC RiskEngine/DisasterRiskEngine). Hazard weights → 0-100 composite geo
+         * risk + insurance multiplier. Per-country hazard levels stay in profiles. ══ */
+        geoRisk: {
+            /* Hazard weights (sum = 1): seismic + flood dominate DC siting risk. */
+            weights: { seismic: 0.30, flood: 0.25, typhoon: 0.15, volcano: 0.10, tsunami: 0.10, wildfire: 0.10 },
+            /* Composite risk % → insurance premium multiplier (vs a low-risk base). */
+            insuranceBands: [
+                { min: 70, mult: 1.8, label: 'Very High' },
+                { min: 50, mult: 1.45, label: 'High' },
+                { min: 30, mult: 1.2, label: 'Moderate' },
+                { min: 0, mult: 1.0, label: 'Low' }
+            ]
+        },
+        /* ══ v2.4.0 — DATA.compliance: regulatory compliance cost model (Group-2
+         * promotion from DCMOC ComplianceEngine). Amortization + typical cost bands.
+         * The per-country framework matrix stays in the DCMOC country profiles. ══ */
+        compliance: {
+            amortizeOneTimeYears: 10,   /* one-time permit/cert cost spread over 10y */
+            /* Typical annual cost bands by category ($/yr) — screening defaults. */
+            categoryAnnualUsd: { fireSafety: 2500, electrical: 4000, environmental: 6000, dataProtection: 3000, buildingCert: 2000, security: 3500 }
+        },
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
@@ -755,7 +777,9 @@
             'fuelGen':                { source: 'EPA Tier 4 Final diesel genset fuel rate (~0.27 L/kWh @ 75%) + Uptime backup-autonomy hours by tier (48/72/96h); lifted from DCMOC FuelGenEngine', asOf: '2026', unit: 'L/kWh + hours + $/L', method: 'screening sizing; NOT a genset selection' },
             'capacity':               { source: 'Multi-phase DC build-out templates (small/medium/large) + occupancy ramp; lifted from DCMOC CapacityPlanningEngine', asOf: '2026', unit: 'kW per phase + months + occupancy fraction', method: 'planning templates; adjust per project' },
             'gridReliability':        { source: 'Utility grid reliability bands (SAIDI-informed uptime tiers) + 0-1 grid score mapping; lifted from DCMOC GridReliabilityEngine — per-country uptime stays in the country profiles', asOf: '2026', unit: 'uptime % + outage hours + 0-1 score', method: 'screening; NOT a utility interconnection study' },
-            'tax':                    { source: 'US TCJA bonus depreciation (20% 2026 phase-down) + IRA §48 solar ITC (30% + 10% domestic-content) + state DC sales-tax exemptions (VA/TX/NV/OH/AZ) + representative import duty; lifted from DCMOC TaxIncentiveEngine', asOf: '2026', unit: 'fractions (rates)', method: 'US-federal + state incentives; NOT tax advice; per-country corporate tax in country profiles' }
+            'tax':                    { source: 'US TCJA bonus depreciation (20% 2026 phase-down) + IRA §48 solar ITC (30% + 10% domestic-content) + state DC sales-tax exemptions (VA/TX/NV/OH/AZ) + representative import duty; lifted from DCMOC TaxIncentiveEngine', asOf: '2026', unit: 'fractions (rates)', method: 'US-federal + state incentives; NOT tax advice; per-country corporate tax in country profiles' },
+            'geoRisk':                { source: 'Natural-hazard weighting (seismic/flood/typhoon/volcano/tsunami/wildfire) + insurance-multiplier bands; lifted from DCMOC RiskEngine/DisasterRiskEngine — per-country hazard levels stay in the country profiles', asOf: '2026', unit: 'weights (sum=1) + 0-100 risk + premium multiplier', method: 'screening geo-risk; NOT a certified hazard/insurance assessment' },
+            'compliance':             { source: 'DC regulatory compliance cost categories (fire/electrical/environmental/data-protection/building/security) + one-time amortization; lifted from DCMOC ComplianceEngine — per-country framework matrix stays in country profiles', asOf: '2026', unit: '$/yr + amortization years', method: 'screening compliance cost; NOT a legal/permitting determination' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.
@@ -2659,6 +2683,61 @@
                 importDuty: function (equipmentCost, country) {
                     var r = DATA.tax.importDutyByCountry[(country || '').toUpperCase()];
                     return r != null ? Math.round((equipmentCost || 0) * r) : 0;
+                }
+            },
+
+            /* ── v2.4.0: geo-risk model — Group-2 promotion ── */
+            risk: {
+                /** Composite natural-hazard risk (0-100) from 0-1 hazard levels
+                 *  (1 = worst). Weights renormalize over supplied hazards. */
+                geo: function (hazards) {
+                    hazards = hazards || {};
+                    var W = DATA.geoRisk.weights, present = 0, weighted = 0, breakdown = [], missing = [];
+                    for (var k in W) {
+                        if (!W.hasOwnProperty(k)) continue;
+                        var v = hazards[k];
+                        if (v == null || isNaN(v)) { missing.push(k); continue; }
+                        var val = Math.max(0, Math.min(1, v));
+                        present += W[k]; weighted += W[k] * val;
+                        breakdown.push({ key: k, weight: W[k], level: +val.toFixed(3) });
+                    }
+                    var risk = present > 0 ? +(100 * weighted / present).toFixed(1) : 0;
+                    var ins = RZEngine.models.risk.insuranceMultiplier(risk);
+                    return { risk: risk, insuranceMultiplier: ins.mult, band: ins.label, breakdown: breakdown, missing: missing, coverage: +present.toFixed(3) };
+                },
+                /** Insurance premium multiplier + band for a 0-100 geo-risk score. */
+                insuranceMultiplier: function (risk) {
+                    var b = DATA.geoRisk.insuranceBands;
+                    for (var i = 0; i < b.length; i++) { if (risk >= b[i].min) return { mult: b[i].mult, label: b[i].label }; }
+                    return { mult: 1.0, label: 'Low' };
+                },
+                /** Site goodness score (0-1) from geo risk — for models.site.score
+                 *  seismic/flood factors (1 = safest). */
+                siteScore: function (risk) { return +(1 - Math.max(0, Math.min(100, risk)) / 100).toFixed(3); }
+            },
+
+            /* ── v2.4.0: compliance cost model — Group-2 promotion ── */
+            compliance: {
+                /** Annualized compliance cost from items [{cost, type:'annual'|'one-time'}].
+                 *  One-time costs are amortized over DATA.compliance.amortizeOneTimeYears. */
+                annualCost: function (items) {
+                    var amort = DATA.compliance.amortizeOneTimeYears || 10, total = 0;
+                    (items || []).forEach(function (it) {
+                        var c = it.cost || 0;
+                        total += it.type === 'one-time' ? c / amort : c;
+                    });
+                    return Math.round(total);
+                },
+                /** Typical annual cost ($) for a compliance category, else 0. */
+                categoryCost: function (category) {
+                    var c = DATA.compliance.categoryAnnualUsd[category];
+                    return c != null ? c : 0;
+                },
+                /** Sum of typical annual costs for a set of category keys. */
+                baselineAnnual: function (categories) {
+                    var self = RZEngine.models.compliance, total = 0;
+                    (categories || []).forEach(function (k) { total += self.categoryCost(k); });
+                    return total;
                 }
             }
         },

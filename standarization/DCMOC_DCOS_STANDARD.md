@@ -188,9 +188,19 @@ local math before its engine parity passes.
   (US bonus dep 20% + IRA ITC 30%+10% + VA/TX/NV/OH/AZ state exemptions + import
   duty) + `DATA.sources['tax']`. Per-country corporate tax stays in country
   profiles. `test-rz-engine.mjs` 284/0.
-  REMAINING Group-2 (country-data-heavy — 50+ country tables that legitimately
-  stay in DCMOC country profiles): Compliance, Risk-geo. Carbon-rich = parallel-
-  owned (skip). **Formula-clean Group-2 promotions COMPLETE.**
+- **Risk-geo** — SHIPPED (7th): `RZEngine.models.risk.geo(hazards)` weighted natural-
+  hazard 0-100 risk + insurance multiplier + `siteScore` (feeds site.score
+  seismic/flood); `insuranceMultiplier`. `DATA.geoRisk` (hazard weights sum=1 +
+  insurance bands). Per-country hazard levels stay in country profiles.
+- **Compliance** — SHIPPED (8th): `RZEngine.models.compliance` (`annualCost(items)`
+  with one-time amortization, `categoryCost`, `baselineAnnual`) + `DATA.compliance`
+  (category $/yr + amortize years). Per-country framework matrix stays in country
+  profiles.
+- **ALL 8 Group-2 promotions COMPLETE** (Maintenance/Fuel/Capacity/Grid/Asset-
+  lifecycle/Tax/Risk-geo/Compliance; Carbon-rich = parallel-owned). **Engine model
+  suite COMPLETE — 27 model namespaces, `test-rz-engine.mjs` 299/0.** DCMOC
+  consumption: Maintenance done; Fuel/Capacity/Grid/Tax/Asset/Risk/Compliance to
+  read their DATA next (same engine-first + fallback pattern).
 
 ## Status (2026-07-17)
 - Bridge (§2): DONE (parallel session, f7a12cc7). REUSED.

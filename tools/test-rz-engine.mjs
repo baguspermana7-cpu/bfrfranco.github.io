@@ -444,6 +444,38 @@ near('pue.dcie(1.5)', M.pue.dcie(1.5), 0.6667, 0.001);
     eq('tax.importDuty unknown = 0', TX.importDuty(20e6, 'ZZ'), 0);
 }
 {
+    /* ── geo-risk model — Group-2 promotion ── */
+    const RK = E.models.risk;
+    // all-worst hazards → 100 risk, Very High, insurance 1.8
+    const worst = RK.geo({ seismic: 1, flood: 1, typhoon: 1, volcano: 1, tsunami: 1, wildfire: 1 });
+    near('risk.geo all-worst = 100', worst.risk, 100, 1e-6);
+    eq('risk.geo all-worst insurance 1.8', worst.insuranceMultiplier, 1.8);
+    // all-safe → 0 risk, Low, insurance 1.0
+    const safe = RK.geo({ seismic: 0, flood: 0, typhoon: 0, volcano: 0, tsunami: 0, wildfire: 0 });
+    near('risk.geo all-safe = 0', safe.risk, 0, 1e-6);
+    eq('risk.geo all-safe insurance 1.0', safe.insuranceMultiplier, 1.0);
+    // partial renormalization: only seismic=1 → 100 (renorm over present)
+    near('risk.geo {seismic:1} = 100', RK.geo({ seismic: 1 }).risk, 100, 1e-6);
+    ok('risk.geo higher hazard higher premium', RK.geo({ seismic: 0.9, flood: 0.9 }).insuranceMultiplier >= RK.geo({ seismic: 0.1 }).insuranceMultiplier);
+    // siteScore inverts risk and feeds site.score
+    near('risk.siteScore 100 = 0', RK.siteScore(100), 0, 1e-6);
+    near('risk.siteScore 0 = 1', RK.siteScore(0), 1, 1e-6);
+    ok('site accepts seismic from risk', E.models.site.score({ seismic: RK.siteScore(RK.geo({ seismic: 0.2 }).risk) }).score >= 0);
+    let gwsum = 0; for (const k in D.geoRisk.weights) gwsum += D.geoRisk.weights[k];
+    near('geoRisk.weights sum = 1', gwsum, 1, 1e-9);
+}
+{
+    /* ── compliance cost model — Group-2 promotion ── */
+    const CO = E.models.compliance;
+    // annual 4000 + one-time 15000 amortized /10 = 1500 → 5500
+    near('compliance.annualCost annual+one-time', CO.annualCost([{ cost: 4000, type: 'annual' }, { cost: 15000, type: 'one-time' }]), 4000 + 15000 / 10, 1);
+    eq('compliance.annualCost empty = 0', CO.annualCost([]), 0);
+    eq('compliance.categoryCost electrical', CO.categoryCost('electrical'), D.compliance.categoryAnnualUsd.electrical);
+    eq('compliance.categoryCost unknown = 0', CO.categoryCost('nope'), 0);
+    // baseline sums categories
+    near('compliance.baselineAnnual fire+electrical', CO.baselineAnnual(['fireSafety', 'electrical']), D.compliance.categoryAnnualUsd.fireSafety + D.compliance.categoryAnnualUsd.electrical, 1);
+}
+{
     const svg = E.charts.histogram([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     ok('charts.histogram returns <svg>', typeof svg === 'string' && svg.indexOf('<svg') === 0 && svg.indexOf('<rect') > 0);
     const tor = E.charts.tornado(M.sim.tornado(inp => inp.x, { x: 1 }, { x: { lo: 0, hi: 2 } }));
