@@ -12,6 +12,7 @@ import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { getPUE } from '@/constants/pue';
 import { decide, type DecisionContext, type DecisionResult } from '@/lib/decision';
+import { rzModels } from '@/lib/rz-engine';
 import { generateDashboardPDF } from '@/modules/reporting/pdf/DashboardPdf';
 import {
     LayoutDashboard, Building, Cpu, Gauge, Server, CalendarClock,
@@ -47,6 +48,34 @@ export function ExecutiveDashboard() {
 
     const pue = getPUE(inputs.coolingType);
     const itLoadMw = inputs.itLoad / 1000;
+
+    // ── Real reads from the shared engine's new DC-OS Layer models (v2.4.0) ──
+    const REDUNDANCY_KEY: Record<string, string> = { 'N+1': 'n1', '2N': '2n', '2N+1': '2n1' };
+    const engineReads = React.useMemo(() => {
+        const m = rzModels();
+        const redKey = REDUNDANCY_KEY[inputs.powerRedundancy] || 'n1';
+        let reliability: { availabilityPct: number; target: number; downtimeMin: number } | null = null;
+        let architecture: { index: number; band: string } | null = null;
+        let construction: { totalMonths: number; rfs: number | null } | null = null;
+        try {
+            if (m.reliability?.systemAvailability) {
+                const av = m.reliability.systemAvailability(['ups', 'crac', 'generator', 'switchgear'], redKey);
+                reliability = {
+                    availabilityPct: +(av * 100).toFixed(3),
+                    target: +(m.reliability.tierTarget(inputs.tierLevel) * 100).toFixed(3),
+                    downtimeMin: m.reliability.annualDowntimeMinutes(av),
+                };
+            }
+            if (m.architecture?.complexity) {
+                architecture = m.architecture.complexity({ coolingType: inputs.coolingType, tier: inputs.tierLevel, redundancy: redKey });
+            }
+            if (m.construction?.fromTimeline && capex?.timeline) {
+                const sc = m.construction.fromTimeline(capex.timeline);
+                construction = { totalMonths: sc.totalMonths, rfs: sc.milestones?.rfs ?? null };
+            }
+        } catch { /* engine absent → panels hidden */ }
+        return { reliability, architecture, construction };
+    }, [inputs.powerRedundancy, inputs.coolingType, inputs.tierLevel, capex]);
 
     // Real AI-decision read from genuinely-available engine outputs (Layer 13).
     const [aiResult, setAiResult] = React.useState<DecisionResult | null>(null);
@@ -194,6 +223,16 @@ export function ExecutiveDashboard() {
                 </div>
             </div>
 
+            {/* Engine reads — real DC-OS Layer engine outputs from current inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <EngineReadCard icon={ShieldCheck} label="Reliability (Layer 10)" value={engineReads.reliability ? `${engineReads.reliability.availabilityPct}%` : '—'}
+                    sub={engineReads.reliability ? `target ${engineReads.reliability.target}% · ${Math.round(engineReads.reliability.downtimeMin)} min/yr downtime` : 'engine loading'} onClick={() => go('risk')} />
+                <EngineReadCard icon={Boxes} label="Architecture (Layer 3)" value={engineReads.architecture ? `${engineReads.architecture.index}/100` : '—'}
+                    sub={engineReads.architecture ? `${engineReads.architecture.band} complexity` : 'engine loading'} />
+                <EngineReadCard icon={HardHat} label="Construction (Layer 6)" value={engineReads.construction ? `${engineReads.construction.totalMonths} mo` : '—'}
+                    sub={engineReads.construction ? `RFS at month ${engineReads.construction.rfs ?? '—'}` : (capex ? 'engine loading' : 'Open CAPEX engine')} onClick={() => go('capex')} />
+            </div>
+
             {/* Data-flow / digital thread */}
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                 <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Data Flow &amp; Digital Thread</h2>
@@ -213,6 +252,21 @@ export function ExecutiveDashboard() {
                 </div>
             )}
         </div>
+    );
+}
+
+function EngineReadCard({ icon: Icon, label, value, sub, onClick }: { icon: React.ElementType; label: string; value: string; sub?: string; onClick?: () => void }) {
+    return (
+        <button onClick={onClick} disabled={!onClick}
+            className={`text-left rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 ${onClick ? 'hover:border-cyan-400/50 cursor-pointer' : 'cursor-default'} transition-colors`}>
+            <div className="flex items-center gap-2 text-slate-400 mb-1.5">
+                <Icon className="w-4 h-4 text-cyan-500" />
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</span>
+                <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500">engine</span>
+            </div>
+            <div className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{value}</div>
+            {sub && <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{sub}</div>}
+        </button>
     );
 }
 
