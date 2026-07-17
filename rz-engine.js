@@ -556,7 +556,18 @@
                 { min: 60, status: 'Monitor', label: 'Monitor' },
                 { min: 40, status: 'Plan', label: 'Plan replacement' },
                 { min: 0,  status: 'Critical', label: 'Replace / high risk' }
-            ]
+            ],
+            /* Lifecycle replacement: interval (years) + unit cost ($/kW IT) by
+             * component (Group-2 promotion from DCMOC CapexEngine lifecycle). */
+            lifecycle: {
+                upsVrla:    { years: 5,  costPerKw: 120, label: 'UPS battery (VRLA)' },
+                upsLiIon:   { years: 10, costPerKw: 180, label: 'UPS battery (Li-Ion)' },
+                generator:  { years: 15, costPerKw: 350, label: 'Diesel generator' },
+                crac:       { years: 12, costPerKw: 200, label: 'CRAC/CRAH' },
+                fire:       { years: 10, costPerKw: 30,  label: 'Fire suppression' },
+                pdu:        { years: 15, costPerKw: 80,  label: 'PDU/RPP' },
+                bms:        { years: 7,  costPerKw: 40,  label: 'BMS/DCIM' }
+            }
         },
         /* ══ v2.4.0 — DATA.construction: Construction schedule (Layer 6). Canonical DC
          * build phase sequence + overlap (fast-track) factors + milestone anchors.
@@ -719,7 +730,7 @@
             'reliability':            { source: 'IEEE 493 (Gold Book) typical component MTBF/MTTR + Uptime Institute Tier Standard availability targets', asOf: '2026', unit: 'hours (MTBF/MTTR) + availability fraction', method: 'screening-grade RAM inputs; NOT a certified reliability/FMEA study' },
             'site':                   { source: 'DC site-selection factor weighting (power + grid + seismic + talent + tax + carbon + flood + latency + water) — engine heuristic informed by 451/CBRE/Uptime site-selection criteria', asOf: '2026', unit: 'weights (fraction, sum=1) + grade bands', method: 'transparent weighted-factor screen; factor inputs are caller-supplied 0-1 goodness scores' },
             'commissioning':          { source: 'Standard DC commissioning sequence (ASHRAE Guideline 0 / BCxA + Uptime Cx) — L1–L5 levels + IST/SAT/FAT + punchlist; weights are an engine readiness heuristic', asOf: '2026', unit: 'weights (fraction, sum=1) + readiness %', method: 'weighted completion index; NOT a Cx authority sign-off' },
-            'asset':                  { source: 'ASHRAE Equipment Life Expectancy + manufacturer service-life data (design lives); health-index weighting is an engine asset-management heuristic (remaining-life + condition + duty)', asOf: '2026', unit: 'years (design life) + weights (fraction, sum=1) + health %', method: 'screening health index; NOT a vibration/thermographic condition survey' },
+            'asset':                  { source: 'ASHRAE Equipment Life Expectancy + manufacturer service-life data (design lives); health-index weighting is an engine asset-management heuristic; lifecycle replacement intervals + $/kW lifted from DCMOC CapexEngine (UPS/gen/CRAC/PDU/BMS/fire)', asOf: '2026', unit: 'years + weights (sum=1) + health % + $/kW replacement', method: 'screening health + lifecycle model; NOT a condition survey' },
             'construction':           { source: 'Canonical DC build phase sequence (design→permit→procurement→civil→MEP→commissioning) + typical fast-track overlap factors — engine scheduling heuristic', asOf: '2026', unit: 'months (durations) + overlap fractions', method: 'CPM-style forward pass with per-phase overlap; screening schedule, NOT a resource-loaded programme' },
             'requirements':           { source: 'DC project brief required-field set + workload density/cooling profiles (AI/HPC/cloud/colo/enterprise/edge) — engine intake heuristic informed by Uptime/OCP rack-density guidance', asOf: '2026', unit: 'field list + kW/rack + cooling/tier defaults', method: 'completeness + profile defaults; not a design basis' },
             'architecture':           { source: 'Canonical DC design disciplines (electrical/mechanical/cooling/fire/security/network/building/structural/BMS) + relative design-complexity multipliers by cooling/tier/redundancy — engine heuristic', asOf: '2026', unit: 'discipline list + complexity multipliers → 0-100 index', method: 'normalized complexity screen; NOT a design deliverable' },
@@ -2371,6 +2382,23 @@
                         health: health, status: s.status, label: s.label,
                         remainingYears: +(life - age).toFixed(1), designLifeYears: life,
                         remainingFraction: +remainingFrac.toFixed(3)
+                    };
+                },
+                /** Lifecycle replacement schedule for a component over a horizon.
+                 *  Returns replacement years + per-event cost ($ = costPerKw × itLoadKw)
+                 *  + total nominal cost. component keys: see DATA.asset.lifecycle. */
+                replacementSchedule: function (component, itLoadKw, horizonYears) {
+                    var L = DATA.asset.lifecycle[component];
+                    if (!L) return null;
+                    var kw = itLoadKw || 0, horizon = horizonYears || 15;
+                    var eventCost = Math.round(L.costPerKw * kw);
+                    var years = [];
+                    for (var y = L.years; y <= horizon; y += L.years) years.push(y);
+                    return {
+                        component: component, label: L.label, intervalYears: L.years,
+                        costPerKw: L.costPerKw, eventCostUsd: eventCost,
+                        replacementYears: years, events: years.length,
+                        totalNominalUsd: eventCost * years.length
                     };
                 }
             },

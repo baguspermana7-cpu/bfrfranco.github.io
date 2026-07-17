@@ -300,6 +300,15 @@ near('pue.dcie(1.5)', M.pue.dcie(1.5), 0.6667, 0.001);
     eq('asset.status 50 Plan', A.status(50).status, 'Plan');
     let awsum = 0; for (const k in D.asset.weights) awsum += D.asset.weights[k];
     near('asset.weights sum = 1', awsum, 1, 1e-9);
+    // lifecycle replacement schedule (Group-2)
+    const rs = A.replacementSchedule('bms', 1000, 20); // BMS every 7yr, $40/kW, 1MW, 20yr
+    eq('asset.replacementSchedule bms events', rs.events, 2); // years 7, 14
+    eq('asset.replacementSchedule bms years', rs.replacementYears.join(','), '7,14');
+    eq('asset.replacementSchedule bms eventCost', rs.eventCostUsd, 40 * 1000);
+    eq('asset.replacementSchedule bms total', rs.totalNominalUsd, 40 * 1000 * 2);
+    eq('asset.replacementSchedule unknown = null', A.replacementSchedule('nope', 1000, 20), null);
+    // generator every 15yr in a 20yr horizon → 1 event
+    eq('asset.replacementSchedule generator events', A.replacementSchedule('generator', 1000, 20).events, 1);
 }
 {
     /* ── construction schedule model — Layer 6 ── */

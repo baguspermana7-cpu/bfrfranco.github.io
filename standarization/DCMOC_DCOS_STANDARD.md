@@ -178,7 +178,12 @@ local math before its engine parity passes.
   0-1 that FEEDS `models.site.score` grid factor) + `DATA.gridReliability` (uptime
   bands + score floor/ceil) + `DATA.sources['gridReliability']`. Per-country uptime
   stays in the country profiles. `test-rz-engine.mjs` 270/0.
-  REMAINING Group-2: Carbon-rich, Compliance, Tax, Risk-geo, Asset-lifecycle.
+- **Asset Lifecycle** — SHIPPED engine-side (5th of 9): `RZEngine.models.asset.replacementSchedule(component, itLoadKw, horizonYears)`
+  (replacement years + per-event $ (costPerKw×kW) + total nominal) + `DATA.asset.lifecycle`
+  (UPS-VRLA/Li-Ion, generator, CRAC, fire, PDU, BMS intervals + $/kW) lifted from
+  DCMOC CapexEngine lifecycle. `test-rz-engine.mjs` 276/0.
+  REMAINING Group-2 (country-data-heavy — model small, data large, stays in country
+  profiles): Compliance, Tax, Risk-geo. Carbon-rich = parallel-owned (skip).
 
 ## Status (2026-07-17)
 - Bridge (§2): DONE (parallel session, f7a12cc7). REUSED.
