@@ -87,7 +87,7 @@
     <script src="js/rz-explain-db.js?v=2026-07-16" defer></script>
 <script src="js/rz-explain.js?v=2026-07-16" defer></script>
 <script src="js/rz-article-editorial.js?v=1.51.8" defer></script>
-    <script src="js/rz-command-palette.js?v=1.50.37" defer></script>
+    <script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
     <script src="js/rz-article-chart.js?v=1.50.19" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
@@ -648,29 +648,7 @@
             background: rgba(180,83,9,0.1);
         }
         .wc-calculator .calc-input-group select option { background: #1c1917; color: #fff; }
-        .wc-calculator .calc-tooltip {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 16px; height: 16px; background: rgba(255,255,255,0.15);
-            border-radius: 50%; font-size: 0.65rem; color: #a8a29e;
-            cursor: help; margin-left: 4px; position: relative;
-            vertical-align: middle; flex-shrink: 0;
-        }
-        .wc-calculator .calc-tooltip .tip-text {
-            visibility: hidden; opacity: 0; position: absolute;
-            bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
-            background: #1e293b; color: #e2e8f0; padding: 0.6rem 0.75rem;
-            border-radius: 8px; font-size: 0.72rem; line-height: 1.4;
-            width: 220px; text-align: left; z-index: 10;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-            transition: opacity 0.2s ease; pointer-events: none; font-weight: 400;
-        }
-        .wc-calculator .calc-tooltip .tip-text::after {
-            content: ''; position: absolute; top: 100%; left: 50%;
-            transform: translateX(-50%); border: 6px solid transparent;
-            border-top-color: #1e293b;
-        }
-        .wc-calculator .calc-tooltip:hover .tip-text { visibility: visible; opacity: 1; }
-        .wc-calculator .calc-actions {
+        .wc-calculator        .wc-calculator        .wc-calculator        .wc-calculator        .wc-calculator .calc-actions {
             display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;
         }
         .wc-calculator .calc-button {
@@ -1469,11 +1447,11 @@
     <div class="wc-tab-panel active" id="wcPanelWfc">
         <div class="calc-grid">
             <div class="calc-input-group">
-                <label>AI Queries per Day <span class="calc-tooltip">?<span class="tip-text">Average number of AI prompts per day. Power users: 100+. Casual: 10-30. Developers with Copilot: 200+.</span></span></label>
+                <label data-explain="ai-queries-per-day">AI Queries per Day</label>
                 <input type="number" id="wfcQueries" value="50" min="1" max="10000" step="1" aria-label="Wfc Queries">
             </div>
             <div class="calc-input-group">
-                <label>Primary AI Model <span class="calc-tooltip">?<span class="tip-text">Different models have different computational requirements. GPT-4/Claude use more resources per query than smaller models. Image generation is the most water-intensive.</span></span></label>
+                <label data-explain="primary-ai-model">Primary AI Model</label>
                 <select id="wfcModel" aria-label="Wfc Model">
                     <optgroup label="OpenAI">
                         <option value="gpt54">GPT-5.4</option>
@@ -1509,7 +1487,7 @@
                 </select>
             </div>
             <div class="calc-input-group">
-                <label>Query Complexity <span class="calc-tooltip">?<span class="tip-text">Simple: short Q&amp;A. Medium: multi-paragraph responses. Complex: long reasoning, code generation. Image: creating images from prompts.</span></span></label>
+                <label data-explain="query-complexity">Query Complexity</label>
                 <select id="wfcComplexity" aria-label="Wfc Complexity">
                     <option value="simple">Simple / Short</option>
                     <option value="medium" selected>Medium</option>
@@ -1519,7 +1497,7 @@
                 </select>
             </div>
             <div class="calc-input-group">
-                <label>DC Cooling Type <span class="calc-tooltip">?<span class="tip-text">Evaporative towers consume the most water (56% of DCs). Air-cooled and closed-loop use dramatically less but cost more.</span></span></label>
+                <label data-explain="dc-cooling-type">DC Cooling Type</label>
                 <select id="wfcCooling" aria-label="Wfc Cooling">
                     <option value="evaporative">Evaporative Tower (56% of DCs)</option>
                     <option value="hybrid">Hybrid Adiabatic</option>
@@ -1528,14 +1506,14 @@
                 </select>
             </div>
             <div class="calc-input-group">
-                <label>Include Upstream Water? <span class="calc-tooltip">?<span class="tip-text">Electricity generation (coal/gas/nuclear) consumes significant water. Including upstream adds ~3x to direct water. Source: Li et al., Joule 2023.</span></span></label>
+                <label data-explain="include-upstream-water">Include Upstream Water?</label>
                 <select id="wfcUpstream" aria-label="Wfc Upstream">
                     <option value="yes">Yes (Full Lifecycle)</option>
                     <option value="no">No (Direct Only)</option>
                 </select>
             </div>
             <div class="calc-input-group">
-                <label>Region / Climate <span class="calc-tooltip">?<span class="tip-text">Arid regions need more cooling water. Cool/Nordic climates leverage free cooling, reducing water use significantly.</span></span></label>
+                <label data-explain="region-climate">Region / Climate</label>
                 <select id="wfcRegion" aria-label="Wfc Region">
                     <option value="arid">Arid / Desert (AZ, NV, TX)</option>
                     <option value="temperate" selected>Temperate (OR, VA, IA)</option>
@@ -1544,11 +1522,11 @@
                 </select>
             </div>
             <div class="calc-input-group">
-                <label>Number of Users <span class="calc-tooltip">?<span class="tip-text">1 = personal use. Set higher for team/org estimates. Enterprise: 500-10,000+. National scale: 1M+.</span></span></label>
+                <label data-explain="number-of-users">Number of Users</label>
                 <input type="number" id="wfcUsers" value="1" min="1" max="10000000" step="1" aria-label="Wfc Users">
             </div>
             <div class="calc-input-group">
-                <label>Active Hours/Day <span class="calc-tooltip">?<span class="tip-text">Hours per day the user(s) actively send AI queries. Typical: 8 (work day). Heavy use: 12-16.</span></span></label>
+                <label data-explain="active-hours-day">Active Hours/Day</label>
                 <input type="number" id="wfcHours" value="8" min="1" max="24" step="1" aria-label="Wfc Hours">
             </div>
         </div>
@@ -1589,15 +1567,15 @@
     <div class="wc-tab-panel" id="wcPanelDcw">
         <div class="calc-grid">
             <div class="calc-input-group">
-                <label>IT Load (MW) <span class="calc-tooltip">?<span class="tip-text">Total IT power. Small DC: 1-5 MW. Enterprise: 10-30 MW. Hyperscale: 50-300 MW. AI factories: 100+ MW.</span></span></label>
+                <label data-explain="it-load">IT Load (MW)</label>
                 <input type="number" id="dcwLoad" value="10" min="0.1" max="1000" step="0.1" aria-label="Dcw Load">
             </div>
             <div class="calc-input-group">
-                <label>PUE <span class="calc-tooltip">?<span class="tip-text">Power Usage Effectiveness. Industry avg: 1.58. Best liquid-cooled: 1.10. Higher PUE = more energy wasted on cooling.</span></span></label>
+                <label data-explain="pue">PUE</label>
                 <input type="number" id="dcwPUE" value="1.4" min="1.0" max="3.0" step="0.01" aria-label="Dcw PUE">
             </div>
             <div class="calc-input-group">
-                <label>Cooling Technology <span class="calc-tooltip">?<span class="tip-text">Evaporative: ~1.8 L/kWh. Hybrid: ~0.8 L/kWh. Air-cooled: ~0.1 L/kWh. DLC/Immersion: near-zero direct water.</span></span></label>
+                <label data-explain="cooling-technology">Cooling Technology</label>
                 <select id="dcwCooling" aria-label="Dcw Cooling">
                     <option value="evaporative">Evaporative Cooling Tower</option>
                     <option value="hybrid">Hybrid Adiabatic</option>
@@ -1607,7 +1585,7 @@
                 </select>
             </div>
             <div class="calc-input-group">
-                <label>Climate Zone <span class="calc-tooltip">?<span class="tip-text">Hot &amp; Dry: highest cooling demand (+40%). Cold: lowest, free cooling 6+ months/year.</span></span></label>
+                <label data-explain="climate-zone">Climate Zone</label>
                 <select id="dcwClimate" aria-label="Dcw Climate">
                     <option value="hotdry">Hot &amp; Dry (AZ, NV, Middle East)</option>
                     <option value="hothumid">Hot &amp; Humid (TX, FL, SEA)</option>
@@ -1616,11 +1594,11 @@
                 </select>
             </div>
             <div class="calc-input-group">
-                <label>Operating Hours/Year <span class="calc-tooltip">?<span class="tip-text">8,760 = 24/7 full year. Most data centers run continuously.</span></span></label>
+                <label data-explain="operating-hours-year">Operating Hours/Year</label>
                 <input type="number" id="dcwHours" value="8760" min="1000" max="8760" step="1" aria-label="Dcw Hours">
             </div>
             <div class="calc-input-group">
-                <label>Water Source <span class="calc-tooltip">?<span class="tip-text">Municipal: $4-8/1000 gal. Reclaimed water is cheaper but requires treatment.</span></span></label>
+                <label data-explain="water-source">Water Source</label>
                 <select id="dcwSource" aria-label="Dcw Source">
                     <option value="municipal">Municipal / Potable</option>
                     <option value="reclaimed">Reclaimed / Gray Water</option>
@@ -1629,15 +1607,15 @@
                 </select>
             </div>
             <div class="calc-input-group">
-                <label>AI Workload % <span class="calc-tooltip">?<span class="tip-text">Percentage of IT load dedicated to AI/ML training and inference. AI-first facilities: 80-100%. Mixed enterprise: 20-40%.</span></span></label>
+                <label data-explain="ai-workload">AI Workload %</label>
                 <input type="number" id="dcwAIPct" value="50" min="0" max="100" step="5" aria-label="Dcw AIPct">
             </div>
             <div class="calc-input-group">
-                <label>GPU Rack Density (kW) <span class="calc-tooltip">?<span class="tip-text">Power per rack. Traditional: 8-12 kW. AI/GPU racks: 40-100 kW. NVIDIA GB200 NVL72: 120 kW.</span></span></label>
+                <label data-explain="gpu-rack-density">GPU Rack Density (kW)</label>
                 <input type="number" id="dcwRackDensity" value="40" min="5" max="200" step="5" aria-label="Dcw Rack Density">
             </div>
             <div class="calc-input-group">
-                <label>Renewable Energy % <span class="calc-tooltip">?<span class="tip-text">Percentage of renewable energy. Affects upstream water calculation. Solar/wind use minimal water vs. coal/gas/nuclear.</span></span></label>
+                <label data-explain="renewable-energy">Renewable Energy %</label>
                 <input type="number" id="dcwRenewable" value="30" min="0" max="100" step="5" aria-label="Dcw Renewable">
             </div>
         </div>
@@ -1679,11 +1657,11 @@
     <div class="wc-tab-panel" id="wcPanelAvh">
         <div class="calc-grid">
             <div class="calc-input-group">
-                <label>Number of AI Queries <span class="calc-tooltip">?<span class="tip-text">Enter any number. 100 = typical power-user daily count. Global daily AI queries exceed 10 billion.</span></span></label>
+                <label data-explain="number-of-ai-queries">Number of AI Queries</label>
                 <input type="number" id="avhQueries" value="100" min="1" max="100000000" step="1" aria-label="Avh Queries">
             </div>
             <div class="calc-input-group">
-                <label>AI Model <span class="calc-tooltip">?<span class="tip-text">Different models have different water footprints based on computational intensity and infrastructure.</span></span></label>
+                <label data-explain="ai-model">AI Model</label>
                 <select id="avhModel" aria-label="Avh Model">
                     <optgroup label="OpenAI">
                         <option value="gpt54">GPT-5.4</option>
@@ -1713,7 +1691,7 @@
                 </select>
             </div>
             <div class="calc-input-group">
-                <label>Scale <span class="calc-tooltip">?<span class="tip-text">Personal: your daily use. Company: 1,000 employees. City: 100K users. Global: ~10 billion daily queries worldwide.</span></span></label>
+                <label data-explain="scale">Scale</label>
                 <select id="avhScaleSelect" aria-label="Avh Scale Select">
                     <option value="personal" selected>Personal (1 user)</option>
                     <option value="team">Team (50 users)</option>
@@ -1723,7 +1701,7 @@
                 </select>
             </div>
             <div class="calc-input-group">
-                <label>Include Upstream? <span class="calc-tooltip">?<span class="tip-text">Upstream water includes water used for electricity generation (coal, gas, nuclear). Adds ~3x to direct cooling water.</span></span></label>
+                <label data-explain="include-upstream">Include Upstream?</label>
                 <select id="avhUpstream" aria-label="Avh Upstream">
                     <option value="yes" selected>Yes (Full Lifecycle)</option>
                     <option value="no">No (Direct Only)</option>

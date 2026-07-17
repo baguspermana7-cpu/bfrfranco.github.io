@@ -494,42 +494,6 @@
         .cite { color: var(--accent-emerald); font-size: 0.75em; vertical-align: super; font-weight: 600; text-decoration: none; padding: 0 2px; }
         .cite:hover { color: #059669; text-decoration: underline; }
 
-        /* Tooltips */
-        .term-tooltip {
-            position: relative;
-            border-bottom: 1px dashed var(--accent-emerald);
-            cursor: help;
-            font-weight: 500;
-        }
-
-        .term-tooltip::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e293b;
-            color: #fff;
-            padding: 0.5rem 0.75rem;
-            border-radius: 8px;
-            font-size: 0.78rem;
-            font-weight: 400;
-            white-space: nowrap;
-            max-width: 320px;
-            white-space: normal;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.2s, visibility 0.2s;
-            z-index: 100;
-            pointer-events: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            line-height: 1.4;
-        }
-
-        .term-tooltip:hover::after {
-            opacity: 1;
-            visibility: visible;
-        }
 
         /* Data Tables */
         .data-table-wrapper {
@@ -1142,7 +1106,6 @@
             .calc-grid { grid-template-columns: 1fr; }
             .dashboard-container { padding: 1rem; }
             .chart-wrapper { padding: 1rem; }
-            .term-tooltip::after { left: 0; transform: none; max-width: 250px; }
         }
 
         /* ═══ PRO ENHANCEMENT MODE ═══ */
@@ -1418,7 +1381,7 @@
             <h1 class="article-title">Maintenance Compliance Is Not<br>a Technician Problem</h1>
 
             <p class="article-subtitle">
-                Why <span class="term-tooltip" data-tooltip="Preventive Maintenance: Scheduled tasks to prevent equipment failure">PM</span> compliance plateaus at 70-85% despite training, monitoring, and pressure. A systems engineering analysis of workflow friction, <span class="term-tooltip" data-tooltip="Computerized Maintenance Management System: Software for managing maintenance operations">CMMS</span> maturity, evidence engineering, and escalation architecture -- with a predictive compliance model and interactive calculator.
+                Why <span data-explain="pm">PM</span> compliance plateaus at 70-85% despite training, monitoring, and pressure. A systems engineering analysis of workflow friction, <span data-explain="cmms">CMMS</span> maturity, evidence engineering, and escalation architecture -- with a predictive compliance model and interactive calculator.
             </p>
 
             <div class="article-meta">
@@ -1548,9 +1511,9 @@
                 <!-- Section 1: Abstract -->
                 <h2 id="section-1"><span class="section-number">1</span> Abstract</h2>
 
-                <p>Maintenance compliance in mission-critical data centers is persistently framed as a technician discipline problem. Managers ask: "Why are people not closing <span class="term-tooltip" data-tooltip="Work Order: A documented task assigned to maintenance personnel">WO</span>s?" and "Why do technicians forget tasks?" This framing is seductively simple -- and dangerously wrong. It locates the failure in human motivation when the actual failure exists within systems architecture, workflow design, and organizational structure.</p>
+                <p>Maintenance compliance in mission-critical data centers is persistently framed as a technician discipline problem. Managers ask: "Why are people not closing <span data-explain="work-order">WO</span>s?" and "Why do technicians forget tasks?" This framing is seductively simple -- and dangerously wrong. It locates the failure in human motivation when the actual failure exists within systems architecture, workflow design, and organizational structure.</p>
 
-                <p>This article presents a comprehensive systems-level analysis of why <span class="term-tooltip" data-tooltip="Preventive Maintenance: Scheduled tasks to prevent equipment failure">PM</span> compliance plateaus at 70-85% in the majority of data center operations despite repeated training interventions, monitoring dashboards, and supervisory pressure. Drawing on maintenance engineering theory<a href="#ref-1" class="cite">[1]</a>, reliability-centered maintenance<a href="#ref-3" class="cite">[3]</a>, and human factors research, it demonstrates that sustained compliance above 95% emerges only when five systemic conditions are simultaneously addressed: workflow friction, <span class="term-tooltip" data-tooltip="Computerized Maintenance Management System: Software for managing maintenance operations">CMMS</span> usability, evidence burden, scheduling conflicts, and escalation gaps.</p>
+                <p>This article presents a comprehensive systems-level analysis of why <span data-explain="pm">PM</span> compliance plateaus at 70-85% in the majority of data center operations despite repeated training interventions, monitoring dashboards, and supervisory pressure. Drawing on maintenance engineering theory<a href="#ref-1" class="cite">[1]</a>, reliability-centered maintenance<a href="#ref-3" class="cite">[3]</a>, and human factors research, it demonstrates that sustained compliance above 95% emerges only when five systemic conditions are simultaneously addressed: workflow friction, <span data-explain="cmms">CMMS</span> usability, evidence burden, scheduling conflicts, and escalation gaps.</p>
 
                 <p>The article introduces a Maintenance Compliance Predictor model that quantifies the relationship between staffing capacity, workflow friction, CMMS maturity, and evidence clarity. Through an applied case study of a 15MW concurrently maintainable facility, it documents the journey from 74% to 97.2% compliance over 18 weeks using exclusively systems-level interventions -- without adding headcount or changing personnel.</p>
 
@@ -1624,17 +1587,17 @@
                 <!-- Section 2: The Compliance Paradox -->
                 <h2 id="section-2"><span class="section-number">2</span> The Compliance Paradox</h2>
 
-                <p>Across the data center industry, a peculiar pattern repeats itself with remarkable consistency. A new facility achieves 90%+ <span class="term-tooltip" data-tooltip="Preventive Maintenance: Scheduled tasks to prevent equipment failure">PM</span> compliance in its first 6-12 months of operation. Technicians are motivated, procedures are fresh, and management attention is high. Then, gradually and predictably, compliance drifts downward to settle in a band between 70% and 85% -- and stays there<a href="#ref-5" class="cite">[5]</a>.</p>
+                <p>Across the data center industry, a peculiar pattern repeats itself with remarkable consistency. A new facility achieves 90%+ <span data-explain="pm">PM</span> compliance in its first 6-12 months of operation. Technicians are motivated, procedures are fresh, and management attention is high. Then, gradually and predictably, compliance drifts downward to settle in a band between 70% and 85% -- and stays there<a href="#ref-5" class="cite">[5]</a>.</p>
 
                 <p>This plateau is not random. It is the equilibrium point of a system where the friction of "doing maintenance correctly" matches the organizational pressure to complete it. When management pushes, compliance ticks up temporarily. When attention shifts elsewhere -- to an incident, a project, or an audit -- compliance reverts to its equilibrium.</p>
 
                 <h3>2.1 The Training Fallacy</h3>
-                <p>The most common response to declining compliance is training. More toolbox talks, refreshed <span class="term-tooltip" data-tooltip="Standard Operating Procedure: Documented step-by-step instructions for routine operations">SOP</span>s, compliance workshops, and reminder emails. The implicit assumption is that technicians do not understand what to do. In reality, the problem is rarely knowledge -- it is almost always the system environment in which knowledge must be applied.</p>
+                <p>The most common response to declining compliance is training. More toolbox talks, refreshed <span data-explain="sop">SOP</span>s, compliance workshops, and reminder emails. The implicit assumption is that technicians do not understand what to do. In reality, the problem is rarely knowledge -- it is almost always the system environment in which knowledge must be applied.</p>
 
                 <p>Smith and Hinchcliffe<a href="#ref-4" class="cite">[4]</a> documented that 80% of maintenance compliance failures originate in planning and scheduling processes, not in execution quality. Technicians typically know how to perform a task correctly. What they lack is a system environment that makes correct execution the path of least resistance.</p>
 
                 <h3>2.2 The Monitoring Trap</h3>
-                <p>The second-most common response is enhanced monitoring: real-time dashboards, daily <span class="term-tooltip" data-tooltip="Key Performance Indicator: A measurable value demonstrating operational effectiveness">KPI</span> reporting, and weekly compliance reviews. While monitoring visibility is necessary, it alone creates a perverse dynamic. Technicians learn to optimize for the metric rather than for the work quality. <span class="term-tooltip" data-tooltip="Work Order: A documented task assigned to maintenance personnel">WO</span>s get closed with "Done" or "OK" as evidence. Physical work may be completed but documentation is minimal. The KPI shows green while actual risk exposure grows.</p>
+                <p>The second-most common response is enhanced monitoring: real-time dashboards, daily <span data-explain="kpi">KPI</span> reporting, and weekly compliance reviews. While monitoring visibility is necessary, it alone creates a perverse dynamic. Technicians learn to optimize for the metric rather than for the work quality. <span data-explain="work-order">WO</span>s get closed with "Done" or "OK" as evidence. Physical work may be completed but documentation is minimal. The KPI shows green while actual risk exposure grows.</p>
 
                 <div class="info-box warning">
                     <div class="info-box-title">The 85% Ceiling</div>
@@ -1704,18 +1667,18 @@
                 </div>
 
                 <h3>3.1 Workflow Friction</h3>
-                <p>Workflow friction is the cumulative burden of non-value-adding activities that a technician must navigate between receiving a <span class="term-tooltip" data-tooltip="Work Order: A documented task assigned to maintenance personnel">WO</span> and closing it with acceptable evidence. This includes physical travel time between dispersed equipment rooms, tool retrieval from centralized stores, documentation requirements that are disconnected from the work sequence, and approval chains that introduce waiting time.</p>
+                <p>Workflow friction is the cumulative burden of non-value-adding activities that a technician must navigate between receiving a <span data-explain="work-order">WO</span> and closing it with acceptable evidence. This includes physical travel time between dispersed equipment rooms, tool retrieval from centralized stores, documentation requirements that are disconnected from the work sequence, and approval chains that introduce waiting time.</p>
 
-                <p>Palmer<a href="#ref-8" class="cite">[8]</a> measured <span class="term-tooltip" data-tooltip="Wrench Time: The percentage of a technician's shift spent performing actual hands-on maintenance work. Industry average: 25-35%. Data centers: 20-28% due to access controls and documentation.">wrench time</span> (actual hands-on-tools time) across industrial maintenance operations and found it typically represents only 25-35% of a technician's shift. The remaining 65-75% is consumed by travel, coordination, documentation, waiting, and breaks. In data center environments where equipment is distributed across multiple secure zones requiring separate access procedures, wrench time can drop to 20-28%.</p>
+                <p>Palmer<a href="#ref-8" class="cite">[8]</a> measured <span data-explain="wrench-time">wrench time</span> (actual hands-on-tools time) across industrial maintenance operations and found it typically represents only 25-35% of a technician's shift. The remaining 65-75% is consumed by travel, coordination, documentation, waiting, and breaks. In data center environments where equipment is distributed across multiple secure zones requiring separate access procedures, wrench time can drop to 20-28%.</p>
 
                 <h3>3.2 CMMS Usability</h3>
-                <p>The <span class="term-tooltip" data-tooltip="Computerized Maintenance Management System: Software for managing maintenance operations">CMMS</span> is the nervous system of maintenance operations. When it is poorly configured, difficult to navigate, or requires excessive clicks to complete routine transactions, it becomes a source of friction rather than an enabler. Common anti-patterns include: work order templates that require 15+ mandatory fields when 5-7 are sufficient, inability to attach photos from mobile devices, no offline capability for areas without Wi-Fi coverage, and approval workflows that route through unavailable managers.</p>
+                <p>The <span data-explain="cmms">CMMS</span> is the nervous system of maintenance operations. When it is poorly configured, difficult to navigate, or requires excessive clicks to complete routine transactions, it becomes a source of friction rather than an enabler. Common anti-patterns include: work order templates that require 15+ mandatory fields when 5-7 are sufficient, inability to attach photos from mobile devices, no offline capability for areas without Wi-Fi coverage, and approval workflows that route through unavailable managers.</p>
 
                 <h3>3.3 Evidence Burden</h3>
                 <p>Every maintenance task requires evidence of completion. When evidence standards are unclear or excessively demanding relative to the task complexity, technicians face a choice: spend 40 minutes documenting a 20-minute task, or record minimal evidence and move to the next job. In the absence of clear, proportionate evidence standards, most technicians will -- rationally -- choose the latter.</p>
 
                 <h3>3.4 Scheduling Conflicts</h3>
-                <p>Data centers operate 24/7 with concurrent maintenance windows that must be carefully scheduled around customer commitments, redundancy requirements, and <span class="term-tooltip" data-tooltip="Management of Change: Formal process for managing modifications to systems or procedures">MoC</span> procedures. When the <span class="term-tooltip" data-tooltip="Preventive Maintenance: Scheduled tasks to prevent equipment failure">PM</span> schedule is generated without regard to access constraints, vendor availability, or N-1 redundancy windows, tasks accumulate as "blocked" without a clear resolution path. Over time, these blocked tasks become the chronic backlog that depresses compliance metrics — a pattern that directly feeds the <a href="article-5.html">accumulation of technical debt</a> in critical infrastructure.</p>
+                <p>Data centers operate 24/7 with concurrent maintenance windows that must be carefully scheduled around customer commitments, redundancy requirements, and <span data-explain="change-management">MoC</span> procedures. When the <span data-explain="pm">PM</span> schedule is generated without regard to access constraints, vendor availability, or N-1 redundancy windows, tasks accumulate as "blocked" without a clear resolution path. Over time, these blocked tasks become the chronic backlog that depresses compliance metrics — a pattern that directly feeds the <a href="article-5.html">accumulation of technical debt</a> in critical infrastructure.</p>
 
                 <h3>3.5 Escalation Gaps</h3>
                 <p>When a task cannot be completed on schedule — because parts are unavailable, because access is denied, because a vendor failed to appear (a challenge that underscores the case for <a href="article-4.html">developing in-house maintenance capability</a>) -- the question becomes: who knows, and what happens next? In many operations, the answer is "nobody" and "nothing." Without an escalation architecture that is calibrated to asset criticality and time-to-risk, blocked tasks simply age until they appear on an overdue report -- at which point the original context has been lost.</p>
@@ -1728,7 +1691,7 @@
                 <!-- Section 4: CMMS as Operating System -->
                 <h2 id="section-4"><span class="section-number">4</span> CMMS as Operating System</h2>
 
-                <p>The <span class="term-tooltip" data-tooltip="Computerized Maintenance Management System: Software for managing maintenance operations">CMMS</span> is frequently treated as a record-keeping tool -- a place where work orders are created, tracked, and closed. This is a fundamental misunderstanding. In a well-run maintenance operation, the CMMS functions as an operating system: it determines the sequence, visibility, accessibility, and evidence capture of every maintenance action. Its design directly determines the upper limit of achievable compliance.</p>
+                <p>The <span data-explain="cmms">CMMS</span> is frequently treated as a record-keeping tool -- a place where work orders are created, tracked, and closed. This is a fundamental misunderstanding. In a well-run maintenance operation, the CMMS functions as an operating system: it determines the sequence, visibility, accessibility, and evidence capture of every maintenance action. Its design directly determines the upper limit of achievable compliance.</p>
 
                 <p>Drawing on ISO 55001<a href="#ref-2" class="cite">[2]</a> asset management principles and industry benchmarking from Uptime Institute<a href="#ref-5" class="cite">[5]</a>, the following maturity model describes five levels of CMMS deployment. Each level corresponds to a predictable compliance ceiling.</p>
 
@@ -1818,7 +1781,7 @@
                 <p class="table-source" style="font-size:0.72rem;color:#64748b;font-style:italic;margin:0.4rem 0 1.2rem;">Source: Publicly available industry data and published standards. For educational and research purposes only.</p>
 
                 <h3>4.3 The CMMS as Compliance Enabler</h3>
-                <p>When the CMMS is treated as an operating system, its configuration directly enables compliance. Critical capabilities include: asset-specific WO templates with pre-populated evidence checklists, mobile-first interfaces with photo capture and <span class="term-tooltip" data-tooltip="QR Code: Quick Response code used for rapid asset identification and task linking">QR</span> code scanning, automated escalation triggers based on asset criticality, integration with <span class="term-tooltip" data-tooltip="Building Management System: Centralized system for monitoring building infrastructure">BMS</span>/<span class="term-tooltip" data-tooltip="Data Center Infrastructure Management: Software for monitoring and managing data center physical infrastructure">DCIM</span> for automated sensor reading capture, and role-based dashboards that show each technician their personal task queue with clear priority ordering.</p>
+                <p>When the CMMS is treated as an operating system, its configuration directly enables compliance. Critical capabilities include: asset-specific WO templates with pre-populated evidence checklists, mobile-first interfaces with photo capture and <span data-explain="qr-code">QR</span> code scanning, automated escalation triggers based on asset criticality, integration with <span data-explain="bms">BMS</span>/<span data-explain="dcim">DCIM</span> for automated sensor reading capture, and role-based dashboards that show each technician their personal task queue with clear priority ordering.</p>
 
                 <p>The most impactful single change observed across multiple facilities is the transition from generic work order templates to asset-specific templates with embedded evidence checklists. This change typically improves evidence completeness by 25-40 percentage points and reduces WO closure time by 30-45% by eliminating ambiguity about what constitutes acceptable evidence<a href="#ref-4" class="cite">[4]</a>.</p>
 
@@ -1835,7 +1798,7 @@
                 <p>Palmer's seminal work on maintenance planning<a href="#ref-8" class="cite">[8]</a> established the concept of "wrench time" as the percentage of a technician's shift spent performing actual hands-on maintenance work. Across industries, wrench time averages 25-35%. In data centers, the unique security, access control, and documentation requirements further reduce this to 20-28%.</p>
 
                 <h3>5.1 Travel Time</h3>
-                <p>In a multi-hall data center facility, travel between equipment locations can consume 15-25% of shift time. This includes walking between data halls, traversing to plant rooms on different floors, accessing external fuel storage or water treatment areas, and returning to offices for documentation. Each trip requires badge access through security checkpoints and potentially changing into or out of <span class="term-tooltip" data-tooltip="Personal Protective Equipment: Safety gear required in specific work areas">PPE</span>. A typical 15MW facility with 4 data halls, 2 plant floors, and external infrastructure can require 8-12 location transitions per shift.</p>
+                <p>In a multi-hall data center facility, travel between equipment locations can consume 15-25% of shift time. This includes walking between data halls, traversing to plant rooms on different floors, accessing external fuel storage or water treatment areas, and returning to offices for documentation. Each trip requires badge access through security checkpoints and potentially changing into or out of <span data-explain="ppe">PPE</span>. A typical 15MW facility with 4 data halls, 2 plant floors, and external infrastructure can require 8-12 location transitions per shift.</p>
 
                 <h3>5.2 Tool and Material Access</h3>
                 <p>Centralized tool stores with sign-out procedures add 10-20 minutes per tool retrieval event. When a technician arrives at an equipment location and discovers a needed tool or part is missing, the round-trip to retrieve it creates a context switch that compounds the original time loss. Levitt<a href="#ref-9" class="cite">[9]</a> estimates that each context switch costs 8-15 minutes in re-orientation, representing a total shift tax of 5-12% for a technician performing 3-5 varied tasks.</p>
@@ -1844,7 +1807,7 @@
                 <p>The documentation burden encompasses all activities required to create evidence of work completion: recording readings, taking photographs, attaching calibration certificates, updating asset registers, and writing completion narratives. When documentation requirements are poorly designed, they create a disproportionate time burden relative to the physical work. The optimal documentation-to-work ratio is approximately 1:3 to 1:4 (15-25 minutes of documentation for every 60 minutes of physical work). When this ratio exceeds 1:2, technicians begin shortcutting evidence capture.</p>
 
                 <h3>5.4 Approval Chains</h3>
-                <p>Multi-level approval chains create waiting time that directly reduces compliance. In the most dysfunctional cases, a completed <span class="term-tooltip" data-tooltip="Work Order: A documented task assigned to maintenance personnel">WO</span> requires: technician submission, supervisor review, quality verification, and manager approval -- with each step introducing 4-24 hours of latency. If any approver is unavailable (on leave, in meetings, or working different shifts), the WO sits open indefinitely. The compliance metric penalizes this delay identically to work that was never performed.</p>
+                <p>Multi-level approval chains create waiting time that directly reduces compliance. In the most dysfunctional cases, a completed <span data-explain="work-order">WO</span> requires: technician submission, supervisor review, quality verification, and manager approval -- with each step introducing 4-24 hours of latency. If any approver is unavailable (on leave, in meetings, or working different shifts), the WO sits open indefinitely. The compliance metric penalizes this delay identically to work that was never performed.</p>
 
                 <div class="formula-box">
                     <div class="formula-box-title">Effective Capacity Formula</div>
@@ -1871,16 +1834,16 @@
                 <p>Evidence engineering is the deliberate design of evidence capture processes so that documenting work completion is integrated into the work sequence rather than appended to it. The distinction is critical: in traditional approaches, evidence is an afterthought -- something a technician must remember to create after the physical work is done. In an engineered approach, evidence capture is embedded within each step of the work procedure, making it impossible to complete the task without simultaneously creating the evidence.</p>
 
                 <h3>6.1 Photo Standards</h3>
-                <p>Unstructured photo requirements ("take a photo of the work") produce inconsistent, often useless evidence. Engineered photo standards specify: the exact subject (e.g., "filter housing after replacement, showing new filter label"), the required angle and framing, the inclusion of date-stamped reference objects, and the minimum count per task type. For critical <span class="term-tooltip" data-tooltip="Heating, Ventilation, and Air Conditioning: Climate control systems in data centers">HVAC</span> maintenance, a standardized photo protocol might require: before-photo of filter condition, photo of replacement filter model number, after-photo of installed filter, and photo of differential pressure gauge reading post-installation.</p>
+                <p>Unstructured photo requirements ("take a photo of the work") produce inconsistent, often useless evidence. Engineered photo standards specify: the exact subject (e.g., "filter housing after replacement, showing new filter label"), the required angle and framing, the inclusion of date-stamped reference objects, and the minimum count per task type. For critical <span data-explain="hvac">HVAC</span> maintenance, a standardized photo protocol might require: before-photo of filter condition, photo of replacement filter model number, after-photo of installed filter, and photo of differential pressure gauge reading post-installation.</p>
 
                 <h3>6.2 Digital Signatures and Timestamps</h3>
                 <p>Paper-based sign-off is a compliance liability. Digital signatures linked to technician identity provide non-repudiable evidence of who performed the work and when. Combined with GPS or beacon-based location verification, digital signatures can confirm that the technician was physically at the asset location when the WO was closed -- eliminating "desk closures" where WOs are completed administratively without physical verification.</p>
 
                 <h3>6.3 Sensor Auto-Verification</h3>
-                <p>For tasks where the acceptance criterion is a measurable parameter (temperature within range, pressure differential below threshold, voltage within tolerance), integration between the <span class="term-tooltip" data-tooltip="Computerized Maintenance Management System: Software for managing maintenance operations">CMMS</span> and <span class="term-tooltip" data-tooltip="Building Management System: Centralized system for monitoring building infrastructure">BMS</span>/<span class="term-tooltip" data-tooltip="Data Center Infrastructure Management: Software for monitoring and managing data center physical infrastructure">DCIM</span> can automate evidence capture. When a technician marks a <span class="term-tooltip" data-tooltip="Preventive Maintenance: Scheduled tasks to prevent equipment failure">PM</span> task as complete, the system automatically captures the relevant sensor reading at that timestamp. This eliminates manual reading transcription errors and provides tamper-proof evidence of post-maintenance condition. ASHRAE TC 9.9<a href="#ref-11" class="cite">[11]</a> provides reference thresholds for environmental monitoring in data center environments.</p>
+                <p>For tasks where the acceptance criterion is a measurable parameter (temperature within range, pressure differential below threshold, voltage within tolerance), integration between the <span data-explain="cmms">CMMS</span> and <span data-explain="bms">BMS</span>/<span data-explain="dcim">DCIM</span> can automate evidence capture. When a technician marks a <span data-explain="pm">PM</span> task as complete, the system automatically captures the relevant sensor reading at that timestamp. This eliminates manual reading transcription errors and provides tamper-proof evidence of post-maintenance condition. ASHRAE TC 9.9<a href="#ref-11" class="cite">[11]</a> provides reference thresholds for environmental monitoring in data center environments.</p>
 
                 <h3>6.4 QR-Linked Checklists</h3>
-                <p><span class="term-tooltip" data-tooltip="QR Code: Quick Response code used for rapid asset identification and task linking">QR</span> codes affixed to equipment provide a direct link between the physical asset and its digital maintenance record. Scanning the QR code at the asset location opens the specific checklist for the current PM task, pre-populated with asset details, previous readings, and acceptance criteria. This eliminates the need to search for the correct WO in the CMMS, navigate to the right asset, and locate the applicable checklist -- saving 3-8 minutes per task and ensuring the technician is working on the correct asset.</p>
+                <p><span data-explain="qr-code">QR</span> codes affixed to equipment provide a direct link between the physical asset and its digital maintenance record. Scanning the QR code at the asset location opens the specific checklist for the current PM task, pre-populated with asset details, previous readings, and acceptance criteria. This eliminates the need to search for the correct WO in the CMMS, navigate to the right asset, and locate the applicable checklist -- saving 3-8 minutes per task and ensuring the technician is working on the correct asset.</p>
 
                 <div class="data-table-wrapper">
                     <table class="data-table">
@@ -1935,11 +1898,11 @@
                 <p class="table-source" style="font-size:0.72rem;color:#64748b;font-style:italic;margin:0.4rem 0 1.2rem;">Source: Publicly available industry data and published standards. For educational and research purposes only.</p>
 
                 <h3>6.5 Evidence Proportionality</h3>
-                <p>A common mistake is applying the same evidence rigor to all tasks regardless of criticality. Changing a light bulb in a corridor does not require the same evidence depth as servicing a <span class="term-tooltip" data-tooltip="Uninterruptible Power Supply: Battery-backed system providing emergency power">UPS</span> static switch. Evidence requirements should be proportional to asset criticality and failure consequence. A three-tier model works well in practice:</p>
+                <p>A common mistake is applying the same evidence rigor to all tasks regardless of criticality. Changing a light bulb in a corridor does not require the same evidence depth as servicing a <span data-explain="ups">UPS</span> static switch. Evidence requirements should be proportional to asset criticality and failure consequence. A three-tier model works well in practice:</p>
 
                 <ul>
-                    <li><strong>Tier A (Critical):</strong> <span class="term-tooltip" data-tooltip="Uninterruptible Power Supply: Battery-backed system providing emergency power">UPS</span>, <span class="term-tooltip" data-tooltip="Automatic Transfer Switch: Device that automatically transfers power between sources">ATS</span>, generators, <span class="term-tooltip" data-tooltip="Power Distribution Unit: Device distributing electric power to rack-mounted equipment">PDU</span>s, chillers -- Full photo protocol, sensor auto-capture, supervisor sign-off, digital timestamp</li>
-                    <li><strong>Tier B (Important):</strong> <span class="term-tooltip" data-tooltip="Computer Room Air Handler: Precision cooling unit for data center environments">CRAH</span> units, pumps, fire suppression -- Photo protocol, technician sign-off, sensor capture where available</li>
+                    <li><strong>Tier A (Critical):</strong> <span data-explain="ups">UPS</span>, <span data-explain="ats">ATS</span>, generators, <span data-explain="pdu">PDU</span>s, chillers -- Full photo protocol, sensor auto-capture, supervisor sign-off, digital timestamp</li>
+                    <li><strong>Tier B (Important):</strong> <span data-explain="crah">CRAH</span> units, pumps, fire suppression -- Photo protocol, technician sign-off, sensor capture where available</li>
                     <li><strong>Tier C (Standard):</strong> Lighting, minor valves, non-critical sensors -- Completion confirmation, optional photo, technician sign-off only</li>
                 </ul>
 
@@ -1948,7 +1911,7 @@
 
                 <p>Escalation architecture is the structured framework that determines what happens when a maintenance task cannot be completed as scheduled. In the absence of explicit escalation rules, blocked tasks enter a gray zone where no one is accountable for resolution, and the task simply ages until it appears on an overdue report -- by which point the context has been lost and the risk exposure may have already materialized.</p>
 
-                <p>HSE HSG65<a href="#ref-10" class="cite">[10]</a> establishes the principle that risk controls must include defined escalation pathways proportional to the consequence of control failure. Applied to maintenance compliance, this means that the escalation response to an overdue <span class="term-tooltip" data-tooltip="Uninterruptible Power Supply: Battery-backed system providing emergency power">UPS</span> battery test must be fundamentally different from the escalation response to an overdue corridor light replacement. The 4-tier model below implements this principle.</p>
+                <p>HSE HSG65<a href="#ref-10" class="cite">[10]</a> establishes the principle that risk controls must include defined escalation pathways proportional to the consequence of control failure. Applied to maintenance compliance, this means that the escalation response to an overdue <span data-explain="ups">UPS</span> battery test must be fundamentally different from the escalation response to an overdue corridor light replacement. The 4-tier model below implements this principle.</p>
 
                 <h3>7.1 The 4-Tier Escalation Model</h3>
 
@@ -1978,7 +1941,7 @@
                         <div class="escalation-tier">T4</div>
                         <div>
                             <h4 style="margin: 0 0 0.5rem 0; font-size: 0.95rem;">Executive Risk Review (T+7 days overdue)</h4>
-                            <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;"><strong>Trigger:</strong> Tier A task overdue by 7+ days, OR cumulative backlog exceeds 15% of monthly <span class="term-tooltip" data-tooltip="Preventive Maintenance: Scheduled tasks to prevent equipment failure">PM</span> volume. <strong>Action:</strong> Facility Director / VP of Operations briefing. Systemic blocker analysis required. May trigger resource reallocation, vendor escalation, or temporary operating restrictions. <strong>Owner:</strong> Facility Director. <strong>Escalation window:</strong> Weekly leadership review.</p>
+                            <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;"><strong>Trigger:</strong> Tier A task overdue by 7+ days, OR cumulative backlog exceeds 15% of monthly <span data-explain="pm">PM</span> volume. <strong>Action:</strong> Facility Director / VP of Operations briefing. Systemic blocker analysis required. May trigger resource reallocation, vendor escalation, or temporary operating restrictions. <strong>Owner:</strong> Facility Director. <strong>Escalation window:</strong> Weekly leadership review.</p>
                         </div>
                     </div>
                 </div>
@@ -1986,7 +1949,7 @@
                 <h3>7.2 Escalation as a Learning System</h3>
                 <p>Beyond its immediate function of ensuring task completion, the escalation architecture serves as a learning system. By requiring documented blocker reasons at Tier 2 and risk acceptance decisions at Tier 3, the organization builds a dataset of systemic constraints. Monthly analysis of escalation patterns reveals recurring blockers -- vendor reliability issues, parts availability gaps, access scheduling conflicts -- that can be addressed through process improvement rather than repeated escalation. IEEE 3007.2<a href="#ref-12" class="cite">[12]</a> recommends this approach for reliability improvement in critical power systems maintenance.</p>
 
-                <p>Gulati and Smith<a href="#ref-13" class="cite">[13]</a> emphasize that escalation systems should be designed to surface systemic issues rather than merely accelerate individual task completion. The most effective escalation architectures produce monthly reports that answer: "What are the top 5 recurring reasons that <span class="term-tooltip" data-tooltip="Preventive Maintenance: Scheduled tasks to prevent equipment failure">PM</span> tasks are blocked, and what structural changes would eliminate these blockers?"</p>
+                <p>Gulati and Smith<a href="#ref-13" class="cite">[13]</a> emphasize that escalation systems should be designed to surface systemic issues rather than merely accelerate individual task completion. The most effective escalation architectures produce monthly reports that answer: "What are the top 5 recurring reasons that <span data-explain="pm">PM</span> tasks are blocked, and what structural changes would eliminate these blockers?"</p>
 
                 <!-- Section 8: Case Context -->
                 <h2 id="section-8"><span class="section-number">8</span> Case Context</h2>
@@ -2011,14 +1974,14 @@
                             <tr><td>Backlog at Baseline</td><td>~85 overdue tasks</td></tr>
                             <tr><td>CMMS Maturity at Baseline</td><td>Level 2 (Scheduled)</td></tr>
                             <tr><td>Baseline Compliance</td><td>74%</td></tr>
-                            <tr><td><span class="term-tooltip" data-tooltip="Service Level Agreement: Contractual performance commitment">SLA</span> Target</td><td>95% PM compliance</td></tr>
+                            <tr><td><span data-explain="sla">SLA</span> Target</td><td>95% PM compliance</td></tr>
                         </tbody>
                     </table>
                 </div>
                 <p class="table-source" style="font-size:0.72rem;color:#64748b;font-style:italic;margin:0.4rem 0 1.2rem;">Source: Publicly available industry data and published standards. For educational and research purposes only.</p>
 
                 <h3>8.2 Baseline Condition Analysis</h3>
-                <p>At 74% compliance, approximately 312 of the 1,200 monthly PM tasks were either not completed on schedule, completed without adequate evidence, or still open from previous periods. The backlog of 85 overdue tasks represented approximately one week of total team capacity, creating a chronic deficit that made achieving the 95% <span class="term-tooltip" data-tooltip="Service Level Agreement: Contractual performance commitment">SLA</span> mathematically impossible without systemic change.</p>
+                <p>At 74% compliance, approximately 312 of the 1,200 monthly PM tasks were either not completed on schedule, completed without adequate evidence, or still open from previous periods. The backlog of 85 overdue tasks represented approximately one week of total team capacity, creating a chronic deficit that made achieving the 95% <span data-explain="sla">SLA</span> mathematically impossible without systemic change.</p>
 
                 <p>Root cause analysis using the five-factor framework (Section 3) revealed the following distribution:</p>
                 <ul>
@@ -2045,7 +2008,7 @@
                 <!-- Section 9: The Intervention -->
                 <h2 id="section-9"><span class="section-number">9</span> The Intervention: 74% to 97.2%</h2>
 
-                <p>The intervention was designed as an 8-step systems redesign program executed over 18 weeks. Critically, no headcount was added and no personnel changes were made. Every improvement was achieved through workflow engineering, <span class="term-tooltip" data-tooltip="Computerized Maintenance Management System: Software for managing maintenance operations">CMMS</span> configuration, and process architecture changes.</p>
+                <p>The intervention was designed as an 8-step systems redesign program executed over 18 weeks. Critically, no headcount was added and no personnel changes were made. Every improvement was achieved through workflow engineering, <span data-explain="cmms">CMMS</span> configuration, and process architecture changes.</p>
 
                 <div class="step-grid">
                     <div class="step-card">
@@ -2208,8 +2171,8 @@
                 <ul>
                     <li><strong>Random WO sampling:</strong> Weekly random audit of 20 closed WOs, checking evidence completeness against asset-specific requirements. Pass rate improved from 48% to 91%.</li>
                     <li><strong>Physical spot-checks:</strong> Monthly unannounced verification of 10 "completed" PM tasks by cross-checking physical asset condition against WO evidence. Discrepancy rate dropped from 22% to 3%.</li>
-                    <li><strong>Rework rate tracking:</strong> Monitoring <span class="term-tooltip" data-tooltip="Corrective Maintenance: Unplanned maintenance to restore equipment after failure">CM</span> incidents within 30 days of PM completion for the same asset. Rate decreased from 8.5% to 2.1%, indicating genuine maintenance quality improvement, not just documentation improvement.</li>
-                    <li><strong><span class="term-tooltip" data-tooltip="Mean Time Between Failures: Average time between equipment failures">MTBF</span> trend analysis:</strong> 6-month trailing MTBF for critical assets showed 15% improvement, correlating with improved PM quality and reduced backlog.</li>
+                    <li><strong>Rework rate tracking:</strong> Monitoring <span data-explain="corrective-maintenance">CM</span> incidents within 30 days of PM completion for the same asset. Rate decreased from 8.5% to 2.1%, indicating genuine maintenance quality improvement, not just documentation improvement.</li>
+                    <li><strong><span data-explain="mtbf">MTBF</span> trend analysis:</strong> 6-month trailing MTBF for critical assets showed 15% improvement, correlating with improved PM quality and reduced backlog.</li>
                 </ul>
 
                 <div class="info-box">
@@ -2566,7 +2529,7 @@
 
                 <p>Maintenance compliance is not a technician problem. It is not a training problem. It is not a motivation problem. It is a systems design problem -- and it has a systems design solution.</p>
 
-                <p>The evidence presented across this article, supported by maintenance engineering literature<a href="#ref-1" class="cite">[1]</a><a href="#ref-3" class="cite">[3]</a><a href="#ref-4" class="cite">[4]</a>, industry benchmarking data<a href="#ref-5" class="cite">[5]</a><a href="#ref-6" class="cite">[6]</a>, and an applied case study, demonstrates that compliance above 95% is achievable in any staffed facility when five systemic conditions are concurrently addressed: workflow friction is minimized, <span class="term-tooltip" data-tooltip="Computerized Maintenance Management System: Software for managing maintenance operations">CMMS</span> maturity is at Level 3+, evidence standards are clear and proportionate, scheduling conflicts are resolved proactively, and escalation architecture is calibrated to asset criticality.</p>
+                <p>The evidence presented across this article, supported by maintenance engineering literature<a href="#ref-1" class="cite">[1]</a><a href="#ref-3" class="cite">[3]</a><a href="#ref-4" class="cite">[4]</a>, industry benchmarking data<a href="#ref-5" class="cite">[5]</a><a href="#ref-6" class="cite">[6]</a>, and an applied case study, demonstrates that compliance above 95% is achievable in any staffed facility when five systemic conditions are concurrently addressed: workflow friction is minimized, <span data-explain="cmms">CMMS</span> maturity is at Level 3+, evidence standards are clear and proportionate, scheduling conflicts are resolved proactively, and escalation architecture is calibrated to asset criticality.</p>
 
                 <p>The case study facility moved from 74% to 97.2% compliance in 18 weeks without adding headcount. The intervention increased effective maintenance capacity by 55% through friction reduction alone. Evidence completeness improved from 52% to 94%. Corrective maintenance rework dropped from 8.5% to 2.1%, confirming that the improvement was substantive rather than cosmetic.</p>
 
@@ -3333,7 +3296,7 @@
 <script src="js/rz-article-toc.js?v=1.50.42" defer></script>
 
 <!-- Search: shared js/rz-command-palette.js -->
-<script src="js/rz-command-palette.js?v=1.50.37" defer></script>
+<script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 
     <!-- Interactive Compliance Dashboard -->
     <script>

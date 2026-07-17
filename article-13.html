@@ -900,27 +900,6 @@
         .aig-privacy-badge i { color: #10b981; font-size: 0.8rem; }
 
         /* Tooltips */
-        .aig-tooltip-trigger {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 18px; height: 18px; border-radius: 50%; background: rgba(99,102,241,0.25);
-            color: #a5b4fc; font-size: 0.65rem; font-weight: 700; cursor: help;
-            position: relative; margin-left: 4px; flex-shrink: 0;
-        }
-        .aig-tooltip-content {
-            display: none; position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%);
-            background: #1e293b; border: 1px solid rgba(99,102,241,0.3); border-radius: 10px;
-            padding: 1rem; width: 260px; z-index: 100; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-            pointer-events: none;
-        }
-        .aig-tooltip-content::after {
-            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-            border: 6px solid transparent; border-top-color: rgba(99,102,241,0.3);
-        }
-        .aig-tooltip-trigger:hover .aig-tooltip-content,
-        .aig-tooltip-trigger:focus .aig-tooltip-content { display: block; }
-        .aig-tooltip-title { font-size: 0.8rem; font-weight: 700; color: #818cf8; margin-bottom: 0.4rem; }
-        .aig-tooltip-desc { font-size: 0.72rem; color: #94a3b8; line-height: 1.5; margin-bottom: 0.4rem; }
-        .aig-tooltip-formula { font-size: 0.68rem; color: #a5b4fc; font-family: 'JetBrains Mono', monospace; background: rgba(99,102,241,0.1); padding: 4px 8px; border-radius: 4px; }
 
         /* Strategic Inputs */
         .aig-strategic-inputs {
@@ -1059,8 +1038,6 @@
             .aig-cta-block { padding: 1.25rem 1rem; }
             .aig-strategic-inputs { grid-template-columns: 1fr; }
             .aig-kpi-grid { grid-template-columns: repeat(2, 1fr); }
-            .aig-tooltip-content { width: 220px; left: auto; right: -10px; transform: none; }
-            .aig-tooltip-content::after { left: auto; right: 20px; transform: none; }
         }
     
         /* Result Card Tooltip System */
@@ -3539,20 +3516,20 @@ E = Cf × En × (t/0.2) × (610/D)^x
 
                     <div class="calc-grid">
                         <div class="calc-input-group">
-                            <label class="calc-label">Component MTBF (hours)
-                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Mean Time Between Failures</div><div class="aig-tooltip-desc">Average operating hours before a component fails. Higher MTBF = more reliable hardware. Typical values: UPS 100K-300K hrs, server PSU 50K-100K hrs, HDD 1M hrs.</div><div class="aig-tooltip-formula">Availability = MTBF / (MTBF + MTTR)</div></span></span>
+                            <label class="calc-label" data-explain="aig-mean-time-between-failures">Component MTBF (hours)
+
                             </label>
                             <input type="number" class="calc-input" id="mtbf" value="50000" min="1000" aria-label="MTBF">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Component MTTR (hours)
-                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Mean Time To Repair</div><div class="aig-tooltip-desc">Average hours to detect, diagnose, and restore a failed component. Includes spare availability, staff response, and testing. Typical: 2-8 hrs with on-site spares, 24-72 hrs without.</div><div class="aig-tooltip-formula">Lower MTTR = Higher Availability</div></span></span>
+                            <label class="calc-label" data-explain="mean-time-to-repair">Component MTTR (hours)
+
                             </label>
                             <input type="number" class="calc-input" id="mttr" value="4" min="0.5" step="0.5" aria-label="MTTR">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Redundancy Configuration
-                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Redundancy Topology</div><div class="aig-tooltip-desc">N = no spare; N+1 = one standby unit; 2N = fully mirrored parallel path; 2N+1 = mirrored + one spare. Higher redundancy exponentially reduces single-point-of-failure risk.</div><div class="aig-tooltip-formula">2N: A_sys = 1 - (1-A)^2</div></span></span>
+                            <label class="calc-label" data-explain="redundancy-topology">Redundancy Configuration
+
                             </label>
                             <select class="calc-input" id="redundancy" aria-label="Redundancy">
                                 <option value="N">N (No redundancy)</option>
@@ -3562,8 +3539,8 @@ E = Cf × En × (t/0.2) × (610/D)^x
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Number of Components
-                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Total Component Count</div><div class="aig-tooltip-desc">Number of identical components in the system chain (e.g., 4 UPS modules, 6 CRAC units). Series chain reliability decreases as count increases — each added component is another potential failure point.</div><div class="aig-tooltip-formula">A_chain = A_single ^ n (series)</div></span></span>
+                            <label class="calc-label" data-explain="total-component-count">Number of Components
+
                             </label>
                             <input type="number" class="calc-input" id="components" value="4" min="1" max="20" aria-label="Components">
                         </div>
@@ -3606,8 +3583,8 @@ E = Cf × En × (t/0.2) × (610/D)^x
                     <!-- Strategic Inputs -->
                     <div class="aig-strategic-inputs">
                         <div class="aig-si-group">
-                            <label class="aig-si-label">SI-01: Workload Profile
-                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Workload Profile</div><div class="aig-tooltip-desc">Determines power density, cooling factor, failure rate multiplier, and regulatory weight. AI/HPC racks draw 50+ kW vs 8 kW for conventional.</div><div class="aig-tooltip-formula">Affects: CER, Stranded Capacity, REI</div></span></span>
+                            <label class="aig-si-label" data-explain="workload-profile">SI-01: Workload Profile
+
                             </label>
                             <select class="aig-si-input" id="aigWorkload" aria-label="Aig Workload">
                                 <option value="AI/HPC High-Density">AI/HPC High-Density</option>
@@ -3617,8 +3594,8 @@ E = Cf × En × (t/0.2) × (610/D)^x
                             </select>
                         </div>
                         <div class="aig-si-group">
-                            <label class="aig-si-label">SI-02: Design Redundancy Tier
-                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Redundancy Tier (I-IV)</div><div class="aig-tooltip-desc">Uptime Institute tier classification. Determines baseline availability, MTBF proxy, and maximum allowable downtime per year.</div><div class="aig-tooltip-formula">Tier IV: 99.995% | 2N+1 | 26 min/yr</div></span></span>
+                            <label class="aig-si-label" data-explain="redundancy-tier">SI-02: Design Redundancy Tier
+
                             </label>
                             <select class="aig-si-input" id="aigTier" aria-label="Aig Tier">
                                 <option value="I">Tier I — N (Basic)</option>
@@ -3628,20 +3605,20 @@ E = Cf × En × (t/0.2) × (610/D)^x
                             </select>
                         </div>
                         <div class="aig-si-group">
-                            <label class="aig-si-label">SI-03: Regional Power Reliability (1-10)
-                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Grid Reliability Score</div><div class="aig-tooltip-desc">Maps to regional grid stability. 10 = Singapore/Japan grade (SAIDI &lt; 5 min). 1 = frequent brownouts. Affects ARO and failure probability in Monte Carlo.</div><div class="aig-tooltip-formula">ARO modifier = 1 + (10 - score) &times; 0.15</div></span></span>
+                            <label class="aig-si-label" data-explain="grid-reliability-score">SI-03: Regional Power Reliability (1-10)
+
                             </label>
                             <input type="number" class="aig-si-input" id="aigGridScore" value="7" min="1" max="10" step="1" aria-label="Aig Grid Score">
                         </div>
                         <div class="aig-si-group">
-                            <label class="aig-si-label">SI-04: Process Maturity Level (1-5)
-                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Process Maturity (McKinsey Scale)</div><div class="aig-tooltip-desc">1=Reactive, 2=Defined, 3=Integrated, 4=Automated, 5=Optimized. Directly impacts MTTD, automation ratio, and governance integrity score.</div><div class="aig-tooltip-formula">Gov. Integrity = maturity &times; 20</div></span></span>
+                            <label class="aig-si-label" data-explain="process-maturity">SI-04: Process Maturity Level (1-5)
+
                             </label>
                             <input type="number" class="aig-si-input" id="aigMaturity" value="3" min="1" max="5" step="1" aria-label="Aig Maturity">
                         </div>
                         <div class="aig-si-group">
-                            <label class="aig-si-label">SI-05: Regulatory Sensitivity Class
-                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">EU AI Act Sensitivity Class</div><div class="aig-tooltip-desc">High-Risk AI requires Article 13 transparency, logging, human oversight. Determines compliance gap count and regulatory weight multiplier.</div><div class="aig-tooltip-formula">High-Risk: 1.5x regulatory weight</div></span></span>
+                            <label class="aig-si-label" data-explain="eu-ai-act-sensitivity-class">SI-05: Regulatory Sensitivity Class
+
                             </label>
                             <select class="aig-si-input" id="aigRegClass" aria-label="Aig Reg Class">
                                 <option value="High-Risk AI">High-Risk AI (Art. 6)</option>
@@ -3651,8 +3628,8 @@ E = Cf × En × (t/0.2) × (610/D)^x
                             </select>
                         </div>
                         <div class="aig-si-group">
-                            <label class="aig-si-label">SI-06: Fiduciary Tolerance ($)
-                                <span class="aig-tooltip-trigger" tabindex="0">?<span class="aig-tooltip-content"><div class="aig-tooltip-title">Max Single-Event Loss Tolerance</div><div class="aig-tooltip-desc">Maximum acceptable financial impact from a single catastrophic event. Used as SLE cap in ALE calculation and Monte Carlo stress testing.</div><div class="aig-tooltip-formula">ALE = SLE &times; ARO | COI threshold</div></span></span>
+                            <label class="aig-si-label" data-explain="max-single-event-loss-tolerance">SI-06: Fiduciary Tolerance ($)
+
                             </label>
                             <input type="number" class="aig-si-input" id="aigFiduciary" value="5000000" min="100000" max="50000000" step="100000" aria-label="Aig Fiduciary">
                         </div>
@@ -5406,28 +5383,7 @@ function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySel
     });
 
     // Tooltip positioning
-    document.querySelectorAll('.aig-tooltip-trigger').forEach(function(trigger) {
-        trigger.addEventListener('mouseenter', function() {
-            var tip = this.querySelector('.aig-tooltip-content');
-            if (!tip) return;
-            var rect = this.getBoundingClientRect();
-            var tipRect = tip.getBoundingClientRect();
-            if (rect.left + tipRect.width / 2 > window.innerWidth - 10) {
-                tip.style.left = 'auto';
-                tip.style.right = '-10px';
-                tip.style.transform = 'none';
-            }
-            if (rect.left - tipRect.width / 2 < 10) {
-                tip.style.left = '-10px';
-                tip.style.right = 'auto';
-                tip.style.transform = 'none';
-            }
-            if (rect.top < tipRect.height + 20) {
-                tip.style.bottom = 'auto';
-                tip.style.top = 'calc(100% + 10px)';
-            }
-        });
-    });
+    /* legacy tooltip hover system removed v1.60.0 — RZExplain owns tooltips */
 
     // ===================== INIT =====================
     if (aigCheckAuth()) {
@@ -5464,7 +5420,7 @@ function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySel
 <script src="js/rz-article-toc.js?v=1.50.42" defer></script>
 
 <!-- Search: shared js/rz-command-palette.js -->
-<script src="js/rz-command-palette.js?v=1.50.37" defer></script>
+<script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 <script src="auth.js?v=2026-07-16b" defer></script>
 <script src="rz-engine.min.js?v=2026-07-15-dsc" defer></script>
 <script src="rz-tracker.js" defer></script>

@@ -1044,52 +1044,6 @@
             border-color: rgba(146,64,14,0.45);
             box-shadow: 0 0 0 4px rgba(217,119,6,0.08);
         }
-        .hfx-tooltip-trigger {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: rgba(146,64,14,0.12);
-            color: #92400e;
-            font-size: 0.64rem;
-            font-weight: 700;
-            cursor: help;
-            position: relative;
-            flex-shrink: 0;
-        }
-        .hfx-tooltip-content {
-            display: none;
-            position: fixed;
-            width: 280px;
-            background: #0f172a;
-            border: 1px solid rgba(14,165,233,0.25);
-            border-radius: 12px;
-            padding: 0.9rem;
-            z-index: 9999;
-            box-shadow: 0 16px 48px rgba(2,6,23,0.55);
-            pointer-events: none;
-        }
-        .hfx-tooltip-title {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #67e8f9;
-            margin-bottom: 0.35rem;
-        }
-        .hfx-tooltip-desc {
-            font-size: 0.74rem;
-            color: #cbd5e1;
-            line-height: 1.55;
-            margin-bottom: 0.5rem;
-        }
-        .hfx-tooltip-formula {
-            font-size: 0.68rem;
-            color: #94a3b8;
-            padding-top: 0.45rem;
-            border-top: 1px solid rgba(255,255,255,0.08);
-            font-style: italic;
-        }
         .hfx-results-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1977,7 +1931,7 @@
 
                     <div class="hfx-input-grid">
                         <div class="hfx-input-group">
-                            <label for="hfxCountry">Country Profile <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Country Profile</div><div class="hfx-tooltip-desc">Uses a public-topology resilience baseline for the selected market. It is an analytical profile, not a live routing feed.</div><div class="hfx-tooltip-formula">Higher baseline = more likely access to bypass routes and diversified landing options.</div></span></span></label>
+                            <label for="hfxCountry" data-explain="country-profile">Country Profile</label>
                             <select id="hfxCountry">
                                 <option value="oman">Oman</option>
                                 <option value="uae">UAE</option>
@@ -1990,23 +1944,23 @@
                             </select>
                         </div>
                         <div class="hfx-input-group">
-                            <label for="hfxCables">Simultaneous Cable Faults <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Simultaneous Cable Faults</div><div class="hfx-tooltip-desc">The number of major routes impaired within the same corridor. Single faults are usually manageable; clustered faults create capacity squeeze.</div><div class="hfx-tooltip-formula">1 = resilience test, 2-3 = severe stress, 4+ = strategic degradation.</div></span></span></label>
+                            <label for="hfxCables" data-explain="simultaneous-cable-faults">Simultaneous Cable Faults</label>
                             <input id="hfxCables" type="number" min="1" max="6" step="1" value="3">
                         </div>
                         <div class="hfx-input-group">
-                            <label for="hfxDiversity">Route Diversity Index <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Route Diversity Index</div><div class="hfx-tooltip-desc">A simple 1-10 proxy for how physically separated remaining routes are after the event. More logical routes do not always mean better physical separation.</div><div class="hfx-tooltip-formula">1 = heavily converged; 10 = strong geodiversity.</div></span></span></label>
+                            <label for="hfxDiversity" data-explain="route-diversity-index">Route Diversity Index</label>
                             <input id="hfxDiversity" type="number" min="1" max="10" step="1" value="4">
                         </div>
                         <div class="hfx-input-group">
-                            <label for="hfxRepairDelay">Repair Delay (weeks) <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Repair Delay</div><div class="hfx-tooltip-desc">Total time before repair vessels can safely start meaningful restoration work.</div><div class="hfx-tooltip-formula">Longer delay magnifies business loss more than the initial hit itself.</div></span></span></label>
+                            <label for="hfxRepairDelay" data-explain="repair-delay">Repair Delay (weeks)</label>
                             <input id="hfxRepairDelay" type="number" min="1" max="24" step="1" value="6">
                         </div>
                         <div class="hfx-input-group">
-                            <label for="hfxDependence">Digital Dependence (%) <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Digital Dependence</div><div class="hfx-tooltip-desc">How much daily economic and social activity depends on stable cloud, broadband, payments, and cross-border applications.</div><div class="hfx-tooltip-formula">Higher dependence increases sector and public-service fallout.</div></span></span></label>
+                            <label for="hfxDependence" data-explain="digital-dependence">Digital Dependence (%)</label>
                             <input id="hfxDependence" type="number" min="30" max="95" step="1" value="72">
                         </div>
                         <div class="hfx-input-group">
-                            <label for="hfxSector">Priority Sector <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Priority Sector</div><div class="hfx-tooltip-desc">The sector you care about most when evaluating impact. Different sectors react differently to latency, jitter, and prolonged congestion.</div><div class="hfx-tooltip-formula">Finance and cloud are most latency-sensitive; ports and public services suffer from continuity drag.</div></span></span></label>
+                            <label for="hfxSector" data-explain="priority-sector">Priority Sector</label>
                             <select id="hfxSector">
                                 <option value="finance">Finance</option>
                                 <option value="cloud" selected>Cloud &amp; Data Centers</option>
@@ -2016,7 +1970,7 @@
                             </select>
                         </div>
                         <div class="hfx-input-group">
-                            <label for="hfxPriority">Traffic Prioritization <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Traffic Prioritization</div><div class="hfx-tooltip-desc">How aggressively operators protect essential traffic. Strong prioritization helps critical workloads but often shifts pain to lower-priority users.</div><div class="hfx-tooltip-formula">Aggressive prioritization improves survival, not overall customer experience.</div></span></span></label>
+                            <label for="hfxPriority" data-explain="traffic-prioritization">Traffic Prioritization</label>
                             <select id="hfxPriority">
                                 <option value="weak">Weak</option>
                                 <option value="moderate" selected>Moderate</option>
@@ -2071,15 +2025,15 @@
                         <h4><i class="fas fa-sliders"></i> Pro Scenario Variables</h4>
                         <div class="hfx-pro-grid">
                             <div class="hfx-pro-input-group">
-                                <label for="hfxTerrestrial">Terrestrial Bypass Strength <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Terrestrial Bypass</div><div class="hfx-tooltip-desc">How much traffic can realistically move over land toward alternative exits.</div><div class="hfx-tooltip-formula">0 = weak land bypass, 100 = strong overland relief.</div></span></span></label>
+                                <label for="hfxTerrestrial" data-explain="terrestrial-bypass">Terrestrial Bypass Strength</label>
                                 <input id="hfxTerrestrial" type="number" min="0" max="100" step="1" value="45">
                             </div>
                             <div class="hfx-pro-input-group">
-                                <label for="hfxOutsideStrait">Outside-Strait Landings <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Outside-Strait Landings</div><div class="hfx-tooltip-desc">Approximate number of meaningful landing options that avoid the most exposed corridor.</div><div class="hfx-tooltip-formula">More outside landings improve route survival and lower congestion pressure.</div></span></span></label>
+                                <label for="hfxOutsideStrait" data-explain="outside-strait-landings">Outside-Strait Landings</label>
                                 <input id="hfxOutsideStrait" type="number" min="0" max="6" step="1" value="2">
                             </div>
                             <div class="hfx-pro-input-group">
-                                <label for="hfxSecurity">Repair Access Condition <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Repair Access</div><div class="hfx-tooltip-desc">Assesses how easy it is for repair ships and permits to reach the fault area.</div><div class="hfx-tooltip-formula">Benign, restricted, or contested repair environment.</div></span></span></label>
+                                <label for="hfxSecurity" data-explain="repair-access">Repair Access Condition</label>
                                 <select id="hfxSecurity">
                                     <option value="benign">Benign</option>
                                     <option value="restricted" selected>Restricted</option>
@@ -2087,7 +2041,7 @@
                                 </select>
                             </div>
                             <div class="hfx-pro-input-group">
-                                <label for="hfxCloud">Cloud Concentration (%) <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Cloud Concentration</div><div class="hfx-tooltip-desc">The share of critical workloads tied to a narrow set of cloud routes or regions.</div><div class="hfx-tooltip-formula">High concentration raises application fragility under reroute stress.</div></span></span></label>
+                                <label for="hfxCloud" data-explain="cloud-concentration">Cloud Concentration (%)</label>
                                 <input id="hfxCloud" type="number" min="20" max="95" step="1" value="62">
                             </div>
                         </div>
@@ -2416,7 +2370,7 @@
 <script src="js/rz-article-toc.js?v=1.50.42" defer></script>
 
 <!-- Search: shared js/rz-command-palette.js -->
-<script src="js/rz-command-palette.js?v=1.50.37" defer></script>
+<script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 
 <script>
 window.hfxSetMode = window.hfxSetMode || function(){};
@@ -3204,30 +3158,7 @@ window.hfxHandleLogin = window.hfxHandleLogin || function(){};
         }
     };
 
-    document.querySelectorAll('.hfx-tooltip-trigger').forEach(function(trigger) {
-        function showTip() {
-            var content = trigger.querySelector('.hfx-tooltip-content');
-            if (!content) return;
-            content.style.display = 'block';
-            var rect = trigger.getBoundingClientRect();
-            var cRect = content.getBoundingClientRect();
-            var top = rect.bottom + 8;
-            var left = rect.left - cRect.width / 2 + rect.width / 2;
-            if (left < 8) left = 8;
-            if (left + cRect.width > window.innerWidth - 8) left = window.innerWidth - cRect.width - 8;
-            if (top + cRect.height > window.innerHeight - 8) top = rect.top - cRect.height - 8;
-            content.style.top = top + 'px';
-            content.style.left = left + 'px';
-        }
-        function hideTip() {
-            var content = trigger.querySelector('.hfx-tooltip-content');
-            if (content) content.style.display = 'none';
-        }
-        trigger.addEventListener('mouseenter', showTip);
-        trigger.addEventListener('mouseleave', hideTip);
-        trigger.addEventListener('focus', showTip);
-        trigger.addEventListener('blur', hideTip);
-    });
+    /* legacy tooltip hover system removed v1.60.0 — RZExplain owns tooltips */
 
     ['hfxCountry','hfxCables','hfxDiversity','hfxRepairDelay','hfxDependence','hfxSector','hfxPriority','hfxTerrestrial','hfxOutsideStrait','hfxSecurity','hfxCloud']
         .forEach(function(id) {

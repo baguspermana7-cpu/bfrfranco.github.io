@@ -2,8 +2,10 @@
 """build-explain-db.py — generate js/rz-explain-db.js (window.RZ_EXPLAIN_DB) from:
   1. glossary.html   — the 354-term human-maintained glossary (source of truth)
   2. tools/explain-extra.json — curated super-detail entries (calculator/finance params)
-Curated entries WIN on key collision (they're richer). Deterministic output (sorted keys).
-Run after editing glossary or explain-extra:  python3 tools/build-explain-db.py
+  3. tools/explain-extra-batch*.json — curated migration batches (term-tooltip -> RZExplain)
+Curated entries WIN on key collision (they're richer); later batches win over earlier.
+Deterministic output (sorted keys).
+Run after editing glossary or explain-extra*:  python3 tools/build-explain-db.py
 """
 import json
 import pathlib
@@ -59,6 +61,8 @@ def main() -> None:
     extra = {}
     if EXTRA.exists():
         extra = json.loads(EXTRA.read_text(encoding='utf-8')).get('entries', {})
+    for batch in sorted((ROOT / 'tools').glob('explain-extra-batch*.json')):
+        extra.update(json.loads(batch.read_text(encoding='utf-8')).get('entries', {}))
     merged = dict(glossary)
     merged.update(extra)          # curated wins on key collision
     # alias dedupe: if a curated entry claims an alias, strip it from glossary entries
@@ -93,7 +97,17 @@ def main() -> None:
         + str(len(extra)) + ' curated). See standarization/EXPLAIN_ENGINE_STANDARD.md. */\n'
         'window.RZ_EXPLAIN_DB = ' + body + ';\n',
         encoding='utf-8')
-    print(f'WROTE {OUT.name}: glossary {len(glossary)} + curated {len(extra)} = {len(merged)} entries')
+    # palette deep-search corpus: navigable glossary terms (id offset avoids collisions)
+    terms = []
+    for i, (k, e) in enumerate(sorted(merged.items())):
+        if not e.get('link'):
+            continue
+        terms.append({'id': 10000 + i, 'title': e['t'], 'url': e['link'],
+                      'description': e['d'][:180], 'category': 'Glossary',
+                      'keywords': e.get('aliases', [])})
+    (ROOT / 'search-terms.json').write_text(
+        json.dumps(terms, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    print(f'WROTE {OUT.name}: glossary {len(glossary)} + curated {len(extra)} = {len(merged)} entries; search-terms.json: {len(terms)} palette terms')
 
 
 if __name__ == '__main__':

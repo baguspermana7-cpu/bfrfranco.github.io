@@ -702,54 +702,6 @@
         }
         .calc-input-group select option { background: #0c1929; color: #fff; }
 
-        .calc-tooltip {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px;
-            height: 16px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 50%;
-            font-size: 0.65rem;
-            color: #a8a29e;
-            cursor: help;
-            margin-left: 4px;
-            position: relative;
-            vertical-align: middle;
-            flex-shrink: 0;
-        }
-        .calc-tooltip .tip-text {
-            visibility: hidden;
-            opacity: 0;
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e293b;
-            color: #e2e8f0;
-            padding: 0.6rem 0.75rem;
-            border-radius: 8px;
-            font-size: 0.72rem;
-            line-height: 1.4;
-            width: 220px;
-            text-align: left;
-            z-index: 10;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-            transition: opacity 0.2s ease, visibility 0.2s ease;
-            pointer-events: none;
-            font-style: normal;
-            font-weight: 400;
-        }
-        .calc-tooltip .tip-text::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 6px solid transparent;
-            border-top-color: #1e293b;
-        }
-        .calc-tooltip:hover .tip-text { visibility: visible; opacity: 1; }
 
         /* Result tooltip */
         .res-tip {
@@ -1797,15 +1749,15 @@
                 <!-- Inputs -->
                 <div class="calc-grid">
                     <div class="calc-input-group">
-                        <label>Rack Density (kW) <span class="calc-tooltip">?<span class="tip-text">Average power per rack. Traditional DCs: 5-10kW. AI-native: 40-130kW. GB300 NVL72 requires 132kW per rack.</span></span></label>
+                        <label data-explain="rack-density">Rack Density (kW)</label>
                         <input type="number" id="aifDensity" value="10" min="1" max="600" step="1" aria-label="Aif Density">
                     </div>
                     <div class="calc-input-group">
-                        <label>Number of AI Racks <span class="calc-tooltip">?<span class="tip-text">Total GPU/AI racks to deploy. Hyperscale clusters: 1000+. Enterprise AI: 50-200. Small AI labs: 10-50.</span></span></label>
+                        <label data-explain="number-of-ai-racks">Number of AI Racks</label>
                         <input type="number" id="aifRacks" value="100" min="10" max="5000" step="10" aria-label="Aif Racks">
                     </div>
                     <div class="calc-input-group">
-                        <label>Cooling Type <span class="calc-tooltip">?<span class="tip-text">Air: limited to ~30kW/rack. Direct-to-Chip (DTC): up to 200kW/rack, dominant solution. Immersion: 300kW+, PFAS regulatory risk.</span></span></label>
+                        <label data-explain="cooling-type">Cooling Type</label>
                         <select id="aifCooling" aria-label="Aif Cooling">
                             <option value="air">Air Cooling</option>
                             <option value="dtc">Direct-to-Chip (DTC)</option>
@@ -1813,23 +1765,23 @@
                         </select>
                     </div>
                     <div class="calc-input-group">
-                        <label>Current PUE <span class="calc-tooltip">?<span class="tip-text">Power Usage Effectiveness. Industry average: 1.58. Best liquid-cooled: 1.10. Google fleet: 1.09. Values below 1.1 require full liquid cooling.</span></span></label>
+                        <label data-explain="current-pue">Current PUE</label>
                         <input type="number" id="aifPUE" value="1.5" min="1.0" max="3.0" step="0.01" aria-label="Aif PUE">
                     </div>
                     <div class="calc-input-group">
-                        <label>Electricity Rate ($/kWh) <span class="calc-tooltip">?<span class="tip-text">Local utility rate. US average: $0.08. EU: $0.15-0.25. Indonesia: $0.07. Singapore: $0.12. Lower rates favor higher-density deployments.</span></span></label>
+                        <label data-explain="electricity-rate">Electricity Rate ($/kWh)</label>
                         <input type="number" id="aifElecRate" value="0.08" min="0.01" max="0.50" step="0.01" aria-label="Aif Elec Rate">
                     </div>
                     <div class="calc-input-group">
-                        <label>Facility Age (years) <span class="calc-tooltip">?<span class="tip-text">Older facilities face higher retrofit costs and structural limitations. Facilities over 10 years typically require significant upgrades for AI workloads.</span></span></label>
+                        <label data-explain="facility-age">Facility Age (years)</label>
                         <input type="number" id="aifAge" value="8" min="0" max="30" step="1" aria-label="Aif Age">
                     </div>
                     <div class="calc-input-group">
-                        <label>Floor Load (kg/m&sup2;) <span class="calc-tooltip">?<span class="tip-text">Structural capacity per square meter. Traditional: 1000 kg/m&sup2;. AI racks (3 ton): need 2500+ kg/m&sup2;. Reinforcement costs $50-150/m&sup2;.</span></span></label>
+                        <label data-explain="floor-load">Floor Load (kg/m&sup2;)</label>
                         <input type="number" id="aifFloorLoad" value="1000" min="300" max="5000" step="100" aria-label="Aif Floor Load">
                     </div>
                     <div class="calc-input-group">
-                        <label>LC Infrastructure <span class="calc-tooltip">?<span class="tip-text">Whether facility has chilled water loops, CDUs, or rear-door heat exchangers installed. Full = complete DTC or immersion ready. Partial = some piping/CDUs. None = air only.</span></span></label>
+                        <label data-explain="lc-infrastructure">LC Infrastructure</label>
                         <select id="aifLCInfra" aria-label="Aif LCInfra">
                             <option value="none">None (Air Only)</option>
                             <option value="partial">Partial (Some Piping/CDUs)</option>
@@ -3003,7 +2955,7 @@ if (aifPremium) { aifUnlockPanels(); }
 <script src="js/rz-article-toc.js?v=1.50.42" defer></script>
 
 <!-- Search: shared js/rz-command-palette.js -->
-<script src="js/rz-command-palette.js?v=1.50.37" defer></script>
+<script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 <script src="auth.js?v=2026-07-16b" defer></script>
 <script src="rz-engine.min.js?v=2026-07-15-dsc" defer></script>
 

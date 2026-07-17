@@ -845,59 +845,7 @@
         }
 
         /* Tooltip Icon Styles */
-        .tooltip-icon, .opm-tooltip-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px;
-            height: 16px;
-            background: rgba(16,185,129,0.15);
-            border: 1px solid rgba(16,185,129,0.3);
-            border-radius: 50%;
-            font-size: 0.65rem;
-            font-weight: 700;
-            color: #34d399;
-            margin-left: 4px;
-            cursor: help;
-            vertical-align: middle;
-            position: relative;
-            flex-shrink: 0;
-        }
-        .tooltip-icon:hover, .opm-tooltip-icon:hover {
-            background: rgba(16, 185, 129, 0.3);
-            color: #34d399;
-            transform: scale(1.15);
-        }
-        .tooltip-icon .tip-text, .opm-tooltip-icon .tip-text,
-        .result-tooltip .tip-text {
-            visibility: hidden;
-            opacity: 0;
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e293b;
-            color: #e2e8f0;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            font-size: 0.72rem;
-            font-weight: 400;
-            line-height: 1.5;
-            width: 280px;
-            z-index: 100;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-            border: 1px solid rgba(16,185,129,0.2);
-            transition: opacity 0.2s ease;
-            pointer-events: none;
-            text-transform: none;
-            letter-spacing: normal;
-        }
-        .tooltip-icon:hover .tip-text, .opm-tooltip-icon:hover .tip-text,
-        .result-tooltip:hover .tip-text {
-            visibility: visible;
-            opacity: 1;
-        }
-        .tip-text .tt-title {
+        .tooltip-icon,        .tooltip-icon:hover,        .tooltip-icon .tip-text,        .tooltip-icon:hover .tip-text,        .tip-text .tt-title {
             font-size: 0.78rem;
             font-weight: 700;
             color: #34d399;
@@ -2171,32 +2119,32 @@
                     </h4>
                     <div class="calc-results" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
                         <div class="calc-result-item">
-                            <div class="label">CAPEX Investment <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">CAPEX Investment</div><div class="tt-desc">Total capital expenditure for DC construction including land, building, power infrastructure, and cooling systems.</div><div class="tt-formula">Typical: $10-18M per MW of IT capacity</div></span></span></div>
+                            <div class="label" data-explain="capex-investment">CAPEX Investment</div>
                             <div class="value blue" id="capexInvestment">$1.2B</div>
                             <div class="subtext">DC construction cost</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Annual OPEX <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">Annual Operating Expenses</div><div class="tt-desc">Yearly operating costs including staffing, maintenance, insurance, and non-energy overhead.</div><div class="tt-formula">Typically 3-5% of CAPEX per year</div></span></span></div>
+                            <div class="label" data-explain="annual-operating-expenses">Annual OPEX</div>
                             <div class="value" id="annualOpex">$85M</div>
                             <div class="subtext">operating expenses/year</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Annual Energy Spend <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">Annual Energy Spend</div><div class="tt-desc">Total electricity cost per year, the single largest operating expense for most data centers.</div><div class="tt-formula">IT Load × PUE × 8,760 hrs × $/kWh</div></span></span></div>
+                            <div class="label" data-explain="annual-energy-spend">Annual Energy Spend</div>
                             <div class="value yellow" id="annualEnergy">$72M</div>
                             <div class="subtext">electricity cost/year</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Tax Revenue (Est.) <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">Tax Revenue Generated</div><div class="tt-desc">Estimated annual tax contribution to local and national government from DC operations, property, and payroll.</div></span></span></div>
+                            <div class="label" data-explain="tax-revenue-generated">Tax Revenue (Est.)</div>
                             <div class="value" id="taxRevenue">$15M</div>
                             <div class="subtext">to local/national gov</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Direct Jobs <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">Direct Jobs</div><div class="tt-desc">Permanent full-time positions at the data center facility including operations, security, and management.</div><div class="tt-formula">Benchmark: 30-50 jobs per 10MW for hyperscale</div></span></span></div>
+                            <div class="label" data-explain="direct-jobs">Direct Jobs</div>
                             <div class="value" id="directJobs">150</div>
                             <div class="subtext">permanent positions</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Indirect Jobs <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">Indirect Jobs</div><div class="tt-desc">Supply chain and service ecosystem jobs created: construction, maintenance vendors, equipment suppliers, fiber providers.</div><div class="tt-formula">Multiplier: 3-5x direct jobs</div></span></span></div>
+                            <div class="label" data-explain="indirect-jobs">Indirect Jobs</div>
                             <div class="value" id="indirectJobs">650</div>
                             <div class="subtext">supply chain + services</div>
                         </div>
@@ -2251,32 +2199,32 @@
                     </h4>
                     <div class="calc-results" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
                         <div class="calc-result-item">
-                            <div class="label">Renewable PPA Capacity <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">Renewable PPA Capacity</div><div class="tt-desc">Solar/wind capacity contracted through Power Purchase Agreements to meet renewable energy targets.</div></span></span></div>
+                            <div class="label" data-explain="renewable-ppa-capacity">Renewable PPA Capacity</div>
                             <div class="value" id="ppaCapacity">150 MW</div>
                             <div class="subtext">solar/wind contracted</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">PPA Investment Value <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">PPA Investment Value</div><div class="tt-desc">Total contract value of renewable energy PPAs over the analysis period. Drives green energy infrastructure investment.</div></span></span></div>
+                            <div class="label" data-explain="ppa-investment-value">PPA Investment Value</div>
                             <div class="value blue" id="ppaValue">$67.5M</div>
                             <div class="subtext">20-year contract value</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Grid Surplus Value <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">Grid Surplus Value</div><div class="tt-desc">Annual value of excess renewable generation fed back to the grid, calculated using E3 methodology.</div><div class="tt-formula">Depends on renewable overbuild and curtailment rates</div></span></span></div>
+                            <div class="label" data-explain="grid-surplus-value">Grid Surplus Value</div>
                             <div class="value" id="gridSurplus">$3.35M</div>
                             <div class="subtext">annual (E3 methodology)</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Demand Response Value <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">Demand Response Value</div><div class="tt-desc">Annual revenue from providing grid stability services by adjusting DC load during peak demand periods.</div><div class="tt-formula">~$50K/MW/year in mature markets</div></span></span></div>
+                            <div class="label" data-explain="demand-response-value">Demand Response Value</div>
                             <div class="value yellow" id="drValue">$850K</div>
                             <div class="subtext">annual grid services</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Load Factor Benefit <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">Load Factor Benefit</div><div class="tt-desc">Economic advantage of DC's high, steady load factor (80-95%) versus residential's low, peaky profile (30-40%).</div></span></span></div>
+                            <div class="label" data-explain="load-factor-benefit">Load Factor Benefit</div>
                             <div class="value" id="loadFactorBenefit">+$2.1M</div>
                             <div class="subtext">vs. residential equivalent</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Grid Reliability Index <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">Grid Reliability Improvement</div><div class="tt-desc">Incremental improvement to grid system reliability from DC investments in substation infrastructure and demand response.</div></span></span></div>
+                            <div class="label" data-explain="grid-reliability-improvement">Grid Reliability Index</div>
                             <div class="value" id="reliabilityIndex">+0.12%</div>
                             <div class="subtext">system improvement</div>
                         </div>
@@ -2330,32 +2278,32 @@
                     </h4>
                     <div class="calc-results" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
                         <div class="calc-result-item">
-                            <div class="label">Annual Energy Use <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">Annual Energy Use</div><div class="tt-desc">Total electricity consumption of the DC including IT load and all overhead (cooling, lighting, UPS losses).</div></span></span></div>
+                            <div class="label" data-explain="annual-energy-use">Annual Energy Use</div>
                             <div class="value" id="annualEnergy2">744</div>
                             <div class="subtext">GWh/year</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Grid Carbon Intensity <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">Grid Carbon Intensity</div><div class="tt-desc">CO2 emissions per kWh from the regional electricity grid. Varies dramatically by country and fuel mix.</div><div class="tt-formula">Measured in gCO2/kWh. Nordic: ~20 &middot; US avg: ~380 &middot; SEA: ~500-800</div></span></span></div>
+                            <div class="label" data-explain="grid-carbon-intensity">Grid Carbon Intensity</div>
                             <div class="value yellow" id="carbonIntensity">610</div>
                             <div class="subtext">gCO2/kWh</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Baseline Emissions <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">Baseline Emissions</div><div class="tt-desc">Total CO2 emissions if the DC used 100% grid electricity with no renewable procurement.</div></span></span></div>
+                            <div class="label" data-explain="baseline-emissions">Baseline Emissions</div>
                             <div class="value" style="color: #f87171;" id="baselineEmissions">454K</div>
                             <div class="subtext">tons CO2/year</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">With Renewables <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">Emissions With Renewables</div><div class="tt-desc">Net CO2 emissions after accounting for renewable energy procurement (PPAs, RECs, on-site generation).</div></span></span></div>
+                            <div class="label" data-explain="emissions-with-renewables">With Renewables</div>
                             <div class="value" id="renewableEmissions">0</div>
                             <div class="subtext">tons CO2/year</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">CO2 Avoided <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">CO2 Avoided</div><div class="tt-desc">Total CO2 emissions prevented through renewable energy procurement. The green premium investment's climate impact.</div></span></span></div>
+                            <div class="label" data-explain="co2-avoided">CO2 Avoided</div>
                             <div class="value" style="color: #34d399;" id="co2Avoided">454K</div>
                             <div class="subtext">tons/year</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Equivalent Trees <span class="result-tooltip">?<span class="tip-text"><div class="tt-title">Equivalent Trees Planted</div><div class="tt-desc">Carbon offset equivalent expressed as number of mature trees needed to absorb the same CO2.</div><div class="tt-formula">1 mature tree absorbs ~22kg CO2/year</div></span></span></div>
+                            <div class="label" data-explain="equivalent-trees-planted">Equivalent Trees</div>
                             <div class="value" id="treesEquiv">20.6M</div>
                             <div class="subtext">trees for 1 year</div>
                         </div>
@@ -2415,7 +2363,7 @@
                     <h4><i class="fas fa-sliders-h"></i> Strategic Maturity Inputs</h4>
                     <div class="opm-input-grid">
                         <div class="opm-input-group">
-                            <label for="opmRegion">Region / Location <span class="opm-tooltip-icon">?<span class="tip-text"><div class="tt-title">Deployment Region</div><div class="tt-desc">Determines regulatory regime (EU EED Article 12 mandatory for EU), grid carbon intensity, energy rates, water stress index, and local labor costs.</div></span></span></label>
+                            <label for="opmRegion" data-explain="deployment-region">Region / Location</label>
                             <select id="opmRegion" onchange="opmRecalc()">
                                 <option value="EU-Germany">EU - Germany</option>
                                 <option value="EU-Ireland">EU - Ireland</option>
@@ -2428,7 +2376,7 @@
                             </select>
                         </div>
                         <div class="opm-input-group">
-                            <label for="opmTier">Infrastructure Tier <span class="opm-tooltip-icon">?<span class="tip-text"><div class="tt-title">Infrastructure Tier</div><div class="tt-desc">Uptime Institute Tier I-IV. Determines redundancy level, expected availability, and baseline MTBF/MTTR assumptions.</div><div class="tt-formula">Tier III: 99.982% &middot; Tier IV: 99.995% availability</div></span></span></label>
+                            <label for="opmTier" data-explain="infrastructure-tier">Infrastructure Tier</label>
                             <select id="opmTier" onchange="opmRecalc()">
                                 <option value="1">Tier I - Basic</option>
                                 <option value="2">Tier II - Redundant</option>
@@ -2437,23 +2385,23 @@
                             </select>
                         </div>
                         <div class="opm-input-group">
-                            <label for="opmITLoad">Total IT Load (MW) <span class="opm-tooltip-icon">?<span class="tip-text"><div class="tt-title">Total IT Load</div><div class="tt-desc">Total IT equipment power in megawatts. EED Article 12 reporting mandatory for EU DCs >500kW. Larger facilities have economies of scale.</div><div class="tt-formula">Benchmark: 0.5-2.5 FTE per MW</div></span></span></label>
+                            <label for="opmITLoad" data-explain="total-it-load">Total IT Load (MW)</label>
                             <input type="number" id="opmITLoad" value="10" min="0.5" max="100" step="0.5" onchange="opmRecalc()">
                         </div>
                         <div class="opm-input-group">
-                            <label for="opmPUE">Current PUE <span class="opm-tooltip-icon">?<span class="tip-text"><div class="tt-title">Current PUE</div><div class="tt-desc">Power Usage Effectiveness. Google averages 1.10, industry average 1.56. Each 0.1 PUE improvement saves ~6-8% energy costs.</div><div class="tt-formula">PUE = Total Facility Power / IT Power</div></span></span></label>
+                            <label for="opmPUE" data-explain="opm-current-pue">Current PUE</label>
                             <input type="number" id="opmPUE" value="1.45" min="1.1" max="3.0" step="0.01" onchange="opmRecalc()">
                         </div>
                         <div class="opm-input-group">
-                            <label for="opmStaffCount">Staff Count <span class="opm-tooltip-icon">?<span class="tip-text"><div class="tt-title">Staff Count</div><div class="tt-desc">FTE headcount for facility operations. Benchmark: 0.5-2.5 FTE per MW depending on tier and automation level.</div><div class="tt-formula">High turnover (&gt;25%) indicates culture or compensation issues</div></span></span></label>
+                            <label for="opmStaffCount" data-explain="staff-count">Staff Count</label>
                             <input type="number" id="opmStaffCount" value="50" min="5" max="500" step="1" onchange="opmRecalc()">
                         </div>
                         <div class="opm-input-group">
-                            <label for="opmTurnover">Staff Turnover (%) <span class="opm-tooltip-icon">?<span class="tip-text"><div class="tt-title">Staff Turnover Rate</div><div class="tt-desc">Annual voluntary turnover rate. Knowledge loss from turnover compounds reliability risk over time.</div><div class="tt-formula">Excellent: &lt;10% &middot; Average: ~18% &middot; Critical: &gt;30%</div></span></span></label>
+                            <label for="opmTurnover" data-explain="staff-turnover-rate">Staff Turnover (%)</label>
                             <input type="number" id="opmTurnover" value="18" min="5" max="60" step="1" onchange="opmRecalc()">
                         </div>
                         <div class="opm-input-group">
-                            <label for="opmIncidents">Incident Frequency <span class="opm-tooltip-icon">?<span class="tip-text"><div class="tt-title">Incident Frequency</div><div class="tt-desc">Critical incidents (Sev-1/Sev-2) per year causing customer impact or capacity loss. Each costs $100K-$1M+ in direct + reputational damage.</div><div class="tt-formula">Mature: 0-3/yr &middot; Average: 5-12/yr &middot; Immature: 15+/yr</div></span></span></label>
+                            <label for="opmIncidents" data-explain="incident-frequency">Incident Frequency</label>
                             <input type="number" id="opmIncidents" value="8" min="0" max="50" step="1" onchange="opmRecalc()">
                         </div>
                     </div>
@@ -4235,7 +4183,7 @@
 <script src="js/rz-article-toc.js?v=1.50.42" defer></script>
 
 <!-- Search: shared js/rz-command-palette.js -->
-<script src="js/rz-command-palette.js?v=1.50.37" defer></script>
+<script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 <script src="auth.js?v=2026-07-16b" defer></script>
 <script src="rz-engine.min.js?v=2026-07-15-dsc" defer></script>
 <script src="rz-tracker.js" defer></script>

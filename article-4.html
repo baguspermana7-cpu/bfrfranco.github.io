@@ -1152,23 +1152,6 @@
             position: relative;
         }
         .tooltip-trigger .tooltip-content { display: none !important; position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none; }
-        #calc-tooltip-container {
-            display: none; position: absolute; z-index: 1000; width: 320px;
-            background: #1e293b; border: 1px solid rgba(59,130,246,0.25);
-            border-radius: 12px; padding: 1rem; box-shadow: 0 12px 30px rgba(0,0,0,0.4);
-            pointer-events: none;
-        }
-        #calc-tooltip-container .tooltip-title {
-            color: var(--accent-blue); font-weight: 700; font-size: 0.8rem;
-            margin-bottom: 0.35rem;
-        }
-        #calc-tooltip-container .tooltip-desc {
-            color: #cbd5e1; font-size: 0.78rem; line-height: 1.55; margin-bottom: 0.35rem;
-        }
-        #calc-tooltip-container .tooltip-formula {
-            color: #64748b; font-size: 0.72rem; font-style: italic;
-            border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.35rem;
-        }
 
         /* PDF Export Button */
         .pdf-btn {
@@ -2060,11 +2043,10 @@
                         </div>
                     </div>
 
-                    <div id="calc-tooltip-container"></div>
 
                     <div class="calc-grid">
                         <div class="calc-input-group">
-                            <label class="calc-label">Incident Category <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Infrastructure Domain</div><div class="tooltip-desc">Select the primary incident category. Each domain has distinct MTTR phase baselines derived from industry data: Electrical (UPS, PDU, switchgear), Mechanical (HVAC, chillers, CRAH), Controls (BMS, PLC, sensors), Fire Protection (suppression, VESDA, detection).</div><div class="tooltip-formula">Ref: IEEE 493 Gold Book — category-specific failure/repair distributions</div></span></span></label>
+                            <label class="calc-label" data-explain="infrastructure-domain">Incident Category</label>
                             <select id="calcCategory" class="calc-select" aria-label="Calc Category">
                                 <option value="Electrical" selected>Electrical</option>
                                 <option value="Mechanical">Mechanical</option>
@@ -2073,11 +2055,11 @@
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Vendor SLA Hours <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Contracted Response Time</div><div class="tooltip-desc">Maximum guaranteed time for vendor technician to arrive on-site after dispatch. This drives the Mobilization phase of vendor MTTR. Note: SLA guarantees arrival, not resolution. Actual response may vary ±40% based on time-of-day and resource availability.</div><div class="tooltip-formula">Typical P1: 4h | P2: 8h | P3: 24h | P4: 48h</div></span></span></label>
+                            <label class="calc-label" data-explain="contracted-response-time">Vendor SLA Hours</label>
                             <input type="number" id="calcVendorSLA" class="calc-input" value="4" min="1" max="24" step="0.5" aria-label="Calc Vendor SLA">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">In-House Skill Level <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Team Competence Tier</div><div class="tooltip-desc">Average diagnostic and repair competence of in-house technicians. Affects Diagnosis and Repair phase durations via a skill factor multiplier. L1 Novice: follow SOPs only. L3 Competent: independent troubleshooting. L5 Expert: root cause analysis, cross-domain.</div><div class="tooltip-formula">Skill Factor: L1=1.50x | L2=1.20x | L3=1.00x | L4=0.75x | L5=0.55x</div></span></span></label>
+                            <label class="calc-label" data-explain="team-competence-tier">In-House Skill Level</label>
                             <select id="calcSkillLevel" class="calc-select" aria-label="Calc Skill Level">
                                 <option value="1">1 — Novice</option>
                                 <option value="2" selected>2 — Basic</option>
@@ -2087,19 +2069,19 @@
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Annual Incidents <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Critical Incident Frequency</div><div class="tooltip-desc">Total critical incidents per year requiring immediate response. Drives annual downtime and cost calculations. A 10MW colocation facility typically experiences 30-50 critical incidents/year across all infrastructure domains.</div><div class="tooltip-formula">Ref: Uptime Institute 2023 — median critical incident frequency for Tier III facilities</div></span></span></label>
+                            <label class="calc-label" data-explain="critical-incident-frequency">Annual Incidents</label>
                             <input type="number" id="calcIncidents" class="calc-input" value="36" min="1" max="200" aria-label="Calc Incidents">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Downtime Cost / Hour ($) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Hourly Outage Cost</div><div class="tooltip-desc">Weighted average cost per hour of downtime including SLA penalties, revenue loss, reputational impact, and operational overhead. Varies significantly by client mix and facility tier. Range: $1,000 (enterprise) to $100,000+ (financial services).</div><div class="tooltip-formula">Ref: Uptime Institute 2023 — average significant outage cost >$100K</div></span></span></label>
+                            <label class="calc-label" data-explain="hourly-outage-cost">Downtime Cost / Hour ($)</label>
                             <input type="number" id="calcCostHour" class="calc-input" value="9000" min="100" step="500" aria-label="Calc Cost Hour">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Vendor Callout Cost ($) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Per-Incident Vendor Fee</div><div class="tooltip-desc">Direct cost per emergency vendor dispatch including emergency response premium, labor, travel, and standard parts. Does NOT include downtime cost (calculated separately). Excludes retainer/contract fees.</div><div class="tooltip-formula">Typical range: $1,500-$5,000 per P1 callout depending on OEM and region</div></span></span></label>
+                            <label class="calc-label" data-explain="per-incident-vendor-fee">Vendor Callout Cost ($)</label>
                             <input type="number" id="calcCallout" class="calc-input" value="2500" min="100" step="100" aria-label="Calc Callout">
                         </div>
                         <div class="calc-input-group">
-                            <label class="calc-label">Training Investment ($) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Annual ICB Investment</div><div class="tooltip-desc">Total annual investment in capability building: OEM training courses, certifications (NFPA 70E, refrigerant handling), diagnostic equipment, spare parts inventory, and competence assessment programs. Year 1 typically 60-70% higher than ongoing.</div><div class="tooltip-formula">ICB Framework: Year 1 ~$85K | Year 2+ ~$50K (10MW facility baseline)</div></span></span></label>
+                            <label class="calc-label" data-explain="annual-icb-investment">Training Investment ($)</label>
                             <input type="number" id="calcTraining" class="calc-input" value="50000" min="0" step="5000" aria-label="Calc Training">
                         </div>
                     </div>
@@ -2109,15 +2091,15 @@
                         <div class="pro-drawer-title"><i class="fas fa-sliders"></i> Advanced Parameters</div>
                         <div class="calc-grid">
                             <div class="calc-input-group">
-                                <label class="calc-label">MTBF (hours) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Mean Time Between Failures</div><div class="tooltip-desc">Average operating hours between critical failures for the selected infrastructure category. Used to calculate system availability: A = MTBF/(MTBF+MTTR). MTBF is primarily driven by equipment design, age, and PM quality.</div><div class="tooltip-formula">Typical DC: 4,000-15,000 hrs | NASA/IEEE 493 availability framework</div></span></span></label>
+                                <label class="calc-label" data-explain="mean-time-between-failures">MTBF (hours)</label>
                                 <input type="number" id="proMTBF" class="calc-input" value="8760" min="500" max="100000" step="100" aria-label="Pro MTBF">
                             </div>
                             <div class="calc-input-group">
-                                <label class="calc-label">Off-Hours SLA Multiplier <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Weekend/Holiday Response Degradation</div><div class="tooltip-desc">Multiplier applied to vendor SLA during off-hours, weekends, and holidays. Analysis shows vendor P1 response averages 6.8h off-hours vs 3.4h business hours — a 2.0x degradation factor. Affects Monte Carlo tail risk calculations.</div><div class="tooltip-formula">Typical: 1.5x (best case) to 2.5x (remote site) | Source: Section 5.2</div></span></span></label>
+                                <label class="calc-label" data-explain="weekend-holiday-response-degradation">Off-Hours SLA Multiplier</label>
                                 <input type="number" id="proOffHours" class="calc-input" value="2.0" min="1.0" max="4.0" step="0.1" aria-label="Pro Off Hours">
                             </div>
                             <div class="calc-input-group">
-                                <label class="calc-label">In-House Coverage <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Shift Coverage Model</div><div class="tooltip-desc">In-house team coverage pattern. Affects mobilization time distribution — 24/7 coverage eliminates off-hours gaps. Limited coverage models introduce mobilization variance during uncovered periods.</div><div class="tooltip-formula">24/7: 0.25h mob | 16/7: avg 0.8h | 12/5: avg 2.1h (off-hours)</div></span></span></label>
+                                <label class="calc-label" data-explain="shift-coverage-model">In-House Coverage</label>
                                 <select id="proCoverage" class="calc-select" aria-label="Pro Coverage">
                                     <option value="24_7" selected>24/7 — Full Coverage</option>
                                     <option value="16_7">16/7 — Two Shifts</option>
@@ -2125,23 +2107,23 @@
                                 </select>
                             </div>
                             <div class="calc-input-group">
-                                <label class="calc-label">Spare Parts Readiness (%) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Critical Spares Availability</div><div class="tooltip-desc">Percentage of common failure components available in on-site inventory. Directly affects Repair phase duration — missing parts add procurement delay (typically 4-48 hours). Strategic spares program is an ICB Phase 3 deliverable.</div><div class="tooltip-formula">Impact: Each 10% gap adds ~0.3h to avg repair phase | ICB Phase 3</div></span></span></label>
+                                <label class="calc-label" data-explain="critical-spares-availability">Spare Parts Readiness (%)</label>
                                 <input type="number" id="proSpares" class="calc-input" value="80" min="0" max="100" step="5" aria-label="Pro Spares">
                             </div>
                             <div class="calc-input-group">
-                                <label class="calc-label">Team Size (responders) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Qualified In-House Responders</div><div class="tooltip-desc">Number of Tier 2+ qualified technicians available for incident response. Used in Erlang-C queueing model to calculate wait probability when multiple incidents occur simultaneously. Understaffing creates hidden queuing delays.</div><div class="tooltip-formula">Erlang-C: P(wait) increases exponentially as utilization → 1.0</div></span></span></label>
+                                <label class="calc-label" data-explain="qualified-in-house-responders">Team Size (responders)</label>
                                 <input type="number" id="proTeamSize" class="calc-input" value="4" min="1" max="20" step="1" aria-label="Pro Team Size">
                             </div>
                             <div class="calc-input-group">
-                                <label class="calc-label">Vendor Retainer ($/yr) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Annual Vendor Contract</div><div class="tooltip-desc">Base annual vendor maintenance contract cost (covering PM visits, priority access, parts discounts). Partially retained under in-house model for OEM warranty work and Tier 4 escalations — typically reduced by 40-60%.</div><div class="tooltip-formula">Under ICB: retain ~40% of retainer for Tier 4 OEM access</div></span></span></label>
+                                <label class="calc-label" data-explain="annual-vendor-contract">Vendor Retainer ($/yr)</label>
                                 <input type="number" id="proRetainer" class="calc-input" value="180000" min="0" step="10000" aria-label="Pro Retainer">
                             </div>
                             <div class="calc-input-group">
-                                <label class="calc-label">Critical Severity (%) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">P1 Critical Mix</div><div class="tooltip-desc">Percentage of incidents classified as P1 Critical (client-impacting). Critical incidents carry full downtime cost; non-critical incidents carry reduced cost (typically 30% of full rate). Affects financial calculation realism.</div><div class="tooltip-formula">Cost weighting: P1 = 100% rate | Non-P1 = 30% of hourly rate</div></span></span></label>
+                                <label class="calc-label" data-explain="p1-critical-mix">Critical Severity (%)</label>
                                 <input type="number" id="proCriticalPct" class="calc-input" value="40" min="0" max="100" step="5" aria-label="Pro Critical Pct">
                             </div>
                             <div class="calc-input-group">
-                                <label class="calc-label">Duration Variability <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Phase Duration Spread</div><div class="tooltip-desc">Coefficient of variation for MTTR phase durations. Low = consistent, predictable repairs. High = wide variance (aging equipment, mixed failure modes). Drives Monte Carlo confidence band width.</div><div class="tooltip-formula">Low: CV=0.2 (tight band) | Medium: CV=0.35 | High: CV=0.5 (wide band)</div></span></span></label>
+                                <label class="calc-label" data-explain="phase-duration-spread">Duration Variability</label>
                                 <select id="proDurVar" class="calc-select" aria-label="Pro Dur Var">
                                     <option value="low">Low — Predictable</option>
                                     <option value="medium" selected>Medium — Typical</option>
@@ -3268,25 +3250,7 @@
         }
         window.handleLogin = handleLogin;
 
-        /* ===== TOOLTIPS ===== */
-        function initTooltips(){
-            var tc=$('calc-tooltip-container');
-            if(!tc) return;
-            document.querySelectorAll('.tooltip-trigger').forEach(function(t){
-                t.addEventListener('mouseenter',function(){
-                    var content=t.querySelector('.tooltip-content');
-                    if(!content) return;
-                    tc.innerHTML=content.innerHTML;
-                    tc.style.display='block';
-                    var r=t.getBoundingClientRect();
-                    var calcSection=document.querySelector('.calculator-section');
-                    var cr=calcSection.getBoundingClientRect();
-                    tc.style.top=(r.bottom-cr.top+8)+'px';
-                    tc.style.left=Math.max(10,Math.min(cr.width-340,r.left-cr.left))+'px';
-                });
-                t.addEventListener('mouseleave',function(){ tc.style.display='none'; });
-            });
-        }
+        /* legacy calc-tooltip system removed v1.60.0 — RZExplain owns tooltips */
 
         /* ===== EVENT LISTENERS ===== */
         var freeInputs = ['calcCategory','calcVendorSLA','calcSkillLevel','calcIncidents','calcCostHour','calcCallout','calcTraining'];
@@ -3325,7 +3289,6 @@
         });
 
         /* ===== INIT ===== */
-        initTooltips();
         calculate();
     })();
     </script>
@@ -3355,7 +3318,7 @@
 <script src="js/rz-article-toc.js?v=1.50.42" defer></script>
 
 <!-- Search: shared js/rz-command-palette.js -->
-<script src="js/rz-command-palette.js?v=1.50.37" defer></script>
+<script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 <script>
 /* v1.9.1: subscribeNewsletter() moved to script.js (global, mailto: based) */
 </script>

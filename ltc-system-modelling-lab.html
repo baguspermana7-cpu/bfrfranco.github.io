@@ -2272,70 +2272,18 @@
             100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .term-tooltip {
-            position: relative;
-            border-bottom: 1px dotted rgba(37, 99, 235, 0.75);
-            cursor: help;
-            color: inherit;
-            text-decoration: none;
-        }
 
         .term-hotspot {
             cursor: help;
         }
 
-        .term-tooltip.auto-term {
-            border-bottom-style: dashed;
-            border-bottom-color: rgba(2, 132, 199, 0.72);
-            border-bottom-width: 1px;
-        }
 
-        [data-theme="dark"] .term-tooltip {
-            border-bottom-color: rgba(96, 165, 250, 0.8);
-        }
 
-        .term-tooltip::after {
-            content: none;
-        }
 
-        .term-tooltip-panel {
-            position: fixed;
-            display: none;
-            width: 320px;
-            background: #1e293b;
-            border: 1px solid rgba(37, 99, 235, 0.35);
-            border-radius: 10px;
-            padding: 12px;
-            z-index: 10030;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-            pointer-events: none;
-        }
 
-        [data-theme="dark"] .term-tooltip-panel {
-            border-color: rgba(96, 165, 250, 0.35);
-        }
 
-        .term-tooltip-panel .term-title {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #60a5fa;
-            margin-bottom: 6px;
-        }
 
-        .term-tooltip-panel .term-desc {
-            font-size: 0.76rem;
-            color: #cbd5e1;
-            line-height: 1.45;
-        }
 
-        .term-tooltip-panel .term-impact {
-            margin-top: 7px;
-            padding-top: 7px;
-            border-top: 1px dashed rgba(148, 163, 184, 0.35);
-            font-size: 0.72rem;
-            color: #cbd5e1;
-            line-height: 1.42;
-        }
 
         .target-block {
             margin-top: 0.65rem;
@@ -3981,9 +3929,6 @@
             }
 
             .tooltip-content,
-            .term-tooltip-panel {
-                width: min(280px, calc(100vw - 16px));
-            }
 
             .chart-svg {
                 min-width: 360px;
@@ -4020,6 +3965,15 @@
 [data-theme="dark"] div > a[href$="terms.html"], [data-theme="dark"] div > a[href$="privacy.html"] { color:#93c5fd !important; }
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-07-17" defer></script>
+    <script src="js/rz-explain.js?v=2026-07-17" defer></script>
+    <script>
+    /* terms live in prose on this lab — text-scan like articles (first occurrence, capped) */
+    document.addEventListener('DOMContentLoaded', function () {
+        var run = function () { if (window.RZExplain) try { RZExplain.scanText(document.querySelector('main') || document.body, 40); } catch (e) {} };
+        if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 3000 }); else setTimeout(run, 1200);
+    });
+    </script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
     <script type="application/ld+json">
@@ -4163,7 +4117,7 @@
         </div>
     </nav>
 
-    <main class="main-content" id="main-content">
+    <main data-explain-scan class="main-content" id="main-content">
         <section class="hero">
             <span class="hero-badge"><i class="fas fa-lock"></i> Root Only Module</span>
             <h1>Liquid-to-Chip System Modelling Laboratory</h1>

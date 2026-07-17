@@ -152,13 +152,6 @@
         .section ul { list-style: none; display: grid; gap: 0.3rem; margin: 0.5rem 0; }
         .section li { font-size: 0.82rem; color: var(--text-body); line-height: 1.6; padding-left: 0.9rem; position: relative; }
         .section li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent2); position: absolute; left: 0; top: 0.45rem; }
-        .term-tooltip { border-bottom: 1px dotted var(--accent2); cursor: help; color: inherit; }
-        .tooltip-float { position: fixed; z-index: 100000; background: #1e293b; color: #e2e8f0; padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; line-height: 1.55; max-width: 340px; min-width: 200px; box-shadow: 0 4px 24px rgba(0,0,0,0.35); border: 1px solid rgba(239,68,68,0.3); opacity: 0; visibility: hidden; transition: opacity 0.15s,visibility 0.15s; pointer-events: none; white-space: normal; font-weight: 400; word-wrap: break-word; }
-        .tooltip-float.visible { opacity: 1; visibility: visible; }
-        .tooltip-float::before { content: ''; position: absolute; width: 10px; height: 10px; background: inherit; border: inherit; border-right: none; border-top: none; transform: rotate(-45deg); }
-        .tooltip-float.above::before { bottom: -6px; left: var(--arrow,50%); margin-left: -5px; }
-        .tooltip-float.below::before { top: -6px; left: var(--arrow,50%); margin-left: -5px; transform: rotate(135deg); }
-        [data-theme="light"] .tooltip-float { background: #fff; color: #1e293b; border-color: rgba(239,68,68,0.25); box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
         .abbr-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 0.4rem; margin-top: 0.6rem; }
         .abbr-item { display: flex; gap: 0.5rem; padding: 0.45rem 0.6rem; border-radius: 8px; font-size: 0.8rem; border: 1px solid var(--line); background: var(--card-inner); }
         .abbr-item:hover { background: var(--card-inner-hover); }
@@ -407,6 +400,8 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
     }
     </script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-07-17" defer></script>
+    <script src="js/rz-explain.js?v=2026-07-17" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>    <meta property="og:image" content="https://resistancezero.com/assets/og/ltc-nfpa-fire-risk.webp">    <meta property="og:image:width" content="1200">    <meta property="og:image:height" content="630">    <meta property="og:image:alt" content="NFPA Fire &amp; Safety Risk — Comprehensive Deep-Dive">    <meta name="twitter:image" content="https://resistancezero.com/assets/og/ltc-nfpa-fire-risk.webp">    <meta name="twitter:card" content="summary_large_image">
 
@@ -577,7 +572,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <section class="section" id="sec-nfpa75" data-nav-id="sec-nfpa75">
             <h2 class="section-title"><i class="fas fa-server"></i> NFPA 75 — IT Equipment Protection <button class="deep-link" onclick="copyDeepLink('sec-nfpa75')" title="Copy link"><i class="fas fa-link"></i></button></h2>
 
-            <p class="section-intro"><span class="term-tooltip" data-tooltip="NFPA 75: Standard for the Fire Protection of Information Technology Equipment. Covers rooms >460 sq ft containing IT equipment.">NFPA 75</span> establishes the minimum fire protection requirements for information technology equipment rooms and areas. It addresses construction, fire detection, suppression, and emergency procedures for spaces housing servers, networking gear, and storage systems.</p>
+            <p class="section-intro"><span data-explain="nfpa-75">NFPA 75</span> establishes the minimum fire protection requirements for information technology equipment rooms and areas. It addresses construction, fire detection, suppression, and emergency procedures for spaces housing servers, networking gear, and storage systems.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> Scope &amp; Purpose <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
@@ -589,7 +584,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
                         <div class="kv-item"><div class="kv-label">Current Edition</div><div class="kv-value">NFPA 75 (2024)</div></div>
                         <div class="kv-item"><div class="kv-label">Companion Standard</div><div class="kv-value">NFPA 76 (Telecom)</div></div>
                     </div>
-                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> NFPA 75 is typically adopted by the <span class="term-tooltip" data-tooltip="AHJ: Authority Having Jurisdiction — the organization, office, or individual responsible for enforcing code requirements.">AHJ</span> as part of the building code for data center projects. It is referenced by IBC, IFC, and FM Global data sheets.</div>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> NFPA 75 is typically adopted by the <span data-explain="ahj">AHJ</span> as part of the building code for data center projects. It is referenced by IBC, IFC, and FM Global data sheets.</div>
                 </div></div>
             </div>
 
@@ -613,7 +608,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
                 <div class="accordion-body"><div class="accordion-content">
                     <p>Upon fire detection, the HVAC system serving the IT room must be automatically shut down to prevent smoke migration and oxygen supply to the fire.</p>
                     <ul>
-                        <li><strong>Automatic HVAC shutdown:</strong> Triggered by fire alarm signal from the <span class="term-tooltip" data-tooltip="FACP: Fire Alarm Control Panel — the central brain of the fire alarm system that monitors inputs and activates outputs.">FACP</span></li>
+                        <li><strong>Automatic HVAC shutdown:</strong> Triggered by fire alarm signal from the <span data-explain="facp">FACP</span></li>
                         <li><strong>Damper closure:</strong> Fire and smoke dampers in all ductwork penetrating the IT room must close automatically</li>
                         <li><strong>Prevent smoke migration:</strong> System must prevent smoke from spreading to other areas via the HVAC ductwork</li>
                         <li><strong>Clean agent coordination:</strong> HVAC shutdown must occur <strong>before</strong> clean agent discharge to maintain design concentration</li>
@@ -649,7 +644,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
                 <div class="accordion-body"><div class="accordion-content">
                     <p>Proper signage is critical for emergency response and personnel safety in IT equipment rooms.</p>
                     <ul>
-                        <li><strong>EPO signage:</strong> <span class="term-tooltip" data-tooltip="EPO: Emergency Power Off — a mechanism to disconnect all power to IT equipment in an emergency. Required by NFPA 70 and NFPA 75.">EPO</span> buttons must be clearly labeled with permanent signage visible from all approaches</li>
+                        <li><strong>EPO signage:</strong> <span data-explain="epo">EPO</span> buttons must be clearly labeled with permanent signage visible from all approaches</li>
                         <li><strong>Hazard labels:</strong> Warning signs for clean agent systems indicating potential oxygen displacement</li>
                         <li><strong>Fire suppression status indicators:</strong> Visual indicators showing system armed/disarmed status at every entry point</li>
                         <li><strong>Room identification:</strong> IT equipment room designations on all doors</li>
@@ -663,7 +658,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <section class="section" id="sec-nfpa76" data-nav-id="sec-nfpa76">
             <h2 class="section-title"><i class="fas fa-broadcast-tower"></i> NFPA 76 — Telecommunications Facilities <button class="deep-link" onclick="copyDeepLink('sec-nfpa76')" title="Copy link"><i class="fas fa-link"></i></button></h2>
 
-            <p class="section-intro"><span class="term-tooltip" data-tooltip="NFPA 76: Standard for the Fire Protection of Telecommunications Facilities. Covers central offices, switching centers, and carrier hotels.">NFPA 76</span> provides fire protection requirements specifically for telecommunications facilities including central offices, switching centers, and carrier hotels. While similar to NFPA 75, it addresses the unique hazards of high-density telecom equipment.</p>
+            <p class="section-intro"><span data-explain="nfpa-76">NFPA 76</span> provides fire protection requirements specifically for telecommunications facilities including central offices, switching centers, and carrier hotels. While similar to NFPA 75, it addresses the unique hazards of high-density telecom equipment.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> Hazard Classification <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
@@ -702,7 +697,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
                         <li><strong>Smoke removal:</strong> Dedicated smoke exhaust or purge capability after fire event</li>
                         <li><strong>HVAC integration:</strong> Automatic shutdown and damper closure coordinated with fire alarm system</li>
                         <li><strong>Temperature monitoring:</strong> Continuous thermal monitoring to detect overheating equipment before ignition</li>
-                        <li><strong>Cable management:</strong> Use of <span class="term-tooltip" data-tooltip="LSZH: Low Smoke Zero Halogen — cable jacketing that produces minimal smoke and no halogen gases when burned, reducing toxicity and equipment corrosion.">LSZH</span> cables to reduce toxic smoke generation</li>
+                        <li><strong>Cable management:</strong> Use of <span data-explain="lszh">LSZH</span> cables to reduce toxic smoke generation</li>
                     </ul>
                 </div></div>
             </div>
@@ -730,7 +725,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <section class="section" id="sec-cleanagent" data-nav-id="sec-cleanagent">
             <h2 class="section-title"><i class="fas fa-cloud"></i> NFPA 2001 — Clean Agent Systems <button class="deep-link" onclick="copyDeepLink('sec-cleanagent')" title="Copy link"><i class="fas fa-link"></i></button></h2>
 
-            <p class="section-intro"><span class="term-tooltip" data-tooltip="NFPA 2001: Standard on Clean Agent Fire Extinguishing Systems. Covers design, installation, and maintenance of gaseous suppression systems.">NFPA 2001</span> governs the design, installation, testing, and maintenance of clean agent fire extinguishing systems. These agents leave no residue and are safe for use around sensitive electronic equipment, making them the preferred choice for data centers.</p>
+            <p class="section-intro"><span data-explain="nfpa-2001">NFPA 2001</span> governs the design, installation, testing, and maintenance of clean agent fire extinguishing systems. These agents leave no residue and are safe for use around sensitive electronic equipment, making them the preferred choice for data centers.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> FM-200 (HFC-227ea) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
@@ -746,7 +741,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
                         <div class="kv-item"><div class="kv-label">Storage</div><div class="kv-value">Liquid in pressurized cylinders</div></div>
                         <div class="kv-item"><div class="kv-label">Safety</div><div class="kv-value">NOAEL 9.0%</div></div>
                     </div>
-                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> FM-200 has a high <span class="term-tooltip" data-tooltip="GWP: Global Warming Potential — a measure of how much heat a greenhouse gas traps compared to CO2. FM-200's GWP of 3220 means it traps 3220x more heat than CO2.">GWP</span> of 3220. Many jurisdictions are phasing out HFC agents due to environmental regulations (EU F-Gas, Kigali Amendment). Plan for Novec 1230 or inert gas alternatives.</div>
+                    <div class="callout callout-warn"><i class="fas fa-exclamation-triangle"></i> FM-200 has a high <span data-explain="gwp">GWP</span> of 3220. Many jurisdictions are phasing out HFC agents due to environmental regulations (EU F-Gas, Kigali Amendment). Plan for Novec 1230 or inert gas alternatives.</div>
                 </div></div>
             </div>
 
@@ -799,7 +794,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
                             <tr><td>IG-55</td><td>38.0%</td><td>43.0%</td><td>5.0%</td><td>1.42 m&sup3;</td></tr>
                         </tbody>
                     </table></div>
-                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> <span class="term-tooltip" data-tooltip="NOAEL: No Observed Adverse Effect Level — the highest concentration at which no adverse health effects are observed in test subjects.">NOAEL</span> represents the maximum safe exposure level. The safety margin (NOAEL minus design concentration) indicates how far below the harmful threshold the system operates.</div>
+                    <div class="callout callout-info"><i class="fas fa-info-circle"></i> <span data-explain="noael-loael">NOAEL</span> represents the maximum safe exposure level. The safety margin (NOAEL minus design concentration) indicates how far below the harmful threshold the system operates.</div>
                 </div></div>
             </div>
 
@@ -854,12 +849,12 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <section class="section" id="sec-detection" data-nav-id="sec-detection">
             <h2 class="section-title"><i class="fas fa-bell"></i> NFPA 72 — Fire Detection Systems <button class="deep-link" onclick="copyDeepLink('sec-detection')" title="Copy link"><i class="fas fa-link"></i></button></h2>
 
-            <p class="section-intro"><span class="term-tooltip" data-tooltip="NFPA 72: National Fire Alarm and Signaling Code. Covers installation, testing, and maintenance of fire alarm systems including detection, notification, and emergency communications.">NFPA 72</span> governs fire detection and alarm systems. In data centers, early detection is critical because fires in IT equipment produce minimal heat initially, making traditional heat-based detection inadequate.</p>
+            <p class="section-intro"><span data-explain="nfpa-72">NFPA 72</span> governs fire detection and alarm systems. In data centers, early detection is critical because fires in IT equipment produce minimal heat initially, making traditional heat-based detection inadequate.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> VESDA Aspirating Detection <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <p><strong><span class="term-tooltip" data-tooltip="VESDA: Very Early Smoke Detection Apparatus — an aspirating smoke detection system that continuously draws air samples through a pipe network to a laser-based detection chamber.">VESDA</span></strong> (Very Early Smoke Detection Apparatus) is the gold standard for data center fire detection. It uses a network of sampling pipes with laser-based smoke analysis.</p>
+                    <p><strong><span data-explain="vesda">VESDA</span></strong> (Very Early Smoke Detection Apparatus) is the gold standard for data center fire detection. It uses a network of sampling pipes with laser-based smoke analysis.</p>
                     <div class="kv-grid">
                         <div class="kv-item"><div class="kv-label">Detection Method</div><div class="kv-value">Laser nephelometry</div></div>
                         <div class="kv-item"><div class="kv-label">Sensitivity Range</div><div class="kv-value">0.005–20% obs/m</div></div>
@@ -939,7 +934,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <section class="section" id="sec-sprinkler" data-nav-id="sec-sprinkler">
             <h2 class="section-title"><i class="fas fa-tint"></i> NFPA 13 — Sprinkler Systems <button class="deep-link" onclick="copyDeepLink('sec-sprinkler')" title="Copy link"><i class="fas fa-link"></i></button></h2>
 
-            <p class="section-intro"><span class="term-tooltip" data-tooltip="NFPA 13: Standard for the Installation of Sprinkler Systems. The primary standard governing automatic sprinkler system design, installation, and requirements.">NFPA 13</span> governs the design and installation of automatic sprinkler systems. While clean agents are preferred for IT spaces, sprinklers remain a code requirement in many jurisdictions and serve as backup protection.</p>
+            <p class="section-intro"><span data-explain="nfpa-13">NFPA 13</span> governs the design and installation of automatic sprinkler systems. While clean agents are preferred for IT spaces, sprinklers remain a code requirement in many jurisdictions and serve as backup protection.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> Pre-Action Systems <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
@@ -1097,7 +1092,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> EPO Design <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <p>The <span class="term-tooltip" data-tooltip="EPO: Emergency Power Off — a mechanism to disconnect all power to IT equipment in an emergency. Required by NFPA 70 Article 645 and NFPA 75.">EPO</span> system provides a means to disconnect power to all IT equipment in an emergency, as required by NFPA 70 (NEC) Article 645.</p>
+                    <p>The <span data-explain="epo">EPO</span> system provides a means to disconnect power to all IT equipment in an emergency, as required by NFPA 70 (NEC) Article 645.</p>
                     <ul>
                         <li><strong>Mushroom button:</strong> Red, illuminated mushroom-head push button at each principal exit door</li>
                         <li><strong>Shunt trip:</strong> EPO activates shunt trip breakers on all PDUs and RPPs serving IT equipment</li>
@@ -1112,7 +1107,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">2</span> NFPA 101 Egress <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <p><span class="term-tooltip" data-tooltip="NFPA 101: Life Safety Code — comprehensive standard covering building design and operation features to protect occupants from fire, smoke, and toxic fumes.">NFPA 101</span> (Life Safety Code) establishes egress requirements for data center facilities.</p>
+                    <p><span data-explain="nfpa-101">NFPA 101</span> (Life Safety Code) establishes egress requirements for data center facilities.</p>
                     <ul>
                         <li><strong>Two exits minimum:</strong> Any room exceeding 1000 sq ft or with more than 50 occupants requires two separate exits</li>
                         <li><strong>Travel distance:</strong> Maximum 200 ft (61 m) to an exit in a sprinklered building, 150 ft (46 m) without sprinklers</li>
@@ -1177,7 +1172,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">2</span> Penetration Seals <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <p><span class="term-tooltip" data-tooltip="Through-penetration firestop: A system designed to restore the fire-resistance rating of a wall or floor where it has been penetrated by cables, conduits, pipes, or ducts.">Through-penetration firestop systems</span> maintain fire barrier integrity where cables, conduits, and pipes pass through rated walls and floors.</p>
+                    <p><span data-explain="firestop">Through-penetration firestop systems</span> maintain fire barrier integrity where cables, conduits, and pipes pass through rated walls and floors.</p>
                     <ul>
                         <li><strong>Annular space:</strong> The gap between the penetrating item and the opening must be sealed with a listed firestop system</li>
                         <li><strong>W rating:</strong> Resistance to water passage under hose stream test conditions</li>
@@ -1240,7 +1235,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> IBC / IFC <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <p>The <span class="term-tooltip" data-tooltip="IBC: International Building Code — model building code published by the International Code Council (ICC). Adopted by most US jurisdictions.">IBC</span> (International Building Code) and <span class="term-tooltip" data-tooltip="IFC: International Fire Code — companion fire code to the IBC, covering fire prevention, fire protection systems, and emergency planning.">IFC</span> (International Fire Code) provide the baseline building and fire code requirements adopted by most US jurisdictions.</p>
+                    <p>The <span data-explain="ibc">IBC</span> (International Building Code) and <span data-explain="ifc">IFC</span> (International Fire Code) provide the baseline building and fire code requirements adopted by most US jurisdictions.</p>
                     <ul>
                         <li><strong>IBC Chapter 5:</strong> General building heights and areas — affects data center building classification</li>
                         <li><strong>IBC Chapter 7:</strong> Fire and smoke protection features — fire-rated assemblies, firestopping</li>
@@ -1254,7 +1249,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">2</span> FM Global Data Sheets <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <p><span class="term-tooltip" data-tooltip="FM Global: One of the world's largest commercial property insurers. Their data sheets provide loss prevention recommendations that often exceed code minimums.">FM Global</span> data sheets provide insurance-grade fire protection recommendations that frequently exceed code minimums.</p>
+                    <p><span data-explain="fm-global">FM Global</span> data sheets provide insurance-grade fire protection recommendations that frequently exceed code minimums.</p>
                     <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Data Sheet</th><th scope="col">Title</th><th scope="col">Key Requirements</th></tr></thead>
                         <tbody>
@@ -1289,7 +1284,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">4</span> EN 50600-2-5 <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <p><span class="term-tooltip" data-tooltip="EN 50600-2-5: European standard for data center facilities — Part 2-5: Security systems. Covers physical security including fire protection integration.">EN 50600-2-5</span> is the European standard for data center fire protection, part of the comprehensive EN 50600 series for data center design and operation.</p>
+                    <p><span data-explain="en-50600-2-5">EN 50600-2-5</span> is the European standard for data center fire protection, part of the comprehensive EN 50600 series for data center design and operation.</p>
                     <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Aspect</th><th scope="col">NFPA (US)</th><th scope="col">EN 50600 (EU)</th></tr></thead>
                         <tbody>
@@ -1434,7 +1429,6 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
 
     </div>
 
-    <div id="tooltipFloat" class="tooltip-float"></div>
     <div class="root-gate"><div class="root-card"><h2><i class="fas fa-lock" style="color:#ef4444;margin-right:0.3rem;"></i> Pro or Educator access required</h2><p>This module requires a Pro or Educator account. Sign in with one to continue, or contact us for access.</p><div class="root-actions"><button id="rootLoginBtn">Sign In</button><a href="standards-ltc-lab.html">Back to Lab</a></div></div></div>
     
 
@@ -1485,7 +1479,6 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
     /* 21. Table Sort */
     document.querySelectorAll('.data-table').forEach(function(table){var headers=table.querySelectorAll('th');headers.forEach(function(th,colIdx){th.classList.add('sortable');th.innerHTML+=(' <span class="sort-icon"><i class="fas fa-sort"></i></span>');var asc=true;th.addEventListener('click',function(){var tbody=table.querySelector('tbody');if(!tbody)return;var rows=Array.from(tbody.querySelectorAll('tr'));rows.sort(function(a,b){var av=a.cells[colIdx]?a.cells[colIdx].textContent.trim():'';var bv=b.cells[colIdx]?b.cells[colIdx].textContent.trim():'';var an=parseFloat(av.replace(/[^0-9.\-]/g,'')),bn=parseFloat(bv.replace(/[^0-9.\-]/g,''));if(!isNaN(an)&&!isNaN(bn))return asc?an-bn:bn-an;return asc?av.localeCompare(bv):bv.localeCompare(av);});asc=!asc;rows.forEach(function(r){tbody.appendChild(r);});headers.forEach(function(h){h.classList.remove('sorted');});th.classList.add('sorted');});});});
     /* 22. Tooltip */
-    (function(){var tip=document.getElementById('tooltipFloat');if(!tip)return;var hideTimer=null;function show(el){clearTimeout(hideTimer);var text=el.getAttribute('data-tooltip');if(!text)return;tip.textContent=text;tip.className='tooltip-float';tip.style.opacity='0';tip.style.visibility='visible';var r=el.getBoundingClientRect();var tw=tip.offsetWidth;var th=tip.offsetHeight;var gap=8;var left=r.left+r.width/2-tw/2;if(left<8)left=8;if(left+tw>window.innerWidth-8)left=window.innerWidth-tw-8;var top;if(r.top-th-gap>8){top=r.top-th-gap;tip.classList.add('above');}else{top=r.bottom+gap;tip.classList.add('below');}var arrowLeft=r.left+r.width/2-left;arrowLeft=Math.max(12,Math.min(arrowLeft,tw-12));tip.style.setProperty('--arrow',arrowLeft+'px');tip.style.left=left+'px';tip.style.top=top+'px';tip.classList.add('visible');}function hide(){hideTimer=setTimeout(function(){tip.classList.remove('visible');tip.style.visibility='hidden';},80);}document.querySelectorAll('.term-tooltip').forEach(function(el){el.addEventListener('mouseenter',function(){show(el);});el.addEventListener('mouseleave',hide);el.addEventListener('touchstart',function(e){e.preventDefault();show(el);setTimeout(hide,3000);},{passive:false});});})();
     /* 23. Hash Scroll */
     (function(){if(window.location.hash){var id=window.location.hash.slice(1);var target=document.getElementById(id)||document.querySelector('[data-nav-id="'+id+'"]');if(target)setTimeout(function(){target.scrollIntoView({behavior:'smooth',block:'start'});},600);}})();
     </script>

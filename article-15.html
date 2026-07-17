@@ -1384,27 +1384,6 @@
         }
 
         /* Tooltips */
-        .mcl-tooltip-trigger {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 16px; height: 16px; border-radius: 50%; background: rgba(236,72,153,0.2);
-            color: #ec4899; font-size: 0.6rem; font-weight: 700; cursor: help;
-            position: relative; flex-shrink: 0;
-        }
-        .mcl-tooltip-content {
-            display: none; position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%);
-            background: #1e293b; border: 1px solid rgba(236,72,153,0.3); border-radius: 10px;
-            padding: 0.85rem; width: 240px; z-index: 100; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-            pointer-events: none;
-        }
-        .mcl-tooltip-content::after {
-            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-            border: 6px solid transparent; border-top-color: rgba(236,72,153,0.3);
-        }
-        .mcl-tooltip-trigger:hover .mcl-tooltip-content,
-        .mcl-tooltip-trigger:focus .mcl-tooltip-content { display: block; }
-        .mcl-tooltip-title { font-size: 0.78rem; font-weight: 700; color: #ec4899; margin-bottom: 0.3rem; }
-        .mcl-tooltip-desc { font-size: 0.7rem; color: #94a3b8; line-height: 1.5; }
-        .mcl-tooltip-formula { font-size: 0.65rem; color: #f9a8d4; font-family: 'JetBrains Mono', monospace; background: rgba(236,72,153,0.1); padding: 3px 6px; border-radius: 4px; margin-top: 0.3rem; display: block; }
 
         /* Pro Panels */
         .mcl-pro-panel {
@@ -1519,8 +1498,6 @@
             .mcl-input-grid { grid-template-columns: 1fr; }
             .mcl-kpi-grid { grid-template-columns: repeat(2, 1fr); }
             .mcl-cta-features { flex-direction: column; align-items: center; }
-            .mcl-tooltip-content { width: 200px; left: auto; right: -10px; transform: none; }
-            .mcl-tooltip-content::after { left: auto; right: 16px; transform: none; }
         }
 
         /* Quote Print (separate print mode for quotes) */
@@ -2077,14 +2054,8 @@
                         <h4><i class="fas fa-sliders-h"></i> Strategic OPEX Parameters</h4>
                         <div class="mcl-input-grid">
                             <div class="mcl-input-group">
-                                <label>Country / Region
-                                    <span class="mcl-tooltip-trigger" tabindex="0">?
-                                        <span class="mcl-tooltip-content">
-                                            <div class="mcl-tooltip-title">SI-01: Country / Region</div>
-                                            <div class="mcl-tooltip-desc">Determines labor rates, energy costs, currency, and climate adjustment factors. Tropical regions have ~10-15% higher cooling OPEX.</div>
-                                            <span class="mcl-tooltip-formula">Affects: laborRate, energyRate, tropicalFactor</span>
-                                        </span>
-                                    </span>
+                                <label data-explain="si-01-country-region">Country / Region
+
                                 </label>
                                 <select id="mclCountry" aria-label="Mcl Country">
                                     <option value="Indonesia">Indonesia (IDR)</option>
@@ -2110,38 +2081,20 @@
                                 </select>
                             </div>
                             <div class="mcl-input-group">
-                                <label>Critical Load (MW)
-                                    <span class="mcl-tooltip-trigger" tabindex="0">?
-                                        <span class="mcl-tooltip-content">
-                                            <div class="mcl-tooltip-title">SI-02: Critical IT Load</div>
-                                            <div class="mcl-tooltip-desc">Total IT power demand in megawatts. Drives energy cost, staffing requirements, and maintenance budgets. 1 MW = ~200 racks at 5kW avg.</div>
-                                            <span class="mcl-tooltip-formula">Energy = MW x 1000 x PUE x rate x 8760</span>
-                                        </span>
-                                    </span>
+                                <label data-explain="si-02-critical-it-load">Critical Load (MW)
+
                                 </label>
                                 <input type="number" id="mclLoad" value="10" min="0.1" max="100" step="0.1" aria-label="Mcl Load">
                             </div>
                             <div class="mcl-input-group">
-                                <label>Target PUE
-                                    <span class="mcl-tooltip-trigger" tabindex="0">?
-                                        <span class="mcl-tooltip-content">
-                                            <div class="mcl-tooltip-title">SI-03: Target PUE</div>
-                                            <div class="mcl-tooltip-desc">Power Usage Effectiveness. Industry avg 1.58 (Uptime 2024). Hyperscalers achieve 1.10-1.20. Tropical locations typically 1.35-1.60.</div>
-                                            <span class="mcl-tooltip-formula">Total Power = IT Load x PUE</span>
-                                        </span>
-                                    </span>
+                                <label data-explain="si-03-target-pue">Target PUE
+
                                 </label>
                                 <input type="number" id="mclPUE" value="1.40" min="1.10" max="3.00" step="0.01" aria-label="Mcl PUE">
                             </div>
                             <div class="mcl-input-group">
-                                <label>Staffing Model
-                                    <span class="mcl-tooltip-trigger" tabindex="0">?
-                                        <span class="mcl-tooltip-content">
-                                            <div class="mcl-tooltip-title">SI-04: Staffing Model</div>
-                                            <div class="mcl-tooltip-desc">In-house provides control; outsourced reduces fixed cost. Hybrid models balance both. 4.2x multiplier for 24/7 coverage per position.</div>
-                                            <span class="mcl-tooltip-formula">Shift staff = positions x 4.2 (24/7)</span>
-                                        </span>
-                                    </span>
+                                <label data-explain="si-04-staffing-model">Staffing Model
+
                                 </label>
                                 <select id="mclStaffModel" aria-label="Mcl Staff Model">
                                     <option value="inhouse" selected>Full In-House</option>
@@ -2151,26 +2104,14 @@
                                 </select>
                             </div>
                             <div class="mcl-input-group">
-                                <label>Retention Target (%)
-                                    <span class="mcl-tooltip-trigger" tabindex="0">?
-                                        <span class="mcl-tooltip-content">
-                                            <div class="mcl-tooltip-title">SI-05: Staff Retention Rate</div>
-                                            <div class="mcl-tooltip-desc">Target annual retention rate. Industry avg ~82%. Each turnover costs 50-200% of annual salary (recruitment, training, knowledge loss).</div>
-                                            <span class="mcl-tooltip-formula">Turnover Cost = (1 - rate) x headcount x 1.5x salary</span>
-                                        </span>
-                                    </span>
+                                <label data-explain="si-05-staff-retention-rate">Retention Target (%)
+
                                 </label>
                                 <input type="number" id="mclRetention" value="85" min="60" max="99" step="1" aria-label="Mcl Retention">
                             </div>
                             <div class="mcl-input-group">
-                                <label>PM/CM Ratio (% Preventive)
-                                    <span class="mcl-tooltip-trigger" tabindex="0">?
-                                        <span class="mcl-tooltip-content">
-                                            <div class="mcl-tooltip-title">SI-06: PM/CM Ratio Target</div>
-                                            <div class="mcl-tooltip-desc">Percentage of maintenance that is preventive vs corrective. Best-in-class: 80%+ PM. Industry avg: 55-65%. Higher PM = lower failure risk.</div>
-                                            <span class="mcl-tooltip-formula">PM Compliance = PM_hours / total_maint_hours</span>
-                                        </span>
-                                    </span>
+                                <label data-explain="si-06-pm-cm-ratio-target">PM/CM Ratio (% Preventive)
+
                                 </label>
                                 <input type="number" id="mclPMRatio" value="75" min="30" max="95" step="1" aria-label="Mcl PMRatio">
                             </div>
@@ -2179,8 +2120,8 @@
 
                     <div class="calc-controls">
                         <div class="calc-control-group">
-                            <label>Region
-                                <span class="mcl-tooltip-trigger" tabindex="0">?<span class="mcl-tooltip-content"><div class="mcl-tooltip-title">Regional Cost Multiplier</div><div class="mcl-tooltip-desc">Adjusts service pricing based on regional labor rates, energy costs, and market maturity. Americas = baseline 1.00x, Europe +20%, SEA -40%, Australia +15%.</div><div class="mcl-tooltip-formula">Price = Base &times; Region Multiplier</div></span></span>
+                            <label data-explain="regional-cost-multiplier">Region
+
                             </label>
                             <select id="calcRegion" aria-label="Calc Region">
                                 <option value="americas">Americas (Virginia/Texas) &mdash; 1.00x</option>
@@ -2190,14 +2131,14 @@
                             </select>
                         </div>
                         <div class="calc-control-group">
-                            <label>Search
-                                <span class="mcl-tooltip-trigger" tabindex="0">?<span class="mcl-tooltip-content"><div class="mcl-tooltip-title">Service Search</div><div class="mcl-tooltip-desc">Filter the 120 maintenance services by name, description, or keyword. Matches are highlighted in real-time across all visible service cards.</div></span></span>
+                            <label data-explain="service-search">Search
+
                             </label>
                             <input type="text" id="calcSearch" placeholder="Search by name, description, or keyword..." aria-label="Search by name, description, or keyword...">
                         </div>
                         <div class="calc-control-group">
-                            <label>Sort By
-                                <span class="mcl-tooltip-trigger" tabindex="0">?<span class="mcl-tooltip-content"><div class="mcl-tooltip-title">Sort Order</div><div class="mcl-tooltip-desc">Reorder the service catalog. Revenue Rank sorts by industry revenue impact (#1 = highest revenue service). Price sorts by estimated annual cost.</div></span></span>
+                            <label data-explain="sort-order">Sort By
+
                             </label>
                             <select id="calcSort" aria-label="Calc Sort">
                                 <option value="rank">Revenue Rank (#1 first)</option>
@@ -2210,8 +2151,8 @@
 
                     <div class="calc-suboptions">
                         <div class="calc-control-group">
-                            <label>Contract Term
-                                <span class="mcl-tooltip-trigger" tabindex="0">?<span class="mcl-tooltip-content"><div class="mcl-tooltip-title">Contract Duration Discount</div><div class="mcl-tooltip-desc">Longer commitments reduce per-year cost through volume discounts. Spot = no discount (1.00x), 3-year = 12% discount (0.88x), 5-year = 18% discount (0.82x).</div><div class="mcl-tooltip-formula">Discount = 1 - (0.05 &times; years)</div></span></span>
+                            <label data-explain="contract-duration-discount">Contract Term
+
                             </label>
                             <select id="calcTerm" aria-label="Calc Term">
                                 <option value="1">Spot / One-time (1.00x)</option>
@@ -2221,8 +2162,8 @@
                             </select>
                         </div>
                         <div class="calc-control-group">
-                            <label>Facility Size
-                                <span class="mcl-tooltip-trigger" tabindex="0">?<span class="mcl-tooltip-content"><div class="mcl-tooltip-title">Facility Scale Factor</div><div class="mcl-tooltip-desc">Larger facilities have economies of scale for maintenance services. Small (&lt;2 MW) = higher unit cost, Hyperscale (50+ MW) = bulk pricing and dedicated teams.</div><div class="mcl-tooltip-formula">Affects staffing, spare inventory, SLA tiers</div></span></span>
+                            <label data-explain="facility-scale-factor">Facility Size
+
                             </label>
                             <select id="calcSize" aria-label="Calc Size">
                                 <option value="small">Small (&lt;2 MW)</option>
@@ -2232,8 +2173,8 @@
                             </select>
                         </div>
                         <div class="calc-control-group">
-                            <label>Revenue Tier
-                                <span class="mcl-tooltip-trigger" tabindex="0">?<span class="mcl-tooltip-content"><div class="mcl-tooltip-title">Revenue Tier Filter</div><div class="mcl-tooltip-desc">Filter services by their industry revenue ranking. High (#1-40) = critical revenue-generating services, Medium (#41-80) = standard operations, Low (#81+) = niche/specialized.</div></span></span>
+                            <label data-explain="revenue-tier-filter">Revenue Tier
+
                             </label>
                             <select id="calcRevTier" aria-label="Calc Rev Tier">
                                 <option value="all" selected>All Tiers</option>
@@ -4521,7 +4462,7 @@ function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySel
 <script src="js/rz-article-toc.js?v=1.50.42" defer></script>
 
 <!-- Search: shared js/rz-command-palette.js -->
-<script src="js/rz-command-palette.js?v=1.50.37" defer></script>
+<script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 <script src="auth.js?v=2026-07-16b" defer></script>
 <script src="rz-engine.min.js?v=2026-07-15-dsc" defer></script>
 <script src="rz-tracker.js" defer></script>

@@ -88,7 +88,7 @@
 <script src="js/rz-explain.js?v=2026-07-16" defer></script>
 <script src="js/rz-article-editorial.js?v=1.51.8" defer></script>
     <script src="js/rz-article-diagram.js?v=1.50.37" defer></script>
-    <script src="js/rz-command-palette.js?v=1.50.37" defer></script>
+    <script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
     <script src="js/rz-article-chart.js?v=1.50.19" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
@@ -529,24 +529,6 @@
         }
         .pjm-input-group input:focus,
         .pjm-input-group select:focus { border-color: #b45309; outline: none; box-shadow: 0 0 0 2px rgba(180,83,9,0.1); }
-        .pjm-tooltip-trigger {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 16px; height: 16px; border-radius: 50%;
-            background: #e5e7eb; color: #94a3b8; font-size: 0.65rem;
-            cursor: help; font-weight: 700; position: relative;
-        }
-        .pjm-tooltip-content {
-            display: none; position: absolute; bottom: calc(100% + 8px); left: 50%;
-            transform: translateX(-50%); width: 240px; padding: 0.75rem;
-            background: #1e293b; color: #e2e8f0; border-radius: 8px;
-            font-size: 0.75rem; line-height: 1.5; z-index: 50;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-        }
-        .pjm-tooltip-trigger:hover .pjm-tooltip-content,
-        .pjm-tooltip-trigger:focus .pjm-tooltip-content { display: block; }
-        .pjm-tooltip-title { font-weight: 700; margin-bottom: 0.25rem; color: #fcd34d; }
-        .pjm-tooltip-desc { color: #cbd5e1; }
-        .pjm-tooltip-formula { margin-top: 0.35rem; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #94a3b8; }
         .pjm-kpi-grid {
             display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 0.75rem;
         }
@@ -705,7 +687,6 @@
         [data-theme="dark"] .pjm-gate-overlay { background: rgba(15,23,42,0.88); }
         [data-theme="dark"] .pjm-gate-overlay span { color: #e2e8f0; }
         [data-theme="dark"] .pjm-disclaimer { background: rgba(255,255,255,0.03); color: #9ca3af; }
-        [data-theme="dark"] .pjm-tooltip-trigger { background: #374151; color: #9ca3af; }
         [data-theme="dark"] .pjm-roadmap-tier { background: rgba(30,41,59,0.5); }
         [data-theme="dark"] .pjm-tier-critical { border-left-color: #fbbf24; }
         [data-theme="dark"] .pjm-tier-warning { border-left-color: #fbbf24; }
@@ -1398,50 +1379,50 @@
         <!-- Free Inputs (8) -->
         <div class="pjm-input-grid">
             <div class="pjm-input-group">
-                <label for="pjmCapacity">Grid Total Capacity (GW)
-                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Grid Total Capacity</div><div class="pjm-tooltip-desc">Total nameplate generation capacity of the interconnection.</div><div class="pjm-tooltip-formula">PJM ~180 GW, ERCOT ~100 GW</div></span></span>
+                <label for="pjmCapacity" data-explain="grid-total-capacity">Grid Total Capacity (GW)
+
                 </label>
                 <input type="number" id="pjmCapacity" value="180" min="50" max="500" step="1">
             </div>
             <div class="pjm-input-group">
-                <label for="pjmPeakDemand">Current Peak Demand (GW)
-                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Current Peak Demand</div><div class="pjm-tooltip-desc">Historical peak system demand. PJM's all-time record is ~165 GW.</div></span></span>
+                <label for="pjmPeakDemand" data-explain="current-peak-demand">Current Peak Demand (GW)
+
                 </label>
                 <input type="number" id="pjmPeakDemand" value="150" min="30" max="400" step="1">
             </div>
             <div class="pjm-input-group">
-                <label for="pjmRetirements">Planned Retirements (GW)
-                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Planned Retirements</div><div class="pjm-tooltip-desc">Thermal plants scheduled for deactivation. PJM has ~40 GW queued for retirement through 2030.</div></span></span>
+                <label for="pjmRetirements" data-explain="planned-retirements">Planned Retirements (GW)
+
                 </label>
                 <input type="number" id="pjmRetirements" value="40" min="0" max="100" step="1">
             </div>
             <div class="pjm-input-group">
-                <label for="pjmNewGen">New Generation Pipeline (GW)
-                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">New Generation Pipeline</div><div class="pjm-tooltip-desc">Approved new generation with financing. Subject to interconnection queue completion rates.</div></span></span>
+                <label for="pjmNewGen" data-explain="new-generation-pipeline">New Generation Pipeline (GW)
+
                 </label>
                 <input type="number" id="pjmNewGen" value="15" min="0" max="100" step="1">
             </div>
             <div class="pjm-input-group">
-                <label for="pjmDCGrowth">DC Load Growth (GW)
-                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Data Center Load Growth</div><div class="pjm-tooltip-desc">Incremental data center demand. PJM expects 7-15 GW of new DC load by 2030.</div></span></span>
+                <label for="pjmDCGrowth" data-explain="data-center-load-growth">DC Load Growth (GW)
+
                 </label>
                 <input type="number" id="pjmDCGrowth" value="10" min="0" max="50" step="0.5">
             </div>
             <div class="pjm-input-group">
-                <label for="pjmOtherGrowth">Other Load Growth (GW)
-                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Other Load Growth</div><div class="pjm-tooltip-desc">EVs, electrification, industrial reshoring. McKinsey estimates 3-8 GW for PJM territory.</div></span></span>
+                <label for="pjmOtherGrowth" data-explain="other-load-growth">Other Load Growth (GW)
+
                 </label>
                 <input type="number" id="pjmOtherGrowth" value="5" min="0" max="30" step="0.5">
             </div>
             <div class="pjm-input-group">
-                <label for="pjmReserveTarget">Target Reserve Margin (%)
-                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Target Reserve Margin</div><div class="pjm-tooltip-desc">NERC-recommended minimum 14.7%. Most ISOs target 15-17%.</div><div class="pjm-tooltip-formula">Reserve = (Capacity - Demand) / Demand</div></span></span>
+                <label for="pjmReserveTarget" data-explain="target-reserve-margin">Target Reserve Margin (%)
+
                 </label>
                 <input type="number" id="pjmReserveTarget" value="15" min="5" max="25" step="0.5">
             </div>
             <div class="pjm-input-group">
-                <label for="pjmELCC">Renewable ELCC Factor (%)
-                    <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Effective Load Carrying Capability</div><div class="pjm-tooltip-desc">ELCC of renewables &mdash; 1 GW solar &asymp; 0.15-0.30 GW reliable capacity. PJM uses ~25% for wind+solar combined.</div><div class="pjm-tooltip-formula">Effective New = Dispatchable + (Renewable &times; ELCC)</div></span></span>
+                <label for="pjmELCC" data-explain="effective-load-carrying-capability">Renewable ELCC Factor (%)
+
                 </label>
                 <input type="number" id="pjmELCC" value="25" min="5" max="80" step="1">
             </div>
@@ -1496,26 +1477,26 @@
             <h4><i class="fas fa-flask"></i> Advanced Parameters</h4>
             <div class="pjm-pro-grid">
                 <div class="pjm-input-group pjm-pro-input-group">
-                    <label for="pjmForcedOutage">Forced Outage Rate (%)
-                        <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Forced Outage Rate</div><div class="pjm-tooltip-desc">% of capacity unavailable due to unplanned outages. Winter Storm Elliott saw 25%+. Normal: 5-10%.</div><div class="pjm-tooltip-formula">Available = Net &times; (1 - FOR/100)</div></span></span>
+                    <label for="pjmForcedOutage" data-explain="forced-outage-rate">Forced Outage Rate (%)
+
                     </label>
                     <input type="number" id="pjmForcedOutage" value="8" min="0" max="25" step="0.5">
                 </div>
                 <div class="pjm-input-group pjm-pro-input-group">
-                    <label for="pjmDR">Demand Response Available (GW)
-                        <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Demand Response</div><div class="pjm-tooltip-desc">Curtailable load from DR programs. PJM has ~8 GW of registered DR capacity.</div></span></span>
+                    <label for="pjmDR" data-explain="demand-response">Demand Response Available (GW)
+
                     </label>
                     <input type="number" id="pjmDR" value="8" min="0" max="30" step="0.5">
                 </div>
                 <div class="pjm-input-group pjm-pro-input-group">
-                    <label for="pjmBattery">Battery Storage (GW)
-                        <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Battery Storage Deployed</div><div class="pjm-tooltip-desc">Grid-scale battery storage (4-hour equivalent). Currently ~3 GW in PJM, expected to grow rapidly.</div></span></span>
+                    <label for="pjmBattery" data-explain="battery-storage-deployed">Battery Storage (GW)
+
                     </label>
                     <input type="number" id="pjmBattery" value="3" min="0" max="50" step="0.5">
                 </div>
                 <div class="pjm-input-group pjm-pro-input-group">
-                    <label for="pjmQueueRate">Queue Completion Rate (%)
-                        <span class="pjm-tooltip-trigger" tabindex="0">?<span class="pjm-tooltip-content"><div class="pjm-tooltip-title">Interconnection Queue Completion</div><div class="pjm-tooltip-desc">% of queued projects that actually get built. PJM historical: &lt;5%. LBNL data confirms most projects drop out.</div></span></span>
+                    <label for="pjmQueueRate" data-explain="interconnection-queue-completion">Queue Completion Rate (%)
+
                     </label>
                     <input type="number" id="pjmQueueRate" value="5" min="1" max="50" step="1">
                 </div>

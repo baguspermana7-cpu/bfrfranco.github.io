@@ -389,17 +389,7 @@ a:hover{text-decoration:underline;}
 .cx-premium-btn:hover{box-shadow:0 4px 20px rgba(139,92,246,0.5);transform:translateY(-1px);}
 .cx-premium-badge{display:none;padding:4px 12px;border-radius:50px;background:linear-gradient(135deg,#8b5cf6,#a855f7);color:white;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;}
 
-/* ===== TOOLTIP STYLES (Standard — global container pattern) ===== */
-.cx-tooltip-trigger{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:rgba(14,116,144,0.15);border:1px solid rgba(34,211,238,0.3);border-radius:50%;font-size:0.6rem;font-weight:700;color:#22d3ee;cursor:help;margin-left:auto;transition:all 0.3s;flex-shrink:0;}
-.cx-tooltip-trigger:hover{background:rgba(14,116,144,0.3);transform:scale(1.1);}
-/* Hide inline tooltip content — rendered via global container */
-.cx-tooltip-trigger .cx-tooltip-content{display:none!important;}
-/* Global tooltip container (appended to body by JS) */
-#cxTooltipContainer{position:fixed;width:320px;max-width:calc(100vw - 40px);padding:16px;background:linear-gradient(135deg,#1e293b,#0f172a);border:1px solid rgba(34,211,238,0.25);border-radius:12px;box-shadow:0 15px 50px rgba(0,0,0,0.5);z-index:999999;pointer-events:none;opacity:0;visibility:hidden;transition:opacity 0.15s ease;color:white;font-size:12px;line-height:1.5;}
-#cxTooltipContainer.visible{opacity:1;visibility:visible;}
-#cxTooltipContainer .cx-tooltip-title{font-size:13px;font-weight:700;color:#22d3ee;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
-#cxTooltipContainer .cx-tooltip-desc{font-size:12px;color:rgba(255,255,255,0.9);margin-bottom:10px;line-height:1.6;}
-#cxTooltipContainer .cx-tooltip-formula{font-size:11px;color:#94a3b8;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1);font-style:italic;line-height:1.5;}
+/* Legacy tooltip CSS removed — RZExplain owns tooltips (js/rz-explain.js) */
 
 /* ===== PRIVACY BADGE + BENCHMARK META ===== */
 .cx-privacy-badge{display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:10px;margin-bottom:1rem;font-size:0.78rem;color:#10b981;font-weight:500;}
@@ -672,6 +662,8 @@ a[href$="opex-calculator.html"][href] { color:#34d399 !important; }
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-calc-utils.js?v=2026-07-03" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-07-17" defer></script>
+    <script src="js/rz-explain.js?v=2026-07-17" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>    <meta property="og:image:alt" content="Data Center Commissioning Calculator | L0-L6 Cost & Schedule">
@@ -808,10 +800,10 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
   </div>
 
   <!-- Inputs Grid -->
-  <div class="cx-inputs" id="cxInputsGrid">
+  <div class="cx-inputs" id="cxInputsGrid" data-explain-scan>
     <!-- Input 1: IT Load -->
     <div class="cx-input-group">
-      <label class="cx-input-label"><i class="fas fa-bolt" style="color:#f59e0b;"></i> IT Load Capacity <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">IT Load Capacity (kW)</div><div class="cx-tooltip-desc">Total planned IT electrical load in kilowatts. This is the primary scaling factor for all commissioning costs and durations.</div><div class="cx-tooltip-formula">Range: 100 kW (edge) to 100,000 kW (hyperscale). Typical: 2,000 kW enterprise, 50,000 kW hyperscale.</div></span></span></label>
+      <label class="cx-input-label" data-explain="it-load"><i class="fas fa-bolt" style="color:#f59e0b;"></i> IT Load Capacity</label>
       <input type="range" id="cxItLoad" class="cx-input-range" min="100" max="100000" step="100" value="2000" oninput="document.getElementById('cxItLoadVal').textContent=this.value+' kW';document.getElementById('cxItLoadNum').value=this.value;" aria-label="CX It Load">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <span class="cx-range-val" id="cxItLoadVal">2000 kW</span>
@@ -820,7 +812,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
     </div>
     <!-- Input 2: Cooling Type -->
     <div class="cx-input-group">
-      <label class="cx-input-label"><i class="fas fa-snowflake" style="color:#22d3ee;"></i> Cooling Type <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Cooling Type</div><div class="cx-tooltip-desc">Primary cooling technology. DLC and immersion add 35-55% to Cx cost due to CDU redundancy testing, liquid loop zoning, manifold pressure, and rack-level thermal acceptance.</div><div class="cx-tooltip-formula">Cost multiplier: Air=1.0x, In-Row=1.12x, RDHX=1.25x, DLC=1.45x, Immersion=1.55x</div></span></span></label>
+      <label class="cx-input-label" data-explain="cooling-type"><i class="fas fa-snowflake" style="color:#22d3ee;"></i> Cooling Type</label>
       <select id="cxCoolingType" class="cx-input-field" aria-label="CX Cooling Type">
         <option value="air">Raised Floor CRAC/CRAH</option>
         <option value="inrow">In-Row Precision</option>
@@ -831,7 +823,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
     </div>
     <!-- Input 3: Redundancy -->
     <div class="cx-input-group">
-      <label class="cx-input-label"><i class="fas fa-shield-halved" style="color:#10b981;"></i> Redundancy Level <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Redundancy Level</div><div class="cx-tooltip-desc">Power and cooling redundancy configuration. 2N doubles commissioning scope — every failure scenario must be tested for both independent paths.</div><div class="cx-tooltip-formula">N=3 IST scenarios, N+1=6, 2N=10, 2N+1=10+ scenarios. Cost: N=1.0x, 2N=2.0x, 2N+1=2.25x</div></span></span></label>
+      <label class="cx-input-label" data-explain="redundancy"><i class="fas fa-shield-halved" style="color:#10b981;"></i> Redundancy Level</label>
       <select id="cxRedundancy" class="cx-input-field" aria-label="CX Redundancy">
         <option value="N">N (No Redundancy)</option>
         <option value="N+1" selected>N+1 (Component)</option>
@@ -841,7 +833,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
     </div>
     <!-- Input 4: Rack Density -->
     <div class="cx-input-group">
-      <label class="cx-input-label"><i class="fas fa-server" style="color:#8b5cf6;"></i> Rack Density <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Rack Density</div><div class="cx-tooltip-desc">Average power per rack. AI/HPC densities (50-100+ kW) require specialized liquid cooling Cx disciplines and increase thermal failure risk during IST.</div><div class="cx-tooltip-formula">Standard=5-7 kW, Medium=10-15 kW, High=20-30 kW, AI/HPC=50-100+ kW. CAPEX basis: Standard $8.5K/kW, AI/HPC $12K/kW.</div></span></span></label>
+      <label class="cx-input-label" data-explain="rack-density"><i class="fas fa-server" style="color:#8b5cf6;"></i> Rack Density</label>
       <select id="cxRackDensity" class="cx-input-field" aria-label="CX Rack Density">
         <option value="standard">Standard (5–7 kW/rack)</option>
         <option value="medium">Medium (10–15 kW/rack)</option>
@@ -851,7 +843,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
     </div>
     <!-- Input 5: Building Type -->
     <div class="cx-input-group">
-      <label class="cx-input-label"><i class="fas fa-building" style="color:#64748b;"></i> Building Type <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Building Type</div><div class="cx-tooltip-desc">Construction type affects Cx complexity. Multi-story adds 25-30% for vertical risers, structural coordination, and staged energization per floor.</div><div class="cx-tooltip-formula">Warehouse=0.80x, Modular=0.75x, Purpose-Built=1.00x, Multi-Story=1.30x</div></span></span></label>
+      <label class="cx-input-label" data-explain="building-type"><i class="fas fa-building" style="color:#64748b;"></i> Building Type</label>
       <select id="cxBuildingType" class="cx-input-field" aria-label="CX Building Type">
         <option value="warehouse">Converted Warehouse</option>
         <option value="modular">Modular / Prefab</option>
@@ -861,7 +853,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
     </div>
     <!-- Input 6: Fire Suppression -->
     <div class="cx-input-group">
-      <label class="cx-input-label"><i class="fas fa-fire-extinguisher" style="color:#ef4444;"></i> Fire Suppression <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Fire Suppression System</div><div class="cx-tooltip-desc">Fire suppression type affects Cx scope: clean agent systems (Novec, FM-200) require integrity testing, concentration hold, and agent release testing per NFPA 2001.</div><div class="cx-tooltip-formula">FM-200=1.0x, Novec=1.05x, Inergen=1.10x, Water Mist=1.15x, Pre-Action=0.85x</div></span></span></label>
+      <label class="cx-input-label" data-explain="fire-suppression"><i class="fas fa-fire-extinguisher" style="color:#ef4444;"></i> Fire Suppression</label>
       <select id="cxFireSuppression" class="cx-input-field" aria-label="CX Fire Suppression">
         <option value="fm200">FM-200 (HFC-227ea)</option>
         <option value="novec" selected>Novec 1230</option>
@@ -873,7 +865,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
     </div>
     <!-- Input 7: UPS Type -->
     <div class="cx-input-group">
-      <label class="cx-input-label"><i class="fas fa-car-battery" style="color:#f59e0b;"></i> UPS Type <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">UPS Type</div><div class="cx-tooltip-desc">UPS topology impacts Cx cost and duration. Rotary UPS (DRUPS) requires mechanical + electrical testing. Distributed requires per-rack validation.</div><div class="cx-tooltip-formula">Standalone=1.0x, Modular=1.25x, Distributed=1.15x, Rotary DRUPS=1.40x</div></span></span></label>
+      <label class="cx-input-label" data-explain="ups-type"><i class="fas fa-car-battery" style="color:#f59e0b;"></i> UPS Type</label>
       <select id="cxUpsType" class="cx-input-field" aria-label="CX UPS Type">
         <option value="standalone">Standalone (Legacy)</option>
         <option value="modular" selected>Modular (Hot-Swap)</option>
@@ -883,7 +875,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
     </div>
     <!-- Input 8: Region -->
     <div class="cx-input-group">
-      <label class="cx-input-label"><i class="fas fa-globe" style="color:#3b82f6;"></i> Region <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Region</div><div class="cx-tooltip-desc">Location determines CxA day rates, field technician rates, OEM costs, per diem, and regional labor multiplier. NoVA vs Jakarta can differ by 3x.</div><div class="cx-tooltip-formula">CxA day rates: US $1,050-1,200, EU $750-1,050, Asia $350-1,000, MENA $800-850. 30 regions covered.</div></span></span></label>
+      <label class="cx-input-label" data-explain="region-location"><i class="fas fa-globe" style="color:#3b82f6;"></i> Region</label>
       <select id="cxRegion" class="cx-input-field" aria-label="CX Region">
         <optgroup label="North America">
           <option value="us_virginia" selected>Northern Virginia (Ashburn)</option>
@@ -929,7 +921,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
 
     <!-- Pro Inputs (9-14) -->
     <div class="cx-input-group cx-pro-input" id="cxProInput9">
-      <label class="cx-input-label"><i class="fas fa-gas-pump" style="color:#94a3b8;"></i> Generator Type <span class="cx-pro-tag">PRO</span> <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Generator Type</div><div class="cx-tooltip-desc">Fuel type affects load bank testing complexity, fuel system commissioning, and environmental compliance. Dual fuel requires testing both fuel paths.</div><div class="cx-tooltip-formula">Diesel=1.0x, Natural Gas=1.10x, Dual Fuel=1.25x, HVO=1.08x</div></span></span></label>
+      <label class="cx-input-label" data-explain="generator-type"><i class="fas fa-gas-pump" style="color:#94a3b8;"></i> Generator Type <span class="cx-pro-tag">PRO</span></label>
       <select id="cxGeneratorType" class="cx-input-field" aria-label="CX Generator Type">
         <option value="diesel" selected>Diesel</option>
         <option value="gas">Natural Gas</option>
@@ -938,7 +930,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </select>
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput10">
-      <label class="cx-input-label"><i class="fas fa-mountain" style="color:#94a3b8;"></i> Seismic Zone <span class="cx-pro-tag">PRO</span> <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Seismic Zone</div><div class="cx-tooltip-desc">Higher seismic zones require seismic restraint testing, vibration isolation verification, and emergency shutdown validation per IBC/ASCE 7.</div><div class="cx-tooltip-formula">Zone 0=1.0x, Zone 1=1.05x, Zone 2=1.12x, Zone 3=1.22x, Zone 4=1.35x</div></span></span></label>
+      <label class="cx-input-label" data-explain="seismic-zone"><i class="fas fa-mountain" style="color:#94a3b8;"></i> Seismic Zone <span class="cx-pro-tag">PRO</span></label>
       <select id="cxSeismicZone" class="cx-input-field" aria-label="CX Seismic Zone">
         <option value="0">Zone 0 — No Risk</option>
         <option value="1" selected>Zone 1 — Low</option>
@@ -948,7 +940,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </select>
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput11">
-      <label class="cx-input-label"><i class="fas fa-list-check" style="color:#94a3b8;"></i> Cx Scope <span class="cx-pro-tag">PRO</span> <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Commissioning Scope</div><div class="cx-tooltip-desc">New Build = full L0-L6. Retrofit covers modified systems only. Recommissioning validates existing systems. Continuous = ongoing monitoring Cx.</div><div class="cx-tooltip-formula">New Build=1.0x, Retrofit=0.75x, Recommission=0.55x, Continuous=0.30x</div></span></span></label>
+      <label class="cx-input-label" data-explain="cx-scope"><i class="fas fa-list-check" style="color:#94a3b8;"></i> Cx Scope <span class="cx-pro-tag">PRO</span></label>
       <select id="cxScope" class="cx-input-field" aria-label="CX Scope">
         <option value="new_build" selected>New Build (Full L1-L5)</option>
         <option value="retrofit">Retrofit / Upgrade</option>
@@ -957,7 +949,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </select>
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput12">
-      <label class="cx-input-label"><i class="fas fa-plug-circle-bolt" style="color:#94a3b8;"></i> Substation <span class="cx-pro-tag">PRO</span> <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Substation Configuration</div><div class="cx-tooltip-desc">Ring bus adds 80-110% to Cx cost. Requires protection relay coordination testing, bus tie testing, and utility switchover scenarios across all bus sections.</div><div class="cx-tooltip-formula">Utility-Fed=0.70x, Single Sub=1.0x, Dual Sub=1.85x, Ring Bus=2.10x</div></span></span></label>
+      <label class="cx-input-label" data-explain="substation-type"><i class="fas fa-plug-circle-bolt" style="color:#94a3b8;"></i> Substation <span class="cx-pro-tag">PRO</span></label>
       <select id="cxSubstation" class="cx-input-field" aria-label="CX Substation">
         <option value="utility_fed">Utility-Fed (No HV)</option>
         <option value="single_sub" selected>Single Substation</option>
@@ -966,7 +958,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </select>
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput13">
-      <label class="cx-input-label"><i class="fas fa-network-wired" style="color:#94a3b8;"></i> BMS/DCIM <span class="cx-pro-tag">PRO</span> <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">BMS/DCIM Complexity</div><div class="cx-tooltip-desc">AI-driven DCIM doubles controls Cx scope with ML model validation, predictive algorithm testing, and integration across all subsystems. Points list scales with complexity.</div><div class="cx-tooltip-formula">Basic=200 pts, Standard=500 pts, Advanced=1,200 pts, AI-Driven=2,000+ pts. Cost: Basic=0.6x, AI=2.0x</div></span></span></label>
+      <label class="cx-input-label" data-explain="cx-bms-dcim"><i class="fas fa-network-wired" style="color:#94a3b8;"></i> BMS/DCIM <span class="cx-pro-tag">PRO</span></label>
       <select id="cxBmsComplexity" class="cx-input-field" aria-label="CX Bms Complexity">
         <option value="basic">Basic BMS</option>
         <option value="standard" selected>Standard BMS + Head-End</option>
@@ -975,7 +967,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </select>
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput14">
-      <label class="cx-input-label"><i class="fas fa-truck-fast" style="color:#94a3b8;"></i> Delivery Method <span class="cx-pro-tag">PRO</span> <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Delivery Method</div><div class="cx-tooltip-desc">EPC and modular pod delivery compress Cx timelines and reduce cost through factory pre-commissioning. Traditional DBB has sequential handoffs.</div><div class="cx-tooltip-formula">Traditional=1.0x, Design-Build=0.90x, EPC=0.85x, Modular/Pod=0.70x</div></span></span></label>
+      <label class="cx-input-label" data-explain="delivery-method"><i class="fas fa-truck-fast" style="color:#94a3b8;"></i> Delivery Method <span class="cx-pro-tag">PRO</span></label>
       <select id="cxDeliveryMethod" class="cx-input-field" aria-label="CX Delivery Method">
         <option value="traditional" selected>Traditional (DBB)</option>
         <option value="design_build">Design-Build</option>
@@ -6240,45 +6232,7 @@ function cxRestoreInputs(){
 }
 cxRestoreInputs();
 
-// --- TOOLTIP SYSTEM (Standard: global container pattern per CAPEX) ---
-(function(){
-  var tooltipEl=document.createElement('div');
-  tooltipEl.id='cxTooltipContainer';
-  document.body.appendChild(tooltipEl);
-
-  document.querySelectorAll('.cx-tooltip-trigger').forEach(function(trigger){
-    var content=trigger.querySelector('.cx-tooltip-content');
-    if(!content)return;
-
-    trigger.addEventListener('mouseenter',function(){
-      tooltipEl.innerHTML=content.innerHTML;
-      var rect=trigger.getBoundingClientRect();
-      var tooltipWidth=320;
-      var padding=15;
-
-      // Position: right of trigger first, fallback to left
-      var left=rect.right+padding;
-      var top=rect.top+rect.height/2;
-
-      // Force layout to get actual height
-      tooltipEl.classList.add('visible');
-      var tooltipHeight=tooltipEl.offsetHeight||200;
-
-      if(left+tooltipWidth>window.innerWidth-20){left=rect.left-tooltipWidth-padding;}
-      if(left<20)left=20;
-      top=top-tooltipHeight/2;
-      if(top<20)top=20;
-      if(top+tooltipHeight>window.innerHeight-20){top=window.innerHeight-tooltipHeight-20;}
-
-      tooltipEl.style.left=left+'px';
-      tooltipEl.style.top=top+'px';
-    });
-
-    trigger.addEventListener('mouseleave',function(){
-      tooltipEl.classList.remove('visible');
-    });
-  });
-})();
+// legacy tooltip system removed — RZExplain (js/rz-explain.js) owns all tooltips
 
 // --- LIVE RECALCULATION ON INPUT CHANGE ---
 document.querySelectorAll('.cx-input-field, .cx-input-range').forEach(function(el){

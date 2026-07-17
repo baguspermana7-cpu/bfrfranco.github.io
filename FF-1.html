@@ -1043,52 +1043,6 @@
             border-color: rgba(91,33,182,0.45);
             box-shadow: 0 0 0 4px rgba(124,58,237,0.08);
         }
-        .hfx-tooltip-trigger {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: rgba(91,33,182,0.12);
-            color: #5b21b6;
-            font-size: 0.64rem;
-            font-weight: 700;
-            cursor: help;
-            position: relative;
-            flex-shrink: 0;
-        }
-        .hfx-tooltip-content {
-            display: none;
-            position: fixed;
-            width: 280px;
-            background: #0f172a;
-            border: 1px solid rgba(14,165,233,0.25);
-            border-radius: 12px;
-            padding: 0.9rem;
-            z-index: 9999;
-            box-shadow: 0 16px 48px rgba(2,6,23,0.55);
-            pointer-events: none;
-        }
-        .hfx-tooltip-title {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #67e8f9;
-            margin-bottom: 0.35rem;
-        }
-        .hfx-tooltip-desc {
-            font-size: 0.74rem;
-            color: #cbd5e1;
-            line-height: 1.55;
-            margin-bottom: 0.5rem;
-        }
-        .hfx-tooltip-formula {
-            font-size: 0.68rem;
-            color: #94a3b8;
-            padding-top: 0.45rem;
-            border-top: 1px solid rgba(255,255,255,0.08);
-            font-style: italic;
-        }
         .hfx-results-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1942,39 +1896,39 @@
 
                     <div class="hfx-input-grid">
                         <div class="hfx-input-group">
-                            <label for="hfxSessions">Monthly Sessions <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Monthly Sessions</div><div class="hfx-tooltip-desc">Your site's typical monthly sessions before modeled click compression.</div><div class="hfx-tooltip-formula">Use a rolling average, not your best month.</div></span></span></label>
+                            <label for="hfxSessions" data-explain="monthly-sessions">Monthly Sessions</label>
                             <input id="hfxSessions" type="number" min="1000" step="1000" value="250000">
                         </div>
                         <div class="hfx-input-group">
-                            <label for="hfxSearchShare">Search Dependency (%) <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Search Dependency</div><div class="hfx-tooltip-desc">Share of sessions that arrive from search engines.</div><div class="hfx-tooltip-formula">High search dependence means more vulnerability to AI answer layers.</div></span></span></label>
+                            <label for="hfxSearchShare" data-explain="search-dependency">Search Dependency (%)</label>
                             <input id="hfxSearchShare" type="number" min="0" max="100" step="1" value="58">
                         </div>
                         <div class="hfx-input-group">
-                            <label for="hfxDirectShare">Direct Traffic Share (%) <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Direct Traffic</div><div class="hfx-tooltip-desc">Typed, bookmarked, or habit-driven traffic not dependent on the discovery layer.</div><div class="hfx-tooltip-formula">Higher direct share usually signals stronger brand or repeat behavior.</div></span></span></label>
+                            <label for="hfxDirectShare" data-explain="direct-traffic">Direct Traffic Share (%)</label>
                             <input id="hfxDirectShare" type="number" min="0" max="100" step="1" value="18">
                         </div>
                         <div class="hfx-input-group">
-                            <label for="hfxAiExposure">AI-Exposed Content (%) <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">AI-Exposed Content</div><div class="hfx-tooltip-desc">Share of traffic landing on pages that mostly answer explainable or summary-friendly questions.</div><div class="hfx-tooltip-formula">The higher this is, the easier your content is to compress into answers.</div></span></span></label>
+                            <label for="hfxAiExposure" data-explain="ai-exposed-content">AI-Exposed Content (%)</label>
                             <input id="hfxAiExposure" type="number" min="0" max="100" step="1" value="62">
                         </div>
                         <div class="hfx-input-group">
-                            <label for="hfxInteractiveShare">Interactive / Tool Share (%) <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Interactive Share</div><div class="hfx-tooltip-desc">Sessions touching calculators, dashboards, workflows, or product-like features.</div><div class="hfx-tooltip-formula">Utility tends to be more defensible than passive content.</div></span></span></label>
+                            <label for="hfxInteractiveShare" data-explain="interactive-share">Interactive / Tool Share (%)</label>
                             <input id="hfxInteractiveShare" type="number" min="0" max="100" step="1" value="14">
                         </div>
                         <div class="hfx-input-group">
-                            <label for="hfxReturnRate">Returning Visitor Rate (%) <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Returning Visitor Rate</div><div class="hfx-tooltip-desc">Approximate share of sessions from users who come back repeatedly within a month.</div><div class="hfx-tooltip-formula">Repeat usage suggests habit, utility, or trust.</div></span></span></label>
+                            <label for="hfxReturnRate" data-explain="returning-visitor-rate">Returning Visitor Rate (%)</label>
                             <input id="hfxReturnRate" type="number" min="0" max="100" step="1" value="27">
                         </div>
                         <div class="hfx-input-group">
-                            <label for="hfxPlatformShare">Platform-Origin Revenue (%) <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Platform-Origin Revenue</div><div class="hfx-tooltip-desc">Share of revenue or leads that begin inside closed platforms such as social, marketplaces, or app stores.</div><div class="hfx-tooltip-formula">Higher values mean more rented economics.</div></span></span></label>
+                            <label for="hfxPlatformShare" data-explain="platform-origin-revenue">Platform-Origin Revenue (%)</label>
                             <input id="hfxPlatformShare" type="number" min="0" max="100" step="1" value="41">
                         </div>
                         <div class="hfx-input-group">
-                            <label for="hfxBrandShare">Branded Search Share (%) <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Branded Search</div><div class="hfx-tooltip-desc">Share of search visits from users already looking for your brand by name.</div><div class="hfx-tooltip-formula">Branded demand is usually more resilient than generic demand.</div></span></span></label>
+                            <label for="hfxBrandShare" data-explain="branded-search">Branded Search Share (%)</label>
                             <input id="hfxBrandShare" type="number" min="0" max="100" step="1" value="21">
                         </div>
                         <div class="hfx-input-group">
-                            <label for="hfxRevenuePerK">Revenue per 1,000 Sessions ($) <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Revenue per 1,000 Sessions</div><div class="hfx-tooltip-desc">Blended RPM, lead value, or monetized session value used to estimate revenue-at-risk.</div><div class="hfx-tooltip-formula">Use your own blended average if possible.</div></span></span></label>
+                            <label for="hfxRevenuePerK" data-explain="revenue-per-1-000-sessions">Revenue per 1,000 Sessions ($)</label>
                             <input id="hfxRevenuePerK" type="number" min="1" step="1" value="42">
                         </div>
                     </div>
@@ -2011,23 +1965,23 @@
                         <h4><i class="fas fa-sliders"></i> Pro Variables</h4>
                         <div class="hfx-pro-grid">
                             <div class="hfx-pro-input-group">
-                                <label for="hfxFirstParty">First-Party Audience Capture (%) <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">First-Party Capture</div><div class="hfx-tooltip-desc">Share of users you can reach directly through email, accounts, saved work, or owned contact channels.</div><div class="hfx-tooltip-formula">More first-party reach lowers discovery dependence.</div></span></span></label>
+                                <label for="hfxFirstParty" data-explain="first-party-capture">First-Party Audience Capture (%)</label>
                                 <input id="hfxFirstParty" type="number" min="0" max="100" step="1" value="11">
                             </div>
                             <div class="hfx-pro-input-group">
-                                <label for="hfxCommunityShare">Community Contribution (%) <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Community Contribution</div><div class="hfx-tooltip-desc">Share of valuable content or interaction generated by users, members, or customers.</div><div class="hfx-tooltip-formula">Community often increases authenticity and trust.</div></span></span></label>
+                                <label for="hfxCommunityShare" data-explain="community-contribution">Community Contribution (%)</label>
                                 <input id="hfxCommunityShare" type="number" min="0" max="100" step="1" value="8">
                             </div>
                             <div class="hfx-pro-input-group">
-                                <label for="hfxRecurringShare">Recurring Revenue Share (%) <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Recurring Revenue</div><div class="hfx-tooltip-desc">Portion of revenue from subscriptions, memberships, software plans, or repeat contracts.</div><div class="hfx-tooltip-formula">Recurring revenue softens traffic shocks.</div></span></span></label>
+                                <label for="hfxRecurringShare" data-explain="recurring-revenue">Recurring Revenue Share (%)</label>
                                 <input id="hfxRecurringShare" type="number" min="0" max="100" step="1" value="16">
                             </div>
                             <div class="hfx-pro-input-group">
-                                <label for="hfxStructuredReadiness">Structured Readiness (%) <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Structured Readiness</div><div class="hfx-tooltip-desc">How machine-readable your site is through schema, entities, clean internal structure, and consistent data.</div><div class="hfx-tooltip-formula">Higher readiness helps citations and agent compatibility.</div></span></span></label>
+                                <label for="hfxStructuredReadiness" data-explain="structured-readiness">Structured Readiness (%)</label>
                                 <input id="hfxStructuredReadiness" type="number" min="0" max="100" step="1" value="44">
                             </div>
                             <div class="hfx-pro-input-group">
-                                <label for="hfxRefreshes">Meaningful Refreshes per Month <span class="hfx-tooltip-trigger" tabindex="0">?<span class="hfx-tooltip-content"><div class="hfx-tooltip-title">Refresh Frequency</div><div class="hfx-tooltip-desc">How often your tools, data, catalogs, or content meaningfully update each month.</div><div class="hfx-tooltip-formula">Live systems usually outperform static pages over time.</div></span></span></label>
+                                <label for="hfxRefreshes" data-explain="refresh-frequency">Meaningful Refreshes per Month</label>
                                 <input id="hfxRefreshes" type="number" min="0" max="60" step="1" value="6">
                             </div>
                         </div>
@@ -2325,7 +2279,7 @@
 <script src="js/rz-article-toc.js?v=1.50.42" defer></script>
 
 <!-- Search: shared js/rz-command-palette.js -->
-<script src="js/rz-command-palette.js?v=1.50.37" defer></script>
+<script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 
 <script>
 window.hfxSetMode = window.hfxSetMode || function(){};
@@ -3034,30 +2988,7 @@ window.hfxHandleLogin = window.hfxHandleLogin || function(){};
         }
     };
 
-    document.querySelectorAll('.hfx-tooltip-trigger').forEach(function(trigger) {
-        function showTip() {
-            var content = trigger.querySelector('.hfx-tooltip-content');
-            if (!content) return;
-            content.style.display = 'block';
-            var rect = trigger.getBoundingClientRect();
-            var cRect = content.getBoundingClientRect();
-            var top = rect.bottom + 8;
-            var left = rect.left - cRect.width / 2 + rect.width / 2;
-            if (left < 8) left = 8;
-            if (left + cRect.width > window.innerWidth - 8) left = window.innerWidth - cRect.width - 8;
-            if (top + cRect.height > window.innerHeight - 8) top = rect.top - cRect.height - 8;
-            content.style.top = top + 'px';
-            content.style.left = left + 'px';
-        }
-        function hideTip() {
-            var content = trigger.querySelector('.hfx-tooltip-content');
-            if (content) content.style.display = 'none';
-        }
-        trigger.addEventListener('mouseenter', showTip);
-        trigger.addEventListener('mouseleave', hideTip);
-        trigger.addEventListener('focus', showTip);
-        trigger.addEventListener('blur', hideTip);
-    });
+    /* legacy tooltip hover system removed v1.60.0 — RZExplain owns tooltips */
 
     ['hfxSessions','hfxSearchShare','hfxDirectShare','hfxAiExposure','hfxInteractiveShare','hfxReturnRate','hfxPlatformShare','hfxBrandShare','hfxRevenuePerK','hfxFirstParty','hfxCommunityShare','hfxRecurringShare','hfxStructuredReadiness','hfxRefreshes']
         .forEach(function(id) {

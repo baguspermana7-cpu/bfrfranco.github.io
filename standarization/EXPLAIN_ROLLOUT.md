@@ -1,22 +1,30 @@
 # RZExplain rollout tracker
 
-Engine: `js/rz-explain.js` · DB: `js/rz-explain-db.js` (generated). Contract: EXPLAIN_ENGINE_STANDARD.md.
+Engine: `js/rz-explain.js` · DB: `js/rz-explain-db.js` (generated — builder auto-merges
+`tools/explain-extra.json` + `tools/explain-extra-batch*.json`). Contract: EXPLAIN_ENGINE_STANDARD.md.
 
-## Adopted (v1.59.0)
+## Adopted
 
-| Surface | Mechanism | Status |
+| Surface | Mechanism | Since |
 |---|---|---|
-| capex-calculator.html | 37 inline `.tooltip-trigger` REMOVED → `data-explain-scan` (2 containers) + curated keys | ✅ probe PASS |
-| pue-calculator.html | `data-explain-scan` on main | ✅ |
-| glossary.html | every `.term-name` wired (cross-hover, 354) | ✅ |
-| Articles (37 editorial pages) | `rz-article-editorial.js` → `RZExplain.scanText` (first occurrence, cap 40, idle-callback) | ✅ article-13: 40 terms live |
-| Finance Terminal | 12 tabs `data-explain` (ft-*) | ✅ |
-| DCMOC | layout DB script + `Explain.tsx` (Tooltip.tsx consumer): 24 tabs + Sensitivity variables + finance KPIs | ✅ |
+| capex-calculator | 37 inline tooltips removed → scan + curated keys | v1.59.0 |
+| pue-calculator | data-explain-scan | v1.59.0 |
+| glossary.html | 354 term names cross-hover | v1.59.0 |
+| 37 editorial/article pages | scanText via rz-article-editorial (idle) | v1.59.0 |
+| Finance Terminal | 12 tabs data-explain | v1.59.0 |
+| DCMOC | Explain.tsx: 24 tabs + Sensitivity vars + 5 KPIs | v1.59.0 |
+| tco-calculator (`.tco-tooltip-*` 14) · cx-calculator (`.cx-tooltip-*` 14) · rz-ops (`.dc-kpi-tooltip` 8, JS-template) | migrated, legacy removed | v1.60.0 |
+| 6 LTC labs + article-3 (`term-tooltip`) | migrated (modelling-lab = scanText; family CSS deleted) | v1.60.0 |
+| article-4/11/12/13/15/16/17/18/20/25, FF-1/2/3, geopolitics-3 (`calc/opm/eeq/mcl/aig/pjm/tgs/hfx/iec-tooltip`) | static triggers migrated; dead hover systems + CSS deleted | v1.60.0 |
+| Command palette | 341 glossary terms searchable (search-terms.json, generated) | v1.60.0 |
 
-## Legacy families pending migration (DEPRECATED — no new instances)
+## Intentionally N/A (dynamic data readouts, NOT explanations)
 
-tco-calculator (`.tco-tooltip-*`), opex (`.opm-tooltip-*`), cx (`.cx-tooltip-*`), monte-carlo
-(`.mcl-tooltip-*`), SLD/diagram (`.sld-tooltip`, `.pjm-*`, `.hfx-*`, `.tgs-*`), equipment
-(`.equipment-tooltip`, `.eeq-*`, `.iec-*`), result/KPI (`.result-tooltip`, `.kpi-tooltip`) —
-~40 families. Migration = move content into `tools/explain-extra.json`, wire `data-explain`,
-delete the local CSS/JS. One page per pass; run `tools/_explain_probe.mjs` + axe after each.
+- `sld-tooltip` (datahallAI) — live SLD value readout; accuracy-gated cockpit. Leave.
+- chart-hover tooltips (Chart.js/echarts) — computed data displays.
+- `iec-tooltip` strings inside changelog.html — generated artifact of CHANGELOG text.
+
+## Pending
+
+- `.tip[data-tip]` micro-family on tco/cx OUTPUT KPI cards (~8 spots) — small follow-up.
+- Remaining per-page one-off families discovered later: migrate on touch, never extend.

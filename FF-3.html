@@ -92,7 +92,7 @@
     <script src="js/rz-explain-db.js?v=2026-07-16" defer></script>
 <script src="js/rz-explain.js?v=2026-07-16" defer></script>
 <script src="js/rz-article-editorial.js?v=1.51.8" defer></script>
-    <script src="js/rz-command-palette.js?v=1.50.37" defer></script>
+    <script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
     <link rel="preload" as="image" href="assets/future-forward-3-cover.webp">
 
     <!-- Structured Data — TechnicalArticle -->
@@ -865,12 +865,7 @@
            Opaque light backgrounds set via inline style on .iec-* elements had no
            dark override, rendering as light islands on the dark page. Each gets a
            same-hue dark tint + readable same-hue light text. */
-        /* .iec-tooltip-trigger — inline background:#e2e8f0 (slate/grey) */
-        [data-theme="dark"] .iec-tooltip-trigger {
-            background: #1e293b !important;
-            color: #cbd5e1 !important;
-        }
-        /* .iec-benchmark-tag — inline background:#ecfeff + border #a5f3fc (cyan) */
+        /*        /* .iec-benchmark-tag — inline background:#ecfeff + border #a5f3fc (cyan) */
         [data-theme="dark"] .iec-benchmark-tag {
             background: rgba(6, 182, 212, 0.14) !important;
             color: #67e8f9 !important;
@@ -2169,8 +2164,8 @@
                     <!-- Free Inputs -->
                     <div class="iec-input-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:1.5rem;">
                         <div class="iec-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                            <label for="iecRegion" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Deployment Region
-                                <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Deployment Region</span>Where your inference infrastructure is deployed. Affects energy cost, cooling requirements, and regulatory environment.</span></span>
+                            <label for="iecRegion" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;" data-explain="iec-deployment-region">Deployment Region
+
                             </label>
                             <select id="iecRegion" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;background:#fff;color:#334155;">
                                 <option value="us" selected>US (Virginia/Texas)</option>
@@ -2186,8 +2181,8 @@
                             </select>
                         </div>
                         <div class="iec-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                            <label for="iecModelSize" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Model Size
-                                <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Model Size</span>Number of parameters in the model. Larger models require more GPU memory and compute per token. 70B is typical for production enterprise inference.</span></span>
+                            <label for="iecModelSize" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;" data-explain="model-size">Model Size
+
                             </label>
                             <select id="iecModelSize" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;background:#fff;color:#334155;">
                                 <option value="7">7B Parameters</option>
@@ -2199,20 +2194,20 @@
                             </select>
                         </div>
                         <div class="iec-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                            <label for="iecDailyRequests" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Daily Inference Requests
-                                <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Daily Inference Requests</span>Total number of inference API calls per day. Used to calculate GPU throughput requirements and monthly compute cost.<br><span style="color:#a5f3fc;font-size:0.68rem;">100K/day = ~3M/month</span></span></span>
+                            <label for="iecDailyRequests" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;" data-explain="daily-inference-requests">Daily Inference Requests
+
                             </label>
                             <input type="number" id="iecDailyRequests" value="100000" min="1000" max="100000000" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;background:#fff;color:#334155;">
                         </div>
                         <div class="iec-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                            <label for="iecTokensPerReq" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Avg Tokens per Request
-                                <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Avg Tokens per Request</span>Combined input + output tokens per inference request. A typical conversation turn is 500-3000 tokens. Long-form generation can exceed 8000.<br><span style="color:#a5f3fc;font-size:0.68rem;">1 token ~ 0.75 words</span></span></span>
+                            <label for="iecTokensPerReq" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;" data-explain="avg-tokens-per-request">Avg Tokens per Request
+
                             </label>
                             <input type="number" id="iecTokensPerReq" value="2000" min="100" max="32000" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;background:#fff;color:#334155;">
                         </div>
                         <div class="iec-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                            <label for="iecGpuType" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">GPU / Accelerator
-                                <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">GPU / Accelerator</span>The hardware used for inference. B200 is NVIDIA's latest (2025). H100 is the current standard. Groq LPU offers highest tokens/sec but limited model support.</span></span>
+                            <label for="iecGpuType" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;" data-explain="gpu-accelerator">GPU / Accelerator
+
                             </label>
                             <select id="iecGpuType" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;background:#fff;color:#334155;">
                                 <option value="b200">NVIDIA Blackwell B200</option>
@@ -2226,8 +2221,8 @@
                             </select>
                         </div>
                         <div class="iec-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                            <label for="iecDeployType" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Deployment Type
-                                <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Deployment Type</span>Cloud = pay-per-use (flexible, higher per-unit cost). Dedicated = reserved instances (cheaper per-unit). On-Premise = own hardware (lowest per-unit, highest CapEx). Edge = device-local (lowest latency).</span></span>
+                            <label for="iecDeployType" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;" data-explain="deployment-type">Deployment Type
+
                             </label>
                             <select id="iecDeployType" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;background:#fff;color:#334155;">
                                 <option value="cloud" selected>Cloud (Pay-per-use)</option>
@@ -2237,14 +2232,14 @@
                             </select>
                         </div>
                         <div class="iec-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                            <label for="iecPowerCost" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Power Cost ($/kWh)
-                                <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Power Cost</span>Electricity cost per kilowatt-hour at your deployment location. Auto-filled based on region selection. Adjust for your specific utility contract.<br><span style="color:#a5f3fc;font-size:0.68rem;">US avg: $0.06 | Japan: $0.14</span></span></span>
+                            <label for="iecPowerCost" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;" data-explain="power-cost">Power Cost ($/kWh)
+
                             </label>
                             <input type="number" id="iecPowerCost" value="0.06" min="0.01" max="0.50" step="0.01" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;background:#fff;color:#334155;">
                         </div>
                         <div class="iec-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                            <label for="iecLatency" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Target Latency
-                                <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Target Latency</span>Maximum acceptable time for first token. Lower latency requires more GPU headroom, increasing cost. Autonomous vehicles need &lt;10ms; chatbots can tolerate 500ms.</span></span>
+                            <label for="iecLatency" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;" data-explain="target-latency">Target Latency
+
                             </label>
                             <div style="display:flex;align-items:center;gap:0.75rem;">
                                 <input type="range" id="iecLatency" min="50" max="5000" value="500" step="50" style="flex:1;accent-color:#0891b2;">
@@ -2252,8 +2247,8 @@
                             </div>
                         </div>
                         <div class="iec-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                            <label for="iecArchitecture" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Model Architecture
-                                <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Model Architecture</span>Dense models activate all parameters per request. MoE (Mixture of Experts) activates only a subset, reducing compute per token by 2-4x at the same quality level. DeepSeek V3 uses MoE.</span></span>
+                            <label for="iecArchitecture" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;" data-explain="model-architecture">Model Architecture
+
                             </label>
                             <select id="iecArchitecture" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;background:#fff;color:#334155;">
                                 <option value="dense" selected>Dense (Standard)</option>
@@ -2261,8 +2256,8 @@
                             </select>
                         </div>
                         <div class="iec-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                            <label for="iecWorkload" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Workload Pattern
-                                <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Workload Pattern</span>Steady = consistent throughput. Burst = peak-heavy (needs headroom, higher cost). Batch = offline processing (can use spot/preemptible, lower cost).</span></span>
+                            <label for="iecWorkload" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;" data-explain="workload-pattern">Workload Pattern
+
                             </label>
                             <select id="iecWorkload" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;background:#fff;color:#334155;">
                                 <option value="steady" selected>Steady (Consistent)</option>
@@ -2327,8 +2322,8 @@
                         <h4 style="font-size:0.85rem;font-weight:700;color:#0e7490;margin:0 0 1rem;display:flex;align-items:center;gap:0.5rem;"><i class="fas fa-sliders"></i> Advanced Cost Modeling</h4>
                         <div class="iec-pro-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;">
                             <div class="iec-pro-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                                <label for="iecGrowthRate" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Traffic Growth Rate
-                                    <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Traffic Growth Rate</span>Expected year-over-year growth in inference request volume. Enterprise AI adoption is driving 30-60% annual growth at most organizations.</span></span>
+                                <label for="iecGrowthRate" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;" data-explain="traffic-growth-rate">Traffic Growth Rate
+
                                 </label>
                                 <div style="display:flex;align-items:center;gap:0.75rem;">
                                     <input type="range" id="iecGrowthRate" min="0" max="200" value="40" step="5" style="flex:1;accent-color:#0891b2;">
@@ -2336,8 +2331,8 @@
                                 </div>
                             </div>
                             <div class="iec-pro-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                                <label for="iecForecastYears" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Forecast Period
-                                    <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Forecast Period</span>Number of years to project infrastructure costs forward. Accounts for hardware refresh cycles, efficiency improvements, and traffic growth.</span></span>
+                                <label for="iecForecastYears" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;" data-explain="forecast-period">Forecast Period
+
                                 </label>
                                 <select id="iecForecastYears" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;background:#fff;color:#334155;">
                                     <option value="3">3 Years</option>
@@ -2347,8 +2342,8 @@
                                 </select>
                             </div>
                             <div class="iec-pro-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                                <label for="iecRefreshCycle" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Hardware Refresh Cycle
-                                    <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Hardware Refresh Cycle</span>How often GPU/accelerator hardware is replaced. Shorter cycles capture efficiency gains from newer hardware but increase CapEx. Industry standard is 3 years for AI workloads.</span></span>
+                                <label for="iecRefreshCycle" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;" data-explain="hardware-refresh-cycle">Hardware Refresh Cycle
+
                                 </label>
                                 <select id="iecRefreshCycle" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;background:#fff;color:#334155;">
                                     <option value="2">2 Years</option>
@@ -2358,8 +2353,8 @@
                                 </select>
                             </div>
                             <div class="iec-pro-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                                <label for="iecQuantization" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Quantization Level
-                                    <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Quantization Level</span>Reducing model precision from FP16 to INT8/INT4 decreases memory usage and increases throughput at minor quality cost. INT8 is commonly used in production.</span></span>
+                                <label for="iecQuantization" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;" data-explain="quantization-level">Quantization Level
+
                                 </label>
                                 <select id="iecQuantization" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;background:#fff;color:#334155;">
                                     <option value="fp16" selected>FP16 (Full Precision)</option>
@@ -2368,8 +2363,8 @@
                                 </select>
                             </div>
                             <div class="iec-pro-input-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                                <label for="iecMultiModel" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;">Multi-Model Serving
-                                    <span class="iec-tooltip-trigger" tabindex="0" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#e2e8f0;font-size:0.6rem;color:#475569;cursor:help;position:relative;">?<span class="iec-tooltip-content" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;padding:0.75rem;background:#1e293b;color:#e2e8f0;border-radius:8px;font-size:0.72rem;line-height:1.5;z-index:100;font-weight:400;"><span style="font-weight:600;color:#fff;display:block;margin-bottom:0.25rem;">Multi-Model Serving</span>Running multiple models on the same GPU cluster. Improves utilization by routing small queries to smaller models. Adds ~10% management overhead but can improve overall GPU utilization by 20-35%.</span></span>
+                                <label for="iecMultiModel" style="font-size:0.78rem;font-weight:600;color:#334155;display:flex;align-items:center;gap:0.35rem;" data-explain="multi-model-serving">Multi-Model Serving
+
                                 </label>
                                 <select id="iecMultiModel" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;background:#fff;color:#334155;">
                                     <option value="no" selected>No</option>
@@ -2719,14 +2714,7 @@ window.iecCalculate = window.iecCalculate || function(){};
     var byId = function(id) { return document.getElementById(id); };
 
     /* ── Tooltip hover logic ── */
-    document.querySelectorAll('.iec-tooltip-trigger').forEach(function(trigger) {
-        var tip = trigger.querySelector('.iec-tooltip-content');
-        if (!tip) return;
-        trigger.addEventListener('mouseenter', function() { tip.style.display = 'block'; });
-        trigger.addEventListener('mouseleave', function() { tip.style.display = 'none'; });
-        trigger.addEventListener('focus', function() { tip.style.display = 'block'; });
-        trigger.addEventListener('blur', function() { tip.style.display = 'none'; });
-    });
+    /* legacy tooltip hover system removed v1.60.0 — RZExplain owns tooltips */
 
     /* ── Latency slider live update ── */
     var latSlider = byId('iecLatency');
@@ -4556,30 +4544,7 @@ document.addEventListener('DOMContentLoaded', function() {
     /* ══════════════════════════════════════════════════
        TOOLTIPS
     ══════════════════════════════════════════════════ */
-    document.querySelectorAll('.iec-tooltip-trigger').forEach(function(trigger) {
-        function showTip() {
-            var content = trigger.querySelector('.iec-tooltip-content');
-            if (!content) return;
-            content.style.display = 'block';
-            var rect  = trigger.getBoundingClientRect();
-            var cRect = content.getBoundingClientRect();
-            var top  = rect.bottom + 8;
-            var left = rect.left - cRect.width / 2 + rect.width / 2;
-            if (left < 8) left = 8;
-            if (left + cRect.width > window.innerWidth - 8) left = window.innerWidth - cRect.width - 8;
-            if (top + cRect.height > window.innerHeight - 8) top = rect.top - cRect.height - 8;
-            content.style.top  = top + 'px';
-            content.style.left = left + 'px';
-        }
-        function hideTip() {
-            var content = trigger.querySelector('.iec-tooltip-content');
-            if (content) content.style.display = 'none';
-        }
-        trigger.addEventListener('mouseenter', showTip);
-        trigger.addEventListener('mouseleave', hideTip);
-        trigger.addEventListener('focus', showTip);
-        trigger.addEventListener('blur', hideTip);
-    });
+    /* legacy tooltip hover system removed v1.60.0 — RZExplain owns tooltips */
 
     /* ══════════════════════════════════════════════════
        EVENT LISTENERS

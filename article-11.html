@@ -847,27 +847,6 @@
         }
 
         /* Tooltips */
-        .eeq-tooltip {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 16px; height: 16px; border-radius: 50%; background: rgba(245,158,11,0.25);
-            color: #fbbf24; font-size: 0.6rem; font-weight: 700; cursor: help;
-            position: relative; margin-left: 4px; flex-shrink: 0;
-        }
-        .eeq-tooltip-body {
-            display: none; position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%);
-            background: #1e293b; border: 1px solid rgba(245,158,11,0.3); border-radius: 10px;
-            padding: 0.85rem; width: 240px; z-index: 100; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-            pointer-events: none;
-        }
-        .eeq-tooltip-body::after {
-            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-            border: 6px solid transparent; border-top-color: rgba(245,158,11,0.3);
-        }
-        .eeq-tooltip:hover .eeq-tooltip-body,
-        .eeq-tooltip:focus .eeq-tooltip-body { display: block; }
-        .eeq-tooltip-title { font-size: 0.78rem; font-weight: 700; color: #f59e0b; margin-bottom: 0.3rem; }
-        .eeq-tooltip-desc { font-size: 0.7rem; color: #94a3b8; line-height: 1.5; margin-bottom: 0.3rem; }
-        .eeq-tooltip-formula { font-size: 0.65rem; color: #fbbf24; font-family: 'JetBrains Mono', monospace; background: rgba(245,158,11,0.1); padding: 3px 7px; border-radius: 4px; }
 
         /* Pro Panels */
         .eeq-pro-panel {
@@ -1023,8 +1002,6 @@
             .eeq-cta-block { padding: 1.25rem 1rem; }
             .eeq-risk-table { font-size: 0.7rem; }
             .eeq-risk-table th, .eeq-risk-table td { padding: 0.35rem 0.5rem; }
-            .eeq-tooltip-body { width: 200px; left: auto; right: -10px; transform: none; }
-            .eeq-tooltip-body::after { left: auto; right: 20px; transform: none; }
             .eeq-tornado-label { width: 80px; }
         }
 
@@ -1591,7 +1568,7 @@
 
                     <div class="calc-grid">
                         <div class="calc-input-group">
-                            <label for="calcCountry">Select Country <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">Country Selection</div><div class="eeq-tooltip-desc">Choose the APAC country to model. Each country has unique electricity tariff structures, grid mix, and DC growth trajectories sourced from IEA, IRENA, and national energy regulators.</div><div class="eeq-tooltip-formula">Affects: base tariff, grid carbon intensity, subsidy structure</div></span></span></label>
+                            <label for="calcCountry" data-explain="country-selection">Select Country</label>
                             <select id="calcCountry" onchange="calculateImpact()">
                                 <option value="indonesia">🇮🇩 Indonesia</option>
                                 <option value="malaysia">🇲🇾 Malaysia</option>
@@ -1602,7 +1579,7 @@
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label for="calcYear">Projection Year <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">Projection Year</div><div class="eeq-tooltip-desc">Target year for the impact projection (2025-2035). Longer horizons compound DC capacity growth and tariff escalation effects.</div><div class="eeq-tooltip-formula">Tariff growth modeled at 2-5% CAGR depending on country</div></span></span></label>
+                            <label for="calcYear" data-explain="eeq-projection-year">Projection Year</label>
                             <select id="calcYear" onchange="calculateImpact()">
                                 <option value="2026">2026 (Current)</option>
                                 <option value="2027">2027</option>
@@ -1612,11 +1589,11 @@
                             </select>
                         </div>
                         <div class="calc-input-group">
-                            <label for="calcHouseholdUsage">Monthly Household Usage (kWh) <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">Monthly Household Usage</div><div class="eeq-tooltip-desc">Your household's average monthly electricity consumption in kWh. Used to calculate your personal cost impact from DC-driven grid load increases.</div><div class="eeq-tooltip-formula">APAC avg: 200-500 kWh/mo &middot; US avg: ~900 kWh/mo</div></span></span></label>
+                            <label for="calcHouseholdUsage" data-explain="monthly-household-usage">Monthly Household Usage (kWh)</label>
                             <input type="number" id="calcHouseholdUsage" value="200" min="50" max="2000">
                         </div>
                         <div class="calc-input-group">
-                            <label for="calcDCCapacity">New DC Capacity Added (MW) <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">New DC Capacity Added</div><div class="eeq-tooltip-desc">Additional data center IT load capacity (MW) planned for the selected country. Each MW of IT load requires ~1.3-1.6 MW total power (depending on PUE).</div><div class="eeq-tooltip-formula">1 MW IT &asymp; 1.4 MW total &asymp; 12.3 GWh/yr at 1.4 PUE</div></span></span></label>
+                            <label for="calcDCCapacity" data-explain="new-dc-capacity-added">New DC Capacity Added (MW)</label>
                             <input type="number" id="calcDCCapacity" value="500" min="100" max="10000">
                         </div>
                     </div>
@@ -1633,32 +1610,32 @@
 
                     <div class="calc-results">
                         <div class="calc-result-item">
-                            <div class="label">DC Annual Consumption <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">DC Annual Consumption</div><div class="eeq-tooltip-desc">Total annual electricity consumed by the new DC capacity, including cooling and infrastructure overhead (PUE-adjusted).</div><div class="eeq-tooltip-formula">MW &times; PUE &times; 8,760 hrs / 1,000 = GWh/yr</div></span></span></div>
+                            <div class="label" data-explain="dc-annual-consumption">DC Annual Consumption</div>
                             <div class="value" id="dcConsumption">3,942</div>
                             <div class="subtext">GWh/year</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Households Equivalent <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">Households Equivalent</div><div class="eeq-tooltip-desc">Number of average households that could be powered by the same amount of electricity the DC consumes annually.</div><div class="eeq-tooltip-formula">DC GWh / (household kWh/mo &times; 12 / 1,000,000)</div></span></span></div>
+                            <div class="label" data-explain="households-equivalent">Households Equivalent</div>
                             <div class="value" id="householdsEquiv">1,642,500</div>
                             <div class="subtext">homes powered</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Est. Tariff Increase <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">Estimated Tariff Increase</div><div class="eeq-tooltip-desc">Projected percentage increase in residential electricity tariffs due to DC-driven demand growth on the national grid.</div><div class="eeq-tooltip-formula">Based on marginal cost of new generation capacity</div></span></span></div>
+                            <div class="label" data-explain="estimated-tariff-increase">Est. Tariff Increase</div>
                             <div class="value" id="tariffIncrease">2.3%</div>
                             <div class="subtext">by selected year</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Your Monthly Impact <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">Your Monthly Impact</div><div class="eeq-tooltip-desc">Estimated additional cost on YOUR monthly electricity bill from DC-induced tariff increases.</div><div class="eeq-tooltip-formula">Monthly kWh &times; current tariff &times; % increase</div></span></span></div>
+                            <div class="label" data-explain="your-monthly-impact">Your Monthly Impact</div>
                             <div class="value yellow" id="monthlyImpact">$1.84</div>
                             <div class="subtext">additional cost/month</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">Your Annual Impact <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">Your Annual Impact</div><div class="eeq-tooltip-desc">Annualized additional electricity cost to your household from DC-driven tariff escalation.</div><div class="eeq-tooltip-formula">Monthly impact &times; 12</div></span></span></div>
+                            <div class="label" data-explain="your-annual-impact">Your Annual Impact</div>
                             <div class="value" id="annualImpact">$22.08</div>
                             <div class="subtext">additional cost/year</div>
                         </div>
                         <div class="calc-result-item">
-                            <div class="label">National Grid Load <span class="eeq-tooltip">?<span class="eeq-tooltip-body"><div class="eeq-tooltip-title">National Grid Load Increase</div><div class="eeq-tooltip-desc">Percentage increase in total national electricity demand caused by the new DC capacity.</div><div class="eeq-tooltip-formula">DC demand / national total demand &times; 100%</div></span></span></div>
+                            <div class="label" data-explain="national-grid-load-increase">National Grid Load</div>
                             <div class="value green" id="gridLoad">+1.2%</div>
                             <div class="subtext">increase in demand</div>
                         </div>
@@ -1704,80 +1681,50 @@
                         </div>
                         <div class="eeq-slider-grid">
                             <div class="eeq-slider-card">
-                                <div class="eeq-slider-label">
+                                <div class="eeq-slider-label" data-explain="gpu-thermal-density">
                                     <span class="eeq-si-tag">SI-02</span>
                                     GPU Thermal Density
-                                    <span class="eeq-tooltip" tabindex="0">?
-                                        <span class="eeq-tooltip-body">
-                                            <div class="eeq-tooltip-title">GPU Thermal Density (kW/rack)</div>
-                                            <div class="eeq-tooltip-desc">Power density per rack. AI racks range from 20 kW (mixed) to 100 kW (full GPU). Higher density = more cooling cost + grid stress.</div>
-                                            <div class="eeq-tooltip-formula">Cooling Load = MW x (Density/40)</div>
-                                        </span>
-                                    </span>
+
                                 </div>
                                 <input type="range" id="eeqGpuDensity" min="20" max="100" value="40" oninput="eeqUpdateSliderDisplay()" aria-label="Eeq GPU Density">
                                 <div class="eeq-slider-minmax"><span>20 kW</span><span>100 kW</span></div>
                                 <div class="eeq-slider-val" id="eeqGpuDensityVal">40 kW/rack</div>
                             </div>
                             <div class="eeq-slider-card">
-                                <div class="eeq-slider-label">
+                                <div class="eeq-slider-label" data-explain="subsidy-delta">
                                     <span class="eeq-si-tag">SI-03</span>
                                     Subsidy Delta
-                                    <span class="eeq-tooltip" tabindex="0">?
-                                        <span class="eeq-tooltip-body">
-                                            <div class="eeq-tooltip-title">Subsidy Delta (%)</div>
-                                            <div class="eeq-tooltip-desc">Gap between real production cost and industry tariff. Higher delta means citizens subsidize more of the energy cost. Indonesia: ~33%, Singapore: ~5%.</div>
-                                            <div class="eeq-tooltip-formula">Citizen Burden = Tariff x (SubsidyDelta/100)</div>
-                                        </span>
-                                    </span>
+
                                 </div>
                                 <input type="range" id="eeqSubsidyDelta" min="5" max="40" value="15" oninput="eeqUpdateSliderDisplay()" aria-label="Eeq Subsidy Delta">
                                 <div class="eeq-slider-minmax"><span>5%</span><span>40%</span></div>
                                 <div class="eeq-slider-val" id="eeqSubsidyDeltaVal">15%</div>
                             </div>
                             <div class="eeq-slider-card">
-                                <div class="eeq-slider-label">
+                                <div class="eeq-slider-label" data-explain="grid-resilience-index">
                                     <span class="eeq-si-tag">SI-04</span>
                                     Grid Resilience Index
-                                    <span class="eeq-tooltip" tabindex="0">?
-                                        <span class="eeq-tooltip-body">
-                                            <div class="eeq-tooltip-title">Grid Resilience Index (3-9)</div>
-                                            <div class="eeq-tooltip-desc">Quality and stability of power supply. 3 = fragile (frequent outages), 9 = robust (Singapore-level). Affects infrastructure investment needs and tariff pressure.</div>
-                                            <div class="eeq-tooltip-formula">Infra Cost Multiplier = 10 / GridIndex</div>
-                                        </span>
-                                    </span>
+
                                 </div>
                                 <input type="range" id="eeqGridResilience" min="3" max="9" value="6" oninput="eeqUpdateSliderDisplay()" aria-label="Eeq Grid Resilience">
                                 <div class="eeq-slider-minmax"><span>3 (Fragile)</span><span>9 (Robust)</span></div>
                                 <div class="eeq-slider-val" id="eeqGridResilienceVal">6</div>
                             </div>
                             <div class="eeq-slider-card">
-                                <div class="eeq-slider-label">
+                                <div class="eeq-slider-label" data-explain="community-impact-factor">
                                     <span class="eeq-si-tag">SI-05</span>
                                     Community Impact Factor
-                                    <span class="eeq-tooltip" tabindex="0">?
-                                        <span class="eeq-tooltip-body">
-                                            <div class="eeq-tooltip-title">Community Impact Factor (1-10)</div>
-                                            <div class="eeq-tooltip-desc">Social license risk level. 1 = minimal opposition, 10 = active protest/political pressure. Affects regulatory and operational risk premiums.</div>
-                                            <div class="eeq-tooltip-formula">Social Risk = CIF / 10 x 100</div>
-                                        </span>
-                                    </span>
+
                                 </div>
                                 <input type="range" id="eeqCommunityImpact" min="1" max="10" value="5" oninput="eeqUpdateSliderDisplay()" aria-label="Eeq Community Impact">
                                 <div class="eeq-slider-minmax"><span>1 (Low)</span><span>10 (High)</span></div>
                                 <div class="eeq-slider-val" id="eeqCommunityImpactVal">5</div>
                             </div>
                             <div class="eeq-slider-card">
-                                <div class="eeq-slider-label">
+                                <div class="eeq-slider-label" data-explain="organizational-maturity-level">
                                     <span class="eeq-si-tag">SI-06</span>
                                     Organizational Maturity
-                                    <span class="eeq-tooltip" tabindex="0">?
-                                        <span class="eeq-tooltip-body">
-                                            <div class="eeq-tooltip-title">Organizational Maturity Level (1-5)</div>
-                                            <div class="eeq-tooltip-desc">CMMI-style maturity. 1 = ad-hoc/reactive, 5 = optimized/proactive. Lower maturity increases Cost of Immaturity (higher incident costs, slower response).</div>
-                                            <div class="eeq-tooltip-formula">CoI = ((C_resp - C_prev) / C_prev) x Gap</div>
-                                        </span>
-                                    </span>
+
                                 </div>
                                 <input type="range" id="eeqMaturity" min="1" max="5" value="3" oninput="eeqUpdateSliderDisplay()" aria-label="Eeq Maturity">
                                 <div class="eeq-slider-minmax"><span>1 (Ad-hoc)</span><span>5 (Optimized)</span></div>
@@ -3452,7 +3399,7 @@
 <script src="js/rz-article-toc.js?v=1.50.42" defer></script>
 
 <!-- Search: shared js/rz-command-palette.js -->
-<script src="js/rz-command-palette.js?v=1.50.37" defer></script>
+<script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 <script src="auth.js?v=2026-07-16b" defer></script>
 <script src="rz-engine.min.js?v=2026-07-15-dsc" defer></script>
 <script src="rz-tracker.js" defer></script>

@@ -11,6 +11,32 @@ release sections rather than semver.
 
 ---
 
+## v1.60.0 — 2026-07-17 (RZExplain rollout: 24 more pages migrated · glossary in the command palette)
+
+### Added
+- **Command palette now searches all glossary terms**: builder emits `search-terms.json`
+  (341 navigable terms, category "Glossary") and `js/rz-command-palette.js` merges it into the
+  Fuse corpus — Ctrl/Cmd+K "approach temp" jumps straight to the definition.
+- Knowledge DB grew to **766 entries** (354 glossary + 425 curated — migration batches are
+  auto-merged fragment files `tools/explain-extra-batch*.json`).
+
+### Changed
+- **Legacy tooltip families migrated to RZExplain on 24 pages** (content centralized, hardcode
+  deleted): tco-calculator (14), cx-calculator (14), rz-ops benchmark KPIs (8, JS-template),
+  6 LTC labs + article-3 (`term-tooltip` — 6th lab's dead CSS removed + prose scanText),
+  10 article calculators + FF-1/2/3 + geopolitics-3 (`calc/opm/eeq/mcl/aig/pjm/tgs/hfx/iec-tooltip`
+  static triggers + their dead hover systems and CSS). Dynamic data-readout tooltips
+  (datahallAI SLD, chart hovers) intentionally out of scope — documented in EXPLAIN_ROLLOUT.md.
+- carbon-footprint: GWP constants annotated to mirror the shared `DATA.refrigerants`;
+  DB gains `interest-rate` + `energy-management-system` entries.
+
+### Verification
+- Migration probe 24/24 pages ALL PASS (db+engine load, wiring, panel opens, 0 errors);
+  palette term-search probe PASS; DB gate 10/10 (766 entries, deterministic);
+  js-syntax + script-tags CLEAN.
+
+---
+
 ## v1.59.0 — 2026-07-17 (RZExplain: the sitewide explanation engine — every parameter explains itself)
 
 ### Added

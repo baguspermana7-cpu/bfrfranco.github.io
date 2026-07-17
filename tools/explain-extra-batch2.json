@@ -1,0 +1,509 @@
+{
+ "version": "1.0.0",
+ "note": "Batch 2 of the term-tooltip -> RZExplain migration (ltc-uptime-tier-alignment, ltc-nfpa-fire-risk, ltc-ansi-tia-topology-readiness, ltc-ashrae-thermal-control, ltc-iso-energy-governance, article-3). Merged into js/rz-explain-db.js by tools/build-explain-db.py.",
+ "entries": {
+  "tccf": {
+   "t": "TCCF (Tier Certification of Constructed Facility)",
+   "d": "Uptime Institute certification that validates the as-built data center infrastructure actually meets the claimed Tier level requirements. Auditors perform live demonstrations on site — pulling breakers and failing components — to prove the constructed facility behaves as the design promised. It is the second step of the certification ladder, after TCCD (design) and before TCOS (operations).",
+   "s": "Uptime Institute",
+   "rel": ["tier", "tccd", "tcos"],
+   "aliases": ["TCCF", "Tier Certification of Constructed Facility"]
+  },
+  "tccd": {
+   "t": "TCCD (Tier Certification of Design Documents)",
+   "d": "Uptime Institute certification that validates the design documents meet the requirements of the claimed Tier level before construction begins. It is a paper review of one-line diagrams, mechanical schematics, and capacity calculations — not a site inspection. TCCD expires if the facility is not subsequently certified as constructed (TCCF), because a design certificate alone proves nothing about what was actually built.",
+   "s": "Uptime Institute",
+   "rel": ["tier", "tccf", "tcos"],
+   "aliases": ["TCCD", "Tier Certification of Design Documents"]
+  },
+  "tcos": {
+   "t": "TCOS (Tier Certification of Operational Sustainability)",
+   "d": "Uptime Institute certification that evaluates the operational behaviors, procedures, staffing, and management of an already Tier-certified facility. Where TCCD and TCCF certify the design and the construction, TCOS certifies the humans and processes running it — maintenance programs, training, and site risk management. It is awarded in Gold, Silver, and Bronze levels.",
+   "s": "Uptime Institute",
+   "rel": ["tier", "tccf", "tccd"],
+   "aliases": ["TCOS", "Tier Certification of Operational Sustainability"]
+  },
+  "bicsi-002": {
+   "t": "BICSI-002 (Data Center Design and Implementation Best Practices)",
+   "d": "A comprehensive design guideline published by BICSI covering data center design and implementation best practices. It references TIA-942 but adds implementation-level detail, and grades facilities with availability classes F0 through F4 that map roughly onto Uptime Institute Tiers. Teams often use BICSI-002 as the practical how-to companion to the more requirement-oriented TIA-942 and Tier standards.",
+   "s": "BICSI",
+   "rel": ["tia-942", "tier"],
+   "aliases": ["BICSI-002", "BICSI 002"]
+  },
+  "ashrae-tc-9-9": {
+   "t": "ASHRAE TC 9.9 (Mission Critical Facilities Technical Committee)",
+   "d": "The ASHRAE Technical Committee responsible for thermal guidelines for data processing environments. TC 9.9 defines the recommended and allowable temperature and humidity envelopes (classes A1-A4, plus liquid cooling classes) that nearly every data center cooling design is anchored to. Its Thermal Guidelines for Data Processing Environments is the de facto global reference for IT-space environmental control.",
+   "s": "ASHRAE",
+   "rel": ["ashrae", "dry-bulb", "dew-point"],
+   "aliases": ["ASHRAE TC 9.9", "TC 9.9"]
+  },
+  "nfpa-75": {
+   "t": "NFPA 75 (Fire Protection of Information Technology Equipment)",
+   "d": "The NFPA standard for the fire protection of information technology equipment, covering rooms larger than roughly 460 sq ft (43 m2) that contain IT equipment. It sets requirements for construction, fire detection, suppression, and emergency power-off in IT rooms and data centers. Together with NFPA 76 (telecom facilities) it is the core occupancy-specific fire standard for digital infrastructure.",
+   "s": "NFPA",
+   "rel": ["nfpa", "nfpa-76", "epo"],
+   "aliases": ["NFPA 75"]
+  },
+  "nfpa-76": {
+   "t": "NFPA 76 (Fire Protection of Telecommunications Facilities)",
+   "d": "The NFPA standard for the fire protection of telecommunications facilities — central offices, switching centers, and carrier hotels. It emphasizes very early detection and service continuity, reflecting how a telecom outage propagates far beyond the burning room. Data centers that host carrier meet-me rooms often fall under both NFPA 75 and NFPA 76.",
+   "s": "NFPA",
+   "rel": ["nfpa", "nfpa-75", "vesda"],
+   "aliases": ["NFPA 76"]
+  },
+  "nfpa-72": {
+   "t": "NFPA 72 (National Fire Alarm and Signaling Code)",
+   "d": "The National Fire Alarm and Signaling Code, covering the installation, testing, and maintenance of fire alarm systems — detection, notification, and emergency communications. In a data center it governs how smoke detectors, VESDA systems, and the fire alarm control panel are wired, supervised, and inspected. Suppression releases (clean agent, pre-action sprinklers) are sequenced through an NFPA 72-compliant releasing panel.",
+   "s": "NFPA",
+   "rel": ["nfpa", "facp", "vesda"],
+   "aliases": ["NFPA 72"]
+  },
+  "nfpa-13": {
+   "t": "NFPA 13 (Standard for the Installation of Sprinkler Systems)",
+   "d": "The primary NFPA standard governing automatic sprinkler system design, installation, and requirements. Data centers typically use it for pre-action sprinkler systems, where pipes stay dry until both a detection event and a sprinkler head activation occur, reducing accidental water discharge over IT equipment. Insurance carriers and the AHJ both enforce NFPA 13 compliance for the building envelope even when clean agent protects the white space.",
+   "s": "NFPA",
+   "rel": ["nfpa", "ahj"],
+   "aliases": ["NFPA 13"]
+  },
+  "nfpa-101": {
+   "t": "NFPA 101 (Life Safety Code)",
+   "d": "The Life Safety Code — a comprehensive NFPA standard covering building design and operation features that protect occupants from fire, smoke, and toxic fumes. It governs egress paths, exit signage, travel distances, and occupancy classifications. In data centers it shapes corridor layouts and door hardware, and interacts with clean agent design because occupants must be able to evacuate before discharge.",
+   "s": "NFPA",
+   "rel": ["nfpa", "nfpa-2001"],
+   "aliases": ["NFPA 101"]
+  },
+  "nfpa-2001": {
+   "t": "NFPA 2001 (Standard on Clean Agent Fire Extinguishing Systems)",
+   "d": "The NFPA standard covering design, installation, and maintenance of gaseous clean agent suppression systems such as FM-200, Novec 1230, and inert gas blends. It sets design concentrations, discharge times, room integrity requirements, and the occupant-safety limits (NOAEL/LOAEL) that determine which agent may be used in occupied spaces. It is the governing document for the suppression layer that protects IT equipment without water damage.",
+   "s": "NFPA",
+   "rel": ["nfpa", "noael-loael", "fire-suppression"],
+   "aliases": ["NFPA 2001"]
+  },
+  "ahj": {
+   "t": "AHJ (Authority Having Jurisdiction)",
+   "d": "The organization, office, or individual responsible for enforcing code requirements on a project — typically the local fire marshal or building official. The AHJ has final say on code interpretations, alternative compliance paths, and occupancy approval, so early engagement is a standard risk-reduction move on data center builds. Different jurisdictions can interpret the same NFPA or IBC clause differently, which is why identical designs may need site-specific changes.",
+   "rel": ["nfpa", "ibc", "ifc"],
+   "aliases": ["AHJ", "Authority Having Jurisdiction"]
+  },
+  "facp": {
+   "t": "FACP (Fire Alarm Control Panel)",
+   "d": "The central brain of the fire alarm system that monitors detection inputs (smoke, heat, aspirating systems) and activates outputs (notification appliances, suppression releases, HVAC shutdowns). In data centers the FACP typically implements cross-zoned or counting logic so a single detector cannot trigger a clean agent dump. It is installed, supervised, and tested under NFPA 72.",
+   "rel": ["nfpa-72", "vesda", "epo"],
+   "aliases": ["FACP", "Fire Alarm Control Panel"]
+  },
+  "lszh": {
+   "t": "LSZH (Low Smoke Zero Halogen)",
+   "d": "Cable jacketing that produces minimal smoke and no halogen gases when burned, reducing toxicity to occupants and corrosive damage to electronics. Halogenated jackets (like PVC) release hydrogen chloride when they burn, which combines with moisture to form acid that destroys circuit boards far from the fire itself. LSZH is standard practice in enclosed plenums and high-value equipment spaces.",
+   "rel": ["pcb", "corrosion"],
+   "aliases": ["LSZH", "Low Smoke Zero Halogen"]
+  },
+  "firestop": {
+   "t": "Through-Penetration Firestop",
+   "d": "A tested assembly designed to restore the fire-resistance rating of a wall or floor where it has been penetrated by cables, conduits, pipes, or ducts. Without firestopping, every cable tray passing through a rated wall becomes a chimney for fire and smoke spread between compartments. Data centers require documented, re-inspectable firestop systems because cabling changes constantly re-open penetrations.",
+   "rel": ["nfpa-101", "ibc"],
+   "aliases": ["Through-penetration firestop", "Firestop"]
+  },
+  "ibc": {
+   "t": "IBC (International Building Code)",
+   "d": "The model building code published by the International Code Council (ICC) and adopted by most US jurisdictions. It governs structural design, occupancy classification, fire-resistance ratings, and egress for the building shell that houses the data center. The IBC works alongside the International Fire Code (IFC) and the NFPA suite, with the local AHJ resolving overlaps.",
+   "s": "ICC",
+   "rel": ["ifc", "ahj"],
+   "aliases": ["IBC", "International Building Code"]
+  },
+  "ifc": {
+   "t": "IFC (International Fire Code)",
+   "d": "The companion fire code to the IBC, published by the ICC, covering fire prevention, fire protection systems, and emergency planning for buildings in operation. Where the IBC governs how the building is constructed, the IFC governs how it is operated and maintained — inspections, storage of combustibles, and system testing. Most US jurisdictions enforce both together.",
+   "s": "ICC",
+   "rel": ["ibc", "ahj"],
+   "aliases": ["IFC", "International Fire Code"]
+  },
+  "fm-global": {
+   "t": "FM Global",
+   "d": "One of the world's largest commercial property insurers, known for engineering-driven loss prevention. Its property loss prevention data sheets (such as FM 5-32 for data centers) provide recommendations that often exceed code minimums, and FM-insured facilities are typically required to follow them. FM Approvals also independently tests and certifies fire protection equipment.",
+   "rel": ["nfpa", "nfpa-13"],
+   "aliases": ["FM Global"]
+  },
+  "en-50600-2-5": {
+   "t": "EN 50600-2-5 (Data Centre Facilities — Security Systems)",
+   "d": "The European standard for data center facilities and infrastructures, Part 2-5: security systems. It covers physical security requirements including protection classes and how fire protection integrates with the security envelope. EN 50600 is the European counterpart ecosystem to TIA-942 and the Uptime Tier standard, with parts covering power, cooling, cabling, and security.",
+   "s": "CENELEC",
+   "rel": ["tia-942", "tier"],
+   "aliases": ["EN 50600-2-5", "EN 50600"]
+  },
+  "tia-568": {
+   "t": "TIA-568 (Telecommunications Cabling Standard)",
+   "d": "The ANSI/TIA telecommunications cabling standard defining copper and fiber specifications, distance limits, and connector requirements for structured cabling systems. It is the reference that makes Cat6A, OM4, and OS2 interoperable claims meaningful — channel performance, maximum lengths, and test parameters all come from TIA-568. Data center designs cite it alongside TIA-942 for the cabling layer.",
+   "s": "ANSI/TIA",
+   "rel": ["tia-942", "cabling-type"],
+   "aliases": ["TIA-568"]
+  },
+  "tia-569": {
+   "t": "TIA-569 (Telecommunications Pathways and Spaces)",
+   "d": "The ANSI/TIA standard for telecommunications pathways and spaces, defining cable tray, conduit, and routing requirements for telecommunications infrastructure. It governs the physical containment layer — tray fill ratios, bend radii, separation from power — that structured cabling depends on. In data centers it shapes underfloor and overhead pathway design between entrance rooms, distribution areas, and racks.",
+   "s": "ANSI/TIA",
+   "rel": ["tia-942", "tia-568"],
+   "aliases": ["TIA-569"]
+  },
+  "tia-607": {
+   "t": "TIA-607 (Telecommunications Bonding and Grounding)",
+   "d": "The ANSI/TIA standard for generic telecommunications bonding and grounding in customer premises. It defines the grounding infrastructure — TMGB (main busbar), TGB (local busbars), BCT (bonding conductor for telecommunications), and TBB (backbone) — required for telecommunications systems. Proper bonding per TIA-607 protects equipment from transient voltages and is a prerequisite for reliable high-speed links.",
+   "s": "ANSI/TIA",
+   "rel": ["tia-942", "esd"],
+   "aliases": ["TIA-607"]
+  },
+  "tia-606": {
+   "t": "TIA-606 (Administration Standard for Telecommunications Infrastructure)",
+   "d": "The ANSI/TIA administration standard for telecommunications infrastructure, defining labeling, color coding, and documentation requirements for cable management. Revision C extends the scheme to data center elements such as cabinets, patch panels, and pathways. Disciplined TIA-606 labeling is what allows a technician to trace any circuit end-to-end during an incident instead of pulling on cables.",
+   "s": "ANSI/TIA",
+   "rel": ["tia-942", "dcim"],
+   "aliases": ["TIA-606", "TIA-606-C"]
+  },
+  "om3": {
+   "t": "OM3 (Laser-Optimized Multimode Fiber)",
+   "d": "Laser-optimized 50 micron multimode fiber supporting 10G Ethernet at up to 300 m. It suits most intra-building data center links and was the workhorse grade before OM4 became the default for new builds. OM3 is typically aqua-jacketed and remains common in installed plant that predates 40/100G requirements.",
+   "rel": ["cabling-type", "om5", "os2"],
+   "aliases": ["OM3"]
+  },
+  "om5": {
+   "t": "OM5 (Wideband Multimode Fiber)",
+   "d": "Wideband 50 micron multimode fiber engineered to support SWDM (Short Wavelength Division Multiplexing) across the 850-950 nm window, packing multiple wavelengths onto one fiber pair for higher bandwidth density. It targets 40G/100G/400G links with fewer fiber strands than parallel-optics approaches. OM5 is lime-green jacketed and backward compatible with OM3/OM4 applications.",
+   "rel": ["cabling-type", "om3", "os2"],
+   "aliases": ["OM5"]
+  },
+  "os2": {
+   "t": "OS2 (Single-Mode Fiber)",
+   "d": "Single-mode fiber supporting extremely long distances — 10 km and beyond — thanks to its small ~9 micron core that carries a single light mode without modal dispersion. It is used for campus backbone, inter-building, and WAN connections, and increasingly inside large data centers as optics costs fall. OS2 is yellow-jacketed and pairs with laser transceivers at 1310/1550 nm.",
+   "rel": ["cabling-type", "om3", "om5"],
+   "aliases": ["OS2"]
+  },
+  "fmea": {
+   "t": "FMEA (Failure Mode and Effects Analysis)",
+   "d": "A systematic methodology for identifying potential failure modes, their causes, their effects on the system, and the mitigations that address them. Each failure mode is scored with an RPN (Risk Priority Number) — severity times occurrence times detectability — to prioritize corrective actions. In data center design, FMEA is how SPOFs and weak failover paths are found on paper before they are found in an outage.",
+   "rel": ["spof", "mtbf", "redundancy"],
+   "aliases": ["FMEA", "Failure Mode and Effects Analysis"]
+  },
+  "fat": {
+   "t": "FAT (Factory Acceptance Test)",
+   "d": "Testing performed at the manufacturer's facility before equipment is shipped, verifying component-level performance against specifications. For chillers this includes performance runs at rated and part-load conditions per AHRI standards; for switchgear it includes functional and protection-relay tests. Catching a deviation at FAT costs days — catching the same deviation after installation costs months.",
+   "rel": ["sat", "ist", "ahri"],
+   "aliases": ["FAT", "Factory Acceptance Test"]
+  },
+  "sat": {
+   "t": "SAT (Site Acceptance Test)",
+   "d": "Testing performed at the installation site after equipment is installed, verifying proper installation and integration with site infrastructure. SAT confirms that what passed FAT still performs correctly once connected to real power, piping, and controls. It is the bridge between individual equipment verification and whole-facility integrated systems testing (IST).",
+   "rel": ["fat", "ist"],
+   "aliases": ["SAT", "Site Acceptance Test"]
+  },
+  "dry-bulb": {
+   "t": "Dry-Bulb Temperature",
+   "d": "The air temperature measured by a standard thermometer, not accounting for humidity or radiation effects. It is the basis of the ASHRAE thermal envelope limits for IT equipment — the recommended A1 range of 18-27 C refers to dry-bulb at the server inlet. Paired with dew point or relative humidity, it fully describes the air state that cooling systems must deliver.",
+   "s": "ASHRAE TC 9.9",
+   "rel": ["dew-point", "ashrae-tc-9-9"],
+   "aliases": ["Dry-bulb temperature", "dry-bulb"]
+  },
+  "h1-class": {
+   "t": "H1 Class (ASHRAE Hybrid Cooling Class)",
+   "d": "The ASHRAE equipment class for hybrid-cooled hardware that uses both air and liquid cooling simultaneously, introduced in the 5th Edition Thermal Guidelines (2021) for racks exceeding roughly 50 kW. H1 gear rejects part of its heat to a liquid loop (cold plates) and the remainder to room air, so both systems must be designed together. It sits alongside the air classes (A1-A4) and liquid classes (W1-W5).",
+   "s": "ASHRAE TC 9.9",
+   "rel": ["hybrid-cooling", "w-class", "dlc"],
+   "aliases": ["H1 Class", "H1 class"]
+  },
+  "w-class": {
+   "t": "W-Classes (ASHRAE Liquid Cooling Classes W1-W5)",
+   "d": "The ASHRAE liquid cooling equipment classes defining facility supply water temperature ranges for liquid-cooled IT gear, from W1 (coolest) to W5 (warmest, 45 C+). Higher classes allow warmer supply water, which enables more hours of free cooling and even chiller-less designs. Selecting the W-class is one of the highest-leverage efficiency decisions in a liquid-cooled facility.",
+   "s": "ASHRAE TC 9.9",
+   "rel": ["liquid-cooling", "h1-class", "dlc"],
+   "aliases": ["W-Classes", "W-class", "W1-W5"]
+  },
+  "iecc": {
+   "t": "IECC (International Energy Conservation Code)",
+   "d": "The model building energy code published by the ICC and adopted across US jurisdictions. Since the 2021 edition it references ASHRAE 90.4 for data center energy requirements, making 90.4 compliance a legal obligation rather than a voluntary benchmark in adopting states. It sets the enforcement path through which MLC and ELC limits reach permit review.",
+   "s": "ICC",
+   "rel": ["mlc", "elc", "ibc"],
+   "aliases": ["IECC", "International Energy Conservation Code"]
+  },
+  "mlc": {
+   "t": "MLC (Mechanical Load Component)",
+   "d": "The ratio of annual mechanical cooling energy to annual IT energy, defined by ASHRAE 90.4 as the compliance metric for the cooling side. Lower is better — efficient facilities target MLC below 0.30. Together with the Electrical Loss Component (ELC), it decomposes PUE overhead into auditable mechanical and electrical shares.",
+   "s": "ASHRAE 90.4",
+   "rel": ["elc", "pue"],
+   "aliases": ["MLC", "Mechanical Load Component"]
+  },
+  "elc": {
+   "t": "ELC (Electrical Loss Component)",
+   "d": "The ratio of electrical distribution losses — UPS, PDU, and transformer losses — to IT energy, defined by ASHRAE 90.4 as the compliance metric for the power chain. Modern facilities target ELC below 0.10. Together with the Mechanical Load Component (MLC), it splits PUE overhead into separately designed and verified electrical and mechanical budgets.",
+   "s": "ASHRAE 90.4",
+   "rel": ["mlc", "pue", "ups"],
+   "aliases": ["ELC", "Electrical Loss Component"]
+  },
+  "ere": {
+   "t": "ERE (Energy Reuse Effectiveness)",
+   "d": "A Green Grid metric equal to PUE minus the fraction of facility energy that is reused elsewhere, such as waste heat exported to district heating. Unlike PUE, which can never go below 1.0, ERE can — a facility exporting significant heat effectively offsets more energy than its own overhead. It rewards heat-reuse designs that PUE is blind to.",
+   "s": "The Green Grid",
+   "rel": ["pue", "cue", "wue"],
+   "aliases": ["ERE", "Energy Reuse Effectiveness"]
+  },
+  "iplv": {
+   "t": "IPLV (Integrated Part Load Value)",
+   "d": "A weighted chiller efficiency metric combining performance at 25%, 50%, 75%, and 100% load per AHRI 550/590. Because chillers spend most of their life at part load, IPLV represents real-world performance far better than full-load COP alone. Specifying and factory-testing to IPLV prevents buying a chiller that only looks efficient at a load point it rarely sees.",
+   "s": "AHRI 550/590",
+   "rel": ["cop", "ahri", "chiller"],
+   "aliases": ["IPLV", "Integrated Part Load Value"]
+  },
+  "bhp": {
+   "t": "BHP (Brake Horsepower)",
+   "d": "The actual mechanical power output at a motor shaft, before drive and motor electrical losses are added. ASHRAE 90.4 uses BHP per unit of airflow (BHP/CFM) to cap fan power in cooling systems. Fan BHP scales with the cube of speed via the affinity laws, which is why variable-speed operation saves so much energy.",
+   "rel": ["cfm", "affinity-laws", "vsd"],
+   "aliases": ["BHP", "Brake Horsepower"]
+  },
+  "bas": {
+   "t": "BAS (Building Automation System)",
+   "d": "The centralized control platform for HVAC, lighting, and other building systems. In data centers the BAS manages cooling sequences, alarm handling, and energy optimization — resetting chilled water temperatures, staging chillers, and coordinating economizer changeovers. It overlaps with the BMS and feeds facility data upward into DCIM.",
+   "rel": ["bms", "dcim"],
+   "aliases": ["BAS", "Building Automation System"]
+  },
+  "chwst": {
+   "t": "CHWST (Chilled Water Supply Temperature)",
+   "d": "The temperature of water leaving the chiller toward the cooling coils. A traditional design setpoint is 6.7 C (44 F), but resetting it upward to 12-15 C improves chiller COP by roughly 2-3% per degree and unlocks more free-cooling hours. Raising CHWST is one of the cheapest efficiency levers in an existing chilled-water plant, limited by coil capacity and dehumidification needs.",
+   "rel": ["chiller", "cop", "economizer"],
+   "aliases": ["CHWST", "Chilled Water Supply Temperature"]
+  },
+  "merv": {
+   "t": "MERV (Minimum Efficiency Reporting Value)",
+   "d": "The ASHRAE 52.2 filter efficiency rating scale from 1 to 20. MERV 11-13 filters capture roughly 65-90% of 0.3-1 micron particles and are the typical requirement for airside economizer operation, preventing outdoor contaminants from reaching IT equipment. Filter selection trades particle protection against fan energy, since higher MERV means higher pressure drop.",
+   "s": "ASHRAE 52.2",
+   "rel": ["economizer", "corrosion"],
+   "aliases": ["MERV", "Minimum Efficiency Reporting Value"]
+  },
+  "affinity-laws": {
+   "t": "Affinity Laws",
+   "d": "The engineering relationships governing centrifugal fans and pumps: flow varies with speed, pressure with speed squared, and power with the cube of speed. Reducing speed by 20% therefore cuts power consumption by roughly 49%. The affinity laws are the physics behind variable speed drives being the single biggest energy saver in cooling distribution systems.",
+   "rel": ["vsd", "bhp", "cfm"],
+   "aliases": ["Affinity Laws", "affinity laws"]
+  },
+  "vsd": {
+   "t": "VSD (Variable Speed Drive)",
+   "d": "An electronic controller that adjusts motor speed to match load demand instead of running at fixed full speed. Applied to fans and pumps, the affinity laws turn modest speed reductions into large energy savings — 20% slower is about 49% less power. VSD and VFD (Variable Frequency Drive) are used near-interchangeably; VFD names the dominant frequency-conversion technology.",
+   "rel": ["vfd", "affinity-laws"],
+   "aliases": ["VSD", "Variable Speed Drive", "variable speed drives"]
+  },
+  "machine-learning": {
+   "t": "ML (Machine Learning)",
+   "d": "A subset of AI using statistical models that learn patterns from data rather than following hand-written rules. In data centers, ML is applied to cooling optimization, predictive maintenance, and workload scheduling — learning from sensor histories to anticipate conditions that rule-based controls react to late. It also drives the demand side: ML training clusters are the racks pushing densities beyond air-cooling limits.",
+   "rel": ["reinforcement-learning", "gpu", "bms"],
+   "aliases": ["Machine Learning", "ML"]
+  },
+  "dx": {
+   "t": "DX (Direct Expansion)",
+   "d": "Refrigerant-based cooling where the evaporator coil sits directly in the airstream, as in a CRAC unit, rather than cooling via an intermediate chilled-water loop. DX systems are simpler and cheaper at small scale but less efficient and harder to scale than central chilled-water plants. They remain common in edge sites, small rooms, and as backup to water-based systems.",
+   "rel": ["crac", "chiller", "cooling-type"],
+   "aliases": ["DX", "Direct Expansion"]
+  },
+  "dielectric-fluid": {
+   "t": "Dielectric Fluid",
+   "d": "An electrically non-conductive liquid that can safely contact live electronic components, enabling immersion cooling and leak-tolerant liquid loops. Types include mineral oil, synthetic esters, and engineered fluorocarbon fluids, each trading thermal performance, material compatibility, cost, and environmental profile. Immersion tanks submerge entire servers in dielectric fluid to remove heat without any air path at all.",
+   "rel": ["immersion-cooling", "liquid-cooling", "dlc"],
+   "aliases": ["Dielectric fluid", "dielectric fluid"]
+  },
+  "tdp": {
+   "t": "TDP (Thermal Design Power)",
+   "d": "The maximum sustained heat output a component generates, expressed in watts, used to size its cooling. A 700 W TDP GPU requires at least 700 W of continuous heat removal at the component level, and thousands of them set the rack and facility cooling load. Rising CPU/GPU TDPs — from ~150 W a decade ago to 1000 W-class accelerators — are the direct driver of the shift to liquid cooling.",
+   "rel": ["gpu", "dlc", "cold-plate"],
+   "aliases": ["TDP", "Thermal Design Power"]
+  },
+  "coupon-testing": {
+   "t": "Reactive Metal Coupon Testing",
+   "d": "A contamination monitoring method where reactive metal strips — copper and silver coupons — are exposed to the data center environment for 30 days, then lab-analyzed for corrosion film thickness in angstroms per month. The results classify the room per ISA-71.04 severity levels (G1 benign through GX severe). It is the standard way to verify that gaseous contamination stays within IT warranty limits, especially where airside economizers are used.",
+   "s": "ISA-71.04",
+   "rel": ["corrosion", "merv", "economizer"],
+   "aliases": ["Coupon testing", "reactive metal coupon testing"]
+  },
+  "pcb": {
+   "t": "PCB (Printed Circuit Board)",
+   "d": "The fiberglass substrate with copper traces that interconnects electronic components in every server, switch, and controller. PCBs are vulnerable to corrosion from sulfur compounds, electrostatic discharge, zinc whiskers, and conductive dust — which is why data centers control humidity, filtration, and contamination so tightly. Environmental limits in the ASHRAE envelope exist largely to protect PCB-level reliability.",
+   "rel": ["corrosion", "esd", "coupon-testing"],
+   "aliases": ["PCB", "Printed Circuit Board"]
+  },
+  "cmos": {
+   "t": "CMOS (Complementary Metal-Oxide Semiconductor)",
+   "d": "The dominant transistor technology in modern processors and memory. CMOS gate oxide layers are only nanometers thick, making them extremely vulnerable to electrostatic discharge — a spark a human cannot even feel can punch through a gate and destroy or degrade a chip. This fragility is a core reason data centers manage humidity, grounding, and anti-static handling procedures.",
+   "rel": ["esd", "pcb"],
+   "aliases": ["CMOS"]
+  },
+  "ashrae-62-1": {
+   "t": "ASHRAE 62.1 (Ventilation for Acceptable Indoor Air Quality)",
+   "d": "The ASHRAE standard defining minimum ventilation rates and other measures for acceptable indoor air quality in occupied spaces. Data center white space is typically unoccupied and exempt, but support areas — offices, NOCs, break rooms — must comply. It interacts with pressurization strategy, since the white space is usually kept positively pressurized with a small filtered makeup-air stream.",
+   "s": "ASHRAE",
+   "rel": ["ashrae", "merv"],
+   "aliases": ["ASHRAE 62.1", "Standard 62.1"]
+  },
+  "tmy3": {
+   "t": "TMY3 (Typical Meteorological Year, 3rd Generation)",
+   "d": "An hourly weather dataset representing typical conditions for a location, compiled from 15-30 years of measurements. Energy models use TMY3 to predict economizer hours, free-cooling potential, and annual PUE before a site is even selected. Because it represents typical rather than extreme years, designers pair it with design-day extremes for capacity sizing.",
+   "s": "NREL",
+   "rel": ["economizer", "pue"],
+   "aliases": ["TMY3", "Typical Meteorological Year"]
+  },
+  "shi": {
+   "t": "SHI (Supply Heating Index)",
+   "d": "The ratio of heat gained by supply air before it reaches IT equipment to the total heat rise across the room. SHI below 0.15 indicates good air separation with minimal hot/cold mixing; higher values mean hot exhaust is recirculating into server inlets. Together with the Return Heating Index (RHI), it quantifies how well containment is actually working.",
+   "rel": ["rhi", "hot-aisle", "cold-aisle"],
+   "aliases": ["SHI", "Supply Heating Index"]
+  },
+  "rhi": {
+   "t": "RHI (Return Heating Index)",
+   "d": "The ratio of heat gain from IT equipment to total heat gain in the return air path. RHI above 0.85 indicates effective containment with minimal bypass air mixing into the return stream; lower values mean cold supply air is short-circuiting straight back to the cooling units. It is the return-side complement to the Supply Heating Index (SHI).",
+   "rel": ["shi", "hot-aisle", "cold-aisle"],
+   "aliases": ["RHI", "Return Heating Index"]
+  },
+  "tab": {
+   "t": "TAB (Testing, Adjusting and Balancing)",
+   "d": "The systematic process of measuring and adjusting airflows, water flows, and temperatures to match design specifications, performed during commissioning per ASHRAE guidelines. TAB is what turns installed capacity into delivered capacity — a perfectly sized CRAH delivers the wrong airflow until dampers and setpoints are balanced. Records from TAB become the baseline for later drift detection.",
+   "rel": ["commissioning", "cfm", "crah"],
+   "aliases": ["TAB", "Test and balance", "Testing Adjusting and Balancing"]
+  },
+  "l2c": {
+   "t": "L2C (Liquid-to-Chip)",
+   "d": "Next-generation cooling where micro-channels are etched directly into or bonded onto the silicon die, eliminating the thermal interface material and heat spreader layers for minimum thermal resistance. It moves the coolant as close to the transistors as physically possible, targeting the kW-per-chip era beyond what cold plates can handle. L2C remains largely in research and early deployment compared with mainstream direct liquid cooling.",
+   "rel": ["dlc", "cold-plate", "tim"],
+   "aliases": ["L2C", "Liquid-to-Chip"]
+  },
+  "tim": {
+   "t": "TIM (Thermal Interface Material)",
+   "d": "The compound placed between a chip die and its heatsink or cold plate to fill microscopic air gaps and improve thermal conductivity. Materials include thermal paste, graphite pads, and liquid metal, each trading conductivity, cost, and longevity. TIM quality and application directly limit how much of a cold plate's capability actually reaches the silicon.",
+   "rel": ["cold-plate", "tdp", "l2c"],
+   "aliases": ["TIM", "Thermal Interface Material", "thermal interface material"]
+  },
+  "tec": {
+   "t": "TEC (Thermoelectric Cooler)",
+   "d": "A solid-state device using the Peltier effect to pump heat via electric current — no moving parts, no refrigerants, just semiconductor junctions. TECs offer precise, compact spot cooling but at low efficiency compared with vapor-compression systems. They appear in targeted applications like optics and sensor cooling rather than bulk data center heat rejection.",
+   "rel": ["peltier-effect", "zt"],
+   "aliases": ["TEC", "Thermoelectric Cooler", "Thermoelectric coolers"]
+  },
+  "peltier-effect": {
+   "t": "Peltier Effect",
+   "d": "The thermoelectric phenomenon where electric current flowing through a junction of two different conductors absorbs heat on one side and releases it on the other, creating a solid-state cooling and heating effect. It is the operating principle of thermoelectric coolers (TECs). The reverse phenomenon — a temperature difference generating voltage — is the Seebeck effect used in waste-heat recovery.",
+   "rel": ["tec", "zt"],
+   "aliases": ["Peltier effect"]
+  },
+  "zt": {
+   "t": "ZT (Thermoelectric Figure of Merit)",
+   "d": "The dimensionless number characterizing how efficient a thermoelectric material is, combining electrical conductivity, thermal conductivity, and the Seebeck coefficient. Today's best practical materials sit around ZT 1-1.5; sustained ZT above 2.0 would make thermoelectric coolers competitive with vapor-compression cooling for targeted applications. Raising ZT is the central materials-science challenge of thermoelectrics.",
+   "rel": ["tec", "peltier-effect"],
+   "aliases": ["ZT", "Thermoelectric Figure of Merit"]
+  },
+  "pcm": {
+   "t": "PCM (Phase-Change Material)",
+   "d": "Substances that absorb and release large amounts of latent heat while transitioning between solid and liquid states. In data centers, PCMs are used for thermal energy storage and peak-load buffering — soaking up a cooling shortfall during a chiller restart or utility event without temperature excursion. Their appeal is passive, high-density energy storage with no moving parts.",
+   "rel": ["latent-heat", "thermal-management"],
+   "aliases": ["PCM", "Phase-Change Material", "PCMs"]
+  },
+  "latent-heat": {
+   "t": "Latent Heat",
+   "d": "The energy absorbed or released during a phase change — melting, freezing, evaporation — without any temperature change. Melting ice stores roughly 80 times more energy per kilogram than heating water by 1 C, which is why phase-change materials and ice storage pack so much cooling into small volumes. Evaporative cooling exploits the same physics: evaporating water carries away large latent loads.",
+   "rel": ["pcm", "evaporator"],
+   "aliases": ["Latent heat"]
+  },
+  "reinforcement-learning": {
+   "t": "RL (Reinforcement Learning)",
+   "d": "A machine learning technique where an agent learns optimal actions through trial-and-error interaction with an environment, guided by a reward signal. Google DeepMind famously achieved around 40% cooling energy reduction by letting an RL agent tune chiller plant setpoints within safety guardrails. It suits control problems too complex for hand-tuned PID loops, at the cost of needing careful constraints and supervision.",
+   "rel": ["machine-learning", "pid"],
+   "aliases": ["Reinforcement Learning", "RL"]
+  },
+  "pid": {
+   "t": "PID (Proportional-Integral-Derivative Control)",
+   "d": "The standard feedback control algorithm that adjusts output based on the error magnitude (P), the accumulated error over time (I), and the rate of change (D). Nearly every HVAC loop — temperature, pressure, flow — runs on tuned PID controllers. It is robust and explainable, which is why even ML-optimized plants keep PID as the underlying actuation layer.",
+   "rel": ["bas", "reinforcement-learning"],
+   "aliases": ["PID", "Proportional-Integral-Derivative"]
+  },
+  "tpm": {
+   "t": "TPM (Technical Program Manager)",
+   "d": "A cross-functional role driving complex engineering programs from concept to delivery. In data center projects the TPM bridges mechanical, electrical, and IT teams with business stakeholders and vendors — owning schedule, dependencies, and risk across disciplines that rarely speak the same language. Large cooling retrofits and new builds typically live or die on TPM coordination quality.",
+   "rel": ["commissioning", "rfp"],
+   "aliases": ["TPM", "Technical Program Manager"]
+  },
+  "rfp": {
+   "t": "RFP (Request for Proposal)",
+   "d": "A formal procurement document specifying technical requirements, evaluation criteria, and commercial terms for vendors to bid against. For data center cooling, a strong RFP references specific ASHRAE standards, performance targets like IPLV and PUE contributions, and acceptance testing obligations (FAT/SAT). Vague RFPs buy vague equipment — the document quality directly shapes what arrives on site.",
+   "rel": ["fat", "sat", "iplv"],
+   "aliases": ["RFP", "Request for Proposal"]
+  },
+  "ahri": {
+   "t": "AHRI (Air-Conditioning, Heating & Refrigeration Institute)",
+   "d": "The industry body that certifies HVAC equipment performance under standardized test conditions. AHRI 550/590 certifies chiller efficiency — COP and IPLV — so competing bids can be compared on verified numbers rather than marketing claims. Specifying AHRI-certified ratings and witnessing factory tests against them is standard practice in data center procurement.",
+   "s": "AHRI",
+   "rel": ["iplv", "cop", "fat"],
+   "aliases": ["AHRI"]
+  },
+  "iso-50001": {
+   "t": "ISO 50001 (Energy Management Systems)",
+   "d": "The international standard for energy management systems (EnMS), providing a Plan-Do-Check-Act framework for continuous improvement of energy performance. It requires an energy policy, baselines, performance indicators, and management review — turning efficiency from a one-off project into an audited operating discipline. Data center operators use ISO 50001 certification to institutionalize PUE improvement and satisfy regulatory or customer energy-governance demands.",
+   "s": "ISO",
+   "rel": ["energy-management-system", "pue", "iso"],
+   "aliases": ["ISO 50001"]
+  },
+  "nebs": {
+   "t": "NEBS (Network Equipment Building System)",
+   "d": "The Telcordia/Bellcore family of standards for equipment deployed in telecom environments. GR-63-CORE covers physical protection — earthquake, fire, transportation — while GR-3028 covers thermal management in telecom central offices. NEBS-compliant gear tolerates wider environmental ranges than typical data center IT, reflecting the harsher, often unconditioned telecom plant.",
+   "s": "Telcordia",
+   "rel": ["ashrae", "nfpa-76"],
+   "aliases": ["NEBS", "Network Equipment Building System"]
+  },
+  "isms": {
+   "t": "ISMS (Information Security Management System)",
+   "d": "A management framework for protecting sensitive company information and ensuring its confidentiality, integrity, and availability. It is the subject of ISO/IEC 27001, which defines risk assessment, controls, and continuous improvement cycles for security governance. Data center operators certify their ISMS to prove to customers that physical and logical security are managed systematically, not ad hoc.",
+   "s": "ISO/IEC 27001",
+   "rel": ["bcms", "iso"],
+   "aliases": ["ISMS", "Information Security Management System"]
+  },
+  "ems": {
+   "t": "EMS (Environmental Management System)",
+   "d": "A structured approach to managing an organization's environmental responsibilities in a systematic manner, standardized as ISO 14001. An EMS covers environmental policy, impact assessment, legal compliance, and continuous improvement — spanning emissions, water, waste, and refrigerants for a data center operator. It complements ISO 50001, which focuses specifically on energy performance.",
+   "s": "ISO 14001",
+   "rel": ["iso-50001", "energy-management-system", "iso"],
+   "aliases": ["EMS", "Environmental Management System"]
+  },
+  "cmms": {
+   "t": "CMMS (Computerized Maintenance Management System)",
+   "d": "Software for managing maintenance operations — assets, work orders, preventive maintenance schedules, spare parts, and labor history in one system of record. A well-run CMMS is what turns maintenance from tribal knowledge into auditable process: every PM generated on schedule, every completion documented. Its data feeds reliability metrics like MTBF and drives spare-parts and staffing decisions.",
+   "rel": ["pm", "work-order", "mtbf"],
+   "aliases": ["CMMS", "Computerized Maintenance Management System"]
+  },
+  "work-order": {
+   "t": "WO (Work Order)",
+   "d": "A documented task assigned to maintenance personnel, specifying what work is to be done, on which asset, with what procedures and safety requirements. Work orders are the atomic unit of maintenance management — planned PMs, corrective repairs, and inspections all flow through them. Their completion records in the CMMS become the facility's maintenance history and compliance evidence.",
+   "rel": ["cmms", "pm", "sop"],
+   "aliases": ["Work Order", "WO"]
+  },
+  "kpi": {
+   "t": "KPI (Key Performance Indicator)",
+   "d": "A measurable value demonstrating how effectively an operation is meeting its objectives. Data center maintenance KPIs include PM completion rate, schedule compliance, wrench time, MTBF, and reactive-versus-planned work ratio. Good KPIs are leading and actionable — chosen to change behavior, not just decorate a dashboard.",
+   "rel": ["pm", "mtbf", "wrench-time"],
+   "aliases": ["KPI", "Key Performance Indicator"]
+  },
+  "wrench-time": {
+   "t": "Wrench Time",
+   "d": "The percentage of a technician's shift spent performing actual hands-on maintenance work, as opposed to travel, waiting for access, hunting parts, or paperwork. Industry average is 25-35%, while data centers often run 20-28% because of access controls and documentation requirements. Raising wrench time through better planning and kitting is usually cheaper than hiring more technicians.",
+   "rel": ["pm", "work-order", "kpi"],
+   "aliases": ["Wrench Time", "wrench time"]
+  },
+  "qr-code": {
+   "t": "QR Code (Quick Response Code)",
+   "d": "A two-dimensional barcode used for rapid asset identification and task linking. In maintenance operations, a QR label on each asset lets a technician scan with a phone or tablet to pull up its CMMS record, work-order history, and procedures on the spot. This kills the transcription errors and time lost to manually looking up asset IDs.",
+   "rel": ["cmms", "work-order"],
+   "aliases": ["QR Code", "QR"]
+  },
+  "ppe": {
+   "t": "PPE (Personal Protective Equipment)",
+   "d": "Safety gear required for specific work areas and tasks — arc-flash suits for electrical switching, hearing protection in generator rooms, safety glasses and gloves for mechanical work. PPE requirements are specified per task on the work order, driven by hazard assessments such as NFPA 70E arc-flash studies. It is the last line of defense after engineering and administrative controls.",
+   "rel": ["work-order", "sop"],
+   "aliases": ["PPE", "Personal Protective Equipment"]
+  },
+  "corrective-maintenance": {
+   "t": "CM (Corrective Maintenance)",
+   "d": "Unplanned maintenance performed to restore equipment to service after a failure or detected fault. It contrasts with preventive maintenance (PM), which is scheduled to stop failures from happening in the first place. A healthy operation keeps the corrective share of total maintenance low — a rising CM ratio is an early warning that the PM program or the asset base is degrading.",
+   "rel": ["pm", "mtbf", "cmms"],
+   "aliases": ["Corrective Maintenance"]
+  }
+ }
+}

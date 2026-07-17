@@ -152,13 +152,6 @@
         .section ul { list-style: none; display: grid; gap: 0.3rem; margin: 0.5rem 0; }
         .section li { font-size: 0.82rem; color: var(--text-body); line-height: 1.6; padding-left: 0.9rem; position: relative; }
         .section li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent2); position: absolute; left: 0; top: 0.45rem; }
-        .term-tooltip { border-bottom: 1px dotted var(--accent2); cursor: help; color: inherit; }
-        .tooltip-float { position: fixed; z-index: 100000; background: #1e293b; color: #e2e8f0; padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; line-height: 1.55; max-width: 340px; min-width: 200px; box-shadow: 0 4px 24px rgba(0,0,0,0.35); border: 1px solid rgba(16,185,129,0.3); opacity: 0; visibility: hidden; transition: opacity 0.15s,visibility 0.15s; pointer-events: none; white-space: normal; font-weight: 400; word-wrap: break-word; }
-        .tooltip-float.visible { opacity: 1; visibility: visible; }
-        .tooltip-float::before { content: ''; position: absolute; width: 10px; height: 10px; background: inherit; border: inherit; border-right: none; border-top: none; transform: rotate(-45deg); }
-        .tooltip-float.above::before { bottom: -6px; left: var(--arrow,50%); margin-left: -5px; }
-        .tooltip-float.below::before { top: -6px; left: var(--arrow,50%); margin-left: -5px; transform: rotate(135deg); }
-        [data-theme="light"] .tooltip-float { background: #fff; color: #1e293b; border-color: rgba(16,185,129,0.25); box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
         .abbr-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 0.4rem; margin-top: 0.6rem; }
         .abbr-item { display: flex; gap: 0.5rem; padding: 0.45rem 0.6rem; border-radius: 8px; font-size: 0.8rem; border: 1px solid var(--line); background: var(--card-inner); }
         .abbr-item:hover { background: var(--card-inner-hover); }
@@ -397,6 +390,8 @@
     }
     </script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-07-17" defer></script>
+    <script src="js/rz-explain.js?v=2026-07-17" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>    <meta property="og:image" content="https://resistancezero.com/assets/og/ltc-iso-energy-governance.webp">    <meta property="og:image:width" content="1200">    <meta property="og:image:height" content="630">    <meta property="og:image:alt" content="ISO Energy &amp; Governance — Comprehensive Deep-Dive">    <meta name="twitter:image" content="https://resistancezero.com/assets/og/ltc-iso-energy-governance.webp">    <meta name="twitter:card" content="summary_large_image">
 
@@ -580,7 +575,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <!-- ========== Section 1: ISO 50001 Energy Management ========== -->
         <section class="section" id="sec-50001" data-nav-id="sec-50001">
             <h2 class="section-title"><i class="fas fa-bolt"></i> ISO 50001 Energy Management <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-50001')"><i class="fas fa-link"></i></button></h2>
-            <p class="section-intro">ISO 50001 provides a systematic framework for establishing an <span class="term-tooltip" data-tooltip="Energy Management System — a structured approach to managing energy use, consumption, and efficiency within an organization.">Energy Management System (EnMS)</span>. It uses the Plan-Do-Check-Act (PDCA) cycle to drive continuous improvement in energy performance, enabling data centers to reduce costs, lower carbon emissions, and demonstrate compliance with energy governance requirements.</p>
+            <p class="section-intro">ISO 50001 provides a systematic framework for establishing an <span data-explain="energy-management-system">Energy Management System (EnMS)</span>. It uses the Plan-Do-Check-Act (PDCA) cycle to drive continuous improvement in energy performance, enabling data centers to reduce costs, lower carbon emissions, and demonstrate compliance with energy governance requirements.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> PDCA Cycle (Plan-Do-Check-Act) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
@@ -782,7 +777,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <!-- ========== Section 3: ISO 27001 Physical Security ========== -->
         <section class="section" id="sec-27001" data-nav-id="sec-27001">
             <h2 class="section-title"><i class="fas fa-lock"></i> ISO 27001 Physical Security <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-27001')"><i class="fas fa-link"></i></button></h2>
-            <p class="section-intro">ISO/IEC 27001 establishes the requirements for an <span class="term-tooltip" data-tooltip="Information Security Management System — a framework for managing sensitive company information and ensuring its confidentiality, integrity, and availability.">Information Security Management System (ISMS)</span>. Annex A.11 (Physical and Environmental Security) is particularly critical for data centers, addressing physical access control, equipment protection, and environmental threat mitigation.</p>
+            <p class="section-intro">ISO/IEC 27001 establishes the requirements for an <span data-explain="isms">Information Security Management System (ISMS)</span>. Annex A.11 (Physical and Environmental Security) is particularly critical for data centers, addressing physical access control, equipment protection, and environmental threat mitigation.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> Access Control Zones (Annex A.11) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
@@ -847,7 +842,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <!-- ========== Section 4: ISO 22301 Business Continuity ========== -->
         <section class="section" id="sec-22301" data-nav-id="sec-22301">
             <h2 class="section-title"><i class="fas fa-life-ring"></i> ISO 22301 Business Continuity <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-22301')"><i class="fas fa-link"></i></button></h2>
-            <p class="section-intro">ISO 22301 specifies requirements for a <span class="term-tooltip" data-tooltip="Business Continuity Management System — a management framework that identifies potential threats and their impacts, and provides a process for building organizational resilience.">Business Continuity Management System (BCMS)</span>. For data centers, this means ensuring that critical IT services can be maintained or rapidly restored following a disruptive incident — whether power failure, natural disaster, cyberattack, or supply chain disruption.</p>
+            <p class="section-intro">ISO 22301 specifies requirements for a <span data-explain="bcms">Business Continuity Management System (BCMS)</span>. For data centers, this means ensuring that critical IT services can be maintained or rapidly restored following a disruptive incident — whether power failure, natural disaster, cyberattack, or supply chain disruption.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> Business Impact Analysis (BIA) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
@@ -931,7 +926,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <!-- ========== Section 5: ISO 14001 Environmental ========== -->
         <section class="section" id="sec-14001" data-nav-id="sec-14001">
             <h2 class="section-title"><i class="fas fa-leaf"></i> ISO 14001 Environmental <button class="deep-link" aria-label="Copy section link" onclick="copyDeepLink('sec-14001')"><i class="fas fa-link"></i></button></h2>
-            <p class="section-intro">ISO 14001 provides a framework for an <span class="term-tooltip" data-tooltip="Environmental Management System — a structured approach to managing an organization's environmental responsibilities in a systematic manner.">Environmental Management System (EMS)</span> that helps organizations reduce their environmental footprint, comply with regulations, and demonstrate environmental stewardship. For data centers, this encompasses carbon emissions, water usage, waste management, and supply chain sustainability.</p>
+            <p class="section-intro">ISO 14001 provides a framework for an <span data-explain="ems">Environmental Management System (EMS)</span> that helps organizations reduce their environmental footprint, comply with regulations, and demonstrate environmental stewardship. For data centers, this encompasses carbon emissions, water usage, waste management, and supply chain sustainability.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> Carbon Footprint (Scope 1/2/3) <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
@@ -1442,7 +1437,6 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <p class="legal">Legal notice: this module is educational/planning content and does not replace licensed engineering, legal, safety, or procurement review. ISO standard references are based on the latest published editions as of 2025. All data is for educational reference — verify against current published standards for production use. &copy; 2026 ResistanceZero. <a href="privacy.html" style="color:var(--muted);text-decoration:underline;">Privacy</a> &middot; <a href="terms.html" style="color:var(--muted);text-decoration:underline;">Terms</a></p>
     </div>
 
-    <div id="tooltipFloat" class="tooltip-float"></div>
     <div class="root-gate"><div class="root-card"><h2><i class="fas fa-lock" style="color:#10b981;margin-right:0.3rem;"></i> Pro or Educator access required</h2><p>This module requires a Pro or Educator account. Sign in with one to continue, or contact us for access.</p><div class="root-actions"><button id="rootLoginBtn">Sign In</button><a href="standards-ltc-lab.html">Back to Lab</a></div></div></div>
     
 
@@ -1792,57 +1786,6 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         });
     });
 
-    /* ===== Floating Tooltips ===== */
-    (function(){
-        var tip=document.getElementById('tooltipFloat');
-        if(!tip)return;
-        var hideTimer=null;
-        function show(el){
-            clearTimeout(hideTimer);
-            var text=el.getAttribute('data-tooltip');
-            if(!text)return;
-            tip.textContent=text;
-            tip.className='tooltip-float';
-            tip.style.opacity='0';
-            tip.style.visibility='visible';
-            var r=el.getBoundingClientRect();
-            var tw=tip.offsetWidth;
-            var th=tip.offsetHeight;
-            var gap=8;
-            var left=r.left+r.width/2-tw/2;
-            if(left<8)left=8;
-            if(left+tw>window.innerWidth-8)left=window.innerWidth-tw-8;
-            var top;
-            if(r.top-th-gap>8){
-                top=r.top-th-gap;
-                tip.classList.add('above');
-            }else{
-                top=r.bottom+gap;
-                tip.classList.add('below');
-            }
-            var arrowLeft=r.left+r.width/2-left;
-            arrowLeft=Math.max(12,Math.min(arrowLeft,tw-12));
-            tip.style.setProperty('--arrow',arrowLeft+'px');
-            tip.style.left=left+'px';
-            tip.style.top=top+'px';
-            tip.classList.add('visible');
-        }
-        function hide(){
-            hideTimer=setTimeout(function(){
-                tip.classList.remove('visible');
-                tip.style.visibility='hidden';
-            },80);
-        }
-        document.querySelectorAll('.term-tooltip').forEach(function(el){
-            el.addEventListener('mouseenter',function(){show(el);});
-            el.addEventListener('mouseleave',hide);
-            el.addEventListener('touchstart',function(e){
-                e.preventDefault();
-                show(el);
-                setTimeout(hide,3000);
-            },{passive:false});
-        });
-    })();
 
     /* ===== Comparison Card Toggle ===== */
     document.addEventListener('click',function(e){

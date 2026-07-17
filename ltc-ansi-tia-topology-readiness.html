@@ -162,13 +162,6 @@
         .section ul { list-style: none; display: grid; gap: 0.3rem; margin: 0.5rem 0; }
         .section li { font-size: 0.82rem; color: var(--text-body); line-height: 1.6; padding-left: 0.9rem; position: relative; }
         .section li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent2); position: absolute; left: 0; top: 0.45rem; }
-        .term-tooltip { border-bottom: 1px dotted var(--accent2); cursor: help; color: inherit; }
-        .tooltip-float { position: fixed; z-index: 100000; background: #1e293b; color: #e2e8f0; padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; line-height: 1.55; max-width: 340px; min-width: 200px; box-shadow: 0 4px 24px rgba(0,0,0,0.35); border: 1px solid rgba(139,92,246,0.3); opacity: 0; visibility: hidden; transition: opacity 0.15s, visibility 0.15s; pointer-events: none; white-space: normal; font-weight: 400; word-wrap: break-word; }
-        .tooltip-float.visible { opacity: 1; visibility: visible; }
-        .tooltip-float::before { content: ''; position: absolute; width: 10px; height: 10px; background: inherit; border: inherit; border-right: none; border-top: none; transform: rotate(-45deg); }
-        .tooltip-float.above::before { bottom: -6px; left: var(--arrow, 50%); margin-left: -5px; }
-        .tooltip-float.below::before { top: -6px; left: var(--arrow, 50%); margin-left: -5px; transform: rotate(135deg); }
-        [data-theme="light"] .tooltip-float { background: #fff; color: #1e293b; border-color: rgba(139,92,246,0.25); box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
         .abbr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.4rem; margin-top: 0.6rem; }
         .abbr-item { display: flex; gap: 0.5rem; padding: 0.45rem 0.6rem; border-radius: 8px; font-size: 0.8rem; border: 1px solid var(--line); background: var(--card-inner); }
         .abbr-item:hover { background: var(--card-inner-hover); }
@@ -430,6 +423,8 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
     }
     </script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-07-17" defer></script>
+    <script src="js/rz-explain.js?v=2026-07-17" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>    <meta property="og:image" content="https://resistancezero.com/assets/og/ltc-ansi-tia-topology-readiness.webp">    <meta property="og:image:width" content="1200">    <meta property="og:image:height" content="630">    <meta property="og:image:alt" content="ANSI/TIA Topology Readiness — Comprehensive Deep-Dive">    <meta name="twitter:image" content="https://resistancezero.com/assets/og/ltc-ansi-tia-topology-readiness.webp">    <meta name="twitter:card" content="summary_large_image">
 
@@ -600,7 +595,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <!-- SECTION 1: TIA-942 Infrastructure Tiers -->
         <section class="section" id="sec-tiers" data-nav-id="sec-tiers">
             <h2 class="section-title"><i class="fas fa-layer-group"></i> TIA-942 Infrastructure Ratings <button class="deep-link" onclick="copyDeepLink('sec-tiers')" title="Copy link"><i class="fas fa-link"></i></button></h2>
-            <p class="section-intro"><span class="term-tooltip" data-tooltip="TIA-942: ANSI/TIA standard for Telecommunications Infrastructure Standard for Data Centers. Defines infrastructure ratings 1-4 for redundancy and availability.">TIA-942-B</span> is the ANSI-accredited standard defining infrastructure requirements for data center facilities. It categorizes data centers into four <strong>Ratings</strong> (1 through 4) based on redundancy, distribution path architecture, and fault tolerance.</p>
+            <p class="section-intro"><span data-explain="tia-942">TIA-942-B</span> is the ANSI-accredited standard defining infrastructure requirements for data center facilities. It categorizes data centers into four <strong>Ratings</strong> (1 through 4) based on redundancy, distribution path architecture, and fault tolerance.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> Overview &amp; Scope <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
@@ -713,7 +708,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <!-- SECTION 2: Structured Cabling TIA-568 -->
         <section class="section" id="sec-cabling" data-nav-id="sec-cabling">
             <h2 class="section-title"><i class="fas fa-ethernet"></i> Structured Cabling — TIA-568 <button class="deep-link" onclick="copyDeepLink('sec-cabling')" title="Copy link"><i class="fas fa-link"></i></button></h2>
-            <p class="section-intro"><span class="term-tooltip" data-tooltip="TIA-568: Telecommunications cabling standard defining copper and fiber specifications, distance limits, and connector requirements for structured cabling systems.">TIA-568</span> defines the structured cabling infrastructure for data centers, including copper and fiber specifications, distribution hierarchy, and performance requirements.</p>
+            <p class="section-intro"><span data-explain="tia-568">TIA-568</span> defines the structured cabling infrastructure for data centers, including copper and fiber specifications, distribution hierarchy, and performance requirements.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> Backbone Cabling Architecture <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
@@ -755,10 +750,10 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
                     <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Type</th><th scope="col">Core</th><th scope="col">Wavelength</th><th scope="col">10G Distance</th><th scope="col">100G Distance</th><th scope="col">Application</th></tr></thead>
                         <tbody>
-                            <tr><td><span class="term-tooltip" data-tooltip="OM3: Laser-optimized 50μm multimode fiber supporting 10G at 300m. Suitable for most intra-building data center links.">OM3</span></td><td>50 μm MM</td><td>850 nm</td><td class="unit-val" data-m="300">300 m</td><td class="unit-val" data-m="100">100 m</td><td>General backbone</td></tr>
-                            <tr><td class="highlight"><span class="term-tooltip" data-tooltip="OM4: Enhanced laser-optimized 50μm multimode fiber supporting 10G at 400m and 100G at 150m. Preferred for new DC installations.">OM4</span></td><td class="highlight">50 μm MM</td><td class="highlight">850 nm</td><td class="unit-val highlight" data-m="400">400 m</td><td class="unit-val highlight" data-m="150">150 m</td><td class="highlight">DC backbone standard</td></tr>
-                            <tr><td><span class="term-tooltip" data-tooltip="OM5: Wideband multimode fiber supporting SWDM (Short Wavelength Division Multiplexing) at 850 and 950nm for higher bandwidth density.">OM5</span></td><td>50 μm MM</td><td>850+950 nm</td><td class="unit-val" data-m="300">300 m</td><td class="unit-val" data-m="150">150 m</td><td>SWDM applications</td></tr>
-                            <tr><td><span class="term-tooltip" data-tooltip="OS2: Single-mode fiber supporting extremely long distances (10+ km). Used for campus backbone, inter-building, and WAN connections.">OS2</span></td><td>9 μm SM</td><td>1310/1550 nm</td><td class="unit-val" data-m="10000">10 km</td><td class="unit-val" data-m="40000">40 km</td><td>Campus/WAN backbone</td></tr>
+                            <tr><td><span data-explain="om3">OM3</span></td><td>50 μm MM</td><td>850 nm</td><td class="unit-val" data-m="300">300 m</td><td class="unit-val" data-m="100">100 m</td><td>General backbone</td></tr>
+                            <tr><td class="highlight"><span data-explain="cabling-type">OM4</span></td><td class="highlight">50 μm MM</td><td class="highlight">850 nm</td><td class="unit-val highlight" data-m="400">400 m</td><td class="unit-val highlight" data-m="150">150 m</td><td class="highlight">DC backbone standard</td></tr>
+                            <tr><td><span data-explain="om5">OM5</span></td><td>50 μm MM</td><td>850+950 nm</td><td class="unit-val" data-m="300">300 m</td><td class="unit-val" data-m="150">150 m</td><td>SWDM applications</td></tr>
+                            <tr><td><span data-explain="os2">OS2</span></td><td>9 μm SM</td><td>1310/1550 nm</td><td class="unit-val" data-m="10000">10 km</td><td class="unit-val" data-m="40000">40 km</td><td>Campus/WAN backbone</td></tr>
                         </tbody>
                     </table></div>
                     <div class="callout callout-info"><i class="fas fa-lightbulb"></i> <strong>OM5</strong> enables SWDM (Short Wavelength Division Multiplexing) which multiplexes 4 wavelengths on a single fiber pair, achieving 100G over 2 fibers instead of 8 (parallel) or requiring expensive CWDM optics.</div>
@@ -801,7 +796,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <!-- SECTION 3: Pathways & Spaces TIA-569 -->
         <section class="section" id="sec-pathways" data-nav-id="sec-pathways">
             <h2 class="section-title"><i class="fas fa-road"></i> Pathways &amp; Spaces — TIA-569 <button class="deep-link" onclick="copyDeepLink('sec-pathways')" title="Copy link"><i class="fas fa-link"></i></button></h2>
-            <p class="section-intro"><span class="term-tooltip" data-tooltip="TIA-569: Standard for Telecommunications Pathways and Spaces. Defines cable tray, conduit, and routing requirements for telecommunications infrastructure.">TIA-569</span> defines the pathways (conduits, cable trays, raceways) and spaces (rooms, closets, access floors) that support telecommunications cabling infrastructure.</p>
+            <p class="section-intro"><span data-explain="tia-569">TIA-569</span> defines the pathways (conduits, cable trays, raceways) and spaces (rooms, closets, access floors) that support telecommunications cabling infrastructure.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> Cable Tray Systems <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
@@ -873,7 +868,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <!-- SECTION 4: Grounding & Bonding TIA-607 -->
         <section class="section" id="sec-grounding" data-nav-id="sec-grounding">
             <h2 class="section-title"><i class="fas fa-bolt"></i> Grounding &amp; Bonding — TIA-607 <button class="deep-link" onclick="copyDeepLink('sec-grounding')" title="Copy link"><i class="fas fa-link"></i></button></h2>
-            <p class="section-intro"><span class="term-tooltip" data-tooltip="TIA-607: Generic Telecommunications Bonding and Grounding for Customer Premises. Defines the grounding infrastructure (TMGB, TGB, BCT, TBB) required for telecommunications systems.">TIA-607</span> defines the bonding and grounding infrastructure required to support telecommunications equipment, protect against electrical hazards, and minimize electromagnetic interference.</p>
+            <p class="section-intro"><span data-explain="tia-607">TIA-607</span> defines the bonding and grounding infrastructure required to support telecommunications equipment, protect against electrical hazards, and minimize electromagnetic interference.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> TMGB / TGB / BCT Architecture <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
@@ -937,7 +932,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <!-- SECTION 5: Administration & Labeling TIA-606 -->
         <section class="section" id="sec-admin" data-nav-id="sec-admin">
             <h2 class="section-title"><i class="fas fa-tags"></i> Administration &amp; Labeling — TIA-606 <button class="deep-link" onclick="copyDeepLink('sec-admin')" title="Copy link"><i class="fas fa-link"></i></button></h2>
-            <p class="section-intro"><span class="term-tooltip" data-tooltip="TIA-606: Administration Standard for Telecommunications Infrastructure. Defines labeling, color coding, and documentation requirements for cable management.">TIA-606-C</span> provides the framework for documenting, labeling, and managing telecommunications infrastructure. Proper administration reduces errors, speeds troubleshooting, and enables efficient capacity planning.</p>
+            <p class="section-intro"><span data-explain="tia-606">TIA-606-C</span> provides the framework for documenting, labeling, and managing telecommunications infrastructure. Proper administration reduces errors, speeds troubleshooting, and enables efficient capacity planning.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> Color Code Standards <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
@@ -987,7 +982,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
                             <tr><td>Class 4</td><td>Multi-campus/site</td><td>Class 3 + site-to-site records, WAN documentation</td></tr>
                         </tbody>
                     </table></div>
-                    <div class="callout callout-info"><i class="fas fa-database"></i> Modern <span class="term-tooltip" data-tooltip="DCIM (Data Center Infrastructure Management): Software platform that provides real-time monitoring and management of DC assets, capacity, connectivity, and environmental conditions.">DCIM</span> systems automate TIA-606 compliance by maintaining cable records, generating labels, and tracking connections through barcode/RFID scanning.</div>
+                    <div class="callout callout-info"><i class="fas fa-database"></i> Modern <span data-explain="dcim">DCIM</span> systems automate TIA-606 compliance by maintaining cable records, generating labels, and tracking connections through barcode/RFID scanning.</div>
                 </div></div>
             </div>
         </section>
@@ -1022,7 +1017,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
                         <div class="comparison-card" onclick="this.classList.toggle('expanded')">
                             <h5><i class="fas fa-toggle-on"></i> Active-Standby</h5>
                             <div class="cc-summary">One path active, one idle (standby)</div>
-                            <div class="cc-detail">Primary path carries all load; alternate path is energized but unloaded. Requires <span class="term-tooltip" data-tooltip="STS (Static Transfer Switch): Power switching device that transfers load between two independent power sources in < 4-8ms, faster than IT equipment ride-through capability.">STS</span> for automatic transfer (typically &lt; 8ms). Simpler design, lower cost. Risk during switchover if STS fails. Common in Tier III / Rating 3 designs.</div>
+                            <div class="cc-detail">Primary path carries all load; alternate path is energized but unloaded. Requires <span data-explain="static-transfer-switch">STS</span> for automatic transfer (typically &lt; 8ms). Simpler design, lower cost. Risk during switchover if STS fails. Common in Tier III / Rating 3 designs.</div>
                         </div>
                     </div>
                 </div></div>
@@ -1101,7 +1096,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <!-- SECTION 7: Single Point of Failure Analysis -->
         <section class="section" id="sec-spof" data-nav-id="sec-spof">
             <h2 class="section-title"><i class="fas fa-exclamation-triangle"></i> Single Point of Failure Analysis <button class="deep-link" onclick="copyDeepLink('sec-spof')" title="Copy link"><i class="fas fa-link"></i></button></h2>
-            <p class="section-intro">A <span class="term-tooltip" data-tooltip="SPOF (Single Point of Failure): Any component whose failure would cause the entire system or service to stop functioning. Identifying and eliminating SPOFs is critical for achieving Rating 3+ availability.">Single Point of Failure (SPOF)</span> is any component whose failure would cause service interruption. Systematic SPOF analysis is essential for achieving TIA-942 Rating 3 or higher.</p>
+            <p class="section-intro">A <span data-explain="spof">Single Point of Failure (SPOF)</span> is any component whose failure would cause service interruption. Systematic SPOF analysis is essential for achieving TIA-942 Rating 3 or higher.</p>
 
             <div class="accordion open">
                 <button class="accordion-header"><span class="acc-num">1</span> SPOF Identification Methodology <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
@@ -1139,7 +1134,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">3</span> FMEA Table <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <p><span class="term-tooltip" data-tooltip="FMEA (Failure Mode and Effects Analysis): Systematic methodology for identifying potential failure modes, their causes, effects, and mitigations. Uses RPN (Risk Priority Number) scoring to prioritize actions.">Failure Mode and Effects Analysis (FMEA)</span> scoring: Severity (1–10), Occurrence (1–10), Detection (1–10). RPN = S × O × D.</p>
+                    <p><span data-explain="fmea">Failure Mode and Effects Analysis (FMEA)</span> scoring: Severity (1–10), Occurrence (1–10), Detection (1–10). RPN = S × O × D.</p>
                     <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Component</th><th scope="col">Failure Mode</th><th scope="col">S</th><th scope="col">O</th><th scope="col">D</th><th scope="col">RPN</th><th scope="col">Mitigation</th></tr></thead>
                         <tbody>
@@ -1167,9 +1162,9 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
                     <div class="table-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="data-table">
                         <thead><tr><th scope="col">Test Phase</th><th scope="col">Location</th><th scope="col">Scope</th><th scope="col">Duration</th><th scope="col">Pass Criteria</th></tr></thead>
                         <tbody>
-                            <tr><td class="highlight"><span class="term-tooltip" data-tooltip="FAT (Factory Acceptance Test): Testing performed at the manufacturer's facility before equipment is shipped. Verifies component-level performance against specifications.">FAT</span></td><td>Manufacturer facility</td><td>Individual component</td><td>1–5 days</td><td>Meets datasheet specifications</td></tr>
-                            <tr><td class="highlight"><span class="term-tooltip" data-tooltip="SAT (Site Acceptance Test): Testing performed at the installation site after equipment is installed. Verifies proper installation and integration with site infrastructure.">SAT</span></td><td>Installation site</td><td>Installed system</td><td>1–2 weeks</td><td>Installed per drawings, functional</td></tr>
-                            <tr><td class="highlight"><span class="term-tooltip" data-tooltip="IST (Integrated Systems Test): Testing all systems together under simulated load to verify end-to-end operation, failover behavior, and alarm sequences.">IST</span></td><td>Installation site</td><td>All systems integrated</td><td>2–4 weeks</td><td>End-to-end operation, failover verified</td></tr>
+                            <tr><td class="highlight"><span data-explain="fat">FAT</span></td><td>Manufacturer facility</td><td>Individual component</td><td>1–5 days</td><td>Meets datasheet specifications</td></tr>
+                            <tr><td class="highlight"><span data-explain="sat">SAT</span></td><td>Installation site</td><td>Installed system</td><td>1–2 weeks</td><td>Installed per drawings, functional</td></tr>
+                            <tr><td class="highlight"><span data-explain="ist">IST</span></td><td>Installation site</td><td>All systems integrated</td><td>2–4 weeks</td><td>End-to-end operation, failover verified</td></tr>
                         </tbody>
                     </table></div>
                     <div class="callout callout-info"><i class="fas fa-project-diagram"></i> The IST is the most critical phase — it validates that all systems work together correctly, including automatic failover sequences, alarm propagation, and emergency procedures.</div>
@@ -1253,7 +1248,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
             <div class="accordion">
                 <button class="accordion-header"><span class="acc-num">2</span> BICSI-002 Comparison <span class="chevron"><i class="fas fa-chevron-down"></i></span></button>
                 <div class="accordion-body"><div class="accordion-content">
-                    <p><span class="term-tooltip" data-tooltip="BICSI-002: BICSI Data Center Design and Implementation Best Practices. Comprehensive design guideline that references TIA-942 but adds implementation-level detail and best practices.">BICSI-002</span> is a comprehensive design guideline that builds upon TIA-942. Key additions:</p>
+                    <p><span data-explain="bicsi-002">BICSI-002</span> is a comprehensive design guideline that builds upon TIA-942. Key additions:</p>
                     <ul>
                         <li><strong>Site selection criteria:</strong> Detailed risk assessment methodology for natural hazards, proximity to services, and regulatory considerations.</li>
                         <li><strong>Architectural design:</strong> Floor loading requirements, ceiling heights, column spacing, and door sizing specific to data centers.</li>
@@ -1410,7 +1405,6 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         <p class="legal">Legal notice: this module is educational/planning content and does not replace licensed engineering, legal, safety, or procurement review. TIA-942-B data references the 2017 edition. All data is for educational reference — verify against current published standards for production use.</p>
     </div>
 
-    <div class="tooltip-float" id="tooltipFloat"></div>
     <div class="root-gate" id="rootGate"><div class="root-card"><h2><i class="fas fa-lock"></i> Pro or Educator access required</h2><p>This module requires a Pro or Educator account. Sign in with one to continue, or contact us for access.</p><div class="root-actions"><button id="rootLoginBtn" type="button">Sign In</button><a href="datacenter-solutions.html">Back</a></div></div></div>
     
 
@@ -1442,7 +1436,6 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
     (function(){var configSel=document.getElementById('redConfig'),mtbfIn=document.getElementById('redMtbf'),mttrIn=document.getElementById('redMttr');var resAvail=document.getElementById('redAvail'),resDown=document.getElementById('redDown'),resNines=document.getElementById('redNines');if(!configSel||!mtbfIn||!mttrIn)return;function calc(){var mtbf=parseFloat(mtbfIn.value)||50000,mttr=parseFloat(mttrIn.value)||4;var A=mtbf/(mtbf+mttr);var config=configSel.value;var sysA;if(config==='n')sysA=A;else if(config==='n1')sysA=1-Math.pow(1-A,2);else if(config==='2n')sysA=1-Math.pow(1-A,2);else sysA=1-Math.pow(1-A,3);var pct=(sysA*100);var downMin=(1-sysA)*525960;var nines=sysA>=1?9:-Math.log10(1-sysA);resAvail.textContent=pct.toFixed(6)+'%';resDown.textContent=downMin.toFixed(1)+' min/yr';resNines.textContent=nines.toFixed(2)+' nines';}configSel.addEventListener('change',calc);mtbfIn.addEventListener('input',calc);mttrIn.addEventListener('input',calc);calc();})();
     document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;var fc=document.getElementById('flashcardOverlay');if(fc&&fc.classList.contains('active'))return;var secs=document.querySelectorAll('[data-nav-id]');if(!secs.length)return;var current=-1;secs.forEach(function(s,i){if(s.getBoundingClientRect().top<150&&s.getBoundingClientRect().top>-s.offsetHeight)current=i;});if(e.key==='ArrowDown'&&!e.ctrlKey){e.preventDefault();var next=Math.min(current+1,secs.length-1);secs[next].scrollIntoView({behavior:'smooth',block:'start'});}if(e.key==='ArrowUp'&&!e.ctrlKey){e.preventDefault();var prev=Math.max(current-1,0);secs[prev].scrollIntoView({behavior:'smooth',block:'start'});}});
     document.querySelectorAll('.data-table').forEach(function(table){var headers=table.querySelectorAll('th');headers.forEach(function(th,colIdx){th.classList.add('sortable');th.innerHTML+=(' <span class="sort-icon"><i class="fas fa-sort"></i></span>');var asc=true;th.addEventListener('click',function(){var tbody=table.querySelector('tbody');if(!tbody)return;var rows=Array.from(tbody.querySelectorAll('tr'));rows.sort(function(a,b){var av=a.cells[colIdx]?a.cells[colIdx].textContent.trim():'';var bv=b.cells[colIdx]?b.cells[colIdx].textContent.trim():'';var an=parseFloat(av.replace(/[^0-9.\-]/g,'')),bn=parseFloat(bv.replace(/[^0-9.\-]/g,''));if(!isNaN(an)&&!isNaN(bn))return asc?an-bn:bn-an;return asc?av.localeCompare(bv):bv.localeCompare(av);});asc=!asc;rows.forEach(function(r){tbody.appendChild(r);});headers.forEach(function(h){h.classList.remove('sorted');});th.classList.add('sorted');});});});
-    (function(){var tip=document.getElementById('tooltipFloat');if(!tip)return;var hideTimer=null;function show(el){clearTimeout(hideTimer);var text=el.getAttribute('data-tooltip');if(!text)return;tip.textContent=text;tip.className='tooltip-float';tip.style.opacity='0';tip.style.visibility='visible';var r=el.getBoundingClientRect();var tw=tip.offsetWidth;var th=tip.offsetHeight;var gap=8;var left=r.left+r.width/2-tw/2;if(left<8)left=8;if(left+tw>window.innerWidth-8)left=window.innerWidth-tw-8;var top;if(r.top-th-gap>8){top=r.top-th-gap;tip.classList.add('above');}else{top=r.bottom+gap;tip.classList.add('below');}var arrowLeft=r.left+r.width/2-left;arrowLeft=Math.max(12,Math.min(arrowLeft,tw-12));tip.style.setProperty('--arrow',arrowLeft+'px');tip.style.left=left+'px';tip.style.top=top+'px';tip.classList.add('visible');}function hide(){hideTimer=setTimeout(function(){tip.classList.remove('visible');tip.style.visibility='hidden';},80);}document.querySelectorAll('.term-tooltip').forEach(function(el){el.addEventListener('mouseenter',function(){show(el);});el.addEventListener('mouseleave',hide);el.addEventListener('touchstart',function(e){e.preventDefault();show(el);setTimeout(hide,3000);},{passive:false});});})();
     (function(){if(window.location.hash){var id=window.location.hash.slice(1);var target=document.getElementById(id)||document.querySelector('[data-nav-id="'+id+'"]');if(target)setTimeout(function(){target.scrollIntoView({behavior:'smooth',block:'start'});},600);}})();
     </script>
 </body>

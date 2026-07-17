@@ -1,0 +1,372 @@
+{
+ "entries": {
+  "tco-deployment-region": {
+   "t": "Deployment Region",
+   "d": "The market where the facility is deployed, which sets four independent cost lines at once: construction cost per MW, industrial electricity rate, facility staffing labor cost, and prevailing colocation lease pricing. The spread is material — building in Tokyo runs roughly twice the $/MW of Mumbai — so region choice often moves the build-vs-colo-vs-cloud verdict more than any tuning parameter. Regional build costs are benchmarked from Turner & Townsend and Cushman & Wakefield 2025 market data.",
+   "table": [
+    [
+     "Region",
+     "Build $/MW"
+    ],
+    [
+     "N. Virginia",
+     "$12.0M"
+    ],
+    [
+     "Singapore",
+     "$14.5M"
+    ],
+    [
+     "Tokyo",
+     "$15.2M"
+    ],
+    [
+     "Mumbai",
+     "$7.5M"
+    ]
+   ],
+   "s": "Turner & Townsend, Cushman & Wakefield 2025",
+   "rel": [
+    "city-market",
+    "region-location",
+    "colocation-pricing",
+    "tco-power-rate"
+   ],
+   "aliases": []
+  },
+  "tco-analysis-period": {
+   "t": "Analysis Period",
+   "d": "The timeframe over which the build / colocation / cloud alternatives are compared. Short horizons favor colo and cloud because they avoid the large upfront CAPEX; longer horizons favor own-build because construction cost amortizes while colo and cloud spend compounds annually with escalation and growth. A 5-year view answers a capacity-bridging question; a 10-year view answers an infrastructure-strategy question — run both before committing.",
+   "u": "years",
+   "table": [
+    [
+     "Period",
+     "Typically Favors"
+    ],
+    [
+     "5 years",
+     "Colo / Cloud (lower upfront)"
+    ],
+    [
+     "10 years",
+     "Build (CAPEX amortized)"
+    ]
+   ],
+   "rel": [
+    "capex",
+    "opex",
+    "escalation",
+    "wacc"
+   ],
+   "aliases": [
+    "Analysis Period"
+   ]
+  },
+  "tco-growth-rate": {
+   "t": "Annual Growth Rate",
+   "d": "Expected year-over-year growth in IT load, which sets the future capacity trajectory and therefore the total cost curve of each scenario. Growth compounds colo and cloud costs directly — every added kW is billed at market rates — while an own-build absorbs growth inside its provisioned capacity until the facility fills. High growth assumptions therefore shift the verdict toward building with headroom; flat demand favors renting exactly what you need.",
+   "u": "%/yr",
+   "table": [
+    [
+     "Scenario",
+     "Growth"
+    ],
+    [
+     "Stable",
+     "0-5%"
+    ],
+    [
+     "Moderate",
+     "5-15%"
+    ],
+    [
+     "Aggressive",
+     "15-25%"
+    ],
+    [
+     "Hyper-growth",
+     "25-30%"
+    ]
+   ],
+   "rel": [
+    "it-load",
+    "utilization",
+    "escalation"
+   ],
+   "aliases": [
+    "Annual Growth Rate"
+   ]
+  },
+  "tco-land-cost": {
+   "t": "Land Cost Override",
+   "d": "Overrides the default regional land price used in the build scenario's site-acquisition line; leave it empty to use market data for the selected region. Land is a minor CAPEX line in cheap-land markets but becomes strategic in dense metros — Tokyo and Singapore land runs an order of magnitude above N. Virginia or Mumbai, which is one reason multi-story builds dominate those markets.",
+   "u": "$/sqft",
+   "table": [
+    [
+     "Market",
+     "$/sqft"
+    ],
+    [
+     "Tokyo",
+     "$150"
+    ],
+    [
+     "Singapore",
+     "$120"
+    ],
+    [
+     "N. Virginia",
+     "$45"
+    ],
+    [
+     "Mumbai",
+     "$10"
+    ]
+   ],
+   "rel": [
+    "tco-deployment-region",
+    "capex",
+    "building-type"
+   ],
+   "aliases": [
+    "Land Cost Override"
+   ]
+  },
+  "tco-power-rate": {
+   "t": "Custom Power Rate",
+   "d": "Overrides the default regional industrial electricity rate; leave it empty to use IEA 2025-2026 market data. Electricity is usually the single largest operating line over the analysis period, and it is paid on total facility power (IT load x PUE x utilization), so a negotiated PPA or utility tariff materially different from the regional average deserves an explicit override. Rates span more than 3x across covered markets.",
+   "u": "$/kWh",
+   "table": [
+    [
+     "Market",
+     "$/kWh"
+    ],
+    [
+     "Dallas",
+     "$0.055"
+    ],
+    [
+     "Jakarta",
+     "$0.080"
+    ],
+    [
+     "London",
+     "$0.170"
+    ],
+    [
+     "Singapore",
+     "$0.180"
+    ]
+   ],
+   "s": "IEA 2025-2026",
+   "rel": [
+    "annual-energy-cost",
+    "pue",
+    "opex"
+   ],
+   "aliases": [
+    "Custom Power Rate"
+   ]
+  },
+  "tco-staff-count": {
+   "t": "Staff Count Override",
+   "d": "Overrides the auto-calculated operations headcount for the build scenario, which defaults to a tier-driven staffing ratio applied to IT load: roughly 3 staff per MW at Tier II, 5 at Tier III, and 8 at Tier IV (24/7 shift coverage plus maintenance and management). Override it when your operating model differs — shared campus staffing, remote NOC coverage, or outsourced facility management can run leaner than the reference ratios.",
+   "table": [
+    [
+     "Tier",
+     "Staff per MW"
+    ],
+    [
+     "Tier II",
+     "3"
+    ],
+    [
+     "Tier III",
+     "5"
+    ],
+    [
+     "Tier IV",
+     "8"
+    ]
+   ],
+   "rel": [
+    "tier-class",
+    "opex"
+   ],
+   "aliases": [
+    "Staff Count Override"
+   ]
+  },
+  "tco-cloud-discount": {
+   "t": "Cloud Committed-Use Discount",
+   "d": "The discount off on-demand cloud list pricing obtained through committed-use or reserved-instance agreements. One-year commitments typically earn ~30% and three-year commitments ~50%, in exchange for giving up elasticity on the committed baseline. Because the cloud scenario compounds with growth, this single assumption can swing cloud TCO by tens of percent — model the discount you can realistically commit to, not the marketing maximum.",
+   "u": "%",
+   "table": [
+    [
+     "Commitment",
+     "Discount"
+    ],
+    [
+     "On-demand",
+     "0%"
+    ],
+    [
+     "1-year reserved",
+     "30%"
+    ],
+    [
+     "3-year reserved",
+     "50%"
+    ]
+   ],
+   "rel": [
+    "cloud",
+    "tco-growth-rate",
+    "escalation"
+   ],
+   "aliases": [
+    "Cloud Discount",
+    "Committed Use Discount"
+   ]
+  },
+  "cx-scope": {
+   "t": "Commissioning Scope",
+   "d": "How much of the commissioning lifecycle the project buys. New Build runs the full L0-L6 sequence from factory witness testing through integrated systems testing; Retrofit commissions only the modified systems plus their interfaces; Recommissioning re-validates existing systems against current requirements; Continuous commissioning is ongoing monitoring-based verification rather than a one-time campaign. Scope is the largest single lever on Cx budget — a recommissioning effort runs roughly half the cost of an equivalent new-build campaign.",
+   "table": [
+    [
+     "Scope",
+     "Cost Multiplier"
+    ],
+    [
+     "New Build (full L0-L6)",
+     "1.00x"
+    ],
+    [
+     "Retrofit",
+     "0.75x"
+    ],
+    [
+     "Recommission",
+     "0.55x"
+    ],
+    [
+     "Continuous",
+     "0.30x"
+    ]
+   ],
+   "rel": [
+    "commissioning",
+    "delivery-method"
+   ],
+   "aliases": [
+    "Cx Scope",
+    "Commissioning Scope"
+   ]
+  },
+  "cx-bms-dcim": {
+   "t": "BMS/DCIM Complexity",
+   "d": "The controls-integration tier, which scales the controls commissioning scope through the points list — every sensor, actuator, and status point must be individually verified end-to-end. A basic BMS runs ~200 points while an AI-driven DCIM exceeds 2,000, and the AI tier roughly doubles controls Cx cost because it adds ML model validation, predictive-algorithm testing, and integration verification across all electrical, mechanical, and fire subsystems.",
+   "table": [
+    [
+     "Tier",
+     "Points / Cost"
+    ],
+    [
+     "Basic",
+     "200 pts - 0.6x"
+    ],
+    [
+     "Standard",
+     "500 pts - 1.0x"
+    ],
+    [
+     "Advanced",
+     "1,200 pts"
+    ],
+    [
+     "AI-Driven",
+     "2,000+ pts - 2.0x"
+    ]
+   ],
+   "rel": [
+    "bms",
+    "dcim",
+    "commissioning"
+   ],
+   "aliases": [
+    "BMS/DCIM Complexity"
+   ]
+  },
+  "ops-installed-capacity": {
+   "t": "Total Installed Capacity",
+   "d": "Global data center capacity measured in gigawatts of critical IT load — the power available to servers, not building shell or nameplate utility feed — as reported by Synergy Research Group. This is the industry's headline supply metric: growth in installed GW tracks the buildout race between hyperscale, colocation, and enterprise segments.",
+   "u": "GW",
+   "s": "Synergy Research Q1 2025",
+   "rel": [
+    "it-load",
+    "hyperscale"
+   ],
+   "aliases": [
+    "Total Installed Capacity"
+   ]
+  },
+  "ops-tracked-operators": {
+   "t": "Tracked Operators",
+   "d": "The number of data center operators tracked in this intelligence database, spanning hyperscalers, wholesale and retail colocation providers, and regional players. The combined MW figure beneath the count is the sum of their reported operating capacity — a coverage indicator for the benchmark charts below, not a global total.",
+   "rel": [
+    "hyperscale",
+    "colocation"
+   ],
+   "aliases": [
+    "Tracked Operators"
+   ]
+  },
+  "ops-countries-tracked": {
+   "t": "Countries Tracked",
+   "d": "The number of countries with tracked data center capacity in this database, spread across the Americas, EMEA, and APAC. Country-level MW mapping is what powers the regional distribution, growth-rate, and market-map views — countries outside the tracked set contribute little installed capacity today.",
+   "rel": [
+    "ops-installed-capacity"
+   ],
+   "aliases": [
+    "Countries Tracked"
+   ]
+  },
+  "ops-fastest-growing": {
+   "t": "Fastest-Growing Market",
+   "d": "The tracked country with the highest year-over-year data center capacity growth rate. High-growth markets are typically supply-constrained metros where hyperscale demand, power availability, and land economics have aligned — they signal where the next wave of construction, and construction-cost pressure, is concentrating.",
+   "u": "% YoY",
+   "rel": [
+    "ops-installed-capacity",
+    "escalation"
+   ],
+   "aliases": [
+    "Fastest Growing"
+   ]
+  },
+  "ops-2030-projection": {
+   "t": "2030 Capacity Projection",
+   "d": "Projected global data center capacity by 2030 per JLL and Synergy Research forecasts, driven primarily by AI training and inference demand. The accompanying investment figure is the estimated capital required to build that capacity — a useful sanity check on whether announced pipelines are financeable, since grid interconnection and transformer lead times, not capital, are the current binding constraints.",
+   "u": "GW",
+   "s": "JLL, Synergy Research forecasts",
+   "rel": [
+    "ops-installed-capacity",
+    "hyperscale"
+   ],
+   "aliases": [
+    "2030 Projection"
+   ]
+  },
+  "ops-renewable-share": {
+   "t": "Operator Renewable Share",
+   "d": "The average renewable-energy percentage claimed by tracked operators. Treat it as a marketing-adjacent figure: most claims rest on annualized renewable energy certificates (RECs) or PPAs rather than 24/7 hourly carbon-free matching, so a '100% renewable' operator may still draw fossil power at night. It remains a useful comparative signal of sustainability commitment across the operator set.",
+   "u": "%",
+   "rel": [
+    "onsite-renewable",
+    "pue"
+   ],
+   "aliases": [
+    "Avg Renewable"
+   ]
+  }
+ }
+}

@@ -650,77 +650,6 @@
 
         .tco-input-label i { color: var(--tco-primary); }
 
-        /* ═══ Tooltip Styles ═══ */
-        .tco-tooltip-trigger {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px; height: 16px;
-            background: rgba(79, 70, 229, 0.1);
-            border: 1px solid rgba(79, 70, 229, 0.3);
-            border-radius: 50%;
-            font-size: 10px;
-            color: var(--tco-primary);
-            cursor: help;
-            margin-left: auto;
-            transition: all 0.3s;
-            flex-shrink: 0;
-        }
-
-        .tco-tooltip-trigger:hover {
-            background: rgba(79, 70, 229, 0.2);
-            transform: scale(1.1);
-        }
-
-        #tco-tooltip-container {
-            position: fixed;
-            width: 320px;
-            max-width: calc(100vw - 40px);
-            padding: 16px;
-            background: linear-gradient(135deg, #312e81, #4338ca);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
-            z-index: 999999;
-            pointer-events: none;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.15s ease;
-            color: white;
-            font-size: 12px;
-            line-height: 1.5;
-        }
-
-        #tco-tooltip-container.visible { opacity: 1; visibility: visible; }
-
-        #tco-tooltip-container .tco-tt-title {
-            font-size: 13px; font-weight: 700; color: var(--tco-accent-light);
-            margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
-        }
-
-        #tco-tooltip-container .tco-tt-desc {
-            color: rgba(255,255,255,0.9); margin-bottom: 10px;
-        }
-
-        #tco-tooltip-container .tco-tt-table {
-            width: 100%; font-size: 11px; border-collapse: collapse;
-        }
-
-        #tco-tooltip-container .tco-tt-table th {
-            text-align: left; color: rgba(255,255,255,0.6); padding: 4px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        #tco-tooltip-container .tco-tt-table td { padding: 4px 0; }
-        #tco-tooltip-container .tco-tt-table td:last-child { text-align: right; color: #22d3ee; }
-
-        .tco-tooltip-trigger .tco-tooltip-content { display: none; }
-
-        .tco-tt-impact {
-            margin-top: 10px; padding: 8px;
-            background: rgba(79, 70, 229, 0.2);
-            border-radius: 6px; font-size: 10px; color: var(--tco-accent-light);
-        }
 
         /* ═══ Input Fields ═══ */
         .tco-input-field {
@@ -2007,7 +1936,7 @@
         @media print {
             body { background: white !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .navbar, .tco-hero, .tco-brief-section, .tco-mode-tabs, #tcoLoginModal, .nav-back, .tco-footer,
-            .tco-free-watermark, .tco-tooltip-trigger, .tco-gated-badge, .tco-cookie-banner, .tco-scroll-top-btn,
+            .tco-free-watermark, .tco-gated-badge, .tco-cookie-banner, .tco-scroll-top-btn,
             .tco-action-row, .tco-region-snapshot { display: none !important; }
             .tco-main-content { padding-top: 0 !important; }
             .tco-calculator-section { padding: 0 !important; }
@@ -2055,6 +1984,8 @@
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-calc-utils.js?v=2026-07-03" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-07-17" defer></script>
+    <script src="js/rz-explain.js?v=2026-07-17" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
     <!-- Structured Data - FAQPage -->
@@ -2150,8 +2081,6 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
     <a href="#tco-main-content" class="skip-link">Skip to main content</a>
     <div class="tco-page-background"></div>
 
-    <!-- ═══ Tooltip Container ═══ -->
-    <div id="tco-tooltip-container"></div>
 
     <!-- ═══ Navigation ═══ -->
     <nav class="navbar">
@@ -2252,27 +2181,13 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             <div class="tco-simulator-container">
 
                 <!-- ═══ INPUT SIDE ═══ -->
-                <div class="tco-simulator-inputs">
+                <div class="tco-simulator-inputs" data-explain-scan>
 
                     <!-- Row 1: Region + IT Load -->
                     <div class="tco-input-row">
                         <div class="tco-input-group">
-                            <label class="tco-input-label">
+                            <label class="tco-input-label" data-explain="tco-deployment-region">
                                 <i class="fas fa-globe-americas"></i> Deployment Region
-                                <span class="tco-tooltip-trigger" data-tt="region">?
-                                    <div class="tco-tooltip-content">
-                                        <div class="tco-tt-title"><i class="fas fa-globe-americas"></i> Deployment Region</div>
-                                        <div class="tco-tt-desc">Select the market region for your data center deployment. Each region has unique construction costs, power rates, labor costs, and colocation pricing.</div>
-                                        <table class="tco-tt-table">
-                                            <tr><th scope="col">Region</th><th scope="col">Build $/MW</th></tr>
-                                            <tr><td>N. Virginia</td><td>$12.0M</td></tr>
-                                            <tr><td>Singapore</td><td>$14.5M</td></tr>
-                                            <tr><td>Tokyo</td><td>$15.2M</td></tr>
-                                            <tr><td>Mumbai</td><td>$7.5M</td></tr>
-                                        </table>
-                                        <div class="tco-tt-impact">Source: Turner &amp; Townsend, Cushman &amp; Wakefield 2025</div>
-                                    </div>
-                                </span>
                             </label>
                             <select class="tco-input-field" id="tcoRegion" aria-label="TCO Region">
                                 <option value="n-virginia" selected>N. Virginia (US)</option>
@@ -2290,22 +2205,8 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                             </select>
                         </div>
                         <div class="tco-input-group">
-                            <label class="tco-input-label">
+                            <label class="tco-input-label" data-explain="it-load">
                                 <i class="fas fa-bolt"></i> IT Load (MW)
-                                <span class="tco-tooltip-trigger" data-tt="itload">?
-                                    <div class="tco-tooltip-content">
-                                        <div class="tco-tt-title"><i class="fas fa-bolt"></i> IT Load (MW)</div>
-                                        <div class="tco-tt-desc">Total critical IT power capacity in megawatts. This drives all cost calculations.</div>
-                                        <table class="tco-tt-table">
-                                            <tr><th scope="col">Scale</th><th scope="col">MW Range</th></tr>
-                                            <tr><td>Small / Edge</td><td>1-3 MW</td></tr>
-                                            <tr><td>Mid-Market</td><td>3-10 MW</td></tr>
-                                            <tr><td>Enterprise</td><td>10-30 MW</td></tr>
-                                            <tr><td>Hyperscale</td><td>30-100 MW</td></tr>
-                                        </table>
-                                        <div class="tco-tt-impact">Formula: CAPEX = MW x Cost/MW x Tier Mult</div>
-                                    </div>
-                                </span>
                             </label>
                             <input type="number" class="tco-input-field" id="tcoItLoad" value="5" min="1" max="100" step="0.5" aria-label="TCO It Load">
                         </div>
@@ -2314,19 +2215,8 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                     <!-- Row 2: Analysis Period + Tier Level -->
                     <div class="tco-input-row">
                         <div class="tco-input-group">
-                            <label class="tco-input-label">
+                            <label class="tco-input-label" data-explain="tco-analysis-period">
                                 <i class="fas fa-calendar-alt"></i> Analysis Period
-                                <span class="tco-tooltip-trigger" data-tt="period">?
-                                    <div class="tco-tooltip-content">
-                                        <div class="tco-tt-title"><i class="fas fa-calendar-alt"></i> Analysis Period</div>
-                                        <div class="tco-tt-desc">Timeframe for TCO comparison. Longer periods favor own-build due to CAPEX amortization. Cloud and colo costs compound annually.</div>
-                                        <table class="tco-tt-table">
-                                            <tr><th scope="col">Period</th><th scope="col">Favors</th></tr>
-                                            <tr><td>5 years</td><td>Colo / Cloud (lower upfront)</td></tr>
-                                            <tr><td>10 years</td><td>Build (CAPEX amortized)</td></tr>
-                                        </table>
-                                    </div>
-                                </span>
                             </label>
                             <select class="tco-input-field" id="tcoPeriod" aria-label="TCO Period">
                                 <option value="5" selected>5 Years</option>
@@ -2334,20 +2224,8 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                             </select>
                         </div>
                         <div class="tco-input-group">
-                            <label class="tco-input-label">
+                            <label class="tco-input-label" data-explain="tier-class">
                                 <i class="fas fa-shield-alt"></i> Tier Level
-                                <span class="tco-tooltip-trigger" data-tt="tier">?
-                                    <div class="tco-tooltip-content">
-                                        <div class="tco-tt-title"><i class="fas fa-shield-alt"></i> Tier Level</div>
-                                        <div class="tco-tt-desc">Uptime Institute tier classification. Higher tiers add redundancy, increasing both CAPEX and staffing requirements.</div>
-                                        <table class="tco-tt-table">
-                                            <tr><th scope="col">Tier</th><th scope="col">Cost Mult / Staff/MW</th></tr>
-                                            <tr><td>Tier II</td><td>0.85x / 3 staff</td></tr>
-                                            <tr><td>Tier III</td><td>1.00x / 5 staff</td></tr>
-                                            <tr><td>Tier IV</td><td>1.35x / 8 staff</td></tr>
-                                        </table>
-                                    </div>
-                                </span>
                             </label>
                             <select class="tco-input-field" id="tcoTier" aria-label="TCO Tier">
                                 <option value="tier-2">Tier II (99.741%)</option>
@@ -2360,41 +2238,14 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                     <!-- Row 3: PUE + Utilization -->
                     <div class="tco-input-row">
                         <div class="tco-input-group">
-                            <label class="tco-input-label">
+                            <label class="tco-input-label" data-explain="pue">
                                 <i class="fas fa-tachometer-alt"></i> PUE Target
-                                <span class="tco-tooltip-trigger" data-tt="pue">?
-                                    <div class="tco-tooltip-content">
-                                        <div class="tco-tt-title"><i class="fas fa-tachometer-alt"></i> PUE Target</div>
-                                        <div class="tco-tt-desc">Power Usage Effectiveness. Ratio of total facility power to IT power. Lower = more efficient = lower power costs.</div>
-                                        <table class="tco-tt-table">
-                                            <tr><th scope="col">Rating</th><th scope="col">PUE Range</th></tr>
-                                            <tr><td>Excellent (DLC)</td><td>1.08-1.15</td></tr>
-                                            <tr><td>Good</td><td>1.15-1.30</td></tr>
-                                            <tr><td>Average</td><td>1.30-1.50</td></tr>
-                                            <tr><td>Poor</td><td>1.50-2.00</td></tr>
-                                        </table>
-                                        <div class="tco-tt-impact">Formula: Total Power = IT Load x PUE</div>
-                                    </div>
-                                </span>
                             </label>
                             <input type="number" class="tco-input-field" id="tcoPue" value="1.3" min="1.1" max="2.0" step="0.05" aria-label="TCO PUE">
                         </div>
                         <div class="tco-input-group">
-                            <label class="tco-input-label">
+                            <label class="tco-input-label" data-explain="utilization">
                                 <i class="fas fa-percentage"></i> Power Utilization %
-                                <span class="tco-tooltip-trigger" data-tt="util">?
-                                    <div class="tco-tooltip-content">
-                                        <div class="tco-tt-title"><i class="fas fa-percentage"></i> Power Utilization</div>
-                                        <div class="tco-tt-desc">Percentage of provisioned IT capacity actually in use. Affects actual power consumption and cost calculations.</div>
-                                        <table class="tco-tt-table">
-                                            <tr><th scope="col">Phase</th><th scope="col">Typical %</th></tr>
-                                            <tr><td>Day 1 (new build)</td><td>30-40%</td></tr>
-                                            <tr><td>Growth phase</td><td>50-70%</td></tr>
-                                            <tr><td>Mature</td><td>70-85%</td></tr>
-                                            <tr><td>Near capacity</td><td>85-95%</td></tr>
-                                        </table>
-                                    </div>
-                                </span>
                             </label>
                             <input type="number" class="tco-input-field" id="tcoUtil" value="70" min="40" max="100" step="5" aria-label="TCO Util">
                         </div>
@@ -2403,21 +2254,8 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                     <!-- Row 4: Cooling + Growth -->
                     <div class="tco-input-row">
                         <div class="tco-input-group">
-                            <label class="tco-input-label">
+                            <label class="tco-input-label" data-explain="cooling-type">
                                 <i class="fas fa-snowflake"></i> Cooling Type
-                                <span class="tco-tooltip-trigger" data-tt="cooling">?
-                                    <div class="tco-tooltip-content">
-                                        <div class="tco-tt-title"><i class="fas fa-snowflake"></i> Cooling Type</div>
-                                        <div class="tco-tt-desc">Cooling architecture affects PUE and construction cost. DLC enables lowest PUE but has highest CAPEX.</div>
-                                        <table class="tco-tt-table">
-                                            <tr><th scope="col">Type</th><th scope="col">Typical PUE</th></tr>
-                                            <tr><td>Air Cooled</td><td>1.40</td></tr>
-                                            <tr><td>Chilled Water</td><td>1.25</td></tr>
-                                            <tr><td>Evaporative</td><td>1.15</td></tr>
-                                            <tr><td>Direct Liquid</td><td>1.08</td></tr>
-                                        </table>
-                                    </div>
-                                </span>
                             </label>
                             <select class="tco-input-field" id="tcoCooling" aria-label="TCO Cooling">
                                 <option value="air">Air Cooled (PUE ~1.40)</option>
@@ -2427,22 +2265,8 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                             </select>
                         </div>
                         <div class="tco-input-group">
-                            <label class="tco-input-label">
+                            <label class="tco-input-label" data-explain="tco-growth-rate">
                                 <i class="fas fa-chart-line"></i> Annual Growth Rate %
-                                <span class="tco-tooltip-trigger" data-tt="growth">?
-                                    <div class="tco-tooltip-content">
-                                        <div class="tco-tt-title"><i class="fas fa-chart-line"></i> Annual Growth Rate</div>
-                                        <div class="tco-tt-desc">Expected year-over-year growth in IT load. Affects future capacity needs and total cost trajectory.</div>
-                                        <table class="tco-tt-table">
-                                            <tr><th scope="col">Scenario</th><th scope="col">Growth %</th></tr>
-                                            <tr><td>Stable</td><td>0-5%</td></tr>
-                                            <tr><td>Moderate</td><td>5-15%</td></tr>
-                                            <tr><td>Aggressive</td><td>15-25%</td></tr>
-                                            <tr><td>Hyper-growth</td><td>25-30%</td></tr>
-                                        </table>
-                                        <div class="tco-tt-impact">Growth compounds colo and cloud costs significantly</div>
-                                    </div>
-                                </span>
                             </label>
                             <input type="number" class="tco-input-field" id="tcoGrowth" value="10" min="0" max="30" step="1" aria-label="TCO Growth">
                         </div>
@@ -2459,40 +2283,14 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
                         <div class="tco-input-row">
                             <div class="tco-input-group">
-                                <label class="tco-input-label">
+                                <label class="tco-input-label" data-explain="tco-land-cost">
                                     <i class="fas fa-map-marker-alt"></i> Land Cost Override ($/sqft)
-                                    <span class="tco-tooltip-trigger" data-tt="land">?
-                                        <div class="tco-tooltip-content">
-                                            <div class="tco-tt-title"><i class="fas fa-map-marker-alt"></i> Land Cost Override</div>
-                                            <div class="tco-tt-desc">Override the default regional land cost. Leave empty to use market data.</div>
-                                            <table class="tco-tt-table">
-                                                <tr><th scope="col">Market</th><th scope="col">$/sqft</th></tr>
-                                                <tr><td>Tokyo</td><td>$150</td></tr>
-                                                <tr><td>Singapore</td><td>$120</td></tr>
-                                                <tr><td>N. Virginia</td><td>$45</td></tr>
-                                                <tr><td>Mumbai</td><td>$10</td></tr>
-                                            </table>
-                                        </div>
-                                    </span>
                                 </label>
                                 <input type="number" class="tco-input-field" id="tcoLandOverride" placeholder="Auto from region" min="0" step="1" aria-label="Auto from region">
                             </div>
                             <div class="tco-input-group">
-                                <label class="tco-input-label">
+                                <label class="tco-input-label" data-explain="tco-power-rate">
                                     <i class="fas fa-plug"></i> Custom Power Rate ($/kWh)
-                                    <span class="tco-tooltip-trigger" data-tt="powerrate">?
-                                        <div class="tco-tooltip-content">
-                                            <div class="tco-tt-title"><i class="fas fa-plug"></i> Custom Power Rate</div>
-                                            <div class="tco-tt-desc">Override the default regional electricity rate. Leave empty to use IEA 2025-2026 data.</div>
-                                            <table class="tco-tt-table">
-                                                <tr><th scope="col">Market</th><th scope="col">$/kWh</th></tr>
-                                                <tr><td>Dallas</td><td>$0.055</td></tr>
-                                                <tr><td>Singapore</td><td>$0.180</td></tr>
-                                                <tr><td>London</td><td>$0.170</td></tr>
-                                                <tr><td>Jakarta</td><td>$0.080</td></tr>
-                                            </table>
-                                        </div>
-                                    </span>
                                 </label>
                                 <input type="number" class="tco-input-field" id="tcoPowerOverride" placeholder="Auto from region" min="0" step="0.001" aria-label="Auto from region">
                             </div>
@@ -2500,38 +2298,14 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
                         <div class="tco-input-row">
                             <div class="tco-input-group">
-                                <label class="tco-input-label">
+                                <label class="tco-input-label" data-explain="tco-staff-count">
                                     <i class="fas fa-users"></i> Staff Count Override
-                                    <span class="tco-tooltip-trigger" data-tt="staff">?
-                                        <div class="tco-tooltip-content">
-                                            <div class="tco-tt-title"><i class="fas fa-users"></i> Staff Count Override</div>
-                                            <div class="tco-tt-desc">Override the auto-calculated staff count. Default is based on tier level and IT load.</div>
-                                            <table class="tco-tt-table">
-                                                <tr><th scope="col">Tier</th><th scope="col">Staff per MW</th></tr>
-                                                <tr><td>Tier II</td><td>3</td></tr>
-                                                <tr><td>Tier III</td><td>5</td></tr>
-                                                <tr><td>Tier IV</td><td>8</td></tr>
-                                            </table>
-                                        </div>
-                                    </span>
                                 </label>
                                 <input type="number" class="tco-input-field" id="tcoStaffOverride" placeholder="Auto from tier" min="1" step="1" aria-label="Auto from tier">
                             </div>
                             <div class="tco-input-group">
-                                <label class="tco-input-label">
+                                <label class="tco-input-label" data-explain="escalation">
                                     <i class="fas fa-arrow-trend-up"></i> Colo Escalation %/yr
-                                    <span class="tco-tooltip-trigger" data-tt="coloesc">?
-                                        <div class="tco-tooltip-content">
-                                            <div class="tco-tt-title"><i class="fas fa-arrow-trend-up"></i> Colo Lease Escalation</div>
-                                            <div class="tco-tt-desc">Annual percentage increase in colocation lease rates. Market standard is 3% but varies by contract.</div>
-                                            <table class="tco-tt-table">
-                                                <tr><th scope="col">Scenario</th><th scope="col">Rate</th></tr>
-                                                <tr><td>Favorable</td><td>1-2%</td></tr>
-                                                <tr><td>Market Standard</td><td>3%</td></tr>
-                                                <tr><td>Tight Market</td><td>4-5%</td></tr>
-                                            </table>
-                                        </div>
-                                    </span>
                                 </label>
                                 <input type="number" class="tco-input-field" id="tcoColoEsc" value="3" min="0" max="10" step="0.5" aria-label="TCO Colo Esc">
                             </div>
@@ -2539,38 +2313,14 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
                         <div class="tco-input-row">
                             <div class="tco-input-group">
-                                <label class="tco-input-label">
+                                <label class="tco-input-label" data-explain="tco-cloud-discount">
                                     <i class="fas fa-cloud"></i> Cloud Discount %
-                                    <span class="tco-tooltip-trigger" data-tt="clouddsc">?
-                                        <div class="tco-tooltip-content">
-                                            <div class="tco-tt-title"><i class="fas fa-cloud"></i> Cloud Committed Use Discount</div>
-                                            <div class="tco-tt-desc">Discount from on-demand cloud pricing via committed use agreements (1-year or 3-year reservations).</div>
-                                            <table class="tco-tt-table">
-                                                <tr><th scope="col">Commitment</th><th scope="col">Discount</th></tr>
-                                                <tr><td>On-demand</td><td>0%</td></tr>
-                                                <tr><td>1-year reserved</td><td>30%</td></tr>
-                                                <tr><td>3-year reserved</td><td>50%</td></tr>
-                                            </table>
-                                        </div>
-                                    </span>
                                 </label>
                                 <input type="number" class="tco-input-field" id="tcoCloudDiscount" value="30" min="0" max="60" step="5" aria-label="TCO Cloud Discount">
                             </div>
                             <div class="tco-input-group">
-                                <label class="tco-input-label">
+                                <label class="tco-input-label" data-explain="debt-ratio-leverage">
                                     <i class="fas fa-university"></i> Debt/Equity Ratio %
-                                    <span class="tco-tooltip-trigger" data-tt="wacc">?
-                                        <div class="tco-tooltip-content">
-                                            <div class="tco-tt-title"><i class="fas fa-university"></i> Debt/Equity Ratio (WACC)</div>
-                                            <div class="tco-tt-desc">Proportion of debt financing for build scenario. Higher debt ratio lowers WACC but increases financial risk.</div>
-                                            <table class="tco-tt-table">
-                                                <tr><th scope="col">Strategy</th><th scope="col">D/E Ratio</th></tr>
-                                                <tr><td>Conservative</td><td>30-40%</td></tr>
-                                                <tr><td>Balanced</td><td>50-60%</td></tr>
-                                                <tr><td>Leveraged</td><td>70-80%</td></tr>
-                                            </table>
-                                        </div>
-                                    </span>
                                 </label>
                                 <input type="number" class="tco-input-field" id="tcoDebtEquity" value="60" min="0" max="100" step="5" aria-label="TCO Debt Equity">
                             </div>
@@ -4560,37 +4310,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
         }
         window.exportPDF = exportPDF;
 
-        /* ─────────── TOOLTIP SYSTEM ─────────── */
-        (function initTooltips() {
-            var container = el('tco-tooltip-container');
-            var triggers = document.querySelectorAll('.tco-tooltip-trigger');
-
-            triggers.forEach(function(trigger) {
-                var content = trigger.querySelector('.tco-tooltip-content');
-                if (!content) return;
-
-                trigger.addEventListener('mouseenter', function(e) {
-                    container.innerHTML = content.innerHTML;
-                    container.classList.add('visible');
-
-                    var rect = trigger.getBoundingClientRect();
-                    var tt = container.getBoundingClientRect();
-                    var top = rect.bottom + 8;
-                    var left = rect.left - tt.width / 2 + rect.width / 2;
-
-                    if (top + tt.height > window.innerHeight) top = rect.top - tt.height - 8;
-                    if (left < 8) left = 8;
-                    if (left + tt.width > window.innerWidth - 8) left = window.innerWidth - tt.width - 8;
-
-                    container.style.top = top + 'px';
-                    container.style.left = left + 'px';
-                });
-
-                trigger.addEventListener('mouseleave', function() {
-                    container.classList.remove('visible');
-                });
-            });
-        })();
+        /* legacy initTooltips removed v1.59.x — RZExplain (js/rz-explain.js) owns all tooltips */
 
         /* ─────────── AUTH ─────────── */
         // Check session on load

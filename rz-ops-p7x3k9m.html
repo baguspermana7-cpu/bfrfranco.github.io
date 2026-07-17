@@ -400,9 +400,7 @@
         .dc-chart-actions{position:absolute;top:4px;right:4px;display:flex;gap:2px;opacity:0;transition:opacity 0.2s}
         .dc-chart-btn{background:rgba(15,23,42,0.7);border:1px solid var(--fs-bd);color:var(--fs-t3);cursor:pointer;padding:3px 6px;border-radius:4px;font-size:0.6rem;transition:all 0.15s}
         .dc-chart-btn:hover{background:rgba(139,92,246,0.2);color:var(--fs-acc2);border-color:var(--fs-acc)}
-        .dc-kpi-tooltip{position:relative;cursor:help}
-        .dc-kpi-tooltip:hover .dc-tooltip-text{opacity:1;visibility:visible;transform:translateY(0)}
-        .dc-tooltip-text{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);background:var(--fs-bg3);border:1px solid var(--fs-bd);border-radius:8px;padding:8px 12px;font-size:0.68rem;color:var(--fs-t3);white-space:nowrap;opacity:0;visibility:hidden;transition:all 0.2s;z-index:50;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+        /* legacy .dc-kpi-tooltip CSS removed — RZExplain (js/rz-explain.js) owns tooltips */
         .dc-skeleton{background:linear-gradient(90deg,var(--fs-bg2) 25%,var(--fs-bd) 50%,var(--fs-bg2) 75%);background-size:200% 100%;animation:dcSkeleton 1.5s infinite;border-radius:8px}
         @keyframes dcSkeleton{0%{background-position:200% 0}100%{background-position:-200% 0}}
         .dc-new-badge{display:inline-block;background:rgba(52,211,153,0.2);color:var(--fs-grn);font-size:0.5rem;padding:1px 5px;border-radius:3px;font-weight:800;letter-spacing:0.5px;vertical-align:middle;margin-left:4px;animation:dcPulse 2s infinite}
@@ -547,7 +545,6 @@
         body.light-mode .bench-table td{color:#334155;border-color:#f1f5f9}
         body.light-mode .dc-chart-btn{background:rgba(255,255,255,0.8);border-color:#e2e8f0;color:#64748b}
         body.light-mode .dc-chart-btn:hover{background:rgba(139,92,246,0.1);color:#7c3aed}
-        body.light-mode .dc-tooltip-text{background:#fff;border-color:#e2e8f0;color:#334155;box-shadow:0 4px 12px rgba(0,0,0,0.08)}
         body.light-mode .dc-new-badge{background:rgba(16,185,129,0.12);color:#059669}
         body.light-mode .tl-item{border-color:#e2e8f0}
         body.light-mode .tl-item::before{border-color:#fff}
@@ -714,6 +711,8 @@
         body.light-mode #dcGlobalMap{background:#f8fafc}
     </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-07-17" defer></script>
+    <script src="js/rz-explain.js?v=2026-07-17" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
     <script src="js/rz-feature-flags.js?v=2026-05-14" defer></script>
@@ -1159,7 +1158,7 @@
     </div>
 
     <!-- KPI Summary Row -->
-    <div class="bench-grid" id="benchKpis" style="gap:0.6rem;margin-bottom:1rem"></div>
+    <div class="bench-grid" id="benchKpis" data-explain-scan style="gap:0.6rem;margin-bottom:1rem"></div>
 
     <!-- Sub-tabs -->
     <div class="bench-tabs">
@@ -3975,15 +3974,16 @@ function renderBenchKpis(){
     const avgPUE=(DC_OPERATORS.reduce((s,o)=>s+o.pue,0)/DC_OPERATORS.length).toFixed(2);
     const avgRenew=Math.round(DC_OPERATORS.reduce((s,o)=>s+o.renewablePercent,0)/DC_OPERATORS.length);
     document.getElementById('benchKpis').innerHTML=[
-        {label:'Total Installed Capacity',val:DC_SUMMARY.totalInstalledGW+' GW',sub:'Synergy Research Q1 2025',cls:'purple',icon:'fa-bolt',tip:'Global data center IT load capacity as reported by Synergy Research Group'},
-        {label:'Tracked Operators',val:DC_OPERATORS.length,sub:(totalOpMW/1000).toFixed(1)+' GW combined capacity',cls:'blue',icon:'fa-building',tip:'Number of DC operators tracked in this intelligence database'},
-        {label:'Countries Tracked',val:DC_COUNTRIES.length,sub:(totalCountryMW/1000).toFixed(1)+' GW mapped',cls:'green',icon:'fa-globe-americas',tip:'Countries with tracked DC capacity across Americas, EMEA, and APAC'},
-        {label:'Hyperscale DCs',val:DC_SUMMARY.hyperscaleDCs.toLocaleString(),sub:Math.round(DC_SUMMARY.hyperscaleShare*100)+'% of global capacity',cls:'amber',icon:'fa-cloud',tip:'Hyperscale facilities (>5000 servers) as counted by Synergy Research'},
-        {label:'Fastest Growing',val:topGrowth.country,sub:topGrowth.growth+'% YoY growth',cls:'cyan',icon:'fa-chart-line',tip:'Country with highest year-over-year capacity growth rate'},
-        {label:'2030 Projection',val:DC_SUMMARY.projected2030GW+' GW',sub:'$'+DC_SUMMARY.investmentRequired2030T+'T investment needed',cls:'red',icon:'fa-rocket',tip:'Projected global DC capacity by 2030 per JLL and Synergy forecasts'},
-        {label:'Avg PUE',val:avgPUE,sub:'Industry benchmark: 1.58',cls:avgPUE<=1.3?'green':'amber',icon:'fa-leaf',tip:'Average Power Usage Effectiveness across tracked operators (lower = better)'},
-        {label:'Avg Renewable',val:avgRenew+'%',sub:'Operator-reported claims',cls:avgRenew>=60?'green':'amber',icon:'fa-solar-panel',tip:'Average renewable energy percentage claimed by tracked operators'}
-    ].map(k=>`<div class="bench-card ${k.cls} dc-kpi-tooltip"><div class="dc-tooltip-text">${k.tip}</div><div class="bench-label"><i class="fas ${k.icon}" style="margin-right:4px"></i>${k.label}</div><div class="bench-val">${k.val}</div><div class="bench-sub">${k.sub}</div></div>`).join('');
+        {label:'Total Installed Capacity',val:DC_SUMMARY.totalInstalledGW+' GW',sub:'Synergy Research Q1 2025',cls:'purple',icon:'fa-bolt',ek:'ops-installed-capacity'},
+        {label:'Tracked Operators',val:DC_OPERATORS.length,sub:(totalOpMW/1000).toFixed(1)+' GW combined capacity',cls:'blue',icon:'fa-building',ek:'ops-tracked-operators'},
+        {label:'Countries Tracked',val:DC_COUNTRIES.length,sub:(totalCountryMW/1000).toFixed(1)+' GW mapped',cls:'green',icon:'fa-globe-americas',ek:'ops-countries-tracked'},
+        {label:'Hyperscale DCs',val:DC_SUMMARY.hyperscaleDCs.toLocaleString(),sub:Math.round(DC_SUMMARY.hyperscaleShare*100)+'% of global capacity',cls:'amber',icon:'fa-cloud',ek:'hyperscale'},
+        {label:'Fastest Growing',val:topGrowth.country,sub:topGrowth.growth+'% YoY growth',cls:'cyan',icon:'fa-chart-line',ek:'ops-fastest-growing'},
+        {label:'2030 Projection',val:DC_SUMMARY.projected2030GW+' GW',sub:'$'+DC_SUMMARY.investmentRequired2030T+'T investment needed',cls:'red',icon:'fa-rocket',ek:'ops-2030-projection'},
+        {label:'Avg PUE',val:avgPUE,sub:'Industry benchmark: 1.58',cls:avgPUE<=1.3?'green':'amber',icon:'fa-leaf',ek:'pue'},
+        {label:'Avg Renewable',val:avgRenew+'%',sub:'Operator-reported claims',cls:avgRenew>=60?'green':'amber',icon:'fa-solar-panel',ek:'ops-renewable-share'}
+    ].map(k=>`<div class="bench-card ${k.cls}"><div class="bench-label" data-explain="${k.ek}"><i class="fas ${k.icon}" style="margin-right:4px"></i>${k.label}</div><div class="bench-val">${k.val}</div><div class="bench-sub">${k.sub}</div></div>`).join('');
+    if(window.RZExplain&&window.RZExplain.attachExplicit)window.RZExplain.attachExplicit(document.getElementById('benchKpis'));
 }
 
 function renderBenchOverview(){
