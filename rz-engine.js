@@ -525,6 +525,22 @@
                 { min: 0,  grade: 'E', label: 'Challenged' }
             ]
         },
+        /* ══ v2.4.0 — DATA.commissioning: Operational Readiness Index (Layer 7).
+         * Weighted commissioning-level completion → readiness %. Levels follow the
+         * standard DC Cx sequence (L1 factory → L5 integrated systems test) + IST/
+         * SAT/FAT + punchlist burndown. ══ */
+        commissioning: {
+            /* Cx category weights (sum = 1). Integrated system test (L5) + IST
+             * dominate operational readiness. */
+            weights: { L1: 0.05, L2: 0.08, L3: 0.12, L4: 0.15, L5: 0.22, ist: 0.18, sat: 0.08, fat: 0.07, punchlist: 0.05 },
+            labels: { L1: 'L1 Factory', L2: 'L2 Component', L3: 'L3 System', L4: 'L4 Subsystem', L5: 'L5 Integrated Systems Test', ist: 'Integrated Systems Test', sat: 'Site Acceptance', fat: 'Factory Acceptance', punchlist: 'Punchlist burndown' },
+            /* Readiness thresholds → status. */
+            statusBands: [
+                { min: 95, status: 'Ready', label: 'Operationally ready' },
+                { min: 80, status: 'Conditional', label: 'Conditionally ready — open items' },
+                { min: 0,  status: 'Not Ready', label: 'Not ready' }
+            ]
+        },
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
@@ -572,7 +588,8 @@
             'workforceParams':        { source: 'Engine model tuning', asOf: '2026' },
             'hoursPerYear':           { source: 'Calendar constant (non-leap)', asOf: 'const', unit: 'h/yr' },
             'reliability':            { source: 'IEEE 493 (Gold Book) typical component MTBF/MTTR + Uptime Institute Tier Standard availability targets', asOf: '2026', unit: 'hours (MTBF/MTTR) + availability fraction', method: 'screening-grade RAM inputs; NOT a certified reliability/FMEA study' },
-            'site':                   { source: 'DC site-selection factor weighting (power + grid + seismic + talent + tax + carbon + flood + latency + water) — engine heuristic informed by 451/CBRE/Uptime site-selection criteria', asOf: '2026', unit: 'weights (fraction, sum=1) + grade bands', method: 'transparent weighted-factor screen; factor inputs are caller-supplied 0-1 goodness scores' }
+            'site':                   { source: 'DC site-selection factor weighting (power + grid + seismic + talent + tax + carbon + flood + latency + water) — engine heuristic informed by 451/CBRE/Uptime site-selection criteria', asOf: '2026', unit: 'weights (fraction, sum=1) + grade bands', method: 'transparent weighted-factor screen; factor inputs are caller-supplied 0-1 goodness scores' },
+            'commissioning':          { source: 'Standard DC commissioning sequence (ASHRAE Guideline 0 / BCxA + Uptime Cx) — L1–L5 levels + IST/SAT/FAT + punchlist; weights are an engine readiness heuristic', asOf: '2026', unit: 'weights (fraction, sum=1) + readiness %', method: 'weighted completion index; NOT a Cx authority sign-off' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.
@@ -2148,6 +2165,38 @@
                     var score = present > 0 ? +(100 * weighted / present).toFixed(1) : 0;
                     var g = RZEngine.models.site.grade(score);
                     return { score: score, grade: g.grade, label: g.label, breakdown: breakdown, missing: missing, coverage: +present.toFixed(3) };
+                }
+            },
+
+            /* ── v2.4.0: commissioning readiness model — Layer 7 ── */
+            commissioning: {
+                /** Readiness status for a 0-100 index. */
+                status: function (index) {
+                    var bands = DATA.commissioning.statusBands;
+                    for (var i = 0; i < bands.length; i++) {
+                        if (index >= bands[i].min) return { status: bands[i].status, label: bands[i].label };
+                    }
+                    return { status: 'Not Ready', label: bands[bands.length - 1].label };
+                },
+                /** Operational Readiness Index from per-category completion (0-1 each,
+                 *  1 = complete). Weights renormalize over supplied categories. Returns
+                 *  index 0-100, status, per-category breakdown, and open categories. */
+                readinessIndex: function (completion) {
+                    completion = completion || {};
+                    var W = DATA.commissioning.weights, L = DATA.commissioning.labels;
+                    var breakdown = [], present = 0, weighted = 0, open = [];
+                    for (var k in W) {
+                        if (!W.hasOwnProperty(k)) continue;
+                        var v = completion[k];
+                        if (v == null || isNaN(v)) { open.push(k); continue; }
+                        var val = Math.max(0, Math.min(1, v));
+                        present += W[k]; weighted += W[k] * val;
+                        if (val < 1) open.push(k);
+                        breakdown.push({ key: k, label: L[k], weight: W[k], completion: +val.toFixed(3) });
+                    }
+                    var index = present > 0 ? +(100 * weighted / present).toFixed(1) : 0;
+                    var s = RZEngine.models.commissioning.status(index);
+                    return { index: index, status: s.status, label: s.label, breakdown: breakdown, open: open, coverage: +present.toFixed(3) };
                 }
             }
         },

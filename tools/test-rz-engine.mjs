@@ -263,6 +263,25 @@ near('pue.dcie(1.5)', M.pue.dcie(1.5), 0.6667, 0.001);
     near('site.weights sum = 1', wsum, 1, 1e-9);
 }
 {
+    /* ── commissioning readiness model — Layer 7 ── */
+    const C = E.models.commissioning;
+    const all = {}; for (const k in D.commissioning.weights) all[k] = 1;
+    const full = C.readinessIndex(all);
+    near('commissioning full = 100', full.index, 100, 1e-6);
+    eq('commissioning full status Ready', full.status, 'Ready');
+    eq('commissioning full no open', full.open.length, 0);
+    const none = {}; for (const k in D.commissioning.weights) none[k] = 0;
+    near('commissioning zero = 0', C.readinessIndex(none).index, 0, 1e-6);
+    eq('commissioning zero Not Ready', C.readinessIndex(none).status, 'Not Ready');
+    // partial: L5 half done alone → 50, and status band mapping
+    near('commissioning {L5:0.5} = 50', C.readinessIndex({ L5: 0.5 }).index, 50, 1e-6);
+    eq('commissioning.status 96 = Ready', C.status(96).status, 'Ready');
+    eq('commissioning.status 85 = Conditional', C.status(85).status, 'Conditional');
+    ok('commissioning open lists incomplete', C.readinessIndex({ L5: 0.9, ist: 1 }).open.includes('L5'));
+    let cwsum = 0; for (const k in D.commissioning.weights) cwsum += D.commissioning.weights[k];
+    near('commissioning.weights sum = 1', cwsum, 1, 1e-9);
+}
+{
     const svg = E.charts.histogram([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     ok('charts.histogram returns <svg>', typeof svg === 'string' && svg.indexOf('<svg') === 0 && svg.indexOf('<rect') > 0);
     const tor = E.charts.tornado(M.sim.tornado(inp => inp.x, { x: 1 }, { x: { lo: 0, hi: 2 } }));

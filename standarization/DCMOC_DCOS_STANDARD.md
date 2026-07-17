@@ -123,6 +123,12 @@ local math before its engine parity passes.
   water + grade bands A–E) + `DATA.sources['site']`. `test-rz-engine.mjs` 193/0
   green. DCMOC Site Intelligence rollup (from tax/disaster/grid/talent/compliance)
   = next increment.
+- **Commissioning (Layer 7)** — SHIPPED engine-side: `RZEngine.models.commissioning`
+  (`readinessIndex(completion)` weighted L1–L5 + IST/SAT/FAT + punchlist 0-1
+  completion → 0-100 Operational Readiness Index + status Ready/Conditional/Not
+  Ready + open-item list + renormalized coverage; `status(index)`) + `DATA.commissioning`
+  (weights sum=1, labels, status bands) + `DATA.sources['commissioning']`.
+  `test-rz-engine.mjs` 203/0 green.
 
 ## Status (2026-07-17)
 - Bridge (§2): DONE (parallel session, f7a12cc7). REUSED.
