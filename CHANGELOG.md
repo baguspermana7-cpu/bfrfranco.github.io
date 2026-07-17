@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.64.2 — 2026-07-18 (DCMOC: Strategic Planning acquisition OPEX → engine)
+
+### Changed
+- `StrategicPlanningDashboard` acquisition ROI now derives annual OPEX from `models.opex.totalAnnual` (engine-real, country + PUE aware) instead of a flat 8%-of-CAPEX heuristic — with a graceful fallback to the heuristic when the engine is unavailable. Backend `/calc` redeployed with the v1.64 rich models live.
+
+---
+
 ## v1.64.1 — 2026-07-18 (DCMOC: Platform surfaces made real, engine-backed)
 
 ### Added

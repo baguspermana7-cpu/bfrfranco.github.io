@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { getPUE } from '@/constants/pue';
+import { rzModels } from '@/lib/rz-engine';
 import { fmtMoney, fmtUnit } from '@/lib/format';
 import { Tooltip } from '@/components/ui/Tooltip';
 import {
@@ -135,11 +136,21 @@ export default function StrategicPlanningDashboard() {
         const fairValue = avgComp;
         const premiumPct = ((acquisition.targetSiteDollarPerMW - fairValue) / fairValue) * 100;
 
-        // ROI horizon: assume DC revenue at $150/kW-month colocation rate
+        // ROI horizon: DC revenue at $150/kW-month colocation rate (illustrative)
         const itCapacityKW = 5000; // typical 5MW site
         const annualRevenue = itCapacityKW * 150 * 12;
         const totalInvestment = acquisition.targetSiteDollarPerMW * (itCapacityKW / 1000);
-        const opexEstimate = totalInvestment * 0.08; // 8% of CAPEX annual OPEX
+        // Engine-real annual OPEX (models.opex) for the 5 MW site; falls back to an
+        // 8%-of-CAPEX heuristic if the engine is unavailable (SSR / not loaded).
+        const sitePue = getPUE(inputs.coolingType);
+        let opexEstimate = totalInvestment * 0.08;
+        try {
+            const om = rzModels().opex;
+            if (om?.totalAnnual) {
+                const r = om.totalAnnual(itCapacityKW / 1000, sitePue, selectedCountry?.id || 'US', 15);
+                opexEstimate = typeof r === 'number' ? r : (r?.total ?? opexEstimate);
+            }
+        } catch { /* fallback heuristic */ }
         const annualNOI = annualRevenue - opexEstimate;
         const simpleROIYears = totalInvestment / annualNOI;
         const capRate = (annualNOI / totalInvestment) * 100;
@@ -156,7 +167,7 @@ export default function StrategicPlanningDashboard() {
             annualNOI,
             totalInvestment,
         };
-    }, [acquisition]);
+    }, [acquisition, inputs.coolingType, selectedCountry]);
 
     // --- Expansion Calculations ---
     const expansionResults = useMemo(() => {
