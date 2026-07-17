@@ -45,18 +45,21 @@ export const MODULE_SOURCES: Record<NavId, ModuleSource> = {
         status: 'partial',
     },
 
+    // ── engine-sourced financial core (via the shared calculateIRR/calculateFinancials
+    //    → RZEngine.models.roi) + domain-specific detail still local ──────────────
+    invest: { engine: 'RZEngine', fn: 'models.roi.irr (levered)', label: 'Investment — levered equity IRR/NPV computed by the shared RZEngine (models.roi); debt schedule & exit-multiple logic local. Not investment advice.', status: 'partial' },
+    montecarlo: { engine: 'RZEngine', fn: 'models.roi (per-trial NPV/IRR)', label: 'Monte Carlo — each trial’s NPV/IRR is computed by the shared RZEngine (models.roi via calculateFinancials); the stochastic sampler is local (promotion to models.sim.monteCarlo scheduled).', status: 'partial' },
+    portfolio: { engine: 'RZEngine', fn: 'models.roi', label: 'Portfolio — aggregates engine-sourced (RZEngine.models.roi) per-project financials.', status: 'partial' },
+    'phased-finance': { engine: 'RZEngine', fn: 'models.roi', label: 'Phased Finance — phased NPV/IRR computed by the shared RZEngine (models.roi).', status: 'partial' },
+    benchmark: { engine: 'RZEngine', fn: 'models.roi / data.markets', label: 'Benchmarks — financial metrics via RZEngine.models.roi; market data via RZEngine.data.markets (fuller market wiring scheduled).', status: 'partial' },
+    tax: { engine: 'RZEngine', fn: 'models.roi (after-tax cashflows)', label: 'Tax & Incentives — after-tax NPV/IRR via the shared RZEngine (models.roi); the incentive rule-set is local (promotion to models.tax scheduled).', status: 'partial' },
+
     // ── not yet wired (scheduled — see plan phases) ───────────────────────────
     sim: { engine: null, fn: '—', label: 'Staff Model Config — master inputs; staffing math scheduled to source from RZEngine.models.workforce.', status: 'local' },
     staff: { engine: null, fn: 'models.workforce.*', label: 'Staffing — scheduled to source from RZEngine.models.workforce (hiringPlan / attritionCost).', status: 'local' },
     maint: { engine: null, fn: 'models.maintenance.*', label: 'Maintenance — scheduled to source from a promoted RZEngine.models.maintenance.', status: 'local' },
     risk: { engine: null, fn: 'models.risk.geo', label: 'Risk Analysis — scheduled to source from a promoted RZEngine.models.risk (geo rules).', status: 'local' },
-    invest: { engine: 'RZEngine+FINEngine', fn: 'FINEngine.models.valueGate + RZEngine.models.roi.irr', label: 'Investment — scheduled to source from FINEngine.models.valueGate + RZEngine.models.roi (levered). Educational analysis, not investment advice.', status: 'local' },
-    benchmark: { engine: null, fn: 'models.market.*', label: 'Benchmarks — scheduled to source from RZEngine.models.market + data.markets.', status: 'local' },
-    montecarlo: { engine: null, fn: 'models.sim.monteCarlo', label: 'Monte Carlo — scheduled to source from RZEngine.models.sim.monteCarlo (shared PRNG + distributions).', status: 'local' },
-    portfolio: { engine: null, fn: '—', label: 'Portfolio — scheduled to aggregate engine-sourced scenario results.', status: 'local' },
     capacity: { engine: null, fn: 'models.capacity.plan', label: 'Capacity Plan — scheduled to source from a promoted RZEngine.models.capacity.', status: 'local' },
-    'phased-finance': { engine: null, fn: 'models.roi.*', label: 'Phased Finance — scheduled to source from RZEngine.models.roi (phased drawdown).', status: 'local' },
-    tax: { engine: null, fn: 'models.tax.incentives', label: 'Tax & Incentives — scheduled to source from a promoted RZEngine.models.tax.', status: 'local' },
     disaster: { engine: null, fn: 'models.risk.geo', label: 'Disaster Risk — scheduled to source from a promoted RZEngine.models.risk (geo/seismic/flood).', status: 'local' },
     grid: { engine: null, fn: 'models.grid.reliability', label: 'Grid Reliability — scheduled to source from a promoted RZEngine.models.grid.', status: 'local' },
     talent: { engine: null, fn: '—', label: 'Talent Index — scheduled to source from RZEngine.data (labor/talent factors).', status: 'local' },
