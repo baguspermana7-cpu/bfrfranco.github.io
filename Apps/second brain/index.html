@@ -657,7 +657,9 @@ const RAW=[
   {id:'ccx',   label:'CX Calculator',   group:'calculators',url:'cx-calculator.html',   desc:'Customer experience and SLA cost impact.',tags:['cx','sla'],path:'rz-work/cx-calculator.html'},
 
   /* ─ SUPER ENGINE & PLANS (added 2026-04-28) ─ */
-  {id:'rzeng', label:'RZEngine v1.2.0',  group:'core',     url:'rz-engine.js',                          desc:'Super Engine — shared data, math models, plumbing, UI primitives. v1.2.0, 35 KB.',tags:['engine','core','shared'],path:'rz-work/rz-engine.js'},
+  {id:'rzeng', label:'RZEngine v2.4.0',  group:'core',     url:'rz-engine.js',                          desc:'Super Engine — shared DATA + 27 math-model namespaces incl DC-OS Layer engines (requirements/site/architecture/construction/commissioning/asset/reliability) + Group-2 (maintenance/fuel/capacity/grid/tax/risk/compliance). Provenance-sourced, gate 299/0.',tags:['engine','core','shared','dc-os'],path:'rz-work/rz-engine.js'},
+  {id:'fineng',label:'FIN Engine',       group:'core',     url:'fin-engine.js',                         desc:'Finance sibling — ratios/valuation/technical(ta.js parity)/score/alphas/valueGate/committee/portfolio. Educational, not advice.',tags:['engine','finance','core'],path:'rz-work/fin-engine.js'},
+  {id:'calcbe',label:'Calc Backend /calc',group:'apps',    url:'cf-worker/src/calc.js',                 desc:'Cloudflare Worker server-side DC-OS engine — runs RZEngine math server-side (anti-theft), allow-listed dispatch + JWT gate + audit.',tags:['backend','worker','security'],path:'rz-work/cf-worker/src/calc.js'},
   {id:'sse',   label:'Super Engine Doc', group:'standards',url:'standarization/SUPER_ENGINE.md',         desc:'Master architectural design for window.RZEngine.',tags:['architecture','engine','plan'],path:'rz-work/standarization/SUPER_ENGINE.md'},
   {id:'scep',  label:'Calc Engine Plan', group:'standards',url:'standarization/CALC_ENGINE_PLAN.md',     desc:'Plumbing roadmap (auth/modal/PDF/charts).',tags:['plan','engine'],path:'rz-work/standarization/CALC_ENGINE_PLAN.md'},
   {id:'scmp',  label:'Calc Models Plan', group:'standards',url:'standarization/CALC_MODELS_PLAN.md',     desc:'Math roadmap (workforce/capex/opex/roi/tco/pue).',tags:['plan','engine'],path:'rz-work/standarization/CALC_MODELS_PLAN.md'},
@@ -706,7 +708,7 @@ const RAW=[
   {id:'asb',   label:'Second Brain',     group:'apps',url:'Apps/second brain/index.html',    desc:'This knowledge graph — maps the full ResistanceZero ecosystem.',tags:['knowledge','graph','meta'],path:'rz-work/Apps/second brain/index.html'},
   {id:'adca',  label:'DCA App',          group:'apps',url:'Apps/dca-app/index.html',         desc:'Dollar Cost Averaging calculator for systematic investment.',tags:['dca','investment'],path:'rz-work/Apps/dca-app/index.html'},
   {id:'ademo', label:'Dunia Emosi',      group:'apps',url:'https://dunia-emosi.vercel.app/',  desc:'Educational emotion game for kids aged 5-10. 18+ game modules. "Dreamy Meadow" purple. Now lives in dedicated repo baguspermana7-cpu/Dunia-Emosi.',tags:['kids','game','education'],path:'rz-work/Dunia-Emosi/index.html'},
-  {id:'dcmoc', label:'DC MOC App',       group:'apps',url:'dcmoc/',                          desc:'Next.js 16 Management Operations Center. React 19, TypeScript, Tailwind, Zustand.',tags:['nextjs','react','ops'],path:'rz-work/dcmoc/'},
+  {id:'dcmoc', label:'DC-OS Platform',   group:'apps',url:'dcmoc/',                          desc:'Data Center Intelligence Platform (DC-OS) — Next.js 16, 13-engine lifecycle (Requirements→AI Decision), Layer-0 orchestrator, Layer-13 AI decision, executive dashboard, per-engine PDF. Every figure engine-sourced from RZEngine (not hardcoded).',tags:['nextjs','react','dc-os','platform'],path:'rz-work/dcmoc/'},
   {id:'astock',label:'Stock Screener',   group:'apps',url:'Apps/stock_screener/',            desc:'Stock analysis and screening tool.',tags:['stocks','finance'],path:'rz-work/Apps/stock_screener/'},
 
   /* ─ STANDARDS ─ */
@@ -906,6 +908,8 @@ const E=[
   ['rzeng','a26'],['rzeng','a27'],['rzeng','a24'],
   ['rzeng','dcmoc'],['rzeng','idx'],
   ['rzeng','sse'],['rzeng','scep'],['rzeng','scmp'],
+  /* DC-OS engine + FIN engine + server-side calc backend */
+  ['rzeng','dcmoc'],['fineng','rzeng'],['fineng','dcmoc'],['calcbe','rzeng'],['calcbe','dcmoc'],['calcbe','fineng'],['astock','fineng'],
   ['sse','scep'],['sse','scmp'],['sse','rzstd'],['sse','idx'],
   /* Article 27 — workforce-adjacent */
   ['a27','arts'],['a27','geo'],['a27','rzeng'],['a27','glos'],
