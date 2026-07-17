@@ -654,6 +654,22 @@
                 ]
             }
         },
+        /* ══ v2.4.0 — DATA.gridReliability: utility-grid reliability bands (Group-2
+         * promotion from DCMOC GridReliabilityEngine). Uptime → outage hours + a
+         * 0-1 grid score that feeds Site Intelligence (Layer 2). ══ */
+        gridReliability: {
+            /* Uptime% → qualitative band (SAIDI-informed). */
+            bands: [
+                { minUptime: 99.99, label: 'Excellent' },
+                { minUptime: 99.9,  label: 'Strong' },
+                { minUptime: 99.5,  label: 'Fair' },
+                { minUptime: 98.0,  label: 'Weak' },
+                { minUptime: 0,     label: 'Poor' }
+            ],
+            /* Reference uptime% mapped to a 0-1 grid goodness score (99.99%→1, 98%→0). */
+            scoreFloorUptime: 98.0,
+            scoreCeilUptime: 99.99
+        },
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
@@ -709,7 +725,8 @@
             'architecture':           { source: 'Canonical DC design disciplines (electrical/mechanical/cooling/fire/security/network/building/structural/BMS) + relative design-complexity multipliers by cooling/tier/redundancy — engine heuristic', asOf: '2026', unit: 'discipline list + complexity multipliers → 0-100 index', method: 'normalized complexity screen; NOT a design deliverable' },
             'maintenance':            { source: 'DC O&M strategy economics — reactive/planned/predictive failure + downtime multipliers + in-house/hybrid/vendor labor blend; lifted from DCMOC MaintenanceStrategyEngine (RCM/CBM industry conventions)', asOf: '2026', unit: 'multipliers + minutes + $/part', method: 'screening O&M cost model; NOT a vendor quote' },
             'fuelGen':                { source: 'EPA Tier 4 Final diesel genset fuel rate (~0.27 L/kWh @ 75%) + Uptime backup-autonomy hours by tier (48/72/96h); lifted from DCMOC FuelGenEngine', asOf: '2026', unit: 'L/kWh + hours + $/L', method: 'screening sizing; NOT a genset selection' },
-            'capacity':               { source: 'Multi-phase DC build-out templates (small/medium/large) + occupancy ramp; lifted from DCMOC CapacityPlanningEngine', asOf: '2026', unit: 'kW per phase + months + occupancy fraction', method: 'planning templates; adjust per project' }
+            'capacity':               { source: 'Multi-phase DC build-out templates (small/medium/large) + occupancy ramp; lifted from DCMOC CapacityPlanningEngine', asOf: '2026', unit: 'kW per phase + months + occupancy fraction', method: 'planning templates; adjust per project' },
+            'gridReliability':        { source: 'Utility grid reliability bands (SAIDI-informed uptime tiers) + 0-1 grid score mapping; lifted from DCMOC GridReliabilityEngine — per-country uptime stays in the country profiles', asOf: '2026', unit: 'uptime % + outage hours + 0-1 score', method: 'screening; NOT a utility interconnection study' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.
@@ -2550,6 +2567,28 @@
                     var r = ramp && ramp.length ? ramp : DATA.capacity.defaultRamp;
                     if (year < 0) return 0;
                     return year < r.length ? r[year] : r[r.length - 1];
+                }
+            },
+
+            /* ── v2.4.0: grid reliability model — Group-2 promotion ── */
+            grid: {
+                /** Qualitative band label for a grid uptime %. */
+                band: function (uptimePct) {
+                    var b = DATA.gridReliability.bands;
+                    for (var i = 0; i < b.length; i++) { if (uptimePct >= b[i].minUptime) return b[i].label; }
+                    return 'Poor';
+                },
+                /** Annual grid-outage hours from uptime % (the backup-runtime demand). */
+                annualOutageHours: function (uptimePct) {
+                    var u = Math.max(0, Math.min(100, uptimePct || 0));
+                    return +((1 - u / 100) * DATA.hoursPerYear).toFixed(1);
+                },
+                /** 0-1 grid goodness score (for models.site.score grid factor). Linear
+                 *  between the floor (98%→0) and ceiling (99.99%→1) uptime. */
+                score: function (uptimePct) {
+                    var G = DATA.gridReliability;
+                    var s = (uptimePct - G.scoreFloorUptime) / (G.scoreCeilUptime - G.scoreFloorUptime);
+                    return +Math.max(0, Math.min(1, s)).toFixed(3);
                 }
             }
         },

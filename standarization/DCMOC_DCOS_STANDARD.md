@@ -173,7 +173,12 @@ local math before its engine parity passes.
   `occupancyAt(ramp,year)`) + `DATA.capacity` (defaultRamp [.3,.6,.85,.95], steady
   0.95, small/medium/large phase presets) + `DATA.sources['capacity']`, lifted from
   DCMOC CapacityPlanningEngine. `test-rz-engine.mjs` 261/0.
-  REMAINING Group-2: Carbon-rich, Compliance, Tax, Risk-geo, Grid, Asset-lifecycle.
+- **Grid Reliability** — SHIPPED engine-side (4th of 9): `RZEngine.models.grid`
+  (`band(uptime)`, `annualOutageHours(uptime)` backup-runtime demand, `score(uptime)`
+  0-1 that FEEDS `models.site.score` grid factor) + `DATA.gridReliability` (uptime
+  bands + score floor/ceil) + `DATA.sources['gridReliability']`. Per-country uptime
+  stays in the country profiles. `test-rz-engine.mjs` 270/0.
+  REMAINING Group-2: Carbon-rich, Compliance, Tax, Risk-geo, Asset-lifecycle.
 
 ## Status (2026-07-17)
 - Bridge (§2): DONE (parallel session, f7a12cc7). REUSED.

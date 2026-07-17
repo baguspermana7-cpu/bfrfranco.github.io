@@ -403,6 +403,22 @@ near('pue.dcie(1.5)', M.pue.dcie(1.5), 0.6667, 0.001);
     eq('capacity.occupancyAt negative = 0', CP.occupancyAt(D.capacity.defaultRamp, -1), 0);
 }
 {
+    /* ── grid reliability model — Group-2 promotion ── */
+    const GR = E.models.grid;
+    eq('grid.band 99.995 Excellent', GR.band(99.995), 'Excellent');
+    eq('grid.band 99.0 Fair', GR.band(99.0), 'Weak');
+    // outage hours: 99.9% → 0.1% × 8760 = 8.76h
+    near('grid.annualOutageHours 99.9%', GR.annualOutageHours(99.9), 0.001 * D.hoursPerYear, 0.05);
+    ok('grid outage lower for higher uptime', GR.annualOutageHours(99.99) < GR.annualOutageHours(99.0));
+    // score: ceiling → 1, floor → 0, clamps
+    near('grid.score ceil = 1', GR.score(99.99), 1, 1e-6);
+    near('grid.score floor = 0', GR.score(98.0), 0, 1e-6);
+    eq('grid.score below floor clamps 0', GR.score(90), 0);
+    ok('grid.score monotonic', GR.score(99.9) > GR.score(99.5));
+    // grid score feeds site score
+    ok('site accepts grid score', E.models.site.score({ grid: GR.score(99.95) }).score >= 0);
+}
+{
     const svg = E.charts.histogram([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     ok('charts.histogram returns <svg>', typeof svg === 'string' && svg.indexOf('<svg') === 0 && svg.indexOf('<rect') > 0);
     const tor = E.charts.tornado(M.sim.tornado(inp => inp.x, { x: 1 }, { x: { lo: 0, hi: 2 } }));
