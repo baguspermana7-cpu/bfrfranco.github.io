@@ -17,7 +17,9 @@ import { rzModels } from '@/lib/rz-engine';
 const REDUNDANCY_KEY: Record<string, string> = { 'N+1': 'n1', '2N': '2n', '2N+1': '2n1' };
 // Illustrative revenue assumption for the roll-up financial (user sets real
 // numbers in the Financial engine). Transparent + labeled on the dashboard.
-const DEFAULT_REVENUE_PER_KW_MONTH = 180;
+// ~$280/kW/mo is a mid-market colo rate that keeps the default project cash-
+// positive; the real number comes from the Financial engine.
+const DEFAULT_REVENUE_PER_KW_MONTH = 280;
 
 export interface DashboardData {
     // inputs
