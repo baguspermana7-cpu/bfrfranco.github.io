@@ -80,10 +80,15 @@ export function RequirementsDashboard() {
 
 /* ── L2 Site Intelligence ── */
 export function SiteIntelDashboard() {
+    const { country } = useCfg();
     const m = rzModels().site;
     if (!m) return <Loading />;
-    // representative factors (0-1 goodness) — real factor wiring lands with the site-data layer
-    const factors = { power: 0.7, grid: 0.82, seismic: 0.72, talent: 0.62, tax: 0.6, carbon: 0.62, flood: 0.75, latency: 0.7, water: 0.68 };
+    // Real 0-1 factors derived from the selected country's reference profile
+    // (DATA.countries: grid uptime, seismic zone, talent, tax, grid carbon, flood…).
+    // Score now moves with the country — no hardcoded factor vector.
+    const factors = m.deriveFactors
+        ? m.deriveFactors(country?.id)
+        : { power: 0.6, grid: 0.6, seismic: 0.6, talent: 0.6, tax: 0.6, carbon: 0.6, flood: 0.6, latency: 0.6, water: 0.6 };
     const r = m.score(factors);
     return (
         <div className="space-y-4">
@@ -92,7 +97,7 @@ export function SiteIntelDashboard() {
                     title: 'Site Intelligence', layer: 'Layer 2 · Site Score', project: '—',
                     kpis: [{ label: 'Site Score', value: `${r.score}/100`, sub: `Grade ${r.grade} · ${r.label}` }, { label: 'Coverage', value: `${Math.round(r.coverage * 100)}%` }, { label: 'Factors', value: String(r.breakdown.length) }],
                     sections: [{ title: 'Factor Breakdown', head: ['Factor', 'Score', 'Weight', 'Contribution'], rows: r.breakdown.map((f: { key: string; value: number; weight: number; contribution: number }) => [f.key, `${Math.round(f.value * 100)}%`, `${Math.round(f.weight * 100)}%`, f.contribution.toFixed(3)]) }],
-                    note: 'Representative factors — per-site GIS/weather/grid/tax data wiring is the next increment.',
+                    note: `Factors derived from the ${country?.name || 'selected country'} reference profile (DATA.countries) — engine-real, country-varying.`,
                 })} />
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 <Metric label="Site Score" value={`${r.score}/100`} sub={`Grade ${r.grade} · ${r.label}`} />
@@ -111,7 +116,7 @@ export function SiteIntelDashboard() {
                         </div>
                     ))}
                 </div>
-                <p className="mt-2 text-[10px] text-slate-400">Representative factors — per-site GIS/weather/grid/tax data wiring is the next increment.</p>
+                <p className="mt-2 text-[10px] text-slate-400">Factors derived from the {country?.name || 'selected country'} reference profile (single-source DATA.countries).</p>
             </Card>
         </div>
     );
@@ -192,38 +197,62 @@ export function ConstructionDashboard() {
 }
 
 /* ── L7 Commissioning ── */
+const cxMoney = (n: number) => n >= 1e6 ? `$${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `$${(n / 1e3).toFixed(0)}K` : `$${Math.round(n)}`;
 export function CommissioningDashboard() {
+    const { inputs, country, redKey } = useCfg();
     const m = rzModels().commissioning;
     if (!m) return <Loading />;
-    // sample readiness for a mid-construction project (L1-L4 done, L5/IST/SAT in progress)
-    const completion = { L1: 1, L2: 1, L3: 1, L4: 0.8, L5: 0.4, ist: 0.3, sat: 0.2, fat: 0.6, punchlist: 0.1 };
-    const r = m.readinessIndex(completion);
+    // LIVE Cx PROGRAM from the shared engine — cost + schedule move with itLoad,
+    // cooling, redundancy, country (promoted from cx-calculator.html). No hardcoded
+    // completion vector: readiness reflects the true design-phase state until a
+    // live Cx checklist feeds it.
+    const cool = inputs.coolingType;
+    const pc = m.programCost ? m.programCost({ itLoadKw: inputs.itLoad, cooling: cool, redundancy: redKey, countryId: country?.id }) : null;
+    const ps = m.programSchedule ? m.programSchedule({ itLoadKw: inputs.itLoad, cooling: cool, redundancy: redKey }) : null;
+    const schedByLevel: Record<string, number> = {};
+    if (ps) ps.byLevel.forEach((l: { level: string; months: number }) => { schedByLevel[l.level] = l.months; });
+    const levels = pc ? Object.keys(pc.byLevel) : [];
+    const disc = pc ? pc.byDiscipline as Record<string, number> : {};
+    const discMax = Math.max(1, ...Object.values(disc));
     return (
         <div className="space-y-4">
-            <Head icon={CheckCircle2} title="Commissioning" sub="DC-OS Layer 7 · models.commissioning" tone="from-emerald-500 to-teal-600"
+            <Head icon={CheckCircle2} title="Commissioning" sub="DC-OS Layer 7 · models.commissioning (program cost + schedule)" tone="from-emerald-500 to-teal-600"
                 report={() => ({
-                    title: 'Commissioning', layer: 'Layer 7 · Operational Readiness', project: '—',
-                    kpis: [{ label: 'Readiness Index', value: `${r.index}%`, sub: r.status }, { label: 'Open Items', value: String(r.open.length) }, { label: 'Coverage', value: `${Math.round(r.coverage * 100)}%` }],
-                    sections: [{ title: 'Cx Level Completion', head: ['Level', 'Completion'], rows: r.breakdown.map((b: { label: string; completion: number }) => [b.label, `${Math.round(b.completion * 100)}%`]) }],
-                    note: 'Sample readiness profile — link to the live Cx checklist as commissioning progresses.',
+                    title: 'Commissioning', layer: 'Layer 7 · Cx Program', project: country?.name || '—',
+                    kpis: [{ label: 'Cx Program Cost', value: pc ? cxMoney(pc.total) : '—', sub: pc ? `${cxMoney(pc.perKw)}/kW` : '' }, { label: 'Program Duration', value: ps ? `${ps.totalMonths} mo` : '—' }, { label: 'IT Load', value: `${(inputs.itLoad / 1000).toFixed(1)} MW` }],
+                    sections: [{ title: 'Cx Program by Level', head: ['Level', 'Duration', 'Cost'], rows: levels.map((k) => [pc!.byLevel[k].label, `${schedByLevel[k] ?? '—'} mo`, cxMoney(pc!.byLevel[k].cost)]) }],
+                    note: `Engine-real Cx program (models.commissioning) for a ${(inputs.itLoad / 1000).toFixed(1)} MW ${cool} ${inputs.powerRedundancy} build in ${country?.name || '—'}. Budgetary Cx estimate, not a Cx plan.`,
                 })} />
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <Metric label="Operational Readiness" value={`${r.index}%`} sub={r.status} />
-                <Metric label="Open Items" value={String(r.open.length)} sub="categories" />
-                <Metric label="Coverage" value={`${Math.round(r.coverage * 100)}%`} />
+                <Metric label="Cx Program Cost" value={pc ? cxMoney(pc.total) : '—'} sub={pc ? `${cxMoney(pc.perKw)}/kW · incl. contingency` : ''} />
+                <Metric label="Program Duration" value={ps ? `${ps.totalMonths} mo` : '—'} sub="L0 → L6" />
+                <Metric label="Scope" value={`${(inputs.itLoad / 1000).toFixed(1)} MW`} sub={`${cool} · ${inputs.powerRedundancy}`} />
             </div>
             <Card>
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Cx Level Completion</h2>
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Cx Program by Level (L0–L6)</h2>
                 <div className="space-y-1.5">
-                    {r.breakdown.map((b: { key: string; label: string; completion: number }) => (
-                        <div key={b.key} className="flex items-center gap-2 text-xs">
-                            <span className="w-40 text-slate-600 dark:text-slate-300">{b.label}</span>
-                            <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className={`h-2 rounded ${b.completion >= 1 ? 'bg-emerald-500' : 'bg-amber-500'}`} style={{ width: `${b.completion * 100}%` }} /></div>
-                            <span className="w-10 text-right tabular-nums text-slate-500">{Math.round(b.completion * 100)}%</span>
+                    {levels.map((k) => (
+                        <div key={k} className="flex items-center gap-2 text-xs">
+                            <span className="w-40 text-slate-600 dark:text-slate-300 truncate">{pc!.byLevel[k].label}</span>
+                            <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className="h-2 rounded bg-emerald-500" style={{ width: `${(pc!.byLevel[k].cost / pc!.total) * 100}%` }} /></div>
+                            <span className="w-14 text-right tabular-nums text-slate-500">{schedByLevel[k] ?? '—'} mo</span>
+                            <span className="w-16 text-right tabular-nums text-slate-400">{cxMoney(pc!.byLevel[k].cost)}</span>
                         </div>
                     ))}
                 </div>
-                <p className="mt-2 text-[10px] text-slate-400">Sample readiness profile — link to the live Cx checklist as commissioning progresses.</p>
+            </Card>
+            <Card>
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Cost by Discipline</h2>
+                <div className="space-y-1.5">
+                    {Object.keys(disc).map((k) => (
+                        <div key={k} className="flex items-center gap-2 text-xs">
+                            <span className="w-24 text-slate-600 dark:text-slate-300 capitalize">{k}</span>
+                            <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className="h-2 rounded bg-cyan-500" style={{ width: `${(disc[k] / discMax) * 100}%` }} /></div>
+                            <span className="w-16 text-right tabular-nums text-slate-400">{cxMoney(disc[k])}</span>
+                        </div>
+                    ))}
+                </div>
+                <p className="mt-2 text-[10px] text-slate-400">Operational Readiness Index activates when a live Cx checklist feeds per-level completion (design phase → not started).</p>
             </Card>
         </div>
     );

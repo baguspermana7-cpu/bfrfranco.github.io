@@ -5,7 +5,7 @@ import { CountryProfile } from '@/constants/countries';
 import { COUNTRIES } from '@/constants/countries';
 import { generateAssetCounts } from '@/lib/AssetGenerator';
 import { getPUE } from '@/constants/pue';
-import { rzData } from '@/lib/rz-engine';
+import { rzData, rzModels } from '@/lib/rz-engine';
 
 export type TestingRegime = 'minimal' | 'complete';
 
@@ -143,8 +143,19 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
     };
 
     // Fuel storage
-    const fuelPerHour = totalFacilityLoadKw * genEfficiency;
-    const storageLiters = Math.min(fuelPerHour * fuelStorageHours, storageLimitLiters * 2);
+    const fuelModel = rzModels().fuel;
+    // Engine-sourced consumption rate (L/h) — uses DATA.fuelGen.genEfficiencyLPerKwh internally
+    const fuelPerHour = fuelModel && typeof fuelModel.consumptionLPerHour === 'function'
+        ? fuelModel.consumptionLPerHour(totalFacilityLoadKw)
+        : totalFacilityLoadKw * genEfficiency;
+    // Engine-sourced storage requirement
+    const engineStorageLiters = fuelModel && typeof fuelModel.storageLiters === 'function'
+        ? fuelModel.storageLiters(totalFacilityLoadKw, tierLevel)
+        : null;
+    const storageLiters = Math.min(
+        engineStorageLiters ?? (fuelPerHour * fuelStorageHours),
+        storageLimitLiters * 2
+    );
     const tankSize = 20000; // liters per tank
     const tankCount = Math.ceil(storageLiters / tankSize);
     const daysOfAutonomy = storageLiters / fuelPerHour / 24;
@@ -154,6 +165,12 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
         tankCount,
         daysOfAutonomy: Math.round(daysOfAutonomy * 10) / 10,
     };
+
+    // Engine-sourced annual test fuel (informational cross-reference; local testing schedule remains authoritative)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const engineTestFuel = fuelModel && typeof fuelModel.annualTestFuelLiters === 'function'
+        ? fuelModel.annualTestFuelLiters(totalFacilityLoadKw)
+        : null;
 
     // Testing schedule — varies by regime
     // Minimal: Monthly no-load run + Annual full loadbank test only

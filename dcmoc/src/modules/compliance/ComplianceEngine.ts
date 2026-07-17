@@ -1,4 +1,5 @@
 import { CountryProfile } from '@/constants/countries';
+import { rzModels } from '@/lib/rz-engine';
 
 export type ComplianceCategory = 'fire' | 'electrical' | 'environmental' | 'building' | 'data-protection' | 'telecom';
 
@@ -210,6 +211,30 @@ export function calculateCompliance(country: CountryProfile, itLoadKw: number): 
     const totalAnnualCost = items.reduce((sum, i) => sum + i.annualCost, 0);
     const mandatoryCount = items.filter(i => i.mandatory).length;
 
+    // Engine cross-check: use rzModels().compliance if available
+    const complianceModel = rzModels().compliance;
+
+    // Engine-sourced annual cost cross-reference (if model present)
+    // complianceModel.annualCost takes [{cost, type:'annual'|'one-time'}]
+    const engineItems: { cost: number; type: 'annual' | 'one-time' }[] = [
+        ...items.map(i => ({ cost: i.annualCost, type: 'annual' as const })),
+        ...items.map(i => ({ cost: i.initialCost, type: 'one-time' as const })),
+    ];
+    const engineAnnualCost = complianceModel && typeof complianceModel.annualCost === 'function'
+        ? complianceModel.annualCost(engineItems)
+        : null;
+    // Blend: use engine amortized annual cost if it's within 50% of local (sanity guard)
+    const blendedAnnualCost = (engineAnnualCost !== null && engineAnnualCost > 0 && Math.abs(engineAnnualCost - totalAnnualCost) / Math.max(1, totalAnnualCost) < 0.5)
+        ? Math.round((totalAnnualCost + engineAnnualCost) / 2)
+        : totalAnnualCost;
+
+    // Engine category baseline cross-reference
+    const categories_used = [...new Set(items.map(i => i.category))];
+    const engineBaseline = complianceModel && typeof complianceModel.baselineAnnual === 'function'
+        ? complianceModel.baselineAnnual(categories_used)
+        : null;
+    void engineBaseline; // available for future consumer — suppress unused warning
+
     const categories: ComplianceCategory[] = ['fire', 'electrical', 'environmental', 'building', 'data-protection', 'telecom'];
     const categoryBreakdown: CategoryBreakdown[] = categories.map(cat => {
         const catItems = items.filter(i => i.category === cat);
@@ -232,7 +257,7 @@ export function calculateCompliance(country: CountryProfile, itLoadKw: number): 
     return {
         items,
         totalInitialCost,
-        totalAnnualCost,
+        totalAnnualCost: blendedAnnualCost,
         mandatoryCount,
         totalCount: items.length,
         categoryBreakdown,

@@ -6,14 +6,21 @@
 
 import type { DecisionProvider, DecisionRequest, DecisionResult } from './types';
 import { deterministicProvider } from './deterministicProvider';
-import { remoteApiProvider, REMOTE_DECISION_ENDPOINT } from './remoteApiProvider';
+import { remoteApiProvider, remoteConfigured } from './remoteApiProvider';
 
 export * from './types';
 export { deterministicProvider } from './deterministicProvider';
+export { remoteConfigured } from './remoteApiProvider';
 
-/** Active provider: remote AI if an endpoint is configured, else deterministic. */
+/** Active provider: the user's AI endpoint when configured + enabled, else the
+ *  built-in deterministic RZ engine (which is always the fallback). */
 export function getDecisionProvider(): DecisionProvider {
-    return REMOTE_DECISION_ENDPOINT ? remoteApiProvider : deterministicProvider;
+    return remoteConfigured() ? remoteApiProvider : deterministicProvider;
+}
+
+/** Which brain will actually run — for UI status chips. */
+export function activeProviderId(): 'deterministic' | 'remoteApi' {
+    return remoteConfigured() ? 'remoteApi' : 'deterministic';
 }
 
 /** Convenience: decide with automatic provider selection + safe fallback. */

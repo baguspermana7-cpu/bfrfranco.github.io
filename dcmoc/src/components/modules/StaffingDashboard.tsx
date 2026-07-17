@@ -265,7 +265,7 @@ export function StaffingDashboard() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                     {results.roleConfigs.map((cfg) => {
                         const autoKey = cfg.role === 'admin' ? 'admin' : cfg.role as keyof typeof autoResult.headcounts;
                         return (
@@ -396,7 +396,7 @@ export function StaffingDashboard() {
                         <div className="mt-6">
                             <div className="text-[10px] text-slate-500 uppercase font-bold mb-2">Shift Types</div>
                             {inputs.shiftModel === '8h' ? (
-                                <div className="grid grid-cols-3 gap-1 h-12 rounded-lg overflow-hidden">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 h-12 rounded-lg overflow-hidden">
                                     <div className="bg-amber-500/10 border-l-4 border-amber-500 flex items-center justify-center text-xs font-bold text-amber-600 dark:text-amber-500" title="Morning shift: 06:00-14:00. Highest staffing density for planned maintenance windows.">
                                         ☀️ Morning
                                         <span className="block text-[9px] font-normal ml-2 opacity-70">06:00 — 14:00</span>

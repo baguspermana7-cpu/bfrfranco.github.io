@@ -19,6 +19,7 @@ const ALLOWED = new Set([
   "energy", "cooling", "forecast", "sim", "reliability", "site", "architecture",
   "construction", "commissioning", "asset", "maintenance", "fuel", "capacity",
   "grid", "tax", "risk", "compliance", "charts",
+  "tier", "fire", "cdu", "spares", "decision",
 ]);
 const ALLOWED_DATA = new Set([
   "capexDetail", "markets", "regions", "pueMatrix", "capexPerMw", "carbon",
@@ -26,6 +27,7 @@ const ALLOWED_DATA = new Set([
   "asset", "maintenance", "fuelGen", "capacity", "gridReliability", "tax",
   "geoRisk", "compliance", "requirements", "architecture", "deepSeaCooling",
   "refrigerants", "energy", "sources",
+  "countries", "tierCodes", "redundancyLevels", "tier", "fire", "cdu", "decision",
 ]);
 
 function resolvePath(root, path) {

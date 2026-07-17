@@ -33,6 +33,24 @@ import { RequirementsDashboard, SiteIntelDashboard, ArchitectureDashboard, Const
 import { useScenarioStore } from '@/store/scenario';
 import { Wrench, ShieldAlert, FileText, Calculator, Activity } from 'lucide-react';
 
+const STUB_LABELS: Record<string, string> = {
+  projects: 'Projects', templates: 'Templates', 'data-library': 'Data Library',
+  knowledge: 'Knowledge Base', integrations: 'Integrations', settings: 'Settings',
+  audit: 'Audit Trail', users: 'User Management',
+};
+function ComingSoon({ tab }: { tab: string }) {
+  const label = STUB_LABELS[tab] || tab;
+  return (
+    <div className="max-w-lg mx-auto pt-24 text-center">
+      <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 flex items-center justify-center mx-auto mb-5">
+        <Activity className="w-6 h-6 text-cyan-500" />
+      </div>
+      <h1 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{label}</h1>
+      <p className="text-sm text-slate-500 dark:text-slate-400">This DC-OS surface is planned. Engine-backed modules are available in the sidebar — {label} is on the roadmap.</p>
+    </div>
+  );
+}
+
 export default function Home() {
   const { activeTab } = useSimulationStore();
   const { isComparisonMode } = useScenarioStore();
@@ -107,6 +125,15 @@ export default function Home() {
         return <FaqDashboard />;
       case 'strategic':
         return <StrategicPlanningDashboard />;
+      case 'projects':
+      case 'templates':
+      case 'data-library':
+      case 'knowledge':
+      case 'integrations':
+      case 'settings':
+      case 'audit':
+      case 'users':
+        return <ComingSoon tab={activeTab} />;
       default: // 'sim'
         return (
           <div className="text-center space-y-4 max-w-2xl mx-auto pt-20">

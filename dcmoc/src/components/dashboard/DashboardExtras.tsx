@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Database, BrainCircuit, Boxes, FileText, CheckCircle2, Rocket, Plus, Zap, Download, UserPlus, Settings, AlertTriangle, ArrowRight } from 'lucide-react';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 /* ── Data Flow & Digital Thread rail ── */
 const FLOW = [
@@ -12,18 +13,18 @@ export function DataFlowRail() {
     return (
         <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/80 p-4">
             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-3">Data Flow &amp; Digital Thread</h2>
-            <div className="flex items-center justify-between gap-1 overflow-x-auto">
+            <div className="flex items-center justify-between gap-0.5 flex-wrap">
                 {FLOW.map((f, i) => {
                     const Icon = f.icon;
                     return (
                         <React.Fragment key={f.label}>
-                            <div className="flex flex-col items-center gap-1 shrink-0">
+                            <div className="flex flex-col items-center gap-1 flex-1 min-w-[44px]">
                                 <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500/15 to-violet-500/10 border border-white/10 flex items-center justify-center">
                                     <Icon className="w-4 h-4 text-cyan-400" />
                                 </div>
-                                <span className="text-[8px] text-slate-500">{f.label}</span>
+                                <span className="text-[8px] text-slate-500 text-center leading-tight">{f.label}</span>
                             </div>
-                            {i < FLOW.length - 1 && <ArrowRight className="w-3 h-3 text-slate-600 shrink-0" />}
+                            {i < FLOW.length - 1 && <ArrowRight className="w-3 h-3 text-slate-600 shrink-0 mb-4" />}
                         </React.Fragment>
                     );
                 })}
@@ -34,9 +35,12 @@ export function DataFlowRail() {
 
 /* ── Quick Actions ── */
 const ACTIONS = [
-    { label: 'New Scenario', icon: Plus }, { label: 'Run Optimization', icon: Zap },
-    { label: 'Generate Report', icon: FileText }, { label: 'Export Dashboard', icon: Download },
-    { label: 'Invite Stakeholder', icon: UserPlus }, { label: 'System Settings', icon: Settings },
+    { label: 'New Scenario', icon: Plus, desc: 'Create a new design scenario to compare configurations side-by-side.' },
+    { label: 'Run Optimization', icon: Zap, desc: 'Re-run the CAPEX engine and Layer-13 AI decision with current inputs.' },
+    { label: 'Generate Report', icon: FileText, desc: 'Export a full Executive PDF report covering all 13 engine outputs.' },
+    { label: 'Export Dashboard', icon: Download, desc: 'Download the dashboard summary as a PDF document.' },
+    { label: 'Invite Stakeholder', icon: UserPlus, desc: 'Share this project with a stakeholder via a secure invite link.' },
+    { label: 'System Settings', icon: Settings, desc: 'Open application settings, preferences, and data sources.' },
 ];
 export function QuickActions({ onAction }: { onAction?: (a: string) => void }) {
     return (
@@ -46,8 +50,17 @@ export function QuickActions({ onAction }: { onAction?: (a: string) => void }) {
                 {ACTIONS.map((a) => {
                     const Icon = a.icon;
                     return (
-                        <button key={a.label} onClick={() => onAction?.(a.label)} className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5 text-xs text-slate-600 dark:text-slate-300 hover:border-cyan-400/40 hover:text-cyan-400 transition-colors">
-                            <Icon className="w-3.5 h-3.5" /> {a.label}
+                        <button
+                            key={a.label}
+                            onClick={() => onAction?.(a.label)}
+                            title={a.desc}
+                            className="group flex items-center gap-2 px-2.5 py-2 rounded-lg bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5 text-xs text-slate-600 dark:text-slate-300 transition-all hover:bg-cyan-500/10 hover:border-cyan-400/60 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] hover:shadow-lg hover:shadow-cyan-900/20"
+                        >
+                            <Icon className="w-3.5 h-3.5 transition-colors group-hover:text-cyan-400" />
+                            <span className="transition-colors group-hover:text-cyan-400">{a.label}</span>
+                            <span className="ml-auto" onClick={(e) => e.stopPropagation()}>
+                                <Tooltip content={a.desc} />
+                            </span>
                         </button>
                     );
                 })}

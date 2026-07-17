@@ -260,7 +260,7 @@ function ScorecardTab({ result }: { result: ReturnType<typeof calculateBenchmark
             </div>
 
             {/* Category Cards */}
-            <div className="grid grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {(Object.entries(BENCHMARK_CATEGORIES) as [BenchmarkCategory, typeof BENCHMARK_CATEGORIES[BenchmarkCategory]][]).map(([catId, cat]) => {
                     const catScore = result.categoryScores[catId];
                     const gc = GRADE_COLORS[catScore.grade];

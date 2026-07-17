@@ -5,6 +5,7 @@ import { CountryProfile } from '@/constants/countries';
 import { getPUE } from '@/constants/pue';
 import { calculateAutoHeadcount } from '@/modules/staffing/ShiftEngine';
 import { fmtMoney, fmtKw } from '@/lib/format';
+import { rzModels } from '@/lib/rz-engine';
 
 export interface CapacityPhase {
     id: string;
@@ -108,6 +109,16 @@ export const CAPACITY_PRESETS = {
     ],
 };
 
+// Engine-backed preset override (rzModels().capacity.preset returns engine phases or null)
+const _capacityModel = rzModels().capacity;
+export function getEnginePreset(size: 'small' | 'medium' | 'large'): CapacityPhase[] | null {
+    if (_capacityModel && typeof _capacityModel.preset === 'function') {
+        const enginePreset = _capacityModel.preset(size);
+        if (Array.isArray(enginePreset) && enginePreset.length > 0) return enginePreset as CapacityPhase[];
+    }
+    return null;
+}
+
 export const calculateCapacityPlan = (input: CapacityPlanInput): CapacityPlanResult => {
     const { phases, country, coolingType, tierLevel, shiftModel, maintenanceModel, hybridRatio, baseCapexPerKw } = input;
 
@@ -120,6 +131,17 @@ export const calculateCapacityPlan = (input: CapacityPlanInput): CapacityPlanRes
 
     // Base PUE from shared constants
     const basePue = getPUE(coolingType);
+
+    // Engine-sourced occupancy ramp helper (rzModels().capacity.occupancyAt)
+    const capacityModel = rzModels().capacity;
+    const getOccupancy = (ramp: number[], year: number): number => {
+        if (capacityModel && typeof capacityModel.occupancyAt === 'function') {
+            return capacityModel.occupancyAt(ramp, year);
+        }
+        // Local fallback
+        if (year < 0) return 0;
+        return year < ramp.length ? ramp[year] : ramp[ramp.length - 1];
+    };
 
     // Calculate total timeline span
     const lastPhaseEnd = Math.max(...phases.map(p => p.startMonth + p.buildMonths + 48));
@@ -233,7 +255,10 @@ export const calculateCapacityPlan = (input: CapacityPlanInput): CapacityPlanRes
 
     // Totals
     const totalCapex = phaseResults.reduce((s, p) => s + p.capex, 0);
-    const totalItLoadKw = phaseResults.reduce((s, p) => s + p.itLoadKw, 0);
+    const engineTotalMw = capacityModel && typeof capacityModel.totalMw === 'function'
+        ? capacityModel.totalMw(phaseResults) * 1000 // convert MW back to kW
+        : phaseResults.reduce((s, p) => s + p.itLoadKw, 0);
+    const totalItLoadKw = Math.round(engineTotalMw);
 
     // Scalability score
     const avgCapexPerKw = totalCapex / totalItLoadKw;
@@ -259,7 +284,7 @@ export const calculateCapacityPlan = (input: CapacityPlanInput): CapacityPlanRes
             if (m >= opMonth) {
                 const monthsSinceOp = m - opMonth;
                 const quarterIndex = Math.min(Math.floor(monthsSinceOp / 12), phase.occupancyRamp.length - 1);
-                demandKw += phase.itLoadKw * (phase.occupancyRamp[quarterIndex] ?? 0.95);
+                demandKw += phase.itLoadKw * getOccupancy(phase.occupancyRamp, quarterIndex);
             }
         }
         utilizationCurve.push({

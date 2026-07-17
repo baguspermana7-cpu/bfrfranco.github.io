@@ -2899,6 +2899,13 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
         var TIER_MULT = { 'tier-2': 0.85, 'tier-3': 1.0, 'tier-4': 1.35 };
         var TIER_STAFF_PER_MW = { 'tier-2': 3, 'tier-3': 5, 'tier-4': 8 };
         var COOLING_PUE = { 'air': 1.4, 'chilled-water': 1.25, 'evaporative': 1.15, 'dlc': 1.08 };
+        /* single-source: RZEngine.data.countries (ENGINE_UNIFICATION.md) */
+        /* pueMatrix isoMap: 'air'→pueMatrix.air.tier3; 'chilled-water'/'evaporative'/'dlc' have no direct engine match, kept inline */
+        document.addEventListener('DOMContentLoaded', function() {
+            var _pue = window.RZEngine && window.RZEngine.data && window.RZEngine.data.pueMatrix;
+            if (_pue && _pue.air && _pue.air.tier3 != null)
+                COOLING_PUE['air'] = _pue.air.tier3;
+        });
         var CLOUD_BASE = 420; // $/kW/month equivalent
 
         /* ─────────── YEAR-BY-YEAR PROJECTIONS (2025-2030) ─────────── */

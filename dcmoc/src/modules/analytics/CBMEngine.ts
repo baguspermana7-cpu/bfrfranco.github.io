@@ -1,5 +1,6 @@
 import { CountryProfile } from '@/constants/countries';
 import { generateAssetCounts } from '@/lib/AssetGenerator';
+import { rzModels } from '@/lib/rz-engine';
 
 export type SensorCategory = 'temperature' | 'humidity' | 'power-quality' | 'vibration' | 'fluid-leak' | 'airflow' | 'door-access';
 
@@ -214,10 +215,18 @@ export function calculateCBM(input: CBMInput): CBMResult {
     const roiPercent = totalSensorInvestment > 0 ? (netAnnualBenefit / totalSensorInvestment) * 100 : 0;
     const paybackYears = netAnnualBenefit > 0 ? totalSensorInvestment / netAnnualBenefit : 99;
 
-    // NPV over 5 years (8% discount rate)
+    // Engine design life cross-reference for sensor replacement (field-sensor assetClass)
+    const assetModel = rzModels().asset;
+    const sensorDesignLife = assetModel && typeof assetModel.designLife === 'function'
+        ? assetModel.designLife('field-sensor')
+        : null;
+    // sensorDesignLife is informational — used for CBM ROI horizon if present (local 5yr fallback)
+    const sensorLifeYears = (sensorDesignLife != null ? sensorDesignLife : 5) as number;
+
+    // NPV over sensorLifeYears (8% discount rate)
     const discountRate = 0.08;
     let npv5Year = -totalSensorInvestment;
-    for (let y = 1; y <= 5; y++) {
+    for (let y = 1; y <= sensorLifeYears; y++) {
         npv5Year += netAnnualBenefit / Math.pow(1 + discountRate, y);
     }
 

@@ -290,7 +290,7 @@ const InvestmentDashboard = () => {
                 {activeTab === 'cap' && (
                     <div className="space-y-4 animate-in fade-in duration-300">
                         {/* KPI Cards */}
-                        <div className="grid grid-cols-4 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                             <KPICard label="Total CAPEX" value={fmtMoney(capexResults.total)} icon={<Building className="w-4 h-4" />} color="slate" tooltip="Total capital expenditure including land, building, MEP, and IT infrastructure. This is the total investment amount to be financed." />
                             <KPICard label="Debt Amount" value={fmtMoney(result.totalDebt)} sub={`${(investInputs.debtRatio * 100).toFixed(0)}% leverage`} icon={<DollarSign className="w-4 h-4" />} color="red" tooltip="Total debt financing amount based on CAPEX and debt ratio. This is the principal amount to be repaid over the debt term." />
                             <KPICard label="Equity Required" value={fmtMoney(result.totalEquity)} sub={`${((1 - investInputs.debtRatio) * 100).toFixed(0)}% equity`} icon={<DollarSign className="w-4 h-4" />} color="emerald" tooltip="Equity capital required from sponsors/investors. This is the portion of CAPEX not covered by debt financing." />
@@ -373,7 +373,7 @@ const InvestmentDashboard = () => {
                 {/* ═══ TAB 2: EQUITY RETURNS & DSCR ═══ */}
                 {activeTab === 'returns' && (
                     <div className="space-y-4 animate-in fade-in duration-300">
-                        <div className="grid grid-cols-4 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                             <KPICard label="Equity IRR" value={fmtPct(result.equityIRR)} sub={result.equityIRR > 15 ? 'Above 15% target' : 'Below 15% target'} icon={<TrendingUp className="w-4 h-4" />} color={result.equityIRR >= 15 ? 'emerald' : 'red'} tooltipKey="equity-irr" tooltip="Levered Internal Rate of Return on equity invested. Target is 15%+ for institutional data center PE investments." />
                             <KPICard label="MOIC" value={Number.isFinite(result.moic) ? `${result.moic.toFixed(2)}x` : 'N/A'} sub="Multiple on invested capital" icon={<ArrowUpRight className="w-4 h-4" />} color={result.moic >= 2 ? 'emerald' : 'amber'} tooltip="Multiple on Invested Capital — total value returned divided by total capital invested. Target is 2-3x for PE." />
                             <KPICard label="Min DSCR" value={Number.isFinite(result.minDSCR) ? `${result.minDSCR.toFixed(2)}x` : 'N/A'} sub={result.minDSCR >= 1.25 ? 'Above 1.25x threshold' : 'Below 1.25x threshold'} icon={<Shield className="w-4 h-4" />} color={result.minDSCR >= 1.25 ? 'emerald' : 'red'} tooltipKey="dscr" tooltip="Minimum Debt Service Coverage Ratio across all years. Lenders typically require 1.25x+ DSCR as a covenant threshold." />
@@ -466,7 +466,7 @@ const InvestmentDashboard = () => {
                         <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm dark:shadow-none">
                             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300 mb-1 flex items-center gap-1">GP/LP Return Waterfall <Tooltip content="Distribution waterfall showing how profits are split between General Partner (GP) and Limited Partners (LP). LP receives preferred return first, then GP takes carried interest on excess profits." /></h3>
                             <p className="text-[11px] text-slate-400 mb-4">{(hurdleRate * 100).toFixed(0)}% preferred return hurdle, {(carryRate * 100).toFixed(0)}% GP carry on profits above hurdle</p>
-                            <div className="grid grid-cols-4 gap-3 mb-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
                                 {waterfallItems.map((item, i) => (
                                     <div key={i} className="text-center p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
                                         <div className="w-2 h-2 rounded-full mx-auto mb-1" style={{ backgroundColor: item.color }} />
@@ -488,7 +488,7 @@ const InvestmentDashboard = () => {
                 {activeTab === 'valuation' && (
                     <div className="space-y-4 animate-in fade-in duration-300">
                         {/* 3 Valuation Cards */}
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm dark:shadow-none">
                                 <div className="text-[10px] text-indigo-600 dark:text-indigo-400 uppercase font-semibold mb-2 flex items-center gap-1">EV/EBITDA Method <Tooltip content="Enterprise Value — total value of the company including debt minus cash. Used for EV/EBITDA and other valuation multiples." /></div>
                                 <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.valuation.evEbitda)}</div>
@@ -540,7 +540,7 @@ const InvestmentDashboard = () => {
                         {/* Exit Waterfall */}
                         <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm dark:shadow-none">
                             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300 mb-4">Exit Waterfall (Year {investInputs.exitYear})</h3>
-                            <div className="grid grid-cols-5 gap-2 text-center">
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-center">
                                 {[
                                     { label: 'Exit EBITDA', value: result.stabilizedEBITDA, color: 'bg-slate-200 dark:bg-slate-700' },
                                     { label: `x ${investInputs.exitEbitdaMultiple}x`, value: result.exitEV, color: 'bg-indigo-100 dark:bg-indigo-950/40' },
@@ -613,7 +613,7 @@ const InvestmentDashboard = () => {
                         {/* Pre/Post Money */}
                         <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm dark:shadow-none">
                             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300 mb-4">IPO / Acquisition Pricing</h3>
-                            <div className="grid grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div className="bg-slate-100 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
                                     <div className="text-[10px] text-slate-500 uppercase mb-1 flex items-center gap-1">Pre-Money (EV) <Tooltip content="Enterprise Value before any acquisition premium. Based on EV/EBITDA multiple applied to stabilized EBITDA." /></div>
                                     <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.valuation.evEbitda)}</div>

@@ -6,10 +6,12 @@
 //     DATA.refrigerants via a cooling-type → refrigerant-key auto-map.
 //   - Carbon offset price comes from DATA.carbon.offsetPrice — same-fact
 //     reconciliation: engine $35/tCO₂e (2026 voluntary blend) vs $45 local.
+//   - Scope 2 blends rzModels().carbon.annualTonnes() (engine, region-based) with
+//     the local per-country gridCarbonIntensity formula; local wins when delta > 30%.
 //   - DIESEL_EMISSION_FACTOR + CARBON_TAX_RATE_USD stay LOCAL: they belong
 //     to DCMOC's own Scope-1 genset / EU-ETS exposure model.
 
-import { rzData } from '@/lib/rz-engine';
+import { rzData, rzModels } from '@/lib/rz-engine';
 
 export interface CarbonResult {
     // Core metrics
@@ -120,7 +122,19 @@ export const calculateCarbonFootprint = (inputs: CarbonInputs): CarbonResult => 
     const lossEnergyMWh = totalEnergyMWh * 0.03; // ~3% distribution losses
 
     // Scope 2: Grid electricity emissions
-    const scope2 = (totalEnergyMWh * 1000 * gridCarbonIntensity) / 1000; // tCO₂/yr
+    const carbonModel = rzModels().carbon;
+    // Engine-sourced annual operational tCO₂ (reconciliation)
+    // rzModels().carbon.annualTonnes(mw, pue, region, hoursPerYear)
+    const itLoadMw = itLoadKw / 1000;
+    const engineAnnualTonnes = carbonModel && typeof carbonModel.annualTonnes === 'function'
+        ? carbonModel.annualTonnes(itLoadMw, pue, inputs.countryName.substring(0, 2).toUpperCase(), hoursPerYear)
+        : null;
+    // Scope 2 from local formula (uses per-country gridCarbonIntensity from country profile)
+    const localScope2 = (totalEnergyMWh * 1000 * gridCarbonIntensity) / 1000; // tCO₂/yr
+    // Blend: if engine value is close (within 30%), average them; else use local (country-specific wins)
+    const scope2 = (engineAnnualTonnes !== null && Math.abs(engineAnnualTonnes - localScope2) / Math.max(1, localScope2) < 0.30)
+        ? (localScope2 + engineAnnualTonnes) / 2
+        : localScope2;
 
     // Scope 1: Direct emissions (generator testing, ~200h/yr testing + emergency)
     const annualGenTestHours = 200;

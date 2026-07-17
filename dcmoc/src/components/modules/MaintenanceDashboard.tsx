@@ -463,7 +463,7 @@ export function MaintenanceDashboard() {
                                             <Line yAxisId="right" type="monotone" dataKey="cumulativePct" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3, fill: '#f59e0b' }} name="cumulativePct" />
                                         </ComposedChart>
                                     </ResponsiveContainer>
-                                    <div className="mt-3 grid grid-cols-3 gap-3">
+                                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
                                         {(() => {
                                             // ABC classification
                                             let cumPct = 0;

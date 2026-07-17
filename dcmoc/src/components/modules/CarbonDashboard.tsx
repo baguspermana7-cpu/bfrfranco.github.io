@@ -92,7 +92,7 @@ const CarbonDashboard = () => {
             </div>
 
             {/* KPI Row */}
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-2 mb-1">
@@ -221,7 +221,7 @@ const CarbonDashboard = () => {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         {result.reductionScenarios.map((scenario, i) => (
                             <div key={i} className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
                                 <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style={{ backgroundColor: scenario.color + '20' }}>
@@ -388,7 +388,7 @@ const CarbonDashboard = () => {
                                     />
                                 </AreaChart>
                             </ResponsiveContainer>
-                            <div className="mt-3 grid grid-cols-3 gap-3">
+                            <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 {[
                                     { year: currentYear, label: 'Current', value: currentEmissions, color: 'text-red-500 dark:text-red-400', tip: 'Current annual net emissions after applying any existing renewable energy offsets from your selected configuration.' },
                                     { year: 2030, label: '2030 Target', value: trajectoryData.find(d => d.year === 2030)?.emissions ?? 0, color: 'text-amber-500 dark:text-amber-400', tip: '2030 interim target aligned with EU Green Deal and corporate ESG commitments. Typically aims for 40-55% reduction from baseline.' },

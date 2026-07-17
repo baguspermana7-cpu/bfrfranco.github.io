@@ -164,7 +164,7 @@ const CapacityDashboardMod = () => {
                                             </button>
                                         )}
                                     </div>
-                                    <div className="grid grid-cols-3 gap-2 text-xs">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                                         <div>
                                             <label className="text-slate-500 mb-0.5 flex items-center gap-1">IT Load (kW) <Tooltip content="IT power capacity in kilowatts for this phase. Determines rack density, cooling requirements, and staffing levels." /></label>
                                             <input

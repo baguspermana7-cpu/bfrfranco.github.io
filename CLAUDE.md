@@ -367,6 +367,8 @@ Music: `my-video/public/audio/intro-music.mp3` — currently a synthesized elect
 | `tools/test-datahall-calc.mjs` | DC AI engine — 57/57 doc-21 worked examples |
 | `tools/test-conv-calc.mjs` | DC Conv engine — 22/22 DoD identities |
 | `tools/probe-accuracy-validation.mjs` | Reviewer's 23 acceptance tests + cross-page Rule-1 consistency — 40/40 PASS at v1.35.1 (see standarization/ACCURACY_VALIDATION.md) |
+| `tools/build-countries-data.mjs` | Generates `rz-engine.js DATA.countries` (single-source country reference) from `dcmoc/src/constants/countries.ts`. Rerun after editing countries.ts, then terser + `?v=` bump. See standarization/ENGINE_UNIFICATION.md |
+| `tools/test-reference-parity.mjs` | Reference-data parity gate — fails if `DATA.countries` drifts from the DCMOC source, or per-country electricity/grid-carbon/tax/enums/currency diverge (126/0) |
 
 ---
 

@@ -536,7 +536,7 @@ const FinancialDashboard = () => {
             <div className="flex-1 space-y-4 overflow-y-auto pb-10">
 
                 {/* ── Financial KPIs ────────────────── */}
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <Card className={`border shadow-sm dark:shadow-none ${result.npv >= 0 ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/50' : 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800/50'}`}>
                         <CardContent className="pt-4">
                             <div className="flex items-center gap-1.5 mb-1">
@@ -593,7 +593,7 @@ const FinancialDashboard = () => {
 
                 {/* ── Revenue KPIs ──────────────────── */}
                 {revResult && (
-                    <div className="grid grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         <Card className="bg-cyan-50 dark:bg-cyan-950/20 border-cyan-200 dark:border-cyan-800/40 shadow-sm dark:shadow-none">
                             <CardContent className="pt-4">
                                 <div className="flex items-center gap-1.5 mb-1">
@@ -1014,7 +1014,7 @@ const FinancialDashboard = () => {
                                         </Bar>
                                     </BarChart>
                                 </ResponsiveContainer>
-                                <div className="grid grid-cols-5 gap-2 mt-3">
+                                <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mt-3">
                                     {opexBreakdown.map((item, i) => (
                                         <div key={i} className="text-center p-2 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">
                                             <div className="text-[10px] text-slate-500 mb-0.5">{item.category}</div>
@@ -1134,7 +1134,7 @@ const FinancialDashboard = () => {
                                         <Bar dataKey="forecast" fill="#f59e0b" radius={[4, 4, 0, 0]} name="forecast" />
                                     </BarChart>
                                 </ResponsiveContainer>
-                                <div className="mt-3 grid grid-cols-4 gap-2">
+                                <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
                                     {budgetVsForecastData.map((d, i) => {
                                         const variance = d.forecast - d.budget;
                                         const variancePct = d.budget > 0 ? ((variance / d.budget) * 100) : 0;

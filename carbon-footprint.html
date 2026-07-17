@@ -1462,6 +1462,20 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
         MX: { name: 'Mexico', grid: 0.45, rate: 0.08, region: 'LATAM' },
         CO: { name: 'Colombia', grid: 0.20, rate: 0.07, region: 'LATAM' }
     };
+    /* single-source: RZEngine.data.countries (ENGINE_UNIFICATION.md) */
+    /* All 32 COUNTRIES keys are direct ISO-2 and match engine entries; all will be patched when engine is available */
+    document.addEventListener('DOMContentLoaded', function() {
+        var _engC = window.RZEngine && window.RZEngine.data && window.RZEngine.data.countries;
+        if (!_engC) return;
+        Object.keys(COUNTRIES).forEach(function(id) {
+            var entry = _engC[id];
+            if (!entry) return;
+            if (entry.environment && entry.environment.gridCarbonIntensity != null)
+                COUNTRIES[id].grid = entry.environment.gridCarbonIntensity;
+            if (entry.economy && entry.economy.electricityRate != null)
+                COUNTRIES[id].rate = entry.economy.electricityRate;
+        });
+    });
 
     // ══════════════════════════════════════════════════════════════
     // 2. NDC DATA (33 countries)
@@ -2733,7 +2747,8 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
     }
     </script>
     <script src="rz-tracker.js" defer></script>
-    
+<script src="rz-engine.min.js?v=2026-07-17-dcos" defer></script>
+
 <!-- Supabase save/reload scenario (additive) -->
 <script src="js/rz-config.js?v=2026-07-11"></script>
 <script src="js/rz-scenario.js?v=2026-07-11d"></script>

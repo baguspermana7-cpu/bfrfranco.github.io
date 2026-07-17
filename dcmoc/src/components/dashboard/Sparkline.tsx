@@ -1,11 +1,23 @@
 'use client';
 
 import React from 'react';
-import { AreaChart, Area, ResponsiveContainer, YAxis } from 'recharts';
+import { AreaChart, Area, ResponsiveContainer, YAxis, Tooltip } from 'recharts';
 
 /** Minimal decorative-but-real sparkline from a genuine series (e.g. cashflow,
  *  occupancy ramp). Renders nothing when no series is supplied — never fakes a trend. */
-export function Sparkline({ data, color = '#22d3ee', height = 30 }: { data?: number[]; color?: string; height?: number }) {
+export function Sparkline({
+    data,
+    color = '#22d3ee',
+    height = 30,
+    valueFormat,
+    seriesLabel,
+}: {
+    data?: number[];
+    color?: string;
+    height?: number;
+    valueFormat?: (n: number) => string;
+    seriesLabel?: string;
+}) {
     if (!data || data.length < 2) return <div style={{ height }} aria-hidden="true" />;
     const rows = data.map((v, i) => ({ i, v }));
     const id = React.useId().replace(/[:]/g, '');
@@ -20,6 +32,15 @@ export function Sparkline({ data, color = '#22d3ee', height = 30 }: { data?: num
                         </linearGradient>
                     </defs>
                     <YAxis hide domain={['dataMin', 'dataMax']} />
+                    <Tooltip
+                        formatter={((v: number) => [valueFormat ? valueFormat(v) : v.toLocaleString(), seriesLabel ?? 'Value']) as never}
+                        labelFormatter={() => ''}
+                        contentStyle={{ background: '#0f1424', border: '1px solid rgba(255,255,255,0.15)', fontSize: 11, borderRadius: 8, padding: '4px 8px' }}
+                        labelStyle={{ color: '#e2e8f0', fontWeight: 600 }}
+                        itemStyle={{ color }}
+                        cursor={{ stroke: color, strokeWidth: 1, strokeDasharray: '3 3' }}
+                        isAnimationActive={false}
+                    />
                     <Area type="monotone" dataKey="v" stroke={color} strokeWidth={1.6} fill={`url(#sl-${id})`} dot={false} isAnimationActive={false} />
                 </AreaChart>
             </ResponsiveContainer>

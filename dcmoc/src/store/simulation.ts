@@ -32,7 +32,7 @@ export interface SimulationState {
         // Capacity planning phases
         capacityPhases: { id: string; label: string; itLoadKw: number; startMonth: number; buildMonths: number; occupancyRamp: number[] }[];
     };
-    activeTab: 'dashboard' | 'sim' | 'staff' | 'maint' | 'risk' | 'report' | 'capex' | 'carbon' | 'finance' | 'invest' | 'benchmark' | 'montecarlo' | 'portfolio' | 'faq' | 'capacity' | 'phased-finance' | 'tax' | 'disaster' | 'grid' | 'talent' | 'compliance' | 'asset-lifecycle' | 'cbm' | 'fuel-gen' | 'strategic' | 'reliability' | 'requirements' | 'site' | 'architecture' | 'construction' | 'commissioning' | 'asset-health';
+    activeTab: 'dashboard' | 'sim' | 'staff' | 'maint' | 'risk' | 'report' | 'capex' | 'carbon' | 'finance' | 'invest' | 'benchmark' | 'montecarlo' | 'portfolio' | 'faq' | 'capacity' | 'phased-finance' | 'tax' | 'disaster' | 'grid' | 'talent' | 'compliance' | 'asset-lifecycle' | 'cbm' | 'fuel-gen' | 'strategic' | 'reliability' | 'requirements' | 'site' | 'architecture' | 'construction' | 'commissioning' | 'asset-health' | 'projects' | 'scenarios' | 'templates' | 'data-library' | 'knowledge' | 'integrations' | 'settings' | 'audit' | 'users';
     isLoading: boolean;
     actions: {
         setLoading: (loading: boolean) => void;

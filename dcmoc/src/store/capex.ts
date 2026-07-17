@@ -7,13 +7,20 @@ export interface CapexStore {
     inputs: CapexInput;
     results: CapexResult | null;
     narrative: string;
+    /** Project hero image (compressed WebP dataURL) shown on the dashboard.
+     *  null → the default /dcmoc/hero-default.webp is used. */
+    heroImage: string | null;
 
     // Actions
     setInputs: (inputs: Partial<CapexInput>) => void;
     setModel: (model: 'simple' | 'advanced') => void;
     runCalculation: () => void;
     reset: () => void;
+    setHeroImage: (url: string | null) => void;
 }
+
+const HERO_KEY = 'dcmoc-hero-image';
+const loadHero = (): string | null => { try { return typeof window !== 'undefined' ? localStorage.getItem(HERO_KEY) : null; } catch { return null; } };
 
 const defaultInputs: CapexInput = {
     itLoad: 1000,
@@ -45,6 +52,12 @@ export const useCapexStore = create<CapexStore>((set, get) => ({
     inputs: defaultInputs,
     results: null,
     narrative: '',
+    heroImage: loadHero(),
+
+    setHeroImage: (url) => {
+        try { if (typeof window !== 'undefined') { if (url) localStorage.setItem(HERO_KEY, url); else localStorage.removeItem(HERO_KEY); } } catch { /* quota */ }
+        set({ heroImage: url });
+    },
 
     setInputs: (newInputs) => {
         set((state) => ({

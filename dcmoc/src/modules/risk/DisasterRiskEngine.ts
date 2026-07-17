@@ -5,6 +5,7 @@
 // seismic weights updated per USGS NSHM 2023 model
 
 import { CountryProfile } from '@/constants/countries';
+import { rzModels } from '@/lib/rz-engine';
 
 export interface DisasterRiskInput {
     country: CountryProfile;
@@ -68,7 +69,16 @@ export const calculateDisasterRisk = (input: DisasterRiskInput): DisasterRiskRes
         : 5;
 
     // 2026 weights: seismic 28%, flood 22%, typhoon 18%, volcano 12%, tsunami 10%, wildfire 10%
-    const compositeScore = Math.min(100, Math.round(
+    const hazards = {
+        seismic: seismicZone / 4,
+        flood: floodRisk === 'extreme' ? 1 : floodRisk === 'high' ? 0.7 : floodRisk === 'moderate' ? 0.4 : 0.1,
+        typhoon: typhoonRisk === 'high' ? 1 : typhoonRisk === 'moderate' ? 0.6 : typhoonRisk === 'low' ? 0.25 : 0,
+        volcano: volcanoRisk === 'moderate' ? 0.8 : volcanoRisk === 'low' ? 0.3 : 0,
+        tsunami: tsunamiRisk === 'high' ? 1 : tsunamiRisk === 'moderate' ? 0.6 : tsunamiRisk === 'low' ? 0.25 : 0,
+    };
+    const riskModel = rzModels().risk;
+    const engineGeo = riskModel && typeof riskModel.geo === 'function' ? riskModel.geo(hazards) : null;
+    const compositeScore = engineGeo ? Math.min(100, Math.round(engineGeo.risk)) : Math.min(100, Math.round(
         seismicScore * 0.28 + floodScore * 0.22 + typhoonScore * 0.18 +
         volcanoScore * 0.12 + tsunamiScore * 0.10 + wildfireScore * 0.10
     ));

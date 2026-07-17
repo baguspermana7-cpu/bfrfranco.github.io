@@ -165,6 +165,26 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
         { num: 12, label: 'Financial', icon: TrendingUp, childIds: ['finance', 'invest', 'montecarlo', 'portfolio', 'benchmark', 'strategic'] },
         { num: 13, label: 'AI Decision Engine', icon: BrainCircuit, childIds: [] },
     ];
+    // Per-engine accent (reference: color-coded number badges 1–13)
+    const ENGINE_COLORS: Record<number, string> = {
+        1: '#22d3ee', 2: '#34d399', 3: '#a78bfa', 4: '#fbbf24', 5: '#60a5fa', 6: '#fb923c',
+        7: '#2dd4bf', 8: '#38bdf8', 9: '#818cf8', 10: '#fb7185', 11: '#4ade80', 12: '#10b981', 13: '#e879f9',
+    };
+    // PLATFORM + SUPPORT sections (route to engine-backed where possible, else stub tabs)
+    const PLATFORM: { label: string; icon: LucideIcon; id?: typeof activeTab; action?: () => void }[] = [
+        { label: 'Projects', icon: FolderOpen, id: 'projects' },
+        { label: 'Scenarios', icon: Layers, action: () => { scenarioStore.togglePanel(); setSidebarOpen(false); } },
+        { label: 'Templates', icon: Boxes, id: 'templates' },
+        { label: 'Data Library', icon: FileText, id: 'data-library' },
+        { label: 'Knowledge Base', icon: HelpCircle, id: 'knowledge' },
+    ];
+    const SUPPORT: { label: string; icon: LucideIcon; id: typeof activeTab }[] = [
+        { label: 'Integrations', icon: Zap, id: 'integrations' },
+        { label: 'Settings', icon: Wrench, id: 'settings' },
+        { label: 'Audit Trail', icon: ClipboardCheck, id: 'audit' },
+        { label: 'User Management', icon: Users, id: 'users' },
+    ];
+
     const engineOfActive = ENGINE_GROUPS.find((g) => g.childIds.includes(activeTab))?.num;
     const isEngineOpen = (num: number) => expandedEngines.includes(num) || engineOfActive === num;
     const toggleEngine = (num: number) =>
@@ -217,7 +237,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
             {/* Sidebar */}
             <aside
                 className={clsx(
-                    "w-64 border-r border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl flex flex-col fixed h-full z-40 transition-all duration-300",
+                    "w-64 border-r border-slate-200 dark:border-white/5 bg-white/95 dark:bg-[#0b1020]/95 backdrop-blur-xl flex flex-col fixed h-full z-40 transition-all duration-300",
                     // On large screens: always visible. On small screens: slide in/out
                     "lg:translate-x-0",
                     sidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:translate-x-0"
@@ -232,27 +252,38 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                         <ArrowLeft className="w-3.5 h-3.5" />
                         Back to Portfolio
                     </a>
-                    <div className="px-6 pb-5 pt-2">
-                        <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-                            <img src="/dcmoc/favicon-portfolio.png" alt="DCMOC" className="w-8 h-8 rounded" />
-                            DCMOC
-                            <span className="text-xs bg-slate-200 dark:bg-slate-800 text-cyan-700 dark:text-cyan-400 px-1.5 py-0.5 rounded ml-auto">PRO</span>
-                        </h1>
+                    <div className="px-5 pb-4 pt-2">
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-900/40 shrink-0">
+                                <BrainCircuit className="w-5 h-5 text-white" />
+                            </div>
+                            <div className="min-w-0">
+                                <h1 className="text-base font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5 leading-none">
+                                    DC-OS
+                                    <span className="text-[9px] bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 px-1.5 py-0.5 rounded font-semibold">PRO</span>
+                                </h1>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-500 truncate mt-0.5">Data Center Intelligence Platform</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div className="p-4 flex-1 overflow-y-auto">
                     <nav className="space-y-1" aria-label="Main navigation">
+                        {/* ── PLATFORM ── */}
+                        <div className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 px-2" aria-hidden="true">
+                            Platform
+                        </div>
                         {/* DC-OS: Executive Overview landing */}
-                        <div className="flex items-center mb-2">
+                        <div className="flex items-center">
                             <button
                                 onClick={() => { actions.setActiveTab('dashboard'); setSidebarOpen(false); }}
                                 aria-current={activeTab === 'dashboard' ? 'page' : undefined}
                                 className={clsx(
-                                    "flex-1 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all",
+                                    "flex-1 flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition-all",
                                     activeTab === 'dashboard'
                                         ? "bg-cyan-600 text-white shadow-sm shadow-cyan-900/30"
-                                        : "text-slate-700 dark:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50"
+                                        : "text-slate-700 dark:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-white/[0.04]"
                                 )}
                             >
                                 <LayoutDashboard className="w-4 h-4" aria-hidden="true" />
@@ -260,7 +291,29 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                             </button>
                             <Explain k="tab-dashboard" />
                         </div>
-                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-2 block px-2" aria-hidden="true">
+                        {PLATFORM.map((p) => {
+                            const PIcon = p.icon;
+                            const active = !!p.id && activeTab === p.id;
+                            return (
+                                <button
+                                    key={p.label}
+                                    onClick={() => { if (p.action) p.action(); else if (p.id) { actions.setActiveTab(p.id); setSidebarOpen(false); } }}
+                                    aria-current={active ? 'page' : undefined}
+                                    className={clsx(
+                                        "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
+                                        active ? "bg-slate-200 dark:bg-white/[0.06] text-cyan-700 dark:text-cyan-400 font-medium"
+                                            : "text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-white/[0.04] hover:text-cyan-700 dark:hover:text-cyan-400"
+                                    )}
+                                >
+                                    <PIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
+                                    <span className="truncate">{p.label}</span>
+                                    {p.label === 'Scenarios' && scenarioStore.scenarios.length > 0 && (
+                                        <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-slate-400">{scenarioStore.scenarios.length}</span>
+                                    )}
+                                </button>
+                            );
+                        })}
+                        <div className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 mt-4 px-2" aria-hidden="true">
                             Engines · 13-Layer Lifecycle
                         </div>
                         {ENGINE_GROUPS.map((g) => {
@@ -280,7 +333,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                                             active ? "text-cyan-700 dark:text-cyan-400" : "text-slate-600 dark:text-slate-300"
                                         )}
                                     >
-                                        <span className="text-[10px] font-mono text-slate-400 w-4 text-right shrink-0">{g.num}</span>
+                                        <span className="text-[10px] font-mono font-bold w-5 h-5 rounded flex items-center justify-center shrink-0 text-white" style={{ background: ENGINE_COLORS[g.num] }}>{g.num}</span>
                                         <GroupIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
                                         <span className="flex-1 text-left truncate">{g.label}</span>
                                         {!hasChildren && <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-400 shrink-0">soon</span>}
@@ -334,6 +387,30 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                             </button>
                             <Explain k="tab-report" />
                         </div>
+
+                        {/* ── SUPPORT ── */}
+                        <div className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 mt-4 px-2" aria-hidden="true">
+                            Support
+                        </div>
+                        {SUPPORT.map((s) => {
+                            const SIcon = s.icon;
+                            const active = activeTab === s.id;
+                            return (
+                                <button
+                                    key={s.id}
+                                    onClick={() => { actions.setActiveTab(s.id); setSidebarOpen(false); }}
+                                    aria-current={active ? 'page' : undefined}
+                                    className={clsx(
+                                        "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
+                                        active ? "bg-slate-200 dark:bg-white/[0.06] text-cyan-700 dark:text-cyan-400 font-medium"
+                                            : "text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-white/[0.04] hover:text-cyan-700 dark:hover:text-cyan-400"
+                                    )}
+                                >
+                                    <SIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
+                                    <span className="truncate">{s.label}</span>
+                                </button>
+                            );
+                        })}
                     </nav>
                 </div>
 
@@ -429,7 +506,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                         <div className="text-sm breadcrumbs text-slate-500 dark:text-slate-400">
                             <span className="hidden sm:inline text-slate-400 dark:text-slate-600">App</span>
                             <span className="hidden sm:inline"> / </span>
-                            <span className="text-slate-800 dark:text-slate-200 font-medium">{activeTab === 'dashboard' ? 'Executive Overview' : navItems.find(n => n.id === activeTab)?.label || 'Simulation'}</span>
+                            <span className="text-slate-800 dark:text-slate-200 font-medium">{activeTab === 'dashboard' ? 'Executive Overview' : navItems.find(n => n.id === activeTab)?.label || SUPPORT.find(s => s.id === activeTab)?.label || PLATFORM.find(p => p.id === activeTab)?.label || 'Overview'}</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">

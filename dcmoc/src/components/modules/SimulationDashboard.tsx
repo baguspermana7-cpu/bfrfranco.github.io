@@ -678,7 +678,7 @@ export function SimulationDashboard() {
                     <CloudFog className="w-4 h-4 text-emerald-500" />
                     Environmental Impact
                 </h3>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {(() => {
                         const gridCarbonIntensity = selectedCountry!.environment?.gridCarbonIntensity ?? 0.50;
                         const envPue = getPUE(inputs.coolingType);

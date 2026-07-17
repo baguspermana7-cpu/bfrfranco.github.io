@@ -108,7 +108,7 @@ export default function PortfolioDashboard() {
             {result && (
                 <>
                     {/* Portfolio Summary */}
-                    <div className="grid grid-cols-6 gap-3">
+                    <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
                         <SummaryCard label="Total CAPEX" value={fmtMoney(result.totalCapex)} tooltip="Combined capital expenditure across all data center sites in the portfolio." />
                         <SummaryCard label="Annual OPEX" value={fmtMoney(result.totalAnnualOpex)} tooltip="Total annual operating expenditure across all portfolio sites including power, staffing, and maintenance." />
                         <SummaryCard label="Total Staff" value={String(result.totalStaff)} tooltip="Combined headcount across all data center sites in the portfolio." />
@@ -281,7 +281,7 @@ function OverviewTab({ result }: { result: ReturnType<typeof calculatePortfolio>
                         <RechartsTooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, fontSize: 11 }} />
                     </RadarChart>
                 </ResponsiveContainer>
-                <div className="grid grid-cols-3 gap-x-4 gap-y-1 mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/50">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-1 mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/50">
                     {[
                         { axis: 'CAPEX Efficiency', desc: 'Lower CAPEX per kW scores higher — measures construction cost efficiency.' },
                         { axis: 'OPEX Efficiency', desc: 'Lower annual OPEX per kW scores higher — measures operational cost efficiency.' },
@@ -299,7 +299,7 @@ function OverviewTab({ result }: { result: ReturnType<typeof calculatePortfolio>
             </div>
 
             {/* Rankings */}
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
                     { label: 'Best CAPEX/kW', siteId: result.bestCapexPerKw, tooltip: 'Site with the lowest capital expenditure per kilowatt of IT capacity, indicating the most cost-efficient build.' },
                     { label: 'Best PUE', siteId: result.bestPue, tooltip: 'Site with the lowest Power Usage Effectiveness, meaning the most energy-efficient facility. Closer to 1.0 is better.' },

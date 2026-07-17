@@ -674,6 +674,64 @@ if (D.regionsCountry) {
 }
 
 /* ============================================================
+ * 2b. DC-OS unification additions (v1.61.x): countries + site.deriveFactors
+ *     + commissioning program cost/schedule
+ * ============================================================ */
+if (D.countries) {
+    ok('DATA.countries has 32 entries', Object.keys(D.countries).length === 32, '' + Object.keys(D.countries).length);
+    ok('DATA.countries.SG electricityRate 0.22', D.countries.SG.economy.electricityRate === 0.22);
+    ok('DATA.tierCodes 2n = Tier III', D.tierCodes && D.tierCodes['2n'] === 'Tier III');
+}
+if (M.site && M.site.deriveFactors) {
+    const fSG = M.site.deriveFactors('SG'), fID = M.site.deriveFactors('ID');
+    ok('site.deriveFactors returns 0-1 factors', fSG.grid >= 0 && fSG.grid <= 1 && fSG.power >= 0 && fSG.power <= 1);
+    const sSG = M.site.score(fSG).score, sID = M.site.score(fID).score;
+    ok('site score is country-varying (SG != ID)', sSG !== sID, `${sSG} vs ${sID}`);
+    ok('site score in range 0-100', sSG > 0 && sSG <= 100);
+}
+if (M.commissioning && M.commissioning.programCost) {
+    const pc = M.commissioning.programCost({ itLoadKw: 3000, cooling: 'air', redundancy: '2n', countryId: 'SG' });
+    ok('commissioning.programCost total > 0', pc.total > 0);
+    ok('commissioning.programCost per-kW plausible (100-600)', pc.perKw >= 100 && pc.perKw <= 600, '' + pc.perKw);
+    const lvlSum = Object.keys(pc.byLevel).reduce((s, k) => s + pc.byLevel[k].cost, 0);
+    ok('commissioning byLevel sums ~ total (±1%)', Math.abs(lvlSum - pc.total) / pc.total < 0.01, `${lvlSum} vs ${pc.total}`);
+    const ps = M.commissioning.programSchedule({ itLoadKw: 3000, cooling: 'air', redundancy: '2n' });
+    ok('commissioning.programSchedule months > 0 and capped', ps.totalMonths > 0 && ps.totalMonths <= 20, '' + ps.totalMonths);
+    ok('commissioning schedule has 7 levels L0-L6', ps.byLevel.length === 7);
+    // liquid + higher redundancy costs more than air + n1 at same load
+    const pcHi = M.commissioning.programCost({ itLoadKw: 3000, cooling: 'liquid', redundancy: '2n1', countryId: 'SG' });
+    ok('commissioning cost scales with cooling+redundancy', pcHi.total > pc.total, `${pcHi.total} > ${pc.total}`);
+}
+
+/* ============================================================
+ * 2c. DC-OS shared pillar engines (v1.63.0): tier/fire/cdu/spares/decision
+ * ============================================================ */
+if (M.tier && M.tier.classify) {
+    ok('tier.classify high scores → Tier IV or capped', M.tier.classify({ power: 95, cooling: 95, network: 95, physical: 95, monitoring: 95, redundancy: '2n' }).tier === 4);
+    ok('tier.classify caps to redundancy (n1 → max Tier III)', M.tier.classify({ power: 95, cooling: 95, network: 95, physical: 95, monitoring: 95, redundancy: 'n1' }).tier === 3);
+}
+if (M.fire && M.fire.agentQuantity) {
+    const nv = M.fire.agentQuantity({ volumeM3: 500, agent: 'novec1230' });
+    ok('fire novec1230 mass plausible (300-360 kg / 500m3)', nv.massKg > 300 && nv.massKg < 360, '' + nv.massKg);
+    ok('fire ig541 returns inert agent volume', M.fire.agentQuantity({ volumeM3: 500, agent: 'ig541' }).type === 'inert');
+}
+if (M.cdu && M.cdu.size) {
+    const c = M.cdu.size({ itKw: 3000, deltaT: 10 });
+    ok('cdu flow = Q/(ρ·cp·ΔT) ~4300 Lpm', c.flowLpm > 4200 && c.flowLpm < 4400, '' + c.flowLpm);
+    ok('cdu N+1 units', c.cduUnitsRedundant === c.cduUnits + 1);
+}
+if (M.spares && M.spares.eoq) {
+    const e = M.spares.eoq({ annualDemand: 120, orderCost: 400, holdingCostPerUnit: 60 });
+    ok('spares EOQ balances holding≈ordering at optimum', Math.abs(e.annualHolding - e.annualOrdering) < 1, `${e.annualHolding} vs ${e.annualOrdering}`);
+}
+if (M.decision && M.decision.recommend) {
+    const d = M.decision.recommend({ inputs: { itLoadKw: 3000, tier: 3, coolingType: 'air' }, capex: { perKw: 16000, timelineMonths: 32 }, carbon: { pue: 1.6 }, financial: { paybackYears: 9, irrPct: 8 } }, {}, ['maxRoi']);
+    ok('decision returns ≥3 recommendations for a flagged project', d.recommendations.length >= 3, '' + d.recommendations.length);
+    ok('decision never empty (balanced project)', M.decision.recommend({ inputs: { itLoadKw: 3000, tier: 3, coolingType: 'liquid' }, financial: { paybackYears: 5, irrPct: 18 } }).recommendations.length >= 1);
+    ok('decision carries disclaimer', !!d.disclaimer && /not investment/i.test(d.disclaimer));
+}
+
+/* ============================================================
  * 3. PROVENANCE (soft until A1 lands the sidecar; hard after)
  * ============================================================ */
 if (D.sources) {

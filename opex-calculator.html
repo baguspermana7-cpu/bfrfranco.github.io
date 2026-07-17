@@ -2810,6 +2810,18 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
             'BR': { name: 'Brazil', flag: '🇧🇷', laborMult: 1.50, energyRate: 0.140, maintMult: 1.15, workerTax: 1.40 },
             'MX': { name: 'Mexico', flag: '🇲🇽', laborMult: 1.30, energyRate: 0.095, maintMult: 1.05, workerTax: 1.20 },
         };
+        /* single-source: RZEngine.data.countries (ENGINE_UNIFICATION.md) */
+        /* isoMap: opex keys are direct ISO-2 except CN2/HK/NO/CH/US-VA/US-TX/US-CA/CA (no engine entry, kept inline) */
+        document.addEventListener('DOMContentLoaded', function() {
+            var _engC = window.RZEngine && window.RZEngine.data && window.RZEngine.data.countries;
+            if (!_engC) return;
+            Object.keys(countryData).forEach(function(id) {
+                var entry = _engC[id];
+                if (!entry) return;
+                if (entry.economy && entry.economy.electricityRate != null)
+                    countryData[id].energyRate = entry.economy.electricityRate;
+            });
+        });
 
         // =====================================================
         // INDONESIA SALARY DATABASE (Monthly Gross in IDR, 13-month basis with THR)
@@ -3100,6 +3112,17 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
             QA: 0.49, BH: 0.52, HK: 0.51, TW: 0.50, CN: 0.58, NZ: 0.10,
             FR: 0.06, IE: 0.30, CH: 0.02
         };
+        /* single-source: RZEngine.data.countries (ENGINE_UNIFICATION.md) */
+        /* gridCarbonIntensity patched from engine for all ISO-2 keys present; US/US-CA/US-TX/US-VA/HK/NO/CH/BH/NZ kept inline (no engine entry or no match) */
+        document.addEventListener('DOMContentLoaded', function() {
+            var _engC = window.RZEngine && window.RZEngine.data && window.RZEngine.data.countries;
+            if (!_engC) return;
+            Object.keys(gridEmissionFactorOpex).forEach(function(id) {
+                var entry = _engC[id];
+                if (entry && entry.environment && entry.environment.gridCarbonIntensity != null)
+                    gridEmissionFactorOpex[id] = entry.environment.gridCarbonIntensity;
+            });
+        });
         const carbonPriceByRegion = {
             ID: 5, SG: 25, MY: 10, TH: 5, VN: 3, PH: 3,
             US: 15, 'US-CA': 30, 'US-TX': 10, 'US-VA': 15,

@@ -2,6 +2,7 @@ import { CountryProfile } from '@/constants/countries';
 import { ASSETS } from '@/constants/assets';
 import { generateAssetCounts, AssetCount } from '@/lib/AssetGenerator';
 import { fmtMoney } from '@/lib/format';
+import { rzModels } from '@/lib/rz-engine';
 
 export type DepreciationMethod = 'straight-line' | 'declining-balance' | 'sum-of-years';
 
@@ -173,6 +174,7 @@ export function calculateAssetLifecycle(input: AssetLifecycleInput): AssetLifecy
     const assetCounts = generateAssetCounts(itLoadKw, effectiveTier, coolingMap, Math.ceil(itLoadKw * 0.6), coolingTopology ?? 'perimeter', powerRedundancy ?? '2N');
 
     // Build lifecycle assets
+    const assetModel = rzModels().asset;
     const assets: LifecycleAsset[] = [];
     for (const ac of assetCounts) {
         const lifecycle = USEFUL_LIVES[ac.assetId];
@@ -180,7 +182,11 @@ export function calculateAssetLifecycle(input: AssetLifecycleInput): AssetLifecy
         const asset = ASSETS.find(a => a.id === ac.assetId);
         if (!asset) continue;
 
-        const usefulLife = lifecycle.years;
+        // Engine design life cross-check (rzModels().asset.designLife)
+        const engineDesignLife = assetModel && typeof assetModel.designLife === 'function'
+            ? assetModel.designLife(ac.assetId)
+            : null;
+        const usefulLife = (engineDesignLife != null ? engineDesignLife : lifecycle.years) as number;
         const unitCost = lifecycle.replacementCostPerUnit;
         const totalCost = unitCost * ac.count;
         const annualDep = calcDepreciation(totalCost, usefulLife, 1, depreciationMethod, totalCost);
@@ -271,6 +277,14 @@ export function calculateAssetLifecycle(input: AssetLifecycleInput): AssetLifecy
     }
     replacements.sort((a, b) => a.year - b.year);
 
+    // Engine replacement schedule cross-reference (rzModels().asset.replacementSchedule)
+    // Used as a secondary validation; local timeline is preserved when engine returns null.
+    const engineReplaceSched = assetModel && typeof assetModel.replacementSchedule === 'function'
+        ? assetModel.replacementSchedule('gen-set', itLoadKw, projectionYears)
+        : null;
+    // (Note: engine schedule is informational — local per-asset schedule remains authoritative)
+    void engineReplaceSched;
+
     // Total lifecycle cost
     const totalReplacementCost = replacements.reduce((s, r) => s + r.cost, 0);
     const totalLifecycleCost25yr = totalAcquisitionCost + totalReplacementCost;
@@ -287,9 +301,18 @@ export function calculateAssetLifecycle(input: AssetLifecycleInput): AssetLifecy
     // --- Health Scores ---
     const assumedAvgAge = 5; // assume assets are ~5 years old on average
     const healthScores: AssetHealthScore[] = assets.map(a => {
-        const remainingLife = Math.max(0, a.usefulLifeYears - assumedAvgAge);
-        const healthPct = Math.round((remainingLife / a.usefulLifeYears) * 100);
-        const ageRatio = Math.min(1, assumedAvgAge / a.usefulLifeYears);
+        const ageYears = assumedAvgAge;
+        // Engine healthIndex — provides health + remainingYears when model is present
+        const engineHealth = assetModel && typeof assetModel.healthIndex === 'function'
+            ? assetModel.healthIndex({ assetClass: a.assetId, ageYears, condition: 0.9, duty: 0.6 })
+            : null;
+        const healthPct = engineHealth
+            ? Math.round(engineHealth.health)
+            : Math.round((Math.max(0, a.usefulLifeYears - ageYears) / a.usefulLifeYears) * 100);
+        const remainingLife = engineHealth
+            ? Math.round(engineHealth.remainingYears)
+            : Math.max(0, a.usefulLifeYears - ageYears);
+        const ageRatio = Math.min(1, ageYears / a.usefulLifeYears);
         const failureProbability = Math.min(0.95, 0.02 * Math.exp(0.3 * ageRatio * 5));
         const riskLevel: AssetHealthScore['riskLevel'] =
             healthPct > 75 ? 'low' : healthPct > 50 ? 'medium' : healthPct > 25 ? 'high' : 'critical';

@@ -400,7 +400,7 @@ function RiskTab({ result }: { result: MonteCarloResult }) {
     return (
         <div className="space-y-4">
             {/* VaR Cards */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <RiskCard
                     icon={<TrendingDown className="w-5 h-5 text-red-500" />}
                     label="VaR (5%)"

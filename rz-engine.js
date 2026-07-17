@@ -60,7 +60,7 @@
         },
 
         // Static currency rates (USD = 1.0 baseline), refreshed 2026-04. Update annually.
-        currency: { USD: 1.0, EUR: 0.92, IDR: 16250, SGD: 1.35, GBP: 0.79, JPY: 152, INR: 83.5, MYR: 4.45 },
+        currency: { USD: 1.0, EUR: 0.92, GBP: 0.79, JPY: 152, INR: 83.5, MYR: 4.45, IDR: 16250, SGD: 1.35, AUD: 1.52, BRL: 5.05, CLP: 950, CNY: 7.15, COP: 4100, KES: 129, KRW: 1360, MXN: 18.5, NZD: 1.65, PHP: 58, PLN: 4.0, QAR: 3.64, SAR: 3.75, SEK: 10.6, THB: 36, TWD: 32, VND: 25400, ZAR: 18.5 },
 
         // Annual inflation rate per region (flat; year-by-year curve is optional via forecast useInflation)
         inflationAnnual: { US: 0.028, EU: 0.024, APAC: 0.030, LATAM: 0.040 },
@@ -161,6 +161,3653 @@
             IN: { salaryMult: 0.28, powerKwh: 0.095, label: 'India',      currency: 'INR', parent: 'APAC' },
             MY: { salaryMult: 0.35, powerKwh: 0.070, label: 'Malaysia',   currency: 'MYR', parent: 'APAC' }
         },
+
+        // ── Canonical country reference — THE single source of truth for region /
+        //    country economics (electricity rate, tax, grid carbon, labor, disaster,
+        //    grid, talent, fuel, incentives, constructionIndex). GENERATED from
+        //    dcmoc/src/constants/countries.ts by tools/build-countries-data.mjs.
+        //    DO NOT hand-edit between the markers — edit countries.ts and rebuild.
+        /* @@COUNTRIES_START */
+        countries: {
+            "ID": {
+                "id": "ID",
+                "region": "APAC",
+                "name": "Indonesia",
+                "currency": "USD",
+                "currencySymbol": "$",
+                "economy": {
+                    "inflationRate": 0.032,
+                    "laborEscalation": 0.065,
+                    "taxRate": 0.22,
+                    "electricityRate": 0.09
+                },
+                "labor": {
+                    "minimumWage": 350,
+                    "baseSalary_ShiftLead": 1500,
+                    "baseSalary_Engineer": 1000,
+                    "baseSalary_Technician": 550,
+                    "baseSalary_Admin": 450,
+                    "baseSalary_Janitor": 350,
+                    "laborRatePerHour": 10,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 2
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 3,
+                            "tenthHourPlus": 4
+                        },
+                        "maxOvertimeHoursPerWeek": 18
+                    },
+                    "shrinkageFactor": 0.2,
+                    "leaves": {
+                        "annual": 12,
+                        "publicHolidays": 15,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "Sertifikat Laik Operasi (SLO)",
+                        "Ahli K3 Listrik",
+                        "AMDAL",
+                        "PP 35/2021"
+                    ],
+                    "annualComplianceCost": 6500
+                },
+                "environment": {
+                    "baselineAQI": 120,
+                    "gridCarbonIntensity": 0.7
+                },
+                "risk": {
+                    "downtimeCostPerMin": 1500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.35
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Batam FTZ",
+                        "Nusantara Capital (IKN)",
+                        "Cikarang SEZ"
+                    ],
+                    "taxHolidayYears": 10,
+                    "taxHolidayRate": 0,
+                    "incentivePrograms": [
+                        "Tax Holiday PP 40/2021",
+                        "Super Deduction R&D",
+                        "IKN Capital Incentive"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0
+                },
+                "naturalDisaster": {
+                    "seismicZone": 3,
+                    "floodRisk": "high",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "moderate",
+                    "tsunamiRisk": "moderate",
+                    "compositeScore": 68,
+                    "insuranceMultiplier": 1.6,
+                    "structuralReinforcement": 0.12
+                },
+                "gridReliability": {
+                    "gridUptime": 99.5,
+                    "voltageStability": "moderate",
+                    "brownoutFrequency": 18,
+                    "averageOutageDuration": 45,
+                    "gridTier": 2,
+                    "backupFuelPremium": 0.15,
+                    "recommendedGenHours": 72,
+                    "renewableReadiness": 55
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 45,
+                    "hyperscalerPresence": 4,
+                    "avgHiringDays": 45,
+                    "salaryPremium": 1.1,
+                    "talentScore": 55,
+                    "certifiedProfessionals": 320
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 0.95,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0.05,
+                    "deliveryLeadDays": 3,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "moderate"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "SG": {
+                "id": "SG",
+                "region": "APAC",
+                "name": "Singapore",
+                "currency": "SGD",
+                "currencySymbol": "S$",
+                "economy": {
+                    "inflationRate": 0.022,
+                    "laborEscalation": 0.04,
+                    "taxRate": 0.17,
+                    "electricityRate": 0.22
+                },
+                "labor": {
+                    "minimumWage": 1400,
+                    "baseSalary_ShiftLead": 5500,
+                    "baseSalary_Engineer": 4500,
+                    "baseSalary_Technician": 3200,
+                    "baseSalary_Admin": 2800,
+                    "baseSalary_Janitor": 1800,
+                    "laborRatePerHour": 35,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.12,
+                    "leaves": {
+                        "annual": 14,
+                        "publicHolidays": 11,
+                        "sickAverage": 4
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "SS 564",
+                        "BCA Green Mark"
+                    ],
+                    "annualComplianceCost": 12000
+                },
+                "environment": {
+                    "baselineAQI": 45,
+                    "gridCarbonIntensity": 0.4
+                },
+                "risk": {
+                    "downtimeCostPerMin": 4500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Jurong Island",
+                        "Changi Business Park"
+                    ],
+                    "taxHolidayYears": 5,
+                    "taxHolidayRate": 0.05,
+                    "incentivePrograms": [
+                        "Pioneer Certificate",
+                        "Development & Expansion Incentive",
+                        "Green DC Incentive"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.05
+                },
+                "naturalDisaster": {
+                    "seismicZone": 0,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "low",
+                    "compositeScore": 12,
+                    "insuranceMultiplier": 1,
+                    "structuralReinforcement": 0
+                },
+                "gridReliability": {
+                    "gridUptime": 99.999,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 0,
+                    "averageOutageDuration": 1,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 24,
+                    "renewableReadiness": 40
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 8,
+                    "hyperscalerPresence": 8,
+                    "avgHiringDays": 35,
+                    "salaryPremium": 1.15,
+                    "talentScore": 72,
+                    "certifiedProfessionals": 850
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.55,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.8,
+                    "fuelTaxRate": 0.1,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 30000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "MY": {
+                "id": "MY",
+                "region": "APAC",
+                "name": "Malaysia",
+                "currency": "MYR",
+                "currencySymbol": "RM",
+                "economy": {
+                    "inflationRate": 0.03,
+                    "laborEscalation": 0.045,
+                    "taxRate": 0.24,
+                    "electricityRate": 0.09
+                },
+                "labor": {
+                    "minimumWage": 340,
+                    "baseSalary_ShiftLead": 1800,
+                    "baseSalary_Engineer": 1200,
+                    "baseSalary_Technician": 700,
+                    "baseSalary_Admin": 500,
+                    "baseSalary_Janitor": 350,
+                    "laborRatePerHour": 8,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 3,
+                            "tenthHourPlus": 3
+                        }
+                    },
+                    "shrinkageFactor": 0.18,
+                    "leaves": {
+                        "annual": 12,
+                        "publicHolidays": 16,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "Suruhanjaya Tenaga",
+                        "GBI"
+                    ],
+                    "annualComplianceCost": 5000
+                },
+                "environment": {
+                    "baselineAQI": 90,
+                    "gridCarbonIntensity": 0.6
+                },
+                "risk": {
+                    "downtimeCostPerMin": 1200
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Iskandar Malaysia",
+                        "Cyberjaya",
+                        "Kulim Hi-Tech Park"
+                    ],
+                    "taxHolidayYears": 10,
+                    "taxHolidayRate": 0,
+                    "incentivePrograms": [
+                        "MSC Malaysia Status",
+                        "Pioneer Status",
+                        "Green Technology Tax Allowance"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0
+                },
+                "naturalDisaster": {
+                    "seismicZone": 1,
+                    "floodRisk": "high",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "low",
+                    "compositeScore": 28,
+                    "insuranceMultiplier": 1.15,
+                    "structuralReinforcement": 0.02
+                },
+                "gridReliability": {
+                    "gridUptime": 99.9,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 4,
+                    "averageOutageDuration": 20,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0.05,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 60
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 25,
+                    "hyperscalerPresence": 5,
+                    "avgHiringDays": 40,
+                    "salaryPremium": 1.1,
+                    "talentScore": 60,
+                    "certifiedProfessionals": 420
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 0.55,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0,
+                    "deliveryLeadDays": 2,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "moderate"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "US": {
+                "id": "US",
+                "region": "AMER",
+                "name": "United States",
+                "currency": "USD",
+                "currencySymbol": "$",
+                "economy": {
+                    "inflationRate": 0.027,
+                    "laborEscalation": 0.04,
+                    "taxRate": 0.21,
+                    "electricityRate": 0.13
+                },
+                "labor": {
+                    "minimumWage": 2000,
+                    "baseSalary_ShiftLead": 10500,
+                    "baseSalary_Engineer": 8500,
+                    "baseSalary_Technician": 5500,
+                    "baseSalary_Admin": 4000,
+                    "baseSalary_Janitor": 3000,
+                    "laborRatePerHour": 45,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 1.5,
+                            "ninthHour": 1.5,
+                            "tenthHourPlus": 1.5
+                        }
+                    },
+                    "shrinkageFactor": 0.1,
+                    "leaves": {
+                        "annual": 10,
+                        "publicHolidays": 10,
+                        "sickAverage": 3
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "OSHA",
+                        "NFPA 70E"
+                    ],
+                    "annualComplianceCost": 15000
+                },
+                "environment": {
+                    "baselineAQI": 35,
+                    "gridCarbonIntensity": 0.4
+                },
+                "risk": {
+                    "downtimeCostPerMin": 5000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Foreign Trade Zones (250+)"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.21,
+                    "incentivePrograms": [
+                        "ITC for Energy Property",
+                        "Opportunity Zones",
+                        "State-level DC Sales Tax Exemptions"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.21
+                },
+                "naturalDisaster": {
+                    "seismicZone": 2,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "moderate",
+                    "volcanoRisk": "low",
+                    "tsunamiRisk": "low",
+                    "compositeScore": 38,
+                    "insuranceMultiplier": 1.2,
+                    "structuralReinforcement": 0.05
+                },
+                "gridReliability": {
+                    "gridUptime": 99.97,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 1,
+                    "averageOutageDuration": 10,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 70
+                },
+                "talentPool": {
+                    "dcEngineerPool": "abundant",
+                    "universityPipeline": 120,
+                    "hyperscalerPresence": 10,
+                    "avgHiringDays": 30,
+                    "salaryPremium": 1,
+                    "talentScore": 90,
+                    "certifiedProfessionals": 8500
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.05,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.2,
+                    "fuelTaxRate": 0.06,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 100000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "JP": {
+                "id": "JP",
+                "region": "APAC",
+                "name": "Japan",
+                "currency": "JPY",
+                "currencySymbol": "¥",
+                "economy": {
+                    "inflationRate": 0.028,
+                    "laborEscalation": 0.03,
+                    "taxRate": 0.2304,
+                    "electricityRate": 0.2
+                },
+                "labor": {
+                    "minimumWage": 1200,
+                    "baseSalary_ShiftLead": 4500,
+                    "baseSalary_Engineer": 3500,
+                    "baseSalary_Technician": 2800,
+                    "baseSalary_Admin": 2200,
+                    "baseSalary_Janitor": 1800,
+                    "laborRatePerHour": 30,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.25,
+                            "subsequent": 1.25
+                        },
+                        "holiday": {
+                            "first8Hours": 1.35,
+                            "ninthHour": 1.35,
+                            "tenthHourPlus": 1.35
+                        }
+                    },
+                    "shrinkageFactor": 0.08,
+                    "leaves": {
+                        "annual": 10,
+                        "publicHolidays": 16,
+                        "sickAverage": 2
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "First Class Electrician",
+                        "Energy Manager"
+                    ],
+                    "annualComplianceCost": 8000
+                },
+                "environment": {
+                    "baselineAQI": 30,
+                    "gridCarbonIntensity": 0.5
+                },
+                "risk": {
+                    "downtimeCostPerMin": 4000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.05
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Okinawa FTZ",
+                        "Narita FTZ"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.2304,
+                    "incentivePrograms": [
+                        "J-Credits Scheme",
+                        "Green Innovation Fund",
+                        "Regional Revitalization Tax"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.2304
+                },
+                "naturalDisaster": {
+                    "seismicZone": 4,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "high",
+                    "volcanoRisk": "moderate",
+                    "tsunamiRisk": "high",
+                    "compositeScore": 82,
+                    "insuranceMultiplier": 1.8,
+                    "structuralReinforcement": 0.18
+                },
+                "gridReliability": {
+                    "gridUptime": 99.99,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 0,
+                    "averageOutageDuration": 5,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 55
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 50,
+                    "hyperscalerPresence": 7,
+                    "avgHiringDays": 60,
+                    "salaryPremium": 1.1,
+                    "talentScore": 70,
+                    "certifiedProfessionals": 1800
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.35,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.5,
+                    "fuelTaxRate": 0.08,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "AU": {
+                "id": "AU",
+                "region": "APAC",
+                "name": "Australia",
+                "currency": "AUD",
+                "currencySymbol": "A$",
+                "economy": {
+                    "inflationRate": 0.03,
+                    "laborEscalation": 0.035,
+                    "taxRate": 0.3,
+                    "electricityRate": 0.18
+                },
+                "labor": {
+                    "minimumWage": 3000,
+                    "baseSalary_ShiftLead": 9500,
+                    "baseSalary_Engineer": 8000,
+                    "baseSalary_Technician": 6000,
+                    "baseSalary_Admin": 5000,
+                    "baseSalary_Janitor": 4000,
+                    "laborRatePerHour": 40,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 2
+                        },
+                        "holiday": {
+                            "first8Hours": 2.5,
+                            "ninthHour": 2.5,
+                            "tenthHourPlus": 2.5
+                        }
+                    },
+                    "shrinkageFactor": 0.12,
+                    "leaves": {
+                        "annual": 20,
+                        "publicHolidays": 10,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "WHS",
+                        "Austel"
+                    ],
+                    "annualComplianceCost": 10000
+                },
+                "environment": {
+                    "baselineAQI": 20,
+                    "gridCarbonIntensity": 0.6
+                },
+                "risk": {
+                    "downtimeCostPerMin": 4500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.2
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Sydney Olympic Park"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.3,
+                    "incentivePrograms": [
+                        "R&D Tax Incentive",
+                        "Clean Energy Finance Corp",
+                        "NSW Digital Economy"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.3
+                },
+                "naturalDisaster": {
+                    "seismicZone": 1,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "low",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "low",
+                    "compositeScore": 22,
+                    "insuranceMultiplier": 1.1,
+                    "structuralReinforcement": 0.02
+                },
+                "gridReliability": {
+                    "gridUptime": 99.98,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 1,
+                    "averageOutageDuration": 8,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 80
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 18,
+                    "hyperscalerPresence": 6,
+                    "avgHiringDays": 35,
+                    "salaryPremium": 1.05,
+                    "talentScore": 75,
+                    "certifiedProfessionals": 1200
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.3,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.4,
+                    "fuelTaxRate": 0.1,
+                    "deliveryLeadDays": 2,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 80000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "AE": {
+                "id": "AE",
+                "region": "MENA",
+                "name": "UAE",
+                "currency": "USD",
+                "currencySymbol": "$",
+                "economy": {
+                    "inflationRate": 0.025,
+                    "laborEscalation": 0.035,
+                    "taxRate": 0.09,
+                    "electricityRate": 0.09
+                },
+                "labor": {
+                    "minimumWage": 800,
+                    "baseSalary_ShiftLead": 5000,
+                    "baseSalary_Engineer": 4000,
+                    "baseSalary_Technician": 2500,
+                    "baseSalary_Admin": 2000,
+                    "baseSalary_Janitor": 1200,
+                    "laborRatePerHour": 25,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.25,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 1.5,
+                            "ninthHour": 1.5,
+                            "tenthHourPlus": 1.5
+                        }
+                    },
+                    "shrinkageFactor": 0.1,
+                    "leaves": {
+                        "annual": 30,
+                        "publicHolidays": 10,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "DCDA",
+                        "Estidama",
+                        "Civil Defence"
+                    ],
+                    "annualComplianceCost": 15000
+                },
+                "environment": {
+                    "baselineAQI": 100,
+                    "gridCarbonIntensity": 0.45
+                },
+                "risk": {
+                    "downtimeCostPerMin": 3500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "JAFZA",
+                        "DAFZA",
+                        "Masdar City",
+                        "ADGM"
+                    ],
+                    "taxHolidayYears": 50,
+                    "taxHolidayRate": 0,
+                    "incentivePrograms": [
+                        "Free Zone 0% Corp Tax (qualifying income)",
+                        "Dubai D33 Digital Economy",
+                        "ADIO DC incentive scheme 2025"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0
+                },
+                "naturalDisaster": {
+                    "seismicZone": 1,
+                    "floodRisk": "low",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 8,
+                    "insuranceMultiplier": 1,
+                    "structuralReinforcement": 0
+                },
+                "gridReliability": {
+                    "gridUptime": 99.98,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 1,
+                    "averageOutageDuration": 5,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 24,
+                    "renewableReadiness": 75
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 6,
+                    "hyperscalerPresence": 6,
+                    "avgHiringDays": 30,
+                    "salaryPremium": 1.15,
+                    "talentScore": 65,
+                    "certifiedProfessionals": 600
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 0.65,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": false,
+                    "storageLimitLiters": 100000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "SA": {
+                "id": "SA",
+                "region": "MENA",
+                "name": "Saudi Arabia",
+                "currency": "SAR",
+                "currencySymbol": "﷼",
+                "economy": {
+                    "inflationRate": 0.02,
+                    "laborEscalation": 0.035,
+                    "taxRate": 0.2,
+                    "electricityRate": 0.05
+                },
+                "labor": {
+                    "minimumWage": 1100,
+                    "baseSalary_ShiftLead": 4500,
+                    "baseSalary_Engineer": 3800,
+                    "baseSalary_Technician": 2200,
+                    "baseSalary_Admin": 1800,
+                    "baseSalary_Janitor": 1000,
+                    "laborRatePerHour": 22,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.12,
+                    "leaves": {
+                        "annual": 21,
+                        "publicHolidays": 9,
+                        "sickAverage": 4
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "Saudi CDC",
+                        "SASO",
+                        "NEOM Standards"
+                    ],
+                    "annualComplianceCost": 12000
+                },
+                "environment": {
+                    "baselineAQI": 110,
+                    "gridCarbonIntensity": 0.55
+                },
+                "risk": {
+                    "downtimeCostPerMin": 3000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.05
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "KAEC",
+                        "NEOM",
+                        "Jazan Economic City"
+                    ],
+                    "taxHolidayYears": 10,
+                    "taxHolidayRate": 0,
+                    "incentivePrograms": [
+                        "Vision 2030 DC Initiative",
+                        "SAGIA Investment License",
+                        "NEOM Tech Incentive"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0
+                },
+                "naturalDisaster": {
+                    "seismicZone": 1,
+                    "floodRisk": "low",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "low",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 10,
+                    "insuranceMultiplier": 1,
+                    "structuralReinforcement": 0.01
+                },
+                "gridReliability": {
+                    "gridUptime": 99.95,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 2,
+                    "averageOutageDuration": 10,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 24,
+                    "renewableReadiness": 80
+                },
+                "talentPool": {
+                    "dcEngineerPool": "scarce",
+                    "universityPipeline": 8,
+                    "hyperscalerPresence": 3,
+                    "avgHiringDays": 50,
+                    "salaryPremium": 1.2,
+                    "talentScore": 45,
+                    "certifiedProfessionals": 280
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 0.2,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": false,
+                    "storageLimitLiters": 100000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "QA": {
+                "id": "QA",
+                "region": "MENA",
+                "name": "Qatar",
+                "currency": "QAR",
+                "currencySymbol": "QR",
+                "economy": {
+                    "inflationRate": 0.02,
+                    "laborEscalation": 0.03,
+                    "taxRate": 0.1,
+                    "electricityRate": 0.04
+                },
+                "labor": {
+                    "minimumWage": 1000,
+                    "baseSalary_ShiftLead": 5200,
+                    "baseSalary_Engineer": 4200,
+                    "baseSalary_Technician": 2600,
+                    "baseSalary_Admin": 2100,
+                    "baseSalary_Janitor": 1300,
+                    "laborRatePerHour": 24,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.25,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 1.5,
+                            "ninthHour": 1.5,
+                            "tenthHourPlus": 1.5
+                        }
+                    },
+                    "shrinkageFactor": 0.1,
+                    "leaves": {
+                        "annual": 21,
+                        "publicHolidays": 9,
+                        "sickAverage": 4
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "Kahramaa",
+                        "QCS 2014"
+                    ],
+                    "annualComplianceCost": 14000
+                },
+                "environment": {
+                    "baselineAQI": 95,
+                    "gridCarbonIntensity": 0.48
+                },
+                "risk": {
+                    "downtimeCostPerMin": 3500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.05
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Qatar Free Zones (QFZ)",
+                        "Manateq Logistics Park"
+                    ],
+                    "taxHolidayYears": 20,
+                    "taxHolidayRate": 0,
+                    "incentivePrograms": [
+                        "QFZ 0% Tax",
+                        "Qatar Investment Authority Support",
+                        "Smart Qatar Programme"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0
+                },
+                "naturalDisaster": {
+                    "seismicZone": 0,
+                    "floodRisk": "low",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 5,
+                    "insuranceMultiplier": 1,
+                    "structuralReinforcement": 0
+                },
+                "gridReliability": {
+                    "gridUptime": 99.97,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 1,
+                    "averageOutageDuration": 8,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 24,
+                    "renewableReadiness": 70
+                },
+                "talentPool": {
+                    "dcEngineerPool": "scarce",
+                    "universityPipeline": 3,
+                    "hyperscalerPresence": 2,
+                    "avgHiringDays": 55,
+                    "salaryPremium": 1.25,
+                    "talentScore": 38,
+                    "certifiedProfessionals": 120
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 0.3,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": false,
+                    "storageLimitLiters": 80000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "ZA": {
+                "id": "ZA",
+                "region": "AFR",
+                "name": "South Africa",
+                "currency": "ZAR",
+                "currencySymbol": "R",
+                "economy": {
+                    "inflationRate": 0.05,
+                    "laborEscalation": 0.06,
+                    "taxRate": 0.27,
+                    "electricityRate": 0.1
+                },
+                "labor": {
+                    "minimumWage": 250,
+                    "baseSalary_ShiftLead": 2200,
+                    "baseSalary_Engineer": 1800,
+                    "baseSalary_Technician": 1100,
+                    "baseSalary_Admin": 800,
+                    "baseSalary_Janitor": 400,
+                    "laborRatePerHour": 12,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 2
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.22,
+                    "leaves": {
+                        "annual": 15,
+                        "publicHolidays": 12,
+                        "sickAverage": 6
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "SABS",
+                        "ECSA",
+                        "OHS Act"
+                    ],
+                    "annualComplianceCost": 5000
+                },
+                "environment": {
+                    "baselineAQI": 50,
+                    "gridCarbonIntensity": 0.9
+                },
+                "risk": {
+                    "downtimeCostPerMin": 1500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.3
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Coega IDZ",
+                        "Dube TradePort",
+                        "Richards Bay IDZ"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.27,
+                    "incentivePrograms": [
+                        "Section 12L Energy Efficiency",
+                        "SEZ Tax Incentive (15%)",
+                        "Renewable Energy Tax Deduction"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.15
+                },
+                "naturalDisaster": {
+                    "seismicZone": 1,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 15,
+                    "insuranceMultiplier": 1.05,
+                    "structuralReinforcement": 0.01
+                },
+                "gridReliability": {
+                    "gridUptime": 95,
+                    "voltageStability": "unstable",
+                    "brownoutFrequency": 200,
+                    "averageOutageDuration": 120,
+                    "gridTier": 3,
+                    "backupFuelPremium": 0.4,
+                    "recommendedGenHours": 168,
+                    "renewableReadiness": 75
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 15,
+                    "hyperscalerPresence": 4,
+                    "avgHiringDays": 35,
+                    "salaryPremium": 1.05,
+                    "talentScore": 60,
+                    "certifiedProfessionals": 450
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.15,
+                    "dieselAvailability": "moderate",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0.07,
+                    "deliveryLeadDays": 3,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 60000,
+                    "fuelQualityRating": "moderate"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "NG": {
+                "id": "NG",
+                "region": "AFR",
+                "name": "Nigeria",
+                "currency": "USD",
+                "currencySymbol": "$",
+                "economy": {
+                    "inflationRate": 0.14,
+                    "laborEscalation": 0.08,
+                    "taxRate": 0.3,
+                    "electricityRate": 0.12
+                },
+                "labor": {
+                    "minimumWage": 80,
+                    "baseSalary_ShiftLead": 1200,
+                    "baseSalary_Engineer": 900,
+                    "baseSalary_Technician": 500,
+                    "baseSalary_Admin": 350,
+                    "baseSalary_Janitor": 150,
+                    "laborRatePerHour": 6,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 2
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.25,
+                    "leaves": {
+                        "annual": 12,
+                        "publicHolidays": 11,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "NCC",
+                        "SON",
+                        "NESREA"
+                    ],
+                    "annualComplianceCost": 3000
+                },
+                "environment": {
+                    "baselineAQI": 140,
+                    "gridCarbonIntensity": 0.45
+                },
+                "risk": {
+                    "downtimeCostPerMin": 800
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.6
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Lekki Free Zone",
+                        "Calabar FTZ",
+                        "Kano FTZ"
+                    ],
+                    "taxHolidayYears": 5,
+                    "taxHolidayRate": 0,
+                    "incentivePrograms": [
+                        "Pioneer Status Tax Holiday",
+                        "Export Expansion Grant",
+                        "Infrastructure Tax Relief"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0
+                },
+                "naturalDisaster": {
+                    "seismicZone": 0,
+                    "floodRisk": "high",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 20,
+                    "insuranceMultiplier": 1.15,
+                    "structuralReinforcement": 0.01
+                },
+                "gridReliability": {
+                    "gridUptime": 50,
+                    "voltageStability": "unstable",
+                    "brownoutFrequency": 500,
+                    "averageOutageDuration": 180,
+                    "gridTier": 3,
+                    "backupFuelPremium": 0.8,
+                    "recommendedGenHours": 336,
+                    "renewableReadiness": 65
+                },
+                "talentPool": {
+                    "dcEngineerPool": "very_scarce",
+                    "universityPipeline": 10,
+                    "hyperscalerPresence": 2,
+                    "avgHiringDays": 75,
+                    "salaryPremium": 1.3,
+                    "talentScore": 25,
+                    "certifiedProfessionals": 60
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 0.9,
+                    "dieselAvailability": "scarce",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0.02,
+                    "deliveryLeadDays": 7,
+                    "environmentalPermitRequired": false,
+                    "storageLimitLiters": 40000,
+                    "fuelQualityRating": "low"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "KE": {
+                "id": "KE",
+                "region": "AFR",
+                "name": "Kenya",
+                "currency": "KES",
+                "currencySymbol": "KSh",
+                "economy": {
+                    "inflationRate": 0.07,
+                    "laborEscalation": 0.06,
+                    "taxRate": 0.3,
+                    "electricityRate": 0.15
+                },
+                "labor": {
+                    "minimumWage": 150,
+                    "baseSalary_ShiftLead": 1400,
+                    "baseSalary_Engineer": 1000,
+                    "baseSalary_Technician": 600,
+                    "baseSalary_Admin": 400,
+                    "baseSalary_Janitor": 200,
+                    "laborRatePerHour": 7,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 2
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.2,
+                    "leaves": {
+                        "annual": 21,
+                        "publicHolidays": 10,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "KEBS",
+                        "ERC License"
+                    ],
+                    "annualComplianceCost": 3500
+                },
+                "environment": {
+                    "baselineAQI": 60,
+                    "gridCarbonIntensity": 0.3
+                },
+                "risk": {
+                    "downtimeCostPerMin": 700
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.5
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Nairobi SEZ",
+                        "Konza Technopolis"
+                    ],
+                    "taxHolidayYears": 10,
+                    "taxHolidayRate": 0.1,
+                    "incentivePrograms": [
+                        "SEZ Corporate Tax 10%",
+                        "Konza Silicon Savannah",
+                        "Digital Economy Blueprint"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0.1
+                },
+                "naturalDisaster": {
+                    "seismicZone": 2,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "low",
+                    "tsunamiRisk": "low",
+                    "compositeScore": 25,
+                    "insuranceMultiplier": 1.1,
+                    "structuralReinforcement": 0.03
+                },
+                "gridReliability": {
+                    "gridUptime": 85,
+                    "voltageStability": "unstable",
+                    "brownoutFrequency": 120,
+                    "averageOutageDuration": 90,
+                    "gridTier": 3,
+                    "backupFuelPremium": 0.5,
+                    "recommendedGenHours": 168,
+                    "renewableReadiness": 80
+                },
+                "talentPool": {
+                    "dcEngineerPool": "very_scarce",
+                    "universityPipeline": 5,
+                    "hyperscalerPresence": 3,
+                    "avgHiringDays": 60,
+                    "salaryPremium": 1.2,
+                    "talentScore": 30,
+                    "certifiedProfessionals": 80
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.25,
+                    "dieselAvailability": "moderate",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0.08,
+                    "deliveryLeadDays": 5,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 40000,
+                    "fuelQualityRating": "moderate"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "BR": {
+                "id": "BR",
+                "region": "LATAM",
+                "name": "Brazil",
+                "currency": "BRL",
+                "currencySymbol": "R$",
+                "economy": {
+                    "inflationRate": 0.045,
+                    "laborEscalation": 0.05,
+                    "taxRate": 0.34,
+                    "electricityRate": 0.1
+                },
+                "labor": {
+                    "minimumWage": 300,
+                    "baseSalary_ShiftLead": 2000,
+                    "baseSalary_Engineer": 1500,
+                    "baseSalary_Technician": 900,
+                    "baseSalary_Admin": 700,
+                    "baseSalary_Janitor": 350,
+                    "laborRatePerHour": 12,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 2
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.22,
+                    "leaves": {
+                        "annual": 30,
+                        "publicHolidays": 12,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "INMETRO",
+                        "NR-10",
+                        "ANATEL"
+                    ],
+                    "annualComplianceCost": 6000
+                },
+                "environment": {
+                    "baselineAQI": 50,
+                    "gridCarbonIntensity": 0.15
+                },
+                "risk": {
+                    "downtimeCostPerMin": 1800
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.4
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Manaus Free Zone",
+                        "ZPE Export Processing Zones"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.34,
+                    "incentivePrograms": [
+                        "SUDENE/SUDAM Regional Incentive",
+                        "Lei do Bem R&D",
+                        "Manaus Digital Hub"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.34
+                },
+                "naturalDisaster": {
+                    "seismicZone": 0,
+                    "floodRisk": "high",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 18,
+                    "insuranceMultiplier": 1.1,
+                    "structuralReinforcement": 0.01
+                },
+                "gridReliability": {
+                    "gridUptime": 99.8,
+                    "voltageStability": "moderate",
+                    "brownoutFrequency": 8,
+                    "averageOutageDuration": 30,
+                    "gridTier": 2,
+                    "backupFuelPremium": 0.08,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 85
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 40,
+                    "hyperscalerPresence": 5,
+                    "avgHiringDays": 40,
+                    "salaryPremium": 1.05,
+                    "talentScore": 58,
+                    "certifiedProfessionals": 350
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.1,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0.12,
+                    "deliveryLeadDays": 3,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 60000,
+                    "fuelQualityRating": "moderate"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "CL": {
+                "id": "CL",
+                "region": "LATAM",
+                "name": "Chile",
+                "currency": "CLP",
+                "currencySymbol": "CL$",
+                "economy": {
+                    "inflationRate": 0.04,
+                    "laborEscalation": 0.04,
+                    "taxRate": 0.27,
+                    "electricityRate": 0.12
+                },
+                "labor": {
+                    "minimumWage": 500,
+                    "baseSalary_ShiftLead": 2300,
+                    "baseSalary_Engineer": 1800,
+                    "baseSalary_Technician": 1100,
+                    "baseSalary_Admin": 800,
+                    "baseSalary_Janitor": 500,
+                    "laborRatePerHour": 14,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.15,
+                    "leaves": {
+                        "annual": 15,
+                        "publicHolidays": 15,
+                        "sickAverage": 4
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "SEC",
+                        "INN Chile"
+                    ],
+                    "annualComplianceCost": 5000
+                },
+                "environment": {
+                    "baselineAQI": 40,
+                    "gridCarbonIntensity": 0.35
+                },
+                "risk": {
+                    "downtimeCostPerMin": 1500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.3
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Iquique FTZ",
+                        "Arica FTZ"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.27,
+                    "incentivePrograms": [
+                        "CORFO Technology Fund",
+                        "Chile Green Hydrogen",
+                        "Extreme Zone Tax Benefits"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.27
+                },
+                "naturalDisaster": {
+                    "seismicZone": 4,
+                    "floodRisk": "low",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "moderate",
+                    "tsunamiRisk": "high",
+                    "compositeScore": 72,
+                    "insuranceMultiplier": 1.7,
+                    "structuralReinforcement": 0.15
+                },
+                "gridReliability": {
+                    "gridUptime": 99.9,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 3,
+                    "averageOutageDuration": 15,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0.03,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 90
+                },
+                "talentPool": {
+                    "dcEngineerPool": "scarce",
+                    "universityPipeline": 8,
+                    "hyperscalerPresence": 3,
+                    "avgHiringDays": 45,
+                    "salaryPremium": 1.15,
+                    "talentScore": 48,
+                    "certifiedProfessionals": 180
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.2,
+                    "dieselAvailability": "moderate",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0.06,
+                    "deliveryLeadDays": 3,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "MX": {
+                "id": "MX",
+                "region": "LATAM",
+                "name": "Mexico",
+                "currency": "MXN",
+                "currencySymbol": "MX$",
+                "economy": {
+                    "inflationRate": 0.04,
+                    "laborEscalation": 0.05,
+                    "taxRate": 0.3,
+                    "electricityRate": 0.09
+                },
+                "labor": {
+                    "minimumWage": 350,
+                    "baseSalary_ShiftLead": 1800,
+                    "baseSalary_Engineer": 1400,
+                    "baseSalary_Technician": 850,
+                    "baseSalary_Admin": 600,
+                    "baseSalary_Janitor": 350,
+                    "laborRatePerHour": 10,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 2,
+                            "subsequent": 3
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 3,
+                            "tenthHourPlus": 3
+                        }
+                    },
+                    "shrinkageFactor": 0.18,
+                    "leaves": {
+                        "annual": 12,
+                        "publicHolidays": 7,
+                        "sickAverage": 4
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "NOM",
+                        "SENER"
+                    ],
+                    "annualComplianceCost": 5000
+                },
+                "environment": {
+                    "baselineAQI": 80,
+                    "gridCarbonIntensity": 0.45
+                },
+                "risk": {
+                    "downtimeCostPerMin": 1200
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.15
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Queretaro SEZ",
+                        "Bajio Industrial Corridor"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.3,
+                    "incentivePrograms": [
+                        "Nearshoring Tax Incentive",
+                        "IMMEX Maquiladora",
+                        "CONACYT R&D Support"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.3
+                },
+                "naturalDisaster": {
+                    "seismicZone": 3,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "moderate",
+                    "volcanoRisk": "moderate",
+                    "tsunamiRisk": "moderate",
+                    "compositeScore": 62,
+                    "insuranceMultiplier": 1.5,
+                    "structuralReinforcement": 0.1
+                },
+                "gridReliability": {
+                    "gridUptime": 99.7,
+                    "voltageStability": "moderate",
+                    "brownoutFrequency": 12,
+                    "averageOutageDuration": 35,
+                    "gridTier": 2,
+                    "backupFuelPremium": 0.1,
+                    "recommendedGenHours": 72,
+                    "renewableReadiness": 70
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 35,
+                    "hyperscalerPresence": 4,
+                    "avgHiringDays": 35,
+                    "salaryPremium": 1.05,
+                    "talentScore": 55,
+                    "certifiedProfessionals": 300
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.05,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0.08,
+                    "deliveryLeadDays": 2,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 60000,
+                    "fuelQualityRating": "moderate"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "CO": {
+                "id": "CO",
+                "region": "LATAM",
+                "name": "Colombia",
+                "currency": "COP",
+                "currencySymbol": "CO$",
+                "economy": {
+                    "inflationRate": 0.06,
+                    "laborEscalation": 0.055,
+                    "taxRate": 0.35,
+                    "electricityRate": 0.1
+                },
+                "labor": {
+                    "minimumWage": 280,
+                    "baseSalary_ShiftLead": 1600,
+                    "baseSalary_Engineer": 1200,
+                    "baseSalary_Technician": 700,
+                    "baseSalary_Admin": 500,
+                    "baseSalary_Janitor": 300,
+                    "laborRatePerHour": 8,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.25,
+                            "subsequent": 1.75
+                        },
+                        "holiday": {
+                            "first8Hours": 1.75,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.2,
+                    "leaves": {
+                        "annual": 15,
+                        "publicHolidays": 18,
+                        "sickAverage": 4
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "RETIE",
+                        "SIC"
+                    ],
+                    "annualComplianceCost": 4000
+                },
+                "environment": {
+                    "baselineAQI": 55,
+                    "gridCarbonIntensity": 0.2
+                },
+                "risk": {
+                    "downtimeCostPerMin": 1000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.35
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Zona Franca Bogota",
+                        "Zona Franca del Pacifico"
+                    ],
+                    "taxHolidayYears": 5,
+                    "taxHolidayRate": 0.2,
+                    "incentivePrograms": [
+                        "Free Zone 20% Rate",
+                        "Orange Economy Tax Benefits",
+                        "Mega-Investment Incentive"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.2
+                },
+                "naturalDisaster": {
+                    "seismicZone": 3,
+                    "floodRisk": "high",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "moderate",
+                    "tsunamiRisk": "low",
+                    "compositeScore": 52,
+                    "insuranceMultiplier": 1.4,
+                    "structuralReinforcement": 0.08
+                },
+                "gridReliability": {
+                    "gridUptime": 99.5,
+                    "voltageStability": "moderate",
+                    "brownoutFrequency": 15,
+                    "averageOutageDuration": 40,
+                    "gridTier": 2,
+                    "backupFuelPremium": 0.12,
+                    "recommendedGenHours": 72,
+                    "renewableReadiness": 60
+                },
+                "talentPool": {
+                    "dcEngineerPool": "scarce",
+                    "universityPipeline": 12,
+                    "hyperscalerPresence": 2,
+                    "avgHiringDays": 50,
+                    "salaryPremium": 1.15,
+                    "talentScore": 40,
+                    "certifiedProfessionals": 120
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 0.85,
+                    "dieselAvailability": "moderate",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0.05,
+                    "deliveryLeadDays": 4,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 40000,
+                    "fuelQualityRating": "moderate"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "IN": {
+                "id": "IN",
+                "region": "APAC",
+                "name": "India",
+                "currency": "INR",
+                "currencySymbol": "₹",
+                "economy": {
+                    "inflationRate": 0.05,
+                    "laborEscalation": 0.07,
+                    "taxRate": 0.2517,
+                    "electricityRate": 0.07
+                },
+                "labor": {
+                    "minimumWage": 200,
+                    "baseSalary_ShiftLead": 1200,
+                    "baseSalary_Engineer": 900,
+                    "baseSalary_Technician": 500,
+                    "baseSalary_Admin": 400,
+                    "baseSalary_Janitor": 200,
+                    "laborRatePerHour": 8,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 2,
+                            "subsequent": 2
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.2,
+                    "leaves": {
+                        "annual": 12,
+                        "publicHolidays": 16,
+                        "sickAverage": 6
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "BIS",
+                        "CEA Regulations",
+                        "LEED India"
+                    ],
+                    "annualComplianceCost": 4000
+                },
+                "environment": {
+                    "baselineAQI": 150,
+                    "gridCarbonIntensity": 0.72
+                },
+                "risk": {
+                    "downtimeCostPerMin": 1200
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.2
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "SEEPZ Mumbai",
+                        "Mahindra World City",
+                        "GIFT City Gujarat"
+                    ],
+                    "taxHolidayYears": 10,
+                    "taxHolidayRate": 0.15,
+                    "incentivePrograms": [
+                        "IT/ITES SEZ Tax Holiday",
+                        "GIFT City IFSC Benefits",
+                        "PLI Scheme for IT Hardware"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0.15
+                },
+                "naturalDisaster": {
+                    "seismicZone": 3,
+                    "floodRisk": "extreme",
+                    "typhoonRisk": "moderate",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "moderate",
+                    "compositeScore": 58,
+                    "insuranceMultiplier": 1.45,
+                    "structuralReinforcement": 0.08
+                },
+                "gridReliability": {
+                    "gridUptime": 99,
+                    "voltageStability": "moderate",
+                    "brownoutFrequency": 30,
+                    "averageOutageDuration": 60,
+                    "gridTier": 2,
+                    "backupFuelPremium": 0.2,
+                    "recommendedGenHours": 96,
+                    "renewableReadiness": 75
+                },
+                "talentPool": {
+                    "dcEngineerPool": "abundant",
+                    "universityPipeline": 200,
+                    "hyperscalerPresence": 6,
+                    "avgHiringDays": 25,
+                    "salaryPremium": 1,
+                    "talentScore": 78,
+                    "certifiedProfessionals": 2500
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0.12,
+                    "deliveryLeadDays": 3,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "moderate"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "CN": {
+                "id": "CN",
+                "region": "APAC",
+                "name": "China",
+                "currency": "CNY",
+                "currencySymbol": "¥",
+                "economy": {
+                    "inflationRate": 0.02,
+                    "laborEscalation": 0.06,
+                    "taxRate": 0.25,
+                    "electricityRate": 0.06
+                },
+                "labor": {
+                    "minimumWage": 400,
+                    "baseSalary_ShiftLead": 2000,
+                    "baseSalary_Engineer": 1500,
+                    "baseSalary_Technician": 900,
+                    "baseSalary_Admin": 700,
+                    "baseSalary_Janitor": 450,
+                    "laborRatePerHour": 12,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 2
+                        },
+                        "holiday": {
+                            "first8Hours": 3,
+                            "ninthHour": 3,
+                            "tenthHourPlus": 3
+                        }
+                    },
+                    "shrinkageFactor": 0.15,
+                    "leaves": {
+                        "annual": 5,
+                        "publicHolidays": 11,
+                        "sickAverage": 3
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "GB Standards",
+                        "MIIT License",
+                        "Green DC Rating"
+                    ],
+                    "annualComplianceCost": 8000
+                },
+                "environment": {
+                    "baselineAQI": 130,
+                    "gridCarbonIntensity": 0.58
+                },
+                "risk": {
+                    "downtimeCostPerMin": 2500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Shanghai FTZ",
+                        "Hainan FTP",
+                        "Shenzhen Qianhai"
+                    ],
+                    "taxHolidayYears": 5,
+                    "taxHolidayRate": 0.15,
+                    "incentivePrograms": [
+                        "HNTE 15% Tax Rate",
+                        "Western Development Strategy",
+                        "New Infrastructure Initiative"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0.15
+                },
+                "naturalDisaster": {
+                    "seismicZone": 2,
+                    "floodRisk": "high",
+                    "typhoonRisk": "moderate",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "low",
+                    "compositeScore": 42,
+                    "insuranceMultiplier": 1.3,
+                    "structuralReinforcement": 0.06
+                },
+                "gridReliability": {
+                    "gridUptime": 99.95,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 2,
+                    "averageOutageDuration": 12,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0.02,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 60
+                },
+                "talentPool": {
+                    "dcEngineerPool": "abundant",
+                    "universityPipeline": 300,
+                    "hyperscalerPresence": 8,
+                    "avgHiringDays": 20,
+                    "salaryPremium": 1,
+                    "talentScore": 85,
+                    "certifiedProfessionals": 5000
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.1,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0.05,
+                    "deliveryLeadDays": 2,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 80000,
+                    "fuelQualityRating": "moderate"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "KR": {
+                "id": "KR",
+                "region": "APAC",
+                "name": "South Korea",
+                "currency": "KRW",
+                "currencySymbol": "₩",
+                "economy": {
+                    "inflationRate": 0.025,
+                    "laborEscalation": 0.04,
+                    "taxRate": 0.22,
+                    "electricityRate": 0.135
+                },
+                "labor": {
+                    "minimumWage": 1500,
+                    "baseSalary_ShiftLead": 4000,
+                    "baseSalary_Engineer": 3200,
+                    "baseSalary_Technician": 2400,
+                    "baseSalary_Admin": 2000,
+                    "baseSalary_Janitor": 1500,
+                    "laborRatePerHour": 28,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.1,
+                    "leaves": {
+                        "annual": 15,
+                        "publicHolidays": 15,
+                        "sickAverage": 3
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "KS Standards",
+                        "KISA DC Cert"
+                    ],
+                    "annualComplianceCost": 9000
+                },
+                "environment": {
+                    "baselineAQI": 55,
+                    "gridCarbonIntensity": 0.42
+                },
+                "risk": {
+                    "downtimeCostPerMin": 3500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Incheon FEZ",
+                        "Busan-Jinhae FEZ",
+                        "Sejong Smart City"
+                    ],
+                    "taxHolidayYears": 5,
+                    "taxHolidayRate": 0,
+                    "incentivePrograms": [
+                        "FEZ Tax Exemption",
+                        "Digital New Deal",
+                        "K-Cloud Initiative"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0
+                },
+                "naturalDisaster": {
+                    "seismicZone": 1,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "moderate",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "low",
+                    "compositeScore": 30,
+                    "insuranceMultiplier": 1.15,
+                    "structuralReinforcement": 0.03
+                },
+                "gridReliability": {
+                    "gridUptime": 99.99,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 0,
+                    "averageOutageDuration": 3,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 24,
+                    "renewableReadiness": 50
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 35,
+                    "hyperscalerPresence": 5,
+                    "avgHiringDays": 40,
+                    "salaryPremium": 1.1,
+                    "talentScore": 68,
+                    "certifiedProfessionals": 900
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.3,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.5,
+                    "fuelTaxRate": 0.1,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 60000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "TH": {
+                "id": "TH",
+                "region": "APAC",
+                "name": "Thailand",
+                "currency": "THB",
+                "currencySymbol": "฿",
+                "economy": {
+                    "inflationRate": 0.02,
+                    "laborEscalation": 0.04,
+                    "taxRate": 0.2,
+                    "electricityRate": 0.1
+                },
+                "labor": {
+                    "minimumWage": 300,
+                    "baseSalary_ShiftLead": 1400,
+                    "baseSalary_Engineer": 1000,
+                    "baseSalary_Technician": 600,
+                    "baseSalary_Admin": 450,
+                    "baseSalary_Janitor": 300,
+                    "laborRatePerHour": 8,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 2
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 3,
+                            "tenthHourPlus": 3
+                        }
+                    },
+                    "shrinkageFactor": 0.18,
+                    "leaves": {
+                        "annual": 6,
+                        "publicHolidays": 16,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "TIS Standards",
+                        "PEA License"
+                    ],
+                    "annualComplianceCost": 4500
+                },
+                "environment": {
+                    "baselineAQI": 80,
+                    "gridCarbonIntensity": 0.5
+                },
+                "risk": {
+                    "downtimeCostPerMin": 1000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.15
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Eastern Seaboard (EEC)",
+                        "Amata City",
+                        "Hemaraj Industrial"
+                    ],
+                    "taxHolidayYears": 8,
+                    "taxHolidayRate": 0,
+                    "incentivePrograms": [
+                        "BOI DC Investment Promotion",
+                        "EEC Digital Park",
+                        "Thailand 4.0 Smart Electronics"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0
+                },
+                "naturalDisaster": {
+                    "seismicZone": 1,
+                    "floodRisk": "extreme",
+                    "typhoonRisk": "low",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "moderate",
+                    "compositeScore": 40,
+                    "insuranceMultiplier": 1.3,
+                    "structuralReinforcement": 0.03
+                },
+                "gridReliability": {
+                    "gridUptime": 99.8,
+                    "voltageStability": "moderate",
+                    "brownoutFrequency": 8,
+                    "averageOutageDuration": 25,
+                    "gridTier": 2,
+                    "backupFuelPremium": 0.08,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 65
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 20,
+                    "hyperscalerPresence": 4,
+                    "avgHiringDays": 35,
+                    "salaryPremium": 1.05,
+                    "talentScore": 55,
+                    "certifiedProfessionals": 280
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 0.85,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0.05,
+                    "deliveryLeadDays": 2,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "moderate"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "VN": {
+                "id": "VN",
+                "region": "APAC",
+                "name": "Vietnam",
+                "currency": "VND",
+                "currencySymbol": "₫",
+                "economy": {
+                    "inflationRate": 0.035,
+                    "laborEscalation": 0.07,
+                    "taxRate": 0.2,
+                    "electricityRate": 0.09
+                },
+                "labor": {
+                    "minimumWage": 200,
+                    "baseSalary_ShiftLead": 1100,
+                    "baseSalary_Engineer": 800,
+                    "baseSalary_Technician": 450,
+                    "baseSalary_Admin": 350,
+                    "baseSalary_Janitor": 200,
+                    "laborRatePerHour": 6,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 2
+                        },
+                        "holiday": {
+                            "first8Hours": 3,
+                            "ninthHour": 3,
+                            "tenthHourPlus": 3
+                        }
+                    },
+                    "shrinkageFactor": 0.22,
+                    "leaves": {
+                        "annual": 12,
+                        "publicHolidays": 10,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "TCVN",
+                        "MOIT License"
+                    ],
+                    "annualComplianceCost": 3500
+                },
+                "environment": {
+                    "baselineAQI": 100,
+                    "gridCarbonIntensity": 0.55
+                },
+                "risk": {
+                    "downtimeCostPerMin": 800
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.3
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Saigon Hi-Tech Park",
+                        "Da Nang IT Park",
+                        "VSIP Binh Duong"
+                    ],
+                    "taxHolidayYears": 4,
+                    "taxHolidayRate": 0,
+                    "incentivePrograms": [
+                        "CIT Preferential Rate 10%",
+                        "Hi-Tech Enterprise Incentive",
+                        "Digital Infrastructure Investment"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0
+                },
+                "naturalDisaster": {
+                    "seismicZone": 1,
+                    "floodRisk": "extreme",
+                    "typhoonRisk": "high",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "low",
+                    "compositeScore": 48,
+                    "insuranceMultiplier": 1.35,
+                    "structuralReinforcement": 0.05
+                },
+                "gridReliability": {
+                    "gridUptime": 99.2,
+                    "voltageStability": "moderate",
+                    "brownoutFrequency": 20,
+                    "averageOutageDuration": 50,
+                    "gridTier": 2,
+                    "backupFuelPremium": 0.18,
+                    "recommendedGenHours": 72,
+                    "renewableReadiness": 55
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 30,
+                    "hyperscalerPresence": 3,
+                    "avgHiringDays": 35,
+                    "salaryPremium": 1.05,
+                    "talentScore": 50,
+                    "certifiedProfessionals": 200
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 0.9,
+                    "dieselAvailability": "moderate",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0.07,
+                    "deliveryLeadDays": 3,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 40000,
+                    "fuelQualityRating": "moderate"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "PH": {
+                "id": "PH",
+                "region": "APAC",
+                "name": "Philippines",
+                "currency": "PHP",
+                "currencySymbol": "₱",
+                "economy": {
+                    "inflationRate": 0.05,
+                    "laborEscalation": 0.05,
+                    "taxRate": 0.25,
+                    "electricityRate": 0.13
+                },
+                "labor": {
+                    "minimumWage": 250,
+                    "baseSalary_ShiftLead": 1300,
+                    "baseSalary_Engineer": 1000,
+                    "baseSalary_Technician": 550,
+                    "baseSalary_Admin": 400,
+                    "baseSalary_Janitor": 250,
+                    "laborRatePerHour": 7,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.25,
+                            "subsequent": 1.3
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2.6
+                        }
+                    },
+                    "shrinkageFactor": 0.22,
+                    "leaves": {
+                        "annual": 5,
+                        "publicHolidays": 18,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "PNS Standards",
+                        "DOE License"
+                    ],
+                    "annualComplianceCost": 3500
+                },
+                "environment": {
+                    "baselineAQI": 70,
+                    "gridCarbonIntensity": 0.6
+                },
+                "risk": {
+                    "downtimeCostPerMin": 900
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.35
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "PEZA Zones (400+)",
+                        "Clark Freeport",
+                        "Subic Bay Freeport"
+                    ],
+                    "taxHolidayYears": 7,
+                    "taxHolidayRate": 0,
+                    "incentivePrograms": [
+                        "CREATE MORE Act",
+                        "PEZA IT Enterprise",
+                        "Green Lane for DC Equipment"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0
+                },
+                "naturalDisaster": {
+                    "seismicZone": 3,
+                    "floodRisk": "extreme",
+                    "typhoonRisk": "high",
+                    "volcanoRisk": "moderate",
+                    "tsunamiRisk": "moderate",
+                    "compositeScore": 78,
+                    "insuranceMultiplier": 1.75,
+                    "structuralReinforcement": 0.14
+                },
+                "gridReliability": {
+                    "gridUptime": 98,
+                    "voltageStability": "unstable",
+                    "brownoutFrequency": 40,
+                    "averageOutageDuration": 60,
+                    "gridTier": 3,
+                    "backupFuelPremium": 0.25,
+                    "recommendedGenHours": 96,
+                    "renewableReadiness": 60
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 22,
+                    "hyperscalerPresence": 3,
+                    "avgHiringDays": 30,
+                    "salaryPremium": 1.05,
+                    "talentScore": 55,
+                    "certifiedProfessionals": 250
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1,
+                    "dieselAvailability": "moderate",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0.06,
+                    "deliveryLeadDays": 3,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 40000,
+                    "fuelQualityRating": "moderate"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "TW": {
+                "id": "TW",
+                "region": "APAC",
+                "name": "Taiwan",
+                "currency": "TWD",
+                "currencySymbol": "NT$",
+                "economy": {
+                    "inflationRate": 0.02,
+                    "laborEscalation": 0.03,
+                    "taxRate": 0.2,
+                    "electricityRate": 0.12
+                },
+                "labor": {
+                    "minimumWage": 900,
+                    "baseSalary_ShiftLead": 2800,
+                    "baseSalary_Engineer": 2200,
+                    "baseSalary_Technician": 1600,
+                    "baseSalary_Admin": 1200,
+                    "baseSalary_Janitor": 900,
+                    "laborRatePerHour": 20,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.34,
+                            "subsequent": 1.67
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.12,
+                    "leaves": {
+                        "annual": 7,
+                        "publicHolidays": 12,
+                        "sickAverage": 4
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "CNS Standards",
+                        "Taipower License"
+                    ],
+                    "annualComplianceCost": 7000
+                },
+                "environment": {
+                    "baselineAQI": 60,
+                    "gridCarbonIntensity": 0.5
+                },
+                "risk": {
+                    "downtimeCostPerMin": 3000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.05
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Hsinchu Science Park",
+                        "Kaohsiung Software Park"
+                    ],
+                    "taxHolidayYears": 5,
+                    "taxHolidayRate": 0,
+                    "incentivePrograms": [
+                        "Smart Machinery Tax Credit",
+                        "Industrial Innovation Act",
+                        "Asia Silicon Valley Plan"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0
+                },
+                "naturalDisaster": {
+                    "seismicZone": 4,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "high",
+                    "volcanoRisk": "low",
+                    "tsunamiRisk": "moderate",
+                    "compositeScore": 75,
+                    "insuranceMultiplier": 1.7,
+                    "structuralReinforcement": 0.16
+                },
+                "gridReliability": {
+                    "gridUptime": 99.9,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 3,
+                    "averageOutageDuration": 15,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0.03,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 50
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 18,
+                    "hyperscalerPresence": 5,
+                    "avgHiringDays": 40,
+                    "salaryPremium": 1.1,
+                    "talentScore": 65,
+                    "certifiedProfessionals": 650
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.05,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0.05,
+                    "deliveryLeadDays": 2,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "NZ": {
+                "id": "NZ",
+                "region": "APAC",
+                "name": "New Zealand",
+                "currency": "NZD",
+                "currencySymbol": "NZ$",
+                "economy": {
+                    "inflationRate": 0.03,
+                    "laborEscalation": 0.035,
+                    "taxRate": 0.28,
+                    "electricityRate": 0.16
+                },
+                "labor": {
+                    "minimumWage": 2500,
+                    "baseSalary_ShiftLead": 7500,
+                    "baseSalary_Engineer": 6000,
+                    "baseSalary_Technician": 4500,
+                    "baseSalary_Admin": 3800,
+                    "baseSalary_Janitor": 3000,
+                    "laborRatePerHour": 38,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.12,
+                    "leaves": {
+                        "annual": 20,
+                        "publicHolidays": 11,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "AS/NZS Standards",
+                        "WorkSafe"
+                    ],
+                    "annualComplianceCost": 8000
+                },
+                "environment": {
+                    "baselineAQI": 15,
+                    "gridCarbonIntensity": 0.1
+                },
+                "risk": {
+                    "downtimeCostPerMin": 4000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.25
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.28,
+                    "incentivePrograms": [
+                        "Callaghan Innovation R&D Grant",
+                        "NZ Green Investment Fund"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.28
+                },
+                "naturalDisaster": {
+                    "seismicZone": 4,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "moderate",
+                    "tsunamiRisk": "moderate",
+                    "compositeScore": 65,
+                    "insuranceMultiplier": 1.6,
+                    "structuralReinforcement": 0.14
+                },
+                "gridReliability": {
+                    "gridUptime": 99.98,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 1,
+                    "averageOutageDuration": 5,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 90
+                },
+                "talentPool": {
+                    "dcEngineerPool": "scarce",
+                    "universityPipeline": 3,
+                    "hyperscalerPresence": 2,
+                    "avgHiringDays": 50,
+                    "salaryPremium": 1.2,
+                    "talentScore": 42,
+                    "certifiedProfessionals": 150
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.4,
+                    "dieselAvailability": "moderate",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.6,
+                    "fuelTaxRate": 0.08,
+                    "deliveryLeadDays": 3,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 40000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "GB": {
+                "id": "GB",
+                "region": "EMEA",
+                "name": "United Kingdom",
+                "currency": "GBP",
+                "currencySymbol": "£",
+                "economy": {
+                    "inflationRate": 0.027,
+                    "laborEscalation": 0.035,
+                    "taxRate": 0.25,
+                    "electricityRate": 0.22
+                },
+                "labor": {
+                    "minimumWage": 2200,
+                    "baseSalary_ShiftLead": 8000,
+                    "baseSalary_Engineer": 6500,
+                    "baseSalary_Technician": 4500,
+                    "baseSalary_Admin": 3500,
+                    "baseSalary_Janitor": 2500,
+                    "laborRatePerHour": 38,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.12,
+                    "leaves": {
+                        "annual": 28,
+                        "publicHolidays": 8,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "BS EN Standards",
+                        "IET Wiring Regs",
+                        "BREEAM"
+                    ],
+                    "annualComplianceCost": 14000
+                },
+                "environment": {
+                    "baselineAQI": 25,
+                    "gridCarbonIntensity": 0.23
+                },
+                "risk": {
+                    "downtimeCostPerMin": 4500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "London Docklands Enterprise Zone"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.25,
+                    "incentivePrograms": [
+                        "R&D Tax Credit (RDEC)",
+                        "Capital Allowances Super Deduction",
+                        "Enterprise Zones"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.25
+                },
+                "naturalDisaster": {
+                    "seismicZone": 0,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 10,
+                    "insuranceMultiplier": 1.05,
+                    "structuralReinforcement": 0
+                },
+                "gridReliability": {
+                    "gridUptime": 99.99,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 0,
+                    "averageOutageDuration": 3,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 24,
+                    "renewableReadiness": 65
+                },
+                "talentPool": {
+                    "dcEngineerPool": "abundant",
+                    "universityPipeline": 30,
+                    "hyperscalerPresence": 7,
+                    "avgHiringDays": 30,
+                    "salaryPremium": 1,
+                    "talentScore": 82,
+                    "certifiedProfessionals": 3500
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.7,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.8,
+                    "fuelTaxRate": 0.15,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 60000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "DE": {
+                "id": "DE",
+                "region": "EMEA",
+                "name": "Germany",
+                "currency": "EUR",
+                "currencySymbol": "€",
+                "economy": {
+                    "inflationRate": 0.023,
+                    "laborEscalation": 0.03,
+                    "taxRate": 0.2975,
+                    "electricityRate": 0.26
+                },
+                "labor": {
+                    "minimumWage": 2400,
+                    "baseSalary_ShiftLead": 8500,
+                    "baseSalary_Engineer": 7000,
+                    "baseSalary_Technician": 5000,
+                    "baseSalary_Admin": 4000,
+                    "baseSalary_Janitor": 2800,
+                    "laborRatePerHour": 42,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.25,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.12,
+                    "leaves": {
+                        "annual": 24,
+                        "publicHolidays": 10,
+                        "sickAverage": 8
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "VDE",
+                        "TÜV",
+                        "EnEfG"
+                    ],
+                    "annualComplianceCost": 16000
+                },
+                "environment": {
+                    "baselineAQI": 20,
+                    "gridCarbonIntensity": 0.35
+                },
+                "risk": {
+                    "downtimeCostPerMin": 5000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.2975,
+                    "incentivePrograms": [
+                        "R&D Tax Allowance (Forschungszulage)",
+                        "EnEfG Compliance Credits",
+                        "Investment Grants (GRW)"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.2975
+                },
+                "naturalDisaster": {
+                    "seismicZone": 1,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 12,
+                    "insuranceMultiplier": 1.05,
+                    "structuralReinforcement": 0.01
+                },
+                "gridReliability": {
+                    "gridUptime": 99.998,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 0,
+                    "averageOutageDuration": 2,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 24,
+                    "renewableReadiness": 70
+                },
+                "talentPool": {
+                    "dcEngineerPool": "abundant",
+                    "universityPipeline": 40,
+                    "hyperscalerPresence": 6,
+                    "avgHiringDays": 35,
+                    "salaryPremium": 1,
+                    "talentScore": 80,
+                    "certifiedProfessionals": 2800
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.8,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 3,
+                    "fuelTaxRate": 0.15,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 60000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "NL": {
+                "id": "NL",
+                "region": "EMEA",
+                "name": "Netherlands",
+                "currency": "EUR",
+                "currencySymbol": "€",
+                "economy": {
+                    "inflationRate": 0.023,
+                    "laborEscalation": 0.03,
+                    "taxRate": 0.2575,
+                    "electricityRate": 0.2
+                },
+                "labor": {
+                    "minimumWage": 2200,
+                    "baseSalary_ShiftLead": 7500,
+                    "baseSalary_Engineer": 6000,
+                    "baseSalary_Technician": 4500,
+                    "baseSalary_Admin": 3500,
+                    "baseSalary_Janitor": 2500,
+                    "laborRatePerHour": 38,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.3,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.1,
+                    "leaves": {
+                        "annual": 25,
+                        "publicHolidays": 8,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "NEN Standards",
+                        "BREEAM-NL"
+                    ],
+                    "annualComplianceCost": 13000
+                },
+                "environment": {
+                    "baselineAQI": 20,
+                    "gridCarbonIntensity": 0.33
+                },
+                "risk": {
+                    "downtimeCostPerMin": 4500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Amsterdam Schiphol Logistics Park"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.2575,
+                    "incentivePrograms": [
+                        "Innovation Box (9% rate)",
+                        "WBSO R&D Tax Credit",
+                        "EIA Energy Investment Allowance"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.2575
+                },
+                "naturalDisaster": {
+                    "seismicZone": 0,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 15,
+                    "insuranceMultiplier": 1.1,
+                    "structuralReinforcement": 0
+                },
+                "gridReliability": {
+                    "gridUptime": 99.998,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 0,
+                    "averageOutageDuration": 2,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 24,
+                    "renewableReadiness": 60
+                },
+                "talentPool": {
+                    "dcEngineerPool": "abundant",
+                    "universityPipeline": 12,
+                    "hyperscalerPresence": 8,
+                    "avgHiringDays": 30,
+                    "salaryPremium": 1.05,
+                    "talentScore": 85,
+                    "certifiedProfessionals": 2200
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.75,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.9,
+                    "fuelTaxRate": 0.15,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "IE": {
+                "id": "IE",
+                "region": "EMEA",
+                "name": "Ireland",
+                "currency": "EUR",
+                "currencySymbol": "€",
+                "economy": {
+                    "inflationRate": 0.024,
+                    "laborEscalation": 0.04,
+                    "taxRate": 0.15,
+                    "electricityRate": 0.24
+                },
+                "labor": {
+                    "minimumWage": 2400,
+                    "baseSalary_ShiftLead": 7800,
+                    "baseSalary_Engineer": 6500,
+                    "baseSalary_Technician": 4800,
+                    "baseSalary_Admin": 3800,
+                    "baseSalary_Janitor": 2800,
+                    "laborRatePerHour": 36,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.12,
+                    "leaves": {
+                        "annual": 20,
+                        "publicHolidays": 9,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "IS EN Standards",
+                        "SEAI BER"
+                    ],
+                    "annualComplianceCost": 14000
+                },
+                "environment": {
+                    "baselineAQI": 15,
+                    "gridCarbonIntensity": 0.3
+                },
+                "risk": {
+                    "downtimeCostPerMin": 4500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.05
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Shannon Free Zone",
+                        "IDA Technology Parks"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.125,
+                    "incentivePrograms": [
+                        "12.5% Corporate Rate",
+                        "IDA Ireland Grants",
+                        "R&D Tax Credit 25%",
+                        "Knowledge Development Box 6.25%"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0.125
+                },
+                "naturalDisaster": {
+                    "seismicZone": 0,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 8,
+                    "insuranceMultiplier": 1,
+                    "structuralReinforcement": 0
+                },
+                "gridReliability": {
+                    "gridUptime": 99.97,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 1,
+                    "averageOutageDuration": 5,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 24,
+                    "renewableReadiness": 65
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 8,
+                    "hyperscalerPresence": 8,
+                    "avgHiringDays": 40,
+                    "salaryPremium": 1.15,
+                    "talentScore": 70,
+                    "certifiedProfessionals": 1200
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.65,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.7,
+                    "fuelTaxRate": 0.12,
+                    "deliveryLeadDays": 2,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "FR": {
+                "id": "FR",
+                "region": "EMEA",
+                "name": "France",
+                "currency": "EUR",
+                "currencySymbol": "€",
+                "economy": {
+                    "inflationRate": 0.025,
+                    "laborEscalation": 0.03,
+                    "taxRate": 0.25,
+                    "electricityRate": 0.15
+                },
+                "labor": {
+                    "minimumWage": 2100,
+                    "baseSalary_ShiftLead": 7000,
+                    "baseSalary_Engineer": 5500,
+                    "baseSalary_Technician": 4000,
+                    "baseSalary_Admin": 3200,
+                    "baseSalary_Janitor": 2300,
+                    "laborRatePerHour": 35,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.25,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.15,
+                    "leaves": {
+                        "annual": 25,
+                        "publicHolidays": 11,
+                        "sickAverage": 6
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "NF C 15-100",
+                        "AFNOR"
+                    ],
+                    "annualComplianceCost": 15000
+                },
+                "environment": {
+                    "baselineAQI": 25,
+                    "gridCarbonIntensity": 0.06
+                },
+                "risk": {
+                    "downtimeCostPerMin": 4000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.25,
+                    "incentivePrograms": [
+                        "CIR R&D Tax Credit 30%",
+                        "France 2030 Digital Infrastructure",
+                        "Reduced Energy Tax for DCs"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.25
+                },
+                "naturalDisaster": {
+                    "seismicZone": 1,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 12,
+                    "insuranceMultiplier": 1.05,
+                    "structuralReinforcement": 0.01
+                },
+                "gridReliability": {
+                    "gridUptime": 99.99,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 0,
+                    "averageOutageDuration": 3,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 24,
+                    "renewableReadiness": 55
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 25,
+                    "hyperscalerPresence": 5,
+                    "avgHiringDays": 40,
+                    "salaryPremium": 1.05,
+                    "talentScore": 68,
+                    "certifiedProfessionals": 1800
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.75,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.9,
+                    "fuelTaxRate": 0.15,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 60000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "SE": {
+                "id": "SE",
+                "region": "EMEA",
+                "name": "Sweden",
+                "currency": "SEK",
+                "currencySymbol": "kr",
+                "economy": {
+                    "inflationRate": 0.02,
+                    "laborEscalation": 0.025,
+                    "taxRate": 0.206,
+                    "electricityRate": 0.08
+                },
+                "labor": {
+                    "minimumWage": 2500,
+                    "baseSalary_ShiftLead": 7200,
+                    "baseSalary_Engineer": 6000,
+                    "baseSalary_Technician": 4500,
+                    "baseSalary_Admin": 3500,
+                    "baseSalary_Janitor": 2800,
+                    "laborRatePerHour": 36,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 2
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.1,
+                    "leaves": {
+                        "annual": 25,
+                        "publicHolidays": 13,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "SS Standards",
+                        "Energimyndigheten"
+                    ],
+                    "annualComplianceCost": 12000
+                },
+                "environment": {
+                    "baselineAQI": 10,
+                    "gridCarbonIntensity": 0.04
+                },
+                "risk": {
+                    "downtimeCostPerMin": 4000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Lulea Data Center Hub"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.206,
+                    "incentivePrograms": [
+                        "Reduced Energy Tax for DCs",
+                        "Vinnova Innovation Grants",
+                        "Northern Sweden Regional Aid"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0.206
+                },
+                "naturalDisaster": {
+                    "seismicZone": 0,
+                    "floodRisk": "low",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 5,
+                    "insuranceMultiplier": 1,
+                    "structuralReinforcement": 0
+                },
+                "gridReliability": {
+                    "gridUptime": 99.999,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 0,
+                    "averageOutageDuration": 1,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 24,
+                    "renewableReadiness": 95
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 10,
+                    "hyperscalerPresence": 3,
+                    "avgHiringDays": 45,
+                    "salaryPremium": 1.1,
+                    "talentScore": 62,
+                    "certifiedProfessionals": 600
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.85,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.8,
+                    "fuelTaxRate": 0.18,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "PL": {
+                "id": "PL",
+                "region": "EMEA",
+                "name": "Poland",
+                "currency": "PLN",
+                "currencySymbol": "zł",
+                "economy": {
+                    "inflationRate": 0.04,
+                    "laborEscalation": 0.05,
+                    "taxRate": 0.19,
+                    "electricityRate": 0.12
+                },
+                "labor": {
+                    "minimumWage": 1000,
+                    "baseSalary_ShiftLead": 3500,
+                    "baseSalary_Engineer": 2800,
+                    "baseSalary_Technician": 2000,
+                    "baseSalary_Admin": 1500,
+                    "baseSalary_Janitor": 1000,
+                    "laborRatePerHour": 15,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 2
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.15,
+                    "leaves": {
+                        "annual": 20,
+                        "publicHolidays": 13,
+                        "sickAverage": 6
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "PN-EN Standards",
+                        "URE License"
+                    ],
+                    "annualComplianceCost": 7000
+                },
+                "environment": {
+                    "baselineAQI": 40,
+                    "gridCarbonIntensity": 0.65
+                },
+                "risk": {
+                    "downtimeCostPerMin": 2000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.05
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Polish SEZ (14 zones)",
+                        "Lodz SEZ",
+                        "Katowice SEZ"
+                    ],
+                    "taxHolidayYears": 15,
+                    "taxHolidayRate": 0,
+                    "incentivePrograms": [
+                        "SEZ Tax Exemption",
+                        "Polish Investment Zone",
+                        "EU Structural Funds Co-financing"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0
+                },
+                "naturalDisaster": {
+                    "seismicZone": 0,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 10,
+                    "insuranceMultiplier": 1.05,
+                    "structuralReinforcement": 0
+                },
+                "gridReliability": {
+                    "gridUptime": 99.95,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 2,
+                    "averageOutageDuration": 10,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0.02,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 55
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 20,
+                    "hyperscalerPresence": 4,
+                    "avgHiringDays": 35,
+                    "salaryPremium": 1.05,
+                    "talentScore": 65,
+                    "certifiedProfessionals": 800
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.45,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0.1,
+                    "deliveryLeadDays": 2,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            },
+            "PT": {
+                "id": "PT",
+                "region": "EMEA",
+                "name": "Portugal",
+                "currency": "EUR",
+                "currencySymbol": "€",
+                "economy": {
+                    "inflationRate": 0.023,
+                    "laborEscalation": 0.035,
+                    "taxRate": 0.2,
+                    "electricityRate": 0.15
+                },
+                "labor": {
+                    "minimumWage": 920,
+                    "baseSalary_ShiftLead": 3800,
+                    "baseSalary_Engineer": 2900,
+                    "baseSalary_Technician": 2200,
+                    "baseSalary_Admin": 1600,
+                    "baseSalary_Janitor": 1050,
+                    "laborRatePerHour": 18,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.25,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.16,
+                    "leaves": {
+                        "annual": 22,
+                        "publicHolidays": 13,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "ITED",
+                        "ITUR",
+                        "RGSPIE",
+                        "DL 95/91"
+                    ],
+                    "annualComplianceCost": 14000
+                },
+                "environment": {
+                    "baselineAQI": 20,
+                    "gridCarbonIntensity": 0.08
+                },
+                "risk": {
+                    "downtimeCostPerMin": 3500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.05
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Madeira Free Trade Zone",
+                        "Sines Industrial Zone"
+                    ],
+                    "taxHolidayYears": 10,
+                    "taxHolidayRate": 0.05,
+                    "incentivePrograms": [
+                        "Portugal 2030 Program",
+                        "SIFIDE R&D Tax Credit",
+                        "Golden Visa Investment"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.05
+                },
+                "naturalDisaster": {
+                    "seismicZone": 2,
+                    "floodRisk": "low",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "low",
+                    "compositeScore": 25,
+                    "insuranceMultiplier": 1.15,
+                    "structuralReinforcement": 0.03
+                },
+                "gridReliability": {
+                    "gridUptime": 99.97,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 1,
+                    "averageOutageDuration": 8,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0.02,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 68
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 15,
+                    "hyperscalerPresence": 3,
+                    "avgHiringDays": 40,
+                    "salaryPremium": 1,
+                    "talentScore": 55,
+                    "certifiedProfessionals": 500
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.59,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.1,
+                    "fuelTaxRate": 0.12,
+                    "deliveryLeadDays": 2,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q1"
+            }
+        },
+        /* @@COUNTRIES_END */
+
+        // Shared enums so every calculator/module labels tier/redundancy/cooling
+        // identically (no more 2n vs 2N vs "Tier III" divergence).
+        tierCodes: { n: 'Tier I', n1: 'Tier II', '2n': 'Tier III', '2n1': 'Tier IV' },
+        redundancyLevels: { n: 'N', n1: 'N+1', '2n': '2N', '2n1': '2N+1' },
+        // NOTE: canonical cooling taxonomy already lives in DATA.coolingTypes below
+        // (label + capex/pue/wue key mapping, model-consumed) — do not duplicate here.
 
         // Land + shell cost by region ($/MW of built capacity). Previously conflated into salaryMult.
         land: {
@@ -569,7 +4216,62 @@
                 { min: 95, status: 'Ready', label: 'Operationally ready' },
                 { min: 80, status: 'Conditional', label: 'Conditionally ready — open items' },
                 { min: 0,  status: 'Not Ready', label: 'Not ready' }
-            ]
+            ],
+            /* Cx PROGRAM cost + schedule model (promoted from cx-calculator.html so
+             * DCMOC + the calculator share one source). base = $/kW per discipline;
+             * levels L0-L6 with cost share + schedule-weight; discipline split of
+             * total; multipliers by cooling/redundancy. Region day-rate scaling
+             * uses DATA.countries[id].constructionIndex. */
+            cx: {
+                base: { electrical: 72, mechanical_air: 35, mechanical_dlc: 50, fire: 12, security: 6, it: 11, controls: 14, building: 5 }, /* $/kW IT */
+                levels: {
+                    L0: { costShare: 0.03, schedWeight: 0.06, label: 'L0 Design & Cx Prep' },
+                    L1: { costShare: 0.04, schedWeight: 0.08, label: 'L1 Factory Witness' },
+                    L2: { costShare: 0.10, schedWeight: 0.12, label: 'L2 Standalone Functional' },
+                    L3: { costShare: 0.22, schedWeight: 0.20, label: 'L3 System Functional' },
+                    L4: { costShare: 0.20, schedWeight: 0.18, label: 'L4 Subsystem Integration' },
+                    L5: { costShare: 0.32, schedWeight: 0.27, label: 'L5 Integrated Systems Test' },
+                    L6: { costShare: 0.09, schedWeight: 0.09, label: 'L6 Closeout & Turnover' }
+                },
+                disciplineSplit: { electrical: 0.40, mechanical: 0.24, fire: 0.09, controls: 0.08, it: 0.07, security: 0.04, building: 0.04, management: 0.04 },
+                coolingMult: { air: 1.0, inrow: 1.05, rdhx: 1.12, liquid: 1.22, immersion: 1.30 },
+                redundancyMult: { n: 0.9, n1: 1.0, '2n': 1.18, '2n1': 1.28 },
+                contingency: 0.15,
+                /* schedule anchor: base months at 1 MW + growth per MW (log-damped). */
+                schedBaseMonths: 4.5, schedPerMw: 0.45, schedMaxMonths: 20
+            }
+        },
+        /* ══ DC-OS shared pillar engines (v1.63.0): tier classification, fire
+         * suppression sizing, CDU/liquid-cooling sizing, spares (EOQ), and the
+         * Layer-13 decision benchmarks — consolidated so DCMOC + the standalone
+         * tools share one source. ══ */
+        tier: {
+            /* Uptime-style tier from a 0-100 weighted infrastructure score. */
+            weights: { power: 0.34, cooling: 0.26, network: 0.16, physical: 0.14, monitoring: 0.10 },
+            bands: [ { min: 90, tier: 4, label: 'Tier IV — Fault Tolerant' }, { min: 75, tier: 3, label: 'Tier III — Concurrently Maintainable' }, { min: 55, tier: 2, label: 'Tier II — Redundant Components' }, { min: 0, tier: 1, label: 'Tier I — Basic Capacity' } ],
+            /* Redundancy floor — a tier can't exceed what its redundancy supports. */
+            redundancyCap: { n: 1, n1: 3, '2n': 4, '2n1': 4 }
+        },
+        fire: {
+            /* Clean-agent properties for NFPA-2001 quantity sizing. s = specific
+             * vapour volume k1 + k2*T (m3/kg); designC = typical design conc (%). */
+            agents: {
+                novec1230: { type: 'halocarbon', k1: 0.0664, k2: 0.0002741, designC: 4.5, label: 'Novec 1230' },
+                fm200:     { type: 'halocarbon', k1: 0.1269, k2: 0.0005140, designC: 7.0, label: 'FM-200 (HFC-227ea)' },
+                ig541:     { type: 'inert',      designC: 37.5, label: 'Inert Gas IG-541' }
+            }
+        },
+        cdu: {
+            /* Water thermophysical constants for coolant-flow sizing. */
+            waterRho: 997, waterCp: 4.18, /* kg/m3, kJ/kg·K */
+            cduUnitKw: 300 /* nominal rejected-heat per CDU rack unit */
+        },
+        decision: {
+            /* Layer-13 planning benchmarks (descriptive, not advice). */
+            tierAvailability: { 2: 99.741, 3: 99.982, 4: 99.995 },
+            perKwBand: { 2: { lean: 7000, premium: 10000 }, 3: { lean: 10000, premium: 15000 }, 4: { lean: 15000, premium: 22000 } },
+            pueTarget: { air: 1.5, inrow: 1.4, rdhx: 1.35, liquid: 1.2, immersion: 1.1 },
+            disclaimer: 'Engineering feasibility guidance from a deterministic rule engine — not investment, legal, or professional advice. Validate against a full design review.'
         },
         /* ══ v2.4.0 — DATA.asset: Asset Intelligence (Layer 9). Design lives by asset
          * class + health-index weights + status bands. Powers the asset digital
@@ -768,6 +4470,8 @@
             'regions.APAC.powerKwh':  { source: 'IEA/regional utility filings (blended)', asOf: '2026', unit: '$/kWh' },
             'regions.LATAM.powerKwh': { source: 'Regional utility filings (blended)', asOf: '2026', unit: '$/kWh' },
             'regionsCountry':         { source: 'PLN/EMA/TEPCO/CEA/TNB tariff filings + national statistics', asOf: '2026', unit: 'mixed (see fields)' },
+            'countries':              { source: 'DCMOC country reference 2026-Q1 (per-country economy/labor/environment/gridReliability/naturalDisaster/talentPool/fuelDiesel/taxIncentives/compliance/constructionIndex); PLN/EMA/TEPCO/national tariff filings + IMF WEO + Ember grid-intensity + national labor statistics. GENERATED from dcmoc/src/constants/countries.ts — single source of truth for the site + DCMOC.', asOf: '2026-Q1', unit: 'mixed (see per-country fields)' },
+            'commissioning.cx':       { source: 'Commissioning program cost/schedule methodology promoted from cx-calculator.html (discipline $/kW base + L0-L6 cost/schedule shares + discipline split); base rates calibrated to DC Cx budgetary practice (ASHRAE Guideline 0 / NETA ECS scope). Region scaling via DATA.countries.constructionIndex.', asOf: '2026', method: 'budgetary estimate-grade Cx program model; NOT a detailed Cx plan' },
             'currency':               { source: 'ECB / central-bank reference rates', asOf: '2026-04', method: 'spot, USD base' },
             'inflationAnnual':        { source: 'IMF WEO 2026 regional CPI', asOf: '2026', unit: 'fraction/yr' },
             'salaryBenchmarks':       { source: 'Uptime Institute 2026 + AFCOM 2026 + US BLS 2025', asOf: '2026', unit: 'USD/yr, base' },
@@ -2364,6 +6068,37 @@
                     }
                     return { grade: 'E', label: bands[bands.length - 1].label };
                 },
+                /** Derive the 0-1 site factor vector from a country's reference
+                 *  profile (DATA.countries) — 1 = best. Missing fields fall back to
+                 *  a neutral 0.6; `overrides` pins any factor. So
+                 *  score(deriveFactors('SG')) is a REAL, country-varying site score
+                 *  (no hardcoded factor vectors). */
+                deriveFactors: function (countryId, overrides) {
+                    var c = (DATA.countries && DATA.countries[countryId]) || null;
+                    var clamp = function (x) { return Math.max(0, Math.min(1, x)); };
+                    var f;
+                    if (!c) {
+                        f = { power: 0.6, grid: 0.6, seismic: 0.6, talent: 0.6, tax: 0.6, carbon: 0.6, flood: 0.6, latency: 0.6, water: 0.6 };
+                    } else {
+                        var floodMap = { low: 1, moderate: 0.66, high: 0.33, extreme: 0 };
+                        var er = c.economy && c.economy.electricityRate;              // $/kWh (lower better)
+                        var gc = c.environment && c.environment.gridCarbonIntensity;  // kgCO2/kWh (lower better)
+                        var tax = c.economy && c.economy.taxRate;                     // fraction (lower better)
+                        f = {
+                            power:   er != null ? clamp(1 - (er - 0.05) / 0.30) : 0.6,
+                            grid:    c.gridReliability ? clamp(((c.gridReliability.gridUptime > 1 ? c.gridReliability.gridUptime : c.gridReliability.gridUptime * 100) - 95) / 5) : 0.6,
+                            seismic: c.naturalDisaster ? clamp(1 - c.naturalDisaster.seismicZone / 4) : 0.6,
+                            talent:  c.talentPool ? clamp(c.talentPool.talentScore / 100) : 0.6,
+                            tax:     tax != null ? clamp(1 - tax / 0.35) : 0.6,
+                            carbon:  gc != null ? clamp(1 - gc / 0.90) : 0.6,
+                            flood:   (c.naturalDisaster && floodMap[c.naturalDisaster.floodRisk] != null) ? floodMap[c.naturalDisaster.floodRisk] : 0.6,
+                            latency: (c.talentPool && c.talentPool.hyperscalerPresence != null) ? clamp(c.talentPool.hyperscalerPresence / 10) : 0.65,
+                            water:   0.65
+                        };
+                    }
+                    if (overrides) { for (var k in overrides) { if (overrides.hasOwnProperty(k)) f[k] = overrides[k]; } }
+                    return f;
+                },
                 /** Weighted Site Score from 0-1 goodness factors (1 = best). Only the
                  *  supplied factors count; weights are renormalized over present
                  *  factors so a partial set still scores fairly. Returns score 0-100,
@@ -2417,6 +6152,53 @@
                     var index = present > 0 ? +(100 * weighted / present).toFixed(1) : 0;
                     var s = RZEngine.models.commissioning.status(index);
                     return { index: index, status: s.status, label: s.label, breakdown: breakdown, open: open, coverage: +present.toFixed(3) };
+                },
+                /** Commissioning PROGRAM cost ($) for a build — the L0-L6 Cx program,
+                 *  promoted from cx-calculator.html so DCMOC + the calculator share one
+                 *  source. input: {itLoadKw, cooling, redundancy, countryId}. Returns
+                 *  {total, contingency, subtotal, perKw, byLevel, byDiscipline}. */
+                programCost: function (input) {
+                    input = input || {};
+                    var cx = DATA.commissioning.cx;
+                    var kw = Math.max(0, +input.itLoadKw || 0);
+                    var cooling = (input.cooling || 'air').toLowerCase();
+                    var red = (input.redundancy || 'n1').toLowerCase().replace(/\s+/g, '');
+                    var mech = (cooling === 'liquid' || cooling === 'immersion' || cooling === 'rdhx') ? cx.base.mechanical_dlc : cx.base.mechanical_air;
+                    var basePerKw = cx.base.electrical + mech + cx.base.fire + cx.base.security + cx.base.it + cx.base.controls + cx.base.building;
+                    var cMult = cx.coolingMult[cooling] != null ? cx.coolingMult[cooling] : 1.0;
+                    var rMult = cx.redundancyMult[red] != null ? cx.redundancyMult[red] : 1.0;
+                    var country = DATA.countries && DATA.countries[input.countryId];
+                    var regionMult = country && country.constructionIndex ? country.constructionIndex : 1.0;
+                    var subtotal = kw * basePerKw * cMult * rMult * regionMult;
+                    var contingency = subtotal * cx.contingency;
+                    var total = subtotal + contingency;
+                    var byLevel = {}, byDiscipline = {};
+                    for (var lk in cx.levels) { if (cx.levels.hasOwnProperty(lk)) byLevel[lk] = { label: cx.levels[lk].label, cost: Math.round(total * cx.levels[lk].costShare) }; }
+                    for (var dk in cx.disciplineSplit) { if (cx.disciplineSplit.hasOwnProperty(dk)) byDiscipline[dk] = Math.round(total * cx.disciplineSplit[dk]); }
+                    return { total: Math.round(total), subtotal: Math.round(subtotal), contingency: Math.round(contingency), perKw: kw > 0 ? +(total / kw).toFixed(1) : 0, byLevel: byLevel, byDiscipline: byDiscipline };
+                },
+                /** Commissioning PROGRAM schedule (months) for a build. input:
+                 *  {itLoadKw, cooling, redundancy}. Returns {totalMonths, byLevel:[{level,label,months,start,end}]}. */
+                programSchedule: function (input) {
+                    input = input || {};
+                    var cx = DATA.commissioning.cx;
+                    var mw = Math.max(0, (+input.itLoadKw || 0) / 1000);
+                    var cooling = (input.cooling || 'air').toLowerCase();
+                    var red = (input.redundancy || 'n1').toLowerCase().replace(/\s+/g, '');
+                    var cMult = cx.coolingMult[cooling] != null ? cx.coolingMult[cooling] : 1.0;
+                    var rMult = cx.redundancyMult[red] != null ? cx.redundancyMult[red] : 1.0;
+                    // log-damped growth so a 100 MW build isn't 45 months of Cx
+                    var raw = cx.schedBaseMonths + cx.schedPerMw * (mw > 0 ? Math.log(1 + mw) / Math.log(2) : 0) * 4;
+                    var totalMonths = Math.min(cx.schedMaxMonths, +(raw * cMult * rMult).toFixed(1));
+                    var order = ['L0', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6'];
+                    var byLevel = [], cursor = 0;
+                    for (var i = 0; i < order.length; i++) {
+                        var lv = cx.levels[order[i]];
+                        var m = +(totalMonths * lv.schedWeight).toFixed(1);
+                        byLevel.push({ level: order[i], label: lv.label, months: m, start: +cursor.toFixed(1), end: +(cursor + m).toFixed(1) });
+                        cursor += m;
+                    }
+                    return { totalMonths: totalMonths, byLevel: byLevel };
                 }
             },
 
@@ -2768,6 +6550,123 @@
                     var self = RZEngine.models.compliance, total = 0;
                     (categories || []).forEach(function (k) { total += self.categoryCost(k); });
                     return total;
+                }
+            },
+
+            /* ── DC-OS Layer: Tier classification (Uptime-style) ── */
+            tier: {
+                /** Classify from 0-100 sub-scores + redundancy. Returns {tier,label,score,capped}. */
+                classify: function (s) {
+                    s = s || {};
+                    var W = DATA.tier.weights;
+                    var score = (s.power || 0) * W.power + (s.cooling || 0) * W.cooling + (s.network || 0) * W.network + (s.physical || 0) * W.physical + (s.monitoring || 0) * W.monitoring;
+                    score = Math.max(0, Math.min(100, +score.toFixed(1)));
+                    var band = DATA.tier.bands.find(function (b) { return score >= b.min; }) || DATA.tier.bands[DATA.tier.bands.length - 1];
+                    var t = band.tier, label = band.label, capped = false;
+                    var red = (s.redundancy || '').toLowerCase().replace(/\s+/g, '');
+                    var cap = DATA.tier.redundancyCap[red];
+                    if (cap != null && t > cap) { t = cap; label = (DATA.tier.bands.find(function (b) { return b.tier === cap; }) || band).label; capped = true; }
+                    return { tier: t, label: label, score: score, capped: capped };
+                }
+            },
+
+            /* ── DC-OS Layer: Fire suppression sizing (NFPA 2001) ── */
+            fire: {
+                /** Clean-agent quantity (kg) for a room. input {volumeM3, agent, tempC, concentration?}.
+                 *  Halocarbon: W = V/s · C/(100−C), s = k1+k2·T. Inert: V_agent = V·ln(100/(100−C)). */
+                agentQuantity: function (input) {
+                    input = input || {};
+                    var a = DATA.fire.agents[(input.agent || 'novec1230').toLowerCase()] || DATA.fire.agents.novec1230;
+                    var V = Math.max(0, input.volumeM3 || 0);
+                    var T = input.tempC != null ? input.tempC : 20;
+                    var C = input.concentration != null ? input.concentration : a.designC;
+                    if (a.type === 'inert') {
+                        var volAgent = V * Math.log(100 / (100 - C)); // m3 of agent at design conc
+                        return { agent: a.label, type: 'inert', agentVolumeM3: +volAgent.toFixed(2), designConcentration: C };
+                    }
+                    var s = a.k1 + a.k2 * T;
+                    var kg = (V / s) * (C / (100 - C));
+                    return { agent: a.label, type: 'halocarbon', massKg: +kg.toFixed(1), specificVolume: +s.toFixed(4), designConcentration: C };
+                }
+            },
+
+            /* ── DC-OS Layer: CDU / liquid-cooling sizing ── */
+            cdu: {
+                /** Coolant flow + CDU count for a liquid-cooled load. input {itKw, deltaT}.
+                 *  flow(m3/s) = Q(kW) / (ρ·cp·ΔT); returns L/min + N+1 CDU units. */
+                size: function (input) {
+                    input = input || {};
+                    var kw = Math.max(0, input.itKw || 0);
+                    var dT = input.deltaT || 10; // K
+                    var flowM3s = kw / (DATA.cdu.waterRho * DATA.cdu.waterCp * dT);
+                    var flowLpm = flowM3s * 60000;
+                    var units = Math.max(1, Math.ceil(kw / DATA.cdu.cduUnitKw));
+                    return { flowLpm: +flowLpm.toFixed(1), flowM3h: +(flowM3s * 3600).toFixed(2), cduUnits: units, cduUnitsRedundant: units + 1, deltaT: dT };
+                }
+            },
+
+            /* ── DC-OS Layer: Spares (EOQ / reorder) ── */
+            spares: {
+                /** Economic order quantity: √(2·D·S / H). */
+                eoq: function (input) {
+                    input = input || {};
+                    var D = Math.max(0, input.annualDemand || 0), S = input.orderCost || 0, H = input.holdingCostPerUnit || 0;
+                    if (H <= 0 || D <= 0) return { eoq: 0, orders: 0 };
+                    var q = Math.sqrt((2 * D * S) / H);
+                    return { eoq: Math.ceil(q), orders: +(D / q).toFixed(1), annualHolding: Math.round((q / 2) * H), annualOrdering: Math.round((D / q) * S) };
+                },
+                /** Reorder point = demand/day · leadDays + safety stock. */
+                reorderPoint: function (input) {
+                    input = input || {};
+                    var dpd = input.demandPerDay || 0, lead = input.leadDays || 0, safety = input.safetyStock || 0;
+                    return Math.ceil(dpd * lead + safety);
+                }
+            },
+
+            /* ── DC-OS Layer 13: deterministic decision engine (shared brain) ──
+             * Always-on: reads an engine-output snapshot + optional constraints/
+             * objectives → explainable, never-empty recommendations. Mirrors the
+             * DCMOC deterministic provider so the static site + DCMOC share it. */
+            decision: {
+                recommend: function (ctx, constraints, objectives) {
+                    ctx = ctx || {}; constraints = constraints || {}; objectives = objectives || [];
+                    var D2 = DATA.decision, recs = [], rationale = [];
+                    var inp = ctx.inputs || {}, tier = inp.tier || 3;
+                    var itKw = inp.itLoadKw || 0, mw = itKw / 1000, cooling = (inp.coolingType || 'air').toLowerCase();
+                    var clamp01 = function (x) { return Math.max(0, Math.min(1, x)); };
+                    var add = function (title, detail, conf, tags, engine, obs, rule, concl, sev) {
+                        recs.push({ title: title, detail: detail, confidence: conf, tags: tags, _sev: sev === 'critical' ? 3 : sev === 'warn' ? 2 : 1 });
+                        rationale.push({ engine: engine, observation: obs, rule: rule, conclusion: concl, severity: sev });
+                    };
+                    // perKw vs band
+                    var perKw = ctx.capex && ctx.capex.perKw;
+                    if (perKw) { var band = D2.perKwBand[tier]; if (perKw > band.premium) add('Cost/kW above tier benchmark', '$' + Math.round(perKw).toLocaleString() + '/kW exceeds the Tier ' + tier + ' premium band (~$' + (band.premium / 1000).toFixed(0) + 'k) — value-engineer cooling/redundancy scope.', 0.7, ['capex', 'cost'], 'capex', 'perKw ' + Math.round(perKw) + ' > premium ' + band.premium, 'perKw>band', 'flag cost premium', 'warn'); }
+                    // PUE vs target
+                    var pue = ctx.carbon && ctx.carbon.pue, pueT = constraints.maxPue || D2.pueTarget[cooling] || 1.5;
+                    if (pue && pue > pueT + 0.03) add('Improve PUE toward ≤ ' + pueT.toFixed(2), 'Modelled PUE ' + pue.toFixed(2) + ' exceeds the ' + pueT.toFixed(2) + ' target for ' + cooling + ' — liquid/rear-door cooling, higher chilled-water temps, economisation.', 0.72, ['pue', 'cooling'], 'sustainability', 'PUE ' + pue.toFixed(2) + ' > ' + pueT.toFixed(2), 'pue>target', 'flag PUE gap', 'warn');
+                    // availability vs tier
+                    var av = ctx.reliability && ctx.reliability.availabilityPct, avT = constraints.minAvailabilityPct || D2.tierAvailability[tier];
+                    if (av != null && av < avT - 0.002) add('Raise redundancy to hit tier availability', 'Availability ' + av.toFixed(3) + '% below the Tier ' + tier + ' target ' + avT.toFixed(3) + '% — add UPS/gen/distribution paths.', 0.75, ['reliability', 'redundancy'], 'reliability', 'avail ' + av + ' < ' + avT, 'avail<target', 'raise redundancy', 'warn');
+                    // financial
+                    var pay = ctx.financial && ctx.financial.paybackYears, irr = ctx.financial && ctx.financial.irrPct;
+                    if (pay != null && isFinite(pay)) { var good = pay <= 7 && (irr == null || irr >= 12); add(good ? 'Return profile is attractive' : 'Strengthen the return profile', 'Payback ≈ ' + pay.toFixed(1) + ' yr' + (irr != null ? ', IRR ' + irr.toFixed(1) + '%' : '') + (good ? ' — clears a typical hurdle.' : ' — raise $/kW revenue, phase CAPEX, or cut OPEX via PUE.'), good ? 0.6 : 0.64, ['financial', 'roi'], 'financial', 'payback ' + pay.toFixed(1) + 'yr', 'payback vs 7yr', good ? 'attractive' : 'needs work', good ? 'info' : 'warn'); }
+                    // density → cooling
+                    if ((cooling === 'air') && mw >= 10) add('Adopt direct liquid cooling', 'At ' + mw.toFixed(1) + ' MW the thermal density favours liquid/immersion — lower PUE + footprint, de-risks AI/HPC density.', 0.75, ['cooling', 'architecture'], 'architecture', mw.toFixed(1) + ' MW on air', 'high density', 'recommend liquid', 'info');
+                    // schedule
+                    var months = ctx.capex && ctx.capex.timelineMonths;
+                    if (months && (constraints.deadlineMonths ? months > constraints.deadlineMonths : months > 30)) add('Consider modular / phased delivery', months + ' mo build — modular/phasing pulls in first-power and de-risks long-lead gear.', 0.6, ['schedule', 'construction'], 'construction', 'timeline ' + months + ' mo', 'long timeline', 'phasing', 'info');
+                    // site
+                    var site = ctx.site && ctx.site.score;
+                    if (site != null && site < 60) add('Mitigate site weaknesses', 'Composite site score ' + site + '/100 below the comfortable band — revisit power/grid/water/hazard or weigh an alternative site.', 0.62, ['site', 'risk'], 'site', 'site ' + site + ' < 60', 'low site', 'flag site', 'warn');
+                    // objective ranking
+                    var OBJ = { maxRoi: ['roi', 'financial', 'cost', 'capex'], minCost: ['cost', 'capex'], minCarbon: ['carbon', 'pue'], maxReliability: ['reliability', 'redundancy'], fastestDelivery: ['schedule', 'construction'] };
+                    var objTags = {}; objectives.forEach(function (o) { (OBJ[o] || []).forEach(function (t) { objTags[t] = 1; }); });
+                    recs.sort(function (a, b) { var sa = a._sev * 10 + a.confidence * 5 + (a.tags.some(function (t) { return objTags[t]; }) ? 4 : 0); var sb = b._sev * 10 + b.confidence * 5 + (b.tags.some(function (t) { return objTags[t]; }) ? 4 : 0); return sb - sa; });
+                    var flags = rationale.filter(function (r) { return r.severity !== 'info'; }).length;
+                    var out = recs.slice(0, 6).map(function (r) { return { title: r.title, detail: r.detail, confidence: r.confidence, tags: r.tags }; });
+                    if (!out.length) out.push({ title: 'Design is balanced — no material flags', detail: 'Tier ' + tier + ' · ' + mw.toFixed(1) + ' MW' + (pue ? ' · PUE ' + pue.toFixed(2) : '') + (pay != null ? ' · payback ~' + pay.toFixed(1) + ' yr' : '') + '. Cost, efficiency, reliability, schedule within best-practice bands.', confidence: clamp01(0.5 + 0.1 * rationale.length), tags: ['balanced'] });
+                    var summary = 'Tier ' + tier + ' · ' + (mw ? mw.toFixed(0) + ' MW' : 'capacity TBD') + (pue ? ' · PUE ' + pue.toFixed(2) : '') + (pay != null ? ' · payback ~' + pay.toFixed(1) + ' yr' : '') + ' — ' + (flags > 0 ? flags + ' optimization' + (flags > 1 ? 's' : '') + ' identified' : 'balanced within best-practice bands') + '.';
+                    return { summary: summary, recommendations: out, rationale: rationale, metrics: { feasible: true, confidence: clamp01(0.4 + 0.1 * rationale.length) }, provider: 'deterministic', disclaimer: D2.disclaimer };
                 }
             }
         },

@@ -11,6 +11,69 @@ release sections rather than semver.
 
 ---
 
+## v1.63.0 — 2026-07-18 (DC-OS engine unification: shared pillar engines + Layer-13 brain)
+
+### Added
+- **5 shared pillar engines promoted into `rz-engine.js`** so DCMOC + the standalone tools share one implementation:
+  - `models.tier.classify()` — Uptime-style Tier I–IV from weighted infra sub-scores, capped by redundancy topology.
+  - `models.fire.agentQuantity()` — NFPA-2001 clean-agent sizing (halocarbon `W=V/s·C/(100−C)`, inert `V·ln(100/(100−C))`) for Novec 1230 / FM-200 / IG-541.
+  - `models.cdu.size()` — liquid-cooling coolant flow `Q/(ρ·cp·ΔT)` → L/min + N+1 CDU count.
+  - `models.spares.eoq()` + `reorderPoint()` — EOQ `√(2DS/H)` + reorder point.
+  - `models.decision.recommend()` — **Layer-13 deterministic decision brain** in the engine (mirrors the DCMOC provider): always-on, never-empty, explainable recommendations (PUE/availability/cost-band/financial/density/schedule/site rules + objective ranking + disclaimer).
+- All 5 registered on the `cf-worker /calc` allow-list (backend-served, anti-theft). `tools/test-rz-engine.mjs` +10 asserts → **321/0**.
+
+### Changed
+- `rz-engine.min.js` rebuilt (terser). Reference-parity 126/0.
+- **Retail vs DC-contract electricity rate documented, not force-merged:** `DATA.countries.economy.electricityRate` is the retail/display rate (single-sourced across calculators + DCMOC); `models.opex` keeps its calibrated DC-contract blend (what the cockpit-accuracy gate is validated against) — the two are intentionally distinct (a DC gets PPA/wholesale rates), with `ppaRate` override available. This resolves the user-visible rate divergence without degrading OPEX accuracy.
+
+---
+
+## v1.62.0 — 2026-07-18 (DC-OS engine unification P-0/B: complete thin engines + de-fake DCMOC modules)
+
+### Added
+- **`models.site.deriveFactors(countryId)`** — derives the 0-1 site factor vector (power/grid/seismic/talent/tax/carbon/flood/latency/water) from `DATA.countries`, so `site.score()` is REAL and country-varying (SG 70, US 72, DE 61, ID 55). Was: a hardcoded factor vector that produced a constant score regardless of country.
+- **`models.commissioning.programCost()` + `programSchedule()`** — full L0–L6 commissioning PROGRAM cost + schedule (discipline $/kW base, level cost/schedule shares, discipline split, cooling/redundancy multipliers, region scaling via `DATA.countries.constructionIndex`), promoted from `cx-calculator.html`'s inline logic into the shared engine (`DATA.commissioning.cx` + `DATA.sources` row). Cost/schedule now move with itLoad/cooling/redundancy/country.
+- `tools/test-rz-engine.mjs` +12 asserts (countries, site.deriveFactors country-varying, commissioning cost/schedule) → **311/0**.
+
+### Changed
+- **DCMOC integrity fixes ("de-fake"):** the Commissioning module fed a hardcoded `{L1:1,L2:1,…}` completion vector to a real engine function (constant output); it now shows the LIVE `models.commissioning` program cost + schedule + discipline breakdown from the current project inputs. The Site Intelligence module fed a hardcoded factor vector; it now derives factors from the selected country via `models.site.deriveFactors`. (DCMOC static app — versioned separately; noted here for the engine wiring.)
+- **DCMOC Layer-13 AI Assistant:** the "AI Assistant" button now opens a config modal — plug in an OpenAI/Anthropic/custom API (key stored only in-browser) and the decision layer routes through it; empty ⇒ the built-in deterministic RZ engine runs everything (auto-fallback on any error). `remoteApiProvider` is now runtime-configurable.
+- **Root calculators single-sourced:** `opex-calculator.html`, `carbon-footprint.html`, `tco-calculator.html` now resolve country electricity rate / grid-carbon / PUE from `RZEngine.data.countries` + `pueMatrix` (inline fallback), killing the per-tool divergence (Singapore rate now 0.22 everywhere; air PUE 1.50). Also fixed: `carbon-footprint.html` previously referenced the engine only inside a PDF template string — it now actually loads `rz-engine.min.js`. Audits (`audit-js-syntax`, `audit-script-tags`) CLEAN.
+- **DCMOC Phase C wiring:** 9 modules (GridReliability, DisasterRisk, Compliance, Capacity, AssetLifecycle, CBM, FuelGen, TaxIncentive, Carbon) now delegate to their existing `rzModels()` engine models with local fallback; Carbon reconciled to `models.carbon.annualTonnes` (agrees with the Executive Dashboard). DCMOC module KPI grids made mobile-responsive (12 files); dashboard 0 horizontal overflow at 390px + 768px.
+- `rz-engine.min.js` rebuilt (terser). Reference-parity gate stays 126/0. DCMOC tsc + build clean, dashboard smoke 9/9.
+
+### Known / next (engine-unification program)
+- Still to build (deferred, need judgment): `models.decision` (promote the DCMOC deterministic provider into the engine), and consolidate `fire`/`cdu`/`tier`/`spares` (standalone `js/*.js` + inline tool logic) into shared `models.*`.
+- Dual DC electricity-rate (`DATA.regions.powerKwh` DC-blend vs `DATA.countries.economy.electricityRate` retail) intentionally NOT force-merged — needs a deliberate accuracy decision on the canonical DC power rate.
+
+---
+
+## v1.61.0 — 2026-07-17 (DC-OS engine unification P-A: single-source country reference)
+
+### Added
+- **`rz-engine.js DATA.countries`** — THE single source of truth for region/country economics
+  (electricity rate, tax, grid-carbon, labor, disaster, grid, talent, fuel, incentives,
+  `constructionIndex`) for 32 countries. **Generated** from the DCMOC authoring source
+  `dcmoc/src/constants/countries.ts` by `tools/build-countries-data.mjs` (Node 24 type-strip import)
+  so the engine copy can never drift from DCMOC. Prior state: the same data was hardcoded in ≥4
+  divergent places (DCMOC `COUNTRIES`, engine `DATA.regions`/`regionsCountry`, and inline tables in
+  `opex-calculator.html` / `carbon-footprint.html` / `tco-calculator.html`) — e.g. Singapore
+  electricity rate read $0.18 / $0.15 / $0.22 depending on the tool. Now one number everywhere.
+- **Shared enums** `DATA.tierCodes` (`n→Tier I … 2n1→Tier IV`) + `DATA.redundancyLevels`
+  (`n→N … 2n1→2N+1`) so tier/redundancy label identically across every calculator/module (was
+  encoded 4 ways). `DATA.currency` expanded 8→26 to cover every country currency. `DATA.sources`
+  gains a `countries` provenance row.
+- **Gate `tools/test-reference-parity.mjs`** — asserts `DATA.countries` deep-equals the DCMOC source
+  and that per-country electricity/grid-carbon/tax + enums + currency are consistent (126/0).
+
+### Changed
+- `rz-engine.min.js` rebuilt (terser). `tools/test-rz-engine.mjs` stays 299/0.
+- Part of the **DC-OS engine-unification program** — see `standarization/ENGINE_UNIFICATION.md`.
+  Root calculators + DCMOC modules migrate to read `DATA.countries` in the following phases
+  (retiring their inline copies); this release lands the canonical source + gate.
+
+---
+
 ## v1.60.1 — 2026-07-17 (index: neutralize contact-section copy)
 
 ### Changed

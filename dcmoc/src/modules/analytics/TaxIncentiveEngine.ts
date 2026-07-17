@@ -5,7 +5,7 @@
 
 import { CountryProfile } from '@/constants/countries';
 import { calculateIRR } from './FinancialEngine';
-import { rzData } from '@/lib/rz-engine';
+import { rzData, rzModels } from '@/lib/rz-engine';
 
 // Engine-sourced US tax-incentive rates (RZEngine DATA.tax) with local fallbacks
 // parity-identical to the former literals.
@@ -132,11 +132,17 @@ export const calculateTaxIncentives = (input: TaxIncentiveInput): TaxIncentiveRe
     // Typical import duty on DC equipment: 5-15% depending on country
     // US: MFN duty 0% for servers/switches, ~3-5% for cooling/power equipment
     // ASEAN: 5-10% before FTZ exemption. EU: 0-3.7%
+    const taxModel = rzModels().tax;
     const importDutyRate = country.id === 'ID' || country.id === 'IN' ? 0.075
         : country.id === 'US' ? 0.03
         : country.id === 'CN' ? 0.08
         : 0.05;
     const ftzBenefits = importDutyExemption ? Math.round(safeTotalCapex * safeEquipShare * importDutyRate) : 0;
+    // Engine-sourced import duty (informational cross-reference; ftzBenefits above remains authoritative for FTZ countries)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const engineImportDuty = (taxModel && typeof taxModel.importDuty === 'function')
+        ? taxModel.importDuty(safeTotalCapex * safeEquipShare, country.id)
+        : null;
 
     // --- Land Subsidy ---
     // Estimate: 15% of land cost, land = ~8-10% of CAPEX in most markets
@@ -145,20 +151,32 @@ export const calculateTaxIncentives = (input: TaxIncentiveInput): TaxIncentiveRe
     // --- US-specific: IRA on-site solar ITC (2026) ---
     // IRA Section 48 ITC: 30% base + 10% domestic content bonus if qualifying
     // Only applicable when solarCapexFraction > 0 and country = US
-    const iraSolarItcValue = (country.id === 'US' && solarCapexFraction > 0)
-        ? Math.round(safeTotalCapex * solarCapexFraction * (IRA_SOLAR_ITC + IRA_DOMESTIC_CONTENT_BONUS))
-        : 0;
+    // Engine-sourced IRA solar ITC
+    const engineSolarItc = (country.id === 'US' && solarCapexFraction > 0 && taxModel && typeof taxModel.solarItc === 'function')
+        ? taxModel.solarItc(safeTotalCapex * solarCapexFraction, true) // true = domestic content
+        : null;
+    const iraSolarItcValue = engineSolarItc !== null
+        ? engineSolarItc
+        : ((country.id === 'US' && solarCapexFraction > 0)
+            ? Math.round(safeTotalCapex * solarCapexFraction * (IRA_SOLAR_ITC + IRA_DOMESTIC_CONTENT_BONUS))
+            : 0);
 
     // --- US-specific: 2026 bonus depreciation (20%) ---
     // Applied in year 1 for qualifying equipment. Creates present-value benefit vs. straight-line.
     // PV benefit = bonus dep rate × equipment capex × tax rate × discount factor
-    const usBonusDepValue = (country.id === 'US' && safeEquipShare > 0)
-        ? Math.round(
-            safeTotalCapex * safeEquipShare * US_BONUS_DEPRECIATION_2026 * standardRate
-            // Year 1 timing benefit vs straight-line average (rough NPV lift)
-            * (1 - Math.pow(1 + safeDiscount, -Math.min(5, safeYears)) / 5)
-          )
-        : 0;
+    // Engine-sourced US bonus depreciation shield
+    const engineBonusDep = (country.id === 'US' && safeEquipShare > 0 && taxModel && typeof taxModel.bonusDepreciationShield === 'function')
+        ? taxModel.bonusDepreciationShield(safeTotalCapex * safeEquipShare, standardRate)
+        : null;
+    const usBonusDepValue = engineBonusDep !== null
+        ? engineBonusDep
+        : ((country.id === 'US' && safeEquipShare > 0)
+            ? Math.round(
+                safeTotalCapex * safeEquipShare * US_BONUS_DEPRECIATION_2026 * standardRate
+                // Year 1 timing benefit vs straight-line average (rough NPV lift)
+                * (1 - Math.pow(1 + safeDiscount, -Math.min(5, safeYears)) / 5)
+              )
+            : 0);
 
     // --- State sales tax exemption (US) ---
     const stateIncentiveValue = (country.id === 'US' && usStateCode && STATE_DC_INCENTIVES[usStateCode])

@@ -3,6 +3,7 @@
 
 import { CountryProfile } from '@/constants/countries';
 import { getPUE } from '@/constants/pue';
+import { rzModels } from '@/lib/rz-engine';
 
 export interface GridReliabilityInput {
     country: CountryProfile;
@@ -56,16 +57,20 @@ export const calculateGridReliability = (input: GridReliabilityInput): GridRelia
     // Outage duration (20%): <5min = 100, >120min = 0
     const durationScore = Math.max(0, Math.min(100, (120 - avgOutageDuration) / 1.2));
 
-    const reliabilityScore = Math.round(
-        uptimeScore * 0.4 + voltageScore * 0.2 + brownoutScore * 0.2 + durationScore * 0.2
-    );
+    const localScore = Math.round(uptimeScore * 0.4 + voltageScore * 0.2 + brownoutScore * 0.2 + durationScore * 0.2);
+    const gridModel = rzModels().grid;
+    const reliabilityScore = gridModel && typeof gridModel.score === 'function'
+        ? Math.round(localScore * 0.5 + gridModel.score(gridUptime) * 100 * 0.5)
+        : localScore;
 
     const reliabilityGrade: 'A' | 'B' | 'C' | 'D' | 'F' =
         reliabilityScore >= 90 ? 'A' : reliabilityScore >= 75 ? 'B' : reliabilityScore >= 55 ? 'C' : reliabilityScore >= 35 ? 'D' : 'F';
 
     // --- Outage Estimation ---
     const annualExpectedOutages = brownoutFreq + Math.round((100 - gridUptime) * 365 / 100);
-    const annualOutageMinutes = annualExpectedOutages * avgOutageDuration;
+    const annualOutageMinutes = gridModel && typeof gridModel.annualOutageHours === 'function'
+        ? gridModel.annualOutageHours(gridUptime) * 60
+        : annualExpectedOutages * avgOutageDuration;
 
     // --- Generator Sizing ---
     const pue = getPUE(coolingType);

@@ -30,7 +30,7 @@ export interface DashboardData {
     timelineMonths: number | null; capexCosts: Record<string, number> | null;
     facilityLoadMw: number;
     // efficiency
-    pue: number; wue: number | null; cue: number | null; lcc: number | null; opexAnnual: number | null;
+    pue: number; wue: number | null; cue: number | null; lcc: number | null; opexAnnual: number | null; carbonTonnes: number | null;
     // reliability
     availabilityPct: number | null; availabilityTarget: number | null; downtimeMin: number | null;
     // architecture / construction / site / risk
@@ -56,11 +56,12 @@ export function useDashboardData(): DashboardData {
         const redKey = REDUNDANCY_KEY[inputs.powerRedundancy] || 'n1';
 
         // ── efficiency (engine-real via rz-engine water/carbon/opex/tco) ──
-        let wue: number | null = null, cue: number | null = null, opexAnnual: number | null = null, lcc: number | null = null;
+        let wue: number | null = null, cue: number | null = null, opexAnnual: number | null = null, lcc: number | null = null, carbonTonnes: number | null = null;
         try { if (m.water?.wue) wue = m.water.wue(inputs.coolingType); } catch { }
         try {
             if (m.carbon?.annualTonnes) {
                 const t = m.carbon.annualTonnes(itLoadMw, pue, region);       // tCO2e/yr
+                carbonTonnes = Math.round(t);
                 const facilityMwh = itLoadMw * 1000 * pue * 8760 / 1000;      // MWh/yr
                 cue = facilityMwh > 0 ? +(t * 1000 / (facilityMwh * 1000)).toFixed(3) : null; // kgCO2/kWh
             }
@@ -107,7 +108,7 @@ export function useDashboardData(): DashboardData {
             redundancy: inputs.powerRedundancy, coolingType: inputs.coolingType, taxRate,
             capexTotal: capex?.total ?? null, perKw: capex?.metrics?.perKw ?? null, racks: capex?.metrics?.racks ?? null,
             timelineMonths: capex?.timeline?.totalMonths ?? null, capexCosts: capex?.costs ?? null, facilityLoadMw,
-            pue, wue, cue, lcc, opexAnnual,
+            pue, wue, cue, lcc, opexAnnual, carbonTonnes,
             availabilityPct, availabilityTarget, downtimeMin,
             architecture, construction, siteScore,
             financial, ebitda, financialIllustrative: true,
