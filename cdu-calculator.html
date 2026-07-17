@@ -33,6 +33,7 @@
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
     <script src="js/cdu-model.js?v=2026-06-25" defer></script>
     <script src="js/cdu-engine.js?v=2026-06-25" defer></script>
+    <script src="rz-engine.min.js?v=2026-07-18-dcos2" defer></script>
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"WebApplication","name":"CDU Sizing & Thermohydraulic Calculator","applicationCategory":"EngineeringApplication","operatingSystem":"Web","url":"https://resistancezero.com/cdu-calculator.html","description":"Size secondary flow, pressure drop, pipe velocity, heat-exchanger approach (epsilon-NTU), NPSH margin, dew-point reset and pump power for a Coolant Distribution Unit.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
     </script>
@@ -428,7 +429,21 @@
         }
 
         function compute(){
-            if(!window.CDU_ENGINE || !window.CDU_MODEL){ return; }
+            if(!window.CDU_ENGINE || !window.CDU_MODEL){
+                // Fallback: use RZEngine.models.cdu when dedicated engine is unavailable
+                if(window.RZEngine && RZEngine.models && RZEngine.models.cdu){
+                    var load=val('inLoad'), dt=val('inDt');
+                    if(!(load>0)){ return; }
+                    var rzCdu = RZEngine.models.cdu.size({itKw:load, deltaT:dt||10});
+                    var html='';
+                    html += kpiCard('Secondary flow', rzCdu.flowLpm.toFixed(0), 'LPM', (rzCdu.flowLpm/load).toFixed(2)+' LPM/kW · OCP band 1.0–1.5', 'ok');
+                    html += kpiCard('Secondary flow', rzCdu.flowM3h.toFixed(2), 'm³/h', 'ΔT '+rzCdu.deltaT+' K', 'ok');
+                    html += kpiCard('CDU units (N+1)', rzCdu.cduUnitsRedundant, 'units', rzCdu.cduUnits+' duty + 1 standby (RZEngine basic sizing)', 'ok');
+                    $('ccKpis').innerHTML = html;
+                    $('ccEngTag').textContent = 'RZEngine v'+RZEngine.version+' (basic sizing)';
+                }
+                return;
+            }
             var E = window.CDU_ENGINE, M = window.CDU_MODEL;
             var load=val('inLoad'), dt=val('inDt'), fluid=val('inFluid'), glycol=val('inGlycol'),
                 supply=val('inSupply'), dn=val('inDn'), len=val('inLen'), K=val('inK'),

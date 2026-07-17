@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.63.1 — 2026-07-18 (standalone tools: engine as fallback where the dedicated engine is richer)
+
+### Changed
+- `fire-calculator.html` + `cdu-calculator.html` now load `rz-engine.min.js` and delegate to `models.fire`/`models.cdu` **only as a fallback** — their dedicated `FIRE_ENGINE`/`CDU_ENGINE` (NOAEL safety, GWP, thermohydraulics, NPSH) are richer, so they stay primary. `tier-advisor.html` (6-band I/I+/…/IV grading) + `spares-readiness-calculator.html` (newsvendor/fill-rate) **kept inline** — their models are richer than the engine's 4-band tier / EOQ; promoting the richer logic into `rz-engine.js` is the honest next step, not downgrading the tools. Audits CLEAN; no calculator behavior changed.
+- `setup-supabase.html` repurposed → DC-OS manual-action checklist (token rotation, backend deploy for the v1.63.0 `/calc` models, tests).
+
+---
+
 ## v1.63.0 — 2026-07-18 (DC-OS engine unification: shared pillar engines + Layer-13 brain)
 
 ### Added

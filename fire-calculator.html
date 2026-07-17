@@ -33,6 +33,7 @@
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
     <script src="js/fire-model.js?v=2026-06-25" defer></script>
     <script src="js/fire-engine.js?v=2026-06-25" defer></script>
+    <script src="rz-engine.min.js?v=2026-07-18-dcos2" defer></script>
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"WebApplication","name":"Clean-Agent & Li-ion Fire Calculator","applicationCategory":"EngineeringApplication","operatingSystem":"Web","url":"https://resistancezero.com/fire-calculator.html","description":"Size clean-agent suppression (NFPA 2001 agent quantity), occupant safety vs NOAEL, cylinders, detector coverage, and Li-ion BBU thermal-runaway off-gas risk.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
     </script>
@@ -291,7 +292,23 @@
                    '<div class="kpi-sub">'+sub+'</div></div>';
         }
         function compute(){
-            if(!window.FIRE_ENGINE || !window.FIRE_MODEL){ return; }
+            if(!window.FIRE_ENGINE || !window.FIRE_MODEL){
+                // Fallback: use RZEngine.models.fire when dedicated engine is unavailable
+                if(window.RZEngine && RZEngine.models && RZEngine.models.fire){
+                    var vol=val('inVol'), temp=val('inTemp'), agent=val('inAgent'), conc=val('inConc');
+                    if(!(vol>0)){ return; }
+                    var rzFire = RZEngine.models.fire.agentQuantity({volumeM3:vol, agent:agent||'novec1230', tempC:temp||20, concentration:(conc===''||conc==null)?undefined:conc});
+                    var html='';
+                    if(rzFire.type==='halocarbon'){
+                        html += kpiCard('Agent quantity', rzFire.massKg.toLocaleString(), 'kg', rzFire.agent+' · design '+rzFire.designConcentration+'%', 'ok');
+                    } else {
+                        html += kpiCard('Agent quantity', rzFire.agentVolumeM3.toLocaleString(), 'm³ (NTP)', rzFire.agent+' · design '+rzFire.designConcentration+'%', 'ok');
+                    }
+                    $('fcKpis').innerHTML = html;
+                    $('fcEngTag').textContent = 'RZEngine v'+RZEngine.version+' · '+rzFire.agent+' (basic sizing)';
+                }
+                return;
+            }
             var E=window.FIRE_ENGINE, M=window.FIRE_MODEL;
             var vres = validateInputs();
             if(!vres.ok){

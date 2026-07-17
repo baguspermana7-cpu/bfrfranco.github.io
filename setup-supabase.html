@@ -4,22 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
-  <title>Deploy Backend /calc — DC-OS anti-theft</title>
+  <title>DC-OS — Yang harus kamu lakukan</title>
   <style>
     :root { color-scheme: dark; }
     * { box-sizing: border-box; }
     body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
            background:#0f172a; color:#e2e8f0; line-height:1.6; }
-    .wrap { max-width:780px; margin:0 auto; padding:28px 20px 80px; }
+    .wrap { max-width:800px; margin:0 auto; padding:28px 20px 80px; }
     h1 { font-size:1.5rem; margin:0 0 6px; }
     .sub { color:#94a3b8; margin:0 0 28px; }
     .step { background:#1e293b; border:1px solid #334155; border-radius:14px; padding:20px 22px; margin-bottom:22px; }
+    .step.urgent { border-color:rgba(239,68,68,0.5); }
     .step h2 { font-size:1.1rem; margin:0 0 4px; display:flex; align-items:center; gap:10px; }
     .num { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px;
            border-radius:50%; background:#1d4ed8; color:#fff; font-size:0.9rem; font-weight:800; flex:none; }
+    .num.red { background:#dc2626; }
+    .num.green { background:#16a34a; }
     .step .goal { color:#94a3b8; font-size:0.85rem; margin:0 0 14px; }
     ol, ul { margin:8px 0 8px; padding-left:22px; }
-    li { margin:5px 0; }
+    li { margin:6px 0; }
     b, strong { color:#f1f5f9; }
     .kbd { background:#0b1220; border:1px solid #334155; border-radius:6px; padding:1px 7px; font-family:ui-monospace,monospace; font-size:0.85em; }
     .codewrap { position:relative; margin:12px 0; }
@@ -28,113 +31,95 @@
     .copybtn { position:absolute; top:8px; right:8px; background:#1d4ed8; color:#fff; border:none; border-radius:7px;
                padding:6px 12px; font-size:0.75rem; font-weight:700; cursor:pointer; font-family:inherit; }
     .copybtn.done { background:#16a34a; }
-    .val { display:flex; align-items:center; gap:10px; background:#0b1220; border:1px solid #334155; border-radius:9px;
-           padding:9px 12px; margin:8px 0; font-family:ui-monospace,monospace; font-size:0.82rem; }
-    .val code { flex:1; word-break:break-all; }
-    .val button { background:#334155; color:#e2e8f0; border:none; border-radius:6px; padding:5px 11px; font-size:0.72rem; cursor:pointer; font-weight:700; }
-    .val button.done { background:#16a34a; color:#fff; }
     .ok { background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.3); border-radius:9px; padding:10px 13px; font-size:0.85rem; margin:12px 0; }
     .warn { background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); border-radius:9px; padding:10px 13px; font-size:0.85rem; margin:12px 0; }
+    .danger { background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.35); border-radius:9px; padding:10px 13px; font-size:0.85rem; margin:12px 0; }
     a { color:#60a5fa; }
     .foot { color:#94a3b8; font-size:0.75rem; margin-top:20px; }
-    .done-note { color:#64748b; font-size:0.82rem; }
     .exp { color:#94a3b8; font-size:0.85rem; margin:4px 0 12px; }
+    .val { display:flex; align-items:center; gap:10px; background:#0b1220; border:1px solid #334155; border-radius:9px; padding:9px 12px; margin:8px 0; font-family:ui-monospace,monospace; font-size:0.82rem; }
+    .val code { flex:1; word-break:break-all; }
+    .val button { background:#334155; color:#e2e8f0; border:none; border-radius:6px; padding:5px 11px; font-size:0.72rem; cursor:pointer; font-weight:700; }
   </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>🔒 Deploy Backend <span style="color:#60a5fa;">/calc</span> — DC-OS anti-theft</h1>
-  <p class="sub">Pindahkan perhitungan engine ke server (Cloudflare Worker) supaya <b>kode math tak ikut ke browser = tak bisa dicuri</b>. Tiap kotak ada tombol <b>Copy</b>. Kerjakan berurutan. Jalankan tiap perintah di terminal Claude Code pakai awalan <span class="kbd">!</span>.</p>
+  <h1>🛠️ DC-OS — Yang harus <span style="color:#60a5fa;">kamu</span> lakukan</h1>
+  <p class="sub">Engine-unification <b>v1.63.0</b> sudah ship + push (2 commit). Sisanya cuma langkah manual yang HARUS kamu jalankan sendiri. Tiap kotak ada tombol <b>Copy</b>. Jalankan di terminal pakai awalan <span class="kbd">!</span> (atau di terminal biasa).</p>
 
-  <div class="ok">✅ Yang SUDAH beres (tak perlu diulang): Supabase schema v3 (14 tabel) + akun + RLS · engine <b>rz-engine.js v2.4.0</b> (299/0) · DCMOC DC-OS + dashboard + 13-pillar UI · 3 bug capex · secondbrain. Halaman ini <b>hanya</b> untuk langkah terakhir: deploy backend <b>/calc</b>.</div>
+  <div class="ok">✅ SUDAH beres (otomatis, tak perlu diulang): <b>DATA.countries single-source</b> (32) + parity gate · engine <b>rz-engine.js v1.63.0 (321/0)</b> + 5 pillar engine baru (tier/fire/cdu/spares/decision) · DCMOC de-fake commissioning+site · 9 modul di-wire ke engine · 4 pillar baru di sidebar · kalkulator opex/carbon/tco single-source · UI/UX (tooltip, hover, AI Assistant modal). Halaman ini = <b>3 aksi manual</b> saja.</div>
 
-  <!-- STEP 1 -->
-  <div class="step">
-    <h2><span class="num">1</span> Login Cloudflare</h2>
-    <p class="goal">Sekali saja. Browser kebuka → klik <b>Authorize</b>. (Kalau sudah pernah login, lompat ke Langkah 2.)</p>
-    <div class="codewrap">
-      <button class="copybtn" data-copy="c1">Copy</button>
-      <pre id="c1">cd cf-worker &amp;&amp; npx wrangler login</pre>
-    </div>
-    <p class="exp">Kalau <span class="kbd">npx</span> tanya install wrangler → ketik <b>y</b>.</p>
+  <!-- STEP 1 — URGENT: token -->
+  <div class="step urgent">
+    <h2><span class="num red">1</span> WAJIB — Ganti GitHub token (bocor di URL remote)</h2>
+    <p class="goal">Token PAT-mu ke-embed plain-text di URL <span class="kbd">git remote</span>. Siapa pun yang lihat config repo bisa pakai. Ganti + revoke sekarang.</p>
+    <p class="exp"><b>1a.</b> Buat token baru — buka <a href="https://github.com/settings/personal-access-tokens" target="_blank">github.com/settings/personal-access-tokens</a> → <b>Generate new token (fine-grained)</b> → pilih repo <b>bfrfranco.github.io</b> → Permissions: <b>Contents = Read and write</b> → Generate → <b>copy token</b> (mulai <span class="kbd">github_pat_…</span>).</p>
+    <p class="exp"><b>1b.</b> Buang token lama dari URL remote (jadi URL bersih tanpa token):</p>
+    <div class="codewrap"><button class="copybtn" data-copy="c1">Copy</button>
+      <pre id="c1">git remote set-url origin https://github.com/baguspermana7-cpu/bfrfranco.github.io.git</pre></div>
+    <p class="exp"><b>1c.</b> Simpan token baru aman via credential helper (biar tak balik ke URL):</p>
+    <div class="codewrap"><button class="copybtn" data-copy="c1b">Copy</button>
+      <pre id="c1b">git config --global credential.helper store</pre></div>
+    <p class="exp">Push berikutnya akan minta: <b>Username</b> = <span class="kbd">baguspermana7-cpu</span>, <b>Password</b> = <b>tempel token baru</b> (bukan password akun). Tes:</p>
+    <div class="codewrap"><button class="copybtn" data-copy="c1c">Copy</button>
+      <pre id="c1c">git push</pre></div>
+    <p class="exp"><b>1d.</b> Revoke token LAMA (yang bocor) — <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a> → cari token lama <span class="kbd">ghp_…</span> → <b>Delete / Revoke</b>.</p>
+    <div class="danger">Selama token lama belum di-revoke, dia masih valid. Revoke = wajib.</div>
   </div>
 
-  <!-- STEP 2 -->
+  <!-- STEP 2 — deploy backend for new models -->
   <div class="step">
-    <h2><span class="num">2</span> Deploy</h2>
-    <p class="goal">Bundle <b>src/calc.js</b> + <b>rz-engine.js</b> jadi satu Worker. Setelah sukses, <b>/calc</b> langsung aktif — math jalan di server.</p>
-    <div class="codewrap">
-      <button class="copybtn" data-copy="c2">Copy</button>
-      <pre id="c2">cd cf-worker &amp;&amp; npx wrangler deploy</pre>
-    </div>
-    <p class="exp">Config sudah siap: <b>SUPABASE_URL</b> + <b>anon</b> sudah di <code>wrangler.toml</code>, KV sudah ada. Tak perlu set apa-apa buat deploy minimal ini.</p>
+    <h2><span class="num">2</span> Deploy backend — aktifkan model baru v1.63.0 di server</h2>
+    <p class="goal">Model baru (countries, tier, fire, cdu, decision, commissioning cost/schedule) sudah masuk allow-list <span class="kbd">/calc</span> tapi belum live sampai kamu deploy ulang Worker.</p>
+    <div class="codewrap"><button class="copybtn" data-copy="c2">Copy</button>
+      <pre id="c2">cd cf-worker &amp;&amp; npx wrangler deploy</pre></div>
+    <p class="exp">Kalau belum pernah login Cloudflare: jalankan dulu <span class="kbd">cd cf-worker &amp;&amp; npx wrangler login</span> (browser kebuka → Authorize).</p>
   </div>
 
-  <!-- STEP 3 -->
+  <!-- STEP 3 — test new models -->
   <div class="step">
-    <h2><span class="num">3</span> Tes — pastikan jalan</h2>
-    <p class="goal">Panggil engine di server. Harus balik <span class="kbd">{"ok":true,"data":0.99995,...}</span>.</p>
-    <div class="codewrap">
-      <button class="copybtn" data-copy="c3">Copy</button>
-      <pre id="c3">curl -X POST https://rz-finance-gateway.resistancezero0us.workers.dev/calc \
+    <h2><span class="num green">3</span> Tes — pastikan model baru jalan di server</h2>
+    <p class="goal">Ketiga tes ini harus balik <span class="kbd">{"ok":true,...}</span>.</p>
+    <p class="exp"><b>3a.</b> Daftar model + data (harus ada tier/fire/cdu/spares/decision + countries):</p>
+    <div class="codewrap"><button class="copybtn" data-copy="c3">Copy</button>
+      <pre id="c3">curl https://rz-finance-gateway.resistancezero0us.workers.dev/calc/models</pre></div>
+    <p class="exp"><b>3b.</b> Single-source country (Singapura listrik = 0.22):</p>
+    <div class="codewrap"><button class="copybtn" data-copy="c3b">Copy</button>
+      <pre id="c3b">curl -X POST https://rz-finance-gateway.resistancezero0us.workers.dev/calc \
   -H "Content-Type: application/json" \
-  -d '{"model":"reliability.tierTarget","args":[4]}'</pre>
-    </div>
-    <p class="exp">Cek daftar engine yang bisa dipanggil:</p>
-    <div class="codewrap">
-      <button class="copybtn" data-copy="c3b">Copy</button>
-      <pre id="c3b">curl https://rz-finance-gateway.resistancezero0us.workers.dev/calc/models</pre>
-    </div>
-    <p class="exp">Tes CAPEX (contoh):</p>
-    <div class="codewrap">
-      <button class="copybtn" data-copy="c3c">Copy</button>
+  -d '{"data":"countries.SG.economy.electricityRate"}'</pre></div>
+    <p class="exp"><b>3c.</b> Engine baru — Tier classification:</p>
+    <div class="codewrap"><button class="copybtn" data-copy="c3c">Copy</button>
       <pre id="c3c">curl -X POST https://rz-finance-gateway.resistancezero0us.workers.dev/calc \
   -H "Content-Type: application/json" \
-  -d '{"data":"capexDetail.cityCapexPerW.muscat"}'</pre>
-    </div>
-    <div class="ok">Kalau ketiga tes balik <b>{"ok":true,...}</b> → <b>backend anti-curi LIVE.</b> Selesai. 🎉</div>
+  -d '{"model":"tier.classify","args":[{"power":95,"cooling":90,"network":80,"physical":85,"monitoring":90,"redundancy":"2n"}]}'</pre></div>
+    <p class="exp"><b>3d.</b> Engine baru — Commissioning program cost (3 MW air 2N Singapura):</p>
+    <div class="codewrap"><button class="copybtn" data-copy="c3d">Copy</button>
+      <pre id="c3d">curl -X POST https://rz-finance-gateway.resistancezero0us.workers.dev/calc \
+  -H "Content-Type: application/json" \
+  -d '{"model":"commissioning.programCost","args":[{"itLoadKw":3000,"cooling":"air","redundancy":"2n","countryId":"SG"}]}'</pre></div>
+    <div class="ok">Kalau semua balik <b>{"ok":true,...}</b> → engine-unification LIVE end-to-end. Selesai. 🎉</div>
   </div>
 
-  <!-- OPSIONAL A -->
-  <div class="step" style="border-color:rgba(245,158,11,0.4);">
-    <h2><span class="num" style="background:#f59e0b;">A</span> Opsional — Audit trail (log tiap calc)</h2>
-    <p class="goal">Supaya tiap panggilan /calc tercatat di tabel <b>audit_log</b> Supabase.</p>
-    <ol>
-      <li>Ambil <b>service_role key</b>: Supabase Dashboard → Project Settings → API → baris <b>service_role</b> (RAHASIA — jangan share).</li>
-      <li>Set sebagai secret (paste key saat diminta):</li>
-    </ol>
-    <div class="codewrap">
-      <button class="copybtn" data-copy="cA">Copy</button>
-      <pre id="cA">cd cf-worker &amp;&amp; npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY</pre>
-    </div>
-    <p class="exp">Lalu deploy ulang:</p>
-    <div class="codewrap">
-      <button class="copybtn" data-copy="cA2">Copy</button>
-      <pre id="cA2">cd cf-worker &amp;&amp; npx wrangler deploy</pre>
-    </div>
-  </div>
-
-  <!-- OPSIONAL B -->
-  <div class="step" style="border-color:rgba(245,158,11,0.4);">
-    <h2><span class="num" style="background:#f59e0b;">B</span> Opsional — Wajib login (gate JWT)</h2>
-    <p class="goal">Kalau mau /calc HANYA bisa dipanggil user yang login (session Supabase valid).</p>
-    <p class="exp">Bilang ke Claude: <b>"set REQUIRE_AUTH"</b> — dia edit <code>cf-worker/wrangler.toml</code> <code>[vars]</code> tambah <code>REQUIRE_AUTH = "1"</code>, lalu kamu deploy ulang (Langkah 2). Client kirim header <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+  <!-- OPTIONAL -->
+  <div class="step" style="border-color:rgba(148,163,184,0.4);">
+    <h2><span class="num" style="background:#475569;">·</span> Opsional — DCMOC redeploy (kalau kamu deploy DCMOC terpisah)</h2>
+    <p class="exp">DCMOC static build sudah di-commit (<span class="kbd">dcmoc/</span> + <span class="kbd">dcmoc/_next</span>). Kalau GitHub Pages serve dari root, otomatis live setelah push. Tak ada aksi tambahan.</p>
   </div>
 
   <div class="step">
     <h2><span class="num">✓</span> Referensi</h2>
     <p class="exp">Worker URL:</p>
     <div class="val"><code id="wurl">https://rz-finance-gateway.resistancezero0us.workers.dev</code><button data-copyval="wurl">Copy</button></div>
-    <p class="exp">Panduan lengkap + migrasi client: <code>cf-worker/DEPLOY_CALC.md</code>. Kalau ada error deploy (bundle / binding / KV) → paste output ke Claude, dia bantu.</p>
-    <p class="warn">Catatan: repo di-private itu bagus, tapi <b>tak</b> menyembunyikan JS yang dilayani situs publik. Hanya backend ini yang benar-benar lindungi math.</p>
+    <p class="exp">Charter engine-unification: <code>standarization/ENGINE_UNIFICATION.md</code>. Changelog: <code>/changelog.html</code> (v1.61–1.63). Kalau ada error deploy/curl → paste output ke Claude.</p>
   </div>
 
-  <p class="foot">ResistanceZero · DC-OS backend deploy · halaman lokal (noindex).</p>
+  <p class="foot">ResistanceZero · DC-OS action checklist · halaman lokal (noindex).</p>
 </div>
 
 <script src="js/rz-version.js" defer></script>
 <script>
-  function flash(btn){ const t=btn.textContent; btn.textContent='✓ Copied'; btn.classList.add('done'); setTimeout(function(){ btn.textContent=t; btn.classList.remove('done'); }, 1400); }
+  function flash(btn){ var t=btn.textContent; btn.textContent='✓ Copied'; btn.classList.add('done'); setTimeout(function(){ btn.textContent=t; btn.classList.remove('done'); }, 1400); }
   document.querySelectorAll('[data-copy]').forEach(function(btn){
     btn.addEventListener('click', function(){
       var el=document.getElementById(btn.getAttribute('data-copy'));
