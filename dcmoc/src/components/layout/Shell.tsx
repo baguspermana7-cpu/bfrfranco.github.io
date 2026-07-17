@@ -41,6 +41,7 @@ import {
     Fuel,
     Menu,
     MapPin,
+    LayoutDashboard,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { getPUE } from '@/constants/pue';
@@ -205,8 +206,25 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
 
                 <div className="p-4 flex-1 overflow-y-auto">
                     <nav className="space-y-1" aria-label="Main navigation">
+                        {/* DC-OS: Executive Overview landing */}
+                        <div className="flex items-center mb-2">
+                            <button
+                                onClick={() => { actions.setActiveTab('dashboard'); setSidebarOpen(false); }}
+                                aria-current={activeTab === 'dashboard' ? 'page' : undefined}
+                                className={clsx(
+                                    "flex-1 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all",
+                                    activeTab === 'dashboard'
+                                        ? "bg-cyan-600 text-white shadow-sm shadow-cyan-900/30"
+                                        : "text-slate-700 dark:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50"
+                                )}
+                            >
+                                <LayoutDashboard className="w-4 h-4" aria-hidden="true" />
+                                Dashboard
+                            </button>
+                            <Explain k="tab-dashboard" />
+                        </div>
                         <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block px-2" aria-hidden="true">
-                            Modules
+                            Engines &amp; Modules
                         </div>
                         {navItems.map((item, idx) => (
                             <React.Fragment key={item.id}>
@@ -342,7 +360,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                         <div className="text-sm breadcrumbs text-slate-500 dark:text-slate-400">
                             <span className="hidden sm:inline text-slate-400 dark:text-slate-600">App</span>
                             <span className="hidden sm:inline"> / </span>
-                            <span className="text-slate-800 dark:text-slate-200 font-medium">{navItems.find(n => n.id === activeTab)?.label || 'Simulation'}</span>
+                            <span className="text-slate-800 dark:text-slate-200 font-medium">{activeTab === 'dashboard' ? 'Executive Overview' : navItems.find(n => n.id === activeTab)?.label || 'Simulation'}</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">

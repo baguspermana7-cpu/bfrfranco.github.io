@@ -27,6 +27,7 @@ import CBMDashboard from '@/components/modules/CBMDashboard';
 import FuelGenDashboard from '@/components/modules/FuelGenDashboard';
 import { ScenarioComparisonPanel } from '@/components/modules/ScenarioComparisonPanel';
 import StrategicPlanningDashboard from '@/components/modules/StrategicPlanningDashboard';
+import { ExecutiveDashboard } from '@/components/modules/ExecutiveDashboard';
 import { useScenarioStore } from '@/store/scenario';
 import { Wrench, ShieldAlert, FileText, Calculator, Activity } from 'lucide-react';
 
@@ -40,6 +41,8 @@ export default function Home() {
 
   const renderContent = () => {
     switch (activeTab) {
+      case 'dashboard':
+        return <ExecutiveDashboard />;
       case 'sim':
         return <SimulationDashboard />;
       case 'capex':
