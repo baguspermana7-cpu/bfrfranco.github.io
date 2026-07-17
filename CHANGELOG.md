@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.65.0 — 2026-07-18 (engine research-deepening: pillars 1/3/4, cited)
+
+### Added
+- **Deep-research enhancement of the DC-OS engine (pillars 1/3/4)** from authoritative standards. L1 requirements: coolingMaxRackKw density ceilings (ASHRAE TC9.9 5th ed. — air ~20kW/rack; NVIDIA GB200 132kW), rackCount, densityBand + a CRITICAL density-vs-cooling safety flag. L3 architecture: ASHRAE thermal-envelope check (A1-A4/H1 supply-temp + ΔT), Uptime/TIA-942-C tier topology, floor loading, design-fee. L4 capacity: logistic S-curve lease-up by market type (CBRE H1 2025), PUE-adjusted facility load, stranded-capacity (Uptime 2024), power-vs-space binding. All with DATA.sources provenance + worked-example asserts (test-rz-engine 366/0, parity 126/0). Pillars 2 (site) + 5-8 + 9-13 research follow.
+
+---
+
 ## v1.64.4 — 2026-07-18 (DCMOC: engine tooltips + hover on the KPI efficiency row)
 
 ### Changed

@@ -4406,7 +4406,17 @@
                 colo:       { label: 'Colocation', rackKw: 12, cooling: 'inrow', tierFloor: 3 },
                 enterprise: { label: 'Enterprise', rackKw: 8, cooling: 'air', tierFloor: 2 },
                 edge:       { label: 'Edge', rackKw: 10, cooling: 'air', tierFloor: 2 }
-            }
+            },
+            /* v2.5.0 research pass — max sustainable rack density by cooling type.
+             * Air is physically limited ~20-25 kW/rack (ASHRAE TC9.9 5th ed. 2021);
+             * liquid unlocks GB200-class 120-132 kW; immersion higher still. */
+            coolingMaxRackKw: { air: 20, inrow: 30, rdhx: 50, liquid: 132, immersion: 200 },
+            densityBands: [
+                { minKw: 80, band: 'Extreme', coolingMandatory: 'liquid' },
+                { minKw: 40, band: 'High', coolingRecommended: 'liquid' },
+                { minKw: 20, band: 'Medium', coolingRecommended: 'rdhx' },
+                { minKw: 0,  band: 'Standard', coolingRecommended: 'air' }
+            ]
         },
         /* ══ v2.4.0 — DATA.architecture: Architecture disciplines + design-complexity
          * (Layer 3). Canonical discipline list + cooling/tier complexity multipliers
@@ -4414,6 +4424,24 @@
         architecture: {
             disciplines: ['electrical', 'mechanical', 'cooling', 'fire', 'security', 'network', 'building', 'structural', 'bms'],
             disciplineLabels: { electrical: 'Electrical', mechanical: 'Mechanical', cooling: 'Cooling', fire: 'Fire & Life Safety', security: 'Security', network: 'Network', building: 'Building', structural: 'Structural', bms: 'BMS / DCIM' },
+            /* v2.5.0 research pass — ASHRAE TC9.9 5th ed. 2021 thermal envelopes
+             * (supply-temp range + max ΔT), cooling ΔT bands, Uptime/TIA-942-C
+             * tier topology, structural floor loading, design-fee by complexity. */
+            ashraeClasses: {
+                A1: { minSupplyC: 15, maxSupplyC: 32, maxDeltaTK: 15, label: 'Class A1 (air, recommended)' },
+                A2: { minSupplyC: 10, maxSupplyC: 35, maxDeltaTK: 17, label: 'Class A2 (air)' },
+                A3: { minSupplyC: 5,  maxSupplyC: 40, maxDeltaTK: 20, label: 'Class A3 (air, allowable)' },
+                A4: { minSupplyC: 5,  maxSupplyC: 45, maxDeltaTK: 20, label: 'Class A4 (air, allowable)' },
+                H1: { minSupplyC: 17, maxSupplyC: 45, maxDeltaTK: 12, label: 'Class H1 (liquid)' }
+            },
+            coolingDeltaT: { air: [10, 15], inrow: [12, 18], rdhx: [10, 20], liquid: [8, 12], immersion: [5, 10] },
+            tierTopology: {
+                2: { powerPath: 'N+1 components, single active path', coolingPath: 'N+1 components', maintainability: 'shutdown required', tiaRating: 'Rated-2' },
+                3: { powerPath: 'N+1, dual-bus (one path maintained)', coolingPath: 'N+1 concurrently maintainable', maintainability: 'concurrently maintainable', tiaRating: 'Rated-3' },
+                4: { powerPath: '2N/2N+1, all paths simultaneously active', coolingPath: '2N fault tolerant', maintainability: 'fault tolerant', tiaRating: 'Rated-4' }
+            },
+            floorLoadingKnM2: { air: 7.2, inrow: 8.0, rdhx: 9.0, liquid: 10.0, immersion: 13.0 },
+            designFeePct: { Standard: 0.07, Moderate: 0.09, High: 0.12, 'Very High': 0.16 },
             /* Relative design complexity by cooling architecture + tier + redundancy. */
             coolingComplexity: { air: 1.0, inrow: 1.3, rdhx: 1.6, liquid: 2.0, immersion: 2.4 },
             tierComplexity: { 2: 1.0, 3: 1.4, 4: 1.9 },
@@ -4455,6 +4483,18 @@
         capacity: {
             defaultRamp: [0.3, 0.6, 0.85, 0.95],   /* per-year occupancy fill */
             steadyOccupancy: 0.95,
+            /* v2.5.0 research pass — logistic S-curve lease-up by market type
+             * (CBRE H1 2025: hyperscale ~84% pre-leased; Uptime 2024: 1-in-4 DCs
+             * <40% utilized = stranded; JLL 2025: ~12% phase-build premium). */
+            rampProfiles: {
+                hyperscale: { L: 0.98, k: 2.0, tMid: 0.5, label: 'Hyperscale (pre-leased)' },
+                wholesale:  { L: 0.95, k: 1.0, tMid: 1.5, label: 'Wholesale colocation' },
+                retail:     { L: 0.92, k: 0.7, tMid: 2.5, label: 'Retail colocation' },
+                enterprise: { L: 0.85, k: 0.5, tMid: 3.0, label: 'Enterprise / build-to-suit' }
+            },
+            strandedThreshold: 0.40,
+            phaseBuildPremiumPct: 0.12,
+            rackFootprintM2: 0.72,
             presets: {
                 small: [
                     { id: 'p1', label: 'Phase 1', itLoadKw: 1000, startMonth: 0, buildMonths: 14 },
@@ -4548,6 +4588,11 @@
             'regionsCountry':         { source: 'PLN/EMA/TEPCO/CEA/TNB tariff filings + national statistics', asOf: '2026', unit: 'mixed (see fields)' },
             'countries':              { source: 'DCMOC country reference 2026-Q1 (per-country economy/labor/environment/gridReliability/naturalDisaster/talentPool/fuelDiesel/taxIncentives/compliance/constructionIndex); PLN/EMA/TEPCO/national tariff filings + IMF WEO + Ember grid-intensity + national labor statistics. GENERATED from dcmoc/src/constants/countries.ts — single source of truth for the site + DCMOC.', asOf: '2026-Q1', unit: 'mixed (see per-country fields)' },
             'commissioning.cx':       { source: 'Commissioning program cost/schedule methodology promoted from cx-calculator.html (discipline $/kW base + L0-L6 cost/schedule shares + discipline split); base rates calibrated to DC Cx budgetary practice (ASHRAE Guideline 0 / NETA ECS scope). Region scaling via DATA.countries.constructionIndex.', asOf: '2026', method: 'budgetary estimate-grade Cx program model; NOT a detailed Cx plan' },
+            'requirements.coolingMaxRackKw': { source: 'ASHRAE TC9.9 5th Ed. 2021 (air ~20-25 kW/rack limit; H1-H3 liquid envelopes); NVIDIA GB200 NVL72 132 kW observed; OCP High Power Rack 92 kW+ (Meta/Rittal OCP Summit 2024); IEA 4E Liquid Cooling in Data Centres 2026', asOf: '2025', unit: 'kW/rack per cooling type' },
+            'architecture.ashraeClasses': { source: 'ASHRAE TC9.9 5th Ed. 2021 "Thermal Guidelines for Data Processing Environments" — A1/A2/A3/A4 air + H1 liquid supply-temp envelopes + ΔT limits', asOf: '2021', unit: '°C supply range + °C ΔT max' },
+            'architecture.tierTopology': { source: 'Uptime Institute Tier Standard: Topology 2022 (T1-T4 redundancy paths); ANSI/TIA-942-C 2024 Rated-1..Rated-4', asOf: '2024', unit: 'topology description + TIA rating' },
+            'architecture.designFeePct': { source: 'ASHRAE Guideline 0-2019 + industry A&E engineering-fee benchmarks (ARUP/Syska/Jacobs DC practice) by complexity band', asOf: '2024', unit: 'fraction of construction capex' },
+            'capacity.rampProfiles':  { source: 'Logistic lease-up S-curve calibrated to CBRE North America DC Trends H1 2025 (hyperscale ~84% pre-lease, 3% vacancy); Uptime Institute Global Survey 2024 (1-in-4 DCs <40% utilized = stranded); JLL DC Construction Cost 2025 (~12% phase premium)', asOf: '2025', unit: 'occupancy fraction (0-1) + % premium', method: 'occupancy(t)=L/(1+e^-k(t-tMid)) per market type' },
             'currency':               { source: 'ECB / central-bank reference rates', asOf: '2026-04', method: 'spot, USD base' },
             'inflationAnnual':        { source: 'IMF WEO 2026 regional CPI', asOf: '2026', unit: 'fraction/yr' },
             'salaryBenchmarks':       { source: 'Uptime Institute 2026 + AFCOM 2026 + US BLS 2025', asOf: '2026', unit: 'USD/yr, base' },
@@ -6393,8 +6438,22 @@
                     var pct = +(100 * have.length / req.length).toFixed(1);
                     return { pct: pct, have: have, missing: missing, ready: missing.length === 0 };
                 },
-                /** Validate a brief: completeness + a coarse tier-floor check for the
-                 *  use case. Returns { completeness, flags:[...], recommendedTierFloor }. */
+                /** Implied rack count = ceil(itLoadKw / rackKw) at the use-case
+                 *  typical density (or an explicit rackKw). (v2.5.0 research pass) */
+                rackCount: function (itLoadKw, rackKw) {
+                    var kw = rackKw || 12;
+                    return kw > 0 ? Math.ceil((itLoadKw || 0) / kw) : 0;
+                },
+                /** Density band + the cooling it needs. (ASHRAE TC9.9 5th ed.:
+                 *  air is physically limited ~20 kW/rack.) */
+                densityBand: function (rackKw) {
+                    var bands = DATA.requirements.densityBands;
+                    for (var i = 0; i < bands.length; i++) if ((rackKw || 0) >= bands[i].minKw) return bands[i];
+                    return bands[bands.length - 1];
+                },
+                /** Validate a brief: completeness + tier-floor + density-to-cooling
+                 *  compatibility (a rack density above the cooling ceiling is a
+                 *  CRITICAL physics flag) + SLA-vs-tier. */
                 validate: function (intake) {
                     intake = intake || {};
                     var comp = RZEngine.models.requirements.completeness(intake);
@@ -6403,7 +6462,21 @@
                     if (prof && intake.targetTier != null && intake.targetTier < prof.tierFloor) {
                         flags.push({ level: 'warn', field: 'targetTier', message: 'Target Tier ' + intake.targetTier + ' is below the ' + prof.label + ' recommended floor (Tier ' + prof.tierFloor + ')' });
                     }
-                    return { completeness: comp, flags: flags, recommendedTierFloor: prof ? prof.tierFloor : null, profile: prof };
+                    // density-to-cooling compatibility (ASHRAE TC9.9): flag if the
+                    // requested rack density exceeds the selected cooling ceiling.
+                    var rackKw = intake.rackKw != null ? intake.rackKw : (prof && prof.rackKw);
+                    var cool = (intake.coolingType || (prof && prof.cooling) || 'air').toLowerCase();
+                    var ceil = DATA.requirements.coolingMaxRackKw[cool];
+                    if (rackKw != null && ceil != null && rackKw > ceil) {
+                        var band = RZEngine.models.requirements.densityBand(rackKw);
+                        flags.push({ level: 'critical', field: 'coolingType', message: 'Requested ' + rackKw + ' kW/rack exceeds the ' + cool + ' ceiling (~' + ceil + ' kW/rack, ASHRAE TC9.9) — ' + band.band + ' density needs ' + (band.coolingMandatory || band.coolingRecommended || 'liquid') + ' cooling' });
+                    }
+                    // SLA vs tier availability
+                    if (intake.slaUptimePct != null && intake.targetTier != null) {
+                        var tgt = DATA.reliability && DATA.reliability.tierAvailability ? DATA.reliability.tierAvailability[intake.targetTier] : null;
+                        if (tgt != null && intake.slaUptimePct > tgt) flags.push({ level: 'warn', field: 'slaUptimePct', message: 'SLA ' + intake.slaUptimePct + '% exceeds Tier ' + intake.targetTier + ' design availability ' + tgt + '% — raise tier' });
+                    }
+                    return { completeness: comp, flags: flags, recommendedTierFloor: prof ? prof.tierFloor : null, profile: prof, rackCount: rackKw ? RZEngine.models.requirements.rackCount(intake.itLoadKw, rackKw) : null };
                 }
             },
 
@@ -6446,6 +6519,31 @@
                     return A.disciplines.map(function (d) {
                         return { key: d, label: A.disciplineLabels[d], driver: drivers[d] || '' };
                     });
+                },
+                /** ASHRAE TC9.9 thermal-envelope check. input {supplyTempC, deltaTK,
+                 *  coolingType, class?}. Flags supply-temp/ΔT outside the class. (v2.5.0) */
+                thermalCheck: function (inp) {
+                    inp = inp || {};
+                    var A = DATA.architecture;
+                    var cls = inp.class || ((inp.coolingType === 'liquid' || inp.coolingType === 'immersion' || inp.coolingType === 'rdhx') ? 'H1' : 'A1');
+                    var spec = A.ashraeClasses[cls] || A.ashraeClasses.A1;
+                    var supply = inp.supplyTempC != null ? inp.supplyTempC : 22;
+                    var band = A.coolingDeltaT[inp.coolingType] || [10, 15];
+                    var dT = inp.deltaTK != null ? inp.deltaTK : band[1];
+                    var flags = [];
+                    if (supply < spec.minSupplyC || supply > spec.maxSupplyC) flags.push('Supply ' + supply + '°C outside ' + spec.label + ' (' + spec.minSupplyC + '-' + spec.maxSupplyC + '°C)');
+                    if (dT > spec.maxDeltaTK) flags.push('ΔT ' + dT + 'K exceeds ' + spec.label + ' max ' + spec.maxDeltaTK + 'K (hotspot risk)');
+                    if (dT < band[0] || dT > band[1]) flags.push('ΔT ' + dT + 'K outside typical ' + inp.coolingType + ' band ' + band[0] + '-' + band[1] + 'K');
+                    return { class: cls, label: spec.label, supplyTempC: supply, deltaTK: dT, deltaTBand: band, compliant: flags.length === 0, flags: flags };
+                },
+                /** Uptime/TIA-942-C redundancy topology for a tier. (v2.5.0) */
+                topology: function (tier) { return DATA.architecture.tierTopology[tier] || DATA.architecture.tierTopology[3]; },
+                /** Structural floor loading (kN/m²) for a cooling type. */
+                floorLoading: function (coolingType) { return DATA.architecture.floorLoadingKnM2[coolingType] != null ? DATA.architecture.floorLoadingKnM2[coolingType] : 7.2; },
+                /** Engineering design fee = constructionCapex × rate(complexity band). */
+                designFee: function (constructionCapex, band) {
+                    var rate = DATA.architecture.designFeePct[band] != null ? DATA.architecture.designFeePct[band] : 0.09;
+                    return { rate: rate, feeUsd: Math.round((constructionCapex || 0) * rate) };
                 }
             },
 
@@ -6532,6 +6630,33 @@
                     var r = ramp && ramp.length ? ramp : DATA.capacity.defaultRamp;
                     if (year < 0) return 0;
                     return year < r.length ? r[year] : r[r.length - 1];
+                },
+                /** PUE-adjusted facility (at-the-meter) load. (v2.5.0) */
+                facilityLoad: function (itLoadKw, coolingType, tier) {
+                    var pue = 1.5;
+                    try { var pm = DATA.pueMatrix[(coolingType || 'air').toLowerCase()]; if (pm) pue = pm['tier' + (tier || 3)] || pm.tier3 || 1.5; } catch (e) { }
+                    var fKw = (itLoadKw || 0) * pue;
+                    return { facilityLoadKw: Math.round(fKw), facilityLoadMw: +(fKw / 1000).toFixed(2), pueUsed: pue };
+                },
+                /** Logistic S-curve occupancy at year t for a market type:
+                 *  L / (1 + e^(-k(t - tMid))). (CBRE/Uptime-calibrated) */
+                occupancyScurve: function (year, marketType) {
+                    var p = DATA.capacity.rampProfiles[marketType] || DATA.capacity.rampProfiles.wholesale;
+                    if (year < 0) return 0;
+                    return +(p.L / (1 + Math.exp(-p.k * (year - p.tMid)))).toFixed(3);
+                },
+                /** Stranded (committed-but-unoccupied) capacity. (Uptime 2024) */
+                strandedCapacity: function (committedKw, occupancy) {
+                    var strandedKw = Math.max(0, (committedKw || 0) * (1 - Math.max(0, Math.min(1, occupancy || 0))));
+                    var frac = committedKw > 0 ? +(strandedKw / committedKw).toFixed(3) : 0;
+                    return { strandedKw: Math.round(strandedKw), strandedFraction: frac, isStranded: frac > DATA.capacity.strandedThreshold };
+                },
+                /** Which bites first — power or white-space. (v2.5.0) */
+                bindingConstraint: function (committedKw, rackKw, whiteFloorM2) {
+                    var byPower = (committedKw || 0) / (rackKw || 12);
+                    var bySpace = (whiteFloorM2 || 0) / DATA.capacity.rackFootprintM2;
+                    var binding = byPower <= bySpace ? 'power' : 'space';
+                    return { binding: binding, maxRacksByPower: Math.floor(byPower), maxRacksBySpace: Math.floor(bySpace), racks: Math.floor(Math.min(byPower, bySpace)) };
                 }
             },
 

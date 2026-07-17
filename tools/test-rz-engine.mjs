@@ -800,6 +800,27 @@ if (M.decision && M.decision.recommend) {
     ok('decision carries disclaimer', !!d.disclaimer && /not investment/i.test(d.disclaimer));
 }
 
+/* ── Research-pass deepening (v2.5.0): pillars 1/3/4 ── */
+if (M.requirements && M.requirements.rackCount) {
+    ok('requirements.rackCount ceil(itLoad/rackKw)', M.requirements.rackCount(3000, 12) === 250);
+    ok('requirements.densityBand extreme→liquid mandatory', M.requirements.densityBand(120).coolingMandatory === 'liquid');
+    const v = M.requirements.validate({ useCase: 'ai', coolingType: 'air', itLoadKw: 3000, targetTier: 3 });
+    ok('requirements.validate flags AI-on-air critical', v.flags.some((f) => f.level === 'critical'));
+}
+if (M.architecture && M.architecture.thermalCheck) {
+    ok('architecture.thermalCheck compliant A1', M.architecture.thermalCheck({ coolingType: 'air', supplyTempC: 24, deltaTK: 12 }).compliant === true);
+    ok('architecture.thermalCheck flags over-ΔT', M.architecture.thermalCheck({ coolingType: 'air', supplyTempC: 24, deltaTK: 22 }).compliant === false);
+    ok('architecture.topology T4 fault tolerant', /fault tolerant/i.test(M.architecture.topology(4).maintainability));
+    ok('architecture.designFee scales', M.architecture.designFee(1e8, 'High').feeUsd === 12000000);
+}
+if (M.capacity && M.capacity.facilityLoad) {
+    const fl = M.capacity.facilityLoad(3000, 'air', 3);
+    ok('capacity.facilityLoad = itLoad×PUE', fl.facilityLoadKw > 3000 && fl.pueUsed >= 1.3, '' + fl.facilityLoadKw);
+    ok('capacity.occupancyScurve hyperscale > retail (yr1)', M.capacity.occupancyScurve(1, 'hyperscale') > M.capacity.occupancyScurve(1, 'retail'));
+    ok('capacity.strandedCapacity flags <60% occ', M.capacity.strandedCapacity(10000, 0.5).isStranded === true);
+    ok('capacity.bindingConstraint power|space', ['power', 'space'].includes(M.capacity.bindingConstraint(3000, 12, 500).binding));
+}
+
 /* ============================================================
  * 3. PROVENANCE (soft until A1 lands the sidecar; hard after)
  * ============================================================ */
