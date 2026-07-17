@@ -110,7 +110,12 @@ local math before its engine parity passes.
 - Provenance map (§6): DATA done; RZExplain rendering deferred.
 - Orchestrator (§5): DONE + Node-verified 5/5.
 - Decision engine (§7): DONE (4 files, tsc green).
-- IA `'dashboard'` tab (§4): store union + default added.
+- IA `'dashboard'` tab (§4): store union + default added; Executive Overview
+  dashboard + Dashboard nav entry shipped (puppeteer-verified, 0 errors).
+- Dashboard PDF (§8): DONE — `pdf/DashboardPdf.ts` `generateDashboardPDF`
+  (cover → KPIs → 13-engine status → AI decision + rationale → provenance),
+  wired to the dashboard "Generate Report" button; smoke-verified 0 PDF errors.
+  Remaining: per-engine gap PDF generators.
 - Held pending parallel-session coordination + build resume: `next build`,
   commit, nav restructure UI, dashboard UI, RZExplain wiring, FINEngine load,
   Group-2 promotions, CAPEX (parallel-owned), backend.
