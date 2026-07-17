@@ -32,7 +32,7 @@ export interface SimulationState {
         // Capacity planning phases
         capacityPhases: { id: string; label: string; itLoadKw: number; startMonth: number; buildMonths: number; occupancyRamp: number[] }[];
     };
-    activeTab: 'sim' | 'staff' | 'maint' | 'risk' | 'report' | 'capex' | 'carbon' | 'finance' | 'invest' | 'benchmark' | 'montecarlo' | 'portfolio' | 'faq' | 'capacity' | 'phased-finance' | 'tax' | 'disaster' | 'grid' | 'talent' | 'compliance' | 'asset-lifecycle' | 'cbm' | 'fuel-gen' | 'strategic';
+    activeTab: 'dashboard' | 'sim' | 'staff' | 'maint' | 'risk' | 'report' | 'capex' | 'carbon' | 'finance' | 'invest' | 'benchmark' | 'montecarlo' | 'portfolio' | 'faq' | 'capacity' | 'phased-finance' | 'tax' | 'disaster' | 'grid' | 'talent' | 'compliance' | 'asset-lifecycle' | 'cbm' | 'fuel-gen' | 'strategic';
     isLoading: boolean;
     actions: {
         setLoading: (loading: boolean) => void;
@@ -87,7 +87,7 @@ export const useSimulationStore = create<SimulationState>((set) => ({
             { id: 'p3', label: 'Phase 3', itLoadKw: 10000, startMonth: 36, buildMonths: 12, occupancyRamp: [0.3, 0.6, 0.85, 0.95] },
         ],
     },
-    activeTab: 'sim', // Change default to SIM for "Super App" feel
+    activeTab: 'dashboard', // DC-OS: Executive Overview is the landing surface
     actions: {
         setLoading: (loading) => set({ isLoading: loading }),
         selectCountry: (countryId) =>
