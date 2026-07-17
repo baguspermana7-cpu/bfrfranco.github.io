@@ -5,6 +5,7 @@ import { CountryProfile } from '@/constants/countries';
 import { COUNTRIES } from '@/constants/countries';
 import { generateAssetCounts } from '@/lib/AssetGenerator';
 import { getPUE } from '@/constants/pue';
+import { rzData } from '@/lib/rz-engine';
 
 export type TestingRegime = 'minimal' | 'complete';
 
@@ -110,8 +111,11 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
     const dieselPrice = overrides?.dieselPricePerLiter ?? baseDieselPrice;
     // 2026: Modern Tier 4 Final diesel generators consume 0.25-0.27 L/kWh at 75% load
     // Previous default was 0.27; keeping at 0.27 as conservative (matches EPA Tier 4 benchmark)
-    const genEfficiency = overrides?.genEfficiency ?? 0.27; // L/kWh (EPA Tier 4 Final, 75% load)
-    const fuelStorageHours = overrides?.fuelStorageHours ?? (tierLevel === 4 ? 96 : tierLevel === 3 ? 72 : 48);
+    // Engine-sourced fuel/gen economics (RZEngine DATA.fuelGen) with local fallbacks
+    // parity-identical to the former inline literals.
+    const FG = (rzData().fuelGen || {}) as { genEfficiencyLPerKwh?: number; fuelStorageHoursByTier?: Record<number, number> };
+    const genEfficiency = overrides?.genEfficiency ?? FG.genEfficiencyLPerKwh ?? 0.27; // L/kWh (EPA Tier 4 Final, 75% load)
+    const fuelStorageHours = overrides?.fuelStorageHours ?? FG.fuelStorageHoursByTier?.[tierLevel] ?? (tierLevel === 4 ? 96 : tierLevel === 3 ? 72 : 48);
     const monthlyTestHours = overrides?.monthlyTestHours ?? 2;
     const annualFullLoadTestHours = overrides?.annualFullLoadTestHours ?? 4;
 

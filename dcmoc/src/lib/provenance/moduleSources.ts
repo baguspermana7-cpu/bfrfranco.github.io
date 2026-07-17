@@ -66,7 +66,7 @@ export const MODULE_SOURCES: Record<NavId, ModuleSource> = {
     compliance: { engine: null, fn: 'models.compliance.frameworks', label: 'Compliance — scheduled to source from a promoted RZEngine.models.compliance (50+ country frameworks).', status: 'local' },
     'asset-lifecycle': { engine: null, fn: 'models.asset.lifecycle', label: 'Asset Lifecycle — scheduled to source from a promoted RZEngine.models.asset.', status: 'local' },
     cbm: { engine: null, fn: '—', label: 'CBM / DCIM — scheduled to source from a promoted RZEngine.models.asset (health index).', status: 'local' },
-    'fuel-gen': { engine: null, fn: 'models.fuel.genSizing', label: 'Fuel & Generator — scheduled to source from a promoted RZEngine.models.fuel.', status: 'local' },
+    'fuel-gen': { engine: 'RZEngine', fn: 'data.fuelGen / models.fuel', label: 'Fuel & Generator — genset fuel rate (L/kWh) + backup autonomy hours by tier sourced from RZEngine.data.fuelGen; country diesel price stays local.', status: 'partial' },
     strategic: { engine: null, fn: '—', label: 'Strategic Planning — scheduled to aggregate engine-sourced scenarios.', status: 'local' },
 
     // ── non-calculating ───────────────────────────────────────────────────────
