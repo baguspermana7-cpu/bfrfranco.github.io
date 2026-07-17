@@ -222,6 +222,25 @@ near('pue.dcie(1.5)', M.pue.dcie(1.5), 0.6667, 0.001);
     ok('water.annualCost > 0', E.models.water.annualCost(10, 'air', 'US') > 0);
 }
 {
+    /* ── reliability (RAM) model — Layer 10 ── */
+    const R = E.models.reliability;
+    near('reliability.availability MTBF=99 MTTR=1', R.availability(99, 1), 0.99, 1e-6);
+    eq('reliability.mtbfFor ups', R.mtbfFor('ups'), D.reliability.components.ups.mtbf);
+    eq('reliability.mtbfFor unknown = null', R.mtbfFor('nope'), null);
+    // parallel redundancy raises availability above a single path
+    ok('reliability.parallelAvailability 2N > 1N', R.parallelAvailability(0.99, 2) > R.availability(99, 1));
+    near('reliability.parallelAvailability a=0.99 paths=2', R.parallelAvailability(0.99, 2), 1 - 0.01 * 0.01, 1e-6);
+    // series of two 0.999 groups = 0.998001
+    near('reliability.seriesAvailability [0.999,0.999]', R.seriesAvailability([0.999, 0.999]), 0.998001, 1e-6);
+    eq('reliability.tierTarget 4', R.tierTarget(4), D.reliability.tierAvailability[4]);
+    ok('reliability.annualDowntimeMinutes tier3 < tier2', R.annualDowntimeMinutes(R.tierTarget(3)) < R.annualDowntimeMinutes(R.tierTarget(2)));
+    // system availability: more redundancy paths never lowers availability
+    const sysN = R.systemAvailability(['ups', 'crac'], 'n');
+    const sys2N = R.systemAvailability(['ups', 'crac'], '2n');
+    ok('reliability.systemAvailability 2N >= N', sys2N >= sysN);
+    ok('reliability.systemAvailability in (0,1]', sys2N > 0 && sys2N <= 1);
+}
+{
     const svg = E.charts.histogram([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     ok('charts.histogram returns <svg>', typeof svg === 'string' && svg.indexOf('<svg') === 0 && svg.indexOf('<rect') > 0);
     const tor = E.charts.tornado(M.sim.tornado(inp => inp.x, { x: 1 }, { x: { lo: 0, hi: 2 } }));

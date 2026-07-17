@@ -30,7 +30,7 @@
      * consumes it. Bump `version` and add a CHANGELOG entry on any change.
      * ==================================================================== */
     var DATA = {
-        version: '2.3.0',
+        version: '2.4.0',
         lastUpdated: '2026-07-15',
         asOf: '2026-07',
 
@@ -490,6 +490,25 @@
             bess: { capexPerKwh: 180, roundtripEff: 0.88, cycleLife: 6000, opexPctYr: 0.02, lifeYears: 15 },
             solarDaylightFraction: 0.42   /* fraction of 24h a tracking-adjusted array meaningfully produces */
         },
+        /* ══ v2.4.0 — DATA.reliability: MTBF/MTTR by component + Uptime tier availability.
+         * Screening-grade RAM inputs (IEEE 493 Gold Book typical figures + Uptime Tier
+         * Standard availability). Powers models.reliability (Layer 10). NOT a certified
+         * RAM/FMEA study. ══ */
+        reliability: {
+            /* Component MTBF (hours) + MTTR (hours) — IEEE 493 typical ranges. */
+            components: {
+                ups:        { mtbf: 250000, mttr: 8,  label: 'UPS module' },
+                generator:  { mtbf: 150000, mttr: 24, label: 'Diesel generator' },
+                crac:       { mtbf: 100000, mttr: 6,  label: 'CRAC/CRAH' },
+                pdu:        { mtbf: 400000, mttr: 4,  label: 'PDU' },
+                switchgear: { mtbf: 350000, mttr: 12, label: 'Switchgear' },
+                chiller:    { mtbf: 120000, mttr: 12, label: 'Chiller' }
+            },
+            /* Uptime Institute Tier Standard availability targets. */
+            tierAvailability: { 2: 0.99741, 3: 0.99982, 4: 0.99995 },
+            /* Redundancy config → number of parallel paths for a component group. */
+            redundancyPaths: { 'n': 1, 'n1': 2, '2n': 2, '2n1': 3 }
+        },
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
@@ -535,7 +554,8 @@
             'capexDefaults':          { source: 'Engine model defaults (industry-typical ranges)', asOf: '2026' },
             'refresh':                { source: 'Typical enterprise IT refresh cycle', asOf: '2026', unit: 'years / fraction' },
             'workforceParams':        { source: 'Engine model tuning', asOf: '2026' },
-            'hoursPerYear':           { source: 'Calendar constant (non-leap)', asOf: 'const', unit: 'h/yr' }
+            'hoursPerYear':           { source: 'Calendar constant (non-leap)', asOf: 'const', unit: 'h/yr' },
+            'reliability':            { source: 'IEEE 493 (Gold Book) typical component MTBF/MTTR + Uptime Institute Tier Standard availability targets', asOf: '2026', unit: 'hours (MTBF/MTTR) + availability fraction', method: 'screening-grade RAM inputs; NOT a certified reliability/FMEA study' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.
@@ -2021,6 +2041,62 @@
                     var c = (region || 'US').toUpperCase();
                     var price = DATA.water.priceM3[c] != null ? DATA.water.priceM3[c] : DATA.water.priceM3.US;
                     return Math.round(RZEngine.models.water.annualM3(mw, cooling, hoursPerYear) * price);
+                }
+            },
+
+            /* ── v2.4.0: reliability (RAM) model — Layer 10 ── */
+            reliability: {
+                /** Steady-state availability of a single item: MTBF/(MTBF+MTTR). */
+                availability: function (mtbf, mttr) {
+                    var a = (mtbf || 0) + (mttr || 0);
+                    return a > 0 ? +(mtbf / a).toFixed(6) : 0;
+                },
+                /** MTBF (h) for a known component, else null. */
+                mtbfFor: function (component) {
+                    var c = DATA.reliability.components[component];
+                    return c ? c.mtbf : null;
+                },
+                /** MTTR (h) for a known component, else null. */
+                mttrFor: function (component) {
+                    var c = DATA.reliability.components[component];
+                    return c ? c.mttr : null;
+                },
+                /** Availability of `paths` identical items in active-parallel redundancy
+                 *  (system up if ≥1 path up): 1 − (1−a)^paths. */
+                parallelAvailability: function (a, paths) {
+                    var p = Math.max(1, paths || 1);
+                    return +(1 - Math.pow(1 - a, p)).toFixed(6);
+                },
+                /** Series availability of independent groups (all must be up): Π a_i. */
+                seriesAvailability: function (avails) {
+                    if (!avails || !avails.length) return 0;
+                    var prod = 1;
+                    for (var i = 0; i < avails.length; i++) prod *= avails[i];
+                    return +prod.toFixed(6);
+                },
+                /** Annual downtime (minutes) for an availability fraction. */
+                annualDowntimeMinutes: function (availability) {
+                    return +((1 - (availability || 0)) * DATA.hoursPerYear * 60).toFixed(1);
+                },
+                /** Uptime Tier availability target for tier 2|3|4. */
+                tierTarget: function (tier) {
+                    return DATA.reliability.tierAvailability[tier] != null
+                        ? DATA.reliability.tierAvailability[tier]
+                        : DATA.reliability.tierAvailability[3];
+                },
+                /** System availability for a set of component groups under a redundancy
+                 *  config: each group = its item availability in parallel over the config's
+                 *  paths, then all groups in series. components = ['ups','crac',...]. */
+                systemAvailability: function (components, redundancy) {
+                    var paths = DATA.reliability.redundancyPaths[redundancy] != null
+                        ? DATA.reliability.redundancyPaths[redundancy] : 1;
+                    var self = RZEngine.models.reliability;
+                    var groups = (components || []).map(function (name) {
+                        var c = DATA.reliability.components[name];
+                        if (!c) return 1;
+                        return self.parallelAvailability(self.availability(c.mtbf, c.mttr), paths);
+                    });
+                    return self.seriesAvailability(groups);
                 }
             }
         },

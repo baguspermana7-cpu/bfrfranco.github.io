@@ -107,6 +107,16 @@ not build the shared static export concurrently) → commit `dcmoc/` (stage only
 own files) → update THIS doc + `CHANGELOG.md` + `js/rz-version.js`. Never delete
 local math before its engine parity passes.
 
+## New engines (§C / R4) — progress
+- **Reliability (Layer 10)** — SHIPPED engine-side: `RZEngine.models.reliability`
+  (availability MTBF/(MTBF+MTTR), parallelAvailability 1−(1−a)^paths,
+  seriesAvailability, systemAvailability by component group + redundancy,
+  annualDowntimeMinutes, tierTarget) + `DATA.reliability` (IEEE 493 component
+  MTBF/MTTR + Uptime Tier availability) + `DATA.sources['reliability']`. Engine
+  `v2.4.0`; `terser` min rebuilt; `node tools/test-rz-engine.mjs` 183/0 green
+  (incl. new reliability worked examples). DCMOC Reliability dashboard + PDF
+  consumption = next increment (bump `layout.tsx ?v=` then).
+
 ## Status (2026-07-17)
 - Bridge (§2): DONE (parallel session, f7a12cc7). REUSED.
 - Financial wiring (§3): DONE — IRR+NPV engine-sourced, parity 0-diff, fallback kept.
