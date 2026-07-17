@@ -4250,21 +4250,97 @@
             weights: { power: 0.34, cooling: 0.26, network: 0.16, physical: 0.14, monitoring: 0.10 },
             bands: [ { min: 90, tier: 4, label: 'Tier IV — Fault Tolerant' }, { min: 75, tier: 3, label: 'Tier III — Concurrently Maintainable' }, { min: 55, tier: 2, label: 'Tier II — Redundant Components' }, { min: 0, tier: 1, label: 'Tier I — Basic Capacity' } ],
             /* Redundancy floor — a tier can't exceed what its redundancy supports. */
-            redundancyCap: { n: 1, n1: 3, '2n': 4, '2n1': 4 }
+            redundancyCap: { n: 1, n1: 3, '2n': 4, '2n1': 4 },
+            /* 6-band advisor (tier-advisor.html) weights — separate from classify() weights above. */
+            adviseWeights: { power: 0.35, cooling: 0.20, network: 0.15, physical: 0.10, monitoring: 0.05, regional: 0.15 },
+            /* Component score maps (tier-advisor.html SCORE_MAPS). */
+            scoreMaps: {
+                utilityFeeds:     { single: 10, dual_same: 40, dual_diverse: 80, onsite: 60 },
+                genConfig:        { none: 0, n: 30, n1: 60, '2n': 85, '2n1': 100 },
+                upsConfig:        { none: 0, n: 20, n1: 50, '2n': 80, '2n1': 100, distributed: 90 },
+                upsTopo:          { standby: 20, line_interactive: 40, double_conversion: 90, rotary: 80 },
+                atsConfig:        { none: 0, single: 40, dual: 75, sts: 100 },
+                pduRedundancy:    { single: 20, dual: 70, triple: 100 },
+                coolRedundancy:   { n: 15, n1: 50, n2: 70, '2n': 90, '2n1': 100 },
+                coolDistribution: { single: 20, dual: 70, n1_piping: 100 },
+                coolType:         { dx: 55, chilled_water: 65, free_cooling: 75, rdhx: 80, dlc: 90, immersion: 100 },
+                netEntry:         { single: 15, dual_same: 40, dual_diverse: 80, three_plus: 100 },
+                carrierDiv:       { single: 20, two: 60, three_plus: 100 },
+                meetMeRoom:       { none: 0, single: 50, redundant: 100 },
+                fireSuppression:  { none: 0, wet: 50, preaction: 65, clean: 85, vesda_clean: 100 },
+                accessControl:    { key: 15, card: 40, biometric: 75, mfa_mantrap: 100 },
+                monitoring:       { none: 0, basic: 30, bms: 65, full_dcim: 100 }
+            },
+            /* 6-band grade → label map (composite score thresholds). */
+            gradeBands: [
+                { min: 90, label: 'Tier IV',  grade: 'A+', tierNum: 4, desc: 'Fault Tolerant' },
+                { min: 75, label: 'Tier III', grade: 'A',  tierNum: 3, desc: 'Concurrently Maintainable' },
+                { min: 60, label: 'Tier II+', grade: 'B',  tierNum: 2, desc: 'Redundant Components+' },
+                { min: 45, label: 'Tier II',  grade: 'C',  tierNum: 2, desc: 'Redundant Components' },
+                { min: 25, label: 'Tier I+',  grade: 'D',  tierNum: 1, desc: 'Basic Capacity+' },
+                { min: 0,  label: 'Tier I',   grade: 'F',  tierNum: 1, desc: 'Basic Capacity' }
+            ]
         },
         fire: {
             /* Clean-agent properties for NFPA-2001 quantity sizing. s = specific
-             * vapour volume k1 + k2*T (m3/kg); designC = typical design conc (%). */
+             * vapour volume k1 + k2*T (m3/kg); designC = typical design conc (%).
+             * designConcClassA / noaelPct / loaelPct / gwp100 from fire-model.js (NFPA 2001). */
             agents: {
-                novec1230: { type: 'halocarbon', k1: 0.0664, k2: 0.0002741, designC: 4.5, label: 'Novec 1230' },
-                fm200:     { type: 'halocarbon', k1: 0.1269, k2: 0.0005140, designC: 7.0, label: 'FM-200 (HFC-227ea)' },
-                ig541:     { type: 'inert',      designC: 37.5, label: 'Inert Gas IG-541' }
+                novec1230: { type: 'halocarbon', k1: 0.0664, k2: 0.0002741, designC: 4.5, label: 'Novec 1230',
+                             designConcClassA: 4.7, noaelPct: 10.0, loaelPct: 10.0, gwp100: 1, cylinderFillKgTypical: 100 },
+                fm200:     { type: 'halocarbon', k1: 0.1269, k2: 0.0005140, designC: 7.0, label: 'FM-200 (HFC-227ea)',
+                             designConcClassA: 7.0, noaelPct: 9.0, loaelPct: 10.5, gwp100: 3220, cylinderFillKgTypical: 120 },
+                ig541:     { type: 'inert', designC: 37.5, label: 'Inert Gas IG-541',
+                             designConcClassA: 37.5, noaelPct: 43, loaelPct: 52, gwp100: 0, cylinderFillM3Typical: 22.3 }
+            },
+            /* Li-ion / VRLA battery chemistry for thermal-runaway risk (fire-model.js). */
+            battery: {
+                nmc:  { name: 'Li-ion NMC', runawayOnsetC: 150,   offGasLPerWh: 4.0 },
+                lfp:  { name: 'Li-ion LFP', runawayOnsetC: 166.8, offGasLPerWh: 2.0 },
+                lco:  { name: 'Li-ion LCO', runawayOnsetC: 150,   offGasLPerWh: 4.5 },
+                vrla: { name: 'VRLA lead-acid', runawayOnsetC: null, offGasLPerWh: 0 }
+            },
+            /* Off-gas flammability limits (NFPA 855). */
+            offGas: { ventGasLflPct: 6.0 },
+            /* TR heat release factor MJ-released / MJ-stored (fire-model.js). */
+            trHeatFactor: { nmc: 2.5, lfp: 1.2, lco: 2.6, vrla: 0 },
+            /* NFPA 72 / 2001 / 855 operating bands. */
+            bands: {
+                dischargeTimeS:       { max: 10 },
+                holdTimeMin:          { min: 10 },
+                safetyMarginPct:      { min: 0 },
+                spotDetectorAreaM2:   { max: 84 },
+                gasDetectAlarmPctLfl: { max: 25 }
             }
         },
         cdu: {
             /* Water thermophysical constants for coolant-flow sizing. */
             waterRho: 997, waterCp: 4.18, /* kg/m3, kJ/kg·K */
-            cduUnitKw: 300 /* nominal rejected-heat per CDU rack unit */
+            cduUnitKw: 300, /* nominal rejected-heat per CDU rack unit */
+            /* Operational bands from cdu-model.js (OCP / ASHRAE TC9.9). */
+            bands: {
+                supplyC:      { min: 17, max: 45 },
+                deltaTK:      { min: 8,  max: 12 },
+                flowLpmPerKw: { min: 1.0, max: 1.5 },
+                dpBar:        { min: 0.5, max: 3.0 },
+                dewMarginK:   { min: 2 },
+                pipeVelMs:    { min: 1.5, max: 3.0 }
+            },
+            /* Pump sizing parameters (cdu-model.js). */
+            pump: { pumpEff: 0.70, motorEff: 0.92, perPumpLpmDefault: 600 },
+            /* Physical constants (cdu-model.js / Alduchov-Eskridge 2006). */
+            phys: { absRoughnessMm: 0.045, barToPa: 100000, dewMagnusA: 17.625, dewMagnusB: 243.04 }
+        },
+        spares: {
+            /* BSM rational approximation coefficients for inverse normal CDF.
+             * Source: Beasley-Springer-Moro (1977). Used in newsvendor Q* calculation. */
+            bsmA: [2.50662823884, -18.61500062529, 41.39119773534, -25.44106049637],
+            bsmB: [-8.47351093090, 23.08336743743, -21.06224101826, 3.13082909833],
+            bsmC: [0.3374754822726147, 0.9761690190917186, 0.1607979714918209,
+                   0.0276438810333863, 0.0038405729373609, 0.0003951896511349,
+                   0.0000321767881768, 0.0000002888167364, 0.0000003960315187],
+            /* Demand threshold below which Poisson model auto-activates (muLT < threshold). */
+            poissonThresholdMuLt: 5
         },
         decision: {
             /* Layer-13 planning benchmarks (descriptive, not advice). */
@@ -4513,7 +4589,14 @@
             'gridReliability':        { source: 'Utility grid reliability bands (SAIDI-informed uptime tiers) + 0-1 grid score mapping; lifted from DCMOC GridReliabilityEngine — per-country uptime stays in the country profiles', asOf: '2026', unit: 'uptime % + outage hours + 0-1 score', method: 'screening; NOT a utility interconnection study' },
             'tax':                    { source: 'US TCJA bonus depreciation (20% 2026 phase-down) + IRA §48 solar ITC (30% + 10% domestic-content) + state DC sales-tax exemptions (VA/TX/NV/OH/AZ) + representative import duty; lifted from DCMOC TaxIncentiveEngine', asOf: '2026', unit: 'fractions (rates)', method: 'US-federal + state incentives; NOT tax advice; per-country corporate tax in country profiles' },
             'geoRisk':                { source: 'Natural-hazard weighting (seismic/flood/typhoon/volcano/tsunami/wildfire) + insurance-multiplier bands; lifted from DCMOC RiskEngine/DisasterRiskEngine — per-country hazard levels stay in the country profiles', asOf: '2026', unit: 'weights (sum=1) + 0-100 risk + premium multiplier', method: 'screening geo-risk; NOT a certified hazard/insurance assessment' },
-            'compliance':             { source: 'DC regulatory compliance cost categories (fire/electrical/environmental/data-protection/building/security) + one-time amortization; lifted from DCMOC ComplianceEngine — per-country framework matrix stays in country profiles', asOf: '2026', unit: '$/yr + amortization years', method: 'screening compliance cost; NOT a legal/permitting determination' }
+            'compliance':             { source: 'DC regulatory compliance cost categories (fire/electrical/environmental/data-protection/building/security) + one-time amortization; lifted from DCMOC ComplianceEngine — per-country framework matrix stays in country profiles', asOf: '2026', unit: '$/yr + amortization years', method: 'screening compliance cost; NOT a legal/permitting determination' },
+            'tier.scoreMaps':         { source: 'tier-advisor.html SCORE_MAPS + WEIGHTS — 15 component maps for 6-band Uptime-style advisor; lifted v2.5.0', asOf: '2026', method: 'engineering heuristic; NOT a certified Uptime Institute assessment' },
+            'fire.battery':           { source: 'fire-model.js BATTERY / TR_HEAT_FACTOR — Li-ion/VRLA thermal-runaway onset temperatures + off-gas volumes; NFPA 855 / UL 9540A', asOf: '2026', unit: '°C onset + L/Wh off-gas + MJ/MJ TR heat', method: 'screening; NOT a certified TR test result' },
+            'fire.bands':             { source: 'fire-model.js BANDS — NFPA 2001/72/855 operating limits (discharge time, hold time, spot-detector area, gas-alarm LFL)', asOf: '2026', unit: 'seconds / minutes / m² / %LFL', method: 'STANDARD per NFPA' },
+            'cdu.bands':              { source: 'cdu-model.js BANDS — OCP cold-plate + ASHRAE TC9.9 CDU operational bounds (supply temp, ΔT, flow, dP, dew margin, pipe velocity)', asOf: '2026', unit: '°C / K / Lpm/kW / bar / m/s' },
+            'cdu.pump':               { source: 'cdu-model.js PUMP — typical seal-less CDU pump (η=0.70) + IE3 motor (η=0.92) + 600 Lpm duty pump; ILLUSTRATIVE', asOf: '2026', unit: 'efficiency fraction + Lpm' },
+            'cdu.phys':               { source: 'cdu-model.js PHYS — commercial-steel absolute roughness (Moody/Colebrook), barToPa, Magnus dew-point coefficients (Alduchov-Eskridge 2006)', asOf: '2026', unit: 'mm / Pa/bar / dimensionless' },
+            'spares.bsm':             { source: 'Beasley-Springer-Moro (1977) rational approximation to Φ⁻¹(p); lifted from spares-readiness-calculator.html normInvCDF()', asOf: '2026', method: 'numerical approximation; error < 4.5e-4' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.
@@ -6567,6 +6650,44 @@
                     var cap = DATA.tier.redundancyCap[red];
                     if (cap != null && t > cap) { t = cap; label = (DATA.tier.bands.find(function (b) { return b.tier === cap; }) || band).label; capped = true; }
                     return { tier: t, label: label, score: score, capped: capped };
+                },
+                /** Full 6-band tier advisor (tier-advisor.html). input = component key-value map.
+                 *  Returns {composite, tier, grade, tierNum, desc, scores, canT3, canT4, floorApplied}. */
+                advise: function (input) {
+                    input = input || {};
+                    var SM = DATA.tier.scoreMaps;
+                    function gs(key) { var m = SM[key]; return (m && input[key] != null) ? (m[input[key]] || 0) : 0; }
+                    function fuelScore(h) {
+                        h = +h || 0;
+                        if (h <= 8)  { return (h / 8) * 30; }
+                        if (h <= 24) { return 30 + ((h - 8) / 16) * 30; }
+                        if (h <= 72) { return 60 + ((h - 24) / 48) * 25; }
+                        return Math.min(100, 85 + ((h - 72) / 648) * 15);
+                    }
+                    var powerScore    = gs('utilityFeeds') * 0.20 + gs('genConfig') * 0.25 + gs('upsConfig') * 0.20 + gs('upsTopo') * 0.10 + gs('atsConfig') * 0.10 + gs('pduRedundancy') * 0.10 + fuelScore(input.fuelAutonomyHrs) * 0.05;
+                    var coolingScore  = gs('coolRedundancy') * 0.50 + gs('coolDistribution') * 0.30 + gs('coolType') * 0.20;
+                    var networkScore  = gs('netEntry') * 0.45 + gs('carrierDiv') * 0.30 + gs('meetMeRoom') * 0.25;
+                    var physicalScore = gs('fireSuppression') * 0.35 + gs('accessControl') * 0.35 + gs('monitoring') * 0.30;
+                    var monitorScore  = gs('monitoring');
+                    var regionalScore = input.regionalScore != null ? +input.regionalScore : 50;
+                    var W = DATA.tier.adviseWeights;
+                    var compositeRaw  = powerScore * W.power + coolingScore * W.cooling + networkScore * W.network + physicalScore * W.physical + monitorScore * W.monitoring + regionalScore * W.regional;
+                    var uF = input.utilityFeeds || '', gC = input.genConfig || '', uC = input.upsConfig || '';
+                    var pR = input.pduRedundancy || '', cR = input.coolRedundancy || '', nE = input.netEntry || '';
+                    var cD = input.coolDistribution || '';
+                    var canT3 = (uF === 'dual_same' || uF === 'dual_diverse' || uF === 'onsite') && (gC === 'n1' || gC === '2n' || gC === '2n1') && (uC === 'n1' || uC === '2n' || uC === '2n1' || uC === 'distributed') && cD !== 'single';
+                    var canT4 = uF === 'dual_diverse' && (gC === '2n' || gC === '2n1') && (uC === '2n' || uC === '2n1') && (pR === 'dual' || pR === 'triple') && (cR === '2n' || cR === '2n1') && (nE === 'dual_diverse' || nE === 'three_plus');
+                    var floorApplied = false;
+                    if (compositeRaw >= 75 && !canT3) { compositeRaw = Math.min(compositeRaw, 74); floorApplied = true; }
+                    if (compositeRaw >= 90 && !canT4) { compositeRaw = Math.min(compositeRaw, 89); floorApplied = true; }
+                    var composite = Math.round(compositeRaw);
+                    var gb = DATA.tier.gradeBands;
+                    var band = gb.find(function (b) { return composite >= b.min; }) || gb[gb.length - 1];
+                    return {
+                        composite: composite, tier: band.label, grade: band.grade, tierNum: band.tierNum, desc: band.desc,
+                        scores: { power: +powerScore.toFixed(1), cooling: +coolingScore.toFixed(1), network: +networkScore.toFixed(1), physical: +physicalScore.toFixed(1), monitoring: +monitorScore.toFixed(1), regional: +regionalScore.toFixed(1) },
+                        canT3: canT3, canT4: canT4, floorApplied: floorApplied
+                    };
                 }
             },
 
@@ -6587,6 +6708,43 @@
                     var s = a.k1 + a.k2 * T;
                     var kg = (V / s) * (C / (100 - C));
                     return { agent: a.label, type: 'halocarbon', massKg: +kg.toFixed(1), specificVolume: +s.toFixed(4), designConcentration: C };
+                },
+                /** Rich NFPA 2001/72/855 fire assessment (fire-engine.js + fire-model.js).
+                 *  input {volumeM3, agent, tempC?, areaM2?, packKWh?, batteryChem?}.
+                 *  Returns mass/volume + NOAEL safety + CO2e + detector count + Li-ion TR section. */
+                assess: function (input) {
+                    input = input || {};
+                    var agentKey = (input.agent || 'novec1230').toLowerCase();
+                    var a = DATA.fire.agents[agentKey] || DATA.fire.agents.novec1230;
+                    var V = Math.max(0, input.volumeM3 || 0);
+                    var T = input.tempC != null ? input.tempC : 20;
+                    var C = a.designConcClassA != null ? a.designConcClassA : a.designC;
+                    var out = { agent: a.label, type: a.type, designConcPct: C };
+                    if (a.type === 'inert') {
+                        out.agentVolumeM3 = +(V * Math.log(100 / (100 - C))).toFixed(2);
+                        if (a.cylinderFillM3Typical) { out.cylinders = Math.ceil(out.agentVolumeM3 / a.cylinderFillM3Typical); }
+                    } else {
+                        var s = a.k1 + a.k2 * T;
+                        out.massKg = +(V / s * (C / (100 - C))).toFixed(1);
+                        out.specificVolume = +s.toFixed(4);
+                        if (a.cylinderFillKgTypical) { out.cylinders = Math.ceil(out.massKg / a.cylinderFillKgTypical); }
+                        if (a.gwp100 != null) { out.co2eTonnes = +(out.massKg * a.gwp100 / 1000).toFixed(2); }
+                    }
+                    out.noaelPct = a.noaelPct; out.loaelPct = a.loaelPct;
+                    out.safetyMarginPct = a.noaelPct != null ? +(a.noaelPct - C).toFixed(2) : null;
+                    out.occupiableOk = a.noaelPct != null ? C <= a.noaelPct : null;
+                    var area = input.areaM2 || 0;
+                    out.spotDetectors = area > 0 ? Math.ceil(area / DATA.fire.bands.spotDetectorAreaM2.max) : null;
+                    if (input.packKWh && input.packKWh > 0) {
+                        var chemKey = (input.batteryChem || 'nmc').toLowerCase();
+                        var bat = DATA.fire.battery[chemKey] || DATA.fire.battery.nmc;
+                        var trFactor = DATA.fire.trHeatFactor[chemKey] != null ? DATA.fire.trHeatFactor[chemKey] : DATA.fire.trHeatFactor.nmc;
+                        var heatMJ = +(input.packKWh * 3.6 * trFactor).toFixed(0);
+                        var gasM3  = +(input.packKWh * 1000 * bat.offGasLPerWh / 1000).toFixed(1);
+                        var gasConc = V > 0 ? +(gasM3 / V * 100).toFixed(2) : null;
+                        out.liIon = { chem: bat.name, runawayHeatMJ: heatMJ, offGasM3: gasM3, roomOffGasConcPct: gasConc, offGasLflOk: gasConc != null ? gasConc < DATA.fire.offGas.ventGasLflPct * (DATA.fire.bands.gasDetectAlarmPctLfl.max / 100) : null };
+                    }
+                    return out;
                 }
             },
 
@@ -6602,6 +6760,58 @@
                     var flowLpm = flowM3s * 60000;
                     var units = Math.max(1, Math.ceil(kw / DATA.cdu.cduUnitKw));
                     return { flowLpm: +flowLpm.toFixed(1), flowM3h: +(flowM3s * 3600).toFixed(2), cduUnits: units, cduUnitsRedundant: units + 1, deltaT: dT };
+                },
+                /** Thermohydraulic analysis (cdu-engine.js). Darcy-Weisbach/Haaland dP + pump power + dew point.
+                 *  input {itKw, deltaTK?, supplyC?, pipeDiamMm?, pipeLengthM?, rhPct?, tAirC?, hxEffectiveness?, facilitySupplyC?}.
+                 *  Returns flow + velocity + Re + f + dP + pumpKw + HX approach + dew point + dew safety flag. */
+                hydraulics: function (input) {
+                    input = input || {};
+                    var kw = Math.max(0, input.itKw || 0);
+                    var dT = input.deltaTK || 10;
+                    var supplyC = input.supplyC != null ? input.supplyC : 20;
+                    var returnC = supplyC + dT;
+                    var Tavg = (supplyC + returnC) / 2;
+                    var rho = 1000.6 - 0.0476 * Tavg - 0.0034 * Tavg * Tavg;
+                    var mu  = 2.414e-5 * Math.pow(10, 247.8 / (Tavg + 133.0));
+                    var rhoKgL = rho / 1000;
+                    var flowLpm = kw * 60 / (rhoKgL * 4.186 * dT);
+                    var D = input.pipeDiamMm || 100;
+                    var L = input.pipeLengthM || 50;
+                    var Dm = D / 1000;
+                    var area = Math.PI * (Dm / 2) * (Dm / 2);
+                    var qm3s = flowLpm / 1000 / 60;
+                    var velMs = qm3s / area;
+                    var Re = rho * velMs * Dm / mu;
+                    var rel = DATA.cdu.phys.absRoughnessMm / D;
+                    var f;
+                    if (Re < 2300) {
+                        f = 64 / Re;
+                    } else {
+                        var t = Math.pow(rel / 3.7, 1.11) + 6.9 / Re;
+                        var inv = -1.8 * (Math.log(t) / Math.LN10);
+                        f = 1 / (inv * inv);
+                    }
+                    var dPa  = f * (L / Dm) * (rho * velMs * velMs / 2);
+                    var dpBar = +(dPa / DATA.cdu.phys.barToPa).toFixed(3);
+                    var hydrKw = flowLpm * dpBar / 600;
+                    var pumpKw = +(hydrKw / DATA.cdu.pump.pumpEff / DATA.cdu.pump.motorEff).toFixed(2);
+                    var nPumps = Math.ceil(flowLpm / DATA.cdu.pump.perPumpLpmDefault) + 1;
+                    var eps = input.hxEffectiveness || 0.85;
+                    var fSupply = input.facilitySupplyC != null ? input.facilitySupplyC : supplyC - 3;
+                    var approachK = +((1 - eps) * (returnC - fSupply)).toFixed(1);
+                    var rhPct = input.rhPct != null ? input.rhPct : 50;
+                    var tAir  = input.tAirC  != null ? input.tAirC  : 25;
+                    var mA = DATA.cdu.phys.dewMagnusA, mB = DATA.cdu.phys.dewMagnusB;
+                    var gamma = Math.log(rhPct / 100) + (mA * tAir) / (mB + tAir);
+                    var dewC = +(mB * gamma / (mA - gamma)).toFixed(1);
+                    var dewMarginK = +(supplyC - dewC).toFixed(1);
+                    var dewSafeOk = dewMarginK >= DATA.cdu.bands.dewMarginK.min;
+                    return {
+                        flowLpm: +flowLpm.toFixed(1), velocityMs: +velMs.toFixed(2),
+                        reynolds: Math.round(Re), frictionFactor: +f.toFixed(5),
+                        dpBar: dpBar, pumpKw: pumpKw, pumpsNplus1: nPumps,
+                        hxApproachK: approachK, dewPointC: dewC, dewMarginK: dewMarginK, dewSafeOk: dewSafeOk
+                    };
                 }
             },
 
@@ -6620,6 +6830,77 @@
                     input = input || {};
                     var dpd = input.demandPerDay || 0, lead = input.leadDays || 0, safety = input.safetyStock || 0;
                     return Math.ceil(dpd * lead + safety);
+                },
+                /** Newsvendor critical-fractile model (spares-readiness-calculator.html calcStock()).
+                 *  CR = Cu/(Cu+Co); Q* via Φ⁻¹(CR) Normal or Poisson for low-demand movers.
+                 *  input {unitCost, understockCostPerEvent, carryRatePct, partLifeYrs,
+                 *         muAnnual, sigmaAnnual, ltWeeks, ltSigmaWeeks, fillRatePct, poissonMode?}.
+                 *  Returns {cr, qStar, safetyStock, rop, fillAchieved, annualCost, muLT, sigLT, usedPoissonMode}. */
+                newsvendor: function (input) {
+                    input = input || {};
+                    var unitCost  = Math.max(1, input.unitCost || 4500);
+                    var cu        = Math.max(1, input.understockCostPerEvent || 85000);
+                    var carryRate = Math.max(0.01, Math.min(1, (input.carryRatePct || 25) / 100));
+                    var partLife  = Math.max(1, input.partLifeYrs || 8);
+                    var muA       = Math.max(0.01, input.muAnnual || 1.0);
+                    var sigA      = Math.max(0, input.sigmaAnnual != null ? input.sigmaAnnual : muA * 0.6);
+                    var ltWeeks   = Math.max(1, input.ltWeeks || 16);
+                    var ltSigma   = Math.max(0, input.ltSigmaWeeks != null ? input.ltSigmaWeeks : 4);
+                    var fillRate  = Math.max(0.5, Math.min(0.9999, (input.fillRatePct || 99) / 100));
+                    /* BSM inverse normal CDF (Beasley-Springer-Moro). */
+                    function normInv(p) {
+                        if (p <= 0) { return -6; } if (p >= 1) { return 6; }
+                        var A = DATA.spares.bsmA, B = DATA.spares.bsmB, C = DATA.spares.bsmC;
+                        var y = p - 0.5;
+                        if (Math.abs(y) < 0.42) {
+                            var r = y * y;
+                            return y * (((A[3]*r+A[2])*r+A[1])*r+A[0]) / ((((B[3]*r+B[2])*r+B[1])*r+B[0])*r+1);
+                        }
+                        var r2 = (y < 0) ? p : 1 - p;
+                        r2 = Math.log(-Math.log(r2));
+                        var z = C[0]+r2*(C[1]+r2*(C[2]+r2*(C[3]+r2*(C[4]+r2*(C[5]+r2*(C[6]+r2*(C[7]+r2*C[8])))))));
+                        return (y < 0) ? -z : z;
+                    }
+                    /* Normal CDF rational approximation. */
+                    function normCDF(x) {
+                        var t = 1 / (1 + 0.2316419 * Math.abs(x));
+                        var poly = t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
+                        var phi = 1 - (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * x * x) * poly;
+                        return x >= 0 ? phi : 1 - phi;
+                    }
+                    /* Poisson CDF (iterative; normal approx for λ>200). */
+                    function poissonCDF(k, lambda) {
+                        if (lambda <= 0) { return (k >= 0) ? 1 : 0; }
+                        if (lambda > 200) { return normCDF((k + 0.5 - lambda) / Math.sqrt(lambda)); }
+                        var sum = 0, term = Math.exp(-lambda);
+                        if (!isFinite(term)) { return normCDF((k + 0.5 - lambda) / Math.sqrt(lambda)); }
+                        for (var i = 0; i <= k; i++) { sum += term; term *= lambda / (i + 1); if (!isFinite(term)) { break; } }
+                        return Math.min(1, sum);
+                    }
+                    var L       = ltWeeks / 52;
+                    var sigL    = ltSigma / 52;
+                    var muLT    = muA * L;
+                    var sigLT   = Math.sqrt(L * sigA * sigA + muA * muA * sigL * sigL);
+                    var co      = carryRate * unitCost * partLife;
+                    var cr      = Math.max(0.001, Math.min(0.999, cu / (cu + co)));
+                    var usePoisson = input.poissonMode === false ? false : (!!input.poissonMode || muLT < DATA.spares.poissonThresholdMuLt);
+                    var qStar;
+                    if (usePoisson) {
+                        qStar = 0;
+                        while (poissonCDF(qStar, muLT) < cr && qStar < 1000) { qStar++; }
+                    } else {
+                        qStar = Math.max(0, Math.ceil(muLT + normInv(cr) * sigLT));
+                    }
+                    var zFR = normInv(fillRate);
+                    var ss  = Math.max(0, Math.ceil(zFR * sigLT));
+                    var rop = Math.max(0, Math.ceil(muLT + ss));
+                    var fillAchieved = usePoisson ? poissonCDF(qStar, muLT) : normCDF((qStar - muLT) / Math.max(sigLT, 1e-9));
+                    var annualCost = (co / partLife) * Math.max(0, qStar - muLT) + cu * muA * (1 - fillAchieved);
+                    return {
+                        cr: +cr.toFixed(4), qStar: qStar, safetyStock: ss, rop: rop,
+                        fillAchieved: +fillAchieved.toFixed(4), annualCost: Math.round(annualCost),
+                        muLT: +muLT.toFixed(3), sigLT: +sigLT.toFixed(3), usedPoissonMode: usePoisson
+                    };
                 }
             },
 

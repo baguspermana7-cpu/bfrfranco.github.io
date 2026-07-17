@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.64.0 — 2026-07-18 (DC-OS: promote the RICH standalone models into the engine)
+
+### Added
+- The richer models that lived only in the standalone tools are now **full-fidelity in `rz-engine.js`** (extending, not replacing, the simple functions — `tier.classify`/`fire.agentQuantity`/`cdu.size`/`spares.eoq` unchanged):
+  - `models.tier.advise()` — 6-band Uptime grading (I / I+ / II / II+ / III / IV) + per-category scores + canT3/canT4 floor constraints + recommendations (from `tier-advisor.html`).
+  - `models.fire.assess()` — NFPA-2001 mass + cylinders + **NOAEL occupant-safety margin** + agent **CO₂e (GWP100)** + NFPA-72 detector count + NFPA-855 Li-ion assessment (from `js/fire-engine.js`).
+  - `models.cdu.hydraulics()` — water/glycol properties + Darcy-Weisbach ΔP (Haaland friction) + Reynolds + pump power + Magnus **dew-point margin** (from `js/cdu-engine.js`).
+  - `models.spares.newsvendor()` — critical ratio, Q* via Φ⁻¹(CR) or Poisson (low-demand), fill rate, annual cost curve (from `spares-readiness-calculator.html`).
+  - Constants moved to `DATA.{tier,fire,cdu,spares}` with `DATA.sources` provenance. `tools/test-rz-engine.mjs` **355/0** (+34 asserts). `cf-worker/src/calc.js` allow-lists the new data.
+- **DCMOC pillars upgraded** to the rich functions: Fire (NOAEL margin + CO₂e + cylinders), CDU (ΔP + Reynolds + pump kW + dew-point margin), Spares (newsvendor Q* + fill rate). Tier pillar stays on `classify` (the 6-band `advise` needs the full topology dropdowns the tool collects). All with graceful fallback to the simple function.
+
+### Changed
+- `rz-engine.min.js` rebuilt (terser). Reference-parity 126/0. Backend `/calc` redeployed (all models live server-side).
+
+---
+
 ## v1.63.1 — 2026-07-18 (standalone tools: engine as fallback where the dedicated engine is richer)
 
 ### Changed

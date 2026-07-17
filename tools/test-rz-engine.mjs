@@ -724,6 +724,75 @@ if (M.spares && M.spares.eoq) {
     const e = M.spares.eoq({ annualDemand: 120, orderCost: 400, holdingCostPerUnit: 60 });
     ok('spares EOQ balances holding≈ordering at optimum', Math.abs(e.annualHolding - e.annualOrdering) < 1, `${e.annualHolding} vs ${e.annualOrdering}`);
 }
+/* ── new rich models (v2.5.0) ── */
+if (M.tier && M.tier.advise) {
+    /* Tier IV requires: dual_diverse feeds + 2n/2n1 gen+ups + triple pdu + 2n/2n1 cooling + three_plus netEntry + regionalScore=100 */
+    const a1 = M.tier.advise({
+        utilityFeeds: 'dual_diverse', genConfig: '2n1', upsConfig: '2n', upsTopo: 'double_conversion',
+        atsConfig: 'sts', pduRedundancy: 'triple', coolRedundancy: '2n1', coolDistribution: 'n1_piping',
+        coolType: 'immersion', netEntry: 'three_plus', carrierDiv: 'three_plus', meetMeRoom: 'redundant',
+        fireSuppression: 'vesda_clean', accessControl: 'mfa_mantrap', monitoring: 'full_dcim',
+        fuelAutonomyHrs: 720, regionalScore: 100
+    });
+    ok('tier.advise Tier IV for fully-redundant site', a1.tier === 'Tier IV', a1.tier);
+    ok('tier.advise grade A+ for Tier IV', a1.grade === 'A+', a1.grade);
+    ok('tier.advise canT4 true for dual_diverse + 2n1 + triple + three_plus netEntry', a1.canT4 === true, String(a1.canT4));
+    const a2 = M.tier.advise({ utilityFeeds: 'single', genConfig: 'none', upsConfig: 'n' });
+    ok('tier.advise Tier I for bare-bones site', a2.tierNum === 1, a2.tier);
+    ok('tier.advise floor not applied for low score', a2.floorApplied === false, String(a2.floorApplied));
+    /* Floor constraint: high score but missing T3 prereq (utilityFeeds=single) → capped below 75 */
+    const a3 = M.tier.advise({
+        utilityFeeds: 'single', genConfig: '2n', upsConfig: '2n', upsTopo: 'double_conversion',
+        atsConfig: 'sts', pduRedundancy: 'triple', coolRedundancy: '2n', coolDistribution: 'n1_piping',
+        coolType: 'immersion', netEntry: 'three_plus', carrierDiv: 'three_plus', meetMeRoom: 'redundant',
+        fireSuppression: 'vesda_clean', accessControl: 'mfa_mantrap', monitoring: 'full_dcim',
+        fuelAutonomyHrs: 96
+    });
+    ok('tier.advise floor clamps score when canT3=false', a3.floorApplied === true, String(a3.floorApplied));
+    ok('tier.advise scores dict has 6 keys', Object.keys(a3.scores).length === 6);
+}
+if (M.fire && M.fire.assess) {
+    const fa = M.fire.assess({ volumeM3: 500, agent: 'novec1230', areaM2: 400 });
+    ok('fire.assess novec1230 designConcClassA 4.7 used', fa.designConcPct === 4.7, '' + fa.designConcPct);
+    ok('fire.assess mass > agentQuantity mass (4.7% vs 4.5% designC)', fa.massKg > M.fire.agentQuantity({ volumeM3: 500, agent: 'novec1230' }).massKg, `assess=${fa.massKg} qty=${M.fire.agentQuantity({ volumeM3: 500, agent: 'novec1230' }).massKg}`);
+    ok('fire.assess occupiableOk=true (4.7 <= NOAEL 10.0)', fa.occupiableOk === true, String(fa.occupiableOk));
+    ok('fire.assess safetyMarginPct = 10-4.7 = 5.3', Math.abs(fa.safetyMarginPct - 5.3) < 0.01, '' + fa.safetyMarginPct);
+    ok('fire.assess spotDetectors = ceil(400/84) = 5', fa.spotDetectors === 5, '' + fa.spotDetectors);
+    const faLi = M.fire.assess({ volumeM3: 200, agent: 'novec1230', areaM2: 100, packKWh: 500, batteryChem: 'nmc' });
+    ok('fire.assess Li-ion section present for packKWh input', !!faLi.liIon, JSON.stringify(faLi.liIon));
+    ok('fire.assess NMC runawayHeat = 500*3.6*2.5 = 4500 MJ', faLi.liIon.runawayHeatMJ === 4500, '' + faLi.liIon.runawayHeatMJ);
+    ok('fire.assess FM-200 co2eTonnes present', M.fire.assess({ volumeM3: 100, agent: 'fm200' }).co2eTonnes > 0);
+    ok('fire.assess IG-541 returns agentVolumeM3', typeof M.fire.assess({ volumeM3: 100, agent: 'ig541' }).agentVolumeM3 === 'number');
+}
+if (M.cdu && M.cdu.hydraulics) {
+    const h = M.cdu.hydraulics({ itKw: 1000, deltaTK: 10, supplyC: 20, pipeDiamMm: 100, pipeLengthM: 50 });
+    ok('cdu.hydraulics returns flowLpm', typeof h.flowLpm === 'number' && h.flowLpm > 0, '' + h.flowLpm);
+    ok('cdu.hydraulics velocity plausible (0.05-5 m/s)', h.velocityMs > 0.05 && h.velocityMs < 5, '' + h.velocityMs);
+    ok('cdu.hydraulics Reynolds > 0', h.reynolds > 0, '' + h.reynolds);
+    ok('cdu.hydraulics frictionFactor in (0.005, 0.1)', h.frictionFactor > 0.005 && h.frictionFactor < 0.1, '' + h.frictionFactor);
+    ok('cdu.hydraulics dpBar positive', h.dpBar > 0, '' + h.dpBar);
+    ok('cdu.hydraulics pumpKw positive', h.pumpKw > 0, '' + h.pumpKw);
+    ok('cdu.hydraulics dewPointC returned', typeof h.dewPointC === 'number', '' + h.dewPointC);
+    ok('cdu.hydraulics dewSafeOk is boolean', typeof h.dewSafeOk === 'boolean');
+    ok('cdu.hydraulics dew margin safe at 50% RH / 25°C air / 20°C supply', h.dewSafeOk === true, 'dewC=' + h.dewPointC + ' margin=' + h.dewMarginK);
+}
+if (M.spares && M.spares.newsvendor) {
+    /* High-demand part — muAnnual=8 forces muLT>5 so Normal mode activates */
+    const nv1 = M.spares.newsvendor({ unitCost: 15000, understockCostPerEvent: 200000, carryRatePct: 25, partLifeYrs: 8, muAnnual: 8.0, sigmaAnnual: 2.0, ltWeeks: 18, ltSigmaWeeks: 5, fillRatePct: 99, poissonMode: false });
+    ok('newsvendor CR close to 1 for critical DC part (Cu>>Co)', nv1.cr > 0.8, '' + nv1.cr);
+    ok('newsvendor qStar > 0', nv1.qStar > 0, '' + nv1.qStar);
+    ok('newsvendor fillAchieved > 0.9 (Normal, high-demand)', nv1.fillAchieved > 0.9, '' + nv1.fillAchieved);
+    ok('newsvendor safetyStock >= 0', nv1.safetyStock >= 0);
+    ok('newsvendor rop >= muLT (ceil)', nv1.rop >= nv1.muLT);
+    /* Low-demand slow mover — muLT < threshold → auto Poisson */
+    const nv2 = M.spares.newsvendor({ unitCost: 50000, understockCostPerEvent: 400000, carryRatePct: 25, partLifeYrs: 20, muAnnual: 0.05, sigmaAnnual: 0.05, ltWeeks: 40, ltSigmaWeeks: 10, fillRatePct: 99 });
+    ok('newsvendor auto-uses Poisson for low muLT', nv2.usedPoissonMode === true, String(nv2.usedPoissonMode));
+    ok('newsvendor Poisson qStar >= 0', nv2.qStar >= 0);
+    /* Explicit poissonMode: false overrides auto-Poisson */
+    const nv3 = M.spares.newsvendor({ unitCost: 4500, understockCostPerEvent: 85000, carryRatePct: 25, partLifeYrs: 8, muAnnual: 6.0, sigmaAnnual: 1.5, ltWeeks: 16, ltSigmaWeeks: 4, fillRatePct: 99, poissonMode: false });
+    ok('newsvendor forced Normal mode (poissonMode=false)', nv3.usedPoissonMode === false, String(nv3.usedPoissonMode));
+    ok('newsvendor annualCost > 0', nv3.annualCost > 0);
+}
 if (M.decision && M.decision.recommend) {
     const d = M.decision.recommend({ inputs: { itLoadKw: 3000, tier: 3, coolingType: 'air' }, capex: { perKw: 16000, timelineMonths: 32 }, carbon: { pue: 1.6 }, financial: { paybackYears: 9, irrPct: 8 } }, {}, ['maxRoi']);
     ok('decision returns ≥3 recommendations for a flagged project', d.recommendations.length >= 3, '' + d.recommendations.length);

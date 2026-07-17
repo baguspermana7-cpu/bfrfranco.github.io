@@ -27,7 +27,7 @@ const ALLOWED_DATA = new Set([
   "asset", "maintenance", "fuelGen", "capacity", "gridReliability", "tax",
   "geoRisk", "compliance", "requirements", "architecture", "deepSeaCooling",
   "refrigerants", "energy", "sources",
-  "countries", "tierCodes", "redundancyLevels", "tier", "fire", "cdu", "decision",
+  "countries", "tierCodes", "redundancyLevels", "tier", "fire", "cdu", "spares", "decision",
 ]);
 
 function resolvePath(root, path) {
