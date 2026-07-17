@@ -12,10 +12,12 @@ import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { getPUE } from '@/constants/pue';
 import { decide, type DecisionContext, type DecisionResult } from '@/lib/decision';
+import { generateDashboardPDF } from '@/modules/reporting/pdf/DashboardPdf';
 import {
     LayoutDashboard, Building, Cpu, Gauge, Server, CalendarClock,
     ClipboardList, MapPin, Boxes, Layers, HardHat, CheckCircle2, Wrench,
     Activity, ShieldCheck, Leaf, TrendingUp, BrainCircuit, ArrowRight, Sparkles,
+    FileDown,
 } from 'lucide-react';
 
 type TabId = ReturnType<typeof useSimulationStore.getState>['activeTab'];
@@ -62,6 +64,27 @@ export function ExecutiveDashboard() {
 
     const go = (tab?: TabId) => { if (tab) actions.setActiveTab(tab); };
 
+    const [exporting, setExporting] = React.useState(false);
+    const handleExport = async () => {
+        setExporting(true);
+        try {
+            await generateDashboardPDF({
+                project: 'Data Center Project',
+                country: selectedCountry?.name || '—',
+                itLoadKw: inputs.itLoad,
+                tier: inputs.tierLevel,
+                redundancy: inputs.powerRedundancy,
+                coolingType: inputs.coolingType,
+                pue,
+                capex: capex ? { total: capex.total, perKw: capex.metrics?.perKw, racks: capex.metrics?.racks, timelineMonths: capex.timeline?.totalMonths } : undefined,
+                engines: ENGINE_STRIP.map((e) => ({ num: e.num, label: e.label, status: e.wired })),
+                decision: aiResult,
+            });
+        } finally {
+            setExporting(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -75,8 +98,18 @@ export function ExecutiveDashboard() {
                         <p className="text-sm text-slate-500 dark:text-slate-400">DC-OS · Data Center Intelligence Platform</p>
                     </div>
                 </div>
-                <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-                    {selectedCountry?.name || '—'} · Tier {inputs.tierLevel} · {itLoadMw.toFixed(1)} MW
+                <div className="flex items-center gap-3">
+                    <div className="text-xs text-slate-500 dark:text-slate-400 font-mono hidden sm:block">
+                        {selectedCountry?.name || '—'} · Tier {inputs.tierLevel} · {itLoadMw.toFixed(1)} MW
+                    </div>
+                    <button
+                        onClick={handleExport}
+                        disabled={exporting}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 dark:bg-slate-700 hover:bg-cyan-700 dark:hover:bg-cyan-700 text-white text-xs font-medium transition-colors disabled:opacity-60"
+                    >
+                        <FileDown className="w-3.5 h-3.5" />
+                        {exporting ? 'Generating…' : 'Generate Report'}
+                    </button>
                 </div>
             </div>
 
