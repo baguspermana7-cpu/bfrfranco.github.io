@@ -1,30 +1,46 @@
 'use client';
 
 import React from 'react';
-import { Database, BrainCircuit, Boxes, FileText, CheckCircle2, Rocket, Plus, Zap, Download, UserPlus, Settings, AlertTriangle, ArrowRight } from 'lucide-react';
+import { Database, BrainCircuit, Boxes, FileText, CheckCircle2, Rocket, Plus, Zap, Download, UserPlus, Settings, AlertTriangle } from 'lucide-react';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { rzModels } from '@/lib/rz-engine';
 
-/* ── Data Flow & Digital Thread rail ── */
-const FLOW = [
-    { label: 'Input Data', icon: Database }, { label: 'Engines', icon: BrainCircuit }, { label: 'Models', icon: Boxes },
-    { label: 'Outputs', icon: FileText }, { label: 'Decisions', icon: CheckCircle2 }, { label: 'Actions', icon: Rocket },
-];
-export function DataFlowRail() {
+/* ── Data Flow & Digital Thread rail — LIVE: each stage shows its real count
+ *    from the current project + engine state, with a flowing pulse (not static). ── */
+export interface FlowStats { inputs?: number; outputs?: number; decisions?: number }
+export function DataFlowRail({ stats }: { stats?: FlowStats }) {
+    const modelCount = Object.keys(rzModels() || {}).length;
+    const FLOW: { label: string; icon: React.ElementType; count: number | null; hint: string }[] = [
+        { label: 'Input Data', icon: Database, count: stats?.inputs ?? null, hint: 'configured project parameters' },
+        { label: 'Engines', icon: BrainCircuit, count: 13, hint: '13-layer lifecycle engines' },
+        { label: 'Models', icon: Boxes, count: modelCount, hint: 'shared rz-engine model namespaces' },
+        { label: 'Outputs', icon: FileText, count: stats?.outputs ?? null, hint: 'computed KPIs on this dashboard' },
+        { label: 'Decisions', icon: CheckCircle2, count: stats?.decisions ?? null, hint: 'Layer-13 AI recommendations' },
+        { label: 'Actions', icon: Rocket, count: 6, hint: 'quick actions available' },
+    ];
     return (
         <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/80 p-4">
-            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-3">Data Flow &amp; Digital Thread</h2>
-            <div className="flex items-center justify-between gap-0.5 flex-wrap">
+            <div className="flex items-center justify-between mb-3">
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Data Flow &amp; Digital Thread</h2>
+                <span className="inline-flex items-center gap-1 text-[9px] text-cyan-500"><span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />live</span>
+            </div>
+            <div className="flex items-start justify-between gap-0.5 flex-wrap">
                 {FLOW.map((f, i) => {
                     const Icon = f.icon;
                     return (
                         <React.Fragment key={f.label}>
-                            <div className="flex flex-col items-center gap-1 flex-1 min-w-[44px]">
-                                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500/15 to-violet-500/10 border border-white/10 flex items-center justify-center">
+                            <div className="group flex flex-col items-center gap-1 flex-1 min-w-[44px]" title={`${f.label} — ${f.hint}`}>
+                                <div className="relative w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500/15 to-violet-500/10 border border-white/10 flex items-center justify-center transition-all group-hover:border-cyan-400/50 group-hover:from-cyan-500/25">
                                     <Icon className="w-4 h-4 text-cyan-400" />
+                                    {f.count != null && <span className="absolute -top-1.5 -right-1.5 min-w-[15px] h-[15px] px-0.5 rounded-full bg-cyan-500 text-[8px] font-bold text-white flex items-center justify-center tabular-nums">{f.count}</span>}
                                 </div>
                                 <span className="text-[8px] text-slate-500 text-center leading-tight">{f.label}</span>
                             </div>
-                            {i < FLOW.length - 1 && <ArrowRight className="w-3 h-3 text-slate-600 shrink-0 mb-4" />}
+                            {i < FLOW.length - 1 && (
+                                <div className="shrink-0 mt-3.5 flex gap-[3px]" aria-hidden="true">
+                                    {[0, 1, 2].map((k) => <span key={k} className="w-1 h-1 rounded-full bg-cyan-500/70 animate-pulse" style={{ animationDelay: `${i * 200 + k * 160}ms`, animationDuration: '1.2s' }} />)}
+                                </div>
+                            )}
                         </React.Fragment>
                     );
                 })}

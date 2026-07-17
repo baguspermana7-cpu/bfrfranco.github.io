@@ -10,31 +10,26 @@ type TabId = string;
 export interface EngineNode { num: number; label: string; icon: React.ElementType; status: 'engine' | 'partial' | 'local'; tab?: TabId; }
 
 export const ENGINES: EngineNode[] = [
-    { num: 1, label: 'Requirements', icon: ClipboardList, status: 'engine', tab: 'sim' },
-    { num: 2, label: 'Site Intel', icon: MapPin, status: 'engine', tab: 'disaster' },
-    { num: 3, label: 'Architecture', icon: Boxes, status: 'engine', tab: 'capex' },
+    { num: 1, label: 'Requirements', icon: ClipboardList, status: 'engine', tab: 'requirements' },
+    { num: 2, label: 'Site Intel', icon: MapPin, status: 'engine', tab: 'site' },
+    { num: 3, label: 'Architecture', icon: Boxes, status: 'engine', tab: 'architecture' },
     { num: 4, label: 'Capacity', icon: Layers, status: 'partial', tab: 'capacity' },
-    { num: 5, label: 'CAPEX', icon: Building, status: 'partial', tab: 'capex' },
-    { num: 6, label: 'Construction', icon: HardHat, status: 'engine', tab: 'phased-finance' },
-    { num: 7, label: 'Commissioning', icon: CheckCircle2, status: 'engine' },
+    { num: 5, label: 'CAPEX', icon: Building, status: 'engine', tab: 'capex' },
+    { num: 6, label: 'Construction', icon: HardHat, status: 'engine', tab: 'construction' },
+    { num: 7, label: 'Commissioning', icon: CheckCircle2, status: 'engine', tab: 'commissioning' },
     { num: 8, label: 'Operations', icon: Wrench, status: 'partial', tab: 'staff' },
-    { num: 9, label: 'Assets', icon: Activity, status: 'engine', tab: 'asset-lifecycle' },
+    { num: 9, label: 'Assets', icon: Activity, status: 'engine', tab: 'asset-health' },
     { num: 10, label: 'Reliability', icon: ShieldCheck, status: 'engine', tab: 'reliability' },
     { num: 11, label: 'Sustainability', icon: Leaf, status: 'partial', tab: 'carbon' },
     { num: 12, label: 'Financial', icon: TrendingUp, status: 'engine', tab: 'finance' },
-    { num: 13, label: 'AI Decision', icon: BrainCircuit, status: 'engine' },
+    { num: 13, label: 'AI Decision', icon: BrainCircuit, status: 'engine', tab: 'dashboard' },
 ];
 
-const TONE: Record<string, string> = {
-    engine: 'text-emerald-400 border-emerald-500/40',
-    partial: 'text-amber-400 border-amber-500/40',
-    local: 'text-slate-400 border-slate-500/30',
-};
-
-const STATUS_COLOR: Record<string, string> = {
-    engine: '#34d399',
-    partial: '#fbbf24',
-    local: '#94a3b8',
+// Per-engine accent — IDENTICAL to the sidebar ENGINE_COLORS (Shell.tsx) so the
+// lifecycle chips read intuitively as the same engines as the submenu numbers.
+const ENGINE_COLORS: Record<number, string> = {
+    1: '#22d3ee', 2: '#34d399', 3: '#a78bfa', 4: '#fbbf24', 5: '#60a5fa', 6: '#fb923c',
+    7: '#2dd4bf', 8: '#38bdf8', 9: '#818cf8', 10: '#fb7185', 11: '#4ade80', 12: '#10b981', 13: '#e879f9',
 };
 
 /** Inline engine dependency graph — shown when "View Engine Graph" is clicked and no onViewGraph prop is set. */
@@ -55,7 +50,7 @@ function EngineGraph({ onClose }: { onClose: () => void }) {
                 <div className="flex items-center gap-0 min-w-max">
                     {ENGINES.map((e, i) => {
                         const Icon = e.icon;
-                        const col = STATUS_COLOR[e.status];
+                        const col = ENGINE_COLORS[e.num];
                         return (
                             <React.Fragment key={e.num}>
                                 <div className="flex flex-col items-center gap-1">
@@ -85,10 +80,10 @@ function EngineGraph({ onClose }: { onClose: () => void }) {
                 </div>
             </div>
             <div className="flex items-center gap-3 mt-2 pt-2 border-t border-white/5">
-                {(['engine', 'partial', 'local'] as const).map((s) => (
+                {([['engine', '#34d399', 'Engine-backed'], ['partial', '#fbbf24', 'Partial'], ['local', '#94a3b8', 'Local only']] as const).map(([s, c, label]) => (
                     <span key={s} className="flex items-center gap-1 text-[9px] text-slate-400">
-                        <span className="w-2 h-2 rounded-full" style={{ background: STATUS_COLOR[s] }} />
-                        {s === 'engine' ? 'Engine-backed' : s === 'partial' ? 'Partial' : 'Local only'}
+                        <span className="w-2 h-2 rounded-full" style={{ background: c }} />
+                        {label}
                     </span>
                 ))}
             </div>
@@ -125,21 +120,30 @@ export function LifecycleStrip({ onOpen, onViewGraph }: { onOpen: (tab?: TabId) 
             <div className="flex items-stretch gap-0.5 overflow-x-auto pb-1">
                 {ENGINES.map((e, i) => {
                     const Icon = e.icon;
+                    const col = ENGINE_COLORS[e.num];
                     return (
                         <React.Fragment key={e.num}>
                             <button
                                 onClick={() => onOpen(e.tab)}
                                 disabled={!e.tab}
-                                title={`${e.num}. ${e.label} — ${e.status}`}
-                                className={`group shrink-0 flex flex-col items-center gap-1 rounded-lg border ${TONE[e.status]} bg-slate-50 dark:bg-white/[0.02] px-2 py-2 min-w-[62px] transition-all ${e.tab ? 'hover:ring-1 hover:ring-cyan-400/60 hover:scale-[1.03] hover:bg-cyan-500/10 hover:border-cyan-400/50 cursor-pointer active:scale-[0.98] active:bg-cyan-500/15' : 'cursor-default'}`}
+                                title={`${e.num}. ${e.label} — open engine`}
+                                style={{ borderColor: `${col}55` }}
+                                className={`group shrink-0 flex flex-col items-center gap-1 rounded-lg border bg-slate-50 dark:bg-white/[0.02] px-2 py-2 min-w-[62px] transition-all ${e.tab ? 'cursor-pointer hover:-translate-y-0.5 hover:scale-[1.05] active:scale-[0.97]' : 'cursor-default'}`}
+                                onMouseEnter={(ev) => { if (e.tab) { ev.currentTarget.style.background = `${col}22`; ev.currentTarget.style.borderColor = col; ev.currentTarget.style.boxShadow = `0 4px 14px ${col}33`; } }}
+                                onMouseLeave={(ev) => { ev.currentTarget.style.background = ''; ev.currentTarget.style.borderColor = `${col}55`; ev.currentTarget.style.boxShadow = ''; }}
                             >
                                 <div className="relative">
-                                    <Icon className="w-4 h-4" />
+                                    <span className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: `${col}1f` }}>
+                                        <Icon className="w-4 h-4" style={{ color: col }} />
+                                    </span>
                                     {e.status !== 'local' && (
-                                        <Check className="absolute -bottom-1 -right-1 w-2.5 h-2.5 text-emerald-500" strokeWidth={4} />
+                                        <Check className="absolute -bottom-1 -right-1 w-2.5 h-2.5" style={{ color: col }} strokeWidth={4} />
                                     )}
                                 </div>
-                                <span className="text-[8px] font-medium leading-tight text-center text-slate-600 dark:text-slate-300">{e.num}.{e.label}</span>
+                                <span className="text-[8px] font-medium leading-tight text-center">
+                                    <span style={{ color: col }} className="font-bold">{e.num}.</span>
+                                    <span className="text-slate-600 dark:text-slate-300">{e.label}</span>
+                                </span>
                             </button>
                             {i < ENGINES.length - 1 && (
                                 <div className="shrink-0 self-center text-slate-300 dark:text-slate-700 text-[10px] px-0.5">›</div>

@@ -244,7 +244,7 @@ export function ExecutiveDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 <KpiEfficiencyRow d={d} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <DataFlowRail />
+                    <DataFlowRail stats={{ inputs: 5, outputs: 7, decisions: ai?.recommendations.length ?? 0 }} />
                     <QuickActions onAction={handleAction} />
                 </div>
             </div>

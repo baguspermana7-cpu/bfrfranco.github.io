@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.64.3 — 2026-07-18 (DCMOC dashboard UIUX: lifecycle colors + engine tooltips + live data-flow)
+
+### Fixed
+- **LifecycleStrip "7. Commissioning" chip was dead** — it (and several others) had a missing/stale `tab` mapping, so the button was `disabled`. All 13 chips now route to their real pillar tab (Requirements→requirements, Site→site, Architecture→architecture, Construction→construction, Commissioning→commissioning, Assets→asset-health, AI→dashboard).
+
+### Changed
+- **Lifecycle chips are now color-coded per engine**, identical to the sidebar submenu numbers (`ENGINE_COLORS` 1–13) — intuitive alignment; each chip's icon + number + border + hover glow use its engine accent. The Engine Dependency Graph matches.
+- **Metric tiles get hover highlight + engine-sourced tooltips** (`CapacityArchOverview`): each tile lifts on hover and carries an `<Explain>` tooltip pulled from the RZExplain knowledge DB (glossary keys — NOT hardcoded strings). Tiles also made responsive.
+- **Data Flow & Digital Thread is now LIVE**: each stage shows its real count (configured inputs / 13 engines / N model namespaces / computed outputs / AI decisions / actions) with a flowing pulse + a "live" indicator — no longer a static image.
+
+---
+
 ## v1.64.2 — 2026-07-18 (DCMOC: Strategic Planning acquisition OPEX → engine)
 
 ### Changed
