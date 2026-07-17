@@ -42,6 +42,12 @@ import {
     Menu,
     MapPin,
     LayoutDashboard,
+    Boxes,
+    HardHat,
+    CheckCircle2,
+    ShieldCheck,
+    BrainCircuit,
+    ChevronRight,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { getPUE } from '@/constants/pue';
@@ -95,6 +101,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
 
     const [scenarioName, setScenarioName] = useState('');
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [expandedEngines, setExpandedEngines] = useState<number[]>([]);
     const [vintageBannerDismissed, setVintageBannerDismissed] = useState(() => {
         if (typeof window !== 'undefined') {
             return localStorage.getItem('dcmoc-vintage-banner-dismissed') === '1';
@@ -132,6 +139,29 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
         { label: 'Fuel & Generator', icon: Fuel, id: 'fuel-gen' },
         { label: 'Report', icon: FileText, id: 'report' },
     ];
+
+    // ── DC-OS 13-engine lifecycle tree: the 23 modules REGROUPED (not deleted)
+    //    under the reference-image engines. Empty engines show a "planned" chip. ──
+    const leaf = (id: typeof activeTab) => navItems.find((n) => n.id === id)!;
+    const ENGINE_GROUPS: { num: number; label: string; icon: LucideIcon; childIds: (typeof activeTab)[] }[] = [
+        { num: 1, label: 'Requirements', icon: ClipboardCheck, childIds: ['sim'] },
+        { num: 2, label: 'Site Intelligence', icon: MapPin, childIds: ['tax', 'disaster', 'grid', 'talent', 'compliance'] },
+        { num: 3, label: 'Architecture', icon: Boxes, childIds: [] },
+        { num: 4, label: 'Capacity Planning', icon: Layers, childIds: ['capacity', 'fuel-gen'] },
+        { num: 5, label: 'CAPEX Engine', icon: Building, childIds: ['capex'] },
+        { num: 6, label: 'Construction', icon: HardHat, childIds: ['phased-finance'] },
+        { num: 7, label: 'Commissioning', icon: CheckCircle2, childIds: [] },
+        { num: 8, label: 'Operations', icon: Wrench, childIds: ['staff', 'maint'] },
+        { num: 9, label: 'Asset Intelligence', icon: Activity, childIds: ['asset-lifecycle', 'cbm'] },
+        { num: 10, label: 'Reliability', icon: ShieldCheck, childIds: ['risk'] },
+        { num: 11, label: 'Sustainability', icon: Leaf, childIds: ['carbon'] },
+        { num: 12, label: 'Financial', icon: TrendingUp, childIds: ['finance', 'invest', 'montecarlo', 'portfolio', 'benchmark', 'strategic'] },
+        { num: 13, label: 'AI Decision Engine', icon: BrainCircuit, childIds: [] },
+    ];
+    const engineOfActive = ENGINE_GROUPS.find((g) => g.childIds.includes(activeTab))?.num;
+    const isEngineOpen = (num: number) => expandedEngines.includes(num) || engineOfActive === num;
+    const toggleEngine = (num: number) =>
+        setExpandedEngines((prev) => prev.includes(num) ? prev.filter((n) => n !== num) : [...prev, num]);
 
     // Save current state as scenario
     const handleSaveScenario = () => {
@@ -223,48 +253,80 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                             </button>
                             <Explain k="tab-dashboard" />
                         </div>
-                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block px-2" aria-hidden="true">
-                            Engines &amp; Modules
+                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-2 block px-2" aria-hidden="true">
+                            Engines · 13-Layer Lifecycle
                         </div>
-                        {navItems.map((item, idx) => (
-                            <React.Fragment key={item.id}>
-                                {item.section === 'planning' && navItems[idx - 1]?.section !== 'planning' && (
-                                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-2 block px-2" aria-hidden="true">
-                                        Capacity Planning
-                                    </div>
-                                )}
-                                {item.section === 'analytics' && navItems[idx - 1]?.section !== 'analytics' && (
-                                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-2 block px-2" aria-hidden="true">
-                                        Advanced Analytics
-                                    </div>
-                                )}
-                                {item.section === 'country-intel' && navItems[idx - 1]?.section !== 'country-intel' && (
-                                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-2 block px-2" aria-hidden="true">
-                                        Country Intelligence
-                                    </div>
-                                )}
-                                {/* RZExplain: tooltip trigger is its own <button>, so it
-                                    sits BESIDE the nav button (nested buttons are invalid
-                                    HTML). Renders nothing when the DB/key is absent. */}
-                                <div className="flex items-center">
+                        {ENGINE_GROUPS.map((g) => {
+                            const open = isEngineOpen(g.num);
+                            const hasChildren = g.childIds.length > 0;
+                            const active = g.childIds.includes(activeTab);
+                            const GroupIcon = g.icon;
+                            return (
+                                <div key={g.num}>
                                     <button
-                                        onClick={() => { actions.setActiveTab(item.id); setSidebarOpen(false); }}
-                                        aria-current={activeTab === item.id ? 'page' : undefined}
+                                        onClick={() => { if (hasChildren) toggleEngine(g.num); }}
+                                        aria-expanded={hasChildren ? open : undefined}
+                                        disabled={!hasChildren}
                                         className={clsx(
-                                            "flex-1 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
-                                            "hover:bg-slate-200/50 dark:hover:bg-slate-800/50",
-                                            activeTab === item.id
-                                                ? "bg-slate-200 dark:bg-slate-800 text-cyan-700 dark:text-cyan-400 border border-slate-300/50 dark:border-slate-700/50"
-                                                : "text-slate-600 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400"
+                                            "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all",
+                                            hasChildren ? "hover:bg-slate-200/50 dark:hover:bg-slate-800/50 cursor-pointer" : "cursor-default",
+                                            active ? "text-cyan-700 dark:text-cyan-400" : "text-slate-600 dark:text-slate-300"
                                         )}
                                     >
-                                        <item.icon className="w-4 h-4" aria-hidden="true" />
-                                        {item.label}
+                                        <span className="text-[10px] font-mono text-slate-400 w-4 text-right shrink-0">{g.num}</span>
+                                        <GroupIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
+                                        <span className="flex-1 text-left truncate">{g.label}</span>
+                                        {!hasChildren && <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-400 shrink-0">soon</span>}
+                                        {hasChildren && <ChevronRight className={clsx("w-3.5 h-3.5 shrink-0 transition-transform", open && "rotate-90")} aria-hidden="true" />}
                                     </button>
-                                    <Explain k={`tab-${item.id}`} />
+                                    {hasChildren && open && (
+                                        <div className="ml-[1.35rem] mt-0.5 mb-1 space-y-0.5 border-l border-slate-200 dark:border-slate-800 pl-2">
+                                            {g.childIds.map((id) => {
+                                                const item = leaf(id);
+                                                const ItemIcon = item.icon;
+                                                return (
+                                                    <div key={id} className="flex items-center">
+                                                        <button
+                                                            onClick={() => { actions.setActiveTab(id); setSidebarOpen(false); }}
+                                                            aria-current={activeTab === id ? 'page' : undefined}
+                                                            className={clsx(
+                                                                "flex-1 flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all",
+                                                                "hover:bg-slate-200/50 dark:hover:bg-slate-800/50",
+                                                                activeTab === id
+                                                                    ? "bg-slate-200 dark:bg-slate-800 text-cyan-700 dark:text-cyan-400 font-medium"
+                                                                    : "text-slate-600 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400"
+                                                            )}
+                                                        >
+                                                            <ItemIcon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                                                            <span className="truncate">{item.label}</span>
+                                                        </button>
+                                                        <Explain k={`tab-${id}`} />
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                 </div>
-                            </React.Fragment>
-                        ))}
+                            );
+                        })}
+                        {/* Reports (cross-cutting — renders engine-sourced results) */}
+                        <div className="flex items-center mt-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                            <button
+                                onClick={() => { actions.setActiveTab('report'); setSidebarOpen(false); }}
+                                aria-current={activeTab === 'report' ? 'page' : undefined}
+                                className={clsx(
+                                    "flex-1 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
+                                    "hover:bg-slate-200/50 dark:hover:bg-slate-800/50",
+                                    activeTab === 'report'
+                                        ? "bg-slate-200 dark:bg-slate-800 text-cyan-700 dark:text-cyan-400"
+                                        : "text-slate-600 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400"
+                                )}
+                            >
+                                <FileText className="w-4 h-4" aria-hidden="true" />
+                                Reports
+                            </button>
+                            <Explain k="tab-report" />
+                        </div>
                     </nav>
                 </div>
 

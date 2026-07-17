@@ -42,13 +42,16 @@ Provenance lives in ONE map: `dcmoc/src/lib/provenance/moduleSources.ts`
 output) BEFORE deleting local math; keep the local as fallback. Financial's
 proof: `node`-level check, IRR diff 0.000000pp, NPV diff $0.00.
 
-## 4. IA — the 13-engine DC-OS tree
-Sidebar = **Dashboard** + **PLATFORM** (Projects/Scenarios/Templates/Data
-Library/Knowledge Base) + **ENGINES 1–13** + **SUPPORT**. The current 23 modules
-are REGROUPED under the 13 engines (never deleted). Layers 1/2/3/6/7/9/10/13 +
-the Knowledge Engine are NEW and developed additively. `activeTab` (in
-`store/simulation.ts`) gains `'dashboard'` (the landing). Mapping table: see the
-plan file §"Mapping".
+## 4. IA — the 13-engine DC-OS tree — SHIPPED
+Sidebar = **Dashboard** + **ENGINES 1–13** (collapsible groups; children = the
+regrouped 23 modules per the mapping table) + **Reports** + footer. `Shell.tsx`
+`ENGINE_GROUPS` drives the tree; each leaf keeps its RZExplain `<Explain
+k={`tab-${id}`}/>` slot; empty engines (Requirements/Architecture/Commissioning/
+AI-Decision have no current module) show a "soon" chip; the engine holding the
+active tab auto-expands. `activeTab` gains `'dashboard'` (landing). The 23
+modules are REGROUPED, never deleted. PLATFORM/SUPPORT sections + Knowledge Base
+are additive-future. Verified: 13 headers, expand→child, leaf reachable, 0
+console errors. Mapping table: plan file §"Mapping".
 
 ## 5. Layer 0 · Master Orchestrator (`dcmoc/src/lib/orchestrator/`)
 `dependencyGraph.ts` — a declarative `DIGITAL_THREAD` DAG (input→engines +
