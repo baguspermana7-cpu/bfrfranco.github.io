@@ -26,5 +26,5 @@ Engine: `js/rz-explain.js` · DB: `js/rz-explain-db.js` (generated — builder a
 
 ## Pending
 
-- `.tip[data-tip]` micro-family on tco/cx OUTPUT KPI cards (~8 spots) — small follow-up.
-- Remaining per-page one-off families discovered later: migrate on touch, never extend.
+- (none known) — `.tip[data-tip]` output-KPI micro-family migrated in batch4 (`a16dca71`).
+- Any per-page one-off family discovered later: migrate on touch, never extend.
