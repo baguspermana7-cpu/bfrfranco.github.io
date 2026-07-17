@@ -16,6 +16,7 @@ import { okData, fail, statusFromError, reqParam } from "./respond.js";
 import { getOrFetch } from "./cache.js";
 import { finnhub } from "./finnhub.js";
 import * as agg from "./aggregates.js";
+import { handleCalc } from "./calc.js";
 
 const VERSION = "1.0.0-phase1";
 
@@ -30,6 +31,9 @@ export default {
       // ── Ops ──
       if (p === "/" || p === "/healthz") return okData(request, env, { ok: true, version: VERSION });
       if (p === "/version") return okData(request, env, { version: VERSION });
+
+      // ── /calc — server-side DC-OS engine (anti-theft): math runs here, never ships ──
+      if (p === "/calc" || p.startsWith("/calc/")) return await handleCalc(request, env, ctx, url);
 
       // ── Aggregate endpoints (the client V2 contract) ──
       if (p === "/sectors") return okData(request, env, await agg.sectors(request, env));
