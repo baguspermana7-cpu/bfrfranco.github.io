@@ -11,6 +11,7 @@ import { AssetCount } from '@/lib/AssetGenerator';
 import { ASSETS, AssetTemplate } from '@/constants/assets';
 import { MaintenanceEvent } from './ScheduleEngine';
 import { CountryProfile } from '@/constants/countries';
+import { rzData } from '@/lib/rz-engine';
 
 // ═══════════════════════════════════════════════════════════════
 // 1. STRATEGY COMPARISON (Reactive / Planned / Predictive)
@@ -62,6 +63,13 @@ export const calculateStrategyComparison = (
     const labor = getLabor(country);
     const COST_PER_MINUTE_DOWN = getDowntimeCost(country);
 
+    // Engine-sourced maintenance economics (RZEngine DATA.maintenance) with local
+    // fallbacks — values are parity-identical to the former inline literals.
+    const MNT = (rzData().maintenance || {}) as {
+        vendorPremium?: number; reactiveFailureMult?: number;
+        predictiveTaskReduction?: number; predictiveFailureReduction?: number;
+    };
+
     // Maintenance model cost multiplier:
     // In-house: 100% internal labor rate
     // Hybrid: internal portion at 1.0x + vendor portion at 1.3x premium
@@ -70,7 +78,7 @@ export const calculateStrategyComparison = (
         : maintenanceModel === 'hybrid' ? Math.max(0.1, hybridRatio)
         : 0.10; // vendor = 10% oversight
     const vendorPortion = 1.0 - internalPortion;
-    const vendorPremium = 1.35; // Vendor labor costs 35% more
+    const vendorPremium = MNT.vendorPremium ?? 1.35; // Vendor labor costs 35% more (engine-sourced)
     const modelMult = internalPortion + (vendorPortion * vendorPremium);
 
     // Planned Preventive (Baseline) — current SFG20 schedule
@@ -82,7 +90,7 @@ export const calculateStrategyComparison = (
     const plannedTotal = plannedLaborCost + plannedPartsCost + plannedDowntimeCost;
 
     // Reactive — No planned maintenance, fix when broken
-    const reactiveFailures = plannedFailures * 3.5;   // 3.5x more failures without PM
+    const reactiveFailures = plannedFailures * (MNT.reactiveFailureMult ?? 3.5);   // engine-sourced
     const reactiveDowntimeMinutes = reactiveFailures * 90; // 90 min avg per failure (vs 45 planned)
     const reactiveDowntimeCost = reactiveDowntimeMinutes * COST_PER_MINUTE_DOWN * 0.03;
     const reactiveLaborCost = reactiveFailures * 6 * labor.emergency * modelMult; // 6hr avg emergency fix
@@ -92,10 +100,10 @@ export const calculateStrategyComparison = (
 
     // Predictive (CBM) — Condition-based monitoring
     const sensorCapex = calculateSensorCapex(assets);
-    const predictiveTaskReduction = 0.25; // 25% fewer tasks via CBM optimization
+    const predictiveTaskReduction = MNT.predictiveTaskReduction ?? 0.25; // engine-sourced (25% fewer tasks via CBM)
     const predictiveLaborCost = plannedLaborCost * (1 - predictiveTaskReduction);
     const predictivePartsCost = plannedPartsCost * 0.85; // Optimized replacement timing
-    const predictiveFailures = plannedFailures * 0.3; // 70% fewer unplanned failures
+    const predictiveFailures = plannedFailures * (1 - (MNT.predictiveFailureReduction ?? 0.70)); // engine-sourced (70% fewer)
     const predictiveDowntimeCost = predictiveFailures * 30 * COST_PER_MINUTE_DOWN * 0.005;
     const predictiveTotal = predictiveLaborCost + predictivePartsCost + predictiveDowntimeCost;
 

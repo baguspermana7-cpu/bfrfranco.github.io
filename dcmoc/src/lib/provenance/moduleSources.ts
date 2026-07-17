@@ -57,7 +57,7 @@ export const MODULE_SOURCES: Record<NavId, ModuleSource> = {
     // ── not yet wired (scheduled — see plan phases) ───────────────────────────
     sim: { engine: null, fn: '—', label: 'Staff Model Config — master inputs; staffing math scheduled to source from RZEngine.models.workforce.', status: 'local' },
     staff: { engine: null, fn: 'models.workforce.*', label: 'Staffing — scheduled to source from RZEngine.models.workforce (hiringPlan / attritionCost).', status: 'local' },
-    maint: { engine: null, fn: 'models.maintenance.*', label: 'Maintenance — scheduled to source from a promoted RZEngine.models.maintenance.', status: 'local' },
+    maint: { engine: 'RZEngine', fn: 'data.maintenance / models.maintenance', label: 'Maintenance — strategy economics (vendor premium, reactive/predictive failure + task multipliers) sourced from RZEngine.data.maintenance; asset schedule + labor stay local.', status: 'partial' },
     risk: { engine: null, fn: 'models.risk.geo', label: 'Risk Analysis — scheduled to source from a promoted RZEngine.models.risk (geo rules).', status: 'local' },
     capacity: { engine: null, fn: 'models.capacity.plan', label: 'Capacity Plan — scheduled to source from a promoted RZEngine.models.capacity.', status: 'local' },
     disaster: { engine: null, fn: 'models.risk.geo', label: 'Disaster Risk — scheduled to source from a promoted RZEngine.models.risk (geo/seismic/flood).', status: 'local' },
