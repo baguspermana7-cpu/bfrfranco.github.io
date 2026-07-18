@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.67.6 — 2026-07-18 (audit fixes: LOW polish D11/G3)
+
+### Changed
+- Pillar `Metric` cards (NewEngineDashboards + DesignTools) now lift + glow on hover (intuitive). OPEX KPI labels its basis ("DC-contract rate · 100%% util") + the tooltip explains why it can differ from the standalone OPEX calculator (retail rate + partial utilization) — the documented dual-rate made visible.
+
+---
+
 ## v1.67.5 — 2026-07-18 (audit fixes: honesty D8/D9)
 
 ### Fixed
