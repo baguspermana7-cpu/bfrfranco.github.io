@@ -4030,7 +4030,7 @@
                 var raw = localStorage.getItem('rz_premium_session');
                 if (!raw) return false;
                 var session = JSON.parse(raw);
-                if (!session || session.tier !== 'pro') return false;
+                if (!session || (session.tier !== 'pro' && session.tier !== 'root')) return false;
                 if (new Date(session.expires) < new Date()) {
                     localStorage.removeItem('rz_premium_session');
                     return false;

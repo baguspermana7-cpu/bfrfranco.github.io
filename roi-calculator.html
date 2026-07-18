@@ -1119,7 +1119,7 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
         } else {
             try {
                 var session = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
-                if (session && session.tier === 'pro' && new Date(session.expires) > new Date()) {
+                if (session && (session.tier === 'pro' || session.tier === 'root') && new Date(session.expires) > new Date()) {
                     isPremiumUser = true;
                     userTier = 'pro';
                     activatePremiumUI();
@@ -1137,7 +1137,7 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
     })();
 
     window.addEventListener('rz-auth-change', function(e) {
-        if (e.detail && e.detail.tier === 'pro') {
+        if (e.detail && (e.detail.tier === 'pro' || e.detail.tier === 'root')) {
             isPremiumUser = true;
             userTier = 'pro';
             activatePremiumUI();

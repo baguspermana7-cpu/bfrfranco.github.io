@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.68.1 — 2026-07-18 (fix: root-tier lockout on premium gates, 22 pages)
+
+### Fixed
+- **Root accounts were locked out of premium actions site-wide** (owner report: "export PDF capex-calculator tidak bisa"). Supabase `profiles.tier` legitimately holds `'root'` (rz-supabase.js allow-list), but 22 pages carried LOCAL strict gates (`tier === 'pro'` / `userTier !== 'pro'`) that treated a root session as free → login modal instead of the action. Patched every local gate to accept `pro || root` (capex-calculator `gatedAction`/`isFullPremium`/`exportCapexCSV` path, dc-market-tracker, roi/carbon calculators, FF-1/2/3, geopolitics-3, dashboard tier badge, 13 article premium blocks). Headless regression probe: seeded `tier:'root'` session → `gatedAction('pdf')` passes on capex + market-tracker (was BLOCKED). Note: `js/rz-feature-flags.js` + `auth.js getTier()` were already root-aware — only page-local checks had drifted.
+
 ## v1.68.0 — 2026-07-18 (DCMOC 7·Commissioning wired to the RICH cx engine)
 
 ### Added

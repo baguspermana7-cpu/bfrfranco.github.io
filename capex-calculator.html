@@ -4188,7 +4188,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
         // PREMIUM OUTPUT RENDERING
         // ═══════════════════════════════════════════
         function renderPremiumOutput() {
-            if (!isPremiumUser || !lastResult || userTier !== 'pro') {
+            if (!isPremiumUser || !lastResult || (userTier !== 'pro' && userTier !== 'root')) {
                 document.getElementById('premiumOutput').style.display = 'none';
                 return;
             }
@@ -4326,7 +4326,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
         // ═══════════════════════════════════════════
         function applyFeatureGating() {
             const isFree = !isPremiumUser;               // true for free tier
-            const isFullPremium = (userTier === 'pro');   // pro tier
+            const isFullPremium = (userTier === 'pro' || userTier === 'root');   // pro tier
 
             // 1. $/kW section — blur for free only (demo + pro see values)
             const perKwSection = document.getElementById('perKwSection');
@@ -4424,7 +4424,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
         // Gated action handler — intercepts non-pro users
         function gatedAction(action) {
-            if (userTier !== 'pro') {
+            if (userTier !== 'pro' && userTier !== 'root') {
                 handlePremiumTab(); // show login modal for free users
                 return;
             }

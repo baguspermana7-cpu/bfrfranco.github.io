@@ -2771,7 +2771,7 @@ window.iecCalculate = window.iecCalculate || function(){};
 
     /* Auth change listener */
     window.addEventListener('rz-auth-change', function(e) {
-        if (e.detail && e.detail.action === 'login' && e.detail.tier === 'pro') {
+        if (e.detail && e.detail.action === 'login' && (e.detail.tier === 'pro' || e.detail.tier === 'root')) {
             window.iecSetMode('pro');
         } else if (e.detail && e.detail.action === 'logout') {
             window.iecSetMode('free');

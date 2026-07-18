@@ -1905,7 +1905,7 @@
                 if (result) { proUnlocked = true; return true; }
             }
             var s = JSON.parse(localStorage.getItem('rz_premium_session'));
-            if (s && s.tier === 'pro' && new Date(s.expires) > new Date()) {
+            if (s && (s.tier === 'pro' || s.tier === 'root') && new Date(s.expires) > new Date()) {
                 proUnlocked = true;
                 return true;
             }

@@ -2631,7 +2631,7 @@ var wcPremium = false;
 
 function wcSetMode(mode) {
     var sess = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
-    wcPremium = sess && sess.tier === 'pro' && new Date(sess.expires) > new Date();
+    wcPremium = sess && (sess.tier === 'pro' || sess.tier === 'root') && new Date(sess.expires) > new Date();
     if (mode === 'pro' && !wcPremium) { wcShowLogin(); return; }
     wcMode = mode;
     document.querySelector('.wc-btn-free').classList.toggle('active', mode === 'free');
@@ -2670,7 +2670,7 @@ function wcUnlockPanels() {
 // Auth check on load
 (function() {
     var sess = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
-    if (sess && sess.tier === 'pro' && new Date(sess.expires) > new Date()) {
+    if (sess && (sess.tier === 'pro' || sess.tier === 'root') && new Date(sess.expires) > new Date()) {
         wcPremium = true;
         wcUnlockPanels();
     }

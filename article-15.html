@@ -4108,7 +4108,7 @@ function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySel
     function mclCheckAuth() {
         try {
             var s = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
-            if (s && s.tier === 'pro' && new Date(s.expires) > new Date()) return true;
+            if (s && (s.tier === 'pro' || s.tier === 'root') && new Date(s.expires) > new Date()) return true;
         } catch (e) {}
         return false;
     }

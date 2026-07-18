@@ -4483,7 +4483,7 @@ Where LMTD (Log Mean Temperature Difference) requires:
         function checkAuth() {
             try {
                 var sess = JSON.parse(localStorage.getItem('rz_premium_session'));
-                if (sess && sess.tier === 'pro' && new Date(sess.expires) > new Date()) {
+                if (sess && (sess.tier === 'pro' || sess.tier === 'root') && new Date(sess.expires) > new Date()) {
                     isAuthenticated = true;
                     unlockPanels();
                     return true;

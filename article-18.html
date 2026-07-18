@@ -2133,7 +2133,7 @@
 <script>
 // ==================== AUTH ====================
 var aifSession = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
-var aifPremium = aifSession && aifSession.tier === 'pro' && new Date(aifSession.expires) > new Date();
+var aifPremium = aifSession && (aifSession.tier === 'pro' || aifSession.tier === 'root') && new Date(aifSession.expires) > new Date();
 var aifMode = 'free';
 var mcChartInstance = null, tcoChartInstance = null, tornadoChartInstance = null, radarChartInstance = null;
 
@@ -2166,7 +2166,7 @@ function aifUnlockPanels() {
 
 function aifSetMode(mode) {
     var sess = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
-    aifPremium = sess && sess.tier === 'pro' && new Date(sess.expires) > new Date();
+    aifPremium = sess && (sess.tier === 'pro' || sess.tier === 'root') && new Date(sess.expires) > new Date();
     if (mode === 'pro' && !aifPremium) { aifShowLogin(); return; }
     aifMode = mode;
     document.querySelector('.aif-btn-free').classList.toggle('active', mode === 'free');

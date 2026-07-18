@@ -2958,7 +2958,7 @@
     function checkRcaSession() {
         try {
             const s = JSON.parse(localStorage.getItem('rz_premium_session'));
-            if (s && s.tier === 'pro' && new Date(s.expires) > new Date()) {
+            if (s && (s.tier === 'pro' || s.tier === 'root') && new Date(s.expires) > new Date()) {
                 rcaProUnlocked = true;
                 unlockRcaPanels();
             }
@@ -2967,7 +2967,7 @@
 
     // Listen for auth changes from other articles / auth.js
     window.addEventListener('rz-auth-change', function(e) {
-        if (e.detail && e.detail.tier === 'pro') {
+        if (e.detail && (e.detail.tier === 'pro' || e.detail.tier === 'root')) {
             rcaProUnlocked = true;
             unlockRcaPanels();
         }
