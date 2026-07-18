@@ -32,6 +32,7 @@ import { ReliabilityDashboard } from '@/components/modules/ReliabilityDashboard'
 import { ConstructionDashboard, CommissioningDashboard, AssetIntelDashboard } from '@/components/modules/NewEngineDashboards';
 import { ArchitecturePage } from '@/components/modules/architecture/ArchitecturePage';
 import { CapacityPlanningPage } from '@/components/modules/capacity/CapacityPlanningPage';
+import { CapexEnginePage } from '@/components/modules/capex/CapexEnginePage';
 import { RequirementsPage } from '@/components/modules/requirements/RequirementsPage';
 import { SiteIntelligencePage } from '@/components/modules/site-intel/SiteIntelligencePage';
 import { TierDashboard, FireDashboard, CduDashboard, SparesDashboard } from '@/components/modules/DesignToolsDashboards';
@@ -68,7 +69,7 @@ export default function Home() {
       case 'sim':
         return <SimulationDashboard />;
       case 'capex':
-        return <CapexDashboard />;
+        return <CapexEnginePage />;
       case 'staff':
         return <StaffingDashboard />;
       case 'maint':

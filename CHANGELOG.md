@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.73.0 — 2026-07-19 (DCMOC Phase E: CAPEX Engine — output/analysis surface)
+
+### Added
+- **DCMOC "CAPEX Engine"** (Phase E) — per owner mandate the page is now an OUTPUT-ANALYSIS surface: KPI row (P50/P80/P10 via the engine AACE accuracyRange — **Class 4 −30/+50 engine truth**, $/kW, contingency = wired design margin, class chip), category breakdown donut (7 categories over the 14 verified cost keys + FOM; **IT fit-out shown as an explicit EXCLUDED row** — no engine cost model), risk-adjusted forecast curve (deterministic asymmetric-normal band anchored on AACE percentiles — no Math.random), BOQ summary (assembly-level, labeled not-a-QTO), IT-load sensitivity sweep (P10/P50/P90 lines, pure recompute), one-at-a-time tornado top-5 cost drivers, contingency & soft-cost card, REAL projYear escalation table (no fabricated commodity indices), payment-terms card (labeled ASSUMPTION), deterministic key insights (top driver %, liquid-vs-air delta, phased-build premium). Full legacy CapexDashboard absorbed BY COMPOSITION as "Assumptions & Config" tab with a shared-canonicals pointer to Requirements.
+
 ## v1.72.0 — 2026-07-19 (DCMOC Phase D: Capacity Planning Engine)
 
 ### Added
