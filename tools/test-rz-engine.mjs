@@ -821,6 +821,24 @@ if (M.capacity && M.capacity.facilityLoad) {
     ok('capacity.bindingConstraint power|space', ['power', 'space'].includes(M.capacity.bindingConstraint(3000, 12, 500).binding));
 }
 
+/* ── Research-pass deepening (v2.5.0): pillars 6/8/9 ── */
+if (M.construction && M.construction.longLeadRisk) {
+    const r = M.construction.longLeadRisk({ powerOnMonth: 20, stressed: true });
+    ok('construction.longLeadRisk flags transformer critical (stressed, 20mo)', r.criticalItems.includes('transformer'));
+    ok('construction.longLeadRisk sorted desc by lead', r.items[0].leadMonths >= r.items[r.items.length - 1].leadMonths);
+}
+if (M.maintenance && M.maintenance.staffingBenchmark) {
+    const s3 = M.maintenance.staffingBenchmark(5, 3), s4 = M.maintenance.staffingBenchmark(5, 4);
+    ok('maintenance.staffingBenchmark T4 > T3 headcount', s4.totalFte > s3.totalFte);
+    ok('maintenance.staffingBenchmark >= min FTE', s3.totalFte >= 6);
+}
+if (M.asset && M.asset.failureProbability) {
+    const young = M.asset.failureProbability('battery', 1), old = M.asset.failureProbability('battery', 8);
+    ok('asset.failureProbability rises with age (Weibull)', old.failureProb > young.failureProb);
+    ok('asset.failureProbability in [0,1]', old.failureProb >= 0 && old.failureProb <= 1);
+    ok('asset Weibull wear-out shape>1', old.shape > 1);
+}
+
 /* ============================================================
  * 3. PROVENANCE (soft until A1 lands the sidecar; hard after)
  * ============================================================ */

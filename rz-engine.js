@@ -4355,6 +4355,21 @@
         asset: {
             /* Typical design life (years) by asset class — manufacturer/ASHRAE service life. */
             designLifeYears: { ups: 12, battery: 8, generator: 25, crac: 15, chiller: 20, pdu: 20, switchgear: 25, transformer: 30, bms: 10, fireSuppression: 15 },
+            /* v2.5.0 research pass — Weibull wear-out parameters by asset class:
+             * shape β>1 = increasing hazard (wear-out); scale η ≈ characteristic
+             * life (yr). F(t)=1-exp(-(t/η)^β). (Reliability engineering / IEEE 493
+             * component-life distributions, manufacturer MTBF.) */
+            weibull: {
+                battery:    { shape: 2.5, scaleYears: 6 },
+                ups:        { shape: 2.0, scaleYears: 13 },
+                generator:  { shape: 1.8, scaleYears: 27 },
+                crac:       { shape: 2.0, scaleYears: 16 },
+                chiller:    { shape: 2.0, scaleYears: 22 },
+                pdu:        { shape: 1.8, scaleYears: 22 },
+                switchgear: { shape: 2.2, scaleYears: 28 },
+                transformer:{ shape: 3.0, scaleYears: 35 },
+                bms:        { shape: 1.6, scaleYears: 11 }
+            },
             /* Health-index factor weights (sum = 1): remaining-life dominates, then
              * observed condition, then duty/criticality stress. */
             weights: { remainingLife: 0.5, condition: 0.35, duty: 0.15 },
@@ -4388,7 +4403,19 @@
             phaseLabels: { design: 'Design', permit: 'Permitting', procurement: 'Procurement', civil: 'Civil & Structure', mep: 'MEP Fit-out', commission: 'Commissioning' },
             overlap: { design: 0, permit: 0.2, procurement: 0.5, civil: 0.1, mep: 0.3, commission: 0 },
             /* Milestone anchors → the phase whose END marks the milestone. */
-            milestones: { permitApproved: 'permit', groundbreak: 'civil', topOut: 'civil', powerOn: 'mep', rfs: 'commission' }
+            milestones: { permitApproved: 'permit', groundbreak: 'civil', topOut: 'civil', powerOn: 'mep', rfs: 'commission' },
+            /* v2.5.0 research pass — critical long-lead equipment procurement times
+             * (weeks), 2024-26 market. These, not construction, are the dominant
+             * schedule driver for AI-era builds. [typical, stressed] weeks. */
+            longLeadWeeks: {
+                transformer:     [60, 120], /* MV/HV power transformers — worst 2024-26 */
+                switchgear:      [50, 80],  /* MV switchgear */
+                generator:       [40, 70],  /* diesel/gas gensets */
+                ups:             [30, 52],  /* modular UPS */
+                chiller:         [30, 50],  /* water-cooled chillers */
+                cdu:             [20, 40],  /* coolant distribution units */
+                genset_paralleling: [40, 60]
+            }
         },
         /* ══ v2.4.0 — DATA.requirements: Requirements intake (Layer 1). Required-field
          * set for a fundable brief + use-case density/cooling profiles. Drives the
@@ -4465,7 +4492,11 @@
             downtime: { plannedMinAvg: 45, reactiveMinAvg: 90, plannedProb: 0.01, reactiveProb: 0.03 },
             expectedFailuresPerYear: { tier4: 1.2, default: 2.5 },
             reactiveEmergencyPartUsd: 2500,      /* avg emergency part */
-            reactiveFixHours: 6                  /* avg emergency fix labor */
+            reactiveFixHours: 6,                 /* avg emergency fix labor */
+            /* v2.5.0 research pass — Uptime Institute critical-facilities staffing
+             * benchmark. 24/7 coverage = ~4.2 FTE per manned position (shifts +
+             * relief/PTO); positions scale with tier; plus per-MW technicians. */
+            staffing: { ftePerPosition: 4.2, positionsByTier: { 2: 3, 3: 5, 4: 7 }, techFtePerMw: 0.35, minFte: 6 }
         },
         /* ══ v2.4.0 — DATA.fuelGen: backup generator + diesel economics (Group-2
          * promotion from DCMOC FuelGenEngine). Sizing + fuel storage/consumption. ══ */
@@ -4593,6 +4624,9 @@
             'architecture.tierTopology': { source: 'Uptime Institute Tier Standard: Topology 2022 (T1-T4 redundancy paths); ANSI/TIA-942-C 2024 Rated-1..Rated-4', asOf: '2024', unit: 'topology description + TIA rating' },
             'architecture.designFeePct': { source: 'ASHRAE Guideline 0-2019 + industry A&E engineering-fee benchmarks (ARUP/Syska/Jacobs DC practice) by complexity band', asOf: '2024', unit: 'fraction of construction capex' },
             'capacity.rampProfiles':  { source: 'Logistic lease-up S-curve calibrated to CBRE North America DC Trends H1 2025 (hyperscale ~84% pre-lease, 3% vacancy); Uptime Institute Global Survey 2024 (1-in-4 DCs <40% utilized = stranded); JLL DC Construction Cost 2025 (~12% phase premium)', asOf: '2025', unit: 'occupancy fraction (0-1) + % premium', method: 'occupancy(t)=L/(1+e^-k(t-tMid)) per market type' },
+            'construction.longLeadWeeks': { source: 'Critical long-lead electrical/mechanical equipment procurement lead times, 2024-26 supply-constrained market (MV/HV transformers 60-120 wk, MV switchgear 50-80 wk, gensets 40-70 wk, UPS 30-52 wk, chillers 30-50 wk) — EPRI/industry procurement trackers + OEM quotes', asOf: '2025', unit: 'weeks [typical, stressed]' },
+            'maintenance.staffing':   { source: 'Uptime Institute critical-facilities staffing benchmark: 24/7 manned position needs ~4.2 FTE (shifts + relief/PTO); positions scale with tier; plus per-MW technicians', asOf: '2024', unit: 'FTE' },
+            'asset.weibull':          { source: 'Weibull wear-out life distributions by asset class (shape β>1 = increasing hazard; scale η = characteristic life yr) — reliability engineering practice + IEEE 493 (Gold Book) component data + manufacturer MTBF', asOf: '2024', unit: 'β (shape), η (years)' },
             'currency':               { source: 'ECB / central-bank reference rates', asOf: '2026-04', method: 'spot, USD base' },
             'inflationAnnual':        { source: 'IMF WEO 2026 regional CPI', asOf: '2026', unit: 'fraction/yr' },
             'salaryBenchmarks':       { source: 'Uptime Institute 2026 + AFCOM 2026 + US BLS 2025', asOf: '2026', unit: 'USD/yr, base' },
@@ -6366,6 +6400,17 @@
                         remainingFraction: +remainingFrac.toFixed(3)
                     };
                 },
+                /** Weibull cumulative failure probability by age: F(t)=1-e^(-(t/η)^β),
+                 *  plus the annual hazard. Uses DATA.asset.weibull[class] (wear-out
+                 *  β>1). Returns {failureProb, hazardRate, characteristicLife}. (v2.5.0) */
+                failureProbability: function (assetClass, ageYears) {
+                    var w = DATA.asset.weibull[assetClass];
+                    if (!w) { var dl = RZEngine.models.asset.designLife(assetClass) || 15; w = { shape: 2.0, scaleYears: dl }; }
+                    var t = Math.max(0, ageYears || 0), b = w.shape, eta = w.scaleYears;
+                    var F = 1 - Math.exp(-Math.pow(t / eta, b));
+                    var hazard = t > 0 ? (b / eta) * Math.pow(t / eta, b - 1) : 0; /* per year */
+                    return { failureProb: +F.toFixed(4), annualHazard: +hazard.toFixed(4), characteristicLifeYears: eta, shape: b };
+                },
                 /** Lifecycle replacement schedule for a component over a horizon.
                  *  Returns replacement years + per-event cost ($ = costPerKw × itLoadKw)
                  *  + total nominal cost. component keys: see DATA.asset.lifecycle. */
@@ -6414,6 +6459,26 @@
                 /** Convenience: schedule directly from a models.capex timeline object. */
                 fromTimeline: function (timeline) {
                     return RZEngine.models.construction.schedule(timeline || {});
+                },
+                /** Long-lead procurement risk: which critical items can't arrive
+                 *  before power-on, given the schedule. input {powerOnMonth, stressed?}.
+                 *  Returns per-item lead (months) + whether it's on the critical path.
+                 *  (v2.5.0 — long-lead gear is the dominant AI-era schedule driver.) */
+                longLeadRisk: function (input) {
+                    input = input || {};
+                    var LL = DATA.construction.longLeadWeeks;
+                    var idx = input.stressed ? 1 : 0;
+                    var powerOn = input.powerOnMonth != null ? input.powerOnMonth : 24;
+                    var items = [], critical = [];
+                    for (var k in LL) {
+                        if (!LL.hasOwnProperty(k)) continue;
+                        var months = +(LL[k][idx] / 4.345).toFixed(1);
+                        var late = months > powerOn;
+                        items.push({ item: k, leadMonths: months, critical: late });
+                        if (late) critical.push(k);
+                    }
+                    items.sort(function (a, b) { return b.leadMonths - a.leadMonths; });
+                    return { items: items, criticalItems: critical, maxLeadMonths: items.length ? items[0].leadMonths : 0, recommendEarlyOrder: critical.length > 0 };
                 }
             },
 
@@ -6576,6 +6641,17 @@
                     var minAvg = strategy === 'reactive' ? d.reactiveMinAvg : d.plannedMinAvg;
                     var prob = strategy === 'reactive' ? d.reactiveProb : d.plannedProb;
                     return Math.round((failures || 0) * minAvg * (costPerMinute || 0) * prob);
+                },
+                /** Critical-facilities staffing benchmark (FTE) — Uptime Institute.
+                 *  24/7 manned positions (× ~4.2 FTE for shifts+relief) scaled by
+                 *  tier, plus per-MW technicians. (v2.5.0) */
+                staffingBenchmark: function (mw, tier) {
+                    var s = DATA.maintenance.staffing;
+                    var positions = s.positionsByTier[tier] != null ? s.positionsByTier[tier] : s.positionsByTier[3];
+                    var shiftFte = positions * s.ftePerPosition;
+                    var techFte = (mw || 0) * s.techFtePerMw;
+                    var total = Math.max(s.minFte, Math.round(shiftFte + techFte));
+                    return { totalFte: total, shiftFte: Math.round(shiftFte), techFte: Math.round(techFte), ftePerMw: mw > 0 ? +(total / mw).toFixed(2) : null };
                 }
             },
 

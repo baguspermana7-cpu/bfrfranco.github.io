@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.65.1 — 2026-07-18 (engine research-deepening: pillars 6/8/9)
+
+### Added
+- **Pillars 6/8/9 deepened** (research pass cont.): L6 construction long-lead procurement risk (transformer 60-120wk, switchgear, genset, UPS, chiller — the dominant AI-era schedule driver, models.construction.longLeadRisk); L8 Uptime critical-facilities staffing benchmark (FTE per position × tier + per-MW techs, models.maintenance.staffingBenchmark); L9 Weibull wear-out failure curves per asset class (models.asset.failureProbability, β/η from IEEE-493 + manufacturer MTBF). DATA.sources provenance + asserts (test-rz-engine 373/0, parity 126/0). 6 of 13 pillars now research-deepened.
+
+---
+
 ## v1.65.0 — 2026-07-18 (engine research-deepening: pillars 1/3/4, cited)
 
 ### Added
