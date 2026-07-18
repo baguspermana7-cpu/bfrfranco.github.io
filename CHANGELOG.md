@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.78.0 — 2026-07-19 (DCMOC Phase J: Asset Intelligence)
+
+### Added
+- **DCMOC "Asset Intelligence"** (Phase J): fleet GENERATED engine-real — per-class unit counts from equipment scaling, health from the engine Weibull healthIndex at a user-set fleet age + condition slider (dropdown-first combobox for age), wear-out risk (Weibull CDF), MTBF/MTTR from the engine IEEE-493 component data. Honest per-CLASS aggregates (no fabricated per-unit registry). Category donut, class health/reliability table, health-distribution chart, KPI buckets (excellent→critical, at-risk ≥25%% CDF). Old AssetIntelDashboard (replacement schedule + failure risk) survives as "Lifecycle Detail" tab; asset-lifecycle/cbm/spares children untouched + deep-linked.
+
 ## v1.77.0 — 2026-07-19 (DCMOC Phase K: Commissioning Engine page)
 
 ### Added
