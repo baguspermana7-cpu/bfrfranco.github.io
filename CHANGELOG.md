@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.67.4 — 2026-07-18 (audit fixes: gaps + docs D7/D10/G1/G2)
+
+### Fixed
+- **Site data completed**: the 7 countries missing from SITE_AUGMENT (CL/CO/KE/NG/NZ/PL/PT) now carry real WRI-Aqueduct/ASHRAE-zone/SAIDI/PGA values → all 32 countries score on real data (was neutral fallback). **Missing tooltip**: added `tab-dashboard` to the RZExplain DB (779 entries) + bumped the DCMOC ?v. **Dead tab**: removed the unrouted `scenarios` id from the store union. **Doc drift**: ENGINE_UNIFICATION.md test count 299/0→395/0; rz-engine.ts bridge header v2.3.0→DATA.version 2.4.0. Engine 395/0, parity 126/0, JS-audit clean.
+
+---
+
 ## v1.67.3 — 2026-07-18 (audit fixes: DCMOC integrity D1-D6)
 
 ### Fixed

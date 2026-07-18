@@ -1397,7 +1397,11 @@
                 },
                 "environment": {
                     "baselineAQI": 140,
-                    "gridCarbonIntensity": 0.45
+                    "gridCarbonIntensity": 0.45,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "1A",
+                    "saidiMinYr": 800,
+                    "pgaPct2in50yr": 5
                 },
                 "risk": {
                     "downtimeCostPerMin": 800
@@ -1511,7 +1515,11 @@
                 },
                 "environment": {
                     "baselineAQI": 60,
-                    "gridCarbonIntensity": 0.3
+                    "gridCarbonIntensity": 0.3,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "2A",
+                    "saidiMinYr": 400,
+                    "pgaPct2in50yr": 15
                 },
                 "risk": {
                     "downtimeCostPerMin": 700
@@ -1742,7 +1750,11 @@
                 },
                 "environment": {
                     "baselineAQI": 40,
-                    "gridCarbonIntensity": 0.35
+                    "gridCarbonIntensity": 0.35,
+                    "aqueductStressScore": 4,
+                    "ashraeClimateZone": "3C",
+                    "saidiMinYr": 200,
+                    "pgaPct2in50yr": 60
                 },
                 "risk": {
                     "downtimeCostPerMin": 1500
@@ -1972,7 +1984,11 @@
                 },
                 "environment": {
                     "baselineAQI": 55,
-                    "gridCarbonIntensity": 0.2
+                    "gridCarbonIntensity": 0.2,
+                    "aqueductStressScore": 2,
+                    "ashraeClimateZone": "1A",
+                    "saidiMinYr": 300,
+                    "pgaPct2in50yr": 40
                 },
                 "risk": {
                     "downtimeCostPerMin": 1000
@@ -2912,7 +2928,11 @@
                 },
                 "environment": {
                     "baselineAQI": 15,
-                    "gridCarbonIntensity": 0.1
+                    "gridCarbonIntensity": 0.1,
+                    "aqueductStressScore": 1,
+                    "ashraeClimateZone": "4C",
+                    "saidiMinYr": 100,
+                    "pgaPct2in50yr": 50
                 },
                 "risk": {
                     "downtimeCostPerMin": 4000
@@ -3717,7 +3737,11 @@
                 },
                 "environment": {
                     "baselineAQI": 40,
-                    "gridCarbonIntensity": 0.65
+                    "gridCarbonIntensity": 0.65,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "5A",
+                    "saidiMinYr": 150,
+                    "pgaPct2in50yr": 3
                 },
                 "risk": {
                     "downtimeCostPerMin": 2000
@@ -3833,7 +3857,11 @@
                 },
                 "environment": {
                     "baselineAQI": 20,
-                    "gridCarbonIntensity": 0.08
+                    "gridCarbonIntensity": 0.08,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "3C",
+                    "saidiMinYr": 60,
+                    "pgaPct2in50yr": 20
                 },
                 "risk": {
                     "downtimeCostPerMin": 3500

@@ -2403,6 +2403,13 @@ const SITE_AUGMENT: Record<string, { aqueductStressScore: number; ashraeClimateZ
     TH: { aqueductStressScore: 3, ashraeClimateZone: '1A', saidiMinYr: 100, pgaPct2in50yr: 8 },
     VN: { aqueductStressScore: 3, ashraeClimateZone: '1A', saidiMinYr: 200, pgaPct2in50yr: 10 },
     PH: { aqueductStressScore: 3, ashraeClimateZone: '1A', saidiMinYr: 400, pgaPct2in50yr: 50 },
+    CL: { aqueductStressScore: 4, ashraeClimateZone: '3C', saidiMinYr: 200, pgaPct2in50yr: 60 },
+    CO: { aqueductStressScore: 2, ashraeClimateZone: '1A', saidiMinYr: 300, pgaPct2in50yr: 40 },
+    KE: { aqueductStressScore: 3, ashraeClimateZone: '2A', saidiMinYr: 400, pgaPct2in50yr: 15 },
+    NG: { aqueductStressScore: 3, ashraeClimateZone: '1A', saidiMinYr: 800, pgaPct2in50yr: 5 },
+    NZ: { aqueductStressScore: 1, ashraeClimateZone: '4C', saidiMinYr: 100, pgaPct2in50yr: 50 },
+    PL: { aqueductStressScore: 3, ashraeClimateZone: '5A', saidiMinYr: 150, pgaPct2in50yr: 3 },
+    PT: { aqueductStressScore: 3, ashraeClimateZone: '3C', saidiMinYr: 60, pgaPct2in50yr: 20 },
 };
 for (const id of Object.keys(SITE_AUGMENT)) {
     if (COUNTRIES[id]) Object.assign(COUNTRIES[id].environment, SITE_AUGMENT[id]);

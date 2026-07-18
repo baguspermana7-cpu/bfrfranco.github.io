@@ -43,7 +43,7 @@ by **`tools/build-countries-data.mjs`**. Edit the authoring source
 ## Definition of done for any engine/data change
 1. `node tools/build-countries-data.mjs` (if country data changed).
 2. `terser rz-engine.js -c -m -o rz-engine.min.js` (never hand-edit the min).
-3. `node tools/test-rz-engine.mjs` (299/0) + `node tools/test-reference-parity.mjs` (0 fail).
+3. `node tools/test-rz-engine.mjs` (395/0 as of v1.67.x — was 299/0 at program start) + `node tools/test-reference-parity.mjs` (126/0).
 4. Bump `js/rz-version.js` + `CHANGELOG.md` + `python3 tools/build-changelog-html.py --apply`.
 5. Bump `?v=` on pages loading `rz-engine.min.js`; for DCMOC rebuild + copy `out/`→`dcmoc/`.
 6. Update this doc + `SUPER_ENGINE.md` if a new `models.*` namespace or DATA key was added.
