@@ -40,6 +40,7 @@ import { CommissioningEnginePage } from '@/components/modules/commissioning/Comm
 import { AssetIntelligencePage } from '@/components/modules/assets/AssetIntelligencePage';
 import { ReliabilityEnginePage } from '@/components/modules/reliability/ReliabilityEnginePage';
 import { SustainabilityEnginePage } from '@/components/modules/sustainability/SustainabilityEnginePage';
+import { ResultsEnginePage } from '@/components/modules/results/ResultsEnginePage';
 import { RequirementsPage } from '@/components/modules/requirements/RequirementsPage';
 import { SiteIntelligencePage } from '@/components/modules/site-intel/SiteIntelligencePage';
 import { TierDashboard, FireDashboard, CduDashboard, SparesDashboard } from '@/components/modules/DesignToolsDashboards';
@@ -86,7 +87,7 @@ export default function Home() {
       case 'risk':
         return <RiskDashboard />;
       case 'report':
-        return <ReportDashboard />;
+        return <ResultsEnginePage />;
       case 'carbon':
         return <SustainabilityEnginePage />;
       case 'finance':

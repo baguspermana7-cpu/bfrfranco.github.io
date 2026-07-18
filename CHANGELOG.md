@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.81.0 — 2026-07-19 (DCMOC Phase I: Results Engine)
+
+### Added
+- **DCMOC "Results Engine"** (Phase I, tab report): final scorecard/verdict for the current configuration — 8 dimension scores as DOCUMENTED deterministic composites over live engine data (Requirements = intake completeness; Site = engine site score; Architecture = 100−0.35×complexity; CAPEX = $/kW vs the cx reference band; Construction = SPI/CPI blend from tracking EVM; Ops readiness = tier availability positioning; Sustainability = PUE band; Financial = screening IRR vs 10%% hurdle via models.roi on the dcContract opex basis). Weighted overall + grade, performance radar, dimension ranking, key financial outcomes (NPV/IRR screening, "not investment advice" note), deterministic recommendations, HONEST validation chips ("computed successfully", not a fake audit). Distinct role vs the Executive Dashboard (live cockpit); full ReportDashboard kept as "Full Report" tab.
+
 ## v1.80.0 — 2026-07-19 (DCMOC Phase M: Sustainability Engine)
 
 ### Added
