@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.71.0 — 2026-07-19 (DCMOC Phase C: Architecture Engine + dynamic system diagram)
+
+### Added
+- **DCMOC "Architecture Engine"** (Phase C) — per the DC-OS reference with a fully DYNAMIC system-architecture diagram (owner mandate: not a static image): pure layout engine computes blocks + orthogonal edges from live requirements — utility feeds/trunks follow redundancy (N+1 single trunk + spare · 2N dual A/B · 2N+1 dual + spare), UPS/generator/switchgear/PDU/rack counts from the engine equipment-scaling model (per-module MW from the redundancy factor), cooling chain follows coolingType (liquid/rdhx → CDU loops + heat rejection · air/inrow → chiller + CRAH), voltage labels from the requirements grid voltage, network fabric leaf estimate, BMS control edges. Logical + Single-Line-Diagram skins of the same graph, pan/zoom, 5-line-type legend. Changing ANY upstream requirement re-renders the diagram.
+- Header selects: Design Standard (Uptime III+/IV, TIA Rated-3/4 → writes shared tier) + Architecture Profile presets (multi-param registry writes: AI-liquid/AI-rdhx/colo/enterprise). KPI row (IT/facility MW, design PUE via pueMatrix direct lookup — defaultFor key-trap avoided, availability target, redundancy). Absorbed old dashboard cards: complexity → KPI/BOM, ASHRAE thermalCheck → Cooling card, topology + floorLoading → Power card, disciplines + designFee → BOM section. Rail: Architecture Summary, Load-Breakdown donut derived from LIVE PUE (labeled screening split), per-layer Design Validation. Bottom: Key Design Decisions, Reference Design id (pattern template), HONEST compliance (Uptime/TIA/ASHRAE engine-derived %; NFPA + ISO/IEC 22237 = SCREENING chips, no fake bars), Next Steps → Capacity.
+
+### Fixed
+- zustand v5 object-selector infinite-render trap (React #185) in the diagram pan/zoom state — selectors split per-field.
+
 ## v1.70.0 — 2026-07-19 (DCMOC Phase B: multi-site Site Intelligence Engine)
 
 ### Added

@@ -29,7 +29,8 @@ import { ScenarioComparisonPanel } from '@/components/modules/ScenarioComparison
 import StrategicPlanningDashboard from '@/components/modules/StrategicPlanningDashboard';
 import { ExecutiveDashboard } from '@/components/modules/ExecutiveDashboard';
 import { ReliabilityDashboard } from '@/components/modules/ReliabilityDashboard';
-import { ArchitectureDashboard, ConstructionDashboard, CommissioningDashboard, AssetIntelDashboard } from '@/components/modules/NewEngineDashboards';
+import { ConstructionDashboard, CommissioningDashboard, AssetIntelDashboard } from '@/components/modules/NewEngineDashboards';
+import { ArchitecturePage } from '@/components/modules/architecture/ArchitecturePage';
 import { RequirementsPage } from '@/components/modules/requirements/RequirementsPage';
 import { SiteIntelligencePage } from '@/components/modules/site-intel/SiteIntelligencePage';
 import { TierDashboard, FireDashboard, CduDashboard, SparesDashboard } from '@/components/modules/DesignToolsDashboards';
@@ -56,7 +57,7 @@ export default function Home() {
       case 'site':
         return <SiteIntelligencePage />;
       case 'architecture':
-        return <ArchitectureDashboard />;
+        return <ArchitecturePage />;
       case 'construction':
         return <ConstructionDashboard />;
       case 'commissioning':

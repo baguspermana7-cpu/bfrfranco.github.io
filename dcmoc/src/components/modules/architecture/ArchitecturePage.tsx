@@ -1,0 +1,191 @@
+'use client';
+
+/* ─── Architecture Engine — page shell (Phase C) ─────────────────────────────
+ * Header (design standard + architecture profile selects, Export/Save/Next) +
+ * KPI row + layers checklist + DYNAMIC system diagram (logical|SLD) + rail +
+ * absorbed engine sections + bottom cards. Everything recomputes reactively
+ * from the shared state (owner mandate: not a static image).
+ * ──────────────────────────────────────────────────────────────────────── */
+
+import React from 'react';
+import { useSimulationStore } from '@/store/simulation';
+import { useCapexStore } from '@/store/capex';
+import { useRequirementsStore } from '@/store/requirements';
+import { useArchitectureStore, DESIGN_STANDARDS, type DesignStandard } from '@/store/architecture';
+import { ARCH_PROFILES, applyProfile } from '@/state/presets';
+import { rzModels } from '@/lib/rz-engine';
+import { readArchInputs, computeFacility, computeEquipCounts, computeValidation } from '@/state/adapters/arch-adapter';
+import { computeLayout } from './diagram/layout';
+import { DiagramSvg } from './diagram/DiagramSvg';
+import { ArchRail } from './ArchRail';
+import { ThermalTopologyRow, BomSection, BottomCards } from './ArchSections';
+import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import { useScenarioStore } from '@/store/scenario';
+import { getPUE } from '@/constants/pue';
+import { Boxes, FileDown, Save, ChevronRight } from 'lucide-react';
+
+const STRIP = [
+    { id: 'sec-arch-overview', label: '1 Overview' },
+    { id: 'sec-arch-diagram', label: '2-4 System Diagram' },
+    { id: 'sec-arch-detail', label: '5-7 Cooling · Power · BMS' },
+    { id: 'sec-bom', label: '9 BOM Summary' },
+    { id: 'sec-reference', label: '8 Reference & Compliance' },
+];
+
+export function ArchitecturePage() {
+    const simInputs = useSimulationStore((s) => s.inputs);
+    const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
+    const country = useSimulationStore((s) => s.selectedCountry);
+    const capexInputs = useCapexStore((s) => s.inputs);
+    const req = useRequirementsStore();
+    const arch = useArchitectureStore();
+    const scenarioStore = useScenarioStore();
+    const [busy, setBusy] = React.useState(false);
+    const [toast, setToast] = React.useState<string | null>(null);
+
+    const i = React.useMemo(() => readArchInputs({
+        itLoad: simInputs.itLoad, tierLevel: simInputs.tierLevel, coolingType: simInputs.coolingType,
+        powerRedundancy: simInputs.powerRedundancy, gridVoltage: req.overview.gridVoltage,
+        rackDensityKw: req.workload.avgRackDensityKw, supplyTempC: arch.supplyTempC, deltaTK: arch.deltaTK,
+        useCase: req.overview.useCase, fuelHours: capexInputs.fuelHours,
+    }), [simInputs, req.overview.gridVoltage, req.overview.useCase, req.workload.avgRackDensityKw, arch.supplyTempC, arch.deltaTK, capexInputs.fuelHours]);
+
+    const f = React.useMemo(() => computeFacility(i), [i]);
+    const { eq } = React.useMemo(() => computeEquipCounts(i), [i]);
+    const { layers, overall } = React.useMemo(() => computeValidation(i, eq), [i, eq]);
+    const model = React.useMemo(() => computeLayout(i, eq, f), [i, eq, f]);
+
+    const m = rzModels()?.architecture;
+    let complexity: { index: number; band: string } | null = null;
+    try { complexity = m?.complexity ? m.complexity({ coolingType: i.coolingType, tier: i.tier, redundancy: i.redKey }) : null; } catch { /* */ }
+
+    const targetTier = DESIGN_STANDARDS.find((d) => d.id === arch.designStandard)?.tier ?? 3;
+    const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 2200); };
+
+    const onStandard = (id: DesignStandard) => {
+        arch.actions.set({ designStandard: id });
+        const t = DESIGN_STANDARDS.find((d) => d.id === id)?.tier;
+        if (t) useSimulationStore.getState().actions.setTierLevel(t);
+    };
+    const onProfile = (pid: string) => {
+        arch.actions.set({ profileId: pid });
+        const p = ARCH_PROFILES.find((x) => x.id === pid);
+        if (p) { applyProfile(p); showToast(`Profile applied: ${p.label}`); }
+    };
+    const onSave = () => {
+        scenarioStore.saveScenario({
+            name: `Arch · ${(i.itLoadKw / 1000).toFixed(0)}MW ${i.coolingType} ${i.redundancy}`,
+            countryId: country?.id ?? 'ID',
+            simInputs, capexInputs: useCapexStore.getState().inputs,
+            summary: { monthlyOpex: 0, annualCapex: useCapexStore.getState().results?.total ?? 0, totalStaff: 0, pue: f.pue },
+        });
+        showToast('Scenario saved');
+    };
+    const onExport = async () => {
+        setBusy(true);
+        try {
+            await generatePillarPDF({
+                title: 'Architecture', layer: 'Layer 3 · Architecture Engine', project: country?.name ?? '—',
+                kpis: [
+                    { label: 'Total IT / Facility', value: `${f.itMw} / ${f.facilityMw} MW`, sub: `PUE ${f.pue}` },
+                    { label: 'Availability Target', value: `${f.availabilityPct}%`, sub: `Tier ${i.tier} · ${f.downtimeMinYr} min/yr` },
+                    { label: 'Redundancy', value: i.redundancy, sub: `${f.paths} active path(s)` },
+                    { label: 'Complexity', value: complexity ? `${complexity.index}/100` : '—', sub: complexity?.band ?? '' },
+                ],
+                sections: [
+                    { title: 'Design Validation', head: ['Layer', 'Status', 'Note'], rows: layers.map((l) => [l.label, l.pass ? 'Passed' : 'Review', l.note]) },
+                    { title: 'Equipment BOM (engine equipScale)', head: ['Item', 'Count'], rows: Object.entries({ Switchgear: eq.switchgear, Transformers: eq.transformers, Generators: eq.generators, 'UPS Modules': eq.ups_modules, PDUs: eq.pdus, Chillers: eq.chillers, Racks: eq.racks }).map(([k, v]) => [k, String(v)]) },
+                ],
+                note: 'Engine-real architecture screening (models.architecture + equipScale). Pattern reference — not a certified design.',
+            });
+        } finally { setBusy(false); }
+    };
+
+    return (
+        <div className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-lg">
+                        <Boxes className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Architecture Engine</h1>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Define and validate the complete data center architecture based on requirements, site conditions and design standards</p>
+                    </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                    <label className="text-[10px] uppercase text-slate-500">Standard
+                        <select value={arch.designStandard} onChange={(e) => onStandard(e.target.value as DesignStandard)}
+                            className="ml-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs normal-case text-slate-900 dark:text-slate-100 outline-none focus:border-violet-500">
+                            {DESIGN_STANDARDS.map((d) => <option key={d.id} value={d.id}>{d.label}</option>)}
+                        </select>
+                    </label>
+                    <label className="text-[10px] uppercase text-slate-500">Profile
+                        <select value={arch.profileId} onChange={(e) => onProfile(e.target.value)}
+                            className="ml-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs normal-case text-slate-900 dark:text-slate-100 outline-none focus:border-violet-500">
+                            {ARCH_PROFILES.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
+                        </select>
+                    </label>
+                    <button onClick={onExport} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
+                    <button onClick={onSave} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><Save className="h-3.5 w-3.5" />Save</button>
+                    <button onClick={() => setActiveTab('capacity')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: Capacity Planning <ChevronRight className="h-3.5 w-3.5" /></button>
+                </div>
+            </div>
+
+            <div className="flex gap-1 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-1">
+                {STRIP.map((t) => (
+                    <button key={t.id} onClick={() => document.getElementById(t.id)?.scrollIntoView({ behavior: 'smooth' })}
+                        className="whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-300 hover:bg-violet-600/10">{t.label}</button>
+                ))}
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-[1fr_290px]">
+                <div className="min-w-0 space-y-4">
+                    {/* KPI row */}
+                    <div id="sec-arch-overview" className="grid scroll-mt-24 grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+                        {[
+                            { label: 'Total IT Load', value: `${f.itMw} MW`, sub: `${eq.racks.toLocaleString()} racks` },
+                            { label: 'Total Facility Load', value: `${f.facilityMw} MW`, sub: 'incl. losses & overhead' },
+                            { label: 'PUE (Design)', value: String(f.pue), sub: f.pue <= 1.2 ? 'Excellent' : f.pue <= 1.4 ? 'Good' : 'Standard' },
+                            { label: 'Cooling Approach', value: { liquid: 'D2C Liquid', rdhx: 'Rear-Door HX', inrow: 'In-Row', air: 'Air CRAC/CRAH' }[i.coolingType], sub: `${i.rackDensityKw} kW/rack` },
+                            { label: 'Availability Target', value: `${f.availabilityPct}%`, sub: `Tier ${i.tier} · ${f.downtimeMinYr} min/yr` },
+                            { label: 'Redundancy Level', value: i.redundancy, sub: 'Power & Cooling' },
+                        ].map((k) => (
+                            <div key={k.label} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                                <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
+                                <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                <div className="truncate text-[10px] text-slate-500">{k.sub}</div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* dynamic diagram */}
+                    <div id="sec-arch-diagram" className="scroll-mt-24 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="mb-2 flex items-center justify-between">
+                            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">System Architecture Diagram <span className="ml-1 text-[9px] normal-case text-violet-400">live — recomputed from requirements</span></h2>
+                            <div className="flex gap-1">
+                                {(['logical', 'sld'] as const).map((v) => (
+                                    <button key={v} onClick={() => arch.actions.set({ diagramView: v })}
+                                        className={`rounded px-2 py-0.5 text-[10px] font-medium ${arch.diagramView === v ? 'bg-violet-600 text-white' : 'text-slate-500 hover:bg-violet-600/10'}`}>
+                                        {v === 'logical' ? 'Logical View' : 'Single Line Diagram'}
+                                    </button>
+                                ))}
+                                <span className="rounded px-2 py-0.5 text-[10px] text-slate-400" title="Planned">Physical · 3D — coming soon</span>
+                            </div>
+                        </div>
+                        <DiagramSvg model={model} />
+                    </div>
+
+                    <div id="sec-arch-detail" className="scroll-mt-24 space-y-3">
+                        <ThermalTopologyRow i={i} />
+                    </div>
+                    <BomSection i={i} eq={eq} />
+                    <BottomCards i={i} targetTier={targetTier} />
+                </div>
+                <ArchRail i={i} eq={eq} f={f} layers={layers} overall={overall} />
+            </div>
+
+            {toast && <div className="fixed bottom-5 right-5 z-50 rounded-lg bg-slate-900 dark:bg-slate-700 px-3 py-2 text-xs text-white shadow-xl">{toast}</div>}
+        </div>
+    );
+}
