@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.79.0 — 2026-07-19 (DCMOC Phase L: Reliability Engine)
+
+### Added
+- **DCMOC "Reliability Engine"** (Phase L): per-system availability chains composed ENGINE-REAL from IEEE-493 component MTBF/MTTR (models.reliability series/parallel at the current redundancy paths — chains documented per row), composed overall availability vs the Uptime tier target (BELOW-target flagged), downtime budget, composite MTBF (harmonic) + avg MTTR, SPOF list from single-path components at the config, documented reliability-score composite (availability-margin 40 + redundancy 30 + maintainability 15 + SPOF 15), component-MTBF chart, active failure events from the SHARED ops log (no duplicate ledger). Old ReliabilityDashboard kept as "RAM Detail" tab; risk/tier children deep-linked.
+
 ## v1.78.0 — 2026-07-19 (DCMOC Phase J: Asset Intelligence)
 
 ### Added

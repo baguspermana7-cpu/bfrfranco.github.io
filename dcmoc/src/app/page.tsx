@@ -38,6 +38,7 @@ import { OperationsDashboard } from '@/components/modules/operations/OperationsD
 import { FinancialPage } from '@/components/modules/financial/FinancialPage';
 import { CommissioningEnginePage } from '@/components/modules/commissioning/CommissioningEnginePage';
 import { AssetIntelligencePage } from '@/components/modules/assets/AssetIntelligencePage';
+import { ReliabilityEnginePage } from '@/components/modules/reliability/ReliabilityEnginePage';
 import { RequirementsPage } from '@/components/modules/requirements/RequirementsPage';
 import { SiteIntelligencePage } from '@/components/modules/site-intel/SiteIntelligencePage';
 import { TierDashboard, FireDashboard, CduDashboard, SparesDashboard } from '@/components/modules/DesignToolsDashboards';
@@ -58,7 +59,7 @@ export default function Home() {
       case 'dashboard':
         return <ExecutiveDashboard />;
       case 'reliability':
-        return <ReliabilityDashboard />;
+        return <ReliabilityEnginePage />;
       case 'requirements':
         return <RequirementsPage />;
       case 'site':
