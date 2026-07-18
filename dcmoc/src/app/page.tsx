@@ -35,6 +35,7 @@ import { CapacityPlanningPage } from '@/components/modules/capacity/CapacityPlan
 import { CapexEnginePage } from '@/components/modules/capex/CapexEnginePage';
 import { ConstructionEngine } from '@/components/modules/construction/ConstructionEngine';
 import { OperationsDashboard } from '@/components/modules/operations/OperationsDashboard';
+import { FinancialPage } from '@/components/modules/financial/FinancialPage';
 import { RequirementsPage } from '@/components/modules/requirements/RequirementsPage';
 import { SiteIntelligencePage } from '@/components/modules/site-intel/SiteIntelligencePage';
 import { TierDashboard, FireDashboard, CduDashboard, SparesDashboard } from '@/components/modules/DesignToolsDashboards';
@@ -85,7 +86,7 @@ export default function Home() {
       case 'carbon':
         return <CarbonDashboard />;
       case 'finance':
-        return <FinancialDashboard />;
+        return <FinancialPage />;
       case 'invest':
         return <InvestmentDashboard />;
       case 'benchmark':

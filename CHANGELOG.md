@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.76.0 — 2026-07-19 (DCMOC Phase H: Financial Engine)
+
+### Added
+- **DCMOC "Financial Engine"** (Phase H): budget baseline = engine capex P50 + approved change orders (checkbox revisions); committed/paid from a fraction-scaled tracking ledger (transactions + AR/AP invoices CRUD, EXAMPLE seeds, Plan Mode); **CPI/SPI passthrough from the Construction EVM — single source, never recomputed**; Forecast-at-Completion = AC + remaining/CPI; PV budget curve from the engine CPM schedule; Annual OPEX donut via `models.opex.totalAnnual` on the **Phase-Q dcContract preset** (labeled basis); Financial Health grade A–E (documented composite 0.3 budget-var + 0.35 CPI + 0.35 SPI); deep-dive links (Investment/Monte-Carlo/Portfolio/Benchmarks/Strategic all preserved); full legacy FinancialDashboard as "Pro Forma (Full)" tab — EditableCell workflow intact.
+
 ## v1.75.1 — 2026-07-19 (Phase Q: shared OPEX basis presets — engine v2.5.1)
 
 ### Added
