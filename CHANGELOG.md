@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.65.5 — 2026-07-18 (DCMOC: surface Uptime staffing benchmark on Staffing)
+
+### Added
+- **StaffingDashboard** shows the Uptime Institute critical-facilities staffing benchmark (`models.maintenance.staffingBenchmark`) vs the configured headcount — FTE/MW by tier, with an aligned/above/below variance chip.
+
+---
+
 ## v1.65.4 — 2026-07-18 (DCMOC: surface density-safety + rack-count on Requirements)
 
 ### Added

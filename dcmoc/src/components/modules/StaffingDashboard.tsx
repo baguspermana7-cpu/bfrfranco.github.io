@@ -3,6 +3,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { useSimulationStore } from '@/store/simulation';
+import { rzModels } from '@/lib/rz-engine';
 import { calculateStaffing, compareShiftModels, generate5YearProjection, StaffRole, StaffingResult, REFERENCE_STAFFING_10MW, ROLE_LABELS, calculateAutoHeadcount } from '@/modules/staffing/ShiftEngine';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
 import { generateAnnualRoster } from '@/modules/staffing/RosterEngine';
@@ -112,8 +113,23 @@ export function StaffingDashboard() {
         </div>
     );
 
+    // Uptime Institute critical-facilities staffing benchmark (engine) vs configured.
+    const staffMw = Math.max(0.5, (inputs.itLoad || 0) / 1000);
+    const staffBench = rzModels().maintenance?.staffingBenchmark
+        ? rzModels().maintenance.staffingBenchmark(staffMw, inputs.tierLevel)
+        : null;
+
     return (
         <div className="space-y-6">
+            {staffBench && (
+                <div className="flex flex-wrap items-center gap-4 px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/70 text-xs">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Uptime Staffing Benchmark</span>
+                    <span className="text-slate-600 dark:text-slate-300">Benchmark <b className="tabular-nums text-cyan-500">{staffBench.totalFte} FTE</b> <span className="text-slate-400">({staffBench.ftePerMw ?? '—'}/MW, Tier {inputs.tierLevel}, {staffMw.toFixed(1)} MW)</span></span>
+                    <span className="text-slate-600 dark:text-slate-300">Configured <b className="tabular-nums text-emerald-500">{results.totalHeadcount} FTE</b></span>
+                    {(() => { const d = results.totalHeadcount - staffBench.totalFte; const over = d > 0; return <span className={`tabular-nums font-semibold ${Math.abs(d) <= 2 ? 'text-emerald-500' : over ? 'text-amber-500' : 'text-rose-400'}`}>{over ? '+' : ''}{d} vs benchmark {Math.abs(d) <= 2 ? '· aligned' : over ? '· above' : '· below'}</span>; })()}
+                    <span className="text-[9px] text-slate-400 ml-auto">Uptime Institute · 4.2 FTE/24×7 position × tier + per-MW techs</span>
+                </div>
+            )}
             {/* Header Controls */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-6 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl backdrop-blur-sm shadow-sm dark:shadow-none gap-4">
                 <div>
