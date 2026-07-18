@@ -594,9 +594,11 @@ const CapexDashboard = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <Card className="bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-950/30 dark:to-slate-800 border-indigo-100 dark:border-indigo-800">
                         <CardContent className="pt-4">
-                            <div className="text-sm font-medium text-indigo-600 dark:text-indigo-400 flex items-center gap-1">Total CAPEX <Tooltip content="Total project capital expenditure including building, MEP, IT infrastructure, and contingency." /></div>
+                            <div className="text-sm font-medium text-indigo-600 dark:text-indigo-400 flex items-center gap-1">Total CAPEX <Tooltip content="Total project capital expenditure including building, MEP, IT infrastructure, and contingency. Shown with the AACE 18R-97 Class-4 budgetary accuracy range." /></div>
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(total)}</div>
-                            <div className="text-xs text-slate-400 dark:text-slate-500 mt-1">incl. {inputs.contingency}% contingency</div>
+                            {(() => { const acc = rzModels().capex?.accuracyRange ? rzModels().capex.accuracyRange(total) : null; return acc ? (
+                                <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">AACE Class-4: <span className="tabular-nums text-slate-600 dark:text-slate-300">{fmtMoney(acc.low)}–{fmtMoney(acc.high)}</span> <span className="text-slate-400">(−30%/+50%)</span></div>
+                            ) : <div className="text-xs text-slate-400 dark:text-slate-500 mt-1">incl. {inputs.contingency}% contingency</div>; })()}
                         </CardContent>
                     </Card>
                     <Card>

@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.67.1 — 2026-07-18 (DCMOC: surface AACE accuracy band on CAPEX)
+
+### Added
+- **CapexDashboard** shows the AACE 18R-97 Class-4 budgetary accuracy range (−30%%/+50%%) under Total CAPEX (`models.capex.accuracyRange`) — honest estimate confidence band. (Carbon scope 1/2/3 already computed locally in CarbonDashboard.)
+
+---
+
 ## v1.67.0 — 2026-07-18 (engine research-deepening: pillars 5/10/13 — all 13 covered)
 
 ### Added
