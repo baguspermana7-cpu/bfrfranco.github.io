@@ -39,6 +39,7 @@ import { FinancialPage } from '@/components/modules/financial/FinancialPage';
 import { CommissioningEnginePage } from '@/components/modules/commissioning/CommissioningEnginePage';
 import { AssetIntelligencePage } from '@/components/modules/assets/AssetIntelligencePage';
 import { ReliabilityEnginePage } from '@/components/modules/reliability/ReliabilityEnginePage';
+import { SustainabilityEnginePage } from '@/components/modules/sustainability/SustainabilityEnginePage';
 import { RequirementsPage } from '@/components/modules/requirements/RequirementsPage';
 import { SiteIntelligencePage } from '@/components/modules/site-intel/SiteIntelligencePage';
 import { TierDashboard, FireDashboard, CduDashboard, SparesDashboard } from '@/components/modules/DesignToolsDashboards';
@@ -87,7 +88,7 @@ export default function Home() {
       case 'report':
         return <ReportDashboard />;
       case 'carbon':
-        return <CarbonDashboard />;
+        return <SustainabilityEnginePage />;
       case 'finance':
         return <FinancialPage />;
       case 'invest':

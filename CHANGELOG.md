@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.80.0 — 2026-07-19 (DCMOC Phase M: Sustainability Engine)
+
+### Added
+- **DCMOC "Sustainability Engine"** (Phase M, tab carbon): engine-real core — GHG Protocol scope 1/2/3 donut (models.carbon.scopes), monthly energy (MW × PUE-matrix × 730h), annual water (engine WUE), energy mix DERIVED from the capex renewable + certification inputs (labeled), documented scorecard composites (PUE band / grid-carbon × mix / WUE band / waste diversion) → grade A–D. Initiatives (progress sliders) + certifications (user-attested status selects) via the sustainability store (EXAMPLE seeds). Old CarbonDashboard kept as "Carbon / ESG Detail" tab.
+
 ## v1.79.0 — 2026-07-19 (DCMOC Phase L: Reliability Engine)
 
 ### Added
