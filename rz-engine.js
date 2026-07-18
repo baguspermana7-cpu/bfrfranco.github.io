@@ -4460,6 +4460,19 @@
             pueTarget: { air: 1.5, inrow: 1.4, rdhx: 1.35, liquid: 1.2, immersion: 1.1 },
             disclaimer: 'Engineering feasibility guidance from a deterministic rule engine — not investment, legal, or professional advice. Validate against a full design review.'
         },
+        /* v2.5.0 research pass — AACE International 18R-97 cost-estimate classes:
+         * maturity (% project definition) → typical accuracy range. The engine's
+         * detailed budgetary capex is a Class 4 estimate. */
+        aace: {
+            classes: {
+                '5': { defLow: 0, defHigh: 2, low: -0.50, high: 1.00, label: 'Class 5 — Concept screening', method: 'capacity-factored / parametric' },
+                '4': { defLow: 1, defHigh: 15, low: -0.30, high: 0.50, label: 'Class 4 — Study / feasibility', method: 'parametric / assembly' },
+                '3': { defLow: 10, defHigh: 40, low: -0.20, high: 0.30, label: 'Class 3 — Budget authorization', method: 'semi-detailed / take-off' },
+                '2': { defLow: 30, defHigh: 70, low: -0.15, high: 0.20, label: 'Class 2 — Control', method: 'detailed unit-cost' },
+                '1': { defLow: 70, defHigh: 100, low: -0.10, high: 0.15, label: 'Class 1 — Check estimate / bid', method: 'detailed / firm quotes' }
+            },
+            engineClass: '4'
+        },
         /* ══ v2.4.0 — DATA.asset: Asset Intelligence (Layer 9). Design lives by asset
          * class + health-index weights + status bands. Powers the asset digital
          * passport / health index. ══ */
@@ -4750,6 +4763,7 @@
             'site.climateFreeHours':  { source: 'ASHRAE 169-2021 climate zones → annual economizer (free-cooling) hours (DOE/NREL psychrometric bin analysis); site-selection factor weights per CBRE/JLL DC Site Selection frameworks 2025; per-country water-stress WRI Aqueduct 4.0 (2023); grid reliability IEEE 1366 SAIDI; seismic USGS PGA → IBC/ASCE 7-22 SDC', asOf: '2025', unit: 'hr/yr free-cooling; 0-1 factor scores' },
             'carbon.dieselKgCo2PerL': { source: 'GHG Protocol Corporate Standard scope 1/2/3 boundaries; EPA Emission Factors 2024 diesel 2.68 kgCO₂/L; refrigerant leakage per GHG Protocol + EPA GreenChill; embodied construction carbon amortized (RICS/LETI DC embodied-carbon studies)', asOf: '2024', unit: 'kgCO₂/L, tCO₂e/MW·yr' },
             'tax.macrs':              { source: 'US IRS Publication 946 (How To Depreciate Property) — MACRS GDS percentage tables, half-year convention (5-yr IT, 7-yr MEP, 15-yr land improvements, 39-yr non-residential building SL)', asOf: '2025', unit: 'depreciation fraction per recovery year' },
+            'aace':                   { source: 'AACE International Recommended Practice 18R-97 "Cost Estimate Classification System" — Class 1-5 by project definition maturity → accuracy ranges (Class 5 -50/+100% … Class 1 -10/+15%). Engine detailed capex is a Class 4 budgetary estimate', asOf: '2020', unit: '% accuracy range by estimate class' },
             'currency':               { source: 'ECB / central-bank reference rates', asOf: '2026-04', method: 'spot, USD base' },
             'inflationAnnual':        { source: 'IMF WEO 2026 regional CPI', asOf: '2026', unit: 'fraction/yr' },
             'salaryBenchmarks':       { source: 'Uptime Institute 2026 + AFCOM 2026 + US BLS 2025', asOf: '2026', unit: 'USD/yr, base' },
@@ -5547,6 +5561,15 @@
             },
 
             capex: {
+
+                /** AACE 18R-97 estimate class → accuracy range + a $ low/high band
+                 *  for a point estimate. Defaults to the engine's Class-4 budgetary
+                 *  maturity. (v2.5.0) */
+                accuracyRange: function (pointEstimate, estimateClass) {
+                    var cls = DATA.aace.classes[String(estimateClass || DATA.aace.engineClass)] || DATA.aace.classes['4'];
+                    var p = pointEstimate || 0;
+                    return { class: cls.label, method: cls.method, lowPct: cls.low, highPct: cls.high, low: Math.round(p * (1 + cls.low)), point: Math.round(p), high: Math.round(p * (1 + cls.high)) };
+                },
 
                 /**
                  * v2.3.0 — the DETAILED budgetary capex model (lineage: capex-calculator.html
@@ -6359,6 +6382,16 @@
                         return self.parallelAvailability(self.availability(c.mtbf, c.mttr), paths);
                     });
                     return self.seriesAvailability(groups);
+                },
+                /** k-of-n availability: system up if at least k of n identical units
+                 *  (each availability a) are up = Σ_{i=k..n} C(n,i) a^i (1-a)^(n-i).
+                 *  (v2.5.0 — exact redundancy math beyond simple 1-of-n parallel.) */
+                kOutOfN: function (a, k, n) {
+                    a = Math.max(0, Math.min(1, a || 0)); n = Math.max(1, n || 1); k = Math.max(1, Math.min(n, k || 1));
+                    var C = function (nn, rr) { if (rr < 0 || rr > nn) return 0; rr = Math.min(rr, nn - rr); var num = 1; for (var i = 0; i < rr; i++) num = num * (nn - i) / (i + 1); return num; };
+                    var p = 0;
+                    for (var i = k; i <= n; i++) p += C(n, i) * Math.pow(a, i) * Math.pow(1 - a, n - i);
+                    return +Math.min(1, p).toFixed(6);
                 }
             },
 
@@ -7326,6 +7359,44 @@
                     if (!out.length) out.push({ title: 'Design is balanced — no material flags', detail: 'Tier ' + tier + ' · ' + mw.toFixed(1) + ' MW' + (pue ? ' · PUE ' + pue.toFixed(2) : '') + (pay != null ? ' · payback ~' + pay.toFixed(1) + ' yr' : '') + '. Cost, efficiency, reliability, schedule within best-practice bands.', confidence: clamp01(0.5 + 0.1 * rationale.length), tags: ['balanced'] });
                     var summary = 'Tier ' + tier + ' · ' + (mw ? mw.toFixed(0) + ' MW' : 'capacity TBD') + (pue ? ' · PUE ' + pue.toFixed(2) : '') + (pay != null ? ' · payback ~' + pay.toFixed(1) + ' yr' : '') + ' — ' + (flags > 0 ? flags + ' optimization' + (flags > 1 ? 's' : '') + ' identified' : 'balanced within best-practice bands') + '.';
                     return { summary: summary, recommendations: out, rationale: rationale, metrics: { feasible: true, confidence: clamp01(0.4 + 0.1 * rationale.length) }, provider: 'deterministic', disclaimer: D2.disclaimer };
+                },
+                /** TOPSIS multi-criteria ranking of options (site/design alternatives).
+                 *  options=[{name, values:{crit:number}}]; criteria=[{key, weight,
+                 *  benefit:true|false}]. Returns options + closeness score (0-1, higher
+                 *  = closer to the ideal) ranked best→worst. (v2.5.0 AHP/TOPSIS.) */
+                rankOptions: function (options, criteria) {
+                    options = options || []; criteria = criteria || [];
+                    if (!options.length || !criteria.length) return [];
+                    // vector-normalize each criterion column, then weight
+                    var norm = {};
+                    criteria.forEach(function (c) {
+                        var ss = 0; options.forEach(function (o) { var v = (o.values && o.values[c.key]) || 0; ss += v * v; });
+                        norm[c.key] = Math.sqrt(ss) || 1;
+                    });
+                    var wsum = criteria.reduce(function (s, c) { return s + (c.weight || 1); }, 0) || 1;
+                    // weighted normalized matrix + ideal best/worst
+                    var best = {}, worst = {};
+                    criteria.forEach(function (c) {
+                        var w = (c.weight || 1) / wsum;
+                        var vals = options.map(function (o) { return ((o.values && o.values[c.key]) || 0) / norm[c.key] * w; });
+                        var mx = Math.max.apply(null, vals), mn = Math.min.apply(null, vals);
+                        best[c.key] = c.benefit === false ? mn : mx;
+                        worst[c.key] = c.benefit === false ? mx : mn;
+                    });
+                    var scored = options.map(function (o) {
+                        var dB = 0, dW = 0;
+                        criteria.forEach(function (c) {
+                            var w = (c.weight || 1) / wsum;
+                            var v = ((o.values && o.values[c.key]) || 0) / norm[c.key] * w;
+                            dB += Math.pow(v - best[c.key], 2); dW += Math.pow(v - worst[c.key], 2);
+                        });
+                        dB = Math.sqrt(dB); dW = Math.sqrt(dW);
+                        var closeness = (dB + dW) > 0 ? +(dW / (dB + dW)).toFixed(4) : 0;
+                        return { name: o.name, closeness: closeness, values: o.values };
+                    });
+                    scored.sort(function (a, b) { return b.closeness - a.closeness; });
+                    scored.forEach(function (s, i) { s.rank = i + 1; });
+                    return scored;
                 }
             }
         },

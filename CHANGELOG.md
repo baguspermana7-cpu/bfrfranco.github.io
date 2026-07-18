@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.67.0 — 2026-07-18 (engine research-deepening: pillars 5/10/13 — all 13 covered)
+
+### Added
+- **Pillar 5 CAPEX**: `models.capex.accuracyRange` — AACE 18R-97 estimate-class accuracy bands (engine capex is Class-4 budgetary: -30%%/+50%%) → $ low/point/high. **Pillar 10 Reliability**: `models.reliability.kOutOfN` — exact k-of-n redundancy availability Σ C(n,i)a^i(1-a)^(n-i). **Pillar 13 AI Decision**: `models.decision.rankOptions` — TOPSIS multi-criteria ranking of site/design alternatives (weighted, benefit/cost criteria, closeness score). DATA.sources (AACE 18R-97). test-rz-engine 390/0, parity 126/0. **All 13 pillars now research-deepened** (7 Cx already sufficient).
+
+---
+
 ## v1.66.1 — 2026-07-18 (engine research-deepening: pillars 11 carbon + 12 financial)
 
 ### Added

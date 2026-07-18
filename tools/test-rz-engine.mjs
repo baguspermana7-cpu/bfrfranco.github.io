@@ -861,6 +861,25 @@ if (M.tax && M.tax.macrsDepreciation) {
     ok('macrs 5yr first-year 20%', mac.rows[0].pct === 0.20);
 }
 
+/* ── Research-pass deepening (v2.5.0): pillars 5/10/13 ── */
+if (M.capex && M.capex.accuracyRange) {
+    const ar = M.capex.accuracyRange(1e8, '4');
+    ok('capex.accuracyRange Class-4 = -30/+50%', ar.lowPct === -0.30 && ar.highPct === 0.50);
+    ok('capex.accuracyRange low<point<high', ar.low < ar.point && ar.point < ar.high);
+}
+if (M.reliability && M.reliability.kOutOfN) {
+    ok('reliability.kOutOfN 2-of-3 @0.99 ≈ 0.9997', Math.abs(M.reliability.kOutOfN(0.99, 2, 3) - 0.999702) < 1e-4);
+    ok('reliability.kOutOfN 1-of-1 = a', Math.abs(M.reliability.kOutOfN(0.95, 1, 1) - 0.95) < 1e-6);
+    ok('reliability.kOutOfN 3-of-3 < 2-of-3 (stricter)', M.reliability.kOutOfN(0.99, 3, 3) < M.reliability.kOutOfN(0.99, 2, 3));
+}
+if (M.decision && M.decision.rankOptions) {
+    const opts = [{ name: 'A', values: { cost: 0.4, rel: 0.9 } }, { name: 'B', values: { cost: 0.9, rel: 0.6 } }];
+    const crit = [{ key: 'cost', weight: 0.5, benefit: false }, { key: 'rel', weight: 0.5, benefit: true }];
+    const r = M.decision.rankOptions(opts, crit);
+    ok('decision.rankOptions ranks low-cost high-rel first', r[0].name === 'A' && r[0].rank === 1);
+    ok('decision.rankOptions closeness in [0,1]', r.every((o) => o.closeness >= 0 && o.closeness <= 1));
+}
+
 /* ============================================================
  * 3. PROVENANCE (soft until A1 lands the sidecar; hard after)
  * ============================================================ */
