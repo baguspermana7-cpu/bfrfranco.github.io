@@ -961,6 +961,20 @@ if (D.sources) {
     console.log('  (provenance sidecar DATA.sources not present yet — A1 pending)');
 }
 
+/* ── Phase-Q opex basis presets (v2.5.1) — legacy-identical default + preset math ── */
+if (M.opex && M.opex.totalAnnual) {
+    const b = M.opex.totalAnnual(2.5, 1.4, 'ID', 12, { capex: 20e6, extendedOpex: true });
+    const same = M.opex.totalAnnual(2.5, 1.4, 'ID', 12, { capex: 20e6, extendedOpex: true, utilization: 1.0 });
+    ok('opex basisPresets: utilization 1.0 ≡ legacy (bit-identical)', JSON.stringify(b) === JSON.stringify(same));
+    const dc = M.opex.totalAnnual(2.5, 1.4, 'ID', 12, { capex: 20e6, basisPreset: 'dcContract' });
+    const legacy = M.opex.totalAnnual(2.5, 1.4, 'ID', 12, { capex: 20e6 });
+    eq('opex basisPresets: dcContract ≡ default', dc.total, legacy.total);
+    const rt = M.opex.totalAnnual(2.5, 1.4, 'ID', 12, { capex: 20e6, extendedOpex: true, basisPreset: 'retailScreening' });
+    near('opex basisPresets: retailScreening power = 0.70×', rt.power / b.power, 0.70, 0.01);
+    ok('opex basisPresets: staffing NOT scaled by utilization', rt.staffing === b.staffing);
+    ok('opex basisPresets provenance', !!D.sources['opex.basisPresets']);
+}
+
 /* ── report ── */
 console.log(`\nRZ-ENGINE TEST — ${pass} passed, ${fail} failed`);
 if (fail) {

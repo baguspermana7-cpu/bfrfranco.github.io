@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.75.1 — 2026-07-19 (Phase Q: shared OPEX basis presets — engine v2.5.1)
+
+### Added
+- **`models.opex.totalAnnual` basis presets** (engine DATA 2.5.0→2.5.1, ADDITIVE): `opts.basisPreset 'dcContract'|'retailScreening'` / `opts.utilization` scale the energy-driven lines (power/water/carbon; staffing untouched). Default = bit-identical to legacy (gate-asserted). This PARAMETERIZES the documented opex-calculator (retail 0.7-util screening) vs DCMOC (DC-contract 1.0-util) divergence — one backend engine, two labeled bases. **opex-calculator.html untouched per owner instruction.** Engine gate 421→426/0; parity 126/0; min rebuilt + DCMOC cache-bust.
+
 ## v1.75.0 — 2026-07-19 (DCMOC Phase G: Operations Engine + owner UX corrections)
 
 ### Added

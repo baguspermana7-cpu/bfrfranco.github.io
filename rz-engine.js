@@ -30,7 +30,7 @@
      * consumes it. Bump `version` and add a CHANGELOG entry on any change.
      * ==================================================================== */
     var DATA = {
-        version: '2.5.0',
+        version: '2.5.1',
         lastUpdated: '2026-07-15',
         asOf: '2026-07',
 
@@ -139,6 +139,16 @@
         staffingLoadFactor: 1.30,
 
         // opex.totalAnnual defaults
+        opex: {
+            /* v2.5.1 — shared OPEX basis presets (Phase Q): both DCMOC and
+             * opex-calculator.html call totalAnnual with an explicit preset so the
+             * documented divergence (retail-rate 70%-util screening vs DC-contract
+             * 100%-util) is PARAMETERIZED, not forked. */
+            basisPresets: {
+                dcContract:      { utilization: 1.0,  label: 'DC-contract rate · 100% utilization' },
+                retailScreening: { utilization: 0.7,  label: 'Retail tariff screening · 70% utilization' }
+            }
+        },
         opexDefaults: { maintenancePct: 0.02, overheadPct: 0.08, contractScope: 'medium' },
 
         // capex.totalCost defaults
@@ -4860,6 +4870,7 @@
             'regions.LATAM.powerKwh': { source: 'Regional utility filings (blended)', asOf: '2026', unit: '$/kWh' },
             'regionsCountry':         { source: 'PLN/EMA/TEPCO/CEA/TNB tariff filings + national statistics', asOf: '2026', unit: 'mixed (see fields)' },
             'countries':              { source: 'DCMOC country reference 2026-Q1 (per-country economy/labor/environment/gridReliability/naturalDisaster/talentPool/fuelDiesel/taxIncentives/compliance/constructionIndex); PLN/EMA/TEPCO/national tariff filings + IMF WEO + Ember grid-intensity + national labor statistics. GENERATED from dcmoc/src/constants/countries.ts — single source of truth for the site + DCMOC.', asOf: '2026-Q1', unit: 'mixed (see per-country fields)' },
+            'opex.basisPresets':      { source: 'Phase-Q shared-engine alignment: utilization presets parameterize the documented opex-calculator (retail 0.7 util) vs DCMOC (DC-contract 1.0 util) basis divergence', asOf: '2026', method: 'multiplier on energy-driven lines (power/water/carbon); default 1.0 = legacy-identical' },
             'commissioning.cx':       { source: 'Commissioning program cost/schedule methodology promoted from cx-calculator.html. RICH engine (cx.rich): equipment quantities scaled from IT load + rack density → per-level (L0-L6) staffed durations at 30 regional day-rate cards ($/day cxDay/fieldDay/oemDay/witnessDay + per-diem + diesel $/L + cost mult), gm-normalized (^0.45) base blend vs level-sum, Monte-Carlo (N=10000) band + 7-param sensitivity tornado. Base rates + multipliers calibrated to DC Cx budgetary practice (ASHRAE Guideline 0 / BCxA / NETA ECS scope, Uptime IST scenario counts). Compact cx.* kept for back-compat.', asOf: '2026', method: 'budgetary estimate-grade Cx program model; NOT a detailed Cx plan' },
             'requirements.coolingMaxRackKw': { source: 'ASHRAE TC9.9 5th Ed. 2021 (air ~20-25 kW/rack limit; H1-H3 liquid envelopes); NVIDIA GB200 NVL72 132 kW observed; OCP High Power Rack 92 kW+ (Meta/Rittal OCP Summit 2024); IEA 4E Liquid Cooling in Data Centres 2026', asOf: '2025', unit: 'kW/rack per cooling type' },
             'architecture.ashraeClasses': { source: 'ASHRAE TC9.9 5th Ed. 2021 "Thermal Guidelines for Data Processing Environments" — A1/A2/A3/A4 air + H1 liquid supply-temp envelopes + ΔT limits', asOf: '2021', unit: '°C supply range + °C ΔT max' },
@@ -6082,6 +6093,12 @@
                  */
                 totalAnnual: function (mw, pue, region, headcount, opts) {
                     opts = opts || {};
+                    /* v2.5.1 basis presets (Phase Q alignment): utilization scales the
+                     * ENERGY-driven lines (power/water/carbon). Default 1.0 keeps every
+                     * existing caller bit-identical. basisPreset: 'dcContract'|'retailScreening'. */
+                    var basisPreset = opts.basisPreset && DATA.opex.basisPresets && DATA.opex.basisPresets[opts.basisPreset];
+                    var util = opts.utilization != null ? Math.max(0.05, Math.min(1, opts.utilization))
+                             : (basisPreset ? basisPreset.utilization : 1.0);
                     var code = (region || 'US').toUpperCase();
                     var rdata = DATA.regions[code] || DATA.regionsCountry[code] || DATA.regions.US;
                     var hrs = DATA.hoursPerYear;
@@ -6098,6 +6115,7 @@
                         var eff = RZEngine.models.opex.coolingEfficiency(opts.climate, opts.designDeltaT);
                         power = Math.round(power * (DATA.coolingClimate.fallback / eff));
                     }
+                    if (util !== 1.0) power = Math.round(power * util);
                     var staffing = RZEngine.models.opex.staffingCostAnnual(headcount || 0, region);
                     var contract = RZEngine.models.opex.contractCostAnnual(opts.contractScope || DATA.opexDefaults.contractScope, region);
 
@@ -6108,7 +6126,7 @@
                     var maintenance = Math.round(capexBase * (opts.maintenancePct != null ? opts.maintenancePct : DATA.opexDefaults.maintenancePct));
 
                     // A6-54: new line items
-                    var itKwh = (mw || 0) * 1000 * hrs;
+                    var itKwh = (mw || 0) * 1000 * hrs * util;
                     var facilityKwh = itKwh * pueVal;
                     var wue = DATA.water.wueByType[opts.cooling] != null ? DATA.water.wueByType[opts.cooling] : DATA.water.wueByType.air;
                     var waterM3 = (wue * itKwh) / 1000;
