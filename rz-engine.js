@@ -3932,6 +3932,10 @@
                 ID: 12, SG: 18, JP: 30, IN: 10, MY: 14
             },
             embodiedPerMw: 3200,   // tCO₂e embodied in construction per MW (concrete+steel+MEP)
+            /* v2.5.0 research pass — GHG Protocol scope 1/3 factors. Scope 1 =
+             * on-site generator diesel combustion (EPA 2.68 kgCO₂/L) at test/outage
+             * hours + refrigerant leakage. Scope 3 = embodied construction amortized. */
+            dieselKgCo2PerL: 2.68, genTestHoursPerYear: 52, refrigerantLeakTco2ePerMwYr: 8,
             offsetPrice:   35       // $/tCO₂e voluntary market 2026 blend (was 18; DCMOC used 45 — reconciled v2.3.0)
         },
 
@@ -4675,6 +4679,15 @@
             usBonusDepreciation2026: 0.20,       /* 20% bonus depreciation (TCJA phase-down) */
             iraSolarItc: 0.30,                   /* IRA §48 base ITC through 2032 */
             iraDomesticContentBonus: 0.10,       /* +10% domestic-content adder */
+            /* v2.5.0 research pass — MACRS (US IRS Pub 946) accelerated depreciation
+             * percentages by recovery class (half-year convention). DC IT/servers =
+             * 5-yr; MEP/gensets often 7-yr; buildings 39-yr straight-line. */
+            macrs: {
+                '5':  [0.20, 0.32, 0.192, 0.1152, 0.1152, 0.0576],
+                '7':  [0.1429, 0.2449, 0.1749, 0.1249, 0.0893, 0.0892, 0.0893, 0.0446],
+                '15': [0.05, 0.095, 0.0855, 0.077, 0.0693, 0.0623, 0.059, 0.059, 0.0591, 0.059, 0.0591, 0.059, 0.0591, 0.059, 0.0591, 0.0295]
+            },
+            macrsBuildingSlYears: 39,
             stateIncentives: {
                 'US-VA': { name: 'Virginia Data Center sales-tax exemption', value: 0.06, type: 'sales_tax_exemption' },
                 'US-TX': { name: 'Texas DC equipment sales-tax exemption', value: 0.0825, type: 'sales_tax_exemption' },
@@ -4735,6 +4748,8 @@
             'maintenance.staffing':   { source: 'Uptime Institute critical-facilities staffing benchmark: 24/7 manned position needs ~4.2 FTE (shifts + relief/PTO); positions scale with tier; plus per-MW technicians', asOf: '2024', unit: 'FTE' },
             'asset.weibull':          { source: 'Weibull wear-out life distributions by asset class (shape β>1 = increasing hazard; scale η = characteristic life yr) — reliability engineering practice + IEEE 493 (Gold Book) component data + manufacturer MTBF', asOf: '2024', unit: 'β (shape), η (years)' },
             'site.climateFreeHours':  { source: 'ASHRAE 169-2021 climate zones → annual economizer (free-cooling) hours (DOE/NREL psychrometric bin analysis); site-selection factor weights per CBRE/JLL DC Site Selection frameworks 2025; per-country water-stress WRI Aqueduct 4.0 (2023); grid reliability IEEE 1366 SAIDI; seismic USGS PGA → IBC/ASCE 7-22 SDC', asOf: '2025', unit: 'hr/yr free-cooling; 0-1 factor scores' },
+            'carbon.dieselKgCo2PerL': { source: 'GHG Protocol Corporate Standard scope 1/2/3 boundaries; EPA Emission Factors 2024 diesel 2.68 kgCO₂/L; refrigerant leakage per GHG Protocol + EPA GreenChill; embodied construction carbon amortized (RICS/LETI DC embodied-carbon studies)', asOf: '2024', unit: 'kgCO₂/L, tCO₂e/MW·yr' },
+            'tax.macrs':              { source: 'US IRS Publication 946 (How To Depreciate Property) — MACRS GDS percentage tables, half-year convention (5-yr IT, 7-yr MEP, 15-yr land improvements, 39-yr non-residential building SL)', asOf: '2025', unit: 'depreciation fraction per recovery year' },
             'currency':               { source: 'ECB / central-bank reference rates', asOf: '2026-04', method: 'spot, USD base' },
             'inflationAnnual':        { source: 'IMF WEO 2026 regional CPI', asOf: '2026', unit: 'fraction/yr' },
             'salaryBenchmarks':       { source: 'Uptime Institute 2026 + AFCOM 2026 + US BLS 2025', asOf: '2026', unit: 'USD/yr, base' },
@@ -6251,7 +6266,26 @@
                     return Math.round(RZEngine.models.carbon.annualTonnes(mw, pue, region, hoursPerYear) * price);
                 },
                 /** Cost to voluntarily offset a tonnage. */
-                offsetCost: function (tonnes) { return Math.round((tonnes || 0) * DATA.carbon.offsetPrice); }
+                offsetCost: function (tonnes) { return Math.round((tonnes || 0) * DATA.carbon.offsetPrice); },
+                /** GHG-Protocol scope 1/2/3 annual breakdown (tCO₂e). Scope 1 =
+                 *  generator diesel combustion at test/outage hours + refrigerant
+                 *  leak; scope 2 = grid electricity; scope 3 = embodied construction
+                 *  amortized over life. input {mw, pue, region, tier?, lifeYears?}. */
+                scopes: function (input) {
+                    input = input || {};
+                    var C = DATA.carbon, mw = input.mw || 0, life = input.lifeYears || 15;
+                    // scope 1 — genset test hours at load factor × diesel efficiency × EPA factor
+                    var testHrs = input.genTestHours != null ? input.genTestHours : C.genTestHoursPerYear;
+                    var facKw = mw * 1000 * (DATA.fuelGen.loadFactor || 0.75);
+                    var dieselL = testHrs * facKw * (DATA.fuelGen.genEfficiencyLPerKwh || 0.27);
+                    var scope1 = +((dieselL * C.dieselKgCo2PerL) / 1000 + mw * C.refrigerantLeakTco2ePerMwYr).toFixed(1);
+                    // scope 2 — grid electricity (operational)
+                    var scope2 = RZEngine.models.carbon.annualTonnes(mw, input.pue, input.region);
+                    // scope 3 — embodied construction, amortized annual
+                    var scope3 = +(RZEngine.models.carbon.embodiedTonnes(mw) / life).toFixed(1);
+                    var total = +(scope1 + scope2 + scope3).toFixed(1);
+                    return { scope1: scope1, scope2: scope2, scope3Annual: scope3, totalAnnual: total, scope2Pct: total > 0 ? Math.round(100 * scope2 / total) : 0 };
+                }
             },
 
             /* ── A7: water model ── */
@@ -6905,6 +6939,23 @@
                 importDuty: function (equipmentCost, country) {
                     var r = DATA.tax.importDutyByCountry[(country || '').toUpperCase()];
                     return r != null ? Math.round((equipmentCost || 0) * r) : 0;
+                },
+                /** MACRS accelerated depreciation schedule (US IRS Pub 946) for a
+                 *  CAPEX base + recovery class ('5'|'7'|'15'). Returns per-year
+                 *  depreciation $, cumulative, and per-year tax shield at taxRate +
+                 *  the NPV of the shield at a discount rate. (v2.5.0) */
+                macrsDepreciation: function (capex, recoveryClass, taxRate, discountRate) {
+                    var sched = DATA.tax.macrs[String(recoveryClass || '5')] || DATA.tax.macrs['5'];
+                    var base = capex || 0, tr = taxRate || 0, dr = discountRate || 0.10;
+                    var rows = [], cum = 0, shieldNpv = 0;
+                    for (var y = 0; y < sched.length; y++) {
+                        var dep = Math.round(base * sched[y]);
+                        var shield = Math.round(dep * tr);
+                        cum += dep;
+                        shieldNpv += shield / Math.pow(1 + dr, y + 1);
+                        rows.push({ year: y + 1, pct: sched[y], depreciation: dep, taxShield: shield, cumulative: cum });
+                    }
+                    return { recoveryClass: String(recoveryClass || '5'), rows: rows, totalDepreciation: cum, totalShield: Math.round(rows.reduce(function (s, r) { return s + r.taxShield; }, 0)), shieldNpv: Math.round(shieldNpv) };
                 }
             },
 

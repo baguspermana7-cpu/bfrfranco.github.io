@@ -846,6 +846,21 @@ if (M.asset && M.asset.failureProbability) {
     ok('asset Weibull wear-out shape>1', old.shape > 1);
 }
 
+/* ── Research-pass deepening (v2.5.0): pillars 11/12 ── */
+if (M.carbon && M.carbon.scopes) {
+    const sc = M.carbon.scopes({ mw: 3, pue: 1.5, region: 'US', tier: 3 });
+    ok('carbon.scopes scope2 dominates (grid)', sc.scope2Pct >= 80, '' + sc.scope2Pct);
+    ok('carbon.scopes total = s1+s2+s3', Math.abs(sc.totalAnnual - (sc.scope1 + sc.scope2 + sc.scope3Annual)) < 1);
+    ok('carbon.scopes scope1 > 0 (genset + refrigerant)', sc.scope1 > 0);
+}
+if (M.tax && M.tax.macrsDepreciation) {
+    const mac = M.tax.macrsDepreciation(1e8, '5', 0.21, 0.10);
+    ok('macrs 5yr sums to 100% of capex', Math.abs(mac.totalDepreciation - 1e8) < 1e8 * 0.001, '' + mac.totalDepreciation);
+    ok('macrs total shield = capex×taxRate', Math.abs(mac.totalShield - 21e6) < 1e6, '' + mac.totalShield);
+    ok('macrs accelerated → shieldNpv < totalShield', mac.shieldNpv < mac.totalShield && mac.shieldNpv > 0);
+    ok('macrs 5yr first-year 20%', mac.rows[0].pct === 0.20);
+}
+
 /* ============================================================
  * 3. PROVENANCE (soft until A1 lands the sidecar; hard after)
  * ============================================================ */

@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.66.1 — 2026-07-18 (engine research-deepening: pillars 11 carbon + 12 financial)
+
+### Added
+- **Pillar 11 Carbon**: `models.carbon.scopes` — GHG-Protocol scope 1/2/3 annual breakdown (scope 1 = genset diesel combustion at test hours + refrigerant leak; scope 2 = grid; scope 3 = embodied construction amortized). Scope 2 dominates (~95%% for a grid-powered DC). **Pillar 12 Financial**: `models.tax.macrsDepreciation` — US IRS Pub-946 MACRS accelerated schedules (5/7/15-yr, half-year), per-year depreciation + tax shield + shield NPV. DATA.sources (EPA, GHG Protocol, IRS Pub 946). test-rz-engine 383/0, parity 126/0. 9 of 13 pillars research-deepened.
+
+---
+
 ## v1.66.0 — 2026-07-18 (engine research-deepening: Pillar 2 Site + per-country data)
 
 ### Added
