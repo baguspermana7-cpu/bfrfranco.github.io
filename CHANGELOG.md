@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.65.2 — 2026-07-18 (DCMOC: surface research-deepened engine outputs)
+
+### Added
+- **ConstructionDashboard** surfaces `models.construction.longLeadRisk` — critical long-lead gear (transformer/switchgear/genset/UPS/chiller) vs power-on month, flagging what to pre-order (rose = critical). **ArchitectureDashboard** surfaces `thermalCheck` (ASHRAE TC9.9 compliance) + `topology` (Uptime/TIA-942-C rating, power/cooling paths, floor loading). Makes the v1.65 research depth visible.
+
+---
+
 ## v1.65.1 — 2026-07-18 (engine research-deepening: pillars 6/8/9)
 
 ### Added

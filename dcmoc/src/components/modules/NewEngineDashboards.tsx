@@ -143,6 +143,35 @@ export function ArchitectureDashboard() {
                 <Metric label="Cooling" value={inputs.coolingType} sub={`×${c.drivers.cooling}`} />
                 <Metric label="Tier × Redundancy" value={`T${inputs.tierLevel} · ${inputs.powerRedundancy}`} sub={`×${c.drivers.tier} · ×${c.drivers.redundancy}`} />
             </div>
+            {(m.thermalCheck || m.topology) && (() => {
+                const tc = m.thermalCheck ? m.thermalCheck({ coolingType: inputs.coolingType, supplyTempC: 22 }) : null;
+                const topo = m.topology ? m.topology(inputs.tierLevel) : null;
+                return (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {tc && (
+                            <Card>
+                                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">ASHRAE Thermal Envelope (TC9.9)</h2>
+                                <div className="flex items-center gap-2 mb-1"><span className={`text-xs font-bold ${tc.compliant ? 'text-emerald-400' : 'text-amber-400'}`}>{tc.compliant ? '✓ Compliant' : '⚠ Review'}</span><span className="text-[11px] text-slate-500">{tc.label}</span></div>
+                                <div className="text-[11px] text-slate-500 space-y-0.5">
+                                    <div>Supply <span className="text-slate-700 dark:text-slate-300 tabular-nums">{tc.supplyTempC}°C</span> · ΔT <span className="text-slate-700 dark:text-slate-300 tabular-nums">{tc.deltaTK}K</span> (band {tc.deltaTBand[0]}-{tc.deltaTBand[1]}K)</div>
+                                    {tc.flags.map((f: string, i: number) => <div key={i} className="text-amber-500">⚠ {f}</div>)}
+                                </div>
+                            </Card>
+                        )}
+                        {topo && (
+                            <Card>
+                                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Redundancy Topology (Uptime / TIA-942-C)</h2>
+                                <div className="text-[11px] text-slate-500 space-y-0.5">
+                                    <div>Rating: <span className="text-slate-700 dark:text-slate-300 font-medium">{topo.tiaRating}</span> · <span className="capitalize">{topo.maintainability}</span></div>
+                                    <div>Power: <span className="text-slate-700 dark:text-slate-300">{topo.powerPath}</span></div>
+                                    <div>Cooling: <span className="text-slate-700 dark:text-slate-300">{topo.coolingPath}</span></div>
+                                    <div>Floor load: <span className="text-slate-700 dark:text-slate-300 tabular-nums">{m.floorLoading ? m.floorLoading(inputs.coolingType) : '—'} kN/m²</span></div>
+                                </div>
+                            </Card>
+                        )}
+                    </div>
+                );
+            })()}
             <Card>
                 <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Discipline Spec</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
@@ -192,6 +221,25 @@ export function ConstructionDashboard() {
                     ))}
                 </div>
             </Card>
+            {m.longLeadRisk && (() => {
+                const ll = m.longLeadRisk({ powerOnMonth: s.milestones?.powerOn ?? 20, stressed: false });
+                return (
+                    <Card>
+                        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Long-Lead Procurement Risk <span className="text-[9px] text-slate-400">(vs power-on M{s.milestones?.powerOn ?? '—'})</span></h2>
+                        <div className="space-y-1.5">
+                            {ll.items.map((it: { item: string; leadMonths: number; critical: boolean }) => (
+                                <div key={it.item} className="flex items-center gap-2 text-xs">
+                                    <span className="w-32 capitalize text-slate-600 dark:text-slate-300">{it.item.replace(/_/g, ' ')}</span>
+                                    <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className={`h-2 rounded ${it.critical ? 'bg-rose-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(100, (it.leadMonths / (ll.maxLeadMonths || 1)) * 100)}%` }} /></div>
+                                    <span className="w-14 text-right tabular-nums text-slate-500">{it.leadMonths} mo</span>
+                                    {it.critical && <span className="text-[9px] text-rose-400 font-semibold">order early</span>}
+                                </div>
+                            ))}
+                        </div>
+                        <p className="mt-2 text-[10px] text-slate-400">{ll.recommendEarlyOrder ? `${ll.criticalItems.length} item(s) exceed the power-on date — pre-order to protect the schedule.` : 'All critical gear fits within the schedule.'} Lead times: 2024-26 supply-constrained market.</p>
+                    </Card>
+                );
+            })()}
         </div>
     );
 }
