@@ -19,6 +19,11 @@ const PHASE_COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ec4899'];
 const CapacityDashboardMod = () => {
     const { selectedCountry, inputs, actions } = useSimulationStore();
     const [localPhases, setLocalPhases] = useState<CapacityPhase[]>(inputs.capacityPhases);
+    // Phase D fix: write phases back to the store so Strategic/PhasedFinancial/Report see edits (was local-only)
+    React.useEffect(() => {
+        const t = setTimeout(() => actions.setInputs({ capacityPhases: localPhases }), 400);
+        return () => clearTimeout(t);
+    }, [localPhases]);
     const [activeTab, setActiveTab] = useState<'overview' | 'details' | 'assumptions'>('overview');
     const [isExporting, setIsExporting] = useState(false);
 

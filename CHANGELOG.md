@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.72.0 — 2026-07-19 (DCMOC Phase D: Capacity Planning Engine)
+
+### Added
+- **DCMOC "Capacity Planning Engine"** (Phase D): KPI row (IT/peak-forecast/facility + design capacities w/ utilization), IT-load forecast & growth chart (Committed = cumulative build phases · Forecast = Requirements growth plan · dashed Design-capacity line incl. the wired design margin), capacity-breakdown donut (PUE-derived screening split), 5 utilization bars (power/cooling/rack/space engine-derived via bindingConstraint + stranded-capacity chip @ Uptime 40% threshold; network = labeled ASSUMPTION), system detail tabs (power component table from engine equipScale w/ OK/Watch/At-Risk chips), 5 deterministic recommendation cards + key insights. Legacy phase planner (editor + Gantt + economics) absorbed BY COMPOSITION as the "Phase Plan & Economics" tab — nothing lost.
+
+### Fixed
+- **Phase-editor write-back bug**: legacy CapacityDashboard kept phases in local React state and never wrote back to `inputs.capacityPhases` — Strategic/Phased-Finance/Report only ever saw defaults. Debounced store write-back added (same schema).
+
 ## v1.71.0 — 2026-07-19 (DCMOC Phase C: Architecture Engine + dynamic system diagram)
 
 ### Added
