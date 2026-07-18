@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.82.0 — 2026-07-19 (DCMOC Phase N: Projects — the workflow spine)
+
+### Added
+- **DCMOC "Projects" page** (Phase N): full-state PROJECT BUNDLES — every program store snapshotted (sim/capex canonicals + requirements + candidate sites + architecture + construction/cx/financial trackings + ops log + sustainability), versioned payloads, ordered sanitized restore (sim → capex auto-recalc → requirements → sites → arch → trackings), max 10, active-project tracking with Update. **Lifecycle strip** (9 engine dots w/ live completion booleans + deep links — the wired workflow). **Template Library** = engine cx scenario presets (enterprise-2MW … AI-factory-100MW) applied through the shared writers (itLoad/cooling/redundancy) → lands on Requirements. Scenarios remain the lightweight input-only snapshots (cross-linked).
+
 ## v1.81.0 — 2026-07-19 (DCMOC Phase I: Results Engine)
 
 ### Added

@@ -41,6 +41,7 @@ import { AssetIntelligencePage } from '@/components/modules/assets/AssetIntellig
 import { ReliabilityEnginePage } from '@/components/modules/reliability/ReliabilityEnginePage';
 import { SustainabilityEnginePage } from '@/components/modules/sustainability/SustainabilityEnginePage';
 import { ResultsEnginePage } from '@/components/modules/results/ResultsEnginePage';
+import { ProjectsPage } from '@/components/modules/platform/ProjectsPage';
 import { RequirementsPage } from '@/components/modules/requirements/RequirementsPage';
 import { SiteIntelligencePage } from '@/components/modules/site-intel/SiteIntelligencePage';
 import { TierDashboard, FireDashboard, CduDashboard, SparesDashboard } from '@/components/modules/DesignToolsDashboards';
@@ -133,7 +134,7 @@ export default function Home() {
       case 'spares':
         return <SparesDashboard />;
       case 'projects':
-        return <ProjectsDashboard />;
+        return <ProjectsPage />;
       case 'templates':
         return <TemplatesDashboard />;
       case 'data-library':
