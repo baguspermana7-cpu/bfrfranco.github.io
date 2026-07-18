@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.83.0 — 2026-07-19 (DCMOC Phase R: Settings & Integrations)
+
+### Added
+- **DCMOC "Settings"** (Phase R): 3 functional menus — General (org name → PDF exports; default country w/ real Apply through the shared writers; default currency seeding Requirements), Data (per-store reset actions clearing the REAL stores — requirements/sites/trackings/ledger/log/sustainability), Integrations (versioned IntegrationConfig schema: webhook/REST/BMS/export-schedule kinds, real reachability Test via no-cors fetch with honest CORS-limited labeling, secretRef labels only — secrets NEVER stored, backend-bound kinds show their true status). Scalable schema (versioned persist) ready for future backend wiring — zero placeholder controls.
+
 ## v1.82.0 — 2026-07-19 (DCMOC Phase N: Projects — the workflow spine)
 
 ### Added
