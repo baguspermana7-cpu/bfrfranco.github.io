@@ -66,3 +66,15 @@ by **`tools/build-countries-data.mjs`**. Edit the authoring source
 3. Rewire the article page to consume the engine (guard `window.RZEngine`; keep inline as fallback); verify headless (0 new console errors) + `audit-js-syntax`/`audit-script-tags` CLEAN.
 4. Surface the reusable ones as DCMOC parameters where they add value.
 **Execution note:** best done as a parallel sweep (one agent per article, worktree-isolated) once account/session limits are clear — do NOT batch-edit live article pages without per-page headless verification. The 21 inline pages: article-1/2/3/4/5/6/8/11/12/13/14/15/16/17/18/20/22/23/24/25/26 (+ re-scan 7/9/10/27).
+
+
+## DC-OS UIUX program (2026-07-19, v1.68.1 → v1.84.1) — COMPLETE
+All 13 DCMOC engine pages rebuilt to the DC-OS reference designs on a thin centralized
+state layer (`dcmoc/src/state/registry.ts` namespaced params over the existing zustand
+slices + `dependencies.ts` DEP_MAP + per-engine adapters in `src/state/adapters/`).
+Conventions now binding for DCMOC work:
+- **Absorb-by-composition**: legacy dashboards survive as tabs inside the new pages — never deleted before absorption.
+- **Plan-Mode tracking stores** (construction/cx/financial/ops/sustainability): planning tool has no telemetry — actuals are user-entered with EXAMPLE-chipped seeds; derived indices (SPI/CPI) default 1.00; Financial consumes the Construction EVM as the single source.
+- **Owner UX rules**: CreatableCombobox is dropdown-FIRST (simple select preserved; "Custom value…" row opt-in); no fabricated entities (sites start at 1, scenario-bound); editable inputs carry a violet left-accent label, generated values render as tinted read-only panels with provenance chips; RZExplain tooltips on technical KPI labels.
+- **Engine additive-only**: the single engine change was v2.5.1 `models.opex.totalAnnual` basisPresets (dcContract/retailScreening) — default bit-identical, gate-asserted; opex-calculator.html untouched.
+Traps catalogued in memory: pue.defaultFor key mismatch (use pueMatrix direct), zustand v5 object-selector infinite render, Shell leaf() crash on missing navItem, capacityPhases write-back, construction zero-duration mapping.
