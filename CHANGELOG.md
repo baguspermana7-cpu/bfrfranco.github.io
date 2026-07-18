@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.77.0 — 2026-07-19 (DCMOC Phase K: Commissioning Engine page)
+
+### Added
+- **DCMOC "Commissioning Engine"** (Phase K): planned plane = the v1.68.0 RICH cx engine (L0–L6 staffed-duration timeline bars, equipment-scaled systems list, IST scenarios/tier); actuals = `cxTracking` store — per-level completion sliders **feed the ENGINE `readinessIndex`** (real linkage, engine weights), test counters, issues & punch CRUD (EXAMPLE seeds, Plan-Mode banner); tests-per-system = labeled screening (unit counts × tests-per-unit table); program-cost-share donut (engine fixed proportions). The rich cost + Monte-Carlo band + tornado cards survive as the "Program Cost & Risk" tab (absorbed by composition).
+
 ## v1.76.0 — 2026-07-19 (DCMOC Phase H: Financial Engine)
 
 ### Added

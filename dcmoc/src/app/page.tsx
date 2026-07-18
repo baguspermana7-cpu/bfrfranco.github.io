@@ -36,6 +36,7 @@ import { CapexEnginePage } from '@/components/modules/capex/CapexEnginePage';
 import { ConstructionEngine } from '@/components/modules/construction/ConstructionEngine';
 import { OperationsDashboard } from '@/components/modules/operations/OperationsDashboard';
 import { FinancialPage } from '@/components/modules/financial/FinancialPage';
+import { CommissioningEnginePage } from '@/components/modules/commissioning/CommissioningEnginePage';
 import { RequirementsPage } from '@/components/modules/requirements/RequirementsPage';
 import { SiteIntelligencePage } from '@/components/modules/site-intel/SiteIntelligencePage';
 import { TierDashboard, FireDashboard, CduDashboard, SparesDashboard } from '@/components/modules/DesignToolsDashboards';
@@ -66,7 +67,7 @@ export default function Home() {
       case 'construction':
         return <ConstructionEngine />;
       case 'commissioning':
-        return <CommissioningDashboard />;
+        return <CommissioningEnginePage />;
       case 'asset-health':
         return <AssetIntelDashboard />;
       case 'ops':
