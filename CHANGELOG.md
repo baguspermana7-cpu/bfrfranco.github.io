@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.74.0 — 2026-07-19 (DCMOC Phase F: Construction Engine)
+
+### Added
+- **DCMOC "Construction Engine"** (Phase F): Plan-Mode-first tracking — planned plane engine-real (CPM schedule, PV S-curve, engine milestones, long-lead procurement w/ derived PO-by/ETA + example-labeled vendors, screening trapezoid manpower), actuals user-entered (constructionTracking store: status month, per-phase actual %% combobox, AC spend, risks/issues CRUD w/ EXAMPLE seeds). Deterministic EVM SPI/CPI (baseline 1.00 in Plan Mode; single source for Financial), forecast = planned/clamp(SPI), documented health composite (SPI 40 + CPI 30 + schedule 15 + issues 15). L2 Gantt reused.
+
+### Fixed
+- Latent zero-schedule bug: old dashboard fed capex.timeline (no duration keys) into models.construction.schedule → durations 0, "Total Build" 0. Durations now mapped explicitly from timeline phases + engine long-lead months.
+
 ## v1.73.0 — 2026-07-19 (DCMOC Phase E: CAPEX Engine — output/analysis surface)
 
 ### Added

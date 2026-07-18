@@ -86,64 +86,6 @@ export function SiteIntelDashboard() {
     );
 }
 
-/* ── L6 Construction ── */
-export function ConstructionDashboard() {
-    const m = rzModels().construction;
-    const capex = useCapexStore((s) => s.results);
-    if (!m) return <Loading />;
-    if (!capex?.timeline) return <div className="space-y-4"><Head icon={HardHat} title="Construction" sub="DC-OS Layer 6 · models.construction" tone="from-amber-500 to-orange-600" /><Card><p className="text-xs text-slate-500">Run the CAPEX engine for the build schedule.</p></Card></div>;
-    const s = m.schedule(capex.timeline);
-    return (
-        <div className="space-y-4">
-            <Head icon={HardHat} title="Construction" sub="DC-OS Layer 6 · models.construction" tone="from-amber-500 to-orange-600"
-                report={() => ({
-                    title: 'Construction', layer: 'Layer 6 · Construction Schedule', project: '—',
-                    kpis: [{ label: 'Total Build', value: `${s.totalMonths} mo` }, { label: 'RFS Milestone', value: `M${s.milestones?.rfs ?? '—'}` }, { label: 'Power On', value: `M${s.milestones?.powerOn ?? '—'}` }],
-                    sections: [{ title: 'Phase Schedule', head: ['Phase', 'Start', 'End', 'Months'], rows: s.rows.map((r: { label: string; startMonth: number; endMonth: number; months: number }) => [r.label, `M${r.startMonth}`, `M${r.endMonth}`, r.months]) }],
-                    note: 'CPM-style screening schedule with fast-track overlap — not a resource-loaded programme.',
-                })} />
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <Metric label="Total Build" value={`${s.totalMonths} mo`} sub="fast-tracked" />
-                <Metric label="RFS Milestone" value={`M${s.milestones?.rfs ?? '—'}`} sub="ready for service" />
-                <Metric label="Power On" value={`M${s.milestones?.powerOn ?? '—'}`} sub="energization" />
-            </div>
-            <Card>
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Phase Schedule</h2>
-                <div className="space-y-1.5">
-                    {s.rows.map((r: { key: string; label: string; startMonth: number; endMonth: number; months: number }) => (
-                        <div key={r.key} className="flex items-center gap-2 text-xs">
-                            <span className="w-28 text-slate-600 dark:text-slate-300">{r.label}</span>
-                            <div className="flex-1 relative h-4 rounded bg-slate-100 dark:bg-slate-800">
-                                <div className="absolute h-4 rounded bg-amber-500/80" style={{ left: `${(r.startMonth / s.totalMonths) * 100}%`, width: `${((r.endMonth - r.startMonth) / s.totalMonths) * 100}%` }} />
-                            </div>
-                            <span className="w-10 text-right tabular-nums text-slate-500">{r.months}mo</span>
-                        </div>
-                    ))}
-                </div>
-            </Card>
-            {m.longLeadRisk && (() => {
-                const ll = m.longLeadRisk({ powerOnMonth: s.milestones?.powerOn ?? 20, stressed: false });
-                return (
-                    <Card>
-                        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Long-Lead Procurement Risk <span className="text-[9px] text-slate-400">(vs power-on M{s.milestones?.powerOn ?? '—'})</span></h2>
-                        <div className="space-y-1.5">
-                            {ll.items.map((it: { item: string; leadMonths: number; critical: boolean }) => (
-                                <div key={it.item} className="flex items-center gap-2 text-xs">
-                                    <span className="w-32 capitalize text-slate-600 dark:text-slate-300">{it.item.replace(/_/g, ' ')}</span>
-                                    <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className={`h-2 rounded ${it.critical ? 'bg-rose-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(100, (it.leadMonths / (ll.maxLeadMonths || 1)) * 100)}%` }} /></div>
-                                    <span className="w-14 text-right tabular-nums text-slate-500">{it.leadMonths} mo</span>
-                                    {it.critical && <span className="text-[9px] text-rose-400 font-semibold">order early</span>}
-                                </div>
-                            ))}
-                        </div>
-                        <p className="mt-2 text-[10px] text-slate-400">{ll.recommendEarlyOrder ? `${ll.criticalItems.length} item(s) exceed the power-on date — pre-order to protect the schedule.` : 'All critical gear fits within the schedule.'} Lead times: 2024-26 supply-constrained market.</p>
-                    </Card>
-                );
-            })()}
-        </div>
-    );
-}
-
 /* ── L7 Commissioning ── */
 const cxMoney = (n: number) => n >= 1e6 ? `$${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `$${(n / 1e3).toFixed(0)}K` : `$${Math.round(n)}`;
 
