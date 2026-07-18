@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.84.1 — 2026-07-19 (DCMOC polish: input-vs-derived convention + labels + Explain)
+
+### Changed
+- **Input-vs-generated visual convention** (owner UX rule): editable input labels now carry a 2px violet left-accent (shared Field primitive) — derived/generated values keep the flat tinted read-only panels with provenance chips. Instantly distinguishable.
+- Sidebar labels aligned to the new engine pages (CAPEX Engine, Architecture Engine, Construction Engine, Commissioning Engine, Asset Intelligence, Reliability Engine, Sustainability Engine, Capacity Planning, Results Engine).
+- **RZExplain tooltips** wired on technical KPI labels (PUE, WUE, MTBF, MTTR, Redundancy) via the shared knowledge DB — renders nothing when a key is absent (safe), per the resistancezero tooltip standard.
+
 ## v1.84.0 — 2026-07-19 (DCMOC Phase O: PDF export standard)
 
 ### Added

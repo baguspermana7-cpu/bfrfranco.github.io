@@ -17,6 +17,7 @@ import { rzModels, rzData } from '@/lib/rz-engine';
 import { REDUNDANCY_KEY } from '@/state/registry';
 import { ReliabilityDashboard } from '@/components/modules/ReliabilityDashboard';
 import { ShieldCheck, ChevronRight } from 'lucide-react';
+import { Explain } from '@/components/ui/Explain';
 
 interface SystemRow { label: string; availability: number; chain: string; redundant: boolean }
 
@@ -92,12 +93,12 @@ export function ReliabilityEnginePage() {
                             { label: 'Composed Availability', value: pct(model.overall), sub: meetsTier ? `meets Tier ${inputs.tierLevel} target` : `BELOW Tier ${inputs.tierLevel} target` },
                             { label: 'Tier Target', value: pct(model.tierTargetFrac), sub: `Tier ${inputs.tierLevel} (Uptime)` },
                             { label: 'Downtime Budget', value: `${model.downtimeMin.toFixed(1)} min/yr`, sub: 'at composed availability' },
-                            { label: 'MTBF (composite)', value: `${(model.mtbfAll / 1000).toFixed(0)}k h`, sub: 'harmonic over components' },
-                            { label: 'MTTR (avg)', value: `${model.mttrAvg} h`, sub: 'component average' },
+                            { label: 'MTBF (composite)', value: `${(model.mtbfAll / 1000).toFixed(0)}k h`, sub: 'harmonic over components', explain: 'mtbf' },
+                            { label: 'MTTR (avg)', value: `${model.mttrAvg} h`, sub: 'component average', explain: 'mttr' },
                             { label: 'Reliability Score', value: `${model.score}/100`, sub: 'documented composite' },
                         ].map((k) => (
                             <div key={k.label} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                                <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
+                                <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>
                                 <div className="text-base font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
                                 <div className={`truncate text-[10px] ${k.sub.startsWith('BELOW') ? 'text-rose-500 font-semibold' : 'text-slate-500'}`}>{k.sub}</div>
                             </div>

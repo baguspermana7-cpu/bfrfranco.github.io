@@ -118,23 +118,23 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
     };
 
     const navItems: { label: string; icon: LucideIcon; id: typeof activeTab; section?: string }[] = [
-        { label: 'CAPEX Config', icon: Building, id: 'capex' },
+        { label: 'CAPEX Engine', icon: Building, id: 'capex' },
         { label: 'Operations Overview', icon: Activity, id: 'ops' },
         { label: 'Staff Model Config', icon: Calculator, id: 'sim' },
         { label: 'Staffing', icon: Users, id: 'staff' },
         { label: 'Maintenance', icon: Wrench, id: 'maint' },
         { label: 'Risk Analysis', icon: ShieldAlert, id: 'risk' },
-        { label: 'Reliability (RAM)', icon: ShieldCheck, id: 'reliability' },
+        { label: 'Reliability Engine', icon: ShieldCheck, id: 'reliability' },
         { label: 'Requirements & Workload', icon: ClipboardCheck, id: 'requirements' },
         { label: 'Site Intelligence', icon: MapPin, id: 'site' },
-        { label: 'Architecture Spec', icon: Boxes, id: 'architecture' },
-        { label: 'Construction Schedule', icon: HardHat, id: 'construction' },
-        { label: 'Commissioning Readiness', icon: CheckCircle2, id: 'commissioning' },
-        { label: 'Asset Health', icon: Activity, id: 'asset-health' },
-        { label: 'Carbon / ESG', icon: Leaf, id: 'carbon' },
+        { label: 'Architecture Engine', icon: Boxes, id: 'architecture' },
+        { label: 'Construction Engine', icon: HardHat, id: 'construction' },
+        { label: 'Commissioning Engine', icon: CheckCircle2, id: 'commissioning' },
+        { label: 'Asset Intelligence', icon: Activity, id: 'asset-health' },
+        { label: 'Sustainability Engine', icon: Leaf, id: 'carbon' },
         { label: 'Financial', icon: TrendingUp, id: 'finance' },
         { label: 'Investment', icon: Landmark, id: 'invest' },
-        { label: 'Capacity Plan', icon: Layers, id: 'capacity', section: 'planning' },
+        { label: 'Capacity Planning', icon: Layers, id: 'capacity', section: 'planning' },
         { label: 'Phased Finance', icon: Calculator, id: 'phased-finance', section: 'planning' },
         { label: 'Benchmarks', icon: Target, id: 'benchmark', section: 'analytics' },
         { label: 'Monte Carlo', icon: Dices, id: 'montecarlo', section: 'analytics' },
@@ -152,7 +152,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
         { label: 'Fire Suppression', icon: Flame, id: 'fire' },
         { label: 'CDU / Liquid Cooling', icon: Waves, id: 'cdu' },
         { label: 'Spares Optimization', icon: Package, id: 'spares' },
-        { label: 'Report', icon: FileText, id: 'report' },
+        { label: 'Results Engine', icon: FileText, id: 'report' },
     ];
 
     // ── DC-OS 13-engine lifecycle tree: the 23 modules REGROUPED (not deleted)

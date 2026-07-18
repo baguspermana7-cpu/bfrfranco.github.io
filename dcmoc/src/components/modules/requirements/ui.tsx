@@ -26,9 +26,11 @@ export function SectionCard({ num, title, caption, id, children }: {
 export function Field({ label, required, children, hint }: {
     label: string; required?: boolean; children: React.ReactNode; hint?: string;
 }) {
+    /* OWNER UX CONVENTION: editable INPUT areas carry a violet left-accent on the
+     * label — GENERATED values never do (they render as tinted read-only panels). */
     return (
         <label className="block">
-            <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500 mb-1">
+            <span className="mb-1 block border-l-2 border-violet-500 pl-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                 {label}{required && <span className="text-violet-500 ml-0.5">*</span>}
             </span>
             {children}
