@@ -234,34 +234,19 @@ export function panelData(site: CandidateSite): Record<'power' | 'connectivity' 
     };
 }
 
-/** 3 demo candidate sites (clearly labeled illustrative + editable). */
+/** OWNER CORRECTION: seed exactly ONE site bound to the ACTIVE scenario
+ *  (country + config). Multi-site compare appears only after "Add Site". */
 export function seedDefaultSites(baseCountryId: string): CandidateSite[] {
     const now = Date.now();
-    const others = Object.keys(COUNTRIES).filter((k) => k !== baseCountryId);
-    const b = others.includes('SG') ? 'SG' : others[0];
-    const cId = others.includes('MY') ? 'MY' : others.filter((k) => k !== b)[0];
-    const mk = (label: string, name: string, countryId: string, city: string, lat: number, lng: number, attrs: SiteAttributes): CandidateSite => ({
-        id: `site_${label.toLowerCase()}_seed`, name, label, countryId, city, lat, lng,
-        attributes: attrs, isExample: true, createdAt: now, updatedAt: now,
-    });
-    return [
-        mk('A', 'Coastal Campus', baseCountryId, 'Coastal zone', 0.35, 0.30, {
-            totalAcres: 120, usableAcres: 95, submarineCableLandings: 3, distanceToCableLandingKm: 4.1,
-            landCostPerM2: 86, roadAccess: 'excellent', distPortKm: 15, distAirportKm: 18, permitMonths: 9,
-            waterSource: 'Seawater (deep intake)', topography: 'flat',
-            latencies: [{ market: 'Singapore', ms: 26 }, { market: 'Mumbai', ms: 48 }, { market: 'Frankfurt', ms: 118 }],
-        }),
-        mk('B', 'Airport District', b, 'Airport area', 0.62, 0.55, {
-            totalAcres: 100, usableAcres: 78, submarineCableLandings: 1, distanceToCableLandingKm: 42,
-            landCostPerM2: 145, roadAccess: 'good', distPortKm: 55, distAirportKm: 6, permitMonths: 12,
-            topography: 'flat',
-            latencies: [{ market: 'Singapore', ms: 8 }, { market: 'Tokyo', ms: 68 }],
-        }),
-        mk('C', 'Inland Plateau', cId, 'Inland region', 0.48, 0.78, {
-            totalAcres: 95, usableAcres: 80, submarineCableLandings: 0, distanceToCableLandingKm: 180,
-            landCostPerM2: 42, roadAccess: 'fair', distPortKm: 140, distAirportKm: 35, permitMonths: 7,
-            topography: 'gentle',
-            latencies: [{ market: 'Singapore', ms: 34 }],
-        }),
-    ];
+    const c = COUNTRIES[baseCountryId];
+    return [{
+        id: 'site_a_scenario',
+        name: c ? `${c.name} Site` : 'Primary Site',
+        label: 'A',
+        countryId: baseCountryId,
+        city: '',
+        lat: 0.42, lng: 0.45,
+        attributes: {},               // all values from the country baseline until edited
+        createdAt: now, updatedAt: now,
+    }];
 }

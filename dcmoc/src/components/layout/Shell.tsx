@@ -119,6 +119,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
 
     const navItems: { label: string; icon: LucideIcon; id: typeof activeTab; section?: string }[] = [
         { label: 'CAPEX Config', icon: Building, id: 'capex' },
+        { label: 'Operations Overview', icon: Activity, id: 'ops' },
         { label: 'Staff Model Config', icon: Calculator, id: 'sim' },
         { label: 'Staffing', icon: Users, id: 'staff' },
         { label: 'Maintenance', icon: Wrench, id: 'maint' },
@@ -165,7 +166,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
         { num: 5, label: 'CAPEX Engine', icon: Building, childIds: ['capex'] },
         { num: 6, label: 'Construction', icon: HardHat, childIds: ['construction', 'phased-finance'] },
         { num: 7, label: 'Commissioning', icon: CheckCircle2, childIds: ['commissioning'] },
-        { num: 8, label: 'Operations', icon: Wrench, childIds: ['sim', 'staff', 'maint'] },
+        { num: 8, label: 'Operations', icon: Wrench, childIds: ['ops', 'sim', 'staff', 'maint'] },
         { num: 9, label: 'Asset Intelligence', icon: Activity, childIds: ['asset-health', 'asset-lifecycle', 'cbm', 'spares'] },
         { num: 10, label: 'Reliability', icon: ShieldCheck, childIds: ['risk', 'reliability', 'tier'] },
         { num: 11, label: 'Sustainability', icon: Leaf, childIds: ['carbon'] },

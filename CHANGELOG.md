@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.75.0 — 2026-07-19 (DCMOC Phase G: Operations Engine + owner UX corrections)
+
+### Added
+- **DCMOC "Operations Engine"** (new 'ops' tab, Engine-8 group [ops, sim, staff, maint]): derived plane engine-real (availability shown as the Tier design TARGET, PUE-at-load via partialLoadPUE × occupancy, active IT load, 24h energy cost at the country tariff, Weibull asset-health distribution, shift overview from the staffing model), ops-log plane user-entered (`opsLog` store: alarms/incidents/tickets CRUD with EXAMPLE-chipped seeds + Plan-Mode banner + PM-week compliance log). 24h load curve = documented deterministic diurnal cosine (±5%%, peak 14:00) — labeled SIMULATED, no Math.random. Shift & People + Maintenance sub-tabs absorb the existing dashboards by composition; quick actions wired to real targets.
+
+### Changed (owner UX corrections — retroactive)
+- **CreatableCombobox v2 — dropdown-FIRST**: the control now renders as a normal select-style button listing preset options (the simple dropdown experience preserved exactly); "Custom value…" row switches to validated typed entry; "Use default" row clears overrides. Applies everywhere the primitive is used (Requirements density/margin, Architecture, Capacity, Construction).
+- **No fabricated sites**: Site Intelligence now seeds exactly ONE candidate site bound to the active scenario country; multi-site compare appears only after the user adds sites.
+
 ## v1.74.0 — 2026-07-19 (DCMOC Phase F: Construction Engine)
 
 ### Added
