@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.65.4 — 2026-07-18 (DCMOC: surface density-safety + rack-count on Requirements)
+
+### Added
+- **RequirementsDashboard** now feeds the real cooling type into `models.requirements.validate` and surfaces the density band, implied rack count, and a CRITICAL red flag when the workload density exceeds the cooling ceiling (e.g. AI on air) — ASHRAE-TC9.9 safety check.
+
+---
+
 ## v1.65.3 — 2026-07-18 (DCMOC: surface Weibull wear-out risk on Asset)
 
 ### Added

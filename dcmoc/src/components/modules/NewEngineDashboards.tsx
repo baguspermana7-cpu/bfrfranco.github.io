@@ -47,9 +47,10 @@ export function RequirementsDashboard() {
     const { inputs, country } = useCfg();
     const m = rzModels().requirements;
     if (!m) return <Loading />;
-    const intake = { itLoadKw: inputs.itLoad, targetTier: inputs.tierLevel, region: country?.id, useCase: 'ai', budgetUsd: undefined, deadlineMonths: undefined };
+    const intake = { itLoadKw: inputs.itLoad, targetTier: inputs.tierLevel, region: country?.id, useCase: 'ai', coolingType: inputs.coolingType, budgetUsd: undefined, deadlineMonths: undefined };
     const v = m.validate(intake);
     const prof = m.profile('ai');
+    const band = m.densityBand ? m.densityBand(prof?.rackKw || 12) : null;
     return (
         <div className="space-y-4">
             <Head icon={ClipboardList} title="Requirements" sub="DC-OS Layer 1 · models.requirements" tone="from-cyan-500 to-blue-600"
@@ -61,9 +62,9 @@ export function RequirementsDashboard() {
                 })} />
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <Metric label="Brief Completeness" value={`${v.completeness.pct}%`} sub={v.completeness.ready ? 'ready' : `${v.completeness.missing.length} missing`} />
-                <Metric label="Use Case" value={prof?.label || '—'} sub={`${prof?.rackKw ?? '—'} kW/rack`} />
+                <Metric label="Rack Density" value={`${prof?.rackKw ?? '—'} kW`} sub={band ? `${band.band} density` : prof?.label} />
+                <Metric label="Implied Racks" value={v.rackCount != null ? v.rackCount.toLocaleString() : '—'} sub={`@ ${prof?.rackKw ?? '—'} kW/rack`} />
                 <Metric label="Rec. Tier Floor" value={v.recommendedTierFloor ? `Tier ${v.recommendedTierFloor}` : '—'} sub={prof?.cooling} />
-                <Metric label="Target Tier" value={`Tier ${inputs.tierLevel}`} sub={v.flags.length ? 'flagged' : 'ok'} />
             </div>
             <Card>
                 <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Intake Checklist</h2>
@@ -72,7 +73,8 @@ export function RequirementsDashboard() {
                         <div key={f} className="flex items-center gap-1.5"><span className={`w-2 h-2 rounded-full ${v.completeness.have.includes(f) ? 'bg-emerald-500' : 'bg-slate-400'}`} /><span className="text-slate-600 dark:text-slate-300">{f}</span></div>
                     ))}
                 </div>
-                {v.flags.map((fl: { message: string }, i: number) => <p key={i} className="mt-2 text-[11px] text-amber-500">⚠ {fl.message}</p>)}
+                {v.flags.map((fl: { level: string; message: string }, i: number) => <p key={i} className={`mt-2 text-[11px] ${fl.level === 'critical' ? 'text-rose-400 font-semibold' : 'text-amber-500'}`}>{fl.level === 'critical' ? '⛔' : '⚠'} {fl.message}</p>)}
+                {v.flags.length === 0 && <p className="mt-2 text-[11px] text-emerald-500">✓ Density-to-cooling compatible; SLA/tier consistent.</p>}
             </Card>
         </div>
     );
