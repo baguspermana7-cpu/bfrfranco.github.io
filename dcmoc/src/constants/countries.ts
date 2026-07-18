@@ -47,6 +47,11 @@ export interface CountryProfile {
     environment: {
         baselineAQI: number;
         gridCarbonIntensity: number;
+        /* v2.5.0 site research pass (optional, augmented for major markets) */
+        aqueductStressScore?: number;   // WRI Aqueduct 4.0 baseline water stress 0-5
+        ashraeClimateZone?: string;     // ASHRAE 169-2021 climate zone (e.g. '3A')
+        saidiMinYr?: number;            // IEEE 1366 SAIDI (min/customer/yr)
+        pgaPct2in50yr?: number;         // USGS PGA %g (2% in 50yr) → seismic design cat
     };
     risk: {
         downtimeCostPerMin: number; // $/min downtime cost (country-adjusted)
@@ -2364,3 +2369,41 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
 };
+
+/* ─── v2.5.0 site research augmentation (Pillar 2) ────────────────────────────
+ * Per-country site factors for the major DC markets, from published frameworks:
+ * WRI Aqueduct 4.0 baseline water stress (0-5), ASHRAE 169-2021 climate zone,
+ * IEEE 1366 SAIDI (min/customer/yr), USGS PGA %g (2% in 50yr). Applied to
+ * COUNTRIES so the engine's models.site.deriveFactors uses real values (water
+ * was previously hardcoded). Countries not listed keep the neutral fallback.
+ * ──────────────────────────────────────────────────────────────────────────── */
+const SITE_AUGMENT: Record<string, { aqueductStressScore: number; ashraeClimateZone: string; saidiMinYr: number; pgaPct2in50yr: number }> = {
+    US: { aqueductStressScore: 3, ashraeClimateZone: '4A', saidiMinYr: 90, pgaPct2in50yr: 15 },
+    SG: { aqueductStressScore: 4, ashraeClimateZone: '1A', saidiMinYr: 15, pgaPct2in50yr: 2 },
+    ID: { aqueductStressScore: 3, ashraeClimateZone: '1A', saidiMinYr: 300, pgaPct2in50yr: 60 },
+    MY: { aqueductStressScore: 2, ashraeClimateZone: '1A', saidiMinYr: 50, pgaPct2in50yr: 5 },
+    JP: { aqueductStressScore: 2, ashraeClimateZone: '3A', saidiMinYr: 20, pgaPct2in50yr: 80 },
+    IN: { aqueductStressScore: 4, ashraeClimateZone: '2A', saidiMinYr: 600, pgaPct2in50yr: 30 },
+    CN: { aqueductStressScore: 4, ashraeClimateZone: '3A', saidiMinYr: 100, pgaPct2in50yr: 30 },
+    KR: { aqueductStressScore: 3, ashraeClimateZone: '4A', saidiMinYr: 15, pgaPct2in50yr: 25 },
+    DE: { aqueductStressScore: 3, ashraeClimateZone: '4A', saidiMinYr: 12, pgaPct2in50yr: 5 },
+    GB: { aqueductStressScore: 2, ashraeClimateZone: '4C', saidiMinYr: 40, pgaPct2in50yr: 3 },
+    NL: { aqueductStressScore: 3, ashraeClimateZone: '4A', saidiMinYr: 20, pgaPct2in50yr: 3 },
+    FR: { aqueductStressScore: 3, ashraeClimateZone: '4A', saidiMinYr: 50, pgaPct2in50yr: 8 },
+    IE: { aqueductStressScore: 1, ashraeClimateZone: '5C', saidiMinYr: 60, pgaPct2in50yr: 3 },
+    SE: { aqueductStressScore: 1, ashraeClimateZone: '6A', saidiMinYr: 45, pgaPct2in50yr: 3 },
+    AU: { aqueductStressScore: 3, ashraeClimateZone: '3B', saidiMinYr: 100, pgaPct2in50yr: 8 },
+    SA: { aqueductStressScore: 5, ashraeClimateZone: '1B', saidiMinYr: 80, pgaPct2in50yr: 5 },
+    AE: { aqueductStressScore: 5, ashraeClimateZone: '1B', saidiMinYr: 30, pgaPct2in50yr: 5 },
+    QA: { aqueductStressScore: 5, ashraeClimateZone: '1B', saidiMinYr: 25, pgaPct2in50yr: 4 },
+    BR: { aqueductStressScore: 2, ashraeClimateZone: '1A', saidiMinYr: 200, pgaPct2in50yr: 5 },
+    ZA: { aqueductStressScore: 4, ashraeClimateZone: '3A', saidiMinYr: 500, pgaPct2in50yr: 8 },
+    MX: { aqueductStressScore: 4, ashraeClimateZone: '2A', saidiMinYr: 120, pgaPct2in50yr: 40 },
+    TW: { aqueductStressScore: 3, ashraeClimateZone: '2A', saidiMinYr: 20, pgaPct2in50yr: 70 },
+    TH: { aqueductStressScore: 3, ashraeClimateZone: '1A', saidiMinYr: 100, pgaPct2in50yr: 8 },
+    VN: { aqueductStressScore: 3, ashraeClimateZone: '1A', saidiMinYr: 200, pgaPct2in50yr: 10 },
+    PH: { aqueductStressScore: 3, ashraeClimateZone: '1A', saidiMinYr: 400, pgaPct2in50yr: 50 },
+};
+for (const id of Object.keys(SITE_AUGMENT)) {
+    if (COUNTRIES[id]) Object.assign(COUNTRIES[id].environment, SITE_AUGMENT[id]);
+}

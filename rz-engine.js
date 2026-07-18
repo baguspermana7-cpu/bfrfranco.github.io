@@ -219,7 +219,11 @@
                 },
                 "environment": {
                     "baselineAQI": 120,
-                    "gridCarbonIntensity": 0.7
+                    "gridCarbonIntensity": 0.7,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "1A",
+                    "saidiMinYr": 300,
+                    "pgaPct2in50yr": 60
                 },
                 "risk": {
                     "downtimeCostPerMin": 1500
@@ -333,7 +337,11 @@
                 },
                 "environment": {
                     "baselineAQI": 45,
-                    "gridCarbonIntensity": 0.4
+                    "gridCarbonIntensity": 0.4,
+                    "aqueductStressScore": 4,
+                    "ashraeClimateZone": "1A",
+                    "saidiMinYr": 15,
+                    "pgaPct2in50yr": 2
                 },
                 "risk": {
                     "downtimeCostPerMin": 4500
@@ -446,7 +454,11 @@
                 },
                 "environment": {
                     "baselineAQI": 90,
-                    "gridCarbonIntensity": 0.6
+                    "gridCarbonIntensity": 0.6,
+                    "aqueductStressScore": 2,
+                    "ashraeClimateZone": "1A",
+                    "saidiMinYr": 50,
+                    "pgaPct2in50yr": 5
                 },
                 "risk": {
                     "downtimeCostPerMin": 1200
@@ -560,7 +572,11 @@
                 },
                 "environment": {
                     "baselineAQI": 35,
-                    "gridCarbonIntensity": 0.4
+                    "gridCarbonIntensity": 0.4,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "4A",
+                    "saidiMinYr": 90,
+                    "pgaPct2in50yr": 15
                 },
                 "risk": {
                     "downtimeCostPerMin": 5000
@@ -672,7 +688,11 @@
                 },
                 "environment": {
                     "baselineAQI": 30,
-                    "gridCarbonIntensity": 0.5
+                    "gridCarbonIntensity": 0.5,
+                    "aqueductStressScore": 2,
+                    "ashraeClimateZone": "3A",
+                    "saidiMinYr": 20,
+                    "pgaPct2in50yr": 80
                 },
                 "risk": {
                     "downtimeCostPerMin": 4000
@@ -785,7 +805,11 @@
                 },
                 "environment": {
                     "baselineAQI": 20,
-                    "gridCarbonIntensity": 0.6
+                    "gridCarbonIntensity": 0.6,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "3B",
+                    "saidiMinYr": 100,
+                    "pgaPct2in50yr": 8
                 },
                 "risk": {
                     "downtimeCostPerMin": 4500
@@ -898,7 +922,11 @@
                 },
                 "environment": {
                     "baselineAQI": 100,
-                    "gridCarbonIntensity": 0.45
+                    "gridCarbonIntensity": 0.45,
+                    "aqueductStressScore": 5,
+                    "ashraeClimateZone": "1B",
+                    "saidiMinYr": 30,
+                    "pgaPct2in50yr": 5
                 },
                 "risk": {
                     "downtimeCostPerMin": 3500
@@ -1014,7 +1042,11 @@
                 },
                 "environment": {
                     "baselineAQI": 110,
-                    "gridCarbonIntensity": 0.55
+                    "gridCarbonIntensity": 0.55,
+                    "aqueductStressScore": 5,
+                    "ashraeClimateZone": "1B",
+                    "saidiMinYr": 80,
+                    "pgaPct2in50yr": 5
                 },
                 "risk": {
                     "downtimeCostPerMin": 3000
@@ -1128,7 +1160,11 @@
                 },
                 "environment": {
                     "baselineAQI": 95,
-                    "gridCarbonIntensity": 0.48
+                    "gridCarbonIntensity": 0.48,
+                    "aqueductStressScore": 5,
+                    "ashraeClimateZone": "1B",
+                    "saidiMinYr": 25,
+                    "pgaPct2in50yr": 4
                 },
                 "risk": {
                     "downtimeCostPerMin": 3500
@@ -1242,7 +1278,11 @@
                 },
                 "environment": {
                     "baselineAQI": 50,
-                    "gridCarbonIntensity": 0.9
+                    "gridCarbonIntensity": 0.9,
+                    "aqueductStressScore": 4,
+                    "ashraeClimateZone": "3A",
+                    "saidiMinYr": 500,
+                    "pgaPct2in50yr": 8
                 },
                 "risk": {
                     "downtimeCostPerMin": 1500
@@ -1585,7 +1625,11 @@
                 },
                 "environment": {
                     "baselineAQI": 50,
-                    "gridCarbonIntensity": 0.15
+                    "gridCarbonIntensity": 0.15,
+                    "aqueductStressScore": 2,
+                    "ashraeClimateZone": "1A",
+                    "saidiMinYr": 200,
+                    "pgaPct2in50yr": 5
                 },
                 "risk": {
                     "downtimeCostPerMin": 1800
@@ -1811,7 +1855,11 @@
                 },
                 "environment": {
                     "baselineAQI": 80,
-                    "gridCarbonIntensity": 0.45
+                    "gridCarbonIntensity": 0.45,
+                    "aqueductStressScore": 4,
+                    "ashraeClimateZone": "2A",
+                    "saidiMinYr": 120,
+                    "pgaPct2in50yr": 40
                 },
                 "risk": {
                     "downtimeCostPerMin": 1200
@@ -2038,7 +2086,11 @@
                 },
                 "environment": {
                     "baselineAQI": 150,
-                    "gridCarbonIntensity": 0.72
+                    "gridCarbonIntensity": 0.72,
+                    "aqueductStressScore": 4,
+                    "ashraeClimateZone": "2A",
+                    "saidiMinYr": 600,
+                    "pgaPct2in50yr": 30
                 },
                 "risk": {
                     "downtimeCostPerMin": 1200
@@ -2153,7 +2205,11 @@
                 },
                 "environment": {
                     "baselineAQI": 130,
-                    "gridCarbonIntensity": 0.58
+                    "gridCarbonIntensity": 0.58,
+                    "aqueductStressScore": 4,
+                    "ashraeClimateZone": "3A",
+                    "saidiMinYr": 100,
+                    "pgaPct2in50yr": 30
                 },
                 "risk": {
                     "downtimeCostPerMin": 2500
@@ -2267,7 +2323,11 @@
                 },
                 "environment": {
                     "baselineAQI": 55,
-                    "gridCarbonIntensity": 0.42
+                    "gridCarbonIntensity": 0.42,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "4A",
+                    "saidiMinYr": 15,
+                    "pgaPct2in50yr": 25
                 },
                 "risk": {
                     "downtimeCostPerMin": 3500
@@ -2381,7 +2441,11 @@
                 },
                 "environment": {
                     "baselineAQI": 80,
-                    "gridCarbonIntensity": 0.5
+                    "gridCarbonIntensity": 0.5,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "1A",
+                    "saidiMinYr": 100,
+                    "pgaPct2in50yr": 8
                 },
                 "risk": {
                     "downtimeCostPerMin": 1000
@@ -2495,7 +2559,11 @@
                 },
                 "environment": {
                     "baselineAQI": 100,
-                    "gridCarbonIntensity": 0.55
+                    "gridCarbonIntensity": 0.55,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "1A",
+                    "saidiMinYr": 200,
+                    "pgaPct2in50yr": 10
                 },
                 "risk": {
                     "downtimeCostPerMin": 800
@@ -2609,7 +2677,11 @@
                 },
                 "environment": {
                     "baselineAQI": 70,
-                    "gridCarbonIntensity": 0.6
+                    "gridCarbonIntensity": 0.6,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "1A",
+                    "saidiMinYr": 400,
+                    "pgaPct2in50yr": 50
                 },
                 "risk": {
                     "downtimeCostPerMin": 900
@@ -2723,7 +2795,11 @@
                 },
                 "environment": {
                     "baselineAQI": 60,
-                    "gridCarbonIntensity": 0.5
+                    "gridCarbonIntensity": 0.5,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "2A",
+                    "saidiMinYr": 20,
+                    "pgaPct2in50yr": 70
                 },
                 "risk": {
                     "downtimeCostPerMin": 3000
@@ -2946,7 +3022,11 @@
                 },
                 "environment": {
                     "baselineAQI": 25,
-                    "gridCarbonIntensity": 0.23
+                    "gridCarbonIntensity": 0.23,
+                    "aqueductStressScore": 2,
+                    "ashraeClimateZone": "4C",
+                    "saidiMinYr": 40,
+                    "pgaPct2in50yr": 3
                 },
                 "risk": {
                     "downtimeCostPerMin": 4500
@@ -3059,7 +3139,11 @@
                 },
                 "environment": {
                     "baselineAQI": 20,
-                    "gridCarbonIntensity": 0.35
+                    "gridCarbonIntensity": 0.35,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "4A",
+                    "saidiMinYr": 12,
+                    "pgaPct2in50yr": 5
                 },
                 "risk": {
                     "downtimeCostPerMin": 5000
@@ -3169,7 +3253,11 @@
                 },
                 "environment": {
                     "baselineAQI": 20,
-                    "gridCarbonIntensity": 0.33
+                    "gridCarbonIntensity": 0.33,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "4A",
+                    "saidiMinYr": 20,
+                    "pgaPct2in50yr": 3
                 },
                 "risk": {
                     "downtimeCostPerMin": 4500
@@ -3281,7 +3369,11 @@
                 },
                 "environment": {
                     "baselineAQI": 15,
-                    "gridCarbonIntensity": 0.3
+                    "gridCarbonIntensity": 0.3,
+                    "aqueductStressScore": 1,
+                    "ashraeClimateZone": "5C",
+                    "saidiMinYr": 60,
+                    "pgaPct2in50yr": 3
                 },
                 "risk": {
                     "downtimeCostPerMin": 4500
@@ -3395,7 +3487,11 @@
                 },
                 "environment": {
                     "baselineAQI": 25,
-                    "gridCarbonIntensity": 0.06
+                    "gridCarbonIntensity": 0.06,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "4A",
+                    "saidiMinYr": 50,
+                    "pgaPct2in50yr": 8
                 },
                 "risk": {
                     "downtimeCostPerMin": 4000
@@ -3505,7 +3601,11 @@
                 },
                 "environment": {
                     "baselineAQI": 10,
-                    "gridCarbonIntensity": 0.04
+                    "gridCarbonIntensity": 0.04,
+                    "aqueductStressScore": 1,
+                    "ashraeClimateZone": "6A",
+                    "saidiMinYr": 45,
+                    "pgaPct2in50yr": 3
                 },
                 "risk": {
                     "downtimeCostPerMin": 4000
@@ -4191,8 +4291,15 @@
          * transparent DC site-selection heuristic (power + grid dominate). ══ */
         site: {
             /* Factor weights (sum = 1.0). Each factor is a 0-1 goodness score
-             * (1 = best). power/grid dominate DC site selection. */
-            weights: { power: 0.18, grid: 0.15, seismic: 0.12, talent: 0.12, tax: 0.10, carbon: 0.10, flood: 0.08, latency: 0.08, water: 0.07 },
+             * (1 = best). power/grid dominate DC site selection. v2.5.0: +climate
+             * (free-cooling hours) factor per CBRE/JLL site-selection frameworks. */
+            weights: { power: 0.17, grid: 0.14, seismic: 0.10, talent: 0.11, tax: 0.09, carbon: 0.09, flood: 0.07, latency: 0.07, water: 0.08, climate: 0.08 },
+            /* v2.5.0 site research pass — ASHRAE 169-2021 climate zone → annual
+             * economizer (free-cooling) hours; USGS PGA %g → IBC/ASCE-7 SDC score;
+             * WRI Aqueduct 0-5 water-stress → 0-1; IEEE-1366 SAIDI reference. */
+            climateFreeHours: { '1': 800, '2': 1400, '3': 2200, '4': 3500, '5': 4200, '6': 5000, '7': 5500, '8': 5800 },
+            saidiRefMin: 500,
+            pgaToScore: [ { maxPga: 5, s: 1.0 }, { maxPga: 15, s: 0.8 }, { maxPga: 30, s: 0.6 }, { maxPga: 60, s: 0.35 }, { maxPga: 9999, s: 0.1 } ],
             /* Score → letter grade bands. */
             gradeBands: [
                 { min: 85, grade: 'A', label: 'Prime' },
@@ -4627,6 +4734,7 @@
             'construction.longLeadWeeks': { source: 'Critical long-lead electrical/mechanical equipment procurement lead times, 2024-26 supply-constrained market (MV/HV transformers 60-120 wk, MV switchgear 50-80 wk, gensets 40-70 wk, UPS 30-52 wk, chillers 30-50 wk) — EPRI/industry procurement trackers + OEM quotes', asOf: '2025', unit: 'weeks [typical, stressed]' },
             'maintenance.staffing':   { source: 'Uptime Institute critical-facilities staffing benchmark: 24/7 manned position needs ~4.2 FTE (shifts + relief/PTO); positions scale with tier; plus per-MW technicians', asOf: '2024', unit: 'FTE' },
             'asset.weibull':          { source: 'Weibull wear-out life distributions by asset class (shape β>1 = increasing hazard; scale η = characteristic life yr) — reliability engineering practice + IEEE 493 (Gold Book) component data + manufacturer MTBF', asOf: '2024', unit: 'β (shape), η (years)' },
+            'site.climateFreeHours':  { source: 'ASHRAE 169-2021 climate zones → annual economizer (free-cooling) hours (DOE/NREL psychrometric bin analysis); site-selection factor weights per CBRE/JLL DC Site Selection frameworks 2025; per-country water-stress WRI Aqueduct 4.0 (2023); grid reliability IEEE 1366 SAIDI; seismic USGS PGA → IBC/ASCE 7-22 SDC', asOf: '2025', unit: 'hr/yr free-cooling; 0-1 factor scores' },
             'currency':               { source: 'ECB / central-bank reference rates', asOf: '2026-04', method: 'spot, USD base' },
             'inflationAnnual':        { source: 'IMF WEO 2026 regional CPI', asOf: '2026', unit: 'fraction/yr' },
             'salaryBenchmarks':       { source: 'Uptime Institute 2026 + AFCOM 2026 + US BLS 2025', asOf: '2026', unit: 'USD/yr, base' },
@@ -6240,22 +6348,40 @@
                     var clamp = function (x) { return Math.max(0, Math.min(1, x)); };
                     var f;
                     if (!c) {
-                        f = { power: 0.6, grid: 0.6, seismic: 0.6, talent: 0.6, tax: 0.6, carbon: 0.6, flood: 0.6, latency: 0.6, water: 0.6 };
+                        f = { power: 0.6, grid: 0.6, seismic: 0.6, talent: 0.6, tax: 0.6, carbon: 0.6, flood: 0.6, latency: 0.6, water: 0.6, climate: 0.6 };
                     } else {
                         var floodMap = { low: 1, moderate: 0.66, high: 0.33, extreme: 0 };
                         var er = c.economy && c.economy.electricityRate;              // $/kWh (lower better)
                         var gc = c.environment && c.environment.gridCarbonIntensity;  // kgCO2/kWh (lower better)
                         var tax = c.economy && c.economy.taxRate;                     // fraction (lower better)
+                        var env = c.environment || {};
+                        var S = DATA.site;
+                        // grid: prefer IEEE-1366 SAIDI when available, else uptime%
+                        var gridScore;
+                        if (env.saidiMinYr != null) gridScore = clamp(1 - env.saidiMinYr / S.saidiRefMin);
+                        else if (c.gridReliability) gridScore = clamp(((c.gridReliability.gridUptime > 1 ? c.gridReliability.gridUptime : c.gridReliability.gridUptime * 100) - 95) / 5);
+                        else gridScore = 0.6;
+                        // seismic: prefer USGS PGA→SDC when available, else zone 0-4
+                        var seismicScore;
+                        if (env.pgaPct2in50yr != null) { var pg = env.pgaPct2in50yr; var bnd = S.pgaToScore.find(function (b) { return pg < b.maxPga; }); seismicScore = bnd ? bnd.s : 0.1; }
+                        else if (c.naturalDisaster) seismicScore = clamp(1 - c.naturalDisaster.seismicZone / 4);
+                        else seismicScore = 0.6;
+                        // water: WRI Aqueduct 0-5 water-stress (was hardcoded 0.65)
+                        var waterScore = env.aqueductStressScore != null ? clamp(1 - env.aqueductStressScore / 5) : 0.65;
+                        // climate: ASHRAE zone → free-cooling hours → 0-1
+                        var climateScore = 0.6;
+                        if (env.ashraeClimateZone) { var z = String(env.ashraeClimateZone).charAt(0); var hrs = S.climateFreeHours[z]; if (hrs != null) climateScore = clamp(hrs / 5500); }
                         f = {
                             power:   er != null ? clamp(1 - (er - 0.05) / 0.30) : 0.6,
-                            grid:    c.gridReliability ? clamp(((c.gridReliability.gridUptime > 1 ? c.gridReliability.gridUptime : c.gridReliability.gridUptime * 100) - 95) / 5) : 0.6,
-                            seismic: c.naturalDisaster ? clamp(1 - c.naturalDisaster.seismicZone / 4) : 0.6,
+                            grid:    gridScore,
+                            seismic: seismicScore,
                             talent:  c.talentPool ? clamp(c.talentPool.talentScore / 100) : 0.6,
                             tax:     tax != null ? clamp(1 - tax / 0.35) : 0.6,
                             carbon:  gc != null ? clamp(1 - gc / 0.90) : 0.6,
                             flood:   (c.naturalDisaster && floodMap[c.naturalDisaster.floodRisk] != null) ? floodMap[c.naturalDisaster.floodRisk] : 0.6,
                             latency: (c.talentPool && c.talentPool.hyperscalerPresence != null) ? clamp(c.talentPool.hyperscalerPresence / 10) : 0.65,
-                            water:   0.65
+                            water:   waterScore,
+                            climate: climateScore
                         };
                     }
                     if (overrides) { for (var k in overrides) { if (overrides.hasOwnProperty(k)) f[k] = overrides[k]; } }

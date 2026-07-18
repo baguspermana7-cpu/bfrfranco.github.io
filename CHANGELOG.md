@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.66.0 — 2026-07-18 (engine research-deepening: Pillar 2 Site + per-country data)
+
+### Added
+- **Pillar 2 Site deepened with real per-country data** (25 major DC markets augmented): WRI Aqueduct 4.0 water-stress (0-5), ASHRAE 169-2021 climate zone → free-cooling hours, IEEE-1366 SAIDI grid reliability, USGS PGA → seismic design category. `models.site.deriveFactors` now uses them: water is no longer hardcoded (0.65→real, e.g. Saudi 0.00 desert), a **climate free-cooling factor** was added (Sweden 0.91 vs Singapore 0.15), grid prefers SAIDI, seismic prefers PGA (Japan 0.10). Site scores now discriminate realistically (Sweden 80 B prime vs Indonesia 42 D). DATA.sources provenance; test-rz-engine 376/0, parity 126/0. 7 of 13 pillars research-deepened.
+
+---
+
 ## v1.65.6 — 2026-07-18 (DCMOC: surface facility-load + lease-up S-curve on Capacity)
 
 ### Added

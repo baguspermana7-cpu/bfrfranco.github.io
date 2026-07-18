@@ -244,10 +244,17 @@ near('pue.dcie(1.5)', M.pue.dcie(1.5), 0.6667, 0.001);
     /* ── site intelligence model — Layer 2 ── */
     const S = E.models.site;
     // all-perfect factors → 100 / grade A
-    const perfect = S.score({ power: 1, grid: 1, seismic: 1, talent: 1, tax: 1, carbon: 1, flood: 1, latency: 1, water: 1 });
+    const perfect = S.score({ power: 1, grid: 1, seismic: 1, talent: 1, tax: 1, carbon: 1, flood: 1, latency: 1, water: 1, climate: 1 });
     near('site.score all-perfect = 100', perfect.score, 100, 1e-6);
     eq('site.score all-perfect grade A', perfect.grade, 'A');
     eq('site.score all-perfect no missing', perfect.missing.length, 0);
+    // v2.5.0 site research: real per-country water/climate/seismic factors
+    if (M.site.deriveFactors && D.countries && D.countries.SE) {
+        const se = M.site.deriveFactors('SE'), sg = M.site.deriveFactors('SG');
+        ok('site.deriveFactors: cold market (SE) beats tropical (SG) on climate', se.climate > sg.climate, `${se.climate} vs ${sg.climate}`);
+        ok('site.deriveFactors: water from Aqueduct (SA desert low)', M.site.deriveFactors('SA').water <= 0.2);
+        ok('site.deriveFactors: seismic from PGA (JP high-hazard low)', M.site.deriveFactors('JP').seismic <= 0.2);
+    }
     // all-zero → 0 / grade E
     const zero = S.score({ power: 0, grid: 0, seismic: 0, talent: 0, tax: 0, carbon: 0, flood: 0, latency: 0, water: 0 });
     near('site.score all-zero = 0', zero.score, 0, 1e-6);
