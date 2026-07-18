@@ -11,7 +11,7 @@ import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { rzModels } from '@/lib/rz-engine';
 import { generatePillarPDF, type PillarReport } from '@/modules/reporting/pdf/PillarPdf';
-import { ClipboardList, MapPin, Boxes, HardHat, CheckCircle2, Activity, FileDown } from 'lucide-react';
+import { MapPin, Boxes, HardHat, CheckCircle2, Activity, FileDown } from 'lucide-react';
 
 const REDUNDANCY_KEY: Record<string, string> = { 'N+1': 'n1', '2N': '2n', '2N+1': '2n1' };
 const useCfg = () => {
@@ -41,44 +41,6 @@ function Metric({ label, value, sub }: { label: string; value: string; sub?: str
     return <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 transition-all hover:-translate-y-0.5 hover:border-cyan-400/50 hover:bg-cyan-500/[0.05] hover:shadow-md hover:shadow-cyan-900/10"><div className="text-[10px] uppercase tracking-wide text-slate-500">{label}</div><div className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{value}</div>{sub && <div className="text-[10px] text-slate-500">{sub}</div>}</div>;
 }
 function Loading() { return <div className="text-sm text-slate-500 p-8 text-center">Engine loading…</div>; }
-
-/* ── L1 Requirements ── */
-export function RequirementsDashboard() {
-    const { inputs, country } = useCfg();
-    const m = rzModels().requirements;
-    if (!m) return <Loading />;
-    const intake = { itLoadKw: inputs.itLoad, targetTier: inputs.tierLevel, region: country?.id, useCase: 'ai', coolingType: inputs.coolingType, budgetUsd: undefined, deadlineMonths: undefined };
-    const v = m.validate(intake);
-    const prof = m.profile('ai');
-    const band = m.densityBand ? m.densityBand(prof?.rackKw || 12) : null;
-    return (
-        <div className="space-y-4">
-            <Head icon={ClipboardList} title="Requirements" sub="DC-OS Layer 1 · models.requirements" tone="from-cyan-500 to-blue-600"
-                report={() => ({
-                    title: 'Requirements', layer: 'Layer 1 · Requirements', project: country?.name || '—',
-                    kpis: [{ label: 'Brief Completeness', value: `${v.completeness.pct}%`, sub: v.completeness.ready ? 'ready' : `${v.completeness.missing.length} missing` }, { label: 'Use Case', value: prof?.label || '—', sub: `${prof?.rackKw ?? '—'} kW/rack` }, { label: 'Rec. Tier Floor', value: v.recommendedTierFloor ? `Tier ${v.recommendedTierFloor}` : '—' }, { label: 'Target Tier', value: `Tier ${inputs.tierLevel}` }],
-                    sections: [{ title: 'Intake Checklist', head: ['Field', 'Status'], rows: ['itLoadKw', 'targetTier', 'region', 'useCase', 'budgetUsd', 'deadlineMonths'].map((f) => [f, v.completeness.have.includes(f) ? 'provided' : 'missing']) }],
-                    note: v.flags.map((f: { message: string }) => f.message).join(' · ') || 'Educational planning intake, not a design basis.',
-                })} />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <Metric label="Brief Completeness" value={`${v.completeness.pct}%`} sub={v.completeness.ready ? 'ready' : `${v.completeness.missing.length} missing`} />
-                <Metric label="Rack Density" value={`${prof?.rackKw ?? '—'} kW`} sub={band ? `${band.band} density` : prof?.label} />
-                <Metric label="Implied Racks" value={v.rackCount != null ? v.rackCount.toLocaleString() : '—'} sub={`@ ${prof?.rackKw ?? '—'} kW/rack`} />
-                <Metric label="Rec. Tier Floor" value={v.recommendedTierFloor ? `Tier ${v.recommendedTierFloor}` : '—'} sub={prof?.cooling} />
-            </div>
-            <Card>
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Intake Checklist</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 text-xs">
-                    {['itLoadKw', 'targetTier', 'region', 'useCase', 'budgetUsd', 'deadlineMonths'].map((f) => (
-                        <div key={f} className="flex items-center gap-1.5"><span className={`w-2 h-2 rounded-full ${v.completeness.have.includes(f) ? 'bg-emerald-500' : 'bg-slate-400'}`} /><span className="text-slate-600 dark:text-slate-300">{f}</span></div>
-                    ))}
-                </div>
-                {v.flags.map((fl: { level: string; message: string }, i: number) => <p key={i} className={`mt-2 text-[11px] ${fl.level === 'critical' ? 'text-rose-400 font-semibold' : 'text-amber-500'}`}>{fl.level === 'critical' ? '⛔' : '⚠'} {fl.message}</p>)}
-                {v.flags.length === 0 && <p className="mt-2 text-[11px] text-emerald-500">✓ Density-to-cooling compatible; SLA/tier consistent.</p>}
-            </Card>
-        </div>
-    );
-}
 
 /* ── L2 Site Intelligence ── */
 export function SiteIntelDashboard() {

@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.69.0 — 2026-07-19 (DCMOC Phase A: Requirements & Workload Engine page)
+
+### Added
+- **DCMOC "Requirements & Workload Engine" page** (Phase A of the DC-OS UIUX program) — replaces the thin Requirements intake dashboard with the full reference design: 1.1 Project Overview (project/customer/COD/grid-voltage/project-type/contract/currency/use-case), 1.2 Workload Profile (IT/peak/avg load w/ MW|kW toggle, rack density CreatableCombobox, computed Total Racks, auto-normalized workload-mix sliders, AI chip, cooling approach), 1.3 Growth Plan (Y0 always = shared IT load; linear/step/custom; 5-yr CAGR), 1.4 Availability Target (engine tier fraction → %, downtime budget min/yr, SLA check), 1.5 Business, Margin & Priority (budget, **Design Margin wired into CAPEX contingency** per owner mandate, rankable priorities), 1.7 Summary (engine-real `models.requirements.validate` checklist + flags + PDF). Sticky right rail: deterministic AI Insights, Requirement Score ring, Active Scenarios, per-section Input Quality bars, Next: Site Intelligence.
+- **Phase 0 state layer now live**: requirements store registers as the registry's `req.*` provider; shared fields (itLoad/cooling/country/tier/rack-density) written through mapping helpers into BOTH simulation + capex stores (no drift).
+
+### Changed
+- Sidebar: Engine-1 children → [Requirements & Workload]; **Staff Model Config moved to Engine-8 Operations** (sim/staff/maint) per owner. Old RequirementsDashboard deleted after absorption.
+
 ## v1.68.1 — 2026-07-18 (fix: root-tier lockout on premium gates, 22 pages)
 
 ### Fixed
