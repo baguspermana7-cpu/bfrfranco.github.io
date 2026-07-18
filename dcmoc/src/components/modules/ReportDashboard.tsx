@@ -756,7 +756,7 @@ export function ReportDashboard() {
                         { label: 'Annual TCO', value: fmtMoney(fullData.annualTCO), sub: 'OPEX + Maint + Depr', icon: TrendingUp, color: 'text-amber-600 dark:text-amber-400' },
                         { label: '5-Year TCO', value: fmtMoney(fullData.fiveYearTCO), sub: `${simYear}-${simYear + 4}`, icon: BarChart3, color: 'text-violet-600 dark:text-violet-400' },
                         { label: 'CAPEX $/kW', value: `$${fullData.capex.metrics?.perKw?.toLocaleString() || '0'}`, sub: `PUE ${fullData.capex.pue?.toFixed(2) || 'N/A'}`, icon: Zap, color: 'text-orange-600 dark:text-orange-400' },
-                        { label: 'Availability', value: `${fullData.riskData?.availability?.toFixed(3) || '99.982'}%`, sub: `Tier ${inputs.tierLevel}`, icon: Shield, color: 'text-blue-600 dark:text-blue-400' },
+                        { label: 'Availability', value: `${fullData.riskData?.availability?.toFixed(3) || ({2:'99.741',3:'99.982',4:'99.995'}[inputs.tierLevel as 2|3|4] || '—')}%`, sub: `Tier ${inputs.tierLevel}`, icon: Shield, color: 'text-blue-600 dark:text-blue-400' },
                     ].map((kpi, i) => (
                         <div key={i} className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-sm dark:shadow-none">
                             <div className="flex items-center gap-2 mb-2">
@@ -980,7 +980,7 @@ export function ReportDashboard() {
                             <div className="text-xs text-slate-500">Redundancy Level</div>
                         </div>
                         <div className="text-center p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg border border-slate-100 dark:border-slate-800">
-                            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{fullData.riskData?.availability?.toFixed(3) || '99.982'}%</div>
+                            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{fullData.riskData?.availability?.toFixed(3) || ({2:'99.741',3:'99.982',4:'99.995'}[inputs.tierLevel as 2|3|4] || '—')}%</div>
                             <div className="text-xs text-slate-500">Expected Availability</div>
                         </div>
                         <div className="text-center p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg border border-slate-100 dark:border-slate-800">

@@ -187,11 +187,14 @@ export function KnowledgeDashboard() {
 export function IntegrationsDashboard() {
     const user = useAuthStore((s) => s.user);
     const ai = useAiConfigStore();
+    // Real check: the engine is "connected" only when window.RZEngine actually
+    // loaded (rzModels() resolves), not a hardcoded true.
+    const engineLoaded = !!(rzModels() && rzModels().capex);
     const rows: [string, boolean, string][] = [
         ['Supabase Auth', !!user, user ? `signed in · ${user.role}` : 'not connected'],
-        ['RZ Engine (shared)', true, 'rz-engine.js loaded'],
-        ['Backend /calc (server-side math)', true, 'rz-finance-gateway (anti-theft)'],
-        ['AI decision API', ai.enabled, ai.enabled ? `${ai.provider}` : 'optional — not configured'],
+        ['RZ Engine (shared)', engineLoaded, engineLoaded ? 'rz-engine.js loaded' : 'not loaded (using local fallback)'],
+        ['Backend /calc (server-side math)', engineLoaded, 'rz-finance-gateway — configured (server-side dispatch)'],
+        ['AI decision API', ai.enabled, ai.enabled ? `${ai.provider} · ${ai.model}` : 'optional — not configured (built-in engine)'],
     ];
     return (
         <div className="space-y-4">

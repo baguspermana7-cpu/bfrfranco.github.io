@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.67.5 — 2026-07-18 (audit fixes: honesty D8/D9)
+
+### Fixed
+- **Integrations panel** no longer shows hardcoded `true` — RZ Engine status is a real check (`rzModels().capex` resolved), gateway labeled honestly "configured" (no fake live-ping). **Report availability fallback** used Tier-3 (99.982%%) for all tiers → now tier-correct (Tier 2 99.741 / 3 99.982 / 4 99.995) or "—".
+
+---
+
 ## v1.67.4 — 2026-07-18 (audit fixes: gaps + docs D7/D10/G1/G2)
 
 ### Fixed
