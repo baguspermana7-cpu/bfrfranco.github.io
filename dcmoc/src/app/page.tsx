@@ -29,8 +29,9 @@ import { ScenarioComparisonPanel } from '@/components/modules/ScenarioComparison
 import StrategicPlanningDashboard from '@/components/modules/StrategicPlanningDashboard';
 import { ExecutiveDashboard } from '@/components/modules/ExecutiveDashboard';
 import { ReliabilityDashboard } from '@/components/modules/ReliabilityDashboard';
-import { SiteIntelDashboard, ArchitectureDashboard, ConstructionDashboard, CommissioningDashboard, AssetIntelDashboard } from '@/components/modules/NewEngineDashboards';
+import { ArchitectureDashboard, ConstructionDashboard, CommissioningDashboard, AssetIntelDashboard } from '@/components/modules/NewEngineDashboards';
 import { RequirementsPage } from '@/components/modules/requirements/RequirementsPage';
+import { SiteIntelligencePage } from '@/components/modules/site-intel/SiteIntelligencePage';
 import { TierDashboard, FireDashboard, CduDashboard, SparesDashboard } from '@/components/modules/DesignToolsDashboards';
 import { DataLibraryDashboard, TemplatesDashboard, ProjectsDashboard, SettingsDashboard, KnowledgeDashboard, IntegrationsDashboard, AuditDashboard, UsersDashboard } from '@/components/modules/PlatformDashboards';
 import { useScenarioStore } from '@/store/scenario';
@@ -53,7 +54,7 @@ export default function Home() {
       case 'requirements':
         return <RequirementsPage />;
       case 'site':
-        return <SiteIntelDashboard />;
+        return <SiteIntelligencePage />;
       case 'architecture':
         return <ArchitectureDashboard />;
       case 'construction':

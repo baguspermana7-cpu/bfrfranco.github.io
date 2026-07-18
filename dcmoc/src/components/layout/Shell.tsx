@@ -125,7 +125,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
         { label: 'Risk Analysis', icon: ShieldAlert, id: 'risk' },
         { label: 'Reliability (RAM)', icon: ShieldCheck, id: 'reliability' },
         { label: 'Requirements & Workload', icon: ClipboardCheck, id: 'requirements' },
-        { label: 'Site Score', icon: MapPin, id: 'site' },
+        { label: 'Site Intelligence', icon: MapPin, id: 'site' },
         { label: 'Architecture Spec', icon: Boxes, id: 'architecture' },
         { label: 'Construction Schedule', icon: HardHat, id: 'construction' },
         { label: 'Commissioning Readiness', icon: CheckCircle2, id: 'commissioning' },

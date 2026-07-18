@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.70.0 — 2026-07-19 (DCMOC Phase B: multi-site Site Intelligence Engine)
+
+### Added
+- **DCMOC "Site Intelligence Engine"** (Phase B) — the single-country Site Score tab becomes a MULTI-SITE comparison engine per the DC-OS reference: up to 5 candidate sites (3 illustrative EXAMPLE-labeled seeds, fully editable), schematic SVG site map (4 style skins, no map lib), 8-axis radar overlay (recharts), site cards with rank badges, 6 detail panels (Power/Connectivity/Environmental/Risks/Land/Cost with per-value provenance dots: site attribute vs country baseline), Site Score & Compare table (+ absorbed legacy 10-factor engine breakdown), sticky rail (Run Analysis stamp, ranking bars, deterministic key takeaways, Next: Architecture), Edit Criteria drawer — every numeric attribute a CreatableCombobox (preset or custom, clamped; clear → country baseline).
+- **site-adapter** (`src/lib/site-adapter.ts`): site attributes → engine factor overrides MIRRORING `models.site.deriveFactors` formulas exactly (SAIDI/PGA/tax/flood/water/power); PARITY INVARIANT verified — a site with no overrides reproduces the engine country score exactly (42.1 ≡ 42.1). Engine remains the authoritative Total Score; the 8 axes are a documented presentation decomposition. "View Power/Risk/Tax Analysis" links route to the existing grid/disaster/tax tabs — all 6 Engine-2 children preserved.
+
+### Changed
+- Sidebar label 'Site Score' → 'Site Intelligence' (tab id unchanged). Old SiteIntelDashboard export dormant (content absorbed).
+
 ## v1.69.0 — 2026-07-19 (DCMOC Phase A: Requirements & Workload Engine page)
 
 ### Added
