@@ -710,6 +710,55 @@ if (M.commissioning && M.commissioning.programCost) {
     ok('commissioning cost scales with cooling+redundancy', pcHi.total > pc.total, `${pcHi.total} > ${pc.total}`);
 }
 
+/* ── RICH cx program engine (v2.5.0) — faithful cx-calculator.html port.
+ *  Golden values computed from cx-calculator.html's OWN cxCalcTotalCost run in
+ *  node over the CX_SCENARIOS presets (see /tmp golden harness). Any drift here
+ *  means the port diverged from the DC-Hub calculator. ── */
+if (M.commissioning && M.commissioning.programRich) {
+    const RC = M.commissioning;
+    // enterprise_2mw preset — exact grand/subtotal/contingency/dur/equip parity
+    const e2 = RC.programRich('enterprise_2mw');
+    eq('cx.rich enterprise_2mw grand', e2.grand, 1115730);
+    eq('cx.rich enterprise_2mw subtotal', e2.subtotal, 970200);
+    eq('cx.rich enterprise_2mw contingency', e2.contingency, 145530);
+    near('cx.rich enterprise_2mw perKw', e2.perKw, 557.9, 0.05);
+    near('cx.rich enterprise_2mw pctCapex', e2.pctCapex, 5.31, 0.01);
+    eq('cx.rich enterprise_2mw durationDays', e2.durationDays, 155);
+    eq('cx.rich enterprise_2mw racks', e2.equip.racks, 334);
+    eq('cx.rich enterprise_2mw generators', e2.equip.generators, 1);
+    const e2L2 = e2.levels.find(l => l.id === 'L2');
+    eq('cx.rich enterprise_2mw L2 cost (fixed 10% proportion)', e2L2.cost, 111573);
+    // hyperscale_50mw preset — exact grand + equipment scaling
+    const h50 = RC.programRich('hyperscale_50mw');
+    eq('cx.rich hyperscale_50mw grand', h50.grand, 52746464);
+    eq('cx.rich hyperscale_50mw switchgear', h50.equip.switchgear, 11);
+    eq('cx.rich hyperscale_50mw generators', h50.equip.generators, 25);
+    eq('cx.rich hyperscale_50mw racks (ai_hpc 75kW/rack)', h50.equip.racks, 667);
+    near('cx.rich hyperscale_50mw pctCapex (ai_hpc capex 16k/kW)', h50.pctCapex, 6.59, 0.01);
+    // discipline split fixed proportions sum to grand
+    const dSum = h50.disciplines.reduce((s, d) => s + d.cost, 0);
+    ok('cx.rich disciplines sum ≈ grand (±1%)', Math.abs(dSum - h50.grand) / h50.grand < 0.01, `${dSum} vs ${h50.grand}`);
+    const lSum = h50.levels.reduce((s, l) => s + l.cost, 0);
+    ok('cx.rich levels sum ≈ grand (±1%)', Math.abs(lSum - h50.grand) / h50.grand < 0.01, `${lSum} vs ${h50.grand}`);
+    // mapInput: DCMOC store shape (liquid→dlc, ID→jakarta, 2N passthrough)
+    const mi = RC.mapInput({ itLoadKw: 2500, coolingType: 'liquid', powerRedundancy: '2N', countryId: 'ID' });
+    eq('cx.rich mapInput liquid→dlc', mi.coolingType, 'dlc');
+    eq('cx.rich mapInput ID→indonesia_jakarta', mi.region, 'indonesia_jakarta');
+    eq('cx.rich mapInput redundancy 2N passthrough', mi.redundancy, '2N');
+    eq('cx.rich mapInput itLoad kW', mi.itLoad, 2500);
+    // Monte-Carlo (deterministic seeded rng) — band ordering + p50 near base grand
+    const seedRng = (s => () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; })(12345);
+    const mc = RC.monteCarlo('colo_10mw', { n: 3000, rng: seedRng });
+    ok('cx.rich monteCarlo band ordered p5<p50<p95', mc.p5 < mc.p50 && mc.p50 < mc.p95, `${mc.p5}/${mc.p50}/${mc.p95}`);
+    ok('cx.rich monteCarlo p50 near base grand (±15%)', Math.abs(mc.p50 - 6429248) / 6429248 < 0.15, `${mc.p50}`);
+    ok('cx.rich monteCarlo cvar95 ≥ p95', mc.cvar95 >= mc.p95, `${mc.cvar95} ≥ ${mc.p95}`);
+    // Sensitivity tornado — sorted desc, redundancy is a top driver
+    const sens = RC.sensitivity('colo_10mw');
+    eq('cx.rich sensitivity has 7 params', sens.length, 7);
+    ok('cx.rich sensitivity sorted by range desc', sens.every((s, i) => i === 0 || sens[i - 1].range >= s.range));
+    ok('cx.rich sensitivity ranges positive', sens.every(s => s.range >= 0));
+}
+
 /* ============================================================
  * 2c. DC-OS shared pillar engines (v1.63.0): tier/fire/cdu/spares/decision
  * ============================================================ */

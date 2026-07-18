@@ -1,4 +1,4 @@
-/* ─── SHARED RZEngine BRIDGE (engine DATA.version 2.4.0) ─────────────────────
+/* ─── SHARED RZEngine BRIDGE (engine DATA.version 2.5.0) ─────────────────────
  * DCMOC consumes site-wide constants from the shared engine (repo-root
  * `rz-engine.js`, loaded in the browser as `/rz-engine.min.js` via a defer
  * <script> in layout.tsx <head>, which executes BEFORE Next's deferred body

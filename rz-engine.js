@@ -30,7 +30,7 @@
      * consumes it. Bump `version` and add a CHANGELOG entry on any change.
      * ==================================================================== */
     var DATA = {
-        version: '2.4.0',
+        version: '2.5.0',
         lastUpdated: '2026-07-15',
         asOf: '2026-07',
 
@@ -4377,7 +4377,87 @@
                 redundancyMult: { n: 0.9, n1: 1.0, '2n': 1.18, '2n1': 1.28 },
                 contingency: 0.15,
                 /* schedule anchor: base months at 1 MW + growth per MW (log-damped). */
-                schedBaseMonths: 4.5, schedPerMw: 0.45, schedMaxMonths: 20
+                schedBaseMonths: 4.5, schedPerMw: 0.45, schedMaxMonths: 20,
+                /* ── RICH cx program engine (v2.5.0) — faithful port of the DC-Hub
+                 *  cx-calculator.html model so DCMOC + the calculator share ONE brain.
+                 *  Equipment-count-driven L0-L6 staffed durations + regional day-rates,
+                 *  gm-normalized base blend, Monte-Carlo band + sensitivity tornado.
+                 *  Consumed by models.commissioning.programRich/monteCarlo/sensitivity. ── */
+                rich: {
+                    /* 30 regional day-rate cards ($/day + per-diem + diesel $/L + cost mult vs US). */
+                    rates: {
+                        us_virginia:{name:'Northern Virginia',cxDay:1200,fieldDay:850,oemDay:2000,witnessDay:3500,perDiem:300,diesel:1.10,mult:1.00},
+                        us_texas:{name:'Dallas-Fort Worth',cxDay:1100,fieldDay:800,oemDay:1800,witnessDay:3500,perDiem:250,diesel:0.95,mult:0.92},
+                        us_oregon:{name:'Oregon',cxDay:1150,fieldDay:825,oemDay:1900,witnessDay:3500,perDiem:280,diesel:1.15,mult:0.96},
+                        us_phoenix:{name:'Phoenix',cxDay:1050,fieldDay:750,oemDay:1800,witnessDay:3500,perDiem:240,diesel:1.05,mult:0.88},
+                        canada_toronto:{name:'Toronto',cxDay:1050,fieldDay:780,oemDay:1700,witnessDay:3200,perDiem:260,diesel:1.45,mult:0.88},
+                        uk_london:{name:'London',cxDay:875,fieldDay:650,oemDay:1500,witnessDay:3000,perDiem:280,diesel:1.75,mult:0.73},
+                        netherlands_amsterdam:{name:'Amsterdam',cxDay:950,fieldDay:700,oemDay:1600,witnessDay:3200,perDiem:270,diesel:1.85,mult:0.79},
+                        germany_frankfurt:{name:'Frankfurt',cxDay:1000,fieldDay:750,oemDay:1650,witnessDay:3200,perDiem:260,diesel:1.80,mult:0.83},
+                        ireland_dublin:{name:'Dublin',cxDay:900,fieldDay:680,oemDay:1550,witnessDay:3000,perDiem:280,diesel:1.70,mult:0.75},
+                        france_paris:{name:'Paris',cxDay:920,fieldDay:680,oemDay:1500,witnessDay:3000,perDiem:270,diesel:1.90,mult:0.77},
+                        nordics_stockholm:{name:'Stockholm',cxDay:1050,fieldDay:780,oemDay:1700,witnessDay:3200,perDiem:290,diesel:1.95,mult:0.88},
+                        spain_madrid:{name:'Madrid',cxDay:750,fieldDay:550,oemDay:1300,witnessDay:2800,perDiem:200,diesel:1.60,mult:0.63},
+                        singapore:{name:'Singapore',cxDay:850,fieldDay:620,oemDay:1500,witnessDay:3000,perDiem:280,diesel:1.60,mult:0.71},
+                        japan_tokyo:{name:'Tokyo',cxDay:1000,fieldDay:750,oemDay:1800,witnessDay:3500,perDiem:300,diesel:1.30,mult:0.83},
+                        australia_sydney:{name:'Sydney',cxDay:950,fieldDay:700,oemDay:1600,witnessDay:3200,perDiem:260,diesel:1.50,mult:0.79},
+                        india_mumbai:{name:'Mumbai',cxDay:400,fieldDay:250,oemDay:800,witnessDay:2000,perDiem:120,diesel:1.10,mult:0.33},
+                        china_shanghai:{name:'Shanghai',cxDay:550,fieldDay:350,oemDay:1000,witnessDay:2500,perDiem:150,diesel:1.20,mult:0.46},
+                        korea_seoul:{name:'Seoul',cxDay:750,fieldDay:550,oemDay:1300,witnessDay:2800,perDiem:200,diesel:1.35,mult:0.63},
+                        hk:{name:'Hong Kong',cxDay:900,fieldDay:650,oemDay:1500,witnessDay:3000,perDiem:300,diesel:1.80,mult:0.75},
+                        indonesia_jakarta:{name:'Jakarta',cxDay:350,fieldDay:200,oemDay:700,witnessDay:1800,perDiem:100,diesel:1.05,mult:0.29},
+                        malaysia_kl:{name:'Kuala Lumpur',cxDay:400,fieldDay:280,oemDay:750,witnessDay:2000,perDiem:110,diesel:0.85,mult:0.33},
+                        uae_dubai:{name:'Dubai',cxDay:800,fieldDay:550,oemDay:1400,witnessDay:3000,perDiem:250,diesel:0.75,mult:0.67},
+                        saudi_riyadh:{name:'Riyadh',cxDay:850,fieldDay:600,oemDay:1500,witnessDay:3000,perDiem:250,diesel:0.60,mult:0.71},
+                        south_africa_jhb:{name:'Johannesburg',cxDay:500,fieldDay:350,oemDay:900,witnessDay:2200,perDiem:150,diesel:1.40,mult:0.42},
+                        nigeria_lagos:{name:'Lagos',cxDay:400,fieldDay:250,oemDay:800,witnessDay:2000,perDiem:180,diesel:0.95,mult:0.33},
+                        kenya_nairobi:{name:'Nairobi',cxDay:350,fieldDay:220,oemDay:700,witnessDay:1800,perDiem:150,diesel:1.30,mult:0.29},
+                        brazil_saopaulo:{name:'São Paulo',cxDay:500,fieldDay:350,oemDay:900,witnessDay:2200,perDiem:150,diesel:1.25,mult:0.42},
+                        chile_santiago:{name:'Santiago',cxDay:550,fieldDay:380,oemDay:950,witnessDay:2400,perDiem:160,diesel:1.20,mult:0.46},
+                        mexico_queretaro:{name:'Querétaro',cxDay:480,fieldDay:320,oemDay:850,witnessDay:2200,perDiem:140,diesel:1.15,mult:0.40}
+                    },
+                    cooling: {air:{cost:1.00,dur:1.00},inrow:{cost:1.12,dur:1.08},rdhx:{cost:1.25,dur:1.18},dlc:{cost:1.45,dur:1.35},immersion:{cost:1.55,dur:1.40}},
+                    redundancy: {
+                        'N':   {cost:1.00,dur:1.00,tier:'Tier I',avail:'99.671%',scenarios:3,istHrs:14},
+                        'N+1': {cost:1.35,dur:1.30,tier:'Tier II/III',avail:'99.982%',scenarios:6,istHrs:16},
+                        '2N':  {cost:2.00,dur:1.75,tier:'Tier IV',avail:'99.995%',scenarios:10,istHrs:110},
+                        '2N+1':{cost:2.25,dur:1.90,tier:'Tier IV+',avail:'99.9995%',scenarios:10,istHrs:120}
+                    },
+                    building: {warehouse:{cost:0.80,dur:0.85},modular:{cost:0.75,dur:0.70},purpose:{cost:1.00,dur:1.00},highrise:{cost:1.30,dur:1.25}},
+                    seismic: {'0':{cost:1.00,dur:1.00},'1':{cost:1.05,dur:1.03},'2':{cost:1.12,dur:1.08},'3':{cost:1.22,dur:1.15},'4':{cost:1.35,dur:1.25}},
+                    substation: {utility_fed:{cost:0.70,dur:0.75},single_sub:{cost:1.00,dur:1.00},dual_sub:{cost:1.85,dur:1.60},ring_bus:{cost:2.10,dur:1.80}},
+                    bms: {basic:{cost:0.60,dur:0.50,pts:200},standard:{cost:1.00,dur:1.00,pts:500},advanced:{cost:1.60,dur:1.45,pts:1200},ai_driven:{cost:2.00,dur:1.70,pts:2000}},
+                    delivery: {traditional:{cost:1.00,dur:1.00},design_build:{cost:0.90,dur:0.85},epc:{cost:0.85,dur:0.80},modular_pod:{cost:0.70,dur:0.60}},
+                    scope: {new_build:{cost:1.00,dur:1.00},retrofit:{cost:0.75,dur:0.70},recommission:{cost:0.55,dur:0.50},continuous:{cost:0.30,dur:0.25}},
+                    fire: {fm200:1.00,novec:1.05,inergen:1.10,n2:1.08,water:0.85,water_mist:1.15},
+                    ups: {standalone:1.00,modular:1.25,distributed:1.15,rotary:1.40},
+                    gen: {diesel:1.00,gas:1.10,dualfuel:1.25,hvo:1.08},
+                    density: {standard:{kw:6,cool:1.0,pow:1.0},medium:{kw:12,cool:1.15,pow:1.05},high:{kw:25,cool:1.35,pow:1.15},ai_hpc:{kw:75,cool:1.60,pow:1.30}},
+                    baseKw: {electrical:72,mechanical_air:35,mechanical_dlc:50,fire:12,security:6,it:11,controls:14,building:5},
+                    /* Fixed display proportions (grand-total split — realistic cost weights). */
+                    levelProportions: {l0:0.03,l1:0.04,l2:0.10,l3:0.22,l4:0.20,l5:0.32,l6:0.09},
+                    levelLabels: {l0:'L0 Design & Cx Prep',l1:'L1 Factory Witness',l2:'L2 Standalone Functional',l3:'L3 System Functional',l4:'L4 Subsystem Integration',l5:'L5 Integrated Systems Test',l6:'L6 Closeout & Turnover'},
+                    disciplineShare: {electrical:0.40,mechanical:0.24,fire:0.09,security:0.04,it:0.07,controls:0.08,building:0.04,management:0.04},
+                    capexPerKw: {standard:10500,high:13000,ai_hpc:16000},
+                    normExp: 0.45, contingency: 0.15,
+                    /* ISO-2 country → CX region key (nearest labor/cost peer where no exact card). */
+                    iso2Region: {US:'us_virginia',CA:'canada_toronto',GB:'uk_london',NL:'netherlands_amsterdam',DE:'germany_frankfurt',IE:'ireland_dublin',FR:'france_paris',SE:'nordics_stockholm',ES:'spain_madrid',SG:'singapore',JP:'japan_tokyo',AU:'australia_sydney',IN:'india_mumbai',CN:'china_shanghai',KR:'korea_seoul',HK:'hk',ID:'indonesia_jakarta',MY:'malaysia_kl',AE:'uae_dubai',SA:'saudi_riyadh',QA:'uae_dubai',ZA:'south_africa_jhb',NG:'nigeria_lagos',KE:'kenya_nairobi',BR:'brazil_saopaulo',CL:'chile_santiago',MX:'mexico_queretaro',CO:'mexico_queretaro',TH:'malaysia_kl',VN:'indonesia_jakarta',PH:'malaysia_kl',TW:'korea_seoul',NZ:'australia_sydney',PL:'germany_frankfurt',PT:'spain_madrid'},
+                    /* DCMOC coolingType enum → CX cooling key. */
+                    coolingMap: {air:'air',inrow:'inrow',rdhx:'rdhx',liquid:'dlc',dlc:'dlc',immersion:'immersion'},
+                    /* Scenario presets (parity with cx-calculator.html CX_SCENARIOS). */
+                    scenarios: {
+                        enterprise_2mw:{itLoad:2000,coolingType:'air',redundancy:'N+1',rackDensity:'standard',buildingType:'purpose',fireSuppression:'novec',upsType:'modular',region:'us_virginia',generatorType:'diesel',seismicZone:'1',cxScope:'new_build',substationConfig:'single_sub',bmsComplexity:'standard',deliveryMethod:'traditional'},
+                        colo_10mw:{itLoad:10000,coolingType:'inrow',redundancy:'2N',rackDensity:'medium',buildingType:'purpose',fireSuppression:'novec',upsType:'modular',region:'us_virginia',generatorType:'diesel',seismicZone:'2',cxScope:'new_build',substationConfig:'dual_sub',bmsComplexity:'advanced',deliveryMethod:'design_build'},
+                        hyperscale_50mw:{itLoad:50000,coolingType:'dlc',redundancy:'2N+1',rackDensity:'ai_hpc',buildingType:'purpose',fireSuppression:'novec',upsType:'modular',region:'us_virginia',generatorType:'diesel',seismicZone:'1',cxScope:'new_build',substationConfig:'ring_bus',bmsComplexity:'ai_driven',deliveryMethod:'epc'},
+                        edge_500kw:{itLoad:500,coolingType:'air',redundancy:'N+1',rackDensity:'standard',buildingType:'warehouse',fireSuppression:'fm200',upsType:'standalone',region:'us_texas',generatorType:'diesel',seismicZone:'0',cxScope:'new_build',substationConfig:'utility_fed',bmsComplexity:'basic',deliveryMethod:'traditional'},
+                        modular_5mw:{itLoad:5000,coolingType:'rdhx',redundancy:'N+1',rackDensity:'high',buildingType:'modular',fireSuppression:'water_mist',upsType:'modular',region:'nordics_stockholm',generatorType:'hvo',seismicZone:'0',cxScope:'new_build',substationConfig:'single_sub',bmsComplexity:'standard',deliveryMethod:'modular_pod'},
+                        recommission:{itLoad:3000,coolingType:'air',redundancy:'N+1',rackDensity:'standard',buildingType:'purpose',fireSuppression:'fm200',upsType:'standalone',region:'uk_london',generatorType:'diesel',seismicZone:'0',cxScope:'recommission',substationConfig:'single_sub',bmsComplexity:'standard',deliveryMethod:'traditional'},
+                        ai_factory_100mw:{itLoad:100000,coolingType:'dlc',redundancy:'2N+1',rackDensity:'ai_hpc',buildingType:'purpose',fireSuppression:'novec',upsType:'distributed',region:'us_texas',generatorType:'dualfuel',seismicZone:'1',cxScope:'new_build',substationConfig:'ring_bus',bmsComplexity:'ai_driven',deliveryMethod:'epc'},
+                        fast_track:{itLoad:10000,coolingType:'inrow',redundancy:'N+1',rackDensity:'medium',buildingType:'warehouse',fireSuppression:'water',upsType:'modular',region:'us_virginia',generatorType:'diesel',seismicZone:'1',cxScope:'new_build',substationConfig:'single_sub',bmsComplexity:'standard',deliveryMethod:'design_build'}
+                    },
+                    /* Default cx input for fields DCMOC does not carry (budgetary assumptions). */
+                    defaults: {rackDensity:'standard',buildingType:'purpose',fireSuppression:'novec',upsType:'modular',generatorType:'diesel',seismicZone:'1',cxScope:'new_build',substationConfig:'single_sub',bmsComplexity:'standard',deliveryMethod:'traditional',region:'us_virginia'}
+                }
             }
         },
         /* ══ DC-OS shared pillar engines (v1.63.0): tier classification, fire
@@ -4780,7 +4860,7 @@
             'regions.LATAM.powerKwh': { source: 'Regional utility filings (blended)', asOf: '2026', unit: '$/kWh' },
             'regionsCountry':         { source: 'PLN/EMA/TEPCO/CEA/TNB tariff filings + national statistics', asOf: '2026', unit: 'mixed (see fields)' },
             'countries':              { source: 'DCMOC country reference 2026-Q1 (per-country economy/labor/environment/gridReliability/naturalDisaster/talentPool/fuelDiesel/taxIncentives/compliance/constructionIndex); PLN/EMA/TEPCO/national tariff filings + IMF WEO + Ember grid-intensity + national labor statistics. GENERATED from dcmoc/src/constants/countries.ts — single source of truth for the site + DCMOC.', asOf: '2026-Q1', unit: 'mixed (see per-country fields)' },
-            'commissioning.cx':       { source: 'Commissioning program cost/schedule methodology promoted from cx-calculator.html (discipline $/kW base + L0-L6 cost/schedule shares + discipline split); base rates calibrated to DC Cx budgetary practice (ASHRAE Guideline 0 / NETA ECS scope). Region scaling via DATA.countries.constructionIndex.', asOf: '2026', method: 'budgetary estimate-grade Cx program model; NOT a detailed Cx plan' },
+            'commissioning.cx':       { source: 'Commissioning program cost/schedule methodology promoted from cx-calculator.html. RICH engine (cx.rich): equipment quantities scaled from IT load + rack density → per-level (L0-L6) staffed durations at 30 regional day-rate cards ($/day cxDay/fieldDay/oemDay/witnessDay + per-diem + diesel $/L + cost mult), gm-normalized (^0.45) base blend vs level-sum, Monte-Carlo (N=10000) band + 7-param sensitivity tornado. Base rates + multipliers calibrated to DC Cx budgetary practice (ASHRAE Guideline 0 / BCxA / NETA ECS scope, Uptime IST scenario counts). Compact cx.* kept for back-compat.', asOf: '2026', method: 'budgetary estimate-grade Cx program model; NOT a detailed Cx plan' },
             'requirements.coolingMaxRackKw': { source: 'ASHRAE TC9.9 5th Ed. 2021 (air ~20-25 kW/rack limit; H1-H3 liquid envelopes); NVIDIA GB200 NVL72 132 kW observed; OCP High Power Rack 92 kW+ (Meta/Rittal OCP Summit 2024); IEA 4E Liquid Cooling in Data Centres 2026', asOf: '2025', unit: 'kW/rack per cooling type' },
             'architecture.ashraeClasses': { source: 'ASHRAE TC9.9 5th Ed. 2021 "Thermal Guidelines for Data Processing Environments" — A1/A2/A3/A4 air + H1 liquid supply-temp envelopes + ΔT limits', asOf: '2021', unit: '°C supply range + °C ΔT max' },
             'architecture.tierTopology': { source: 'Uptime Institute Tier Standard: Topology 2022 (T1-T4 redundancy paths); ANSI/TIA-942-C 2024 Rated-1..Rated-4', asOf: '2024', unit: 'topology description + TIA rating' },
@@ -6584,6 +6664,262 @@
                         cursor += m;
                     }
                     return { totalMonths: totalMonths, byLevel: byLevel };
+                },
+
+                /* ══ RICH Cx program engine (v2.5.0) — faithful port of the DC-Hub
+                 *  cx-calculator.html model. Equipment-count-driven, regional day-rates,
+                 *  per-level staffed L0-L6 duration+cost, gm-normalized base blend,
+                 *  Monte-Carlo band + sensitivity tornado. DCMOC + the calculator now
+                 *  share this ONE brain. See DATA.commissioning.cx.rich. ══ */
+                _rich: function () { return DATA.commissioning.cx.rich; },
+                _rate: function (region) { var R = DATA.commissioning.cx.rich; return R.rates[region] || R.rates.us_virginia; },
+
+                /** Equipment quantities scaled from IT load (kW) + rack density. */
+                equipScale: function (inp) {
+                    var R = DATA.commissioning.cx.rich, kw = inp.itLoad;
+                    var den = R.density[inp.rackDensity] || R.density.standard;
+                    return {
+                        switchgear: Math.ceil(kw / 5000) + 1, transformers: Math.ceil(kw / 2500), generators: Math.ceil(kw / 2000),
+                        ups_modules: Math.ceil(kw / 500), cooling_units: Math.ceil(kw / 200), pdus: Math.ceil(kw / 100),
+                        sts: Math.ceil(kw / 1000), chillers: Math.ceil(kw / 500), pumps: Math.ceil(kw / 300),
+                        racks: Math.ceil(kw / den.kw), fireZones: Math.ceil(kw / 200),
+                        lvsb: Math.ceil(kw / 2000) + 1, db: Math.ceil(kw / 500), mcc: Math.ceil(kw / 3000) + 1,
+                        vfd: Math.ceil(kw / 300), busway: Math.ceil(kw / 2000) + 1, firePumps: Math.max(2, Math.ceil(kw / 25000) + 1),
+                        ahu: Math.ceil(kw / 5000) + 1, accessDoors: Math.ceil(kw / 500) + 10, cameras: Math.ceil(kw / 200) + 20,
+                        lightZones: Math.ceil(kw / 1000) + 4, emergLights: Math.ceil(kw / 500) + 20, sumpPumps: Math.ceil(kw / 5000) + 2,
+                        ats: Math.ceil(kw / 2000), rpp: Math.ceil(kw / 200)
+                    };
+                },
+
+                /** Per-level working-day durations {l0..l6,total}. */
+                levelDurations: function (inp, eq) {
+                    var R = DATA.commissioning.cx.rich;
+                    eq = eq || RZEngine.models.commissioning.equipScale(inp);
+                    var liquid = (inp.coolingType === 'dlc' || inp.coolingType === 'immersion');
+                    var scopeDur = (R.scope[inp.cxScope] || R.scope.new_build).dur;
+                    var redDur = (R.redundancy[inp.redundancy] || R.redundancy['N+1']).dur;
+                    var bldDur = (R.building[inp.buildingType] || R.building.purpose).dur;
+                    var coolDur = (R.cooling[inp.coolingType] || R.cooling.air).dur;
+                    // L0
+                    var l0 = 15;
+                    if (inp.itLoad > 5000) l0 += 5; if (inp.itLoad > 20000) l0 += 10; if (inp.itLoad > 50000) l0 += 15;
+                    if (liquid) l0 += 5;
+                    if (inp.substationConfig === 'dual_sub' || inp.substationConfig === 'ring_bus') l0 += 5;
+                    if (inp.bmsComplexity === 'advanced' || inp.bmsComplexity === 'ai_driven') l0 += 3;
+                    l0 *= scopeDur; if (inp.cxScope === 'recommission') l0 = Math.max(5, l0); l0 = Math.max(5, Math.ceil(l0));
+                    // L1
+                    var l1 = eq.switchgear * 2 + eq.transformers * 3 + eq.generators * 2 + 2 + eq.chillers * 0.5 + 1 + eq.lvsb * 0.5 + eq.mcc * 0.5 + eq.pdus * 0.3 + eq.busway * 0.3 + eq.ats * 0.3;
+                    if (liquid) l1 += 2; if (inp.deliveryMethod === 'modular_pod') l1 *= 1.5; l1 = Math.ceil(l1 * scopeDur);
+                    // L2
+                    var l2elec = eq.switchgear * 1.5 + eq.transformers + eq.generators + Math.ceil(eq.ups_modules / 4) * 0.5 + eq.pdus * 0.25 + eq.sts * 0.5 + 2;
+                    var l2mech = 3 + eq.chillers * 0.5 + eq.pumps * 0.5 + eq.cooling_units * 0.5; if (liquid) l2mech += 3;
+                    var l2 = Math.max(l2elec, l2mech) + eq.fireZones * 0.75 + (eq.fireZones * 0.25 + Math.ceil(inp.itLoad / 1000) * 2 + 1);
+                    l2 = Math.max(1, Math.ceil(l2 * redDur * bldDur * scopeDur));
+                    // L3
+                    var l3elec = eq.switchgear * 2 + eq.transformers * 1.5 + eq.generators * 2 + 1.5 + eq.sts * 0.5;
+                    var l3mech = eq.chillers * 2 + eq.cooling_units * 0.5 + eq.pumps * 0.5 + Math.ceil(inp.itLoad / 2000); if (liquid) l3mech += Math.ceil(inp.itLoad / 500) * 2;
+                    var l3fire = eq.fireZones * 1.5;
+                    var l3bms = Math.ceil((R.bms[inp.bmsComplexity] || R.bms.standard).pts * (inp.itLoad / 1000) / 100);
+                    var l3 = l3elec + Math.max(l3mech, l3fire) + l3bms;
+                    l3 = Math.max(1, Math.ceil(l3 * coolDur * redDur * scopeDur));
+                    // L4
+                    var l4elec = 3; if (inp.redundancy === '2N' || inp.redundancy === '2N+1') l4elec += 3; l4elec += 2;
+                    var l4mech = 4 + 3; if (liquid) l4mech += 3;
+                    var l4 = l4elec + Math.max(l4mech, 3);
+                    var sf = 1.0; if (inp.itLoad > 5000) sf = 1.15; if (inp.itLoad > 10000) sf = 1.30; if (inp.itLoad > 25000) sf = 1.50; if (inp.itLoad > 50000) sf = 1.75;
+                    l4 = Math.max(1, Math.ceil(l4 * sf * redDur * scopeDur));
+                    // L5
+                    var rd = R.redundancy[inp.redundancy] || R.redundancy['N+1'];
+                    var hrs = rd.istHrs + rd.scenarios * 3; var l5 = Math.ceil(hrs / 10);
+                    var sf5 = 1.0; if (inp.itLoad > 5000) sf5 = 1.2; if (inp.itLoad > 10000) sf5 = 1.4; if (inp.itLoad > 50000) sf5 = 1.8;
+                    l5 = Math.max(1, Math.ceil(l5 * sf5 * coolDur * scopeDur));
+                    // L6
+                    var l6 = 10; if (inp.itLoad > 5000) l6 += 3; if (inp.itLoad > 20000) l6 += 5; if (inp.itLoad > 50000) l6 += 8;
+                    if (inp.redundancy === '2N' || inp.redundancy === '2N+1') l6 += 5; if (liquid) l6 += 3;
+                    if (inp.bmsComplexity === 'advanced' || inp.bmsComplexity === 'ai_driven') l6 += 3;
+                    l6 = Math.max(3, Math.ceil(l6 * scopeDur));
+                    return { l0: l0, l1: l1, l2: l2, l3: l3, l4: l4, l5: l5, l6: l6, total: l0 + l1 + l2 + l3 + l4 + l5 + l6 };
+                },
+
+                /** Raw per-level costs {l0..l6} BEFORE regional mult on L1-L5 (L0/L6 include
+                 *  r.mult internally, per the cx model). */
+                levelCosts: function (inp, dur, eq) {
+                    var C = RZEngine.models.commissioning;
+                    eq = eq || C.equipScale(inp); dur = dur || C.levelDurations(inp, eq);
+                    var r = C._rate(inp.region);
+                    var l0 = (dur.l0 * r.cxDay * 2.5 + inp.itLoad * 2) * r.mult;
+                    var l1 = dur.l1 * r.cxDay * 2 + dur.l1 * r.perDiem;
+                    var l2 = dur.l2 * r.cxDay * 3 + dur.l2 * 350 + inp.itLoad * 0.5;
+                    var l3 = dur.l3 * r.cxDay * 4 + (eq.generators * 12 + 8) * 350 + dur.l3 * 500 + (eq.generators * 2 + eq.chillers * 2) * r.oemDay;
+                    var lbHrs = 24; if (inp.redundancy === '2N' || inp.redundancy === '2N+1') lbHrs *= 2;
+                    var l4 = dur.l4 * r.cxDay * 5 + lbHrs * 350 + dur.l4 * 200 * 4 + dur.l4 * 600;
+                    var mw = inp.itLoad / 1000;
+                    var lbDays = (inp.redundancy === '2N' || inp.redundancy === '2N+1') ? 5 : (inp.redundancy === 'N+1' ? 2 : 1);
+                    var l5 = dur.l5 * r.cxDay * 8 + mw * 8000 * lbDays + 20 * inp.itLoad * 0.3 * r.diesel + dur.l5 * r.witnessDay;
+                    var l6 = (dur.l6 * r.cxDay * 3 + Math.ceil(inp.itLoad / 2000) * r.cxDay * 2 + inp.itLoad * 3 + inp.itLoad * 1.5) * r.mult;
+                    return { l0: l0, l1: l1, l2: l2, l3: l3, l4: l4, l5: l5, l6: l6 };
+                },
+
+                /** FULL Cx program (faithful cxCalcTotalCost port). input schema:
+                 *  {itLoad(kW), coolingType, redundancy, rackDensity, buildingType,
+                 *   fireSuppression, upsType, region, generatorType, seismicZone,
+                 *   cxScope, substationConfig, bmsComplexity, deliveryMethod}. Use
+                 *   mapInput() to build it from the DCMOC store. Returns rich result. */
+                programRich: function (input) {
+                    var R = DATA.commissioning.cx.rich, C = RZEngine.models.commissioning;
+                    var inp = C.mapInput(input);
+                    var eq = C.equipScale(inp);
+                    var dur = C.levelDurations(inp, eq);
+                    var lc = C.levelCosts(inp, dur, eq);
+                    // Global cost multiplier (11 tables) → normalized.
+                    var gm = R.cooling[inp.coolingType].cost * R.redundancy[inp.redundancy].cost * R.building[inp.buildingType].cost;
+                    gm *= R.seismic[inp.seismicZone].cost * R.substation[inp.substationConfig].cost;
+                    gm *= R.bms[inp.bmsComplexity].cost * R.delivery[inp.deliveryMethod].cost;
+                    gm *= R.fire[inp.fireSuppression] * R.ups[inp.upsType] * R.gen[inp.generatorType];
+                    gm *= R.density[inp.rackDensity].cool;
+                    var normFactor = Math.pow(gm, R.normExp);
+                    var baseCostKw = (inp.coolingType === 'dlc' || inp.coolingType === 'immersion') ? R.baseKw.mechanical_dlc : R.baseKw.mechanical_air;
+                    var totalBase = (R.baseKw.electrical + baseCostKw + R.baseKw.fire + R.baseKw.security + R.baseKw.it + R.baseKw.controls + R.baseKw.building) * inp.itLoad;
+                    totalBase *= normFactor;
+                    var rm = C._rate(inp.region).mult;
+                    var levelTotal = lc.l0 + lc.l1 * rm + lc.l2 * rm + lc.l3 * rm + lc.l4 * rm + lc.l5 * rm + lc.l6;
+                    var subtotal = Math.max(totalBase, levelTotal);
+                    var docCost = inp.itLoad * 5;
+                    var travelCost = dur.total * C._rate(inp.region).perDiem * 3;
+                    subtotal += docCost + travelCost;
+                    subtotal *= rm;
+                    if (inp.itLoad >= 50000) subtotal *= 1.08;
+                    if (inp.itLoad >= 100000) subtotal *= 1.05;
+                    var contingency = subtotal * R.contingency;
+                    var grand = subtotal + contingency;
+                    // Fixed display proportions.
+                    var lp = R.levelProportions, ll = R.levelLabels, order = ['l0', 'l1', 'l2', 'l3', 'l4', 'l5', 'l6'];
+                    var levels = [];
+                    for (var i = 0; i < order.length; i++) {
+                        var k = order[i];
+                        levels.push({ id: k.toUpperCase(), label: ll[k], cost: Math.round(grand * lp[k]), pct: +(lp[k] * 100).toFixed(1), days: dur[k] });
+                    }
+                    var ds = R.disciplineShare, disciplines = [];
+                    for (var d in ds) { if (ds.hasOwnProperty(d)) disciplines.push({ name: d, cost: Math.round(grand * ds[d]), pct: +(ds[d] * 100).toFixed(1) }); }
+                    var capexPerKw = R.capexPerKw.standard;
+                    if (inp.rackDensity === 'ai_hpc') capexPerKw = R.capexPerKw.ai_hpc; else if (inp.rackDensity === 'high') capexPerKw = R.capexPerKw.high;
+                    var estCapex = inp.itLoad * capexPerKw;
+                    var rd = R.redundancy[inp.redundancy], rate = C._rate(inp.region);
+                    return {
+                        grand: Math.round(grand), subtotal: Math.round(subtotal), contingency: Math.round(contingency),
+                        perKw: +(grand / inp.itLoad).toFixed(1), pctCapex: +((grand / estCapex) * 100).toFixed(2), capexPerKw: capexPerKw,
+                        durationDays: dur.total, durationWeeks: Math.ceil(dur.total / 5), durationMonths: Math.ceil(dur.total / 22),
+                        levels: levels, disciplines: disciplines, equip: eq,
+                        region: { key: inp.region, name: rate.name, mult: rate.mult },
+                        tierInfo: { tier: rd.tier, avail: rd.avail, scenarios: rd.scenarios, istHrs: rd.istHrs },
+                        input: inp
+                    };
+                },
+
+                /** Normal deviate (Box-Muller). rng defaults to Math.random; pass a
+                 *  seeded rng for a deterministic path (tests). */
+                _randNorm: function (mu, sigma, rng) {
+                    rng = rng || Math.random;
+                    var u1 = rng(), u2 = rng();
+                    return mu + sigma * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+                },
+
+                /** Monte-Carlo cost band (itLoad ±7.5% Normal, cost noise ±5% clamped).
+                 *  opts: {n=10000, rng}. Returns {p5,p25,p50,p75,p95,mean,stdDev,cvar95,min,max}. */
+                monteCarlo: function (input, opts) {
+                    opts = opts || {}; var C = RZEngine.models.commissioning;
+                    var base = C.mapInput(input);
+                    var N = opts.n || 10000, rng = opts.rng || Math.random, results = [];
+                    for (var i = 0; i < N; i++) {
+                        var vi = {}; for (var kk in base) { if (base.hasOwnProperty(kk)) vi[kk] = base[kk]; }
+                        vi.itLoad = Math.max(100, Math.round(base.itLoad * (1 + C._randNorm(0, 0.075, rng))));
+                        var g = C.programRich(vi).grand;
+                        var costNoise = 1 + C._randNorm(0, 0.05, rng);
+                        results.push(g * Math.max(0.85, Math.min(1.15, costNoise)));
+                    }
+                    results.sort(function (a, b) { return a - b; });
+                    var mean = results.reduce(function (a, b) { return a + b; }, 0) / N;
+                    var variance = results.reduce(function (a, b) { return a + Math.pow(b - mean, 2); }, 0) / N;
+                    var p95idx = Math.ceil(0.95 * N) - 1, tail = results.slice(p95idx);
+                    var cvar95 = tail.reduce(function (a, b) { return a + b; }, 0) / tail.length;
+                    return {
+                        p5: results[Math.ceil(0.05 * N) - 1], p25: results[Math.ceil(0.25 * N) - 1], p50: results[Math.ceil(0.50 * N) - 1],
+                        p75: results[Math.ceil(0.75 * N) - 1], p95: results[p95idx], mean: mean, stdDev: Math.sqrt(variance),
+                        cvar95: cvar95, min: results[0], max: results[N - 1]
+                    };
+                },
+
+                /** Sensitivity tornado — 7-param swing (each {name,low,high,range,lowD,highD}),
+                 *  sorted by range desc. baseCost optional (defaults to programRich().grand). */
+                sensitivity: function (input, baseCost) {
+                    var C = RZEngine.models.commissioning;
+                    var inp = C.mapInput(input);
+                    if (baseCost == null) baseCost = C.programRich(inp).grand;
+                    var tests = [
+                        { name: 'IT Load', key: 'itLoad', isNum: true },
+                        { name: 'Cooling Type', key: 'coolingType', low: 'air', high: 'dlc' },
+                        { name: 'Redundancy', key: 'redundancy', low: 'N', high: '2N+1' },
+                        { name: 'Building Type', key: 'buildingType', low: 'warehouse', high: 'highrise' },
+                        { name: 'Seismic Zone', key: 'seismicZone', low: '0', high: '4' },
+                        { name: 'Substation', key: 'substationConfig', low: 'utility_fed', high: 'ring_bus' },
+                        { name: 'BMS/DCIM', key: 'bmsComplexity', low: 'basic', high: 'ai_driven' }
+                    ];
+                    var results = [];
+                    for (var i = 0; i < tests.length; i++) {
+                        var t = tests[i], lo = {}, hi = {};
+                        for (var kk in inp) { if (inp.hasOwnProperty(kk)) { lo[kk] = inp[kk]; hi[kk] = inp[kk]; } }
+                        if (t.isNum) { lo[t.key] = Math.round(inp[t.key] * 0.8); hi[t.key] = Math.round(inp[t.key] * 1.2); }
+                        else { lo[t.key] = t.low; hi[t.key] = t.high; }
+                        var lc = C.programRich(lo).grand, hc = C.programRich(hi).grand;
+                        results.push({ name: t.name, low: lc, high: hc, range: Math.abs(hc - lc), lowD: lc - baseCost, highD: hc - baseCost });
+                    }
+                    results.sort(function (a, b) { return b.range - a.range; });
+                    return results;
+                },
+
+                /** Map a DCMOC store slice (or a partial rich input, or a preset name)
+                 *  → the full rich input schema. Fills missing fields with budgetary
+                 *  defaults. Accepts: {itLoad|itLoadKw, coolingType, redundancy|powerRedundancy,
+                 *  countryId|region, rackDensity, ...} or a preset key string. */
+                mapInput: function (src) {
+                    var R = DATA.commissioning.cx.rich, def = R.defaults;
+                    if (typeof src === 'string') { var p = R.scenarios[src]; if (p) src = p; else src = {}; }
+                    src = src || {};
+                    // If it already looks like a full rich input (has region + coolingType in CX form), pass through with defaults.
+                    var out = {};
+                    for (var dk in def) { if (def.hasOwnProperty(dk)) out[dk] = def[dk]; }
+                    // itLoad (kW)
+                    var kw = src.itLoad != null ? src.itLoad : (src.itLoadKw != null ? src.itLoadKw : 2000);
+                    out.itLoad = Math.max(100, Math.round(+kw || 2000));
+                    // cooling
+                    var cool = src.coolingType || src.cooling || 'air';
+                    out.coolingType = R.coolingMap[cool] || (R.cooling[cool] ? cool : 'air');
+                    // redundancy — accept CX form ('N+1'/'2N'/'2N+1'/'N') or DCMOC form (same) or compact ('n1'/'2n'/'2n1')
+                    var red = src.redundancy || src.powerRedundancy || 'N+1';
+                    var redMap = { n: 'N', n1: 'N+1', '2n': '2N', '2n1': '2N+1' };
+                    if (redMap[red]) red = redMap[red];
+                    out.redundancy = R.redundancy[red] ? red : 'N+1';
+                    // region — accept CX region key, else ISO-2 countryId, else nearest by mult
+                    var region = src.region;
+                    if (!region || !R.rates[region]) {
+                        var iso = src.countryId || (src.country && src.country.id) || src.iso2;
+                        if (iso && R.iso2Region[iso]) region = R.iso2Region[iso];
+                    }
+                    out.region = (region && R.rates[region]) ? region : def.region;
+                    // pass-through rich fields when supplied and valid
+                    if (src.rackDensity && R.density[src.rackDensity]) out.rackDensity = src.rackDensity;
+                    if (src.buildingType && R.building[src.buildingType]) out.buildingType = src.buildingType;
+                    if (src.fireSuppression && R.fire[src.fireSuppression] != null) out.fireSuppression = src.fireSuppression;
+                    if (src.upsType && R.ups[src.upsType] != null) out.upsType = src.upsType;
+                    if (src.generatorType && R.gen[src.generatorType] != null) out.generatorType = src.generatorType;
+                    if (src.seismicZone != null && R.seismic[String(src.seismicZone)]) out.seismicZone = String(src.seismicZone);
+                    if (src.cxScope && R.scope[src.cxScope]) out.cxScope = src.cxScope;
+                    if (src.substationConfig && R.substation[src.substationConfig]) out.substationConfig = src.substationConfig;
+                    if (src.bmsComplexity && R.bms[src.bmsComplexity]) out.bmsComplexity = src.bmsComplexity;
+                    if (src.deliveryMethod && R.delivery[src.deliveryMethod]) out.deliveryMethod = src.deliveryMethod;
+                    // density heuristic from cooling when not supplied: liquid ⇒ ai_hpc-ish density default stays 'standard'
+                    // (keep budgetary default; DCMOC has no rack-density input)
+                    return out;
                 }
             },
 

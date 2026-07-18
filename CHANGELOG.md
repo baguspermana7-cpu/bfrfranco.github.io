@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.68.0 — 2026-07-18 (DCMOC 7·Commissioning wired to the RICH cx engine)
+
+### Added
+- **Rich commissioning engine promoted into `rz-engine.js` (`models.commissioning.*`, DATA `2.4.0→2.5.0`)** — a faithful port of the DC-Hub `cx-calculator.html` model so DCMOC and the standalone calculator share ONE brain. New pure models: `equipScale` (26 equipment counts scaled from IT load + rack density), `levelDurations`/`levelCosts` (per-level L0–L6 staffed durations + costs at 30 regional day-rate cards — `cxDay/fieldDay/oemDay/witnessDay` + per-diem + diesel), `programRich` (gm-normalized `^0.45` base-vs-level-sum blend + campus adders + 15%% contingency → grand total, per-level + per-discipline splits, `pctCapex`, tier/availability), `monteCarlo` (N=10000 Box-Muller, itLoad ±7.5%% + pricing ±5%% → P5/P50/P95/CVaR95, seedable for tests), `sensitivity` (7-param tornado), and `mapInput` (DCMOC store → rich schema; `liquid→dlc`, ISO-2 country → nearest CX region, redundancy passthrough). New `DATA.commissioning.cx.rich` tables (30 rates + cooling/redundancy/building/seismic/substation/BMS/delivery/scope/fire/UPS/gen/density/base + fixed display proportions + 8 scenario presets). Compact `programCost`/`programSchedule` kept for back-compat.
+- **DCMOC `CommissioningDashboard` (Layer 7) rewired to the rich model** — equipment-scaled program cost + `%%-of-capex`, per-level L0–L6 duration+cost bars, equipment-count grid, discipline breakdown, a **Monte-Carlo cost-uncertainty band** (P5–P95 + P50 marker + CVaR95 + CoV), and a **sensitivity tornado**. All values move with IT load / cooling / redundancy / country. Graceful fallback to the compact estimate if a stale engine build lacks `programRich`.
+
+### Changed
+- Engine gate `tools/test-rz-engine.mjs` 395→421 asserts (rich-cx worked examples with golden values computed from `cx-calculator.html`'s own `cxCalcTotalCost` — exact grand/subtotal/contingency/duration/equipment parity across `enterprise_2mw`/`hyperscale_50mw`/`colo_10mw`). Reference-parity 126/0 unchanged. `rz-engine.min.js` rebuilt; DCMOC engine cache-bust `dcos2→cxrich`; bridge header `2.4.0→2.5.0`.
+
 ## v1.67.6 — 2026-07-18 (audit fixes: LOW polish D11/G3)
 
 ### Changed

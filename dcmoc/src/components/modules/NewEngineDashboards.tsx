@@ -248,62 +248,157 @@ export function ConstructionDashboard() {
 
 /* ── L7 Commissioning ── */
 const cxMoney = (n: number) => n >= 1e6 ? `$${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `$${(n / 1e3).toFixed(0)}K` : `$${Math.round(n)}`;
+
+interface CxLevel { id: string; label: string; cost: number; pct: number; days: number }
+interface CxDisc { name: string; cost: number; pct: number }
+interface CxRich {
+    grand: number; subtotal: number; contingency: number; perKw: number; pctCapex: number; capexPerKw: number;
+    durationDays: number; durationWeeks: number; durationMonths: number;
+    levels: CxLevel[]; disciplines: CxDisc[]; equip: Record<string, number>;
+    region: { key: string; name: string; mult: number }; tierInfo: { tier: string; avail: string; scenarios: number; istHrs: number };
+}
+interface CxMC { p5: number; p25: number; p50: number; p75: number; p95: number; mean: number; stdDev: number; cvar95: number; min: number; max: number }
+interface CxSens { name: string; low: number; high: number; range: number; lowD: number; highD: number }
+
+const EQUIP_SHOWN: [string, string][] = [
+    ['switchgear', 'Switchgear'], ['transformers', 'Transformers'], ['generators', 'Generators'], ['ups_modules', 'UPS Modules'],
+    ['cooling_units', 'Cooling Units'], ['chillers', 'Chillers'], ['pumps', 'Pumps'], ['pdus', 'PDUs'],
+    ['sts', 'STS'], ['racks', 'Racks'], ['fireZones', 'Fire Zones'], ['ats', 'ATS'],
+];
+
 export function CommissioningDashboard() {
-    const { inputs, country, redKey } = useCfg();
+    const { inputs, country } = useCfg();
     const m = rzModels().commissioning;
-    if (!m) return <Loading />;
-    // LIVE Cx PROGRAM from the shared engine — cost + schedule move with itLoad,
-    // cooling, redundancy, country (promoted from cx-calculator.html). No hardcoded
+    // RICH Cx PROGRAM from the shared engine (faithful cx-calculator.html port) —
+    // equipment-count-driven cost, 30 regional day-rates, per-level L0-L6 staffed
+    // durations, gm-normalized base blend, Monte-Carlo band + sensitivity tornado.
+    // All values move with itLoad / cooling / redundancy / country. No hardcoded
     // completion vector: readiness reflects the true design-phase state until a
     // live Cx checklist feeds it.
-    const cool = inputs.coolingType;
-    const pc = m.programCost ? m.programCost({ itLoadKw: inputs.itLoad, cooling: cool, redundancy: redKey, countryId: country?.id }) : null;
-    const ps = m.programSchedule ? m.programSchedule({ itLoadKw: inputs.itLoad, cooling: cool, redundancy: redKey }) : null;
-    const schedByLevel: Record<string, number> = {};
-    if (ps) ps.byLevel.forEach((l: { level: string; months: number }) => { schedByLevel[l.level] = l.months; });
-    const levels = pc ? Object.keys(pc.byLevel) : [];
-    const disc = pc ? pc.byDiscipline as Record<string, number> : {};
-    const discMax = Math.max(1, ...Object.values(disc));
+    const store = { itLoadKw: inputs.itLoad, coolingType: inputs.coolingType, powerRedundancy: inputs.powerRedundancy, countryId: country?.id };
+    const key = JSON.stringify(store);
+    const rich = React.useMemo<CxRich | null>(() => (m && m.programRich ? m.programRich(store) : null), [m, key]);
+    const mc = React.useMemo<CxMC | null>(() => (m && m.monteCarlo && rich ? m.monteCarlo(store, { n: 4000 }) : null), [m, key, rich]);
+    const sens = React.useMemo<CxSens[] | null>(() => (m && m.sensitivity && rich ? m.sensitivity(store, rich.grand) : null), [m, key, rich]);
+    if (!m) return <Loading />;
+
+    // graceful fallback to the compact model if a stale engine build lacks programRich
+    if (!rich) {
+        const pc = m.programCost ? m.programCost({ itLoadKw: inputs.itLoad, cooling: inputs.coolingType, redundancy: (REDUNDANCY_KEY[inputs.powerRedundancy] || 'n1'), countryId: country?.id }) : null;
+        return (
+            <div className="space-y-4">
+                <Head icon={CheckCircle2} title="Commissioning" sub="DC-OS Layer 7 · models.commissioning" tone="from-emerald-500 to-teal-600" />
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3"><Metric label="Cx Program Cost" value={pc ? cxMoney(pc.total) : '—'} sub={pc ? `${cxMoney(pc.perKw)}/kW` : ''} /></div>
+                <p className="text-[10px] text-slate-400">Rich Cx engine not present in this build — showing compact estimate.</p>
+            </div>
+        );
+    }
+
+    const discMax = Math.max(1, ...rich.disciplines.map((d) => d.cost));
+    const sensMax = Math.max(1, ...(sens || []).map((s) => s.range));
+    const band = mc ? Math.max(1, mc.p95 - mc.p5) : 1;
+    const p50pos = mc ? Math.max(0, Math.min(100, ((mc.p50 - mc.p5) / band) * 100)) : 50;
+
     return (
         <div className="space-y-4">
-            <Head icon={CheckCircle2} title="Commissioning" sub="DC-OS Layer 7 · models.commissioning (program cost + schedule)" tone="from-emerald-500 to-teal-600"
+            <Head icon={CheckCircle2} title="Commissioning" sub="DC-OS Layer 7 · models.commissioning.programRich (equipment-scaled Cx program · cx-calculator.html parity)" tone="from-emerald-500 to-teal-600"
                 report={() => ({
-                    title: 'Commissioning', layer: 'Layer 7 · Cx Program', project: country?.name || '—',
-                    kpis: [{ label: 'Cx Program Cost', value: pc ? cxMoney(pc.total) : '—', sub: pc ? `${cxMoney(pc.perKw)}/kW` : '' }, { label: 'Program Duration', value: ps ? `${ps.totalMonths} mo` : '—' }, { label: 'IT Load', value: `${(inputs.itLoad / 1000).toFixed(1)} MW` }],
-                    sections: [{ title: 'Cx Program by Level', head: ['Level', 'Duration', 'Cost'], rows: levels.map((k) => [pc!.byLevel[k].label, `${schedByLevel[k] ?? '—'} mo`, cxMoney(pc!.byLevel[k].cost)]) }],
-                    note: `Engine-real Cx program (models.commissioning) for a ${(inputs.itLoad / 1000).toFixed(1)} MW ${cool} ${inputs.powerRedundancy} build in ${country?.name || '—'}. Budgetary Cx estimate, not a Cx plan.`,
+                    title: 'Commissioning', layer: 'Layer 7 · Cx Program (rich)', project: country?.name || '—',
+                    kpis: [
+                        { label: 'Cx Program Cost', value: cxMoney(rich.grand), sub: `${cxMoney(rich.perKw)}/kW · ${rich.pctCapex.toFixed(1)}% of capex` },
+                        { label: 'Program Duration', value: `${rich.durationDays} d`, sub: `~${rich.durationMonths} mo` },
+                        { label: 'IT Load', value: `${(inputs.itLoad / 1000).toFixed(1)} MW`, sub: `${rich.tierInfo.tier} · ${rich.tierInfo.avail}` },
+                        ...(mc ? [{ label: 'Cost Range P5–P95', value: `${cxMoney(mc.p5)}–${cxMoney(mc.p95)}`, sub: `P50 ${cxMoney(mc.p50)} · CVaR95 ${cxMoney(mc.cvar95)}` }] : []),
+                    ],
+                    sections: [
+                        { title: 'Cx Program by Level', head: ['Level', 'Duration (d)', 'Cost'], rows: rich.levels.map((l) => [l.label, String(l.days), cxMoney(l.cost)]) },
+                        { title: 'Cost by Discipline', head: ['Discipline', 'Share', 'Cost'], rows: rich.disciplines.map((d) => [d.name, `${d.pct}%`, cxMoney(d.cost)]) },
+                        { title: 'Equipment Scaled', head: ['Equipment', 'Qty'], rows: EQUIP_SHOWN.map(([k, l]) => [l, String(rich.equip[k])]) },
+                        ...(sens ? [{ title: 'Sensitivity (tornado, ± swing)', head: ['Parameter', 'Low', 'High', 'Range'], rows: sens.map((s) => [s.name, cxMoney(s.low), cxMoney(s.high), cxMoney(s.range)]) }] : []),
+                    ],
+                    note: `Rich engine-real Cx program (models.commissioning.programRich) for a ${(inputs.itLoad / 1000).toFixed(1)} MW ${inputs.coolingType} ${inputs.powerRedundancy} build in ${rich.region.name} (${rich.region.key}, ×${rich.region.mult} regional cost). Equipment-scaled, 30-region day-rates, ${mc ? 'Monte-Carlo N=4000, ' : ''}budgetary Cx estimate — not a detailed Cx plan.`,
                 })} />
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <Metric label="Cx Program Cost" value={pc ? cxMoney(pc.total) : '—'} sub={pc ? `${cxMoney(pc.perKw)}/kW · incl. contingency` : ''} />
-                <Metric label="Program Duration" value={ps ? `${ps.totalMonths} mo` : '—'} sub="L0 → L6" />
-                <Metric label="Scope" value={`${(inputs.itLoad / 1000).toFixed(1)} MW`} sub={`${cool} · ${inputs.powerRedundancy}`} />
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <Metric label="Cx Program Cost" value={cxMoney(rich.grand)} sub={`${cxMoney(rich.perKw)}/kW · ${rich.pctCapex.toFixed(1)}% of capex`} />
+                <Metric label="Program Duration" value={`${rich.durationDays} d`} sub={`~${rich.durationMonths} mo · L0→L6`} />
+                <Metric label="Contingency (15%)" value={cxMoney(rich.contingency)} sub={`subtotal ${cxMoney(rich.subtotal)}`} />
+                <Metric label="Scope" value={`${(inputs.itLoad / 1000).toFixed(1)} MW`} sub={`${inputs.coolingType} · ${inputs.powerRedundancy} · ${rich.tierInfo.tier}`} />
             </div>
+
+            {mc && (
+                <Card>
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Cost Uncertainty <span className="text-[9px] text-slate-400">(Monte-Carlo · IT load ±7.5%, pricing ±5% · N=4000)</span></h2>
+                    <div className="relative h-3 rounded-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 mb-1">
+                        <div className="absolute -top-1 w-0.5 h-5 bg-slate-900 dark:bg-white" style={{ left: `${p50pos}%` }} title={`P50 ${cxMoney(mc.p50)}`} />
+                    </div>
+                    <div className="flex justify-between text-[10px] text-slate-500 tabular-nums"><span>P5 {cxMoney(mc.p5)}</span><span>P50 {cxMoney(mc.p50)}</span><span>P95 {cxMoney(mc.p95)}</span></div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3">
+                        <Metric label="P50 (median)" value={cxMoney(mc.p50)} />
+                        <Metric label="P95" value={cxMoney(mc.p95)} sub="95th percentile" />
+                        <Metric label="CVaR 95%" value={cxMoney(mc.cvar95)} sub="expected tail" />
+                        <Metric label="Std Dev" value={cxMoney(mc.stdDev)} sub={`±${((mc.stdDev / mc.mean) * 100).toFixed(1)}% CoV`} />
+                    </div>
+                </Card>
+            )}
+
+            <div className="grid md:grid-cols-2 gap-4">
+                <Card>
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Cx Program by Level (L0–L6)</h2>
+                    <div className="space-y-1.5">
+                        {rich.levels.map((l) => (
+                            <div key={l.id} className="flex items-center gap-2 text-xs">
+                                <span className="w-36 text-slate-600 dark:text-slate-300 truncate">{l.label}</span>
+                                <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className="h-2 rounded bg-emerald-500" style={{ width: `${l.pct}%` }} /></div>
+                                <span className="w-12 text-right tabular-nums text-slate-500">{l.days}d</span>
+                                <span className="w-14 text-right tabular-nums text-slate-400">{cxMoney(l.cost)}</span>
+                            </div>
+                        ))}
+                    </div>
+                </Card>
+                <Card>
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Cost by Discipline</h2>
+                    <div className="space-y-1.5">
+                        {rich.disciplines.map((d) => (
+                            <div key={d.name} className="flex items-center gap-2 text-xs">
+                                <span className="w-24 text-slate-600 dark:text-slate-300 capitalize">{d.name}</span>
+                                <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className="h-2 rounded bg-cyan-500" style={{ width: `${(d.cost / discMax) * 100}%` }} /></div>
+                                <span className="w-16 text-right tabular-nums text-slate-400">{cxMoney(d.cost)}</span>
+                            </div>
+                        ))}
+                    </div>
+                </Card>
+            </div>
+
             <Card>
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Cx Program by Level (L0–L6)</h2>
-                <div className="space-y-1.5">
-                    {levels.map((k) => (
-                        <div key={k} className="flex items-center gap-2 text-xs">
-                            <span className="w-40 text-slate-600 dark:text-slate-300 truncate">{pc!.byLevel[k].label}</span>
-                            <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className="h-2 rounded bg-emerald-500" style={{ width: `${(pc!.byLevel[k].cost / pc!.total) * 100}%` }} /></div>
-                            <span className="w-14 text-right tabular-nums text-slate-500">{schedByLevel[k] ?? '—'} mo</span>
-                            <span className="w-16 text-right tabular-nums text-slate-400">{cxMoney(pc!.byLevel[k].cost)}</span>
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Equipment Scaled <span className="text-[9px] text-slate-400">(from IT load {(inputs.itLoad / 1000).toFixed(1)} MW · verification scope)</span></h2>
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                    {EQUIP_SHOWN.map(([k, l]) => (
+                        <div key={k} className="rounded-lg border border-slate-200 dark:border-slate-800 p-2 text-center">
+                            <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{rich.equip[k]}</div>
+                            <div className="text-[9px] uppercase tracking-wide text-slate-500">{l}</div>
                         </div>
                     ))}
                 </div>
             </Card>
-            <Card>
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Cost by Discipline</h2>
-                <div className="space-y-1.5">
-                    {Object.keys(disc).map((k) => (
-                        <div key={k} className="flex items-center gap-2 text-xs">
-                            <span className="w-24 text-slate-600 dark:text-slate-300 capitalize">{k}</span>
-                            <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className="h-2 rounded bg-cyan-500" style={{ width: `${(disc[k] / discMax) * 100}%` }} /></div>
-                            <span className="w-16 text-right tabular-nums text-slate-400">{cxMoney(disc[k])}</span>
-                        </div>
-                    ))}
-                </div>
-                <p className="mt-2 text-[10px] text-slate-400">Operational Readiness Index activates when a live Cx checklist feeds per-level completion (design phase → not started).</p>
-            </Card>
+
+            {sens && (
+                <Card>
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Sensitivity Tornado <span className="text-[9px] text-slate-400">(cost swing per parameter · low → high)</span></h2>
+                    <div className="space-y-1.5">
+                        {sens.map((s) => (
+                            <div key={s.name} className="flex items-center gap-2 text-xs">
+                                <span className="w-28 text-slate-600 dark:text-slate-300">{s.name}</span>
+                                <div className="flex-1 h-2.5 rounded bg-slate-100 dark:bg-slate-800"><div className="h-2.5 rounded bg-amber-500" style={{ width: `${(s.range / sensMax) * 100}%` }} /></div>
+                                <span className="w-16 text-right tabular-nums text-slate-500">{cxMoney(s.low)}</span>
+                                <span className="w-4 text-center text-slate-400">→</span>
+                                <span className="w-16 text-right tabular-nums text-slate-400">{cxMoney(s.high)}</span>
+                            </div>
+                        ))}
+                    </div>
+                    <p className="mt-2 text-[10px] text-slate-400">Each bar = grand-total swing when the parameter moves low→high (all else fixed at the current config). Longest bar = biggest cost driver. Operational Readiness Index activates when a live Cx checklist feeds per-level completion.</p>
+                </Card>
+            )}
         </div>
     );
 }
