@@ -11,9 +11,17 @@ import {
 
 export interface PillarKpi { label: string; value: string; sub?: string; }
 export interface PillarSection { title: string; head: string[]; rows: (string | number)[][]; }
+export interface PillarCallout { title: string; body: string; tone?: 'info' | 'good' | 'warn'; }
+export interface PillarAction { priority: 'HIGH' | 'MEDIUM' | 'LOW'; action: string; }
 export interface PillarReport {
     title: string; layer: string; project: string;
     kpis: PillarKpi[]; sections: PillarSection[]; note?: string;
+    /* v1.83+ PDF standard (opex-report reference) — all OPTIONAL/additive */
+    config?: [string, string][];          // configuration table (all inputs)
+    callouts?: PillarCallout[];           // tinted analysis boxes
+    actions?: PillarAction[];             // prioritized action items
+    summaryBand?: PillarKpi[];            // footer mini-KPI band
+    orgName?: string;                     // from Settings
 }
 
 const MARGIN = 14;
@@ -50,7 +58,60 @@ export async function generatePillarPDF(r: PillarReport): Promise<void> {
         y = (lastY(doc) ?? y + 40) + 8;
     }
 
+    /* ── v1.83 PDF standard extras (optional) ── */
+    if (r.config?.length) {
+        if (y > 235) { drawFooter(doc, page); doc.addPage(); page++; drawModernHeader(doc, r.title, r.layer); y = 40; }
+        y = drawSectionTitle(doc, y, 'Configuration', String(n++));
+        autoTable(doc, {
+            startY: y, head: [['Parameter', 'Value']], body: r.config,
+            theme: 'plain', headStyles: { fillColor: PDF_COLORS.slate900 },
+            styles: { fontSize: 8, cellPadding: 1.4 }, margin: { left: MARGIN, right: MARGIN },
+        });
+        y = (lastY(doc) ?? y + 30) + 8;
+    }
+    if (r.callouts?.length) {
+        for (const c of r.callouts) {
+            if (y > 245) { drawFooter(doc, page); doc.addPage(); page++; drawModernHeader(doc, r.title, r.layer); y = 40; }
+            const tone = c.tone === 'good' ? [16, 185, 129] : c.tone === 'warn' ? [245, 158, 11] : [59, 130, 246];
+            doc.setFillColor(tone[0], tone[1], tone[2]);
+            doc.setDrawColor(tone[0], tone[1], tone[2]);
+            doc.roundedRect(MARGIN, y, pageW - MARGIN * 2, 16, 2, 2, 'S');
+            doc.setFontSize(9); doc.setTextColor(tone[0], tone[1], tone[2]);
+            doc.text(c.title, MARGIN + 3, y + 5.5);
+            doc.setFontSize(7.5); doc.setTextColor(71, 85, 105);
+            doc.text(doc.splitTextToSize(c.body, pageW - MARGIN * 2 - 6), MARGIN + 3, y + 10.5);
+            y += 20;
+        }
+    }
+    if (r.actions?.length) {
+        if (y > 235) { drawFooter(doc, page); doc.addPage(); page++; drawModernHeader(doc, r.title, r.layer); y = 40; }
+        y = drawSectionTitle(doc, y, 'Prioritized Action Items', String(n++));
+        autoTable(doc, {
+            startY: y, head: [['Priority', 'Action']],
+            body: r.actions.map((a) => [a.priority, a.action]),
+            theme: 'striped', headStyles: { fillColor: PDF_COLORS.slate900 },
+            styles: { fontSize: 8, cellPadding: 1.6 },
+            columnStyles: { 0: { cellWidth: 22, fontStyle: 'bold' } },
+            margin: { left: MARGIN, right: MARGIN },
+        });
+        y = (lastY(doc) ?? y + 30) + 8;
+    }
+    if (r.summaryBand?.length) {
+        if (y > 245) { drawFooter(doc, page); doc.addPage(); page++; y = 40; }
+        const bw = (pageW - MARGIN * 2 - (r.summaryBand.length - 1) * 3) / r.summaryBand.length;
+        doc.setFillColor(15, 23, 42);
+        doc.roundedRect(MARGIN, y, pageW - MARGIN * 2, 18, 2, 2, 'F');
+        r.summaryBand.forEach((k, i) => {
+            const x = MARGIN + i * (bw + 3);
+            doc.setFontSize(8.5); doc.setTextColor(255, 255, 255);
+            doc.text(String(k.value), x + bw / 2, y + 8, { align: 'center' });
+            doc.setFontSize(5.5); doc.setTextColor(148, 163, 184);
+            doc.text(k.label.toUpperCase(), x + bw / 2, y + 13.5, { align: 'center' });
+        });
+        y += 24;
+    }
     if (r.note) { if (y > 255) { drawFooter(doc, page); doc.addPage(); page++; y = 40; } y = drawParagraph(doc, y, r.note); }
+    if (r.orgName) { doc.setFontSize(6.5); doc.setTextColor(148, 163, 184); doc.text(`Prepared for ${r.orgName} · DC-OS`, MARGIN, 287); }
     drawFooter(doc, page);
     savePdf(doc, `DC-OS_${r.title.replace(/\s+/g, '_')}.pdf`);
 }

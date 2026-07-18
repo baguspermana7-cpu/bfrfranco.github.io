@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.84.0 — 2026-07-19 (DCMOC Phase O: PDF export standard)
+
+### Added
+- **PillarPdf standard extension** (additive — every existing call keeps working) per the owner's reference PDF (opex-calculator report): PillarReport gains optional `config` (full configuration table), `callouts` (tinted analysis boxes info/good/warn), `actions` (prioritized HIGH/MEDIUM/LOW table), `summaryBand` (footer mini-KPI band), `orgName` (from Settings → "Prepared for" footer). All DCMOC page exports can now compose the full standard: header+KPI cards → configuration → sections → callouts → actions → summary band → disclaimer.
+
 ## v1.83.0 — 2026-07-19 (DCMOC Phase R: Settings & Integrations)
 
 ### Added
