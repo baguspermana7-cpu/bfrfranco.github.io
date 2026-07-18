@@ -328,6 +328,29 @@ export function AssetIntelDashboard() {
                 <Metric label="Remaining Life" value={`${health.remainingYears} yr`} sub={`of ${health.designLifeYears}`} />
                 <Metric label="Tracked Assets" value={String(rows.length)} sub="15-yr horizon" />
             </div>
+            {m.failureProbability && (
+                <Card>
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Wear-Out Failure Risk <span className="text-[9px] text-slate-400">(Weibull, at 60% of design life)</span></h2>
+                    <div className="space-y-1.5">
+                        {['battery', 'ups', 'generator', 'crac', 'chiller', 'transformer'].map((cls) => {
+                            const life = m.designLife(cls) || 15;
+                            const age = Math.round(life * 0.6);
+                            const fp = m.failureProbability(cls, age);
+                            const pctv = Math.round(fp.failureProb * 100);
+                            const col = pctv >= 40 ? 'bg-rose-500' : pctv >= 20 ? 'bg-amber-500' : 'bg-emerald-500';
+                            return (
+                                <div key={cls} className="flex items-center gap-2 text-xs">
+                                    <span className="w-24 capitalize text-slate-600 dark:text-slate-300">{cls}</span>
+                                    <span className="w-14 text-[10px] text-slate-400 tabular-nums">age {age}yr</span>
+                                    <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className={`h-2 rounded ${col}`} style={{ width: `${Math.min(100, pctv)}%` }} /></div>
+                                    <span className="w-16 text-right tabular-nums text-slate-500">{pctv}% CDF</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <p className="mt-2 text-[10px] text-slate-400">Cumulative failure probability F(t)=1−e^(−(t/η)^β) per asset class (β&gt;1 wear-out). Drives condition-based replacement timing. Reliability-engineering / IEEE-493 basis.</p>
+                </Card>
+            )}
             <Card>
                 <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">15-Year Replacement Schedule</h2>
                 <table className="w-full text-xs">

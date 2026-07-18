@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.65.3 — 2026-07-18 (DCMOC: surface Weibull wear-out risk on Asset)
+
+### Added
+- **AssetIntelDashboard** surfaces `models.asset.failureProbability` — per-class Weibull cumulative failure probability at 60%% of design life (battery/ups/generator/crac/chiller/transformer), color-coded, driving condition-based replacement timing.
+
+---
+
 ## v1.65.2 — 2026-07-18 (DCMOC: surface research-deepened engine outputs)
 
 ### Added
