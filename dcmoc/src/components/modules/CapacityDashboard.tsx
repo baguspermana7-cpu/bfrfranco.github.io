@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState, useCallback } from 'react';
 import { useSimulationStore } from '@/store/simulation';
+import { rzModels } from '@/lib/rz-engine';
 import { calculateCapacityPlan, CAPACITY_PRESETS, CapacityPhase, CapacityPlanResult } from '@/modules/capacity/CapacityPlanningEngine';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -83,6 +84,21 @@ const CapacityDashboardMod = () => {
 
     return (
         <div className="space-y-6">
+            {(() => {
+                const cm = rzModels().capacity;
+                if (!cm?.facilityLoad) return null;
+                const fl = cm.facilityLoad(inputs.itLoad, inputs.coolingType, inputs.tierLevel);
+                const markets = ['hyperscale', 'wholesale', 'retail'] as const;
+                return (
+                    <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/70 text-xs">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Facility Load &amp; Lease-Up</span>
+                        <span className="text-slate-600 dark:text-slate-300">IT <b className="tabular-nums">{(inputs.itLoad / 1000).toFixed(1)} MW</b> → Facility <b className="tabular-nums text-cyan-500">{fl.facilityLoadMw} MW</b> <span className="text-slate-400">@ PUE {fl.pueUsed}</span></span>
+                        <span className="text-slate-400">Yr-2 occupancy S-curve:</span>
+                        {markets.map((mk) => <span key={mk} className="text-slate-600 dark:text-slate-300 capitalize">{mk} <b className="tabular-nums text-emerald-500">{Math.round((cm.occupancyScurve ? cm.occupancyScurve(2, mk) : 0) * 100)}%</b></span>)}
+                        <span className="text-[9px] text-slate-400 ml-auto">CBRE H1'25 · Uptime'24 · logistic ramp</span>
+                    </div>
+                );
+            })()}
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>

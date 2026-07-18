@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.65.6 — 2026-07-18 (DCMOC: surface facility-load + lease-up S-curve on Capacity)
+
+### Added
+- **CapacityDashboard** shows PUE-adjusted facility load (`models.capacity.facilityLoad`) + year-2 lease-up occupancy by market type (`occupancyScurve`: hyperscale/wholesale/retail). Completes surfacing of all 6 research-deepened pillars (1/3/4/6/8/9) in the DCMOC UI.
+
+---
+
 ## v1.65.5 — 2026-07-18 (DCMOC: surface Uptime staffing benchmark on Staffing)
 
 ### Added
