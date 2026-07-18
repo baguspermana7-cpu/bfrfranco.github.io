@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.67.2 — 2026-07-18 (audit fixes: engine correctness E1-E6)
+
+### Fixed
+- **CRITICAL** `models.decision.recommend` crashed when `objectives` passed as {} (guard only covered null/undefined). **MAJOR** `models.tax.macrsDepreciation` treated discountRate=0 as 0.10 (~30%% wrong undiscounted NPV). `models.architecture.topology(1)` now returns real Tier-1 (was Tier-3 fallback). Climate free-cooling denom 5500→5800 so ASHRAE zone 8 (subarctic) scores above zone 7. Added `DATA.sources['decision']` provenance (was missing, CLAUDE.md rule). +5 edge-case asserts (test-rz-engine 395/0, parity 126/0). From a 3-agent adversarial audit.
+
+---
+
 ## v1.67.1 — 2026-07-18 (DCMOC: surface AACE accuracy band on CAPEX)
 
 ### Added

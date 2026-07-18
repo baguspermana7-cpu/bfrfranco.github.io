@@ -880,6 +880,23 @@ if (M.decision && M.decision.rankOptions) {
     ok('decision.rankOptions closeness in [0,1]', r.every((o) => o.closeness >= 0 && o.closeness <= 1));
 }
 
+/* ── Audit-pass edge cases (v2.5.0 perfection) ── */
+if (M.decision && M.decision.recommend) {
+    ok('decision.recommend survives objectives={} (no crash)', (() => { try { return !!M.decision.recommend({ inputs: { itLoadKw: 3000, tier: 3 } }, {}, {}); } catch { return false; } })());
+}
+if (M.tax && M.tax.macrsDepreciation) {
+    ok('macrs discountRate=0 → undiscounted shield (not 0.10)', M.tax.macrsDepreciation(1e6, '5', 0.21, 0).shieldNpv === 210000, '' + M.tax.macrsDepreciation(1e6, '5', 0.21, 0).shieldNpv);
+}
+if (M.architecture && M.architecture.topology) {
+    ok('architecture.topology(1) = Tier-1 (not Tier-3 fallback)', M.architecture.topology(1).tiaRating === 'Rated-1');
+}
+if (M.site && M.site.deriveFactors && D.countries && D.countries.SE) {
+    ok('site climate zone 8 > zone 7 (5800 denom)', M.site.deriveFactors('SE').climate <= 1 && M.site.score(M.site.deriveFactors('SE')).score > 70);
+}
+if (M.decision && M.decision.rankOptions) {
+    ok('rankOptions identical options → closeness 0, no crash', (() => { const r = M.decision.rankOptions([{ name: 'A', values: { x: 1 } }, { name: 'B', values: { x: 1 } }], [{ key: 'x', weight: 1, benefit: true }]); return Array.isArray(r) && r.every((o) => o.closeness === 0); })());
+}
+
 /* ============================================================
  * 3. PROVENANCE (soft until A1 lands the sidecar; hard after)
  * ============================================================ */

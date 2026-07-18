@@ -4587,6 +4587,7 @@
             },
             coolingDeltaT: { air: [10, 15], inrow: [12, 18], rdhx: [10, 20], liquid: [8, 12], immersion: [5, 10] },
             tierTopology: {
+                1: { powerPath: 'N, single non-redundant path', coolingPath: 'N, single path', maintainability: 'shutdown required (no redundancy)', tiaRating: 'Rated-1' },
                 2: { powerPath: 'N+1 components, single active path', coolingPath: 'N+1 components', maintainability: 'shutdown required', tiaRating: 'Rated-2' },
                 3: { powerPath: 'N+1, dual-bus (one path maintained)', coolingPath: 'N+1 concurrently maintainable', maintainability: 'concurrently maintainable', tiaRating: 'Rated-3' },
                 4: { powerPath: '2N/2N+1, all paths simultaneously active', coolingPath: '2N fault tolerant', maintainability: 'fault tolerant', tiaRating: 'Rated-4' }
@@ -4764,6 +4765,7 @@
             'carbon.dieselKgCo2PerL': { source: 'GHG Protocol Corporate Standard scope 1/2/3 boundaries; EPA Emission Factors 2024 diesel 2.68 kgCO₂/L; refrigerant leakage per GHG Protocol + EPA GreenChill; embodied construction carbon amortized (RICS/LETI DC embodied-carbon studies)', asOf: '2024', unit: 'kgCO₂/L, tCO₂e/MW·yr' },
             'tax.macrs':              { source: 'US IRS Publication 946 (How To Depreciate Property) — MACRS GDS percentage tables, half-year convention (5-yr IT, 7-yr MEP, 15-yr land improvements, 39-yr non-residential building SL)', asOf: '2025', unit: 'depreciation fraction per recovery year' },
             'aace':                   { source: 'AACE International Recommended Practice 18R-97 "Cost Estimate Classification System" — Class 1-5 by project definition maturity → accuracy ranges (Class 5 -50/+100% … Class 1 -10/+15%). Engine detailed capex is a Class 4 budgetary estimate', asOf: '2020', unit: '% accuracy range by estimate class' },
+            'decision':               { source: 'Layer-13 planning benchmarks: Uptime Institute Tier Standard availability targets (99.741/99.982/99.995); cost/kW bands by tier from CBRE/JLL/Cushman & Wakefield DC Cost 2025; PUE best-practice bands ASHRAE TC9.9. Descriptive engineering guidance — not advice.', asOf: '2026', unit: '% availability, $/kW bands, PUE targets' },
             'currency':               { source: 'ECB / central-bank reference rates', asOf: '2026-04', method: 'spot, USD base' },
             'inflationAnnual':        { source: 'IMF WEO 2026 regional CPI', asOf: '2026', unit: 'fraction/yr' },
             'salaryBenchmarks':       { source: 'Uptime Institute 2026 + AFCOM 2026 + US BLS 2025', asOf: '2026', unit: 'USD/yr, base' },
@@ -6437,7 +6439,7 @@
                         var waterScore = env.aqueductStressScore != null ? clamp(1 - env.aqueductStressScore / 5) : 0.65;
                         // climate: ASHRAE zone → free-cooling hours → 0-1
                         var climateScore = 0.6;
-                        if (env.ashraeClimateZone) { var z = String(env.ashraeClimateZone).charAt(0); var hrs = S.climateFreeHours[z]; if (hrs != null) climateScore = clamp(hrs / 5500); }
+                        if (env.ashraeClimateZone) { var z = String(env.ashraeClimateZone).charAt(0); var hrs = S.climateFreeHours[z]; if (hrs != null) climateScore = clamp(hrs / 5800); }
                         f = {
                             power:   er != null ? clamp(1 - (er - 0.05) / 0.30) : 0.6,
                             grid:    gridScore,
@@ -6979,7 +6981,7 @@
                  *  the NPV of the shield at a discount rate. (v2.5.0) */
                 macrsDepreciation: function (capex, recoveryClass, taxRate, discountRate) {
                     var sched = DATA.tax.macrs[String(recoveryClass || '5')] || DATA.tax.macrs['5'];
-                    var base = capex || 0, tr = taxRate || 0, dr = discountRate || 0.10;
+                    var base = capex || 0, tr = taxRate || 0, dr = discountRate != null ? discountRate : 0.10;
                     var rows = [], cum = 0, shieldNpv = 0;
                     for (var y = 0; y < sched.length; y++) {
                         var dep = Math.round(base * sched[y]);
@@ -7321,7 +7323,7 @@
              * DCMOC deterministic provider so the static site + DCMOC share it. */
             decision: {
                 recommend: function (ctx, constraints, objectives) {
-                    ctx = ctx || {}; constraints = constraints || {}; objectives = objectives || [];
+                    ctx = ctx || {}; constraints = constraints || {}; if (!Array.isArray(objectives)) objectives = [];
                     var D2 = DATA.decision, recs = [], rationale = [];
                     var inp = ctx.inputs || {}, tier = inp.tier || 3;
                     var itKw = inp.itLoadKw || 0, mw = itKw / 1000, cooling = (inp.coolingType || 'air').toLowerCase();
