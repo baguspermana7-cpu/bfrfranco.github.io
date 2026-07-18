@@ -4,6 +4,7 @@ import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
+import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 import { calculateFinancials, defaultOccupancyRamp, FinancialResult } from '@/modules/analytics/FinancialEngine';
 import { calculateRevenue, defaultRevenueOccupancy, RevenueResult } from '@/modules/analytics/RevenueEngine';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -78,7 +79,7 @@ const FinancialDashboard = () => {
 
     // ─── Combined Financial + Revenue Inputs ────────────
     const [finInputs, setFinInputs] = useState({
-        revenuePerKwMonth: 150,
+        revenuePerKwMonth: DEFAULT_REVENUE_PER_KW_MONTH,
         discountRate: 0.10,
         projectLifeYears: 10,
         escalationRate: 0.03,

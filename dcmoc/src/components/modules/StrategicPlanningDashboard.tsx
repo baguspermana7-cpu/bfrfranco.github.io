@@ -137,7 +137,7 @@ export default function StrategicPlanningDashboard() {
         const premiumPct = ((acquisition.targetSiteDollarPerMW - fairValue) / fairValue) * 100;
 
         // ROI horizon: DC revenue at $150/kW-month colocation rate (illustrative)
-        const itCapacityKW = 5000; // typical 5MW site
+        const itCapacityKW = inputs.itLoad; // real project IT load
         const annualRevenue = itCapacityKW * 150 * 12;
         const totalInvestment = acquisition.targetSiteDollarPerMW * (itCapacityKW / 1000);
         // Engine-real annual OPEX (models.opex) for the 5 MW site; falls back to an
@@ -167,7 +167,7 @@ export default function StrategicPlanningDashboard() {
             annualNOI,
             totalInvestment,
         };
-    }, [acquisition, inputs.coolingType, selectedCountry]);
+    }, [acquisition, inputs.coolingType, inputs.itLoad, selectedCountry]);
 
     // --- Expansion Calculations ---
     const expansionResults = useMemo(() => {

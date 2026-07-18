@@ -521,7 +521,7 @@ function CarbonTab({ result }: { result: ReturnType<typeof calculatePortfolio> }
                             { label: 'Annual CO₂', get: (s: SiteResult) => `${Math.round(s.carbon.annualEmissionsTonCO2).toLocaleString()} tCO₂`, tooltip: 'Total annual carbon dioxide emissions in metric tons, based on energy consumption and local grid carbon intensity.' },
                             { label: 'PUE', get: (s: SiteResult) => s.pue.toFixed(2), tooltip: 'Power Usage Effectiveness — ratio of total facility power to IT equipment power. 1.0 is perfect; typical range is 1.2-1.8.' },
                             { label: 'Annual Energy', get: (s: SiteResult) => `${Math.round(s.carbon.annualEnergyMWh).toLocaleString()} MWh`, tooltip: 'Total annual energy consumption including IT load and all overhead (cooling, lighting, losses) in megawatt-hours.' },
-                            { label: 'Grid Intensity', get: (s: SiteResult) => `${s.carbon.pueEfficiency.toFixed(2)} PUE`, tooltip: 'PUE efficiency factor reflecting how the local electricity grid carbon intensity affects overall emissions.' },
+                            { label: 'Site PUE', get: (s: SiteResult) => `${s.carbon.pueEfficiency.toFixed(2)}`, tooltip: 'Design PUE for the site — the cooling/power overhead factor that drives energy use and grid-carbon emissions.' },
                             { label: 'Carbon Offset Cost', get: (s: SiteResult) => `$${Math.round(s.carbon.carbonOffsetCostUSD).toLocaleString()}`, tooltip: 'Estimated annual cost to offset carbon emissions through verified carbon credits at current market rates.' },
                         ].map(row => (
                             <tr key={row.label} className="border-b border-slate-100 dark:border-slate-800">

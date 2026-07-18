@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.67.3 — 2026-07-18 (audit fixes: DCMOC integrity D1-D6)
+
+### Fixed
+- **Executive Dashboard site score was hardcoded** (constant 68.4 regardless of country, diverged from the Site Intel pillar) → now uses `models.site.deriveFactors(country)` — the two surfaces agree. **Revenue default diverged across 5 surfaces** ($120/$150/$280 → contradictory IRR) → single shared `DEFAULT_REVENUE_PER_KW_MONTH` (constants/finance.ts) in Executive/Financial/Report. **SimulationDashboard** hardcoded $20,000 salary + $1,126.30 overtime → real `selectedCountry.labor` + derived OT premium. **TierDashboard** `network` sub-score was fixed 70 → derived from tier. **StrategicPlanning** acquisition ROI used fixed 5MW → real `inputs.itLoad`. **PortfolioDashboard** "Grid Intensity" column showed PUE values → relabeled "Site PUE". tsc+build clean.
+
+---
+
 ## v1.67.2 — 2026-07-18 (audit fixes: engine correctness E1-E6)
 
 ### Fixed

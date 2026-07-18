@@ -13,13 +13,9 @@ import { useCapexStore } from '@/store/capex';
 import { getPUE } from '@/constants/pue';
 import { calculateFinancials, defaultOccupancyRamp, type FinancialResult } from '@/modules/analytics/FinancialEngine';
 import { rzModels } from '@/lib/rz-engine';
+import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 
 const REDUNDANCY_KEY: Record<string, string> = { 'N+1': 'n1', '2N': '2n', '2N+1': '2n1' };
-// Illustrative revenue assumption for the roll-up financial (user sets real
-// numbers in the Financial engine). Transparent + labeled on the dashboard.
-// ~$280/kW/mo is a mid-market colo rate that keeps the default project cash-
-// positive; the real number comes from the Financial engine.
-const DEFAULT_REVENUE_PER_KW_MONTH = 280;
 
 export interface DashboardData {
     // inputs
@@ -84,8 +80,16 @@ export function useDashboardData(): DashboardData {
         let construction: DashboardData['construction'] = null;
         try { if (m.construction?.fromTimeline && capex?.timeline) { const s = m.construction.fromTimeline(capex.timeline); construction = { totalMonths: s.totalMonths, rfs: s.milestones?.rfs ?? null }; } } catch { }
         let siteScore: number | null = null;
-        // site score from available factors (grid/seismic default mid where unknown)
-        try { if (m.site?.score) siteScore = m.site.score({ power: 0.7, grid: 0.8, seismic: 0.7, talent: 0.6, tax: 0.6, carbon: 0.6, flood: 0.7, latency: 0.7, water: 0.7 }).score; } catch { }
+        // Country-real site score — same basis as the Site Intelligence pillar
+        // (deriveFactors from DATA.countries), so the two surfaces agree.
+        try {
+            if (m.site?.score) {
+                const factors = m.site.deriveFactors
+                    ? m.site.deriveFactors(region)
+                    : { power: 0.7, grid: 0.8, seismic: 0.7, talent: 0.6, tax: 0.6, carbon: 0.6, flood: 0.7, latency: 0.7, water: 0.7 };
+                siteScore = m.site.score(factors).score;
+            }
+        } catch { }
 
         // ── financial (illustrative revenue assumption) ──
         let financial: FinancialResult | null = null, ebitda: number | null = null;

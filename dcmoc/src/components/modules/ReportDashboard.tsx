@@ -7,6 +7,7 @@ import { useCapexStore } from '@/store/capex';
 import { useScenarioStore } from '@/store/scenario';
 import { runSensitivityAnalysis } from '@/modules/analytics/SensitivityEngine';
 import { calculateFinancials, defaultOccupancyRamp } from '@/modules/analytics/FinancialEngine';
+import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 import TornadoChart from '@/components/visualizations/TornadoChart';
 import SankeyDiagram from '@/components/visualizations/SankeyDiagram';
 import type { SankeyNode, SankeyLink } from '@/components/visualizations/SankeyDiagram';
@@ -276,7 +277,7 @@ export function ReportDashboard() {
         const financialResult = calculateFinancials({
             totalCapex: capexResults.total,
             annualOpex: opexAnnual,
-            revenuePerKwMonth: 150,
+            revenuePerKwMonth: DEFAULT_REVENUE_PER_KW_MONTH,
             itLoadKw: inputs.itLoad,
             discountRate: 0.08,
             projectLifeYears,

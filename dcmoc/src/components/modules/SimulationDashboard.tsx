@@ -483,12 +483,12 @@ export function SimulationDashboard() {
                             </div>
                             <div className="space-y-2">
                                 <div className="flex justify-between text-xs border-b border-slate-300 dark:border-slate-600/50 pb-1">
-                                    <span className="text-slate-600 dark:text-slate-400 flex items-center">Base Salary <Tooltip content="Overtime cost calculation based on local labor law multipliers. First 1-2 hours typically at 1.5x, subsequent hours at 2x base rate." /></span>
-                                    <span className="text-slate-900 dark:text-white font-mono">${(20000).toFixed(2)}</span>
+                                    <span className="text-slate-600 dark:text-slate-400 flex items-center">Engineer Base Salary <Tooltip content="Country engineer base salary from the selected market's labor profile." /></span>
+                                    <span className="text-slate-900 dark:text-white font-mono">${selectedCountry.labor.baseSalary_Engineer.toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between text-xs font-bold text-amber-600 dark:text-amber-400">
-                                    <span className="flex items-center">Overtime Penalty <Tooltip content="Overtime cost calculation based on local labor law multipliers. First 1-2 hours typically at 1.5x, subsequent hours at 2x base rate." /></span>
-                                    <span className="font-mono">${(1126.30).toFixed(2)}</span>
+                                    <span className="flex items-center">Overtime Rate (1st hr) <Tooltip content="Overtime premium per hour = hourly base × (workday first-hour multiplier − 1), from the country's overtime rules." /></span>
+                                    <span className="font-mono">${((selectedCountry.labor.baseSalary_Engineer / 2080) * (selectedCountry.labor.overtimeRules.workday.firstHour - 1)).toFixed(2)}/hr</span>
                                 </div>
                             </div>
                         </div>

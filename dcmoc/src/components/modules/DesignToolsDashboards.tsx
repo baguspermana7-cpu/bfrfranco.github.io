@@ -44,7 +44,7 @@ export function TierDashboard() {
     const scores = {
         power: RED_SCORE[redKey] ?? 75,
         cooling: COOL_SCORE[inputs.coolingType] ?? 60,
-        network: 70,
+        network: 55 + (inputs.tierLevel - 2) * 15,
         physical: 60 + (inputs.tierLevel - 2) * 12,
         monitoring: 60 + (inputs.tierLevel - 2) * 12,
         redundancy: redKey,
