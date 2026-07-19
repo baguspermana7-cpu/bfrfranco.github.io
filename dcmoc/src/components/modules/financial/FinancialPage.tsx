@@ -20,6 +20,7 @@ import { rzModels, rzData } from '@/lib/rz-engine';
 import FinancialDashboard from '@/components/modules/FinancialDashboard';
 import MonteCarloDashboard from '@/components/modules/MonteCarloDashboard';
 import { fmtMoney } from '@/lib/format';
+import { TraceValue } from '@/components/ui/TraceValue';
 import { TrendingUp, ChevronRight, FileDown } from 'lucide-react';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
@@ -226,7 +227,7 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                     {/* KPI row */}
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'Total Budget (Baseline)', value: fmtMoney(model.baseline), sub: 'engine capex P50' },
+                            { label: 'Total Budget (Baseline)', value: fmtMoney(model.baseline), sub: 'engine capex P50', trace: 'capex.total' },
                             { label: 'Revised Budget', value: fmtMoney(model.revised), sub: `+${fmtMoney(model.approvedRev)} approved changes` },
                             { label: 'Total Committed', value: fmtMoney(model.committed), sub: `${Math.round((model.committed / model.revised) * 100)}% of revised` },
                             { label: 'Total Actual (Paid)', value: fmtMoney(model.paid), sub: `${Math.round((model.paid / model.revised) * 100)}% of revised` },
@@ -235,7 +236,13 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
-                                <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                {(k as { trace?: string }).trace ? (
+                                    <TraceValue traceId={(k as { trace?: string }).trace!}>
+                                        <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                    </TraceValue>
+                                ) : (
+                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                )}
                                 <div className="truncate text-[10px] text-slate-500">{k.sub}</div>
                             </div>
                         ))}

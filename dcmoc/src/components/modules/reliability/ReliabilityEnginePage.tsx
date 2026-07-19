@@ -27,6 +27,7 @@ import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNar
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { ShieldCheck, ChevronRight, FileDown } from 'lucide-react';
 import { Explain } from '@/components/ui/Explain';
+import { TraceValue } from '@/components/ui/TraceValue';
 
 interface SystemRow { label: string; availability: number; chain: string; redundant: boolean }
 interface ComponentRow { key: string; label: string; mtbf: number; mttr: number; lambdaMyr: number; count: number | null; availability: number; contribPct: number }
@@ -265,7 +266,7 @@ export function ReliabilityEnginePage() {
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
                             { label: 'Composed Availability', value: fmtAvail(model.overall), sub: meetsTier ? `meets Tier ${inputs.tierLevel} target` : `BELOW Tier ${inputs.tierLevel} target`, chip: `${ninesOf(model.overall)} nines`, title: 'β=5% common-cause screening (assumption)' },
-                            { label: 'Tier Target', value: fmtAvail(model.tierTargetFrac), sub: `Tier ${inputs.tierLevel} (Uptime)` },
+                            { label: 'Tier Target', value: fmtAvail(model.tierTargetFrac), sub: `Tier ${inputs.tierLevel} (Uptime)`, trace: 'rel.tierTarget' },
                             { label: 'Downtime (unplanned)', value: fmtDowntime(model.downtimeMin), sub: `budget ${fmtDowntime(model.budgetMin)}` },
                             { label: 'MTBF (series composite)', value: `≈ ${(model.mtbfAll / 1000).toFixed(0)}k h`, sub: '1/Σλ serial — excl. redundancy', explain: 'mtbf' },
                             { label: 'MTTR (avg)', value: `${model.mttrAvg} h`, sub: 'component average', explain: 'mttr' },
@@ -274,7 +275,13 @@ export function ReliabilityEnginePage() {
                             <div key={k.label} title={(k as { title?: string }).title} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>
                                 <div className="flex items-baseline gap-1.5">
-                                    <div className="text-base font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                    {(k as { trace?: string }).trace ? (
+                                        <TraceValue traceId={(k as { trace?: string }).trace!}>
+                                            <div className="text-base font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                        </TraceValue>
+                                    ) : (
+                                        <div className="text-base font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                    )}
                                     {(k as { chip?: string }).chip && <span className="rounded bg-violet-500/15 px-1 py-0.5 text-[8.5px] font-semibold text-violet-600 dark:text-violet-400">{(k as { chip?: string }).chip}</span>}
                                 </div>
                                 <div className={`truncate text-[10px] ${k.sub.startsWith('BELOW') ? 'text-rose-500 font-semibold' : 'text-slate-500'}`}>{k.sub}</div>

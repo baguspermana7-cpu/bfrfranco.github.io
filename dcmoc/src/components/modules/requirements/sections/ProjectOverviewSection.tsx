@@ -124,7 +124,7 @@ export function ProjectOverviewSection() {
                 <Field label="Target COD (Commercial Operation Date)" required>
                     <QuarterPicker value={o.targetCod} onChange={(v) => set({ targetCod: v })} />
                 </Field>
-                <Field label="Grid Voltage" explainKey="mv-switchgear">
+                <Field label="Grid Voltage" explainKey="voltage">
                     <Segmented<GridVoltage> value={o.gridVoltage} onChange={(v) => set({ gridVoltage: v })}
                         options={(['11kV', '20kV', '33kV', '132kV', '220kV'] as GridVoltage[]).map((g) => ({ value: g, label: g }))} />
                 </Field>
@@ -155,7 +155,7 @@ export function ProjectOverviewSection() {
             <div className="mt-3">
                 {/* Owner S6: the single use-case picker lives in 1.2 (was duplicated
                   * here as "Primary Use Case" next to Industry + Workload Category). */}
-                <Field label="IT Workload / Use Case" hint="Selected in 1.2 Workload Profile — one source">
+                <Field label="IT Workload / Use Case" explainKey="workload" hint="Selected in 1.2 Workload Profile — one source">
                     <a href="#sec-workload" className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/40 bg-violet-600/10 px-2.5 py-1 text-[11px] font-medium text-violet-600 dark:text-violet-300 hover:bg-violet-600/20">
                         {USE_CASE_LABELS[o.useCase]}
                         <span className="text-[9px] uppercase text-violet-400">edit in 1.2 ↓</span>

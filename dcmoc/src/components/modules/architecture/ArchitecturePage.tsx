@@ -26,6 +26,7 @@ import { useScenarioStore } from '@/store/scenario';
 import { getPUE } from '@/constants/pue';
 import { Boxes, FileDown, Save, ChevronRight } from 'lucide-react';
 import { Explain } from '@/components/ui/Explain';
+import { TraceValue } from '@/components/ui/TraceValue';
 
 const STRIP = [
     { id: 'sec-arch-overview', label: '1 Overview' },
@@ -205,16 +206,22 @@ export function ArchitecturePage() {
                     {/* KPI row */}
                     <div id="sec-arch-overview" className="grid scroll-mt-24 grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'Total IT Load', value: `${f.itMw} MW`, sub: `${eq.racks.toLocaleString()} racks` },
-                            { label: 'Total Facility Load', value: `${f.facilityMw} MW`, sub: 'incl. losses & overhead' },
+                            { label: 'Total IT Load', value: `${f.itMw} MW`, sub: `${eq.racks.toLocaleString()} racks`, trace: 'sim.itLoad' },
+                            { label: 'Total Facility Load', value: `${f.facilityMw} MW`, sub: 'incl. losses & overhead', trace: 'arch.facilityMw' },
                             { label: 'PUE (Design)', value: String(f.pue), sub: f.pue <= 1.2 ? 'Excellent' : f.pue <= 1.4 ? 'Good' : 'Standard', explain: 'pue' },
                             { label: 'Cooling Approach', value: { liquid: 'D2C Liquid', rdhx: 'Rear-Door HX', inrow: 'In-Row', air: 'Air CRAC/CRAH' }[i.coolingType], sub: `${i.rackDensityKw} kW/rack` },
-                            { label: 'Availability Target', value: `${f.availabilityPct}%`, sub: `Tier ${i.tier} · ${f.downtimeMinYr} min/yr` },
+                            { label: 'Availability Target', value: `${f.availabilityPct}%`, sub: `Tier ${i.tier} · ${f.downtimeMinYr} min/yr`, trace: 'rel.tierTarget' },
                             { label: 'Redundancy Level', value: i.redundancy, sub: 'Power & Cooling', explain: 'redundancy' },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>
-                                <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                {(k as { trace?: string }).trace ? (
+                                    <TraceValue traceId={(k as { trace?: string }).trace!}>
+                                        <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                    </TraceValue>
+                                ) : (
+                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                )}
                                 <div className="truncate text-[10px] text-slate-500">{k.sub}</div>
                             </div>
                         ))}

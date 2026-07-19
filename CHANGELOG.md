@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.95.1 — 2026-07-19 (Trace instrument 5 halaman + explain 802 + DK2 batch)
+
+### Added
+- **Value Trace instrument wave-2 (5 halaman engine)**: KPI ber-ƒx di Reliability (Tier Target → `rel.tierTarget`), Financial (Total Budget → `capex.total`), Operations (Availability Target + Energy Cost 24h → node baru `ops.energyCostDaily`), Sustainability (PUE Design → `engine.pueMatrix`, Carbon Annual → `carbon.annualEmissions`), Architecture (IT Load, Facility Load, Availability Target). Node `ops.energyCostDaily` ditambah ke graf `value-trace.ts` (acyclic, gate 73/0 tetap hijau).
+- **RZExplain coverage sweep (CC)**: 42 `explainKey` di 4 file section Requirements (was 4, satu rusak `mv-switchgear`→`voltage`); 23 istilah baru di `tools/explain-extra.json` (budget-usd, design-margin, p50/p80, aace-class, newsvendor, spi/cpi/evm, saidi, pga, water-stress, deep-sea-depth, dll) → DB regen **802 entri** (`js/rz-explain-db.js`), `test-explain-db.mjs` 10/10, layout dcmoc `?v=2026-07-19-cc`.
+- **Spares on-page assessment**: panel Executive Assessment + prioritized actions (ReportNarrative `spares` family) di atas grid metrik Spares Optimization — fill-rate & classes-at-risk dinilai on-page, bukan hanya di PDF.
+
+### Changed
+- **Staffing Cost Structure Decomposition dirapikan** (owner: "chart aneh"): bar vertikal menggantung diganti 100% composition bar + baris waterfall horizontal kumulatif (offset `Σ` berjalan, nilai + persen + deskripsi per kategori) — geometri deterministik, tidak ada bar melayang/overflow.
+- `store/portfolio.ts`: `require()` runtime diganti deferred `import('@/store/simulation')` + subscribe (`currentCountryId()` helper) — SSR-safe.
+- `store/scenario.ts`: payload localStorage berversi `{version:1, scenarios}` dengan migrasi legacy bare-array.
+- DC corpus `sources.yaml`: URL DayOne diperbaiki → `dayonedc.com` (fetch 20/20 OK).
+
+### Verified
+- tsc clean · build + deploy-copy · walk probe 23/23 (0 console error) · value-bindings + catalog staleness 73/0 · test-explain-db 10/10.
+
 ## v1.95.0 — 2026-07-19 (TRACE VISIBLE everywhere it exists + final-audit fixes)
 
 ### Added

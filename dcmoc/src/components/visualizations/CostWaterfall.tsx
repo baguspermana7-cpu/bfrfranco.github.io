@@ -3,7 +3,6 @@
 import React from 'react';
 import { StaffingResult } from '@/modules/staffing/ShiftEngine';
 import { DollarSign, TrendingUp, Users } from 'lucide-react';
-import { Tooltip } from '@/components/ui/Tooltip';
 
 interface CostWaterfallProps {
     staffing: StaffingResult[];
@@ -48,8 +47,8 @@ export function CostWaterfall({ staffing, currency, trainingCostMonthly = 0, tur
         style: 'currency', currency, maximumFractionDigits: 0
     }).format(val);
 
-    // Running cumulative totals
-    let cumulative = 0;
+    // Running cumulative share for the waterfall rows
+    let running = 0;
 
     return (
         <div className="p-6 bg-slate-900/50 border border-slate-800 rounded-xl h-full flex flex-col">
@@ -71,84 +70,54 @@ export function CostWaterfall({ staffing, currency, trainingCostMonthly = 0, tur
                 </div>
             </div>
 
-            {/* Waterfall Chart */}
-            <div className="flex-1 flex gap-1 items-end min-h-[280px] border-b border-slate-700 pb-0 relative">
-                {/* Grid Lines */}
-                <div className="absolute inset-0 pointer-events-none flex flex-col justify-between text-xs text-slate-600">
-                    <div className="border-t border-slate-800/50 w-full pt-1">100%</div>
-                    <div className="border-t border-slate-800/50 w-full pt-1">75%</div>
-                    <div className="border-t border-slate-800/50 w-full pt-1">50%</div>
-                    <div className="border-t border-slate-800/50 w-full pt-1">25%</div>
-                    <div className="border-t border-slate-800/50 w-full pt-1">0%</div>
-                </div>
-
-                {/* Stacked Total Bar */}
-                <div className="w-16 mx-1 relative z-20 flex flex-col justify-end h-full">
+            {/* 100% composition bar */}
+            <div className="mb-4">
+                <div className="flex h-6 w-full overflow-hidden rounded-md border border-slate-700/60">
                     {categories.map((cat, idx) => (
                         <div
                             key={idx}
-                            className={`w-full ${cat.color} hover:opacity-80 transition-opacity relative group`}
-                            style={{ height: `${getPct(cat.value)}%` }}
-                        >
-                            <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-slate-900 border border-slate-700 p-2 rounded z-50 hidden group-hover:block w-36">
-                                <div className="text-xs text-slate-400">{cat.label}</div>
-                                <div className="font-bold text-white">{formatMoney(cat.value)}</div>
-                            </div>
-                        </div>
+                            className={`${cat.color} transition-opacity hover:opacity-80`}
+                            style={{ width: `${getPct(cat.value)}%` }}
+                            title={`${cat.label}: ${formatMoney(cat.value)} (${getPct(cat.value).toFixed(1)}%)`}
+                        />
                     ))}
-                    <div className="text-center mt-2 text-[10px] font-bold text-white leading-tight">
-                        Total<br />
-                        <span className="text-emerald-400 text-xs">{formatMoney(total)}</span>
-                    </div>
                 </div>
+                <div className="mt-1 flex justify-between text-[10px] text-slate-500">
+                    <span>0%</span>
+                    <span>Monthly total <span className="font-bold text-emerald-400">{formatMoney(total)}</span></span>
+                    <span>100%</span>
+                </div>
+            </div>
 
-                {/* Individual Waterfall Bars */}
-                {/* B14: Refactored to use flexbox instead of absolute positioning */}
+            {/* Cumulative build-up rows (waterfall) */}
+            <div className="flex-1 space-y-2.5">
                 {categories.map((cat, idx) => {
-                    const prevCumulative = cumulative;
-                    cumulative += cat.value;
-                    const barHeight = getPct(cat.value);
-                    const spacerHeight = getPct(prevCumulative);
+                    const start = running;
+                    running += cat.value;
+                    const startPct = getPct(start);
+                    const widthPct = getPct(cat.value);
                     return (
-                        <div key={idx} className="flex-1 flex flex-col h-full z-10 group">
-                            {/* Spacer pushes bar down (flex-grow fills top) */}
-                            <div className="flex-1" />
-                            {/* B1: Permanent value label */}
-                            <div className="whitespace-nowrap text-[10px] font-bold w-full text-center text-white mb-1">
-                                {formatMoney(cat.value)}
+                        <div key={idx} className="group" title={cat.desc}>
+                            <div className="flex items-baseline justify-between gap-2 text-[11px]">
+                                <span className={`font-bold ${cat.text}`}>{cat.label}</span>
+                                <span className="whitespace-nowrap font-mono text-white">
+                                    {formatMoney(cat.value)}
+                                    <span className="ml-2 text-slate-500">{widthPct.toFixed(1)}%</span>
+                                </span>
                             </div>
-                            {/* Bar raised by cumulative spacer */}
-                            <div
-                                className={`w-full ${cat.color} rounded-t-sm relative`}
-                                style={{ height: `${barHeight}%` }}
-                            />
-                            {/* Cumulative spacer below bar */}
-                            {spacerHeight > 0 && (
-                                <div style={{ height: `${spacerHeight}%` }} className="relative">
-                                    {/* Connector line */}
-                                    <div className="absolute top-0 left-0 w-full border-t border-dashed border-slate-600/50" />
-                                </div>
-                            )}
-                            <div className="text-[10px] text-center text-slate-400 h-10 flex items-center justify-center leading-tight px-0.5">
-                                {cat.label}
+                            <div className="relative mt-0.5 h-2.5 w-full rounded-sm bg-slate-800/70">
+                                <div
+                                    className={`absolute top-0 h-full rounded-sm ${cat.color} transition-opacity group-hover:opacity-80`}
+                                    style={{ left: `${startPct}%`, width: `${Math.max(widthPct, 0.75)}%` }}
+                                />
+                            </div>
+                            <div className="flex justify-between text-[10px] text-slate-500">
+                                <span className="truncate pr-2">{cat.desc}</span>
+                                <span className="whitespace-nowrap font-mono text-slate-600">Σ {formatMoney(running)}</span>
                             </div>
                         </div>
                     );
                 })}
-            </div>
-
-            {/* Legend */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
-                {categories.map((cat, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
-                        <div className={`w-2.5 h-2.5 rounded-full ${cat.color} mt-1 flex-shrink-0`} />
-                        <div>
-                            <div className={`text-xs font-bold ${cat.text}`}>{cat.label}</div>
-                            <div className="text-[10px] text-slate-500">{cat.desc}</div>
-                            <div className="text-[10px] text-slate-600 font-mono">{getPct(cat.value).toFixed(1)}%</div>
-                        </div>
-                    </div>
-                ))}
             </div>
 
             {/* FTE Summary Bar */}

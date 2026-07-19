@@ -3002,6 +3002,351 @@
     "Energy Management System",
     "EnMS"
    ]
+  },
+  "budget-usd": {
+   "t": "Project Budget (USD)",
+   "d": "The total funding envelope the owner commits to deliver the project. In DCMOC it is predefined at the P80 commitment basis — the screening CAPEX P50 multiplied by 1.2 — so the budget already carries headroom for estimate uncertainty at early AACE classes. Editable: replace it with the board-approved figure once one exists.",
+   "u": "USD",
+   "f": "Budget ≈ CAPEX P50 × 1.2 (P80 screening basis)",
+   "rel": [
+    "total-capex",
+    "p80",
+    "contingency",
+    "aace-class"
+   ],
+   "aliases": [
+    "Budget (USD)",
+    "Project Budget"
+   ]
+  },
+  "design-margin": {
+   "t": "Design Margin",
+   "d": "Extra headroom added on top of the best-estimate design and cost basis to absorb scope growth, estimate error, and market movement. In DCMOC the Design Margin writes straight into the CAPEX contingency percentage, so raising it moves the investment cost and the whole financial baseline. Typical screening values are 5–20% depending on estimate maturity.",
+   "u": "%",
+   "rel": [
+    "contingency",
+    "p50",
+    "p80",
+    "aace-class"
+   ],
+   "aliases": [
+    "Design Margin"
+   ]
+  },
+  "workload-mix": {
+   "t": "Workload Mix",
+   "d": "The share of total IT load carried by each workload class — AI/GPU compute, storage-intensive, general compute, and network/others. The mix drives the facility profile: a GPU-heavy mix pushes rack density and liquid cooling, while a storage-heavy mix favors lower density and air cooling. DCMOC predefines the mix from the selected use-case profile; tick manual override to adjust.",
+   "u": "%",
+   "rel": [
+    "rack-density",
+    "cooling-type",
+    "it-load"
+   ],
+   "aliases": [
+    "Workload Mix"
+   ]
+  },
+  "peak-it-load": {
+   "t": "Peak IT Load",
+   "d": "The highest instantaneous power the IT equipment draws — the sizing basis for the entire power chain (UPS, generators, switchgear) and the cooling plant, which must all carry the peak, not the average. DCMOC predefines peak equal to the base IT load; edit it if the design carries burst headroom above nameplate.",
+   "u": "kW",
+   "rel": [
+    "it-load",
+    "avg-it-load",
+    "ups",
+    "generator"
+   ],
+   "aliases": [
+    "Peak IT Load",
+    "Peak IT Load (kW)",
+    "Peak IT Load (MW)"
+   ]
+  },
+  "avg-it-load": {
+   "t": "Average IT Load",
+   "d": "The time-averaged power the IT equipment actually draws through the year — the basis for energy bills and OPEX, whereas peak load sizes the equipment. AI training clusters typically run at 70–80% utilization of peak, so DCMOC predefines average as 75% of peak; replace it with measured utilization when available.",
+   "u": "kW",
+   "f": "Avg ≈ 0.75 × Peak (AI-cluster utilisation band 70–80%)",
+   "rel": [
+    "peak-it-load",
+    "it-load",
+    "opex",
+    "pue"
+   ],
+   "aliases": [
+    "Average IT Load",
+    "Average IT Load (kW)",
+    "Average IT Load (MW)"
+   ]
+  },
+  "total-racks": {
+   "t": "Total Racks",
+   "d": "The estimated number of IT racks the facility must house, derived from the IT load and the average rack density. It sizes the data-hall floor area, containment rows, and structured cabling. DCMOC computes it automatically and lets you override to match the actual deployment plan.",
+   "f": "Total Racks = ceil(IT Load ÷ Average Rack Density)",
+   "rel": [
+    "it-load",
+    "rack-density",
+    "rack"
+   ],
+   "aliases": [
+    "Total Racks",
+    "Total Racks (Estimated)"
+   ]
+  },
+  "deep-sea-depth": {
+   "t": "Intake Depth (Deep-Sea Cooling)",
+   "d": "The depth of the cold-water intake for a deep-sea (or deep-lake) cooling loop. Deeper intakes reach colder, thermally stable water — around 60 m and below the supply is cold enough year-round to reject the full facility heat load without chillers, which is what enables the chiller-less PUE ≤ 1.15 basis.",
+   "u": "m",
+   "rel": [
+    "pipeline-length",
+    "loop-delta-t",
+    "pue",
+    "free-cooling"
+   ],
+   "aliases": [
+    "Deep-Sea Intake Depth"
+   ]
+  },
+  "pipeline-length": {
+   "t": "Pipeline Length (Deep-Sea Cooling)",
+   "d": "The run of intake and return piping between the facility and the deep-water intake point. It is the dominant civil/marine CAPEX item of a deep-sea cooling system and sets the pumping head the seawater pumps must overcome, so longer routes trade colder water against higher capital and pump energy.",
+   "u": "km",
+   "rel": [
+    "deep-sea-depth",
+    "loop-delta-t"
+   ],
+   "aliases": [
+    "Pipeline Length"
+   ]
+  },
+  "loop-delta-t": {
+   "t": "Loop ΔT (Cooling Loop Temperature Rise)",
+   "d": "The temperature rise of the water across the cooling loop — the difference between return and supply. A larger ΔT moves the same heat with less flow, shrinking pipe diameter and pump energy; a smaller ΔT needs more flow. It is the denominator of the fundamental flow equation for any water loop.",
+   "u": "°C",
+   "f": "Flow (m³/s) = Heat (kW) ÷ (ρ × cp × ΔT) ≈ Q ÷ (4186 × ΔT)",
+   "rel": [
+    "deep-sea-depth",
+    "pipeline-length",
+    "chiller"
+   ],
+   "aliases": [
+    "Loop ΔT",
+    "Delta T"
+   ]
+  },
+  "take-or-pay": {
+   "t": "Take-or-Pay",
+   "d": "A contract clause obliging the buyer to pay for a minimum committed quantity — power capacity, cooling, or colocation space — whether or not it is actually consumed. Utilities and colo providers use it to de-risk the infrastructure they build for you; for the tenant it converts usage risk into a fixed obligation that must be covered by the ramp plan.",
+   "rel": [
+    "front-of-meter",
+    "mrc"
+   ],
+   "aliases": [
+    "Take-or-Pay",
+    "take or pay"
+   ]
+  },
+  "nrc": {
+   "t": "NRC (Non-Recurring Charge)",
+   "d": "The one-time fee at the start of a colocation or connectivity contract — installation, fit-out, cross-connect setup, and commissioning of the customer space. Paid once, in contrast to the MRC that repeats monthly for the life of the term.",
+   "u": "USD",
+   "rel": [
+    "mrc",
+    "colocation"
+   ],
+   "aliases": [
+    "NRC",
+    "Non-Recurring Charge"
+   ]
+  },
+  "mrc": {
+   "t": "MRC (Monthly Recurring Charge)",
+   "d": "The fixed monthly fee in a colocation contract, usually quoted per kW of committed IT capacity or per rack, covering space, power availability, and cooling. Together with the one-time NRC it defines the tenant's cost structure; contract value ≈ NRC + MRC × term months.",
+   "u": "USD/month",
+   "rel": [
+    "nrc",
+    "colocation",
+    "take-or-pay"
+   ],
+   "aliases": [
+    "MRC",
+    "Monthly Recurring Charge"
+   ]
+  },
+  "p50": {
+   "t": "P50 Estimate",
+   "d": "A cost or schedule estimate with a 50% probability of not being exceeded — the median outcome, with equal chance of coming in under or over. P50 is the honest central estimate, but committing a budget at P50 means a coin-flip of overrun, which is why budget commitments are usually set at P80.",
+   "rel": [
+    "p80",
+    "contingency",
+    "aace-class"
+   ],
+   "aliases": [
+    "P50 Estimate"
+   ]
+  },
+  "p80": {
+   "t": "P80 Estimate",
+   "d": "A cost or schedule estimate with an 80% probability of not being exceeded — the common budget-commitment basis, leaving only a 20% chance of overrun. At early screening classes P80 is approximated as P50 × 1.2; a formal Monte-Carlo risk analysis replaces that factor as the estimate matures.",
+   "f": "P80 ≈ P50 × 1.2 (early-class screening factor)",
+   "rel": [
+    "p50",
+    "budget-usd",
+    "contingency",
+    "aace-class"
+   ],
+   "aliases": [
+    "P80"
+   ]
+  },
+  "aace-class": {
+   "t": "AACE Estimate Class",
+   "d": "The AACE International classification of cost-estimate maturity, from Class 5 (concept screening, roughly -50%/+100% accuracy) down to Class 1 (definitive, around ±10%). The class tells you how much contingency and P50→P80 spread the estimate still needs — a Class 5 number is a direction, not a budget.",
+   "table": [
+    [
+     "Class",
+     "Maturity",
+     "Typical accuracy"
+    ],
+    [
+     "5",
+     "Concept screening",
+     "-50% / +100%"
+    ],
+    [
+     "4",
+     "Feasibility",
+     "-30% / +50%"
+    ],
+    [
+     "3",
+     "Budget authorization",
+     "-20% / +30%"
+    ],
+    [
+     "2",
+     "Control / bid",
+     "-15% / +20%"
+    ],
+    [
+     "1",
+     "Definitive",
+     "-10% / +15%"
+    ]
+   ],
+   "rel": [
+    "p50",
+    "p80",
+    "contingency"
+   ],
+   "aliases": [
+    "AACE Class",
+    "AACE"
+   ]
+  },
+  "punchlist": {
+   "t": "Punch List",
+   "d": "The itemized list of defects, incomplete work, and deviations recorded during commissioning walk-downs and acceptance testing. Every item must be closed (or formally waived) before final acceptance and handover to operations — an open punch list is the practical gate between construction and revenue service.",
+   "rel": [
+    "ist",
+    "sat",
+    "fat"
+   ],
+   "aliases": [
+    "Punch List",
+    "punch-list"
+   ]
+  },
+  "newsvendor": {
+   "t": "Newsvendor Model",
+   "d": "A single-period inventory optimization that balances the cost of stocking too much (capital tied up in a part that never fails) against too little (downtime while a part ships). Used in DCMOC to size critical-spares holdings: stock up to the service level where the marginal underage and overage costs balance.",
+   "f": "Optimal service level = Cu ÷ (Cu + Co)  — underage vs overage cost",
+   "rel": [
+    "availability",
+    "mtbf"
+   ],
+   "aliases": [
+    "Newsvendor",
+    "newsvendor model"
+   ]
+  },
+  "spi": {
+   "t": "SPI (Schedule Performance Index)",
+   "d": "The earned-value ratio of work performed to work planned. SPI = 1.0 means on schedule, below 1.0 behind, above 1.0 ahead. Because it is measured in value rather than dates, it flags schedule slip early — while the milestone dates still look achievable on paper.",
+   "f": "SPI = EV ÷ PV (earned value ÷ planned value)",
+   "rel": [
+    "cpi",
+    "evm"
+   ],
+   "aliases": [
+    "SPI",
+    "Schedule Performance Index"
+   ]
+  },
+  "cpi": {
+   "t": "CPI (Cost Performance Index)",
+   "d": "The earned-value ratio of work performed to money spent. CPI = 1.0 means on budget, below 1.0 over budget (each dollar buys less than a dollar of progress), above 1.0 under budget. CPI trends are stubborn — a project running CPI 0.9 at 30% complete rarely recovers to 1.0.",
+   "f": "CPI = EV ÷ AC (earned value ÷ actual cost)",
+   "rel": [
+    "spi",
+    "evm"
+   ],
+   "aliases": [
+    "CPI",
+    "Cost Performance Index"
+   ]
+  },
+  "evm": {
+   "t": "EVM (Earned Value Management)",
+   "d": "The project-controls method that integrates scope, schedule, and cost in one measurement frame: planned value (PV) for what should be done, earned value (EV) for what is done, and actual cost (AC) for what was spent. From those three come SPI and CPI, plus forecast-at-completion — the standard dashboard for a build program.",
+   "rel": [
+    "spi",
+    "cpi",
+    "punchlist"
+   ],
+   "aliases": [
+    "EVM",
+    "Earned Value Management",
+    "earned value"
+   ]
+  },
+  "saidi": {
+   "t": "SAIDI (System Average Interruption Duration Index)",
+   "d": "The utility-grid reliability metric: average total outage minutes each customer experiences per year. A low-SAIDI grid means fewer generator starts and less fuel burn; a high-SAIDI grid pushes the design toward longer fuel autonomy and stricter backup testing. Used in DCMOC site intelligence to compare candidate grids.",
+   "u": "min/yr",
+   "rel": [
+    "fuel-autonomy",
+    "generator",
+    "availability"
+   ],
+   "aliases": [
+    "SAIDI"
+   ]
+  },
+  "pga": {
+   "t": "PGA (Peak Ground Acceleration)",
+   "d": "The maximum ground acceleration expected at the site during a design earthquake, expressed as a fraction of gravity (g). PGA sets the seismic design category, which dictates structural bracing, base isolation, and — often overlooked — the anchorage and snubbing of every rack, transformer, and pipe run.",
+   "u": "g",
+   "rel": [
+    "seismic-zone",
+    "building-type"
+   ],
+   "aliases": [
+    "PGA",
+    "Peak Ground Acceleration"
+   ]
+  },
+  "water-stress": {
+   "t": "Water Stress",
+   "d": "The ratio of total water demand to available renewable supply in the site's river basin (WRI Aqueduct scale, low to extremely high). A high-stress basin makes evaporative cooling a licence-to-operate risk — permits, community pressure, drought curtailment — and pushes the design toward dry coolers or liquid loops with low WUE.",
+   "rel": [
+    "wue",
+    "cooling-type"
+   ],
+   "aliases": [
+    "Water Stress",
+    "water stress"
+   ]
   }
  }
 }

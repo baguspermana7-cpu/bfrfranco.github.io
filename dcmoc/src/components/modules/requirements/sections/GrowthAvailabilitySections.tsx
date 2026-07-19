@@ -27,7 +27,7 @@ export function GrowthPlanSection({ derived }: { derived: ReqDerived }) {
     return (
         <SectionCard num="1.3" title="Growth Plan (IT Load)" caption="Committed + forecast IT load by year (Y0 = shared IT load)" id="sec-growth">
             <div className="flex items-center gap-3 mb-3">
-                <Field label="Growth Type">
+                <Field label="Growth Type" explainKey="capacity-planning">
                     <Segmented<GrowthType> value={g.growthType} onChange={(v) => req.actions.setGrowth({ growthType: v })}
                         options={[{ value: 'linear', label: 'Linear' }, { value: 'step', label: 'Step' }, { value: 'custom', label: 'Custom' }]} />
                 </Field>
@@ -88,7 +88,7 @@ export function AvailabilitySection({ derived }: { derived: ReqDerived }) {
                     <Segmented<number> value={inputs.tierLevel} onChange={(v) => writeSharedTier(v as 2 | 3 | 4)}
                         options={[...(inputs.tierLevel === 2 ? [{ value: 2, label: 'Tier II' }] : []), { value: 3, label: 'Tier III' }, { value: 4, label: 'Tier IV' }]} />
                 </Field>
-                <Field label="Target Availability">
+                <Field label="Target Availability" explainKey="availability">
                     <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 px-2 py-1.5 text-sm font-bold tabular-nums text-emerald-500">{derived.tierTargetPct}%</div>
                 </Field>
                 <Field label="Downtime Budget">
@@ -119,9 +119,9 @@ export function BusinessPrioritySection({ derived }: { derived: ReqDerived }) {
     return (
         <SectionCard num="1.5" title="Business, Margin & Priority" caption="Budget + design margin (flows into CAPEX contingency & financials) + project priorities" id="sec-business">
             <div className="grid gap-3 md:grid-cols-3">
-                <Field label="Budget (USD)" hint={b.budgetUsd != null && capexTotal != null && b.budgetUsd === Math.round(capexTotal * 1.2 / 1e5) * 1e5 ? 'predefined ≈ CAPEX P80 (editable)' : undefined}><NumInput value={b.budgetUsd} min={0} unit="USD" placeholder="Total budget"
+                <Field label="Budget (USD)" explainKey="budget-usd" hint={b.budgetUsd != null && capexTotal != null && b.budgetUsd === Math.round(capexTotal * 1.2 / 1e5) * 1e5 ? 'predefined ≈ CAPEX P80 (editable)' : undefined}><NumInput value={b.budgetUsd} min={0} unit="USD" placeholder="Total budget"
                     onChange={(v) => req.actions.setBusiness({ budgetUsd: v })} /></Field>
-                <Field label="Design Margin" explainKey="contingency" hint="Wired: writes CAPEX contingency % → investment cost & financial baseline move">
+                <Field label="Design Margin" explainKey="design-margin" hint="Wired: writes CAPEX contingency % → investment cost & financial baseline move">
                     <CreatableCombobox<number> options={MARGIN_PRESETS} value={marginValue} min={0} max={30} unit="%"
                         onChange={(v) => setParam('req.designMarginPct', v == null ? 10 : v.value)} />
                 </Field>

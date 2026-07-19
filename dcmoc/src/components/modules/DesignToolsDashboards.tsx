@@ -499,6 +499,31 @@ export function SparesDashboard() {
                     <FileDown className="w-3.5 h-3.5" />{busy ? 'Generating…' : 'Generate Report'}
                 </button>
             </div>
+            {/* audit #9 — assessment on-page (bukan cuma PDF) */}
+            {(() => {
+                const met = { fillRatePct: totals.weightedFillPct, classesAtRisk: totals.belowTarget };
+                const assess = buildAssessment('spares', met);
+                const acts = buildActions('spares', met);
+                return (
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-700/70 bg-white dark:bg-slate-900/50 p-3">
+                        <div className="flex flex-wrap items-start gap-3">
+                            <div className="shrink-0 rounded-lg px-3 py-1.5 text-center text-white" style={{ background: assess.color }}>
+                                <div className="text-[9px] uppercase opacity-80">Spares</div>
+                                <div className="text-sm font-bold">{assess.label}</div>
+                            </div>
+                            <p className="min-w-0 flex-1 text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">{assess.narrative}</p>
+                        </div>
+                        <div className="mt-2 space-y-1">
+                            {acts.slice(0, 2).map((a, i) => (
+                                <div key={i} className="flex items-start gap-2 text-[10.5px] text-slate-600 dark:text-slate-300">
+                                    <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8.5px] font-bold text-white ${a.priority === 'HIGH' ? 'bg-red-600' : a.priority === 'MEDIUM' ? 'bg-amber-600' : 'bg-emerald-600'}`}>{a.priority}</span>
+                                    <span>{a.action}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            })()}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <Metric label="Recommended Stock Value" value={money(totals.inventoryValue)} sub={totals.inventoryValue === 0 ? "all Q*=0 — ROP covers demand at this fleet size" : "Σ Q* × unit cost"} />
                 <Metric label="Annual Cost" value={money(totals.annualCost)} sub="holding + shortage risk" />

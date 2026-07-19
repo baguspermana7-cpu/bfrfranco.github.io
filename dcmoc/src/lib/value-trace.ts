@@ -143,6 +143,13 @@ export const TRACE: Record<string, TraceNode> = {
             return +npv.toFixed(0);
         },
     },
+    /* ── EB-instrument: page-KPI nodes (append-only) ── */
+    'ops.energyCostDaily': {
+        label: 'Energy Cost (24h)', page: 'ops', unit: '$', provenance: 'derived',
+        formulaTemplate: 'ops.energyCost ÷ 365',
+        deps: ['ops.energyCost'],
+        get: () => { const a = TRACE['ops.energyCost'].get(); return a == null ? null : +(a / 365).toFixed(0); },
+    },
 };
 
 export interface ResolvedTrace {

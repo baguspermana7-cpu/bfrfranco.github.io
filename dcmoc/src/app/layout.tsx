@@ -37,10 +37,10 @@ export default function RootLayout({
             the DC-OS Layer engines: reliability/site/commissioning/asset/
             construction/requirements/architecture. */}
         <script src="/rz-engine.min.js?v=2026-07-19-c40" defer></script>
-        {/* Shared RZExplain knowledge DB (window.RZ_EXPLAIN_DB, 481 entries) —
+        {/* Shared RZExplain knowledge DB (window.RZ_EXPLAIN_DB, 802 entries) —
             consumed via src/lib/explain.ts + <Explain k="..."/> (SSR-guarded,
             renders nothing when absent). */}
-        <script src="/js/rz-explain-db.js?v=2026-07-18" defer></script>
+        <script src="/js/rz-explain-db.js?v=2026-07-19-cc" defer></script>
       </head>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}

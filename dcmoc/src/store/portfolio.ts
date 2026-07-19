@@ -1,4 +1,16 @@
 import { create } from 'zustand';
+
+/* Live project country for new-site seeding (audit #7 — was hardcoded 'ID').
+ * Lazy require avoided; module-level mutable set by a deferred import. */
+let _countryId = 'ID';
+if (typeof window !== 'undefined') {
+    import('@/store/simulation').then((m) => {
+        const upd = () => { _countryId = m.useSimulationStore.getState().selectedCountry?.id ?? 'ID'; };
+        upd();
+        m.useSimulationStore.subscribe(upd);
+    }).catch(() => {});
+}
+const currentCountryId = () => _countryId;
 import { useSimulationStore } from './simulation';
 import { useCapexStore } from './capex';
 import { CapexInput } from '@/lib/CapexEngine';
@@ -55,7 +67,7 @@ let siteCounter = 1;
 const createDefaultSite = (label?: string): SiteConfig => ({
     id: `site_${Date.now()}_${siteCounter++}`,
     label: label || `Site ${siteCounter}`,
-    countryId: (typeof window !== 'undefined' ? (require('@/store/simulation') as { useSimulationStore: { getState: () => { selectedCountry: { id: string } | null } } }).useSimulationStore.getState().selectedCountry?.id : undefined) ?? 'ID',
+    countryId: currentCountryId(),
     tierLevel: 3,
     itLoad: 2500,
     coolingType: 'air',

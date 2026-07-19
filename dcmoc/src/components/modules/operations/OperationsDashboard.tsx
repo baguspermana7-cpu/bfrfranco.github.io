@@ -186,17 +186,23 @@ export function OperationsDashboard() {
                     {/* KPI row */}
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
                         {[
-                            { label: 'Availability Target', value: `${model.availTargetPct}%`, sub: `Tier ${inputs.tierLevel} design target` },
+                            { label: 'Availability Target', value: `${model.availTargetPct}%`, sub: `Tier ${inputs.tierLevel} design target`, trace: 'rel.tierTarget' },
                             { label: 'PUE (at load)', value: String(model.livePue), sub: `design ${model.designPue} · ${Math.round(model.occ * 100)}% occ` },
                             { label: 'Active IT Load', value: `${model.activeItMw} MW`, sub: `of ${model.capMw.toFixed(1)} MW (${Math.round(model.occ * 100)}%)` },
                             { label: 'Active Alarms', value: String(activeAlarms.length), sub: `P1:${byPri('P1')} P2:${byPri('P2')} P3:${byPri('P3')}` },
                             { label: 'Open Tickets', value: String(openTickets.length), sub: `${openIncidents.length} incidents open` },
                             { label: 'PM Compliance', value: log.completedPmWeeks.length > 0 ? `${Math.min(100, Math.round((log.completedPmWeeks.length / 52) * 100))}%` : '—', sub: log.completedPmWeeks.length > 0 ? `${log.completedPmWeeks.length}/52 weeks logged` : 'no PM logged yet' },
-                            { label: 'Energy Cost (24h)', value: `$${model.energyCostToday.toLocaleString()}`, sub: `@ $${model.rate}/kWh (${country?.name ?? '—'})` },
+                            { label: 'Energy Cost (24h)', value: `$${model.energyCostToday.toLocaleString()}`, sub: `@ $${model.rate}/kWh (${country?.name ?? '—'})`, trace: 'ops.energyCostDaily' },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
-                                <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                {(k as { trace?: string }).trace ? (
+                                    <TraceValue traceId={(k as { trace?: string }).trace!}>
+                                        <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                    </TraceValue>
+                                ) : (
+                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                )}
                                 <div className="truncate text-[10px] text-slate-500">{k.sub}</div>
                             </div>
                         ))}

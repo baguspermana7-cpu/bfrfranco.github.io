@@ -61,9 +61,9 @@ export function InfrastructureOptionsSection() {
                         {!deepSeaAvailable && <p className="mt-0.5 text-[9px] text-slate-400">engine loading…</p>}
                     </div>
                     {inputs.deepSea && (<>
-                        <Field label="Intake Depth"><NumInput value={inputs.dsDepthM ?? 60} min={20} max={1000} unit="m" onChange={(v) => setInputs({ dsDepthM: v ?? 60 })} /></Field>
-                        <Field label="Pipeline Length"><NumInput value={inputs.dsPipelineKm ?? 3} min={0.5} max={50} unit="km" onChange={(v) => setInputs({ dsPipelineKm: v ?? 3 })} /></Field>
-                        <Field label="Loop ΔT"><NumInput value={inputs.dsDeltaTC ?? 8} min={4} max={15} unit="°C" onChange={(v) => setInputs({ dsDeltaTC: v ?? 8 })} /></Field>
+                        <Field label="Intake Depth" explainKey="intake-depth"><NumInput value={inputs.dsDepthM ?? 60} min={20} max={1000} unit="m" onChange={(v) => setInputs({ dsDepthM: v ?? 60 })} /></Field>
+                        <Field label="Pipeline Length" explainKey="pipeline-length"><NumInput value={inputs.dsPipelineKm ?? 3} min={0.5} max={50} unit="km" onChange={(v) => setInputs({ dsPipelineKm: v ?? 3 })} /></Field>
+                        <Field label="Loop ΔT" explainKey="loop-delta-t"><NumInput value={inputs.dsDeltaTC ?? 8} min={4} max={15} unit="°C" onChange={(v) => setInputs({ dsDeltaTC: v ?? 8 })} /></Field>
                     </>)}
                 </Group>
 
@@ -76,61 +76,61 @@ export function InfrastructureOptionsSection() {
                         </label>
                     </div>
                     {inputs.includeFOM && (<>
-                        <Field label="Substation"><Select value={inputs.substationType} onChange={(v) => setInputs({ substationType: v })} options={SUBSTATIONS} /></Field>
-                        <Field label="Transformer Lead">
+                        <Field label="Substation" explainKey="grid-connection"><Select value={inputs.substationType} onChange={(v) => setInputs({ substationType: v })} options={SUBSTATIONS} /></Field>
+                        <Field label="Transformer Lead" explainKey="transformer">
                             <Segmented<string> value={inputs.transformerLead} onChange={(v) => setInputs({ transformerLead: v })}
                                 options={[{ value: 'standard', label: 'Standard' }, { value: 'expedited', label: 'Expedited' }, { value: 'long_lead', label: 'Long-lead' }]} />
                         </Field>
-                        <Field label="Utility Connection Rate"><NumInput value={inputs.utilityRate} min={0} max={30} unit="%" onChange={(v) => setInputs({ utilityRate: v ?? 9 })} /></Field>
+                        <Field label="Utility Connection Rate" explainKey="utility-rate"><NumInput value={inputs.utilityRate} min={0} max={30} unit="%" onChange={(v) => setInputs({ utilityRate: v ?? 9 })} /></Field>
                     </>)}
                 </Group>
 
                 <Group title="Building & Site">
-                    <Field label="Building Type">
+                    <Field label="Building Type" explainKey="building-type">
                         <Select value={inputs.buildingType} onChange={(v) => setInputs({ buildingType: v })}
                             options={[{ value: 'purpose', label: 'Purpose Built (Standard)' }, { value: 'warehouse', label: 'Warehouse Conversion' }, { value: 'modular', label: 'Modular / Prefab' }, { value: 'highrise', label: 'Vertical High-Rise' }]} />
                     </Field>
-                    <Field label="Seismic Zone"><Select value={inputs.seismicZone ?? 'zone2'} onChange={(v) => setInputs({ seismicZone: v })} options={SEISMIC} /></Field>
-                    <Field label="Site Condition">
+                    <Field label="Seismic Zone" explainKey="seismic-zone"><Select value={inputs.seismicZone ?? 'zone2'} onChange={(v) => setInputs({ seismicZone: v })} options={SEISMIC} /></Field>
+                    <Field label="Site Condition" explainKey="site-condition">
                         <Segmented<string> value={inputs.siteCondition ?? 'greenfield'} onChange={(v) => setInputs({ siteCondition: v })}
                             options={[{ value: 'greenfield', label: 'Greenfield' }, { value: 'brownfield', label: 'Brownfield' }]} />
                     </Field>
-                    <Field label="Floor System">
+                    <Field label="Floor System" explainKey="raised-floor">
                         <Segmented<string> value={inputs.floorType ?? 'slab'} onChange={(v) => setInputs({ floorType: v })}
                             options={[{ value: 'slab', label: 'Slab (overhead)' }, { value: 'raised', label: 'Raised Floor' }]} />
                     </Field>
                 </Group>
 
                 <Group title="Systems (UPS · Gen · Fire · Refrigerant)">
-                    <Field label="UPS Type">
+                    <Field label="UPS Type" explainKey="ups">
                         <Select value={inputs.upsType} onChange={(v) => setInputs({ upsType: v })}
                             options={[{ value: 'standalone', label: 'Standalone UPS' }, { value: 'modular', label: 'Modular UPS' }, { value: 'distributed', label: 'Distributed' }, { value: 'rotary', label: 'Rotary / DRUPS' }]} />
                     </Field>
-                    <Field label="Generator">
+                    <Field label="Generator" explainKey="generator">
                         <Select value={inputs.genType} onChange={(v) => setInputs({ genType: v })}
                             options={[{ value: 'diesel', label: 'Diesel Gen' }, { value: 'gas', label: 'Gas Engine' }, { value: 'hvo', label: 'HVO / Renewable' }]} />
                     </Field>
-                    <Field label="Fire Suppression">
+                    <Field label="Fire Suppression" explainKey="fire-suppression">
                         <Select value={inputs.fireType} onChange={(v) => setInputs({ fireType: v })}
                             options={[{ value: 'novec', label: 'Novec 1230' }, { value: 'fm200', label: 'FM-200' }, { value: 'inert', label: 'Inert Gas (IG-541)' }, { value: 'sprinkler', label: 'Wet Pipe Sprinkler' }]} />
                     </Field>
-                    <Field label="Detection / Alarm">
+                    <Field label="Detection / Alarm" explainKey="vesda">
                         <Select value={inputs.alarmType} onChange={(v) => setInputs({ alarmType: v })}
                             options={[{ value: 'addressable', label: 'Addressable' }, { value: 'vesda', label: 'VESDA (Aspirating)' }, { value: 'beam', label: 'Beam Detection' }]} />
                     </Field>
-                    <Field label="Refrigerant" hint="engine GWP/COP database"><Select value={inputs.refrigerantType ?? 'R134a'} onChange={(v) => setInputs({ refrigerantType: v })} options={refOpts} /></Field>
+                    <Field label="Refrigerant" explainKey="refrigerant" hint="engine GWP/COP database"><Select value={inputs.refrigerantType ?? 'R134a'} onChange={(v) => setInputs({ refrigerantType: v })} options={refOpts} /></Field>
                 </Group>
 
                 <Group title="Distribution & Security">
-                    <Field label="Power Distribution">
+                    <Field label="Power Distribution" explainKey="power-distribution">
                         <Segmented<string> value={inputs.powerDistribution ?? 'busway'} onChange={(v) => setInputs({ powerDistribution: v })}
                             options={[{ value: 'busway', label: 'Busway' }, { value: 'cable', label: 'Cable Tray' }]} />
                     </Field>
-                    <Field label="Transformer Type">
+                    <Field label="Transformer Type" explainKey="transformer">
                         <Segmented<string> value={inputs.transformerType ?? 'dry'} onChange={(v) => setInputs({ transformerType: v })}
                             options={[{ value: 'dry', label: 'Dry-type' }, { value: 'oil', label: 'Oil-filled' }]} />
                     </Field>
-                    <Field label="Fiber Entry">
+                    <Field label="Fiber Entry" explainKey="fiber-entry">
                         <Segmented<string> value={inputs.fiberEntry ?? 'dual'} onChange={(v) => setInputs({ fiberEntry: v })}
                             options={[{ value: 'single', label: 'Single' }, { value: 'dual', label: 'Dual (diverse)' }]} />
                     </Field>
@@ -141,7 +141,7 @@ export function InfrastructureOptionsSection() {
                 </Group>
 
                 <Group title="Sustainability & Renewables">
-                    <Field label="Green Certification">
+                    <Field label="Green Certification" explainKey="green-certification">
                         <Select value={inputs.greenCert} onChange={(v) => setInputs({ greenCert: v })}
                             options={[{ value: 'none', label: 'None' }, { value: 'silver', label: 'LEED Silver (+2%)' }, { value: 'gold', label: 'LEED Gold (+4%)' }, { value: 'platinum', label: 'LEED Platinum (+8%)' }]} />
                     </Field>
@@ -162,17 +162,17 @@ export function InfrastructureOptionsSection() {
                         <Segmented<string> value={inputs.projYear} onChange={(v) => setInputs({ projYear: v })}
                             options={['2025', '2026', '2027', '2028'].map((y) => ({ value: y, label: y }))} />
                     </Field>
-                    <Field label="Market Condition">
+                    <Field label="Market Condition" explainKey="market-condition">
                         <Segmented<string> value={inputs.marketCondition ?? 'normal'} onChange={(v) => setInputs({ marketCondition: v })}
                             options={[{ value: 'soft', label: 'Soft' }, { value: 'normal', label: 'Normal' }, { value: 'hot', label: 'Hot' }]} />
                     </Field>
-                    <Field label="Delivery Method">
+                    <Field label="Delivery Method" explainKey="delivery-method">
                         <Select value={inputs.deliveryMethod ?? 'design_build'} onChange={(v) => setInputs({ deliveryMethod: v })}
                             options={[{ value: 'design_build', label: 'Design-Build' }, { value: 'design_bid_build', label: 'Design-Bid-Build' }, { value: 'epc', label: 'EPC / Turnkey' }]} />
                     </Field>
-                    <Field label="Design Fee"><NumInput value={inputs.designFee} min={0} max={20} unit="%" onChange={(v) => setInputs({ designFee: v ?? 8 })} /></Field>
-                    <Field label="PM Fee"><NumInput value={inputs.pmFee} min={0} max={15} unit="%" onChange={(v) => setInputs({ pmFee: v ?? 5 })} /></Field>
-                    <Field label="Contingency" hint="bound to Design Margin (1.5) — edit there">
+                    <Field label="Design Fee" explainKey="design-fee"><NumInput value={inputs.designFee} min={0} max={20} unit="%" onChange={(v) => setInputs({ designFee: v ?? 8 })} /></Field>
+                    <Field label="PM Fee" explainKey="pm-fee"><NumInput value={inputs.pmFee} min={0} max={15} unit="%" onChange={(v) => setInputs({ pmFee: v ?? 5 })} /></Field>
+                    <Field label="Contingency" explainKey="contingency" hint="bound to Design Margin (1.5) — edit there">
                         <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 px-2 py-1.5 text-sm font-bold tabular-nums text-slate-900 dark:text-white">
                             {inputs.contingency}%
                         </div>

@@ -79,7 +79,7 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
             )}
             <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-3">
-                    <Field label="IT Workload / Use Case" required hint="Single source — picking a category auto-applies the engine profile (density, cooling, tier floor, mix)">
+                    <Field label="IT Workload / Use Case" required explainKey="workload" hint="Single source — picking a category auto-applies the engine profile (density, cooling, tier floor, mix)">
                         <RadioList<UseCase> value={req.overview.useCase} onChange={pickUseCase}
                             options={(Object.keys(USE_CASE_LABELS) as UseCase[]).map((k) => ({ value: k, label: USE_CASE_LABELS[k], sub: USE_CASE_SUBS[k] }))} />
                     </Field>
@@ -100,7 +100,7 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                 <div className="space-y-3">
                     <div className="flex items-end gap-2">
                         <div className="flex-1">
-                            <Field label={`IT Load (${unit})`} required>
+                            <Field label={`IT Load (${unit})`} required explainKey="it-load">
                                 <NumInput value={disp(inputs.itLoad)} min={0}
                                     onChange={(v) => { const kw = toKw(v); if (kw != null && kw >= 100) writeSharedItLoad(kw); }} unit={unit} />
                             </Field>
@@ -108,12 +108,12 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                         <Segmented<'MW' | 'kW'> value={unit} onChange={(v) => set({ itLoadUnit: v })}
                             options={[{ value: 'MW', label: 'MW' }, { value: 'kW', label: 'kW' }]} />
                     </div>
-                    <Field label={`Peak IT Load (${unit})`} hint="Validated ≥ IT load">
+                    <Field label={`Peak IT Load (${unit})`} explainKey="peak-it-load" hint="Validated ≥ IT load">
                         <NumInput value={disp(w.peakItLoadKw)} min={0} unit={unit}
                             onChange={(v) => set({ peakItLoadKw: toKw(v) })} />
                         {w.peakItLoadKw === inputs.itLoad && <span className="mt-0.5 inline-block rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] text-violet-500 dark:text-violet-300">predefined = IT Load</span>}
                     </Field>
-                    <Field label={`Average IT Load (${unit})`}>
+                    <Field label={`Average IT Load (${unit})`} explainKey="avg-it-load">
                         <NumInput value={disp(w.avgItLoadKw)} min={0} unit={unit}
                             onChange={(v) => set({ avgItLoadKw: toKw(v) })} />
                         {w.avgItLoadKw === Math.round(inputs.itLoad * 0.75) && <span className="mt-0.5 inline-block rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] text-violet-500 dark:text-violet-300">predefined 75% peak</span>}
@@ -124,16 +124,16 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                 </div>
 
                 <div className="space-y-3">
-                    <Field label="Average Rack Density" required>
+                    <Field label="Average Rack Density" required explainKey="rack-density">
                         <CreatableCombobox<number>
                             options={DENSITY_PRESETS} value={densityValue} min={1} max={200} unit="kW/rack"
                             onChange={(v) => writeSharedRackDensity(v == null ? 12 : v.value)} />
                     </Field>
-                    <Field label="Target Rack Density (Max)">
+                    <Field label="Target Rack Density (Max)" explainKey="rack-density">
                         <NumInput value={w.maxRackDensityKw} min={1} max={250} unit="kW/rack"
                             onChange={(v) => set({ maxRackDensityKw: v })} />
                     </Field>
-                    <Field label="Total Racks (Estimated)" hint="ceil(IT load ÷ density) — override to match the actual count">
+                    <Field label="Total Racks (Estimated)" explainKey="total-racks" hint="ceil(IT load ÷ density) — override to match the actual count">
                         {editRacks || w.totalRacksOverride != null ? (
                             <div className="flex items-center gap-1.5">
                                 <NumInput value={w.totalRacksOverride ?? totalRacks} min={1} max={100000}
@@ -153,7 +153,7 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                             <p className="mt-0.5 text-[9px] text-amber-500">manual override — auto = {totalRacks.toLocaleString()}</p>
                         )}
                     </Field>
-                    <Field label="Rack Type"><Select value={w.rackForm} onChange={(v) => set({ rackForm: v })} options={RACK_FORMS} /></Field>
+                    <Field label="Rack Type" explainKey="rack"><Select value={w.rackForm} onChange={(v) => set({ rackForm: v })} options={RACK_FORMS} /></Field>
                 </div>
             </div>
 
@@ -184,8 +184,8 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                     </div>
                 </div>
                 <div className="space-y-3">
-                    <Field label="AI Chip Type (Primary)"><Select value={w.aiChipType} onChange={(v) => set({ aiChipType: v })} options={CHIPS} /></Field>
-                    <Field label="Cooling Approach (Preferred)" hint="Writes the shared cooling type (CAPEX + all engines)">
+                    <Field label="AI Chip Type (Primary)" explainKey="gpu"><Select value={w.aiChipType} onChange={(v) => set({ aiChipType: v })} options={CHIPS} /></Field>
+                    <Field label="Cooling Approach (Preferred)" explainKey="cooling-type" hint="Writes the shared cooling type (CAPEX + all engines)">
                         <Select value={inputs.coolingType} onChange={(v) => writeSharedCooling(v)}
                             options={COOLING_UI.map((c) => ({ value: c.key, label: c.label }))} />
                     </Field>

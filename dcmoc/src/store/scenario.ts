@@ -53,18 +53,24 @@ interface ScenarioStore {
 // ─── PERSISTENCE ────────────────────────────────────────────
 const STORAGE_KEY = 'dcmoc_scenarios';
 
+/* audit #6 — VERSIONED payload: legacy bare-array blobs migrate transparently;
+ * future schema changes bump version + add a migrate branch here. */
 const loadFromStorage = (): SavedScenario[] => {
     if (typeof window === 'undefined') return [];
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : [];
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;                   // legacy v0 shape
+        if (parsed?.version === 1 && Array.isArray(parsed.scenarios)) return parsed.scenarios;
+        return [];
     } catch { return []; }
 };
 
 const saveToStorage = (scenarios: SavedScenario[]) => {
     if (typeof window === 'undefined') return;
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(scenarios));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, scenarios }));
     } catch { /* quota exceeded, silently fail */ }
 };
 

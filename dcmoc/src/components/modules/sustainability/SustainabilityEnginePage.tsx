@@ -18,6 +18,7 @@ import { getPUE } from '@/constants/pue';
 import CarbonDashboard from '@/components/modules/CarbonDashboard';
 import { Leaf, ChevronRight, FileDown } from 'lucide-react';
 import { Explain } from '@/components/ui/Explain';
+import { TraceValue } from '@/components/ui/TraceValue';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
@@ -146,16 +147,22 @@ export function SustainabilityEnginePage() {
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'PUE (Design)', value: String(model.pue), sub: `${inputs.coolingType} · Tier ${inputs.tierLevel}`, explain: 'pue' },
+                            { label: 'PUE (Design)', value: String(model.pue), sub: `${inputs.coolingType} · Tier ${inputs.tierLevel}`, explain: 'pue', trace: 'engine.pueMatrix' },
                             { label: 'Energy (Month)', value: `${model.monthlyMwh.toLocaleString()} MWh`, sub: `${model.mw.toFixed(1)} MW × PUE × 730h` },
-                            { label: 'Carbon (Annual)', value: model.scopes ? `${Math.round(model.scopes.totalAnnual).toLocaleString()} tCO₂e` : '—', sub: 'GHG Protocol scopes (engine)' },
+                            { label: 'Carbon (Annual)', value: model.scopes ? `${Math.round(model.scopes.totalAnnual).toLocaleString()} tCO₂e` : '—', sub: 'GHG Protocol scopes (engine)', trace: 'carbon.annualEmissions' },
                             { label: 'Water (Annual)', value: model.waterM3Yr != null ? `${model.waterM3Yr.toLocaleString()} m³` : '—', sub: `WUE ${model.wue} L/kWh (engine)`, explain: 'wue' },
                             { label: 'Renewable Energy', value: `${model.renewablePct}%`, sub: 'derived from capex renewable/cert inputs' },
                             { label: 'Sustainability Score', value: model.grade, sub: `${model.overall}/100 · documented composite` },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>
-                                <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                {(k as { trace?: string }).trace ? (
+                                    <TraceValue traceId={(k as { trace?: string }).trace!}>
+                                        <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                    </TraceValue>
+                                ) : (
+                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                )}
                                 <div className="truncate text-[10px] text-slate-500">{k.sub}</div>
                             </div>
                         ))}
