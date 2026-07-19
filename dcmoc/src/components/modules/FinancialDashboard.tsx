@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import { MAINT_PER_KW_YR } from '@/lib/screening';
+import { rzData } from '@/lib/rz-engine';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
@@ -193,8 +195,8 @@ const FinancialDashboard = () => {
             effectiveInputs.headcount_Admin * labor.baseSalary_Admin +
             effectiveInputs.headcount_Janitor * labor.baseSalary_Janitor
         ) * 12;
-        const energyCost = effectiveInputs.itLoad * 1.4 * 8760 * 0.10 / 1000;
-        const maintenanceCost = effectiveInputs.itLoad * 50;
+        const energyCost = effectiveInputs.itLoad * ((rzData().pueMatrix as Record<string, Record<string, number>> | undefined)?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? 1.4) * 8760 * (selectedCountry?.economy.electricityRate ?? 0.10) / 1000;
+        const maintenanceCost = effectiveInputs.itLoad * MAINT_PER_KW_YR;
         return staffCost + energyCost + maintenanceCost;
     }, [selectedCountry, effectiveInputs]);
 
@@ -271,8 +273,8 @@ const FinancialDashboard = () => {
             inputs.headcount_Admin * labor.baseSalary_Admin +
             inputs.headcount_Janitor * labor.baseSalary_Janitor
         ) * 12;
-        const maintenanceBudget = inputs.itLoad * 50;
-        const energyBudget = inputs.itLoad * 1.4 * 8760 * 0.10 / 1000;
+        const maintenanceBudget = inputs.itLoad * MAINT_PER_KW_YR;
+        const energyBudget = inputs.itLoad * ((rzData().pueMatrix as Record<string, Record<string, number>> | undefined)?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? 1.4) * 8760 * (selectedCountry?.economy.electricityRate ?? 0.10) / 1000;
         const vendorBudget = 50000;
         const esc = 1 + (finInputs.opexEscalation || 0.035);
         return [
@@ -976,8 +978,8 @@ const FinancialDashboard = () => {
                         effectiveInputs.headcount_Admin * labor.baseSalary_Admin +
                         effectiveInputs.headcount_Janitor * labor.baseSalary_Janitor
                     ) * 12;
-                    const energyCost = effectiveInputs.itLoad * 1.4 * 8760 * 0.10 / 1000;
-                    const maintenanceCost = effectiveInputs.itLoad * 50;
+                    const energyCost = effectiveInputs.itLoad * ((rzData().pueMatrix as Record<string, Record<string, number>> | undefined)?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? 1.4) * 8760 * (selectedCountry?.economy.electricityRate ?? 0.10) / 1000;
+                    const maintenanceCost = effectiveInputs.itLoad * MAINT_PER_KW_YR;
                     const insuranceCost = capexResults.total * 0.003; // 0.3% of CAPEX
                     const overheadCost = annualOpex * 0.05; // 5% overhead
 

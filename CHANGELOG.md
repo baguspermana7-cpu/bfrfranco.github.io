@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.91.3 — 2026-07-19 (calc hygiene — Financial hardcodes bound to canonical sources)
+
+### Fixed
+- **Financial energy cost hardcoded PUE 1.4 + $0.10/kWh in 3 places** (audit finding): now reads the live `pueMatrix[cooling][tier]` + the project country's `economy.electricityRate` — changing country or cooling moves the Financial opex/budget lines automatically (owner mandate: tarif listrik auto per negara). Maintenance $50/kW/yr literals bound to the shared sourced screening constant. Revenue screening bases (Disaster/Tax) unified to `lib/screening.ts` in the prior commit.
+
+---
+
 ## v1.91.2 — 2026-07-19 (sub-linear staffing algorithm)
 
 ### Fixed
