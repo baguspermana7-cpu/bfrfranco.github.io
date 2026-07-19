@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.90.2 — 2026-07-19 (article-calculator engine sweep, batch 4)
+
+### Added
+- **`models.mttr`** + `DATA.mttrResponse` (promoted from article-4): vendor-vs-inhouse MTTR phase model (per-category base durations, skill 1.5..0.55, coverage mobilization, spares gap factor) + full annual economics compare (downtime delta x effective cost/hr, callout + 55% retainer recovery, ROI, break-even); 7 engine asserts. Article-4 phases + savings block delegate.
+- **`models.techDebt`** + `DATA.techDebt` (promoted from article-5): Weibull-hazard technical-debt risk score (weights 10/5/1, facility-age multiplier) + 1/3/5-yr projections + deferred-cost escalation + NPV-of-deferral/inaction/break-even/insurance-band costRoi + age-adjusted Weibull params (Lanczos gamma MTTF) + remediation capacity; 11 engine asserts. Article-5 risk core/costROI/weibullParams/capacity delegate.
+- **`models.rca.effectivenessScore`** + `DATA.rcaScore` (promoted from article-6): 6-component weighted RCA program rubric (completion 20/implementation 25/recurrence 20/time 15/design-authority 10/verification 10); 3 engine asserts. Article-6 main scorecard + MC/sensitivity paths delegate.
+
+### Changed
+- Engine catalog auto-regenerated: 37→40 namespaces, 173→182 functions, 88→91 sourced tables (auto-linking chain). `?v=2026-07-19-a6b` bumped sitewide. Sweep: 11 calculators engine-bound, 12 article pages remaining.
+
+---
+
 ## v1.90.1 — 2026-07-19 (article-calculator engine sweep, batch 3 + backend deploy verified)
 
 ### Added

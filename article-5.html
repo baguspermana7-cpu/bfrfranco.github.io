@@ -3043,19 +3043,20 @@
             // Facility multiplier
             const facilityMultiplier = 1 + (facilityAge / 20);
 
-            // Current risk score
-            const currentRisk = Math.min(100, baseRisk * facilityMultiplier);
-
-            // Projected risks
-            const projectedRisk1 = Math.min(100, currentRisk * Math.pow(1.15, 1));
-            const projectedRisk3 = Math.min(100, currentRisk * Math.pow(1.15, 3));
-            const projectedRisk5 = Math.min(100, currentRisk * Math.pow(1.15, 5));
+            // ENGINE-BOUND (models.techDebt — single source; inline kept as fallback)
+            var engTD = window.RZEngine && window.RZEngine.models && window.RZEngine.models.techDebt;
+            var engRisk = engTD && engTD.riskScore ? engTD.riskScore({ items: items, avgAgeMonths: avgAge, facilityAgeYears: facilityAge, criticalPct: criticalPct, majorPct: majorPct }) : null;
+            const currentRisk = engRisk ? engRisk.currentRisk : Math.min(100, baseRisk * facilityMultiplier);
+            const projectedRisk1 = engRisk ? engRisk.projected1 : Math.min(100, currentRisk * Math.pow(1.15, 1));
+            const projectedRisk3 = engRisk ? engRisk.projected3 : Math.min(100, currentRisk * Math.pow(1.15, 3));
+            const projectedRisk5 = engRisk ? engRisk.projected5 : Math.min(100, currentRisk * Math.pow(1.15, 5));
 
             // Cost escalation
+            var engEsc = engTD && engTD.escalation ? engTD.escalation(items, avgCost, avgAge) : null;
             const escalationFactor = 1 + (avgAge / 24) * 0.5;
-            const escalatedCost = items * avgCost * escalationFactor;
+            const escalatedCost = engEsc ? engEsc.escalatedCostUsd : items * avgCost * escalationFactor;
             const originalCost = items * avgCost;
-            const escalationPct = ((escalationFactor - 1) * 100).toFixed(0);
+            const escalationPct = engEsc ? engEsc.escalationPct.toFixed(0) : ((escalationFactor - 1) * 100).toFixed(0);
 
             // Revenue at risk
             const revenueAtRisk = annualRevenue * (currentRisk / 100) * 0.1;
@@ -3209,6 +3210,11 @@
 
         /* ─── PANEL 2: COST & ROI ─── */
         function calcCostROI(items, age, facAge, cost, revenue, critPct, majPct, riskScore) {
+            var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.techDebt;
+            if (eng && eng.costRoi) {
+                var r = eng.costRoi(items, cost, revenue, riskScore);
+                return { npv: r.npvUsd, inactionCost: r.inactionCostUsd, breakEvenMonths: r.breakEvenMonths, roi3yr: r.roi3yrPct, slaPenalty: r.slaPenaltyUsd, insuranceDelta: r.insuranceDeltaUsd };
+            }
             var totalCost = items * cost;
             var escalRate = 0.15;
             var discRate = 0.08;
@@ -3244,6 +3250,11 @@
 
         /* ─── PANEL 3: WEIBULL PARAMETERS ─── */
         function calcWeibullParams(age, facAge) {
+            var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.techDebt;
+            if (eng && eng.weibullParams) {
+                var r = eng.weibullParams(age, facAge);
+                return { beta: r.beta, eta: r.eta, mttf: r.mttfMonths, reliability: r.reliability, hazardTrend: r.hazardTrend, b10: r.b10Months };
+            }
             var beta = 2.5 + (facAge > 10 ? (facAge-10)*0.05 : 0);
             beta = Math.min(4.0, beta);
             var eta = 60 - (facAge > 15 ? (facAge-15)*1.5 : 0);
@@ -3258,6 +3269,8 @@
 
         /* ─── PANEL 4: REMEDIATION CAPACITY ─── */
         function calcCapacity(items, critPct, majPct) {
+            var engCap = window.RZEngine && window.RZEngine.models && window.RZEngine.models.techDebt;
+            var er = engCap && engCap.capacity ? engCap.capacity(items, critPct, majPct) : null;
             var avgDaysPerItem = 3;
             var critItems = items * critPct / 100;
             var majItems = items * majPct / 100;
@@ -3272,6 +3285,7 @@
             var serviceRate = fte / avgDaysPerItem;
             var rho = arrivalRate / serviceRate;
             var queueProb = Math.min(0.99, Math.max(0, rho > 0.95 ? 0.95 : Math.pow(rho, fte) / (1-rho+0.001)));
+            if (er) return { crewMonths: er.crewMonths, optPhasing: er.optPhasingQuarters, queueProb: queueProb, throughputPerQuarter: er.throughputPerQuarter };
             return { crewMonths:crewMonths, optPhasing:optPhasing, queueProb:queueProb, throughputPerQuarter:throughputPerQuarter };
         }
 
@@ -3856,7 +3870,7 @@ document.querySelectorAll('.tooltip-trigger').forEach(function(trigger) {
 /* v1.9.1: subscribeNewsletter() moved to script.js (global, mailto: based) */
 </script>
 <script src="auth.js?v=2026-07-16b" defer></script>
-<script src="rz-engine.min.js?v=2026-07-19-a3b" defer></script>
+<script src="rz-engine.min.js?v=2026-07-19-a6b" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

@@ -2,9 +2,9 @@
  "generator": "tools/build-engine-catalog.mjs",
  "note": "AUTO-GENERATED from rz-engine.js — do not hand-edit. Consumers are grep-derived from real usage.",
  "dataVersion": "2.5.1",
- "modelCount": 37,
- "functionCount": 173,
- "sourceCount": 88,
+ "modelCount": 40,
+ "functionCount": 182,
+ "sourceCount": 91,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -860,6 +860,26 @@
    ]
   },
   {
+   "name": "mttr",
+   "functions": [
+    {
+     "name": "compare",
+     "params": [
+      "p"
+     ]
+    },
+    {
+     "name": "phases",
+     "params": [
+      "p"
+     ]
+    }
+   ],
+   "consumers": [
+    "article-4.html"
+   ]
+  },
+  {
    "name": "opex",
    "functions": [
     {
@@ -988,6 +1008,20 @@
     "dcmoc/src/lib/value-bindings.ts",
     "dcmoc/src/state/adapters/arch-adapter.ts",
     "pue-calculator.html"
+   ]
+  },
+  {
+   "name": "rca",
+   "functions": [
+    {
+     "name": "effectivenessScore",
+     "params": [
+      "inp"
+     ]
+    }
+   ],
+   "consumers": [
+    "article-6.html"
    ]
   },
   {
@@ -1386,6 +1420,60 @@
     }
    ],
    "consumers": []
+  },
+  {
+   "name": "techDebt",
+   "functions": [
+    {
+     "name": "capacity",
+     "params": [
+      "items",
+      "criticalPct",
+      "majorPct"
+     ]
+    },
+    {
+     "name": "costRoi",
+     "params": [
+      "items",
+      "avgCostUsd",
+      "annualRevenueUsd",
+      "riskScore"
+     ]
+    },
+    {
+     "name": "escalation",
+     "params": [
+      "items",
+      "avgCostUsd",
+      "avgAgeMonths"
+     ]
+    },
+    {
+     "name": "riskScore",
+     "params": [
+      "inp"
+     ]
+    },
+    {
+     "name": "weibullHazard",
+     "params": [
+      "t",
+      "beta",
+      "eta"
+     ]
+    },
+    {
+     "name": "weibullParams",
+     "params": [
+      "ageMonths",
+      "facAgeYears"
+     ]
+    }
+   ],
+   "consumers": [
+    "article-5.html"
+   ]
   },
   {
    "name": "tier",
@@ -1834,6 +1922,12 @@
    "asOf": "2026"
   },
   {
+   "key": "mttrResponse",
+   "source": "Article-4 vendor-vs-inhouse MTTR model: per-category phase durations (Electrical/Mechanical/Controls/Fire — field screening), skill multipliers 1.5..0.55, coverage mobilization hours (24x7 0.25h / 16x7 0.8h / 12x5 2.1h), 55% retainer recovery, 30% non-critical downtime cost weight",
+   "asOf": "2026",
+   "method": "phase-sum MTTR + annual downtime-delta economics; deterministic (page Monte Carlo stays page-side)"
+  },
+  {
    "key": "opex.basisPresets",
    "source": "Phase-Q shared-engine alignment: utilization presets parameterize the documented opex-calculator (retail 0.7 util) vs DCMOC (DC-contract 1.0 util) basis divergence",
    "asOf": "2026",
@@ -1875,6 +1969,12 @@
    "key": "pueMatrix.rdhx",
    "source": "Uptime Institute Global Survey 2026 rear-door cohort",
    "asOf": "2026"
+  },
+  {
+   "key": "rcaScore",
+   "source": "Article-6 RCA program effectiveness rubric: completion 20% + implementation 25% + recurrence 20% + time-to-close 15% (90-day target) + design-authority involvement 10% + verification 10%",
+   "asOf": "2026",
+   "method": "weighted 6-component composite 0-100"
   },
   {
    "key": "refresh",
@@ -1976,6 +2076,12 @@
    "key": "tax.macrs",
    "source": "US IRS Publication 946 (How To Depreciate Property) — MACRS GDS percentage tables, half-year convention (5-yr IT, 7-yr MEP, 15-yr land improvements, 39-yr non-residential building SL)",
    "asOf": "2025"
+  },
+  {
+   "key": "techDebt",
+   "source": "Article-5 technical-debt risk model: criticality weights 10/5/1, Weibull screening (beta 2.5 base, eta 60 months, facility-age adjustments), 15%/yr risk growth, 8% discount, escalation 1+(age/24)x0.5, inaction 30% factor, SLA 0.1% revenue factor, insurance bands 1-8% by risk score",
+   "asOf": "2026",
+   "method": "hazard-weighted composite scaled to 100; Lanczos gamma for MTTF; screening-grade"
   },
   {
    "key": "tier.scoreMaps",

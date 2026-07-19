@@ -916,6 +916,50 @@ if (M.capex && M.capex.accuracyRange) {
     ok('capex.accuracyRange Class-4 = -30/+50%', ar.lowPct === -0.30 && ar.highPct === 0.50);
     ok('capex.accuracyRange low<point<high', ar.low < ar.point && ar.point < ar.high);
 }
+/* A4 — mttr vendor-vs-inhouse (article-4 promoted) */
+if (M.mttr) {
+    const p4 = { category: 'Electrical', skillLevel: 3, coverage: '24_7', spares: 100, vendorSLA: 4, incidents: 6, callout: 2500, retainer: 24000, training: 45000, costHour: 10000, criticalPct: 60 };
+    const ph = M.mttr.phases(p4);
+    near('mttr.vendor Electrical sum', ph.vendor.detect + ph.vendor.diagnose + ph.vendor.mobilize + ph.vendor.repair + ph.vendor.verify, 0.25 + 0.5 + 4 + 1.5 + 0.5, 1e-12);
+    near('mttr.inhouse skill-3 spares-100', ph.inhouse.repair, 1.5, 1e-12);   // sf=1, spareFactor=1
+    const cmp = M.mttr.compare(p4);
+    near('mttr.vendorMTTR', cmp.vendorMTTR, 6.75, 1e-12);
+    near('mttr.inhouseMTTR', cmp.inhouseMTTR, 0.25 + 0.5 + 0.25 + 1.5 + 0.5, 1e-12);
+    near('mttr.effCostHour 60% crit', cmp.effCostHour, 10000 * 0.6 + 10000 * 0.3 * 0.4, 1e-9);
+    const expSav = (cmp.vendorDowntimeHr - cmp.inhouseDowntimeHr) * cmp.effCostHour + 6 * 2500 + 24000 * 0.55 - 45000;
+    near('mttr.netSavings composition', cmp.netSavingsUsd, expSav, 1e-9);
+    ok('mttr.breakeven positive', cmp.breakevenMonths > 0 && cmp.breakevenMonths < 99);
+}
+
+/* A5 — techDebt (article-5 promoted) */
+if (M.techDebt) {
+    near('techDebt.hazard t=60 β2.5 η60', M.techDebt.weibullHazard(60, 2.5, 60), 2.5 / 60, 1e-12);
+    const r5 = M.techDebt.riskScore({ items: 45, avgAgeMonths: 18, facilityAgeYears: 8, criticalPct: 20, majorPct: 35 });
+    const hz = (2.5 / 60) * Math.pow(18 / 60, 1.5);
+    near('techDebt.risk article defaults', r5.currentRisk, Math.min(100, (9 * 10 + 15.75 * 5 + 20.25 * 1) * hz * 1.4), 1e-9);
+    near('techDebt.projected1 ×1.15', r5.projected1, Math.min(100, r5.currentRisk * 1.15), 1e-12);
+    const esc = M.techDebt.escalation(45, 15000, 18);
+    near('techDebt.escalation 1+(18/24)*.5', esc.escalatedCostUsd, 45 * 15000 * 1.375, 1e-9);
+    const cr = M.techDebt.costRoi(45, 15000, 50e6, 50);
+    near('techDebt.inaction 30% factor', cr.inactionCostUsd, 45 * 15000 * 0.5 * 0.3, 1e-9);
+    near('techDebt.insurance band 50', cr.insuranceDeltaUsd, 45 * 15000 * 0.05, 1e-9);
+    const wp = M.techDebt.weibullParams(18, 8);
+    near('techDebt.wp beta base (fac<10yr)', wp.beta, 2.5, 1e-12);
+    near('techDebt.wp mttf = ηΓ(1+1/β)', wp.mttfMonths, 60 * 0.8873, 5e-4);   // Γ(1.4)=0.887264
+    eq('techDebt.wp trend increasing', wp.hazardTrend, 'Increasing');
+    const cap = M.techDebt.capacity(45, 20, 35);
+    near('techDebt.capacity crewMonths', cap.crewMonths, (9 * 5 + 15.75 * 3 + 20.25 * 1.5) / 22, 1e-9);
+}
+
+/* A6 — rca effectiveness (article-6 promoted) */
+if (M.rca) {
+    const perfect = M.rca.effectivenessScore({ incidents: 10, rcas: 10, implRate: 100, recurRate: 0, days: 0, daInvolve: 100, verifyRate: 100 });
+    near('rca.perfect = 100', perfect, 100, 1e-9);
+    const mid = M.rca.effectivenessScore({ incidents: 40, rcas: 20, implRate: 50, recurRate: 30, days: 45, daInvolve: 40, verifyRate: 50 });
+    near('rca.mid composite', mid, 50 * 0.20 + 50 * 0.25 + 70 * 0.20 + 50 * 0.15 + 40 * 0.10 + 50 * 0.10, 1e-9);
+    ok('rca.weights sum 1.0', Math.abs(Object.values(D.rcaScore.weights).reduce((a, b) => a + b, 0) - 1) < 1e-12);
+}
+
 /* A1 — opsMaturity (article-1 promoted) */
 if (M.opsMaturity) {
     const allThrees = [3, 3, 3, 3, 3, 3, 3, 3];

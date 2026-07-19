@@ -4598,6 +4598,43 @@
             equivalences: { bottleL: 0.5, showerL: 65, drinkLPerDay: 2, co2KgPerL: 0.0005, waterCostUsdPerL: 0.006, glassL: 0.25, householdLPerDay: 1135 }
         },
 
+        /* ── A4: MTTR vendor-vs-inhouse response model (article-4). ── */
+        mttrResponse: {
+            categoryBase: {
+                Electrical:        { detect: 0.25, diagnose: 0.5,  repair: 1.5, verify: 0.5 },
+                Mechanical:        { detect: 0.5,  diagnose: 0.75, repair: 2.0, verify: 0.5 },
+                Controls:          { detect: 0.15, diagnose: 1.0,  repair: 1.0, verify: 0.75 },
+                'Fire Protection': { detect: 0.1,  diagnose: 0.5,  repair: 1.5, verify: 1.0 }
+            },
+            skillFactors: { 1: 1.5, 2: 1.2, 3: 1.0, 4: 0.75, 5: 0.55 },   // in-house skill level multiplier
+            coverageMobilizeHr: { '24_7': 0.25, '16_7': 0.80, '12_5': 2.10 },
+            durationCv: { low: 0.20, medium: 0.35, high: 0.50 },
+            spareGapFactor: 0.5,              // repair inflation when spares coverage < 100%
+            retainerRecovery: 0.55,           // share of vendor retainer recoverable in-house
+            nonCriticalCostFactor: 0.3        // downtime cost weight for non-critical load
+        },
+
+        /* ── A5: technical-debt operational-risk model (article-5). ── */
+        techDebt: {
+            weights: { critical: 10, major: 5, minor: 1 },
+            weibull: { beta: 2.5, etaMonths: 60, betaAgePerYr: 0.05, betaCap: 4.0, etaDecayPerYr: 1.5, etaFloorMonths: 30, facAgeBetaFromYr: 10, facAgeEtaFromYr: 15 },
+            facilityAgeDivisor: 20,           // facility multiplier = 1 + facAgeYears/20
+            riskGrowthPerYr: 0.15,
+            discountRate: 0.08,
+            ageCost: { factor: 0.5, baseMonths: 24 },   // escalation = 1 + (age/24)*0.5
+            inactionFactor: 0.3,
+            revenueAtRiskFactor: 0.1,
+            slaPenaltyFactor: 0.001,
+            insuranceBands: [ { min: 75, f: 0.08 }, { min: 50, f: 0.05 }, { min: 25, f: 0.03 }, { min: 0, f: 0.01 } ],
+            remediation: { critDays: 5, majDays: 3, minDays: 1.5, avgDays: 3, workDaysPerMonth: 22, fte: 3 }
+        },
+
+        /* ── A6: RCA program effectiveness score (article-6). ── */
+        rcaScore: {
+            weights: { completion: 0.20, implementation: 0.25, recurrence: 0.20, time: 0.15, designAuthority: 0.10, verification: 0.10 },
+            timeTargetDays: 90
+        },
+
         /* ── A1: operations-maturity assessment (promoted from article-1). ── */
         opsMaturity: {
             dimensions: [
@@ -5076,6 +5113,9 @@
             'cdu.bands':              { source: 'cdu-model.js BANDS — OCP cold-plate + ASHRAE TC9.9 CDU operational bounds (supply temp, ΔT, flow, dP, dew margin, pipe velocity)', asOf: '2026', unit: '°C / K / Lpm/kW / bar / m/s' },
             'cdu.pump':               { source: 'cdu-model.js PUMP — typical seal-less CDU pump (η=0.70) + IE3 motor (η=0.92) + 600 Lpm duty pump; ILLUSTRATIVE', asOf: '2026', unit: 'efficiency fraction + Lpm' },
             'cdu.phys':               { source: 'cdu-model.js PHYS — commercial-steel absolute roughness (Moody/Colebrook), barToPa, Magnus dew-point coefficients (Alduchov-Eskridge 2006)', asOf: '2026', unit: 'mm / Pa/bar / dimensionless' },
+            'mttrResponse':           { source: 'Article-4 vendor-vs-inhouse MTTR model: per-category phase durations (Electrical/Mechanical/Controls/Fire — field screening), skill multipliers 1.5..0.55, coverage mobilization hours (24x7 0.25h / 16x7 0.8h / 12x5 2.1h), 55% retainer recovery, 30% non-critical downtime cost weight', asOf: '2026', method: 'phase-sum MTTR + annual downtime-delta economics; deterministic (page Monte Carlo stays page-side)' },
+            'techDebt':               { source: 'Article-5 technical-debt risk model: criticality weights 10/5/1, Weibull screening (beta 2.5 base, eta 60 months, facility-age adjustments), 15%/yr risk growth, 8% discount, escalation 1+(age/24)x0.5, inaction 30% factor, SLA 0.1% revenue factor, insurance bands 1-8% by risk score', asOf: '2026', method: 'hazard-weighted composite scaled to 100; Lanczos gamma for MTTF; screening-grade' },
+            'rcaScore':               { source: 'Article-6 RCA program effectiveness rubric: completion 20% + implementation 25% + recurrence 20% + time-to-close 15% (90-day target) + design-authority involvement 10% + verification 10%', asOf: '2026', method: 'weighted 6-component composite 0-100' },
             'opsMaturity':            { source: 'Article-1 ops-maturity assessment: 8 weighted dimensions (weights sum 1.0, expert screening), 5 maturity levels (Reactive..Generative); risk translation basis Uptime Institute 2024 Annual Outage Analysis (>55% outages ops/human factors, ~$200K median outage cost, 2.5 outages/yr low-maturity screening base)', asOf: '2026', method: 'weighted 1-5 composite scaled 0-100; risk factor max(0.05, 1-score/120) — screening-grade' },
             'alarmMgmt':              { source: 'ISA-18.2 / EEMUA-191 alarm-management targets: avg rate <=1 alarm/10 min per operator, flood >=10 alarms/10 min, actionable >=85%; cognitive-load knee at 70% utilization (human-factors literature); Erlang-C standard queueing formula', asOf: '2026', method: 'Poisson flood probability via the shared Acklam/Poisson kernel (models.spares.poissonCdf); composite = rate 50% + flood 30% + actionable 20% (article-2 rubric)' },
             'maintCompliance':        { source: 'Article-3 maintenance-compliance capacity model: friction factors (High .55/Med .70/Low .85 productive-time share), CMMS maturity multipliers (.70-.100), evidence multipliers (.85-.98), backlog aging weight (0.3 + 0.02/month, cap 0.5) — industry screening estimates', asOf: '2026', method: 'compliance = min(100, capacity/demand*100) x cmms x evidence; deterministic (page-side Monte Carlo stays page-side)' },
@@ -5672,6 +5712,137 @@
                         tco5yrUsd: gpuCost + annualPower * G.tcoYears + infraCost,
                         method: 'screening: infra $' + (G.infraCostPerMw / 1e6) + 'M/MW, ' + G.tcoYears + '-yr power, Colossus ' + G.colossusBenchmarkDays + '-day benchmark'
                     };
+                },
+            },
+            /* ── A4: MTTR vendor-vs-inhouse (article-4 promoted). input p {category,
+             * skillLevel(1-5), coverage('24_7'|'16_7'|'12_5'), spares(0-100 %),
+             * vendorSLA(h), incidents/yr, callout($), retainer($/yr), training($),
+             * costHour($), criticalPct(0-100)}. ── */
+            mttr: {
+                phases: function (p) {
+                    var T = DATA.mttrResponse;
+                    var base = T.categoryBase[p.category] || T.categoryBase.Electrical;
+                    var sf = T.skillFactors[p.skillLevel] || 1.0;
+                    var mob = T.coverageMobilizeHr[p.coverage] || 0.25;
+                    var spareFactor = 1 + (100 - (p.spares == null ? 100 : p.spares)) / 100 * T.spareGapFactor;
+                    return {
+                        vendor:  { detect: base.detect, diagnose: base.diagnose, mobilize: p.vendorSLA, repair: base.repair, verify: base.verify },
+                        inhouse: { detect: base.detect, diagnose: base.diagnose * sf, mobilize: mob, repair: base.repair * sf * spareFactor, verify: base.verify }
+                    };
+                },
+                /** Full comparison + annual economics (deterministic core of the calculator). */
+                compare: function (p) {
+                    var T = DATA.mttrResponse;
+                    var ph = RZEngine.models.mttr.phases(p);
+                    var sum = function (x) { return x.detect + x.diagnose + x.mobilize + x.repair + x.verify; };
+                    var vendorMTTR = sum(ph.vendor), inhouseMTTR = sum(ph.inhouse);
+                    var vDown = vendorMTTR * p.incidents, iDown = inhouseMTTR * p.incidents;
+                    var critW = (p.criticalPct == null ? 100 : p.criticalPct) / 100;
+                    var effCostHour = p.costHour * critW + p.costHour * T.nonCriticalCostFactor * (1 - critW);
+                    var downtimeSavings = (vDown - iDown) * effCostHour;
+                    var vendorCosts = p.incidents * (p.callout || 0);
+                    var retainerSavings = (p.retainer || 0) * T.retainerRecovery;
+                    var netSavings = downtimeSavings + vendorCosts + retainerSavings - (p.training || 0);
+                    var roiPct = p.training > 0 ? (netSavings / p.training) * 100 : 0;
+                    var monthlyBenefit = (downtimeSavings + vendorCosts + retainerSavings) / 12;
+                    return {
+                        phases: ph, vendorMTTR: vendorMTTR, inhouseMTTR: inhouseMTTR,
+                        vendorDowntimeHr: vDown, inhouseDowntimeHr: iDown,
+                        effCostHour: effCostHour, netSavingsUsd: netSavings, roiPct: roiPct,
+                        breakevenMonths: monthlyBenefit > 0 ? (p.training || 0) / monthlyBenefit : 99
+                    };
+                },
+            },
+            /* ── A5: technical-debt operational risk (article-5 promoted). ── */
+            techDebt: {
+                weibullHazard: function (t, beta, eta) { return t <= 0 ? 0 : (beta / eta) * Math.pow(t / eta, beta - 1); },
+                /** Risk score 0-100 + 1/3/5-yr projections. input {items, avgAgeMonths,
+                 * facilityAgeYears, criticalPct, majorPct}. */
+                riskScore: function (inp) {
+                    var T = DATA.techDebt;
+                    var minorPct = Math.max(0, 100 - inp.criticalPct - inp.majorPct);
+                    var cI = inp.items * inp.criticalPct / 100, mI = inp.items * inp.majorPct / 100;
+                    var nI = inp.items - cI - mI;
+                    var hazard = RZEngine.models.techDebt.weibullHazard(inp.avgAgeMonths, T.weibull.beta, T.weibull.etaMonths);
+                    var baseRisk = (cI * T.weights.critical + mI * T.weights.major + nI * T.weights.minor) * hazard;
+                    var facMult = 1 + inp.facilityAgeYears / T.facilityAgeDivisor;
+                    var current = Math.min(100, baseRisk * facMult);
+                    var g = 1 + T.riskGrowthPerYr;
+                    return {
+                        currentRisk: current, minorPct: minorPct, hazardRate: hazard, facilityMultiplier: facMult,
+                        projected1: Math.min(100, current * g),
+                        projected3: Math.min(100, current * Math.pow(g, 3)),
+                        projected5: Math.min(100, current * Math.pow(g, 5))
+                    };
+                },
+                /** Deferred-cost escalation + budget guidance. */
+                escalation: function (items, avgCostUsd, avgAgeMonths) {
+                    var A = DATA.techDebt.ageCost;
+                    var factor = 1 + (avgAgeMonths / A.baseMonths) * A.factor;
+                    var escalated = items * avgCostUsd * factor;
+                    return { originalCostUsd: items * avgCostUsd, escalatedCostUsd: escalated, escalationPct: (factor - 1) * 100, recommendedBudgetUsd: escalated / 3 };
+                },
+                /** NPV of 5-yr deferral, inaction cost, break-even, 3-yr ROI, SLA + insurance deltas. */
+                costRoi: function (items, avgCostUsd, annualRevenueUsd, riskScore) {
+                    var T = DATA.techDebt;
+                    var totalCost = items * avgCostUsd;
+                    var npv = 0;
+                    for (var y = 1; y <= 5; y++) npv += totalCost * Math.pow(1 + T.riskGrowthPerYr, y) / Math.pow(1 + T.discountRate, y);
+                    var inactionCost = totalCost * (riskScore / 100) * T.inactionFactor;
+                    var cumRisk = 0, breakEvenMonths = 60;
+                    for (var m = 1; m <= 60; m++) { cumRisk += inactionCost / 12; if (cumRisk >= totalCost) { breakEvenMonths = m; break; } }
+                    var band = T.insuranceBands.filter(function (b) { return riskScore >= b.min; })[0] || T.insuranceBands[T.insuranceBands.length - 1];
+                    return {
+                        npvUsd: npv, inactionCostUsd: inactionCost, breakEvenMonths: breakEvenMonths,
+                        roi3yrPct: totalCost > 0 ? ((inactionCost * 3 - totalCost) / totalCost) * 100 : 0,
+                        slaPenaltyUsd: annualRevenueUsd * T.slaPenaltyFactor * riskScore / 100,
+                        insuranceDeltaUsd: totalCost * band.f
+                    };
+                },
+                /** Age-adjusted Weibull parameter set (screening). */
+                weibullParams: function (ageMonths, facAgeYears) {
+                    var W = DATA.techDebt.weibull;
+                    var beta = Math.min(W.betaCap, W.beta + (facAgeYears > W.facAgeBetaFromYr ? (facAgeYears - W.facAgeBetaFromYr) * W.betaAgePerYr : 0));
+                    var eta = Math.max(W.etaFloorMonths, W.etaMonths - (facAgeYears > W.facAgeEtaFromYr ? (facAgeYears - W.facAgeEtaFromYr) * W.etaDecayPerYr : 0));
+                    /* Lanczos gamma (g=7, n=9) — standard coefficients */
+                    var gamma = function (z) {
+                        var c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+                        if (z < 0.5) return Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z));
+                        z -= 1;
+                        var x = c[0];
+                        for (var i = 1; i < 9; i++) x += c[i] / (z + i);
+                        var t = z + 7.5;
+                        return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
+                    };
+                    return {
+                        beta: beta, eta: eta, mttfMonths: eta * gamma(1 + 1 / beta),
+                        reliability: Math.exp(-Math.pow(ageMonths / eta, beta)),
+                        hazardTrend: beta > 1 ? 'Increasing' : beta === 1 ? 'Constant' : 'Decreasing',
+                        b10Months: eta * Math.pow(-Math.log(0.9), 1 / beta)
+                    };
+                },
+                /** Remediation-capacity screening (crew-months, phasing quarters). */
+                capacity: function (items, criticalPct, majorPct) {
+                    var R = DATA.techDebt.remediation;
+                    var cI = items * criticalPct / 100, mI = items * majorPct / 100, nI = items - cI - mI;
+                    var totalDays = cI * R.critDays + mI * R.majDays + nI * R.minDays;
+                    var throughputPerQuarter = Math.floor(R.fte * R.workDaysPerMonth * 3 / R.avgDays);
+                    return { crewMonths: totalDays / R.workDaysPerMonth, throughputPerQuarter: throughputPerQuarter, optPhasingQuarters: Math.ceil(items / Math.max(1, throughputPerQuarter)) };
+                },
+            },
+            /* ── A6: RCA program effectiveness (article-6 promoted). input {incidents,
+             * rcas, implRate(0-100), recurRate(0-100), days, daInvolve(0-100),
+             * verifyRate(0-100)}. ── */
+            rca: {
+                effectivenessScore: function (inp) {
+                    var W = DATA.rcaScore.weights;
+                    var completion = Math.min((inp.rcas / Math.max(1, inp.incidents)) * 100, 100) * W.completion;
+                    var implementation = inp.implRate * W.implementation;
+                    var recurrence = (100 - inp.recurRate) * W.recurrence;
+                    var time = Math.max(0, 1 - inp.days / DATA.rcaScore.timeTargetDays) * 100 * W.time;
+                    var da = inp.daInvolve * W.designAuthority;
+                    var verify = inp.verifyRate * W.verification;
+                    return completion + implementation + recurrence + time + da + verify;
                 },
             },
             /* ── A1: operations-maturity assessment (article-1 promoted). ── */
@@ -8443,7 +8614,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-19-a3b"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-19-a6b"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string
