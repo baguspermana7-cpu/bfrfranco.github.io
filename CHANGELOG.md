@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v1.88.0 — 2026-07-19 (ENGINE ACCURACY PROGRAM M1-M3: independent truth harness + precision core)
+
+### Added
+- **Independent accuracy truth harness** (permanent gates): `tools/verify-engine-accuracy.py` computes 27 worked examples at 50-digit Decimal / machine-erf precision from the AUTHORITATIVE formulas (never engine output) — annuity/CRF, NPV/IRR bisection, Weibull, exact binomial k-of-n, availability chains, Φ⁻¹, exact Poisson sums, Magnus dew point, Colebrook iterated to 1e-14, deep-sea poster identities, opex accounting identity — into `tools/fixtures/accuracy-truth.json`; `tools/test-engine-accuracy.mjs` asserts every engine value within its documented per-family tolerance. Baseline run MEASURED the defect list before any fix.
+- **Deep-sea poster-floor spec** (owner baseline): `DATA.deepSeaCooling.spec` + `deepSea().spec` now carry every poster field — intake 800-1,000 m @ 4-6 °C, return 9-11 °C, three loops (TCS/FWS/seawater), Ti Grade-2 PHE (approach 1.5-2.5 °C @ 10 bar), 4-stage filtration (50 mm → 5 mm → 200 µm → 50 µm backwash), full materials + redundancy map, facility 20-21/28-32 °C, trim-chiller basis. Poster identities gate-locked (8.625 m³/s exact, 4+1 pumps).
+
+### Changed (measured error, before → after)
+- **Reliability chain de-saturated (MATERIAL)**: availability/parallel/series/kOutOfN/downtime no longer round 6 dp INSIDE the chain — two-path parallel of a 0.999968 item was collapsing to exactly 1.000000 (downtime 0.0 min/yr, the engine-level origin of the fake "100.0000%"); now full double precision end-to-end (err 1.0e-9 → < 1e-15; downtime 0.0 → 0.00243 min/yr on the reference chain).
+- **Inverse normal CDF upgraded**: Beasley-Springer-Moro (1977, |ε|<4.5e-4) → Acklam (2003, |ε|<1.15e-9) — spares newsvendor quantiles now precision-grade; kernels exposed as `models.spares.normInv/normCdf/poissonCdf` (one implementation, gate-verified at 2e-9).
+- **IRR solver scale-aware**: Newton/bisection tolerances now scale with cashflow magnitude (`1e-12·max|cf|`) — $M-scale series converge to machine precision (measured err 5.6e-17) instead of a fixed $1e-7 cutoff.
+- **Provenance**: sources updated (spares.acklam, pue.partialLoad screening basis); `?v=2026-07-19-accuracy` bumped across all 58 engine-loading pages + DCMOC.
+
+### Verified unchanged (parity locks held)
+- capex golden EXACT (<$1), commissioning cx golden exact, opex default ≡ dcContract bit-identical, reference-parity 126/0, engine suite 426/0, datahall 57/57, conv DoD, DCMOC walk 23/23 + synergy 6/6. Whole-dollar opex line rounding kept as the documented ACCOUNTING convention (components+overhead ≡ total identity now gate-asserted; max error ≤$3 on multi-$M totals).
+
 ## v1.87.0 — 2026-07-19 (DCMOC audit round 2, batch AH: Value Binding & Sync Manual + synergy probe)
 
 ### Added

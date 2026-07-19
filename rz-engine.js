@@ -4271,6 +4271,19 @@
             opex: { marineMaintPctOfMarineCapex: 0.03, chlorinationPerM3hYr: 6.5,
                     rovInspectionYr: 350000, pumpLoadFactor: 0.85 },
             contingencyPct: 0.15,
+            /* Poster-floor reference spec (owner baseline 2026-07-19): the 150 MW
+             * poster fields the engine must never present LESS than. Additive —
+             * surfaced verbatim on deepSea() output as `spec`. */
+            spec: {
+                intakeDepthM: [800, 1000], intakeTempC: [4, 6], returnTempC: [9, 11],
+                loops: ['TCS — rack CDU to chip (treated water, closed)', 'FWS — facility water (closed)', 'Seawater heat rejection (open, raw)'],
+                phe: { material: 'Titanium Grade 2', approachC: [1.5, 2.5], designPressureBar: 10 },
+                filtrationStages: ['Coarse screen 50 mm', 'Fine screen 5 mm', 'Disc filter 200 \u00b5m', 'Automatic backwash 50 \u00b5m'],
+                materials: { heatExchanger: 'Titanium Grade 2', seawaterPipeline: 'HDPE / GRP', pumps: 'Super Duplex / Bronze', fasteners: 'Super Duplex / Bronze', valves: 'Super Duplex / Titanium' },
+                redundancyMap: { seawaterPumps: 'N+1', filters: 'N+1', heatExchangers: 'N+1 (parallel)', facilityWaterPumps: 'N+1', chillersBackup: 'N+1', powerSupply: '2N', controlSystem: '2N' },
+                facilitySupplyC: [20, 21], facilityReturnC: [28, 32],
+                trimChiller: 'N+1 chillers, VFD pumps, economizer mode — high-seawater-temp / maintenance backup only'
+            },
             redundancy: { pumps: 'N+1', filters: 'N+1', hx: 'N+1 parallel', chillers: 'N+1', power: '2N', controls: '2N' }
         },
 
@@ -4563,12 +4576,18 @@
         spares: {
             /* BSM rational approximation coefficients for inverse normal CDF.
              * Source: Beasley-Springer-Moro (1977). Used in newsvendor Q* calculation. */
-            bsmA: [2.50662823884, -18.61500062529, 41.39119773534, -25.44106049637],
-            bsmB: [-8.47351093090, 23.08336743743, -21.06224101826, 3.13082909833],
-            bsmC: [0.3374754822726147, 0.9761690190917186, 0.1607979714918209,
-                   0.0276438810333863, 0.0038405729373609, 0.0003951896511349,
-                   0.0000321767881768, 0.0000002888167364, 0.0000003960315187],
-            /* Demand threshold below which Poisson model auto-activates (muLT < threshold). */
+            /* Acklam (2003) rational approximation to the inverse normal CDF —
+             * |relative error| < 1.15e-9 over (0,1). Replaces the BSM (1977)
+             * set (|e|<4.5e-4) in the M2b precision upgrade. */
+            acklamA: [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02,
+                       1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00],
+            acklamB: [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02,
+                       6.680131188771972e+01, -1.328068155288572e+01],
+            acklamC: [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00,
+                      -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00],
+            acklamD: [ 7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00,
+                       3.754408661907416e+00],
+            acklamPLow: 0.02425,
             poissonThresholdMuLt: 5
         },
         decision: {
@@ -4933,7 +4952,8 @@
             'cdu.bands':              { source: 'cdu-model.js BANDS — OCP cold-plate + ASHRAE TC9.9 CDU operational bounds (supply temp, ΔT, flow, dP, dew margin, pipe velocity)', asOf: '2026', unit: '°C / K / Lpm/kW / bar / m/s' },
             'cdu.pump':               { source: 'cdu-model.js PUMP — typical seal-less CDU pump (η=0.70) + IE3 motor (η=0.92) + 600 Lpm duty pump; ILLUSTRATIVE', asOf: '2026', unit: 'efficiency fraction + Lpm' },
             'cdu.phys':               { source: 'cdu-model.js PHYS — commercial-steel absolute roughness (Moody/Colebrook), barToPa, Magnus dew-point coefficients (Alduchov-Eskridge 2006)', asOf: '2026', unit: 'mm / Pa/bar / dimensionless' },
-            'spares.bsm':             { source: 'Beasley-Springer-Moro (1977) rational approximation to Φ⁻¹(p); lifted from spares-readiness-calculator.html normInvCDF()', asOf: '2026', method: 'numerical approximation; error < 4.5e-4' }
+            'pue.partialLoad':        { source: 'Screening model: fixed infrastructure-overhead share 0.55 at partial IT load (industry rule-of-thumb band 0.4-0.7; Green Grid partial-load PUE guidance)', asOf: '2026', method: 'PUE(l) = 1 + overhead*(0.55/l + 0.45) — screening estimate, labeled' },
+            'spares.acklam':          { source: 'P. J. Acklam (2003) rational approximation to the inverse normal CDF', asOf: '2026', method: 'numerical approximation; |relative error| < 1.15e-9 (upgraded from BSM 1977, |e|<4.5e-4, in the M2b precision pass)' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.
@@ -5274,6 +5294,7 @@
                         env: { deltaTCompliant: dT <= SW.deltaTEnvMaxC,
                                note: 'Low-entrainment intake + multiport diffuser outfall; controlled ΔT ≤ ' + SW.deltaTEnvMaxC + ' °C.' },
                         redundancy: D.redundancy,
+                        spec: D.spec, /* poster-floor reference block (owner baseline) */
                         warnings: warnings
                     };
                 },
@@ -5551,24 +5572,30 @@
                         return cashflows.reduce(function (a, cf, t) { return a - t * cf / Math.pow(1 + r, t + 1); }, 0);
                     };
                     // A6-60: Newton from the caller's guess (honored), robust for multi-sign-change series.
+                    /* M2c: convergence thresholds SCALE with cashflow magnitude so a
+                     * $B-scale series converges as precisely as a $K-scale one. */
+                    var scale = 0;
+                    for (var s0 = 0; s0 < cashflows.length; s0++) scale = Math.max(scale, Math.abs(cashflows[s0] || 0));
+                    if (!scale) return null;
+                    var fTol = 1e-12 * scale;
                     var r = (guess != null ? guess : 0.1);
-                    for (var k = 0; k < 40; k++) {
+                    for (var k = 0; k < 60; k++) {
                         var f = npv(r), d = dnpv(r);
-                        if (Math.abs(f) < 1e-7) return r;
-                        if (!isFinite(d) || Math.abs(d) < 1e-12) break;
+                        if (Math.abs(f) < fTol) return r;
+                        if (!isFinite(d) || Math.abs(d) < 1e-300) break;
                         var step = f / d;
                         r = r - step;
                         if (r <= -0.999) { r = -0.999; }
-                        if (Math.abs(step) < 1e-9) return (Math.abs(npv(r)) < 1e-4) ? r : bracket();
+                        if (Math.abs(step) < 1e-12) return (Math.abs(npv(r)) < 1e-9 * scale) ? r : bracket();
                     }
                     return bracket();
                     // Bisection fallback over [-0.99, 10] when Newton fails to converge.
                     function bracket() {
                         var lo = -0.99, hi = 10, fLo = npv(lo), fHi = npv(hi);
                         if (fLo * fHi > 0) return null;
-                        for (var i = 0; i < 100; i++) {
+                        for (var i = 0; i < 200; i++) {
                             var mid = (lo + hi) / 2, fMid = npv(mid);
-                            if (Math.abs(fMid) < 1e-6) return mid;
+                            if (Math.abs(fMid) < fTol || (hi - lo) < 1e-12) return mid;
                             if (fLo * fMid < 0) { hi = mid; fHi = fMid; } else { lo = mid; fLo = fMid; }
                         }
                         return (lo + hi) / 2;
@@ -6461,8 +6488,10 @@
             reliability: {
                 /** Steady-state availability of a single item: MTBF/(MTBF+MTTR). */
                 availability: function (mtbf, mttr) {
+                    /* M2a: FULL precision — in-chain rounding saturated composed
+                     * availability to exactly 1.0 (fake 100.0000%). Display rounds. */
                     var a = (mtbf || 0) + (mttr || 0);
-                    return a > 0 ? +(mtbf / a).toFixed(6) : 0;
+                    return a > 0 ? (mtbf / a) : 0;
                 },
                 /** MTBF (h) for a known component, else null. */
                 mtbfFor: function (component) {
@@ -6478,18 +6507,20 @@
                  *  (system up if ≥1 path up): 1 − (1−a)^paths. */
                 parallelAvailability: function (a, paths) {
                     var p = Math.max(1, paths || 1);
-                    return +(1 - Math.pow(1 - a, p)).toFixed(6);
+                    return 1 - Math.pow(1 - a, p); /* M2a: full precision */
                 },
                 /** Series availability of independent groups (all must be up): Π a_i. */
                 seriesAvailability: function (avails) {
                     if (!avails || !avails.length) return 0;
                     var prod = 1;
                     for (var i = 0; i < avails.length; i++) prod *= avails[i];
-                    return +prod.toFixed(6);
+                    return prod; /* M2a: full precision */
                 },
                 /** Annual downtime (minutes) for an availability fraction. */
                 annualDowntimeMinutes: function (availability) {
-                    return +((1 - (availability || 0)) * DATA.hoursPerYear * 60).toFixed(1);
+                    /* M2a: full precision — 1dp rounding erased sub-minute downtime
+                     * (0.0024 min/yr → 0.0) for high-availability chains. */
+                    return (1 - (availability || 0)) * DATA.hoursPerYear * 60;
                 },
                 /** Uptime Tier availability target for tier 2|3|4. */
                 tierTarget: function (tier) {
@@ -6519,7 +6550,7 @@
                     var C = function (nn, rr) { if (rr < 0 || rr > nn) return 0; rr = Math.min(rr, nn - rr); var num = 1; for (var i = 0; i < rr; i++) num = num * (nn - i) / (i + 1); return num; };
                     var p = 0;
                     for (var i = k; i <= n; i++) p += C(n, i) * Math.pow(a, i) * Math.pow(1 - a, n - i);
-                    return +Math.min(1, p).toFixed(6);
+                    return Math.min(1, p); /* M2a: full precision (min guards fp-sum noise only) */
                 }
             },
 
@@ -7613,6 +7644,45 @@
             /* ── DC-OS Layer: Spares (EOQ / reorder) ── */
             spares: {
                 /** Economic order quantity: √(2·D·S / H). */
+                /* ── M2b shared statistical kernels (exposed + upgraded) ── */
+                /** Inverse normal CDF Phi^-1(p) — Acklam (2003) rational approx,
+                 *  |relative error| < 1.15e-9 (was BSM 1977, |e|<4.5e-4). */
+                normInv: function (p) {
+                    if (!(p > 0)) { return -Infinity; } if (!(p < 1)) { return Infinity; }
+                    var S = DATA.spares, a = S.acklamA, b = S.acklamB, c = S.acklamC, d = S.acklamD, pl = S.acklamPLow, ph = 1 - pl;
+                    var q, r, x;
+                    if (p < pl) {
+                        q = Math.sqrt(-2 * Math.log(p));
+                        x = (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) /
+                            ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+                    } else if (p <= ph) {
+                        q = p - 0.5; r = q * q;
+                        x = (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q /
+                            (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+                    } else {
+                        q = Math.sqrt(-2 * Math.log(1 - p));
+                        x = -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) /
+                             ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+                    }
+                    return x;
+                },
+                /** Normal CDF Phi(x) — Abramowitz-Stegun 26.2.17 rational, |e| <= 7.5e-8. */
+                normCdf: function (x) {
+                    var t = 1 / (1 + 0.2316419 * Math.abs(x));
+                    var poly = t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
+                    var phi = 1 - (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * x * x) * poly;
+                    return x >= 0 ? phi : 1 - phi;
+                },
+                /** Poisson CDF P(X<=k; lambda) — exact partial sum; normal approx
+                 *  (continuity-corrected) only when lambda > 200. */
+                poissonCdf: function (k, lambda) {
+                    if (lambda <= 0) { return (k >= 0) ? 1 : 0; }
+                    if (lambda > 200) { return RZEngine.models.spares.normCdf((k + 0.5 - lambda) / Math.sqrt(lambda)); }
+                    var sum = 0, term = Math.exp(-lambda);
+                    if (!isFinite(term)) { return RZEngine.models.spares.normCdf((k + 0.5 - lambda) / Math.sqrt(lambda)); }
+                    for (var i = 0; i <= k; i++) { sum += term; term *= lambda / (i + 1); if (!isFinite(term)) { break; } }
+                    return Math.min(1, sum);
+                },
                 eoq: function (input) {
                     input = input || {};
                     var D = Math.max(0, input.annualDemand || 0), S = input.orderCost || 0, H = input.holdingCostPerUnit || 0;
@@ -7642,36 +7712,11 @@
                     var ltWeeks   = Math.max(1, input.ltWeeks || 16);
                     var ltSigma   = Math.max(0, input.ltSigmaWeeks != null ? input.ltSigmaWeeks : 4);
                     var fillRate  = Math.max(0.5, Math.min(0.9999, (input.fillRatePct || 99) / 100));
-                    /* BSM inverse normal CDF (Beasley-Springer-Moro). */
-                    function normInv(p) {
-                        if (p <= 0) { return -6; } if (p >= 1) { return 6; }
-                        var A = DATA.spares.bsmA, B = DATA.spares.bsmB, C = DATA.spares.bsmC;
-                        var y = p - 0.5;
-                        if (Math.abs(y) < 0.42) {
-                            var r = y * y;
-                            return y * (((A[3]*r+A[2])*r+A[1])*r+A[0]) / ((((B[3]*r+B[2])*r+B[1])*r+B[0])*r+1);
-                        }
-                        var r2 = (y < 0) ? p : 1 - p;
-                        r2 = Math.log(-Math.log(r2));
-                        var z = C[0]+r2*(C[1]+r2*(C[2]+r2*(C[3]+r2*(C[4]+r2*(C[5]+r2*(C[6]+r2*(C[7]+r2*C[8])))))));
-                        return (y < 0) ? -z : z;
-                    }
-                    /* Normal CDF rational approximation. */
-                    function normCDF(x) {
-                        var t = 1 / (1 + 0.2316419 * Math.abs(x));
-                        var poly = t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
-                        var phi = 1 - (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * x * x) * poly;
-                        return x >= 0 ? phi : 1 - phi;
-                    }
-                    /* Poisson CDF (iterative; normal approx for λ>200). */
-                    function poissonCDF(k, lambda) {
-                        if (lambda <= 0) { return (k >= 0) ? 1 : 0; }
-                        if (lambda > 200) { return normCDF((k + 0.5 - lambda) / Math.sqrt(lambda)); }
-                        var sum = 0, term = Math.exp(-lambda);
-                        if (!isFinite(term)) { return normCDF((k + 0.5 - lambda) / Math.sqrt(lambda)); }
-                        for (var i = 0; i <= k; i++) { sum += term; term *= lambda / (i + 1); if (!isFinite(term)) { break; } }
-                        return Math.min(1, sum);
-                    }
+                    /* M2b: delegate to the shared exposed kernels (Acklam Phi^-1,
+                     * A&S Phi, exact Poisson) — one implementation, gate-verified. */
+                    var normInv = RZEngine.models.spares.normInv;
+                    var normCDF = RZEngine.models.spares.normCdf;
+                    var poissonCDF = RZEngine.models.spares.poissonCdf;
                     var L       = ltWeeks / 52;
                     var sigL    = ltSigma / 52;
                     var muLT    = muA * L;
@@ -7891,7 +7936,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-15-dsc"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-19-accuracy"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

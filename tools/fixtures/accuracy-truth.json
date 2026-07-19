@@ -1,0 +1,322 @@
+{
+ "_generated_by": "tools/verify-engine-accuracy.py",
+ "cases": {
+  "roi.npv.basic": {
+   "inputs": {
+    "cashflows": [
+     -1000,
+     300,
+     300,
+     300,
+     300
+    ],
+    "rate": 0.08
+   },
+   "truth": -6.3619479867003115,
+   "tol": 1e-09,
+   "tolKind": "abs",
+   "note": "geometric discounting, Decimal 50dp"
+  },
+  "roi.npv.large": {
+   "inputs": {
+    "cashflows": [
+     -5000000,
+     900000,
+     1100000,
+     1300000,
+     1500000,
+     1700000,
+     1700000,
+     1700000
+    ],
+    "rate": 0.1
+   },
+   "truth": 1616042.8827765712,
+   "tol": 1e-06,
+   "tolKind": "abs",
+   "note": "large-magnitude series"
+  },
+  "roi.irr.basic": {
+   "inputs": {
+    "cashflows": [
+     -1000,
+     300,
+     300,
+     300,
+     300
+    ]
+   },
+   "truth": 0.07713847295208355,
+   "tol": 1e-06,
+   "tolKind": "abs",
+   "note": "bisection 200 iters, Decimal"
+  },
+  "roi.irr.large": {
+   "inputs": {
+    "cashflows": [
+     -5000000,
+     900000,
+     1100000,
+     1300000,
+     1500000,
+     1700000,
+     1700000,
+     1700000
+    ]
+   },
+   "truth": 0.18149964412506409,
+   "tol": 1e-06,
+   "tolKind": "abs",
+   "note": "large-magnitude convergence quality"
+  },
+  "finance.crf.8pct20y": {
+   "inputs": {
+    "r": 0.08,
+    "n": 20
+   },
+   "truth": 0.10185220882315062,
+   "tol": 1e-12,
+   "tolKind": "abs",
+   "note": "capital recovery factor identity"
+  },
+  "roi.discountedPayback": {
+   "inputs": {
+    "cashflows": [
+     -1000,
+     300,
+     300,
+     300,
+     300
+    ],
+    "rate": 0.06
+   },
+   "truth": 3.8336405333333334,
+   "tol": 1e-09,
+   "tolKind": "abs",
+   "note": "fractional-year interpolation"
+  },
+  "finance.projectByYear.y10": {
+   "inputs": {
+    "startVal": 1000000,
+    "ratePct": 0.03,
+    "startYear": 2026,
+    "endYear": 2036,
+    "pickYear": 2036
+   },
+   "truth": 1343916.379344122,
+   "tol": 0.5,
+   "tolKind": "abs",
+   "note": "display rounds \u2264$0.5; compounding itself must be UNROUNDED (no drift)"
+  },
+  "rel.availability.ups": {
+   "inputs": {
+    "mtbf": 250000,
+    "mttr": 8
+   },
+   "truth": 0.9999680010239672,
+   "tol": 1e-12,
+   "tolKind": "abs",
+   "note": "steady-state MTBF/(MTBF+MTTR)"
+  },
+  "rel.parallel.saturation": {
+   "inputs": {
+    "a": 0.9999680010239672,
+    "paths": 2
+   },
+   "truth": 0.9999999989760655,
+   "tol": 1e-15,
+   "tolKind": "abs",
+   "note": "1-(1-a)^2 = 0.999999998976 \u2014 must NOT saturate to 1.0"
+  },
+  "rel.systemAvailability.ups-crac-2n": {
+   "inputs": {
+    "components": [
+     "ups",
+     "crac"
+    ],
+    "redundancy": "2n"
+   },
+   "truth": 0.9999999953764975,
+   "tol": 1e-12,
+   "tolKind": "abs",
+   "note": "series of two 2-path parallel groups \u2014 full-precision chain"
+  },
+  "rel.downtime.chain2": {
+   "inputs": {
+    "availability": 0.9999999953764975
+   },
+   "truth": 0.002430112914,
+   "tol": 1e-06,
+   "tolKind": "abs",
+   "note": "annual downtime minutes of the chain \u2014 nonzero (was 0.0 via saturation)"
+  },
+  "rel.kOutOfN.2of3": {
+   "inputs": {
+    "a": 0.99,
+    "k": 2,
+    "n": 3
+   },
+   "truth": 0.999702,
+   "tol": 1e-12,
+   "tolKind": "abs",
+   "note": "exact binomial sum"
+  },
+  "rel.kOutOfN.3of4-high": {
+   "inputs": {
+    "a": 0.9999,
+    "k": 3,
+    "n": 4
+   },
+   "truth": 0.9999999400079997,
+   "tol": 1e-15,
+   "tolKind": "abs",
+   "note": "high-availability k-of-n \u2014 no 6dp collapse"
+  },
+  "stat.phiInv.0.8": {
+   "inputs": {
+    "p": 0.8
+   },
+   "truth": 0.8416212335729142,
+   "tol": 2e-09,
+   "tolKind": "abs",
+   "note": "\u03a6\u207b\u00b9 truth (erf-Newton, ~1e-15). tol = Acklam(2003) bound 1.15e-9 + margin (M2b)"
+  },
+  "stat.phiInv.0.95": {
+   "inputs": {
+    "p": 0.95
+   },
+   "truth": 1.6448536269514717,
+   "tol": 2e-09,
+   "tolKind": "abs",
+   "note": "\u03a6\u207b\u00b9 truth (erf-Newton, ~1e-15). tol = Acklam(2003) bound 1.15e-9 + margin (M2b)"
+  },
+  "stat.phiInv.0.99": {
+   "inputs": {
+    "p": 0.99
+   },
+   "truth": 2.326347874040841,
+   "tol": 2e-09,
+   "tolKind": "abs",
+   "note": "\u03a6\u207b\u00b9 truth (erf-Newton, ~1e-15). tol = Acklam(2003) bound 1.15e-9 + margin (M2b)"
+  },
+  "stat.phiInv.0.999": {
+   "inputs": {
+    "p": 0.999
+   },
+   "truth": 3.090232306167824,
+   "tol": 2e-09,
+   "tolKind": "abs",
+   "note": "\u03a6\u207b\u00b9 truth (erf-Newton, ~1e-15). tol = Acklam(2003) bound 1.15e-9 + margin (M2b)"
+  },
+  "stat.poissonCdf.3at2p5": {
+   "inputs": {
+    "k": 3,
+    "lambda": 2.5
+   },
+   "truth": 0.7575761331330659,
+   "tol": 1e-09,
+   "tolKind": "abs",
+   "note": "exact Poisson partial sum"
+  },
+  "stat.poissonCdf.10at20": {
+   "inputs": {
+    "k": 10,
+    "lambda": 20
+   },
+   "truth": 0.010811718826652723,
+   "tol": 1e-09,
+   "tolKind": "abs",
+   "note": "left-tail heavy case"
+  },
+  "asset.weibullF.b2e15t5": {
+   "inputs": {
+    "beta": 2.0,
+    "eta": 15,
+    "t": 5
+   },
+   "truth": 0.10516068318563022,
+   "tol": 5e-05,
+   "tolKind": "abs",
+   "note": "F(t)=1-exp(-(t/\u03b7)^\u03b2); engine returns 4dp \u2192 tol 5e-5"
+  },
+  "cdu.dewPoint.t20rh60": {
+   "inputs": {
+    "tAirC": 20,
+    "rhPct": 60
+   },
+   "truth": 11.999894615745436,
+   "tol": 0.05,
+   "tolKind": "abs",
+   "note": "Magnus (Alduchov-Eskridge 2006, \u03b1=17.625 \u03b2=243.04); engine rounds 1dp"
+  },
+  "cdu.size.flow1MWdT10": {
+   "inputs": {
+    "itKw": 1000,
+    "deltaT": 10
+   },
+   "truth": 1439.725876193173,
+   "tol": 0.05,
+   "tolKind": "abs",
+   "note": "Q=kW/(\u03c1\u00b7cp\u00b7\u0394T)\u00b760000, engine 1dp"
+  },
+  "cdu.hydraulics.friction500kW": {
+   "inputs": {
+    "itKw": 500,
+    "deltaTK": 10,
+    "supplyC": 20,
+    "pipeDiamMm": 100,
+    "pipeLengthM": 50
+   },
+   "truth": 0.018866414379311615,
+   "tol": 0.0003773282875862323,
+   "tolKind": "abs",
+   "note": "Colebrook truth (1e-14); Haaland documented band \u00b12%"
+  },
+  "cdu.hydraulics.reynolds500kW": {
+   "inputs": {
+    "itKw": 500,
+    "deltaTK": 10,
+    "supplyC": 20,
+    "pipeDiamMm": 100,
+    "pipeLengthM": 50
+   },
+   "truth": 170211.6190857596,
+   "tol": 171.2116190857596,
+   "tolKind": "abs",
+   "note": "Re from engine's own \u03c1(T)/\u03bc(T) correlations (verifies plumbing, 1dp rounding)"
+  },
+  "cooling.deepSea.poster.flow": {
+   "inputs": {
+    "itLoadMw": 150,
+    "pueTarget": 1.15,
+    "mode": "poster"
+   },
+   "truth": 8.625,
+   "tol": 1e-09,
+   "tolKind": "abs",
+   "note": "poster: 172.5 MW /(4.0\u00b75) = 8.625 m\u00b3/s \u2014 OWNER FLOOR"
+  },
+  "cooling.deepSea.poster.pumps": {
+   "inputs": {
+    "itLoadMw": 150,
+    "pueTarget": 1.15,
+    "mode": "poster"
+   },
+   "truth": 4,
+   "tol": 0,
+   "tolKind": "abs",
+   "note": "poster: 4 duty (+1 standby) \u00d7 2.9 m\u00b3/s \u2014 OWNER FLOOR"
+  },
+  "opex.powerCostAnnual.2p5MW": {
+   "inputs": {
+    "mw": 2.5,
+    "pue": 1.5,
+    "rate": 0.09
+   },
+   "truth": 2956500.0,
+   "tol": 0.5,
+   "tolKind": "abs",
+   "note": "whole-dollar accounting rounding \u2014 |engine\u2212truth| \u2264 $0.5 (documented convention)"
+  }
+ }
+}
