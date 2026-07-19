@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.88.1 — 2026-07-19 (rz-ops: Owner Action Board)
+
+### Added
+- **Owner Actions** section in the rz-ops admin console: the standing list of actions only the OWNER can perform (Supabase SQL hardening, admin-users Edge Function deploy + migrate, exposed-password resets, Claude spend-limit raise, CC0 intro-music file, Dunia taste-skill install) — each with why-owner-only, exact steps and an added-date; per-item done-ticks persist locally and an open-count badge sits on the nav. The list is maintained: any future task that ends blocked-on-owner lands here.
+
 ## v1.88.0 — 2026-07-19 (ENGINE ACCURACY PROGRAM M1-M3: independent truth harness + precision core)
 
 ### Added
