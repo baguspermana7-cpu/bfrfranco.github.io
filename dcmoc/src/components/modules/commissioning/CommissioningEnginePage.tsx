@@ -104,11 +104,19 @@ export function CommissioningEnginePage() {
     const overall = readiness ? readiness.index : 0;
     const openIssues = t.issues.filter((x) => x.open && x.kind === 'issue');
     const punch = t.issues.filter((x) => x.kind === 'punch' && x.open);
-    const READY_KEYS: { key: string; label: string }[] = [
-        { key: 'L1', label: 'L1 Factory' }, { key: 'L2', label: 'L2 Component' }, { key: 'L3', label: 'L3 System' },
-        { key: 'L4', label: 'L4 Subsystem' }, { key: 'L5', label: 'L5 Integrated (IST)' },
-        { key: 'ist', label: 'IST scenarios' }, { key: 'sat', label: 'Site Acceptance' }, { key: 'fat', label: 'Factory Acceptance' },
-        { key: 'punchlist', label: 'Punchlist burndown' },
+    /* DE1 (owner: "L1 itu apa kepanjangannya") — nama lengkap + penjelasan per
+     * level; label render "L1 — Factory Witness & Verification" dan tooltip
+     * menjelaskan isi level (basis industri Cx Level 1-5 / ASHRAE-NEBB). */
+    const READY_KEYS: { key: string; label: string; full: string; desc: string }[] = [
+        { key: 'L1', label: 'L1 — Factory Witness', full: 'Level 1: Factory Witness & Verification', desc: 'Verifikasi & witness test di PABRIK sebelum kirim: inspeksi rakitan, relay/CT test, transformer test. Termasuk dokumentasi FAT per unit.' },
+        { key: 'L2', label: 'L2 — Site Inspection', full: 'Level 2: Site Acceptance / Component Verification', desc: 'Inspeksi kedatangan di SITE: visual, kelengkapan, kabel & tekanan, penyimpanan benar — komponen siap dipasang.' },
+        { key: 'L3', label: 'L3 — Startup / Pre-Functional', full: 'Level 3: System Startup & Pre-Functional', desc: 'Energize & startup per sistem: breaker, genset load bank, chiller startup, kontrol hidup — sistem menyala sesuai spesifikasi.' },
+        { key: 'L4', label: 'L4 — Functional Performance', full: 'Level 4: Functional Performance Test', desc: 'Uji performa fungsi per subsistem: flow/air balance, VFD, kapasitas & respon kontrol pada beban riil.' },
+        { key: 'L5', label: 'L5 — IST (Integrated)', full: 'Level 5: Integrated Systems Test', desc: 'Uji TERINTEGRASI seluruh fasilitas: skenario kegagalan (pull-the-plug, transfer genset/UPS, redundansi N+1/2N) sesuai target tier.' },
+        { key: 'ist', label: 'IST scenarios', full: 'Integrated Systems Test scenarios', desc: 'Jumlah skenario IST yang lulus — skenario dari tier requirement (mis. utility fail, single-path loss).' },
+        { key: 'sat', label: 'SAT — Site Acceptance', full: 'Site Acceptance Test', desc: 'Penerimaan akhir di site: review dokumen, training operator, closeout — serah terima operasional.' },
+        { key: 'fat', label: 'FAT — Factory Acceptance', full: 'Factory Acceptance Test', desc: 'Uji penerimaan di pabrik (sebelum L1 witness): unit memenuhi spec kontrak sebelum pengiriman.' },
+        { key: 'punchlist', label: 'Punchlist burndown', full: 'Punchlist burndown', desc: 'Penyelesaian daftar temuan (defect/incomplete) — harus turun ke nol atau ber-waiver sebelum handover.' },
     ];
 
     return (
@@ -213,7 +221,7 @@ export function CommissioningEnginePage() {
                                 <button onClick={() => setOpenLevel(open ? null : key)}
                                     className="flex w-full items-center gap-2 px-4 py-2.5 text-left">
                                     <ChevronDown className={`h-3.5 w-3.5 text-slate-400 transition-transform ${open ? '' : '-rotate-90'}`} />
-                                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-100">{rk.label}</span>
+                                    <span title={`${rk.full} — ${rk.desc}`} className="text-xs font-semibold text-slate-800 dark:text-slate-100">{rk.label}</span>
                                     <span className="rounded bg-violet-500/10 px-1.5 py-0.5 text-[8.5px] font-semibold text-violet-400"
                                         title="Engine readiness weight">w {Math.round(((rzData()?.commissioning?.weights ?? {})[key] ?? 0) * 100)}%</span>
                                     <div className="ml-2 h-1.5 w-32 overflow-hidden rounded bg-slate-100 dark:bg-slate-800"
@@ -366,7 +374,7 @@ export function CommissioningEnginePage() {
                                     const v = derived != null ? derived : t.completion[rk.key];
                                     return (
                                         <div key={rk.key} className="flex items-center gap-2 text-[11px]">
-                                            <span className="w-36 text-slate-600 dark:text-slate-300">{rk.label}</span>
+                                            <span className="w-36 cursor-help text-slate-600 dark:text-slate-300" title={`${rk.full} — ${rk.desc}`}>{rk.label} <span className="text-[8px] text-slate-400">ⓘ</span></span>
                                             <input type="range" min={0} max={100} step={5}
                                                 value={v == null ? 0 : Math.round(v * 100)}
                                                 disabled={derived != null}

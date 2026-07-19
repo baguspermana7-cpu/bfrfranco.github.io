@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.94.4 — 2026-07-19 (Cx level explainers)
+
+### Added
+- **Commissioning levels explain themselves** (owner: "L1 itu apa kepanjangannya, misal FAT"): every readiness key renamed with its full meaning (L1 — Factory Witness, L2 — Site Inspection, L3 — Startup/Pre-Functional, L4 — Functional Performance, L5 — IST Integrated, SAT/FAT expanded) + hover explainer describing what each level covers (industry Cx Level 1-5 basis) on both the checklist accordion and the slider rows.
+
+---
+
 ## v1.94.3 — 2026-07-19 (site score explainers — every criterion self-explanatory)
 
 ### Added
