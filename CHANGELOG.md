@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.93.1 — 2026-07-19 (DC-hub city dropdown)
+
+### Added
+- **City / Region is no longer free-typing** (owner: "kok isi manual"): new `DC_CITIES` table — 2-4 real DC-hub cities WITH coordinates for all 40 countries (Ashburn/Dallas/Phoenix/SV, Jakarta/Bekasi-Cikarang/Batam, Madrid/Barcelona/Zaragoza, Muscat/Salalah/Duqm, Hamina, Johor/Cyberjaya, NEOM, Luleå…). Requirements 1.1 City field becomes a dropdown-first combobox (datalist — custom entry still allowed) filtered by the selected country. City coordinates feed the upcoming real-map pin placement.
+
+---
+
 ## v1.93.0 — 2026-07-19 (COUNTRY EXPANSION — 32 → 40 markets)
 
 ### Added

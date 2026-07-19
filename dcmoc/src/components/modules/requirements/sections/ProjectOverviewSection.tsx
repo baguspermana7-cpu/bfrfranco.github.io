@@ -10,6 +10,7 @@ import { useRequirementsStore } from '@/store/requirements';
 import { useCapexStore } from '@/store/capex';
 import { compressToWebp, dataUrlBytes } from '@/lib/imageCompress';
 import { CountrySelect } from '@/components/ui/CountrySelect';
+import { DC_CITIES } from '@/constants/geo';
 import { writeSharedCountry, USE_CASE_LABELS } from '@/lib/requirementsMappings';
 import { SectionCard, Field, TextInput, Select, Segmented, QuarterPicker, NumInput } from '../ui';
 import type { SiteStatus, Industry, GridVoltage, ProjectType } from '@/store/requirements';
@@ -103,7 +104,16 @@ export function ProjectOverviewSection() {
                 <Field label="Project Owner"><TextInput value={o.projectOwner} onChange={(v) => set({ projectOwner: v })} placeholder="Owning entity" /></Field>
 
                 <Field label="Project Code"><TextInput value={o.projectCode} onChange={(v) => set({ projectCode: v })} placeholder="e.g. GDC-150MW-001" /></Field>
-                <Field label="City / Region"><TextInput value={o.cityRegion} onChange={(v) => set({ cityRegion: v })} placeholder="City, region" /></Field>
+                <Field label="City / Region" hint="Pilih kota DC-hub (dropdown) atau ketik custom">
+                    <>
+                        <input list="dc-city-options" value={o.cityRegion} onChange={(e) => set({ cityRegion: e.target.value })}
+                            placeholder="Pilih / ketik kota"
+                            className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm text-slate-900 focus:border-violet-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-white" />
+                        <datalist id="dc-city-options">
+                            {(DC_CITIES[country?.id ?? 'ID'] ?? []).map((c) => <option key={c.name} value={c.name} />)}
+                        </datalist>
+                    </>
+                </Field>
                 <Field label="Development Partner"><TextInput value={o.developmentPartner} onChange={(v) => set({ developmentPartner: v })} placeholder="Optional" /></Field>
 
                 <Field label="Customer / Tenant"><TextInput value={o.customer} onChange={(v) => set({ customer: v })} placeholder="Anchor customer" /></Field>
