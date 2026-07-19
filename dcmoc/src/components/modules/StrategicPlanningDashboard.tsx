@@ -278,6 +278,10 @@ export default function StrategicPlanningDashboard() {
                     Land feasibility, site acquisition analysis, and multi-phase expansion scheduling
                 </p>
             </div>
+            {/* #335 — PURPOSE (owner bingung fungsinya): halaman OUTPUT analisis strategis. */}
+            <p className="rounded-lg border border-violet-500/30 bg-violet-600/5 px-3 py-2 text-[11px] text-slate-600 dark:text-slate-300">
+                <b>Untuk apa halaman ini:</b> analisis strategis TURUNAN dari data project yang sudah kamu isi — (1) <b>Feasibility</b>: apakah lahan/grid/iklim site sanggup menampung target MW; (2) <b>Expansion</b>: kapan & berapa fase ekspansi berdasar pertumbuhan demand; (3) <b>Acquisition</b>: banding beli-vs-bangun dgn comparables pasar. Input yang sudah ada di menu lain TERKUNCI di sini (satu sumber) — edit di menu asalnya; hanya parameter analisis lokal (growth, horizon, comparables) yang diisi di sini.
+            </p>
 
             {/* Mode Selector */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -322,6 +326,8 @@ export default function StrategicPlanningDashboard() {
                                 type="number"
                                 className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
                                 value={feasibility.landAreaM2}
+                                disabled={derivedFeas.landAreaM2 != null}
+                                title={derivedFeas.landAreaM2 != null ? 'Derived dari Site Intelligence — edit di sana (#335 dedup)' : undefined}
                                 onChange={e => setFeasibility(f => ({ ...f, landAreaM2: Number(e.target.value) }))}
                             />
                             <div className="text-[10px] text-slate-400 mt-0.5">Hall floor approx: {Math.round(feasibility.landAreaM2 * 0.40).toLocaleString()} m²</div>
@@ -336,6 +342,8 @@ export default function StrategicPlanningDashboard() {
                                 type="number"
                                 className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
                                 value={feasibility.gridCapacityMW}
+                                disabled={derivedFeas.gridCapacityMW != null}
+                                title={derivedFeas.gridCapacityMW != null ? 'Derived dari Site Intelligence — edit di sana (#335 dedup)' : undefined}
                                 onChange={e => setFeasibility(f => ({ ...f, gridCapacityMW: Number(e.target.value) }))}
                             />
                         </div>
@@ -348,6 +356,8 @@ export default function StrategicPlanningDashboard() {
                             <select
                                 className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
                                 value={feasibility.climateZone}
+                                disabled={derivedFeas.climateZone != null}
+                                title={derivedFeas.climateZone != null ? 'Derived dari negara/site — edit di sana (#335 dedup)' : undefined}
                                 onChange={e => setFeasibility(f => ({ ...f, climateZone: e.target.value as FeasibilityInputs['climateZone'] }))}
                             >
                                 {(Object.keys(CLIMATE_LABELS) as FeasibilityInputs['climateZone'][]).map(z => (
@@ -555,6 +565,7 @@ export default function StrategicPlanningDashboard() {
                                 type="number" min={0.5} step={0.5}
                                 className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
                                 value={expansion.currentFootprintMW}
+                                disabled title="≡ IT Load project (Requirements) — satu sumber, edit di sana (#335 dedup)"
                                 onChange={e => setExpansion(x => ({ ...x, currentFootprintMW: Number(e.target.value) }))}
                             />
                         </div>
@@ -600,6 +611,7 @@ export default function StrategicPlanningDashboard() {
                                 type="number" step={100000}
                                 className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
                                 value={expansion.capexPerMW}
+                                disabled title="≡ CAPEX engine $/MW hasil — edit asumsi CAPEX (#335 dedup)"
                                 onChange={e => setExpansion(x => ({ ...x, capexPerMW: Number(e.target.value) }))}
                             />
                         </div>

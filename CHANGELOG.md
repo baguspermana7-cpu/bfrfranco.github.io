@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.94.6 — 2026-07-19 (Strategic Planning — purpose + duplicate inputs locked)
+
+### Changed
+- **Strategic Planning explains itself and stops re-asking** (owner: "bingung untuk apa; parameter tidak perlu diisi karena sudah ada"): a purpose banner states the three analyses (Feasibility fit / Expansion timing / Acquisition buy-vs-build) and the rule — inputs that already exist elsewhere are LOCKED here (land/grid/climate from Site Intelligence, target PUE from the engine, current footprint ≡ Requirements IT load, capex $/MW ≡ CAPEX engine) with edit-at-source hovers; only analysis-local parameters (growth %, horizon, comparables) stay editable.
+
+---
+
 ## v1.94.5 — 2026-07-19 (At-Risk remediation guidance — capacity equipment)
 
 ### Added
