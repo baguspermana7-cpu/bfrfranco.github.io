@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.91.6 — 2026-07-19 (on-page grade guidance — Carbon/ESG first)
+
+### Added
+- **Carbon/ESG Rating now explains itself on-page** (owner: "Rating F itu kenapa, apa yang di-finetune"): a guidance panel under the header renders the SAME deterministic assessment the PDF uses — profile chip + narrative (why this band, which inputs drive it) + prioritized HIGH/MED/LOW actions naming the parameter to adjust (PUE via cooling class, renewable share, etc.). Pattern (buildAssessment/buildActions live on-page) rolls out to every grade/rating chip app-wide in the next slices.
+
+---
+
 ## v1.91.5 — 2026-07-19 (scale-aware maintenance fleet ratings)
 
 ### Fixed

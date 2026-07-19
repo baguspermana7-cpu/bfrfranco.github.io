@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import { useSimulationStore } from '@/store/simulation';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 import { useCapexStore } from '@/store/capex';
@@ -73,6 +74,10 @@ const CarbonDashboard = () => {
                     <div className={`px-4 py-2 rounded-xl border text-xl font-bold ${ratingColors[result.efficiencyRating]} flex items-center gap-1`}>
                         Rating: {result.efficiencyRating}<Tooltip content="Efficiency rating from A (best) to F (worst) based on PUE, carbon intensity, and renewable energy adoption. A = hyperscale-class efficiency, F = legacy facility with high emissions." />
                     </div>
+                    {/* #328 — algorithmic on-page guidance beside the grade (owner:
+                      * "rating F itu kenapa & apa yang di-finetune"): the SAME
+                      * deterministic assessment/actions the PDF uses, rendered live. */}
+
                     <ExportPDFButton
                         isGenerating={isExporting}
                         onExport={async () => {
@@ -90,6 +95,36 @@ const CarbonDashboard = () => {
                     />
                 </div>
             </div>
+
+            {/* #328 — WHY this grade + WHAT to fine-tune (deterministic, same
+              * rubric as the PDF assessment; renders live from the model). */}
+            {(() => {
+                const met = { pue: result.pueEfficiency, renewablePct: result.renewableReductionPct ?? 0 };
+                const assess = buildAssessment('sustainability', met);
+                const acts = buildActions('sustainability', met);
+                return (
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-700/70 bg-white dark:bg-slate-800/50 p-4">
+                        <div className="flex flex-wrap items-start gap-3">
+                            <div className="shrink-0 rounded-lg px-3 py-2 text-center text-white" style={{ background: assess.color }}>
+                                <div className="text-[9px] uppercase opacity-80">Profile</div>
+                                <div className="text-sm font-bold">{assess.label}</div>
+                                <div className="text-[10px] opacity-90">{assess.valueLine}</div>
+                            </div>
+                            <p className="min-w-0 flex-1 text-xs leading-relaxed text-slate-600 dark:text-slate-300">{assess.narrative}</p>
+                        </div>
+                        {acts.length > 0 && (
+                            <div className="mt-3 space-y-1">
+                                {acts.map((a, i) => (
+                                    <div key={i} className="flex items-start gap-2 text-[11px] text-slate-600 dark:text-slate-300">
+                                        <span className={`shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold text-white ${a.priority === 'HIGH' ? 'bg-red-600' : a.priority === 'MEDIUM' ? 'bg-amber-600' : 'bg-emerald-600'}`}>{a.priority}</span>
+                                        <span>{a.action}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                );
+            })()}
 
             {/* KPI Row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
