@@ -84,6 +84,36 @@ export const TRACE: Record<string, TraceNode> = {
         deps: ['capex.total', 'sim.itLoad'],
         get: () => { const t = cap().results?.total; return t ? +(t / Math.max(1, cap().inputs.itLoad)).toFixed(0) : null; },
     },
+    /* ── EB batch-3: opex / staffing / availability chains ── */
+    'staff.fte': {
+        label: 'Total FTE (auto headcount)', page: 'staff', provenance: 'derived',
+        formulaTemplate: 'core shift 24×7 + marginal × (sim.itLoad ÷ 1000 ÷ 10)^0.65 — kalibrasi benchmark Uptime',
+        deps: ['sim.itLoad'],
+        get: () => {
+            const i = sim().inputs;
+            return (i.headcount_ShiftLead ?? 0) + (i.headcount_Engineer ?? 0) + (i.headcount_Technician ?? 0) + (i.headcount_Admin ?? 0) + (i.headcount_Janitor ?? 0);
+        },
+    },
+    'rel.tierTarget': {
+        label: 'Tier Availability Target', page: 'reliability', unit: '%', provenance: 'engine', sourceKey: 'reliability',
+        external: { href: '/glossary.html#tier', label: 'Glossary: Tier' },
+        get: () => {
+            const t = (rzData() as { reliability?: { tierAvailability?: Record<string, number> } }).reliability?.tierAvailability?.[String(sim().inputs.tierLevel)];
+            return t ? +(t * 100).toFixed(4) : null;
+        },
+    },
+    'opex.totalAnnual': {
+        label: 'OPEX Tahunan (dcContract)', page: 'finance', unit: '$', provenance: 'engine',
+        formulaTemplate: 'models.opex.totalAnnual(sim.itLoad, negara, staff.fte — basis dcContract)',
+        deps: ['sim.itLoad', 'staff.fte'],
+        get: () => {
+            try {
+                const m = (rzModels() as { opex?: { totalAnnual?: (inp: Record<string, unknown>) => { total?: number } } }).opex;
+                const r = m?.totalAnnual?.({ itLoadKw: sim().inputs.itLoad, countryId: sim().selectedCountry?.id, basisPreset: 'dcContract' });
+                return r?.total ?? null;
+            } catch { return null; }
+        },
+    },
 };
 
 export interface ResolvedTrace {

@@ -8,6 +8,7 @@
  * ──────────────────────────────────────────────────────────────────────── */
 
 import React from 'react';
+import { TraceValue } from '@/components/ui/TraceValue';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Legend, BarChart, Bar } from 'recharts';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
@@ -133,7 +134,7 @@ export function CapexEnginePage() {
                     {/* KPI row */}
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'Total CAPEX (P50)', value: fmtMoney(band.p50), sub: 'base estimate' },
+                            { label: 'Total CAPEX (P50)', value: fmtMoney(band.p50), sub: 'base estimate', trace: 'capex.total' },
                             { label: 'P80 (Risk-Adjusted)', value: fmtMoney(band.p80), sub: `+${(((band.p80 - band.p50) / band.p50) * 100).toFixed(1)}% vs P50` },
                             { label: 'P10 (Optimistic)', value: fmtMoney(band.p10), sub: `${(((band.p10 - band.p50) / band.p50) * 100).toFixed(1)}% vs P50` },
                             { label: '$ / kW', value: `$${perKw.toLocaleString()}`, sub: `${(inputs.itLoad / 1000).toFixed(1)} MW IT` },
@@ -142,7 +143,13 @@ export function CapexEnginePage() {
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
-                                <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                {(k as { trace?: string }).trace ? (
+                                    <TraceValue traceId={(k as { trace?: string }).trace!}>
+                                        <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                    </TraceValue>
+                                ) : (
+                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                )}
                                 <div className="truncate text-[10px] text-slate-500">{k.sub}</div>
                             </div>
                         ))}

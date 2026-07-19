@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.92.5 — 2026-07-19 (trace graph batch 3)
+
+### Added
+- Trace graph extended: `staff.fte` (sub-linear headcount chain, formula shows the MW^0.65 calibration), `rel.tierTarget` (engine tier availability, glossary-linked), `opex.totalAnnual` (engine dcContract basis, deps on IT load + FTE). CAPEX Engine page KPI grid is now trace-aware — Total CAPEX (P50) is click-to-trace; the render pattern (`trace` key on KPI rows) rolls out to every KPI grid next.
+
+---
+
 ## v1.92.4 — 2026-07-19 (trace cross-surface links + trace standard)
 
 ### Added
