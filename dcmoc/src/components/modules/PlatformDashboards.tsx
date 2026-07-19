@@ -30,16 +30,19 @@ const pct = (n: number) => `${Math.round(n * 100)}%`;
 /* ── Data Library — browse the canonical engine DATA (single source) ── */
 export function DataLibraryDashboard() {
     const d = rzData();
-    const [tab, setTab] = React.useState<'countries' | 'markets' | 'pue' | 'refrigerants'>('countries');
+    const [tab, setTab] = React.useState<'countries' | 'markets' | 'pue' | 'refrigerants' | 'sources'>('countries');
+    const [srcQuery, setSrcQuery] = React.useState('');
     const countries = d.countries || {};
     const markets = d.markets || {};
     const pue = d.pueMatrix || {};
     const refr = d.refrigerants || {};
+    const sources = (d.sources || {}) as Record<string, { source?: string; asOf?: string; method?: string; unit?: string }>;
     const tabs: [typeof tab, string, number][] = [
         ['countries', 'Countries', Object.keys(countries).length],
         ['markets', 'Markets', Object.keys(markets).length],
         ['pue', 'PUE Matrix', Object.keys(pue).length],
         ['refrigerants', 'Refrigerants', Object.keys(refr).length],
+        ['sources', 'Provenance', Object.keys(sources).length],
     ];
     return (
         <div className="space-y-4">
@@ -50,7 +53,33 @@ export function DataLibraryDashboard() {
                 ))}
             </div>
             <Card className="overflow-x-auto">
-                {tab === 'countries' && (
+                {tab === 'sources' && (
+                <Card>
+                    <div className="mb-2 flex items-center gap-2">
+                        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">DATA.sources — provenance ledger ({Object.keys(sources).length} entries)</h2>
+                        <input value={srcQuery} onChange={(e) => setSrcQuery(e.target.value)} placeholder="Search key/source…"
+                            className="ml-auto w-56 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1 text-xs outline-none focus:border-cyan-400 text-slate-900 dark:text-slate-100" />
+                    </div>
+                    <div className="max-h-[480px] overflow-y-auto">
+                        <table className="w-full text-[11px]">
+                            <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400 sticky top-0 bg-white dark:bg-slate-900"><th className="py-1 text-left">Data key</th><th className="text-left">Source</th><th className="text-right">As of</th></tr></thead>
+                            <tbody>
+                                {Object.entries(sources)
+                                    .filter(([k, v]) => !srcQuery || (k + ' ' + (v.source ?? '')).toLowerCase().includes(srcQuery.toLowerCase()))
+                                    .map(([k, v]) => (
+                                        <tr key={k} className="border-b border-slate-100 dark:border-slate-800/60 align-top">
+                                            <td className="py-1 pr-2 font-mono text-cyan-600 dark:text-cyan-400">{k}</td>
+                                            <td className="pr-2 text-slate-600 dark:text-slate-300">{v.source ?? '—'}{v.method && <span className="block text-[9px] text-slate-400">{v.method}</span>}</td>
+                                            <td className="text-right tabular-nums text-slate-500">{v.asOf ?? '—'}</td>
+                                        </tr>
+                                    ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p className="mt-1.5 text-[9px] text-slate-400">Every economically-material DATA value in the engine carries a source + as-of date (gate-enforced). Read-only.</p>
+                </Card>
+            )}
+            {tab === 'countries' && (
                     <table className="w-full text-xs min-w-[560px]">
                         <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Country</th><th className="pr-3">Region</th><th className="pr-3 text-right">Electricity $/kWh</th><th className="pr-3 text-right">Tax</th><th className="pr-3 text-right">Grid kgCO₂/kWh</th><th className="text-right">Constr. idx</th></tr></thead>
                         <tbody>{(Object.values(countries) as Record<string, unknown>[]).map((c) => {

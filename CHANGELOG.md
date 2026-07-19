@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.84.3 — 2026-07-19 (DCMOC: Data Library provenance browser)
+
+### Added
+- **Data Library "Provenance" tab**: searchable read-only browser over the engine's `DATA.sources` ledger (80 entries) — data key, source citation, method, as-of date. Surfaces the gate-enforced provenance discipline (every economically-material DATA value carries a source) directly in the platform UI.
+
 ## v1.84.2 — 2026-07-19 (DCMOC platform perfection: promised bindings + project breadcrumb)
 
 ### Changed
