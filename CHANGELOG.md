@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.93.0 — 2026-07-19 (COUNTRY EXPANSION — 32 → 40 markets)
+
+### Added
+- **8 new country profiles** (owner: "tidak ada Oman, Finland, Madrid dll yang penting"): **Oman** (Duqm/Salalah zones, $0.07/kWh), **Finland** (Hamina, grid 0.08 kgCO2), **Spain** (Madrid/Barcelona/Aragón), **Canada** (Toronto/Montreal, Québec hydro note), **Italy** (Milan), **Norway** (hydro 0.03), **Denmark** (Copenhagen/Odense), **Switzerland** (Zurich, highest labor rates) — full profiles (economy/labor/compliance/environment/risk/tax-incentives/disaster/grid/talent/fuel) in the authoring source, screening-labeled per value; SITE_AUGMENT rows (Aqueduct/ASHRAE/SAIDI/PGA); COUNTRY_GEO anchors (DC-hub cities). `DATA.currency` +OMR/CAD/NOK/DKK/CHF (gateway /fx-verified). Engine regenerated: parity gate now 155/0 (was 126), engine gate count pin 32→40. All country dropdowns, site engines, fuel/tax/talent/grid analyses cover the new markets automatically.
+
+---
+
 ## v1.92.6 — 2026-07-19 (on-page guidance — Reliability)
 
 ### Added

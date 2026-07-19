@@ -60,7 +60,7 @@
         },
 
         // Static currency rates (USD = 1.0 baseline), refreshed 2026-04. Update annually.
-        currency: { USD: 1.0, EUR: 0.92, GBP: 0.79, JPY: 152, INR: 83.5, MYR: 4.45, IDR: 16250, SGD: 1.35, AUD: 1.52, BRL: 5.05, CLP: 950, CNY: 7.15, COP: 4100, KES: 129, KRW: 1360, MXN: 18.5, NZD: 1.65, PHP: 58, PLN: 4.0, QAR: 3.64, SAR: 3.75, SEK: 10.6, THB: 36, TWD: 32, VND: 25400, ZAR: 18.5 },
+        currency: { USD: 1.0, EUR: 0.92, GBP: 0.79, JPY: 152, INR: 83.5, MYR: 4.45, IDR: 16250, SGD: 1.35, AUD: 1.52, BRL: 5.05, CLP: 950, CNY: 7.15, COP: 4100, KES: 129, KRW: 1360, MXN: 18.5, NZD: 1.65, PHP: 58, PLN: 4.0, QAR: 3.64, SAR: 3.75, SEK: 10.6, THB: 36, TWD: 32, VND: 25400, ZAR: 18.5, OMR: 0.385, CAD: 1.40, NOK: 10.5, DKK: 6.54, CHF: 0.81 }, // +5 for the 40-country expansion (gateway /fx-verified 2026-07)
 
         // Annual inflation rate per region (flat; year-by-year curve is optional via forecast useInflation)
         inflationAnnual: { US: 0.028, EU: 0.024, APAC: 0.030, LATAM: 0.040 },
@@ -3936,6 +3936,948 @@
                     "fuelQualityRating": "high"
                 },
                 "lastUpdated": "2026-Q1"
+            },
+            "OM": {
+                "id": "OM",
+                "region": "MENA",
+                "name": "Oman",
+                "currency": "OMR",
+                "currencySymbol": "ر.ع.",
+                "economy": {
+                    "inflationRate": 0.015,
+                    "laborEscalation": 0.03,
+                    "taxRate": 0.15,
+                    "electricityRate": 0.07
+                },
+                "labor": {
+                    "minimumWage": 850,
+                    "baseSalary_ShiftLead": 4200,
+                    "baseSalary_Engineer": 3400,
+                    "baseSalary_Technician": 2000,
+                    "baseSalary_Admin": 1600,
+                    "baseSalary_Janitor": 900,
+                    "laborRatePerHour": 20,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.25,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 1.5,
+                            "ninthHour": 1.5,
+                            "tenthHourPlus": 1.5
+                        }
+                    },
+                    "shrinkageFactor": 0.12,
+                    "leaves": {
+                        "annual": 30,
+                        "publicHolidays": 9,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "Oman Civil Defence",
+                        "MTCIT License",
+                        "OPWP Grid Code"
+                    ],
+                    "annualComplianceCost": 10000
+                },
+                "environment": {
+                    "baselineAQI": 90,
+                    "gridCarbonIntensity": 0.48,
+                    "aqueductStressScore": 5,
+                    "ashraeClimateZone": "1B",
+                    "saidiMinYr": 60,
+                    "pgaPct2in50yr": 10
+                },
+                "risk": {
+                    "downtimeCostPerMin": 2000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.05
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Duqm SEZ",
+                        "Salalah Free Zone",
+                        "Sohar Free Zone"
+                    ],
+                    "taxHolidayYears": 30,
+                    "taxHolidayRate": 0,
+                    "incentivePrograms": [
+                        "Duqm SEZ 30yr tax holiday",
+                        "Salalah FZ 0% CIT",
+                        "Vision 2040 digital infrastructure"
+                    ],
+                    "importDutyExemption": true,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0
+                },
+                "naturalDisaster": {
+                    "seismicZone": 1,
+                    "floodRisk": "low",
+                    "typhoonRisk": "low",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "low",
+                    "compositeScore": 12,
+                    "insuranceMultiplier": 1.05,
+                    "structuralReinforcement": 0
+                },
+                "gridReliability": {
+                    "gridUptime": 99.95,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 2,
+                    "averageOutageDuration": 10,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 40
+                },
+                "talentPool": {
+                    "dcEngineerPool": "scarce",
+                    "universityPipeline": 4,
+                    "hyperscalerPresence": 1,
+                    "avgHiringDays": 45,
+                    "salaryPremium": 1.1,
+                    "talentScore": 45,
+                    "certifiedProfessionals": 150
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 0.6,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": false,
+                    "hvoPricePerLiter": 0,
+                    "fuelTaxRate": 0,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": false,
+                    "storageLimitLiters": 100000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q3"
+            },
+            "FI": {
+                "id": "FI",
+                "region": "EMEA",
+                "name": "Finland",
+                "currency": "EUR",
+                "currencySymbol": "€",
+                "economy": {
+                    "inflationRate": 0.018,
+                    "laborEscalation": 0.025,
+                    "taxRate": 0.2,
+                    "electricityRate": 0.09
+                },
+                "labor": {
+                    "minimumWage": 2400,
+                    "baseSalary_ShiftLead": 7000,
+                    "baseSalary_Engineer": 5800,
+                    "baseSalary_Technician": 4300,
+                    "baseSalary_Admin": 3400,
+                    "baseSalary_Janitor": 2700,
+                    "laborRatePerHour": 35,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 2
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.1,
+                    "leaves": {
+                        "annual": 25,
+                        "publicHolidays": 13,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "SFS Standards",
+                        "Tukes",
+                        "Energiavirasto"
+                    ],
+                    "annualComplianceCost": 12000
+                },
+                "environment": {
+                    "baselineAQI": 8,
+                    "gridCarbonIntensity": 0.08,
+                    "aqueductStressScore": 1,
+                    "ashraeClimateZone": "6A",
+                    "saidiMinYr": 30,
+                    "pgaPct2in50yr": 2
+                },
+                "risk": {
+                    "downtimeCostPerMin": 4000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Hamina DC Hub"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.2,
+                    "incentivePrograms": [
+                        "Reduced electricity tax class II for DCs",
+                        "Business Finland RDI grants",
+                        "District-heat reuse credits"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0.2
+                },
+                "naturalDisaster": {
+                    "seismicZone": 0,
+                    "floodRisk": "low",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 4,
+                    "insuranceMultiplier": 1,
+                    "structuralReinforcement": 0
+                },
+                "gridReliability": {
+                    "gridUptime": 99.999,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 0,
+                    "averageOutageDuration": 2,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 24,
+                    "renewableReadiness": 90
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 9,
+                    "hyperscalerPresence": 3,
+                    "avgHiringDays": 45,
+                    "salaryPremium": 1.1,
+                    "talentScore": 60,
+                    "certifiedProfessionals": 500
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.9,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.6,
+                    "fuelTaxRate": 0.2,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q3"
+            },
+            "ES": {
+                "id": "ES",
+                "region": "EMEA",
+                "name": "Spain",
+                "currency": "EUR",
+                "currencySymbol": "€",
+                "economy": {
+                    "inflationRate": 0.025,
+                    "laborEscalation": 0.035,
+                    "taxRate": 0.25,
+                    "electricityRate": 0.13
+                },
+                "labor": {
+                    "minimumWage": 1250,
+                    "baseSalary_ShiftLead": 4200,
+                    "baseSalary_Engineer": 3300,
+                    "baseSalary_Technician": 2500,
+                    "baseSalary_Admin": 1900,
+                    "baseSalary_Janitor": 1300,
+                    "laborRatePerHour": 20,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.25,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.14,
+                    "leaves": {
+                        "annual": 22,
+                        "publicHolidays": 14,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "UNE Standards",
+                        "REBT",
+                        "CNMC Grid Access"
+                    ],
+                    "annualComplianceCost": 12000
+                },
+                "environment": {
+                    "baselineAQI": 25,
+                    "gridCarbonIntensity": 0.15,
+                    "aqueductStressScore": 4,
+                    "ashraeClimateZone": "3B",
+                    "saidiMinYr": 50,
+                    "pgaPct2in50yr": 6
+                },
+                "risk": {
+                    "downtimeCostPerMin": 3500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.05
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Zona Franca Barcelona",
+                        "Aragón DC corridor",
+                        "Canary Islands ZEC"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.25,
+                    "incentivePrograms": [
+                        "Aragón hyperscale land+grid incentives",
+                        "PERTE digitalization funds",
+                        "Canary ZEC 4% CIT"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": true,
+                    "effectiveTaxRate": 0.25
+                },
+                "naturalDisaster": {
+                    "seismicZone": 1,
+                    "floodRisk": "low",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 12,
+                    "insuranceMultiplier": 1.05,
+                    "structuralReinforcement": 0
+                },
+                "gridReliability": {
+                    "gridUptime": 99.96,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 1,
+                    "averageOutageDuration": 8,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0.02,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 70
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 18,
+                    "hyperscalerPresence": 5,
+                    "avgHiringDays": 38,
+                    "salaryPremium": 1.05,
+                    "talentScore": 62,
+                    "certifiedProfessionals": 700
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.55,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.05,
+                    "fuelTaxRate": 0.12,
+                    "deliveryLeadDays": 2,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q3"
+            },
+            "CA": {
+                "id": "CA",
+                "region": "AMER",
+                "name": "Canada",
+                "currency": "CAD",
+                "currencySymbol": "C$",
+                "economy": {
+                    "inflationRate": 0.02,
+                    "laborEscalation": 0.03,
+                    "taxRate": 0.265,
+                    "electricityRate": 0.08
+                },
+                "labor": {
+                    "minimumWage": 2300,
+                    "baseSalary_ShiftLead": 6500,
+                    "baseSalary_Engineer": 5400,
+                    "baseSalary_Technician": 4000,
+                    "baseSalary_Admin": 3200,
+                    "baseSalary_Janitor": 2500,
+                    "laborRatePerHour": 32,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 1.5,
+                            "ninthHour": 1.5,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.1,
+                    "leaves": {
+                        "annual": 15,
+                        "publicHolidays": 11,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "CSA Standards",
+                        "ESA/RBQ Electrical",
+                        "Provincial Permits"
+                    ],
+                    "annualComplianceCost": 13000
+                },
+                "environment": {
+                    "baselineAQI": 15,
+                    "gridCarbonIntensity": 0.13,
+                    "aqueductStressScore": 2,
+                    "ashraeClimateZone": "6A",
+                    "saidiMinYr": 180,
+                    "pgaPct2in50yr": 15
+                },
+                "risk": {
+                    "downtimeCostPerMin": 4500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Montréal hydro corridor",
+                        "Alberta DC zone"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.265,
+                    "incentivePrograms": [
+                        "Hydro-Québec industrial rate",
+                        "SR&ED tax credits",
+                        "Provincial DC incentives (QC/AB)"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.265
+                },
+                "naturalDisaster": {
+                    "seismicZone": 1,
+                    "floodRisk": "low",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 8,
+                    "insuranceMultiplier": 1,
+                    "structuralReinforcement": 0
+                },
+                "gridReliability": {
+                    "gridUptime": 99.97,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 1,
+                    "averageOutageDuration": 15,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 82
+                },
+                "talentPool": {
+                    "dcEngineerPool": "abundant",
+                    "universityPipeline": 25,
+                    "hyperscalerPresence": 6,
+                    "avgHiringDays": 35,
+                    "salaryPremium": 1.1,
+                    "talentScore": 72,
+                    "certifiedProfessionals": 1200
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.2,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 1.8,
+                    "fuelTaxRate": 0.1,
+                    "deliveryLeadDays": 2,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 100000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q3"
+            },
+            "IT": {
+                "id": "IT",
+                "region": "EMEA",
+                "name": "Italy",
+                "currency": "EUR",
+                "currencySymbol": "€",
+                "economy": {
+                    "inflationRate": 0.02,
+                    "laborEscalation": 0.03,
+                    "taxRate": 0.279,
+                    "electricityRate": 0.18
+                },
+                "labor": {
+                    "minimumWage": 1250,
+                    "baseSalary_ShiftLead": 4500,
+                    "baseSalary_Engineer": 3600,
+                    "baseSalary_Technician": 2700,
+                    "baseSalary_Admin": 2100,
+                    "baseSalary_Janitor": 1400,
+                    "laborRatePerHour": 22,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.25,
+                            "subsequent": 1.5
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.15,
+                    "leaves": {
+                        "annual": 22,
+                        "publicHolidays": 12,
+                        "sickAverage": 6
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "CEI Standards",
+                        "VVF Fire Cert",
+                        "ARERA Grid Access"
+                    ],
+                    "annualComplianceCost": 14000
+                },
+                "environment": {
+                    "baselineAQI": 35,
+                    "gridCarbonIntensity": 0.25,
+                    "aqueductStressScore": 3,
+                    "ashraeClimateZone": "4A",
+                    "saidiMinYr": 45,
+                    "pgaPct2in50yr": 20
+                },
+                "risk": {
+                    "downtimeCostPerMin": 3500
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1.05
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Trieste Free Port",
+                        "ZES Unica (South)"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.279,
+                    "incentivePrograms": [
+                        "Transizione 5.0 credits",
+                        "ZES Unica South incentives",
+                        "Industria 4.0 hyper-depreciation"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.279
+                },
+                "naturalDisaster": {
+                    "seismicZone": 2,
+                    "floodRisk": "moderate",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "low",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 25,
+                    "insuranceMultiplier": 1.15,
+                    "structuralReinforcement": 0.03
+                },
+                "gridReliability": {
+                    "gridUptime": 99.95,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 2,
+                    "averageOutageDuration": 10,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0.02,
+                    "recommendedGenHours": 48,
+                    "renewableReadiness": 55
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 20,
+                    "hyperscalerPresence": 4,
+                    "avgHiringDays": 40,
+                    "salaryPremium": 1.05,
+                    "talentScore": 58,
+                    "certifiedProfessionals": 600
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.75,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.2,
+                    "fuelTaxRate": 0.15,
+                    "deliveryLeadDays": 2,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q3"
+            },
+            "NO": {
+                "id": "NO",
+                "region": "EMEA",
+                "name": "Norway",
+                "currency": "NOK",
+                "currencySymbol": "kr",
+                "economy": {
+                    "inflationRate": 0.02,
+                    "laborEscalation": 0.03,
+                    "taxRate": 0.22,
+                    "electricityRate": 0.07
+                },
+                "labor": {
+                    "minimumWage": 2800,
+                    "baseSalary_ShiftLead": 7500,
+                    "baseSalary_Engineer": 6300,
+                    "baseSalary_Technician": 4700,
+                    "baseSalary_Admin": 3700,
+                    "baseSalary_Janitor": 3000,
+                    "laborRatePerHour": 38,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.4,
+                            "subsequent": 1.4
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.1,
+                    "leaves": {
+                        "annual": 25,
+                        "publicHolidays": 12,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "NEK Standards",
+                        "DSB",
+                        "NVE Grid License"
+                    ],
+                    "annualComplianceCost": 12000
+                },
+                "environment": {
+                    "baselineAQI": 8,
+                    "gridCarbonIntensity": 0.03,
+                    "aqueductStressScore": 1,
+                    "ashraeClimateZone": "6A",
+                    "saidiMinYr": 90,
+                    "pgaPct2in50yr": 5
+                },
+                "risk": {
+                    "downtimeCostPerMin": 4000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Norwegian DC power regions (Rjukan, Stavanger)"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.22,
+                    "incentivePrograms": [
+                        "Reduced el-tax for DCs",
+                        "Enova energy-efficiency grants",
+                        "Statkraft green PPAs"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.22
+                },
+                "naturalDisaster": {
+                    "seismicZone": 0,
+                    "floodRisk": "low",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 5,
+                    "insuranceMultiplier": 1,
+                    "structuralReinforcement": 0
+                },
+                "gridReliability": {
+                    "gridUptime": 99.999,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 0,
+                    "averageOutageDuration": 2,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 24,
+                    "renewableReadiness": 98
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 8,
+                    "hyperscalerPresence": 2,
+                    "avgHiringDays": 50,
+                    "salaryPremium": 1.15,
+                    "talentScore": 55,
+                    "certifiedProfessionals": 350
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.95,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.7,
+                    "fuelTaxRate": 0.2,
+                    "deliveryLeadDays": 2,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q3"
+            },
+            "DK": {
+                "id": "DK",
+                "region": "EMEA",
+                "name": "Denmark",
+                "currency": "DKK",
+                "currencySymbol": "kr",
+                "economy": {
+                    "inflationRate": 0.018,
+                    "laborEscalation": 0.025,
+                    "taxRate": 0.22,
+                    "electricityRate": 0.12
+                },
+                "labor": {
+                    "minimumWage": 2700,
+                    "baseSalary_ShiftLead": 7300,
+                    "baseSalary_Engineer": 6100,
+                    "baseSalary_Technician": 4600,
+                    "baseSalary_Admin": 3600,
+                    "baseSalary_Janitor": 2900,
+                    "laborRatePerHour": 37,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.5,
+                            "subsequent": 2
+                        },
+                        "holiday": {
+                            "first8Hours": 2,
+                            "ninthHour": 2,
+                            "tenthHourPlus": 2
+                        }
+                    },
+                    "shrinkageFactor": 0.1,
+                    "leaves": {
+                        "annual": 25,
+                        "publicHolidays": 11,
+                        "sickAverage": 5
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "DS Standards",
+                        "Sikkerhedsstyrelsen",
+                        "Energinet Grid Code"
+                    ],
+                    "annualComplianceCost": 12000
+                },
+                "environment": {
+                    "baselineAQI": 10,
+                    "gridCarbonIntensity": 0.12,
+                    "aqueductStressScore": 2,
+                    "ashraeClimateZone": "5A",
+                    "saidiMinYr": 12,
+                    "pgaPct2in50yr": 2
+                },
+                "risk": {
+                    "downtimeCostPerMin": 4000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Copenhagen/Odense DC corridor"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.22,
+                    "incentivePrograms": [
+                        "Reduced electricity tax for DCs",
+                        "Danish green power PPAs",
+                        "District-heat reuse credits"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.22
+                },
+                "naturalDisaster": {
+                    "seismicZone": 0,
+                    "floodRisk": "low",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 4,
+                    "insuranceMultiplier": 1,
+                    "structuralReinforcement": 0
+                },
+                "gridReliability": {
+                    "gridUptime": 99.998,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 0,
+                    "averageOutageDuration": 2,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 24,
+                    "renewableReadiness": 90
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 8,
+                    "hyperscalerPresence": 4,
+                    "avgHiringDays": 42,
+                    "salaryPremium": 1.1,
+                    "talentScore": 60,
+                    "certifiedProfessionals": 450
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.85,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.6,
+                    "fuelTaxRate": 0.18,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 50000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q3"
+            },
+            "CH": {
+                "id": "CH",
+                "region": "EMEA",
+                "name": "Switzerland",
+                "currency": "CHF",
+                "currencySymbol": "CHF",
+                "economy": {
+                    "inflationRate": 0.01,
+                    "laborEscalation": 0.02,
+                    "taxRate": 0.149,
+                    "electricityRate": 0.14
+                },
+                "labor": {
+                    "minimumWage": 4000,
+                    "baseSalary_ShiftLead": 9500,
+                    "baseSalary_Engineer": 8200,
+                    "baseSalary_Technician": 6200,
+                    "baseSalary_Admin": 5000,
+                    "baseSalary_Janitor": 4000,
+                    "laborRatePerHour": 55,
+                    "overtimeRules": {
+                        "workday": {
+                            "firstHour": 1.25,
+                            "subsequent": 1.25
+                        },
+                        "holiday": {
+                            "first8Hours": 1.5,
+                            "ninthHour": 1.5,
+                            "tenthHourPlus": 1.5
+                        }
+                    },
+                    "shrinkageFactor": 0.08,
+                    "leaves": {
+                        "annual": 20,
+                        "publicHolidays": 9,
+                        "sickAverage": 4
+                    }
+                },
+                "compliance": {
+                    "certifications": [
+                        "SEV/Electrosuisse",
+                        "ESTI",
+                        "Cantonal Fire Police"
+                    ],
+                    "annualComplianceCost": 16000
+                },
+                "environment": {
+                    "baselineAQI": 10,
+                    "gridCarbonIntensity": 0.04,
+                    "aqueductStressScore": 2,
+                    "ashraeClimateZone": "5A",
+                    "saidiMinYr": 15,
+                    "pgaPct2in50yr": 10
+                },
+                "risk": {
+                    "downtimeCostPerMin": 5000
+                },
+                "supplyChain": {
+                    "importDifficultyFactor": 1
+                },
+                "taxIncentives": {
+                    "freeTradeZones": [
+                        "Zug/Lucerne cantonal low-tax"
+                    ],
+                    "taxHolidayYears": 0,
+                    "taxHolidayRate": 0.149,
+                    "incentivePrograms": [
+                        "Cantonal tax rulings",
+                        "Patent box regime",
+                        "Grid-adjacent heat-reuse credits"
+                    ],
+                    "importDutyExemption": false,
+                    "landSubsidy": false,
+                    "effectiveTaxRate": 0.149
+                },
+                "naturalDisaster": {
+                    "seismicZone": 1,
+                    "floodRisk": "low",
+                    "typhoonRisk": "none",
+                    "volcanoRisk": "none",
+                    "tsunamiRisk": "none",
+                    "compositeScore": 6,
+                    "insuranceMultiplier": 1,
+                    "structuralReinforcement": 0
+                },
+                "gridReliability": {
+                    "gridUptime": 99.998,
+                    "voltageStability": "stable",
+                    "brownoutFrequency": 0,
+                    "averageOutageDuration": 2,
+                    "gridTier": 1,
+                    "backupFuelPremium": 0,
+                    "recommendedGenHours": 24,
+                    "renewableReadiness": 75
+                },
+                "talentPool": {
+                    "dcEngineerPool": "moderate",
+                    "universityPipeline": 12,
+                    "hyperscalerPresence": 4,
+                    "avgHiringDays": 40,
+                    "salaryPremium": 1.25,
+                    "talentScore": 68,
+                    "certifiedProfessionals": 500
+                },
+                "fuelDiesel": {
+                    "dieselPricePerLiter": 1.95,
+                    "dieselAvailability": "abundant",
+                    "hvoAvailable": true,
+                    "hvoPricePerLiter": 2.75,
+                    "fuelTaxRate": 0.2,
+                    "deliveryLeadDays": 1,
+                    "environmentalPermitRequired": true,
+                    "storageLimitLiters": 40000,
+                    "fuelQualityRating": "high"
+                },
+                "lastUpdated": "2026-Q3"
             }
         },
         /* @@COUNTRIES_END */
@@ -8675,7 +9617,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-19-cor"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-19-c40"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

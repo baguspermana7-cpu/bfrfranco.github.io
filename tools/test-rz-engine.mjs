@@ -685,7 +685,7 @@ if (D.regionsCountry) {
  *     + commissioning program cost/schedule
  * ============================================================ */
 if (D.countries) {
-    ok('DATA.countries has 32 entries', Object.keys(D.countries).length === 32, '' + Object.keys(D.countries).length);
+    ok('DATA.countries has 40 entries (32+8 expansion 2026-07-19)', Object.keys(D.countries).length === 40, '' + Object.keys(D.countries).length);
     ok('DATA.countries.SG electricityRate 0.22', D.countries.SG.economy.electricityRate === 0.22);
     ok('DATA.tierCodes 2n = Tier III', D.tierCodes && D.tierCodes['2n'] === 'Tier III');
 }

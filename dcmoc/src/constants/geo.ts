@@ -10,15 +10,21 @@ export const COUNTRY_GEO: Record<string, GeoAnchor> = {
     AE: { lat: 24.4539, lng: 54.3773, capital: 'Abu Dhabi' },
     AU: { lat: -35.2809, lng: 149.13, capital: 'Canberra' },
     BR: { lat: -15.7939, lng: -47.8828, capital: 'Brasília' },
+    CA: { lat: 43.6532, lng: -79.3832, capital: 'Toronto' },       // DC hub, not Ottawa
+    CH: { lat: 47.3769, lng: 8.5417, capital: 'Zurich' },          // DC hub, not Bern
     CL: { lat: -33.4489, lng: -70.6693, capital: 'Santiago' },
     CN: { lat: 39.9042, lng: 116.4074, capital: 'Beijing' },
     CO: { lat: 4.711, lng: -74.0721, capital: 'Bogotá' },
     DE: { lat: 50.1109, lng: 8.6821, capital: 'Frankfurt' },       // DC hub, not Berlin
+    DK: { lat: 55.6761, lng: 12.5683, capital: 'Copenhagen' },
+    ES: { lat: 40.4168, lng: -3.7038, capital: 'Madrid' },
+    FI: { lat: 60.1699, lng: 24.9384, capital: 'Helsinki' },
     FR: { lat: 48.8566, lng: 2.3522, capital: 'Paris' },
     GB: { lat: 51.5074, lng: -0.1278, capital: 'London' },
     ID: { lat: -6.2088, lng: 106.8456, capital: 'Jakarta' },
     IE: { lat: 53.3498, lng: -6.2603, capital: 'Dublin' },
     IN: { lat: 19.076, lng: 72.8777, capital: 'Mumbai' },          // DC hub
+    IT: { lat: 45.4642, lng: 9.19, capital: 'Milan' },             // DC hub, not Rome
     JP: { lat: 35.6762, lng: 139.6503, capital: 'Tokyo' },
     KE: { lat: -1.2921, lng: 36.8219, capital: 'Nairobi' },
     KR: { lat: 37.5665, lng: 126.978, capital: 'Seoul' },
@@ -26,7 +32,9 @@ export const COUNTRY_GEO: Record<string, GeoAnchor> = {
     MY: { lat: 1.4927, lng: 103.7414, capital: 'Johor Bahru' },    // DC hub
     NG: { lat: 6.5244, lng: 3.3792, capital: 'Lagos' },
     NL: { lat: 52.3676, lng: 4.9041, capital: 'Amsterdam' },
+    NO: { lat: 59.9139, lng: 10.7522, capital: 'Oslo' },
     NZ: { lat: -36.8485, lng: 174.7633, capital: 'Auckland' },
+    OM: { lat: 23.588, lng: 58.3829, capital: 'Muscat' },
     PH: { lat: 14.5995, lng: 120.9842, capital: 'Manila' },
     PL: { lat: 52.2297, lng: 21.0122, capital: 'Warsaw' },
     PT: { lat: 38.7223, lng: -9.1393, capital: 'Lisbon' },

@@ -2368,6 +2368,559 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         },
         lastUpdated: '2026-Q1',
     },
+
+    OM: {
+        id: 'OM', region: 'MENA', name: 'Oman', currency: 'OMR', currencySymbol: 'ر.ع.',
+        // 2026: Oman CIT 15% standard; Duqm SEZ / Salalah / Sohar free zones offer long holidays
+        // Electricity: ~$0.07/kWh industrial (subsidized CRT tariff) // screening est. 2026
+        economy: { inflationRate: 0.015, laborEscalation: 0.03, taxRate: 0.15, electricityRate: 0.07 }, // screening est. 2026
+        labor: {
+            // USD/month equivalents (OMR pegged 1 OMR = $2.60) // screening est. 2026
+            minimumWage: 850, baseSalary_ShiftLead: 4200, baseSalary_Engineer: 3400,
+            baseSalary_Technician: 2000, baseSalary_Admin: 1600, baseSalary_Janitor: 900,
+            laborRatePerHour: 20, // screening est. 2026
+            overtimeRules: { workday: { firstHour: 1.25, subsequent: 1.5 }, holiday: { first8Hours: 1.5, ninthHour: 1.5, tenthHourPlus: 1.5 } },
+            shrinkageFactor: 0.12, leaves: { annual: 30, publicHolidays: 9, sickAverage: 5 },
+        },
+        compliance: { certifications: ['Oman Civil Defence', 'MTCIT License', 'OPWP Grid Code'], annualComplianceCost: 10000 }, // screening est. 2026
+        environment: { baselineAQI: 90, gridCarbonIntensity: 0.48 }, // gas-dominated grid // screening est. 2026
+        risk: { downtimeCostPerMin: 2000 }, // screening est. 2026
+        supplyChain: { importDifficultyFactor: 1.05 },
+        taxIncentives: {
+            freeTradeZones: ['Duqm SEZ', 'Salalah Free Zone', 'Sohar Free Zone'],
+            taxHolidayYears: 30, // Duqm SEZ up to 30yr // screening est. 2026
+            taxHolidayRate: 0.0,
+            incentivePrograms: ['Duqm SEZ 30yr tax holiday', 'Salalah FZ 0% CIT', 'Vision 2040 digital infrastructure'],
+            importDutyExemption: true,
+            landSubsidy: true,
+            effectiveTaxRate: 0.0, // free zone effective rate // screening est. 2026
+        },
+        naturalDisaster: {
+            seismicZone: 1, // low seismic
+            floodRisk: 'low',
+            typhoonRisk: 'low', // occasional cyclones (Salalah coast)
+            volcanoRisk: 'none',
+            tsunamiRisk: 'low',
+            compositeScore: 12,
+            insuranceMultiplier: 1.05,
+            structuralReinforcement: 0.0,
+        },
+        gridReliability: {
+            gridUptime: 99.95,
+            voltageStability: 'stable',
+            brownoutFrequency: 2,
+            averageOutageDuration: 10,
+            gridTier: 1,
+            backupFuelPremium: 0.0,
+            recommendedGenHours: 48,
+            renewableReadiness: 40,
+        },
+        talentPool: {
+            dcEngineerPool: 'scarce',
+            universityPipeline: 4,
+            hyperscalerPresence: 1,
+            avgHiringDays: 45,
+            salaryPremium: 1.1,
+            talentScore: 45,
+            certifiedProfessionals: 150,
+        },
+        fuelDiesel: {
+            dieselPricePerLiter: 0.60, // subsidized // screening est. 2026
+            dieselAvailability: 'abundant',
+            hvoAvailable: false,
+            hvoPricePerLiter: 0,
+            fuelTaxRate: 0.0,
+            deliveryLeadDays: 1,
+            environmentalPermitRequired: false,
+            storageLimitLiters: 100000,
+            fuelQualityRating: 'high',
+        },
+        lastUpdated: '2026-Q3',
+    },
+
+    FI: {
+        id: 'FI', region: 'EMEA', name: 'Finland', currency: 'EUR', currencySymbol: '€',
+        // 2026: Finland CIT 20%; Hamina/Helsinki DC market; cool climate = strong free cooling
+        // Electricity: ~$0.09/kWh industrial; grid ~0.08 kgCO2/kWh (nuclear+hydro+wind) // screening est. 2026
+        economy: { inflationRate: 0.018, laborEscalation: 0.025, taxRate: 0.20, electricityRate: 0.09 }, // screening est. 2026
+        labor: {
+            // USD/month equivalents; no statutory minimum wage — collective agreements // screening est. 2026
+            minimumWage: 2400, baseSalary_ShiftLead: 7000, baseSalary_Engineer: 5800,
+            baseSalary_Technician: 4300, baseSalary_Admin: 3400, baseSalary_Janitor: 2700,
+            laborRatePerHour: 35, // screening est. 2026
+            overtimeRules: { workday: { firstHour: 1.5, subsequent: 2.0 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
+            shrinkageFactor: 0.10, leaves: { annual: 25, publicHolidays: 13, sickAverage: 5 },
+        },
+        compliance: { certifications: ['SFS Standards', 'Tukes', 'Energiavirasto'], annualComplianceCost: 12000 }, // screening est. 2026
+        environment: { baselineAQI: 8, gridCarbonIntensity: 0.08 }, // screening est. 2026
+        risk: { downtimeCostPerMin: 4000 }, // screening est. 2026
+        supplyChain: { importDifficultyFactor: 1.0 },
+        taxIncentives: {
+            freeTradeZones: ['Hamina DC Hub'],
+            taxHolidayYears: 0,
+            taxHolidayRate: 0.20,
+            incentivePrograms: ['Reduced electricity tax class II for DCs', 'Business Finland RDI grants', 'District-heat reuse credits'],
+            importDutyExemption: false,
+            landSubsidy: true,
+            effectiveTaxRate: 0.20, // screening est. 2026
+        },
+        naturalDisaster: {
+            seismicZone: 0,
+            floodRisk: 'low',
+            typhoonRisk: 'none',
+            volcanoRisk: 'none',
+            tsunamiRisk: 'none',
+            compositeScore: 4,
+            insuranceMultiplier: 1.0,
+            structuralReinforcement: 0.0,
+        },
+        gridReliability: {
+            gridUptime: 99.999,
+            voltageStability: 'stable',
+            brownoutFrequency: 0,
+            averageOutageDuration: 2,
+            gridTier: 1,
+            backupFuelPremium: 0.0,
+            recommendedGenHours: 24,
+            renewableReadiness: 90,
+        },
+        talentPool: {
+            dcEngineerPool: 'moderate',
+            universityPipeline: 9,
+            hyperscalerPresence: 3, // Google Hamina, Microsoft Espoo/Kirkkonummi
+            avgHiringDays: 45,
+            salaryPremium: 1.1,
+            talentScore: 60,
+            certifiedProfessionals: 500,
+        },
+        fuelDiesel: {
+            dieselPricePerLiter: 1.90, // screening est. 2026
+            dieselAvailability: 'abundant',
+            hvoAvailable: true, // Neste HVO home market
+            hvoPricePerLiter: 2.60,
+            fuelTaxRate: 0.20,
+            deliveryLeadDays: 1,
+            environmentalPermitRequired: true,
+            storageLimitLiters: 50000,
+            fuelQualityRating: 'high',
+        },
+        lastUpdated: '2026-Q3',
+    },
+
+    ES: {
+        id: 'ES', region: 'EMEA', name: 'Spain', currency: 'EUR', currencySymbol: '€',
+        // 2026: Spain CIT 25%; Madrid/Barcelona/Aragón hyperscale boom (AWS, Microsoft, Meta)
+        // Electricity: ~$0.13/kWh industrial // screening est. 2026
+        economy: { inflationRate: 0.025, laborEscalation: 0.035, taxRate: 0.25, electricityRate: 0.13 }, // screening est. 2026
+        labor: {
+            // USD/month equivalents // screening est. 2026
+            minimumWage: 1250, baseSalary_ShiftLead: 4200, baseSalary_Engineer: 3300,
+            baseSalary_Technician: 2500, baseSalary_Admin: 1900, baseSalary_Janitor: 1300,
+            laborRatePerHour: 20, // screening est. 2026
+            overtimeRules: { workday: { firstHour: 1.25, subsequent: 1.5 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
+            shrinkageFactor: 0.14, leaves: { annual: 22, publicHolidays: 14, sickAverage: 5 },
+        },
+        compliance: { certifications: ['UNE Standards', 'REBT', 'CNMC Grid Access'], annualComplianceCost: 12000 }, // screening est. 2026
+        environment: { baselineAQI: 25, gridCarbonIntensity: 0.15 }, // screening est. 2026
+        risk: { downtimeCostPerMin: 3500 }, // screening est. 2026
+        supplyChain: { importDifficultyFactor: 1.05 },
+        taxIncentives: {
+            freeTradeZones: ['Zona Franca Barcelona', 'Aragón DC corridor', 'Canary Islands ZEC'],
+            taxHolidayYears: 0,
+            taxHolidayRate: 0.25,
+            incentivePrograms: ['Aragón hyperscale land+grid incentives', 'PERTE digitalization funds', 'Canary ZEC 4% CIT'],
+            importDutyExemption: false,
+            landSubsidy: true,
+            effectiveTaxRate: 0.25, // screening est. 2026
+        },
+        naturalDisaster: {
+            seismicZone: 1,
+            floodRisk: 'low',
+            typhoonRisk: 'none',
+            volcanoRisk: 'none',
+            tsunamiRisk: 'none',
+            compositeScore: 12,
+            insuranceMultiplier: 1.05,
+            structuralReinforcement: 0.0,
+        },
+        gridReliability: {
+            gridUptime: 99.96,
+            voltageStability: 'stable',
+            brownoutFrequency: 1,
+            averageOutageDuration: 8,
+            gridTier: 1,
+            backupFuelPremium: 0.02,
+            recommendedGenHours: 48,
+            renewableReadiness: 70,
+        },
+        talentPool: {
+            dcEngineerPool: 'moderate',
+            universityPipeline: 18,
+            hyperscalerPresence: 5, // AWS Aragón, Microsoft Madrid, Meta Talavera
+            avgHiringDays: 38,
+            salaryPremium: 1.05,
+            talentScore: 62,
+            certifiedProfessionals: 700,
+        },
+        fuelDiesel: {
+            dieselPricePerLiter: 1.55, // screening est. 2026
+            dieselAvailability: 'abundant',
+            hvoAvailable: true,
+            hvoPricePerLiter: 2.05,
+            fuelTaxRate: 0.12,
+            deliveryLeadDays: 2,
+            environmentalPermitRequired: true,
+            storageLimitLiters: 50000,
+            fuelQualityRating: 'high',
+        },
+        lastUpdated: '2026-Q3',
+    },
+
+    // ─── AMER (addl) ────────────────────────────────────────
+    CA: {
+        id: 'CA', region: 'AMER', name: 'Canada', currency: 'CAD', currencySymbol: 'C$',
+        // 2026: combined federal+provincial CIT ~26.5% (ON); Toronto/Montreal hubs
+        // Electricity: ~$0.08/kWh industrial; grid ~0.13 kgCO2/kWh national (Québec hydro ~0.03) // screening est. 2026
+        economy: { inflationRate: 0.02, laborEscalation: 0.03, taxRate: 0.265, electricityRate: 0.08 }, // screening est. 2026
+        labor: {
+            // USD/month equivalents // screening est. 2026
+            minimumWage: 2300, baseSalary_ShiftLead: 6500, baseSalary_Engineer: 5400,
+            baseSalary_Technician: 4000, baseSalary_Admin: 3200, baseSalary_Janitor: 2500,
+            laborRatePerHour: 32, // screening est. 2026
+            overtimeRules: { workday: { firstHour: 1.5, subsequent: 1.5 }, holiday: { first8Hours: 1.5, ninthHour: 1.5, tenthHourPlus: 2.0 } },
+            shrinkageFactor: 0.10, leaves: { annual: 15, publicHolidays: 11, sickAverage: 5 },
+        },
+        compliance: { certifications: ['CSA Standards', 'ESA/RBQ Electrical', 'Provincial Permits'], annualComplianceCost: 13000 }, // screening est. 2026
+        environment: { baselineAQI: 15, gridCarbonIntensity: 0.13 }, // Québec hydro ~0.03 // screening est. 2026
+        risk: { downtimeCostPerMin: 4500 }, // screening est. 2026
+        supplyChain: { importDifficultyFactor: 1.0 },
+        taxIncentives: {
+            freeTradeZones: ['Montréal hydro corridor', 'Alberta DC zone'],
+            taxHolidayYears: 0,
+            taxHolidayRate: 0.265,
+            incentivePrograms: ['Hydro-Québec industrial rate', 'SR&ED tax credits', 'Provincial DC incentives (QC/AB)'],
+            importDutyExemption: false,
+            landSubsidy: false,
+            effectiveTaxRate: 0.265, // screening est. 2026
+        },
+        naturalDisaster: {
+            seismicZone: 1,
+            floodRisk: 'low',
+            typhoonRisk: 'none',
+            volcanoRisk: 'none',
+            tsunamiRisk: 'none',
+            compositeScore: 8,
+            insuranceMultiplier: 1.0,
+            structuralReinforcement: 0.0,
+        },
+        gridReliability: {
+            gridUptime: 99.97,
+            voltageStability: 'stable',
+            brownoutFrequency: 1,
+            averageOutageDuration: 15, // winter-storm driven
+            gridTier: 1,
+            backupFuelPremium: 0.0,
+            recommendedGenHours: 48,
+            renewableReadiness: 82,
+        },
+        talentPool: {
+            dcEngineerPool: 'abundant',
+            universityPipeline: 25,
+            hyperscalerPresence: 6,
+            avgHiringDays: 35,
+            salaryPremium: 1.1,
+            talentScore: 72,
+            certifiedProfessionals: 1200,
+        },
+        fuelDiesel: {
+            dieselPricePerLiter: 1.20, // screening est. 2026
+            dieselAvailability: 'abundant',
+            hvoAvailable: true,
+            hvoPricePerLiter: 1.80,
+            fuelTaxRate: 0.10,
+            deliveryLeadDays: 2,
+            environmentalPermitRequired: true,
+            storageLimitLiters: 100000,
+            fuelQualityRating: 'high',
+        },
+        lastUpdated: '2026-Q3',
+    },
+
+    IT: {
+        id: 'IT', region: 'EMEA', name: 'Italy', currency: 'EUR', currencySymbol: '€',
+        // 2026: IRES 24% + IRAP ~3.9% ≈ 27.9% combined; Milan is the FLAP-D+ hub
+        // Electricity: ~$0.18/kWh industrial (among highest in EU) // screening est. 2026
+        economy: { inflationRate: 0.02, laborEscalation: 0.03, taxRate: 0.279, electricityRate: 0.18 }, // screening est. 2026
+        labor: {
+            // USD/month equivalents; no statutory minimum wage — CCNL sector agreements // screening est. 2026
+            minimumWage: 1250, baseSalary_ShiftLead: 4500, baseSalary_Engineer: 3600,
+            baseSalary_Technician: 2700, baseSalary_Admin: 2100, baseSalary_Janitor: 1400,
+            laborRatePerHour: 22, // screening est. 2026
+            overtimeRules: { workday: { firstHour: 1.25, subsequent: 1.5 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
+            shrinkageFactor: 0.15, leaves: { annual: 22, publicHolidays: 12, sickAverage: 6 },
+        },
+        compliance: { certifications: ['CEI Standards', 'VVF Fire Cert', 'ARERA Grid Access'], annualComplianceCost: 14000 }, // screening est. 2026
+        environment: { baselineAQI: 35, gridCarbonIntensity: 0.25 }, // Po valley air // screening est. 2026
+        risk: { downtimeCostPerMin: 3500 }, // screening est. 2026
+        supplyChain: { importDifficultyFactor: 1.05 },
+        taxIncentives: {
+            freeTradeZones: ['Trieste Free Port', 'ZES Unica (South)'],
+            taxHolidayYears: 0,
+            taxHolidayRate: 0.279,
+            incentivePrograms: ['Transizione 5.0 credits', 'ZES Unica South incentives', 'Industria 4.0 hyper-depreciation'],
+            importDutyExemption: false,
+            landSubsidy: false,
+            effectiveTaxRate: 0.279, // screening est. 2026
+        },
+        naturalDisaster: {
+            seismicZone: 2, // moderate seismic (Milan hub itself lower)
+            floodRisk: 'moderate',
+            typhoonRisk: 'none',
+            volcanoRisk: 'low',
+            tsunamiRisk: 'none',
+            compositeScore: 25,
+            insuranceMultiplier: 1.15,
+            structuralReinforcement: 0.03,
+        },
+        gridReliability: {
+            gridUptime: 99.95,
+            voltageStability: 'stable',
+            brownoutFrequency: 2,
+            averageOutageDuration: 10,
+            gridTier: 1,
+            backupFuelPremium: 0.02,
+            recommendedGenHours: 48,
+            renewableReadiness: 55,
+        },
+        talentPool: {
+            dcEngineerPool: 'moderate',
+            universityPipeline: 20,
+            hyperscalerPresence: 4,
+            avgHiringDays: 40,
+            salaryPremium: 1.05,
+            talentScore: 58,
+            certifiedProfessionals: 600,
+        },
+        fuelDiesel: {
+            dieselPricePerLiter: 1.75, // screening est. 2026
+            dieselAvailability: 'abundant',
+            hvoAvailable: true, // Eni HVO
+            hvoPricePerLiter: 2.20,
+            fuelTaxRate: 0.15,
+            deliveryLeadDays: 2,
+            environmentalPermitRequired: true,
+            storageLimitLiters: 50000,
+            fuelQualityRating: 'high',
+        },
+        lastUpdated: '2026-Q3',
+    },
+
+    NO: {
+        id: 'NO', region: 'EMEA', name: 'Norway', currency: 'NOK', currencySymbol: 'kr',
+        // 2026: Norway CIT 22%; ~98% hydro grid — lowest carbon in the set; cool climate free cooling
+        // Electricity: ~$0.07/kWh industrial; grid ~0.03 kgCO2/kWh // screening est. 2026
+        economy: { inflationRate: 0.02, laborEscalation: 0.03, taxRate: 0.22, electricityRate: 0.07 }, // screening est. 2026
+        labor: {
+            // USD/month equivalents; sector collective agreements set floors // screening est. 2026
+            minimumWage: 2800, baseSalary_ShiftLead: 7500, baseSalary_Engineer: 6300,
+            baseSalary_Technician: 4700, baseSalary_Admin: 3700, baseSalary_Janitor: 3000,
+            laborRatePerHour: 38, // screening est. 2026
+            overtimeRules: { workday: { firstHour: 1.4, subsequent: 1.4 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
+            shrinkageFactor: 0.10, leaves: { annual: 25, publicHolidays: 12, sickAverage: 5 },
+        },
+        compliance: { certifications: ['NEK Standards', 'DSB', 'NVE Grid License'], annualComplianceCost: 12000 }, // screening est. 2026
+        environment: { baselineAQI: 8, gridCarbonIntensity: 0.03 }, // hydro // screening est. 2026
+        risk: { downtimeCostPerMin: 4000 }, // screening est. 2026
+        supplyChain: { importDifficultyFactor: 1.0 },
+        taxIncentives: {
+            freeTradeZones: ['Norwegian DC power regions (Rjukan, Stavanger)'],
+            taxHolidayYears: 0,
+            taxHolidayRate: 0.22,
+            incentivePrograms: ['Reduced el-tax for DCs', 'Enova energy-efficiency grants', 'Statkraft green PPAs'],
+            importDutyExemption: false,
+            landSubsidy: false,
+            effectiveTaxRate: 0.22, // screening est. 2026
+        },
+        naturalDisaster: {
+            seismicZone: 0,
+            floodRisk: 'low',
+            typhoonRisk: 'none',
+            volcanoRisk: 'none',
+            tsunamiRisk: 'none',
+            compositeScore: 5,
+            insuranceMultiplier: 1.0,
+            structuralReinforcement: 0.0,
+        },
+        gridReliability: {
+            gridUptime: 99.999,
+            voltageStability: 'stable',
+            brownoutFrequency: 0,
+            averageOutageDuration: 2,
+            gridTier: 1,
+            backupFuelPremium: 0.0,
+            recommendedGenHours: 24,
+            renewableReadiness: 98,
+        },
+        talentPool: {
+            dcEngineerPool: 'moderate',
+            universityPipeline: 8,
+            hyperscalerPresence: 2,
+            avgHiringDays: 50,
+            salaryPremium: 1.15,
+            talentScore: 55,
+            certifiedProfessionals: 350,
+        },
+        fuelDiesel: {
+            dieselPricePerLiter: 1.95, // screening est. 2026
+            dieselAvailability: 'abundant',
+            hvoAvailable: true,
+            hvoPricePerLiter: 2.70,
+            fuelTaxRate: 0.20,
+            deliveryLeadDays: 2,
+            environmentalPermitRequired: true,
+            storageLimitLiters: 50000,
+            fuelQualityRating: 'high',
+        },
+        lastUpdated: '2026-Q3',
+    },
+
+    DK: {
+        id: 'DK', region: 'EMEA', name: 'Denmark', currency: 'DKK', currencySymbol: 'kr',
+        // 2026: Denmark CIT 22%; Copenhagen/Odense hyperscale market (Meta, Google, Apple)
+        // Electricity: ~$0.12/kWh industrial; grid ~0.12 kgCO2/kWh (wind-heavy) // screening est. 2026
+        economy: { inflationRate: 0.018, laborEscalation: 0.025, taxRate: 0.22, electricityRate: 0.12 }, // screening est. 2026
+        labor: {
+            // USD/month equivalents; collective agreements set floors // screening est. 2026
+            minimumWage: 2700, baseSalary_ShiftLead: 7300, baseSalary_Engineer: 6100,
+            baseSalary_Technician: 4600, baseSalary_Admin: 3600, baseSalary_Janitor: 2900,
+            laborRatePerHour: 37, // screening est. 2026
+            overtimeRules: { workday: { firstHour: 1.5, subsequent: 2.0 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
+            shrinkageFactor: 0.10, leaves: { annual: 25, publicHolidays: 11, sickAverage: 5 },
+        },
+        compliance: { certifications: ['DS Standards', 'Sikkerhedsstyrelsen', 'Energinet Grid Code'], annualComplianceCost: 12000 }, // screening est. 2026
+        environment: { baselineAQI: 10, gridCarbonIntensity: 0.12 }, // wind-heavy // screening est. 2026
+        risk: { downtimeCostPerMin: 4000 }, // screening est. 2026
+        supplyChain: { importDifficultyFactor: 1.0 },
+        taxIncentives: {
+            freeTradeZones: ['Copenhagen/Odense DC corridor'],
+            taxHolidayYears: 0,
+            taxHolidayRate: 0.22,
+            incentivePrograms: ['Reduced electricity tax for DCs', 'Danish green power PPAs', 'District-heat reuse credits'],
+            importDutyExemption: false,
+            landSubsidy: false,
+            effectiveTaxRate: 0.22, // screening est. 2026
+        },
+        naturalDisaster: {
+            seismicZone: 0,
+            floodRisk: 'low',
+            typhoonRisk: 'none',
+            volcanoRisk: 'none',
+            tsunamiRisk: 'none',
+            compositeScore: 4,
+            insuranceMultiplier: 1.0,
+            structuralReinforcement: 0.0,
+        },
+        gridReliability: {
+            gridUptime: 99.998, // SAIDI ~12 min/yr — among Europe's best
+            voltageStability: 'stable',
+            brownoutFrequency: 0,
+            averageOutageDuration: 2,
+            gridTier: 1,
+            backupFuelPremium: 0.0,
+            recommendedGenHours: 24,
+            renewableReadiness: 90,
+        },
+        talentPool: {
+            dcEngineerPool: 'moderate',
+            universityPipeline: 8,
+            hyperscalerPresence: 4, // Meta Odense, Google Fredericia, Apple Viborg
+            avgHiringDays: 42,
+            salaryPremium: 1.1,
+            talentScore: 60,
+            certifiedProfessionals: 450,
+        },
+        fuelDiesel: {
+            dieselPricePerLiter: 1.85, // screening est. 2026
+            dieselAvailability: 'abundant',
+            hvoAvailable: true,
+            hvoPricePerLiter: 2.60,
+            fuelTaxRate: 0.18,
+            deliveryLeadDays: 1,
+            environmentalPermitRequired: true,
+            storageLimitLiters: 50000,
+            fuelQualityRating: 'high',
+        },
+        lastUpdated: '2026-Q3',
+    },
+
+    CH: {
+        id: 'CH', region: 'EMEA', name: 'Switzerland', currency: 'CHF', currencySymbol: 'CHF',
+        // 2026: combined effective CIT ~14.9% (federal+cantonal avg); Zurich colocation hub
+        // Electricity: ~$0.14/kWh industrial; grid ~0.04 kgCO2/kWh (hydro+nuclear) // screening est. 2026
+        economy: { inflationRate: 0.01, laborEscalation: 0.02, taxRate: 0.149, electricityRate: 0.14 }, // screening est. 2026
+        labor: {
+            // USD/month equivalents — highest salaries in the set // screening est. 2026
+            minimumWage: 4000, baseSalary_ShiftLead: 9500, baseSalary_Engineer: 8200,
+            baseSalary_Technician: 6200, baseSalary_Admin: 5000, baseSalary_Janitor: 4000,
+            laborRatePerHour: 55, // screening est. 2026
+            overtimeRules: { workday: { firstHour: 1.25, subsequent: 1.25 }, holiday: { first8Hours: 1.5, ninthHour: 1.5, tenthHourPlus: 1.5 } },
+            shrinkageFactor: 0.08, leaves: { annual: 20, publicHolidays: 9, sickAverage: 4 },
+        },
+        compliance: { certifications: ['SEV/Electrosuisse', 'ESTI', 'Cantonal Fire Police'], annualComplianceCost: 16000 }, // screening est. 2026
+        environment: { baselineAQI: 10, gridCarbonIntensity: 0.04 }, // hydro+nuclear // screening est. 2026
+        risk: { downtimeCostPerMin: 5000 }, // finance-sector density // screening est. 2026
+        supplyChain: { importDifficultyFactor: 1.0 },
+        taxIncentives: {
+            freeTradeZones: ['Zug/Lucerne cantonal low-tax'],
+            taxHolidayYears: 0,
+            taxHolidayRate: 0.149,
+            incentivePrograms: ['Cantonal tax rulings', 'Patent box regime', 'Grid-adjacent heat-reuse credits'],
+            importDutyExemption: false,
+            landSubsidy: false,
+            effectiveTaxRate: 0.149, // screening est. 2026
+        },
+        naturalDisaster: {
+            seismicZone: 1, // very low overall risk
+            floodRisk: 'low',
+            typhoonRisk: 'none',
+            volcanoRisk: 'none',
+            tsunamiRisk: 'none',
+            compositeScore: 6,
+            insuranceMultiplier: 1.0,
+            structuralReinforcement: 0.0,
+        },
+        gridReliability: {
+            gridUptime: 99.998,
+            voltageStability: 'stable',
+            brownoutFrequency: 0,
+            averageOutageDuration: 2,
+            gridTier: 1,
+            backupFuelPremium: 0.0,
+            recommendedGenHours: 24,
+            renewableReadiness: 75,
+        },
+        talentPool: {
+            dcEngineerPool: 'moderate',
+            universityPipeline: 12,
+            hyperscalerPresence: 4,
+            avgHiringDays: 40,
+            salaryPremium: 1.25,
+            talentScore: 68,
+            certifiedProfessionals: 500,
+        },
+        fuelDiesel: {
+            dieselPricePerLiter: 1.95, // screening est. 2026
+            dieselAvailability: 'abundant',
+            hvoAvailable: true,
+            hvoPricePerLiter: 2.75,
+            fuelTaxRate: 0.20,
+            deliveryLeadDays: 1,
+            environmentalPermitRequired: true,
+            storageLimitLiters: 40000,
+            fuelQualityRating: 'high',
+        },
+        lastUpdated: '2026-Q3',
+    },
 };
 
 /* ─── v2.5.0 site research augmentation (Pillar 2) ────────────────────────────
@@ -2410,6 +2963,14 @@ const SITE_AUGMENT: Record<string, { aqueductStressScore: number; ashraeClimateZ
     NZ: { aqueductStressScore: 1, ashraeClimateZone: '4C', saidiMinYr: 100, pgaPct2in50yr: 50 },
     PL: { aqueductStressScore: 3, ashraeClimateZone: '5A', saidiMinYr: 150, pgaPct2in50yr: 3 },
     PT: { aqueductStressScore: 3, ashraeClimateZone: '3C', saidiMinYr: 60, pgaPct2in50yr: 20 },
+    OM: { aqueductStressScore: 5, ashraeClimateZone: '1B', saidiMinYr: 60, pgaPct2in50yr: 10 },
+    FI: { aqueductStressScore: 1, ashraeClimateZone: '6A', saidiMinYr: 30, pgaPct2in50yr: 2 },
+    ES: { aqueductStressScore: 4, ashraeClimateZone: '3B', saidiMinYr: 50, pgaPct2in50yr: 6 },
+    CA: { aqueductStressScore: 2, ashraeClimateZone: '6A', saidiMinYr: 180, pgaPct2in50yr: 15 },
+    IT: { aqueductStressScore: 3, ashraeClimateZone: '4A', saidiMinYr: 45, pgaPct2in50yr: 20 },
+    NO: { aqueductStressScore: 1, ashraeClimateZone: '6A', saidiMinYr: 90, pgaPct2in50yr: 5 },
+    DK: { aqueductStressScore: 2, ashraeClimateZone: '5A', saidiMinYr: 12, pgaPct2in50yr: 2 },
+    CH: { aqueductStressScore: 2, ashraeClimateZone: '5A', saidiMinYr: 15, pgaPct2in50yr: 10 },
 };
 for (const id of Object.keys(SITE_AUGMENT)) {
     if (COUNTRIES[id]) Object.assign(COUNTRIES[id].environment, SITE_AUGMENT[id]);
