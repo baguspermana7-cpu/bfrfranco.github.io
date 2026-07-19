@@ -37,14 +37,16 @@ const pct = (n: number) => `${Math.round(n * 100)}%`;
 /* ── Data Library — browse the canonical engine DATA (single source) ── */
 export function DataLibraryDashboard() {
     const d = rzData();
-    const [tab, setTab] = React.useState<'countries' | 'markets' | 'pue' | 'refrigerants' | 'sources'>('countries');
+    const [tab, setTab] = React.useState<'countries' | 'markets' | 'pue' | 'refrigerants' | 'sources' | 'corpus'>('countries');
     const [srcQuery, setSrcQuery] = React.useState('');
     const countries = d.countries || {};
     const markets = d.markets || {};
     const pue = d.pueMatrix || {};
     const refr = d.refrigerants || {};
     const sources = (d.sources || {}) as Record<string, { source?: string; asOf?: string; method?: string; unit?: string }>;
+    const corpus = (d.benchmarksCorpus || {}) as Record<string, Record<string, { n: number; unit: string; p10: number; p25: number; p50: number; p75: number; p90: number; companies: string[]; sources: number }>>;
     const tabs: [typeof tab, string, number][] = [
+        ['corpus', 'DC Corpus', Object.keys(corpus).length],
         ['countries', 'Countries', Object.keys(countries).length],
         ['markets', 'Markets', Object.keys(markets).length],
         ['pue', 'PUE Matrix', Object.keys(pue).length],
@@ -94,6 +96,35 @@ export function DataLibraryDashboard() {
                         </table>
                     </div>
                     <p className="mt-1.5 text-[9px] text-slate-400">Every economically-material DATA value in the engine carries a source + as-of date (gate-enforced). Read-only.</p>
+                </Card>
+            )}
+            {tab === 'corpus' && (
+                <Card>
+                    <div className="mb-2 flex items-center gap-2">
+                        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">DC Public-Data Corpus — distribusi multi-sumber</h2>
+                        <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">auto-generated</span>
+                    </div>
+                    <p className="mb-2 text-[10px] text-slate-400">Setiap fakta di baliknya membawa source_url + kutipan verbatim (gate-enforced) — pipeline tools/dc-corpus (markitdown). Persentil p10-p90 per metrik × segmen.</p>
+                    <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-[11px]">
+                        <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-left text-slate-500">
+                            <th className="py-1.5 pr-3">Metrik</th><th className="py-1.5 pr-3">Segmen</th><th className="py-1.5 pr-3">n</th>
+                            <th className="py-1.5 pr-3">p10</th><th className="py-1.5 pr-3">p25</th><th className="py-1.5 pr-3 font-bold">p50</th>
+                            <th className="py-1.5 pr-3">p75</th><th className="py-1.5 pr-3">p90</th><th className="py-1.5">Perusahaan</th>
+                        </tr></thead>
+                        <tbody>{Object.entries(corpus).flatMap(([metric, segs]) => Object.entries(segs).map(([seg, dta]) => (
+                            <tr key={metric + seg} className="border-b border-slate-100 dark:border-slate-800/60">
+                                <td className="py-1.5 pr-3 font-medium text-slate-700 dark:text-slate-200">{metric} <span className="text-[9px] text-slate-400">({dta.unit})</span></td>
+                                <td className="py-1.5 pr-3 text-slate-500">{seg}</td>
+                                <td className="py-1.5 pr-3 tabular-nums">{dta.n}</td>
+                                <td className="py-1.5 pr-3 tabular-nums text-slate-500">{dta.p10.toLocaleString()}</td>
+                                <td className="py-1.5 pr-3 tabular-nums text-slate-500">{dta.p25.toLocaleString()}</td>
+                                <td className="py-1.5 pr-3 tabular-nums font-bold text-slate-900 dark:text-white">{dta.p50.toLocaleString()}</td>
+                                <td className="py-1.5 pr-3 tabular-nums text-slate-500">{dta.p75.toLocaleString()}</td>
+                                <td className="py-1.5 pr-3 tabular-nums text-slate-500">{dta.p90.toLocaleString()}</td>
+                                <td className="py-1.5 text-[10px] text-slate-400" title={dta.companies.join(', ')}>{dta.companies.slice(0, 3).join(', ')}{dta.companies.length > 3 ? ` +${dta.companies.length - 3}` : ''} · {dta.sources} dok</td>
+                            </tr>
+                        )))}</tbody>
+                    </table></div>
                 </Card>
             )}
             {tab === 'countries' && (

@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.93.7 — 2026-07-19 (EA6 — DC Corpus surfaces in the Data Library)
+
+### Added
+- **Data Library gains a "DC Corpus" tab** (first tab): the multi-source public-data distributions rendered live from `DATA.benchmarksCorpus` — per metric × segment rows with n, p10/p25/**p50**/p75/p90, company list and document count; auto-generated chip + provenance note (every underlying fact carries source_url + verbatim quote). Regenerating the corpus pipeline updates this tab with zero manual edits (auto-link chain).
+
+---
+
 ## v1.93.6 — 2026-07-19 (corpus round 2 — 92 facts, 5 metric families)
 
 ### Changed
