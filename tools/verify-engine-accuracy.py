@@ -166,6 +166,71 @@ energy_true = 2.5 * 1000 * 1.5 * 8760 * 0.09
 case("opex.powerCostAnnual.2p5MW", {"mw": 2.5, "pue": 1.5, "rate": 0.09}, energy_true, 0.5,
      "whole-dollar accounting rounding — |engine−truth| ≤ $0.5 (documented convention)", "abs")
 
+
+# ── M3-FULL: remaining model families (formula-grade truth) ─────────────────
+# FIRE — NFPA 2001 clean-agent quantity. Constants (k1,k2,designC) are the
+# published NFPA-2001 Novec-1230 table values (shared w/ engine DATA — the
+# independence is in the FORMULA implementation).
+k1, k2, Cc = 0.0664, 0.0002741, 4.5
+s_vol = k1 + k2 * 20.0
+fire_kg = (1463.0 / s_vol) * (Cc / (100 - Cc))
+case("fire.agentQuantity.novec1463m3", {"volumeM3": 1463, "agent": "novec1230", "tempC": 20},
+     fire_kg, 0.06, "m = V/s · C/(100−C), s = k1+k2·T (NFPA 2001 eq.); engine 1dp", "abs")
+inert_v = 1463.0 * math.log(100 / (100 - 40.0))
+case("fire.agentQuantity.inert40pct", {"volumeM3": 1463, "agent": "inergen", "concentration": 40},
+     inert_v, 0.06, "V_agent = V·ln(100/(100−C)) — inert flooding equation", "abs")
+
+# WATER — annual m³ = WUE(L/kWh) · IT kWh / 1000; formula case w/ wue=1.8
+water_m3 = 1.8 * (2.5 * 1000 * 8760) / 1000
+case("water.annualM3.wue1p8", {"mw": 2.5, "wue": 1.8}, water_m3, 1.0,
+     "WUE·IT-kWh/1000 (engine rounds m³ to integer)", "abs")
+
+# PUE — partial-load identity: PUE(l) = 1 + oh·(0.55/l + 0.45)
+pl = 1 + (1.5 - 1) * (0.55 / 0.4 + 0.45)
+case("pue.partialLoad.d1p5l0p4", {"designPUE": 1.5, "loadFraction": 0.4}, pl, 1e-12,
+     "documented screening formula — exact identity", "abs")
+
+# DEEP-SEA accurate mode — energy balance: kg/s = MW_heat·1e6/(cp·ΔT), ρ=1025 cp=3985
+heat_mw = 10 * 1.15
+kgps = heat_mw * 1e6 / (3985 * 8.0)
+m3s_acc = kgps / 1025
+case("cooling.deepSea.accurate.flow10MW", {"itLoadMw": 10, "pueTarget": 1.15, "deltaTC": 8},
+     round(m3s_acc, 3), 5e-4, "accurate mode: TEOS-10 ρ=1025 cp=3985 energy balance (engine 3dp)", "abs")
+
+# COMMISSIONING — readinessIndex weighted identity (weights from the engine's
+# published table L1.05 L2.08 L3.12 L4.15 L5.22 ist.18 sat.08 fat.07 punch.05)
+Wt = {"L1":0.05,"L2":0.08,"L3":0.12,"L4":0.15,"L5":0.22,"ist":0.18,"sat":0.08,"fat":0.07,"punchlist":0.05}
+comp = {"L1":1.0,"L2":0.8,"L3":0.5,"ist":0.25}
+present = sum(Wt[k] for k in comp)
+weighted = sum(Wt[k]*v for k,v in comp.items())
+case("cx.readinessIndex.partial", {"completion": comp}, round(100*weighted/present, 1), 0.05,
+     "Σw·c/Σw over PRESENT keys only ×100 (engine 1dp)", "abs")
+
+# OPEX staffing — headcount × salary × load factor (US dcTechMid 75,100? engine
+# DATA benchmark; formula identity w/ explicit salary 75100, load 1.3)
+case("opex.staffingCostAnnual.us13", {"headcount": 13, "region": "US"},
+     None, 0.5, "IDENTITY IN GATE: round(hc·salary·loadFactor) recomputed from engine DATA — formula check", "abs")
+
+# FORECAST — compound growth exact
+case("forecast.compoundGrowth.2p5pct10y", {"base": 1000, "ratePct": 0.025, "years": 10},
+     float(Decimal("1000") * (Decimal("1.025") ** 10)), 1e-6, "FV = base·(1+r)^n", "abs")
+
+# NEWSVENDOR end-to-end (normal mode) — python replication w/ erf-based Φ/Φ⁻¹
+muA, sigA, ltW, ltSigW = 6.0, 3.6, 16, 4
+Lfrac, sLfrac = ltW/52, ltSigW/52
+muLT = muA * Lfrac
+sigLT = math.sqrt(Lfrac * sigA**2 + muA**2 * sLfrac**2)
+cu, unit, carry, life = 85000, 45000, 0.25, 8
+co = carry * unit * life
+cr = max(0.001, min(0.999, cu / (cu + co)))
+qstar = max(0, math.ceil(muLT + phi_inv(cr) * sigLT))
+case("spares.newsvendor.qstar.normal", {"unitCost": unit, "understockCostPerEvent": cu, "carryRatePct": 25,
+     "partLifeYrs": 8, "muAnnual": muA, "sigmaAnnual": sigA, "ltWeeks": 16, "ltSigmaWeeks": 4, "poissonMode": False},
+     qstar, 0, "Q* = ⌈μLT + Φ⁻¹(CR)·σLT⌉ — end-to-end replication (Acklam ≡ erf-Newton at ceil grain)", "abs")
+
+# TIER classify boundary — weighted score w/ redundancy cap is engine-table logic;
+# identity asserted in gate (score in [0,100], cap honored) — no fixture value.
+
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 json.dump(T, open(OUT, 'w'), indent=1)
 print(f"accuracy-truth.json: {len(T['cases'])} cases written")

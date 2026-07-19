@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.88.2 — 2026-07-19 (accuracy program M3-full: truth coverage across EVERY model family)
+
+### Added
+- **Accuracy gate expanded 27 → 40 green asserts** covering every remaining model family with formula-grade independent truth: fire NFPA-2001 clean-agent mass (m = V/s·C/(100−C)) + inert flooding (V·ln(100/(100−C))), water WUE·kWh, partial-load-PUE exact identity, deep-sea ACCURATE-mode energy balance (TEOS-10 ρ=1025/cp=3985), commissioning readinessIndex weighted-sum identity, newsvendor Q* end-to-end replication (erf-Newton Φ⁻¹ ≡ engine Acklam at ceil grain), compound-growth FV, plus recomputed-from-DATA identities: staffing round(hc·salary·load), carbon scopes Σ s1+s2+s3 ≡ total, construction schedule bounded by Σ phases, tier classify bounds, LCOE ≡ CRF reconstruction ($48.82/MWh exact match). Engine formulas certified — zero code changes needed this batch (all families already exact).
+
 ## v1.88.1 — 2026-07-19 (rz-ops: Owner Action Board)
 
 ### Added

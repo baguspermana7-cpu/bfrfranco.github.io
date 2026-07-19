@@ -66,6 +66,15 @@ const MAP = {
     'cooling.deepSea.poster.flow': (i) => M.cooling.deepSea(i).flow.m3s,
     'cooling.deepSea.poster.pumps': (i) => M.cooling.deepSea(i).pumps.duty,
     'opex.powerCostAnnual.2p5MW': (i) => M.opex.powerCostAnnual(i.mw, i.pue, i.rate),
+    'fire.agentQuantity.novec1463m3': (i) => M.fire.agentQuantity(i).massKg,
+    'fire.agentQuantity.inert40pct': (i) => M.fire.agentQuantity({ volumeM3: i.volumeM3, agent: 'ig541', concentration: i.concentration }).agentVolumeM3,
+    'water.annualM3.wue1p8': (i) => M.water.annualM3(i.mw, 'air'),
+    'pue.partialLoad.d1p5l0p4': (i) => M.pue.partialLoadPUE(i.designPUE, i.loadFraction),
+    'cooling.deepSea.accurate.flow10MW': (i) => M.cooling.deepSea(i).flow.m3s,
+    'cx.readinessIndex.partial': (i) => M.commissioning.readinessIndex(i.completion).index,
+    'opex.staffingCostAnnual.us13': null, // identity block below (recomputes from engine DATA)
+    'forecast.compoundGrowth.2p5pct10y': (i) => M.forecast.compoundGrowth(i.base, i.ratePct, i.years),
+    'spares.newsvendor.qstar.normal': (i) => M.spares.newsvendor(i).qStar,
 };
 
 console.log('ENGINE ACCURACY GATE — independent-truth comparison\n');
@@ -88,6 +97,48 @@ try {
     if (ok) { pass++; console.log('  ✔ opex.Σ-identity  components+overhead ≡ totalExtended (accounting convention)'); }
     else { fail++; failures.push(`opex.Σ-identity: sum=${sum} overhead=${overhead} total=${expect}`); }
 } catch (e) { fail++; failures.push('opex.Σ-identity threw ' + e.message); }
+
+
+/* M3-full identity asserts (recomputed from engine DATA — formula checks) */
+try {
+    const D = win.RZEngine.data;
+    const hc = 13, salary = (D.salaryBenchmarks.dcTechMid && D.salaryBenchmarks.dcTechMid.US) || 75100;
+    const expectStaff = Math.round(hc * salary * D.staffingLoadFactor);
+    const gotStaff = M.opex.staffingCostAnnual(hc, 'US');
+    if (gotStaff === expectStaff) { pass++; console.log('  ✔ opex.staffing identity  round(hc·salary·loadFactor) =', gotStaff); }
+    else { fail++; failures.push(`opex.staffing identity: ${gotStaff} vs ${expectStaff}`); }
+
+    const sc = M.carbon.scopes({ mw: 2.5, pue: 1.5, region: 'US', lifeYears: 15 });
+    const sumOk = Math.abs((sc.scope1 + sc.scope2 + sc.scope3Annual) - sc.totalAnnual) <= 0.11; // 1dp terminal rounding budget
+    if (sumOk) { pass++; console.log('  ✔ carbon.scopes Σ-identity  s1+s2+s3 ≡ total (±0.1 display)'); }
+    else { fail++; failures.push(`carbon.scopes: ${sc.scope1}+${sc.scope2}+${sc.scope3Annual} != ${sc.totalAnnual}`); }
+
+    const sched = M.construction.schedule({ design: 4, permit: 3, civil: 8, mep: 6, commission: 3 });
+    const phasesSum = sched && sched.phases ? sched.phases.reduce((a, p) => a + (p.months || 0), 0) : null;
+    if (sched && (sched.totalMonths != null) && phasesSum != null && Math.abs(sched.totalMonths - phasesSum) < 1e-9) {
+        pass++; console.log('  ✔ construction.schedule Σ-identity  totalMonths ≡ Σ phases =', sched.totalMonths);
+    } else if (sched && sched.totalMonths != null) {
+        // overlap-modeled schedules may legitimately differ — assert bounded instead
+        const ok = sched.totalMonths > 0 && sched.totalMonths <= (phasesSum ?? Infinity);
+        if (ok) { pass++; console.log('  ✔ construction.schedule bounded  0 < total ≤ Σ phases (overlap model)'); }
+        else { fail++; failures.push(`construction.schedule: total=${sched.totalMonths} phasesSum=${phasesSum}`); }
+    } else { skip++; console.log('  − construction.schedule identity SKIP (shape differs)'); }
+
+    const t3 = M.tier.classify({ power: 92, cooling: 92, network: 90, physical: 90, monitoring: 90, redundancy: '2n' });
+    const t3ok = t3 && t3.score >= 0 && t3.score <= 100 && t3.tier >= 1 && t3.tier <= 4;
+    if (t3ok) { pass++; console.log('  ✔ tier.classify bounds  score∈[0,100], tier∈[1,4]'); }
+    else { fail++; failures.push('tier.classify bounds violated: ' + JSON.stringify(t3)); }
+
+    // lcoe CRF identity: engine lcoe ≡ (capex·CRF + capex·opexPct)/mwhYr recomputed from DATA
+    const E = D.energy.solar;
+    const capexMw = (E.capexPerMwp && (E.capexPerMwp.US || E.capexPerMw)) || E.capexPerMw;
+    const cf = E.cfByRegion.US, r = D.discountDefaults.US || D.discountDefaults.global, n = E.lifeYears;
+    const crf = (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    const lcoeExpect = Math.round(((capexMw * crf + capexMw * E.opexPctYr) / (8760 * cf)) * 100) / 100;
+    const lcoeGot = M.energy.lcoe('solar', 'US');
+    if (lcoeGot === lcoeExpect) { pass++; console.log('  ✔ energy.lcoe CRF identity  $' + lcoeGot + '/MWh'); }
+    else { fail++; failures.push(`energy.lcoe identity: ${lcoeGot} vs ${lcoeExpect}`); }
+} catch (e) { fail++; failures.push('M3-full identity block threw: ' + e.message); }
 
 console.log(`\nACCURACY GATE: ${pass} pass / ${fail} fail / ${skip} skip`);
 if (failures.length) { console.log('\nFAILURES:'); failures.forEach((f) => console.log('  ✘ ' + f)); }

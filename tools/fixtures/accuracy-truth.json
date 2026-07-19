@@ -317,6 +317,111 @@
    "tol": 0.5,
    "tolKind": "abs",
    "note": "whole-dollar accounting rounding \u2014 |engine\u2212truth| \u2264 $0.5 (documented convention)"
+  },
+  "fire.agentQuantity.novec1463m3": {
+   "inputs": {
+    "volumeM3": 1463,
+    "agent": "novec1230",
+    "tempC": 20
+   },
+   "truth": 959.032480660932,
+   "tol": 0.06,
+   "tolKind": "abs",
+   "note": "m = V/s \u00b7 C/(100\u2212C), s = k1+k2\u00b7T (NFPA 2001 eq.); engine 1dp"
+  },
+  "fire.agentQuantity.inert40pct": {
+   "inputs": {
+    "volumeM3": 1463,
+    "agent": "inergen",
+    "concentration": 40
+   },
+   "truth": 747.3378875696444,
+   "tol": 0.06,
+   "tolKind": "abs",
+   "note": "V_agent = V\u00b7ln(100/(100\u2212C)) \u2014 inert flooding equation"
+  },
+  "water.annualM3.wue1p8": {
+   "inputs": {
+    "mw": 2.5,
+    "wue": 1.8
+   },
+   "truth": 39420.0,
+   "tol": 1.0,
+   "tolKind": "abs",
+   "note": "WUE\u00b7IT-kWh/1000 (engine rounds m\u00b3 to integer)"
+  },
+  "pue.partialLoad.d1p5l0p4": {
+   "inputs": {
+    "designPUE": 1.5,
+    "loadFraction": 0.4
+   },
+   "truth": 1.9125,
+   "tol": 1e-12,
+   "tolKind": "abs",
+   "note": "documented screening formula \u2014 exact identity"
+  },
+  "cooling.deepSea.accurate.flow10MW": {
+   "inputs": {
+    "itLoadMw": 10,
+    "pueTarget": 1.15,
+    "deltaTC": 8
+   },
+   "truth": 0.352,
+   "tol": 0.0005,
+   "tolKind": "abs",
+   "note": "accurate mode: TEOS-10 \u03c1=1025 cp=3985 energy balance (engine 3dp)"
+  },
+  "cx.readinessIndex.partial": {
+   "inputs": {
+    "completion": {
+     "L1": 1.0,
+     "L2": 0.8,
+     "L3": 0.5,
+     "ist": 0.25
+    }
+   },
+   "truth": 50.9,
+   "tol": 0.05,
+   "tolKind": "abs",
+   "note": "\u03a3w\u00b7c/\u03a3w over PRESENT keys only \u00d7100 (engine 1dp)"
+  },
+  "opex.staffingCostAnnual.us13": {
+   "inputs": {
+    "headcount": 13,
+    "region": "US"
+   },
+   "truth": null,
+   "tol": 0.5,
+   "tolKind": "abs",
+   "note": "IDENTITY IN GATE: round(hc\u00b7salary\u00b7loadFactor) recomputed from engine DATA \u2014 formula check"
+  },
+  "forecast.compoundGrowth.2p5pct10y": {
+   "inputs": {
+    "base": 1000,
+    "ratePct": 0.025,
+    "years": 10
+   },
+   "truth": 1280.084544196358,
+   "tol": 1e-06,
+   "tolKind": "abs",
+   "note": "FV = base\u00b7(1+r)^n"
+  },
+  "spares.newsvendor.qstar.normal": {
+   "inputs": {
+    "unitCost": 45000,
+    "understockCostPerEvent": 85000,
+    "carryRatePct": 25,
+    "partLifeYrs": 8,
+    "muAnnual": 6.0,
+    "sigmaAnnual": 3.6,
+    "ltWeeks": 16,
+    "ltSigmaWeeks": 4,
+    "poissonMode": false
+   },
+   "truth": 2,
+   "tol": 0,
+   "tolKind": "abs",
+   "note": "Q* = \u2308\u03bcLT + \u03a6\u207b\u00b9(CR)\u00b7\u03c3LT\u2309 \u2014 end-to-end replication (Acklam \u2261 erf-Newton at ceil grain)"
   }
  }
 }
