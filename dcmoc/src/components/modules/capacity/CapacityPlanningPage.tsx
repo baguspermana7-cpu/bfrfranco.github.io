@@ -309,7 +309,7 @@ export function CapacityPlanningPage() {
                             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Capacity Utilization (Current)</h2>
                                 <p className="mb-1.5 text-[10px] text-slate-500" title="Kapasitas power/cooling didesain = IT load + design margin, jadi utilization saat ini secara konstruksi ≈ 1/(1+margin). Yang bergerak dgn waktu adalah FORECAST (tab Forecast & Growth) — exhaustion year per sistem ada di Key Insights.">
-                                    Basis: kapasitas design = IT + margin — util saat ini ≈ 1/(1+margin) secara konstruksi; lihat Forecast utk exhaustion tahun-tahun mendatang. ⓘ
+                                    Basis: kapasitas design = IT + margin (util saat ini ≈ 1/(1+margin) secara konstruksi) — STATUS band memakai puncak FORECAST pertumbuhan + estimasi tahun exhaust per sistem. ⓘ
                                 </p>
                                 <div className="space-y-1.5">
                                     {util.rows.map((u) => (
@@ -320,14 +320,20 @@ export function CapacityPlanningPage() {
                                                     <div className={`h-2 rounded ${u.pct >= 85 ? 'bg-rose-500' : u.pct >= 70 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(100, u.pct)}%` }} />
                                                 </div>
                                                 <span className="w-24 text-right tabular-nums text-slate-500">{u.used.toLocaleString()}/{u.capacity.toLocaleString()} {u.unit}</span>
-                                                <span className="w-9 text-right tabular-nums font-semibold text-slate-700 dark:text-slate-300">{u.pct}%</span>
-                                                {u.pct >= 70 ? (
-                                                    <button onClick={() => setUtilExplain(utilExplain === u.key ? null : u.key)}
-                                                        title="Klik untuk alasan + lever terukur (dihitung dari model kapasitas live)"
-                                                        className={`w-14 shrink-0 rounded px-1 py-0.5 text-[9px] font-semibold ${u.pct >= 85 ? 'bg-rose-500/15 text-rose-500' : 'bg-amber-500/15 text-amber-500'} ${utilExplain === u.key ? 'ring-1 ring-amber-400' : ''}`}>
-                                                        {u.pct >= 85 ? 'At Risk' : 'Watch'} ⓘ
-                                                    </button>
-                                                ) : <span className="w-14 shrink-0 rounded px-1 py-0.5 text-center text-[9px] font-semibold bg-emerald-500/15 text-emerald-500">OK</span>}
+                                                <span className="w-9 text-right tabular-nums font-semibold text-slate-700 dark:text-slate-300"
+                                                    title={u.forecastPct != null ? `Sekarang ${u.pct}% · puncak forecast ${u.forecastPct}%${u.exhaustYear ? ` · exhaust ~${u.exhaustYear}` : ''}` : undefined}>{u.pct}%</span>
+                                                {(() => {
+                                                    /* Banding forecast-aware (keputusan owner): status dari tekanan pertumbuhan */
+                                                    const bandPct = u.forecastPct ?? u.pct;
+                                                    const chipTitle = `Band dari puncak FORECAST ${bandPct}% (sekarang ${u.pct}%)${u.exhaustYear ? ` — kapasitas habis ~${u.exhaustYear} tanpa fase baru` : ''} · klik utk lever terukur`;
+                                                    return bandPct >= 70 ? (
+                                                        <button onClick={() => setUtilExplain(utilExplain === u.key ? null : u.key)}
+                                                            title={chipTitle}
+                                                            className={`w-auto min-w-14 shrink-0 rounded px-1 py-0.5 text-[9px] font-semibold ${bandPct >= 85 ? 'bg-rose-500/15 text-rose-500' : 'bg-amber-500/15 text-amber-500'} ${utilExplain === u.key ? 'ring-1 ring-amber-400' : ''}`}>
+                                                            {bandPct >= 85 ? 'At Risk' : 'Watch'}{u.exhaustYear ? ` ·~${u.exhaustYear}` : ''} ⓘ
+                                                        </button>
+                                                    ) : <span title={chipTitle} className="w-14 shrink-0 cursor-help rounded px-1 py-0.5 text-center text-[9px] font-semibold bg-emerald-500/15 text-emerald-500">OK</span>;
+                                                })()}
                                             </div>
                                             {utilEx && utilEx.row.key === u.key && (
                                                 <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2">

@@ -89,7 +89,15 @@ export function forecastSeries(i: CapInputs, designPowerMw: number, horizon = 10
     return rows;
 }
 
-export interface UtilRow { key: string; label: string; used: number; capacity: number; pct: number; unit: string; basis: 'engine' | 'derived' | 'assumption' }
+export interface UtilRow {
+    key: string; label: string; used: number; capacity: number; pct: number; unit: string;
+    basis: 'engine' | 'derived' | 'assumption';
+    /* Forecast-aware banding (owner decision 2026-07-20): current pct is structurally
+     * ≈ 1/(1+margin) by construction, so STATUS derives from growth pressure —
+     * peak forecast share of design capacity + first exhaustion year. */
+    forecastPct?: number;
+    exhaustYear?: number | null;
+}
 
 export function utilization(i: CapInputs, facilityMw: number): { rows: UtilRow[]; binding: string | null; stranded: { strandedKw: number; fraction: number; isStranded: boolean } | null } {
     const m = rzModels()?.capacity;
@@ -121,6 +129,22 @@ export function utilization(i: CapInputs, facilityMw: number): { rows: UtilRow[]
         { key: 'space', label: 'Space Capacity', used: usedSpace, capacity: i.whiteFloorM2, pct: Math.round((usedSpace / Math.max(1, i.whiteFloorM2)) * 100), unit: 'm²', basis: 'engine' },
         { key: 'network', label: 'Network Capacity', used: +(racks * 0.0015).toFixed(1), capacity: +(designRacks * 0.0015 * margin).toFixed(1), pct: Math.round((racks / Math.max(1, designRacks * margin)) * 100), unit: 'Tbps', basis: 'assumption' },
     ];
+    /* Forecast overlay: scale each row's utilization by growth (all rows scale ∝ IT MW
+     * at constant PUE/density — power/cooling via facility, rack/space/network via racks). */
+    try {
+        const series = forecastSeries(i, designPowerMva * 0.9);
+        const itMwNow = Math.max(0.001, i.itLoadKw / 1000);
+        const peakMw = Math.max(...series.map((r) => Math.max(r.forecastMw, r.committedMw)), itMwNow);
+        const gf = Math.max(1, peakMw / itMwNow);
+        for (const row of rows) {
+            row.forecastPct = Math.min(400, Math.round(row.pct * gf));
+            if (row.pct > 0) {
+                const exhaustMw = itMwNow * (100 / row.pct);
+                const hit = series.find((r) => Math.max(r.forecastMw, r.committedMw) >= exhaustMw);
+                row.exhaustYear = hit ? hit.year : null;
+            } else row.exhaustYear = null;
+        }
+    } catch { /* forecast unavailable — rows keep current pct only */ }
     return { rows, binding, stranded };
 }
 

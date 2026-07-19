@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.97.5 — 2026-07-20 (Capacity banding forecast-aware — keputusan owner "go ahead")
+
+### Changed
+- **Capacity Utilization status kini forecast-aware**: chip OK/Watch/At-Risk dihitung dari **puncak forecast pertumbuhan** (share kapasitas design) bukan util saat ini yang struktural ≈1/(1+margin); tiap sistem dapat estimasi **tahun exhaust** ("At Risk ·~2029") — semua baris scale ∝ IT MW (power/cooling via facility, rack/space/network via racks), overlay di `capacity-adapter.utilization()` (field additive `forecastPct`/`exhaustYear`, fallback aman bila forecast kosong). Hover % = "Sekarang X% · puncak forecast Y% · exhaust ~tahun". Basis note diperbarui.
+
+### Verified
+- tsc/build · walk 24/0 · synergy 6/0.
+
 ## v1.97.4 — 2026-07-20 (pagi: Results DL + Country Coverage 98.3% + 2 fix jujur)
 
 ### Added
