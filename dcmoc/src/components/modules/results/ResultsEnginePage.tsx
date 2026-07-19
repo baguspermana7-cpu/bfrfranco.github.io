@@ -216,7 +216,7 @@ export function ResultsEnginePage() {
                                         <PolarAngleAxis dataKey="axis" tick={{ fontSize: 9, fill: '#94a3b8' }} />
                                         <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 8, fill: '#64748b' }} />
                                         <Radar name="Score" dataKey="score" stroke="#a78bfa" fill="#a78bfa" fillOpacity={0.2} strokeWidth={2} />
-                                        <Tooltip contentStyle={{ fontSize: 10 }} />
+                                        <Tooltip contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                     </RadarChart>
                                 </ResponsiveContainer>
                             </div>

@@ -252,7 +252,7 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
                                             <XAxis dataKey="month" tick={{ fontSize: 9 }} unit="mo" />
                                             <YAxis tick={{ fontSize: 8 }} tickFormatter={(v) => `$${(v / 1e6).toFixed(0)}M`} />
-                                            <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10 }} />
+                                            <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                             <Legend wrapperStyle={{ fontSize: 10 }} />
                                             <Area dataKey="pvUsd" name="Planned Value (cumulative)" stroke="#a78bfa" fill="#a78bfa" fillOpacity={0.15} />
                                         </ComposedChart>
@@ -271,7 +271,7 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                                                     <Pie data={model.opexDonut} dataKey="v" nameKey="name" innerRadius={34} outerRadius={54} paddingAngle={2}>
                                                         {model.opexDonut.map((_, idx) => <Cell key={idx} fill={OPEX_COLORS[idx]} />)}
                                                     </Pie>
-                                                    <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10 }} />
+                                                    <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                                 </PieChart>
                                             </ResponsiveContainer>
                                         </div>

@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.91.1 — 2026-07-19 (chart tooltips dark-theme sweep)
+
+### Fixed
+- **21 chart hover tooltips rendered as WHITE boxes with invisible text in dark mode** (owner-caught on the CAPEX forecast curve): every bare `contentStyle={{ fontSize: 10 }}` recharts Tooltip across 13 files (capex, capacity, construction, commissioning, financial, operations, reliability, results, sustainability, assets, architecture rail, site radar, scenarios) now carries the dark panel style (#1e293b bg, #334155 border, explicit light text) — hover values readable everywhere.
+
+---
+
 ## v1.91.0 — 2026-07-19 (DCMOC binding-trust round, slice 1 — audit-driven structural fixes)
 
 ### Fixed

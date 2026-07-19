@@ -194,7 +194,7 @@ export function AssetIntelligencePage() {
                                                 <Pie data={model.catDonut} dataKey="value" nameKey="name" innerRadius={30} outerRadius={50} paddingAngle={2}>
                                                     {model.catDonut.map((_, idx) => <Cell key={idx} fill={CAT_COLORS[idx]} />)}
                                                 </Pie>
-                                                <Tooltip contentStyle={{ fontSize: 10 }} />
+                                                <Tooltip contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                             </PieChart>
                                         </ResponsiveContainer>
                                     </div>
@@ -249,7 +249,7 @@ export function AssetIntelligencePage() {
                                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
                                     <XAxis dataKey="label" tick={{ fontSize: 8 }} interval={0} angle={-15} height={40} textAnchor="end" />
                                     <YAxis tick={{ fontSize: 9 }} domain={[0, 100]} />
-                                    <Tooltip contentStyle={{ fontSize: 10 }} />
+                                    <Tooltip contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                     <Bar dataKey="health" name="Health /100" radius={[3, 3, 0, 0]}>
                                         {model.rows.map((r) => <Cell key={r.cls + r.label} fill={r.health >= 70 ? '#34d399' : r.health >= 50 ? '#f59e0b' : '#fb7185'} />)}
                                     </Bar>

@@ -444,7 +444,7 @@ export function CommissioningEnginePage() {
                                         <Pie data={rich.levels} dataKey="cost" nameKey="label" innerRadius={34} outerRadius={54} paddingAngle={2}>
                                             {rich.levels.map((_: unknown, idx: number) => <Cell key={idx} fill={LEVEL_COLORS[idx]} />)}
                                         </Pie>
-                                        <Tooltip formatter={(v) => `$${(Number(v) / 1e3).toFixed(0)}K`} contentStyle={{ fontSize: 10 }} />
+                                        <Tooltip formatter={(v) => `$${(Number(v) / 1e3).toFixed(0)}K`} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                     </PieChart>
                                 </ResponsiveContainer>
                             </div>

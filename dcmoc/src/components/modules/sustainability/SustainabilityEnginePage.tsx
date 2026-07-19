@@ -172,7 +172,7 @@ export function SustainabilityEnginePage() {
                                                 <Pie data={scopeDonut} dataKey="v" nameKey="name" innerRadius={28} outerRadius={48} paddingAngle={2}>
                                                     {scopeDonut.map((_, idx) => <Cell key={idx} fill={SCOPE_COLORS[idx]} />)}
                                                 </Pie>
-                                                <Tooltip formatter={(v) => `${Math.round(Number(v)).toLocaleString()} tCO₂e`} contentStyle={{ fontSize: 10 }} />
+                                                <Tooltip formatter={(v) => `${Math.round(Number(v)).toLocaleString()} tCO₂e`} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                             </PieChart>
                                         </ResponsiveContainer>
                                     </div>
@@ -197,7 +197,7 @@ export function SustainabilityEnginePage() {
                                             <Pie data={model.mix} dataKey="v" nameKey="name" innerRadius={28} outerRadius={48} paddingAngle={2}>
                                                 {model.mix.map((_, idx) => <Cell key={idx} fill={MIX_COLORS[idx]} />)}
                                             </Pie>
-                                            <Tooltip formatter={(v) => `${v}%`} contentStyle={{ fontSize: 10 }} />
+                                            <Tooltip formatter={(v) => `${v}%`} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                         </PieChart>
                                     </ResponsiveContainer>
                                 </div>

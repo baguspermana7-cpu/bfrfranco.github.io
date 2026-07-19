@@ -197,7 +197,7 @@ export function ConstructionEngine() {
                                         <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
                                         <XAxis dataKey="month" tick={{ fontSize: 9 }} unit="mo" />
                                         <YAxis tick={{ fontSize: 9 }} unit="%" domain={[0, 100]} />
-                                        <Tooltip contentStyle={{ fontSize: 10 }} />
+                                        <Tooltip contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                         <Area dataKey="pvPct" name="Planned %" stroke="#a78bfa" fill="#a78bfa" fillOpacity={0.15} />
                                         {!planMode && t.statusMonth != null && (
                                             <Line data={[{ month: t.statusMonth, ev: e.evPct }]} dataKey="ev" name="Actual (EV) %" stroke="#34d399" dot={{ r: 5 }} />
@@ -214,7 +214,7 @@ export function ConstructionEngine() {
                                         <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
                                         <XAxis dataKey="month" tick={{ fontSize: 9 }} unit="mo" />
                                         <YAxis tick={{ fontSize: 9 }} />
-                                        <Tooltip contentStyle={{ fontSize: 10 }} />
+                                        <Tooltip contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                         <Area dataKey="planned" name="Planned crew" stroke="#22d3ee" fill="#22d3ee" fillOpacity={0.15} />
                                     </ComposedChart>
                                 </ResponsiveContainer>

@@ -66,7 +66,7 @@ export function ArchRail({ i, eq, f, layers, overall }: {
                             <Pie data={donut} dataKey="mw" nameKey="name" innerRadius={38} outerRadius={56} paddingAngle={2}>
                                 {donut.map((_, idx) => <Cell key={idx} fill={DONUT_COLORS[idx]} />)}
                             </Pie>
-                            <Tooltip formatter={(v) => `${v} MW`} contentStyle={{ fontSize: 10 }} />
+                            <Tooltip formatter={(v) => `${v} MW`} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>

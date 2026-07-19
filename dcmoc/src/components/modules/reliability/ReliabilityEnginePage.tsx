@@ -381,7 +381,7 @@ export function ReliabilityEnginePage() {
                                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
                                     <XAxis dataKey="name" tick={{ fontSize: 8 }} interval={0} angle={-12} height={34} textAnchor="end" />
                                     <YAxis tick={{ fontSize: 9 }} unit="k h" />
-                                    <Tooltip formatter={(v) => `${v}k h`} contentStyle={{ fontSize: 10 }} />
+                                    <Tooltip formatter={(v) => `${v}k h`} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                     <Bar dataKey="mtbfK" fill="#fb7185" radius={[3, 3, 0, 0]} />
                                 </BarChart>
                             </ResponsiveContainer>

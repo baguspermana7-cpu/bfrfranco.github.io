@@ -104,7 +104,7 @@ export function SiteRadarPanel({ sites, results, analysesById }: {
                             return <Radar key={r.siteId} name={`Site ${site.label}`} dataKey={`Site ${site.label}`}
                                 stroke={SITE_COLORS[i]} fill={SITE_COLORS[i]} fillOpacity={0.12} strokeWidth={1.5} />;
                         })}
-                        <Tooltip formatter={(v) => `${v}/100`} contentStyle={{ fontSize: 10 }} />
+                        <Tooltip formatter={(v) => `${v}/100`} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                         <Legend wrapperStyle={{ fontSize: 10 }} />
                     </RadarChart>
                 </ResponsiveContainer>

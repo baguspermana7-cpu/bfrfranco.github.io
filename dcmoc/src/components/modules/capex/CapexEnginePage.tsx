@@ -159,7 +159,7 @@ export function CapexEnginePage() {
                                             <Pie data={cats.rows} dataKey="usd" nameKey="name" innerRadius={38} outerRadius={62} paddingAngle={2}>
                                                 {cats.rows.map((r) => <Cell key={r.name} fill={r.color} />)}
                                             </Pie>
-                                            <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10 }} />
+                                            <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                         </PieChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -187,7 +187,7 @@ export function CapexEnginePage() {
                                     <ComposedChart data={band.curve}>
                                         <XAxis dataKey="x" tick={{ fontSize: 8 }} tickFormatter={(v) => `$${(v / 1e6).toFixed(0)}M`} />
                                         <YAxis hide />
-                                        <Tooltip formatter={() => ''} labelFormatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10 }} />
+                                        <Tooltip formatter={() => ''} labelFormatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                         <Area dataKey="y" stroke="#a78bfa" fill="#a78bfa" fillOpacity={0.25} />
                                     </ComposedChart>
                                 </ResponsiveContainer>
@@ -230,7 +230,7 @@ export function CapexEnginePage() {
                                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
                                             <XAxis dataKey="itMw" tick={{ fontSize: 9 }} unit=" MW" />
                                             <YAxis tick={{ fontSize: 8 }} tickFormatter={(v) => `$${(v / 1e6).toFixed(0)}M`} />
-                                            <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10 }} />
+                                            <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                             <Legend wrapperStyle={{ fontSize: 9 }} />
                                             <Line dataKey="p90" name="P90" stroke="#fb7185" strokeWidth={1.5} dot={false} />
                                             <Line dataKey="p50" name="P50" stroke="#a78bfa" strokeWidth={2} dot={{ r: 2 }} />
@@ -284,7 +284,7 @@ export function CapexEnginePage() {
                                     <BarChart data={PAYMENT_TERMS}>
                                         <XAxis dataKey="milestone" tick={{ fontSize: 7 }} interval={0} angle={-18} height={34} textAnchor="end" />
                                         <YAxis hide />
-                                        <Tooltip formatter={(v) => `${v}%`} contentStyle={{ fontSize: 10 }} />
+                                        <Tooltip formatter={(v) => `${v}%`} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                         <Bar dataKey="pct" fill="#a78bfa" radius={[3, 3, 0, 0]} />
                                     </BarChart>
                                 </ResponsiveContainer>

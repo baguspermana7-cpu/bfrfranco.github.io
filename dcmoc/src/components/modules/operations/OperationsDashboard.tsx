@@ -212,7 +212,7 @@ export function OperationsDashboard() {
                                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
                                             <XAxis dataKey="hour" tick={{ fontSize: 9 }} unit="h" />
                                             <YAxis tick={{ fontSize: 9 }} unit=" MW" />
-                                            <Tooltip contentStyle={{ fontSize: 10 }} />
+                                            <Tooltip contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                             <Legend wrapperStyle={{ fontSize: 10 }} />
                                             <Area dataKey="itMw" name="IT Load" stroke="#22d3ee" fill="#22d3ee" fillOpacity={0.15} />
                                             <Line dataKey="facilityMw" name="Facility Load" stroke="#a78bfa" strokeWidth={1.6} dot={false} />
