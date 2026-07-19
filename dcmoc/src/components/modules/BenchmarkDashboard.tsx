@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
+import { rzData } from '@/lib/rz-engine';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
@@ -176,8 +177,50 @@ export default function BenchmarkDashboard() {
         { id: 'comparison', label: 'Industry Comparison' },
     ];
 
+    /* #334 — CORPUS LIVE: posisi proyek dalam distribusi publik multi-sumber
+     * (DATA.benchmarksCorpus — setiap fakta ber-source_url+kutipan). */
+    const corpusData = (rzData() as { benchmarksCorpus?: Record<string, Record<string, { n: number; unit: string; p10: number; p25: number; p50: number; p75: number; p90: number; companies: string[]; sources: number }>> }).benchmarksCorpus ?? {};
+    const pueMx = (rzData() as { pueMatrix?: Record<string, Record<string, number>> }).pueMatrix;
+    const projPue = pueMx?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? null;
+    const corpusRows: { metric: string; unit: string; project: number | null; d: { n: number; p10: number; p25: number; p50: number; p75: number; p90: number; companies: string[]; sources: number } }[] = [];
+    if (corpusData.pue?.hyperscale) corpusRows.push({ metric: 'PUE', unit: 'ratio', project: projPue, d: corpusData.pue.hyperscale });
+    if (corpusData.capacity_mw?.hyperscale) corpusRows.push({ metric: 'Site Capacity', unit: 'MW', project: inputs.itLoad / 1000, d: corpusData.capacity_mw.hyperscale });
+    if (corpusData.renewable_share?.hyperscale) corpusRows.push({ metric: 'Renewable Share', unit: '%', project: null, d: corpusData.renewable_share.hyperscale });
+    const pctile = (v: number, d: { p10: number; p25: number; p50: number; p75: number; p90: number }): string =>
+        v <= d.p10 ? '≤p10' : v <= d.p25 ? 'p10-25' : v <= d.p50 ? 'p25-50' : v <= d.p75 ? 'p50-75' : v <= d.p90 ? 'p75-90' : '>p90';
+
     return (
         <div className="space-y-6">
+            {/* #334 — corpus live section */}
+            {corpusRows.length > 0 && (
+                <div className="rounded-2xl border border-emerald-500/30 bg-white dark:bg-slate-900/50 p-4">
+                    <div className="mb-2 flex items-center gap-2">
+                        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Posisi Proyek vs Korpus Publik Multi-Sumber</h3>
+                        <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">live corpus</span>
+                    </div>
+                    <div className="space-y-2.5">
+                        {corpusRows.map((r) => {
+                            const span = Math.max(1e-9, r.d.p90 - r.d.p10);
+                            const pos = r.project != null ? Math.min(100, Math.max(0, ((r.project - r.d.p10) / span) * 100)) : null;
+                            return (
+                                <div key={r.metric}>
+                                    <div className="flex items-baseline gap-2 text-[11px]">
+                                        <span className="w-32 font-medium text-slate-700 dark:text-slate-200">{r.metric}</span>
+                                        <span className="tabular-nums text-slate-500">p10 {r.d.p10.toLocaleString()} · p50 <b className="text-slate-900 dark:text-white">{r.d.p50.toLocaleString()}</b> · p90 {r.d.p90.toLocaleString()} {r.unit}</span>
+                                        {r.project != null && <span className="ml-auto rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-violet-500 dark:text-violet-300">proyekmu: {r.project.toLocaleString()} ({pctile(r.project, r.d)})</span>}
+                                    </div>
+                                    <div className="relative mt-1 h-2 rounded bg-slate-100 dark:bg-slate-800">
+                                        <div className="absolute h-2 rounded bg-emerald-500/30" style={{ left: `${((r.d.p25 - r.d.p10) / span) * 100}%`, width: `${((r.d.p75 - r.d.p25) / span) * 100}%` }} />
+                                        <div className="absolute top-[-2px] h-3 w-0.5 bg-slate-400" style={{ left: `${((r.d.p50 - r.d.p10) / span) * 100}%` }} />
+                                        {pos != null && <div className="absolute top-[-3px] h-4 w-1 rounded bg-violet-500" style={{ left: `${pos}%` }} title={`Proyekmu: ${r.project}`} />}
+                                    </div>
+                                    <div className="mt-0.5 text-[9px] text-slate-400">n={r.d.n} fakta · {r.d.sources} dokumen · {r.d.companies.slice(0, 4).join(', ')}{r.d.companies.length > 4 ? '…' : ''}</div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>

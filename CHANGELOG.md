@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.93.8 — 2026-07-19 (Benchmarks — project position vs the live corpus)
+
+### Added
+- **Benchmarks page opens with "Posisi Proyek vs Korpus Publik Multi-Sumber"** (owner: "jangan cuma JLL/CBRE; benchmarks kurang detail"): per metric (PUE, site capacity, renewable share) a distribution bar shows the corpus p10-p90 band (interquartile shaded, median tick) with YOUR project's marker + percentile chip ("proyekmu: 1.22 (p25-50)") and full provenance line (n facts · document count · companies). Data = live `DATA.benchmarksCorpus`; corpus refresh updates the page automatically.
+
+---
+
 ## v1.93.7 — 2026-07-19 (EA6 — DC Corpus surfaces in the Data Library)
 
 ### Added
