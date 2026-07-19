@@ -9,6 +9,7 @@
  * ──────────────────────────────────────────────────────────────────────────── */
 
 import React from 'react';
+import { useRequirementsStore } from '@/store/requirements';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useScenarioStore } from '@/store/scenario';
@@ -54,7 +55,8 @@ export function ExecutiveDashboard() {
     // Populate the roll-up with real CAPEX on first view.
     React.useEffect(() => { if (!capexResults) runCapex(); }, [capexResults, runCapex]);
     const d = useDashboardData();
-    const [tab, setTab] = React.useState('Executive Overview');
+    const [tab] = React.useState('Executive Overview');   // DI3 — single full view (tabs deleted)
+    const projName = useRequirementsStore((s2) => s2.overview.projectName);
     const [optNonce, setOptNonce] = React.useState(0);
     const [busy, setBusy] = React.useState<string | null>(null);
     const go = (t?: string) => { if (t) actions.setActiveTab(t as TabId); };
@@ -145,7 +147,7 @@ export function ExecutiveDashboard() {
 
     return (
         <div className="space-y-4 dark:text-slate-100">
-            <DashTopBar project={`${d.country} DC Campus — ${d.itLoadMw.toFixed(0)}MW`} activeTab={tab} onTab={setTab} />
+            <DashTopBar project={`${projName || d.country + ' DC'} — ${d.itLoadMw.toFixed(1)} MW IT · design ${(d.itLoadMw * 1.2).toFixed(1)} MW`} />
 
             {/* Reports view — a launcher into the full Reports module */}
             {has('reports') && (

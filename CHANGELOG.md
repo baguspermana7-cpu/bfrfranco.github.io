@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.94.2 — 2026-07-19 (dashboard integrity — fake selector + fragment tabs deleted)
+
+### Changed
+- **The fake dashboard project dropdown is gone** (owner-caught: "Indonesia DC Campus — 3MW" hardcoded label vs 2.5 MW context bar): the header now reads LIVE from the shared stores — real project name + "2.5 MW IT · design 3.0 MW" so the IT-vs-design distinction is explicit, one source with the context bar.
+- **Engineering/Construction/Operations/Financial/Analytics/Reports dashboard tabs DELETED** (owner: "isinya cuma potongan Executive Overview"): they were honest subsets; the full Executive Overview is now the single dashboard view (engine deep-dives live in their own sidebar pages).
+
+---
+
 ## v1.94.1 — 2026-07-19 (map integrity — real styles, no fakes, clean fallback)
 
 ### Changed

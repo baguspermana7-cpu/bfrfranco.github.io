@@ -8,7 +8,11 @@ import { useAiConfigStore } from '@/store/aiConfig';
 const TABS = ['Executive Overview', 'Engineering', 'Construction', 'Operations', 'Financial', 'Analytics', 'Reports'];
 
 /** DC-OS dashboard top bar: project selector + view tabs + search + AI Assistant. */
-export function DashTopBar({ project, activeTab, onTab }: { project: string; activeTab: string; onTab: (t: string) => void }) {
+/* DI1+DI3 (owner 2026-07-19): fake project-selector dropdown killed (label is
+ * now LIVE from the shared stores, passed by ExecutiveDashboard) and the
+ * Engineering/Construction/…/Reports view tabs DELETED — they were honest
+ * subsets of the full Executive Overview; the full view is the only view. */
+export function DashTopBar({ project }: { project: string; activeTab?: string; onTab?: (t: string) => void }) {
     const [aiOpen, setAiOpen] = React.useState(false);
     const aiEnabled = useAiConfigStore((s) => s.enabled);
     return (
@@ -16,30 +20,13 @@ export function DashTopBar({ project, activeTab, onTab }: { project: string; act
             {/* Project selector */}
             <div className="flex items-center gap-2">
                 <span className="text-[10px] uppercase tracking-wider text-slate-500">Project</span>
-                <button className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/80 text-sm font-medium text-slate-800 dark:text-slate-100">
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/80 text-sm font-medium text-slate-800 dark:text-slate-100">
                     {project}
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                </button>
+                </span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 font-semibold">Active</span>
             </div>
 
-            {/* View tabs */}
-            <div className="flex items-center gap-1 overflow-x-auto rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/60 p-0.5 mx-auto">
-                {TABS.map((t) => (
-                    <button
-                        key={t}
-                        data-dashtab={t}
-                        onClick={() => onTab(t)}
-                        className={`whitespace-nowrap px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === t
-                            ? 'bg-cyan-600 text-white'
-                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}
-                    >
-                        {t}
-                    </button>
-                ))}
-            </div>
-
-            {/* Search + AI */}
+                        {/* Search + AI */}
             <div className="flex items-center gap-2 ml-auto">
                 <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/80 text-slate-400 text-xs">
                     <Search className="w-3.5 h-3.5" />
