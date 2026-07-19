@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { REVENUE_PER_KW_MONTH } from '@/lib/screening';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { calculateDisasterRisk } from '@/modules/risk/DisasterRiskEngine';
@@ -29,7 +30,7 @@ const DisasterRiskDashboard = () => {
         if (!selectedCountry) return null;
         const itLoad = capexStore.inputs.itLoad || inputs.itLoad;
         const totalCapex = capexStore.results?.total || itLoad * 10000;
-        const annualRevenue = itLoad * 150 * 12; // $150/kW/month
+        const annualRevenue = itLoad * REVENUE_PER_KW_MONTH * 12; // screening basis — lib/screening.ts
         return calculateDisasterRisk({
             country: selectedCountry,
             totalCapex,

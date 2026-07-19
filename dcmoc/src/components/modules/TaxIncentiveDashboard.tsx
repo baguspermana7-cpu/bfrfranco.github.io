@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { REVENUE_PER_KW_MONTH, MAINT_PER_KW_YR } from '@/lib/screening';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { calculateTaxIncentives, TaxIncentiveResult } from '@/modules/analytics/TaxIncentiveEngine';
@@ -22,8 +23,8 @@ const TaxIncentiveDashboard = () => {
         if (!selectedCountry) return null;
         const itLoad = capexStore.inputs.itLoad || inputs.itLoad;
         const totalCapex = capexStore.results?.total || itLoad * 10000;
-        const annualRevenue = itLoad * 150 * 12;
-        const annualOpex = itLoad * 50 * 12;
+        const annualRevenue = itLoad * REVENUE_PER_KW_MONTH * 12;
+        const annualOpex = itLoad * MAINT_PER_KW_YR * 12;
 
         return calculateTaxIncentives({
             country: selectedCountry,
