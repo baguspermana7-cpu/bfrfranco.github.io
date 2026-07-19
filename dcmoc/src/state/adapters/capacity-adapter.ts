@@ -124,7 +124,7 @@ export function utilization(i: CapInputs, facilityMw: number): { rows: UtilRow[]
     return { rows, binding, stranded };
 }
 
-export interface ComponentRow { label: string; config: string; utilPct: number; status: 'OK' | 'Watch' | 'At Risk' }
+export interface ComponentRow { label: string; config: string; utilPct: number; status: 'OK' | 'Watch' | 'At Risk'; remediation?: string }
 
 /** Power components from the engine equipment-scaling model; ratings = scaling divisors (screening). */
 export function equipmentTable(i: CapInputs): { rows: ComponentRow[]; source: string } {
@@ -135,7 +135,21 @@ export function equipmentTable(i: CapInputs): { rows: ComponentRow[]; source: st
     const facilityKw = i.itLoadKw * (rzData()?.pueMatrix?.[i.coolingType]?.['tier' + i.tier] ?? 1.4);
     const mk = (label: string, count: number, ratingKw: number, loadKw: number): ComponentRow => {
         const pct = Math.min(150, Math.round((loadKw / Math.max(1, count * ratingKw)) * 100));
-        return { label, config: `${count}× ${(ratingKw / 1000).toFixed(1)} MW`, utilPct: pct, status: pct < 70 ? 'OK' : pct < 85 ? 'Watch' : 'At Risk' };
+        const status = pct < 70 ? 'OK' as const : pct < 85 ? 'Watch' as const : 'At Risk' as const;
+        /* DD (owner: "At Risk itu apa maksudnya — kasih guidance jelas apa yang
+         * di-finetune"): hitung DEFISIT persis dari divisor yang sama, sebutkan
+         * PARAMETER + JUMLAH + tuas alternatifnya. */
+        let remediation: string | undefined;
+        if (status !== 'OK') {
+            const needed = Math.ceil(loadKw / (0.8 * ratingKw));           // target ≤80% utilization
+            const addUnits = Math.max(0, needed - count);
+            const maxLoadKw = Math.floor(count * ratingKw * 0.8);
+            const shedKw = Math.max(0, loadKw - maxLoadKw);
+            remediation = status === 'At Risk'
+                ? `Utilisasi ${pct}% > 85%: tambah +${addUnits} unit (${count}→${needed}) untuk target ≤80%, ATAU turunkan beban ${(shedKw / 1000).toFixed(1)} MW (phase plan / IT load), ATAU naikkan rating unit di atas ${(ratingKw / 1000).toFixed(1)} MW.`
+                : `Utilisasi ${pct}% (Watch 70-85%): fase berikutnya akan melewati 85% — rencanakan +${Math.max(1, addUnits)} unit atau tahan pertumbuhan beban di ≤${(maxLoadKw / 1000).toFixed(1)} MW.`;
+        }
+        return { label, config: `${count}× ${(ratingKw / 1000).toFixed(1)} MW`, utilPct: pct, status, remediation };
     };
     return {
         source: 'engine equipScale · ratings = scaling divisors (screening)',

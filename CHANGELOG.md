@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.94.5 — 2026-07-19 (At-Risk remediation guidance — capacity equipment)
+
+### Added
+- **Every non-OK capacity status now says exactly WHAT to fine-tune** (owner: "At Risk itu apa maksudnya — harus ada guidance per equipment"): computed from the same scaling divisors — e.g. "Utilisasi 122% > 85%: tambah +45 unit (250→295) untuk target ≤80%, ATAU turunkan beban 12.5 MW (phase plan/IT load), ATAU naikkan rating unit" — hover on the status chip AND remediation lines under the table (Watch rows get a plan-ahead variant). Pattern rolls out to reliability SPOF / spares / sustainability chips next.
+
+---
+
 ## v1.94.4 — 2026-07-19 (Cx level explainers)
 
 ### Added

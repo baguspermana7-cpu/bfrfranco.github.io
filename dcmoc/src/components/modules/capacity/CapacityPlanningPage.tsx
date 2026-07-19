@@ -243,11 +243,21 @@ export function CapacityPlanningPage() {
                                                 <td className="py-1.5 text-slate-700 dark:text-slate-200">{r.label}</td>
                                                 <td className="text-right tabular-nums text-slate-500">{r.config}</td>
                                                 <td className="text-right tabular-nums text-slate-500">{r.utilPct}%</td>
-                                                <td className="text-right"><span className={`rounded px-1.5 py-0.5 text-[9px] font-semibold ${r.status === 'OK' ? 'bg-emerald-500/15 text-emerald-500' : r.status === 'Watch' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{r.status}</span></td>
+                                                <td className="text-right"><span title={r.remediation ?? 'Utilisasi sehat (<70%)'} className={`cursor-help rounded px-1.5 py-0.5 text-[9px] font-semibold ${r.status === 'OK' ? 'bg-emerald-500/15 text-emerald-500' : r.status === 'Watch' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{r.status}{r.remediation ? ' ⓘ' : ''}</span></td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
+                                        {equip.rows.some((r) => r.remediation) && (
+                                            <div className="mt-2 space-y-1">
+                                                {equip.rows.filter((r) => r.remediation).map((r) => (
+                                                    <div key={r.label} className="flex items-start gap-2 text-[10.5px] text-slate-600 dark:text-slate-300">
+                                                        <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8.5px] font-bold text-white ${r.status === 'At Risk' ? 'bg-rose-600' : 'bg-amber-600'}`}>{r.label}</span>
+                                                        <span>{r.remediation}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                 <p className="mt-1 text-[9px] text-slate-400">{equip.source}</p>
                             </div>
                         )}
