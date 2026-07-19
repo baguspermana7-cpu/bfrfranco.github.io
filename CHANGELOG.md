@@ -11,6 +11,12 @@ release sections rather than semver.
 
 ---
 
+## v1.85.4 — 2026-07-19 (DCMOC batch 5: Settings & Integrations to the reference UIUX)
+
+### Changed
+- **Settings rebuilt to the reference layout** (setting.png): Overview tab with KPI chip row (projects/scenarios/integrations/engine-data/storage — all real counts), Quick Settings rows (organization, default country w/ Apply, currency, theme — icon + subtitle + inline control), System Preferences card grid (Data Management, Integrations, User Management, Audit Trail, real JSON Backup & Export, Security note), right rail with Platform Information (site version, engine DATA version, real storage estimate bar), Recent Activity (real settings change log, additive store field) and Need Help (FAQ/Knowledge links).
+- **Integrations rebuilt to the reference layout** (integration.png): KPI row (total/reachable/configured/errors), search filter, integrations TABLE (name, kind, status chip, last test, test/delete row actions), selected-integration DETAIL RAIL (name/kind/URL/secret-ref editors + Test Connection), Add Custom Integration; the sidebar Integrations tab now opens this same surface (old card grid retired). Honest scope labels retained (CORS-limited reachability, secrets never stored).
+
 ## v1.85.3 — 2026-07-19 (DCMOC batch 4: Architecture dynamic symbol palette + all-parameter diagram)
 
 ### Added

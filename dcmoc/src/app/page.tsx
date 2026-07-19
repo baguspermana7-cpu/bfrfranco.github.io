@@ -12,7 +12,7 @@ import CarbonDashboard from '@/components/modules/CarbonDashboard';
 import FinancialDashboard from '@/components/modules/FinancialDashboard';
 import InvestmentDashboard from '@/components/modules/InvestmentDashboard';
 import BenchmarkDashboard from '@/components/modules/BenchmarkDashboard';
-import MonteCarloDashboard from '@/components/modules/MonteCarloDashboard';
+
 import PortfolioDashboard from '@/components/modules/PortfolioDashboard';
 import { FaqDashboard } from '@/components/modules/FaqDashboard';
 import CapacityDashboardMod from '@/components/modules/CapacityDashboard';
@@ -46,7 +46,7 @@ import { SettingsPage } from '@/components/modules/platform/SettingsPage';
 import { RequirementsPage } from '@/components/modules/requirements/RequirementsPage';
 import { SiteIntelligencePage } from '@/components/modules/site-intel/SiteIntelligencePage';
 import { TierDashboard, FireDashboard, CduDashboard, SparesDashboard } from '@/components/modules/DesignToolsDashboards';
-import { DataLibraryDashboard, TemplatesDashboard, ProjectsDashboard, SettingsDashboard, KnowledgeDashboard, IntegrationsDashboard, AuditDashboard, UsersDashboard } from '@/components/modules/PlatformDashboards';
+import { DataLibraryDashboard, TemplatesDashboard, ProjectsDashboard, KnowledgeDashboard, AuditDashboard, UsersDashboard } from '@/components/modules/PlatformDashboards';
 import { useScenarioStore } from '@/store/scenario';
 import { Calculator } from 'lucide-react';
 
@@ -144,7 +144,8 @@ export default function Home() {
       case 'knowledge':
         return <KnowledgeDashboard />;
       case 'integrations':
-        return <IntegrationsDashboard />;
+        /* AD2: single integrations surface — the rebuilt Settings integrations tab */
+        return <SettingsPage initialTab="integrations" />;
       case 'settings':
         return <SettingsPage />;
       case 'audit':
