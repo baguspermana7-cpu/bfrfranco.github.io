@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.92.4 — 2026-07-19 (trace cross-surface links + trace standard)
+
+### Added
+- **Trace links beyond DCMOC** (owner: "trace bisa beda page atau data lain, tidak terbatas DCMOC"): trace leaves gain external cross-surface links — "🌐 Sumber eksternal" beside "↗ Edit di menu" (PUE → site glossary; tariff → DC market tracker; corpus facts → the original public document URL as the graph grows). Audit chain now runs DCMOC number → parameter → engine constant → public source document.
+- **`standarization/VALUE_TRACE_STANDARD.md`** — the trace system codified (registry schema, traceId ≡ data-bind ≡ value-bindings id, provenance colors, adoption RULE: every newly rendered number MUST register a traceId — added to the Definition of Done in ENGINE_UNIFICATION.md; USER_MANUAL §9).
+
+---
+
 ## v1.92.3 — 2026-07-19 (Trace Angka v2 — intuitive visual formula)
 
 ### Changed

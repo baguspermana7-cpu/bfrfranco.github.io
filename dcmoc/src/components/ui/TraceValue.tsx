@@ -112,10 +112,19 @@ function Panel({ root }: { root: ResolvedTrace }) {
                 </div>
             )}
 
-            <button onClick={() => setActiveTab(node.page as never)}
-                className="mt-2 w-full rounded-lg bg-violet-600 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">
-                ↗ Buka / edit di menu: {node.page}
-            </button>
+            <div className="mt-2 flex gap-2">
+                <button onClick={() => setActiveTab(node.page as never)}
+                    className="flex-1 rounded-lg bg-violet-600 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">
+                    ↗ Buka / edit di menu: {node.page}
+                </button>
+                {node.external && (
+                    <a href={node.external.href} target="_blank" rel="noopener"
+                        className="flex-1 rounded-lg border border-emerald-500/50 py-1.5 text-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10"
+                        title={node.external.label}>
+                        🌐 Sumber eksternal
+                    </a>
+                )}
+            </div>
         </div>
     );
 }

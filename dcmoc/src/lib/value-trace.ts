@@ -25,6 +25,8 @@ export interface TraceNode {
     get: () => number | null;
     /** for engine leaves: DATA.sources key documenting the constant */
     sourceKey?: string;
+    /** EB6 — cross-surface link OUTSIDE dcmoc (glossary/article/corpus doc/gateway) */
+    external?: { href: string; label: string };
 }
 
 const sim = () => useSimulationStore.getState();
@@ -40,12 +42,12 @@ export const TRACE: Record<string, TraceNode> = {
     /* ── LEAF INPUTS (titik paling ujung — user-owned) ── */
     'sim.itLoad': { label: 'IT Load', page: 'requirements', unit: 'kW', provenance: 'input', get: () => sim().inputs.itLoad },
     'sim.tierLevel': { label: 'Tier Level', page: 'requirements', provenance: 'input', get: () => sim().inputs.tierLevel },
-    'sim.electricityRate': { label: 'Electricity Tariff (country)', page: 'requirements', unit: '$/kWh', provenance: 'input', get: () => sim().selectedCountry?.economy.electricityRate ?? null },
+    'sim.electricityRate': { label: 'Electricity Tariff (country)', page: 'requirements', unit: '$/kWh', provenance: 'input', external: { href: '/dc-market-tracker.html', label: 'DC market tracker (tarif per negara)' }, get: () => sim().selectedCountry?.economy.electricityRate ?? null },
     'req.designMarginPct': { label: 'Design Margin', page: 'requirements', unit: '%', provenance: 'input', get: () => req().business.designMarginPct ?? 10 },
     'capex.contingencyPct': { label: 'Contingency %', page: 'capex', unit: '%', provenance: 'input', get: () => cap().inputs.contingency },
 
     /* ── ENGINE LEAVES (DATA constants — provenance via DATA.sources) ── */
-    'engine.pueMatrix': { label: 'Design PUE (matrix[cooling][tier])', page: 'architecture', unit: 'ratio', provenance: 'engine', sourceKey: 'pueMatrix', get: pueLive },
+    'engine.pueMatrix': { label: 'Design PUE (matrix[cooling][tier])', page: 'architecture', unit: 'ratio', provenance: 'engine', sourceKey: 'pueMatrix', external: { href: '/glossary.html#pue', label: 'Glossary: PUE' }, get: pueLive },
     'engine.hoursPerYear': { label: 'Hours per Year', page: 'knowledge', unit: 'h', provenance: 'engine', sourceKey: 'conventions', get: () => 8760 },
 
     /* ── DERIVED CHAIN ── */
@@ -94,6 +96,7 @@ export interface ResolvedTrace {
     /** formula with LIVE numbers substituted, e.g. "610 = 500000 × 1.22 ÷ 1000" */
     formulaLive?: string;
     sourceKey?: string;
+    external?: { href: string; label: string };
     children: ResolvedTrace[];
 }
 
@@ -113,7 +116,7 @@ export function resolveTrace(id: string, depth = 8): ResolvedTrace | null {
         for (const c of children) formulaLive = formulaLive.split(c.id).join(`${c.label} [${fmtV(c.value)}]`);
         formulaLive = `${fmtV(value)} = ${formulaLive}`;
     }
-    return { id, label: n.label, page: n.page, unit: n.unit, provenance: n.provenance, value, formulaLive, sourceKey: n.sourceKey, children };
+    return { id, label: n.label, page: n.page, unit: n.unit, provenance: n.provenance, value, formulaLive, sourceKey: n.sourceKey, external: n.external, children };
 }
 
 /** All ids (for gates + Knowledge Base live-trace rendering). */
