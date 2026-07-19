@@ -165,8 +165,34 @@ export function SiteRightRail({ sites, results, selectedId, onSelect, onEdit }: 
         } finally { setBusy(false); }
     };
 
+    /* #328 — on-page site guidance (5th adoption of the assessment pattern). */
+    const siteAssess = selResult ? (() => {
+        const weakest = [...selResult.engine.breakdown].sort((a, b) => a.value - b.value)[0];
+        const met = { score: selResult.engine.score, keyRisk: weakest?.key ?? '' };
+        return { assess: buildAssessment('site', met), acts: buildActions('site', met) };
+    })() : null;
+
     return (
         <aside className="space-y-4 lg:sticky lg:top-4 self-start">
+            {siteAssess && (
+                <div className="rounded-xl border border-slate-200 dark:border-slate-700/70 bg-white dark:bg-slate-900/50 p-3">
+                    <div className="flex items-start gap-2.5">
+                        <div className="shrink-0 rounded-lg px-2.5 py-1.5 text-center text-white" style={{ background: siteAssess.assess.color }}>
+                            <div className="text-[8.5px] uppercase opacity-80">Site</div>
+                            <div className="text-xs font-bold">{siteAssess.assess.label}</div>
+                        </div>
+                        <p className="min-w-0 flex-1 text-[10.5px] leading-relaxed text-slate-600 dark:text-slate-300">{siteAssess.assess.narrative}</p>
+                    </div>
+                    <div className="mt-2 space-y-1">
+                        {siteAssess.acts.slice(0, 2).map((a, i) => (
+                            <div key={i} className="flex items-start gap-2 text-[10px] text-slate-600 dark:text-slate-300">
+                                <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8px] font-bold text-white ${a.priority === 'HIGH' ? 'bg-red-600' : a.priority === 'MEDIUM' ? 'bg-amber-600' : 'bg-emerald-600'}`}>{a.priority}</span>
+                                <span>{a.action}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 space-y-2">
                 <select className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-violet-500"
                     value={selectedId ?? ''} onChange={(e) => onSelect(e.target.value)}>

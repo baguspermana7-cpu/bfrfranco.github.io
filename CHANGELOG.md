@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.94.9 — 2026-07-19 (on-page guidance — Site Intelligence; pattern complete)
+
+### Added
+- Site Intelligence rail gains the on-page guidance panel (5th and final planned adoption): site band chip + narrative (leading risk factor named) + prioritized actions. The assessment pattern now covers Carbon, Reliability, Results, Commissioning and Site — every major grade/score in the app explains itself and says what to fine-tune.
+
+---
+
 ## v1.94.8 — 2026-07-19 (on-page guidance — Commissioning)
 
 ### Added
