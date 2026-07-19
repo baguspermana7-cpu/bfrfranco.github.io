@@ -8,6 +8,7 @@
 import React from 'react';
 import { useArchitectureStore } from '@/store/architecture';
 import type { DiagramModel, DiagBlock, DiagEdge, EdgeKind } from './layout';
+import { SymbolGlyph } from './palette';
 import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 
 const EDGE_STYLE: Record<EdgeKind, { stroke: string; dash?: string; label: string }> = {
@@ -74,6 +75,30 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
             <svg viewBox={`${vx} ${vy} ${vw} ${vh}`} className="w-full cursor-grab rounded-xl active:cursor-grabbing" style={{ background: '#0b1020', minHeight: 260 }}
                 onWheel={onWheel} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerLeave={onUp}>
                 <g transform={`translate(${panX},${panY}) scale(${zoom})`} style={{ transformOrigin: 'center' }}>
+                    {/* group containment boxes (under everything) */}
+                    {model.groups?.map((gr, i) => (
+                        <g key={'grp' + i}>
+                            <rect x={gr.x} y={gr.y} width={gr.w} height={gr.h} rx={6}
+                                fill={sld ? 'none' : LANE_FILL[gr.lane]} fillOpacity={sld ? 0 : 0.25}
+                                stroke={LANE_STROKE[gr.lane]} strokeWidth={0.6} strokeDasharray="5 4" opacity={0.7}>
+                                <title>{gr.title}</title>
+                            </rect>
+                            <text x={gr.x + 6} y={gr.y + 9} fontSize="6.5" fontWeight={700} letterSpacing="0.8"
+                                fill={LANE_STROKE[gr.lane]} opacity={0.9}>{gr.title}</text>
+                        </g>
+                    ))}
+                    {/* A/B bus bars */}
+                    {model.buses?.map((b, i) => (
+                        <g key={'bus' + i}>
+                            <line x1={b.x1} y1={b.y} x2={b.x2} y2={b.y}
+                                stroke={b.spare ? '#f97316' : '#3b82f6'} strokeWidth={b.spare ? 1.6 : 2.6}
+                                strokeDasharray={b.spare ? '4 3' : undefined} opacity={0.9}>
+                                <title>{b.label} — {b.spare ? 'spare trunk (2N+1)' : 'main distribution bus'}</title>
+                            </line>
+                            <text x={(b.x1 + b.x2) / 2} y={b.y - 3} fontSize="5.5" fontWeight={700} textAnchor="middle"
+                                fill={b.spare ? '#fb923c' : '#60a5fa'}>{b.label}</text>
+                        </g>
+                    ))}
                     {/* edges under blocks */}
                     {model.edges.map((e: DiagEdge, i) => {
                         const from = byId[e.from]; const to = byId[e.to];
@@ -88,12 +113,20 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
                     {model.blocks.map((b) => {
                         const hidden = sld && (b.lane === 'cooling' || b.lane === 'bms');
                         if (hidden) return null;
+                        const hasGlyph = !!b.kind;
+                        const tx = hasGlyph ? b.x + 28 : b.x + 8;
                         return (
                             <g key={b.id}>
                                 <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={sld ? 2 : 8}
-                                    fill={sld ? '#0f172a' : LANE_FILL[b.lane]} stroke={sld ? '#94a3b8' : LANE_STROKE[b.lane]} strokeWidth={1} />
-                                <text x={b.x + 8} y={b.y + 16} fontSize="9" fontWeight={700} fill="#e2e8f0">{b.title}</text>
-                                {b.sub && <text x={b.x + 8} y={b.y + 28} fontSize="7.5" fill="#94a3b8">{b.sub}</text>}
+                                    fill={sld ? '#0f172a' : LANE_FILL[b.lane]} stroke={sld ? '#94a3b8' : LANE_STROKE[b.lane]} strokeWidth={1}>
+                                    <title>{b.hover ?? `${b.title}${b.sub ? ` — ${b.sub}` : ''}`}</title>
+                                </rect>
+                                {b.kind && (
+                                    <SymbolGlyph kind={b.kind} x={b.x + 4} y={b.y + (b.h - 22) / 2} s={22}
+                                        color={sld ? '#cbd5e1' : LANE_STROKE[b.lane]} sld={sld} />
+                                )}
+                                <text x={tx} y={b.y + 16} fontSize="9" fontWeight={700} fill="#e2e8f0">{b.title}</text>
+                                {b.sub && <text x={tx} y={b.y + 28} fontSize="7.5" fill="#94a3b8">{b.sub}</text>}
                                 {b.badge && (
                                     <>
                                         <rect x={b.x + b.w - 34} y={b.y + 4} width={30} height={11} rx={5} fill="#a78bfa22" stroke="#a78bfa" strokeWidth={0.5} />

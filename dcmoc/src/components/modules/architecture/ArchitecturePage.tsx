@@ -54,7 +54,23 @@ export function ArchitecturePage() {
     const f = React.useMemo(() => computeFacility(i), [i]);
     const { eq } = React.useMemo(() => computeEquipCounts(i), [i]);
     const { layers, overall } = React.useMemo(() => computeValidation(i, eq), [i, eq]);
-    const model = React.useMemo(() => computeLayout(i, eq, f), [i, eq, f]);
+    /* AF: the diagram plots from ALL requirement params — utility name, workload
+     * mix cells, growth phases, design margin, SLA, use-case label. */
+    const model = React.useMemo(() => {
+        const phases = (simInputs.capacityPhases ?? []).map((p: { label?: string; name?: string; itLoadKw?: number; kw?: number; mw?: number }, idx: number) => ({
+            label: p.label ?? p.name ?? `Phase ${idx + 1}`,
+            mw: (p.mw ?? ((p.itLoadKw ?? p.kw ?? 0) / 1000)) || 0,
+            future: idx > 0,
+        })).filter((p) => p.mw > 0);
+        return computeLayout(i, eq, f, {
+            utilityProvider: req.overview.utilityProvider,
+            mix: req.workload.workloadMix,
+            phases,
+            marginPct: req.business.designMarginPct,
+            slaPct: req.availability.slaTargetPct,
+            useCaseLabel: req.overview.useCase.toUpperCase(),
+        });
+    }, [i, eq, f, simInputs.capacityPhases, req.overview.utilityProvider, req.overview.useCase, req.workload.workloadMix, req.business.designMarginPct, req.availability.slaTargetPct]);
 
     const m = rzModels()?.architecture;
     let complexity: { index: number; band: string } | null = null;

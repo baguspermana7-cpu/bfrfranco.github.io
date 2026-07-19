@@ -11,6 +11,12 @@ release sections rather than semver.
 
 ---
 
+## v1.85.3 — 2026-07-19 (DCMOC batch 4: Architecture dynamic symbol palette + all-parameter diagram)
+
+### Added
+- **Dynamic symbol palette** (`diagram/palette.tsx`): data-driven registry of 16 parametric equipment glyphs (utility pylon, IEC transformer, switchgear/breaker, genset, fuel tank, UPS AC/DC, battery plates, PDU, rack, spine-leaf fabric, chiller, cooling tower, CDU pump+HX, CRAH, BMS, IT load) with logical + SLD skins — the layout engine composes ONLY from the palette; a new equipment kind is one registry entry.
+- **Diagram plots from ALL requirement parameters**: transformer stage (MV/LV bank counts), A/B bus bars (+ dashed spare trunk at 2N+1), battery-autonomy annotation per tier, utility blocks named from the 1.1 utility provider, IT hall split into CELLS sized by the workload mix (AI/GPU, storage, general+network with per-cell rack counts), growth-phase boxes from the capacity plan (NOW/PLAN badges), design-margin + SLA + use-case annotations, group containment boxes (POWER TRAIN / IT HALL / GENERATION / COOLING PLANT / NETWORK & CONTROL) with live counts. Every block carries an exact-value hover title. Param-reactivity probe: changing grid voltage (incl. new 20 kV) re-labels the diagram live — 7/7.
+
 ## v1.85.2 — 2026-07-19 (DCMOC batch 3: Monte Carlo folded in + Strategic dedup + CDU rebuild with deep-sea advanced)
 
 ### Changed
