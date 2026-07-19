@@ -11,6 +11,12 @@ release sections rather than semver.
 
 ---
 
+## v1.85.1 — 2026-07-19 (DCMOC batch 2: Site Intelligence full integration + Requirements 1.6 Infrastructure)
+
+### Added
+- **Site Intelligence FULL INTEGRATION**: the five sibling analyses (Tax & Incentives, Disaster Risk, Grid Reliability, Talent, Compliance) are now COMPUTED PER CANDIDATE SITE inside the unified page — integrated analysis panels with real engine outputs (grade/outage-minutes/required gen, composite risk/insurance/EAL, incentive value/NPV uplift/rank, time-to-staff/recruitment cost, mandatory items/costs), radar axes remapped to the integrated engines, comparison table gains 7 engine rows, deep-dive links preserved.
+- **Requirements 1.6 Infrastructure & Site Options**: the capex-calculator questionnaire surfaced in Requirements writing straight to the SHARED capex store — Deep-Sea Cooling (tick + depth/pipeline/ΔT), Front-of-Meter (substation/transformer lead/utility rate), Building & Site (building type, seismic zone, site condition, floor), Systems (UPS/gen/fire/alarm/refrigerant from the engine GWP database), Distribution & Security, Sustainability & Renewables (solar MWp + BESS MWh), Delivery basis (year/market/method/fees; contingency stays bound to Design Margin). Deep-sea tick in the CAPEX drawer now shares the same store field.
+
 ## v1.85.0 — 2026-07-19 (DCMOC revision round batch 1: PDF standard renderer + Cx checklist + spares engine + shell UIUX + reliability depth)
 
 ### Fixed
