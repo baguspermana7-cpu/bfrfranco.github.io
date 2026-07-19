@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.92.6 — 2026-07-19 (on-page guidance — Reliability)
+
+### Added
+- Reliability Engine gains the on-page guidance panel (pattern from Carbon v1.91.6): availability status chip + plain narrative (why the band, β common-cause note) + top-3 prioritized actions naming exactly what to fix (redundancy on the weakest chain, SPOF elimination, MTTR levers) — rendered live beside the KPI row.
+
+---
+
 ## v1.92.5 — 2026-07-19 (trace graph batch 3)
 
 ### Added
