@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useSimulationStore } from '@/store/simulation';
+import { useRequirementsStore } from '@/store/requirements';
 import { useScenarioStore, SavedScenario } from '@/store/scenario';
 import { useCapexStore } from '@/store/capex';
 import { useTheme } from '@/components/providers/ThemeProvider';
@@ -99,6 +100,7 @@ export function Shell({ children }: ShellProps) {
 function ShellContent({ children, user }: { children: React.ReactNode; user: { email: string; role: string } }) {
     const logout = useAuthStore((s) => s.logout);
     const { selectedCountry, activeTab, inputs, actions } = useSimulationStore();
+    const projectName = useRequirementsStore((s) => s.overview.projectName);
     const scenarioStore = useScenarioStore();
     const capexStore = useCapexStore();
     const { theme, setTheme } = useTheme();
@@ -594,18 +596,30 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                     </div>
                 </header>
 
-                {/* Data-vintage banner */}
+                {/* #336 — PROJECT CONTEXT BAR (owner: every page must show WHICH
+                  * project it is working on — live from the shared stores; the old
+                  * static data-vintage note shrinks into a hover title). */}
                 {!vintageBannerDismissed && (
-                    <div className="mx-4 sm:mx-6 lg:mx-8 mt-4 flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs text-slate-500 dark:text-slate-400">
-                        <span>
-                            <span className="font-medium text-slate-600 dark:text-slate-300">Data vintage: 2026-Q1</span>
-                            {' · '}benchmarks: Uptime Institute 2025, JLL/CBRE 2025
-                            {' · '}costs in USD
+                    <div className="mx-4 sm:mx-6 lg:mx-8 mt-4 flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs text-slate-500 dark:text-slate-400"
+                        title="Data vintage: 2026-Q1 · benchmarks: Uptime Institute 2025, JLL/CBRE 2025 · costs in USD">
+                        <span className="flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0">
+                            <span className="font-semibold text-violet-600 dark:text-violet-300 truncate">
+                                {projectName || 'Untitled Project'}
+                            </span>
+                            <span className="text-slate-300 dark:text-slate-600">·</span>
+                            <span className="font-medium text-slate-600 dark:text-slate-300">{selectedCountry?.name ?? '—'}</span>
+                            <span className="text-slate-300 dark:text-slate-600">·</span>
+                            <span className="tabular-nums">{(inputs.itLoad / 1000).toFixed(inputs.itLoad >= 100000 ? 0 : 1)} MW IT</span>
+                            <span className="text-slate-300 dark:text-slate-600">·</span>
+                            <span>Tier {inputs.tierLevel}</span>
+                            <span className="text-slate-300 dark:text-slate-600">·</span>
+                            <span className="capitalize">{inputs.coolingType}</span>
+                            <span className="hidden sm:inline text-[10px] text-slate-400 dark:text-slate-500">· data 2026-Q1 ⓘ</span>
                         </span>
                         <button
                             onClick={handleDismissVintageBanner}
                             className="shrink-0 p-0.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
-                            aria-label="Dismiss data vintage notice"
+                            aria-label="Dismiss project context bar"
                         >
                             <X className="w-3.5 h-3.5" />
                         </button>

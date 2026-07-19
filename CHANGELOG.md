@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.91.0 — 2026-07-19 (DCMOC binding-trust round, slice 1 — audit-driven structural fixes)
+
+### Fixed
+- **Capex + simulation stores now PERSIST** (audit-critical): reload no longer wipes IT load/tier/cooling/phases/deep-sea tick while requirements survived — the root of the owner-caught cross-page contradictions ("Requirements 1.6 enabled, CDU says off"; "Indonesia · 1,000 kW" headers on a UAE 500 MW project). selectedCountry rehydrates by id against the live COUNTRIES table.
+- **Candidate site follows the project country**: `syncToCountry` updates the pristine scenario site (name/country/coords from the new COUNTRY_GEO table) on every `writeSharedCountry` + stale-localStorage rebase on load; user-customized sites keep manual values. Kills "Indonesia Site" on a UAE project.
+- **Capacity phases derive from IT load**: hardcoded 2/5/10 MW seeds replaced by `derivePhases(itLoad)` (4-phase staggered split); pristine phases re-derive on itLoad change, manual edits set `capacityPhasesCustomized` and stop derivation. Kills "22 MW plan on a 500 MW project".
+- **Engine-ready signal**: `useEngineReady()` hook + `rz-engine-ready` event fix the deferred-engine race (Spares memo never re-ran; CDU deep-sea stuck "off"); CDU banner now distinguishes "engine loading" from "off".
+
+### Changed
+- Data-vintage banner → live **project-context bar** (project name · country · MW IT · tier · cooling from the shared stores; vintage note moved to hover) — every page shows which project it is working on.
+- `maplibre-gl` dependency added (real-map slice upcoming); `src/constants/geo.ts` country geo anchors.
+
+---
+
 ## v1.90.2 — 2026-07-19 (article-calculator engine sweep, batch 4)
 
 ### Added
