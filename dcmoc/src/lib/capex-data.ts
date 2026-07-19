@@ -39,6 +39,9 @@ export const fireSuppressionMultipliers: Record<string, number> = { fm200: 1.0, 
 export const fireAlarmMultipliers: Record<string, number> = { conventional: 0.6, addressable: 1.0, vesda: 1.8, hybrid: 2.2 };
 export const upsMultipliers: Record<string, number> = { standalone: 0.9, modular: 1.0, distributed: 1.2, rotary: 1.5 };
 export const genMultipliers: Record<string, number> = { diesel: 1.0, gas: 1.15, dualfuel: 1.3, hvo: 1.2 };
+// DM audit: legacy coarse REGION map — FALLBACK ONLY. CapexEngine location priority is
+// COUNTRIES[id].constructionIndex (now filled 40/40 in constants/countries.ts, T&T ICMS/RLB
+// screening rel. US=1.0) > cityData perW > this map (CapexEngine.ts:131-143).
 export const locationMultipliers: Record<string, number> = { sea: 0.65, india: 0.55, china: 0.7, japan: 1.1, australia: 1.05, europe: 1.15, usa: 1.0, mena: 0.85, africa: 0.55, south_america: 0.6, south_korea: 0.95, taiwan: 0.8 };
 
 export const cityData: Record<string, { perW: number; region: string; label: string; source: string }> = {

@@ -38,23 +38,51 @@ const pct = (n: number) => `${Math.round(n * 100)}%`;
 /* ── Data Library — browse the canonical engine DATA (single source) ── */
 export function DataLibraryDashboard() {
     const d = rzData();
-    const [tab, setTab] = React.useState<'countries' | 'markets' | 'pue' | 'refrigerants' | 'sources' | 'corpus'>('countries');
+    const [tab, setTab] = React.useState<'countries' | 'markets' | 'pue' | 'refrigerants' | 'omcontracts' | 'sparespricing' | 'envcosts' | 'sources' | 'corpus'>('countries');
     const [srcQuery, setSrcQuery] = React.useState('');
+    // Carbon-price table sort (Environmental Costs)
+    const [envSort, setEnvSort] = React.useState<'country' | 'price'>('price');
+    const [envDir, setEnvDir] = React.useState<1 | -1>(-1);
     const countries = d.countries || {};
     const markets = d.markets || {};
     const pue = d.pueMatrix || {};
     const refr = d.refrigerants || {};
+    /* v2.5.2 sourced screening bands — rendered LIVE from rzData(), no local copy */
+    const omContracts = (d.omContracts || {}) as {
+        tiers?: Record<string, { low?: number; mid?: number; high?: number; scope?: string }>;
+        thirdPartyMultiplier?: number; agingFacilityMultiplier?: number; basis?: string;
+    };
+    const sparesPricing = ((d.sparesPricing || {}).classes || {}) as Record<string, { low?: number; mid?: number; high?: number; unit?: string }>;
+    const envCosts = (d.envCosts || {}) as {
+        carbonPriceUsdPerT?: Record<string, number>;
+        voluntaryOffsetUsdPerT?: number;
+        wasteMgmt?: { generalUsdPerTonne?: { developed?: number; emerging?: number }; eWasteUsdPerKg?: number; generalTonnesPerMwItYr?: number; eWasteKgPerMwItYr?: number };
+        developedMarkets?: string[];
+    };
+    const carbonRows = Object.entries(envCosts.carbonPriceUsdPerT || {});
     const sources = (d.sources || {}) as Record<string, { source?: string; asOf?: string; method?: string; unit?: string }>;
     const corpus = (d.benchmarksCorpus || {}) as Record<string, Record<string, { n: number; unit: string; p10: number; p25: number; p50: number; p75: number; p90: number; companies: string[]; sources: number }>>;
+    const countryName = (code: string): string => ((countries as Record<string, { name?: string }>)[code]?.name) ?? code;
+    const envSortBtn = (col: 'country' | 'price') => () => {
+        if (envSort === col) setEnvDir((x) => (x === 1 ? -1 : 1));
+        else { setEnvSort(col); setEnvDir(col === 'price' ? -1 : 1); }
+    };
+    const sortedCarbon = [...carbonRows].sort((a, b) => envSort === 'price'
+        ? (a[1] - b[1]) * envDir
+        : countryName(a[0]).localeCompare(countryName(b[0])) * envDir);
     const tabs: [typeof tab, string, number][] = [
         ['corpus', 'DC Corpus', Object.keys(corpus).length],
         ['countries', 'Countries', Object.keys(countries).length],
         ['markets', 'Markets', Object.keys(markets).length],
         ['pue', 'PUE Matrix', Object.keys(pue).length],
         ['refrigerants', 'Refrigerants', Object.keys(refr).length],
+        ['omcontracts', 'O&M Contracts', Object.keys(omContracts.tiers || {}).length],
+        ['sparespricing', 'Spares Pricing', Object.keys(sparesPricing).length],
+        ['envcosts', 'Env Costs', carbonRows.length],
         ['sources', 'Provenance', Object.keys(sources).length],
     ];
-    const totalRows = Object.keys(countries).length + Object.keys(markets).length + Object.keys(pue).length + Object.keys(refr).length;
+    const totalRows = Object.keys(countries).length + Object.keys(markets).length + Object.keys(pue).length + Object.keys(refr).length
+        + Object.keys(omContracts.tiers || {}).length + Object.keys(sparesPricing).length + carbonRows.length;
     // AG1: only date-like asOf values (some source entries carry prose here)
     const asOfYears = (Object.values(sources).map((v) => v.asOf).filter(Boolean) as string[]).filter((v) => /^\d{4}/.test(v));
     return (
@@ -150,6 +178,108 @@ export function DataLibraryDashboard() {
                 )}
                 {tab === 'refrigerants' && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">{Object.entries(refr).map(([k, v]) => { const r = v as { label?: string; gwp?: number; safety?: string }; return (<div key={k} className="flex justify-between text-xs border border-slate-100 dark:border-white/5 rounded-lg px-3 py-2"><span className="text-slate-700 dark:text-slate-200">{r.label || k}</span><span className="text-slate-400 tabular-nums">GWP {r.gwp ?? '—'}{r.safety ? ` · ${r.safety}` : ''}</span></div>); })}</div>
+                )}
+                {tab === 'omcontracts' && (
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">O&amp;M Contract Pricing — DATA.omContracts ($/kW IT per year, fixed-fee)</h2>
+                            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">engine · sourced band</span>
+                        </div>
+                        {Object.keys(omContracts.tiers || {}).length === 0
+                            ? <p className="text-xs text-slate-400">Engine not loaded — DATA.omContracts unavailable in this session.</p>
+                            : (<>
+                                <table className="w-full text-xs min-w-[560px]">
+                                    <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Contract tier</th><th className="pr-3">Scope</th><th className="pr-3 text-right">Low</th><th className="pr-3 text-right font-bold">Mid</th><th className="text-right">High</th></tr></thead>
+                                    <tbody>{Object.entries(omContracts.tiers || {}).map(([k, t]) => (
+                                        <tr key={k} className="border-t border-slate-100 dark:border-white/5 align-top">
+                                            <td className="py-1.5 pr-3 font-medium capitalize text-slate-700 dark:text-slate-200">{k.replace(/([A-Z])/g, ' $1')}</td>
+                                            <td className="pr-3 text-slate-500 max-w-[320px]">{t.scope ?? '—'}</td>
+                                            <td className="pr-3 text-right tabular-nums text-slate-500">${t.low ?? '—'}</td>
+                                            <td className="pr-3 text-right tabular-nums font-bold text-slate-900 dark:text-white">${t.mid ?? '—'}</td>
+                                            <td className="text-right tabular-nums text-slate-500">${t.high ?? '—'}</td>
+                                        </tr>
+                                    ))}</tbody>
+                                </table>
+                                <div className="flex flex-wrap gap-2 text-[10px]">
+                                    <span className="rounded-lg border border-slate-200 dark:border-white/10 px-2 py-1 text-slate-500">Third-party vs OEM: <b className="text-slate-700 dark:text-slate-200">×{omContracts.thirdPartyMultiplier ?? '—'}</b></span>
+                                    <span className="rounded-lg border border-slate-200 dark:border-white/10 px-2 py-1 text-slate-500">Facility &gt;10 yr: <b className="text-slate-700 dark:text-slate-200">×{omContracts.agingFacilityMultiplier ?? '—'}</b></span>
+                                </div>
+                                {omContracts.basis && <p className="text-[10px] text-slate-400">Basis: {omContracts.basis}</p>}
+                                <p className="text-[9px] text-slate-400">Consumed by Maintenance → SLA (vendor tier fee = band × IT kW) — screening bands, source in DATA.sources[&apos;omContracts&apos;].</p>
+                            </>)}
+                    </div>
+                )}
+                {tab === 'sparespricing' && (
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Spares Pricing — DATA.sparesPricing (unit list-price bands, USD)</h2>
+                            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">engine · sourced band</span>
+                        </div>
+                        {Object.keys(sparesPricing).length === 0
+                            ? <p className="text-xs text-slate-400">Engine not loaded — DATA.sparesPricing unavailable in this session.</p>
+                            : (<>
+                                <table className="w-full text-xs min-w-[560px]">
+                                    <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Spare class</th><th className="pr-3">Unit</th><th className="pr-3 text-right">Low</th><th className="pr-3 text-right font-bold">Mid</th><th className="text-right">High</th></tr></thead>
+                                    <tbody>{Object.entries(sparesPricing).map(([k, b]) => (
+                                        <tr key={k} className="border-t border-slate-100 dark:border-white/5">
+                                            <td className="py-1.5 pr-3 font-mono text-slate-700 dark:text-slate-200">{k}</td>
+                                            <td className="pr-3 text-slate-500">{b.unit ?? '—'}</td>
+                                            <td className="pr-3 text-right tabular-nums text-slate-500">{b.low != null ? `$${b.low.toLocaleString()}` : '—'}</td>
+                                            <td className="pr-3 text-right tabular-nums font-bold text-slate-900 dark:text-white">{b.mid != null ? `$${b.mid.toLocaleString()}` : '—'}</td>
+                                            <td className="text-right tabular-nums text-slate-500">{b.high != null ? `$${b.high.toLocaleString()}` : '—'}</td>
+                                        </tr>
+                                    ))}</tbody>
+                                </table>
+                                <p className="text-[9px] text-slate-400">Mid band = default unit cost in the newsvendor spares adapter (Maintenance → Spares) — source in DATA.sources[&apos;sparesPricing&apos;].</p>
+                            </>)}
+                    </div>
+                )}
+                {tab === 'envcosts' && (
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Environmental Costs — DATA.envCosts (carbon compliance price + waste bands)</h2>
+                            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">engine · sourced band</span>
+                        </div>
+                        {carbonRows.length === 0
+                            ? <p className="text-xs text-slate-400">Engine not loaded — DATA.envCosts unavailable in this session.</p>
+                            : (<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div>
+                                    <div className="max-h-[420px] overflow-y-auto">
+                                        <table className="w-full text-xs">
+                                            <thead><tr className="text-slate-400 text-left sticky top-0 bg-white dark:bg-slate-900">
+                                                <th className="py-1.5 pr-3"><button onClick={envSortBtn('country')} className="uppercase text-[10px] font-medium hover:text-cyan-500">Country {envSort === 'country' ? (envDir === 1 ? '▲' : '▼') : ''}</button></th>
+                                                <th className="text-right"><button onClick={envSortBtn('price')} className="uppercase text-[10px] font-medium hover:text-cyan-500">Carbon $/tCO₂e {envSort === 'price' ? (envDir === 1 ? '▲' : '▼') : ''}</button></th>
+                                            </tr></thead>
+                                            <tbody>{sortedCarbon.map(([code, price]) => (
+                                                <tr key={code} className="border-t border-slate-100 dark:border-white/5">
+                                                    <td className="py-1 pr-3 text-slate-700 dark:text-slate-200">{countryName(code)} <span className="text-[9px] text-slate-400 font-mono">{code}</span></td>
+                                                    <td className="text-right tabular-nums">{price > 0
+                                                        ? <span className="font-medium text-slate-900 dark:text-white">${price}</span>
+                                                        : <span className="text-amber-500" title={`No compliance scheme — voluntary offset basis $${envCosts.voluntaryOffsetUsdPerT ?? 10}/t (labeled)`}>offset ${envCosts.voluntaryOffsetUsdPerT ?? 10}</span>}</td>
+                                                </tr>
+                                            ))}</tbody>
+                                        </table>
+                                    </div>
+                                    <p className="mt-1 text-[9px] text-slate-400">{carbonRows.length} countries — compliance price where a scheme exists; <span className="text-amber-500">offset</span> = voluntary basis (no compliance scheme), labeled.</p>
+                                </div>
+                                <div className="space-y-2">
+                                    <h3 className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Waste management bands (screening)</h3>
+                                    {([
+                                        ['General waste — developed markets', envCosts.wasteMgmt?.generalUsdPerTonne?.developed, '$/tonne'],
+                                        ['General waste — emerging markets', envCosts.wasteMgmt?.generalUsdPerTonne?.emerging, '$/tonne'],
+                                        ['E-waste (certified ITAD/recycling)', envCosts.wasteMgmt?.eWasteUsdPerKg, '$/kg'],
+                                        ['General waste intensity', envCosts.wasteMgmt?.generalTonnesPerMwItYr, 't / MW-IT·yr'],
+                                        ['E-waste intensity', envCosts.wasteMgmt?.eWasteKgPerMwItYr, 'kg / MW-IT·yr'],
+                                    ] as [string, number | undefined, string][]).map(([label, val, unit]) => (
+                                        <div key={label} className="flex justify-between text-xs border border-slate-100 dark:border-white/5 rounded-lg px-3 py-2">
+                                            <span className="text-slate-700 dark:text-slate-200">{label}</span>
+                                            <span className="text-slate-500 tabular-nums">{val != null ? `${val.toLocaleString()} ${unit}` : '—'}</span>
+                                        </div>
+                                    ))}
+                                    <p className="text-[9px] text-slate-400">Source in DATA.sources[&apos;envCosts&apos;] — World Bank Carbon Pricing Dashboard + OECD ECR 2025 + national schemes; waste = screening bands.</p>
+                                </div>
+                            </div>)}
+                    </div>
                 )}
                 <p className="mt-3 text-[10px] text-slate-400">Read-only view of <code>rz-engine.js DATA</code> — the single source every calculator + module consumes.</p>
             </Card>

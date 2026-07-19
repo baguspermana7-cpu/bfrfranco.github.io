@@ -236,8 +236,11 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
     // Using $18,000/gen + $5/kW capacity-based variable
     const annualMaintenanceUsd = genCount * 18000 + (totalGenCapacity * 5);
 
-    // Environmental compliance
-    const annualEnvCompliance = envPermitRequired ? (genCount * 2500 + 5000) : 0;
+    // Environmental compliance — DM audit: country-specific annual permitting cost
+    // (countries.ts compliance.environmentalPermitCostPerYear, screening band US $8k /
+    // JP $15k / EU ~$4.5-6.5k / emerging $2-3.5k); fallback = legacy flat $5,000 site fee.
+    const envPermitSiteFee = country.compliance.environmentalPermitCostPerYear ?? 5000;
+    const annualEnvCompliance = envPermitRequired ? (genCount * 2500 + envPermitSiteFee) : 0;
 
     const totalAnnualGenOpex = annualFuelCost + annualMaintenanceUsd + annualEnvCompliance;
 

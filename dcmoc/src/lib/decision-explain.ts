@@ -16,6 +16,10 @@ export interface DecisionLever {
     detail: string;
     /** Shell tab to navigate to for fine-tuning this parameter. */
     targetTab: string;
+    /** Optional same-page element id — scroll/focus this input instead of a tab hop. */
+    targetSelector?: string;
+    /** HIGH = solved lever that reaches the threshold; MED = quantified honesty note. */
+    priority?: 'HIGH' | 'MED';
 }
 
 export interface DecisionExplain {
@@ -179,4 +183,97 @@ export function explainPhaseDecision(input: DecisionExplainInput): DecisionExpla
     }
 
     return { verdict, reason, levers };
+}
+
+/* ─── GENERIC THRESHOLD-METRIC EXPLAIN (owner mandate rollout) ──────────────
+ * Any pass/fail metric (DSCR vs covenant, equity IRR vs target, payback vs
+ * limit, availability vs tier target, …) gets the same treatment as the
+ * phase GO/NO-GO: a computed reason with the live numbers, plus levers whose
+ * magnitudes are SOLVED by bisection against the caller's own model via
+ * `metricAt` closures. Nothing here re-implements or fabricates model math.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+export interface ThresholdLeverSpec {
+    /**
+     * Lever-magnitude search bounds. Contract: `metricAt` is monotonic toward
+     * passing across [lo, hi]; lo = current config (fails the threshold),
+     * hi = the strongest realistic move. The solver bisects for the SMALLEST
+     * magnitude that passes; if even `hi` fails, `unreachable` renders an
+     * honest quantified note instead.
+     */
+    lo: number;
+    hi: number;
+    /** Re-runs the caller's own model at lever magnitude x → metric value. */
+    metricAt: (x: number) => number;
+    /** Renders the solved lever (x = minimal passing magnitude, achieved = metricAt(x)). */
+    render: (x: number, achieved: number) => { label: string; detail: string };
+    /** Rendered when even x = hi does not pass (receives metricAt(hi)). */
+    unreachable?: (atHi: number) => { label: string; detail: string };
+    /** Shell tab where this parameter is fine-tuned. */
+    targetTab: string;
+    /** Optional same-page element id — scroll/focus beats a tab hop. */
+    targetSelector?: string;
+}
+
+export interface ThresholdMetricInput {
+    /** e.g. "Min DSCR" */
+    metricLabel: string;
+    /** Live computed value from the page's model. */
+    value: number;
+    threshold: number;
+    /** Pass when value ≥ threshold ('atLeast') or ≤ threshold ('atMost'). */
+    direction: 'atLeast' | 'atMost';
+    fmtValue: (v: number) => string;
+    /** Live-number computed cause, e.g. "debt service $8.1M vs EBITDA $9.0M pada debt ratio 65%". */
+    because?: string;
+    levers: ThresholdLeverSpec[];
+}
+
+export interface ThresholdMetricExplain {
+    pass: boolean;
+    /** One computed sentence with the live numbers behind the verdict. */
+    reason: string;
+    /** Solved (HIGH) + honesty-note (MED) levers; empty when the metric passes. */
+    levers: DecisionLever[];
+}
+
+/**
+ * Explain one threshold verdict. Deterministic; every lever number comes from
+ * bisection over the caller's own model closure (`metricAt`).
+ */
+export function explainThresholdMetric(input: ThresholdMetricInput): ThresholdMetricExplain {
+    const { metricLabel, value, threshold, direction, fmtValue, because } = input;
+    const passes = (v: number): boolean => direction === 'atLeast' ? v >= threshold : v <= threshold;
+    const pass = passes(value);
+    const cmp = direction === 'atLeast' ? (pass ? '≥' : '<') : (pass ? '≤' : '>');
+    const reason =
+        `${metricLabel} ${fmtValue(value)} ${cmp} threshold ${fmtValue(threshold)}` +
+        (because ? (pass ? ` — ${because}` : ` karena ${because}`) : '') + '.';
+
+    if (pass) return { pass, reason, levers: [] };
+
+    const levers: DecisionLever[] = [];
+    for (const spec of input.levers) {
+        const ok = (x: number): boolean => passes(spec.metricAt(x));
+        const atHi = spec.metricAt(spec.hi);
+        if (!passes(atHi)) {
+            if (spec.unreachable) {
+                levers.push({
+                    ...spec.unreachable(atHi),
+                    targetTab: spec.targetTab,
+                    targetSelector: spec.targetSelector,
+                    priority: 'MED',
+                });
+            }
+            continue;
+        }
+        const x = ok(spec.lo) ? spec.lo : bisectMin(spec.lo, spec.hi, ok);
+        levers.push({
+            ...spec.render(x, spec.metricAt(x)),
+            targetTab: spec.targetTab,
+            targetSelector: spec.targetSelector,
+            priority: 'HIGH',
+        });
+    }
+    return { pass, reason, levers };
 }

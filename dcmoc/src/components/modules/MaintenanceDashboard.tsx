@@ -27,6 +27,8 @@ import {
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 import clsx from 'clsx';
 import { fmtMoney } from '@/lib/format';
+import { useEngineReady } from '@/lib/rz-engine';
+import { sparesPricingBands, SparesPriceBandRow } from '@/state/adapters/spares-adapter';
 
 type TabId = 'assets' | 'schedule' | 'strategy' | 'sla' | 'spares';
 
@@ -39,6 +41,10 @@ export function MaintenanceDashboard() {
     const [isPencilMode, setIsPencilMode] = useState(false);
     const [activeTab, setActiveTab] = useState<TabId>('assets');
     const [isExporting, setIsExporting] = useState(false);
+    // Engine O&M contract options (DATA.omContracts sourced multipliers)
+    const [slaThirdParty, setSlaThirdParty] = useState(false);   // third-party vs OEM contract (×0.65)
+    const [slaFacilityAged, setSlaFacilityAged] = useState(false); // facility >10yr (×1.5)
+    const engineReady = useEngineReady(); // re-run engine-bound memos once rz-engine.min.js lands
 
     const schedule = useMemo(() => {
         return generateMaintenanceSchedule(assetCounts);
@@ -60,9 +66,12 @@ export function MaintenanceDashboard() {
         return calculateSLAComparison(
             assetCounts,
             inputs.tierLevel === 4 ? 4 : 3,
-            selectedCountry
+            selectedCountry,
+            // Engine omContracts pricing: sourced $/kW-yr band × IT kW (+ multipliers)
+            { itLoadKw: inputs.itLoad, thirdParty: slaThirdParty, facilityAgeYears: slaFacilityAged ? 12 : 0 }
         );
-    }, [assetCounts, inputs.tierLevel, selectedCountry]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [assetCounts, inputs.tierLevel, selectedCountry, inputs.itLoad, slaThirdParty, slaFacilityAged, engineReady]);
 
     const sparesData = useMemo(() => {
         if (!selectedCountry || assetCounts.length === 0) return null;
@@ -72,6 +81,12 @@ export function MaintenanceDashboard() {
             selectedCountry
         );
     }, [assetCounts, inputs.tierLevel, selectedCountry]);
+
+    // Sourced DATA.sparesPricing bands (same engine read whose mid band feeds
+    // the spares-adapter newsvendor unit cost — imported, not re-implemented)
+    const sparesBands = useMemo(() => sparesPricingBands(),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [engineReady]);
 
     // Initial Generation Effect — use simulation store for consistency with FuelGen/CBM
     const coolingMap: 'air' | 'pumped' = inputs.coolingType === 'liquid' || inputs.coolingType === 'rdhx' ? 'pumped' : 'air';
@@ -314,8 +329,14 @@ export function MaintenanceDashboard() {
             {activeTab === 'assets' && <AssetsTab assets={activeAssets} assetCounts={assetCounts} isPencilMode={isPencilMode} handleCountChange={handleCountChange} selectedCountry={selectedCountry} currentAQI={currentAQI} />}
             {activeTab === 'schedule' && <ScheduleTab assetCounts={assetCounts} schedule={schedule} weeks={weeks} />}
             {activeTab === 'strategy' && strategyData && <StrategyTab data={strategyData} fmt={fmtMoney} activeStrat={inputs.maintenanceStrategy || 'planned'} onSelect={(s) => actions.setInputs({ maintenanceStrategy: s as any })} />}
-            {activeTab === 'sla' && slaData && <SLATab data={slaData} fmt={fmtMoney} />}
-            {activeTab === 'spares' && sparesData && <SparesTab data={sparesData} fmt={fmtMoney} />}
+            {activeTab === 'sla' && slaData && (
+                <SLATab
+                    data={slaData} fmt={fmtMoney}
+                    thirdParty={slaThirdParty} onThirdParty={setSlaThirdParty}
+                    facilityAged={slaFacilityAged} onFacilityAged={setSlaFacilityAged}
+                />
+            )}
+            {activeTab === 'spares' && sparesData && <SparesTab data={sparesData} fmt={fmtMoney} bands={sparesBands} />}
 
             {/* ═══ B17: MAINTENANCE EVENT TIMELINE (Monthly Heatmap) ═══ */}
             {activeTab === 'schedule' && schedule.length > 0 && (
@@ -969,9 +990,60 @@ function StrategyTab({ data, fmt, activeStrat, onSelect }: { data: ReturnType<ty
 // TAB: SLA (NEW — Vendor SLA Comparison)
 // ═══════════════════════════════════════════════════════════════
 
-function SLATab({ data, fmt }: { data: ReturnType<typeof calculateSLAComparison>; fmt: (n: number) => string }) {
+function SLATab({ data, fmt, thirdParty, onThirdParty, facilityAged, onFacilityAged }: {
+    data: ReturnType<typeof calculateSLAComparison>;
+    fmt: (n: number) => string;
+    thirdParty: boolean;
+    onThirdParty: (v: boolean) => void;
+    facilityAged: boolean;
+    onFacilityAged: (v: boolean) => void;
+}) {
+    const cb = data.contractBasis;
     return (
         <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
+            {/* Contract pricing basis + engine multiplier toggles */}
+            <div className="flex flex-wrap items-center gap-3 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 shadow-sm dark:shadow-none">
+                <span className={clsx(
+                    "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border",
+                    cb.fromEngine
+                        ? "bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30"
+                        : "bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30"
+                )}>
+                    {cb.fromEngine ? 'engine · sourced band' : 'screening fallback'}
+                </span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">
+                    {cb.fromEngine
+                        ? <>Vendor contract fee = sourced $/kW-yr band × {cb.itLoadKw.toLocaleString()} kW IT <Tooltip content="Annual contract fee per tier comes from the engine's sourced O&M contract table (DATA.omContracts): fixed-fee $/kW-yr band (low/mid/high) × IT load. The mid band drives the comparison; the low–high band is shown under each fee." /></>
+                        : <>Engine contract table unavailable — per-asset screening rates in use <Tooltip content="DATA.omContracts is not loaded (or IT load is zero), so the tier fees fall back to the local per-critical-asset screening rates." /></>}
+                </span>
+                <div className="ml-auto flex flex-wrap items-center gap-2">
+                    <button
+                        onClick={() => onThirdParty(!thirdParty)}
+                        className={clsx(
+                            "px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors",
+                            thirdParty
+                                ? "bg-cyan-600 text-white border-cyan-600"
+                                : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                        )}
+                        title={`Third-party (non-OEM) contract — ×${cb.thirdPartyMultiplier} on the sourced band (OEM typically 40–60% higher)`}
+                    >
+                        Third-party ×{cb.thirdPartyMultiplier}
+                    </button>
+                    <button
+                        onClick={() => onFacilityAged(!facilityAged)}
+                        className={clsx(
+                            "px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors",
+                            facilityAged
+                                ? "bg-amber-600 text-white border-amber-600"
+                                : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                        )}
+                        title={`Facility older than 10 years — ×${cb.agingFacilityMultiplier} parts + corrective escalation on the sourced band`}
+                    >
+                        Facility &gt;10 yr ×{cb.agingFacilityMultiplier}
+                    </button>
+                </div>
+            </div>
+
             {/* SLA Table */}
             <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm dark:shadow-none">
                 <div className="overflow-x-auto">
@@ -1006,7 +1078,14 @@ function SLATab({ data, fmt }: { data: ReturnType<typeof calculateSLAComparison>
                                     <td className="py-4 px-4">
                                         <span className="font-mono text-cyan-600 dark:text-cyan-400">{tier.responseTime}</span>
                                     </td>
-                                    <td className="py-4 px-4 text-right font-mono text-slate-700 dark:text-slate-300">{fmt(tier.annualCost)}</td>
+                                    <td className="py-4 px-4 text-right">
+                                        <div className="font-mono text-slate-700 dark:text-slate-300">{fmt(tier.annualCost)}</div>
+                                        {tier.contractBand && tier.contractPerKwYr && (
+                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 font-mono mt-0.5" title={`Sourced band ${tier.contractPerKwYr.low}–${tier.contractPerKwYr.mid}–${tier.contractPerKwYr.high} $/kW-yr (${tier.omTierKey} tier) × IT kW`}>
+                                                {fmt(tier.contractBand.low)}–{fmt(tier.contractBand.high)}
+                                            </div>
+                                        )}
+                                    </td>
                                     <td className="py-4 px-4 text-right">
                                         <span className={clsx("font-mono", tier.riskExposure > 50000 ? "text-red-500 dark:text-red-400" : tier.riskExposure > 20000 ? "text-amber-500 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400")}>
                                             {fmt(tier.riskExposure)}
@@ -1021,6 +1100,12 @@ function SLATab({ data, fmt }: { data: ReturnType<typeof calculateSLAComparison>
                             ))}
                         </tbody>
                     </table>
+                </div>
+                <div className="px-4 py-2.5 border-t border-slate-100 dark:border-slate-800/50 text-[10px] text-slate-400 dark:text-slate-500">
+                    Basis: {cb.basis}
+                    {cb.fromEngine && (cb.thirdPartyApplied || cb.agingApplied) && (
+                        <span> · applied: {[cb.thirdPartyApplied ? `third-party ×${cb.thirdPartyMultiplier}` : null, cb.agingApplied ? `>10yr facility ×${cb.agingFacilityMultiplier}` : null].filter(Boolean).join(' · ')}</span>
+                    )}
                 </div>
             </div>
 
@@ -1083,9 +1168,67 @@ function SLATab({ data, fmt }: { data: ReturnType<typeof calculateSLAComparison>
 // TAB: Spares (NEW — Inventory Analysis)
 // ═══════════════════════════════════════════════════════════════
 
-function SparesTab({ data, fmt }: { data: ReturnType<typeof calculateSparesOptimization>; fmt: (n: number) => string }) {
+function SparesTab({ data, fmt, bands }: {
+    data: ReturnType<typeof calculateSparesOptimization>;
+    fmt: (n: number) => string;
+    bands: SparesPriceBandRow[];
+}) {
     return (
         <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
+            {/* Sourced spares price bands (engine DATA.sparesPricing — same read as the newsvendor adapter) */}
+            <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm dark:shadow-none">
+                <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center gap-2">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <Package className="w-4 h-4 text-cyan-500 dark:text-cyan-400" />
+                        Spares Price Bands <Tooltip content="Researched list-price bands per spare class from the shared engine (DATA.sparesPricing, sourced public list/retrofit prices). The mid band is the same unit cost the newsvendor spares model uses — one source, no duplicate." />
+                    </h3>
+                    <span className={clsx(
+                        "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border",
+                        bands.length > 0
+                            ? "bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30"
+                            : "bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30"
+                    )}>
+                        {bands.length > 0 ? 'engine · sourced band' : 'engine not loaded'}
+                    </span>
+                    <span className="ml-auto text-[10px] text-slate-400">mid band feeds the newsvendor spares adapter</span>
+                </div>
+                {bands.length > 0 ? (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/50">
+                                    <th className="py-2.5 px-4 text-left text-xs text-slate-500 font-medium uppercase">Spare Class</th>
+                                    <th className="py-2.5 px-4 text-left text-xs text-slate-500 font-medium uppercase">Unit</th>
+                                    <th className="py-2.5 px-4 text-right text-xs text-slate-500 font-medium uppercase">Low</th>
+                                    <th className="py-2.5 px-4 text-right text-xs text-slate-500 font-medium uppercase">Mid</th>
+                                    <th className="py-2.5 px-4 text-right text-xs text-slate-500 font-medium uppercase">High</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {bands.map((b) => (
+                                    <tr key={b.key} className="border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
+                                        <td className="py-2.5 px-4 font-medium text-slate-800 dark:text-slate-200">
+                                            <span className="font-mono text-xs">{b.key}</span>
+                                            {b.adapterClass && (
+                                                <span className="ml-2 px-1.5 py-0.5 rounded text-[9px] uppercase font-bold bg-cyan-100 dark:bg-cyan-500/15 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-500/30" title={`Mid band is the default unit cost for the '${b.adapterClass}' newsvendor class`}>
+                                                    → {b.adapterClass}
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="py-2.5 px-4 text-xs text-slate-500 dark:text-slate-400">{b.unit}</td>
+                                        <td className="py-2.5 px-4 text-right font-mono text-slate-500 dark:text-slate-400">{fmt(b.low)}</td>
+                                        <td className="py-2.5 px-4 text-right font-mono font-bold text-slate-900 dark:text-white">{fmt(b.mid)}</td>
+                                        <td className="py-2.5 px-4 text-right font-mono text-slate-500 dark:text-slate-400">{fmt(b.high)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <p className="px-6 py-4 text-xs text-slate-500">Shared engine (rz-engine) not loaded — sourced price bands unavailable; the inventory list below uses per-part template costs.</p>
+                )}
+            </div>
+
             {/* Critical Spares List */}
             <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm dark:shadow-none">
                 <div className="overflow-x-auto">

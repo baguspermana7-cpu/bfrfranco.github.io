@@ -259,7 +259,8 @@ export function ReportDashboard() {
 
         // Strategy Analysis
         const strategyData = calculateStrategyComparison(assets, schedule, inputs.tierLevel === 4 ? 4 : 3, selectedCountry);
-        const slaData = calculateSLAComparison(assets, inputs.tierLevel === 4 ? 4 : 3, selectedCountry);
+        // Same engine omContracts pricing basis as the Maintenance SLA tab (value-sync)
+        const slaData = calculateSLAComparison(assets, inputs.tierLevel === 4 ? 4 : 3, selectedCountry, { itLoadKw: inputs.itLoad });
         const sparesData = calculateSparesOptimization(assets, inputs.tierLevel === 4 ? 4 : 3, selectedCountry);
 
         // Risk (Fix: 'risks' on CountryProfile is actually 'risk' or distinct properties)

@@ -21,6 +21,7 @@ import { rzModels, rzData } from '@/lib/rz-engine';
 import { getPUE } from '@/constants/pue';
 import { ReportDashboard } from '@/components/modules/ReportDashboard';
 import { fmtMoney } from '@/lib/format';
+import { TraceValue } from '@/components/ui/TraceValue';
 import { Trophy, ChevronRight, FileDown } from 'lucide-react';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
@@ -220,7 +221,9 @@ export function ResultsEnginePage() {
                         {/* overall */}
                         <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 text-center">
                             <h2 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Overall Score (Weighted)</h2>
-                            <div className="text-5xl font-bold tabular-nums text-violet-500">{model.overall}<span className="text-lg text-slate-400">/100</span></div>
+                            <TraceValue traceId="results.score">
+                                <div className="text-5xl font-bold tabular-nums text-violet-500">{model.overall}<span className="text-lg text-slate-400">/100</span></div>
+                            </TraceValue>
                             <div className={`mt-1 text-sm font-semibold ${model.overall >= 85 ? 'text-emerald-500' : model.overall >= 70 ? 'text-lime-500' : 'text-amber-500'}`}>{model.grade}</div>
                             <div className="mt-3 space-y-1 text-left">
                                 {[...model.dims].sort((a, b) => b.score - a.score).map((d, idx) => (
@@ -252,15 +255,24 @@ export function ResultsEnginePage() {
                             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Key Financial Outcomes</h3>
                                 <div className="space-y-1 text-[11px]">
-                                    {[
-                                        ['Total CAPEX (P50)', fmtMoney(capexResults.total)],
-                                        ['$ / kW', `$${model.perKw.toLocaleString()}`],
+                                    {([
+                                        ['Total CAPEX (P50)', fmtMoney(capexResults.total), 'capex.total'],
+                                        ['$ / kW', `$${model.perKw.toLocaleString()}`, 'capex.perKw'],
                                         ['NPV (15y @10%)', model.npv != null ? fmtMoney(model.npv) : '—'],
                                         ['IRR (screening)', model.irr != null ? `${(model.irr * 100).toFixed(1)}%` : '—'],
-                                        ['Design PUE', String(model.opexPue)],
+                                        ['Design PUE', String(model.opexPue), 'engine.pueMatrix'],
                                         ['Best Site', model.siteBest ? `${model.siteBest.engine.score}/100 (${model.siteBest.engine.grade})` : '—'],
-                                    ].map(([k, v]) => (
-                                        <div key={k} className="flex justify-between"><span className="text-slate-500">{k}</span><span className="tabular-nums font-medium text-slate-800 dark:text-slate-200">{v}</span></div>
+                                    ] as [string, string, string?][]).map(([k, v, tr]) => (
+                                        <div key={k} className="flex justify-between">
+                                            <span className="text-slate-500">{k}</span>
+                                            {tr ? (
+                                                <TraceValue traceId={tr}>
+                                                    <span className="tabular-nums font-medium text-slate-800 dark:text-slate-200">{v}</span>
+                                                </TraceValue>
+                                            ) : (
+                                                <span className="tabular-nums font-medium text-slate-800 dark:text-slate-200">{v}</span>
+                                            )}
+                                        </div>
                                     ))}
                                 </div>
                                 <p className="mt-1.5 text-[9px] text-slate-400">Screening outcomes (engine roi/opex models, dcContract basis) — not investment advice.</p>
@@ -285,14 +297,19 @@ export function ResultsEnginePage() {
                         <table className="w-full text-[11px]">
                             <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Dimension</th><th className="text-right">Score</th><th className="text-right">Weight</th><th className="text-left pl-4">Basis (formula)</th></tr></thead>
                             <tbody>
-                                {model.dims.map((d) => (
+                                {model.dims.map((d) => {
+                                    const dimTrace: Record<string, string> = { capex: 'results.capexScore', sus: 'results.susScore', fin: 'results.finScore', constr: 'results.constrScore' };
+                                    const tr = dimTrace[d.key];
+                                    const scoreEl = <span className={`tabular-nums font-semibold ${d.score >= 70 ? 'text-emerald-500' : d.score >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{d.score}</span>;
+                                    return (
                                     <tr key={d.key} className="border-b border-slate-100 dark:border-slate-800/60">
                                         <td className="py-1 text-slate-700 dark:text-slate-200">{d.label}</td>
-                                        <td className="text-right"><span className={`tabular-nums font-semibold ${d.score >= 70 ? 'text-emerald-500' : d.score >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{d.score}</span></td>
+                                        <td className="text-right">{tr ? <TraceValue traceId={tr}>{scoreEl}</TraceValue> : scoreEl}</td>
                                         <td className="text-right tabular-nums text-slate-500">{Math.round(d.weight * 100)}%</td>
                                         <td className="pl-4 text-[10px] text-slate-400">{d.basis}</td>
                                     </tr>
-                                ))}
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>

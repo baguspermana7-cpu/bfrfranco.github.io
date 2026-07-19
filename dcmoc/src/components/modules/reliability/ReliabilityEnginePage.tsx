@@ -25,9 +25,10 @@ import { TierDashboard } from '@/components/modules/DesignToolsDashboards';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
-import { ShieldCheck, ChevronRight, FileDown } from 'lucide-react';
+import { ShieldCheck, ChevronRight, FileDown, ArrowUpRight } from 'lucide-react';
 import { Explain } from '@/components/ui/Explain';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { explainThresholdMetric, DecisionLever } from '@/lib/decision-explain';
 
 interface SystemRow { label: string; availability: number; chain: string; redundant: boolean }
 interface ComponentRow { key: string; label: string; mtbf: number; mttr: number; lambdaMyr: number; count: number | null; availability: number; contribPct: number }
@@ -142,8 +143,83 @@ export function ReliabilityEnginePage() {
         ];
 
         const budgetMin = (1 - tierTargetFrac) * MIN_PER_YEAR;
-        return { systems, overall, tierTargetFrac, downtimeMin, budgetMin, mtbfAll, mttrAvg, spof, score, paths, comps, componentRows, sensitivity, hasFleet: !!eq };
+        /* recompute closure for the owner-mandate explain: re-runs the SAME
+         * β-adjusted chain at a modified MTTR factor / path count — the lever
+         * bisection below never re-implements or fabricates the model. */
+        const recompute = (mods: { mttrFactor?: number; paths?: number }): number =>
+            ccOverall(mods.mttrFactor ?? 1, mods.paths ?? paths);
+        return { systems, overall, tierTargetFrac, downtimeMin, budgetMin, mtbfAll, mttrAvg, spof, score, paths, comps, componentRows, sensitivity, hasFleet: !!eq, recompute };
     }, [inputs.powerRedundancy, inputs.tierLevel, inputs.itLoad, req.workload.avgRackDensityKw]);
+
+    /* ── Owner-mandate explain: availability below tier target ───────────────
+     * (1) computed reason: nines gap + biggest downtime contributors from the
+     * live composed chains; (2) measured levers: redundancy +1 path (computed
+     * directly) and MTTR cut (solved by bisection) on the SAME β-adjusted
+     * model via the memo's recompute closure; (3) click → parameter tab. */
+    const availExplain = React.useMemo(() => {
+        if (!model || model.overall >= model.tierTargetFrac) return null;
+        const exactNines = (a: number): number => -Math.log10(1 - Math.min(a, 1 - 1e-12));
+        const gapNines = exactNines(model.tierTargetFrac) - exactNines(model.overall);
+        const contributors = [...model.systems]
+            .map((s) => ({ label: s.label, dtMin: (1 - s.availability) * MIN_PER_YEAR }))
+            .sort((a, b) => b.dtMin - a.dtMin);
+        const topTxt = contributors.slice(0, 2).map((c) => `${c.label} ${fmtDowntime(c.dtMin)}`).join(', ');
+
+        const base = explainThresholdMetric({
+            metricLabel: 'Composed availability',
+            value: model.overall,
+            threshold: model.tierTargetFrac,
+            direction: 'atLeast',
+            fmtValue: fmtAvail,
+            because: `gap ${gapNines.toFixed(2)} nines — downtime ${fmtDowntime(model.downtimeMin)} vs budget Tier ${inputs.tierLevel} ${fmtDowntime(model.budgetMin)}; kontributor downtime terbesar: ${topTxt}`,
+            levers: [
+                {
+                    lo: 0, hi: 0.9,
+                    metricAt: (x) => model.recompute({ mttrFactor: 1 - x }),
+                    render: (x, achieved) => ({
+                        label: `MTTR −${(x * 100).toFixed(0)}%`,
+                        detail: `Pangkas MTTR rata-rata ${model.mttrAvg} h → ${(model.mttrAvg * (1 - x)).toFixed(1)} h (kontrak comprehensive + spares on-site + respons 24/7): availability naik ke ${fmtAvail(achieved)} ≥ target — dihitung bisection pada chain β-adjusted halaman ini.`,
+                    }),
+                    unreachable: (atHi) => ({
+                        label: 'MTTR −90% belum cukup',
+                        detail: `Bahkan MTTR −90% hanya memberi ${fmtAvail(atHi)} < target ${fmtAvail(model.tierTargetFrac)} — kombinasikan dengan redundancy: +1 path & MTTR −50% memberi ${fmtAvail(model.recompute({ paths: model.paths + 1, mttrFactor: 0.5 }))} (dihitung).`,
+                    }),
+                    targetTab: 'maint',
+                },
+            ],
+        });
+
+        /* discrete redundancy lever — computed directly on the same chain */
+        const aPlus = model.recompute({ paths: model.paths + 1 });
+        const dtPlus = (1 - aPlus) * MIN_PER_YEAR;
+        const nGain = exactNines(aPlus) - exactNines(model.overall);
+        const reaches = aPlus >= model.tierTargetFrac;
+        const pathsLever: DecisionLever = {
+            label: `Paths ${model.paths} → ${model.paths + 1}`,
+            detail: `Naikkan power redundancy dari ${inputs.powerRedundancy} (+1 path pada power chain): availability ${fmtAvail(model.overall)} → ${fmtAvail(aPlus)} (+${nGain.toFixed(2)} nines, downtime −${fmtDowntime(Math.max(0, model.downtimeMin - dtPlus))}) ${reaches ? '— MENCAPAI target tier' : `— masih di bawah target ${fmtAvail(model.tierTargetFrac)}`} — dihitung dari chain yang sama.`,
+            targetTab: 'sim',
+            priority: reaches ? 'HIGH' : 'MED',
+        };
+
+        return { reason: base.reason, levers: [pathsLever, ...base.levers], gapNines };
+    }, [model, inputs.tierLevel, inputs.powerRedundancy]);
+
+    /* SPOF remediation — short measured fix per row, from the live model. */
+    const spofRemedy = React.useCallback((s: string): { fix: string; targetTab: 'sim' } | null => {
+        if (!model) return null;
+        if (s.startsWith('Utility intake')) {
+            const swMttr = model.comps['switchgear']?.mttr;
+            return {
+                fix: `Dual utility feed + ATS (2N intake) menghilangkan SPOF pra-ATS — eksposur single-feed: MTTR switchgear ${swMttr ?? '—'} h per event (data IEEE-493 model ini).`,
+                targetTab: 'sim',
+            };
+        }
+        const a2 = model.recompute({ paths: 2 });
+        return {
+            fix: `Naikkan redundancy ke ≥ N+1 (2 paths): composed availability ${fmtAvail(model.overall)} → ${fmtAvail(a2)} — dihitung dari chain model yang sama.`,
+            targetTab: 'sim',
+        };
+    }, [model]);
 
     if (!model) return <div className="p-8 text-center text-sm text-slate-500">Engine loading…</div>;
     const failures = log.alarms.filter((a) => a.status !== 'Cleared');
@@ -263,6 +339,36 @@ export function ReliabilityEnginePage() {
                             </div>
                         );
                     })()}
+                    {/* Owner-mandate explain: availability below tier target →
+                      * computed reason + measured levers (click → parameter tab). */}
+                    {!meetsTier && availExplain && (
+                        <div className="rounded-xl border border-rose-200 dark:border-rose-800/40 bg-rose-50 dark:bg-rose-950/20 p-4">
+                            <div className="mb-1.5 flex flex-wrap items-center gap-2">
+                                <span className="rounded bg-rose-600 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">Below Tier {inputs.tierLevel} target</span>
+                                <span className="rounded bg-rose-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-rose-600 dark:text-rose-400">gap {availExplain.gapNines.toFixed(2)} nines</span>
+                            </div>
+                            <p className="text-xs leading-relaxed text-slate-700 dark:text-slate-300">{availExplain.reason}</p>
+                            <div className="mt-2">
+                                <div className="mb-1.5 text-[10px] font-semibold uppercase text-slate-500">Lever terukur — dihitung pada chain model halaman ini</div>
+                                <div className="space-y-1.5">
+                                    {availExplain.levers.map((lv, i) => (
+                                        <button
+                                            key={i}
+                                            type="button"
+                                            onClick={() => setActiveTab(lv.targetTab as Parameters<typeof setActiveTab>[0])}
+                                            title={`Buka tab "${lv.targetTab}" untuk ubah parameter ini`}
+                                            className="group flex w-full items-start gap-2 rounded-md border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/50 p-2 text-left transition-colors hover:border-violet-400 dark:hover:border-violet-500"
+                                        >
+                                            <span className={`mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold text-white ${lv.priority === 'HIGH' ? 'bg-red-600' : 'bg-amber-600'}`}>{lv.priority ?? 'MED'}</span>
+                                            <span className="mt-0.5 shrink-0 whitespace-nowrap rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-bold text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">{lv.label}</span>
+                                            <span className="flex-1 text-[11px] leading-snug text-slate-600 dark:text-slate-400">{lv.detail}</span>
+                                            <ArrowUpRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400 group-hover:text-violet-500" />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
                             { label: 'Composed Availability', value: fmtAvail(model.overall), sub: meetsTier ? `meets Tier ${inputs.tierLevel} target` : `BELOW Tier ${inputs.tierLevel} target`, chip: `${ninesOf(model.overall)} nines`, title: 'β=5% common-cause screening (assumption)' },
@@ -338,8 +444,27 @@ export function ReliabilityEnginePage() {
                                 {model.spof.length === 0 ? (
                                     <p className="text-[11px] text-emerald-500">✓ No single-path components at {inputs.powerRedundancy} — fully redundant paths.</p>
                                 ) : (
-                                    <ul className="space-y-1">
-                                        {model.spof.map((s) => <li key={s} className="flex gap-1.5 text-[11px] text-rose-500">⛔ {s}</li>)}
+                                    <ul className="space-y-2">
+                                        {model.spof.map((s) => {
+                                            const r = spofRemedy(s);
+                                            return (
+                                                <li key={s} className="text-[11px]">
+                                                    <div className="flex gap-1.5 text-rose-500">⛔ {s}</div>
+                                                    {r && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setActiveTab(r.targetTab)}
+                                                            title={`Buka tab "${r.targetTab}" untuk ubah redundancy`}
+                                                            className="group mt-0.5 flex w-full items-start gap-1.5 rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-2 py-1 text-left text-[10px] text-slate-600 dark:text-slate-300 transition-colors hover:border-violet-400 dark:hover:border-violet-500"
+                                                        >
+                                                            <span className="mt-0.5 shrink-0 rounded bg-amber-600 px-1 py-0.5 text-[8px] font-bold text-white">FIX</span>
+                                                            <span className="flex-1 leading-snug">{r.fix}</span>
+                                                            <ArrowUpRight className="mt-0.5 h-3 w-3 shrink-0 text-slate-400 group-hover:text-violet-500" />
+                                                        </button>
+                                                    )}
+                                                </li>
+                                            );
+                                        })}
                                     </ul>
                                 )}
                             </div>

@@ -237,6 +237,11 @@ function calculateSensorCapex(assets: AssetCount[]): number {
 // 2. VENDOR SLA COMPARISON
 // ═══════════════════════════════════════════════════════════════
 
+export type OmContractTierKey = 'comprehensive' | 'preventive' | 'onCall';
+
+/** Annual USD band (low/mid/high) for a vendor contract tier. */
+export interface SLAContractBand { low: number; mid: number; high: number }
+
 export interface SLATier {
     id: 'nbd' | '4hr' | '2hr';
     label: string;
@@ -247,18 +252,50 @@ export interface SLATier {
     breakEvenDowntimeCost: number; // At what $/min this tier breaks even vs NBD
     netAnnualCost: number;         // SLA cost - risk reduction vs NBD
     recommended: boolean;
+    /* Engine DATA.omContracts binding (present only when the sourced band drove the cost) */
+    omTierKey?: OmContractTierKey;      // which sourced contract tier maps to this SLA tier
+    contractBand?: SLAContractBand;     // annual USD band = $/kW-yr band × IT kW × multipliers
+    contractPerKwYr?: SLAContractBand;  // sourced $/kW-yr band as published
+}
+
+/** Provenance / multiplier metadata for the vendor contract pricing. */
+export interface SLAContractBasis {
+    fromEngine: boolean;          // true = DATA.omContracts sourced band; false = verbatim local fallback
+    basis: string;                // human-readable pricing basis (engine DATA.omContracts.basis)
+    itLoadKw: number;
+    thirdPartyApplied: boolean;   // third-party (non-OEM) contract multiplier applied
+    agingApplied: boolean;        // facility >10yr multiplier applied
+    thirdPartyMultiplier: number;
+    agingFacilityMultiplier: number;
 }
 
 export interface SLAComparison {
     tiers: SLATier[];
     recommended: 'nbd' | '4hr' | '2hr';
     analysis: string;
+    contractBasis: SLAContractBasis;
 }
+
+/** Optional engine-contract inputs: IT load (kW) activates the DATA.omContracts
+ *  $/kW-yr pricing; third-party + facility-age drive the sourced multipliers. */
+export interface SLAContractOptions {
+    itLoadKw?: number;
+    thirdParty?: boolean;
+    facilityAgeYears?: number;
+}
+
+/* SLA tier ↔ engine O&M contract tier mapping (scope-matched):
+ * NBD ≈ onCall (T&M on failure), 4hr ≈ preventive (PM + corrective billed),
+ * 2hr ≈ comprehensive (full parts+labor+emergency, OEM-grade SLA). */
+const OM_TIER_FOR_SLA: Record<'nbd' | '4hr' | '2hr', OmContractTierKey> = {
+    nbd: 'onCall', '4hr': 'preventive', '2hr': 'comprehensive',
+};
 
 export const calculateSLAComparison = (
     assets: AssetCount[],
     tierLevel: 3 | 4,
-    country?: CountryProfile
+    country?: CountryProfile,
+    contract?: SLAContractOptions
 ): SLAComparison => {
     const criticalAssets = assets.filter(a => {
         const t = ASSETS.find(at => at.id === a.assetId);
@@ -272,10 +309,45 @@ export const calculateSLAComparison = (
     // Regional cost multiplier
     const regionMult = country?.id === 'US' ? 1.3 : country?.id === 'SG' ? 1.2 : country?.id === 'JP' ? 1.4 : 1.0;
 
-    // SLA costs scale with number of critical assets
-    const nbdBaseCost = totalCritical * 800 * regionMult;  // ~$800/asset/year for NBD
-    const fourHrBaseCost = totalCritical * 2200 * regionMult;
-    const twoHrBaseCost = totalCritical * 4500 * regionMult;
+    // ── Vendor contract cost per tier — engine DATA.omContracts (v2.5.2 sourced
+    // $/kW-yr bands) × IT kW, with third-party (×0.65) and >10yr-facility (×1.5)
+    // multipliers. Verbatim per-critical-asset fallback kept below for when the
+    // engine (or IT load) is unavailable.
+    const om = (rzData().omContracts || null) as {
+        tiers?: Record<OmContractTierKey, { low?: number; mid?: number; high?: number; scope?: string }>;
+        thirdPartyMultiplier?: number; agingFacilityMultiplier?: number; basis?: string;
+    } | null;
+    const itLoadKw = contract?.itLoadKw ?? 0;
+    const omReady = !!(om?.tiers?.comprehensive && om?.tiers?.preventive && om?.tiers?.onCall && itLoadKw > 0);
+    const thirdPartyMultiplier = om?.thirdPartyMultiplier ?? 0.65;
+    const agingFacilityMultiplier = om?.agingFacilityMultiplier ?? 1.5;
+    const thirdPartyApplied = !!contract?.thirdParty;
+    const agingApplied = (contract?.facilityAgeYears ?? 0) > 10;
+    const contractMult = (thirdPartyApplied ? thirdPartyMultiplier : 1) * (agingApplied ? agingFacilityMultiplier : 1);
+
+    // Verbatim local fallback — SLA costs scale with number of critical assets
+    const fallbackAnnual: Record<'nbd' | '4hr' | '2hr', number> = {
+        nbd: totalCritical * 800 * regionMult,  // ~$800/asset/year for NBD
+        '4hr': totalCritical * 2200 * regionMult,
+        '2hr': totalCritical * 4500 * regionMult,
+    };
+
+    const perKwBand = (slaId: 'nbd' | '4hr' | '2hr'): SLAContractBand | undefined => {
+        if (!omReady) return undefined;
+        const t = om!.tiers![OM_TIER_FOR_SLA[slaId]];
+        return { low: t.low ?? 0, mid: t.mid ?? 0, high: t.high ?? 0 };
+    };
+    const annualBand = (slaId: 'nbd' | '4hr' | '2hr'): SLAContractBand | undefined => {
+        const b = perKwBand(slaId);
+        if (!b) return undefined;
+        return { low: b.low * itLoadKw * contractMult, mid: b.mid * itLoadKw * contractMult, high: b.high * itLoadKw * contractMult };
+    };
+    const contractAnnual = (slaId: 'nbd' | '4hr' | '2hr'): number =>
+        omReady ? annualBand(slaId)!.mid : fallbackAnnual[slaId];
+
+    const nbdBaseCost = contractAnnual('nbd');
+    const fourHrBaseCost = contractAnnual('4hr');
+    const twoHrBaseCost = contractAnnual('2hr');
 
     // Risk exposure: downtime cost that SLA doesn't cover
     // NBD: avg 16hr response → 960 min downtime per incident
@@ -300,7 +372,8 @@ export const calculateSLAComparison = (
             riskExposure: nbdDowntime,
             breakEvenDowntimeCost: nbdBreakEven,
             netAnnualCost: nbdBaseCost + nbdDowntime,
-            recommended: false
+            recommended: false,
+            ...(omReady ? { omTierKey: OM_TIER_FOR_SLA.nbd, contractBand: annualBand('nbd'), contractPerKwYr: perKwBand('nbd') } : {})
         },
         {
             id: '4hr',
@@ -311,7 +384,8 @@ export const calculateSLAComparison = (
             riskExposure: fourHrDowntime,
             breakEvenDowntimeCost: fourHrBreakEven,
             netAnnualCost: fourHrBaseCost + fourHrDowntime,
-            recommended: false
+            recommended: false,
+            ...(omReady ? { omTierKey: OM_TIER_FOR_SLA['4hr'], contractBand: annualBand('4hr'), contractPerKwYr: perKwBand('4hr') } : {})
         },
         {
             id: '2hr',
@@ -322,7 +396,8 @@ export const calculateSLAComparison = (
             riskExposure: twoHrDowntime,
             breakEvenDowntimeCost: twoHrBreakEven,
             netAnnualCost: twoHrBaseCost + twoHrDowntime,
-            recommended: false
+            recommended: false,
+            ...(omReady ? { omTierKey: OM_TIER_FOR_SLA['2hr'], contractBand: annualBand('2hr'), contractPerKwYr: perKwBand('2hr') } : {})
         }
     ];
 
@@ -338,7 +413,19 @@ export const calculateSLAComparison = (
         ? `For Tier IV operations, ${sorted[0].label} SLA provides the best balance of cost (${formatUSD(sorted[0].annualCost)}/yr) and risk exposure (${formatUSD(sorted[0].riskExposure)}/yr). The break-even downtime cost for upgrading from NBD to 4-Hour is ${formatUSD(fourHrBreakEven)}/min.`
         : `For Tier III, the ${sorted[0].label} SLA is recommended. Upgrading to 4-Hour response is justified when downtime costs exceed ${formatUSD(fourHrBreakEven)}/min.`;
 
-    return { tiers, recommended, analysis };
+    const contractBasis: SLAContractBasis = {
+        fromEngine: omReady,
+        basis: omReady
+            ? (om?.basis ?? 'Engine DATA.omContracts $/kW-yr fixed-fee bands')
+            : 'Local screening fallback — per-critical-asset rates × regional multiplier',
+        itLoadKw,
+        thirdPartyApplied,
+        agingApplied,
+        thirdPartyMultiplier,
+        agingFacilityMultiplier,
+    };
+
+    return { tiers, recommended, analysis, contractBasis };
 };
 
 

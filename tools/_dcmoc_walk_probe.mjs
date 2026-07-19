@@ -144,6 +144,47 @@ for (const [grp, label] of [['Capacity', 'Capacity Planning'], ['CAPEX', 'CAPEX 
 }
 ok(`export popups opened (${popupCount})`, popupCount >= 2);
 
+console.log('— ƒx trace coverage (EB full-coverage mandate) —');
+/* Per tab: count numeric KPI value elements (the bold tabular figures used in
+ * the KPI grids) vs those wrapped in TraceValue (stable selector:
+ * [data-trace] on the TraceValue root button). Floor: ≥30% of the core pages
+ * must be instrumented (≥1 traced KPI). */
+const TRACE_PAGES = [
+    { group: 'Dashboard', leaf: null, name: 'Dashboard' },
+    { group: 'Capacity', leaf: 'Capacity Planning', name: 'Capacity' },
+    { group: 'CAPEX', leaf: 'CAPEX Engine', name: 'Capex' },
+    { group: 'Reliability', leaf: 'Reliability Engine', name: 'Reliability' },
+    { group: 'Financial', leaf: 'Financial', name: 'Financial' },
+    { group: 'Operations', leaf: 'Operations Overview', name: 'Ops' },
+    { group: 'Sustainability', leaf: 'Sustainability Engine', name: 'Sustainability' },
+    { group: 'Architecture', leaf: 'Architecture Engine', name: 'Architecture' },
+    { group: 'Operations', leaf: 'Staffing', name: 'Staffing' },
+    { group: 'Results', leaf: 'Results Engine', name: 'Results' },
+];
+let tracedPages = 0;
+for (const pg of TRACE_PAGES) {
+    try {
+        await nav(pg.group, pg.leaf ?? undefined);
+        await new Promise((r) => setTimeout(r, 900));
+        const cov = await page.evaluate(() => {
+            const inContent = (el) => !el.closest('aside') && !el.closest('nav');
+            const hasDigit = (el) => /\d/.test(el.textContent || '');
+            const kpiSel = [
+                '[class*="font-bold"][class*="tabular-nums"]',
+                '.text-3xl.font-bold', '.text-2xl.font-bold', '.text-5xl.font-bold', '.text-xl.font-bold',
+            ].join(', ');
+            const kpis = [...document.querySelectorAll(kpiSel)].filter((el) => inContent(el) && hasDigit(el));
+            const traced = [...document.querySelectorAll('[data-trace]')].filter(inContent);
+            return { kpis: Math.max(kpis.length, traced.length), traced: traced.length };
+        });
+        console.log(`  trace-coverage ${pg.name}: ${cov.traced}/${cov.kpis}`);
+        if (cov.traced > 0) tracedPages++;
+    } catch {
+        console.log(`  trace-coverage ${pg.name}: nav failed`);
+    }
+}
+ok(`trace coverage floor — ≥30% core pages instrumented (${tracedPages}/${TRACE_PAGES.length})`, tracedPages >= Math.ceil(TRACE_PAGES.length * 0.3));
+
 console.log('— Console errors —');
 const realErrors = errors.filter((e) => !e.includes('favicon') && !e.includes('net::ERR') && !e.includes('404'));
 ok(`0 real console errors (${realErrors.length})`, realErrors.length === 0);

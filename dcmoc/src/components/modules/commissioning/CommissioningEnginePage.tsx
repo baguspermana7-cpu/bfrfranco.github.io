@@ -19,6 +19,7 @@ import { CommissioningDashboard } from '@/components/modules/NewEngineDashboards
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
+import { TraceValue } from '@/components/ui/TraceValue';
 import { CheckCircle2, ChevronRight, ChevronDown, FileDown, ListChecks } from 'lucide-react';
 
 const WITNESS_STYLE: Record<string, { label: string; cls: string }> = {
@@ -350,16 +351,22 @@ export function CommissioningEnginePage() {
 
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'Readiness Index', value: readiness ? `${overall}%` : '—', sub: readiness ? `${readiness.status} (engine)` : 'enter completion below' },
+                            { label: 'Readiness Index', value: readiness ? `${overall}%` : '—', sub: readiness ? `${readiness.status} (engine)` : 'enter completion below', trace: 'cx.readiness' },
                             { label: 'Program Duration', value: `${rich.durationDays} d`, sub: `~${rich.durationMonths} mo · L0→L6` },
                             { label: 'Systems in Scope', value: String(systems.length), sub: 'from equipment scaling' },
-                            { label: 'Tests (screening)', value: testsTotal.toLocaleString(), sub: t.testsPassed != null ? `${t.testsPassed} passed · ${t.testsFailed ?? 0} failed` : 'counts × tests-per-unit' },
+                            { label: 'Tests (screening)', value: testsTotal.toLocaleString(), sub: t.testsPassed != null ? `${t.testsPassed} passed · ${t.testsFailed ?? 0} failed` : 'counts × tests-per-unit', trace: 'cx.testsTotal' },
                             { label: 'Open Issues', value: String(openIssues.length), sub: `${punch.length} punch items` },
                             { label: 'IST Scenarios', value: String(rich.tierInfo.scenarios), sub: `${rich.tierInfo.tier} · ${rich.tierInfo.istHrs}h IST` },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
-                                <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                {(k as { trace?: string }).trace ? (
+                                    <TraceValue traceId={(k as { trace?: string }).trace!}>
+                                        <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                    </TraceValue>
+                                ) : (
+                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                )}
                                 <div className="truncate text-[10px] text-slate-500">{k.sub}</div>
                             </div>
                         ))}

@@ -284,7 +284,8 @@ export interface SiteAnalyses {
 
 /** Shared project context for the per-site analyses (computed once per render).
  *  Screening bases documented: revenue = engine decision.revenuePerKwMonth
- *  (fallback 280 $/kW·mo), staff cost = headcount × country base salary × 1.3. */
+ *  (fallback 280 $/kW·mo), staff cost = headcount × country base salary ×
+ *  (1 + country benefitsOverheadRate; fallback 0.3 = legacy flat ×1.3 burden). */
 export function buildAnalysisCtx(args: {
     itLoadKw: number; tierLevel: 2 | 3 | 4; coolingType: SiteAnalysisCtx['coolingType'];
     capexTotal: number | null; headcounts: number[]; countryId: string; opexAnnual?: number | null;
@@ -300,7 +301,8 @@ export function buildAnalysisCtx(args: {
         annualRevenue,
         annualOpex: args.opexAnnual ?? annualRevenue * 0.4,   // screening fallback
         totalFTE,
-        annualStaffCost: totalFTE * baseSalary * 1.3,
+        // DM audit: country-specific benefits+overhead burden (countries.ts labor.benefitsOverheadRate); fallback legacy ×1.3
+        annualStaffCost: totalFTE * baseSalary * (1 + (c?.labor?.benefitsOverheadRate ?? 0.3)),
     };
 }
 

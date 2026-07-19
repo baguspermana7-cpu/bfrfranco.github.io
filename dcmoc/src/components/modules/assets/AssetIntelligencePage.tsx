@@ -20,6 +20,7 @@ import { CreatableCombobox, type ComboValue } from '@/components/ui/CreatableCom
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
+import { TraceValue } from '@/components/ui/TraceValue';
 import { Activity, ChevronRight, FileDown } from 'lucide-react';
 
 const CAT_COLORS = ['#3b82f6', '#06b6d4', '#a855f7', '#f59e0b', '#ef4444', '#64748b'];
@@ -168,8 +169,8 @@ export function AssetIntelligencePage() {
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'Total Tracked Units', value: model.total.toLocaleString(), sub: 'engine equipment scaling' },
-                            { label: 'Avg Health', value: `${model.avgHealth}/100`, sub: `age ${ageYears} yr · condition ${Math.round(condition * 100)}%` },
+                            { label: 'Total Tracked Units', value: model.total.toLocaleString(), sub: 'engine equipment scaling', trace: 'asset.fleetUnits' },
+                            { label: 'Avg Health', value: `${model.avgHealth}/100`, sub: `age ${ageYears} yr · condition ${Math.round(condition * 100)}%`, trace: 'asset.avgHealth' },
                             { label: 'Excellent / Good', value: (model.buckets.excellent + model.buckets.good).toLocaleString(), sub: `${model.buckets.excellent.toLocaleString()} excellent` },
                             { label: 'Fair', value: model.buckets.fair.toLocaleString(), sub: 'monitor' },
                             { label: 'Poor / Critical', value: (model.buckets.poor + model.buckets.critical).toLocaleString(), sub: 'plan replacement' },
@@ -177,7 +178,13 @@ export function AssetIntelligencePage() {
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
-                                <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                {(k as { trace?: string }).trace ? (
+                                    <TraceValue traceId={(k as { trace?: string }).trace!}>
+                                        <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                    </TraceValue>
+                                ) : (
+                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                )}
                                 <div className="truncate text-[10px] text-slate-500">{k.sub}</div>
                             </div>
                         ))}

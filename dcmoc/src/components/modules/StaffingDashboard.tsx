@@ -11,6 +11,7 @@ import { calculateTurnoverCost as calculateCostOfTurnover } from '@/modules/staf
 import { Users, Clock, DollarSign, AlertTriangle, Calendar, Award, Briefcase, TrendingUp, ArrowRight, CheckCircle, XCircle, BarChart3, Activity } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { TraceValue } from '@/components/ui/TraceValue';
 import { fmtMoney, fmtMoneyFull } from '@/lib/format';
 import clsx from 'clsx';
 
@@ -324,7 +325,9 @@ export function StaffingDashboard() {
                                 <span className="text-xs text-slate-400 flex items-center gap-1">Total Headcount <Tooltip content="Total full-time equivalent employees across all roles and shifts" /></span>
                             </div>
                             <div className="mt-auto">
-                                <div className="text-3xl font-bold text-slate-900 dark:text-white">{results.totalHeadcount} <span className="text-sm font-normal text-slate-500">FTEs</span></div>
+                                <TraceValue traceId="staff.fte">
+                                    <div className="text-3xl font-bold text-slate-900 dark:text-white">{results.totalHeadcount} <span className="text-sm font-normal text-slate-500">FTEs</span></div>
+                                </TraceValue>
                                 <div className="text-xs text-slate-500 mt-1">{results.totalOnShift} on-shift at any time</div>
                             </div>
                         </div>
@@ -337,9 +340,11 @@ export function StaffingDashboard() {
                                 <span className="text-xs text-slate-400 flex items-center gap-1">Monthly Payroll <Tooltip content="Total monthly cost including base salary, shift allowances, overtime, and benefits" /></span>
                             </div>
                             <div className="mt-auto">
-                                <div className="text-3xl font-bold text-slate-900 dark:text-white truncate" title={fmtMoney(results.totalMonthlyCost)}>
-                                    {fmtMoney(results.totalMonthlyCost)}
-                                </div>
+                                <TraceValue traceId="staff.monthlyCost">
+                                    <div className="text-3xl font-bold text-slate-900 dark:text-white truncate" title={fmtMoney(results.totalMonthlyCost)}>
+                                        {fmtMoney(results.totalMonthlyCost)}
+                                    </div>
+                                </TraceValue>
                                 <div className="text-xs text-slate-500 mt-1">Year 1 Baseline ({inputs.shiftModel === '8h' ? 'Continental' : '4-on/3-off'})</div>
                             </div>
                         </div>

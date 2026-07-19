@@ -20,6 +20,7 @@ import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { fmtMoney } from '@/lib/format';
+import { TraceValue } from '@/components/ui/TraceValue';
 import { HardHat, ChevronRight, FileDown } from 'lucide-react';
 
 const PCT_PRESETS = [0, 10, 25, 50, 75, 90, 100].map((v) => ({ value: v, label: `${v}%` }));
@@ -144,16 +145,22 @@ export function ConstructionEngine() {
             {/* KPI row */}
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                 {[
-                    { label: 'Overall Progress', value: `${e.overallPct}%`, sub: planMode ? 'baseline' : `PV ${e.pvPct}%` },
+                    { label: 'Overall Progress', value: `${e.overallPct}%`, sub: planMode ? 'baseline' : `PV ${e.pvPct}%`, trace: 'constr.progressPct' },
                     { label: 'Planned Completion', value: `M${sched.totalMonths}`, sub: `${Math.round(sched.totalMonths / 12 * 10) / 10} years` },
-                    { label: 'Forecast Completion', value: `M${e.forecastTotalMonths}`, sub: e.delayMonths > 0 ? `+${e.delayMonths} mo delay` : 'on plan' },
-                    { label: 'Budget (Cumulative)', value: fmtMoney(budget), sub: `AC ${fmtMoney(e.acUsd)} (${budget > 0 ? Math.round((e.acUsd / budget) * 100) : 0}%)` },
-                    { label: 'SPI', value: String(e.spi), sub: planMode ? 'baseline' : e.spi >= 1 ? 'on/ahead' : 'behind' },
-                    { label: 'CPI', value: String(e.cpi), sub: planMode ? 'baseline' : e.cpi >= 1 ? 'under budget' : 'over budget' },
+                    { label: 'Forecast Completion', value: `M${e.forecastTotalMonths}`, sub: e.delayMonths > 0 ? `+${e.delayMonths} mo delay` : 'on plan', trace: 'constr.forecastMonths' },
+                    { label: 'Budget (Cumulative)', value: fmtMoney(budget), sub: `AC ${fmtMoney(e.acUsd)} (${budget > 0 ? Math.round((e.acUsd / budget) * 100) : 0}%)`, trace: 'capex.total' },
+                    { label: 'SPI', value: String(e.spi), sub: planMode ? 'baseline' : e.spi >= 1 ? 'on/ahead' : 'behind', trace: 'constr.spi' },
+                    { label: 'CPI', value: String(e.cpi), sub: planMode ? 'baseline' : e.cpi >= 1 ? 'under budget' : 'over budget', trace: 'constr.cpi' },
                 ].map((k) => (
                     <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                         <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
-                        <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                        {(k as { trace?: string }).trace ? (
+                            <TraceValue traceId={(k as { trace?: string }).trace!}>
+                                <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                            </TraceValue>
+                        ) : (
+                            <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                        )}
                         <div className="truncate text-[10px] text-slate-500">{k.sub}</div>
                     </div>
                 ))}

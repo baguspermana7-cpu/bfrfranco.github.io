@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.97.0 — 2026-07-20 (WAVE MALAM 2-3: env costs country-auto + labor statutory 40 negara + DL rollout + trace coverage gate + O&M consumers)
+
+### Added
+- **Environmental Costs (country-auto) di Sustainability** (owner: "dimana biaya air/waste/carbon?"): Water (WUE engine × climate mult ASHRAE zone × $/kgal per source; deep-sea ON → $0 seawater basis), Carbon (scope-2 × `DATA.envCosts.carbonPriceUsdPerT[negara]` — compliance World Bank/OECD/NCCS 2025-26; tanpa skema → voluntary $10/t chip amber), Waste (2 t/MW-IT + e-waste 150 kg/MW × band developed/emerging), total + forecast ramp; ganti negara = semua rate ikut.
+- **DATA.envCosts engine** (40 negara carbon price: SG $33, EU-ETS $61, SE $120, CH $130, NO $100, JP $2 …) + 9 assert.
+- **Labor statutory 40 negara (DM fase 1-2)**: field baru `socialSecurityRate` (AU super 12% ATO 2025, GB NIC 15% 2025, FR 38%, BR 28%, SG CPF 17% …), `benefitsOverheadRate`, `nightShiftPremiumRate` (statutory JP 25%/KR 30%/VN 30%/BR 20%), `workingHoursPerMonth` (150-161 dari leave data), `constructionIndex` 40/40 (was 0/40 — CapexEngine priority logic aktif), `environmentalPermitCostPerYear` — konsumen ShiftEngine ×3 titik, site-adapter burden 1.3→per-negara, FuelGen permit, capex-data fallback-only. Engine DATA.countries regen; parity 155/0.
+- **DL rollout**: `explainThresholdMetric` generik (bisection) — Investment (Min DSCR ≥1.25x, Equity IRR ≥15%, payback ≤7th; lever debt-ratio/revenue/exit dihitung + honest-unreachable; klik → focus input/tab) + Reliability (availability < tier target → gap nines + top kontributor + lever "paths +1 → +0.67 nines MENCAPAI target" / "MTTR −46% bisection"; SPOF rows tombol FIX).
+- **EB trace wave-3**: 19 node baru (staff.monthlyCost, constr.spi/cpi/ev/progress/forecast, cx.readiness/tests, results.score+4 dimensi, asset.fleet/health/replacement) + wraps di Staffing/Construction/Commissioning/Results/Assets; **coverage gate permanen** di walk probe (`trace-coverage x/y` per halaman, floor ≥30% halaman ter-instrument) — walk kini 24/0.
+- **DN consumers**: biaya kontrak SLA Maintenance dari `DATA.omContracts` (NBD≈on-call/4hr≈preventive/2hr≈comprehensive × IT kW; toggle third-party ×0.65 + aging ×1.5; fallback verbatim); Spares tab band harga; **Data Library +3 dataset live** (O&M Contracts, Spares Pricing, Env Costs sortable 40 negara).
+
+### Verified
+- Engine 599/0 · parity 155/0 · bindings 73/0 · accuracy 40/0 · dcmoc tsc+build · walk 24/0 (+coverage) · synergy 6/0 · export 44/0 · ?v `2026-07-20-d`.
+- Audit country-specificity diarsip: `audit-reports/2026-07-20_0130_DM-country-specificity-inventory.md` (fase 3 dead-data = wave berikut).
+
 ## v1.96.0 — 2026-07-20 (ARTICLE SWEEP 22/22 + O&M pricing research + site-intel ƒx + 3 bug nyata + fleet malam)
 
 ### Added

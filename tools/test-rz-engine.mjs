@@ -1253,6 +1253,20 @@ if (M.opex && M.opex.totalAnnual) {
     ok('opex basisPresets provenance', !!D.sources['opex.basisPresets']);
 }
 
+/* ── v2.5.2 DG environmental cost tables ── */
+{
+    const ec = D.envCosts;
+    ok('envCosts present', !!ec && !!ec.carbonPriceUsdPerT);
+    ok('envCosts covers all 40 countries', Object.keys(D.countries).every(id => typeof ec.carbonPriceUsdPerT[id] === 'number'));
+    ok('envCosts SG matches NCCS 2026', ec.carbonPriceUsdPerT.SG === 33);
+    ok('envCosts EU-ETS coherent', ec.carbonPriceUsdPerT.DE === 61 && ec.carbonPriceUsdPerT.FR === 61);
+    ok('envCosts CH highest tax band', ec.carbonPriceUsdPerT.CH >= 100);
+    ok('envCosts voluntary fallback sane', ec.voluntaryOffsetUsdPerT > 0 && ec.voluntaryOffsetUsdPerT < 50);
+    ok('wasteMgmt bands sane', ec.wasteMgmt.generalUsdPerTonne.developed > ec.wasteMgmt.generalUsdPerTonne.emerging);
+    ok('developedMarkets subset of countries', ec.developedMarkets.every(id => !!D.countries[id]));
+    ok('envCosts sourced', !!D.sources['envCosts']);
+}
+
 /* ── v2.5.2 O&M pricing tables (DN research — sourced screening bands) ── */
 {
     const om = D.omContracts, sp = D.sparesPricing;

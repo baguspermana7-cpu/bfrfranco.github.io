@@ -48,6 +48,35 @@ const SPARES_PRICE_CLASS: Partial<Record<SparesClassKey, string>> = {
     pdu: 'pdu_breaker_mccb',
 };
 
+/* ── Sourced price-band browser (shared with the Maintenance Spares tab) ──
+ * Same DATA.sparesPricing read as unitCostDefault (mid band feeds the
+ * newsvendor unit cost); exported so UI surfaces render the full low/mid/high
+ * band + unit label WITHOUT duplicating the engine-read logic. */
+export interface SparesPriceBandRow {
+    key: string;                       // DATA.sparesPricing class id
+    low: number; mid: number; high: number;
+    unit: string;                      // engine unit label (e.g. 'per 50kW power module')
+    adapterClass?: SparesClassKey;     // newsvendor adapter class consuming the mid band
+}
+
+export function sparesPricingBands(): SparesPriceBandRow[] {
+    try {
+        const classes = (rzData() as {
+            sparesPricing?: { classes?: Record<string, { low?: number; mid?: number; high?: number; unit?: string }> };
+        })?.sparesPricing?.classes;
+        if (!classes) return [];
+        return Object.entries(classes).map(([key, b]) => ({
+            key,
+            low: b.low ?? 0,
+            mid: b.mid ?? 0,
+            high: b.high ?? 0,
+            unit: b.unit ?? '',
+            adapterClass: (Object.entries(SPARES_PRICE_CLASS)
+                .find(([, priced]) => priced === key)?.[0]) as SparesClassKey | undefined,
+        }));
+    } catch { return []; }
+}
+
 /** Researched engine price (mid band) else screening fallback. */
 function unitCostDefault(classKey: SparesClassKey): { cost: number; fromEngine: boolean } {
     try {

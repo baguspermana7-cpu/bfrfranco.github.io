@@ -147,7 +147,7 @@ export function TraceValue({ traceId, children }: { traceId: string; children: R
 
     return (
         <>
-            <button onClick={openAt} data-bind={traceId}
+            <button onClick={openAt} data-bind={traceId} data-trace={traceId}
                 className="group relative cursor-pointer border-b border-dotted border-violet-400/60 hover:border-violet-500 text-left"
                 title="Klik: lihat rumus & sumber angka ini (formula field)">
                 {children}

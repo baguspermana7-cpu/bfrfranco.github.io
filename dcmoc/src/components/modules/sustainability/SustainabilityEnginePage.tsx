@@ -14,6 +14,7 @@ import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useSustainability } from '@/store/sustainability';
 import { rzModels, rzData } from '@/lib/rz-engine';
+import { fmt, fmtMoney } from '@/lib/format';
 import { getPUE } from '@/constants/pue';
 import CarbonDashboard from '@/components/modules/CarbonDashboard';
 import { Leaf, ChevronRight, FileDown } from 'lucide-react';
@@ -64,6 +65,55 @@ export function SustainabilityEnginePage() {
         return { mw, pue, monthlyMwh, scopes, waterM3Yr, mix: [{ name: 'Renewable (on-site)', v: onSite }, { name: 'Renewable (off-site PPA)', v: offSite }, { name: 'Grid Electricity', v: grid }].filter((x) => x.v > 0), renewablePct, energyScore, carbonScore, waterScore, wasteScore, overall, grade, wue };
     }, [inputs, country, capexInputs.renewableOption, capexInputs.greenCert, sus.wasteDiversionPct]);
 
+    /* ── Environmental Costs (country-auto) — engine DATA.envCosts + DATA.waterFootprint.
+     * Reuses the numbers ALREADY rendered above (scope-2 tCO₂e, WUE m³/yr) so the
+     * section can never disagree with the KPI row; only the RATES are new. All
+     * per-country rates key off sim selectedCountry.id (ISO-2) — one source. ── */
+    const [waterSource, setWaterSource] = React.useState<'municipal' | 'reclaimed' | 'river' | 'groundwell'>('municipal');
+    const env = React.useMemo(() => {
+        const D = rzData();
+        const ec = D?.envCosts;
+        const wf = D?.waterFootprint;
+        if (!ec?.carbonPriceUsdPerT || !ec?.wasteMgmt || !wf?.waterCostPerKgal) return null; // engine absent → section hides (local KPIs above still render)
+        const cid = (country?.id ?? 'US').toUpperCase();
+        const cname = country?.name ?? 'United States';
+        /* climate band from the country ASHRAE zone (screening map → DATA.waterFootprint.climateMult) */
+        const zone: string = country?.environment?.ashraeClimateZone ?? '';
+        const zn = parseInt(zone, 10);
+        const climate = !zone || Number.isNaN(zn) ? 'temperate'
+            : zn <= 2 && zone.includes('A') ? 'hothumid'
+            : zn <= 3 && zone.includes('B') ? 'hotdry'
+            : zn >= 5 ? 'cold' : 'temperate';
+        const climateMult: number = wf.climateMult?.[climate] ?? 1.0;
+        /* 1 · WATER — same engine WUE volume as the KPI row, climate-adjusted, priced per kgal */
+        const waterM3 = (model.waterM3Yr ?? 0) * climateMult;               // m³/yr = WUE(cooling) × IT kWh × climate
+        const kgal = (waterM3 * 1000) / (wf.lPerGal ?? 3.785) / 1000;      // liters → kgal
+        const waterRate: number = wf.waterCostPerKgal[waterSource] ?? wf.waterCostPerKgal.municipal;
+        const deepSea = !!capexInputs.deepSea;
+        const waterCost = deepSea ? 0 : kgal * waterRate;                   // deep-sea = seawater basis, no potable draw
+        /* 2 · CARBON — scope-2 tCO₂e rendered above × country compliance price (voluntary fallback) */
+        const scope2 = model.scopes?.scope2 ?? 0;
+        const compliancePrice: number | undefined = ec.carbonPriceUsdPerT[cid];
+        const hasScheme = compliancePrice != null && compliancePrice > 0;
+        const carbonRate: number = hasScheme ? compliancePrice : (ec.voluntaryOffsetUsdPerT ?? 10);
+        const carbonCost = scope2 * carbonRate;
+        /* 3 · WASTE — screening bands: general (developed/emerging) + certified e-waste */
+        const developed = (ec.developedMarkets ?? []).includes(cid);
+        const genRate: number = ec.wasteMgmt.generalUsdPerTonne?.[developed ? 'developed' : 'emerging'] ?? (developed ? 120 : 60);
+        const genTonnes = (ec.wasteMgmt.generalTonnesPerMwItYr ?? 2.0) * model.mw;
+        const eKg = (ec.wasteMgmt.eWasteKgPerMwItYr ?? 150) * model.mw;
+        const eRate: number = ec.wasteMgmt.eWasteUsdPerKg ?? 1.0;
+        const wasteCost = genTonnes * genRate + eKg * eRate;
+        const total = waterCost + carbonCost + wasteCost;
+        /* mini forecast — water+carbon follow the occupancy ramp (energy-driven);
+         * waste stays on the installed IT base (screening) */
+        const ramp: number[] = inputs.occupancyRamp?.length ? inputs.occupancyRamp : [1];
+        const forecast = ramp.map((occ, i) => ({
+            year: `Y${i + 1}`, water: Math.round(waterCost * occ), carbon: Math.round(carbonCost * occ), waste: Math.round(wasteCost),
+        }));
+        return { cid, cname, climate, climateMult, waterM3, kgal, waterRate, waterCost, deepSea, scope2, hasScheme, carbonRate, carbonCost, developed, genRate, genTonnes, eKg, eRate, wasteCost, total, forecast };
+    }, [model, country, capexInputs.deepSea, waterSource, inputs.occupancyRamp]);
+
     const scopeDonut = model.scopes ? [
         { name: 'Scope 1', v: model.scopes.scope1 }, { name: 'Scope 2 (location-based)', v: model.scopes.scope2 }, { name: 'Scope 3 (annualized)', v: model.scopes.scope3Annual },
     ] : [];
@@ -94,6 +144,14 @@ export function SustainabilityEnginePage() {
                             ['Waste Management', model.wasteScore != null ? String(model.wasteScore) : '—'],
                         ],
                     },
+                    ...(env ? [{
+                        title: `Environmental Costs — ${env.cname} (${env.cid}) · country-auto rates · screening`, head: ['Cost', 'USD / yr', 'Basis'], rows: [
+                            ['Water', fmtMoney(env.waterCost), env.deepSea ? 'deep-sea ON — seawater basis, no potable draw' : `${fmt(env.waterM3)} m³ (WUE × climate ×${env.climateMult}) × $${env.waterRate}/kgal (${waterSource})`],
+                            ['Carbon', fmtMoney(env.carbonCost), `${fmt(env.scope2)} tCO₂e scope-2 × $${env.carbonRate}/t (${env.hasScheme ? 'compliance' : 'voluntary offset'})`],
+                            ['Waste', fmtMoney(env.wasteCost), `general ${fmt(env.genTonnes, 1)} t × $${env.genRate}/t (${env.developed ? 'developed' : 'emerging'}) + e-waste ${fmt(env.eKg)} kg × $${env.eRate}/kg`],
+                            ['Total', fmtMoney(env.total), 'engine DATA.envCosts + waterFootprint · World Bank / OECD / NCCS 2025-26'],
+                        ],
+                    }] : []),
                     { title: 'Initiatives in Progress', head: ['Category', 'Initiative', 'Progress', 'Status'], rows: sus.initiatives.map((i) => [i.category, i.title, `${i.progressPct}%`, i.status]) },
                 ],
                 callouts: [
@@ -245,6 +303,70 @@ export function SustainabilityEnginePage() {
                             </div>
                         </div>
                     </div>
+
+                    {env && (
+                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <div className="mb-2 flex flex-wrap items-center gap-2">
+                                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Environmental Costs <span className="text-[9px] normal-case text-slate-400">country-auto rates</span></h2>
+                                <span className="rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-violet-500">{env.cname} · {env.cid}</span>
+                                <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-500">engine DATA.envCosts + waterFootprint</span>
+                                <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-500">screening</span>
+                            </div>
+                            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                                <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+                                    <div className="flex items-center justify-between gap-1 text-[10px] uppercase tracking-wide text-slate-500">
+                                        <span>Water Cost /yr <Explain k="wue" /></span>
+                                        <select value={waterSource} onChange={(e) => setWaterSource(e.target.value as typeof waterSource)}
+                                            className="rounded border border-slate-300 dark:border-slate-700 bg-transparent px-1 py-0.5 text-[9px] normal-case text-slate-500">
+                                            {(['municipal', 'reclaimed', 'river', 'groundwell'] as const).map((s) => <option key={s} value={s}>{s}</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{fmtMoney(env.waterCost)}</div>
+                                    <div className="text-[10px] text-slate-500">{fmt(env.waterM3)} m³ = WUE {model.wue} L/kWh × IT kWh × climate ×{env.climateMult} ({env.climate}) → {fmt(env.kgal)} kgal × ${env.waterRate}/kgal ({waterSource})</div>
+                                    {env.deepSea && <div className="mt-1 inline-block rounded bg-cyan-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-cyan-600 dark:text-cyan-400">deep-sea ON — seawater basis, no potable draw</div>}
+                                </div>
+                                <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+                                    <div className="text-[10px] uppercase tracking-wide text-slate-500">Carbon Cost /yr <Explain k="cue" /></div>
+                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{fmtMoney(env.carbonCost)}</div>
+                                    <div className="text-[10px] text-slate-500">{fmt(env.scope2)} tCO₂e scope-2 (rendered above) × ${env.carbonRate}/tCO₂e</div>
+                                    <div className="mt-1 flex flex-wrap gap-1">
+                                        {env.hasScheme
+                                            ? <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-500">compliance price — {env.cid} ${env.carbonRate}/t</span>
+                                            : <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-500">voluntary basis — no compliance scheme in {env.cname} yet (offset ${env.carbonRate}/t)</span>}
+                                        <span className="rounded bg-slate-500/10 px-1.5 py-0.5 text-[9px] text-slate-500">World Bank / OECD / NCCS 2025-26</span>
+                                    </div>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+                                    <div className="text-[10px] uppercase tracking-wide text-slate-500">Waste Mgmt Cost /yr</div>
+                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{fmtMoney(env.wasteCost)}</div>
+                                    <div className="text-[10px] text-slate-500">general {fmt(env.genTonnes, 1)} t × ${env.genRate}/t ({env.developed ? 'developed' : 'emerging'} band) + e-waste {fmt(env.eKg)} kg × ${env.eRate}/kg</div>
+                                    <div className="mt-1 inline-block rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-500">screening — packaging/consumables + certified ITAD, IT refresh excluded</div>
+                                </div>
+                                <div className="rounded-xl border border-violet-300 dark:border-violet-800 bg-violet-500/5 p-3">
+                                    <div className="text-[10px] uppercase tracking-wide text-slate-500">Total Environmental Cost /yr</div>
+                                    <div className="text-lg font-bold tabular-nums text-violet-600 dark:text-violet-400">{fmtMoney(env.total)}</div>
+                                    <div className="text-[10px] text-slate-500">water + carbon + waste · rates auto-switch with country ({env.cid})</div>
+                                </div>
+                            </div>
+                            <div className="mt-3">
+                                <div className="mb-1 text-[10px] uppercase tracking-wide text-slate-500">Forecast — follows occupancy ramp (water + carbon energy-driven; waste on installed IT base)</div>
+                                <div className="h-40">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={env.forecast} margin={{ top: 4, right: 8, left: 8, bottom: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#33415522" vertical={false} />
+                                            <XAxis dataKey="year" tick={{ fontSize: 9 }} />
+                                            <YAxis tick={{ fontSize: 9 }} tickFormatter={(v) => fmtMoney(Number(v))} width={52} />
+                                            <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
+                                            <Legend wrapperStyle={{ fontSize: 10 }} />
+                                            <Bar dataKey="water" name="Water" stackId="env" fill="#22d3ee" />
+                                            <Bar dataKey="carbon" name="Carbon" stackId="env" fill="#f59e0b" />
+                                            <Bar dataKey="waste" name="Waste" stackId="env" fill="#64748b" radius={[3, 3, 0, 0]} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Initiatives in Progress {sus.touched ? '' : <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">EXAMPLE</span>}</h2>

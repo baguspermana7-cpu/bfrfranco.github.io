@@ -39,10 +39,38 @@ export interface CountryProfile {
             publicHolidays: number;
             sickAverage: number;
         };
+        /* ── DM audit phase 1-2: country-specific labor economics (optional, filled 40/40) ──
+         * socialSecurityRate — EMPLOYER statutory contribution as decimal of base wage.
+         *   Sources (2024-2026 public statutory data): SG CPF Board (17% age<=55); US IRS FICA
+         *   (7.65%); ID BPJS Ketenagakerjaan+Kesehatan (~10.4%); AU ATO Super Guarantee (12%
+         *   from 1 Jul 2025); GB HMRC employer NIC (15% from Apr 2025); PH SSS 2025 schedule
+         *   (10% employer of MSC); VN SI Law 2024 (21.5%); SE Skatteverket (31.42%); FR URSSAF
+         *   band mid; expat-dominated Gulf states blended (screening). Per-country note inline.
+         * benefitsOverheadRate — total benefits+overhead ABOVE base salary (13th/14th salary,
+         *   THR/aguinaldo/prima, health/pension top-ups, meals, training, HR overhead),
+         *   screening band 0.15-0.40 vs BLS ECEC / country payroll guides. Consumed by
+         *   site-adapter staff-cost burden (was flat x1.3).
+         * nightShiftPremiumRate — statutory night-work premium where codified (JP LSA Art.37
+         *   25%; KR LSA 50% on night hours -> ~30% blended; BR CLT Art.73 20%; VN Art.98 30%;
+         *   PH LC Art.86 10%; CO CST Art.168 35%; PT CdT Art.266 25%; DE EStG s3b 25% tax-free
+         *   custom; CH ArG Art.17b 10%), else market/CLA screening 0.05-0.20.
+         * workingHoursPerMonth — effective paid hours/month after annual leave + public
+         *   holidays + avg sick days (derived from this profile's `leaves` on a 40h week;
+         *   BR on 44h), clamped 150-176. Replaces the global /173 divisor in ShiftEngine. */
+        socialSecurityRate?: number;
+        benefitsOverheadRate?: number;
+        nightShiftPremiumRate?: number;
+        workingHoursPerMonth?: number;
     };
     compliance: {
         certifications: string[];
         annualComplianceCost: number;
+        /* Annual environmental permitting cost for backup-gen operation (air-quality /
+         * emissions permit renewals, stack-testing admin). Screening band 2024-2026:
+         * US ~$8k (EPA Title V minor-source range), JP ~$15k (strict local air ordinances),
+         * EU ~$4.5-6.5k (IED/local permits), emerging markets $2-3.5k. Consumed by
+         * FuelGenEngine (fallback: legacy flat $5,000 site fee). */
+        environmentalPermitCostPerYear?: number;
     };
     environment: {
         baselineAQI: number;
@@ -125,6 +153,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             taxRate: 0.22,
             electricityRate: 0.09,
         },
+        constructionIndex: 0.65, // ID rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 350,
             baseSalary_ShiftLead: 1500,
@@ -140,10 +169,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             },
             shrinkageFactor: 0.20,
             leaves: { annual: 12, publicHolidays: 15, sickAverage: 5 },
+            // ID labor add-ons (2024-2026 statutory/screening): BPJS employer ~10.2-11.7% (JHT 3.7+JP 2+JKK 0.24-1.74+JKM 0.3+Kes 4); no statutory night premium (UU 13/2003 silent) — market screening 8%
+            socialSecurityRate: 0.104, benefitsOverheadRate: 0.25, nightShiftPremiumRate: 0.08, workingHoursPerMonth: 152,
         },
         compliance: {
             certifications: ['Sertifikat Laik Operasi (SLO)', 'Ahli K3 Listrik', 'AMDAL', 'PP 35/2021'],
-            annualComplianceCost: 6500,
+            annualComplianceCost: 6500, environmentalPermitCostPerYear: 2500,
         },
         environment: {
             baselineAQI: 120,
@@ -219,6 +250,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             taxRate: 0.17,
             electricityRate: 0.22, // Significant increase 2023-2026 post-gas price normalisation
         },
+        constructionIndex: 1.1, // SG rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 1400,
             baseSalary_ShiftLead: 5500,
@@ -233,10 +265,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             },
             shrinkageFactor: 0.12,
             leaves: { annual: 14, publicHolidays: 11, sickAverage: 4 },
+            // SG labor add-ons (2024-2026 statutory/screening): CPF employer 17% (age<=55, CPF Board 2025); night premium not statutory — market screening 10%
+            socialSecurityRate: 0.17, benefitsOverheadRate: 0.2, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 154,
         },
         compliance: {
             certifications: ['SS 564', 'BCA Green Mark'],
-            annualComplianceCost: 12000,
+            annualComplianceCost: 12000, environmentalPermitCostPerYear: 6000,
         },
         environment: {
             baselineAQI: 45,
@@ -310,6 +344,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             // 2026: Tenaga Nasional ICPT surcharges + tariff review 2024; industrial ~MYR 0.38-0.42/kWh = ~$0.08-0.09 USD
             electricityRate: 0.09,
         },
+        constructionIndex: 0.7, // MY rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 340,
             baseSalary_ShiftLead: 1800,
@@ -324,10 +359,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             },
             shrinkageFactor: 0.18,
             leaves: { annual: 12, publicHolidays: 16, sickAverage: 5 },
+            // MY labor add-ons (2024-2026 statutory/screening): EPF employer 13% (wage<=RM5k) + SOCSO 1.75% + EIS 0.2%; night premium not statutory — screening 10%
+            socialSecurityRate: 0.15, benefitsOverheadRate: 0.22, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 151,
         },
         compliance: {
             certifications: ['Suruhanjaya Tenaga', 'GBI'],
-            annualComplianceCost: 5000,
+            annualComplianceCost: 5000, environmentalPermitCostPerYear: 2500,
         },
         environment: {
             baselineAQI: 90,
@@ -401,6 +438,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             taxRate: 0.21,
             electricityRate: 0.13,
         },
+        constructionIndex: 1.0, // US rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 2000,
             baseSalary_ShiftLead: 10500,
@@ -415,10 +453,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             },
             shrinkageFactor: 0.10,
             leaves: { annual: 10, publicHolidays: 10, sickAverage: 3 },
+            // US labor add-ons (2024-2026 statutory/screening): FICA employer 7.65% (6.2 OASDI + 1.45 Medicare); no federal night differential — BLS common shift diff ~10% (screening)
+            socialSecurityRate: 0.0765, benefitsOverheadRate: 0.3, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 158,
         },
         compliance: {
             certifications: ['OSHA', 'NFPA 70E'],
-            annualComplianceCost: 15000,
+            annualComplianceCost: 15000, environmentalPermitCostPerYear: 8000,
         },
         environment: {
             baselineAQI: 35,
@@ -491,6 +531,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             taxRate: 0.2304,
             electricityRate: 0.20,
         },
+        constructionIndex: 1.15, // JP rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 1200,
             baseSalary_ShiftLead: 4500,
@@ -505,10 +546,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             },
             shrinkageFactor: 0.08,
             leaves: { annual: 10, publicHolidays: 16, sickAverage: 2 },
+            // JP labor add-ons (2024-2026 statutory/screening): employer ~15.5% (pension 9.15 + health ~5 + employment 0.95 + workers comp ~0.3); night 22:00-05:00 statutory +25% (LSA Art.37)
+            socialSecurityRate: 0.155, benefitsOverheadRate: 0.3, nightShiftPremiumRate: 0.25, workingHoursPerMonth: 155,
         },
         compliance: {
             certifications: ['First Class Electrician', 'Energy Manager'],
-            annualComplianceCost: 8000,
+            annualComplianceCost: 8000, environmentalPermitCostPerYear: 15000,
         },
         environment: {
             baselineAQI: 30,
@@ -581,6 +624,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             taxRate: 0.30,
             electricityRate: 0.18,
         },
+        constructionIndex: 1.05, // AU rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 3000,
             baseSalary_ShiftLead: 9500,
@@ -595,10 +639,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             },
             shrinkageFactor: 0.12,
             leaves: { annual: 20, publicHolidays: 10, sickAverage: 5 },
+            // AU labor add-ons (2024-2026 statutory/screening): Superannuation Guarantee 12% (ATO, from 1 Jul 2025); night loading award-based ~15% (screening)
+            socialSecurityRate: 0.12, benefitsOverheadRate: 0.25, nightShiftPremiumRate: 0.15, workingHoursPerMonth: 150,
         },
         compliance: {
             certifications: ['WHS', 'Austel'],
-            annualComplianceCost: 10000,
+            annualComplianceCost: 10000, environmentalPermitCostPerYear: 7000,
         },
         environment: {
             baselineAQI: 20,
@@ -665,14 +711,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         // 2026: UAE Corp Tax 9% (since Jun 2023, free zones still 0% qualifying income)
         // Electricity: ~$0.09/kWh for industrial (DEWA tariff band E 2025)
         economy: { inflationRate: 0.025, laborEscalation: 0.035, taxRate: 0.09, electricityRate: 0.09 },
+        constructionIndex: 0.85, // AE rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 800, baseSalary_ShiftLead: 5000, baseSalary_Engineer: 4000,
             baseSalary_Technician: 2500, baseSalary_Admin: 2000, baseSalary_Janitor: 1200,
             laborRatePerHour: 25,
             overtimeRules: { workday: { firstHour: 1.25, subsequent: 1.5 }, holiday: { first8Hours: 1.5, ninthHour: 1.5, tenthHourPlus: 1.5 } },
             shrinkageFactor: 0.10, leaves: { annual: 30, publicHolidays: 10, sickAverage: 5 },
+            // AE labor add-ons (2024-2026 statutory/screening): GPSSA 12.5% Emiratis only; expat-dominated DC workforce -> blended ~3% (screening); no statutory night premium — screening 10%
+            socialSecurityRate: 0.03, benefitsOverheadRate: 0.3, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['DCDA', 'Estidama', 'Civil Defence'], annualComplianceCost: 15000 },
+        compliance: { certifications: ['DCDA', 'Estidama', 'Civil Defence'], annualComplianceCost: 15000, environmentalPermitCostPerYear: 3000 },
         environment: { baselineAQI: 100, gridCarbonIntensity: 0.45 },
         risk: { downtimeCostPerMin: 3500 },
         supplyChain: { importDifficultyFactor: 1.0 },
@@ -730,14 +779,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     SA: {
         id: 'SA', region: 'MENA', name: 'Saudi Arabia', currency: 'SAR', currencySymbol: '﷼',
         economy: { inflationRate: 0.02, laborEscalation: 0.035, taxRate: 0.20, electricityRate: 0.05 },
+        constructionIndex: 0.8, // SA rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 1100, baseSalary_ShiftLead: 4500, baseSalary_Engineer: 3800,
             baseSalary_Technician: 2200, baseSalary_Admin: 1800, baseSalary_Janitor: 1000,
             laborRatePerHour: 22,
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 1.5 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.12, leaves: { annual: 21, publicHolidays: 9, sickAverage: 4 },
+            // SA labor add-ons (2024-2026 statutory/screening): GOSI employer 11.75% Saudis / 2% expats -> mixed-workforce blend ~6% (screening); no statutory night premium — screening 10%
+            socialSecurityRate: 0.06, benefitsOverheadRate: 0.32, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 151,
         },
-        compliance: { certifications: ['Saudi CDC', 'SASO', 'NEOM Standards'], annualComplianceCost: 12000 },
+        compliance: { certifications: ['Saudi CDC', 'SASO', 'NEOM Standards'], annualComplianceCost: 12000, environmentalPermitCostPerYear: 2500 },
         environment: { baselineAQI: 110, gridCarbonIntensity: 0.55 },
         risk: { downtimeCostPerMin: 3000 },
         supplyChain: { importDifficultyFactor: 1.05 },
@@ -795,14 +847,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     QA: {
         id: 'QA', region: 'MENA', name: 'Qatar', currency: 'QAR', currencySymbol: 'QR',
         economy: { inflationRate: 0.02, laborEscalation: 0.03, taxRate: 0.10, electricityRate: 0.04 },
+        constructionIndex: 0.85, // QA rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 1000, baseSalary_ShiftLead: 5200, baseSalary_Engineer: 4200,
             baseSalary_Technician: 2600, baseSalary_Admin: 2100, baseSalary_Janitor: 1300,
             laborRatePerHour: 24,
             overtimeRules: { workday: { firstHour: 1.25, subsequent: 1.5 }, holiday: { first8Hours: 1.5, ninthHour: 1.5, tenthHourPlus: 1.5 } },
             shrinkageFactor: 0.10, leaves: { annual: 21, publicHolidays: 9, sickAverage: 4 },
+            // QA labor add-ons (2024-2026 statutory/screening): pension 14% Qataris only (Law 1/2022); expat-dominated -> blended ~3% (screening); no statutory night premium — screening 10%
+            socialSecurityRate: 0.03, benefitsOverheadRate: 0.32, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 151,
         },
-        compliance: { certifications: ['Kahramaa', 'QCS 2014'], annualComplianceCost: 14000 },
+        compliance: { certifications: ['Kahramaa', 'QCS 2014'], annualComplianceCost: 14000, environmentalPermitCostPerYear: 3000 },
         environment: { baselineAQI: 95, gridCarbonIntensity: 0.48 },
         risk: { downtimeCostPerMin: 3500 },
         supplyChain: { importDifficultyFactor: 1.05 },
@@ -861,14 +916,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     ZA: {
         id: 'ZA', region: 'AFR', name: 'South Africa', currency: 'ZAR', currencySymbol: 'R',
         economy: { inflationRate: 0.05, laborEscalation: 0.06, taxRate: 0.27, electricityRate: 0.10 },
+        constructionIndex: 0.55, // ZA rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 250, baseSalary_ShiftLead: 2200, baseSalary_Engineer: 1800,
             baseSalary_Technician: 1100, baseSalary_Admin: 800, baseSalary_Janitor: 400,
             laborRatePerHour: 12,
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 2.0 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.22, leaves: { annual: 15, publicHolidays: 12, sickAverage: 6 },
+            // ZA labor add-ons (2024-2026 statutory/screening): UIF 1% + SDL 1% + COIDA ~1% (no mandatory pension); BCEA s17 requires night allowance, amount by agreement — screening 10%
+            socialSecurityRate: 0.03, benefitsOverheadRate: 0.22, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 151,
         },
-        compliance: { certifications: ['SABS', 'ECSA', 'OHS Act'], annualComplianceCost: 5000 },
+        compliance: { certifications: ['SABS', 'ECSA', 'OHS Act'], annualComplianceCost: 5000, environmentalPermitCostPerYear: 3000 },
         environment: { baselineAQI: 50, gridCarbonIntensity: 0.9 },
         risk: { downtimeCostPerMin: 1500 },
         supplyChain: { importDifficultyFactor: 1.3 },
@@ -926,14 +984,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     NG: {
         id: 'NG', region: 'AFR', name: 'Nigeria', currency: 'USD', currencySymbol: '$',
         economy: { inflationRate: 0.14, laborEscalation: 0.08, taxRate: 0.30, electricityRate: 0.12 },
+        constructionIndex: 0.75, // NG rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 80, baseSalary_ShiftLead: 1200, baseSalary_Engineer: 900,
             baseSalary_Technician: 500, baseSalary_Admin: 350, baseSalary_Janitor: 150,
             laborRatePerHour: 6,
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 2.0 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.25, leaves: { annual: 12, publicHolidays: 11, sickAverage: 5 },
+            // NG labor add-ons (2024-2026 statutory/screening): PenCom pension employer 10% + NSITF 1% + ITF 1%; no statutory night premium — screening 5%
+            socialSecurityRate: 0.12, benefitsOverheadRate: 0.18, nightShiftPremiumRate: 0.05, workingHoursPerMonth: 155,
         },
-        compliance: { certifications: ['NCC', 'SON', 'NESREA'], annualComplianceCost: 3000 },
+        compliance: { certifications: ['NCC', 'SON', 'NESREA'], annualComplianceCost: 3000, environmentalPermitCostPerYear: 2000 },
         environment: { baselineAQI: 140, gridCarbonIntensity: 0.45 },
         risk: { downtimeCostPerMin: 800 },
         supplyChain: { importDifficultyFactor: 1.6 },
@@ -991,14 +1052,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     KE: {
         id: 'KE', region: 'AFR', name: 'Kenya', currency: 'KES', currencySymbol: 'KSh',
         economy: { inflationRate: 0.07, laborEscalation: 0.06, taxRate: 0.30, electricityRate: 0.15 },
+        constructionIndex: 0.6, // KE rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 150, baseSalary_ShiftLead: 1400, baseSalary_Engineer: 1000,
             baseSalary_Technician: 600, baseSalary_Admin: 400, baseSalary_Janitor: 200,
             laborRatePerHour: 7,
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 2.0 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.20, leaves: { annual: 21, publicHolidays: 10, sickAverage: 5 },
+            // KE labor add-ons (2024-2026 statutory/screening): NSSF employer 6% (Act 2013 tiers) + housing levy 1.5%; no statutory night premium — screening 5%
+            socialSecurityRate: 0.075, benefitsOverheadRate: 0.18, nightShiftPremiumRate: 0.05, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['KEBS', 'ERC License'], annualComplianceCost: 3500 },
+        compliance: { certifications: ['KEBS', 'ERC License'], annualComplianceCost: 3500, environmentalPermitCostPerYear: 2000 },
         environment: { baselineAQI: 60, gridCarbonIntensity: 0.3 },
         risk: { downtimeCostPerMin: 700 },
         supplyChain: { importDifficultyFactor: 1.5 },
@@ -1057,14 +1121,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     BR: {
         id: 'BR', region: 'LATAM', name: 'Brazil', currency: 'BRL', currencySymbol: 'R$',
         economy: { inflationRate: 0.045, laborEscalation: 0.05, taxRate: 0.34, electricityRate: 0.10 },
+        constructionIndex: 0.6, // BR rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 300, baseSalary_ShiftLead: 2000, baseSalary_Engineer: 1500,
             baseSalary_Technician: 900, baseSalary_Admin: 700, baseSalary_Janitor: 350,
             laborRatePerHour: 12,
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 2.0 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.22, leaves: { annual: 30, publicHolidays: 12, sickAverage: 5 },
+            // BR labor add-ons (2024-2026 statutory/screening): INSS patronal 20% + RAT ~2% + Sistema S ~5.8%; adicional noturno statutory +20% urban 22:00-05:00 (CLT Art.73); hrs on 44h wk
+            socialSecurityRate: 0.28, benefitsOverheadRate: 0.4, nightShiftPremiumRate: 0.2, workingHoursPerMonth: 156,
         },
-        compliance: { certifications: ['INMETRO', 'NR-10', 'ANATEL'], annualComplianceCost: 6000 },
+        compliance: { certifications: ['INMETRO', 'NR-10', 'ANATEL'], annualComplianceCost: 6000, environmentalPermitCostPerYear: 3500 },
         environment: { baselineAQI: 50, gridCarbonIntensity: 0.15 },
         risk: { downtimeCostPerMin: 1800 },
         supplyChain: { importDifficultyFactor: 1.4 },
@@ -1122,14 +1189,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     CL: {
         id: 'CL', region: 'LATAM', name: 'Chile', currency: 'CLP', currencySymbol: 'CL$',
         economy: { inflationRate: 0.04, laborEscalation: 0.04, taxRate: 0.27, electricityRate: 0.12 },
+        constructionIndex: 0.65, // CL rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 500, baseSalary_ShiftLead: 2300, baseSalary_Engineer: 1800,
             baseSalary_Technician: 1100, baseSalary_Admin: 800, baseSalary_Janitor: 500,
             laborRatePerHour: 14,
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 1.5 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.15, leaves: { annual: 15, publicHolidays: 15, sickAverage: 4 },
+            // CL labor add-ons (2024-2026 statutory/screening): employer SIS ~1.5% + seguro cesantia 2.4% + mutual ~1% (worker pays AFP); no general statutory night premium — screening 10%
+            socialSecurityRate: 0.05, benefitsOverheadRate: 0.25, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 151,
         },
-        compliance: { certifications: ['SEC', 'INN Chile'], annualComplianceCost: 5000 },
+        compliance: { certifications: ['SEC', 'INN Chile'], annualComplianceCost: 5000, environmentalPermitCostPerYear: 3000 },
         environment: { baselineAQI: 40, gridCarbonIntensity: 0.35 },
         risk: { downtimeCostPerMin: 1500 },
         supplyChain: { importDifficultyFactor: 1.3 },
@@ -1187,14 +1257,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     MX: {
         id: 'MX', region: 'LATAM', name: 'Mexico', currency: 'MXN', currencySymbol: 'MX$',
         economy: { inflationRate: 0.04, laborEscalation: 0.05, taxRate: 0.30, electricityRate: 0.09 },
+        constructionIndex: 0.6, // MX rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 350, baseSalary_ShiftLead: 1800, baseSalary_Engineer: 1400,
             baseSalary_Technician: 850, baseSalary_Admin: 600, baseSalary_Janitor: 350,
             laborRatePerHour: 10,
             overtimeRules: { workday: { firstHour: 2.0, subsequent: 3.0 }, holiday: { first8Hours: 2.0, ninthHour: 3.0, tenthHourPlus: 3.0 } },
             shrinkageFactor: 0.18, leaves: { annual: 12, publicHolidays: 7, sickAverage: 4 },
+            // MX labor add-ons (2024-2026 statutory/screening): IMSS employer ~20-25% + INFONAVIT 5% + SAR 2% + state payroll ~3% -> ~30% (screening); LFT night shift = 7h for 8h pay ~ +14% effective
+            socialSecurityRate: 0.3, benefitsOverheadRate: 0.32, nightShiftPremiumRate: 0.14, workingHoursPerMonth: 158,
         },
-        compliance: { certifications: ['NOM', 'SENER'], annualComplianceCost: 5000 },
+        compliance: { certifications: ['NOM', 'SENER'], annualComplianceCost: 5000, environmentalPermitCostPerYear: 3000 },
         environment: { baselineAQI: 80, gridCarbonIntensity: 0.45 },
         risk: { downtimeCostPerMin: 1200 },
         supplyChain: { importDifficultyFactor: 1.15 },
@@ -1253,14 +1326,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         id: 'CO', region: 'LATAM', name: 'Colombia', currency: 'COP', currencySymbol: 'CO$',
         // 2026: Colombia C&I electricity ~COP 700-900/kWh; currency depreciation pushes USD equivalent ~$0.09-0.11
         economy: { inflationRate: 0.06, laborEscalation: 0.055, taxRate: 0.35, electricityRate: 0.10 },
+        constructionIndex: 0.55, // CO rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 280, baseSalary_ShiftLead: 1600, baseSalary_Engineer: 1200,
             baseSalary_Technician: 700, baseSalary_Admin: 500, baseSalary_Janitor: 300,
             laborRatePerHour: 8,
             overtimeRules: { workday: { firstHour: 1.25, subsequent: 1.75 }, holiday: { first8Hours: 1.75, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.20, leaves: { annual: 15, publicHolidays: 18, sickAverage: 4 },
+            // CO labor add-ons (2024-2026 statutory/screening): pension 12% + ARL ~2% + caja 4% + health 8.5% (Ley 1607 exoneration partial) -> ~21% screening; recargo nocturno statutory +35% (CST Art.168, window 19:00- per 2025 reform)
+            socialSecurityRate: 0.21, benefitsOverheadRate: 0.35, nightShiftPremiumRate: 0.35, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['RETIE', 'SIC'], annualComplianceCost: 4000 },
+        compliance: { certifications: ['RETIE', 'SIC'], annualComplianceCost: 4000, environmentalPermitCostPerYear: 2500 },
         environment: { baselineAQI: 55, gridCarbonIntensity: 0.2 },
         risk: { downtimeCostPerMin: 1000 },
         supplyChain: { importDifficultyFactor: 1.35 },
@@ -1319,14 +1395,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     IN: {
         id: 'IN', region: 'APAC', name: 'India', currency: 'INR', currencySymbol: '₹',
         economy: { inflationRate: 0.05, laborEscalation: 0.07, taxRate: 0.2517, electricityRate: 0.07 },
+        constructionIndex: 0.55, // IN rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 200, baseSalary_ShiftLead: 1200, baseSalary_Engineer: 900,
             baseSalary_Technician: 500, baseSalary_Admin: 400, baseSalary_Janitor: 200,
             laborRatePerHour: 8,
             overtimeRules: { workday: { firstHour: 2.0, subsequent: 2.0 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.20, leaves: { annual: 12, publicHolidays: 16, sickAverage: 6 },
+            // IN labor add-ons (2024-2026 statutory/screening): EPF employer 12% + EDLI/admin ~1%; no national statutory night premium — screening 10%
+            socialSecurityRate: 0.13, benefitsOverheadRate: 0.25, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 151,
         },
-        compliance: { certifications: ['BIS', 'CEA Regulations', 'LEED India'], annualComplianceCost: 4000 },
+        compliance: { certifications: ['BIS', 'CEA Regulations', 'LEED India'], annualComplianceCost: 4000, environmentalPermitCostPerYear: 2500 },
         environment: { baselineAQI: 150, gridCarbonIntensity: 0.72 },
         risk: { downtimeCostPerMin: 1200 },
         supplyChain: { importDifficultyFactor: 1.2 },
@@ -1384,14 +1463,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     CN: {
         id: 'CN', region: 'APAC', name: 'China', currency: 'CNY', currencySymbol: '¥',
         economy: { inflationRate: 0.02, laborEscalation: 0.06, taxRate: 0.25, electricityRate: 0.06 },
+        constructionIndex: 0.7, // CN rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 400, baseSalary_ShiftLead: 2000, baseSalary_Engineer: 1500,
             baseSalary_Technician: 900, baseSalary_Admin: 700, baseSalary_Janitor: 450,
             laborRatePerHour: 12,
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 2.0 }, holiday: { first8Hours: 3.0, ninthHour: 3.0, tenthHourPlus: 3.0 } },
             shrinkageFactor: 0.15, leaves: { annual: 5, publicHolidays: 11, sickAverage: 3 },
+            // CN labor add-ons (2024-2026 statutory/screening): employer ~27% ex-housing-fund (pension 16 + medical ~8 + unemp ~0.7 + injury ~0.4, city-varying); night premium local/company practice — screening 10%
+            socialSecurityRate: 0.27, benefitsOverheadRate: 0.28, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 161,
         },
-        compliance: { certifications: ['GB Standards', 'MIIT License', 'Green DC Rating'], annualComplianceCost: 8000 },
+        compliance: { certifications: ['GB Standards', 'MIIT License', 'Green DC Rating'], annualComplianceCost: 8000, environmentalPermitCostPerYear: 4000 },
         environment: { baselineAQI: 130, gridCarbonIntensity: 0.58 },
         risk: { downtimeCostPerMin: 2500 },
         supplyChain: { importDifficultyFactor: 1.1 },
@@ -1450,14 +1532,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         id: 'KR', region: 'APAC', name: 'South Korea', currency: 'KRW', currencySymbol: '₩',
         // 2026: KEPCO industrial tariff raised 2023-2024; now ~$0.13-0.14/kWh large industrial
         economy: { inflationRate: 0.025, laborEscalation: 0.04, taxRate: 0.22, electricityRate: 0.135 },
+        constructionIndex: 0.95, // KR rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 1500, baseSalary_ShiftLead: 4000, baseSalary_Engineer: 3200,
             baseSalary_Technician: 2400, baseSalary_Admin: 2000, baseSalary_Janitor: 1500,
             laborRatePerHour: 28,
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 1.5 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.10, leaves: { annual: 15, publicHolidays: 15, sickAverage: 3 },
+            // KR labor add-ons (2024-2026 statutory/screening): NPS 4.5% + NHI 3.55% + LTC ~0.46% + EI 1.15% + comp ~1%; statutory +50% on 22:00-06:00 hours (LSA Art.56) -> ~30% applied blended over rotation
+            socialSecurityRate: 0.11, benefitsOverheadRate: 0.3, nightShiftPremiumRate: 0.3, workingHoursPerMonth: 151,
         },
-        compliance: { certifications: ['KS Standards', 'KISA DC Cert'], annualComplianceCost: 9000 },
+        compliance: { certifications: ['KS Standards', 'KISA DC Cert'], annualComplianceCost: 9000, environmentalPermitCostPerYear: 7000 },
         environment: { baselineAQI: 55, gridCarbonIntensity: 0.42 },
         risk: { downtimeCostPerMin: 3500 },
         supplyChain: { importDifficultyFactor: 1.0 },
@@ -1516,14 +1601,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         id: 'TH', region: 'APAC', name: 'Thailand', currency: 'THB', currencySymbol: '฿',
         // 2026: EGAT + MEA raised rates 2023-2024; industrial C&I ~THB 3.5-4.0/kWh = ~$0.09-0.11 USD
         economy: { inflationRate: 0.02, laborEscalation: 0.04, taxRate: 0.20, electricityRate: 0.10 },
+        constructionIndex: 0.6, // TH rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 300, baseSalary_ShiftLead: 1400, baseSalary_Engineer: 1000,
             baseSalary_Technician: 600, baseSalary_Admin: 450, baseSalary_Janitor: 300,
             laborRatePerHour: 8,
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 2.0 }, holiday: { first8Hours: 2.0, ninthHour: 3.0, tenthHourPlus: 3.0 } },
             shrinkageFactor: 0.18, leaves: { annual: 6, publicHolidays: 16, sickAverage: 5 },
+            // TH labor add-ons (2024-2026 statutory/screening): SSF employer 5% (capped B750/mo) + workmen comp 0.2-1%; no statutory night premium — screening 8%
+            socialSecurityRate: 0.052, benefitsOverheadRate: 0.2, nightShiftPremiumRate: 0.08, workingHoursPerMonth: 155,
         },
-        compliance: { certifications: ['TIS Standards', 'PEA License'], annualComplianceCost: 4500 },
+        compliance: { certifications: ['TIS Standards', 'PEA License'], annualComplianceCost: 4500, environmentalPermitCostPerYear: 2500 },
         environment: { baselineAQI: 80, gridCarbonIntensity: 0.5 },
         risk: { downtimeCostPerMin: 1000 },
         supplyChain: { importDifficultyFactor: 1.15 },
@@ -1582,14 +1670,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         id: 'VN', region: 'APAC', name: 'Vietnam', currency: 'VND', currencySymbol: '₫',
         // 2026: EVN raised industrial tariffs ~20% in 2023; current C&I ~VND 2,000-2,400/kWh = ~$0.08-0.10
         economy: { inflationRate: 0.035, laborEscalation: 0.07, taxRate: 0.20, electricityRate: 0.09 },
+        constructionIndex: 0.55, // VN rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 200, baseSalary_ShiftLead: 1100, baseSalary_Engineer: 800,
             baseSalary_Technician: 450, baseSalary_Admin: 350, baseSalary_Janitor: 200,
             laborRatePerHour: 6,
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 2.0 }, holiday: { first8Hours: 3.0, ninthHour: 3.0, tenthHourPlus: 3.0 } },
             shrinkageFactor: 0.22, leaves: { annual: 12, publicHolidays: 10, sickAverage: 5 },
+            // VN labor add-ons (2024-2026 statutory/screening): employer 21.5% (SI 17.5 + HI 3 + UI 1, capped; SI Law 2024 eff. 7/2025); night statutory +30% (Labor Code 2019 Art.98)
+            socialSecurityRate: 0.215, benefitsOverheadRate: 0.22, nightShiftPremiumRate: 0.3, workingHoursPerMonth: 155,
         },
-        compliance: { certifications: ['TCVN', 'MOIT License'], annualComplianceCost: 3500 },
+        compliance: { certifications: ['TCVN', 'MOIT License'], annualComplianceCost: 3500, environmentalPermitCostPerYear: 2000 },
         environment: { baselineAQI: 100, gridCarbonIntensity: 0.55 },
         risk: { downtimeCostPerMin: 800 },
         supplyChain: { importDifficultyFactor: 1.3 },
@@ -1648,14 +1739,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         id: 'PH', region: 'APAC', name: 'Philippines', currency: 'PHP', currencySymbol: '₱',
         // 2026: Philippines has among highest C&I electricity in SEA; Meralco commercial ~PHP 7.0-8.5/kWh = ~$0.12-0.15
         economy: { inflationRate: 0.05, laborEscalation: 0.05, taxRate: 0.25, electricityRate: 0.13 },
+        constructionIndex: 0.6, // PH rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 250, baseSalary_ShiftLead: 1300, baseSalary_Engineer: 1000,
             baseSalary_Technician: 550, baseSalary_Admin: 400, baseSalary_Janitor: 250,
             laborRatePerHour: 7,
             overtimeRules: { workday: { firstHour: 1.25, subsequent: 1.3 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.6 } },
             shrinkageFactor: 0.22, leaves: { annual: 5, publicHolidays: 18, sickAverage: 5 },
+            // PH labor add-ons (2024-2026 statutory/screening): SSS employer 10% of MSC (2025, cap P35k) + PhilHealth 2.5% + Pag-IBIG 2% -> ~12% effective w/ caps; night shift differential statutory +10% 22:00-06:00 (LC Art.86)
+            socialSecurityRate: 0.12, benefitsOverheadRate: 0.25, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 155,
         },
-        compliance: { certifications: ['PNS Standards', 'DOE License'], annualComplianceCost: 3500 },
+        compliance: { certifications: ['PNS Standards', 'DOE License'], annualComplianceCost: 3500, environmentalPermitCostPerYear: 2500 },
         environment: { baselineAQI: 70, gridCarbonIntensity: 0.6 },
         risk: { downtimeCostPerMin: 900 },
         supplyChain: { importDifficultyFactor: 1.35 },
@@ -1714,14 +1808,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         id: 'TW', region: 'APAC', name: 'Taiwan', currency: 'TWD', currencySymbol: 'NT$',
         // 2026: Taipower raised industrial rates 2023-2024; ~TWD 3.5-4.0/kWh = ~$0.11-0.13 USD
         economy: { inflationRate: 0.02, laborEscalation: 0.03, taxRate: 0.20, electricityRate: 0.12 },
+        constructionIndex: 0.8, // TW rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 900, baseSalary_ShiftLead: 2800, baseSalary_Engineer: 2200,
             baseSalary_Technician: 1600, baseSalary_Admin: 1200, baseSalary_Janitor: 900,
             laborRatePerHour: 20,
             overtimeRules: { workday: { firstHour: 1.34, subsequent: 1.67 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.12, leaves: { annual: 7, publicHolidays: 12, sickAverage: 4 },
+            // TW labor add-ons (2024-2026 statutory/screening): Labor Insurance ~12%x70% + NHI 5.17%x60% + Labor Pension 6% -> ~17%; no statutory night premium — screening 10%
+            socialSecurityRate: 0.17, benefitsOverheadRate: 0.25, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 158,
         },
-        compliance: { certifications: ['CNS Standards', 'Taipower License'], annualComplianceCost: 7000 },
+        compliance: { certifications: ['CNS Standards', 'Taipower License'], annualComplianceCost: 7000, environmentalPermitCostPerYear: 5000 },
         environment: { baselineAQI: 60, gridCarbonIntensity: 0.5 },
         risk: { downtimeCostPerMin: 3000 },
         supplyChain: { importDifficultyFactor: 1.05 },
@@ -1779,14 +1876,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     NZ: {
         id: 'NZ', region: 'APAC', name: 'New Zealand', currency: 'NZD', currencySymbol: 'NZ$',
         economy: { inflationRate: 0.03, laborEscalation: 0.035, taxRate: 0.28, electricityRate: 0.16 },
+        constructionIndex: 1.1, // NZ rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 2500, baseSalary_ShiftLead: 7500, baseSalary_Engineer: 6000,
             baseSalary_Technician: 4500, baseSalary_Admin: 3800, baseSalary_Janitor: 3000,
             laborRatePerHour: 38,
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 1.5 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.12, leaves: { annual: 20, publicHolidays: 11, sickAverage: 5 },
+            // NZ labor add-ons (2024-2026 statutory/screening): KiwiSaver employer 3% + ACC levy ~1%; no statutory night premium — screening 10%
+            socialSecurityRate: 0.04, benefitsOverheadRate: 0.2, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['AS/NZS Standards', 'WorkSafe'], annualComplianceCost: 8000 },
+        compliance: { certifications: ['AS/NZS Standards', 'WorkSafe'], annualComplianceCost: 8000, environmentalPermitCostPerYear: 6000 },
         environment: { baselineAQI: 15, gridCarbonIntensity: 0.1 },
         risk: { downtimeCostPerMin: 4000 },
         supplyChain: { importDifficultyFactor: 1.25 },
@@ -1846,14 +1946,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         id: 'GB', region: 'EMEA', name: 'United Kingdom', currency: 'GBP', currencySymbol: '£',
         // 2026: UK C&I electricity ~£0.18-0.22/kWh; corp tax held at 25%; wage growth moderating
         economy: { inflationRate: 0.027, laborEscalation: 0.035, taxRate: 0.25, electricityRate: 0.22 },
+        constructionIndex: 1.15, // GB rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 2200, baseSalary_ShiftLead: 8000, baseSalary_Engineer: 6500,
             baseSalary_Technician: 4500, baseSalary_Admin: 3500, baseSalary_Janitor: 2500,
             laborRatePerHour: 38,
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 1.5 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.12, leaves: { annual: 28, publicHolidays: 8, sickAverage: 5 },
+            // GB labor add-ons (2024-2026 statutory/screening): employer NIC 15% above GBP5k threshold (HMRC, from Apr 2025); no statutory night premium (NMW only) — screening 10%
+            socialSecurityRate: 0.15, benefitsOverheadRate: 0.25, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['BS EN Standards', 'IET Wiring Regs', 'BREEAM'], annualComplianceCost: 14000 },
+        compliance: { certifications: ['BS EN Standards', 'IET Wiring Regs', 'BREEAM'], annualComplianceCost: 14000, environmentalPermitCostPerYear: 6500 },
         environment: { baselineAQI: 25, gridCarbonIntensity: 0.23 },
         risk: { downtimeCostPerMin: 4500 },
         supplyChain: { importDifficultyFactor: 1.0 },
@@ -1912,14 +2015,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         id: 'DE', region: 'EMEA', name: 'Germany', currency: 'EUR', currencySymbol: '€',
         // 2026: German C&I electricity still ~€0.22-0.28/kWh; slight moderation from 2022 peak
         economy: { inflationRate: 0.023, laborEscalation: 0.03, taxRate: 0.2975, electricityRate: 0.26 },
+        constructionIndex: 1.05, // DE rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 2400, baseSalary_ShiftLead: 8500, baseSalary_Engineer: 7000,
             baseSalary_Technician: 5000, baseSalary_Admin: 4000, baseSalary_Janitor: 2800,
             laborRatePerHour: 42,
             overtimeRules: { workday: { firstHour: 1.25, subsequent: 1.5 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.12, leaves: { annual: 24, publicHolidays: 10, sickAverage: 8 },
+            // DE labor add-ons (2024-2026 statutory/screening): employer ~21% (RV 9.3 + KV ~8.1 + AV 1.3 + PV ~1.8); night 25% tax-free custom (EStG s3b cap) — common practice 25%
+            socialSecurityRate: 0.21, benefitsOverheadRate: 0.28, nightShiftPremiumRate: 0.25, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['VDE', 'TÜV', 'EnEfG'], annualComplianceCost: 16000 },
+        compliance: { certifications: ['VDE', 'TÜV', 'EnEfG'], annualComplianceCost: 16000, environmentalPermitCostPerYear: 6000 },
         environment: { baselineAQI: 20, gridCarbonIntensity: 0.35 },
         risk: { downtimeCostPerMin: 5000 },
         supplyChain: { importDifficultyFactor: 1.0 },
@@ -1978,14 +2084,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         id: 'NL', region: 'EMEA', name: 'Netherlands', currency: 'EUR', currencySymbol: '€',
         // 2026: Dutch electricity C&I ~€0.18-0.22/kWh; AMS land moratorium easing slightly
         economy: { inflationRate: 0.023, laborEscalation: 0.03, taxRate: 0.2575, electricityRate: 0.20 },
+        constructionIndex: 1.1, // NL rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 2200, baseSalary_ShiftLead: 7500, baseSalary_Engineer: 6000,
             baseSalary_Technician: 4500, baseSalary_Admin: 3500, baseSalary_Janitor: 2500,
             laborRatePerHour: 38,
             overtimeRules: { workday: { firstHour: 1.3, subsequent: 1.5 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.10, leaves: { annual: 25, publicHolidays: 8, sickAverage: 5 },
+            // NL labor add-ons (2024-2026 statutory/screening): employer ~18% (AOF/WW/WIA ~12% + ZVW 6.5%); night via CLA ~10-40% -> screening 15%
+            socialSecurityRate: 0.18, benefitsOverheadRate: 0.3, nightShiftPremiumRate: 0.15, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['NEN Standards', 'BREEAM-NL'], annualComplianceCost: 13000 },
+        compliance: { certifications: ['NEN Standards', 'BREEAM-NL'], annualComplianceCost: 13000, environmentalPermitCostPerYear: 6000 },
         environment: { baselineAQI: 20, gridCarbonIntensity: 0.33 },
         risk: { downtimeCostPerMin: 4500 },
         supplyChain: { importDifficultyFactor: 1.0 },
@@ -2044,14 +2153,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         id: 'IE', region: 'EMEA', name: 'Ireland', currency: 'EUR', currencySymbol: '€',
         // 2026: Ireland electricity among highest in EU; large DC density straining grid; corporate tax 15% (pillar-2 compliant)
         economy: { inflationRate: 0.024, laborEscalation: 0.04, taxRate: 0.15, electricityRate: 0.24 },
+        constructionIndex: 1.1, // IE rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 2400, baseSalary_ShiftLead: 7800, baseSalary_Engineer: 6500,
             baseSalary_Technician: 4800, baseSalary_Admin: 3800, baseSalary_Janitor: 2800,
             laborRatePerHour: 36,
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 1.5 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.12, leaves: { annual: 20, publicHolidays: 9, sickAverage: 5 },
+            // IE labor add-ons (2024-2026 statutory/screening): employer PRSI 11.15% (Class A, from Oct 2024); no statutory night premium — screening 10%
+            socialSecurityRate: 0.1115, benefitsOverheadRate: 0.25, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 151,
         },
-        compliance: { certifications: ['IS EN Standards', 'SEAI BER'], annualComplianceCost: 14000 },
+        compliance: { certifications: ['IS EN Standards', 'SEAI BER'], annualComplianceCost: 14000, environmentalPermitCostPerYear: 6000 },
         environment: { baselineAQI: 15, gridCarbonIntensity: 0.3 },
         risk: { downtimeCostPerMin: 4500 },
         supplyChain: { importDifficultyFactor: 1.05 },
@@ -2110,14 +2222,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         id: 'FR', region: 'EMEA', name: 'France', currency: 'EUR', currencySymbol: '€',
         // 2026: EDF tariff bouclier ended 2024; regulated industrial tariff ~€0.14-0.17/kWh post-normalisation
         economy: { inflationRate: 0.025, laborEscalation: 0.03, taxRate: 0.25, electricityRate: 0.15 },
+        constructionIndex: 1.05, // FR rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 2100, baseSalary_ShiftLead: 7000, baseSalary_Engineer: 5500,
             baseSalary_Technician: 4000, baseSalary_Admin: 3200, baseSalary_Janitor: 2300,
             laborRatePerHour: 35,
             overtimeRules: { workday: { firstHour: 1.25, subsequent: 1.5 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.15, leaves: { annual: 25, publicHolidays: 11, sickAverage: 6 },
+            // FR labor add-ons (2024-2026 statutory/screening): employer charges sociales ~30-45% band (URSSAF, reductions at low wage) -> mid 38%; night premium branch-CLA typical 10%
+            socialSecurityRate: 0.38, benefitsOverheadRate: 0.35, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['NF C 15-100', 'AFNOR'], annualComplianceCost: 15000 },
+        compliance: { certifications: ['NF C 15-100', 'AFNOR'], annualComplianceCost: 15000, environmentalPermitCostPerYear: 6000 },
         environment: { baselineAQI: 25, gridCarbonIntensity: 0.06 },
         risk: { downtimeCostPerMin: 4000 },
         supplyChain: { importDifficultyFactor: 1.0 },
@@ -2175,14 +2290,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     SE: {
         id: 'SE', region: 'EMEA', name: 'Sweden', currency: 'SEK', currencySymbol: 'kr',
         economy: { inflationRate: 0.02, laborEscalation: 0.025, taxRate: 0.206, electricityRate: 0.08 },
+        constructionIndex: 1.1, // SE rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 2500, baseSalary_ShiftLead: 7200, baseSalary_Engineer: 6000,
             baseSalary_Technician: 4500, baseSalary_Admin: 3500, baseSalary_Janitor: 2800,
             laborRatePerHour: 36,
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 2.0 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.10, leaves: { annual: 25, publicHolidays: 13, sickAverage: 5 },
+            // SE labor add-ons (2024-2026 statutory/screening): arbetsgivaravgifter 31.42% (Skatteverket); OB-tillagg night via CLA -> blended screening 20%
+            socialSecurityRate: 0.3142, benefitsOverheadRate: 0.3, nightShiftPremiumRate: 0.2, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['SS Standards', 'Energimyndigheten'], annualComplianceCost: 12000 },
+        compliance: { certifications: ['SS Standards', 'Energimyndigheten'], annualComplianceCost: 12000, environmentalPermitCostPerYear: 6000 },
         environment: { baselineAQI: 10, gridCarbonIntensity: 0.04 },
         risk: { downtimeCostPerMin: 4000 },
         supplyChain: { importDifficultyFactor: 1.0 },
@@ -2240,14 +2358,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     PL: {
         id: 'PL', region: 'EMEA', name: 'Poland', currency: 'PLN', currencySymbol: 'zł',
         economy: { inflationRate: 0.04, laborEscalation: 0.05, taxRate: 0.19, electricityRate: 0.12 },
+        constructionIndex: 0.75, // PL rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 1000, baseSalary_ShiftLead: 3500, baseSalary_Engineer: 2800,
             baseSalary_Technician: 2000, baseSalary_Admin: 1500, baseSalary_Janitor: 1000,
             laborRatePerHour: 15,
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 2.0 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.15, leaves: { annual: 20, publicHolidays: 13, sickAverage: 6 },
+            // PL labor add-ons (2024-2026 statutory/screening): employer ZUS ~20.5% (emerytalne 9.76 + rentowe 6.5 + wypadkowe ~1.7 + FP 2.45 + FGSP 0.1); night statutory 20% of MIN-WAGE hourly -> ~10% on tech base
+            socialSecurityRate: 0.21, benefitsOverheadRate: 0.22, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['PN-EN Standards', 'URE License'], annualComplianceCost: 7000 },
+        compliance: { certifications: ['PN-EN Standards', 'URE License'], annualComplianceCost: 7000, environmentalPermitCostPerYear: 4500 },
         environment: { baselineAQI: 40, gridCarbonIntensity: 0.65 },
         risk: { downtimeCostPerMin: 2000 },
         supplyChain: { importDifficultyFactor: 1.05 },
@@ -2306,14 +2427,17 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     PT: {
         id: 'PT', region: 'EMEA', name: 'Portugal', currency: 'EUR', currencySymbol: '€',
         economy: { inflationRate: 0.023, laborEscalation: 0.035, taxRate: 0.20, electricityRate: 0.15 },
+        constructionIndex: 0.85, // PT rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             minimumWage: 920, baseSalary_ShiftLead: 3800, baseSalary_Engineer: 2900,
             baseSalary_Technician: 2200, baseSalary_Admin: 1600, baseSalary_Janitor: 1050,
             laborRatePerHour: 18,
             overtimeRules: { workday: { firstHour: 1.25, subsequent: 1.5 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.16, leaves: { annual: 22, publicHolidays: 13, sickAverage: 5 },
+            // PT labor add-ons (2024-2026 statutory/screening): TSU employer 23.75% (Seg. Social); night statutory +25% 22:00-07:00 (Codigo do Trabalho Art.266)
+            socialSecurityRate: 0.2375, benefitsOverheadRate: 0.3, nightShiftPremiumRate: 0.25, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['ITED', 'ITUR', 'RGSPIE', 'DL 95/91'], annualComplianceCost: 14000 },
+        compliance: { certifications: ['ITED', 'ITUR', 'RGSPIE', 'DL 95/91'], annualComplianceCost: 14000, environmentalPermitCostPerYear: 5000 },
         environment: { baselineAQI: 20, gridCarbonIntensity: 0.08 },
         risk: { downtimeCostPerMin: 3500 },
         supplyChain: { importDifficultyFactor: 1.05 },
@@ -2374,6 +2498,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         // 2026: Oman CIT 15% standard; Duqm SEZ / Salalah / Sohar free zones offer long holidays
         // Electricity: ~$0.07/kWh industrial (subsidized CRT tariff) // screening est. 2026
         economy: { inflationRate: 0.015, laborEscalation: 0.03, taxRate: 0.15, electricityRate: 0.07 }, // screening est. 2026
+        constructionIndex: 0.8, // OM rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             // USD/month equivalents (OMR pegged 1 OMR = $2.60) // screening est. 2026
             minimumWage: 850, baseSalary_ShiftLead: 4200, baseSalary_Engineer: 3400,
@@ -2381,8 +2506,10 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             laborRatePerHour: 20, // screening est. 2026
             overtimeRules: { workday: { firstHour: 1.25, subsequent: 1.5 }, holiday: { first8Hours: 1.5, ninthHour: 1.5, tenthHourPlus: 1.5 } },
             shrinkageFactor: 0.12, leaves: { annual: 30, publicHolidays: 9, sickAverage: 5 },
+            // OM labor add-ons (2024-2026 statutory/screening): Social Protection Fund ~12.5% Omanis only; expat-dominated -> blended ~6% (screening); no statutory night premium — screening 10%
+            socialSecurityRate: 0.06, benefitsOverheadRate: 0.28, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['Oman Civil Defence', 'MTCIT License', 'OPWP Grid Code'], annualComplianceCost: 10000 }, // screening est. 2026
+        compliance: { certifications: ['Oman Civil Defence', 'MTCIT License', 'OPWP Grid Code'], annualComplianceCost: 10000, environmentalPermitCostPerYear: 2500 }, // screening est. 2026
         environment: { baselineAQI: 90, gridCarbonIntensity: 0.48 }, // gas-dominated grid // screening est. 2026
         risk: { downtimeCostPerMin: 2000 }, // screening est. 2026
         supplyChain: { importDifficultyFactor: 1.05 },
@@ -2443,6 +2570,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         // 2026: Finland CIT 20%; Hamina/Helsinki DC market; cool climate = strong free cooling
         // Electricity: ~$0.09/kWh industrial; grid ~0.08 kgCO2/kWh (nuclear+hydro+wind) // screening est. 2026
         economy: { inflationRate: 0.018, laborEscalation: 0.025, taxRate: 0.20, electricityRate: 0.09 }, // screening est. 2026
+        constructionIndex: 1.05, // FI rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             // USD/month equivalents; no statutory minimum wage — collective agreements // screening est. 2026
             minimumWage: 2400, baseSalary_ShiftLead: 7000, baseSalary_Engineer: 5800,
@@ -2450,8 +2578,10 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             laborRatePerHour: 35, // screening est. 2026
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 2.0 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.10, leaves: { annual: 25, publicHolidays: 13, sickAverage: 5 },
+            // FI labor add-ons (2024-2026 statutory/screening): employer ~20% (TyEL avg 17.4 + health 1.3 + unemployment ~0.6); night via CLA ~15% (screening)
+            socialSecurityRate: 0.2, benefitsOverheadRate: 0.28, nightShiftPremiumRate: 0.15, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['SFS Standards', 'Tukes', 'Energiavirasto'], annualComplianceCost: 12000 }, // screening est. 2026
+        compliance: { certifications: ['SFS Standards', 'Tukes', 'Energiavirasto'], annualComplianceCost: 12000, environmentalPermitCostPerYear: 6000 }, // screening est. 2026
         environment: { baselineAQI: 8, gridCarbonIntensity: 0.08 }, // screening est. 2026
         risk: { downtimeCostPerMin: 4000 }, // screening est. 2026
         supplyChain: { importDifficultyFactor: 1.0 },
@@ -2512,6 +2642,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         // 2026: Spain CIT 25%; Madrid/Barcelona/Aragón hyperscale boom (AWS, Microsoft, Meta)
         // Electricity: ~$0.13/kWh industrial // screening est. 2026
         economy: { inflationRate: 0.025, laborEscalation: 0.035, taxRate: 0.25, electricityRate: 0.13 }, // screening est. 2026
+        constructionIndex: 0.9, // ES rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             // USD/month equivalents // screening est. 2026
             minimumWage: 1250, baseSalary_ShiftLead: 4200, baseSalary_Engineer: 3300,
@@ -2519,8 +2650,10 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             laborRatePerHour: 20, // screening est. 2026
             overtimeRules: { workday: { firstHour: 1.25, subsequent: 1.5 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.14, leaves: { annual: 22, publicHolidays: 14, sickAverage: 5 },
+            // ES labor add-ons (2024-2026 statutory/screening): employer Seg. Social ~30% (common contingencies 23.6 + unemp 5.5 + FOGASA/MEI); night premium CBA-common ~25% (ET Art.36 mandates plus, amount by CBA)
+            socialSecurityRate: 0.3, benefitsOverheadRate: 0.3, nightShiftPremiumRate: 0.25, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['UNE Standards', 'REBT', 'CNMC Grid Access'], annualComplianceCost: 12000 }, // screening est. 2026
+        compliance: { certifications: ['UNE Standards', 'REBT', 'CNMC Grid Access'], annualComplianceCost: 12000, environmentalPermitCostPerYear: 5500 }, // screening est. 2026
         environment: { baselineAQI: 25, gridCarbonIntensity: 0.15 }, // screening est. 2026
         risk: { downtimeCostPerMin: 3500 }, // screening est. 2026
         supplyChain: { importDifficultyFactor: 1.05 },
@@ -2582,6 +2715,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         // 2026: combined federal+provincial CIT ~26.5% (ON); Toronto/Montreal hubs
         // Electricity: ~$0.08/kWh industrial; grid ~0.13 kgCO2/kWh national (Québec hydro ~0.03) // screening est. 2026
         economy: { inflationRate: 0.02, laborEscalation: 0.03, taxRate: 0.265, electricityRate: 0.08 }, // screening est. 2026
+        constructionIndex: 1.0, // CA rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             // USD/month equivalents // screening est. 2026
             minimumWage: 2300, baseSalary_ShiftLead: 6500, baseSalary_Engineer: 5400,
@@ -2589,8 +2723,10 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             laborRatePerHour: 32, // screening est. 2026
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 1.5 }, holiday: { first8Hours: 1.5, ninthHour: 1.5, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.10, leaves: { annual: 15, publicHolidays: 11, sickAverage: 5 },
+            // CA labor add-ons (2024-2026 statutory/screening): CPP 5.95% (+CPP2) + EI 2.28% + workers comp ~1.5% + prov. payroll tax ~2% -> ~12% (screening); no statutory night premium — screening 8%
+            socialSecurityRate: 0.12, benefitsOverheadRate: 0.25, nightShiftPremiumRate: 0.08, workingHoursPerMonth: 153,
         },
-        compliance: { certifications: ['CSA Standards', 'ESA/RBQ Electrical', 'Provincial Permits'], annualComplianceCost: 13000 }, // screening est. 2026
+        compliance: { certifications: ['CSA Standards', 'ESA/RBQ Electrical', 'Provincial Permits'], annualComplianceCost: 13000, environmentalPermitCostPerYear: 7000 }, // screening est. 2026
         environment: { baselineAQI: 15, gridCarbonIntensity: 0.13 }, // Québec hydro ~0.03 // screening est. 2026
         risk: { downtimeCostPerMin: 4500 }, // screening est. 2026
         supplyChain: { importDifficultyFactor: 1.0 },
@@ -2651,6 +2787,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         // 2026: IRES 24% + IRAP ~3.9% ≈ 27.9% combined; Milan is the FLAP-D+ hub
         // Electricity: ~$0.18/kWh industrial (among highest in EU) // screening est. 2026
         economy: { inflationRate: 0.02, laborEscalation: 0.03, taxRate: 0.279, electricityRate: 0.18 }, // screening est. 2026
+        constructionIndex: 0.95, // IT rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             // USD/month equivalents; no statutory minimum wage — CCNL sector agreements // screening est. 2026
             minimumWage: 1250, baseSalary_ShiftLead: 4500, baseSalary_Engineer: 3600,
@@ -2658,8 +2795,10 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             laborRatePerHour: 22, // screening est. 2026
             overtimeRules: { workday: { firstHour: 1.25, subsequent: 1.5 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.15, leaves: { annual: 22, publicHolidays: 12, sickAverage: 6 },
+            // IT labor add-ons (2024-2026 statutory/screening): INPS employer ~30%; night via CCNL ~15-30% -> screening 20%
+            socialSecurityRate: 0.3, benefitsOverheadRate: 0.35, nightShiftPremiumRate: 0.2, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['CEI Standards', 'VVF Fire Cert', 'ARERA Grid Access'], annualComplianceCost: 14000 }, // screening est. 2026
+        compliance: { certifications: ['CEI Standards', 'VVF Fire Cert', 'ARERA Grid Access'], annualComplianceCost: 14000, environmentalPermitCostPerYear: 5500 }, // screening est. 2026
         environment: { baselineAQI: 35, gridCarbonIntensity: 0.25 }, // Po valley air // screening est. 2026
         risk: { downtimeCostPerMin: 3500 }, // screening est. 2026
         supplyChain: { importDifficultyFactor: 1.05 },
@@ -2720,6 +2859,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         // 2026: Norway CIT 22%; ~98% hydro grid — lowest carbon in the set; cool climate free cooling
         // Electricity: ~$0.07/kWh industrial; grid ~0.03 kgCO2/kWh // screening est. 2026
         economy: { inflationRate: 0.02, laborEscalation: 0.03, taxRate: 0.22, electricityRate: 0.07 }, // screening est. 2026
+        constructionIndex: 1.2, // NO rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             // USD/month equivalents; sector collective agreements set floors // screening est. 2026
             minimumWage: 2800, baseSalary_ShiftLead: 7500, baseSalary_Engineer: 6300,
@@ -2727,8 +2867,10 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             laborRatePerHour: 38, // screening est. 2026
             overtimeRules: { workday: { firstHour: 1.4, subsequent: 1.4 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.10, leaves: { annual: 25, publicHolidays: 12, sickAverage: 5 },
+            // NO labor add-ons (2024-2026 statutory/screening): arbeidsgiveravgift 14.1% + OTP pension min 2%; night/shift supplements via CLA ~20% (screening)
+            socialSecurityRate: 0.16, benefitsOverheadRate: 0.3, nightShiftPremiumRate: 0.2, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['NEK Standards', 'DSB', 'NVE Grid License'], annualComplianceCost: 12000 }, // screening est. 2026
+        compliance: { certifications: ['NEK Standards', 'DSB', 'NVE Grid License'], annualComplianceCost: 12000, environmentalPermitCostPerYear: 6500 }, // screening est. 2026
         environment: { baselineAQI: 8, gridCarbonIntensity: 0.03 }, // hydro // screening est. 2026
         risk: { downtimeCostPerMin: 4000 }, // screening est. 2026
         supplyChain: { importDifficultyFactor: 1.0 },
@@ -2789,6 +2931,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         // 2026: Denmark CIT 22%; Copenhagen/Odense hyperscale market (Meta, Google, Apple)
         // Electricity: ~$0.12/kWh industrial; grid ~0.12 kgCO2/kWh (wind-heavy) // screening est. 2026
         economy: { inflationRate: 0.018, laborEscalation: 0.025, taxRate: 0.22, electricityRate: 0.12 }, // screening est. 2026
+        constructionIndex: 1.15, // DK rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             // USD/month equivalents; collective agreements set floors // screening est. 2026
             minimumWage: 2700, baseSalary_ShiftLead: 7300, baseSalary_Engineer: 6100,
@@ -2796,8 +2939,10 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             laborRatePerHour: 37, // screening est. 2026
             overtimeRules: { workday: { firstHour: 1.5, subsequent: 2.0 }, holiday: { first8Hours: 2.0, ninthHour: 2.0, tenthHourPlus: 2.0 } },
             shrinkageFactor: 0.10, leaves: { annual: 25, publicHolidays: 11, sickAverage: 5 },
+            // DK labor add-ons (2024-2026 statutory/screening): statutory low ~2-3% (ATP + AUB flat DKK); pension via CLA sits in benefits; night via CLA ~20% (screening)
+            socialSecurityRate: 0.03, benefitsOverheadRate: 0.35, nightShiftPremiumRate: 0.2, workingHoursPerMonth: 150,
         },
-        compliance: { certifications: ['DS Standards', 'Sikkerhedsstyrelsen', 'Energinet Grid Code'], annualComplianceCost: 12000 }, // screening est. 2026
+        compliance: { certifications: ['DS Standards', 'Sikkerhedsstyrelsen', 'Energinet Grid Code'], annualComplianceCost: 12000, environmentalPermitCostPerYear: 6000 }, // screening est. 2026
         environment: { baselineAQI: 10, gridCarbonIntensity: 0.12 }, // wind-heavy // screening est. 2026
         risk: { downtimeCostPerMin: 4000 }, // screening est. 2026
         supplyChain: { importDifficultyFactor: 1.0 },
@@ -2858,6 +3003,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         // 2026: combined effective CIT ~14.9% (federal+cantonal avg); Zurich colocation hub
         // Electricity: ~$0.14/kWh industrial; grid ~0.04 kgCO2/kWh (hydro+nuclear) // screening est. 2026
         economy: { inflationRate: 0.01, laborEscalation: 0.02, taxRate: 0.149, electricityRate: 0.14 }, // screening est. 2026
+        constructionIndex: 1.3, // CH rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
         labor: {
             // USD/month equivalents — highest salaries in the set // screening est. 2026
             minimumWage: 4000, baseSalary_ShiftLead: 9500, baseSalary_Engineer: 8200,
@@ -2865,8 +3011,10 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             laborRatePerHour: 55, // screening est. 2026
             overtimeRules: { workday: { firstHour: 1.25, subsequent: 1.25 }, holiday: { first8Hours: 1.5, ninthHour: 1.5, tenthHourPlus: 1.5 } },
             shrinkageFactor: 0.08, leaves: { annual: 20, publicHolidays: 9, sickAverage: 4 },
+            // CH labor add-ons (2024-2026 statutory/screening): AHV/IV/EO 5.3% + ALV 1.1% + BVG ~4-6% + UVG/FAK ~2% -> ~13%; regular night work statutory +10% time compensation (ArG Art.17b)
+            socialSecurityRate: 0.13, benefitsOverheadRate: 0.25, nightShiftPremiumRate: 0.1, workingHoursPerMonth: 151,
         },
-        compliance: { certifications: ['SEV/Electrosuisse', 'ESTI', 'Cantonal Fire Police'], annualComplianceCost: 16000 }, // screening est. 2026
+        compliance: { certifications: ['SEV/Electrosuisse', 'ESTI', 'Cantonal Fire Police'], annualComplianceCost: 16000, environmentalPermitCostPerYear: 7500 }, // screening est. 2026
         environment: { baselineAQI: 10, gridCarbonIntensity: 0.04 }, // hydro+nuclear // screening est. 2026
         risk: { downtimeCostPerMin: 5000 }, // finance-sector density // screening est. 2026
         supplyChain: { importDifficultyFactor: 1.0 },

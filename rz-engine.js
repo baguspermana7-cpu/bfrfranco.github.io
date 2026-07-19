@@ -191,6 +191,7 @@
                     "taxRate": 0.22,
                     "electricityRate": 0.09
                 },
+                "constructionIndex": 0.65,
                 "labor": {
                     "minimumWage": 350,
                     "baseSalary_ShiftLead": 1500,
@@ -216,7 +217,11 @@
                         "annual": 12,
                         "publicHolidays": 15,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.104,
+                    "benefitsOverheadRate": 0.25,
+                    "nightShiftPremiumRate": 0.08,
+                    "workingHoursPerMonth": 152
                 },
                 "compliance": {
                     "certifications": [
@@ -225,7 +230,8 @@
                         "AMDAL",
                         "PP 35/2021"
                     ],
-                    "annualComplianceCost": 6500
+                    "annualComplianceCost": 6500,
+                    "environmentalPermitCostPerYear": 2500
                 },
                 "environment": {
                     "baselineAQI": 120,
@@ -312,6 +318,7 @@
                     "taxRate": 0.17,
                     "electricityRate": 0.22
                 },
+                "constructionIndex": 1.1,
                 "labor": {
                     "minimumWage": 1400,
                     "baseSalary_ShiftLead": 5500,
@@ -336,14 +343,19 @@
                         "annual": 14,
                         "publicHolidays": 11,
                         "sickAverage": 4
-                    }
+                    },
+                    "socialSecurityRate": 0.17,
+                    "benefitsOverheadRate": 0.2,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 154
                 },
                 "compliance": {
                     "certifications": [
                         "SS 564",
                         "BCA Green Mark"
                     ],
-                    "annualComplianceCost": 12000
+                    "annualComplianceCost": 12000,
+                    "environmentalPermitCostPerYear": 6000
                 },
                 "environment": {
                     "baselineAQI": 45,
@@ -429,6 +441,7 @@
                     "taxRate": 0.24,
                     "electricityRate": 0.09
                 },
+                "constructionIndex": 0.7,
                 "labor": {
                     "minimumWage": 340,
                     "baseSalary_ShiftLead": 1800,
@@ -453,14 +466,19 @@
                         "annual": 12,
                         "publicHolidays": 16,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.15,
+                    "benefitsOverheadRate": 0.22,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 151
                 },
                 "compliance": {
                     "certifications": [
                         "Suruhanjaya Tenaga",
                         "GBI"
                     ],
-                    "annualComplianceCost": 5000
+                    "annualComplianceCost": 5000,
+                    "environmentalPermitCostPerYear": 2500
                 },
                 "environment": {
                     "baselineAQI": 90,
@@ -547,6 +565,7 @@
                     "taxRate": 0.21,
                     "electricityRate": 0.13
                 },
+                "constructionIndex": 1,
                 "labor": {
                     "minimumWage": 2000,
                     "baseSalary_ShiftLead": 10500,
@@ -571,14 +590,19 @@
                         "annual": 10,
                         "publicHolidays": 10,
                         "sickAverage": 3
-                    }
+                    },
+                    "socialSecurityRate": 0.0765,
+                    "benefitsOverheadRate": 0.3,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 158
                 },
                 "compliance": {
                     "certifications": [
                         "OSHA",
                         "NFPA 70E"
                     ],
-                    "annualComplianceCost": 15000
+                    "annualComplianceCost": 15000,
+                    "environmentalPermitCostPerYear": 8000
                 },
                 "environment": {
                     "baselineAQI": 35,
@@ -663,6 +687,7 @@
                     "taxRate": 0.2304,
                     "electricityRate": 0.2
                 },
+                "constructionIndex": 1.15,
                 "labor": {
                     "minimumWage": 1200,
                     "baseSalary_ShiftLead": 4500,
@@ -687,14 +712,19 @@
                         "annual": 10,
                         "publicHolidays": 16,
                         "sickAverage": 2
-                    }
+                    },
+                    "socialSecurityRate": 0.155,
+                    "benefitsOverheadRate": 0.3,
+                    "nightShiftPremiumRate": 0.25,
+                    "workingHoursPerMonth": 155
                 },
                 "compliance": {
                     "certifications": [
                         "First Class Electrician",
                         "Energy Manager"
                     ],
-                    "annualComplianceCost": 8000
+                    "annualComplianceCost": 8000,
+                    "environmentalPermitCostPerYear": 15000
                 },
                 "environment": {
                     "baselineAQI": 30,
@@ -780,6 +810,7 @@
                     "taxRate": 0.3,
                     "electricityRate": 0.18
                 },
+                "constructionIndex": 1.05,
                 "labor": {
                     "minimumWage": 3000,
                     "baseSalary_ShiftLead": 9500,
@@ -804,14 +835,19 @@
                         "annual": 20,
                         "publicHolidays": 10,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.12,
+                    "benefitsOverheadRate": 0.25,
+                    "nightShiftPremiumRate": 0.15,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
                         "WHS",
                         "Austel"
                     ],
-                    "annualComplianceCost": 10000
+                    "annualComplianceCost": 10000,
+                    "environmentalPermitCostPerYear": 7000
                 },
                 "environment": {
                     "baselineAQI": 20,
@@ -896,6 +932,7 @@
                     "taxRate": 0.09,
                     "electricityRate": 0.09
                 },
+                "constructionIndex": 0.85,
                 "labor": {
                     "minimumWage": 800,
                     "baseSalary_ShiftLead": 5000,
@@ -920,7 +957,11 @@
                         "annual": 30,
                         "publicHolidays": 10,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.03,
+                    "benefitsOverheadRate": 0.3,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
@@ -928,7 +969,8 @@
                         "Estidama",
                         "Civil Defence"
                     ],
-                    "annualComplianceCost": 15000
+                    "annualComplianceCost": 15000,
+                    "environmentalPermitCostPerYear": 3000
                 },
                 "environment": {
                     "baselineAQI": 100,
@@ -1016,6 +1058,7 @@
                     "taxRate": 0.2,
                     "electricityRate": 0.05
                 },
+                "constructionIndex": 0.8,
                 "labor": {
                     "minimumWage": 1100,
                     "baseSalary_ShiftLead": 4500,
@@ -1040,7 +1083,11 @@
                         "annual": 21,
                         "publicHolidays": 9,
                         "sickAverage": 4
-                    }
+                    },
+                    "socialSecurityRate": 0.06,
+                    "benefitsOverheadRate": 0.32,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 151
                 },
                 "compliance": {
                     "certifications": [
@@ -1048,7 +1095,8 @@
                         "SASO",
                         "NEOM Standards"
                     ],
-                    "annualComplianceCost": 12000
+                    "annualComplianceCost": 12000,
+                    "environmentalPermitCostPerYear": 2500
                 },
                 "environment": {
                     "baselineAQI": 110,
@@ -1135,6 +1183,7 @@
                     "taxRate": 0.1,
                     "electricityRate": 0.04
                 },
+                "constructionIndex": 0.85,
                 "labor": {
                     "minimumWage": 1000,
                     "baseSalary_ShiftLead": 5200,
@@ -1159,14 +1208,19 @@
                         "annual": 21,
                         "publicHolidays": 9,
                         "sickAverage": 4
-                    }
+                    },
+                    "socialSecurityRate": 0.03,
+                    "benefitsOverheadRate": 0.32,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 151
                 },
                 "compliance": {
                     "certifications": [
                         "Kahramaa",
                         "QCS 2014"
                     ],
-                    "annualComplianceCost": 14000
+                    "annualComplianceCost": 14000,
+                    "environmentalPermitCostPerYear": 3000
                 },
                 "environment": {
                     "baselineAQI": 95,
@@ -1252,6 +1306,7 @@
                     "taxRate": 0.27,
                     "electricityRate": 0.1
                 },
+                "constructionIndex": 0.55,
                 "labor": {
                     "minimumWage": 250,
                     "baseSalary_ShiftLead": 2200,
@@ -1276,7 +1331,11 @@
                         "annual": 15,
                         "publicHolidays": 12,
                         "sickAverage": 6
-                    }
+                    },
+                    "socialSecurityRate": 0.03,
+                    "benefitsOverheadRate": 0.22,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 151
                 },
                 "compliance": {
                     "certifications": [
@@ -1284,7 +1343,8 @@
                         "ECSA",
                         "OHS Act"
                     ],
-                    "annualComplianceCost": 5000
+                    "annualComplianceCost": 5000,
+                    "environmentalPermitCostPerYear": 3000
                 },
                 "environment": {
                     "baselineAQI": 50,
@@ -1371,6 +1431,7 @@
                     "taxRate": 0.3,
                     "electricityRate": 0.12
                 },
+                "constructionIndex": 0.75,
                 "labor": {
                     "minimumWage": 80,
                     "baseSalary_ShiftLead": 1200,
@@ -1395,7 +1456,11 @@
                         "annual": 12,
                         "publicHolidays": 11,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.12,
+                    "benefitsOverheadRate": 0.18,
+                    "nightShiftPremiumRate": 0.05,
+                    "workingHoursPerMonth": 155
                 },
                 "compliance": {
                     "certifications": [
@@ -1403,7 +1468,8 @@
                         "SON",
                         "NESREA"
                     ],
-                    "annualComplianceCost": 3000
+                    "annualComplianceCost": 3000,
+                    "environmentalPermitCostPerYear": 2000
                 },
                 "environment": {
                     "baselineAQI": 140,
@@ -1490,6 +1556,7 @@
                     "taxRate": 0.3,
                     "electricityRate": 0.15
                 },
+                "constructionIndex": 0.6,
                 "labor": {
                     "minimumWage": 150,
                     "baseSalary_ShiftLead": 1400,
@@ -1514,14 +1581,19 @@
                         "annual": 21,
                         "publicHolidays": 10,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.075,
+                    "benefitsOverheadRate": 0.18,
+                    "nightShiftPremiumRate": 0.05,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
                         "KEBS",
                         "ERC License"
                     ],
-                    "annualComplianceCost": 3500
+                    "annualComplianceCost": 3500,
+                    "environmentalPermitCostPerYear": 2000
                 },
                 "environment": {
                     "baselineAQI": 60,
@@ -1607,6 +1679,7 @@
                     "taxRate": 0.34,
                     "electricityRate": 0.1
                 },
+                "constructionIndex": 0.6,
                 "labor": {
                     "minimumWage": 300,
                     "baseSalary_ShiftLead": 2000,
@@ -1631,7 +1704,11 @@
                         "annual": 30,
                         "publicHolidays": 12,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.28,
+                    "benefitsOverheadRate": 0.4,
+                    "nightShiftPremiumRate": 0.2,
+                    "workingHoursPerMonth": 156
                 },
                 "compliance": {
                     "certifications": [
@@ -1639,7 +1716,8 @@
                         "NR-10",
                         "ANATEL"
                     ],
-                    "annualComplianceCost": 6000
+                    "annualComplianceCost": 6000,
+                    "environmentalPermitCostPerYear": 3500
                 },
                 "environment": {
                     "baselineAQI": 50,
@@ -1725,6 +1803,7 @@
                     "taxRate": 0.27,
                     "electricityRate": 0.12
                 },
+                "constructionIndex": 0.65,
                 "labor": {
                     "minimumWage": 500,
                     "baseSalary_ShiftLead": 2300,
@@ -1749,14 +1828,19 @@
                         "annual": 15,
                         "publicHolidays": 15,
                         "sickAverage": 4
-                    }
+                    },
+                    "socialSecurityRate": 0.05,
+                    "benefitsOverheadRate": 0.25,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 151
                 },
                 "compliance": {
                     "certifications": [
                         "SEC",
                         "INN Chile"
                     ],
-                    "annualComplianceCost": 5000
+                    "annualComplianceCost": 5000,
+                    "environmentalPermitCostPerYear": 3000
                 },
                 "environment": {
                     "baselineAQI": 40,
@@ -1842,6 +1926,7 @@
                     "taxRate": 0.3,
                     "electricityRate": 0.09
                 },
+                "constructionIndex": 0.6,
                 "labor": {
                     "minimumWage": 350,
                     "baseSalary_ShiftLead": 1800,
@@ -1866,14 +1951,19 @@
                         "annual": 12,
                         "publicHolidays": 7,
                         "sickAverage": 4
-                    }
+                    },
+                    "socialSecurityRate": 0.3,
+                    "benefitsOverheadRate": 0.32,
+                    "nightShiftPremiumRate": 0.14,
+                    "workingHoursPerMonth": 158
                 },
                 "compliance": {
                     "certifications": [
                         "NOM",
                         "SENER"
                     ],
-                    "annualComplianceCost": 5000
+                    "annualComplianceCost": 5000,
+                    "environmentalPermitCostPerYear": 3000
                 },
                 "environment": {
                     "baselineAQI": 80,
@@ -1959,6 +2049,7 @@
                     "taxRate": 0.35,
                     "electricityRate": 0.1
                 },
+                "constructionIndex": 0.55,
                 "labor": {
                     "minimumWage": 280,
                     "baseSalary_ShiftLead": 1600,
@@ -1983,14 +2074,19 @@
                         "annual": 15,
                         "publicHolidays": 18,
                         "sickAverage": 4
-                    }
+                    },
+                    "socialSecurityRate": 0.21,
+                    "benefitsOverheadRate": 0.35,
+                    "nightShiftPremiumRate": 0.35,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
                         "RETIE",
                         "SIC"
                     ],
-                    "annualComplianceCost": 4000
+                    "annualComplianceCost": 4000,
+                    "environmentalPermitCostPerYear": 2500
                 },
                 "environment": {
                     "baselineAQI": 55,
@@ -2076,6 +2172,7 @@
                     "taxRate": 0.2517,
                     "electricityRate": 0.07
                 },
+                "constructionIndex": 0.55,
                 "labor": {
                     "minimumWage": 200,
                     "baseSalary_ShiftLead": 1200,
@@ -2100,7 +2197,11 @@
                         "annual": 12,
                         "publicHolidays": 16,
                         "sickAverage": 6
-                    }
+                    },
+                    "socialSecurityRate": 0.13,
+                    "benefitsOverheadRate": 0.25,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 151
                 },
                 "compliance": {
                     "certifications": [
@@ -2108,7 +2209,8 @@
                         "CEA Regulations",
                         "LEED India"
                     ],
-                    "annualComplianceCost": 4000
+                    "annualComplianceCost": 4000,
+                    "environmentalPermitCostPerYear": 2500
                 },
                 "environment": {
                     "baselineAQI": 150,
@@ -2195,6 +2297,7 @@
                     "taxRate": 0.25,
                     "electricityRate": 0.06
                 },
+                "constructionIndex": 0.7,
                 "labor": {
                     "minimumWage": 400,
                     "baseSalary_ShiftLead": 2000,
@@ -2219,7 +2322,11 @@
                         "annual": 5,
                         "publicHolidays": 11,
                         "sickAverage": 3
-                    }
+                    },
+                    "socialSecurityRate": 0.27,
+                    "benefitsOverheadRate": 0.28,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 161
                 },
                 "compliance": {
                     "certifications": [
@@ -2227,7 +2334,8 @@
                         "MIIT License",
                         "Green DC Rating"
                     ],
-                    "annualComplianceCost": 8000
+                    "annualComplianceCost": 8000,
+                    "environmentalPermitCostPerYear": 4000
                 },
                 "environment": {
                     "baselineAQI": 130,
@@ -2314,6 +2422,7 @@
                     "taxRate": 0.22,
                     "electricityRate": 0.135
                 },
+                "constructionIndex": 0.95,
                 "labor": {
                     "minimumWage": 1500,
                     "baseSalary_ShiftLead": 4000,
@@ -2338,14 +2447,19 @@
                         "annual": 15,
                         "publicHolidays": 15,
                         "sickAverage": 3
-                    }
+                    },
+                    "socialSecurityRate": 0.11,
+                    "benefitsOverheadRate": 0.3,
+                    "nightShiftPremiumRate": 0.3,
+                    "workingHoursPerMonth": 151
                 },
                 "compliance": {
                     "certifications": [
                         "KS Standards",
                         "KISA DC Cert"
                     ],
-                    "annualComplianceCost": 9000
+                    "annualComplianceCost": 9000,
+                    "environmentalPermitCostPerYear": 7000
                 },
                 "environment": {
                     "baselineAQI": 55,
@@ -2432,6 +2546,7 @@
                     "taxRate": 0.2,
                     "electricityRate": 0.1
                 },
+                "constructionIndex": 0.6,
                 "labor": {
                     "minimumWage": 300,
                     "baseSalary_ShiftLead": 1400,
@@ -2456,14 +2571,19 @@
                         "annual": 6,
                         "publicHolidays": 16,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.052,
+                    "benefitsOverheadRate": 0.2,
+                    "nightShiftPremiumRate": 0.08,
+                    "workingHoursPerMonth": 155
                 },
                 "compliance": {
                     "certifications": [
                         "TIS Standards",
                         "PEA License"
                     ],
-                    "annualComplianceCost": 4500
+                    "annualComplianceCost": 4500,
+                    "environmentalPermitCostPerYear": 2500
                 },
                 "environment": {
                     "baselineAQI": 80,
@@ -2550,6 +2670,7 @@
                     "taxRate": 0.2,
                     "electricityRate": 0.09
                 },
+                "constructionIndex": 0.55,
                 "labor": {
                     "minimumWage": 200,
                     "baseSalary_ShiftLead": 1100,
@@ -2574,14 +2695,19 @@
                         "annual": 12,
                         "publicHolidays": 10,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.215,
+                    "benefitsOverheadRate": 0.22,
+                    "nightShiftPremiumRate": 0.3,
+                    "workingHoursPerMonth": 155
                 },
                 "compliance": {
                     "certifications": [
                         "TCVN",
                         "MOIT License"
                     ],
-                    "annualComplianceCost": 3500
+                    "annualComplianceCost": 3500,
+                    "environmentalPermitCostPerYear": 2000
                 },
                 "environment": {
                     "baselineAQI": 100,
@@ -2668,6 +2794,7 @@
                     "taxRate": 0.25,
                     "electricityRate": 0.13
                 },
+                "constructionIndex": 0.6,
                 "labor": {
                     "minimumWage": 250,
                     "baseSalary_ShiftLead": 1300,
@@ -2692,14 +2819,19 @@
                         "annual": 5,
                         "publicHolidays": 18,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.12,
+                    "benefitsOverheadRate": 0.25,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 155
                 },
                 "compliance": {
                     "certifications": [
                         "PNS Standards",
                         "DOE License"
                     ],
-                    "annualComplianceCost": 3500
+                    "annualComplianceCost": 3500,
+                    "environmentalPermitCostPerYear": 2500
                 },
                 "environment": {
                     "baselineAQI": 70,
@@ -2786,6 +2918,7 @@
                     "taxRate": 0.2,
                     "electricityRate": 0.12
                 },
+                "constructionIndex": 0.8,
                 "labor": {
                     "minimumWage": 900,
                     "baseSalary_ShiftLead": 2800,
@@ -2810,14 +2943,19 @@
                         "annual": 7,
                         "publicHolidays": 12,
                         "sickAverage": 4
-                    }
+                    },
+                    "socialSecurityRate": 0.17,
+                    "benefitsOverheadRate": 0.25,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 158
                 },
                 "compliance": {
                     "certifications": [
                         "CNS Standards",
                         "Taipower License"
                     ],
-                    "annualComplianceCost": 7000
+                    "annualComplianceCost": 7000,
+                    "environmentalPermitCostPerYear": 5000
                 },
                 "environment": {
                     "baselineAQI": 60,
@@ -2903,6 +3041,7 @@
                     "taxRate": 0.28,
                     "electricityRate": 0.16
                 },
+                "constructionIndex": 1.1,
                 "labor": {
                     "minimumWage": 2500,
                     "baseSalary_ShiftLead": 7500,
@@ -2927,14 +3066,19 @@
                         "annual": 20,
                         "publicHolidays": 11,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.04,
+                    "benefitsOverheadRate": 0.2,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
                         "AS/NZS Standards",
                         "WorkSafe"
                     ],
-                    "annualComplianceCost": 8000
+                    "annualComplianceCost": 8000,
+                    "environmentalPermitCostPerYear": 6000
                 },
                 "environment": {
                     "baselineAQI": 15,
@@ -3016,6 +3160,7 @@
                     "taxRate": 0.25,
                     "electricityRate": 0.22
                 },
+                "constructionIndex": 1.15,
                 "labor": {
                     "minimumWage": 2200,
                     "baseSalary_ShiftLead": 8000,
@@ -3040,7 +3185,11 @@
                         "annual": 28,
                         "publicHolidays": 8,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.15,
+                    "benefitsOverheadRate": 0.25,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
@@ -3048,7 +3197,8 @@
                         "IET Wiring Regs",
                         "BREEAM"
                     ],
-                    "annualComplianceCost": 14000
+                    "annualComplianceCost": 14000,
+                    "environmentalPermitCostPerYear": 6500
                 },
                 "environment": {
                     "baselineAQI": 25,
@@ -3133,6 +3283,7 @@
                     "taxRate": 0.2975,
                     "electricityRate": 0.26
                 },
+                "constructionIndex": 1.05,
                 "labor": {
                     "minimumWage": 2400,
                     "baseSalary_ShiftLead": 8500,
@@ -3157,7 +3308,11 @@
                         "annual": 24,
                         "publicHolidays": 10,
                         "sickAverage": 8
-                    }
+                    },
+                    "socialSecurityRate": 0.21,
+                    "benefitsOverheadRate": 0.28,
+                    "nightShiftPremiumRate": 0.25,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
@@ -3165,7 +3320,8 @@
                         "TÜV",
                         "EnEfG"
                     ],
-                    "annualComplianceCost": 16000
+                    "annualComplianceCost": 16000,
+                    "environmentalPermitCostPerYear": 6000
                 },
                 "environment": {
                     "baselineAQI": 20,
@@ -3248,6 +3404,7 @@
                     "taxRate": 0.2575,
                     "electricityRate": 0.2
                 },
+                "constructionIndex": 1.1,
                 "labor": {
                     "minimumWage": 2200,
                     "baseSalary_ShiftLead": 7500,
@@ -3272,14 +3429,19 @@
                         "annual": 25,
                         "publicHolidays": 8,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.18,
+                    "benefitsOverheadRate": 0.3,
+                    "nightShiftPremiumRate": 0.15,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
                         "NEN Standards",
                         "BREEAM-NL"
                     ],
-                    "annualComplianceCost": 13000
+                    "annualComplianceCost": 13000,
+                    "environmentalPermitCostPerYear": 6000
                 },
                 "environment": {
                     "baselineAQI": 20,
@@ -3364,6 +3526,7 @@
                     "taxRate": 0.15,
                     "electricityRate": 0.24
                 },
+                "constructionIndex": 1.1,
                 "labor": {
                     "minimumWage": 2400,
                     "baseSalary_ShiftLead": 7800,
@@ -3388,14 +3551,19 @@
                         "annual": 20,
                         "publicHolidays": 9,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.1115,
+                    "benefitsOverheadRate": 0.25,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 151
                 },
                 "compliance": {
                     "certifications": [
                         "IS EN Standards",
                         "SEAI BER"
                     ],
-                    "annualComplianceCost": 14000
+                    "annualComplianceCost": 14000,
+                    "environmentalPermitCostPerYear": 6000
                 },
                 "environment": {
                     "baselineAQI": 15,
@@ -3482,6 +3650,7 @@
                     "taxRate": 0.25,
                     "electricityRate": 0.15
                 },
+                "constructionIndex": 1.05,
                 "labor": {
                     "minimumWage": 2100,
                     "baseSalary_ShiftLead": 7000,
@@ -3506,14 +3675,19 @@
                         "annual": 25,
                         "publicHolidays": 11,
                         "sickAverage": 6
-                    }
+                    },
+                    "socialSecurityRate": 0.38,
+                    "benefitsOverheadRate": 0.35,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
                         "NF C 15-100",
                         "AFNOR"
                     ],
-                    "annualComplianceCost": 15000
+                    "annualComplianceCost": 15000,
+                    "environmentalPermitCostPerYear": 6000
                 },
                 "environment": {
                     "baselineAQI": 25,
@@ -3596,6 +3770,7 @@
                     "taxRate": 0.206,
                     "electricityRate": 0.08
                 },
+                "constructionIndex": 1.1,
                 "labor": {
                     "minimumWage": 2500,
                     "baseSalary_ShiftLead": 7200,
@@ -3620,14 +3795,19 @@
                         "annual": 25,
                         "publicHolidays": 13,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.3142,
+                    "benefitsOverheadRate": 0.3,
+                    "nightShiftPremiumRate": 0.2,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
                         "SS Standards",
                         "Energimyndigheten"
                     ],
-                    "annualComplianceCost": 12000
+                    "annualComplianceCost": 12000,
+                    "environmentalPermitCostPerYear": 6000
                 },
                 "environment": {
                     "baselineAQI": 10,
@@ -3712,6 +3892,7 @@
                     "taxRate": 0.19,
                     "electricityRate": 0.12
                 },
+                "constructionIndex": 0.75,
                 "labor": {
                     "minimumWage": 1000,
                     "baseSalary_ShiftLead": 3500,
@@ -3736,14 +3917,19 @@
                         "annual": 20,
                         "publicHolidays": 13,
                         "sickAverage": 6
-                    }
+                    },
+                    "socialSecurityRate": 0.21,
+                    "benefitsOverheadRate": 0.22,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
                         "PN-EN Standards",
                         "URE License"
                     ],
-                    "annualComplianceCost": 7000
+                    "annualComplianceCost": 7000,
+                    "environmentalPermitCostPerYear": 4500
                 },
                 "environment": {
                     "baselineAQI": 40,
@@ -3830,6 +4016,7 @@
                     "taxRate": 0.2,
                     "electricityRate": 0.15
                 },
+                "constructionIndex": 0.85,
                 "labor": {
                     "minimumWage": 920,
                     "baseSalary_ShiftLead": 3800,
@@ -3854,7 +4041,11 @@
                         "annual": 22,
                         "publicHolidays": 13,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.2375,
+                    "benefitsOverheadRate": 0.3,
+                    "nightShiftPremiumRate": 0.25,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
@@ -3863,7 +4054,8 @@
                         "RGSPIE",
                         "DL 95/91"
                     ],
-                    "annualComplianceCost": 14000
+                    "annualComplianceCost": 14000,
+                    "environmentalPermitCostPerYear": 5000
                 },
                 "environment": {
                     "baselineAQI": 20,
@@ -3949,6 +4141,7 @@
                     "taxRate": 0.15,
                     "electricityRate": 0.07
                 },
+                "constructionIndex": 0.8,
                 "labor": {
                     "minimumWage": 850,
                     "baseSalary_ShiftLead": 4200,
@@ -3973,7 +4166,11 @@
                         "annual": 30,
                         "publicHolidays": 9,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.06,
+                    "benefitsOverheadRate": 0.28,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
@@ -3981,7 +4178,8 @@
                         "MTCIT License",
                         "OPWP Grid Code"
                     ],
-                    "annualComplianceCost": 10000
+                    "annualComplianceCost": 10000,
+                    "environmentalPermitCostPerYear": 2500
                 },
                 "environment": {
                     "baselineAQI": 90,
@@ -4068,6 +4266,7 @@
                     "taxRate": 0.2,
                     "electricityRate": 0.09
                 },
+                "constructionIndex": 1.05,
                 "labor": {
                     "minimumWage": 2400,
                     "baseSalary_ShiftLead": 7000,
@@ -4092,7 +4291,11 @@
                         "annual": 25,
                         "publicHolidays": 13,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.2,
+                    "benefitsOverheadRate": 0.28,
+                    "nightShiftPremiumRate": 0.15,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
@@ -4100,7 +4303,8 @@
                         "Tukes",
                         "Energiavirasto"
                     ],
-                    "annualComplianceCost": 12000
+                    "annualComplianceCost": 12000,
+                    "environmentalPermitCostPerYear": 6000
                 },
                 "environment": {
                     "baselineAQI": 8,
@@ -4185,6 +4389,7 @@
                     "taxRate": 0.25,
                     "electricityRate": 0.13
                 },
+                "constructionIndex": 0.9,
                 "labor": {
                     "minimumWage": 1250,
                     "baseSalary_ShiftLead": 4200,
@@ -4209,7 +4414,11 @@
                         "annual": 22,
                         "publicHolidays": 14,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.3,
+                    "benefitsOverheadRate": 0.3,
+                    "nightShiftPremiumRate": 0.25,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
@@ -4217,7 +4426,8 @@
                         "REBT",
                         "CNMC Grid Access"
                     ],
-                    "annualComplianceCost": 12000
+                    "annualComplianceCost": 12000,
+                    "environmentalPermitCostPerYear": 5500
                 },
                 "environment": {
                     "baselineAQI": 25,
@@ -4304,6 +4514,7 @@
                     "taxRate": 0.265,
                     "electricityRate": 0.08
                 },
+                "constructionIndex": 1,
                 "labor": {
                     "minimumWage": 2300,
                     "baseSalary_ShiftLead": 6500,
@@ -4328,7 +4539,11 @@
                         "annual": 15,
                         "publicHolidays": 11,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.12,
+                    "benefitsOverheadRate": 0.25,
+                    "nightShiftPremiumRate": 0.08,
+                    "workingHoursPerMonth": 153
                 },
                 "compliance": {
                     "certifications": [
@@ -4336,7 +4551,8 @@
                         "ESA/RBQ Electrical",
                         "Provincial Permits"
                     ],
-                    "annualComplianceCost": 13000
+                    "annualComplianceCost": 13000,
+                    "environmentalPermitCostPerYear": 7000
                 },
                 "environment": {
                     "baselineAQI": 15,
@@ -4422,6 +4638,7 @@
                     "taxRate": 0.279,
                     "electricityRate": 0.18
                 },
+                "constructionIndex": 0.95,
                 "labor": {
                     "minimumWage": 1250,
                     "baseSalary_ShiftLead": 4500,
@@ -4446,7 +4663,11 @@
                         "annual": 22,
                         "publicHolidays": 12,
                         "sickAverage": 6
-                    }
+                    },
+                    "socialSecurityRate": 0.3,
+                    "benefitsOverheadRate": 0.35,
+                    "nightShiftPremiumRate": 0.2,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
@@ -4454,7 +4675,8 @@
                         "VVF Fire Cert",
                         "ARERA Grid Access"
                     ],
-                    "annualComplianceCost": 14000
+                    "annualComplianceCost": 14000,
+                    "environmentalPermitCostPerYear": 5500
                 },
                 "environment": {
                     "baselineAQI": 35,
@@ -4540,6 +4762,7 @@
                     "taxRate": 0.22,
                     "electricityRate": 0.07
                 },
+                "constructionIndex": 1.2,
                 "labor": {
                     "minimumWage": 2800,
                     "baseSalary_ShiftLead": 7500,
@@ -4564,7 +4787,11 @@
                         "annual": 25,
                         "publicHolidays": 12,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.16,
+                    "benefitsOverheadRate": 0.3,
+                    "nightShiftPremiumRate": 0.2,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
@@ -4572,7 +4799,8 @@
                         "DSB",
                         "NVE Grid License"
                     ],
-                    "annualComplianceCost": 12000
+                    "annualComplianceCost": 12000,
+                    "environmentalPermitCostPerYear": 6500
                 },
                 "environment": {
                     "baselineAQI": 8,
@@ -4657,6 +4885,7 @@
                     "taxRate": 0.22,
                     "electricityRate": 0.12
                 },
+                "constructionIndex": 1.15,
                 "labor": {
                     "minimumWage": 2700,
                     "baseSalary_ShiftLead": 7300,
@@ -4681,7 +4910,11 @@
                         "annual": 25,
                         "publicHolidays": 11,
                         "sickAverage": 5
-                    }
+                    },
+                    "socialSecurityRate": 0.03,
+                    "benefitsOverheadRate": 0.35,
+                    "nightShiftPremiumRate": 0.2,
+                    "workingHoursPerMonth": 150
                 },
                 "compliance": {
                     "certifications": [
@@ -4689,7 +4922,8 @@
                         "Sikkerhedsstyrelsen",
                         "Energinet Grid Code"
                     ],
-                    "annualComplianceCost": 12000
+                    "annualComplianceCost": 12000,
+                    "environmentalPermitCostPerYear": 6000
                 },
                 "environment": {
                     "baselineAQI": 10,
@@ -4774,6 +5008,7 @@
                     "taxRate": 0.149,
                     "electricityRate": 0.14
                 },
+                "constructionIndex": 1.3,
                 "labor": {
                     "minimumWage": 4000,
                     "baseSalary_ShiftLead": 9500,
@@ -4798,7 +5033,11 @@
                         "annual": 20,
                         "publicHolidays": 9,
                         "sickAverage": 4
-                    }
+                    },
+                    "socialSecurityRate": 0.13,
+                    "benefitsOverheadRate": 0.25,
+                    "nightShiftPremiumRate": 0.1,
+                    "workingHoursPerMonth": 151
                 },
                 "compliance": {
                     "certifications": [
@@ -4806,7 +5045,8 @@
                         "ESTI",
                         "Cantonal Fire Police"
                     ],
-                    "annualComplianceCost": 16000
+                    "annualComplianceCost": 16000,
+                    "environmentalPermitCostPerYear": 7500
                 },
                 "environment": {
                     "baselineAQI": 10,
@@ -6013,6 +6253,32 @@
         /* v2.5.2 O&M pricing research (owner: "biaya kontrak per tier + harga spares
          * riil, no placeholder") — SCREENING bands from public 2024-2026 sources;
          * every band sourced in DATA.sources. USD. */
+        /* v2.5.2 DG environmental costs (owner: "biaya air, waste management, carbon —
+         * rate spesifik per negara"). Carbon = COMPLIANCE price per country where a
+         * scheme exists (World Bank Carbon Pricing Dashboard / OECD ECR 2025 / national
+         * sources, USD/tCO2e, screening snapshot 2025-26); countries without a scheme
+         * fall back to a VOLUNTARY offset basis (labeled). Waste = screening bands. */
+        envCosts: {
+            carbonPriceUsdPerT: {
+                /* EU ETS members (fixed-price trajectory ≈ USD 61 in 2025-26) */
+                DE: 61, NL: 61, IE: 61, FR: 61, ES: 61, IT: 61, PT: 61, PL: 61, FI: 61, DK: 61,
+                SE: 120,   /* national carbon tax above ETS */
+                NO: 100, CH: 130, GB: 50,
+                SG: 33,    /* S$45/tCO2e from 2026 (NCCS) */
+                JP: 2, KR: 6.3, ID: 1.8 /* postponed scheme — indicative */, CN: 14, TW: 9.5,
+                CA: 70 /* industrial OBPS */, NZ: 35, AU: 23 /* Safeguard credit basis */,
+                MX: 3.5, CL: 5, CO: 5, ZA: 9,
+                US: 0, IN: 0, TH: 0, VN: 0, PH: 0, MY: 0, AE: 0, SA: 0, QA: 0, OM: 0, BR: 0, NG: 0, KE: 0
+            },
+            voluntaryOffsetUsdPerT: 10,   /* screening basis where no compliance price */
+            wasteMgmt: {
+                generalUsdPerTonne: { developed: 120, emerging: 60 },   /* non-hazardous industrial disposal band */
+                eWasteUsdPerKg: 1.0,                                     /* certified ITAD/recycling net cost */
+                generalTonnesPerMwItYr: 2.0,                             /* packaging+consumables screening */
+                eWasteKgPerMwItYr: 150                                   /* filters/PSU/board attrition, colo basis (IT refresh excluded) */
+            },
+            developedMarkets: ['US','CA','GB','DE','NL','IE','FR','SE','FI','DK','NO','CH','ES','IT','PT','PL','AU','NZ','JP','SG','KR','TW']
+        },
         omContracts: {
             /* $/kW IT per YEAR, fixed-fee basis. Bands: low/mid/high. */
             tiers: {
@@ -6356,6 +6622,7 @@
             'salaryBenchmarks':       { source: 'Uptime Institute 2026 + AFCOM 2026 + US BLS 2025', asOf: '2026', unit: 'USD/yr, base' },
             'salaryRolesExt':         { source: 'Uptime 2026 + Levels.fyi + AFCOM 2026 role survey', asOf: '2026', unit: 'USD/yr, base' },
             'attritionFactors':       { source: 'Center for American Progress + DataX Connect 2024', asOf: '2024' },
+            'envCosts':               { source: 'Carbon: World Bank Carbon Pricing Dashboard + OECD Effective Carbon Rates 2025 + NCCS Singapore (S$45/t from 2026) + national schemes — compliance snapshot 2025-26; Waste: industrial disposal + certified e-waste/ITAD screening bands', asOf: '2026-07', method: 'per-country compliance price, voluntary-offset fallback labeled; waste screening' },
             'omContracts':            { source: 'SCREENING bands — datacentres.com cost guide 2026 (preventive $200-400K/yr per 10MW; OEM +40-60% vs third-party), Schneider Electric maintenance-ROI blog 2024, TechTarget/thenetworkinstallers OPEX guides 2026', asOf: '2026-07', method: 'public benchmark synthesis, fixed-fee $/kW-yr bands' },
             'sparesPricing':          { source: 'SCREENING list-price bands — Schneider/APC Galaxy VS 50kW module class, criticalpowerbatterysolutions.com VRLA string TCO 2026 (~$10K/string), Schneider CRAH VFD retrofit kit ~$15K installed, OnPoint/secondwatt genset maintenance guides 2026, industrial MCCB distributor ranges', asOf: '2026-07', method: 'public list/retrofit price synthesis per class' },
             'pueDefaults':            { source: 'Uptime Global PUE Survey 2026 by cooling architecture', asOf: '2026', unit: 'ratio' },

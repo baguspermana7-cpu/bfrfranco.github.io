@@ -172,7 +172,8 @@ export const calculateStaffing = (
     hybridRatio: number = 0.5
 ): StaffingResult => {
     const baseSalary = getBaseSalary(role, country);
-    const hourlyRate = baseSalary / 173;
+    // DM audit: country-specific effective hours/month (leave+holiday-adjusted); fallback 173 (global 40h-week divisor)
+    const hourlyRate = baseSalary / (country.labor.workingHoursPerMonth ?? 173);
     const aqiMult = aqiCostMultiplier(aqiOverride ?? country.environment.baselineAQI);
 
     // Operating Model Multipliers — hybridRatio drives the in-house retention portion
@@ -192,7 +193,8 @@ export const calculateStaffing = (
     if (!is24x7) {
         const headcount = Math.ceil(quantity * opModelMult);
         const totalBase = headcount * baseSalary;
-        const socialSecurity = totalBase * (country.id === 'ID' ? 0.04 : 0.06);
+        // DM audit: statutory employer social-security rate per country (countries.ts provenance); legacy 2-bucket fallback
+        const socialSecurity = totalBase * (country.labor.socialSecurityRate ?? (country.id === 'ID' ? 0.04 : 0.06));
         const allowances = totalBase * 0.05 * aqiMult; // AQI affects allowances
 
         return {
@@ -251,15 +253,14 @@ export const calculateStaffing = (
 
     const totalBase = totalHeads * baseSalary;
 
-    let nightPremiumRate: number;
-    if (patternId === 'continental-8h') {
-        nightPremiumRate = 0.07;
-    } else {
-        nightPremiumRate = 0.10;
-    }
+    // DM audit: statutory/CLA night-work premium per country (countries.ts provenance);
+    // fallback = legacy shift-model heuristic (7% continental, 10% compressed 12h)
+    const nightPremiumRate: number = country.labor.nightShiftPremiumRate
+        ?? (patternId === 'continental-8h' ? 0.07 : 0.10);
     const nightShiftPremium = totalBase * nightPremiumRate;
 
-    const socialSecurity = totalBase * (country.id === 'ID' ? 0.04 : 0.06);
+    // DM audit: statutory employer social-security rate per country; legacy 2-bucket fallback
+    const socialSecurity = totalBase * (country.labor.socialSecurityRate ?? (country.id === 'ID' ? 0.04 : 0.06));
     const allowances = totalBase * (patternId === 'continental-8h' ? 0.06 : 0.08) * aqiMult; // AQI multiplier
 
     const weeklyOTCost = overtimeHours * 1.5 * hourlyRate;
