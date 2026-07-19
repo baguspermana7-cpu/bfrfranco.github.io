@@ -67,10 +67,29 @@ export const calculateGridReliability = (input: GridReliabilityInput): GridRelia
         reliabilityScore >= 90 ? 'A' : reliabilityScore >= 75 ? 'B' : reliabilityScore >= 55 ? 'C' : reliabilityScore >= 35 ? 'D' : 'F';
 
     // --- Outage Estimation ---
-    const annualExpectedOutages = brownoutFreq + Math.round((100 - gridUptime) * 365 / 100);
-    const annualOutageMinutes = gridModel && typeof gridModel.annualOutageHours === 'function'
+    // DM audit phase 3: `gridReliability.brownoutFrequency` + `averageOutageDuration` existed in
+    // COUNTRIES but were dead in the engine-present path (outage minutes came from the uptime-SAIDI
+    // model alone). When BOTH country fields are present we now blend two independent estimates:
+    //   saidiMin   = uptime-derived SAIDI minutes (RZEngine grid.annualOutageHours(uptime)×60;
+    //                local fallback (100−uptime)% × 525,600 min/yr — same math)
+    //   eventMin   = brownoutFrequency × averageOutageDuration   (event-based, from country data)
+    //   outage minutes/yr = 0.5·saidiMin + 0.5·eventMin          (equal-weight blend, screening)
+    //   outages/yr        = brownoutFrequency + saidiMin / max(averageOutageDuration, 1)
+    //                       (brownout events + sustained-outage events implied by SAIDI at the
+    //                        country's average outage duration — categories are additive)
+    // Fallback when either field is absent: legacy formulas verbatim (defaults 5 events / 15 min).
+    const engineSaidiMin = gridModel && typeof gridModel.annualOutageHours === 'function'
         ? gridModel.annualOutageHours(gridUptime) * 60
-        : annualExpectedOutages * avgOutageDuration;
+        : null;
+    const hasOutageData = grid?.brownoutFrequency != null && grid?.averageOutageDuration != null;
+    const legacyExpectedOutages = brownoutFreq + Math.round((100 - gridUptime) * 365 / 100);
+    const uptimeSaidiMin = engineSaidiMin ?? ((100 - gridUptime) / 100) * 525600;
+    const annualExpectedOutages = hasOutageData
+        ? Math.round(brownoutFreq + uptimeSaidiMin / Math.max(avgOutageDuration, 1))
+        : legacyExpectedOutages;
+    const annualOutageMinutes = hasOutageData
+        ? Math.round(0.5 * uptimeSaidiMin + 0.5 * brownoutFreq * avgOutageDuration)
+        : (engineSaidiMin ?? legacyExpectedOutages * avgOutageDuration);
 
     // --- Generator Sizing ---
     const pue = getPUE(coolingType);

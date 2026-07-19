@@ -206,11 +206,11 @@ export function SustainabilityEnginePage() {
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
                             { label: 'PUE (Design)', value: String(model.pue), sub: `${inputs.coolingType} · Tier ${inputs.tierLevel}`, explain: 'pue', trace: 'engine.pueMatrix' },
-                            { label: 'Energy (Month)', value: `${model.monthlyMwh.toLocaleString()} MWh`, sub: `${model.mw.toFixed(1)} MW × PUE × 730h` },
+                            { label: 'Energy (Month)', value: `${model.monthlyMwh.toLocaleString()} MWh`, sub: `${model.mw.toFixed(1)} MW × PUE × 730h`, trace: 'sus.energyMonthlyMwh' },
                             { label: 'Carbon (Annual)', value: model.scopes ? `${Math.round(model.scopes.totalAnnual).toLocaleString()} tCO₂e` : '—', sub: 'GHG Protocol scopes (engine)', trace: 'carbon.annualEmissions' },
-                            { label: 'Water (Annual)', value: model.waterM3Yr != null ? `${model.waterM3Yr.toLocaleString()} m³` : '—', sub: `WUE ${model.wue} L/kWh (engine)`, explain: 'wue' },
-                            { label: 'Renewable Energy', value: `${model.renewablePct}%`, sub: 'derived from capex renewable/cert inputs' },
-                            { label: 'Sustainability Score', value: model.grade, sub: `${model.overall}/100 · documented composite` },
+                            { label: 'Water (Annual)', value: model.waterM3Yr != null ? `${model.waterM3Yr.toLocaleString()} m³` : '—', sub: `WUE ${model.wue} L/kWh (engine)`, explain: 'wue', trace: 'sus.waterAnnualM3' },
+                            { label: 'Renewable Energy', value: `${model.renewablePct}%`, sub: 'derived from capex renewable/cert inputs', trace: 'sus.renewablePct' },
+                            { label: 'Sustainability Score', value: model.grade, sub: `${model.overall}/100 · documented composite`, trace: 'sus.overallScore' },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>
@@ -321,13 +321,17 @@ export function SustainabilityEnginePage() {
                                             {(['municipal', 'reclaimed', 'river', 'groundwell'] as const).map((s) => <option key={s} value={s}>{s}</option>)}
                                         </select>
                                     </div>
-                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{fmtMoney(env.waterCost)}</div>
+                                    <TraceValue traceId="sus.waterCost">
+                                        <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{fmtMoney(env.waterCost)}</div>
+                                    </TraceValue>
                                     <div className="text-[10px] text-slate-500">{fmt(env.waterM3)} m³ = WUE {model.wue} L/kWh × IT kWh × climate ×{env.climateMult} ({env.climate}) → {fmt(env.kgal)} kgal × ${env.waterRate}/kgal ({waterSource})</div>
                                     {env.deepSea && <div className="mt-1 inline-block rounded bg-cyan-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-cyan-600 dark:text-cyan-400">deep-sea ON — seawater basis, no potable draw</div>}
                                 </div>
                                 <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
                                     <div className="text-[10px] uppercase tracking-wide text-slate-500">Carbon Cost /yr <Explain k="cue" /></div>
-                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{fmtMoney(env.carbonCost)}</div>
+                                    <TraceValue traceId="sus.carbonCost">
+                                        <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{fmtMoney(env.carbonCost)}</div>
+                                    </TraceValue>
                                     <div className="text-[10px] text-slate-500">{fmt(env.scope2)} tCO₂e scope-2 (rendered above) × ${env.carbonRate}/tCO₂e</div>
                                     <div className="mt-1 flex flex-wrap gap-1">
                                         {env.hasScheme
@@ -338,13 +342,17 @@ export function SustainabilityEnginePage() {
                                 </div>
                                 <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
                                     <div className="text-[10px] uppercase tracking-wide text-slate-500">Waste Mgmt Cost /yr</div>
-                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{fmtMoney(env.wasteCost)}</div>
+                                    <TraceValue traceId="sus.wasteCost">
+                                        <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{fmtMoney(env.wasteCost)}</div>
+                                    </TraceValue>
                                     <div className="text-[10px] text-slate-500">general {fmt(env.genTonnes, 1)} t × ${env.genRate}/t ({env.developed ? 'developed' : 'emerging'} band) + e-waste {fmt(env.eKg)} kg × ${env.eRate}/kg</div>
                                     <div className="mt-1 inline-block rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-500">screening — packaging/consumables + certified ITAD, IT refresh excluded</div>
                                 </div>
                                 <div className="rounded-xl border border-violet-300 dark:border-violet-800 bg-violet-500/5 p-3">
                                     <div className="text-[10px] uppercase tracking-wide text-slate-500">Total Environmental Cost /yr</div>
-                                    <div className="text-lg font-bold tabular-nums text-violet-600 dark:text-violet-400">{fmtMoney(env.total)}</div>
+                                    <TraceValue traceId="sus.envTotal">
+                                        <div className="text-lg font-bold tabular-nums text-violet-600 dark:text-violet-400">{fmtMoney(env.total)}</div>
+                                    </TraceValue>
                                     <div className="text-[10px] text-slate-500">water + carbon + waste · rates auto-switch with country ({env.cid})</div>
                                 </div>
                             </div>

@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v1.97.2 — 2026-07-20 (WAVE 5 penutup malam: dead-data dikonsumsi + trace Financial/Sustainability 100%)
+
+### Added
+- **EB tail**: 13 node trace baru — Financial (revisedBudget/committed/paid/FAC/healthScore, EVM basis revised budget) + Sustainability (energi bulanan, air m³, renewable %, overall score, dan 4 node Environmental Costs water/carbon/waste/total). Coverage: **Financial 7/7, Sustainability 10/10, Ops 7/7**.
+- **HVO jadi opsi bahan bakar NYATA** (FuelGen): baris perbandingan HVO vs diesel (harga negara × pajak, litres ×1.03 EN 15940, CO₂ −90%, delta $/thn) untuk 20 negara ber-harga HVO.
+
+### Changed (DM fase 3 — dead data dikonsumsi, scoring dinormalisasi; fallback verbatim semua)
+- GridReliability: `brownoutFrequency`+`averageOutageDuration` (dead) kini blend 50/50 dgn basis SAIDI — ID: outage minutes 2628→1719, run-hours genset −35%, fuel cost −26%; SG 5→3 menit.
+- FuelGen: `fuelQualityRating` → multiplier maintenance ×1.00/1.05/1.15 terdokumentasi.
+- Talent: training overhead ×1.5 global → scarcity-scaled ×1.2-2.0; `talentPool.talentScore` blend 70/30.
+- Site scoring: permit window 3-24→3-36 bln; land score linear $500-cap → log-scale ($30=1.0, $300=0.5, $3000=0.0) — metro prime tidak lagi seragam nol.
+
+### Verified
+- tsc/build · walk 24/0 (coverage: Fin 7/7 · Sus 10/10 · Ops 7/7 · Dash 18/29 · Arch/Staff/Results 11/17) · synergy 6/0 · export 44/0 · bindings 73/0.
+
 ## v1.97.1 — 2026-07-20 (WAVE 4: Cx/CDU rebuild + Financial dedup + DA3 snapshot jujur + trace 62-100%)
 
 ### Added

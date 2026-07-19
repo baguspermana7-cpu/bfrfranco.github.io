@@ -60,6 +60,21 @@ export interface FuelCost {
     annualEnvironmentalComplianceUsd: number;
     totalAnnualGenOpex: number;
     dieselPriceWithTax: number;
+    /** DM audit phase 3: maintenance uplift from countries.ts fuelDiesel.fuelQualityRating
+     *  (high ×1.00 / moderate ×1.05 / low ×1.15 — screening; 1.00 when field absent). */
+    fuelQualityMaintenanceMultiplier: number;
+}
+
+/** DM audit phase 3: HVO (renewable diesel) as a real fuel alternative when
+ *  countries.ts fuelDiesel.hvoAvailable && hvoPricePerLiter > 0. Screening-level
+ *  comparison at the SAME duty cycle as the diesel baseline. */
+export interface HvoComparison {
+    hvoPricePerLiter: number;        // pump price, USD/L (country data)
+    hvoPriceWithTax: number;         // ×(1 + fuelTaxRate), same tax treatment as diesel
+    annualLiters: number;            // diesel litres ×1.03 (HVO ~3% lower volumetric energy density)
+    annualFuelCostUsd: number;       // annualLiters × hvoPriceWithTax
+    annualDeltaVsDieselUsd: number;  // HVO annual fuel cost − diesel annual fuel cost (+ = premium)
+    co2SavingsTonsPerYear: number;   // ~90% lifecycle CO2 reduction vs fossil diesel (EN 15940 screening)
 }
 
 export interface FuelStorage {
@@ -91,6 +106,8 @@ export interface FuelGenResult {
     testingRegime: TestingRegime;
     co2EmissionsKgPerYear: number;
     co2EmissionsTonsPerYear: number;
+    /** null when country has no HVO supply data (hvoAvailable false or price 0). */
+    hvo: HvoComparison | null;
     countryComparison: CountryFuelComparison[];
     editableParams: EditableParam[];
 }
@@ -234,7 +251,14 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
     // 2026: Tier 4 Final generator annual PM costs $16,000-$22,000 per unit
     // (CBRE FM benchmark 2025; includes oil/filters, inspections, load bank test)
     // Using $18,000/gen + $5/kW capacity-based variable
-    const annualMaintenanceUsd = genCount * 18000 + (totalGenCapacity * 5);
+    // DM audit phase 3: countries.ts fuelDiesel.fuelQualityRating was dead — poor local fuel
+    // quality (water/sulphur/particulates) fouls injectors + filters and shortens PM intervals.
+    // Screening multiplier on generator maintenance: high ×1.00, moderate ×1.05, low ×1.15.
+    // Fallback (field absent): ×1.00 — no effect, legacy cost verbatim.
+    const fuelQualityMaintMult =
+        fuel?.fuelQualityRating === 'low' ? 1.15 :
+        fuel?.fuelQualityRating === 'moderate' ? 1.05 : 1.00;
+    const annualMaintenanceUsd = (genCount * 18000 + (totalGenCapacity * 5)) * fuelQualityMaintMult;
 
     // Environmental compliance — DM audit: country-specific annual permitting cost
     // (countries.ts compliance.environmentalPermitCostPerYear, screening band US $8k /
@@ -251,7 +275,30 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
         annualEnvironmentalComplianceUsd: Math.round(annualEnvCompliance),
         totalAnnualGenOpex: Math.round(totalAnnualGenOpex),
         dieselPriceWithTax: Math.round(dieselPriceWithTax * 100) / 100,
+        fuelQualityMaintenanceMultiplier: fuelQualityMaintMult,
     };
+
+    // DM audit phase 3: HVO comparison — countries.ts fuelDiesel.hvoPricePerLiter was dead.
+    // When the country reports HVO supply (hvoAvailable && price > 0), model running the SAME
+    // annual duty cycle (tests + outages + polishing) on HVO100:
+    //   litres ×1.03 (HVO volumetric energy density ~3% below diesel, EN 15940)
+    //   price ×(1 + fuelTaxRate) — same tax treatment as diesel (screening)
+    //   CO2 savings = diesel lifecycle CO2 × 90% (HVO ~90% lifecycle reduction, screening)
+    // Fallback: null when fuelDiesel absent, hvoAvailable false, or price 0 — result unchanged.
+    let hvo: HvoComparison | null = null;
+    if (fuel?.hvoAvailable && fuel.hvoPricePerLiter > 0) {
+        const hvoPriceWithTax = fuel.hvoPricePerLiter * (1 + fuelTaxRate);
+        const hvoLiters = totalLitersPerYear * 1.03;
+        const hvoAnnualCost = hvoLiters * hvoPriceWithTax;
+        hvo = {
+            hvoPricePerLiter: fuel.hvoPricePerLiter,
+            hvoPriceWithTax: Math.round(hvoPriceWithTax * 100) / 100,
+            annualLiters: Math.round(hvoLiters),
+            annualFuelCostUsd: Math.round(hvoAnnualCost),
+            annualDeltaVsDieselUsd: Math.round(hvoAnnualCost - annualFuelCost),
+            co2SavingsTonsPerYear: Math.round((totalLitersPerYear * 2.68 * 0.90) / 1000 * 10) / 10,
+        };
+    }
 
     // CO2 emissions: 2.68 kgCO2 per liter of diesel
     const co2Kg = totalLitersPerYear * 2.68;
@@ -288,6 +335,7 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
         testingRegime,
         co2EmissionsKgPerYear: Math.round(co2Kg),
         co2EmissionsTonsPerYear: Math.round(co2Kg / 1000 * 10) / 10,
+        hvo,
         countryComparison: comparisonCountries,
         editableParams,
     };

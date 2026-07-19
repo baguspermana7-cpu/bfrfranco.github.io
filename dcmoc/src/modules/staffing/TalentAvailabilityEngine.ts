@@ -57,9 +57,17 @@ export const calculateTalentAvailability = (input: TalentAvailabilityInput): Tal
     // Certifications (10%)
     const certScore = Math.min(100, (certifiedProfessionals / 3000) * 100);
 
-    const talentScore = Math.round(
+    const derivedScore = Math.round(
         poolScore * 0.30 + pipelineScore * 0.20 + competitionScore * 0.25 + speedScore * 0.15 + certScore * 0.10
     );
+    // DM audit phase 3: countries.ts talentPool.talentScore was read but dead (never blended).
+    // When the country supplies a curated talentScore, blend it 30% against the 70% derived
+    // component score (curated data anchors the derivation without replacing it — screening).
+    // certifiedProfessionals is already consumed above via certScore (10% weight).
+    // Fallback (field absent): derived formula verbatim.
+    const talentScore = talent?.talentScore != null
+        ? Math.round(derivedScore * 0.70 + baseTalentScore * 0.30)
+        : derivedScore;
 
     // --- Hiring Difficulty ---
     const hiringDifficulty: 'Easy' | 'Moderate' | 'Difficult' | 'Very Difficult' =
@@ -86,7 +94,16 @@ export const calculateTalentAvailability = (input: TalentAvailabilityInput): Tal
     // Training cost — 2026: Uptime Institute CDCP ~$3,800-4,500; blended with on-the-job training
     const certTrainingCost = 4200; // Per person for CDCP/CDCS (2026 rate)
     const newHiresPerYear = Math.ceil(totalFTE * adjustedTurnoverRate);
-    const annualTrainingCost = Math.round(newHiresPerYear * certTrainingCost * 1.5); // 1.5x for onboarding overhead
+    // DM audit phase 3: onboarding overhead was a flat ×1.5 globally. Now scaled with talent
+    // scarcity (talentPool.dcEngineerPool): scarce markets hire greener candidates who need more
+    // ramp-up/shadowing; abundant markets hire near-ready staff. Screening bands:
+    //   abundant ×1.2 · moderate ×1.5 (legacy value) · scarce ×1.75 · very_scarce ×2.0
+    // Fallback (talentPool absent): pool defaults to 'moderate' → ×1.5, legacy cost verbatim.
+    const trainingOverheadMult =
+        dcEngineerPool === 'abundant' ? 1.2 :
+        dcEngineerPool === 'scarce' ? 1.75 :
+        dcEngineerPool === 'very_scarce' ? 2.0 : 1.5;
+    const annualTrainingCost = Math.round(newHiresPerYear * certTrainingCost * trainingOverheadMult);
 
     // Competition index
     const competitionIndex = Math.round(hyperscalerPresence * (dcEngineerPool === 'scarce' || dcEngineerPool === 'very_scarce' ? 15 : 8));
@@ -106,6 +123,8 @@ export const calculateTalentAvailability = (input: TalentAvailabilityInput): Tal
         { metric: 'Avg Hiring Time', value: `${avgHiringDays} days`, impact: avgHiringDays <= 35 ? 'Fast' : avgHiringDays <= 50 ? 'Average' : 'Slow' },
         { metric: 'Certified Professionals', value: `${certifiedProfessionals}`, impact: certifiedProfessionals >= 500 ? 'Strong' : 'Limited' },
         { metric: 'Salary Premium', value: `${((salaryPremium - 1) * 100).toFixed(0)}%`, impact: salaryPremium <= 1.05 ? 'Low' : salaryPremium <= 1.15 ? 'Moderate' : 'High' },
+        // DM audit phase 3: surface the scarcity-scaled onboarding multiplier (screening label)
+        { metric: 'Training Overhead', value: `×${trainingOverheadMult.toFixed(2)} (${dcEngineerPool.replace('_', ' ')} pool, screening)`, impact: trainingOverheadMult <= 1.5 ? 'Manageable' : 'Elevated' },
     ];
 
     return {

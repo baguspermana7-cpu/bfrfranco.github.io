@@ -107,7 +107,11 @@ export function scoreSite(site: CandidateSite): SiteScoreResult | null {
     const landParts: number[] = [];
     if (a.roadAccess) landParts.push(roadMap[a.roadAccess]);
     const permit = sanitizeAttr('permitMonths', a.permitMonths);
-    if (permit != null) landParts.push(clamp01(1 - (permit - 3) / 21));
+    /* DM audit phase 3: permit window widened 3–24mo → 3–36mo. Real permitting data spans
+     * 1–48 months (types/site-intel.ts); the old /21 divisor floored anything ≥24mo to 0,
+     * flattening distinctions between slow (24mo) and very slow (36mo+) jurisdictions.
+     * New: clamp01(1 − (months − 3)/33) → 3mo=1.0, 24mo≈0.36, 36mo=0. */
+    if (permit != null) landParts.push(clamp01(1 - (permit - 3) / 33));
     const port = sanitizeAttr('distPortKm', a.distPortKm);
     if (port != null) landParts.push(clamp01(1 - port / 300));
     const landInfra = landParts.length ? landParts.reduce((s, x) => s + x, 0) / landParts.length : 0.6;
@@ -119,7 +123,16 @@ export function scoreSite(site: CandidateSite): SiteScoreResult | null {
 
     const cyc = a.cycloneRisk ? RISK_MAP[a.cycloneRisk] : 0.66;
     const landCost = sanitizeAttr('landCostPerM2', a.landCostPerM2);
-    const landCostScore = landCost != null ? clamp01(1 - landCost / 500) : 0.6;
+    /* DM audit phase 3: land-cost score was linear with a hard $500/m² global ceiling —
+     * every prime metro ($500–$20,000/m², see types/site-intel.ts range 1–20,000) scored
+     * an identical 0, and cheap-land differences were over-rewarded. Now log10-normalized:
+     *   score = clamp01(1 − log10(cost/30) / 2)  →  $30/m²→1.0, $300→0.5, $3,000→0.0
+     * ($30 ≈ cheap emerging-market industrial land; $3,000 ≈ prime CBD — 2 decades span).
+     * At the $150/m² default the score is ~0.65 (old linear: 0.70 — near-parity).
+     * Fallback (attribute absent): 0.6 verbatim. */
+    const landCostScore = landCost != null
+        ? clamp01(1 - Math.log10(Math.max(landCost, 1) / 30) / 2)
+        : 0.6;
     const hyper = country?.talentPool?.hyperscalerPresence != null ? clamp01(country.talentPool.hyperscalerPresence / 10) : 0.65;
 
     const risksGoodness = 0.5 * g('seismic') + 0.3 * g('flood') + 0.2 * cyc;

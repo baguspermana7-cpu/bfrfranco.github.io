@@ -27,6 +27,9 @@ import { riskBand } from '@/state/adapters/capex-adapter';
 import { sanitizeCap, facilitySnapshot, utilization, forecastSeries, type UtilRow } from '@/state/adapters/capacity-adapter';
 import { calculateFinancials, defaultOccupancyRamp, type FinancialResult } from '@/modules/analytics/FinancialEngine';
 import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
+/* EB-finsus wave (Financial + Sustainability telemetry ≥60%) — live readers */
+import { useFinancialTracking } from '@/store/financialTracking';
+import { useSustainability } from '@/store/sustainability';
 
 export type TraceProvenance = 'input' | 'engine' | 'derived' | 'screening';
 
@@ -758,6 +761,92 @@ export const TRACE: Record<string, TraceNode> = {
         deps: ['sim.itLoad'],
         get: () => assetEquip()?.chillers ?? null,
     },
+
+    /* ── EB-finsus wave: FINANCIAL page KPIs (append-only) ────────────────────
+     * Mirrors FinancialPage model memo EXACTLY (helpers at file bottom):
+     * budget = REVISED (baseline + approved change orders), EVM run on the
+     * revised budget as on the page. All null-safe. */
+    'fin.revisedBudget': {
+        label: 'Revised Budget', page: 'finance', unit: '$', provenance: 'derived',
+        formulaTemplate: 'capex.total + Σ revisi disetujui (change orders financialTracking — amountFrac × baseline)',
+        deps: ['capex.total'],
+        get: () => finRevisedBudget(),
+    },
+    'fin.committed': {
+        label: 'Total Committed', page: 'finance', unit: '$', provenance: 'derived',
+        formulaTemplate: 'Σ transaksi ledger financialTracking berstatus committed/approved/paid — amountFrac × capex.total',
+        deps: ['capex.total'],
+        get: () => finLedgerSum(['committed', 'approved', 'paid']),
+    },
+    'fin.paid': {
+        label: 'Total Actual (Paid)', page: 'finance', unit: '$', provenance: 'derived',
+        formulaTemplate: 'Σ transaksi ledger financialTracking berstatus paid — amountFrac × capex.total',
+        deps: ['capex.total'],
+        get: () => finLedgerSum(['paid']),
+    },
+    'fin.fac': {
+        label: 'Forecast at Completion (FAC)', page: 'finance', unit: '$', provenance: 'derived',
+        formulaTemplate: 'AC + (fin.revisedBudget − EV) ÷ clamp(constr.cpi, ≥0.5) — Plan Mode: FAC ≡ fin.revisedBudget',
+        deps: ['fin.revisedBudget', 'constr.cpi'],
+        get: () => finFacLive(),
+    },
+    'fin.healthScore': {
+        label: 'Financial Health Score', page: 'finance', unit: '/100', provenance: 'derived',
+        formulaTemplate: '100 × (0.3 × skor varian budget (1 − |fin.fac − fin.revisedBudget| ÷ fin.revisedBudget × 5) + 0.35 × min(1, constr.cpi) + 0.35 × min(1, constr.spi)) — komposit terdokumentasi',
+        deps: ['fin.fac', 'fin.revisedBudget', 'constr.cpi', 'constr.spi'],
+        get: () => finHealthLive(),
+    },
+
+    /* ── EB-finsus wave: SUSTAINABILITY page KPIs + Environmental Costs ───────
+     * Mirrors SustainabilityEnginePage model + env memos EXACTLY (env memo
+     * :68-115 — country-auto rates; water basis municipal = page default). */
+    'sus.energyMonthlyMwh': {
+        label: 'Energy (Month)', page: 'carbon', unit: 'MWh', provenance: 'derived',
+        formulaTemplate: 'sim.itLoad ÷ 1000 × engine.pueMatrix × 730 jam',
+        deps: ['sim.itLoad', 'engine.pueMatrix'],
+        get: () => { const p = susPueLive(); return p == null ? null : Math.round((sim().inputs.itLoad / 1000) * p * 730); },
+    },
+    'sus.waterAnnualM3': {
+        label: 'Water (Annual)', page: 'carbon', unit: 'm³', provenance: 'engine',
+        formulaTemplate: 'models.water.annualM3(sim.itLoad dalam MW, tipe cooling) — sus.wue × IT kWh tahunan',
+        deps: ['sim.itLoad', 'sus.wue'],
+        get: () => susWaterM3(),
+    },
+    'sus.renewablePct': {
+        label: 'Renewable Energy Share', page: 'carbon', unit: '%', provenance: 'derived',
+        formulaTemplate: 'on-site dari input CAPEX renewable (solar+BESS 25% · solar 15%) + off-site PPA dari green cert (silver 10% · gold 20% · platinum 35%) — derivasi berlabel',
+        get: () => susRenewablePct(),
+    },
+    'sus.overallScore': {
+        label: 'Sustainability Score (composite)', page: 'carbon', unit: '/100', provenance: 'derived',
+        formulaTemplate: 'rata-rata 4 skor terdokumentasi: energi (band engine.pueMatrix 1.10–1.60) + karbon (grid intensity negara × porsi grid dari sus.renewablePct) + air (band sus.wue 0–2.2) + waste (slider diversion, default 60)',
+        deps: ['engine.pueMatrix', 'sus.renewablePct', 'sus.wue'],
+        get: () => susOverallScore(),
+    },
+    'sus.waterCost': {
+        label: 'Water Cost /yr', page: 'carbon', unit: '$/yr', provenance: 'derived',
+        formulaTemplate: 'sus.waterAnnualM3 × climate multiplier (zona ASHRAE negara → DATA.waterFootprint.climateMult) → kgal × $/kgal (basis municipal — dropdown halaman dapat memilih sumber lain); deep-sea ON → $0 (seawater basis, no potable draw)',
+        deps: ['sus.waterAnnualM3'],
+        get: () => susEnvLive()?.waterCost ?? null,
+    },
+    'sus.carbonCost': {
+        label: 'Carbon Cost /yr', page: 'carbon', unit: '$/yr', provenance: 'derived',
+        formulaTemplate: 'scope-2 tCO₂e (models.carbon.scopes dari sim.itLoad & engine.pueMatrix, grid negara) × harga karbon negara (compliance DATA.envCosts.carbonPriceUsdPerT; fallback voluntary offset)',
+        deps: ['sim.itLoad', 'engine.pueMatrix'],
+        get: () => susEnvLive()?.carbonCost ?? null,
+    },
+    'sus.wasteCost': {
+        label: 'Waste Mgmt Cost /yr', page: 'carbon', unit: '$/yr', provenance: 'derived',
+        formulaTemplate: '(tonase umum per MW-IT × band tarif developed/emerging + e-waste kg per MW-IT × $/kg — DATA.envCosts.wasteMgmt) × sim.itLoad ÷ 1000',
+        deps: ['sim.itLoad'],
+        get: () => susEnvLive()?.wasteCost ?? null,
+    },
+    'sus.envTotal': {
+        label: 'Total Environmental Cost /yr', page: 'carbon', unit: '$/yr', provenance: 'derived',
+        formulaTemplate: 'sus.waterCost + sus.carbonCost + sus.wasteCost — tarif auto-switch per negara',
+        deps: ['sus.waterCost', 'sus.carbonCost', 'sus.wasteCost'],
+        get: () => { const e = susEnvLive(); return e ? Math.round(e.waterCost + e.carbonCost + e.wasteCost) : null; },
+    },
 };
 
 export interface ResolvedTrace {
@@ -1115,4 +1204,153 @@ function capPlanModel(): { peak: number; rows: UtilRow[] } | null {
 
 function capUtilRow(rowKey: string): UtilRow | null {
     return capPlanModel()?.rows.find((u) => u.key === rowKey) ?? null;
+}
+
+/* ═══ EB-finsus live-reader helpers (appended — invoked lazily by get()) ═════
+ * Mirror FinancialPage model memo + SustainabilityEnginePage model/env memos
+ * EXACTLY so the popover number matches the rendered KPI. All null-safe. */
+
+/** Revised budget — mirrors FinancialPage: baseline + approved change orders. */
+function finRevisedBudget(): number | null {
+    try {
+        const baseline = cap().results?.total;
+        if (!baseline) return null;
+        const approved = useFinancialTracking.getState().revisions
+            .filter((r) => r.approved).reduce((s, r) => s + r.amountFrac * baseline, 0);
+        return Math.round(baseline + approved);
+    } catch { return null; }
+}
+
+/** Ledger sum by status — mirrors FinancialPage committed/paid (amountFrac × baseline). */
+function finLedgerSum(statuses: string[]): number | null {
+    try {
+        const baseline = cap().results?.total;
+        if (!baseline) return null;
+        return Math.round(useFinancialTracking.getState().transactions
+            .filter((t) => statuses.includes(t.status)).reduce((s, t) => s + t.amountFrac * baseline, 0));
+    } catch { return null; }
+}
+
+/** EVM on the REVISED budget — mirrors FinancialPage (budget = revised, NOT the
+ *  raw baseline used by the Construction page's constrPlan()). */
+function finEvmLive(): { e: EvmResult; revised: number } | null {
+    try {
+        const res = cap().results;
+        const revised = finRevisedBudget();
+        if (!res?.timeline || revised == null) return null;
+        const sched = plannedSchedule(res.timeline);
+        if (!sched) return null;
+        const t = useConstructionTracking.getState();
+        return { e: evm(sched, revised, t.statusMonth, t.phaseActualPct, t.acSpentUsd), revised };
+    } catch { return null; }
+}
+
+/** FAC — mirrors FinancialPage: AC + (revised − EV) ÷ clamp(CPI); Plan Mode ≡ revised. */
+function finFacLive(): number | null {
+    const r = finEvmLive();
+    if (!r) return null;
+    return !r.e.planMode ? Math.round(r.e.acUsd + (r.revised - r.e.evUsd) / Math.max(0.5, r.e.cpi)) : r.revised;
+}
+
+/** Health composite — mirrors FinancialPage: 0.3 budget-var + 0.35 CPI + 0.35 SPI. */
+function finHealthLive(): number | null {
+    const r = finEvmLive();
+    const fac = finFacLive();
+    if (!r || fac == null || r.revised <= 0) return null;
+    const bv = Math.max(0, 1 - (Math.abs(fac - r.revised) / r.revised) * 5);
+    return Math.round(100 * (0.3 * bv + 0.35 * Math.min(1, r.e.cpi) + 0.35 * Math.min(1, r.e.spi)));
+}
+
+/** Design PUE with the page's getPUE fallback — mirrors SustainabilityEnginePage model.pue. */
+function susPueLive(): number | null {
+    try { return pueLive() ?? getPUE(sim().inputs.coolingType); } catch { return null; }
+}
+
+/** Annual water volume — mirrors model.waterM3Yr (models.water.annualM3). */
+function susWaterM3(): number | null {
+    try {
+        const m = (rzModels() as { water?: { annualM3?: (mw: number, cooling: string) => number } }).water;
+        const v = m?.annualM3?.(sim().inputs.itLoad / 1000, sim().inputs.coolingType);
+        return v != null && Number.isFinite(v) ? Math.round(v) : null;
+    } catch { return null; }
+}
+
+/** Renewable share — mirrors the labeled derivation from capex renewable/cert inputs. */
+function susRenewablePct(): number | null {
+    try {
+        const ci = cap().inputs;
+        const ren = ci.renewableOption ?? 'none';
+        const cert = ci.greenCert ?? 'none';
+        const onSite = ren === 'solar_bess' ? 25 : ren === 'solar' ? 15 : 0;
+        const offSite = cert === 'platinum' ? 35 : cert === 'gold' ? 20 : cert === 'silver' ? 10 : 0;
+        return onSite + offSite;
+    } catch { return null; }
+}
+
+/** Overall sustainability composite — mirrors the page's documented scorecard. */
+function susOverallScore(): number | null {
+    try {
+        const pue = susPueLive();
+        if (pue == null) return null;
+        const energyScore = Math.round(Math.max(0, Math.min(100, ((1.6 - pue) / 0.5) * 100)));
+        const gi = sim().selectedCountry?.environment?.gridCarbonIntensity ?? 0.7;
+        const grid = Math.max(0, 100 - (susRenewablePct() ?? 0));
+        const carbonScore = Math.round(Math.max(0, Math.min(100, ((0.9 - gi * (grid / 100)) / 0.9) * 100)));
+        const m = (rzModels() as { water?: { wue?: (c: string) => number } }).water;
+        const wue = m?.wue ? m.wue(sim().inputs.coolingType) : 1.8;
+        const waterScore = Math.round(Math.max(0, Math.min(100, ((2.2 - wue) / 2.2) * 100)));
+        const wd = useSustainability.getState().wasteDiversionPct;
+        const wasteScore = wd != null ? Math.round(wd) : null;
+        return Math.round((energyScore + carbonScore + waterScore + (wasteScore ?? 60)) / 4);
+    } catch { return null; }
+}
+
+/** Environmental Costs — mirrors SustainabilityEnginePage env memo (country-auto
+ *  DATA.envCosts + DATA.waterFootprint rates; water basis municipal = page default;
+ *  deep-sea ON → water $0 seawater basis). Null when the engine DATA is absent —
+ *  same hide condition as the page section. */
+function susEnvLive(): { waterCost: number; carbonCost: number; wasteCost: number } | null {
+    try {
+        const D = rzData() as {
+            envCosts?: {
+                carbonPriceUsdPerT?: Record<string, number>; voluntaryOffsetUsdPerT?: number; developedMarkets?: string[];
+                wasteMgmt?: { generalUsdPerTonne?: Record<string, number>; generalTonnesPerMwItYr?: number; eWasteKgPerMwItYr?: number; eWasteUsdPerKg?: number };
+            };
+            waterFootprint?: { waterCostPerKgal?: Record<string, number>; climateMult?: Record<string, number>; lPerGal?: number };
+        };
+        const ec = D?.envCosts; const wf = D?.waterFootprint;
+        if (!ec?.carbonPriceUsdPerT || !ec?.wasteMgmt || !wf?.waterCostPerKgal) return null;
+        const country = sim().selectedCountry;
+        const cid = (country?.id ?? 'US').toUpperCase();
+        const mw = sim().inputs.itLoad / 1000;
+        /* climate band from the country ASHRAE zone (same screening map as the page) */
+        const zone: string = country?.environment?.ashraeClimateZone ?? '';
+        const zn = parseInt(zone, 10);
+        const climate = !zone || Number.isNaN(zn) ? 'temperate'
+            : zn <= 2 && zone.includes('A') ? 'hothumid'
+            : zn <= 3 && zone.includes('B') ? 'hotdry'
+            : zn >= 5 ? 'cold' : 'temperate';
+        const climateMult: number = wf.climateMult?.[climate] ?? 1.0;
+        /* 1 · water — WUE volume × climate, priced per kgal (municipal basis) */
+        const waterM3 = (susWaterM3() ?? 0) * climateMult;
+        const kgal = (waterM3 * 1000) / (wf.lPerGal ?? 3.785) / 1000;
+        const waterRate: number = wf.waterCostPerKgal.municipal ?? 0;
+        const waterCost = cap().inputs.deepSea ? 0 : Math.round(kgal * waterRate);
+        /* 2 · carbon — scope-2 tCO₂e × country compliance price (voluntary fallback) */
+        let scope2 = 0;
+        try {
+            const mc = (rzModels() as { carbon?: { scopes?: (inp: Record<string, unknown>) => { scope2: number } | null } }).carbon;
+            scope2 = mc?.scopes?.({ mw, pue: susPueLive() ?? 1.3, region: country?.id ?? 'US', capexUsd: 0 })?.scope2 ?? 0;
+        } catch { /* keep 0 */ }
+        const compliancePrice: number | undefined = ec.carbonPriceUsdPerT[cid];
+        const carbonRate: number = compliancePrice != null && compliancePrice > 0 ? compliancePrice : (ec.voluntaryOffsetUsdPerT ?? 10);
+        const carbonCost = Math.round(scope2 * carbonRate);
+        /* 3 · waste — general band (developed/emerging) + certified e-waste */
+        const developed = (ec.developedMarkets ?? []).includes(cid);
+        const genRate: number = ec.wasteMgmt.generalUsdPerTonne?.[developed ? 'developed' : 'emerging'] ?? (developed ? 120 : 60);
+        const wasteCost = Math.round(
+            (ec.wasteMgmt.generalTonnesPerMwItYr ?? 2.0) * mw * genRate
+            + (ec.wasteMgmt.eWasteKgPerMwItYr ?? 150) * mw * (ec.wasteMgmt.eWasteUsdPerKg ?? 1.0));
+        return { waterCost, carbonCost, wasteCost };
+    } catch { return null; }
 }

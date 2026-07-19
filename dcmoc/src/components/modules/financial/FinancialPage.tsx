@@ -228,11 +228,11 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
                             { label: 'Total Budget (Baseline)', value: fmtMoney(model.baseline), sub: 'engine capex P50', trace: 'capex.total' },
-                            { label: 'Revised Budget', value: fmtMoney(model.revised), sub: `+${fmtMoney(model.approvedRev)} approved changes` },
-                            { label: 'Total Committed', value: fmtMoney(model.committed), sub: `${Math.round((model.committed / model.revised) * 100)}% of revised` },
-                            { label: 'Total Actual (Paid)', value: fmtMoney(model.paid), sub: `${Math.round((model.paid / model.revised) * 100)}% of revised` },
-                            { label: 'Forecast at Completion', value: fmtMoney(model.fac), sub: model.planMode ? 'Plan Mode ≡ revised' : `variance ${fmtMoney(model.fac - model.revised)}` },
-                            { label: 'CPI / SPI', value: `${model.cpi} / ${model.spi}`, sub: 'from Construction EVM (single source)' },
+                            { label: 'Revised Budget', value: fmtMoney(model.revised), sub: `+${fmtMoney(model.approvedRev)} approved changes`, trace: 'fin.revisedBudget' },
+                            { label: 'Total Committed', value: fmtMoney(model.committed), sub: `${Math.round((model.committed / model.revised) * 100)}% of revised`, trace: 'fin.committed' },
+                            { label: 'Total Actual (Paid)', value: fmtMoney(model.paid), sub: `${Math.round((model.paid / model.revised) * 100)}% of revised`, trace: 'fin.paid' },
+                            { label: 'Forecast at Completion', value: fmtMoney(model.fac), sub: model.planMode ? 'Plan Mode ≡ revised' : `variance ${fmtMoney(model.fac - model.revised)}`, trace: 'fin.fac' },
+                            { label: 'CPI / SPI', value: `${model.cpi} / ${model.spi}`, sub: 'from Construction EVM (single source)', trace: 'constr.cpi' },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
@@ -290,9 +290,11 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                                                     <span className="ml-auto tabular-nums text-slate-500">{fmtMoney(r.v)}</span>
                                                 </div>
                                             ))}
-                                            <div className="border-t border-slate-200 dark:border-slate-800 pt-0.5 text-[11px] font-bold text-slate-900 dark:text-white">
-                                                {fmtMoney(model.opex.totalExtended ?? model.opex.total)} <span className="font-normal text-slate-400">/ year</span>
-                                            </div>
+                                            <TraceValue traceId="opex.totalAnnual">
+                                                <div className="border-t border-slate-200 dark:border-slate-800 pt-0.5 text-[11px] font-bold text-slate-900 dark:text-white">
+                                                    {fmtMoney(model.opex.totalExtended ?? model.opex.total)} <span className="font-normal text-slate-400">/ year</span>
+                                                </div>
+                                            </TraceValue>
                                         </div>
                                     </div>
                                 ) : <p className="text-xs text-slate-500">Engine loading…</p>}
@@ -303,7 +305,9 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                         <aside className="space-y-4 lg:sticky lg:top-4 self-start">
                             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 text-center">
                                 <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Financial Health</h3>
-                                <div className={`text-4xl font-bold ${model.grade === 'A' ? 'text-emerald-500' : model.grade === 'B' ? 'text-lime-500' : model.grade === 'C' ? 'text-amber-500' : 'text-rose-500'}`}>{model.grade}</div>
+                                <TraceValue traceId="fin.healthScore">
+                                    <div className={`text-4xl font-bold ${model.grade === 'A' ? 'text-emerald-500' : model.grade === 'B' ? 'text-lime-500' : model.grade === 'C' ? 'text-amber-500' : 'text-rose-500'}`}>{model.grade}</div>
+                                </TraceValue>
                                 <div className="text-[10px] text-slate-500">{model.health}/100 · 0.3 budget-var + 0.35 CPI + 0.35 SPI</div>
                                 <div className="mt-1.5 space-y-0.5 text-left text-[11px]">
                                     <div className="flex justify-between"><span className="text-slate-500">Budget Variance</span><span className={`tabular-nums ${Math.abs(model.fac - model.revised) / model.revised < 0.02 ? 'text-emerald-500' : 'text-amber-500'}`}>{((model.fac - model.revised) / model.revised * 100).toFixed(1)}%</span></div>
