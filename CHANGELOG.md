@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.85.2 — 2026-07-19 (DCMOC batch 3: Monte Carlo folded in + Strategic dedup + CDU rebuild with deep-sea advanced)
+
+### Changed
+- **Monte Carlo folded into Financial**: sidebar sub-menu removed; MonteCarloDashboard now lives as the "Monte Carlo Risk" tab inside the Financial Engine (deep links land there). Its analysis-local inputs (iterations/seed/variables) stay.
+- **Strategic Planning is now an OUTPUT page**: feasibility land/grid/climate auto-derive from the active candidate site (Site Intelligence) with source chips + edit-at-source links; target PUE from the engine matrix; expansion footprint/growth/horizon/capex-per-MW derive from Requirements growth, contract duration and CAPEX results. Acquisition comparables stay local (genuinely market data).
+
+### Added
+- **CDU / Liquid Cooling rebuilt**: loop hydraulics (Darcy-Weisbach ΔP, Reynolds, pump power, dew-point margin), PUE-impact panel (air vs D2C vs current from the engine matrix), refrigerant selection table (engine GWP/COP database, click-to-select shared capex field), and the **Deep-Sea Water Cooling ADVANCED section** — gated on the shared capex deep-sea tick: seawater flow, intake temp @ depth, pump station N+1, chiller-less PUE, marine CAPEX/OPEX + screening warnings, with depth/pipeline/ΔT parameters editable in place. Full-standard PDF export.
+
 ## v1.85.1 — 2026-07-19 (DCMOC batch 2: Site Intelligence full integration + Requirements 1.6 Infrastructure)
 
 ### Added

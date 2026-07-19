@@ -212,7 +212,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
         { num: 9, label: 'Asset Intelligence', icon: Activity, childIds: ['asset-health', 'asset-lifecycle', 'cbm', 'spares'] },
         { num: 10, label: 'Reliability', icon: ShieldCheck, childIds: ['risk', 'reliability'] },
         { num: 11, label: 'Sustainability', icon: Leaf, childIds: ['carbon'] },
-        { num: 12, label: 'Financial', icon: TrendingUp, childIds: ['finance', 'invest', 'montecarlo', 'portfolio', 'benchmark', 'strategic'] },
+        { num: 12, label: 'Financial', icon: TrendingUp, childIds: ['finance', 'invest', 'portfolio', 'benchmark', 'strategic'] },
         { num: 13, label: 'AI Decision Engine', icon: BrainCircuit, childIds: [] },
     ];
     // Per-engine accent (reference: color-coded number badges 1–13)

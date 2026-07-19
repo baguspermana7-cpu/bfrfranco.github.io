@@ -99,7 +99,8 @@ export default function Home() {
       case 'benchmark':
         return <BenchmarkDashboard />;
       case 'montecarlo':
-        return <MonteCarloDashboard />;
+        /* AC1: folded into Financial as a sub-tab — deep links land there */
+        return <FinancialPage initialTab="montecarlo" />;
       case 'portfolio':
         return <PortfolioDashboard />;
       case 'capacity':

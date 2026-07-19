@@ -1,8 +1,11 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
+import { useSitesStore } from '@/store/sites';
+import { useRequirementsStore } from '@/store/requirements';
+import { cagr5 } from '@/lib/requirementsMappings';
 import { getPUE } from '@/constants/pue';
 import { rzModels } from '@/lib/rz-engine';
 import { fmtMoney, fmtUnit } from '@/lib/format';
@@ -84,6 +87,60 @@ export default function StrategicPlanningDashboard() {
         capexPerMW: capexResults ? (capexResults.total / (inputs.itLoad / 1000)) : 6_000_000,
         gridReservationLeadMonths: 18,
     });
+
+    /* ── AC2 (owner): inputs are NOT re-asked here — they derive from Site
+     * Intelligence (land/grid), Requirements (growth/contract) and CAPEX.
+     * The auto-sync keeps this page an OUTPUT surface; source chips + edit
+     * links point at the owning pages. Acquisition comps stay local (market
+     * data — genuinely strategic-only). */
+    const req = useRequirementsStore();
+    const sites = useSitesStore((s) => s.sites);
+    const selectedSiteId = useSitesStore((s) => s.selectedSiteId);
+    const activeSite = sites.find((s) => s.id === selectedSiteId) ?? sites[0] ?? null;
+    const derivedFeas = useMemo(() => {
+        const acres = activeSite?.attributes.usableAcres ?? activeSite?.attributes.totalAcres ?? null;
+        const landAreaM2 = acres != null ? Math.round(acres * 4046.86) : null;
+        const gridCapacityMW = activeSite?.attributes.availableCapacityMw ?? null;
+        const ambient = activeSite?.attributes.avgAmbientC ?? null;
+        const climateZone: FeasibilityInputs['climateZone'] | null =
+            ambient == null ? (selectedCountry?.id === 'ID' || selectedCountry?.id === 'SG' || selectedCountry?.id === 'MY' ? 'tropical' : null)
+                : ambient >= 26 ? 'tropical' : ambient >= 22 ? 'arid' : ambient >= 14 ? 'temperate' : ambient >= 5 ? 'continental' : 'polar';
+        const targetPUE = getPUE(inputs.coolingType);
+        return { landAreaM2, gridCapacityMW, climateZone, targetPUE };
+    }, [activeSite, selectedCountry, inputs.coolingType]);
+    const derivedExp = useMemo(() => {
+        const y0 = inputs.itLoad / 1000;
+        const y5 = req.growth.itLoadMwByYear.y5 || 0;
+        const growthPct = y5 > 0 ? Math.round(cagr5(y0, y5) * 100) : null;
+        const horizon = req.overview.contractDurationYr === 'custom'
+            ? (req.overview.contractDurationCustom ?? 5) : Math.min(10, req.overview.contractDurationYr);
+        return { growthPct, horizon };
+    }, [inputs.itLoad, req.growth.itLoadMwByYear.y5, req.overview.contractDurationYr, req.overview.contractDurationCustom]);
+    useEffect(() => {
+        setFeasibility((f) => ({
+            ...f,
+            ...(derivedFeas.landAreaM2 != null ? { landAreaM2: derivedFeas.landAreaM2 } : {}),
+            ...(derivedFeas.gridCapacityMW != null ? { gridCapacityMW: derivedFeas.gridCapacityMW } : {}),
+            ...(derivedFeas.climateZone != null ? { climateZone: derivedFeas.climateZone } : {}),
+            targetPUE: derivedFeas.targetPUE,
+        }));
+    }, [derivedFeas]);
+    useEffect(() => {
+        setExpansion((x) => ({
+            ...x,
+            currentFootprintMW: inputs.itLoad / 1000,
+            ...(derivedExp.growthPct != null ? { yearlyDemandGrowthPct: derivedExp.growthPct } : {}),
+            planningHorizonYears: derivedExp.horizon,
+            capexPerMW: capexResults ? (capexResults.total / (inputs.itLoad / 1000)) : x.capexPerMW,
+        }));
+    }, [derivedExp, inputs.itLoad, capexResults]);
+    const SourceChip = ({ from, tab }: { from: string; tab: string }) => (
+        <button onClick={() => useSimulationStore.getState().actions.setActiveTab(tab as never)}
+            title={`Derived from ${from} — click to edit at the source`}
+            className="ml-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[8.5px] font-semibold uppercase text-emerald-500 hover:bg-emerald-500/20">
+            {from} ↗
+        </button>
+    );
 
     // --- Feasibility Calculations ---
     const feasibilityResults = useMemo(() => {
@@ -259,6 +316,7 @@ export default function StrategicPlanningDashboard() {
                         <div>
                             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1 mb-1.5">
                                 Total Land Area (m²) <Tooltip content="Total land parcel area. Roughly 40% will be usable as data hall floor, the rest used for cooling yards, access roads, substation setback, and future expansion reserve." />
+                                {derivedFeas.landAreaM2 != null && <SourceChip from="Site Intelligence" tab="site" />}
                             </label>
                             <input
                                 type="number"
@@ -272,6 +330,7 @@ export default function StrategicPlanningDashboard() {
                         <div>
                             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1 mb-1.5">
                                 Grid Capacity (MW) <Tooltip content="Committed or available grid connection capacity from the local utility. This is the hard ceiling on total facility power draw (IT + cooling + ancillaries)." />
+                                {derivedFeas.gridCapacityMW != null && <SourceChip from="Site Intelligence" tab="site" />}
                             </label>
                             <input
                                 type="number"
@@ -284,6 +343,7 @@ export default function StrategicPlanningDashboard() {
                         <div>
                             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1 mb-1.5">
                                 Climate Zone <Tooltip content="Climate directly affects PUE. Tropical climates require full mechanical cooling year-round. Polar climates can use free-cooling 80%+ of the year." />
+                                {derivedFeas.climateZone != null && <SourceChip from="Site / Country" tab="site" />}
                             </label>
                             <select
                                 className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
@@ -299,6 +359,7 @@ export default function StrategicPlanningDashboard() {
                         <div>
                             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1 mb-1.5">
                                 Target PUE <Tooltip content="Design PUE target before climate adjustment. The climate zone adds a penalty on top." />
+                                <SourceChip from="Engine PUE" tab="requirements" />
                             </label>
                             <input
                                 type="range" min={1.10} max={2.0} step={0.05}
@@ -487,6 +548,7 @@ export default function StrategicPlanningDashboard() {
                         <div>
                             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1 mb-1.5">
                                 Current Footprint (MW) <Tooltip content="Current deployed IT load capacity." />
+                                <SourceChip from="Requirements" tab="requirements" />
                             </label>
                             <input
                                 type="number" min={0.5} step={0.5}
@@ -499,6 +561,7 @@ export default function StrategicPlanningDashboard() {
                         <div>
                             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1 mb-1.5">
                                 Annual Demand Growth <Tooltip content="Expected year-over-year IT load demand growth. AI workloads drive 30-50% compound growth at many hyperscaler facilities." />
+                                {derivedExp.growthPct != null && <SourceChip from="Requirements growth" tab="requirements" />}
                             </label>
                             <input
                                 type="range" min={5} max={80} step={1}
@@ -516,6 +579,7 @@ export default function StrategicPlanningDashboard() {
                         <div>
                             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1 mb-1.5">
                                 Planning Horizon (Years) <Tooltip content="How many years to model demand growth and phased expansion." />
+                                <SourceChip from="Contract duration" tab="requirements" />
                             </label>
                             <select
                                 className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
@@ -529,6 +593,7 @@ export default function StrategicPlanningDashboard() {
                         <div>
                             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1 mb-1.5">
                                 CAPEX per MW <Tooltip content="Expected build cost per MW of IT capacity for the expansion phases." />
+                                {capexResults && <SourceChip from="CAPEX engine" tab="capex" />}
                             </label>
                             <input
                                 type="number" step={100000}

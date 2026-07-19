@@ -18,13 +18,14 @@ import { useConstructionTracking } from '@/store/constructionTracking';
 import { plannedSchedule, evm, pvCurve } from '@/state/adapters/construction-adapter';
 import { rzModels } from '@/lib/rz-engine';
 import FinancialDashboard from '@/components/modules/FinancialDashboard';
+import MonteCarloDashboard from '@/components/modules/MonteCarloDashboard';
 import { fmtMoney } from '@/lib/format';
 import { TrendingUp, ChevronRight, FileDown } from 'lucide-react';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 
 const OPEX_COLORS = ['#f59e0b', '#10b981', '#3b82f6', '#a855f7', '#64748b', '#14b8a6'];
 
-export function FinancialPage() {
+export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledger' | 'proforma' | 'montecarlo' } = {}) {
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
     const inputs = useSimulationStore((s) => s.inputs);
     const country = useSimulationStore((s) => s.selectedCountry);
@@ -32,7 +33,7 @@ export function FinancialPage() {
     const runCalculation = useCapexStore((s) => s.runCalculation);
     const fin = useFinancialTracking();
     const ct = useConstructionTracking();
-    const [tab, setTab] = React.useState<'overview' | 'ledger' | 'proforma'>('overview');
+    const [tab, setTab] = React.useState<'overview' | 'ledger' | 'proforma' | 'montecarlo'>(initialTab ?? 'overview');
     const [busy, setBusy] = React.useState(false);
 
     React.useEffect(() => { if (!results) runCalculation(); }, [results, runCalculation]);
@@ -144,7 +145,7 @@ export function FinancialPage() {
                 </div>
                 <div className="flex items-center gap-2">
                     <div className="flex rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden">
-                        {([['overview', 'Overview'], ['ledger', 'Transactions & AR/AP'], ['proforma', 'Pro Forma (Full)']] as const).map(([k, l]) => (
+                        {([['overview', 'Overview'], ['ledger', 'Transactions & AR/AP'], ['montecarlo', 'Monte Carlo Risk'], ['proforma', 'Pro Forma (Full)']] as const).map(([k, l]) => (
                             <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
                         ))}
                     </div>
@@ -154,7 +155,7 @@ export function FinancialPage() {
                 </div>
             </div>
 
-            {tab === 'proforma' ? <FinancialDashboard /> : tab === 'ledger' ? (
+            {tab === 'proforma' ? <FinancialDashboard /> : tab === 'montecarlo' ? <MonteCarloDashboard /> : tab === 'ledger' ? (
                 <div className="grid gap-4 xl:grid-cols-2">
                     <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Recent Financial Transactions {fin.touched ? '' : <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">EXAMPLE LEDGER</span>}</h2>

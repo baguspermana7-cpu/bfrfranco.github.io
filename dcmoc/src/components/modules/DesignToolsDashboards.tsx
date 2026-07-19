@@ -11,7 +11,7 @@ import React from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useRequirementsStore } from '@/store/requirements';
-import { rzModels } from '@/lib/rz-engine';
+import { rzModels, rzData } from '@/lib/rz-engine';
 import { densityToEngineBucket } from '@/lib/requirementsMappings';
 import { generatePillarPDF, type PillarReport } from '@/modules/reporting/pdf/PillarPdf';
 import {
@@ -129,23 +129,109 @@ export function FireDashboard() {
     );
 }
 
-/* ── CDU / liquid-cooling sizing (models.cdu) ── */
+/* ── CDU / liquid-cooling — Phase W rebuild ───────────────────────────────────
+ * Sections: CDU sizing + hydraulics (models.cdu) · refrigerant selection
+ * (DATA.refrigerants, shared capex refrigerantType) · PUE impact (pueMatrix
+ * liquid vs air) · DEEP-SEA ADVANCED when the shared capex deep-sea tick is
+ * ON (models.cooling.deepSea — flow, intake temp @depth, pumps, chiller-less
+ * PUE, marine capex/opex) · full-standard PDF export. */
 export function CduDashboard() {
     const { inputs } = useCfg();
-    const m = rzModels().cdu;
-    if (!m) return <Loading />;
+    const capexInputs = useCapexStore((s) => s.inputs);
+    const setCapexInputs = useCapexStore((s) => s.setInputs);
     const [dT, setDT] = React.useState(10);
-    // rich hydraulics() when present (dP, Reynolds, pump kW, dew-point margin), else basic size()
+    const [busy, setBusy] = React.useState(false);
+    const m = rzModels().cdu;
+    const dsModel = rzModels().cooling?.deepSea;
+    const data = rzData() as {
+        refrigerants?: Record<string, { label: string; gwp: number; safety: string; copIndex: number; capexMult: number; apps: string[]; note: string }>;
+        pueMatrix?: Record<string, Record<string, number>>;
+        refrigerantAutoByCooling?: Record<string, string | null>;
+    };
+    /* deep-sea advanced — gated on the SHARED capex tick (Requirements 1.6 /
+     * CAPEX drawer). Hook stays ABOVE the early return (hooks-order rule). */
+    const ds = React.useMemo(() => {
+        if (!capexInputs.deepSea || typeof dsModel !== 'function') return null;
+        try {
+            return dsModel({
+                itLoadMw: inputs.itLoad / 1000, pueTarget: 1.15,
+                depthM: capexInputs.dsDepthM ?? 60, pipelineKm: capexInputs.dsPipelineKm ?? 3, deltaTC: capexInputs.dsDeltaTC ?? 8,
+            });
+        } catch { return null; }
+    }, [capexInputs.deepSea, capexInputs.dsDepthM, capexInputs.dsPipelineKm, capexInputs.dsDeltaTC, dsModel, inputs.itLoad]);
+    if (!m) return <Loading />;
     const rich = !!m.hydraulics;
     const r = rich ? m.hydraulics({ itKw: inputs.itLoad, deltaTK: dT, supplyC: 20 }) : m.size({ itKw: inputs.itLoad, deltaT: dT });
     const liquid = inputs.coolingType === 'liquid' || inputs.coolingType === 'rdhx';
+    const tierKey = 'tier' + inputs.tierLevel;
+    const pueLiquid = data.pueMatrix?.directToChip?.[tierKey] ?? data.pueMatrix?.liquid?.[tierKey] ?? 1.15;
+    const pueAir = data.pueMatrix?.air?.[tierKey] ?? 1.5;
+    const pueCurrent = data.pueMatrix?.[inputs.coolingType]?.[tierKey] ?? (liquid ? pueLiquid : pueAir);
+    const refKey = capexInputs.refrigerantType ?? data.refrigerantAutoByCooling?.[inputs.coolingType] ?? 'R134a';
+    const refDb = data.refrigerants ?? {};
+
+    const exportPdf = async () => {
+        setBusy(true);
+        try {
+            const report: PillarReport = {
+                title: 'CDU / Liquid Cooling', layer: 'Cooling Design', project: 'DC-OS Project',
+                kpis: [
+                    { label: 'Coolant Flow', value: `${(r.flowLpm as number).toLocaleString()} L/min`, sub: `ΔT ${dT} K` },
+                    { label: 'Heat Load', value: `${(inputs.itLoad / 1000).toFixed(1)} MW`, sub: 'IT load' },
+                    { label: 'PUE (liquid basis)', value: String(pueLiquid), sub: `vs air ${pueAir}` },
+                    ...(ds ? [{ label: 'Deep-Sea PUE', value: String(ds.pue), sub: 'chiller-less basis' }] : []),
+                ],
+                config: [
+                    ['Cooling Type', inputs.coolingType], ['Tier', `Tier ${inputs.tierLevel}`], ['Loop ΔT', `${dT} K`],
+                    ['Refrigerant', refDb[refKey]?.label ?? refKey],
+                    ['Deep-Sea Cooling', capexInputs.deepSea ? `ON — ${capexInputs.dsDepthM ?? 60} m · ${capexInputs.dsPipelineKm ?? 3} km · ΔT ${capexInputs.dsDeltaTC ?? 8}°C` : 'off'],
+                ],
+                sections: [
+                    ...(rich ? [{
+                        title: 'Loop Hydraulics', head: ['Metric', 'Value'],
+                        rows: [['Flow', `${(r.flowLpm as number).toLocaleString()} L/min (${r.velocityMs} m/s)`], ['Pressure drop', `${r.dpBar} bar (Re ${(r.reynolds as number).toLocaleString()})`], ['Pump power', `${r.pumpKw} kW (${r.pumpsNplus1} pumps N+1)`], ['Dew-point margin', `${r.dewMarginK} K ${r.dewSafeOk ? '(safe)' : '(condensation risk)'}`], ['HX approach', `${r.hxApproachK} K`]],
+                    }] : []),
+                    {
+                        title: 'Refrigerant Database (engine)', head: ['Refrigerant', 'GWP', 'Safety', 'COP idx', 'CAPEX ×', 'Apps'],
+                        rows: Object.entries(refDb).map(([k, v]) => [`${v.label}${k === refKey ? ' ◀ selected' : ''}`, v.gwp, v.safety, v.copIndex, v.capexMult, v.apps.join('/')]),
+                    },
+                    ...(ds ? [{
+                        title: 'Deep-Sea Water Cooling (engine models.cooling.deepSea)', head: ['Metric', 'Value'],
+                        rows: [
+                            ['Seawater flow', `${ds.flow.m3s} m³/s (${ds.flow.m3h.toLocaleString()} m³/h)`],
+                            ['Intake temp @ depth', `${ds.intakeTempC} °C @ ${ds.depthM} m`],
+                            ['Pumps', `${ds.pumps.duty}+1 × ${ds.pumps.perPumpKw} kW (head ${ds.pumps.headM} m)`],
+                            ['Cooling power', `${ds.coolingMw} MW → pPUE ${ds.pPUE}`],
+                            ['PUE (chiller-less)', String(ds.pue)],
+                            ['Marine CAPEX', `$${(ds.capex.total / 1e6).toFixed(1)}M ($${(ds.capex.perMw / 1e3).toFixed(0)}K/MW)`],
+                            ['vs baseline cooling', `${ds.capex.vsBaselineCooling >= 0 ? '+' : ''}$${(ds.capex.vsBaselineCooling / 1e6).toFixed(1)}M`],
+                            ['OPEX', `$${(ds.opex.totalYr / 1e6).toFixed(2)}M/yr (pumps ${ds.opex.pumpMwhYr.toLocaleString()} MWh/yr)`],
+                        ],
+                    }] : []),
+                ],
+                callouts: ds && ds.warnings?.length ? ds.warnings.map((w: string) => ({ title: 'Deep-sea screening warning', body: w, tone: 'warn' as const })) : undefined,
+                note: 'Thermohydraulic sizing estimate (Darcy-Weisbach + Magnus dew point) and deep-sea screening per the engine deepSeaCooling dataset — not a hydraulic or marine design.',
+            };
+            await generatePillarPDF(report);
+        } finally { setBusy(false); }
+    };
+
     return (
         <div className="space-y-4">
-            <Head icon={Waves} title="CDU / Liquid Cooling" sub="DC-OS · models.cdu (thermohydraulic)" tone="from-cyan-500 to-blue-600" />
+            <div className="flex items-start justify-between gap-3">
+                <Head icon={Waves} title="CDU / Liquid Cooling" sub="DC-OS · models.cdu + models.cooling.deepSea + DATA.refrigerants" tone="from-cyan-500 to-blue-600" />
+                <button onClick={exportPdf} disabled={busy}
+                    className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400 disabled:opacity-50">
+                    <FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}
+                </button>
+            </div>
             {!liquid && <p className="text-[11px] text-amber-500">Current cooling is {inputs.coolingType} — CDU sizing shown for a liquid-cooled scenario.</p>}
+
+            {/* sizing + hydraulics */}
             <div className="flex items-center gap-2 text-xs">
                 <span className="text-slate-500">ΔT (K)</span>
-                <input type="range" min={5} max={20} value={dT} onChange={(e) => setDT(Number(e.target.value))} className="accent-cyan-500" />
+                <input type="range" min={5} max={20} value={dT} onChange={(e) => setDT(Number(e.target.value))} className="accent-cyan-500"
+                    title={`Loop ΔT: ${dT} K`} />
                 <span className="tabular-nums text-slate-600 dark:text-slate-300">{dT} K</span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -165,6 +251,106 @@ export function CduDashboard() {
                     <Metric label="HX Approach" value={`${r.hxApproachK} K`} sub="facility → technical" />
                 </div>
             )}
+
+            {/* PUE impact */}
+            <Card>
+                <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">PUE Impact (engine pueMatrix · Tier {inputs.tierLevel})</h3>
+                <div className="grid grid-cols-3 gap-3 text-center">
+                    <div title={`Air cooling PUE at Tier ${inputs.tierLevel}: ${pueAir}`}>
+                        <div className="text-lg font-bold tabular-nums text-slate-500">{pueAir}</div>
+                        <div className="text-[9px] uppercase text-slate-400">Air (CRAC/CRAH)</div>
+                    </div>
+                    <div title={`Direct-to-chip liquid PUE at Tier ${inputs.tierLevel}: ${pueLiquid}`}>
+                        <div className="text-lg font-bold tabular-nums text-cyan-500">{pueLiquid}</div>
+                        <div className="text-[9px] uppercase text-slate-400">D2C Liquid</div>
+                    </div>
+                    <div title={`Current (${inputs.coolingType}) PUE: ${pueCurrent}`}>
+                        <div className="text-lg font-bold tabular-nums text-violet-500">{pueCurrent}</div>
+                        <div className="text-[9px] uppercase text-slate-400">Current ({inputs.coolingType})</div>
+                    </div>
+                </div>
+                <p className="mt-1.5 text-[9px] text-slate-400">Liquid vs air saves ≈ {(inputs.itLoad / 1000 * (pueAir - pueLiquid)).toFixed(2)} MW facility power at this IT load.</p>
+            </Card>
+
+            {/* refrigerant selection */}
+            {Object.keys(refDb).length > 0 && (
+                <Card>
+                    <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Refrigerant Selection <span className="normal-case text-[9px] text-emerald-500">engine GWP/COP database · shared capex field</span></h3>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-[10.5px]">
+                            <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Refrigerant</th><th className="text-right">GWP</th><th className="text-center">Safety</th><th className="text-right">COP idx</th><th className="text-right">CAPEX ×</th><th className="text-left pl-2">Note</th></tr></thead>
+                            <tbody>
+                                {Object.entries(refDb).map(([k, v]) => (
+                                    <tr key={k} onClick={() => setCapexInputs({ refrigerantType: k })}
+                                        title={`${v.label}: GWP ${v.gwp}, safety ${v.safety} — click to select`}
+                                        className={`cursor-pointer border-b border-slate-100 dark:border-slate-800/60 ${k === refKey ? 'bg-cyan-500/10' : 'hover:bg-slate-50 dark:hover:bg-slate-800/40'}`}>
+                                        <td className="py-1 font-medium text-slate-700 dark:text-slate-200">{k === refKey ? '● ' : ''}{v.label}</td>
+                                        <td className={`text-right tabular-nums ${v.gwp > 700 ? 'text-rose-400' : v.gwp > 150 ? 'text-amber-500' : 'text-emerald-500'}`}>{v.gwp}</td>
+                                        <td className="text-center text-slate-500">{v.safety}</td>
+                                        <td className="text-right tabular-nums text-slate-500">{v.copIndex}</td>
+                                        <td className="text-right tabular-nums text-slate-500">{v.capexMult}</td>
+                                        <td className="pl-2 text-[9px] text-slate-400">{v.note.slice(0, 70)}…</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </Card>
+            )}
+
+            {/* deep-sea advanced (gated on the shared capex tick) */}
+            {capexInputs.deepSea && ds ? (
+                <Card>
+                    <h3 className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-cyan-500">
+                        Deep-Sea Water Cooling — Advanced <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[8px] font-bold text-emerald-500">ENGINE</span>
+                        <span className="text-[9px] normal-case text-slate-400">models.cooling.deepSea · {ds.mode} mode</span>
+                    </h3>
+                    <div className="mb-3 grid grid-cols-3 gap-3">
+                        <label className="block text-[10px] text-slate-500">Depth
+                            <input type="number" value={capexInputs.dsDepthM ?? 60} min={20} max={1000}
+                                onChange={(e) => setCapexInputs({ dsDepthM: Number(e.target.value) })}
+                                className="mt-0.5 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1 text-xs text-slate-900 dark:text-slate-100" /> m
+                        </label>
+                        <label className="block text-[10px] text-slate-500">Pipeline
+                            <input type="number" value={capexInputs.dsPipelineKm ?? 3} min={0.5} max={50} step={0.5}
+                                onChange={(e) => setCapexInputs({ dsPipelineKm: Number(e.target.value) })}
+                                className="mt-0.5 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1 text-xs text-slate-900 dark:text-slate-100" /> km
+                        </label>
+                        <label className="block text-[10px] text-slate-500">ΔT
+                            <input type="number" value={capexInputs.dsDeltaTC ?? 8} min={4} max={15}
+                                onChange={(e) => setCapexInputs({ dsDeltaTC: Number(e.target.value) })}
+                                className="mt-0.5 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1 text-xs text-slate-900 dark:text-slate-100" /> °C
+                        </label>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        <Metric label="Seawater Flow" value={`${ds.flow.m3s} m³/s`} sub={`${ds.flow.m3h.toLocaleString()} m³/h`} />
+                        <Metric label="Intake Temp" value={`${ds.intakeTempC} °C`} sub={`@ ${ds.depthM} m depth`} />
+                        <Metric label="Pumps" value={`${ds.pumps.duty}+1 × ${ds.pumps.perPumpKw} kW`} sub={`head ${ds.pumps.headM} m`} />
+                        <Metric label="PUE (chiller-less)" value={String(ds.pue)} sub={`pPUE ${ds.pPUE} · WUE 0`} />
+                        <Metric label="Marine CAPEX" value={`$${(ds.capex.total / 1e6).toFixed(1)}M`} sub={`$${(ds.capex.perMw / 1e3).toFixed(0)}K/MW`} />
+                        <Metric label="vs Baseline Cooling" value={`${ds.capex.vsBaselineCooling >= 0 ? '+' : ''}$${(ds.capex.vsBaselineCooling / 1e6).toFixed(1)}M`} sub="capex delta" />
+                        <Metric label="OPEX" value={`$${(ds.opex.totalYr / 1e6).toFixed(2)}M/yr`} sub={`pumps ${ds.opex.pumpMwhYr.toLocaleString()} MWh/yr`} />
+                        <Metric label="Env. ΔT" value={ds.env.deltaTCompliant ? 'Compliant' : 'Review'} sub={`redundancy ${ds.redundancy}`} />
+                    </div>
+                    {ds.warnings?.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                            {ds.warnings.map((w: string, i: number) => (
+                                <p key={i} className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-2 py-1 text-[10px] text-amber-600 dark:text-amber-400">{w}</p>
+                            ))}
+                        </div>
+                    )}
+                    <p className="mt-2 text-[9px] text-slate-400">{ds.env.note} Screening per the engine deepSeaCooling dataset — not a marine engineering design.</p>
+                </Card>
+            ) : (
+                <Card>
+                    <p className="text-[11px] text-slate-500">
+                        Deep Sea Water Cooling is <b>off</b> — enable it in
+                        <button onClick={() => useSimulationStore.getState().actions.setActiveTab('requirements' as never)} className="mx-1 text-violet-500 hover:text-violet-400">Requirements 1.6</button>
+                        or the CAPEX assumptions to unlock the advanced marine section (intake temp @ depth, seawater flow, pump energy, chiller-less PUE, marine capex/opex).
+                    </p>
+                </Card>
+            )}
+
             <Card><p className="text-[11px] text-slate-500">{rich ? 'Darcy-Weisbach ΔP (Haaland friction) + Reynolds + pump power + Magnus dew-point margin over a water/glycol loop.' : 'Coolant flow = Q/(ρ·cp·ΔT).'} Sizing estimate, not a hydraulic design.</p></Card>
         </div>
     );
