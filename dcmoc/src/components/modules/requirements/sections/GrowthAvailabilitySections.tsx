@@ -3,6 +3,7 @@
 /* ─── 1.3 Growth Plan · 1.4 Availability Target · 1.5 Business & Priority ──── */
 
 import React from 'react';
+import { useCapexStore } from '@/store/capex';
 import { useSimulationStore } from '@/store/simulation';
 import { useRequirementsStore } from '@/store/requirements';
 import { writeSharedTier } from '@/lib/requirementsMappings';
@@ -75,6 +76,11 @@ export function AvailabilitySection({ derived }: { derived: ReqDerived }) {
     const inputs = useSimulationStore((s) => s.inputs);
     const req = useRequirementsStore();
     const sla = req.availability.slaTargetPct;
+    /* CB — SLA predefined = tier availability target (standar AI-DC, editable). */
+    React.useEffect(() => {
+        if (sla == null && derived.tierTargetPct) req.actions.setAvailability({ slaTargetPct: derived.tierTargetPct });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [derived.tierTargetPct]);
     return (
         <SectionCard num="1.4" title="Availability Target" caption="Uptime Institute tier target drives the availability budget (engine-real)" id="sec-availability">
             <div className="grid gap-3 md:grid-cols-4">
@@ -88,7 +94,7 @@ export function AvailabilitySection({ derived }: { derived: ReqDerived }) {
                 <Field label="Downtime Budget">
                     <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 px-2 py-1.5 text-sm font-bold tabular-nums text-slate-900 dark:text-white">{derived.downtimeMinYr} min/yr</div>
                 </Field>
-                <Field label="SLA Target (%)" hint={sla != null && sla > derived.tierTargetPct ? 'Exceeds tier design availability!' : `Defaults to tier target`}>
+                <Field label="SLA Target (%)" hint={sla != null && sla > derived.tierTargetPct ? 'Exceeds tier design availability!' : sla === derived.tierTargetPct ? 'predefined = tier target (editable)' : 'Defaults to tier target'}>
                     <NumInput value={sla} min={90} max={100} unit="%"
                         onChange={(v) => req.actions.setAvailability({ slaTargetPct: v })} />
                 </Field>
@@ -100,11 +106,20 @@ export function AvailabilitySection({ derived }: { derived: ReqDerived }) {
 export function BusinessPrioritySection({ derived }: { derived: ReqDerived }) {
     const req = useRequirementsStore();
     const b = req.business;
+    const capexTotal = useCapexStore((s) => s.results?.total ?? null);
+    /* CB — Budget predefined = CAPEX P80 basis (P50 × 1.2 screening dari band
+     * AACE) + 1 thn opex kasar; "budget-commitment basis P80" — editable. */
+    React.useEffect(() => {
+        if (b.budgetUsd == null && capexTotal && capexTotal > 0) {
+            req.actions.setBusiness({ budgetUsd: Math.round(capexTotal * 1.2 / 1e5) * 1e5 });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [capexTotal]);
     const marginValue: ComboValue<number> = { value: b.designMarginPct, isCustom: !MARGIN_PRESETS.some((p) => p.value === b.designMarginPct) };
     return (
         <SectionCard num="1.5" title="Business, Margin & Priority" caption="Budget + design margin (flows into CAPEX contingency & financials) + project priorities" id="sec-business">
             <div className="grid gap-3 md:grid-cols-3">
-                <Field label="Budget (USD)"><NumInput value={b.budgetUsd} min={0} unit="USD" placeholder="Total budget"
+                <Field label="Budget (USD)" hint={b.budgetUsd != null && capexTotal != null && b.budgetUsd === Math.round(capexTotal * 1.2 / 1e5) * 1e5 ? 'predefined ≈ CAPEX P80 (editable)' : undefined}><NumInput value={b.budgetUsd} min={0} unit="USD" placeholder="Total budget"
                     onChange={(v) => req.actions.setBusiness({ budgetUsd: v })} /></Field>
                 <Field label="Design Margin" hint="Wired: writes CAPEX contingency % → investment cost & financial baseline move">
                     <CreatableCombobox<number> options={MARGIN_PRESETS} value={marginValue} min={0} max={30} unit="%"

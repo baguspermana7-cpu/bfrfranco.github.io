@@ -44,6 +44,16 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
     const [toast, setToast] = React.useState<string | null>(null);
     const [editRacks, setEditRacks] = React.useState(false);
 
+    /* CB — PREDEFINED (owner: "peak IT load menyamakan IT load, avg predefined,
+     * tapi editable"): kosong → auto-isi standar AI-DC; user edit → nilai manual
+     * dipertahankan. peak = itLoad; avg = 0.75 × peak (band utilisasi klaster
+     * AI 70-80%, screening). */
+    React.useEffect(() => {
+        if (w.peakItLoadKw == null && inputs.itLoad > 0) set({ peakItLoadKw: inputs.itLoad });
+        if (w.avgItLoadKw == null && inputs.itLoad > 0) set({ avgItLoadKw: Math.round(inputs.itLoad * 0.75) });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [inputs.itLoad]);
+
     const unit = w.itLoadUnit;
     const disp = (kw: number | null) => kw == null ? null : (unit === 'MW' ? +(kw / 1000).toFixed(1) : kw);
     const toKw = (v: number | null) => v == null ? null : (unit === 'MW' ? Math.round(v * 1000) : Math.round(v));
@@ -101,10 +111,12 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                     <Field label={`Peak IT Load (${unit})`} hint="Validated ≥ IT load">
                         <NumInput value={disp(w.peakItLoadKw)} min={0} unit={unit}
                             onChange={(v) => set({ peakItLoadKw: toKw(v) })} />
+                        {w.peakItLoadKw === inputs.itLoad && <span className="mt-0.5 inline-block rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] text-violet-500 dark:text-violet-300">predefined = IT Load</span>}
                     </Field>
                     <Field label={`Average IT Load (${unit})`}>
                         <NumInput value={disp(w.avgItLoadKw)} min={0} unit={unit}
                             onChange={(v) => set({ avgItLoadKw: toKw(v) })} />
+                        {w.avgItLoadKw === Math.round(inputs.itLoad * 0.75) && <span className="mt-0.5 inline-block rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] text-violet-500 dark:text-violet-300">predefined 75% peak</span>}
                     </Field>
                     {w.peakItLoadKw != null && w.peakItLoadKw < inputs.itLoad && (
                         <p className="text-[10px] text-amber-500">Peak load is below the base IT load — check the values.</p>

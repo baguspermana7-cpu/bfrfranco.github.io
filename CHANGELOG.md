@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.93.3 — 2026-07-19 (predefined values batch 1 + cascading country select)
+
+### Added
+- **Predefined values, editable** (owner mandate, first 4 fields): Peak IT Load auto = IT Load ("menyamakan"), Avg IT Load auto = 75% of peak (AI-cluster utilization band, screening), SLA Target auto = tier availability target (Uptime engine), Budget auto ≈ CAPEX P80 (P50 × AACE band factor, "budget-commitment basis") — each auto-fills ONLY when empty, violet "predefined" chip shows the basis, any manual edit is preserved.
+- **Cascading Region → Country dropdown** (owner: "40 negara kepanjangan"): CountrySelect now picks the REGION first (EMEA/APAC/AMER/MENA/AFR/LATAM), the country field lists only that region's markets; region auto-syncs on external changes (project restore). One shared component — Requirements, Site editor, Settings inherit.
+
+---
+
 ## v1.93.2 — 2026-07-19 (REAL MAP — MapLibre GL + OpenFreeMap)
 
 ### Added
