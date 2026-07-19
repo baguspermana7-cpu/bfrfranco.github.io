@@ -52,6 +52,7 @@ node   tools/audit-a11y.mjs --strict               # axe-core render gate: 0 cri
 node tools/test-datahall-calc.mjs                  # 57/57 doc-21 worked examples
 node tools/test-conv-calc.mjs                      # 22/22 conv DoD identities
 RZ_BASE=file node tools/probe-accuracy-validation.mjs   # 40/40 reviewer acceptance tests
+node tools/test-dc-corpus.mjs                      # DC corpus gate — provenance-mandatory facts + monotonic distributions (gate any corpus/aggregate change)
 node tools/test-rz-engine.mjs                      # RZEngine v2.0 — model worked examples + data invariants + reachability + provenance (gate any change to rz-engine.js)
 node tools/test-fin-engine.mjs                     # FIN Engine — ratios/valuation/technical/score worked examples + ta.js PARITY + invariants + provenance + disclaimer (gate any change to fin-engine.js)
 node tools/backtest-fin-screener.mjs               # FIN Engine — walk-forward technical-gauge backtest vs live gateway /candles (accuracy check, needs network; not a strict gate — honest verdict: gauge is descriptive not predictive)
