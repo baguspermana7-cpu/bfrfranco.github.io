@@ -5599,6 +5599,22 @@
                                 "sources": 4
                         }
                 },
+                "investment_busd": {
+                        "hyperscale": {
+                                "n": 3,
+                                "unit": "$B",
+                                "p10": 1,
+                                "p25": 1,
+                                "p50": 3.7,
+                                "p75": 16,
+                                "p90": 16,
+                                "companies": [
+                                        "Google Report 2024",
+                                        "Google Report 2025"
+                                ],
+                                "sources": 2
+                        }
+                },
                 "pue": {
                         "hyperscale": {
                                 "n": 30,
@@ -5632,6 +5648,22 @@
                                         "Microsoft"
                                 ],
                                 "sources": 5
+                        }
+                },
+                "water_million_gal": {
+                        "hyperscale": {
+                                "n": 5,
+                                "unit": "Mgal",
+                                "p10": 1.3,
+                                "p25": 2,
+                                "p50": 19,
+                                "p75": 150,
+                                "p90": 150,
+                                "companies": [
+                                        "Google Report 2024",
+                                        "Google Report 2025"
+                                ],
+                                "sources": 2
                         }
                 }
         },

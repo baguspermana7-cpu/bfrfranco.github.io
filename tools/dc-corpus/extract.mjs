@@ -19,6 +19,11 @@ const PATTERNS = [
     { metric: 'renewable_share', unit: '%', re: /renewable[^.\n]{0,60}?(\d{1,3})\s?%/gi, min: 1, max: 100 },
     { metric: 'capacity_mw', unit: 'MW', re: /(\d{2,4}(?:,\d{3})?)\s?(?:MW|megawatts?)(?!h)/gi, min: 10, max: 5000 },
     { metric: 'capex_per_mw', unit: '$M/MW', re: /\$\s?(\d{1,2}(?:\.\d)?)\s?(?:M|million)[^.\n]{0,30}?per\s?(?:MW|megawatt)/gi, min: 3, max: 30 },
+    /* round-2 patterns — phrasings actually present in operator/hyperscaler reports */
+    { metric: 'water_million_gal', unit: 'Mgal', re: /(\d{1,4}(?:,\d{3})?(?:\.\d)?)\s?million gallons/gi, min: 1, max: 100000 },
+    { metric: 'investment_busd', unit: '$B', re: /\$\s?(\d{1,3}(?:\.\d)?)\s?billion/gi, min: 0.5, max: 200 },
+    { metric: 'energy_gwh', unit: 'GWh', re: /(\d{1,5}(?:,\d{3})?)\s?GWh/gi, min: 10, max: 100000 },
+    { metric: 'wue', unit: 'L/kWh', re: /(?:WUE|water usage effectiveness)[^.\n]{0,80}?(\d\.\d{1,2})/gi, min: 0.01, max: 9 },
 ];
 
 const yearRe = /\b(20[12]\d)\b/;

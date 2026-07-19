@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.93.6 — 2026-07-19 (corpus round 2 — 92 facts, 5 metric families)
+
+### Changed
+- Corpus extractor round-2 patterns (phrasings actually present in hyperscaler reports): water (million gallons), investment ($B), energy (GWh), WUE loose-form — corpus now 92 facts across pue/capacity/renewable/water/investment; `DATA.benchmarksCorpus` regenerated (5 metric families with p10-p90 distributions), full auto-link chain green.
+
+---
+
 ## v1.93.5 — 2026-07-19 (Financial input dedup — batch 1)
 
 ### Changed
