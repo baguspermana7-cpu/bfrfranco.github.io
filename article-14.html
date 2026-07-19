@@ -3090,6 +3090,13 @@
         const constYears = parseInt(document.getElementById('constructionYears').value);
         const rd = regionData[region];
 
+        // ENGINE-BOUND (models.communityImpact.assess — single source; every inline
+        // formula below is kept verbatim as the fallback when the engine is absent)
+        var engCI = window.RZEngine && window.RZEngine.models && window.RZEngine.models.communityImpact;
+        const R = (engCI && engCI.assess)
+            ? engCI.assess({ mw: mw, regionKey: region, cooling: cooling, pue: pue, renewPct: renewPct, taxLevel: taxLevel, engagement: engagement, genType: genType, wasteHeat: wasteHeat, rateProt: rateProt, waterStrat: waterStrat, constYears: constYears })
+            : null;
+
         // === DERIVED VALUES ===
         const totalPowerMW = mw * pue;
         const annualMWh = totalPowerMW * 8760 * 0.85; // 85% utilization
@@ -3098,52 +3105,52 @@
 
         // === COSTS ===
         // 1. Bill increase — Carnegie Mellon model: grid load ratio * base bill * rate protection factor
-        const gridLoadPct = (totalPowerMW / (rd.gridGW * 1000)) * 100;
-        const billIncrease = (gridLoadPct / 100) * rd.avgBill * (1 - renewPct * 0.3) * rateProtect[rateProt];
+        const gridLoadPct = R ? R.gridLoadPct : (totalPowerMW / (rd.gridGW * 1000)) * 100;
+        const billIncrease = R ? R.billIncrease : (gridLoadPct / 100) * rd.avgBill * (1 - renewPct * 0.3) * rateProtect[rateProt];
 
         // 2. Water consumption (million litres/year)
-        const waterML = mw * coolingWater[cooling] * waterStrategy[waterStrat];
-        const waterHouseholdsNum = Math.round((waterML * 1_000_000) / (rd.householdWaterL * 365));
+        const waterML = R ? R.waterML : mw * coolingWater[cooling] * waterStrategy[waterStrat];
+        const waterHouseholdsNum = R ? R.waterHouseholds : Math.round((waterML * 1_000_000) / (rd.householdWaterL * 365));
 
         // 3. NOx emissions (tons/year) — EPA AP-42 factors
         const numGenerators = Math.ceil(totalPowerMW / 2); // 2MW per generator
-        const annualNoxTons = (numGenerators * genNoxPerMW[genType] * genHoursYear[genType]) / 1000;
+        const annualNoxTons = R ? R.annualNoxTons : (numGenerators * genNoxPerMW[genType] * genHoursYear[genType]) / 1000;
 
         // 4. Health cost (UCR/Caltech model)
-        const healthCostAnnual = annualNoxTons * healthCostPerTonNox * rd.waterStress; // water stress proxy for pop density
+        const healthCostAnnual = R ? R.healthCostAnnual : annualNoxTons * healthCostPerTonNox * rd.waterStress; // water stress proxy for pop density
 
         // 5. Noise
         const noiseBase = coolingNoise[cooling];
         const noiseMitigation = engagement === 'comprehensive' ? 10 : engagement === 'basic' ? 4 : 0;
-        const noise = Math.max(35, noiseBase - noiseMitigation);
+        const noise = R ? R.noiseDb : Math.max(35, noiseBase - noiseMitigation);
 
         // 6. Tax foregone
-        const foregoneTax = capex * rd.taxRate * (1 - taxRetain[taxLevel]);
+        const foregoneTax = R ? R.foregoneTax : capex * rd.taxRate * (1 - taxRetain[taxLevel]);
 
         // === BENEFITS ===
         // 1. Tax revenue actually collected
-        const actualTaxRev = capex * rd.taxRate * taxRetain[taxLevel] + (annualEnergyCost * 0.05);
+        const actualTaxRev = R ? R.actualTaxRev : capex * rd.taxRate * taxRetain[taxLevel] + (annualEnergyCost * 0.05);
 
         // 2. Construction jobs (temporary, during build)
-        const constJobsTotal = Math.round(mw * constJobsPerMW * rd.jobM / constYears);
+        const constJobsTotal = R ? R.constJobsTotal : Math.round(mw * constJobsPerMW * rd.jobM / constYears);
 
         // 3. Permanent direct jobs
-        const directJobs = Math.round(mw * permJobsPerMW * rd.jobM);
+        const directJobs = R ? R.directJobs : Math.round(mw * permJobsPerMW * rd.jobM);
 
         // 4. Total employment with BEA RIMS II multiplier (2.5x for DC industry)
-        const totalJobsCalc = Math.round(directJobs * 2.5) + Math.round(constJobsTotal * 0.3);
+        const totalJobsCalc = R ? R.totalJobs : Math.round(directJobs * 2.5) + Math.round(constJobsTotal * 0.3);
 
         // 5. Renewable energy capacity
-        const reCapacity = Math.round(mw * renewPct * 1.3); // 1.3x for intermittency overbuild
+        const reCapacity = R ? R.reCapacityMW : Math.round(mw * renewPct * 1.3); // 1.3x for intermittency overbuild
 
         // 6. CO2 avoided (tons/yr) from renewables
-        const co2Avoided = Math.round(reCapacity * 8760 * 0.30 * rd.carbonKg / 1000); // 30% capacity factor
+        const co2Avoided = R ? R.co2AvoidedTons : Math.round(reCapacity * 8760 * 0.30 * rd.carbonKg / 1000); // 30% capacity factor
 
         // 7. Waste heat value
-        const wasteHeatAnnual = mw * wasteHeatVal[wasteHeat] * (pue - 1) / 0.4;
+        const wasteHeatAnnual = R ? R.wasteHeatAnnual : mw * wasteHeatVal[wasteHeat] * (pue - 1) / 0.4;
 
         // 8. GDP contribution (Fortune/Harvard: ~$800K GDP per MW annually)
-        const gdpContrib = mw * 800_000 * rd.capexM;
+        const gdpContrib = R ? R.gdpContrib : mw * 800_000 * rd.capexM;
 
         // === UPDATE COST UI ===
         document.getElementById('billIncrease').textContent = '$' + billIncrease.toFixed(2);
@@ -3188,7 +3195,8 @@
         benefitScore += cbaFactor[engagement];                        // CBA engagement
 
         const net = Math.round(costScore + benefitScore);
-        const clamped = Math.max(-100, Math.min(100, net));
+        // ENGINE-BOUND net score (models.communityImpact.assess; inline composite kept as fallback)
+        const clamped = R ? R.netScore : Math.max(-100, Math.min(100, net));
         const display = document.getElementById('netScoreDisplay');
         const scoreEl = document.getElementById('netScore');
         const verdictEl = document.getElementById('netVerdict');
@@ -4530,7 +4538,7 @@
 <!-- Search: shared js/rz-command-palette.js -->
 <script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 <script src="auth.js?v=2026-07-16b" defer></script>
-<script src="rz-engine.min.js?v=2026-07-19-c40" defer></script>
+<script src="rz-engine.min.js?v=2026-07-20-b" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

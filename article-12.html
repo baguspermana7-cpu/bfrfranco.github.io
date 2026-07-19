@@ -3018,70 +3018,78 @@
             const cd = countryData[country];
             const dt = dcTypes[dcType];
 
+            // ENGINE-BOUND (models.dcValue.economicImpact — single source; every inline
+            // formula below is kept verbatim as the fallback when the engine is absent)
+            var engDV = window.RZEngine && window.RZEngine.models && window.RZEngine.models.dcValue;
+            const R = (engDV && engDV.economicImpact)
+                ? engDV.economicImpact({ countryKey: country, capacityMw: dcCapacityMW, dcType: dcType, renewableTarget: renewableTarget, pue: pue, capacityFactor: capacityFactor, projectYears: projectYears, demandResponse: demandResponse })
+                : null;
+
             // Calculate renewable percentage
             let renewablePct = 0;
-            if (renewableTarget === '100' || renewableTarget === '100_annual') renewablePct = 1.0;
+            if (R) renewablePct = R.renewablePct;
+            else if (renewableTarget === '100' || renewableTarget === '100_annual') renewablePct = 1.0;
             else if (renewableTarget === '80') renewablePct = 0.8;
             else if (renewableTarget === '50') renewablePct = 0.5;
             else renewablePct = 0;
 
             // Calculate total power (IT + overhead from PUE)
-            const totalPowerMW = dcCapacityMW * pue;
+            const totalPowerMW = R ? R.totalPowerMW : dcCapacityMW * pue;
 
             // Annual energy consumption
-            const annualMWh = totalPowerMW * 8760 * capacityFactor;
+            const annualMWh = R ? R.annualMWh : totalPowerMW * 8760 * capacityFactor;
             const annualGWh = annualMWh / 1000;
 
             // === ECONOMIC CALCULATIONS ===
-            const capex = dcCapacityMW * dt.capexPerMW * cd.capexMultiplier;
-            const annualOpex = capex * 0.07; // ~7% of CAPEX for operations
-            const annualEnergyCost = annualMWh * cd.electricityRate;
-            const taxRevenue = (annualOpex + annualEnergyCost) * cd.taxRate;
+            const capex = R ? R.capex : dcCapacityMW * dt.capexPerMW * cd.capexMultiplier;
+            const annualOpex = R ? R.annualOpex : capex * 0.07; // ~7% of CAPEX for operations
+            const annualEnergyCost = R ? R.annualEnergyCost : annualMWh * cd.electricityRate;
+            const taxRevenue = R ? R.taxRevenue : (annualOpex + annualEnergyCost) * cd.taxRate;
 
             // Jobs calculation
-            const directJobs = Math.round(dcCapacityMW * dt.jobsPerMW * cd.jobMultiplier);
-            const indirectJobs = Math.round(directJobs * 4.3); // IMPLAN multiplier
+            const directJobs = R ? R.directJobs : Math.round(dcCapacityMW * dt.jobsPerMW * cd.jobMultiplier);
+            const indirectJobs = R ? R.indirectJobs : Math.round(directJobs * 4.3); // IMPLAN multiplier
 
             // Economic multiplier effect
-            const directImpact = capex;
-            const indirectImpact = capex * 1.5;
-            const inducedImpact = capex * 0.75;
-            const totalEconomicImpact = (directImpact + indirectImpact + inducedImpact) +
+            const directImpact = R ? R.directImpact : capex;
+            const indirectImpact = R ? R.indirectImpact : capex * 1.5;
+            const inducedImpact = R ? R.inducedImpact : capex * 0.75;
+            const totalEconomicImpact = R ? R.totalEconomicImpact : (directImpact + indirectImpact + inducedImpact) +
                                        (annualOpex + annualEnergyCost) * projectYears;
 
             // === RENEWABLE & GRID CALCULATIONS ===
             // PPA capacity (1.5x overbuild for 24/7 CFE, 1.2x for annual match)
             const overbuildFactor = renewableTarget === '100' ? 1.5 : 1.2;
-            const ppaCapacityMW = Math.round(dcCapacityMW * overbuildFactor * renewablePct);
-            const ppaInvestmentValue = ppaCapacityMW * cd.ppaPrice * 20 / 1000000; // 20-year PPA value
+            const ppaCapacityMW = R ? R.ppaCapacityMW : Math.round(dcCapacityMW * overbuildFactor * renewablePct);
+            const ppaInvestmentValue = R ? R.ppaInvestmentValue : ppaCapacityMW * cd.ppaPrice * 20 / 1000000; // 20-year PPA value
 
             // Grid surplus value (E3 methodology: $33,500/MW/year)
-            const gridSurplusAnnual = dcCapacityMW * 33500;
+            const gridSurplusAnnual = R ? R.gridSurplusAnnual : dcCapacityMW * 33500;
 
             // Demand response value
             let drCapacityPct = 0;
             if (demandResponse === 'full') drCapacityPct = 0.15;
             else if (demandResponse === 'partial') drCapacityPct = 0.075;
-            const drCapacityMW = dcCapacityMW * drCapacityPct;
-            const drValueAnnual = drCapacityMW * 50000; // ~$50K/MW/year for DR participation
+            const drCapacityMW = R ? R.drCapacityMW : dcCapacityMW * drCapacityPct;
+            const drValueAnnual = R ? R.drValueAnnual : drCapacityMW * 50000; // ~$50K/MW/year for DR participation
 
             // Load factor benefit calculation
             const dcLoadFactor = capacityFactor;
             const residentialLoadFactor = 0.35;
-            const loadFactorBenefit = dcCapacityMW * 8760 * (dcLoadFactor - residentialLoadFactor) * 0.003; // $3/MWh value
+            const loadFactorBenefit = R ? R.loadFactorBenefit : dcCapacityMW * 8760 * (dcLoadFactor - residentialLoadFactor) * 0.003; // $3/MWh value
 
             // Grid reliability improvement
-            const gridReliabilityImprovement = (dcCapacityMW / cd.gridCapacityGW / 1000) * 0.5; // 0.5% per % of grid
+            const gridReliabilityImprovement = R ? R.gridReliabilityImprovement : (dcCapacityMW / cd.gridCapacityGW / 1000) * 0.5; // 0.5% per % of grid
 
             // === ENVIRONMENTAL CALCULATIONS ===
-            const baselineEmissions = annualMWh * cd.carbonIntensity / 1000000; // Million tons
-            const actualEmissions = baselineEmissions * (1 - renewablePct);
-            const co2Avoided = baselineEmissions * renewablePct;
-            const treesEquivalent = co2Avoided * 1000000 / 22; // ~22 kg CO2 per tree per year
+            const baselineEmissions = R ? R.baselineEmissions : annualMWh * cd.carbonIntensity / 1000000; // Million tons
+            const actualEmissions = R ? R.actualEmissions : baselineEmissions * (1 - renewablePct);
+            const co2Avoided = R ? R.co2Avoided : baselineEmissions * renewablePct;
+            const treesEquivalent = R ? R.treesEquivalent : co2Avoided * 1000000 / 22; // ~22 kg CO2 per tree per year
 
             // PUE efficiency comparison
             const industryAvgPUE = 1.56;
-            const pueEfficiencyGain = ((industryAvgPUE - pue) / industryAvgPUE) * 100;
+            const pueEfficiencyGain = R ? R.pueEfficiencyGain : ((industryAvgPUE - pue) / industryAvgPUE) * 100;
 
             // === UPDATE UI ===
             // Economic section
@@ -4185,7 +4193,7 @@
 <!-- Search: shared js/rz-command-palette.js -->
 <script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 <script src="auth.js?v=2026-07-16b" defer></script>
-<script src="rz-engine.min.js?v=2026-07-19-c40" defer></script>
+<script src="rz-engine.min.js?v=2026-07-20-b" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

@@ -371,11 +371,11 @@ const CapexDashboard = () => {
                             {inputs.includeFOM && (
                                 <div className="grid grid-cols-2 gap-2">
                                     <div className="space-y-1">
-                                        <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Substation <Tooltip content="Pad Mount 11kV: compact, low-cost, suits <5MW loads. Dedicated 33kV: standard for 5-20MW campuses. 66kV/132kV: transmission-level for hyperscale 50MW+ sites with direct grid tap." /></div>
+                                        <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Substation <Tooltip content="Pad Mount 11kV: compact, low-cost, suits <5MW loads. Dedicated 20\u201333kV: standard for 5-20MW campuses (PLN 20kV MV / 33kV band, same cost basis). 66kV/132kV: transmission-level for hyperscale 50MW+ sites with direct grid tap." /></div>
                                         <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.substationType}
                                             onChange={(e) => handleChange('substationType', e.target.value)}>
                                             <option value="pad_mounted_11kv">Pad Mount 11kV</option>
-                                            <option value="dedicated_33kv">Dedicated 33kV</option>
+                                            <option value="dedicated_33kv">Dedicated 20\u201333kV</option>
                                             <option value="dedicated_66kv">Dedicated 66kV</option>
                                             <option value="dedicated_132kv">Dedicated 132kV</option>
                                         </select>

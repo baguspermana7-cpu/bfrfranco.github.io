@@ -960,6 +960,133 @@ if (M.rca) {
     ok('rca.weights sum 1.0', Math.abs(Object.values(D.rcaScore.weights).reduce((a, b) => a + b, 0) - 1) < 1e-12);
 }
 
+/* A7 — resilience (article-7 promoted) — page defaults worked example */
+if (M.resilience) {
+    const a = M.resilience.assess({ redundancy: 'N+1', drillFreq: 'Annual', responseTimeMin: 15, recovery: 'Documented', crossTrainPct: 30, docCurrency: 'Outdated 1-2yr', commPlan: 'Basic', lessons: 'Ad-hoc' });
+    eq('resilience.rel N+1 = 55', a.reliabilityScore, 55);
+    eq('resilience.res defaults = 40', a.resilienceScore, 40);
+    eq('resilience.gap 15 = warning', a.gapClass, 'warning');
+    eq('resilience.relTier', a.relTier, 'Tier II Equivalent');
+    eq('resilience.resTier', a.resTier, 'Stage 3: Proactive');
+    ok('resilience.weights sum 1.0', Math.abs(D.resilience.weights.reduce((s, w) => s + w, 0) - 1) < 1e-12);
+}
+
+/* A8 — safetyCulture (article-8 promoted) — page defaults worked example */
+if (M.safetyCulture) {
+    const hi = M.safetyCulture.healthIndex({ nearMiss: 3, weakSignals: 5, audit: 12, training: 8, walks: 2, hazard: 60, meeting: 'Monthly' });
+    near('safetyCulture.total defaults = 42', hi.total, 42, 1e-9);
+    near('safetyCulture.dim0 near-miss', hi.dims[0], 30, 1e-12);
+    near('safetyCulture.drift 365d/42', M.safetyCulture.driftProbability(365, hi.total), 0.7095, 1e-9);
+    eq('safetyCulture.label 42 = Pathological', M.safetyCulture.cultureLabel(hi.total), 'Pathological');
+    ok('safetyCulture.weights sum 1.0', Math.abs(D.safetyCulture.weights.reduce((s, w) => s + w, 0) - 1) < 1e-12);
+}
+
+/* A9 — hvac (article-9 promoted) — 10 MW @ $0.10 worked example */
+if (M.hvac) {
+    const s = M.hvac.simplePueCost(10, 0.10);
+    near('hvac.simple traditional', s.traditional, 14629200, 1e-9);
+    near('hvac.simple savingsDLC', s.savingsDLC, 4555200, 1e-9);
+    eq('hvac.simple co2 31%', s.co2ReductionPct, 31);
+    const t = M.hvac.tco({ load: 10, rate: 0.10, regionKey: 'indonesia' });
+    near('hvac.tco trad npv10', t.traditional.npv10yr, 55440275.49051599, 1e-9);
+    near('hvac.tco dlc annualOpex', t.dlc.annualOpex, 2004500, 1e-9);
+    near('hvac.tco paybackDLC', t.paybackDLC, 1.184483269173823, 1e-9);
+    near('hvac.tco savingsDLC10yr', t.savingsDLC10yr, 27989917.326337874, 1e-9);
+}
+
+/* A10 — water.stressCost (article-10 promoted) — 100 MW, WUE 1.8, Jakarta */
+if (M.water && M.water.stressCost) {
+    const w = M.water.stressCost({ powerMw: 100, wue: 1.8, regionKey: 'jakarta' });
+    near('waterStress.annualCost', w.annualCost, 1892160, 1e-9);
+    near('waterStress.tco10', w.tco10, 15428945.842248302, 1e-9);
+    near('waterStress.dlcCost', w.dlcCost, 245980.8, 1e-9);
+    eq('waterStress.riskPct jakarta = 22', w.riskPremiumPct, 22);
+    near('waterStress.recyclePayback', w.recyclePayback, 59.4558599695586, 1e-9);
+    near('waterStress.nexus', w.waterEnergyNexus, 1034, 1e-9);
+}
+
+/* A12 — dcValue (article-12 promoted) — Indonesia 100 MW hyperscale worked example */
+if (M.dcValue) {
+    const v = M.dcValue.economicImpact({ countryKey: 'indonesia', capacityMw: 100, dcType: 'hyperscale', renewableTarget: '100', pue: 1.2, capacityFactor: 0.85, projectYears: 10, demandResponse: 'none' });
+    near('dcValue.capex', v.capex, 1020000000, 1e-9);
+    near('dcValue.taxRevenue', v.taxRevenue, 8575720.012799999, 1e-9);
+    eq('dcValue.directJobs', v.directJobs, 195);
+    eq('dcValue.indirectJobs', v.indirectJobs, 839);
+    eq('dcValue.ppaCapacity', v.ppaCapacityMW, 150);
+    near('dcValue.totalEconomicImpact', v.totalEconomicImpact, 4029643334.4, 1e-9);
+    near('dcValue.co2Avoided', v.co2Avoided, 545.0472, 1e-9);
+}
+
+/* A14 — communityImpact (article-14 promoted) — Virginia 100 MW worked example */
+if (M.communityImpact) {
+    const c = M.communityImpact.assess({ mw: 100, regionKey: 'virginia', cooling: 'evaporative', pue: 1.4, renewPct: 0.5, taxLevel: 'moderate', engagement: 'basic', genType: 'diesel', wasteHeat: 'none', rateProt: 'standard', waterStrat: 'standard', constYears: 2 });
+    near('communityImpact.billIncrease', c.billIncrease, 0.12461944444444446, 1e-9);
+    near('communityImpact.waterML', c.waterML, 2600, 1e-9);
+    near('communityImpact.noxTons', c.annualNoxTons, 31.5, 1e-9);
+    eq('communityImpact.netScore', c.netScore, -2);
+    eq('communityImpact.totalJobs', c.totalJobs, 825);
+    eq('communityImpact.co2Avoided', c.co2AvoidedTons, 59787);
+}
+
+/* A15 — opsBudget (article-15 promoted) — US-Virginia 10 MW in-house worked example */
+if (M.opsBudget) {
+    const inp = { countryKey: 'US-Virginia', loadMW: 10, pue: 1.40, staffModelKey: 'inhouse', retention: 85, pmRatio: 75 };
+    const o = M.opsBudget.opex(inp);
+    near('opsBudget.energy', o.energyCost, 8339520, 1e-9);
+    near('opsBudget.labor', o.laborBudget, 22700250, 1e-9);
+    near('opsBudget.maint', o.maintBudget, 1665000, 1e-9);
+    near('opsBudget.total', o.totalOpex, 32704770, 1e-9);
+    eq('opsBudget.shiftFTE', o.shiftFTE, 177);
+    const s = M.opsBudget.staffing(inp, o);
+    near('opsBudget.staffing.util', s.utilization, 79.2, 1e-9);
+    near('opsBudget.staffing.burnout', s.burnoutProb, 25.807460164972586, 1e-9);
+    near('opsBudget.staffing.retentionCost', s.retentionCost, 3783375, 1e-9);
+    eq('opsBudget.staffing.sri', s.resilienceIdx, 83);
+}
+
+/* A16 — dcMarket.bubbleRisk (article-16 promoted) — Johor preset worked example */
+if (M.dcMarket) {
+    const j = D.dcMarket.bubbleMarkets.johor;
+    const b = M.dcMarket.bubbleRisk({ op: j.op, pipe: j.pipe, pop: j.pop, absorb: j.absorb, precommit: j.precommit, spec: j.spec, demandGrowth: j.growth, costMW: j.cost, revMW: j.rev, opexRatio: j.opex, wacc: j.wacc });
+    near('dcMarket.bubble sdRatio', b.sdRatio, 5.8, 1e-9);
+    near('dcMarket.bubble yearsAbsorb', b.yearsAbsorb, 26.565, 1e-9);
+    near('dcMarket.bubble vacancy', b.actualVacancy, 40.58912102390363, 1e-9);
+    near('dcMarket.bubble npv', b.npv, -36271.9552277085, 1e-9);
+    near('dcMarket.bubble risk', b.riskScore, 92.5, 1e-9);
+
+    /* A17 — dcMarket.opportunity (article-17 promoted) — Indonesia preset worked example */
+    const io = D.dcMarket.opportunityMarkets.indonesia;
+    const p = M.dcMarket.opportunity({ op: io.op, pipe: io.pipe, pop: io.pop, digiGrowth: io.digi, sovDemand: io.sov, infCAGR: io.inf, entMigration: io.ent, buildCost: io.cost, revMW: io.rev, opexRatio: io.opex, wacc: io.wacc });
+    near('dcMarket.opp totalDemand', p.totalDemand, 4723.038919687499, 1e-9);
+    near('dcMarket.opp utilization', p.utilization, 113.94545041465621, 1e-9);
+    near('dcMarket.opp npv', p.npv, -19579.485158003277, 1e-9);
+    near('dcMarket.opp irr', p.irr, -0.06213598111657573, 1e-6);
+    near('dcMarket.opp score', p.oppScore, 66.82045317098914, 1e-9);
+    eq('dcMarket.opp jobsPerm', p.jobsPerm, 5389);
+}
+
+/* A22 — interconnect (article-22 promoted) — 8192 GPU @ 800G/5m/$0.10 worked example */
+if (M.interconnect) {
+    const c = M.interconnect.compare({ gpuCount: 8192, gpuPerRack: 8, portSpeedG: 800, linkDistM: 5, elecCostKwh: 0.10 });
+    near('interconnect.plug powerPerLink', c.pluggable.powerPerLinkW, 10.2375, 1e-9);
+    near('interconnect.cpo powerPerLink', c.cpo.powerPerLinkW, 2.475, 1e-9);
+    near('interconnect.plug annualCost', c.pluggable.annualCostUsd, 73466.2656, 1e-9);
+    near('interconnect.cpo annualCost', c.cpo.annualCostUsd, 17761.0752, 1e-9);
+    eq('interconnect.copper not viable at 5m/800G', c.copper.viable, false);
+    eq('interconnect.racks', c.racks, 1024);
+}
+
+/* A25 — gridReserve (article-25 promoted) — PJM page-default worked example */
+if (M.gridReserve) {
+    const g = M.gridReserve.adequacy({ capacity: 180, peakDemand: 150, retirements: 40, newGen: 15, dcGrowth: 10, otherGrowth: 5, reserveTarget: 15, elcc: 25 });
+    near('gridReserve.netAvailable', g.netAvailable, 147.125, 1e-9);
+    near('gridReserve.reserveMargin', g.reserveMargin, -10.833333333333334, 1e-9);
+    eq('gridReserve.blackoutRisk', g.blackoutRisk, 84);
+    near('gridReserve.auctionPrice', g.auctionPrice, 2061.3333333333335, 1e-9);
+    near('gridReserve.costImpact', g.costImpact, 108.85528833333333, 1e-9);
+    near('gridReserve.dcShare', g.dcShare, 6.0606060606060606, 1e-9);
+}
+
 /* A1 — opsMaturity (article-1 promoted) */
 if (M.opsMaturity) {
     const allThrees = [3, 3, 3, 3, 3, 3, 3, 3];
@@ -1124,6 +1251,30 @@ if (M.opex && M.opex.totalAnnual) {
     near('opex basisPresets: retailScreening power = 0.70×', rt.power / b.power, 0.70, 0.01);
     ok('opex basisPresets: staffing NOT scaled by utilization', rt.staffing === b.staffing);
     ok('opex basisPresets provenance', !!D.sources['opex.basisPresets']);
+}
+
+/* ── v2.5.2 O&M pricing tables (DN research — sourced screening bands) ── */
+{
+    const om = D.omContracts, sp = D.sparesPricing;
+    ok('omContracts present', !!om && !!om.tiers);
+    for (const t of ['comprehensive', 'preventive', 'onCall']) {
+        const b = om.tiers[t];
+        ok(`omContracts.${t} band monotonic`, b && b.low < b.mid && b.mid < b.high);
+        ok(`omContracts.${t} has scope`, typeof b.scope === 'string' && b.scope.length > 10);
+    }
+    ok('omContracts tier ordering comprehensive>preventive>onCall (mid)',
+        om.tiers.comprehensive.mid > om.tiers.preventive.mid && om.tiers.preventive.mid > om.tiers.onCall.mid);
+    ok('omContracts thirdPartyMultiplier sane', om.thirdPartyMultiplier > 0.5 && om.thirdPartyMultiplier < 1);
+    ok('omContracts agingFacilityMultiplier sane', om.agingFacilityMultiplier > 1 && om.agingFacilityMultiplier <= 2);
+    ok('omContracts sourced', !!D.sources['omContracts']);
+    ok('sparesPricing present', !!sp && !!sp.classes);
+    const cls = Object.keys(sp.classes);
+    ok('sparesPricing ≥8 classes', cls.length >= 8);
+    for (const c of cls) {
+        const b = sp.classes[c];
+        ok(`sparesPricing.${c} band monotonic + unit`, b.low < b.mid && b.mid < b.high && typeof b.unit === 'string');
+    }
+    ok('sparesPricing sourced', !!D.sources['sparesPricing']);
 }
 
 /* ── report ── */

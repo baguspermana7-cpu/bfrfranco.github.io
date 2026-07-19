@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useSimulationStore } from '@/store/simulation';
+import { explainPhaseDecision, DecisionExplain } from '@/lib/decision-explain';
 import { calculateCapacityPlan, CapacityPlanResult } from '@/modules/capacity/CapacityPlanningEngine';
 import { calculateFinancials, FinancialResult, calculateIRR } from '@/modules/analytics/FinancialEngine';
 import { calculateTaxIncentives } from '@/modules/analytics/TaxIncentiveEngine';
@@ -10,7 +11,7 @@ import { calculateGridReliability } from '@/modules/infrastructure/GridReliabili
 import { calculateTalentAvailability } from '@/modules/staffing/TalentAvailabilityEngine';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
-import { Calculator, DollarSign, TrendingUp, Target, Percent, CheckCircle2, XCircle, FileText, AlertTriangle } from 'lucide-react';
+import { Calculator, DollarSign, TrendingUp, Target, Percent, CheckCircle2, XCircle, FileText, AlertTriangle, ChevronDown, ArrowUpRight } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer,
     ComposedChart, Line, Area, Cell, ReferenceLine, LineChart,
@@ -25,14 +26,23 @@ interface PhaseFinancialResult {
     npv: number;
     payback: number;
     goNoGo: boolean;
+    explain: DecisionExplain;
 }
+
+/** Navigate the shell to the tab where a lever's parameter is fine-tuned. */
+const goToTab = (tab: string) => {
+    const { actions } = useSimulationStore.getState();
+    actions.setActiveTab(tab as Parameters<typeof actions.setActiveTab>[0]);
+};
 
 const PhasedFinancialDashboard = () => {
     const { selectedCountry, inputs } = useSimulationStore();
     const [isExporting, setIsExporting] = useState(false);
+    const [openPhase, setOpenPhase] = useState<number | null>(null);
+    const decisionRef = useRef<HTMLDivElement>(null);
 
-    const { capacityResult, phaseFinancials, blendedIrr, blendedNpv, blendedPayback, totalInvestment, profitabilityIndex, cashflowData, adjustments, scenarios, drawSchedule, totalIDC, constructionMonths, narrative } = useMemo(() => {
-        if (!selectedCountry) return { capacityResult: null, phaseFinancials: [], blendedIrr: 0, blendedNpv: 0, blendedPayback: 0, totalInvestment: 0, profitabilityIndex: 0, cashflowData: [], adjustments: { tax: 0, disaster: 0, grid: 0, talent: 0 }, scenarios: [], drawSchedule: [], totalIDC: 0, constructionMonths: 0, narrative: '' };
+    const { capacityResult, phaseFinancials, blendedIrr, blendedNpv, blendedPayback, totalInvestment, profitabilityIndex, cashflowData, adjustments, scenarios, drawSchedule, totalIDC, constructionMonths, narrative, overallExplain } = useMemo(() => {
+        if (!selectedCountry) return { capacityResult: null, phaseFinancials: [] as PhaseFinancialResult[], blendedIrr: 0, blendedNpv: 0, blendedPayback: 0, totalInvestment: 0, profitabilityIndex: 0, cashflowData: [], adjustments: { tax: 0, disaster: 0, grid: 0, talent: 0 }, scenarios: [], drawSchedule: [], totalIDC: 0, constructionMonths: 0, narrative: '', overallExplain: null as DecisionExplain | null };
 
         // 1. Get capacity plan
         const capPlan = calculateCapacityPlan({
@@ -102,10 +112,12 @@ const PhasedFinancialDashboard = () => {
             const phaseRevenue = phase.itLoadKw * 150 * 12;
             const phaseOpex = phase.itLoadKw * 50 * 12 + (gridOpexAdder + insuranceOpex + talentCostAdder) * (phase.itLoadKw / capPlan.totalItLoadKw);
 
-            const financials = calculateFinancials({
-                totalCapex: phaseCapex,
+            // ONE cashflow model for verdict AND explain — the lever bisection in
+            // decision-explain re-runs this exact function with scaled rev/capex.
+            const runPhaseModel = (mods: { revMult?: number; capexMult?: number } = {}) => calculateFinancials({
+                totalCapex: phaseCapex * (mods.capexMult ?? 1),
                 annualOpex: phaseOpex,
-                revenuePerKwMonth: 150,
+                revenuePerKwMonth: 150 * (mods.revMult ?? 1),
                 itLoadKw: phase.itLoadKw,
                 discountRate: adjustedDiscount,
                 projectLifeYears: 20,
@@ -115,6 +127,7 @@ const PhasedFinancialDashboard = () => {
                 taxRate: effectiveTaxRate,
                 depreciationYears: 20,
             });
+            const financials = runPhaseModel();
 
             phaseResults.push({
                 phaseLabel: phase.label,
@@ -123,6 +136,18 @@ const PhasedFinancialDashboard = () => {
                 npv: financials.npv,
                 payback: financials.paybackPeriodYears,
                 goNoGo: financials.irr >= hurdleRate,
+                explain: explainPhaseDecision({
+                    irrPct: financials.irr,
+                    hurdlePct: hurdleRate,
+                    npv: financials.npv,
+                    capex: phaseCapex,
+                    payback: financials.paybackPeriodYears,
+                    revenuePerKwMonth: 150,
+                    recompute: (mods) => {
+                        const f = runPhaseModel(mods);
+                        return { irrPct: f.irr, npv: f.npv };
+                    },
+                }),
             });
         }
 
@@ -131,13 +156,17 @@ const PhasedFinancialDashboard = () => {
         const weightedIrr = phaseResults.reduce((s, p) => s + p.irr * (p.capex / totalCapex), 0);
         const totalNpv = phaseResults.reduce((s, p) => s + p.npv, 0);
         const avgPayback = phaseResults.reduce((s, p) => s + p.payback * (p.capex / totalCapex), 0);
-        const pi = totalNpv > 0 ? (totalNpv + totalCapex) / totalCapex : 0;
+        /* PI = PV of benefits / investment = (NPV + Investment) / Investment.
+         * Previous code returned 0 whenever NPV ≤ 0 — a display bug: a −$34M NPV
+         * on $100M invested is PI 0.66x, not 0x. Only clamp at 0 (PV benefits
+         * cannot be negative below full capital loss). */
+        const pi = totalCapex > 0 ? Math.max(0, (totalNpv + totalCapex) / totalCapex) : 0;
 
-        // 5. Blended cashflow chart data
-        const blendedFinancials = calculateFinancials({
-            totalCapex: totalCapex,
+        // 5. Blended cashflow chart data (same closure pattern for the portfolio-level explain)
+        const runBlendedModel = (mods: { revMult?: number; capexMult?: number } = {}) => calculateFinancials({
+            totalCapex: totalCapex * (mods.capexMult ?? 1),
             annualOpex: capPlan.totalItLoadKw * 50 * 12 + gridOpexAdder + insuranceOpex + talentCostAdder,
-            revenuePerKwMonth: 150,
+            revenuePerKwMonth: 150 * (mods.revMult ?? 1),
             itLoadKw: capPlan.totalItLoadKw,
             discountRate: adjustedDiscount,
             projectLifeYears: 20,
@@ -146,6 +175,20 @@ const PhasedFinancialDashboard = () => {
             occupancyRamp: inputs.occupancyRamp.concat(Array(10).fill(0.95)),
             taxRate: effectiveTaxRate,
             depreciationYears: 20,
+        });
+        const blendedFinancials = runBlendedModel();
+
+        const overallExplain = explainPhaseDecision({
+            irrPct: weightedIrr,
+            hurdlePct: hurdleRate,
+            npv: totalNpv,
+            capex: totalCapex,
+            payback: avgPayback,
+            revenuePerKwMonth: 150,
+            recompute: (mods) => {
+                const f = runBlendedModel(mods);
+                return { irrPct: f.irr, npv: f.npv };
+            },
         });
 
         const cfData = blendedFinancials.cashflows.map(cf => ({
@@ -210,7 +253,8 @@ const PhasedFinancialDashboard = () => {
             `the blended IRR is ${weightedIrr.toFixed(1)}% against a 12% hurdle rate. ` +
             `${goPhases === phaseResults.length ? 'All phases pass the GO threshold' : `${goPhases} of ${phaseResults.length} phases meet the hurdle`}. ` +
             `Interest during construction adds ${fmtMoney(totalIDC)} to the effective cost base over ${constructionMonths} months of build activity. ` +
-            `The profitability index of ${pi.toFixed(2)}x indicates ${pi > 1.5 ? 'strong value creation' : pi > 1 ? 'positive but modest returns' : 'value destruction'}.`;
+            `The profitability index of ${pi.toFixed(2)}x indicates ${pi > 1.5 ? 'strong value creation' : pi > 1 ? 'positive but modest returns' : 'value destruction'}. ` +
+            `${overallExplain.reason}${overallExplain.levers.length > 0 ? ` ${overallExplain.levers[0].detail}` : ''}`;
 
         return {
             capacityResult: capPlan,
@@ -232,8 +276,18 @@ const PhasedFinancialDashboard = () => {
             totalIDC,
             constructionMonths,
             narrative,
+            overallExplain,
         };
     }, [selectedCountry, inputs]);
+
+    /** Open + scroll to the decision panel of the worst (lowest-IRR) phase. */
+    const openWorstPhase = () => {
+        if (phaseFinancials.length === 0) return;
+        let worst = 0;
+        phaseFinancials.forEach((p, i) => { if (p.irr < phaseFinancials[worst].irr) worst = i; });
+        setOpenPhase(worst);
+        decisionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
 
     if (!selectedCountry || !capacityResult) {
         return <div className="p-8 text-center text-slate-500">Select a country and configure capacity phases to view phased financial analysis.</div>;
@@ -276,6 +330,12 @@ const PhasedFinancialDashboard = () => {
                                 totalIDC,
                                 blendedCashflows: cashflowData,
                                 narrative,
+                                decisionExplains: phaseFinancials.map(pf => ({
+                                    label: pf.phaseLabel,
+                                    verdict: pf.explain.verdict === 'go' ? 'GO' : 'NO-GO',
+                                    reason: pf.explain.reason,
+                                    levers: pf.explain.levers.map(l => l.detail),
+                                })),
                             });
                         } catch (e) {
                             console.error('Phased Financial PDF error:', e);
@@ -297,7 +357,11 @@ const PhasedFinancialDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">Blended IRR</span>
                             <Tooltip content="Investment-weighted internal rate of return across all phases, adjusted for tax incentives and risk." />
                         </div>
-                        <div className={`text-2xl font-bold ${blendedIrr >= 12 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                        <div
+                            className={`text-2xl font-bold ${blendedIrr >= 12 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
+                            title={blendedIrr < 12 ? (overallExplain?.reason ?? 'IRR di bawah hurdle') + ' Klik untuk lihat lever per fase.' : undefined}
+                            onClick={blendedIrr < 12 ? openWorstPhase : undefined}
+                        >
                             {blendedIrr.toFixed(1)}%
                         </div>
                     </CardContent>
@@ -309,7 +373,11 @@ const PhasedFinancialDashboard = () => {
                             <DollarSign className="w-4 h-4 text-emerald-500" />
                             <span className="text-xs text-slate-500 uppercase">Total NPV</span>
                         </div>
-                        <div className={`text-2xl font-bold ${blendedNpv >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                        <div
+                            className={`text-2xl font-bold ${blendedNpv >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
+                            title={blendedNpv < 0 ? `NPV negatif ${fmtMoney(blendedNpv)} pada discount rate yang dipakai. Klik untuk lihat alasan & lever fase terlemah.` : undefined}
+                            onClick={blendedNpv < 0 ? openWorstPhase : undefined}
+                        >
                             {fmtMoney(blendedNpv)}
                         </div>
                     </CardContent>
@@ -342,7 +410,13 @@ const PhasedFinancialDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">PI</span>
                             <Tooltip content="Profitability Index: (NPV + Investment) / Investment. Above 1.0 = value-creating." />
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white">{profitabilityIndex}x</div>
+                        <div
+                            className={`text-2xl font-bold ${profitabilityIndex >= 1 ? 'text-slate-900 dark:text-white' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
+                            title={profitabilityIndex < 1 ? `PI ${profitabilityIndex}x < 1.0 — PV manfaat lebih kecil dari investasi. Klik untuk lihat lever fase terlemah.` : undefined}
+                            onClick={profitabilityIndex < 1 ? openWorstPhase : undefined}
+                        >
+                            {profitabilityIndex}x
+                        </div>
                     </CardContent>
                 </Card>
             </div>
@@ -358,9 +432,10 @@ const PhasedFinancialDashboard = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Phase Decision Matrix */}
-                <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+                <Card ref={decisionRef} className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 scroll-mt-4">
                     <CardContent className="pt-6">
-                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Investment Decision Matrix (12% Hurdle)</h3>
+                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Investment Decision Matrix (12% Hurdle)</h3>
+                        <p className="text-[11px] text-slate-400 mb-3">Klik baris untuk lihat alasan verdict &amp; lever kuantitatif — dihitung dengan bisection pada model cashflow yang sama.</p>
                         <div className="overflow-x-auto">
                             <table className="w-full text-xs">
                                 <thead>
@@ -375,28 +450,63 @@ const PhasedFinancialDashboard = () => {
                                 </thead>
                                 <tbody>
                                     {phaseFinancials.map((pf, idx) => (
-                                        <tr key={idx} className="border-b border-slate-100 dark:border-slate-800">
-                                            <td className="py-2 px-2 font-medium text-slate-900 dark:text-white">{pf.phaseLabel}</td>
-                                            <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{fmtMoney(pf.capex)}</td>
-                                            <td className={`text-right py-2 px-2 font-semibold ${pf.irr >= 12 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                {pf.irr.toFixed(1)}%
-                                            </td>
-                                            <td className={`text-right py-2 px-2 ${pf.npv >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                {fmtMoney(pf.npv)}
-                                            </td>
-                                            <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{pf.payback} yr</td>
-                                            <td className="text-center py-2 px-2">
-                                                {pf.goNoGo ? (
-                                                    <span className="inline-flex items-center gap-1 text-emerald-500 font-semibold">
-                                                        <CheckCircle2 className="w-3.5 h-3.5" /> GO
+                                        <React.Fragment key={idx}>
+                                            <tr
+                                                className="border-b border-slate-100 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                                                onClick={() => setOpenPhase(openPhase === idx ? null : idx)}
+                                                title={pf.explain.reason}
+                                            >
+                                                <td className="py-2 px-2 font-medium text-slate-900 dark:text-white">{pf.phaseLabel}</td>
+                                                <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{fmtMoney(pf.capex)}</td>
+                                                <td className={`text-right py-2 px-2 font-semibold ${pf.irr >= 12 ? 'text-emerald-500' : 'text-red-500 underline decoration-dotted underline-offset-2'}`}>
+                                                    {pf.irr.toFixed(1)}%
+                                                </td>
+                                                <td className={`text-right py-2 px-2 ${pf.npv >= 0 ? 'text-emerald-500' : 'text-red-500 underline decoration-dotted underline-offset-2'}`}>
+                                                    {fmtMoney(pf.npv)}
+                                                </td>
+                                                <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{pf.payback} yr</td>
+                                                <td className="text-center py-2 px-2">
+                                                    <span className={`inline-flex items-center gap-1 font-semibold ${pf.goNoGo ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                        {pf.goNoGo ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                                                        {pf.goNoGo ? 'GO' : 'NO-GO'}
+                                                        <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${openPhase === idx ? 'rotate-180' : ''}`} />
                                                     </span>
-                                                ) : (
-                                                    <span className="inline-flex items-center gap-1 text-red-500 font-semibold">
-                                                        <XCircle className="w-3.5 h-3.5" /> NO-GO
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
+                                                </td>
+                                            </tr>
+                                            {openPhase === idx && (
+                                                <tr className="border-b border-slate-100 dark:border-slate-800">
+                                                    <td colSpan={6} className="py-0 px-0">
+                                                        <div className={`m-2 p-3 rounded-lg border text-left ${pf.goNoGo
+                                                            ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/40'
+                                                            : 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800/40'}`}>
+                                                            <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{pf.explain.reason}</p>
+                                                            {pf.explain.levers.length > 0 && (
+                                                                <div className="mt-2">
+                                                                    <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">
+                                                                        {pf.goNoGo ? 'Margin keamanan' : 'Yang perlu diubah'}
+                                                                    </div>
+                                                                    <div className="space-y-1.5">
+                                                                        {pf.explain.levers.map((lv, li) => (
+                                                                            <button
+                                                                                key={li}
+                                                                                type="button"
+                                                                                onClick={(e) => { e.stopPropagation(); goToTab(lv.targetTab); }}
+                                                                                title={`Buka tab "${lv.targetTab}" untuk fine-tune parameter ini`}
+                                                                                className="w-full flex items-start gap-2 p-2 rounded-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition-colors text-left group"
+                                                                            >
+                                                                                <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 whitespace-nowrap">{lv.label}</span>
+                                                                                <span className="flex-1 text-[11px] text-slate-600 dark:text-slate-400 leading-snug">{lv.detail}</span>
+                                                                                <ArrowUpRight className="shrink-0 w-3.5 h-3.5 text-slate-400 group-hover:text-blue-500 mt-0.5" />
+                                                                            </button>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </React.Fragment>
                                     ))}
                                 </tbody>
                             </table>

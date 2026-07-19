@@ -31,12 +31,32 @@ export const SPARES_CLASSES: Record<SparesClassKey, { equipKey: string; critical
     pdu: { equipKey: 'pdus', criticality: 'Major', fillTargetPct: 97 },
 };
 
-/* ASSUMPTION (screening-grade, USD per repairable spare) — order-of-magnitude
- * budgetary unit costs for a stocked repairable module/part per class. NOT
- * vendor quotes; user-overridable per class in the UI. */
+/* Fallback screening unit costs — used ONLY when the engine's researched
+ * DATA.sparesPricing table (v2.5.2, sourced public list-price bands) is
+ * unavailable. User-overridable per class in the UI. */
 export const UNIT_COST_SCREENING: Record<SparesClassKey, number> = {
     ups: 45_000, generator: 120_000, chiller: 90_000, crac: 15_000, pdu: 8_000, switchgear: 25_000,
 };
+
+/* Map each spares class to its researched DATA.sparesPricing class (mid band).
+ * switchgear has no researched class yet — stays screening. */
+const SPARES_PRICE_CLASS: Partial<Record<SparesClassKey, string>> = {
+    ups: 'ups_module_50kw',
+    generator: 'genset_top_overhaul',
+    chiller: 'chiller_compressor',
+    crac: 'crah_ec_fan_kit',
+    pdu: 'pdu_breaker_mccb',
+};
+
+/** Researched engine price (mid band) else screening fallback. */
+function unitCostDefault(classKey: SparesClassKey): { cost: number; fromEngine: boolean } {
+    try {
+        const key = SPARES_PRICE_CLASS[classKey];
+        const band = key ? (rzData() as { sparesPricing?: { classes?: Record<string, { mid?: number }> } })?.sparesPricing?.classes?.[key] : undefined;
+        if (band && typeof band.mid === 'number' && band.mid > 0) return { cost: band.mid, fromEngine: true };
+    } catch { /* engine absent */ }
+    return { cost: UNIT_COST_SCREENING[classKey], fromEngine: false };
+}
 
 /* ASSUMPTION (screening-grade, USD per stockout event) — cost of an unfilled
  * critical-spare demand (expedite + downtime exposure) by criticality. */
@@ -118,7 +138,8 @@ export function computeSpares(input: SparesComputeInput): SparesResult {
 
         const ov = overrides[classKey] ?? {};
         const demandYr = (fleet * 8760) / comp.mtbf;
-        const unitCost = ov.unitCost != null ? ov.unitCost : UNIT_COST_SCREENING[classKey];
+        const priceDefault = unitCostDefault(classKey);
+        const unitCost = ov.unitCost != null ? ov.unitCost : priceDefault.cost;
         const leadWeeks = ov.leadWeeks != null ? ov.leadWeeks : lead.weeks;
         const fillTargetPct = ov.fillRatePct != null ? ov.fillRatePct : def.fillTargetPct;
 
@@ -152,7 +173,7 @@ export function computeSpares(input: SparesComputeInput): SparesResult {
             usedPoissonMode: !!nv.usedPoissonMode,
             prov: {
                 mtbf: 'engine',
-                unitCost: ov.unitCost != null ? 'user' : 'screening',
+                unitCost: ov.unitCost != null ? 'user' : (priceDefault.fromEngine ? 'engine' : 'screening'),
                 leadWeeks: ov.leadWeeks != null ? 'user' : 'screening',
             },
         }];

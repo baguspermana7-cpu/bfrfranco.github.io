@@ -10,6 +10,7 @@ import { ASSETS } from '@/constants/assets';
 import { COUNTRIES } from '@/constants/countries';
 import { getPUE } from '@/constants/pue';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
+import { rzData } from '@/lib/rz-engine';
 import {
     Users, Wrench, Activity, AlertTriangle, ShieldAlert,
     ArrowRight, TrendingUp, DollarSign, CloudFog, Globe2, Zap
@@ -22,22 +23,6 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsToolti
 import { PageTransition, CardMotion } from '@/components/ui/MotionWrapper';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Region-grouped countries (same pattern as CapexDashboard)
-const REGIONS = Object.values(COUNTRIES).reduce((acc, c) => {
-    if (!acc[c.region]) acc[c.region] = [];
-    acc[c.region].push(c);
-    return acc;
-}, {} as Record<string, typeof COUNTRIES[keyof typeof COUNTRIES][]>);
-
-const REGION_LABELS: Record<string, string> = {
-    'APAC': '🌏 Asia Pacific',
-    'EMEA': '🌍 Europe',
-    'AMER': '🌎 Americas',
-    'MENA': '🏜️ Middle East',
-    'AFR': '🌍 Africa',
-    'LATAM': '🌎 Latin America',
-};
-
 export function SimulationDashboard() {
     const { selectedCountry, inputs, actions, isLoading } = useSimulationStore();
     const effectiveInputs = useEffectiveInputs();
@@ -48,7 +33,18 @@ export function SimulationDashboard() {
     const [scenarioTurnover, setScenarioTurnover] = useState(inputs.turnoverRate ?? 0.09);
     const [showWizard, setShowWizard] = useState(false);
     const [simYear, setSimYear] = useState(new Date().getFullYear());
-    const [selectedRegion, setSelectedRegion] = useState(selectedCountry?.region || 'APAC');
+    /* PREDEFINED sliders (owner): AQI baseline = country environment table;
+     * turnover baseline = engine attrition avg. Manual slide = override (touched);
+     * country change re-seeds only untouched sliders. */
+    const baselineAqi = selectedCountry?.environment?.baselineAQI ?? 50;
+    const baselineTurnover = (rzData()?.attritionFactors?.voluntaryAttritionAvg as number | undefined) ?? 0.15;
+    const [aqiTouched, setAqiTouched] = useState(inputs.aqiOverride != null && inputs.aqiOverride !== baselineAqi);
+    const [turnoverTouched, setTurnoverTouched] = useState(false);
+    const [showLossDetail, setShowLossDetail] = useState(false);
+    useEffect(() => {
+        if (!aqiTouched) setScenarioAQI(baselineAqi);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedCountry?.id]);
 
     // Simulation Trigger Logic
     useEffect(() => {
@@ -69,13 +65,6 @@ export function SimulationDashboard() {
         }, 500);
         return () => clearTimeout(timer);
     }, [scenarioAQI, scenarioTurnover]);
-
-    // Sync region when country changes externally (e.g. scenario load)
-    useEffect(() => {
-        if (selectedCountry && selectedCountry.region !== selectedRegion) {
-            setSelectedRegion(selectedCountry.region);
-        }
-    }, [selectedCountry?.id]);
 
     const results = useMemo(() => {
         if (!selectedCountry) return null;
@@ -103,6 +92,9 @@ export function SimulationDashboard() {
             eng.headcount
         );
         const turnoverAmortizedMonthly = (coT.totalAnnualCost / 12) * laborMultiplier;
+        /* Delta vs engine-baseline turnover — the quantified lever for the Hidden-Loss explain panel */
+        const coTBaseline = calculateTurnoverCost('Duty Engineer', selectedCountry.labor.baseSalary_Engineer, selectedCountry, baselineTurnover, eng.headcount);
+        const lossSavedAtBaseline = Math.max(0, ((coT.totalAnnualCost - coTBaseline.totalAnnualCost) / 12) * laborMultiplier);
 
         // 2. Maintenance Calculation (Filter Life)
         // Filter Asset (PAC Unit G4)
@@ -176,7 +168,7 @@ export function SimulationDashboard() {
         return {
             eng, coT, filterLife, risk, finalMonthlyStaffCost,
             aqiLaborPunishment, turnoverAmortizedMonthly, strategyMultiplier,
-            partsCost, aqiConsumablePenalty,
+            partsCost, aqiConsumablePenalty, lossSavedAtBaseline,
             laborMultiplier, partsMultiplier,
             monthlyInternalCost,
             headcount: eng.headcount,
@@ -189,14 +181,14 @@ export function SimulationDashboard() {
             downtimeMinutes: risk.expectedDowntimeMinutes,
             financialRisk: risk.financialImpact
         };
-    }, [selectedCountry, inputs.shiftModel, scenarioAQI, scenarioTurnover, inputs.tierLevel, inputs.maintenanceModel, inputs.hybridRatio, simYear]);
+    }, [selectedCountry, inputs.shiftModel, scenarioAQI, scenarioTurnover, inputs.tierLevel, inputs.maintenanceModel, inputs.hybridRatio, simYear, baselineTurnover]);
 
     if (!selectedCountry || !results) return null;
 
     const {
         eng, coT, filterLife, risk, finalMonthlyStaffCost,
         aqiLaborPunishment, turnoverAmortizedMonthly, strategyMultiplier,
-        partsCost, aqiConsumablePenalty, laborMultiplier
+        partsCost, aqiConsumablePenalty, laborMultiplier, lossSavedAtBaseline
     } = results;
 
     return (
@@ -244,45 +236,25 @@ export function SimulationDashboard() {
                         </div>
                     </h2>
 
-                    {/* Region & Country Selector */}
-                    <div className="mb-8 space-y-3">
+                    {/* Location — DERIVED from the shared project country (owner: no duplicate
+                        re-input; the single input lives in Requirements 1.1) */}
+                    <div className="mb-8 space-y-2">
                         <label className="text-xs font-semibold text-slate-700 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                            <Globe2 className="w-3 h-3" /> Region & Country
-                            <Tooltip content="Select datacenter location. Costs, regulations, and labor markets vary by country." />
+                            <Globe2 className="w-3 h-3" /> Location
+                            <Tooltip content="Lokasi project (satu sumber, diinput di Requirements 1.1). Biaya, regulasi, dan pasar tenaga kerja mengikuti negara ini." />
                         </label>
-                        <select
-                            className="w-full p-2 border border-slate-300 dark:border-slate-700 rounded-md text-sm text-slate-900 dark:text-white bg-white dark:bg-slate-800 focus:ring-2 focus:ring-cyan-500 outline-none"
-                            value={selectedRegion}
-                            onChange={(e) => {
-                                const newRegion = e.target.value as 'APAC' | 'EMEA' | 'AMER' | 'MENA' | 'AFR' | 'LATAM';
-                                setSelectedRegion(newRegion);
-                                const countriesInRegion = REGIONS[newRegion];
-                                if (countriesInRegion && countriesInRegion.length > 0) {
-                                    actions.selectCountry(countriesInRegion[0].id);
-                                }
-                            }}
-                        >
-                            {Object.keys(REGIONS).sort().map(region => (
-                                <option key={region} value={region}>
-                                    {REGION_LABELS[region] || region}
-                                </option>
-                            ))}
-                        </select>
-                        <select
-                            className="w-full p-2 border border-slate-300 dark:border-slate-700 rounded-md text-sm text-slate-900 dark:text-white bg-white dark:bg-slate-800 focus:ring-2 focus:ring-cyan-500 outline-none"
-                            value={selectedCountry?.id || ''}
-                            onChange={(e) => actions.selectCountry(e.target.value)}
-                        >
-                            {(REGIONS[selectedRegion] || []).map(c => (
-                                <option key={c.id} value={c.id}>
-                                    {c.name} ({c.id})
-                                </option>
-                            ))}
-                        </select>
+                        <div className="flex items-center justify-between rounded-md border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/60 px-3 py-2">
+                            <span className="text-sm text-slate-900 dark:text-white">
+                                {selectedCountry ? `${selectedCountry.name} (${selectedCountry.id})` : '—'}
+                                <span className="ml-2 rounded bg-emerald-500/15 px-1 text-[9px] font-bold text-emerald-500">project</span>
+                            </span>
+                            <button onClick={() => actions.setActiveTab('requirements')}
+                                className="text-[11px] text-violet-500 hover:underline">Edit di Requirements ↗</button>
+                        </div>
                     </div>
                     <div className="mb-8">
                         <label className="text-xs font-semibold text-slate-700 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                            Simulation Year <Tooltip content={`Projects costs into the future using inflation and yearly benefit escalation constants. Multiplier: x${laborMultiplier.toFixed(2)}`} />
+                            Simulation Year <Tooltip content={`Kontrol analisis halaman ini (BUKAN duplikat requirement): memproyeksikan biaya staf ke tahun operasi memakai eskalasi inflasi/benefit. Multiplier: x${laborMultiplier.toFixed(2)}. Basis COD project ada di Requirements 1.1.`} />
                         </label>
                         <select
                             className="w-full p-2 border border-slate-300 dark:border-slate-700 rounded-md text-sm text-slate-900 dark:text-white bg-white dark:bg-slate-800 focus:ring-2 focus:ring-cyan-500 outline-none"
@@ -344,9 +316,17 @@ export function SimulationDashboard() {
                             min="10"
                             max="300"
                             value={scenarioAQI}
-                            onChange={(e) => setScenarioAQI(Number(e.target.value))}
+                            onChange={(e) => { setScenarioAQI(Number(e.target.value)); setAqiTouched(true); }}
                             className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
                         />
+                        <div className="mt-1 flex items-center gap-2 text-[10px]">
+                            {scenarioAQI === baselineAqi
+                                ? <span className="rounded bg-cyan-500/15 px-1.5 py-0.5 font-bold text-cyan-500" title={`Predefined dari tabel environment negara ${selectedCountry.name} (baselineAQI) — geser untuk override manual`}>≡ baseline {selectedCountry.id}: {baselineAqi} AQI</span>
+                                : <>
+                                    <span className="rounded bg-violet-500/15 px-1.5 py-0.5 font-bold text-violet-500">manual override</span>
+                                    <button className="text-cyan-500 hover:underline" onClick={() => { setScenarioAQI(baselineAqi); setAqiTouched(false); }}>reset ke baseline {selectedCountry.id} ({baselineAqi})</button>
+                                </>}
+                        </div>
                         <div className="flex justify-between mt-2 text-sm">
                             <span className="text-slate-500 dark:text-slate-400 flex items-center">Low (10) <Tooltip content="AQI 0-50: Good air quality, minimal equipment impact. AQI 150-300: Hazardous — accelerated filter degradation, increased cooling load, potential facility shutdown." /></span>
                             <span className="text-slate-900 dark:text-white font-bold">{scenarioAQI} AQI</span>
@@ -372,18 +352,65 @@ export function SimulationDashboard() {
                             max="0.5"
                             step="0.01"
                             value={scenarioTurnover}
-                            onChange={(e) => setScenarioTurnover(Number(e.target.value))}
+                            onChange={(e) => { setScenarioTurnover(Number(e.target.value)); setTurnoverTouched(true); }}
                             className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
                         />
+                        <div className="mt-1 flex items-center gap-2 text-[10px]">
+                            {Math.abs(scenarioTurnover - baselineTurnover) < 0.005
+                                ? <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 font-bold text-emerald-500" title="Predefined dari engine DATA.attritionFactors.voluntaryAttritionAvg (sourced) — geser untuk override manual">≡ engine baseline: {(baselineTurnover * 100).toFixed(0)}%</span>
+                                : <>
+                                    <span className="rounded bg-violet-500/15 px-1.5 py-0.5 font-bold text-violet-500">manual override</span>
+                                    <button className="text-cyan-500 hover:underline" onClick={() => { setScenarioTurnover(baselineTurnover); setTurnoverTouched(false); }}>reset ke engine baseline ({(baselineTurnover * 100).toFixed(0)}%)</button>
+                                </>}
+                        </div>
                         <div className="flex justify-between mt-2 text-sm items-center">
                             <span className="text-slate-500 dark:text-slate-400 flex items-center text-xs">0% <Tooltip content="Annual employee turnover rate. Industry average 10-15%. Higher turnover increases recruitment costs and reduces operational continuity." /></span>
                             <span className="text-slate-900 dark:text-white font-bold">{(scenarioTurnover * 100).toFixed(0)}%</span>
                             <span className="text-slate-500 dark:text-slate-400 text-xs">50%</span>
                         </div>
-                        <div className="mt-2 text-xs text-amber-400 bg-amber-950/20 p-2 rounded flex items-center gap-2">
+                        <button onClick={() => setShowLossDetail((v) => !v)}
+                            title="Klik: kenapa angka ini muncul, parameter penyebab, dan yang perlu diubah"
+                            className="mt-2 w-full text-left text-xs text-amber-400 bg-amber-950/20 p-2 rounded flex items-center gap-2 hover:bg-amber-950/40 transition-colors">
                             <DollarSign className="w-3 h-3" />
                             +{fmtMoneyFull(turnoverAmortizedMonthly)} Monthly Hidden Loss
-                        </div>
+                            <span className="ml-auto text-[9px] text-amber-500/80">{showLossDetail ? '▾ tutup' : '▸ kenapa?'}</span>
+                        </button>
+                        {showLossDetail && (
+                            <div className="mt-1 rounded border border-amber-500/30 bg-slate-900/60 p-2 text-[11px] text-slate-300 space-y-1.5">
+                                <div>
+                                    <span className="font-bold text-amber-400">Kenapa:</span>{' '}
+                                    ceil({eng.headcount} FTE × {(scenarioTurnover * 100).toFixed(0)}% turnover) = {Math.ceil(eng.headcount * scenarioTurnover)} penggantian/thn
+                                    × {fmtMoneyFull(coT.totalCostPerHire)}/hire ÷ 12 × eskalasi {laborMultiplier.toFixed(2)}.
+                                </div>
+                                <div className="text-slate-400">
+                                    Per hire: severance {fmtMoneyFull(coT.separationCost)} + rekrutmen {fmtMoneyFull(coT.replacementCost)} + training {fmtMoneyFull(coT.trainingCost)} + ramp-up produktivitas {fmtMoneyFull(coT.productivityLoss)}
+                                    {' '}(basis gaji engineer {selectedCountry.name}: {fmtMoneyFull(selectedCountry.labor.baseSalary_Engineer)}/bln — tabel labor per negara).
+                                </div>
+                                <div className="font-bold text-slate-200">Yang perlu diubah:</div>
+                                <ul className="space-y-1">
+                                    {scenarioTurnover > baselineTurnover + 0.004 && (
+                                        <li>
+                                            <button className="text-cyan-400 hover:underline" onClick={() => { setScenarioTurnover(baselineTurnover); setTurnoverTouched(false); }}>
+                                                ▸ Turunkan turnover ke baseline {(baselineTurnover * 100).toFixed(0)}% → hemat {fmtMoneyFull(lossSavedAtBaseline)}/bln
+                                            </button>{' '}
+                                            <span className="text-slate-500">(program retensi/benefit — lihat tabel benefit negara)</span>
+                                        </li>
+                                    )}
+                                    {inputs.shiftModel === '8h' && (
+                                        <li>
+                                            <button className="text-cyan-400 hover:underline" onClick={() => actions.setInputs({ shiftModel: '12h' })}>
+                                                ▸ Shift 12h (2 tim) → headcount turun → paparan turnover mengecil
+                                            </button>
+                                        </li>
+                                    )}
+                                    <li>
+                                        <button className="text-cyan-400 hover:underline" onClick={() => actions.setActiveTab('requirements')}>
+                                            ▸ Basis gaji mengikuti negara project — ubah lokasi di Requirements ↗
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        )}
                     </div>
 
                 </div>

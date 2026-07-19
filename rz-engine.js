@@ -5716,6 +5716,231 @@
             backlogWeight: { base: 0.3, perMonthAge: 0.02, cap: 0.5 }
         },
 
+        /* ── A7: reliability-vs-resilience assessment (article-7). ── */
+        resilience: {
+            reliabilityMap: { 'N': 35, 'N+1': 55, '2N': 75, '2N+1': 95 },   // design-redundancy score
+            maps: {
+                drill:    { 'Never': 0, 'Annual': 40, 'Quarterly': 70, 'Monthly': 100 },
+                recovery: { 'None': 0, 'Documented': 30, 'Tested Annually': 60, 'Tested Quarterly': 100 },
+                doc:      { 'Outdated >2yr': 0, 'Outdated 1-2yr': 30, 'Current <1yr': 70, 'Real-time updated': 100 },
+                comm:     { 'None': 0, 'Basic': 30, 'Detailed': 60, 'Tested & Drilled': 100 },
+                lessons:  { 'None': 0, 'Ad-hoc': 25, 'Structured': 65, 'Integrated into design': 100 }
+            },
+            /* drill / response / recovery / cross-train / doc / comm / lessons */
+            weights: [0.15, 0.20, 0.15, 0.10, 0.15, 0.10, 0.15],
+            responseTargetMin: 60,                                          // response score = (1 - min/60)
+            gapBands: { critical: 30, warning: 15 }
+        },
+
+        /* ── A8: safety-culture health index (article-8). ── */
+        safetyCulture: {
+            /* near-miss / weak-signals / audit / training / walkarounds / hazard / meetings */
+            weights: [0.15, 0.15, 0.10, 0.15, 0.10, 0.20, 0.15],
+            norms: { nearMissPerMonth: 10, weakSignalsPerMonth: 15, auditFindingsMax: 30, trainingHrsPerQuarter: 20, walksPerMonth: 8 },
+            meetingMap: { 'None': 0, 'Monthly': 40, 'Bi-weekly': 70, 'Weekly': 100 },
+            drift: { shortDays: 180, shortScore: 50, longDays: 365, longScore: 70, cap: 0.99 }
+        },
+
+        /* ── A9: HVAC cooling-architecture TCO (article-9). ── */
+        hvacCooling: {
+            simplePue: { traditional: 1.67, hybrid: 1.35, dlc: 1.15 },      // quick PUE-cost comparison
+            regions: {
+                indonesia: { pueTraditional: 1.75, pueHybrid: 1.45, pueDLC: 1.25, co2Factor: 0.78, waterFactor: 1.15, freeHours: 600,  label: 'Indonesia (Tropical)' },
+                singapore: { pueTraditional: 1.72, pueHybrid: 1.42, pueDLC: 1.22, co2Factor: 0.41, waterFactor: 1.10, freeHours: 500,  label: 'Singapore (Tropical)' },
+                india:     { pueTraditional: 1.70, pueHybrid: 1.38, pueDLC: 1.20, co2Factor: 0.82, waterFactor: 1.30, freeHours: 2200, label: 'India (Mixed)' },
+                uae:       { pueTraditional: 1.80, pueHybrid: 1.50, pueDLC: 1.30, co2Factor: 0.58, waterFactor: 1.60, freeHours: 800,  label: 'UAE (Hot-Arid)' },
+                virginia:  { pueTraditional: 1.55, pueHybrid: 1.28, pueDLC: 1.12, co2Factor: 0.39, waterFactor: 0.85, freeHours: 5500, label: 'Virginia, USA' },
+                frankfurt: { pueTraditional: 1.50, pueHybrid: 1.25, pueDLC: 1.10, co2Factor: 0.35, waterFactor: 0.75, freeHours: 6200, label: 'Frankfurt, Germany' },
+                stockholm: { pueTraditional: 1.35, pueHybrid: 1.15, pueDLC: 1.05, co2Factor: 0.01, waterFactor: 0.60, freeHours: 7800, label: 'Stockholm, Sweden' },
+                ireland:   { pueTraditional: 1.40, pueHybrid: 1.20, pueDLC: 1.08, co2Factor: 0.30, waterFactor: 0.70, freeHours: 7000, label: 'Ireland (Maritime)' }
+            },
+            configs: {
+                traditional: { capexPerMW: 800000,  opexFactor: 1.0,  maintenancePerMW: 50000, pueKey: 'pueTraditional' },
+                hybrid:      { capexPerMW: 1100000, opexFactor: 0.75, maintenancePerMW: 65000, pueKey: 'pueHybrid' },
+                dlc:         { capexPerMW: 1400000, opexFactor: 0.55, maintenancePerMW: 80000, pueKey: 'pueDLC' }
+            },
+            discountRate: 0.08, tcoYears: 10,
+            coolingEnergyFactor: { dlc: 0.55, hybrid: 0.75 },               // residual cooling kWh share
+            waterGalPerKwh: { evaporative: 1.8, dlc: 0.2 },
+            retrainPerMwUsd: 25000, phasedOverheadPct: 0.12,
+            downtimeHrPerMw: { phased: 4.5, full: 12 },
+            irrApproxFactor: 0.85
+        },
+
+        /* ── A10: SEA water-stress cost model (article-10). ── */
+        waterStress: {
+            regions: {
+                jakarta:     { name: 'Jakarta/Bekasi', stressScore: 4.8, waterPrice: 1.20, riskScore: 92, aquiferDrop: 25, regSeverity: 88, altSource: 15, climateProjection: 5.2, communityIdx: 85, rainfall: 1800 },
+                singapore:   { name: 'Singapore',      stressScore: 3.8, waterPrice: 2.80, riskScore: 65, aquiferDrop: 0,  regSeverity: 72, altSource: 70, climateProjection: 4.2, communityIdx: 30, rainfall: 2340 },
+                johor:       { name: 'Johor Bahru',    stressScore: 1.5, waterPrice: 0.80, riskScore: 25, aquiferDrop: 3,  regSeverity: 25, altSource: 65, climateProjection: 1.8, communityIdx: 20, rainfall: 2200 },
+                hanoi:       { name: 'Hanoi',          stressScore: 2.2, waterPrice: 0.55, riskScore: 40, aquiferDrop: 8,  regSeverity: 35, altSource: 55, climateProjection: 2.8, communityIdx: 35, rainfall: 1680 },
+                danang:      { name: 'Da Nang',        stressScore: 1.0, waterPrice: 0.45, riskScore: 18, aquiferDrop: 2,  regSeverity: 18, altSource: 72, climateProjection: 1.4, communityIdx: 15, rainfall: 2500 },
+                bangkok:     { name: 'Bangkok',        stressScore: 2.8, waterPrice: 0.90, riskScore: 55, aquiferDrop: 12, regSeverity: 52, altSource: 40, climateProjection: 3.5, communityIdx: 45, rainfall: 1500 },
+                manila:      { name: 'Manila',         stressScore: 3.5, waterPrice: 1.10, riskScore: 72, aquiferDrop: 18, regSeverity: 65, altSource: 28, climateProjection: 4.0, communityIdx: 68, rainfall: 1800 },
+                kualalumpur: { name: 'Kuala Lumpur',   stressScore: 2.0, waterPrice: 0.70, riskScore: 35, aquiferDrop: 5,  regSeverity: 30, altSource: 58, climateProjection: 2.3, communityIdx: 25, rainfall: 2400 }
+            },
+            escalation: 0.03, discountRate: 0.08, tcoYears: 10,
+            industryAvgWue: 1.1, targetWue: 0.5,
+            dlcWueFactor: 0.13, hybridWueFactor: 0.565,                     // WUE retained vs evaporative
+            riskPremiumBands: [ { min: 80, pct: 22 }, { min: 60, pct: 14 }, { min: 40, pct: 8 }, { min: 0, pct: 3 } ],
+            recycle: { capexPerMw: 450000, savingFraction: 0.4 },
+            nexus: { baseKwhPerMl: 650, perStressScore: 80 }
+        },
+
+        /* ── A12: DC economic/community value model (article-12). ── */
+        dcValue: {
+            countries: {
+                indonesia:      { name: 'Indonesia',        electricityRate: 0.072, carbonIntensity: 610, capexMultiplier: 0.85, jobMultiplier: 1.3,  taxRate: 0.12,  ppaPrice: 380000, gridCapacityGW: 70 },
+                malaysia:       { name: 'Malaysia',         electricityRate: 0.097, carbonIntensity: 580, capexMultiplier: 0.9,  jobMultiplier: 1.2,  taxRate: 0.15,  ppaPrice: 400000, gridCapacityGW: 35 },
+                singapore:      { name: 'Singapore',        electricityRate: 0.18,  carbonIntensity: 400, capexMultiplier: 1.3,  jobMultiplier: 0.8,  taxRate: 0.17,  ppaPrice: 550000, gridCapacityGW: 14 },
+                thailand:       { name: 'Thailand',         electricityRate: 0.11,  carbonIntensity: 500, capexMultiplier: 0.88, jobMultiplier: 1.15, taxRate: 0.13,  ppaPrice: 390000, gridCapacityGW: 50 },
+                vietnam:        { name: 'Vietnam',          electricityRate: 0.084, carbonIntensity: 550, capexMultiplier: 0.82, jobMultiplier: 1.4,  taxRate: 0.10,  ppaPrice: 360000, gridCapacityGW: 80 },
+                philippines:    { name: 'Philippines',      electricityRate: 0.18,  carbonIntensity: 620, capexMultiplier: 0.95, jobMultiplier: 1.25, taxRate: 0.14,  ppaPrice: 420000, gridCapacityGW: 25 },
+                us_virginia:    { name: 'US - Virginia',    electricityRate: 0.065, carbonIntensity: 350, capexMultiplier: 1.0,  jobMultiplier: 1.0,  taxRate: 0.21,  ppaPrice: 450000, gridCapacityGW: 180 },
+                us_texas:       { name: 'US - Texas',       electricityRate: 0.055, carbonIntensity: 420, capexMultiplier: 0.95, jobMultiplier: 1.05, taxRate: 0.18,  ppaPrice: 400000, gridCapacityGW: 85 },
+                eu_ireland:     { name: 'EU - Ireland',     electricityRate: 0.22,  carbonIntensity: 320, capexMultiplier: 1.15, jobMultiplier: 0.9,  taxRate: 0.125, ppaPrice: 500000, gridCapacityGW: 11 },
+                eu_netherlands: { name: 'EU - Netherlands', electricityRate: 0.20,  carbonIntensity: 380, capexMultiplier: 1.2,  jobMultiplier: 0.85, taxRate: 0.25,  ppaPrice: 520000, gridCapacityGW: 31 }
+            },
+            dcTypes: {
+                hyperscale: { capexPerMW: 12000000, jobsPerMW: 1.5, pueRange: [1.1, 1.25] },
+                colocation: { capexPerMW: 10000000, jobsPerMW: 2.0, pueRange: [1.3, 1.5] },
+                enterprise: { capexPerMW: 15000000, jobsPerMW: 2.5, pueRange: [1.5, 1.8] },
+                ai_hpc:     { capexPerMW: 18000000, jobsPerMW: 1.8, pueRange: [1.15, 1.3] }
+            },
+            opexPctOfCapex: 0.07, indirectJobsMult: 4.3,                    // IMPLAN multiplier
+            indirectImpactMult: 1.5, inducedImpactMult: 0.75,
+            overbuild: { cfe247: 1.5, annual: 1.2 }, ppaYears: 20,
+            gridSurplusPerMwYr: 33500,                                      // E3 methodology
+            drValuePerMwYr: 50000, drCapacityPct: { full: 0.15, partial: 0.075, none: 0 },
+            residentialLoadFactor: 0.35, loadFactorValuePerMwh: 0.003,
+            industryAvgPUE: 1.56, treeKgCo2PerYr: 22
+        },
+
+        /* ── A14: community cost/benefit impact model (article-14). ── */
+        communityImpact: {
+            regions: {
+                virginia:  { name: 'Virginia, USA',    eRate: 0.12, waterStress: 1.0, taxRate: 0.048, carbonKg: 350, avgBill: 145, gridGW: 90, capexM: 1.0,  jobM: 1.0,  householdWaterL: 450 },
+                georgia:   { name: 'Georgia, USA',     eRate: 0.11, waterStress: 0.8, taxRate: 0.040, carbonKg: 400, avgBill: 130, gridGW: 50, capexM: 0.9,  jobM: 0.95, householdWaterL: 500 },
+                texas:     { name: 'Texas, USA',       eRate: 0.10, waterStress: 1.3, taxRate: 0.035, carbonKg: 380, avgBill: 140, gridGW: 85, capexM: 0.85, jobM: 0.9,  householdWaterL: 550 },
+                ireland:   { name: 'Ireland, EU',      eRate: 0.22, waterStress: 0.3, taxRate: 0.050, carbonKg: 300, avgBill: 180, gridGW: 12, capexM: 1.3,  jobM: 1.1,  householdWaterL: 400 },
+                malaysia:  { name: 'Malaysia (Johor)', eRate: 0.08, waterStress: 1.8, taxRate: 0.025, carbonKg: 550, avgBill: 45,  gridGW: 35, capexM: 0.75, jobM: 0.8,  householdWaterL: 350 },
+                indonesia: { name: 'Indonesia',        eRate: 0.07, waterStress: 1.2, taxRate: 0.020, carbonKg: 650, avgBill: 35,  gridGW: 70, capexM: 0.70, jobM: 0.75, householdWaterL: 300 },
+                thailand:  { name: 'Thailand',         eRate: 0.09, waterStress: 0.9, taxRate: 0.030, carbonKg: 450, avgBill: 50,  gridGW: 50, capexM: 0.80, jobM: 0.85, householdWaterL: 380 },
+                singapore: { name: 'Singapore',        eRate: 0.18, waterStress: 2.0, taxRate: 0.060, carbonKg: 400, avgBill: 120, gridGW: 14, capexM: 1.50, jobM: 1.2,  householdWaterL: 370 }
+            },
+            coolingWaterMlPerMwYr: { evaporative: 26, hybrid: 13, aircooled: 0.5, liquid: 3 },
+            coolingNoiseDb: { evaporative: 65, hybrid: 58, aircooled: 60, liquid: 50 },
+            genNoxKgPerHr: { battery: 0, hvo: 0.5, diesel: 4.5, diesel_heavy: 12 },   // per 2 MW generator (EPA AP-42)
+            genHoursYear: { battery: 0, hvo: 50, diesel: 100, diesel_heavy: 500 },
+            taxRetain: { none: 1.0, moderate: 0.6, aggressive: 0.3, extreme: 0.05 },
+            rateProtect: { full: 0.05, gs5: 0.25, standard: 0.65, none: 1.0 },
+            waterStrategy: { netpositive: 0.1, recycled: 0.4, standard: 1.0, none: 1.2 },
+            wasteHeatValPerMw: { district: 85000, industrial: 45000, partial: 20000, none: 0 },
+            cbaFactor: { comprehensive: 30, basic: 10, none: -25 },
+            noiseMitigationDb: { comprehensive: 10, basic: 4, none: 0 },
+            constJobsPerMW: 35, permJobsPerMW: 1.2, healthCostPerTonNox: 15385,
+            capexPerMwUsd: 12000000, utilization: 0.85, jobsMultiplier: 2.5,
+            renewOverbuild: 1.3, renewCapFactor: 0.30, gdpPerMwUsd: 800000, genUnitMw: 2
+        },
+
+        /* ── A15: ops budget + staffing resilience model (article-15). ── */
+        opsBudget: {
+            countries: {
+                'Indonesia':      { laborRate: 18000, energyRate: 0.085, fxToUSD: 0.000063, tropFactor: 1.12, laborIdx: 0.35 },
+                'Singapore':      { laborRate: 72000, energyRate: 0.168, fxToUSD: 0.74,     tropFactor: 1.10, laborIdx: 1.05 },
+                'Malaysia':       { laborRate: 48000, energyRate: 0.082, fxToUSD: 0.22,     tropFactor: 1.11, laborIdx: 0.45 },
+                'Thailand':       { laborRate: 36000, energyRate: 0.098, fxToUSD: 0.028,    tropFactor: 1.10, laborIdx: 0.42 },
+                'Vietnam':        { laborRate: 15000, energyRate: 0.078, fxToUSD: 0.000040, tropFactor: 1.13, laborIdx: 0.30 },
+                'Philippines':    { laborRate: 22000, energyRate: 0.142, fxToUSD: 0.018,    tropFactor: 1.14, laborIdx: 0.38 },
+                'India':          { laborRate: 24000, energyRate: 0.075, fxToUSD: 0.012,    tropFactor: 1.08, laborIdx: 0.32 },
+                'Japan':          { laborRate: 82000, energyRate: 0.210, fxToUSD: 0.0067,   tropFactor: 1.00, laborIdx: 1.10 },
+                'Australia':      { laborRate: 88000, energyRate: 0.185, fxToUSD: 0.65,     tropFactor: 1.05, laborIdx: 1.15 },
+                'US-Virginia':    { laborRate: 95000, energyRate: 0.068, fxToUSD: 1.00,     tropFactor: 1.00, laborIdx: 1.00 },
+                'US-Texas':       { laborRate: 88000, energyRate: 0.058, fxToUSD: 1.00,     tropFactor: 1.06, laborIdx: 0.95 },
+                'US-Oregon':      { laborRate: 90000, energyRate: 0.042, fxToUSD: 1.00,     tropFactor: 1.00, laborIdx: 0.98 },
+                'EU-Germany':     { laborRate: 78000, energyRate: 0.235, fxToUSD: 1.08,     tropFactor: 1.00, laborIdx: 1.12 },
+                'EU-Netherlands': { laborRate: 75000, energyRate: 0.195, fxToUSD: 1.08,     tropFactor: 1.00, laborIdx: 1.08 },
+                'EU-Ireland':     { laborRate: 70000, energyRate: 0.178, fxToUSD: 1.08,     tropFactor: 0.95, laborIdx: 1.02 },
+                'UK':             { laborRate: 72000, energyRate: 0.215, fxToUSD: 1.26,     tropFactor: 0.96, laborIdx: 1.06 },
+                'UAE':            { laborRate: 65000, energyRate: 0.082, fxToUSD: 0.27,     tropFactor: 1.15, laborIdx: 0.75 },
+                'Saudi-Arabia':   { laborRate: 60000, energyRate: 0.048, fxToUSD: 0.27,     tropFactor: 1.18, laborIdx: 0.70 },
+                'Brazil':         { laborRate: 32000, energyRate: 0.110, fxToUSD: 0.18,     tropFactor: 1.09, laborIdx: 0.40 },
+                'Chile':          { laborRate: 28000, energyRate: 0.095, fxToUSD: 0.0011,   tropFactor: 1.00, laborIdx: 0.42 }
+            },
+            staffModels: {
+                inhouse:    { label: 'Full In-House',  costMult: 1.00, qualityMult: 1.00, retentionMod: 0,   ftePerMW: 4.2 },
+                hybrid70:   { label: 'Hybrid 70/30',   costMult: 0.88, qualityMult: 0.95, retentionMod: -3,  ftePerMW: 3.8 },
+                hybrid50:   { label: 'Hybrid 50/50',   costMult: 0.78, qualityMult: 0.88, retentionMod: -6,  ftePerMW: 3.5 },
+                outsourced: { label: 'Full Outsourced', costMult: 0.65, qualityMult: 0.80, retentionMod: -12, ftePerMW: 3.0 }
+            },
+            shiftMult: 4.2, laborBurden: 1.35, maintPerMwUsd: 180000,
+            pmSavingsSlope: 0.30, pmBaseline: 0.50, maintCapexShare: 0.15, ffoFactor: 0.12,
+            cashVariance: { basePct: 3.5, reductionSlope: 4.0, floorPct: 0.5 },
+            utilization: { base: 78, perLoadMw: 0.12, min: 55, max: 98 },
+            burnout: { k: 0.12, midUtil: 88 },
+            outsourcedCostFactor: 0.65, mgmtOverheadPerFteUsd: 25000,
+            replacementCostFactor: 1.5, spof: { base: 8, perHeadcount: 0.08, retentionDiv: 40 },
+            sriWeights: { retention: 0.35, burnout: 0.25, pm: 0.20, quality: 0.20, spofPenalty: 3 },
+            hepBase: 0.003
+        },
+
+        /* ── A16/A17: SEA DC market screening — bubble risk + opportunity (articles 16, 17). ── */
+        dcMarket: {
+            bubbleMarkets: {
+                johor:       { op: 487,  pipe: 5800, pop: 3.8, absorb: 200, precommit: 0.40, spec: 0.35, growth: 0.19, cost: 9,   rev: 2.0, opex: 0.58, wacc: 0.10 },
+                indonesia:   { op: 1717, pipe: 4145, pop: 280, absorb: 300, precommit: 0.55, spec: 0.25, growth: 0.15, cost: 8,   rev: 1.8, opex: 0.60, wacc: 0.10 },
+                singapore:   { op: 780,  pipe: 900,  pop: 5.9, absorb: 150, precommit: 0.70, spec: 0.15, growth: 0.12, cost: 14,  rev: 3.0, opex: 0.55, wacc: 0.08 },
+                thailand:    { op: 200,  pipe: 1092, pop: 72,  absorb: 120, precommit: 0.50, spec: 0.30, growth: 0.14, cost: 8.5, rev: 1.9, opex: 0.62, wacc: 0.11 },
+                vietnam:     { op: 150,  pipe: 560,  pop: 100, absorb: 80,  precommit: 0.45, spec: 0.30, growth: 0.18, cost: 7,   rev: 1.6, opex: 0.65, wacc: 0.12 },
+                philippines: { op: 100,  pipe: 500,  pop: 115, absorb: 50,  precommit: 0.35, spec: 0.40, growth: 0.12, cost: 9,   rev: 2.1, opex: 0.63, wacc: 0.12 }
+            },
+            opportunityMarkets: {
+                indonesia:   { op: 1717, pipe: 4145, pop: 280, digi: 0.15, sov: 500, inf: 0.35, ent: 0.30, cost: 8,   rev: 1.8, opex: 0.60, wacc: 0.10 },
+                johor:       { op: 487,  pipe: 5800, pop: 3.8, digi: 0.19, sov: 200, inf: 0.35, ent: 0.25, cost: 9,   rev: 2.0, opex: 0.58, wacc: 0.10 },
+                singapore:   { op: 780,  pipe: 900,  pop: 5.9, digi: 0.12, sov: 150, inf: 0.30, ent: 0.40, cost: 14,  rev: 3.0, opex: 0.55, wacc: 0.08 },
+                thailand:    { op: 200,  pipe: 1092, pop: 72,  digi: 0.14, sov: 400, inf: 0.35, ent: 0.25, cost: 8.5, rev: 1.9, opex: 0.62, wacc: 0.11 },
+                vietnam:     { op: 150,  pipe: 560,  pop: 100, digi: 0.18, sov: 300, inf: 0.35, ent: 0.20, cost: 7,   rev: 1.6, opex: 0.65, wacc: 0.12 },
+                philippines: { op: 100,  pipe: 500,  pop: 115, digi: 0.12, sov: 100, inf: 0.30, ent: 0.20, cost: 9,   rev: 2.1, opex: 0.63, wacc: 0.12 }
+            },
+            bubble: {
+                supplyYears: 5, absorbWindowYears: 3, rampYears: 3, rampStartOcc: 0.30,
+                vacancyShare: 0.6, vacancyScale: 50, vacancyMin: 5, vacancyMax: 60,
+                occBase: 95, occSlope: 15, occMin: 40, breakevenSpecSlope: 15, npvYears: 10,
+                riskCaps: { sd: 30, spec: 25, precommit: 20, absorb: 15, payback: 10 },
+                riskSlopes: { sd: 15, spec: 50, precommit: 40, absorbYears: 3, absorbSlope: 3, paybackYears: 6, paybackSlope: 2 }
+            },
+            opportunity: {
+                horizonYears: 4, digiCapture: 0.8, entCapture: 0.5, infBaseShare: 0.15,
+                utilizationCap: 150, occFactor: 0.7, occMin: 0.50, occMax: 0.98,
+                rampYears: 3, rampStartOcc: 0.40, npvYears: 10,
+                facilityMw: 50, jobsConstructPerFacility: 1500, jobsPermPerFacility: 65, jobsEcoMult: 4, taxRevFactor: 0.025,
+                scoreCaps: { util: 25, digi: 20, sov: 20, inf: 20, ent: 15 },
+                scoreSlopes: { util: 0.2, digi: 100, sov: 50, inf: 40, ent: 30 }
+            }
+        },
+
+        /* ── A22: AI interconnect physics/TCO — copper vs pluggable vs CPO (article-22). ── */
+        interconnect: {
+            speedFactor: { 200: 1, 400: 2.1, 800: 4.5, 1600: 9.5 },         // power scaling vs 200G
+            copper:    { reachM: { 200: 3, 400: 2, 800: 1, 1600: 0 }, wattsBase: 0.5, latencyNsAtReach: 5, latencyUnviableNs: 999 },
+            pluggable: { reachM: { 200: 2000, 400: 500, 800: 100, 1600: 2000 }, wattsBase: 3.5, efficiency: 0.65, latencyBaseNs: 50, latencyPerMNs: 0.005 },
+            cpo:       { reachM: 100, wattsBase: 1.0, efficiency: 0.55, latencyBaseNs: 10, latencyPerMNs: 0.005 }
+        },
+
+        /* ── A25: grid reserve-margin adequacy screening (article-25, PJM basis). ── */
+        gridReserve: {
+            renewableShareOfNew: 0.70,                                      // new-gen mix assumption
+            auctionCurve: [
+                { minMargin: 20, base: 28,  pivot: 20, slope: 0 },
+                { minMargin: 15, base: 28,  pivot: 20, slope: 10 },
+                { minMargin: 10, base: 78,  pivot: 15, slope: 30 },
+                { minMargin: 5,  base: 228, pivot: 10, slope: 50 },
+                { minMargin: -Infinity, base: 478, pivot: 5, slope: 100 }
+            ],
+            baseline: { priceMwDay: 28, capacityGW: 180 },
+            risk: { marginSlope: 8, deficitSlope: 5, retireCap: 30, wMargin: 0.5, wDeficit: 0.3, wRetire: 0.2 }
+        },
+
         /* ── A20: facility water-footprint screening (promoted from the
          * article-20 Data-Center-Water calculator). ── */
         waterFootprint: {
@@ -5784,6 +6009,33 @@
                        3.754408661907416e+00],
             acklamPLow: 0.02425,
             poissonThresholdMuLt: 5
+        },
+        /* v2.5.2 O&M pricing research (owner: "biaya kontrak per tier + harga spares
+         * riil, no placeholder") — SCREENING bands from public 2024-2026 sources;
+         * every band sourced in DATA.sources. USD. */
+        omContracts: {
+            /* $/kW IT per YEAR, fixed-fee basis. Bands: low/mid/high. */
+            tiers: {
+                comprehensive: { low: 30, mid: 45, high: 60, scope: 'Full parts+labor+emergency response, OEM-grade SLA (all critical systems)' },
+                preventive:    { low: 20, mid: 30, high: 40, scope: 'Scheduled PM visits + consumables; corrective billed separately' },
+                onCall:        { low: 10, mid: 15, high: 20, scope: 'Time & materials on failure; no scheduled PM commitment' }
+            },
+            thirdPartyMultiplier: 0.65,   // third-party vs OEM contract (OEM typically 40-60% higher)
+            agingFacilityMultiplier: 1.5, // facilities >10yr — parts + corrective escalation
+            basis: 'Preventive $200-400K/yr per 10MW facility; OEM premium 40-60% over third-party'
+        },
+        sparesPricing: {
+            /* Unit list-price bands per spare class (USD, screening — public list/retrofit prices). */
+            classes: {
+                ups_module_50kw:      { low: 25000, mid: 40000,  high: 60000,  unit: 'per 50kW power module' },
+                ups_battery_string:   { low: 8000,  mid: 10000,  high: 15000,  unit: 'per VRLA string' },
+                genset_pm_kit:        { low: 5000,  mid: 9000,   high: 15000,  unit: 'per 2-3MW unit annual parts kit' },
+                genset_top_overhaul:  { low: 60000, mid: 100000, high: 150000, unit: 'per 2-3MW unit top-end overhaul' },
+                chiller_compressor:   { low: 80000, mid: 150000, high: 250000, unit: 'per centrifugal compressor' },
+                crah_ec_fan_kit:      { low: 8000,  mid: 15000,  high: 20000,  unit: 'per EC/VFD fan retrofit kit installed' },
+                pdu_breaker_mccb:     { low: 1000,  mid: 2500,   high: 5000,   unit: 'per DC-grade MCCB breaker' },
+                air_filter_set_g4:    { low: 1500,  mid: 2500,   high: 4000,   unit: 'per CRAH/PAC filter set-year' }
+            }
         },
         decision: {
             /* Layer-13 planning benchmarks (descriptive, not advice). */
@@ -6104,6 +6356,8 @@
             'salaryBenchmarks':       { source: 'Uptime Institute 2026 + AFCOM 2026 + US BLS 2025', asOf: '2026', unit: 'USD/yr, base' },
             'salaryRolesExt':         { source: 'Uptime 2026 + Levels.fyi + AFCOM 2026 role survey', asOf: '2026', unit: 'USD/yr, base' },
             'attritionFactors':       { source: 'Center for American Progress + DataX Connect 2024', asOf: '2024' },
+            'omContracts':            { source: 'SCREENING bands — datacentres.com cost guide 2026 (preventive $200-400K/yr per 10MW; OEM +40-60% vs third-party), Schneider Electric maintenance-ROI blog 2024, TechTarget/thenetworkinstallers OPEX guides 2026', asOf: '2026-07', method: 'public benchmark synthesis, fixed-fee $/kW-yr bands' },
+            'sparesPricing':          { source: 'SCREENING list-price bands — Schneider/APC Galaxy VS 50kW module class, criticalpowerbatterysolutions.com VRLA string TCO 2026 (~$10K/string), Schneider CRAH VFD retrofit kit ~$15K installed, OnPoint/secondwatt genset maintenance guides 2026, industrial MCCB distributor ranges', asOf: '2026-07', method: 'public list/retrofit price synthesis per class' },
             'pueDefaults':            { source: 'Uptime Global PUE Survey 2026 by cooling architecture', asOf: '2026', unit: 'ratio' },
             'pueMatrix':              { source: 'Uptime Global PUE Survey 2026 (tier x cooling)', asOf: '2026', unit: 'ratio' },
             'capexPerMw':             { source: '451 Research 2026 + JLL DC Cost 2026 + Cushman & Wakefield 2026', asOf: '2026', unit: 'USD/MW raw build' },
@@ -6158,6 +6412,16 @@
             'aiWater':                { source: 'Article-20 per-query AI water model: Li, P. et al. 2023 (Making AI Less Thirsty, Joule) per-query scaling; company env. reports 2024 (Microsoft/Google); per-model attribution = estimate-grade; upstream 3\u00d7 = power-generation water (Macknick/NREL screening)', asOf: '2026', method: 'estimate-grade per-model attribution, not vendor-published telemetry' },
             'waterFootprint':         { source: 'Article-20 DC water model: WUE bases per cooling (Li et al. 2023 Joule; Uptime Institute 2024; ASHRAE TC9.9), company benchmarks (Google/Microsoft/Meta env. reports 2024, AWS est.), water $/kgal typical municipal/reclaimed/surface/well ranges; upstream-power water factor 1.5 L/kWh non-renewable = screening (Macknick et al. NREL ranges)', asOf: '2026', method: 'screening-grade footprint, not a site water balance' },
             'gridImpact':             { source: 'Article-11 SEA citizen-bill model: residential tariffs (PLN/TNB/EMA/MEA/EVN/Meralco published 2025-2026 rates), national grid capacity (national utility/EIA country notes), avg household kWh (national statistics), IEA data-centre electricity growth ~15%/yr; 40% residential pass-through = screening assumption', asOf: '2026', method: 'screening-grade allocation model, not a tariff filing analysis' },
+            'resilience':             { source: 'Article-7 reliability-vs-resilience rubric: design-redundancy score bands (N/N+1/2N/2N+1 per Uptime tier topology), 7 operational-resilience dimensions weighted (drill 15 / response 20 / recovery 15 / cross-train 10 / documentation 15 / communication 10 / lessons 15 — expert screening weights); gap bands 30/15 pts', asOf: '2026', method: 'weighted 0-100 composite; screening-grade self-assessment, not a certified resilience audit' },
+            'safetyCulture':          { source: 'Article-8 Safety Health Index: 7 leading-indicator dimensions with screening norms (10 near-miss/mo, 15 weak signals/mo, 30 open findings cap, 20 training hr/qtr, 8 walkarounds/mo — HSE/HRO literature targets); drift-to-failure logic per Rasmussen (1997) boundary-migration model; culture stages per Hudson/Parker HSE ladder', asOf: '2026', method: 'weighted 0-100 leading-indicator composite + heuristic drift probability; screening-grade, not an audited safety-culture survey' },
+            'hvacCooling':            { source: 'Article-9 HVAC cooling TCO model: regional PUE by architecture (traditional/hybrid/DLC, tropical vs temperate — Uptime Global Survey bands + tropical-climate screening), capex $0.8/1.1/1.4M per MW, maintenance $50/65/80K per MW·yr, grid CO2 factors (kg/kWh, national grid data), evaporative 1.8 gal/kWh vs DLC 0.2 gal/kWh (NREL/Macknick ranges); 8% discount, 10-yr NPV', asOf: '2026', method: 'screening-grade cooling-architecture TCO; NOT an engineered cooling design or vendor quote' },
+            'waterStress':            { source: 'Article-10 SEA water-stress model: per-city stress scores + water tariffs (WRI Aqueduct 4.0 stress classes; PAM Jaya/PUB/Ranhill/city-utility published tariffs $/m3), aquifer subsidence (Jakarta ~25 cm/yr, BRIN/JICA), DLC ~87% water reduction (vendor/Uptime screening), recycling capex ~$450K/MW at 40% saving, water-energy nexus 650-1000 kWh/ML (SEA pumping+treatment)', asOf: '2026', method: 'screening-grade water cost/risk model with 3% escalation + 8% discount; not a site water balance or utility filing' },
+            'dcValue':                { source: 'Article-12 DC economic-value model: country industrial tariffs + grid carbon intensity (national utility/Ember), capex $/MW by DC type (hyperscale 12M / colo 10M / enterprise 15M / AI-HPC 18M — CBRE/Turner&Townsend bands), IMPLAN 4.3x indirect-jobs multiplier, E3 grid-surplus $33.5K/MW·yr, DR $50K/MW·yr, 24/7 CFE 1.5x overbuild (Google CFE methodology), 22 kg CO2/tree·yr (EPA)', asOf: '2026', method: 'screening-grade economic/environmental impact model, not an economic-impact study' },
+            'communityImpact':        { source: 'Article-14 community cost/benefit model: cooling water 26/13/0.5/3 ML per MW·yr (Dgtl Infra/Equinix WUE benchmarks), noise at 400ft (Prince William County/WUSA9 measurements), NOx per 2MW genset (EPA AP-42), health cost $15,385/ton NOx (UCR/Caltech), bill impact per Carnegie Mellon grid-load model, construction 35 jobs/MW + permanent 1.2 jobs/MW (BLS/DCK consensus), BEA RIMS II 2.5x, GDP ~$800K/MW·yr (Fortune/Harvard)', asOf: '2026', method: 'screening-grade community net-score (-100..+100); not an environmental-impact assessment' },
+            'opsBudget':              { source: 'Article-15 ops budget + staffing model: country labor rates + industrial energy tariffs (national statistics/utility filings), 4.2 FTE/MW in-house staffing at 4.2x shift multiplier (Uptime critical-facilities staffing benchmark), 35% labor burden, $180K/MW·yr comprehensive maintenance base, PM-ratio savings up to 15%, burnout logistic (k=0.12, mid 88% utilization — occupational-health literature), 150% replacement cost (SHRM)', asOf: '2026', method: 'screening-grade OPEX + staffing-resilience model; deterministic core (page Monte Carlo stays page-side)' },
+            'dcMarket':               { source: 'Articles 16-17 SEA market screening: per-market operational/pipeline MW + absorption (Cushman & Wakefield/DC Byte/Knight Frank SEA 2025-26 reports; Johor 487 op/5800 pipe, Indonesia 1717 op), build cost $7-14M/MW, revenue $1.6-3.0M/MW·yr, opex ratios 55-65%, WACC 8-12%; demand-side: digital-economy growth (e-Conomy SEA), sovereign-AI programs, inference CAGR, enterprise migration shares', asOf: '2026', method: 'screening-grade supply/demand + NPV/IRR (Newton-Raphson) + heuristic 0-100 risk/opportunity scores; not investment advice' },
+            'interconnect':           { source: 'Article-22 AI interconnect model: power per link by speed class (200G-1.6T; pluggable ~3.5W base scaled, CPO ~45% lower per Broadcom/NVIDIA CPO disclosures 2024-25), copper DAC reach limits 3/2/1/0 m by speed (IEEE 802.3 + SerDes reach practice), latency floors (copper ~5ns, CPO ~10ns, pluggable ~50ns with DSP), $/kWh electricity user input', asOf: '2026', method: 'screening-grade per-link power/latency/annual-cost comparison; not a network design' },
+            'gridReserve':            { source: 'Article-25 PJM reserve-margin model: PJM 2026-27 BRA context (capacity ~180 GW, peak ~150 GW screening defaults), ELCC-derated renewable share of new-build 70% (PJM ELCC method), piecewise capacity-auction price curve calibrated to PJM BRA clearing history ($28 to $478+/MW-day), blackout-risk composite (margin 50% / deficit 30% / retirements 20%)', asOf: '2026', method: 'screening-grade adequacy model; not an RTO planning study' },
             'pue.partialLoad':        { source: 'Screening model: fixed infrastructure-overhead share 0.55 at partial IT load (industry rule-of-thumb band 0.4-0.7; Green Grid partial-load PUE guidance)', asOf: '2026', method: 'PUE(l) = 1 + overhead*(0.55/l + 0.45) — screening estimate, labeled' },
             'spares.acklam':          { source: 'P. J. Acklam (2003) rational approximation to the inverse normal CDF', asOf: '2026', method: 'numerical approximation; |relative error| < 1.15e-9 (upgraded from BSM 1977, |e|<4.5e-4, in the M2b precision pass)' }
         },
@@ -6997,6 +7261,494 @@
                         if (RZEngine.models.maintCompliance.compliance(pp) >= target * 100) return t;
                     }
                     return null;
+                },
+            },
+            /* ── A7: reliability-vs-resilience assessment (article-7 promoted).
+             * input p {redundancy('N'|'N+1'|'2N'|'2N+1'), drillFreq, responseTimeMin,
+             * recovery, crossTrainPct(0-100), docCurrency, commPlan, lessons}. ── */
+            resilience: {
+                reliabilityScore: function (redundancy) {
+                    var m = DATA.resilience.reliabilityMap;
+                    return m[redundancy] != null ? m[redundancy] : m['N+1'];
+                },
+                /** Raw 0-100 dimension scores in DATA.resilience.weights order. */
+                rawScores: function (p) {
+                    var M = DATA.resilience.maps;
+                    return [
+                        M.drill[p.drillFreq] || 0,
+                        Math.max(0, 1 - p.responseTimeMin / DATA.resilience.responseTargetMin) * 100,
+                        M.recovery[p.recovery] || 0,
+                        p.crossTrainPct || 0,
+                        M.doc[p.docCurrency] || 0,
+                        M.comm[p.commPlan] || 0,
+                        M.lessons[p.lessons] || 0
+                    ];
+                },
+                /** Weighted resilience score (rounded 0-100) from raw dimension scores. */
+                score: function (rawScores) {
+                    var w = DATA.resilience.weights, s = 0;
+                    for (var i = 0; i < rawScores.length; i++) s += rawScores[i] * w[i];
+                    return Math.round(s);
+                },
+                /** Full assessment: design reliability vs operational resilience + gap. */
+                assess: function (p) {
+                    var R = RZEngine.models.resilience;
+                    var rel = R.reliabilityScore(p.redundancy);
+                    var raw = R.rawScores(p);
+                    var res = R.score(raw);
+                    var gap = Math.abs(rel - res);
+                    var B = DATA.resilience.gapBands;
+                    return {
+                        reliabilityScore: rel, rawScores: raw, resilienceScore: res, gap: gap,
+                        gapClass: gap > B.critical ? 'critical' : gap >= B.warning ? 'warning' : 'balanced',
+                        relTier: rel < 45 ? 'Tier I Equivalent' : rel < 65 ? 'Tier II Equivalent' : rel < 85 ? 'Tier III Equivalent' : 'Tier IV Equivalent',
+                        resTier: res < 20 ? 'Stage 1: Reactive' : res < 40 ? 'Stage 2: Aware' : res < 65 ? 'Stage 3: Proactive' : res < 85 ? 'Stage 4: Adaptive' : 'Stage 5: Generative'
+                    };
+                },
+            },
+            /* ── A8: safety-culture health index (article-8 promoted). input v
+             * {nearMiss(/mo), weakSignals(/mo), audit(open findings), training(hr/qtr),
+             * walks(/mo), hazard(close %), meeting(freq label)}. ── */
+            safetyCulture: {
+                healthIndex: function (v) {
+                    var S = DATA.safetyCulture, N = S.norms;
+                    var dims = [
+                        Math.min(100, (v.nearMiss / N.nearMissPerMonth) * 100),
+                        Math.min(100, (v.weakSignals / N.weakSignalsPerMonth) * 100),
+                        Math.max(0, (1 - v.audit / N.auditFindingsMax) * 100),
+                        Math.min(100, (v.training / N.trainingHrsPerQuarter) * 100),
+                        Math.min(100, (v.walks / N.walksPerMonth) * 100),
+                        v.hazard,
+                        S.meetingMap[v.meeting] || 0
+                    ];
+                    var total = 0;
+                    for (var i = 0; i < dims.length; i++) total += dims[i] * S.weights[i];
+                    return { dims: dims, total: total };
+                },
+                /** Rasmussen drift-to-failure probability (0-0.99) from incident-free days + SHI. */
+                driftProbability: function (days, total) {
+                    var Dr = DATA.safetyCulture.drift, drift;
+                    if (days > Dr.shortDays && total < Dr.shortScore) drift = 0.6 + (days / 1000) * 0.3;
+                    else if (days > Dr.longDays && total < Dr.longScore) drift = 0.3 + (days / 2000) * 0.3;
+                    else drift = Math.max(0.05, 0.4 - total / 250);
+                    return Math.min(drift, Dr.cap);
+                },
+                cultureLabel: function (total) {
+                    return total >= 80 ? 'Generative' : total >= 55 ? 'Bureaucratic' : 'Pathological';
+                },
+            },
+            /* ── A9: HVAC cooling-architecture TCO (article-9 promoted). ── */
+            hvac: {
+                /** Quick full-power PUE cost comparison (article free calculator). */
+                simplePueCost: function (itLoadMw, rateUsdPerKwh) {
+                    var P = DATA.hvacCooling.simplePue, hours = DATA.hoursPerYear;
+                    var t = itLoadMw * 1000 * P.traditional * hours * rateUsdPerKwh;
+                    var h = itLoadMw * 1000 * P.hybrid * hours * rateUsdPerKwh;
+                    var d = itLoadMw * 1000 * P.dlc * hours * rateUsdPerKwh;
+                    return {
+                        traditional: t, hybrid: h, dlc: d,
+                        savingsHybrid: t - h, savingsDLC: t - d,
+                        co2ReductionPct: Math.round((1 - P.dlc / P.traditional) * 100)
+                    };
+                },
+                /** Regional 10-yr TCO: traditional vs hybrid vs DLC (article pro model).
+                 *  input {load(MW IT), rate($/kWh), regionKey}. Math preserved EXACTLY. */
+                tco: function (input) {
+                    var H = DATA.hvacCooling;
+                    var region = H.regions[input.regionKey] || H.regions.indonesia;
+                    var load = input.load, rate = input.rate;
+                    var results = {};
+                    ['traditional', 'hybrid', 'dlc'].forEach(function (arch) {
+                        var cfg = H.configs[arch];
+                        var pue = region[cfg.pueKey];
+                        var capex = cfg.capexPerMW * load;
+                        var annualEnergy = load * 1000 * (pue - 1) * 8760 * rate * cfg.opexFactor;
+                        var annualMaint = cfg.maintenancePerMW * load;
+                        var annualOpex = annualEnergy + annualMaint;
+                        var npv = capex;
+                        for (var y = 1; y <= H.tcoYears; y++) npv += annualOpex / Math.pow(1 + H.discountRate, y);
+                        results[arch] = { capex: capex, annualEnergy: annualEnergy, annualMaint: annualMaint, annualOpex: annualOpex, npv10yr: npv, pue: pue };
+                    });
+                    var capexPremiumDLC = results.dlc.capex - results.traditional.capex;
+                    var annualSavingsDLC = results.traditional.annualOpex - results.dlc.annualOpex;
+                    results.paybackDLC = annualSavingsDLC > 0 ? capexPremiumDLC / annualSavingsDLC : 99;
+                    var capexPremiumHybrid = results.hybrid.capex - results.traditional.capex;
+                    var annualSavingsHybrid = results.traditional.annualOpex - results.hybrid.annualOpex;
+                    results.paybackHybrid = annualSavingsHybrid > 0 ? capexPremiumHybrid / annualSavingsHybrid : 99;
+                    results.irrDLC = annualSavingsDLC > 0 ? (annualSavingsDLC / capexPremiumDLC) * H.irrApproxFactor : 0;
+                    results.savingsDLC10yr = results.traditional.npv10yr - results.dlc.npv10yr;
+                    results.savingsHybrid10yr = results.traditional.npv10yr - results.hybrid.npv10yr;
+                    var tradCoolingKWh = load * 1000 * (region.pueTraditional - 1) * 8760;
+                    var dlcCoolingKWh = load * 1000 * (region.pueDLC - 1) * 8760 * H.coolingEnergyFactor.dlc;
+                    var hybridCoolingKWh = load * 1000 * (region.pueHybrid - 1) * 8760 * H.coolingEnergyFactor.hybrid;
+                    results.energySavingsDLC_kWh = tradCoolingKWh - dlcCoolingKWh;
+                    results.energySavingsHybrid_kWh = tradCoolingKWh - hybridCoolingKWh;
+                    results.carbonOffsetDLC = (results.energySavingsDLC_kWh / 1000) * region.co2Factor;
+                    results.carbonOffsetHybrid = (results.energySavingsHybrid_kWh / 1000) * region.co2Factor;
+                    var tradWaterGal = tradCoolingKWh * H.waterGalPerKwh.evaporative * region.waterFactor;
+                    var dlcWaterGal = dlcCoolingKWh * H.waterGalPerKwh.dlc;
+                    results.waterSavingsDLC = tradWaterGal - dlcWaterGal;
+                    results.tradWaterGal = tradWaterGal; results.dlcWaterGal = dlcWaterGal;
+                    var coolingCapacityKW = load * 1000 * (region.pueTraditional - 1);
+                    results.lifecycleCostPerKW_trad = results.traditional.npv10yr / coolingCapacityKW;
+                    results.lifecycleCostPerKW_dlc = results.dlc.npv10yr / coolingCapacityKW;
+                    results.lifecycleCostPerKW_hybrid = results.hybrid.npv10yr / coolingCapacityKW;
+                    results.coolingCapacityKW = coolingCapacityKW;
+                    results.annualEnergySavingsDLC = results.traditional.annualEnergy - results.dlc.annualEnergy;
+                    results.annualEnergySavingsHybrid = results.traditional.annualEnergy - results.hybrid.annualEnergy;
+                    results.phasedDeploymentCost = results.dlc.capex * (1 + H.phasedOverheadPct);
+                    results.fullDeploymentCost = results.dlc.capex;
+                    results.phasedOverhead = results.dlc.capex * H.phasedOverheadPct;
+                    results.retrainingCost = load * H.retrainPerMwUsd;
+                    results.downtimeHoursPhased = Math.round(load * H.downtimeHrPerMw.phased);
+                    results.downtimeHoursFull = Math.round(load * H.downtimeHrPerMw.full);
+                    return results;
+                },
+            },
+            /* ── A12: DC economic/community value model (article-12 promoted).
+             * input {countryKey, capacityMw, dcType, renewableTarget('100'|'100_annual'|
+             * '80'|'50'|'0'), pue, capacityFactor(0-1), projectYears, demandResponse}. ── */
+            dcValue: {
+                economicImpact: function (inp) {
+                    var V = DATA.dcValue;
+                    var cd = V.countries[inp.countryKey] || V.countries.indonesia;
+                    var dt = V.dcTypes[inp.dcType] || V.dcTypes.hyperscale;
+                    var renewablePct = inp.renewableTarget === '100' || inp.renewableTarget === '100_annual' ? 1.0
+                        : inp.renewableTarget === '80' ? 0.8 : inp.renewableTarget === '50' ? 0.5 : 0;
+                    var mw = inp.capacityMw, pue = inp.pue, cf = inp.capacityFactor, years = inp.projectYears;
+                    var totalPowerMW = mw * pue;
+                    var annualMWh = totalPowerMW * 8760 * cf;
+                    var capex = mw * dt.capexPerMW * cd.capexMultiplier;
+                    var annualOpex = capex * V.opexPctOfCapex;
+                    var annualEnergyCost = annualMWh * cd.electricityRate;
+                    var taxRevenue = (annualOpex + annualEnergyCost) * cd.taxRate;
+                    var directJobs = Math.round(mw * dt.jobsPerMW * cd.jobMultiplier);
+                    var indirectJobs = Math.round(directJobs * V.indirectJobsMult);
+                    var directImpact = capex, indirectImpact = capex * V.indirectImpactMult, inducedImpact = capex * V.inducedImpactMult;
+                    var totalEconomicImpact = (directImpact + indirectImpact + inducedImpact) + (annualOpex + annualEnergyCost) * years;
+                    var overbuildFactor = inp.renewableTarget === '100' ? V.overbuild.cfe247 : V.overbuild.annual;
+                    var ppaCapacityMW = Math.round(mw * overbuildFactor * renewablePct);
+                    var ppaInvestmentValue = ppaCapacityMW * cd.ppaPrice * V.ppaYears / 1000000;
+                    var gridSurplusAnnual = mw * V.gridSurplusPerMwYr;
+                    var drCapacityPct = V.drCapacityPct[inp.demandResponse] || 0;
+                    var drValueAnnual = mw * drCapacityPct * V.drValuePerMwYr;
+                    var loadFactorBenefit = mw * 8760 * (cf - V.residentialLoadFactor) * V.loadFactorValuePerMwh;
+                    var gridReliabilityImprovement = (mw / cd.gridCapacityGW / 1000) * 0.5;
+                    var baselineEmissions = annualMWh * cd.carbonIntensity / 1000000;   // million tons
+                    var actualEmissions = baselineEmissions * (1 - renewablePct);
+                    var co2Avoided = baselineEmissions * renewablePct;
+                    var treesEquivalent = co2Avoided * 1000000 / V.treeKgCo2PerYr;
+                    var pueEfficiencyGain = ((V.industryAvgPUE - pue) / V.industryAvgPUE) * 100;
+                    return {
+                        renewablePct: renewablePct, totalPowerMW: totalPowerMW, annualMWh: annualMWh,
+                        capex: capex, annualOpex: annualOpex, annualEnergyCost: annualEnergyCost, taxRevenue: taxRevenue,
+                        directJobs: directJobs, indirectJobs: indirectJobs,
+                        directImpact: directImpact, indirectImpact: indirectImpact, inducedImpact: inducedImpact,
+                        totalEconomicImpact: totalEconomicImpact,
+                        ppaCapacityMW: ppaCapacityMW, ppaInvestmentValue: ppaInvestmentValue,
+                        gridSurplusAnnual: gridSurplusAnnual, drCapacityMW: mw * drCapacityPct, drValueAnnual: drValueAnnual,
+                        loadFactorBenefit: loadFactorBenefit, gridReliabilityImprovement: gridReliabilityImprovement,
+                        baselineEmissions: baselineEmissions, actualEmissions: actualEmissions,
+                        co2Avoided: co2Avoided, treesEquivalent: treesEquivalent, pueEfficiencyGain: pueEfficiencyGain,
+                        method: 'screening-grade economic/environmental impact (article-12 model)'
+                    };
+                },
+            },
+            /* ── A14: community cost/benefit impact (article-14 promoted). input
+             * {mw, regionKey, cooling, pue, renewPct(0-1), taxLevel, engagement,
+             * genType, wasteHeat, rateProt, waterStrat, constYears}. ── */
+            communityImpact: {
+                assess: function (inp) {
+                    var C = DATA.communityImpact;
+                    var rd = C.regions[inp.regionKey] || C.regions.virginia;
+                    var mw = Math.max(1, inp.mw), pue = inp.pue, renewPct = inp.renewPct;
+                    var totalPowerMW = mw * pue;
+                    var annualMWh = totalPowerMW * 8760 * C.utilization;
+                    var annualEnergyCost = annualMWh * rd.eRate;
+                    var capex = mw * C.capexPerMwUsd * rd.capexM;
+                    var gridLoadPct = (totalPowerMW / (rd.gridGW * 1000)) * 100;
+                    var billIncrease = (gridLoadPct / 100) * rd.avgBill * (1 - renewPct * 0.3) * (C.rateProtect[inp.rateProt] != null ? C.rateProtect[inp.rateProt] : 1.0);
+                    var waterML = mw * (C.coolingWaterMlPerMwYr[inp.cooling] || 0) * (C.waterStrategy[inp.waterStrat] != null ? C.waterStrategy[inp.waterStrat] : 1.0);
+                    var waterHouseholds = Math.round((waterML * 1000000) / (rd.householdWaterL * 365));
+                    var numGenerators = Math.ceil(totalPowerMW / C.genUnitMw);
+                    var annualNoxTons = (numGenerators * (C.genNoxKgPerHr[inp.genType] || 0) * (C.genHoursYear[inp.genType] || 0)) / 1000;
+                    var healthCostAnnual = annualNoxTons * C.healthCostPerTonNox * rd.waterStress;
+                    var noiseMitigation = C.noiseMitigationDb[inp.engagement] || 0;
+                    var noise = Math.max(35, (C.coolingNoiseDb[inp.cooling] || 60) - noiseMitigation);
+                    var taxRetainF = C.taxRetain[inp.taxLevel] != null ? C.taxRetain[inp.taxLevel] : 1.0;
+                    var foregoneTax = capex * rd.taxRate * (1 - taxRetainF);
+                    var actualTaxRev = capex * rd.taxRate * taxRetainF + (annualEnergyCost * 0.05);
+                    var constJobsTotal = Math.round(mw * C.constJobsPerMW * rd.jobM / inp.constYears);
+                    var directJobs = Math.round(mw * C.permJobsPerMW * rd.jobM);
+                    var totalJobs = Math.round(directJobs * C.jobsMultiplier) + Math.round(constJobsTotal * 0.3);
+                    var reCapacity = Math.round(mw * renewPct * C.renewOverbuild);
+                    var co2Avoided = Math.round(reCapacity * 8760 * C.renewCapFactor * rd.carbonKg / 1000);
+                    var wasteHeatAnnual = mw * (C.wasteHeatValPerMw[inp.wasteHeat] || 0) * (pue - 1) / 0.4;
+                    var gdpContrib = mw * C.gdpPerMwUsd * rd.capexM;
+                    var costScore = 0;
+                    costScore -= Math.min(billIncrease * 5, 20);
+                    costScore -= Math.min(waterML * rd.waterStress * 0.02, 15);
+                    costScore -= Math.min(annualNoxTons * 0.3, 15);
+                    costScore -= (noise > 55 ? 12 : noise > 50 ? 6 : noise > 45 ? 2 : 0);
+                    costScore -= Math.min(foregoneTax / 10000000, 12);
+                    costScore -= Math.min(gridLoadPct * 2, 10);
+                    costScore -= (inp.rateProt === 'none' ? 8 : inp.rateProt === 'standard' ? 4 : 0);
+                    var benefitScore = 0;
+                    benefitScore += Math.min(actualTaxRev / 5000000, 20);
+                    benefitScore += Math.min(directJobs * 0.12, 10);
+                    benefitScore += Math.min(constJobsTotal * 0.005, 8);
+                    benefitScore += Math.min(reCapacity * 0.04, 12);
+                    benefitScore += Math.min(co2Avoided * 0.00005, 8);
+                    benefitScore += Math.min(wasteHeatAnnual / 2000000, 10);
+                    benefitScore += Math.min(gdpContrib / 50000000, 12);
+                    benefitScore += (C.cbaFactor[inp.engagement] || 0);
+                    var netScore = Math.max(-100, Math.min(100, Math.round(costScore + benefitScore)));
+                    return {
+                        billIncrease: billIncrease, waterML: waterML, waterHouseholds: waterHouseholds,
+                        annualNoxTons: annualNoxTons, healthCostAnnual: healthCostAnnual, noiseDb: noise,
+                        gridLoadPct: gridLoadPct, foregoneTax: foregoneTax,
+                        actualTaxRev: actualTaxRev, constJobsTotal: constJobsTotal, directJobs: directJobs,
+                        totalJobs: totalJobs, reCapacityMW: reCapacity, co2AvoidedTons: co2Avoided,
+                        wasteHeatAnnual: wasteHeatAnnual, gdpContrib: gdpContrib,
+                        costScore: costScore, benefitScore: benefitScore, netScore: netScore,
+                        method: 'screening-grade community net-score (article-14 model)'
+                    };
+                },
+            },
+            /* ── A15: ops budget + staffing resilience (article-15 promoted). input
+             * {countryKey, loadMW, pue, staffModelKey, retention(0-100), pmRatio(0-100)}. ── */
+            opsBudget: {
+                opex: function (inp) {
+                    var O = DATA.opsBudget;
+                    var r = O.countries[inp.countryKey] || O.countries['US-Virginia'];
+                    var sm = O.staffModels[inp.staffModelKey] || O.staffModels.inhouse;
+                    var loadKW = inp.loadMW * 1000;
+                    var energyCostUSD = loadKW * inp.pue * r.energyRate * 8760 * r.fxToUSD;
+                    var baseFTE = Math.ceil(inp.loadMW * sm.ftePerMW);
+                    var shiftFTE = Math.ceil(baseFTE * O.shiftMult);
+                    var laborRateUSD = r.laborRate * r.fxToUSD;
+                    var burdenedRate = laborRateUSD * O.laborBurden;
+                    var laborBudget = shiftFTE * burdenedRate * sm.costMult;
+                    var maintBudget = inp.loadMW * O.maintPerMwUsd * r.tropFactor;
+                    var pmEfficiency = 1.0 - (inp.pmRatio / 100 - O.pmBaseline) * O.pmSavingsSlope;
+                    maintBudget = maintBudget * pmEfficiency;
+                    var totalOpex = energyCostUSD + laborBudget + maintBudget;
+                    var CV = O.cashVariance;
+                    var cashVariance = Math.max(CV.floorPct, CV.basePct - (inp.pmRatio / 100 - O.pmBaseline) * CV.reductionSlope);
+                    var maintCapex = maintBudget * O.maintCapexShare;
+                    var ffo = totalOpex * O.ffoFactor;
+                    return {
+                        energyCost: energyCostUSD, laborBudget: laborBudget, maintBudget: maintBudget,
+                        totalOpex: totalOpex, opexPerMW: totalOpex / inp.loadMW, costPerKW: totalOpex / (loadKW * 12),
+                        cashVariance: cashVariance, affo: ffo - maintCapex,
+                        baseFTE: baseFTE, shiftFTE: shiftFTE, laborRateUSD: laborRateUSD,
+                        burdenedRate: burdenedRate, maintCapex: maintCapex
+                    };
+                },
+                staffing: function (inp, opex) {
+                    var O = DATA.opsBudget;
+                    var sm = O.staffModels[inp.staffModelKey] || O.staffModels.inhouse;
+                    var U = O.utilization, headcount = opex.shiftFTE;
+                    var baseUtil = U.base + (inp.loadMW / 100) * (U.perLoadMw * 100);
+                    var utilization = Math.max(U.min, Math.min(U.max, baseUtil * sm.qualityMult));
+                    var burnoutProb = 1.0 / (1.0 + Math.exp(-O.burnout.k * (utilization - O.burnout.midUtil))) * 100;
+                    var inhouseCost = opex.burdenedRate * O.shiftMult;
+                    var outsourcedCost = opex.burdenedRate * O.shiftMult * O.outsourcedCostFactor;
+                    var breakevenFTE = Math.max(1, Math.round(O.mgmtOverheadPerFteUsd / (inhouseCost - outsourcedCost)));
+                    var turnoverRate = (100 - inp.retention) / 100;
+                    var retentionCost = Math.round(headcount * turnoverRate * (opex.laborRateUSD * O.replacementCostFactor));
+                    var spof = Math.max(0, Math.round(Math.max(0, O.spof.base - headcount * O.spof.perHeadcount) + (100 - inp.retention) / O.spof.retentionDiv));
+                    var W = O.sriWeights;
+                    var sri = Math.max(0, Math.min(100,
+                        (inp.retention * W.retention) + ((100 - burnoutProb) * W.burnout) +
+                        (inp.pmRatio * W.pm) + (sm.qualityMult * 100 * W.quality) - (spof * W.spofPenalty)));
+                    var hep = O.hepBase * (1 + (burnoutProb / 100) * 0.5) * (1 + turnoverRate * 0.3) * (2.0 - sm.qualityMult);
+                    return {
+                        headcount: headcount, utilization: utilization, burnoutProb: burnoutProb,
+                        breakevenFTE: breakevenFTE, retentionCost: retentionCost, spof: spof,
+                        resilienceIdx: Math.round(sri), hep: hep
+                    };
+                },
+            },
+            /* ── A16/A17: SEA DC market screening (articles 16+17 promoted). ── */
+            dcMarket: {
+                /** Bubble-risk model (article-16). input {op,pipe,pop,absorb,
+                 *  precommit(0-1),spec(0-1),demandGrowth(0-1),costMW($M),revMW($M/yr),
+                 *  opexRatio(0-1),wacc(0-1)}. Math preserved EXACTLY. */
+                bubbleRisk: function (i) {
+                    var B = DATA.dcMarket.bubble;
+                    var newCapacity = i.pipe - i.op;
+                    var sdRatio = (newCapacity > 0) ? i.pipe / (i.absorb * B.supplyYears) : 1;
+                    var yearsAbsorb = newCapacity / Math.max(1, i.absorb);
+                    var threeYrAbsorb = i.absorb * B.absorbWindowYears;
+                    var actualVacancy = Math.max(B.vacancyMin, Math.min(B.vacancyMax, (1 - (threeYrAbsorb / Math.max(1, newCapacity * B.vacancyShare))) * B.vacancyScale));
+                    var specMW = newCapacity * i.spec;
+                    var capitalRisk = specMW * i.costMW;
+                    var totalCapex = newCapacity * i.costMW;
+                    var breakeven = i.opexRatio * 100 + (i.spec * B.breakevenSpecSlope);
+                    var avgOccupancy = Math.max(B.occMin, B.occBase - (sdRatio * B.occSlope)) / 100;
+                    var annualRev = i.revMW * i.pipe * avgOccupancy;
+                    var annualEBITDA = annualRev * (1 - i.opexRatio);
+                    var paybackYears = annualEBITDA > 0 ? totalCapex / annualEBITDA : 99;
+                    var npv = -totalCapex;
+                    for (var yr = 1; yr <= B.npvYears; yr++) {
+                        var occYear = yr <= B.rampYears ? (B.rampStartOcc + (avgOccupancy - B.rampStartOcc) * (yr / B.rampYears)) : avgOccupancy;
+                        npv += i.revMW * i.pipe * occYear * (1 - i.opexRatio) / Math.pow(1 + i.wacc, yr);
+                    }
+                    var RC = B.riskCaps, RS = B.riskSlopes;
+                    var riskScore = 0;
+                    riskScore += Math.min(RC.sd, sdRatio * RS.sd);
+                    riskScore += Math.min(RC.spec, i.spec * RS.spec);
+                    riskScore += Math.min(RC.precommit, (1 - i.precommit) * RS.precommit);
+                    riskScore += Math.min(RC.absorb, Math.max(0, yearsAbsorb - RS.absorbYears) * RS.absorbSlope);
+                    riskScore += Math.min(RC.payback, Math.max(0, paybackYears - RS.paybackYears) * RS.paybackSlope);
+                    riskScore = Math.min(100, Math.max(0, riskScore));
+                    return {
+                        sdRatio: sdRatio, yearsAbsorb: yearsAbsorb, actualVacancy: actualVacancy,
+                        specMW: specMW, capitalRisk: capitalRisk, totalCapex: totalCapex,
+                        breakeven: breakeven, avgOccupancy: avgOccupancy, annualRev: annualRev,
+                        annualEBITDA: annualEBITDA, paybackYears: paybackYears,
+                        pipePerPop: i.pop > 0 ? i.pipe / i.pop : 0, npv: npv, riskScore: riskScore,
+                        newCapacity: newCapacity, threeYrAbsorb: threeYrAbsorb
+                    };
+                },
+                /** Opportunity model (article-17). input {op,pipe,pop,digiGrowth(0-1),
+                 *  sovDemand(MW),infCAGR(0-1),entMigration(0-1),buildCost($M/MW),
+                 *  revMW($M/yr),opexRatio(0-1),wacc(0-1)}. Math preserved EXACTLY
+                 *  (incl. Newton-Raphson IRR). */
+                opportunity: function (i) {
+                    var Op = DATA.dcMarket.opportunity, yr, occYear, cf;
+                    var baselineDemand = i.op;
+                    var digiDemandGrowth = i.op * (Math.pow(1 + i.digiGrowth, Op.horizonYears) - 1) * Op.digiCapture;
+                    var entDemand = i.pipe * i.entMigration * Op.entCapture;
+                    var infDemand = i.op * Op.infBaseShare * Math.pow(1 + i.infCAGR, Op.horizonYears);
+                    var totalDemand = baselineDemand + digiDemandGrowth + entDemand + infDemand + i.sovDemand;
+                    var uncounted = entDemand + infDemand + i.sovDemand;
+                    var utilization = Math.min(Op.utilizationCap, (totalDemand / i.pipe) * 100);
+                    var deficit = totalDemand - i.pipe;
+                    var wattsPerCapita = ((i.op + i.pipe) * 1000000) / (i.pop * 1000000);
+                    var yearsToFill = i.pipe > 0 ? (i.pipe - i.op) / ((totalDemand - i.op) / Op.horizonYears) : 0;
+                    var totalCapex = i.pipe * i.buildCost;
+                    var stabilizedOcc = Math.min(Op.occMax, Math.max(Op.occMin, (totalDemand / i.pipe) * Op.occFactor));
+                    var annualRevStabilized = i.revMW * i.pipe * stabilizedOcc;
+                    var annualEBITDA = annualRevStabilized * (1 - i.opexRatio);
+                    var npv = -totalCapex;
+                    for (yr = 1; yr <= Op.npvYears; yr++) {
+                        occYear = yr <= Op.rampYears ? (Op.rampStartOcc + (stabilizedOcc - Op.rampStartOcc) * (yr / Op.rampYears)) : stabilizedOcc;
+                        npv += i.revMW * i.pipe * occYear * (1 - i.opexRatio) / Math.pow(1 + i.wacc, yr);
+                    }
+                    var irr = 0.10;
+                    for (var iter = 0; iter < 50; iter++) {
+                        var npvTest = -totalCapex, dnpv = 0;
+                        for (yr = 1; yr <= Op.npvYears; yr++) {
+                            occYear = yr <= Op.rampYears ? (Op.rampStartOcc + (stabilizedOcc - Op.rampStartOcc) * (yr / Op.rampYears)) : stabilizedOcc;
+                            cf = i.revMW * i.pipe * occYear * (1 - i.opexRatio);
+                            npvTest += cf / Math.pow(1 + irr, yr);
+                            dnpv -= yr * cf / Math.pow(1 + irr, yr + 1);
+                        }
+                        if (Math.abs(dnpv) < 0.001) break;
+                        irr = irr - npvTest / dnpv;
+                        if (irr < -0.5) { irr = -0.5; break; }
+                        if (irr > 2) { irr = 2; break; }
+                    }
+                    var cumulCF = -totalCapex, payback = 10;
+                    for (yr = 1; yr <= 15; yr++) {
+                        occYear = yr <= Op.rampYears ? (Op.rampStartOcc + (stabilizedOcc - Op.rampStartOcc) * (yr / Op.rampYears)) : stabilizedOcc;
+                        cf = i.revMW * i.pipe * occYear * (1 - i.opexRatio);
+                        cumulCF += cf;
+                        if (cumulCF >= 0) { payback = yr - (cumulCF / cf); break; }
+                    }
+                    var numFacilities = i.pipe / Op.facilityMw;
+                    var jobsConstruct = Math.round(numFacilities * Op.jobsConstructPerFacility);
+                    var jobsPerm = Math.round(numFacilities * Op.jobsPermPerFacility);
+                    var SC = Op.scoreCaps, SS = Op.scoreSlopes;
+                    var oppScore = 0;
+                    oppScore += Math.min(SC.util, utilization * SS.util);
+                    oppScore += Math.min(SC.digi, i.digiGrowth * SS.digi);
+                    oppScore += Math.min(SC.sov, (i.sovDemand / Math.max(1, i.pipe)) * SS.sov);
+                    oppScore += Math.min(SC.inf, i.infCAGR * SS.inf);
+                    oppScore += Math.min(SC.ent, i.entMigration * SS.ent);
+                    oppScore = Math.min(100, Math.max(0, oppScore));
+                    return {
+                        totalDemand: totalDemand, uncounted: uncounted, utilization: utilization, deficit: deficit,
+                        baselineDemand: baselineDemand, digiDemandGrowth: digiDemandGrowth, entDemand: entDemand,
+                        infDemand: infDemand, sovTotal: i.sovDemand,
+                        wattsPerCapita: wattsPerCapita, yearsToFill: yearsToFill,
+                        totalCapex: totalCapex, annualRevStabilized: annualRevStabilized, annualEBITDA: annualEBITDA,
+                        npv: npv, irr: irr, payback: payback, stabilizedOcc: stabilizedOcc,
+                        jobsConstruct: jobsConstruct, jobsPerm: jobsPerm, jobsEco: Math.round(jobsPerm * Op.jobsEcoMult),
+                        taxRevenue: annualRevStabilized * Op.taxRevFactor, oppScore: oppScore
+                    };
+                },
+            },
+            /* ── A22: AI interconnect comparison (article-22 promoted). input
+             * {gpuCount, gpuPerRack, portSpeedG(200|400|800|1600), linkDistM,
+             * elecCostKwh}. Math preserved EXACTLY. ── */
+            interconnect: {
+                compare: function (inp) {
+                    var I = DATA.interconnect;
+                    var links = inp.gpuCount;
+                    var racks = Math.ceil(inp.gpuCount / inp.gpuPerRack);
+                    var sf = I.speedFactor[inp.portSpeedG] || I.speedFactor[800];
+                    var copperMaxReach = I.copper.reachM[inp.portSpeedG] != null ? I.copper.reachM[inp.portSpeedG] : 1;
+                    var copperPowerPerLink = I.copper.wattsBase * sf;
+                    var copperViable = inp.linkDistM <= copperMaxReach;
+                    var copperLatencyNs = copperViable ? I.copper.latencyNsAtReach * (inp.linkDistM / copperMaxReach) : I.copper.latencyUnviableNs;
+                    var plugMaxReach = I.pluggable.reachM[inp.portSpeedG] != null ? I.pluggable.reachM[inp.portSpeedG] : 100;
+                    var plugPowerPerLink = I.pluggable.wattsBase * sf * I.pluggable.efficiency;
+                    var plugViable = inp.linkDistM <= plugMaxReach;
+                    var plugLatencyNs = I.pluggable.latencyBaseNs + (inp.linkDistM * I.pluggable.latencyPerMNs);
+                    var cpoPowerPerLink = I.cpo.wattsBase * sf * I.cpo.efficiency;
+                    var cpoViable = inp.linkDistM <= I.cpo.reachM;
+                    var cpoLatencyNs = I.cpo.latencyBaseNs + (inp.linkDistM * I.cpo.latencyPerMNs);
+                    var kwhFactor = 8760 * inp.elecCostKwh / 1000;
+                    return {
+                        links: links, racks: racks, speedFactor: sf,
+                        copper: { powerPerLinkW: copperPowerPerLink, maxReachM: copperMaxReach, viable: copperViable, latencyNs: copperLatencyNs, annualCostUsd: copperViable ? links * copperPowerPerLink * kwhFactor : 0 },
+                        pluggable: { powerPerLinkW: plugPowerPerLink, maxReachM: plugMaxReach, viable: plugViable, latencyNs: plugLatencyNs, annualCostUsd: plugViable ? links * plugPowerPerLink * kwhFactor : 0 },
+                        cpo: { powerPerLinkW: cpoPowerPerLink, maxReachM: I.cpo.reachM, viable: cpoViable, latencyNs: cpoLatencyNs, annualCostUsd: cpoViable ? links * cpoPowerPerLink * kwhFactor : 0 },
+                        method: 'screening-grade per-link power/latency/cost (article-22 model)'
+                    };
+                },
+            },
+            /* ── A25: grid reserve-margin adequacy (article-25 promoted). input
+             * {capacity(GW), peakDemand(GW), retirements(GW), newGen(GW), dcGrowth(GW),
+             * otherGrowth(GW), reserveTarget(%), elcc(%)}. Math preserved EXACTLY. ── */
+            gridReserve: {
+                adequacy: function (inp) {
+                    var G = DATA.gridReserve;
+                    var elcc = inp.elcc / 100;
+                    var dispatchableNew = inp.newGen * (1 - G.renewableShareOfNew);
+                    var renewableNew = inp.newGen * G.renewableShareOfNew * elcc;
+                    var effectiveNewGen = dispatchableNew + renewableNew;
+                    var netAvailable = inp.capacity - inp.retirements + effectiveNewGen;
+                    var peakDemand = inp.peakDemand + inp.dcGrowth + inp.otherGrowth;
+                    var reserveMargin = ((netAvailable - peakDemand) / peakDemand) * 100;
+                    var requiredCapacity = peakDemand * (1 + inp.reserveTarget / 100);
+                    var surplusDeficit = netAvailable - requiredCapacity;
+                    var R = G.risk;
+                    var marginGap = inp.reserveTarget - reserveMargin;
+                    var riskFromMargin = Math.min(100, Math.max(0, marginGap * R.marginSlope));
+                    var riskFromDeficit = surplusDeficit < 0 ? Math.min(100, Math.abs(surplusDeficit) * R.deficitSlope) : 0;
+                    var riskFromRetirements = Math.min(R.retireCap, (inp.retirements / inp.capacity) * 100);
+                    var blackoutRisk = Math.min(100, Math.round(riskFromMargin * R.wMargin + riskFromDeficit * R.wDeficit + riskFromRetirements * R.wRetire));
+                    var auctionPrice = null;
+                    for (var c = 0; c < G.auctionCurve.length; c++) {
+                        var band = G.auctionCurve[c];
+                        if (reserveMargin >= band.minMargin) { auctionPrice = band.base + (band.pivot - reserveMargin) * band.slope; break; }
+                    }
+                    if (auctionPrice == null) { var last = G.auctionCurve[G.auctionCurve.length - 1]; auctionPrice = last.base + (last.pivot - reserveMargin) * last.slope; }
+                    var annualCost = (auctionPrice * netAvailable * 1000 * 365) / 1e9;
+                    var baselineCost = (G.baseline.priceMwDay * G.baseline.capacityGW * 1000 * 365) / 1e9;
+                    return {
+                        netAvailable: netAvailable, peakDemand: peakDemand,
+                        reserveMargin: reserveMargin, surplusDeficit: surplusDeficit,
+                        blackoutRisk: blackoutRisk, dcShare: (inp.dcGrowth / peakDemand) * 100,
+                        auctionPrice: auctionPrice, costImpact: annualCost - baselineCost,
+                        annualCost: annualCost, effectiveNewGen: effectiveNewGen,
+                        effectiveRetirements: inp.retirements,
+                        method: 'screening-grade reserve-margin adequacy (article-25 model)'
+                    };
                 },
             },
             /* ── A11: residential bill-impact screening (article-11 promoted) ── */
@@ -8116,6 +8868,52 @@
             water: {
                 /** WUE (L/kWh) for a cooling type. */
                 wue: function (cooling) { return DATA.water.wueByType[cooling] != null ? DATA.water.wueByType[cooling] : DATA.water.wueByType.air; },
+                /** A10: SEA water-stress cost model (article-10 promoted). input
+                 *  {powerMw, wue(L/kWh), regionKey}. Math preserved EXACTLY. */
+                stressCost: function (inp) {
+                    var W = DATA.waterStress;
+                    var region = W.regions[inp.regionKey] || W.regions.jakarta;
+                    var annualKwh = inp.powerMw * 1000 * 8760;
+                    var annualLiters = annualKwh * inp.wue;
+                    var annualM3 = annualLiters / 1000;
+                    var annualML = annualLiters / 1e6;
+                    var annualCost = annualM3 * region.waterPrice;
+                    var tco10 = 0, tco10Nominal = 0;
+                    for (var y = 0; y < W.tcoYears; y++) {
+                        var yearCost = annualCost * Math.pow(1 + W.escalation, y);
+                        tco10Nominal += yearCost;
+                        tco10 += yearCost / Math.pow(1 + W.discountRate, y);
+                    }
+                    var dlcWue = Math.max(inp.wue * W.dlcWueFactor, 0);
+                    var dlcM3 = inp.powerMw * 1000 * 8760 * dlcWue / 1000;
+                    var dlcCost = dlcM3 * region.waterPrice;
+                    var hybridWue = inp.wue * W.hybridWueFactor;
+                    var hybridM3 = inp.powerMw * 1000 * 8760 * hybridWue / 1000;
+                    var hybridCost = hybridM3 * region.waterPrice;
+                    var evapCost = annualCost;
+                    var dlcSaving = evapCost > 0 ? ((evapCost - dlcCost) / evapCost * 100) : 0;
+                    var riskPremiumPct = W.riskPremiumBands[W.riskPremiumBands.length - 1].pct;
+                    for (var b = 0; b < W.riskPremiumBands.length; b++) {
+                        if (region.riskScore >= W.riskPremiumBands[b].min) { riskPremiumPct = W.riskPremiumBands[b].pct; break; }
+                    }
+                    var recycleCapex = inp.powerMw * W.recycle.capexPerMw;
+                    var recycleSaving = annualCost * W.recycle.savingFraction;
+                    return {
+                        annualKwh: annualKwh, annualM3: annualM3, annualML: annualML,
+                        annualCost: annualCost, costPerMW: annualCost / Math.max(inp.powerMw, 1),
+                        tco10: tco10, tco10Nominal: tco10Nominal,
+                        evapCost: evapCost, dlcCost: dlcCost, hybridCost: hybridCost, airCost: 0, dlcSaving: dlcSaving,
+                        costPerML_evap: annualML > 0 ? (evapCost / annualML) : 0,
+                        costPerML_dlc: (dlcM3 / 1000) > 0 ? (dlcCost / (dlcM3 / 1000)) : 0,
+                        costPerML_hybrid: (hybridM3 / 1000) > 0 ? (hybridCost / (hybridM3 / 1000)) : 0,
+                        riskPremiumPct: riskPremiumPct, riskPremium: annualCost * riskPremiumPct / 100,
+                        recycleCapex: recycleCapex, recycleSaving: recycleSaving,
+                        recyclePayback: recycleSaving > 0 ? recycleCapex / recycleSaving : 99,
+                        waterEnergyNexus: W.nexus.baseKwhPerMl + region.stressScore * W.nexus.perStressScore,
+                        dlcM3: dlcM3, hybridM3: hybridM3,
+                        method: 'screening-grade water cost/risk (article-10 model)'
+                    };
+                },
                 /** Annual water use (m³) — WUE × IT energy. mw = IT load. */
                 /** A20b: per-query AI water footprint (article-20 wfc/avh tabs).
                  *  input {modelKey, complexity?, cooling?, region?, includeUpstream?,

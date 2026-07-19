@@ -9,13 +9,14 @@ import { COUNTRIES } from '@/constants/countries';
 import { CountrySelect } from '@/components/ui/CountrySelect';
 import { CreatableCombobox, type ComboValue } from '@/components/ui/CreatableCombobox';
 import { ATTR_BOUNDS, type CandidateSite, type SiteAttributes } from '@/types/site-intel';
+import { countryBaselineAttributes, SCREENING_ATTR_DEFAULTS } from '@/lib/site-adapter';
 import { X, Plus, Trash2 } from 'lucide-react';
 
 type NumKey = keyof typeof ATTR_BOUNDS;
 
 const NUM_FIELDS: { key: NumKey; label: string; presets: number[] }[] = [
     { key: 'availableCapacityMw', label: 'Available Capacity', presets: [50, 100, 200, 300] },
-    { key: 'gridVoltageKv', label: 'Grid Voltage', presets: [33, 132, 220] },
+    { key: 'gridVoltageKv', label: 'Grid Voltage', presets: [11, 20, 33, 66, 132, 220] },
     { key: 'saidiMinYr', label: 'SAIDI (grid)', presets: [30, 100, 300, 600] },
     { key: 'powerCostKwh', label: 'Power Cost', presets: [0.05, 0.09, 0.12, 0.2] },
     { key: 'submarineCableLandings', label: 'Cable Landings', presets: [0, 1, 2, 4] },
@@ -64,9 +65,27 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
     const site: CandidateSite | undefined = sites.find((s) => s.id === selectedSiteId) ?? sites[0];
     if (!open || !site) return null;
 
+    /* PREFILL (owner): unset fields show the EFFECTIVE value — country baseline
+     * (cyan) else screening typical (amber) — as placeholder; store stays unset
+     * (= baseline semantics) until the user picks/enters a value (violet custom). */
+    const baseline = countryBaselineAttributes(site.countryId);
     const numVal = (k: NumKey): ComboValue<number> | null => {
         const v = site.attributes[k] as number | undefined;
         return v == null ? null : { value: v, isCustom: true };
+    };
+    const prefill = (k: NumKey): { text: string; src: 'baseline' | 'screening' } | null => {
+        const unit = ATTR_BOUNDS[k]?.unit ? ` ${ATTR_BOUNDS[k]!.unit}` : '';
+        if (baseline[k] != null) return { text: `${baseline[k]}${unit}`, src: 'baseline' };
+        if (SCREENING_ATTR_DEFAULTS[k] != null) return { text: `${SCREENING_ATTR_DEFAULTS[k]}${unit}`, src: 'screening' };
+        return null;
+    };
+    const srcChip = (k: NumKey) => {
+        if ((site.attributes[k] as number | undefined) != null)
+            return <span className="ml-1 rounded bg-violet-500/15 px-1 text-[8px] font-bold text-violet-500">custom</span>;
+        const p = prefill(k);
+        if (p?.src === 'baseline') return <span className="ml-1 rounded bg-cyan-500/15 px-1 text-[8px] font-bold text-cyan-500" title={`Baseline negara ${COUNTRIES[site.countryId]?.name ?? site.countryId} — dipakai engine sampai diganti`}>baseline</span>;
+        if (p?.src === 'screening') return <span className="ml-1 rounded bg-amber-500/15 px-1 text-[8px] font-bold text-amber-500" title="Screening typical — belum ada data negara/site; isi untuk mempertajam skor">screening</span>;
+        return null;
     };
 
     return (
@@ -108,10 +127,11 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
                         const b = ATTR_BOUNDS[f.key]!;
                         return (
                             <label key={f.key} className="block">
-                                <span className="text-[9px] font-medium uppercase text-slate-500">{f.label}</span>
+                                <span className="text-[9px] font-medium uppercase text-slate-500">{f.label}{srcChip(f.key)}</span>
                                 <CreatableCombobox<number>
                                     options={f.presets.map((p) => ({ value: p, label: `${p}${b.unit ? ' ' + b.unit : ''}` }))}
                                     value={numVal(f.key)} min={b.min} max={b.max} unit={b.unit}
+                                    placeholder={prefill(f.key)?.text ?? 'Select…'}
                                     onChange={(v) => updateAttributes(site.id, { [f.key]: v?.value } as Partial<SiteAttributes>)} />
                             </label>
                         );

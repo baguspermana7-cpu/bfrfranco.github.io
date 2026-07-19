@@ -349,3 +349,41 @@ export function integratedAxes(r: SiteScoreResult, an: SiteAnalyses): { axis: st
         { axis: 'Land & Infra', score: r.axes.landInfra },
     ];
 }
+
+/* ─── Edit-Criteria PREFILL (owner: "edit criteria harusnya prefill") ────────
+ * Effective value shown in the drawer when a site attribute is UNSET:
+ * country baseline (COUNTRIES tables, sourced) first, else a labeled
+ * SCREENING typical. Display-only — the store stays unset (= baseline
+ * semantics in deriveFactors) until the user actually picks/enters a value. */
+export function countryBaselineAttributes(countryId: string): Partial<Record<keyof SiteAttributes, number>> {
+    const c = COUNTRIES[countryId];
+    if (!c) return {};
+    const out: Partial<Record<keyof SiteAttributes, number>> = {};
+    if (c.environment?.saidiMinYr != null) out.saidiMinYr = c.environment.saidiMinYr;
+    if (c.economy?.electricityRate != null) out.powerCostKwh = c.economy.electricityRate;
+    if (c.environment?.baselineAQI != null) out.airQualityIndex = c.environment.baselineAQI;
+    if (c.environment?.aqueductStressScore != null) out.waterStress0to5 = c.environment.aqueductStressScore;
+    if (c.environment?.pgaPct2in50yr != null) out.pgaPct2in50yr = c.environment.pgaPct2in50yr;
+    if (c.economy?.taxRate != null) out.effectiveTaxRate = c.economy.taxRate;
+    if (c.constructionIndex != null) out.constructionCostIndex = c.constructionIndex;
+    return out;
+}
+
+/** SCREENING typicals for attributes with no country table (labeled amber in
+ *  the drawer; mid-band values for a 5-20 MW AI-DC greenfield screening). */
+export const SCREENING_ATTR_DEFAULTS: Partial<Record<keyof SiteAttributes, number>> = {
+    availableCapacityMw: 100,        // typical committed utility intake band
+    gridVoltageKv: 132,              // dedicated HV intake, hyperscale screening
+    submarineCableLandings: 1,
+    distanceToCableLandingKm: 50,
+    avgAmbientC: 27,                 // tropical/subtropical DC market typical
+    coolingDegreeDays: 2500,
+    totalAcres: 100,
+    usableAcres: 80,
+    distHighwayKm: 5,
+    distPortKm: 30,
+    distAirportKm: 25,
+    permitMonths: 12,
+    landCostPerM2: 150,
+    waterCostPerM3: 1,
+};

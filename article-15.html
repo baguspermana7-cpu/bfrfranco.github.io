@@ -3451,6 +3451,8 @@ function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySel
     // PANEL 1: OPEX FINANCIAL INTELLIGENCE
     // ============================================================
     function calcOpex(inp) {
+        var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.opsBudget;
+        if (eng && eng.opex) return eng.opex(inp);   // ENGINE-BOUND (models.opsBudget.opex — single source; inline below kept as fallback)
         var r = inp.region;
         var loadKW = inp.loadMW * 1000;
 
@@ -3508,6 +3510,8 @@ function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySel
     // PANEL 2: STAFFING RESILIENCE ANALYSIS
     // ============================================================
     function calcStaffing(inp, opex) {
+        var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.opsBudget;
+        if (eng && eng.staffing) return eng.staffing(inp, opex);   // ENGINE-BOUND (models.opsBudget.staffing — single source; inline below kept as fallback)
         var sm = inp.staffModel;
         var headcount = opex.shiftFTE;
 
@@ -4464,7 +4468,7 @@ function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySel
 <!-- Search: shared js/rz-command-palette.js -->
 <script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 <script src="auth.js?v=2026-07-16b" defer></script>
-<script src="rz-engine.min.js?v=2026-07-19-c40" defer></script>
+<script src="rz-engine.min.js?v=2026-07-20-b" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

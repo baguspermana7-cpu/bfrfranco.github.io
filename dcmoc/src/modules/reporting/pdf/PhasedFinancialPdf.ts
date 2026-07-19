@@ -28,6 +28,8 @@ export const generatePhasedFinancialPDF = async (
         crossModuleAdjustments?: any[];
         blendedCashflows?: any[];
         narrative?: string;
+        /** Per-phase computed decision rationale + quantified levers (decision-explain lib). */
+        decisionExplains?: { label: string; verdict: string; reason: string; levers: string[] }[];
     },
     branding?: BrandingConfig
 ) => {
@@ -103,6 +105,43 @@ export const generatePhasedFinancialPDF = async (
                     if (val === 'GO') { data.cell.styles.textColor = [34, 197, 94]; data.cell.styles.fontStyle = 'bold'; }
                     else if (val === 'CONDITIONAL') { data.cell.styles.textColor = [245, 158, 11]; data.cell.styles.fontStyle = 'bold'; }
                     else { data.cell.styles.textColor = [220, 38, 38]; data.cell.styles.fontStyle = 'bold'; }
+                }
+            }
+        });
+        y = (doc as any).lastAutoTable.finalY + 10;
+    }
+
+    // Decision rationale + quantified levers (computed by bisection on the
+    // same cashflow model — see src/lib/decision-explain.ts)
+    if (pd.decisionExplains && pd.decisionExplains.length > 0) {
+        y = ensureSpace(doc, y, 40, pg);
+        y = drawSectionTitle(doc, y, 'Decision Rationale & Required Changes', '1.1', branding);
+
+        const explainRows = pd.decisionExplains.map((ex) => [
+            ex.label,
+            ex.verdict,
+            ex.reason,
+            ex.levers.length > 0 ? ex.levers.map((l) => `• ${l}`).join('\n') : '—',
+        ]);
+
+        autoTable(doc, {
+            startY: y,
+            head: [['Phase', 'Verdict', 'Why (computed)', 'What must change / headroom (computed)']],
+            body: explainRows,
+            theme: 'grid',
+            headStyles: { fillColor: PDF_COLORS.slate900, textColor: 255, fontSize: 8 },
+            bodyStyles: { fontSize: 7, cellPadding: 2 },
+            columnStyles: {
+                0: { cellWidth: 22 },
+                1: { cellWidth: 18, halign: 'center' },
+                2: { cellWidth: 65 },
+            },
+            margin: { left: 14, right: 14 },
+            didParseCell: (data: any) => {
+                if (data.section === 'body' && data.column.index === 1) {
+                    const val = data.cell.text[0];
+                    data.cell.styles.fontStyle = 'bold';
+                    data.cell.styles.textColor = val === 'GO' ? [34, 197, 94] : [220, 38, 38];
                 }
             }
         });

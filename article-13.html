@@ -4390,11 +4390,25 @@ E = Cf × En × (t/0.2) × (610/D)^x
             const redundancy = document.getElementById('redundancy').value;
             const components = parseInt(document.getElementById('components').value) || 4;
 
+            // ENGINE-BOUND (models.reliability availability/parallelAvailability kernels —
+            // shared RAM math; the inline formulas below are kept verbatim as fallback)
+            var engRel = window.RZEngine && window.RZEngine.models && window.RZEngine.models.reliability;
+
             // Single component availability
-            const singleA = mtbf / (mtbf + mttr);
+            const singleA = (engRel && engRel.availability)
+                ? engRel.availability(mtbf, mttr)
+                : mtbf / (mtbf + mttr);
 
             let systemA;
-            switch(redundancy) {
+            if (engRel && engRel.parallelAvailability) {
+                switch(redundancy) {
+                    case 'N':    systemA = Math.pow(singleA, components); break;
+                    case 'N+1':  systemA = engRel.parallelAvailability(singleA, 2); break;
+                    case '2N':   systemA = engRel.parallelAvailability(Math.pow(singleA, components/2), 2); break;
+                    case '2N+1': systemA = engRel.parallelAvailability(engRel.parallelAvailability(singleA, 2), 2); break;
+                    default:     systemA = singleA;
+                }
+            } else switch(redundancy) {
                 case 'N':
                     // Series - all must work
                     systemA = Math.pow(singleA, components);
@@ -4418,7 +4432,9 @@ E = Cf × En × (t/0.2) × (610/D)^x
 
             // Calculate metrics
             const availabilityPercent = (systemA * 100).toFixed(4);
-            const downtimeMinutes = Math.round(525600 * (1 - systemA));
+            const downtimeMinutes = Math.round((engRel && engRel.annualDowntimeMinutes)
+                ? engRel.annualDowntimeMinutes(systemA)
+                : 525600 * (1 - systemA));
             const nines = Math.min(9, Math.floor(-Math.log10(1 - systemA)));
 
             // Determine tier
@@ -5422,7 +5438,7 @@ function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySel
 <!-- Search: shared js/rz-command-palette.js -->
 <script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 <script src="auth.js?v=2026-07-16b" defer></script>
-<script src="rz-engine.min.js?v=2026-07-19-c40" defer></script>
+<script src="rz-engine.min.js?v=2026-07-20-b" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

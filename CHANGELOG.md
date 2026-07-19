@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v1.96.0 — 2026-07-20 (ARTICLE SWEEP 22/22 + O&M pricing research + site-intel ƒx + 3 bug nyata + fleet malam)
+
+### Added
+- **Article-calculator engine sweep COMPLETE (22/22)** — final 14 halaman: 12 wired ke engine (`models.resilience`, `safetyCulture`, `hvac`, `water.stressCost`, `dcValue`, reliability existing (a13), `communityImpact`, `opsBudget`, `dcMarket.bubbleRisk/opportunity`, `interconnect`, `gridReserve`) + a19/a21 murni prosa (tanpa kalkulator, skip sah). 66 assert baru (golden dihitung independen dari formula halaman asli). Headless probe 12/12. Gate engine **590/0**.
+- **O&M pricing research (DN)**: `DATA.omContracts` (tier Comprehensive/Preventive/On-call, band $/kW-yr 30-60/20-40/10-20, multiplier third-party 0.65 & aging 1.5) + `DATA.sparesPricing` (8 class: UPS module 50kW $25-60K, VRLA string $8-15K, genset PM kit & top-overhaul, kompresor chiller $80-250K, CRAH EC fan kit, MCCB, filter) — band bersumber publik 2024-2026 (screening, sumber di DATA.sources), 24 assert gate (monotonic + sourced). Spares-adapter unitCost kini baca tabel riset (provenance emerald `engine`), fallback screening.
+- **Korpus DayOne**: URL fixed → extract+aggregate, gate dc-corpus 389/0; katalog 49 namespace/200 fn/104 sumber.
+- **Site Intelligence full trace (ƒx)**: 30 node `site.*` (5 engine terintegrasi: grid/disaster/tax/talent/compliance + leaf panel SAIDI/tarif/AQI/WRI/PGA/tax) — semua angka kartu Integrated Analyses + Detail Panels klik-to-trace.
+- **Edit Criteria PREFILL**: field kosong menampilkan nilai efektif — baseline negara (chip cyan, dari tabel COUNTRIES) atau screening typical (amber); store tetap unset (= semantik baseline). Preset Grid Voltage site +11/20/66 kV.
+- **1.6 prefill DINAMIS (CB)**: `lib/recommended.ts` — 13 rule rekomendasi dihitung live dari parameter (substation by band MW, deep-sea dari poster spec engine, refrigerant lowest-GWP by cooling, fuel by tier, fee AACE band, solar 10% IT + BESS 2h); chip `rec: X` klik-apply + "Terapkan semua rekomendasi"; tanpa overwrite diam-diam. Field Fuel Autonomy ditambah di 1.6.
+- **Decision explainability (DL, Phased Financial)**: verdict GO/NO-GO klik → alasan angka live + lever TERUKUR via bisection 36-iter pada model cashflow yang sama (Revenue +X% ke $Y/kW/bln, CAPEX −Z%, catatan hurdle); KPI merah klik → panel fase terburuk; PDF dapat section "Decision Rationale & Required Changes".
+- **Staff Model (sim)**: slider AQI predefined dari `environment.baselineAQI` negara + turnover dari `DATA.attritionFactors` engine (chip baseline/override + reset); **Monthly Hidden Loss klik "▸ kenapa?"** → formula live + breakdown per-hire + lever terukur (reset baseline → hemat $X/bln, shift 12h, link lokasi).
+- **Kalender maintenance dirombak**: baris per SYSTEM ×count (222→19 baris; 500MW: 34.815→20), toggle Week/Month, blok ×N warna per tipe, hover panel kaya, klik → detail event di bawah grid.
+
+### Fixed (3 bug nyata)
+- **IRR tax incentives ×100 dobel** (site-intel — sumber "5780%" di screenshot owner): engine sudah mengembalikan persen; render & trace disinkronkan.
+- **PI "0x"** (Phased Financial): formula meng-nol-kan PI saat NPV ≤ 0 — kini (NPV+investasi)/investasi benar (mis. 0.65x), propagasi ke narasi + PDF.
+- **Kalender maintenance blank di fleet besar**: filter nama per-unit `#idx` tidak pernah match event batch `(batch N — X units)` sejak v1.91.4 — baris kosong ratusan; agregasi per-class baru menghilangkan akar masalah.
+
+### Changed
+- **Dedup input (owner)**: Staff Model Config Region & Country → display derived "project" + "Edit di Requirements ↗" (satu sumber); Simulation Year diberi keterangan jujur (kontrol proyeksi analisis); dead code region dibuang. Substation dilabel "Dedicated 20–33kV (5-20MW)" (PLN 20kV, basis biaya sama) di 1.6 + Capex.
+- `?v` engine loader UNIFIED `2026-07-20-b` (57 loader; sebagian stale 2026-07-16 ikut tersapu).
+
+### Verified
+- Engine 590/0 · accuracy 40/0 (2 skip) · parity 155/0 · bindings+staleness 73/0 · dc-corpus 389/0 · js-syntax 133 clean · script-tags 606 clean · dcmoc tsc+build · walk 23/23 · synergy 6/6 · export probe 44/0.
+
 ## v1.95.1 — 2026-07-19 (Trace instrument 5 halaman + explain 802 + DK2 batch)
 
 ### Added

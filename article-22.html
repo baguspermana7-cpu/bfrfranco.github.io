@@ -2140,29 +2140,37 @@
 
         var links = gpuCount;
         var racks = Math.ceil(gpuCount / gpuPerRack);
-        var speedFactor = { 200: 1, 400: 2.1, 800: 4.5, 1600: 9.5 }[portSpeedG] || 4.5;
+
+        // ENGINE-BOUND (models.interconnect.compare — single source; every inline
+        // formula below is kept verbatim as the fallback when the engine is absent)
+        var engIC = window.RZEngine && window.RZEngine.models && window.RZEngine.models.interconnect;
+        var ER = (engIC && engIC.compare)
+            ? engIC.compare({ gpuCount: gpuCount, gpuPerRack: gpuPerRack, portSpeedG: portSpeedG, linkDistM: linkDist, elecCostKwh: elecCost })
+            : null;
+
+        var speedFactor = ER ? ER.speedFactor : ({ 200: 1, 400: 2.1, 800: 4.5, 1600: 9.5 }[portSpeedG] || 4.5);
 
         // Copper DAC
-        var copperMaxReach = { 200: 3, 400: 2, 800: 1, 1600: 0 }[portSpeedG] || 1;
-        var copperPowerPerLink = 0.5 * speedFactor;
-        var copperViable = linkDist <= copperMaxReach;
-        var copperLatencyNs = copperViable ? 5 * (linkDist / copperMaxReach) : 999;
+        var copperMaxReach = ER ? ER.copper.maxReachM : ({ 200: 3, 400: 2, 800: 1, 1600: 0 }[portSpeedG] || 1);
+        var copperPowerPerLink = ER ? ER.copper.powerPerLinkW : 0.5 * speedFactor;
+        var copperViable = ER ? ER.copper.viable : linkDist <= copperMaxReach;
+        var copperLatencyNs = ER ? ER.copper.latencyNs : (copperViable ? 5 * (linkDist / copperMaxReach) : 999);
 
         // Pluggable Optics
-        var plugMaxReach = { 200: 2000, 400: 500, 800: 100, 1600: 2000 }[portSpeedG] || 100;
-        var plugPowerPerLink = 3.5 * speedFactor * 0.65;
-        var plugViable = linkDist <= plugMaxReach;
-        var plugLatencyNs = 50 + (linkDist * 0.005);
+        var plugMaxReach = ER ? ER.pluggable.maxReachM : ({ 200: 2000, 400: 500, 800: 100, 1600: 2000 }[portSpeedG] || 100);
+        var plugPowerPerLink = ER ? ER.pluggable.powerPerLinkW : 3.5 * speedFactor * 0.65;
+        var plugViable = ER ? ER.pluggable.viable : linkDist <= plugMaxReach;
+        var plugLatencyNs = ER ? ER.pluggable.latencyNs : 50 + (linkDist * 0.005);
 
         // CPO
-        var cpoMaxReach = 100;
-        var cpoPowerPerLink = 1.0 * speedFactor * 0.55;
-        var cpoViable = linkDist <= cpoMaxReach;
-        var cpoLatencyNs = 10 + (linkDist * 0.005);
+        var cpoMaxReach = ER ? ER.cpo.maxReachM : 100;
+        var cpoPowerPerLink = ER ? ER.cpo.powerPerLinkW : 1.0 * speedFactor * 0.55;
+        var cpoViable = ER ? ER.cpo.viable : linkDist <= cpoMaxReach;
+        var cpoLatencyNs = ER ? ER.cpo.latencyNs : 10 + (linkDist * 0.005);
 
-        var copperAnnual = copperViable ? (links * copperPowerPerLink * 8760 * elecCost / 1000) : 0;
-        var plugAnnual = plugViable ? (links * plugPowerPerLink * 8760 * elecCost / 1000) : 0;
-        var cpoAnnual = cpoViable ? (links * cpoPowerPerLink * 8760 * elecCost / 1000) : 0;
+        var copperAnnual = ER ? ER.copper.annualCostUsd : (copperViable ? (links * copperPowerPerLink * 8760 * elecCost / 1000) : 0);
+        var plugAnnual = ER ? ER.pluggable.annualCostUsd : (plugViable ? (links * plugPowerPerLink * 8760 * elecCost / 1000) : 0);
+        var cpoAnnual = ER ? ER.cpo.annualCostUsd : (cpoViable ? (links * cpoPowerPerLink * 8760 * elecCost / 1000) : 0);
 
         function fmt(n) { return n >= 1000000 ? (n/1000000).toFixed(1) + 'M' : n >= 1000 ? (n/1000).toFixed(1) + 'K' : n.toFixed(1); }
         function fmtCurr(n) { return '$' + (n >= 1000000 ? (n/1000000).toFixed(2) + 'M' : n >= 1000 ? (n/1000).toFixed(1) + 'K' : n.toFixed(0)); }
@@ -2557,6 +2565,6 @@ function copyLink(){navigator.clipboard.writeText(shareUrl).then(function(){var 
 <script src="js/rz-article-toc.js?v=1.50.42" defer></script>
 
 <script src="auth.js?v=2026-07-16b" defer></script>
-<script src="rz-engine.min.js?v=2026-07-19-c40" defer></script>
+<script src="rz-engine.min.js?v=2026-07-20-b" defer></script>
 </body>
 </html>

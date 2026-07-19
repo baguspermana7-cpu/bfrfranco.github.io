@@ -2874,6 +2874,10 @@ function prefillMarket() {
 function fmt(n) { return n >= 1000 ? (n/1000).toFixed(1) + 'B' : n.toFixed(0) + 'M'; }
 
 function runModel(op, pipe, pop, digiGrowth, sovDemand, infCAGR, entMigration, buildCost, revMW, opexRatio, wacc) {
+    var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.dcMarket;
+    if (eng && eng.opportunity) {   // ENGINE-BOUND (models.dcMarket.opportunity — single source; inline below kept as fallback)
+        return eng.opportunity({ op: op, pipe: pipe, pop: pop, digiGrowth: digiGrowth, sovDemand: sovDemand, infCAGR: infCAGR, entMigration: entMigration, buildCost: buildCost, revMW: revMW, opexRatio: opexRatio, wacc: wacc });
+    }
     // --- DEMAND MODEL (2026-2030 = 4 years) ---
     const baselineDemand = op;
     const digiDemandGrowth = op * (Math.pow(1 + digiGrowth, 4) - 1) * 0.8;
@@ -3784,7 +3788,7 @@ if(seaPremium){seaUnlockPanels()}
     /* v1.9.1: subscribeNewsletter() moved to script.js (global, mailto: based) */
     </script>
 <script src="auth.js?v=2026-07-16b" defer></script>
-<script src="rz-engine.min.js?v=2026-07-19-c40" defer></script>
+<script src="rz-engine.min.js?v=2026-07-20-b" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

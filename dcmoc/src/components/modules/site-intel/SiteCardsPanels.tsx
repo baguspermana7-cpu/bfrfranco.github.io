@@ -8,6 +8,7 @@ import { COUNTRIES } from '@/constants/countries';
 import { panelData, type PanelValue, type SiteAnalyses } from '@/lib/site-adapter';
 import type { CandidateSite, SiteScoreResult } from '@/types/site-intel';
 import { SITE_COLORS } from './SiteMapRadar';
+import { TraceValue } from '@/components/ui/TraceValue';
 import { Zap, Network, Leaf, ShieldAlert, LandPlot, Coins } from 'lucide-react';
 
 export function SiteCards({ sites, results, selectedId, onSelect }: {
@@ -52,6 +53,17 @@ const PANELS: { key: keyof ReturnType<typeof panelData>; title: string; icon: Re
     { key: 'cost', title: 'Cost & Incentives', icon: Coins, linkTab: 'tax', linkLabel: 'View Incentives & Tax' },
 ];
 
+/* Value-Trace ids for the country-baseline leaves rendered in the detail panels
+ * (label → traceId; nodes registered at the bottom of lib/value-trace.ts). */
+const DETAIL_TRACE: Record<string, string> = {
+    'SAIDI': 'site.saidi',
+    'Power Cost': 'site.powerCostKwh',
+    'Air Quality Index': 'site.airQuality',
+    'Water Stress (WRI)': 'site.waterStress',
+    'PGA (2% in 50yr)': 'site.pga',
+    'Effective Tax Rate': 'site.effTaxRate',
+};
+
 function Provenance({ source }: { source: PanelValue['source'] }) {
     const color = source === 'site' ? 'bg-violet-500' : source === 'country' ? 'bg-cyan-500' : 'bg-slate-500';
     const title = source === 'site' ? 'site attribute' : source === 'country' ? 'country baseline' : 'not set';
@@ -79,12 +91,16 @@ export function SiteDetailPanels({ site }: { site: CandidateSite | null }) {
                             </h3>
                             <div className="space-y-1">
                                 {rows.length === 0 && <p className="text-[10px] text-slate-400">No data — edit via Edit Criteria.</p>}
-                                {rows.map((r) => (
-                                    <div key={r.label} className="flex items-center justify-between gap-2 text-[11px]">
-                                        <span className="flex items-center gap-1.5 text-slate-500"><Provenance source={r.source} />{r.label}</span>
-                                        <span className="font-medium tabular-nums text-slate-800 dark:text-slate-200">{r.value}</span>
-                                    </div>
-                                ))}
+                                {rows.map((r) => {
+                                    const tid = DETAIL_TRACE[r.label];
+                                    const valueEl = <span className="font-medium tabular-nums text-slate-800 dark:text-slate-200">{r.value}</span>;
+                                    return (
+                                        <div key={r.label} className="flex items-center justify-between gap-2 text-[11px]">
+                                            <span className="flex items-center gap-1.5 text-slate-500"><Provenance source={r.source} />{r.label}</span>
+                                            {tid ? <TraceValue traceId={tid}>{valueEl}</TraceValue> : valueEl}
+                                        </div>
+                                    );
+                                })}
                                 {empty > 0 && <p className="text-[9px] text-slate-400">+{empty} unset field(s)</p>}
                             </div>
                             {p.linkTab && (
@@ -108,12 +124,15 @@ export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSi
     if (!analyses) return null;
     const { grid, disaster, tax, talent, compliance } = analyses;
     const card = 'rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3';
-    const row = (label: string, value: string, title?: string) => (
-        <div key={label} className="flex items-center justify-between gap-2 text-[11px]" title={title ?? `${label}: ${value}`}>
-            <span className="flex items-center gap-1.5 text-slate-500"><span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" title="computed by the sibling engine" />{label}</span>
-            <span className="font-medium tabular-nums text-slate-800 dark:text-slate-200">{value}</span>
-        </div>
-    );
+    const row = (label: string, value: string, title?: string, traceId?: string) => {
+        const valueEl = <span className="font-medium tabular-nums text-slate-800 dark:text-slate-200">{value}</span>;
+        return (
+            <div key={label} className="flex items-center justify-between gap-2 text-[11px]" title={title ?? `${label}: ${value}`}>
+                <span className="flex items-center gap-1.5 text-slate-500"><span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" title="computed by the sibling engine" />{label}</span>
+                {traceId ? <TraceValue traceId={traceId}>{valueEl}</TraceValue> : valueEl}
+            </div>
+        );
+    };
     return (
         <div>
             <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
@@ -128,11 +147,11 @@ export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSi
                     </h3>
                     {grid ? (
                         <div className="space-y-1">
-                            {row('Reliability score', `${Math.round(grid.reliabilityScore)}/100`)}
-                            {row('Expected outages', `${grid.annualExpectedOutages.toFixed(1)}/yr`)}
-                            {row('Outage minutes', `${Math.round(grid.annualOutageMinutes)} min/yr`)}
-                            {row('Required gen capacity', `${(grid.requiredGenCapacity / 1000).toFixed(1)} MW`)}
-                            {row('Annual fuel cost', fm(grid.annualFuelCost))}
+                            {row('Reliability score', `${Math.round(grid.reliabilityScore)}/100`, undefined, 'site.gridScore')}
+                            {row('Expected outages', `${grid.annualExpectedOutages.toFixed(1)}/yr`, undefined, 'site.gridOutages')}
+                            {row('Outage minutes', `${Math.round(grid.annualOutageMinutes)} min/yr`, undefined, 'site.gridOutageMin')}
+                            {row('Required gen capacity', `${(grid.requiredGenCapacity / 1000).toFixed(1)} MW`, undefined, 'site.gridGenCapacity')}
+                            {row('Annual fuel cost', fm(grid.annualFuelCost), undefined, 'site.gridFuelCost')}
                         </div>
                     ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
                     <button onClick={() => setActiveTab('grid' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Grid deep-dive →</button>
@@ -144,11 +163,11 @@ export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSi
                     </h3>
                     {disaster ? (
                         <div className="space-y-1">
-                            {row('Composite risk', `${Math.round(disaster.compositeScore)}/100 (lower better)`)}
-                            {row('Insurance', `${fm(disaster.annualInsuranceCost)}/yr`)}
-                            {row('Expected annual loss', fm(disaster.expectedAnnualLoss))}
-                            {row('Bus. interruption', `${disaster.businessInterruptionDays.toFixed(1)} days`)}
-                            {row('Revenue at risk', fm(disaster.revenueAtRisk))}
+                            {row('Composite risk', `${Math.round(disaster.compositeScore)}/100 (lower better)`, undefined, 'site.riskComposite')}
+                            {row('Insurance', `${fm(disaster.annualInsuranceCost)}/yr`, undefined, 'site.riskInsurance')}
+                            {row('Expected annual loss', fm(disaster.expectedAnnualLoss), undefined, 'site.riskEal')}
+                            {row('Bus. interruption', `${disaster.businessInterruptionDays.toFixed(1)} days`, undefined, 'site.riskBiDays')}
+                            {row('Revenue at risk', fm(disaster.revenueAtRisk), undefined, 'site.riskRevenueAtRisk')}
                         </div>
                     ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
                     <button onClick={() => setActiveTab('disaster' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Risk deep-dive →</button>
@@ -160,11 +179,11 @@ export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSi
                     </h3>
                     {tax ? (
                         <div className="space-y-1">
-                            {row('Total incentive value', fm(tax.totalIncentiveValue), 'Total incentive value over 15 years')}
-                            {row('FTZ benefits', fm(tax.ftzBenefits))}
-                            {row('NPV with incentives', fm(tax.npvWithIncentives))}
-                            {row('NPV uplift', fm(Math.max(0, tax.npvWithIncentives - tax.npvWithoutIncentives)))}
-                            {row('IRR w/ incentives', `${(tax.irrWithIncentives * 100).toFixed(1)}%`)}
+                            {row('Total incentive value', fm(tax.totalIncentiveValue), 'Total incentive value over 15 years', 'site.taxIncentiveValue')}
+                            {row('FTZ benefits', fm(tax.ftzBenefits), undefined, 'site.taxFtz')}
+                            {row('NPV with incentives', fm(tax.npvWithIncentives), undefined, 'site.taxNpvWith')}
+                            {row('NPV uplift', fm(Math.max(0, tax.npvWithIncentives - tax.npvWithoutIncentives)), undefined, 'site.taxNpvUplift')}
+                            {row('IRR w/ incentives', `${tax.irrWithIncentives.toFixed(1)}%`, undefined, 'site.taxIrrWith')}
                         </div>
                     ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
                     <button onClick={() => setActiveTab('tax' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Incentives deep-dive →</button>
@@ -176,11 +195,11 @@ export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSi
                     </h3>
                     {talent ? (
                         <div className="space-y-1">
-                            {row('Talent score', `${Math.round(talent.talentScore)}/100`)}
-                            {row('Time to full staff', `${talent.timeToFullStaff.toFixed(1)} mo`)}
-                            {row('Recruitment cost', fm(talent.totalRecruitmentCost))}
-                            {row('Annual training', fm(talent.annualTrainingCost))}
-                            {row('Turnover rate', `${(talent.adjustedTurnoverRate * 100).toFixed(1)}%/yr`)}
+                            {row('Talent score', `${Math.round(talent.talentScore)}/100`, undefined, 'site.talentScore')}
+                            {row('Time to full staff', `${talent.timeToFullStaff.toFixed(1)} mo`, undefined, 'site.talentTimeToStaff')}
+                            {row('Recruitment cost', fm(talent.totalRecruitmentCost), undefined, 'site.talentRecruitCost')}
+                            {row('Annual training', fm(talent.annualTrainingCost), undefined, 'site.talentTraining')}
+                            {row('Turnover rate', `${(talent.adjustedTurnoverRate * 100).toFixed(1)}%/yr`, undefined, 'site.talentTurnover')}
                         </div>
                     ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
                     <button onClick={() => setActiveTab('talent' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Talent deep-dive →</button>
@@ -188,13 +207,13 @@ export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSi
                 <div className={card}>
                     <h3 className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                         Compliance
-                        {compliance && <span className="rounded bg-cyan-500/15 px-1.5 py-0.5 text-[9px] font-bold text-cyan-500">{Math.round(compliance.complianceScore)}/100</span>}
+                        {compliance && <TraceValue traceId="site.compScore"><span className="rounded bg-cyan-500/15 px-1.5 py-0.5 text-[9px] font-bold text-cyan-500">{Math.round(compliance.complianceScore)}/100</span></TraceValue>}
                     </h3>
                     {compliance ? (
                         <div className="space-y-1">
-                            {row('Mandatory items', String(compliance.mandatoryCount))}
-                            {row('Initial cost', fm(compliance.totalInitialCost))}
-                            {row('Annual cost', fm(compliance.totalAnnualCost))}
+                            {row('Mandatory items', String(compliance.mandatoryCount), undefined, 'site.compMandatory')}
+                            {row('Initial cost', fm(compliance.totalInitialCost), undefined, 'site.compInitialCost')}
+                            {row('Annual cost', fm(compliance.totalAnnualCost), undefined, 'site.compAnnualCost')}
                         </div>
                     ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
                     <button onClick={() => setActiveTab('compliance' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Compliance deep-dive →</button>

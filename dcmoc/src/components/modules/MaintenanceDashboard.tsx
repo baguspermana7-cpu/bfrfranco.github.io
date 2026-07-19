@@ -630,108 +630,243 @@ function AssetsTab({ assets, assetCounts, isPencilMode, handleCountChange, selec
 // TAB: Schedule (existing Gantt)
 // ═══════════════════════════════════════════════════════════════
 
+const CAL_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+type CalendarView = 'week' | 'month';
+
+interface CalendarCell {
+    units: number;          // distinct units scheduled in this period (batches deduped)
+    totalHours: number;     // sum of event durations (already units-multiplied)
+    color: string;          // dominant criticality: Statutory > Optimal > Discretionary
+    criticalities: string[];
+    events: MaintenanceEvent[];
+}
+
+function calWeekStart(year: number, week: number): Date {
+    return new Date(new Date(year, 0, 1).getTime() + (week - 1) * 7 * MS_PER_DAY);
+}
+
+function calMonthOfWeek(year: number, week: number): number {
+    return calWeekStart(year, week).getMonth() + 1;
+}
+
 function ScheduleTab({ assetCounts, schedule, weeks }: {
     assetCounts: AssetCount[];
     schedule: MaintenanceEvent[];
     weeks: number[];
 }) {
+    const [view, setView] = useState<CalendarView>('week');
+    const [selected, setSelected] = useState<{ assetId: string; period: number } | null>(null);
+
+    const year = new Date().getFullYear();
+    const periods = view === 'week' ? weeks : Array.from({ length: 12 }, (_, i) => i + 1);
+    const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const periodLabel = (p: number) => {
+        if (view === 'month') return `${CAL_MONTHS[p - 1]} ${year}`;
+        const start = calWeekStart(year, p);
+        const end = new Date(start.getTime() + 6 * MS_PER_DAY);
+        return `Week ${p} · ${fmtDate(start)} – ${fmtDate(end)}`;
+    };
+
+    // Per-(class × period) aggregation — events from ScheduleEngine are already
+    // per-class batches carrying `units`; here we only group them into cells.
+    const cellMap = useMemo(() => {
+        const map = new Map<string, CalendarCell>();
+        for (const e of schedule) {
+            const period = view === 'week' ? e.weekNumber : calMonthOfWeek(year, e.weekNumber);
+            const key = `${e.assetId}:${period}`;
+            const cell = map.get(key);
+            if (cell) {
+                cell.events.push(e);
+            } else {
+                map.set(key, { units: 0, totalHours: 0, color: '#94a3b8', criticalities: [], events: [e] });
+            }
+        }
+        for (const cell of map.values()) {
+            // Dedupe units by batch (assetName is unique per batch) so a batch
+            // with 2 tasks in the same period is not counted twice.
+            const batchUnits = new Map<string, number>();
+            for (const e of cell.events) {
+                batchUnits.set(e.assetName, Math.max(batchUnits.get(e.assetName) ?? 0, e.units ?? 1));
+            }
+            cell.units = Array.from(batchUnits.values()).reduce((a, b) => a + b, 0);
+            cell.totalHours = cell.events.reduce((a, e) => a + e.durationHours, 0);
+            const crits = new Set(cell.events.map(e => e.task.criticality));
+            cell.criticalities = ['Statutory', 'Optimal', 'Discretionary'].filter(c => crits.has(c as MaintenanceEvent['task']['criticality']));
+            cell.color = crits.has('Statutory') ? '#ef4444' : crits.has('Optimal') ? '#3b82f6' : '#94a3b8';
+        }
+        return map;
+    }, [schedule, view, year]);
+
+    const classRows = assetCounts
+        .filter(a => a.count > 0)
+        .map(a => ({ asset: a, template: ASSETS.find(t => t.id === a.assetId) }))
+        .filter((r): r is { asset: AssetCount; template: (typeof ASSETS)[number] } => !!r.template);
+
+    const selectedCell = selected ? cellMap.get(`${selected.assetId}:${selected.period}`) : undefined;
+    const selectedRow = selected ? classRows.find(r => r.asset.assetId === selected.assetId) : undefined;
+
+    const critChipClass = (crit: string) => clsx(
+        "font-medium px-1.5 py-0.5 rounded text-[9px]",
+        crit === 'Statutory' ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400" :
+            crit === 'Optimal' ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" :
+                "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+    );
+
+    const gridColsClass = view === 'week'
+        ? "grid-cols-[repeat(52,minmax(20px,1fr))]"
+        : "grid-cols-[repeat(12,minmax(56px,1fr))]";
+
     return (
         <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden backdrop-blur-sm shadow-sm dark:shadow-none animate-in fade-in zoom-in-95 duration-300">
-            <div className="p-4 border-b border-slate-200 dark:border-slate-800/50 flex justify-between items-center bg-slate-50/50 dark:bg-transparent">
-                <div className="text-sm font-medium text-slate-800 dark:text-slate-300">Annual Maintenance Calendar ({new Date().getFullYear()}) <Tooltip content="12-month schedule grid showing all planned maintenance events. Color-coded: statutory (legally required), optimal (manufacturer-recommended), discretionary (condition-based)." /></div>
-                <div className="flex gap-4 text-xs text-slate-700 dark:text-slate-300 font-medium">
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-red-500 border border-red-400"></div>Statutory <Tooltip content="Legally required inspections and certifications — non-negotiable." /></div>
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-blue-500 border border-blue-400"></div>Optimal <Tooltip content="Manufacturer-recommended maintenance intervals for optimal performance and warranty compliance." /></div>
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-slate-500 border border-slate-400"></div>Discretionary <Tooltip content="Condition-based maintenance triggered by sensor data, inspections, or degradation thresholds." /></div>
+            <div className="p-4 border-b border-slate-200 dark:border-slate-800/50 flex flex-wrap justify-between items-center gap-3 bg-slate-50/50 dark:bg-transparent">
+                <div className="text-sm font-medium text-slate-800 dark:text-slate-300">Annual Maintenance Calendar ({year}) <Tooltip content="Per-system schedule summary: one row per asset class (unit count in the label). Colored blocks mark periods with planned maintenance — color shows the highest criticality present; ×N is the number of units scheduled. Hover a block for details, click it to expand the event list below." /></div>
+                <div className="flex items-center gap-4">
+                    {/* Week / Month view toggle */}
+                    <div className="flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden text-xs font-medium">
+                        {(['week', 'month'] as CalendarView[]).map(v => (
+                            <button
+                                key={v}
+                                onClick={() => { setView(v); setSelected(null); }}
+                                className={clsx(
+                                    "px-3 py-1.5 transition-colors",
+                                    view === v
+                                        ? "bg-cyan-600 text-white"
+                                        : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                )}
+                            >
+                                {v === 'week' ? 'Week' : 'Month'}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="flex gap-4 text-xs text-slate-700 dark:text-slate-300 font-medium">
+                        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-red-500 border border-red-400"></div>Statutory <Tooltip content="Legally required inspections and certifications — non-negotiable." /></div>
+                        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-blue-500 border border-blue-400"></div>Optimal <Tooltip content="Manufacturer-recommended maintenance intervals for optimal performance and warranty compliance." /></div>
+                        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-slate-500 border border-slate-400"></div>Discretionary <Tooltip content="Condition-based maintenance triggered by sensor data, inspections, or degradation thresholds." /></div>
+                    </div>
                 </div>
             </div>
             <div className="overflow-x-auto">
-                <div className="min-w-[1500px] p-4">
+                <div className={clsx("p-4", view === 'week' ? "min-w-[1500px]" : "min-w-[900px]")}>
                     {/* Header Row */}
                     <div className="flex mb-2">
-                        <div className="w-48 flex-shrink-0 text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">Asset Name</div>
-                        <div className="flex-1 grid grid-cols-[repeat(52,minmax(20px,1fr))] gap-px">
-                            {weeks.map(w => (
-                                <div key={w} className="text-[10px] text-center text-slate-500 dark:text-slate-600 border-l border-slate-200 dark:border-slate-800/30">
-                                    {w % 4 === 0 ? w : ''}
+                        <div className="w-56 flex-shrink-0 text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">Asset System</div>
+                        <div className={clsx("flex-1 grid gap-px", gridColsClass)}>
+                            {periods.map(p => (
+                                <div key={p} className="text-[10px] text-center text-slate-500 dark:text-slate-600 border-l border-slate-200 dark:border-slate-800/30">
+                                    {view === 'week' ? (p % 4 === 0 ? p : '') : CAL_MONTHS[p - 1]}
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    {/* Schedule Rows */}
-                    {assetCounts.filter(a => a.count > 0).map((asset) => {
-                        const template = ASSETS.find(t => t.id === asset.assetId);
-                        if (!template) return null;
+                    {/* One summary row per asset CLASS */}
+                    {classRows.map(({ asset, template }, rowIdx) => (
+                        <div key={asset.assetId} className="flex items-center hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors py-1 border-b border-slate-100 dark:border-slate-800/30">
+                            <div className="w-56 flex-shrink-0 pl-2 text-xs text-slate-700 dark:text-slate-300 font-semibold truncate">
+                                {template.name} <span className="text-slate-400 dark:text-slate-500 font-normal">×{asset.count}</span>
+                            </div>
+                            <div className={clsx("flex-1 grid gap-px h-6 relative", gridColsClass)}>
+                                {periods.map(p => {
+                                    const cell = cellMap.get(`${asset.assetId}:${p}`);
+                                    if (!cell) return <div key={p} className="border-l border-slate-100 dark:border-slate-800/10"></div>;
 
-                        return Array.from({ length: asset.count }).map((_, idx) => {
-                            const unitName = `${template.name} #${idx + 1}`;
-                            const assetEvents = schedule.filter(e => e.assetId === asset.assetId && e.assetName === unitName);
+                                    const isSelected = selected?.assetId === asset.assetId && selected?.period === p;
+                                    const openDown = rowIdx < 3; // avoid clipping the popover at the top of the scroll container
+                                    const taskNames = Array.from(new Set(cell.events.map(e => e.task.name)));
 
-                            return (
-                                <div key={`${asset.assetId}-${idx}`} className="flex items-center hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors py-1 group border-b border-slate-100 dark:border-slate-800/30">
-                                    <div className="w-48 flex-shrink-0 pl-2 text-xs text-slate-700 dark:text-slate-300 font-semibold truncate">{unitName}</div>
-                                    <div className="flex-1 grid grid-cols-[repeat(52,minmax(20px,1fr))] gap-px h-6 relative">
-                                        {weeks.map(week => {
-                                            const event = assetEvents.find(e => e.weekNumber === week);
-                                            if (!event) return <div key={week} className="border-l border-slate-100 dark:border-slate-800/10"></div>;
+                                    return (
+                                        <div key={p} className="relative group/event mx-0.5" style={{ minWidth: '4px' }}>
+                                            <button
+                                                onClick={() => setSelected(isSelected ? null : { assetId: asset.assetId, period: p })}
+                                                aria-label={`${template.name}, ${periodLabel(p)}: ${cell.units} unit(s), ${cell.totalHours} hours planned`}
+                                                className={clsx(
+                                                    "w-full h-full rounded-sm shadow-sm cursor-pointer flex items-center justify-center transition-transform hover:scale-y-110",
+                                                    isSelected && "ring-2 ring-cyan-400 dark:ring-cyan-300"
+                                                )}
+                                                style={{ backgroundColor: cell.color }}
+                                            >
+                                                {cell.units > 1 && (
+                                                    <span className="text-[9px] font-bold text-white leading-none drop-shadow-sm">×{cell.units}</span>
+                                                )}
+                                            </button>
 
-                                            // Calculate start/end dates for the week
-                                            const yearStart = new Date(new Date().getFullYear(), 0, 1);
-                                            const weekStart = new Date(yearStart.getTime() + (week - 1) * 7 * 24 * 60 * 60 * 1000);
-                                            const weekEnd = new Date(weekStart.getTime() + 6 * 24 * 60 * 60 * 1000);
-                                            const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
-                                            return (
-                                                <div
-                                                    key={week}
-                                                    className="rounded-sm mx-0.5 cursor-help relative group/event shadow-sm"
-                                                    style={{
-                                                        backgroundColor: event.color,
-                                                        minWidth: '4px',
-                                                    }}
-                                                >
-                                                    {/* Enhanced Hover Popover */}
-                                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3 rounded-lg shadow-xl z-20 hidden group-hover/event:block">
-                                                        <div className="text-xs font-bold text-slate-900 dark:text-white mb-1.5">{event.task.name}</div>
-                                                        <div className="space-y-1">
-                                                            <div className="flex items-center justify-between text-[10px]">
-                                                                <span className="text-slate-500 dark:text-slate-400">Asset:</span>
-                                                                <span className="text-slate-700 dark:text-slate-300 font-medium">{event.assetName}</span>
-                                                            </div>
-                                                            <div className="flex items-center justify-between text-[10px]">
-                                                                <span className="text-slate-500 dark:text-slate-400">Duration:</span>
-                                                                <span className="text-slate-700 dark:text-slate-300 font-medium">{event.durationHours} hours</span>
-                                                            </div>
-                                                            <div className="flex items-center justify-between text-[10px]">
-                                                                <span className="text-slate-500 dark:text-slate-400">Technicians:</span>
-                                                                <span className="text-slate-700 dark:text-slate-300 font-medium">{event.techniciansRequired}</span>
-                                                            </div>
-                                                            <div className="flex items-center justify-between text-[10px]">
-                                                                <span className="text-slate-500 dark:text-slate-400">Week {week}:</span>
-                                                                <span className="text-slate-700 dark:text-slate-300 font-medium">{fmtDate(weekStart)} – {fmtDate(weekEnd)}</span>
-                                                            </div>
-                                                            <div className="flex items-center justify-between text-[10px]">
-                                                                <span className="text-slate-500 dark:text-slate-400">Criticality:</span>
-                                                                <span className={clsx(
-                                                                    "font-medium px-1 py-0.5 rounded text-[9px]",
-                                                                    event.task.criticality === 'Statutory' ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400" :
-                                                                        event.task.criticality === 'Optimal' ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" :
-                                                                            "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
-                                                                )}>{event.task.criticality}</span>
-                                                            </div>
-                                                        </div>
+                                            {/* Hover Popover — aggregated summary */}
+                                            <div className={clsx(
+                                                "absolute left-1/2 -translate-x-1/2 w-60 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3 rounded-lg shadow-xl z-20 hidden group-hover/event:block pointer-events-none",
+                                                openDown ? "top-full mt-2" : "bottom-full mb-2"
+                                            )}>
+                                                <div className="text-xs font-bold text-slate-900 dark:text-white mb-0.5">{template.name}</div>
+                                                <div className="text-[10px] text-slate-500 dark:text-slate-400 mb-1.5">{periodLabel(p)}</div>
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center justify-between text-[10px]">
+                                                        <span className="text-slate-500 dark:text-slate-400">Units scheduled:</span>
+                                                        <span className="text-slate-700 dark:text-slate-300 font-medium">{cell.units} of {asset.count}</span>
                                                     </div>
+                                                    <div className="flex items-center justify-between text-[10px]">
+                                                        <span className="text-slate-500 dark:text-slate-400">Total hours:</span>
+                                                        <span className="text-slate-700 dark:text-slate-300 font-medium">{cell.totalHours.toLocaleString()} hrs</span>
+                                                    </div>
+                                                    <div className="flex items-center justify-between text-[10px]">
+                                                        <span className="text-slate-500 dark:text-slate-400">PM type:</span>
+                                                        <span className="flex gap-1">
+                                                            {cell.criticalities.map(c => <span key={c} className={critChipClass(c)}>{c}</span>)}
+                                                        </span>
+                                                    </div>
+                                                    <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
+                                                        {taskNames.slice(0, 3).map(t => (
+                                                            <div key={t} className="text-[10px] text-slate-600 dark:text-slate-400 truncate">• {t}</div>
+                                                        ))}
+                                                        {taskNames.length > 3 && (
+                                                            <div className="text-[10px] text-slate-400 dark:text-slate-500">+{taskNames.length - 3} more…</div>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-[9px] text-slate-400 dark:text-slate-500 pt-0.5">Click block for full event list</div>
                                                 </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            );
-                        });
-                    })}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
+
+            {/* Click-to-expand detail panel */}
+            {selected && selectedCell && selectedRow && (
+                <div className="border-t border-slate-200 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-950/30 p-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="flex items-start justify-between mb-3">
+                        <div>
+                            <div className="text-sm font-bold text-slate-900 dark:text-white">
+                                {selectedRow.template.name} <span className="text-slate-400 dark:text-slate-500 font-normal">×{selectedCell.units} unit{selectedCell.units > 1 ? 's' : ''} scheduled</span>
+                            </div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">{periodLabel(selected.period)} · {selectedCell.totalHours.toLocaleString()} total maintenance hours</div>
+                        </div>
+                        <button
+                            onClick={() => setSelected(null)}
+                            className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white px-2 py-1 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
+                    <div className="space-y-1.5">
+                        {selectedCell.events.map(e => (
+                            <div key={e.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs">
+                                <span className={critChipClass(e.task.criticality)}>{e.task.criticality}</span>
+                                <span className="text-slate-800 dark:text-slate-200 font-medium flex-1 min-w-[180px]">{e.task.name}</span>
+                                <span className="text-slate-500 dark:text-slate-400">×{e.units ?? 1} unit{(e.units ?? 1) > 1 ? 's' : ''}</span>
+                                <span className="text-slate-500 dark:text-slate-400">{e.task.standardHours} hrs/unit</span>
+                                <span className="text-slate-700 dark:text-slate-300 font-medium">{e.durationHours.toLocaleString()} hrs total</span>
+                                {view === 'week' ? null : (
+                                    <span className="text-slate-400 dark:text-slate-500">Wk {e.weekNumber}</span>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -2533,6 +2533,10 @@ function prefillMarket() {
 function fmt(n) { return n >= 1000 ? (n/1000).toFixed(1) + 'B' : n.toFixed(0) + 'M'; }
 
 function runBubbleModel(op, pipe, pop, absorb, precommit, spec, demandGrowth, costMW, revMW, opexRatio, wacc) {
+    var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.dcMarket;
+    if (eng && eng.bubbleRisk) {   // ENGINE-BOUND (models.dcMarket.bubbleRisk — single source; inline below kept as fallback)
+        return eng.bubbleRisk({ op: op, pipe: pipe, pop: pop, absorb: absorb, precommit: precommit, spec: spec, demandGrowth: demandGrowth, costMW: costMW, revMW: revMW, opexRatio: opexRatio, wacc: wacc });
+    }
     const newCapacity = pipe - op;
     const sdRatio = (newCapacity > 0) ? pipe / (absorb * 5) : 1;
     const yearsAbsorb = newCapacity / Math.max(1, absorb);
@@ -3357,7 +3361,7 @@ if(bubPremium){bubUnlockPanels()}
 <script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 
 <script src="auth.js?v=2026-07-16b" defer></script>
-<script src="rz-engine.min.js?v=2026-07-19-c40" defer></script>
+<script src="rz-engine.min.js?v=2026-07-20-b" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

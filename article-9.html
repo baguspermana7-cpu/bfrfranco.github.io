@@ -3397,6 +3397,18 @@ Where LMTD (Log Mean Temperature Difference) requires:
         }
 
         function calculate(itLoad, rate) {
+            var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.hvac;
+            if (eng && eng.simplePueCost) {   // ENGINE-BOUND (models.hvac.simplePueCost — single source; inline below kept as fallback)
+                var er = eng.simplePueCost(itLoad, rate);
+                return {
+                    traditional: er.traditional,
+                    hybrid: er.hybrid,
+                    dlc: er.dlc,
+                    savingsHybrid: er.savingsHybrid,
+                    savingsDLC: er.savingsDLC,
+                    co2Reduction: er.co2ReductionPct
+                };
+            }
             const hours = 8760;
             const traditional = { pue: 1.67 };
             const hybrid = { pue: 1.35 };
@@ -3582,6 +3594,10 @@ Where LMTD (Log Mean Temperature Difference) requires:
 
         // === CORE CALCULATIONS ===
         function hvacCalcTCO(inputs) {
+            var engH = window.RZEngine && window.RZEngine.models && window.RZEngine.models.hvac;
+            if (engH && engH.tco) {   // ENGINE-BOUND (models.hvac.tco — single source; inline below kept as fallback)
+                return engH.tco({ load: inputs.load, rate: inputs.rate, regionKey: inputs.region });
+            }
             var load = inputs.load;
             var rate = inputs.rate;
             var regionKey = inputs.region;
@@ -4898,7 +4914,7 @@ Where LMTD (Log Mean Temperature Difference) requires:
 <!-- Search: shared js/rz-command-palette.js -->
 <script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 <script src="auth.js?v=2026-07-16b" defer></script>
-<script src="rz-engine.min.js?v=2026-07-19-c40" defer></script>
+<script src="rz-engine.min.js?v=2026-07-20-b" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 
