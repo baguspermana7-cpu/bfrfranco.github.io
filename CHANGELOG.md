@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.94.3 — 2026-07-19 (site score explainers — every criterion self-explanatory)
+
+### Added
+- **Site Score & Compare rows explain themselves** (owner: "score ini tidak menunjukkan apapun — get it done"): every criterion label carries a hover explainer (what it measures, the deriveFactors formula behind it, and an honest note when a low value just means site data hasn't been entered — country baseline in use) + each score cell gains a band chip ("91 · Excellent", "10 · Poor"); Natural Risks band inverts (lower = better). Explainer map lives in `AXIS_EXPLAIN` (site-intel types) — one source for table + radar.
+
+---
+
 ## v1.94.2 — 2026-07-19 (dashboard integrity — fake selector + fragment tabs deleted)
 
 ### Changed

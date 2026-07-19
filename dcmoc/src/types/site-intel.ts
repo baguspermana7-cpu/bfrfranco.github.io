@@ -78,6 +78,29 @@ export interface CandidateSite {
 export type FactorKey = 'power' | 'grid' | 'seismic' | 'talent' | 'tax' | 'carbon' | 'flood' | 'latency' | 'water' | 'climate';
 export type AxisKey = 'powerAvailability' | 'connectivity' | 'waterCooling' | 'landInfra' | 'environmental' | 'naturalRisks' | 'costIncentives' | 'marketProximity';
 
+/* DI6 — per-criteria explainers (owner: setiap parameter WAJIB ada penjelasan).
+ * definisi + dari faktor apa dihitung + arti band 0-100. Rendered as tooltips
+ * on the Site Score table + radar. */
+export const AXIS_EXPLAIN: Record<AxisKey, string> = {
+    powerAvailability: 'Ketersediaan & keekonomian listrik: tarif industri + keandalan grid (SAIDI). 0-100, tinggi = tarif kompetitif & grid andal. Formula: blend factor power (1−(rate−0.05)/0.30) + grid (1−SAIDI/500).',
+    connectivity: 'Konektivitas jaringan: skor latensi + jumlah kabel bawah laut / IXP. Tinggi = latensi rendah & rute beragam. Nilai rendah biasanya karena data site belum diisi (memakai baseline negara).',
+    waterCooling: 'Ketersediaan air & kecocokan iklim untuk pendinginan: water-stress index (WRI Aqueduct) + iklim (cooling degree days). Tinggi = air cukup & iklim sejuk.',
+    landInfra: 'Lahan & infrastruktur: luas lahan usable, akses, kesiapan utilitas. Tinggi = lahan siap bangun. Nilai default = baseline negara sampai atribut site diisi.',
+    environmental: 'Kondisi lingkungan: kualitas udara (AQI), intensitas karbon grid. Tinggi = udara bersih & grid rendah karbon.',
+    naturalRisks: 'Risiko bencana (SKOR RISIKO — makin RENDAH makin baik): seismik (PGA 2%/50thn), banjir, siklon. Dari profil geo-risk negara + atribut site.',
+    costIncentives: 'Biaya & insentif: tarif listrik, pajak, tax holiday / FTZ. Tinggi = biaya rendah + insentif kuat.',
+    marketProximity: 'Kedekatan pasar: jarak ke pusat demand & ekosistem DC. Tinggi = dekat pasar utama. Rendah bila data site belum diisi.',
+};
+
+/** Band interpretasi 0-100 (dipakai chip di tabel skor). */
+export function axisBand(v: number, lowerBetter = false): { label: string; cls: string } {
+    const x = lowerBetter ? 100 - v : v;
+    if (x >= 80) return { label: 'Excellent', cls: 'text-emerald-500' };
+    if (x >= 60) return { label: 'Good', cls: 'text-cyan-500' };
+    if (x >= 40) return { label: 'Fair', cls: 'text-amber-500' };
+    return { label: 'Poor', cls: 'text-rose-500' };
+}
+
 export const AXIS_LABELS: Record<AxisKey, string> = {
     powerAvailability: 'Power Availability',
     connectivity: 'Connectivity',

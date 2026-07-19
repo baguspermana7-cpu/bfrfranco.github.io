@@ -10,7 +10,7 @@ import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import type { CandidateSite, SiteScoreResult, AxisKey } from '@/types/site-intel';
-import { AXIS_LABELS } from '@/types/site-intel';
+import { AXIS_LABELS, AXIS_EXPLAIN, axisBand } from '@/types/site-intel';
 import { Play, FileDown, ChevronRight } from 'lucide-react';
 
 export function SiteComparisonTable({ sites, results, selectedId, analysesById }: {
@@ -43,13 +43,16 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById }
                         </tr>
                         {axes.map((k) => (
                             <tr key={k} className="border-b border-slate-100 dark:border-slate-800/60">
-                                <td className="py-1.5 pr-2 text-slate-500">{AXIS_LABELS[k]}{k === 'naturalRisks' && <span className="ml-1 text-[9px]">(risk: lower better)</span>}</td>
+                                <td className="py-1.5 pr-2 text-slate-500 cursor-help" title={AXIS_EXPLAIN[k]}>{AXIS_LABELS[k]} <span className="text-[9px] text-slate-400">ⓘ</span>{k === 'naturalRisks' && <span className="ml-1 text-[9px]">(risk: lower better)</span>}</td>
                                 {sites.map((s) => {
                                     const r = bySite(s.id);
                                     const raw = r ? (k === 'naturalRisks' ? r.riskScore : r.axes[k]) : null;
                                     const goodVals = results.map((x) => k === 'naturalRisks' ? 100 - x.riskScore : x.axes[k]);
                                     const good = r ? (k === 'naturalRisks' ? 100 - r.riskScore : r.axes[k]) : 0;
-                                    return <td key={s.id} className={`px-2 py-1.5 text-right tabular-nums ${r && best(goodVals, good) ? 'text-violet-500 font-semibold' : 'text-slate-600 dark:text-slate-400'}`}>{raw ?? '—'}</td>;
+                                    const band = raw != null ? axisBand(raw, k === 'naturalRisks') : null;
+                                    return <td key={s.id} className={`px-2 py-1.5 text-right tabular-nums ${r && best(goodVals, good) ? 'text-violet-500 font-semibold' : 'text-slate-600 dark:text-slate-400'}`}>
+                                        {raw ?? '—'}{band && <span className={`ml-1 text-[9px] ${band.cls}`}>· {band.label}</span>}
+                                    </td>;
                                 })}
                             </tr>
                         ))}
