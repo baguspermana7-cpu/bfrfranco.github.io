@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.92.3 — 2026-07-19 (Trace Angka v2 — intuitive visual formula)
+
+### Changed
+- **Click-to-trace popover redesigned for clarity** (owner: "sangat bagus, intuitive, mudah dimengerti"): big live value header + provenance chip in plain language ("Input kamu" / "Engine (bersumber)" / "Dihitung") · formula rendered as VISUAL PILLS — each operand is a clickable provenance-colored card showing its label + live value, with large operators between, ending in "= result" · clicking a pill drills into ITS formula with a breadcrumb path back · leaves show a plain-language source card ("Ini titik ujung: angka yang KAMU isi") + an "Edit di menu" button. Headless-verified: "[IT Load 2,500 kW] × [Design PUE 1.5] ÷ 1000 = 3.75".
+
+---
+
 ## v1.92.2 — 2026-07-19 (live FX + shared currency list)
 
 ### Added
