@@ -8,6 +8,7 @@
  * ──────────────────────────────────────────────────────────────────────── */
 
 import { rzModels, rzData } from '@/lib/rz-engine';
+import { OVERHEAD_SPLIT } from '@/lib/screening';
 import { getPUE } from '@/constants/pue';
 import { densityToEngineBucket } from '@/lib/requirementsMappings';
 import { REDUNDANCY_KEY } from '@/state/registry';
@@ -187,10 +188,10 @@ export function computeLoadBreakdown(f: FacilityCalc): { name: string; mw: numbe
     const overhead = Math.max(0, total - it);
     const rows = [
         { name: 'IT Load (Racks)', mw: it },
-        { name: 'Cooling Systems', mw: overhead * 0.60 },
-        { name: 'Power Systems', mw: overhead * 0.30 },
-        { name: 'Lighting', mw: overhead * 0.05 },
-        { name: 'Others', mw: overhead * 0.05 },
+        { name: 'Cooling Systems', mw: overhead * OVERHEAD_SPLIT.cooling },
+        { name: 'Power Systems', mw: overhead * OVERHEAD_SPLIT.power },
+        { name: 'Lighting', mw: overhead * OVERHEAD_SPLIT.lighting },
+        { name: 'Others', mw: overhead * OVERHEAD_SPLIT.other },
     ];
     return rows.map((r) => ({ ...r, mw: +r.mw.toFixed(1), pct: total > 0 ? +((r.mw / total) * 100).toFixed(1) : 0 }));
 }

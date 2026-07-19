@@ -7,3 +7,8 @@
  * These are SCREENING numbers — every consumer must label them as such. */
 export const REVENUE_PER_KW_MONTH = 150;   // $/kW/month — blended colo screening (JLL/CBRE 2025 mid-band)
 export const MAINT_PER_KW_YR = 50;         // $/kW/yr — maintenance screening share
+
+/* Screening split of (PUE−1) overhead energy — ONE source (audit: capacity used
+ * 62/24/8/6 while architecture used 60/30/5/5 → cross-page divergence).
+ * Basis: cooling dominates DC overhead (~60%), electrical losses ~28%. */
+export const OVERHEAD_SPLIT = { cooling: 0.60, power: 0.28, lighting: 0.06, other: 0.06 } as const;

@@ -7,6 +7,7 @@
  * ──────────────────────────────────────────────────────────────────────── */
 
 import { rzModels, rzData } from '@/lib/rz-engine';
+import { OVERHEAD_SPLIT } from '@/lib/screening';
 import { getPUE } from '@/constants/pue';
 import { densityToEngineBucket } from '@/lib/requirementsMappings';
 
@@ -50,16 +51,16 @@ export function facilitySnapshot(i: CapInputs): { facilityMw: number; pue: numbe
     return { facilityMw: +((i.itLoadKw / 1000) * pue).toFixed(1), pue, source: 'fallback' };
 }
 
-/** Screening split of (PUE−1) overhead: cooling 62 / power 24 / lighting 8 / other 6. ASSUMPTION. */
+/** Screening split of (PUE−1) overhead — SHARED OVERHEAD_SPLIT (lib/screening.ts), one source with arch-adapter. */
 export function overheadDonut(i: CapInputs, facilityMw: number): { name: string; mw: number; pct: number }[] {
     const itMw = i.itLoadKw / 1000;
     const ov = Math.max(0, facilityMw - itMw);
     const rows = [
         { name: 'IT Load (Racks)', mw: itMw },
-        { name: 'Cooling Systems', mw: ov * 0.62 },
-        { name: 'Power Losses', mw: ov * 0.24 },
-        { name: 'Lighting & Small Power', mw: ov * 0.08 },
-        { name: 'Other', mw: ov * 0.06 },
+        { name: 'Cooling Systems', mw: ov * OVERHEAD_SPLIT.cooling },
+        { name: 'Power Losses', mw: ov * OVERHEAD_SPLIT.power },
+        { name: 'Lighting & Small Power', mw: ov * OVERHEAD_SPLIT.lighting },
+        { name: 'Other', mw: ov * OVERHEAD_SPLIT.other },
     ];
     return rows.map((r) => ({ ...r, mw: +r.mw.toFixed(2), pct: facilityMw > 0 ? +((r.mw / facilityMw) * 100).toFixed(1) : 0 }));
 }
