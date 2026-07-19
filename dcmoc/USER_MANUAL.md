@@ -121,3 +121,11 @@ numbers by `src/modules/reporting/pdf/ReportNarrative.ts`.
 ---
 *Status 2026-07-17: Financial + AI Decision + orchestrator engine-sourced and
 verified; remaining engines scheduled per `standarization/DCMOC_DCOS_STANDARD.md`.*
+
+## 9. Trace Angka (Formula Field) — AUDIT SETIAP ANGKA
+Angka dengan garis-bawah titik violet bisa DIKLIK: popover "Trace Angka"
+menampilkan rumusnya dengan angka live sebagai pill berwarna (violet = input
+kamu, emerald = konstanta engine bersumber, cyan = dihitung, amber = screening).
+Klik pill mana pun untuk masuk ke rumus pill itu — rekursif sampai titik paling
+ujung; leaf menyediakan "Edit di menu" dan link sumber eksternal (glossary,
+dokumen publik korpus). Standar: `standarization/VALUE_TRACE_STANDARD.md`.
