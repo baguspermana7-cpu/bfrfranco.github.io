@@ -3,6 +3,7 @@
 import React from 'react';
 import { Explain } from '@/components/ui/Explain';
 import type { DashboardData } from './useDashboardData';
+import { TraceValue } from '@/components/ui/TraceValue';
 
 const fmtUsd = (n: number | null) => n == null ? '—' : n >= 1e6 ? `$${(n / 1e6).toFixed(1)}M` : `$${(n / 1e3).toFixed(0)}K`;
 
@@ -29,8 +30,8 @@ export function CapacityArchOverview({ d }: { d: DashboardData }) {
         <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/80 p-4">
             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-3">Capacity &amp; Architecture Overview</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
-                <Tile label="IT Load" value={`${d.itLoadMw.toFixed(1)} MW`} sub={`${d.itLoadKw.toLocaleString()} kW`} tip="it-load" />
-                <Tile label="Facility Load" value={`${d.facilityLoadMw.toFixed(1)} MW`} sub={`PUE ${d.pue.toFixed(2)}`} tip="dc-power" />
+                <TraceValue traceId="sim.itLoad"><Tile label="IT Load" value={`${d.itLoadMw.toFixed(1)} MW`} sub={`${d.itLoadKw.toLocaleString()} kW`} tip="it-load" /></TraceValue>
+                <TraceValue traceId="arch.facilityMw"><Tile label="Facility Load" value={`${d.facilityLoadMw.toFixed(1)} MW`} sub={`PUE ${d.pue.toFixed(2)}`} tip="dc-power" /></TraceValue>
                 <Tile label="Rack Count" value={d.racks != null ? d.racks.toLocaleString() : '—'} sub="racks" tip="rack" />
                 <Tile label="Rack Density" value={rackDensity != null ? `${rackDensity.toFixed(1)} kW` : '—'} sub="per rack" tip="rack-density" />
             </div>

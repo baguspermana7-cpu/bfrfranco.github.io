@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.92.1 — 2026-07-19 (VALUE TRACE INDEX — Excel-style formula field, batch 1)
+
+### Added
+- **Click-to-trace "Formula Field"** (owner: "seperti Excel — klik X tahu rumus A+3=X, trace sampai titik paling ujung"): new live trace graph (`src/lib/value-trace.ts` — deps + formula templates + live getters, acyclic) + `TraceValue` popover component: click an instrumented number → its formula with LIVE numbers substituted ("3.75 = IT Load [2500] × Design PUE [1.5] ÷ 1000"), every source row expandable (recursive drill-down to leaf inputs/DATA constants with provenance chips + DATA.sources ref) or jumpable (↗ opens the value's home menu). Batch 1 instruments the Dashboard IT Load + Facility Load tiles; the graph seeds from the value-bindings catalog and grows per page. Headless-verified (popover renders live formula + expand controls, 0 errors).
+
+---
+
 ## v1.92.0 — 2026-07-19 (DC DATA CORPUS — multi-source benchmarks land in the engine)
 
 ### Added
