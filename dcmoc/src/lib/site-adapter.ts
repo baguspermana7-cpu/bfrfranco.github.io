@@ -250,3 +250,102 @@ export function seedDefaultSites(baseCountryId: string): CandidateSite[] {
         createdAt: now, updatedAt: now,
     }];
 }
+
+/* ─── PHASE V — FULL INTEGRATION of the 5 sibling analyses per site ──────────
+ * The unified Site Intelligence page COMPUTES tax / disaster / grid / talent /
+ * compliance PER CANDIDATE SITE (its country), sharing one project context.
+ * The child tabs stay as deep-dives over the SAME engines.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+import { calculateTaxIncentives, type TaxIncentiveResult } from '@/modules/analytics/TaxIncentiveEngine';
+import { calculateDisasterRisk, type DisasterRiskResult } from '@/modules/risk/DisasterRiskEngine';
+import { calculateGridReliability, type GridReliabilityResult } from '@/modules/infrastructure/GridReliabilityEngine';
+import { calculateTalentAvailability, type TalentAvailabilityResult } from '@/modules/staffing/TalentAvailabilityEngine';
+import { calculateCompliance, type ComplianceResult } from '@/modules/compliance/ComplianceEngine';
+
+export interface SiteAnalysisCtx {
+    itLoadKw: number;
+    tierLevel: 2 | 3 | 4;
+    coolingType: 'air' | 'inrow' | 'rdhx' | 'liquid';
+    totalCapex: number;
+    annualRevenue: number;      // screening: revenuePerKwMonth × itLoad × 12
+    annualOpex: number;
+    totalFTE: number;
+    annualStaffCost: number;    // screening: FTE × base salary × 1.3 burden
+}
+
+export interface SiteAnalyses {
+    tax: TaxIncentiveResult | null;
+    disaster: DisasterRiskResult | null;
+    grid: GridReliabilityResult | null;
+    talent: TalentAvailabilityResult | null;
+    compliance: ComplianceResult | null;
+}
+
+/** Shared project context for the per-site analyses (computed once per render).
+ *  Screening bases documented: revenue = engine decision.revenuePerKwMonth
+ *  (fallback 280 $/kW·mo), staff cost = headcount × country base salary × 1.3. */
+export function buildAnalysisCtx(args: {
+    itLoadKw: number; tierLevel: 2 | 3 | 4; coolingType: SiteAnalysisCtx['coolingType'];
+    capexTotal: number | null; headcounts: number[]; countryId: string; opexAnnual?: number | null;
+}): SiteAnalysisCtx {
+    const revenuePerKwMonth: number = rzData()?.decision?.revenuePerKwMonth ?? 280;
+    const annualRevenue = revenuePerKwMonth * args.itLoadKw * 12;
+    const totalFTE = Math.max(1, Math.round(args.headcounts.reduce((s, x) => s + (x || 0), 0)));
+    const c = COUNTRIES[args.countryId];
+    const baseSalary = c?.labor?.baseSalary_Engineer ?? 60000;
+    return {
+        itLoadKw: args.itLoadKw, tierLevel: args.tierLevel, coolingType: args.coolingType,
+        totalCapex: args.capexTotal ?? args.itLoadKw * 10500, // engine reference $/kW when capex not yet run
+        annualRevenue,
+        annualOpex: args.opexAnnual ?? annualRevenue * 0.4,   // screening fallback
+        totalFTE,
+        annualStaffCost: totalFTE * baseSalary * 1.3,
+    };
+}
+
+/** Run all 5 sibling engines for one candidate site (its country). Null-guarded. */
+export function analyzeSite(site: CandidateSite, ctx: SiteAnalysisCtx): SiteAnalyses {
+    const country = COUNTRIES[site.countryId];
+    const out: SiteAnalyses = { tax: null, disaster: null, grid: null, talent: null, compliance: null };
+    if (!country) return out;
+    try {
+        out.tax = calculateTaxIncentives({
+            country, totalCapex: ctx.totalCapex, annualRevenue: ctx.annualRevenue, annualOpex: ctx.annualOpex,
+            projectLifeYears: 15, discountRate: 0.10, equipmentCapexShare: 0.6,
+        });
+    } catch { /* engine guard */ }
+    try {
+        out.disaster = calculateDisasterRisk({ country, totalCapex: ctx.totalCapex, itLoadKw: ctx.itLoadKw, annualRevenue: ctx.annualRevenue });
+    } catch { /* */ }
+    try {
+        out.grid = calculateGridReliability({ country, itLoadKw: ctx.itLoadKw, tierLevel: ctx.tierLevel, coolingType: ctx.coolingType });
+    } catch { /* */ }
+    try {
+        out.talent = calculateTalentAvailability({ country, totalFTE: ctx.totalFTE, annualStaffCost: ctx.annualStaffCost });
+    } catch { /* */ }
+    try {
+        out.compliance = calculateCompliance(country, ctx.itLoadKw);
+    } catch { /* */ }
+    return out;
+}
+
+/** Radar axes remapped to the INTEGRATED analyses (Phase V, documented):
+ *  Site Score (engine site model) · Grid (reliabilityScore) · Disaster Safety
+ *  (100−compositeScore) · Tax & Incentives (incentive value vs capex, scaled)
+ *  · Talent · Compliance · Water & Cooling + Land & Infra (site factors). */
+export function integratedAxes(r: SiteScoreResult, an: SiteAnalyses): { axis: string; score: number }[] {
+    const taxScore = an.tax
+        ? Math.round(Math.max(5, Math.min(100, (an.tax.totalIncentiveValue / Math.max(1, an.tax.npvWithoutIncentives === 0 ? 1 : Math.abs(an.tax.npvWithoutIncentives))) * 400 + 40)))
+        : r.axes.costIncentives;
+    return [
+        { axis: 'Site Score', score: r.engine.score },
+        { axis: 'Grid Reliability', score: an.grid ? Math.round(an.grid.reliabilityScore) : r.axes.powerAvailability },
+        { axis: 'Disaster Safety', score: an.disaster ? Math.round(100 - an.disaster.compositeScore) : r.axes.naturalRisks },
+        { axis: 'Tax & Incentives', score: taxScore },
+        { axis: 'Talent', score: an.talent ? Math.round(an.talent.talentScore) : 60 },
+        { axis: 'Compliance', score: an.compliance ? Math.round(an.compliance.complianceScore) : 60 },
+        { axis: 'Water & Cooling', score: r.axes.waterCooling },
+        { axis: 'Land & Infra', score: r.axes.landInfra },
+    ];
+}

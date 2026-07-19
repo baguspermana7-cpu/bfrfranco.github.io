@@ -3,9 +3,10 @@
 /* ─── Site location map (stylized SVG, no map lib) + 8-axis radar (Phase B) ── */
 
 import React from 'react';
-import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Legend } from 'recharts';
+import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import type { CandidateSite, SiteScoreResult, AxisKey } from '@/types/site-intel';
 import { AXIS_LABELS } from '@/types/site-intel';
+import { integratedAxes, type SiteAnalyses } from '@/lib/site-adapter';
 
 const MAP_STYLES = ['Map', 'Satellite', 'Hybrid', '3D Terrain'] as const;
 const SITE_COLORS = ['#a78bfa', '#22d3ee', '#34d399', '#f59e0b', '#fb7185'];
@@ -57,20 +58,40 @@ export function SiteMapPanel({ sites, results, selectedId, onSelect }: {
     );
 }
 
-export function SiteRadarPanel({ sites, results }: { sites: CandidateSite[]; results: SiteScoreResult[] }) {
-    const axes = Object.keys(AXIS_LABELS) as AxisKey[];
-    const data = axes.map((k) => {
-        const row: Record<string, string | number> = { axis: AXIS_LABELS[k] };
-        results.forEach((r) => {
-            const site = sites.find((s) => s.id === r.siteId);
-            if (site) row[`Site ${site.label}`] = r.axes[k];
+export function SiteRadarPanel({ sites, results, analysesById }: {
+    sites: CandidateSite[]; results: SiteScoreResult[]; analysesById?: Map<string, SiteAnalyses>;
+}) {
+    /* Phase V: when the integrated analyses are available, the radar axes ARE
+     * the sibling-engine outputs (grid/disaster/tax/talent/compliance). */
+    const integrated = analysesById && results.some((r) => analysesById.get(r.siteId));
+    let data: Record<string, string | number>[];
+    if (integrated) {
+        const first = results[0] ? integratedAxes(results[0], analysesById!.get(results[0].siteId) ?? { tax: null, disaster: null, grid: null, talent: null, compliance: null }) : [];
+        data = first.map((ax, i) => {
+            const row: Record<string, string | number> = { axis: ax.axis };
+            results.forEach((r) => {
+                const site = sites.find((s) => s.id === r.siteId);
+                if (!site) return;
+                const a = integratedAxes(r, analysesById!.get(r.siteId) ?? { tax: null, disaster: null, grid: null, talent: null, compliance: null });
+                row[`Site ${site.label}`] = a[i]?.score ?? 0;
+            });
+            return row;
         });
-        return row;
-    });
+    } else {
+        const axes = Object.keys(AXIS_LABELS) as AxisKey[];
+        data = axes.map((k) => {
+            const row: Record<string, string | number> = { axis: AXIS_LABELS[k] };
+            results.forEach((r) => {
+                const site = sites.find((s) => s.id === r.siteId);
+                if (site) row[`Site ${site.label}`] = r.axes[k];
+            });
+            return row;
+        });
+    }
     return (
         <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
             <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Site Intelligence Score Breakdown</h2>
-            <p className="mb-1 text-[9px] text-slate-400">8-axis presentation view — authoritative Total Score = engine models.site.score</p>
+            <p className="mb-1 text-[9px] text-slate-400">{integrated ? 'Integrated axes — grid/disaster/tax/talent/compliance computed per site by the sibling engines' : '8-axis presentation view — authoritative Total Score = engine models.site.score'}</p>
             <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                     <RadarChart data={data} outerRadius="72%">
@@ -83,6 +104,7 @@ export function SiteRadarPanel({ sites, results }: { sites: CandidateSite[]; res
                             return <Radar key={r.siteId} name={`Site ${site.label}`} dataKey={`Site ${site.label}`}
                                 stroke={SITE_COLORS[i]} fill={SITE_COLORS[i]} fillOpacity={0.12} strokeWidth={1.5} />;
                         })}
+                        <Tooltip formatter={(v) => `${v}/100`} contentStyle={{ fontSize: 10 }} />
                         <Legend wrapperStyle={{ fontSize: 10 }} />
                     </RadarChart>
                 </ResponsiveContainer>

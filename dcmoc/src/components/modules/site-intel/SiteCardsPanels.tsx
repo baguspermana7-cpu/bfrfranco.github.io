@@ -5,7 +5,7 @@
 import React from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { COUNTRIES } from '@/constants/countries';
-import { panelData, type PanelValue } from '@/lib/site-adapter';
+import { panelData, type PanelValue, type SiteAnalyses } from '@/lib/site-adapter';
 import type { CandidateSite, SiteScoreResult } from '@/types/site-intel';
 import { SITE_COLORS } from './SiteMapRadar';
 import { Zap, Network, Leaf, ShieldAlert, LandPlot, Coins } from 'lucide-react';
@@ -94,6 +94,111 @@ export function SiteDetailPanels({ site }: { site: CandidateSite | null }) {
                         </div>
                     );
                 })}
+            </div>
+        </div>
+    );
+}
+
+/* ─── PHASE V — integrated analyses panels (5 sibling engines PER SITE) ────── */
+
+const fm = (v: number) => v >= 1e6 ? `$${(v / 1e6).toFixed(1)}M` : v >= 1e3 ? `$${(v / 1e3).toFixed(0)}K` : `$${Math.round(v)}`;
+
+export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSite; analyses: SiteAnalyses | null }) {
+    const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
+    if (!analyses) return null;
+    const { grid, disaster, tax, talent, compliance } = analyses;
+    const card = 'rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3';
+    const row = (label: string, value: string, title?: string) => (
+        <div key={label} className="flex items-center justify-between gap-2 text-[11px]" title={title ?? `${label}: ${value}`}>
+            <span className="flex items-center gap-1.5 text-slate-500"><span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" title="computed by the sibling engine" />{label}</span>
+            <span className="font-medium tabular-nums text-slate-800 dark:text-slate-200">{value}</span>
+        </div>
+    );
+    return (
+        <div>
+            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                Integrated Analyses — Site {site.label} · computed per site by the tax / disaster / grid / talent / compliance engines
+                <span className="ml-2 text-[9px] normal-case text-emerald-500">● engine-computed</span>
+            </h2>
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                <div className={card}>
+                    <h3 className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                        Grid Reliability
+                        {grid && <span className={`rounded px-1.5 py-0.5 text-[9px] font-bold ${grid.reliabilityGrade === 'A' ? 'bg-emerald-500/15 text-emerald-500' : grid.reliabilityGrade === 'B' ? 'bg-lime-500/15 text-lime-500' : 'bg-amber-500/15 text-amber-500'}`}>Grade {grid.reliabilityGrade}</span>}
+                    </h3>
+                    {grid ? (
+                        <div className="space-y-1">
+                            {row('Reliability score', `${Math.round(grid.reliabilityScore)}/100`)}
+                            {row('Expected outages', `${grid.annualExpectedOutages.toFixed(1)}/yr`)}
+                            {row('Outage minutes', `${Math.round(grid.annualOutageMinutes)} min/yr`)}
+                            {row('Required gen capacity', `${(grid.requiredGenCapacity / 1000).toFixed(1)} MW`)}
+                            {row('Annual fuel cost', fm(grid.annualFuelCost))}
+                        </div>
+                    ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
+                    <button onClick={() => setActiveTab('grid' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Grid deep-dive →</button>
+                </div>
+                <div className={card}>
+                    <h3 className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                        Disaster Risk
+                        {disaster && <span className={`rounded px-1.5 py-0.5 text-[9px] font-bold ${disaster.riskCategory === 'Low' ? 'bg-emerald-500/15 text-emerald-500' : disaster.riskCategory === 'Moderate' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{disaster.riskCategory}</span>}
+                    </h3>
+                    {disaster ? (
+                        <div className="space-y-1">
+                            {row('Composite risk', `${Math.round(disaster.compositeScore)}/100 (lower better)`)}
+                            {row('Insurance', `${fm(disaster.annualInsuranceCost)}/yr`)}
+                            {row('Expected annual loss', fm(disaster.expectedAnnualLoss))}
+                            {row('Bus. interruption', `${disaster.businessInterruptionDays.toFixed(1)} days`)}
+                            {row('Revenue at risk', fm(disaster.revenueAtRisk))}
+                        </div>
+                    ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
+                    <button onClick={() => setActiveTab('disaster' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Risk deep-dive →</button>
+                </div>
+                <div className={card}>
+                    <h3 className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                        Tax & Incentives
+                        {tax && <span className="rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-bold text-violet-400">rank #{tax.countryRanking}</span>}
+                    </h3>
+                    {tax ? (
+                        <div className="space-y-1">
+                            {row('Total incentive value', fm(tax.totalIncentiveValue), 'Total incentive value over 15 years')}
+                            {row('FTZ benefits', fm(tax.ftzBenefits))}
+                            {row('NPV with incentives', fm(tax.npvWithIncentives))}
+                            {row('NPV uplift', fm(Math.max(0, tax.npvWithIncentives - tax.npvWithoutIncentives)))}
+                            {row('IRR w/ incentives', `${(tax.irrWithIncentives * 100).toFixed(1)}%`)}
+                        </div>
+                    ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
+                    <button onClick={() => setActiveTab('tax' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Incentives deep-dive →</button>
+                </div>
+                <div className={card}>
+                    <h3 className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                        Talent Availability
+                        {talent && <span className={`rounded px-1.5 py-0.5 text-[9px] font-bold ${talent.hiringDifficulty === 'Easy' ? 'bg-emerald-500/15 text-emerald-500' : talent.hiringDifficulty === 'Moderate' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{talent.hiringDifficulty}</span>}
+                    </h3>
+                    {talent ? (
+                        <div className="space-y-1">
+                            {row('Talent score', `${Math.round(talent.talentScore)}/100`)}
+                            {row('Time to full staff', `${talent.timeToFullStaff.toFixed(1)} mo`)}
+                            {row('Recruitment cost', fm(talent.totalRecruitmentCost))}
+                            {row('Annual training', fm(talent.annualTrainingCost))}
+                            {row('Turnover rate', `${(talent.adjustedTurnoverRate * 100).toFixed(1)}%/yr`)}
+                        </div>
+                    ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
+                    <button onClick={() => setActiveTab('talent' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Talent deep-dive →</button>
+                </div>
+                <div className={card}>
+                    <h3 className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                        Compliance
+                        {compliance && <span className="rounded bg-cyan-500/15 px-1.5 py-0.5 text-[9px] font-bold text-cyan-500">{Math.round(compliance.complianceScore)}/100</span>}
+                    </h3>
+                    {compliance ? (
+                        <div className="space-y-1">
+                            {row('Mandatory items', String(compliance.mandatoryCount))}
+                            {row('Initial cost', fm(compliance.totalInitialCost))}
+                            {row('Annual cost', fm(compliance.totalAnnualCost))}
+                        </div>
+                    ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
+                    <button onClick={() => setActiveTab('compliance' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Compliance deep-dive →</button>
+                </div>
             </div>
         </div>
     );

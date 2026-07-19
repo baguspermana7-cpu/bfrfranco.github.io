@@ -10,10 +10,12 @@
 import React from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useSitesStore } from '@/store/sites';
-import { scoreAllSites } from '@/lib/site-adapter';
+import { useCapexStore } from '@/store/capex';
+import { useEffectiveInputs } from '@/store/useEffectiveInputs';
+import { scoreAllSites, buildAnalysisCtx, analyzeSite, type SiteAnalyses } from '@/lib/site-adapter';
 import { COUNTRIES } from '@/constants/countries';
 import { SiteMapPanel, SiteRadarPanel } from './SiteMapRadar';
-import { SiteCards, SiteDetailPanels } from './SiteCardsPanels';
+import { SiteCards, SiteDetailPanels, IntegratedAnalysesPanels } from './SiteCardsPanels';
 import { SiteComparisonTable, SiteRightRail } from './SiteComparisonRail';
 import { SiteEditorDrawer } from './SiteEditorDrawer';
 import { MapPin, Loader2 } from 'lucide-react';
@@ -26,12 +28,32 @@ const STRIP = [
 ];
 
 export function SiteIntelligencePage() {
-    const itLoadMw = useSimulationStore((s) => s.inputs.itLoad) / 1000;
+    const inputs = useSimulationStore((s) => s.inputs);
+    const itLoadMw = inputs.itLoad / 1000;
+    const capexTotal = useCapexStore((s) => s.results?.total ?? null);
+    const eff = useEffectiveInputs();
     const { sites, selectedSiteId, selectSite } = useSitesStore();
     const [drawer, setDrawer] = React.useState(false);
     const [activeSec, setActiveSec] = React.useState(STRIP[0].id);
 
     const results = React.useMemo(() => scoreAllSites(sites), [sites]);
+
+    /* PHASE V — the 5 sibling analyses computed PER SITE (shared project ctx) */
+    const analysesById = React.useMemo(() => {
+        const map = new Map<string, SiteAnalyses>();
+        try {
+            const ctx = buildAnalysisCtx({
+                itLoadKw: inputs.itLoad,
+                tierLevel: (inputs.tierLevel === 4 ? 4 : inputs.tierLevel === 2 ? 2 : 3),
+                coolingType: inputs.coolingType,
+                capexTotal,
+                headcounts: [eff.headcount_ShiftLead, eff.headcount_Engineer, eff.headcount_Technician, eff.headcount_Admin, eff.headcount_Janitor],
+                countryId: sites[0]?.countryId ?? 'ID',
+            });
+            sites.forEach((s) => map.set(s.id, analyzeSite(s, ctx)));
+        } catch { /* engines guarded individually too */ }
+        return map;
+    }, [sites, inputs.itLoad, inputs.tierLevel, inputs.coolingType, capexTotal, eff]);
     const best = results[0] ?? null;
     const bestSite = best ? sites.find((s) => s.id === best.siteId) : null;
     const selected = sites.find((s) => s.id === selectedSiteId) ?? sites[0] ?? null;
@@ -102,16 +124,21 @@ export function SiteIntelligencePage() {
 
                     <div id="sec-map" className="grid scroll-mt-24 gap-4 xl:grid-cols-2">
                         <SiteMapPanel sites={sites} results={results} selectedId={selected?.id ?? null} onSelect={selectSite} />
-                        <SiteRadarPanel sites={sites} results={results} />
+                        <SiteRadarPanel sites={sites} results={results} analysesById={analysesById} />
                     </div>
 
                     <SiteCards sites={sites} results={results} selectedId={selected?.id ?? null} onSelect={selectSite} />
+
+                    {/* PHASE V — integrated per-site analyses (tax/disaster/grid/talent/compliance) */}
+                    {selected && (
+                        <IntegratedAnalysesPanels site={selected} analyses={analysesById.get(selected.id) ?? null} />
+                    )}
 
                     <div id="sec-panels" className="scroll-mt-24">
                         <SiteDetailPanels site={selected} />
                     </div>
 
-                    <SiteComparisonTable sites={sites} results={results} selectedId={selected?.id ?? null} />
+                    <SiteComparisonTable sites={sites} results={results} selectedId={selected?.id ?? null} analysesById={analysesById} />
 
                     <p className="text-[10px] text-slate-400">
                         Country marked “EXAMPLE” sites carry illustrative attributes — edit via Edit Criteria. Country: {selected ? COUNTRIES[selected.countryId]?.name : '—'}.

@@ -14,6 +14,7 @@ import { ProjectOverviewSection } from './sections/ProjectOverviewSection';
 import { WorkloadProfileSection } from './sections/WorkloadProfileSection';
 import { GrowthPlanSection, AvailabilitySection, BusinessPrioritySection } from './sections/GrowthAvailabilitySections';
 import { SummarySection } from './sections/SummarySection';
+import { InfrastructureOptionsSection } from './sections/InfrastructureOptionsSection';
 import { InsightsRail } from './InsightsRail';
 import { ClipboardList, Check, ChevronRight } from 'lucide-react';
 
@@ -23,6 +24,7 @@ const TABS = [
     { id: 'sec-growth', label: '1.3 Capacity & Growth' },
     { id: 'sec-availability', label: '1.4 Reliability & SLA' },
     { id: 'sec-business', label: '1.5 Business & Financial' },
+    { id: 'sec-infra', label: '1.6 Infrastructure & Site' },
     { id: 'sec-summary', label: '1.7 Summary' },
 ];
 
@@ -107,6 +109,7 @@ export function RequirementsPage() {
                     <GrowthPlanSection derived={derived} />
                     <AvailabilitySection derived={derived} />
                     <BusinessPrioritySection derived={derived} />
+                    <InfrastructureOptionsSection />
                     <SummarySection derived={derived} />
                 </div>
                 <InsightsRail derived={derived} />

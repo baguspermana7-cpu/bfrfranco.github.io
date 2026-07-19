@@ -41,9 +41,11 @@ const CapexDashboard = () => {
         }
         setHeroBusy(false);
     };
-    // Deep Sea Water Cooling (shared RZEngine v2.3.0 models.cooling.deepSea) —
-    // component-local, DISPLAY-LEVEL only: never mutates the store CAPEX math.
-    const [deepSea, setDeepSea] = useState(false);
+    // Deep Sea Water Cooling (shared RZEngine v2.3.0 models.cooling.deepSea).
+    // S9: the tick now lives in the SHARED capex store (inputs.deepSea) so the
+    // Requirements 1.6 section, this drawer and the CDU page stay consistent.
+    const deepSea = !!inputs.deepSea;
+    const setDeepSea = (v: boolean) => setInputs({ deepSea: v });
     const deepSeaModel = rzModels().cooling?.deepSea;
     const ds = useMemo(() => {
         if (!deepSea || typeof deepSeaModel !== 'function') return null;

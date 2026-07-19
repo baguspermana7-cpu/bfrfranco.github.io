@@ -5,14 +5,15 @@
 import React from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useSitesStore } from '@/store/sites';
-import { keyTakeaways } from '@/lib/site-adapter';
+import { keyTakeaways, type SiteAnalyses } from '@/lib/site-adapter';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import type { CandidateSite, SiteScoreResult, AxisKey } from '@/types/site-intel';
 import { AXIS_LABELS } from '@/types/site-intel';
 import { Play, FileDown, ChevronRight } from 'lucide-react';
 
-export function SiteComparisonTable({ sites, results, selectedId }: {
+export function SiteComparisonTable({ sites, results, selectedId, analysesById }: {
     sites: CandidateSite[]; results: SiteScoreResult[]; selectedId: string | null;
+    analysesById?: Map<string, SiteAnalyses>;
 }) {
     const axes = Object.keys(AXIS_LABELS) as AxisKey[];
     const bySite = (id: string) => results.find((r) => r.siteId === id);
@@ -50,6 +51,32 @@ export function SiteComparisonTable({ sites, results, selectedId }: {
                                 })}
                             </tr>
                         ))}
+                        {/* PHASE V — integrated sibling-engine rows */}
+                        {analysesById && ([
+                            { label: 'Grid reliability (engine)', get: (a: SiteAnalyses) => a.grid ? { v: `${Math.round(a.grid.reliabilityScore)} · ${a.grid.reliabilityGrade}`, good: a.grid.reliabilityScore } : null },
+                            { label: 'Outage minutes /yr', get: (a: SiteAnalyses) => a.grid ? { v: `${Math.round(a.grid.annualOutageMinutes)}`, good: -a.grid.annualOutageMinutes } : null },
+                            { label: 'Disaster composite (lower better)', get: (a: SiteAnalyses) => a.disaster ? { v: `${Math.round(a.disaster.compositeScore)} · ${a.disaster.riskCategory}`, good: -a.disaster.compositeScore } : null },
+                            { label: 'Insurance $/yr', get: (a: SiteAnalyses) => a.disaster ? { v: `$${(a.disaster.annualInsuranceCost / 1e3).toFixed(0)}K`, good: -a.disaster.annualInsuranceCost } : null },
+                            { label: 'Tax incentive value (15y)', get: (a: SiteAnalyses) => a.tax ? { v: `$${(a.tax.totalIncentiveValue / 1e6).toFixed(1)}M`, good: a.tax.totalIncentiveValue } : null },
+                            { label: 'Talent score', get: (a: SiteAnalyses) => a.talent ? { v: `${Math.round(a.talent.talentScore)} · ${a.talent.hiringDifficulty}`, good: a.talent.talentScore } : null },
+                            { label: 'Compliance score', get: (a: SiteAnalyses) => a.compliance ? { v: `${Math.round(a.compliance.complianceScore)}`, good: a.compliance.complianceScore } : null },
+                        ] as { label: string; get: (a: SiteAnalyses) => { v: string; good: number } | null }[]).map((rowDef) => {
+                            const cells = sites.map((s) => { const a = analysesById.get(s.id); return a ? rowDef.get(a) : null; });
+                            if (cells.every((c) => c == null)) return null;
+                            const goods = cells.filter((c): c is { v: string; good: number } => c != null).map((c) => c.good);
+                            return (
+                                <tr key={rowDef.label} className="border-b border-slate-100 dark:border-slate-800/60">
+                                    <td className="py-1.5 pr-2 text-slate-500">
+                                        <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" title="computed by the sibling engine" />{rowDef.label}
+                                    </td>
+                                    {sites.map((s, i) => {
+                                        const c = cells[i];
+                                        return <td key={s.id} title={c ? `${rowDef.label}: ${c.v}` : undefined}
+                                            className={`px-2 py-1.5 text-right tabular-nums ${c && goods.length > 1 && c.good === Math.max(...goods) ? 'text-violet-500 font-semibold' : 'text-slate-600 dark:text-slate-400'}`}>{c?.v ?? '—'}</td>;
+                                    })}
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>
