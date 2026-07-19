@@ -23,6 +23,7 @@ import { VALUE_BINDINGS, BINDING_GROUPS } from '@/lib/value-bindings';
 import ENGINE_CATALOG from '@/lib/engine-catalog.json';
 import RESEARCH_LIB from '@/lib/research-library.json';
 import { Database, Boxes, FolderOpen, HelpCircle, Zap, Wrench, ClipboardCheck, Users, Sun, Moon, Cpu, Server, Building, ArrowRight, CheckCircle2, Circle, ExternalLink } from 'lucide-react';
+import { COUNTRIES, type CountryProfile } from '@/constants/countries';
 
 function Head({ icon: Icon, title, sub, tone = 'from-cyan-500 to-blue-600' }: { icon: React.ElementType; title: string; sub: string; tone?: string }) {
     return (
@@ -35,10 +36,187 @@ function Head({ icon: Icon, title, sub, tone = 'from-cyan-500 to-blue-600' }: { 
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) { return <div className={`rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 ${className}`}>{children}</div>; }
 const pct = (n: number) => `${Math.round(n * 100)}%`;
 
+/* ── Country Data Coverage — computed LIVE from constants/countries.ts ──
+ * A per-country × field-group completeness matrix over the 40-country DB.
+ * Every cell is derived at runtime from the real COUNTRIES objects (no
+ * hardcoded coverage), so filling a gap in countries.ts updates this view
+ * automatically. hvoPricePerLiter counts as empty when HVO is not available
+ * (price 0 + hvoAvailable:false = no HVO supply in that market). */
+type CovGroup = 'economy' | 'labor' | 'environment' | 'gridReliability' | 'fuelDiesel' | 'naturalDisaster' | 'talentPool' | 'compliance' | 'constructionIndex';
+interface CovField { group: CovGroup; key: string; short: string; get: (c: CountryProfile) => unknown; }
+const COV_GROUP_LABELS: Record<CovGroup, string> = {
+    economy: 'Economy', labor: 'Labor', environment: 'Environment', gridReliability: 'Grid Reliability',
+    fuelDiesel: 'Fuel / Diesel', naturalDisaster: 'Natural Disaster', talentPool: 'Talent Pool', compliance: 'Compliance', constructionIndex: 'Construction Idx',
+};
+const COV_FIELDS: CovField[] = [
+    { group: 'economy', key: 'economy.electricityRate', short: 'Elec $/kWh', get: (c) => c.economy.electricityRate },
+    { group: 'economy', key: 'economy.taxRate', short: 'Tax', get: (c) => c.economy.taxRate },
+    { group: 'economy', key: 'economy.inflationRate', short: 'Inflation', get: (c) => c.economy.inflationRate },
+    { group: 'labor', key: 'labor.baseSalary_ShiftLead', short: 'Sal SL', get: (c) => c.labor.baseSalary_ShiftLead },
+    { group: 'labor', key: 'labor.baseSalary_Engineer', short: 'Sal Eng', get: (c) => c.labor.baseSalary_Engineer },
+    { group: 'labor', key: 'labor.baseSalary_Technician', short: 'Sal Tech', get: (c) => c.labor.baseSalary_Technician },
+    { group: 'labor', key: 'labor.baseSalary_Admin', short: 'Sal Adm', get: (c) => c.labor.baseSalary_Admin },
+    { group: 'labor', key: 'labor.baseSalary_Janitor', short: 'Sal Jan', get: (c) => c.labor.baseSalary_Janitor },
+    { group: 'labor', key: 'labor.socialSecurityRate', short: 'Soc Sec', get: (c) => c.labor.socialSecurityRate },
+    { group: 'labor', key: 'labor.benefitsOverheadRate', short: 'Benefits', get: (c) => c.labor.benefitsOverheadRate },
+    { group: 'labor', key: 'labor.nightShiftPremiumRate', short: 'Night Prem', get: (c) => c.labor.nightShiftPremiumRate },
+    { group: 'labor', key: 'labor.workingHoursPerMonth', short: 'Hrs/mo', get: (c) => c.labor.workingHoursPerMonth },
+    { group: 'environment', key: 'environment.saidiMinYr', short: 'SAIDI', get: (c) => c.environment.saidiMinYr },
+    { group: 'environment', key: 'environment.baselineAQI', short: 'AQI', get: (c) => c.environment.baselineAQI },
+    { group: 'environment', key: 'environment.aqueductStressScore', short: 'Aqueduct', get: (c) => c.environment.aqueductStressScore },
+    { group: 'environment', key: 'environment.pgaPct2in50yr', short: 'PGA', get: (c) => c.environment.pgaPct2in50yr },
+    { group: 'environment', key: 'environment.ashraeClimateZone', short: 'Climate', get: (c) => c.environment.ashraeClimateZone },
+    { group: 'gridReliability', key: 'gridReliability.gridUptime', short: 'Uptime', get: (c) => c.gridReliability?.gridUptime },
+    { group: 'gridReliability', key: 'gridReliability.brownoutFrequency', short: 'Brownout', get: (c) => c.gridReliability?.brownoutFrequency },
+    { group: 'gridReliability', key: 'gridReliability.averageOutageDuration', short: 'Outage min', get: (c) => c.gridReliability?.averageOutageDuration },
+    { group: 'fuelDiesel', key: 'fuelDiesel.dieselPricePerLiter', short: 'Diesel $/L', get: (c) => c.fuelDiesel?.dieselPricePerLiter },
+    /* HVO: price 0 + hvoAvailable:false = no HVO supply → counted as a data gap */
+    { group: 'fuelDiesel', key: 'fuelDiesel.hvoPricePerLiter', short: 'HVO $/L', get: (c) => (c.fuelDiesel && c.fuelDiesel.hvoAvailable && c.fuelDiesel.hvoPricePerLiter > 0 ? c.fuelDiesel.hvoPricePerLiter : undefined) },
+    { group: 'fuelDiesel', key: 'fuelDiesel.fuelQualityRating', short: 'Fuel Qual', get: (c) => c.fuelDiesel?.fuelQualityRating },
+    { group: 'naturalDisaster', key: 'naturalDisaster.compositeScore', short: 'Hazard', get: (c) => c.naturalDisaster?.compositeScore },
+    { group: 'naturalDisaster', key: 'naturalDisaster.insuranceMultiplier', short: 'Insur ×', get: (c) => c.naturalDisaster?.insuranceMultiplier },
+    { group: 'talentPool', key: 'talentPool.talentScore', short: 'Talent', get: (c) => c.talentPool?.talentScore },
+    { group: 'talentPool', key: 'talentPool.avgHiringDays', short: 'Hiring d', get: (c) => c.talentPool?.avgHiringDays },
+    { group: 'compliance', key: 'compliance.annualComplianceCost', short: 'Compl $', get: (c) => c.compliance.annualComplianceCost },
+    { group: 'compliance', key: 'compliance.environmentalPermitCostPerYear', short: 'Env Permit', get: (c) => c.compliance.environmentalPermitCostPerYear },
+    { group: 'constructionIndex', key: 'constructionIndex', short: 'Constr idx', get: (c) => c.constructionIndex },
+];
+const covFilled = (v: unknown): boolean => {
+    if (v == null) return false;
+    if (typeof v === 'string') return v.trim() !== '';
+    if (Array.isArray(v)) return v.length > 0;
+    if (typeof v === 'number') return Number.isFinite(v);
+    return true;
+};
+function CountryCoverageSection() {
+    const [group, setGroup] = React.useState<'all' | CovGroup>('all');
+    const [query, setQuery] = React.useState('');
+    const [sel, setSel] = React.useState<string | null>(null);
+    /* PERF: 40 countries × 30 fields — computed ONCE (COUNTRIES is a static module constant). */
+    const cov = React.useMemo(() => {
+        const rows = Object.values(COUNTRIES).map((c) => {
+            const cells = COV_FIELDS.map((f) => covFilled(f.get(c)));
+            const filledCount = cells.filter(Boolean).length;
+            const missing = COV_FIELDS.filter((_, i) => !cells[i]);
+            return { id: c.id, name: c.name, region: c.region, cells, filledCount, missing };
+        });
+        const fieldGaps = COV_FIELDS
+            .map((f, i) => ({ key: f.key, group: f.group, gaps: rows.reduce((s, r) => s + (r.cells[i] ? 0 : 1), 0) }))
+            .filter((g) => g.gaps > 0)
+            .sort((a, b) => b.gaps - a.gaps);
+        const totalCells = rows.length * COV_FIELDS.length;
+        const filledCells = rows.reduce((s, r) => s + r.filledCount, 0);
+        const maxFill = Math.max(...rows.map((r) => r.filledCount));
+        const minFill = Math.min(...rows.map((r) => r.filledCount));
+        const fullest = rows.filter((r) => r.filledCount === maxFill);
+        const thinnest = rows.filter((r) => r.filledCount === minFill);
+        return { rows, fieldGaps, totalCells, filledCells, coverage: filledCells / totalCells, maxFill, minFill, fullest, thinnest };
+    }, []);
+    const visFields = COV_FIELDS.map((f, i) => ({ f, i })).filter(({ f }) => group === 'all' || f.group === group);
+    const visRows = cov.rows.filter((r) => !query || (r.name + ' ' + r.id).toLowerCase().includes(query.toLowerCase()));
+    const selRow = sel ? cov.rows.find((r) => r.id === sel) : null;
+    return (
+        <div className="space-y-3">
+            <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Country Data Coverage — {COV_FIELDS.length} fields × {cov.rows.length} countries</h2>
+                <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">computed live</span>
+            </div>
+            {/* Summary: totals + biggest gaps + fullest/thinnest countries */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                <div className="rounded-lg border border-slate-200 dark:border-white/10 px-3 py-2">
+                    <p className="text-[9px] uppercase text-slate-400">Total coverage</p>
+                    <p className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{(cov.coverage * 100).toFixed(1)}%</p>
+                    <p className="text-[9px] text-slate-400">{cov.filledCells.toLocaleString()} / {cov.totalCells.toLocaleString()} cells filled</p>
+                </div>
+                <div className="rounded-lg border border-slate-200 dark:border-white/10 px-3 py-2">
+                    <p className="text-[9px] uppercase text-slate-400">Biggest gaps</p>
+                    {cov.fieldGaps.length === 0
+                        ? <p className="text-xs text-emerald-500 font-medium">No gaps — all fields filled</p>
+                        : cov.fieldGaps.slice(0, 3).map((g) => (
+                            <p key={g.key} className="text-[10px] text-slate-600 dark:text-slate-300"><span className="font-mono text-amber-500">{g.key.split('.').pop()}</span> kosong di <b>{g.gaps}</b> negara</p>
+                        ))}
+                </div>
+                <div className="rounded-lg border border-slate-200 dark:border-white/10 px-3 py-2">
+                    <p className="text-[9px] uppercase text-slate-400">Most complete</p>
+                    <p className="text-xs font-medium text-slate-700 dark:text-slate-200">{cov.fullest.length > 3 ? `${cov.fullest.length} countries` : cov.fullest.map((r) => r.name).join(', ')}</p>
+                    <p className="text-[9px] text-slate-400 tabular-nums">{cov.maxFill}/{COV_FIELDS.length} fields</p>
+                </div>
+                <div className="rounded-lg border border-slate-200 dark:border-white/10 px-3 py-2">
+                    <p className="text-[9px] uppercase text-slate-400">Least complete</p>
+                    <p className="text-xs font-medium text-slate-700 dark:text-slate-200">{cov.thinnest.length > 3 ? `${cov.thinnest.length} countries` : cov.thinnest.map((r) => r.name).join(', ')}</p>
+                    <p className="text-[9px] text-slate-400 tabular-nums">{cov.minFill}/{COV_FIELDS.length} fields</p>
+                </div>
+            </div>
+            {/* Filters */}
+            <div className="flex items-center gap-2 flex-wrap">
+                <select value={group} onChange={(e) => setGroup(e.target.value as 'all' | CovGroup)}
+                    className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1 text-xs outline-none focus:border-cyan-400 text-slate-900 dark:text-slate-100">
+                    <option value="all">All groups ({COV_FIELDS.length} fields)</option>
+                    {(Object.keys(COV_GROUP_LABELS) as CovGroup[]).map((g) => (
+                        <option key={g} value={g}>{COV_GROUP_LABELS[g]} ({COV_FIELDS.filter((f) => f.group === g).length})</option>
+                    ))}
+                </select>
+                <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search country…"
+                    className="w-44 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1 text-xs outline-none focus:border-cyan-400 text-slate-900 dark:text-slate-100" />
+                <span className="text-[10px] text-slate-400">{visRows.length} negara · klik baris → daftar field kosong</span>
+            </div>
+            {/* Selected-country gap panel (actionable fill list) */}
+            {selRow && (
+                <div className="rounded-lg border border-cyan-400/40 bg-cyan-500/5 px-3 py-2">
+                    <div className="flex items-center gap-2">
+                        <p className="text-xs font-semibold text-slate-800 dark:text-slate-100">{selRow.name} <span className="font-mono text-[9px] text-slate-400">{selRow.id}</span> — {selRow.filledCount}/{COV_FIELDS.length} fields filled</p>
+                        <button onClick={() => setSel(null)} className="ml-auto text-[10px] text-slate-400 hover:text-cyan-500">✕ close</button>
+                    </div>
+                    {selRow.missing.length === 0
+                        ? <p className="mt-1 text-[10px] text-emerald-500">Lengkap — tidak ada field kosong.</p>
+                        : (<div className="mt-1.5 flex flex-wrap gap-1.5">
+                            {selRow.missing.map((f) => (
+                                <span key={f.key} className="rounded-md border border-amber-400/40 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-mono text-amber-600 dark:text-amber-400" title={COV_GROUP_LABELS[f.group]}>{f.key}</span>
+                            ))}
+                        </div>)}
+                </div>
+            )}
+            {/* Matrix */}
+            <div className="overflow-x-auto">
+                <table className="text-[10px]">
+                    <thead>
+                        <tr className="text-slate-400">
+                            <th className="py-1 pr-3 text-left sticky left-0 bg-white dark:bg-slate-900 z-10">Country</th>
+                            {visFields.map(({ f }) => (
+                                <th key={f.key} className="px-0.5 pb-1 align-bottom font-medium" title={`${COV_GROUP_LABELS[f.group]} · ${f.key}`}>
+                                    <span className="inline-block whitespace-nowrap text-[8px]" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>{f.short}</span>
+                                </th>
+                            ))}
+                            <th className="pl-2 text-right">Filled</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {visRows.map((r) => (
+                            <tr key={r.id} onClick={() => setSel(sel === r.id ? null : r.id)}
+                                className={`border-t border-slate-100 dark:border-white/5 cursor-pointer hover:bg-cyan-500/5 ${sel === r.id ? 'bg-cyan-500/10' : ''}`}>
+                                <td className="py-0.5 pr-3 whitespace-nowrap font-medium text-slate-700 dark:text-slate-200 sticky left-0 bg-white dark:bg-slate-900">{r.name} <span className="text-[8px] text-slate-400">{r.region}</span></td>
+                                {visFields.map(({ f, i }) => (
+                                    <td key={f.key} className="px-0.5 text-center">
+                                        {r.cells[i]
+                                            ? <span className="text-emerald-500">✓</span>
+                                            : <span className="text-amber-500 font-bold" title={`${f.key} kosong`}>—</span>}
+                                    </td>
+                                ))}
+                                <td className="pl-2 text-right tabular-nums text-slate-500">{r.filledCount}/{COV_FIELDS.length}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <p className="text-[9px] text-slate-400">Read-only browser — coverage dihitung live dari <code>constants/countries.ts</code> (objek COUNTRIES nyata, bukan daftar statis). ✓ = terisi · <span className="text-amber-500">—</span> = kosong / tidak tersedia (HVO dihitung kosong saat pasar tanpa suplai HVO).</p>
+        </div>
+    );
+}
+
 /* ── Data Library — browse the canonical engine DATA (single source) ── */
 export function DataLibraryDashboard() {
     const d = rzData();
-    const [tab, setTab] = React.useState<'countries' | 'markets' | 'pue' | 'refrigerants' | 'omcontracts' | 'sparespricing' | 'envcosts' | 'sources' | 'corpus'>('countries');
+    const [tab, setTab] = React.useState<'countries' | 'coverage' | 'markets' | 'pue' | 'refrigerants' | 'omcontracts' | 'sparespricing' | 'envcosts' | 'sources' | 'corpus'>('countries');
     const [srcQuery, setSrcQuery] = React.useState('');
     // Carbon-price table sort (Environmental Costs)
     const [envSort, setEnvSort] = React.useState<'country' | 'price'>('price');
@@ -73,6 +251,7 @@ export function DataLibraryDashboard() {
     const tabs: [typeof tab, string, number][] = [
         ['corpus', 'DC Corpus', Object.keys(corpus).length],
         ['countries', 'Countries', Object.keys(countries).length],
+        ['coverage', 'Country Coverage', COV_FIELDS.length],
         ['markets', 'Markets', Object.keys(markets).length],
         ['pue', 'PUE Matrix', Object.keys(pue).length],
         ['refrigerants', 'Refrigerants', Object.keys(refr).length],
@@ -165,6 +344,7 @@ export function DataLibraryDashboard() {
                         })}</tbody>
                     </table>
                 )}
+                {tab === 'coverage' && <CountryCoverageSection />}
                 {tab === 'markets' && (
                     <table className="w-full text-xs min-w-[520px]">
                         <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Market</th><th className="pr-3 text-right">Power $/kWh</th><th className="pr-3 text-right">Colo $/kW·mo</th><th className="pr-3 text-right">Vacancy</th><th className="text-right">CAGR</th></tr></thead>

@@ -960,10 +960,14 @@ export const TRACE: Record<string, TraceNode> = {
         get: () => { const s = staffShrinkage(); return s == null ? null : +((1 - s) * 100).toFixed(0); },
     },
     'staff.costPerMw': {
-        label: 'Cost per MW (basis tampilan halaman)', page: 'staff', unit: '$/mo', provenance: 'derived',
-        formulaTemplate: 'staff.monthlyCost ÷ 1 — CATATAN: tampilan halaman membagi 1 (bukan MW IT aktual), jadi angka = total payroll bulanan',
-        deps: ['staff.monthlyCost'],
-        get: () => { const p = staffCostParts(); return p ? Math.round(p.total) : null; },
+        label: 'Cost per MW', page: 'staff', unit: '$/MW/mo', provenance: 'derived',
+        formulaTemplate: 'staff.monthlyCost ÷ max(0.5, sim.itLoad ÷ 1000) — payroll bulanan per MW IT (fixed 2026-07-20; sebelumnya tampilan membagi 1)',
+        deps: ['staff.monthlyCost', 'sim.itLoad'],
+        get: () => {
+            const p = staffCostParts();
+            const kw = useSimulationStore.getState().inputs.itLoad || 0;
+            return p ? Math.round(p.total / Math.max(0.5, kw / 1000)) : null;
+        },
     },
     'staff.otRatioPct': {
         label: 'OT Ratio', page: 'staff', unit: '%', provenance: 'derived',

@@ -552,7 +552,7 @@ export function StaffingDashboard() {
                                         <div className="bg-white dark:bg-black/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
                                             <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Cost per MW <Tooltip content="Total monthly staffing cost divided by IT load in MW. Benchmark for comparing staffing efficiency across facilities." /></div>
                                             <TraceValue traceId="staff.costPerMw">
-                                                <div className="text-xl font-bold text-cyan-600 dark:text-cyan-400">{fmtMoney(totalCost / 1)}</div>
+                                                <div className="text-xl font-bold text-cyan-600 dark:text-cyan-400">{fmtMoney(totalCost / staffMw)}</div>
                                             </TraceValue>
                                             <div className="text-[10px] text-slate-500">Staff cost / MW IT load</div>
                                         </div>

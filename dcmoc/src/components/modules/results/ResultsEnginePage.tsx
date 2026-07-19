@@ -26,6 +26,11 @@ import { Trophy, ChevronRight, FileDown } from 'lucide-react';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
+import {
+    capexScoreOf, susScoreOf, finScoreOf, constrScoreOf, opsScoreOf, archScoreOf,
+    finScreening, explainDimension, explainOverall, DIM_CHIP_FLOOR, GRADE_B_FLOOR,
+    type DimContext, type DimKey,
+} from './dimension-explain';
 
 interface Dim { key: string; label: string; score: number; weight: number; basis: string }
 
@@ -47,51 +52,55 @@ export function ResultsEnginePage() {
         if (!capexResults) return null;
         /* dimension composites — each formula documented in `basis` */
         const dims: Dim[] = [];
-        // Requirements: engine intake completeness
-        let reqScore = 50;
+        // Requirements: engine intake completeness (intake object captured for the explain panel)
+        const intake = { itLoadKw: inputs.itLoad, targetTier: inputs.tierLevel, region: country?.id, useCase: 'ai', coolingType: inputs.coolingType, rackKw: req.workload.avgRackDensityKw, budgetUsd: req.business.budgetUsd ?? undefined };
+        let reqScore = 50; let reqMissing: string[] = [];
         try {
-            const v = m?.requirements?.validate?.({ itLoadKw: inputs.itLoad, targetTier: inputs.tierLevel, region: country?.id, useCase: 'ai', coolingType: inputs.coolingType, rackKw: req.workload.avgRackDensityKw, budgetUsd: req.business.budgetUsd ?? undefined });
+            const v = m?.requirements?.validate?.(intake);
             reqScore = v?.completeness?.pct ?? 50;
+            reqMissing = v?.completeness?.missing ?? [];
         } catch { /* */ }
         dims.push({ key: 'req', label: 'Requirements', score: Math.round(reqScore), weight: 0.12, basis: 'engine intake completeness %' });
         // Site: engine site score (best candidate)
         const siteResults = scoreAllSites(sites);
         dims.push({ key: 'site', label: 'Site Intelligence', score: Math.round(siteResults[0]?.engine.score ?? 50), weight: 0.13, basis: 'engine site score (best candidate)' });
         // Architecture: 100 − complexity penalty (engine complexity index)
-        let archScore = 60;
+        // complexity is cost-of-delivery, not badness — soft penalty (archScoreOf, shared with explain)
+        const redundancy = inputs.powerRedundancy === 'N+1' ? 'n1' : inputs.powerRedundancy === '2N' ? '2n' : '2n1';
+        let archScore = 60; let complexityIndex: number | null = null;
         try {
-            const c = m?.architecture?.complexity?.({ coolingType: inputs.coolingType, tier: inputs.tierLevel, redundancy: inputs.powerRedundancy === 'N+1' ? 'n1' : inputs.powerRedundancy === '2N' ? '2n' : '2n1' });
-            archScore = c ? Math.round(100 - c.index * 0.35) : 60; // complexity is cost-of-delivery, not badness — soft penalty
+            const c = m?.architecture?.complexity?.({ coolingType: inputs.coolingType, tier: inputs.tierLevel, redundancy });
+            if (c) { complexityIndex = c.index; archScore = archScoreOf(c.index); }
         } catch { /* */ }
         dims.push({ key: 'arch', label: 'Architecture', score: archScore, weight: 0.12, basis: '100 − 0.35×engine complexity index' });
         // CAPEX: $/kW vs band (10500 std baseline from cx capexPerKw)
         const perKw = capexResults.metrics?.perKw ?? Math.round(capexResults.total / Math.max(1, inputs.itLoad));
         const band = rzData()?.commissioning?.cx?.rich?.capexPerKw?.standard ?? 10500;
-        const capexScore = Math.round(Math.max(10, Math.min(100, 100 - ((perKw - band * 0.6) / (band * 0.8)) * 60)));
+        const capexScore = capexScoreOf(perKw, band);
         dims.push({ key: 'capex', label: 'CAPEX Efficiency', score: capexScore, weight: 0.13, basis: `$${perKw.toLocaleString()}/kW vs $${band.toLocaleString()} reference band` });
         // Construction: SPI/CPI blend
         const sched = plannedSchedule(capexResults.timeline);
         const e = sched ? evm(sched, capexResults.total, ct.statusMonth, ct.phaseActualPct, ct.acSpentUsd) : null;
-        const constrScore = e ? Math.round(50 * Math.min(1.2, e.spi) + 50 * Math.min(1.2, e.cpi)) : 100;
-        dims.push({ key: 'constr', label: 'Construction', score: Math.min(100, constrScore), weight: 0.12, basis: e?.planMode ? 'baseline (Plan Mode SPI/CPI 1.00)' : '50×SPI + 50×CPI (tracking EVM)' });
+        const constrScore = e ? constrScoreOf(e.spi, e.cpi) : 100;
+        dims.push({ key: 'constr', label: 'Construction', score: constrScore, weight: 0.12, basis: e?.planMode ? 'baseline (Plan Mode SPI/CPI 1.00)' : '50×SPI + 50×CPI (tracking EVM)' });
         // Operations readiness: tier availability positioning
         const tierAvail: Record<number, number> = rzData()?.reliability?.tierAvailability ?? {};
-        const opsScore = Math.round(((tierAvail[inputs.tierLevel] ?? 0.9998) - 0.997) / (0.99995 - 0.997) * 100);
-        dims.push({ key: 'ops', label: 'Operational Readiness', score: Math.max(0, Math.min(100, opsScore)), weight: 0.12, basis: 'tier availability positioning' });
+        const opsScore = opsScoreOf(tierAvail[inputs.tierLevel] ?? 0.9998);
+        dims.push({ key: 'ops', label: 'Operational Readiness', score: opsScore, weight: 0.12, basis: 'tier availability positioning' });
         // Sustainability: PUE band
         const pue = rzData()?.pueMatrix?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? getPUE(inputs.coolingType);
-        const susScore = Math.round(Math.max(0, Math.min(100, (1.6 - pue) / 0.5 * 100)));
+        const susScore = susScoreOf(pue);
         dims.push({ key: 'sus', label: 'Sustainability', score: susScore, weight: 0.13, basis: `PUE ${pue} vs 1.10–1.60 band` });
-        // Financial: NPV>0 + IRR proxy via roi model on a simple stream
+        // Financial: NPV>0 + IRR proxy via roi model on a simple stream — the SAME
+        // cashflow chain (finScreening) also powers the explain-panel lever solves.
         let finScore = 60; let npv: number | null = null; let irr: number | null = null;
+        let fin: ReturnType<typeof finScreening> = null;
         try {
-            if (m?.roi?.npv) {
-                const revenue = (rzData()?.decision?.revenuePerKwMonth ?? 280) * inputs.itLoad * 12;
-                const opexAnnual = m?.opex?.totalAnnual ? (m.opex.totalAnnual(inputs.itLoad / 1000, pue, country?.id ?? 'US', 12, { capex: capexResults.total, basisPreset: 'dcContract' }).total) : revenue * 0.4;
-                const flows = Array.from({ length: 15 }, () => revenue - opexAnnual);
-                npv = m.roi.npv(flows, 0.1) - capexResults.total;
-                irr = m.roi.irr ? m.roi.irr([-capexResults.total, ...flows]) : null;
-                finScore = Math.round(Math.max(10, Math.min(100, 50 + (irr != null ? (irr - 0.10) * 400 : 0))));
+            fin = finScreening(inputs.itLoad, pue, country?.id ?? 'US', capexResults.total);
+            if (fin) {
+                npv = fin.npv;
+                irr = fin.irr;
+                finScore = finScoreOf(fin.irr);
             }
         } catch { /* */ }
         dims.push({ key: 'fin', label: 'Financial', score: finScore, weight: 0.13, basis: irr != null ? `IRR ${(irr * 100).toFixed(1)}% vs 10% hurdle` : 'roi model screening' });
@@ -106,10 +115,34 @@ export function ResultsEnginePage() {
             ...(reqScore < 80 ? ['Complete the Requirements intake — missing fields reduce downstream confidence.'] : []),
             ...(susScore < 60 ? ['Increase renewable share / cooling efficiency to lift the sustainability grade.'] : []),
         ].slice(0, 5);
-        return { dims, overall, grade, perKw, npv, irr, opexPue: pue, siteBest: siteResults[0] ?? null, recs };
+        /* live context for the dimension-explain panels — everything above, nothing re-derived */
+        const dimCtx: DimContext = {
+            itLoadKw: inputs.itLoad, tier: inputs.tierLevel, coolingType: inputs.coolingType, redundancy,
+            intake: intake as unknown as Record<string, unknown>, reqMissing,
+            perKw, band, capexTotal: capexResults.total, pue,
+            evm: e ? { spi: e.spi, cpi: e.cpi, planMode: e.planMode } : null,
+            tierAvail, siteBest: siteResults[0] ?? null,
+            siteName: sites.find((s) => s.id === siteResults[0]?.siteId)?.name,
+            complexityIndex, fin,
+        };
+        return { dims, overall, grade, perKw, npv, irr, opexPue: pue, siteBest: siteResults[0] ?? null, recs, dimCtx };
     }, [capexResults, inputs, country, req, ct, sites]);
 
     const [busy, setBusy] = React.useState(false);
+
+    /* ── Fair/Poor dimension chip → reason + solved-lever panel (dimension-explain) ── */
+    const [dimOpen, setDimOpen] = React.useState<string | null>(null);
+    const dimEx = React.useMemo(() => {
+        if (!dimOpen || !model) return null;
+        const d = model.dims.find((x) => x.key === dimOpen);
+        return d ? explainDimension(d.key as DimKey, d.score, model.dimCtx) : null;
+    }, [dimOpen, model]);
+    /* ── overall grade < B ("Good") → two weakest dims + their top levers ── */
+    const overallEx = React.useMemo(() => {
+        if (!model || model.overall >= GRADE_B_FLOOR) return null;
+        return explainOverall(model.dims, model.overall, model.grade, model.dimCtx);
+    }, [model]);
+    const goTab = (t: string) => { if (t) setActiveTab(t as never); };
     const exportPdf = async () => {
         if (!model || !capexResults) return;
         setBusy(true);
@@ -214,6 +247,25 @@ export function ResultsEnginePage() {
                                         </div>
                                     ))}
                                 </div>
+                                {/* grade < B ("Good") → 2 weakest dimensions + their top solved levers (dimension-explain) */}
+                                {overallEx && (
+                                    <div className="mt-2 border-t border-slate-200 pt-2 dark:border-slate-700/60">
+                                        <p className="text-[10.5px] font-medium text-slate-700 dark:text-slate-200">{overallEx.reason}</p>
+                                        <div className="mt-1 space-y-1">
+                                            {overallEx.spots.map((s) => (
+                                                <div key={s.key} className="flex items-start gap-2 text-[10.5px] text-slate-600 dark:text-slate-300">
+                                                    <span className="shrink-0 rounded bg-rose-600/80 px-1.5 py-0.5 text-[8.5px] font-bold text-white">{s.label} {s.score}</span>
+                                                    <span>
+                                                        {s.topLever ? <><b>{s.topLever.label}</b> — {s.topLever.detail}</> : 'Tidak ada lever parameter pada state sekarang.'}
+                                                        {s.liftPts > 0 && <span className="text-slate-500"> Mencapai {s.liftTarget} menambah +{s.liftPts} poin overall (bobot {Math.round(s.weight * 100)}%).</span>}
+                                                        <button onClick={() => goTab(s.topLever?.targetTab || s.targetTab)} className="ml-1 font-medium text-violet-500 hover:text-violet-400">↗ {s.targetLabel}</button>
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <p className="mt-1 text-[9px] text-slate-400">{overallEx.note}</p>
+                                    </div>
+                                )}
                             </div>
                         );
                     })()}
@@ -301,13 +353,53 @@ export function ResultsEnginePage() {
                                     const dimTrace: Record<string, string> = { capex: 'results.capexScore', sus: 'results.susScore', fin: 'results.finScore', constr: 'results.constrScore' };
                                     const tr = dimTrace[d.key];
                                     const scoreEl = <span className={`tabular-nums font-semibold ${d.score >= 70 ? 'text-emerald-500' : d.score >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{d.score}</span>;
+                                    const low = d.score < DIM_CHIP_FLOOR;
                                     return (
-                                    <tr key={d.key} className="border-b border-slate-100 dark:border-slate-800/60">
+                                    <React.Fragment key={d.key}>
+                                    <tr className="border-b border-slate-100 dark:border-slate-800/60">
                                         <td className="py-1 text-slate-700 dark:text-slate-200">{d.label}</td>
-                                        <td className="text-right">{tr ? <TraceValue traceId={tr}>{scoreEl}</TraceValue> : scoreEl}</td>
+                                        <td className="text-right whitespace-nowrap">
+                                            {tr ? <TraceValue traceId={tr}>{scoreEl}</TraceValue> : scoreEl}
+                                            {low && (
+                                                <button onClick={() => setDimOpen(dimOpen === d.key ? null : d.key)}
+                                                    title="Klik untuk alasan + lever terukur (di-solve dari formula dimensi yang sama)"
+                                                    className={`ml-1.5 rounded px-1 py-0.5 text-[9px] font-semibold ${d.score < 50 ? 'bg-rose-500/15 text-rose-500' : 'bg-amber-500/15 text-amber-500'} ${dimOpen === d.key ? 'ring-1 ring-amber-400' : ''}`}>
+                                                    {d.score < 50 ? 'Poor' : 'Fair'} ⓘ
+                                                </button>
+                                            )}
+                                        </td>
                                         <td className="text-right tabular-nums text-slate-500">{Math.round(d.weight * 100)}%</td>
                                         <td className="pl-4 text-[10px] text-slate-400">{d.basis}</td>
                                     </tr>
+                                    {low && dimEx && dimOpen === d.key && (
+                                        <tr className="border-b border-slate-100 dark:border-slate-800/60">
+                                            <td colSpan={4} className="py-1.5">
+                                                <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2">
+                                                    <p className="text-[10px] leading-relaxed text-slate-600 dark:text-slate-300">{dimEx.reason}</p>
+                                                    <div className="mt-1 space-y-1">
+                                                        {dimEx.levers.map((l, idx) => (
+                                                            <div key={idx} className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
+                                                                <span className={`shrink-0 rounded px-1 py-0.5 text-[8px] font-bold text-white ${l.priority === 'HIGH' ? 'bg-emerald-600' : 'bg-slate-500'}`}>{l.priority === 'HIGH' ? 'LEVER' : 'NOTE'}</span>
+                                                                <span><b>{l.label}</b> — {l.detail}
+                                                                    {l.targetTab && (
+                                                                        <button onClick={() => goTab(l.targetTab)} className="ml-1 font-medium text-violet-500 hover:text-violet-400">
+                                                                            ↗ {l.targetTab === dimEx.targetTab ? dimEx.targetLabel : 'Buka'}
+                                                                        </button>
+                                                                    )}
+                                                                </span>
+                                                            </div>
+                                                        ))}
+                                                        {dimEx.levers.length === 0 && <p className="text-[10px] text-slate-500">Tidak ada lever parameter untuk dimensi ini pada state sekarang.</p>}
+                                                    </div>
+                                                    <div className="mt-1 flex items-center justify-between gap-2">
+                                                        <p className="text-[8.5px] text-slate-400">Angka lever di-solve dari formula dimensi yang SAMA dengan skor di tabel (bisection / tabel engine) — bukan estimasi statis.</p>
+                                                        <button onClick={() => goTab(dimEx.targetTab)} className="shrink-0 text-[9px] font-semibold text-violet-500 hover:text-violet-400">↗ {dimEx.targetLabel}</button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                    </React.Fragment>
                                     );
                                 })}
                             </tbody>

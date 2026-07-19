@@ -308,6 +308,9 @@ export function CapacityPlanningPage() {
                             </div>
                             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Capacity Utilization (Current)</h2>
+                                <p className="mb-1.5 text-[10px] text-slate-500" title="Kapasitas power/cooling didesain = IT load + design margin, jadi utilization saat ini secara konstruksi ≈ 1/(1+margin). Yang bergerak dgn waktu adalah FORECAST (tab Forecast & Growth) — exhaustion year per sistem ada di Key Insights.">
+                                    Basis: kapasitas design = IT + margin — util saat ini ≈ 1/(1+margin) secara konstruksi; lihat Forecast utk exhaustion tahun-tahun mendatang. ⓘ
+                                </p>
                                 <div className="space-y-1.5">
                                     {util.rows.map((u) => (
                                         <React.Fragment key={u.key}>

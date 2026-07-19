@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.97.4 — 2026-07-20 (pagi: Results DL + Country Coverage 98.3% + 2 fix jujur)
+
+### Added
+- **Results dimension explain (DL final)**: skor dimensi < 60 → chip Poor/Fair ⓘ klik → alasan formula live + lever solved atas fungsi dimensi yang SAMA dgn render (extract single-source `dimension-explain.ts`): capex bisection $/kW, sustainability upgrade cooling via pueMatrix ("air→inrow: skor 20→66"), financial revenue/capex bisection lewat rantai IRR engine, tier upgrade, requirements field-fill (+16.7/field) — + catatan jujur per dimensi (renewable TIDAK di formula PUE, hurdle 10% = konstanta scorecard). Grade < B → ringkasan 2 dimensi terlemah + apakah lever cukup mencapai 70 (dihitung).
+- **Data Library "Country Coverage"**: matriks 40 negara × 30 field ✓/— dihitung live dari countries.ts — **98.3% (1.180/1.200)**; satu-satunya gap = HVO price kosong 20 negara (pasar belum ada); panel klik per negara daftar field kosong (actionable).
+
+### Fixed
+- **Staffing "Cost per MW"** benar-benar dibagi MW IT (sebelumnya ÷1 = total payroll); trace node diperbarui.
+- Capacity Utilization dapat basis-note jujur (util current ≈ 1/(1+margin) by construction; exhaustion ada di Forecast).
+
+### Verified
+- tsc/build · walk 24/0 · synergy 6/0 · export 44/0 · bindings 73/0 · screenshot Sustainability env-costs + Coverage matrix.
+
 ## v1.97.3 — 2026-07-20 (WAVE 6 final malam: trace ~maks jujur + Site axis explain + Capacity chips solved)
 
 ### Added
