@@ -14,12 +14,28 @@ import type { CandidateSite } from '@/types/site-intel';
 import { resolveSiteCoords } from '@/constants/geo';
 
 const STYLE_URL = 'https://tiles.openfreemap.org/styles/liberty';
+/* Esri World Imagery — free tile access with mandatory attribution (Esri terms) */
+const SAT_STYLE = {
+    version: 8 as const,
+    sources: {
+        esri: {
+            type: 'raster' as const,
+            tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+            tileSize: 256,
+            attribution: 'Imagery © Esri, Maxar, Earthstar Geographics, GIS User Community',
+        },
+    },
+    layers: [{ id: 'esri', type: 'raster' as const, source: 'esri' }],
+};
 
-export function RealMap({ sites, selectedId, onSelect, height = 300 }: {
+export function RealMap({ sites, selectedId, onSelect, height = 300, mapStyle = 'map', onStatus }: {
     sites: CandidateSite[];
     selectedId: string | null;
     onSelect?: (id: string) => void;
     height?: number;
+    /** 'map' = OpenFreeMap liberty (vector) · 'satellite' = Esri World Imagery (raster, atribusi wajib) */
+    mapStyle?: 'map' | 'satellite';
+    onStatus?: (ok: boolean) => void;
 }) {
     const ref = React.useRef<HTMLDivElement>(null);
     const mapRef = React.useRef<unknown>(null);
@@ -37,24 +53,25 @@ export function RealMap({ sites, selectedId, onSelect, height = 300 }: {
                 if (cancelled || !ref.current) return;
                 const map = new maplibre.Map({
                     container: ref.current,
-                    style: STYLE_URL,
+                    style: mapStyle === 'satellite' ? (SAT_STYLE as never) : STYLE_URL,
                     center: [106.8456, -6.2088],
                     zoom: 3,
                     attributionControl: { compact: true },
                 });
                 map.addControl(new maplibre.NavigationControl({ showCompass: false }), 'top-right');
-                map.on('error', () => { if (!cancelled) setFailed(true); });
-                map.on('load', () => { if (!cancelled) setReady(true); });
+                map.on('error', () => { if (!cancelled) { setFailed(true); onStatus?.(false); } });
+                map.on('load', () => { if (!cancelled) { setReady(true); onStatus?.(true); } });
                 mapRef.current = map;
             } catch {
-                if (!cancelled) setFailed(true);
+                if (!cancelled) { setFailed(true); onStatus?.(false); }
             }
         })();
         return () => {
             cancelled = true;
             try { (mapRef.current as { remove?: () => void } | null)?.remove?.(); } catch { /* torn down */ }
         };
-    }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [mapStyle]);
 
     /* markers follow sites/selection */
     React.useEffect(() => {

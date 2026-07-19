@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.94.1 — 2026-07-19 (map integrity — real styles, no fakes, clean fallback)
+
+### Changed
+- **Map style tabs are now REAL** (owner: "3D terrain dll cari repos, kalau tidak ada delete"): Map = OpenFreeMap vector · **Satellite = Esri World Imagery raster** (free tiles, mandatory Esri attribution rendered); fake Hybrid + 3D Terrain buttons DELETED (3D needs a DEM terrain source — backlogged, not faked).
+- **"Wave aneh" fixed**: the schematic SVG fallback now renders ONLY when the real map fails to load (onStatus callback) — no more decorative coastline under a working map.
+- Context-bar hover cleaned: the raw black title box is gone; the data-vintage note lives on the small "data 2026-Q1 ⓘ" chip only.
+
+---
+
 ## v1.94.0 — 2026-07-19 (Pro-Forma predefined visible + lease-term dedup)
 
 ### Changed

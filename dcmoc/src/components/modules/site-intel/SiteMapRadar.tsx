@@ -9,13 +9,14 @@ import type { CandidateSite, SiteScoreResult, AxisKey } from '@/types/site-intel
 import { AXIS_LABELS } from '@/types/site-intel';
 import { integratedAxes, type SiteAnalyses } from '@/lib/site-adapter';
 
-const MAP_STYLES = ['Map', 'Satellite', 'Hybrid', '3D Terrain'] as const;
+const MAP_STYLES = ['Map', 'Satellite'] as const;   // DI5 — hanya style NYATA (Hybrid/3D dihapus, no fake)
 const SITE_COLORS = ['#a78bfa', '#22d3ee', '#34d399', '#f59e0b', '#fb7185'];
 
 export function SiteMapPanel({ sites, results, selectedId, onSelect }: {
     sites: CandidateSite[]; results: SiteScoreResult[]; selectedId: string | null; onSelect: (id: string) => void;
 }) {
     const [style, setStyle] = React.useState<(typeof MAP_STYLES)[number]>('Map');
+    const [mapOk, setMapOk] = React.useState(true);
     const skin = {
         Map: { bg: '#0b1424', land: '#12203a', grid: '#1e3a5f' },
         Satellite: { bg: '#0a0f14', land: '#17251c', grid: '#233c2c' },
@@ -37,7 +38,9 @@ export function SiteMapPanel({ sites, results, selectedId, onSelect }: {
             {/* CA — REAL geographic map (MapLibre + OpenFreeMap); schematic SVG
               * below stays as the offline fallback (RealMap returns null on
               * tile/style failure, so the schematic still shows). */}
-            <RealMap sites={sites} selectedId={selectedId} onSelect={onSelect} height={300} />
+            <RealMap sites={sites} selectedId={selectedId} onSelect={onSelect} height={300}
+                mapStyle={style === 'Satellite' ? 'satellite' : 'map'} onStatus={setMapOk} />
+            {!mapOk && (
             <svg viewBox="0 0 100 62" className="mt-2 w-full rounded-xl" style={{ background: skin.bg }}>
                 {/* schematic coast + grid (stylized, not geographic) */}
                 <path d="M0,44 C18,38 30,48 46,42 C64,35 78,46 100,40 L100,62 L0,62 Z" fill={skin.land} />
@@ -59,6 +62,7 @@ export function SiteMapPanel({ sites, results, selectedId, onSelect }: {
                 })}
                 <text x="2" y="60" fontSize="2" fill="#64748b">Schematic fallback (offline) — peta nyata di atas</text>
             </svg>
+            )}
         </div>
     );
 }
