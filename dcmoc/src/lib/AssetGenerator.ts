@@ -17,6 +17,15 @@ export const generateAssetCounts = (
     powerRedundancy: 'N+1' | '2N' | '2N+1' = '2N'
 ): AssetCount[] => {
     const counts: AssetCount[] = [];
+    /* #329 SCALE-AWARE unit ratings (owner-caught absurdity: 100 kW CRACs at
+     * 500 MW → 15,625 units). Real hyperscale designs step up unit blocks:
+     * air-handling 100 kW CRAC (≤5 MW) → 300 kW CRAH (≤50 MW) → 900 kW
+     * fan-wall/AHU (>50 MW); chillers 1 MW → 2.5 MW (>50 MW); gensets 2.5 MW →
+     * 3.0 MW (>100 MW). Screening tiers — counts stay engineering-plausible. */
+    const mwScale = itLoadKw / 1000;
+    const airUnitKw = mwScale <= 5 ? 100 : mwScale <= 50 ? 300 : 900;
+    const chillerKw = mwScale <= 50 ? 1000 : 2500;
+    const gensetKw = mwScale <= 100 ? 2500 : 3000;
 
     // Helper for redundancy
     const applyRedundancy = (base: number, type: 'N+1' | '2N' | '2N+1') => {
@@ -34,7 +43,7 @@ export const generateAssetCounts = (
             case 'gen-set':
                 // 2.5MW gensets.
                 const requiredGenPower = itLoadKw * 1.5; // Safety factor + cooling + losses
-                const genCap = 2500;
+                const genCap = gensetKw;
                 const baseGen = Math.ceil(requiredGenPower / genCap);
                 // Respect user's powerRedundancy, but Tier 4 minimum is 2N
                 const genRedundancy = tierLevel === 4 && powerRedundancy === 'N+1' ? '2N' : powerRedundancy;
@@ -67,7 +76,7 @@ export const generateAssetCounts = (
                 if (coolingType === 'air' && coolingTopology !== 'dlc') {
                     // 1000kW Chillers. N+1.
                     const coolingLoad = itLoadKw * 1.3; // PUE overhead roughly
-                    const chilCap = 1000;
+                    const chilCap = chillerKw;
                     const baseChil = Math.ceil(coolingLoad / chilCap);
                     count = baseChil + 1;
                 }
@@ -77,11 +86,11 @@ export const generateAssetCounts = (
                 // Renamed logic based on topology
                 // If In-Row, unit capacity is smaller (e.g. 40kW vs 100kW CRAC)
                 if (coolingTopology === 'perimeter') {
-                    const cracCap = 100;
+                    const cracCap = airUnitKw;
                     const baseCrac = Math.ceil(itLoadKw / cracCap);
                     count = Math.ceil(baseCrac * 1.2); // N+20%
                 } else if (coolingTopology === 'in-row') {
-                    const inRowCap = 40; // Smaller capacity per unit
+                    const inRowCap = mwScale <= 50 ? 40 : 80; // in-row unit steps up at scale
                     const baseInRow = Math.ceil(itLoadKw / inRowCap);
                     count = Math.ceil(baseInRow * 1.25); // N+25% for distribution
                 } else {

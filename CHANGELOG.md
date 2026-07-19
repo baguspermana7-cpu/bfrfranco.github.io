@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.91.5 — 2026-07-19 (scale-aware maintenance fleet ratings)
+
+### Fixed
+- **Absurd fleet counts at hyperscale** (owner-caught: x15,625 CRAC 100 kW + x600 gensets on 500 MW): unit ratings now step up with facility scale the way real designs do — air handling 100 kW CRAC (≤5 MW) → 300 kW CRAH (≤50 MW) → 900 kW fan-wall (>50 MW); chillers 1 MW → 2.5 MW; gensets 2.5 → 3.0 MW above 100 MW. 500 MW now shows ~667 air units / ~500 gensets (engineering-plausible campus counts). Screening tiers, labeled in-code; schedule/SLA/spares consumers inherit automatically.
+
+---
+
 ## v1.91.4 — 2026-07-19 (Maintenance Schedule performance — per-class aggregation)
 
 ### Fixed
