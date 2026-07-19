@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { usePortfolioStore, SiteConfig } from '@/store/portfolio';
+import { useSimulationStore } from '@/store/simulation';
 import { COUNTRIES } from '@/constants/countries';
 import { calculatePortfolio, SiteResult } from '@/modules/analytics/PortfolioEngine';
 import {
@@ -20,6 +21,9 @@ type PortfolioTab = 'overview' | 'financial' | 'staffing' | 'risk' | 'carbon';
 export default function PortfolioDashboard() {
     const store = usePortfolioStore();
     const [activeTab, setActiveTab] = useState<PortfolioTab>('overview');
+    /* DA3 honest snapshot — pembanding live sim untuk badge amber per entry */
+    const liveCountryId = useSimulationStore((s) => s.selectedCountry?.id);
+    const liveItLoad = useSimulationStore((s) => s.inputs.itLoad);
 
     const result = useMemo(() => {
         if (store.sites.length < 2) return null;
@@ -85,6 +89,7 @@ export default function PortfolioDashboard() {
                         key={site.id}
                         site={site}
                         index={i}
+                        differsFromLive={site.countryId !== liveCountryId || site.itLoad !== liveItLoad}
                         countryOptions={countryOptions}
                         onUpdate={(updates) => store.updateSite(site.id, updates)}
                         onDuplicate={() => store.duplicateSite(site.id)}
@@ -149,9 +154,10 @@ export default function PortfolioDashboard() {
 
 // ─── SITE CARD ──────────────────────────────────────────────
 
-function SiteCard({ site, index, countryOptions, onUpdate, onDuplicate, onRemove, canRemove, canDuplicate, isBest }: {
+function SiteCard({ site, index, differsFromLive, countryOptions, onUpdate, onDuplicate, onRemove, canRemove, canDuplicate, isBest }: {
     site: SiteConfig;
     index: number;
+    differsFromLive: boolean;
     countryOptions: { id: string; name: string }[];
     onUpdate: (updates: Partial<SiteConfig>) => void;
     onDuplicate: () => void;
@@ -184,6 +190,16 @@ function SiteCard({ site, index, countryOptions, onUpdate, onDuplicate, onRemove
                         </button>
                     )}
                 </div>
+            </div>
+
+            {/* DA3 honest snapshot chips — entry portfolio = konfigurasi tersimpan */}
+            <div className="flex flex-wrap gap-1">
+                {site.savedAt && (
+                    <span title="Konfigurasi site ini tersimpan lokal (bukan state live)" className="rounded bg-slate-500/15 px-1 py-0.5 text-[8px] font-semibold text-slate-500 dark:text-slate-400">saved snapshot · {new Date(site.savedAt).toLocaleDateString()}</span>
+                )}
+                {differsFromLive && (
+                    <span title="Country/IT load site ini beda dari project aktif (live sim) — sengaja untuk perbandingan multi-site, tapi jangan dibaca sebagai state project" className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">differs from current project</span>
+                )}
             </div>
 
             <div className="space-y-1.5 text-[10px]">

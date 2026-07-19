@@ -32,14 +32,14 @@ export function CapacityArchOverview({ d }: { d: DashboardData }) {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
                 <TraceValue traceId="sim.itLoad"><Tile label="IT Load" value={`${d.itLoadMw.toFixed(1)} MW`} sub={`${d.itLoadKw.toLocaleString()} kW`} tip="it-load" /></TraceValue>
                 <TraceValue traceId="arch.facilityMw"><Tile label="Facility Load" value={`${d.facilityLoadMw.toFixed(1)} MW`} sub={`PUE ${d.pue.toFixed(2)}`} tip="dc-power" /></TraceValue>
-                <Tile label="Rack Count" value={d.racks != null ? d.racks.toLocaleString() : '—'} sub="racks" tip="rack" />
-                <Tile label="Rack Density" value={rackDensity != null ? `${rackDensity.toFixed(1)} kW` : '—'} sub="per rack" tip="rack-density" />
+                <TraceValue traceId="capex.racks"><Tile label="Rack Count" value={d.racks != null ? d.racks.toLocaleString() : '—'} sub="racks" tip="rack" /></TraceValue>
+                <TraceValue traceId="capex.rackDensity"><Tile label="Rack Density" value={rackDensity != null ? `${rackDensity.toFixed(1)} kW` : '—'} sub="per rack" tip="rack-density" /></TraceValue>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <Tile label="Power Config" value={d.redundancy} sub="redundancy" tip="redundancy" />
                 <Tile label="Cooling" value={coolingLabel[d.coolingType] || d.coolingType} tip="cooling-type" />
-                <Tile label="PUE Target" value={`≤ ${d.pue.toFixed(2)}`} sub="design" tip="pue" />
-                <Tile label="Availability" value={d.availabilityPct != null ? `${d.availabilityPct}%` : '—'} sub={d.availabilityTarget ? `target ${d.availabilityTarget}%` : 'Tier'} tip="availability" />
+                <TraceValue traceId="engine.pueTier3"><Tile label="PUE Target" value={`≤ ${d.pue.toFixed(2)}`} sub="design" tip="pue" /></TraceValue>
+                <TraceValue traceId="rel.systemAvailability"><Tile label="Availability" value={d.availabilityPct != null ? `${d.availabilityPct}%` : '—'} sub={d.availabilityTarget ? `target ${d.availabilityTarget}%` : 'Tier'} tip="availability" /></TraceValue>
             </div>
             <div className="mt-2 text-[10px] text-slate-500">CAPEX/kW {fmtUsd(d.perKw)} · build {d.timelineMonths ?? '—'} mo</div>
         </div>

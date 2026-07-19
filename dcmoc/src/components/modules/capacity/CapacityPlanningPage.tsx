@@ -26,6 +26,11 @@ import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 
 const DONUT_COLORS = ['#a78bfa', '#14b8a6', '#3b82f6', '#f59e0b', '#64748b'];
 
+/* util-row key → value-trace id (KPI wrap; network row = assumption, no trace) */
+const UTIL_TRACE: Record<string, string | undefined> = {
+    power: 'cap.powerCapacityMva', cooling: 'cap.coolingCapacityMw', rack: 'cap.rackCapacity',
+};
+
 export function CapacityPlanningPage() {
     const simInputs = useSimulationStore((s) => s.inputs);
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
@@ -145,9 +150,9 @@ export function CapacityPlanningPage() {
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
                             { label: 'IT Load (Total)', value: `${(i.itLoadKw / 1000).toFixed(1)} MW`, sub: 'current', trace: 'sim.itLoad' },
-                            { label: 'Peak Forecast', value: `${peak.toFixed(0)} MW`, sub: 'growth plan' },
+                            { label: 'Peak Forecast', value: `${peak.toFixed(0)} MW`, sub: 'growth plan', trace: 'cap.peakForecastMw' },
                             { label: 'Total Facility Load', value: `${snap.facilityMw} MW`, sub: `PUE ${snap.pue} (${snap.source})`, trace: 'arch.facilityMw' },
-                            ...util.rows.slice(0, 3).map((u) => ({ label: u.label, value: `${u.capacity.toLocaleString()} ${u.unit}`, sub: `${u.pct}% utilized${u.basis === 'assumption' ? ' · assumption' : ''}` })),
+                            ...util.rows.slice(0, 3).map((u) => ({ label: u.label, value: `${u.capacity.toLocaleString()} ${u.unit}`, sub: `${u.pct}% utilized${u.basis === 'assumption' ? ' · assumption' : ''}`, trace: UTIL_TRACE[u.key] })),
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>

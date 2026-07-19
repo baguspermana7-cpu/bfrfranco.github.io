@@ -29,6 +29,9 @@ export interface SiteConfig {
     maintenanceStrategy: 'reactive' | 'planned' | 'predictive';
     powerRedundancy: 'N+1' | '2N' | '2N+1';
     capexInputs: Partial<CapexInput>;
+    /* DA3 — display metadata ADDITIVE (optional; entri lama tanpa field ini
+     * tetap valid, tidak ada migrasi): kapan snapshot site terakhir disimpan. */
+    savedAt?: number;
 }
 
 interface PortfolioStore {
@@ -76,6 +79,7 @@ const createDefaultSite = (label?: string): SiteConfig => ({
     maintenanceStrategy: 'planned',
     powerRedundancy: '2N',
     capexInputs: {},
+    savedAt: Date.now(),
 });
 
 // ─── STORE ──────────────────────────────────────────────────
@@ -100,7 +104,7 @@ export const usePortfolioStore = create<PortfolioStore>((set, get) => ({
     },
 
     updateSite: (id, updates) => {
-        const updated = get().sites.map(s => s.id === id ? { ...s, ...updates } : s);
+        const updated = get().sites.map(s => s.id === id ? { ...s, ...updates, savedAt: Date.now() } : s);
         set({ sites: updated });
         saveToStorage(updated);
     },
@@ -114,6 +118,7 @@ export const usePortfolioStore = create<PortfolioStore>((set, get) => ({
             ...source,
             id: `site_${Date.now()}_${siteCounter++}`,
             label: `${source.label} (Copy)`,
+            savedAt: Date.now(),
         };
         const updated = [...sites, dup];
         set({ sites: updated, activeSiteId: dup.id });
@@ -138,6 +143,7 @@ export const usePortfolioStore = create<PortfolioStore>((set, get) => ({
             maintenanceStrategy: simStore.inputs.maintenanceStrategy,
             powerRedundancy: simStore.inputs.powerRedundancy,
             capexInputs: { ...capexStore.inputs },
+            savedAt: Date.now(),
         };
         const updated = [...sites, newSite];
         set({ sites: updated, activeSiteId: newSite.id });

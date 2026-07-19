@@ -28,10 +28,14 @@ const WITNESS_STYLE: Record<string, { label: string; cls: string }> = {
     R: { label: 'REVIEW', cls: 'bg-slate-500/15 text-slate-400' },
 };
 
-/** Items applicable at the current cooling type (DLC items are liquid/rdhx-only). */
-function itemsFor(key: ReadinessKey, coolingType: string): { systemKey: string; items: ChecklistItem[] }[] {
+/** Items applicable at the current cooling type (DLC items are liquid/rdhx-only).
+ *  When the live equipScale record is passed, system groups with ZERO installed
+ *  units are dropped entirely — the checklist only shows systems that exist in
+ *  the current config (derived from equipment, not a static list). */
+function itemsFor(key: ReadinessKey, coolingType: string, equip?: Record<string, number>): { systemKey: string; items: ChecklistItem[] }[] {
     const liquid = coolingType === 'liquid' || coolingType === 'rdhx';
     return CX_CHECKLIST[key]
+        .filter((g) => g.systemKey === 'general' || !equip || (equip[g.systemKey] ?? 0) > 0)
         .map((g) => ({ systemKey: g.systemKey, items: g.items.filter((i) => !i.liquidOnly || liquid) }))
         .filter((g) => g.items.length > 0);
 }
@@ -63,11 +67,13 @@ export function CommissioningEnginePage() {
         const m = rzModels()?.commissioning;
         if (!m?.programRich) return null;
         const rich = m.programRich({ itLoadKw: inputs.itLoad, coolingType: inputs.coolingType, powerRedundancy: inputs.powerRedundancy, countryId: country?.id });
-        /* Per-readiness-key checklist stats (applicable items at current cooling). */
+        const eq = rich.equip as Record<string, number>;
+        /* Per-readiness-key checklist stats — items filtered to systems that
+         * actually EXIST at the current config (live equipScale counts). */
         const KEYS: ReadinessKey[] = ['L1', 'L2', 'L3', 'L4', 'L5', 'ist', 'sat', 'fat', 'punchlist'];
         const checklistStats: Record<string, { total: number; pass: number; fail: number; ticked: number; derived: number | null }> = {};
         KEYS.forEach((k) => {
-            const items = itemsFor(k, inputs.coolingType).flatMap((g) => g.items);
+            const items = itemsFor(k, inputs.coolingType, eq).flatMap((g) => g.items);
             const derived = checklistDerivedCompletion(t, k, items.length);
             let pass = 0, fail = 0;
             items.forEach((i) => {
@@ -85,7 +91,6 @@ export function CommissioningEnginePage() {
         try {
             if (m.readinessIndex && Object.keys(comp).length > 0) readiness = m.readinessIndex(comp);
         } catch { /* */ }
-        const eq = rich.equip as Record<string, number>;
         const systems = Object.values(TESTS_PER).map((s) => {
             const count = eq[s.key] ?? 0;
             const tests = count * s.per;
@@ -107,7 +112,15 @@ export function CommissioningEnginePage() {
     const punch = t.issues.filter((x) => x.kind === 'punch' && x.open);
     /* DE1 (owner: "L1 itu apa kepanjangannya") — nama lengkap + penjelasan per
      * level; label render "L1 — Factory Witness & Verification" dan tooltip
-     * menjelaskan isi level (basis industri Cx Level 1-5 / ASHRAE-NEBB). */
+     * menjelaskan isi level. Nama level di-ANCHOR ke engine
+     * DATA.commissioning.labels (live); teks definisi = LOCAL MAP berlabel
+     * (basis industri ASHRAE Guideline 0 / BCxA / NEBB — engine hanya
+     * menyimpan label pendek, bukan teks definisi). */
+    const engineLevelLabels: Record<string, string> = rzData()?.commissioning?.labels ?? {};
+    const levelTip = (rk: { key: string; full: string; desc: string }) => {
+        const el = engineLevelLabels[rk.key];
+        return `${rk.full}${el ? ` · engine label: "${el}"` : ''}\n${rk.desc}\n[Definisi: local map (ASHRAE Gl.0 / BCxA basis) — nama level: engine DATA.commissioning.labels]`;
+    };
     const READY_KEYS: { key: string; label: string; full: string; desc: string }[] = [
         { key: 'L1', label: 'L1 — Factory Witness', full: 'Level 1: Factory Witness & Verification', desc: 'Verifikasi & witness test di PABRIK sebelum kirim: inspeksi rakitan, relay/CT test, transformer test. Termasuk dokumentasi FAT per unit.' },
         { key: 'L2', label: 'L2 — Site Inspection', full: 'Level 2: Site Acceptance / Component Verification', desc: 'Inspeksi kedatangan di SITE: visual, kelengkapan, kabel & tekanan, penyimpanan benar — komponen siap dipasang.' },
@@ -147,7 +160,7 @@ export function CommissioningEnginePage() {
                             const weights: Record<string, number> = rzData()?.commissioning?.weights ?? {};
                             const tickedRows: (string | number)[][] = [];
                             KEYS.forEach(({ key, label }) => {
-                                itemsFor(key, inputs.coolingType).forEach((g) => g.items.forEach((i) => {
+                                itemsFor(key, inputs.coolingType, rich.equip as Record<string, number>).forEach((g) => g.items.forEach((i) => {
                                     const v = t.checklist[`${key}:${i.id}`];
                                     if (v) tickedRows.push([label, i.label, resolveProc(i.templateKey, i.params)?.witness ?? 'R', v.toUpperCase()]);
                                 }));
@@ -209,10 +222,13 @@ export function CommissioningEnginePage() {
                         <ListChecks className="mr-1 inline h-3.5 w-3.5 text-violet-400" />
                         Cx test-procedure checklist — activities trace to the DC Hub commissioning templates (NETA ATS / IEEE / ASHRAE basis).
                         PASS/FAIL ticks drive each level&apos;s completion and the engine readiness index; sliders become coarse fallback.
+                        System groups & ×N unit counts derive LIVE from engine equipment scaling (models.commissioning.equipScale) — systems absent
+                        from this config are not rendered. Level names anchor to engine DATA.commissioning.labels; hover definitions are a labeled
+                        local map (ASHRAE Guideline 0 / BCxA basis).
                     </div>
                     {READY_KEYS.map((rk) => {
                         const key = rk.key as ReadinessKey;
-                        const groups = itemsFor(key, inputs.coolingType);
+                        const groups = itemsFor(key, inputs.coolingType, rich.equip as Record<string, number>);
                         const st = checklistStats[key];
                         if (!groups.length) return null;
                         const open = openLevel === key;
@@ -222,7 +238,7 @@ export function CommissioningEnginePage() {
                                 <button onClick={() => setOpenLevel(open ? null : key)}
                                     className="flex w-full items-center gap-2 px-4 py-2.5 text-left">
                                     <ChevronDown className={`h-3.5 w-3.5 text-slate-400 transition-transform ${open ? '' : '-rotate-90'}`} />
-                                    <span title={`${rk.full} — ${rk.desc}`} className="text-xs font-semibold text-slate-800 dark:text-slate-100">{rk.label}</span>
+                                    <span title={levelTip(rk)} className="text-xs font-semibold text-slate-800 dark:text-slate-100">{rk.label}</span>
                                     <span className="rounded bg-violet-500/10 px-1.5 py-0.5 text-[8.5px] font-semibold text-violet-400"
                                         title="Engine readiness weight">w {Math.round(((rzData()?.commissioning?.weights ?? {})[key] ?? 0) * 100)}%</span>
                                     <div className="ml-2 h-1.5 w-32 overflow-hidden rounded bg-slate-100 dark:bg-slate-800"
@@ -406,7 +422,7 @@ export function CommissioningEnginePage() {
                                     const v = derived != null ? derived : t.completion[rk.key];
                                     return (
                                         <div key={rk.key} className="flex items-center gap-2 text-[11px]">
-                                            <span className="w-36 cursor-help text-slate-600 dark:text-slate-300" title={`${rk.full} — ${rk.desc}`}>{rk.label} <span className="text-[8px] text-slate-400">ⓘ</span></span>
+                                            <span className="w-36 cursor-help text-slate-600 dark:text-slate-300" title={levelTip(rk)}>{rk.label} <span className="text-[8px] text-slate-400">ⓘ</span></span>
                                             <input type="range" min={0} max={100} step={5}
                                                 value={v == null ? 0 : Math.round(v * 100)}
                                                 disabled={derived != null}

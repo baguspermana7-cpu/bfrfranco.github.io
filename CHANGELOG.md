@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.97.1 — 2026-07-20 (WAVE 4: Cx/CDU rebuild + Financial dedup + DA3 snapshot jujur + trace 62-100%)
+
+### Added
+- **Commissioning explainers (DE)**: chip L1-L5/FAT/SAT/IST bernama penuh + tooltip (label live engine + definisi ASHRAE Gl.0/BCxA berlabel); grup checklist derived dari equipScale (×N live; sistem 0 unit tidak dirender) — totals/readiness ikut config nyata.
+- **CDU page rebuild (DE)**: 5 section engine-real — Sizing (models.cdu.size), tabel Hydraulics (Darcy/Haaland + Magnus dew point, bar + head), PUE mini-bars air vs liquid (pueMatrix), Refrigerant 9-baris GWP/COP + selected-summary (user vs auto), Deep-Sea advanced (intake @depth, seawater flow, pump, PUE ≤1.15) gated tick + teaser 1.6.
+- **DA3 snapshot jujur**: kartu ACTIVE Projects = live sim (chip hijau); kartu tersimpan "saved snapshot · tanggal"; badge amber "differs from current project" (Projects/Scenarios/Portfolio; portfolio +savedAt additive).
+- **EB wave-4**: 32 node baru + ~41 wrap — coverage Dashboard 2→18/29, Capacity→18, Capex→18, Ops 7/7, Architecture 11/17, Staffing/Results 11/17.
+
+### Fixed
+- **Monte Carlo revenue basis divergen**: hardcode $120/kW/bln → `DEFAULT_REVENUE_PER_KW_MONTH` ($280 single-source) — MC sebelumnya menghitung distribusi di basis revenue berbeda dari semua permukaan lain.
+- 2 tooltip escalation Pro-Forma salah copy-paste dikoreksi.
+
+### Changed
+- **#333 Financial dedup**: Lease Term input → derived dari Requirements contractDuration (+link ↗); Tax Rate sync reaktif negara; MC dapat kartu "Base Case" provenance (project chip + ↗); input analisis lokal diberi hint eksplisit.
+
+### Verified
+- bindings 73/0 (catalog regen) · tsc/build · walk 24/0 + coverage · synergy 6/0 · export 44/0.
+
 ## v1.97.0 — 2026-07-20 (WAVE MALAM 2-3: env costs country-auto + labor statutory 40 negara + DL rollout + trace coverage gate + O&M consumers)
 
 ### Added

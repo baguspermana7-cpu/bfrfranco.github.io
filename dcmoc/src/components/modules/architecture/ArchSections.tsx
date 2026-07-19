@@ -14,6 +14,13 @@ import { useCapexStore } from '@/store/capex';
 import { computeCompliance, referenceDesignId, type ArchInputs, type EquipCounts } from '@/state/adapters/arch-adapter';
 import { useScenarioStore } from '@/store/scenario';
 import { ChevronRight } from 'lucide-react';
+import { TraceValue } from '@/components/ui/TraceValue';
+
+/* BOM equipment key → value-trace id (engine equipScale chain; others untraced) */
+const BOM_TRACE: Partial<Record<string, string>> = {
+    switchgear: 'arch.eqSwitchgear', transformers: 'arch.eqTransformers', generators: 'arch.eqGenerators',
+    ups_modules: 'arch.eqUps', pdus: 'arch.eqPdus', chillers: 'arch.eqChillers', racks: 'arch.racks',
+};
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
     return (
@@ -85,7 +92,13 @@ export function BomSection({ i, eq }: { i: ArchInputs; eq: EquipCounts }) {
                 <div className="grid grid-cols-3 gap-1.5">
                     {ROWS.map(([label, k]) => (
                         <div key={label} className="rounded-lg border border-slate-200 dark:border-slate-800 p-1.5 text-center">
-                            <div className="text-sm font-bold tabular-nums text-slate-900 dark:text-white">{(eq[k] ?? 0).toLocaleString()}</div>
+                            {BOM_TRACE[k as string] ? (
+                                <TraceValue traceId={BOM_TRACE[k as string]!}>
+                                    <div className="text-sm font-bold tabular-nums text-slate-900 dark:text-white">{(eq[k] ?? 0).toLocaleString()}</div>
+                                </TraceValue>
+                            ) : (
+                                <div className="text-sm font-bold tabular-nums text-slate-900 dark:text-white">{(eq[k] ?? 0).toLocaleString()}</div>
+                            )}
                             <div className="text-[8.5px] uppercase tracking-wide text-slate-500">{label}</div>
                         </div>
                     ))}

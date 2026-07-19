@@ -3,6 +3,7 @@
 import React from 'react';
 import { Sparkline } from './Sparkline';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { TraceValue } from '@/components/ui/TraceValue';
 
 export interface KpiCardProps {
     label: string;
@@ -15,6 +16,8 @@ export interface KpiCardProps {
     tip?: string;
     valueFormat?: (n: number) => string;
     seriesLabel?: string;
+    /** value-trace id — wraps the value in the ƒx TraceValue popover */
+    trace?: string;
 }
 
 const ACCENTS: Record<string, { text: string; glow: string; spark: string }> = {
@@ -28,7 +31,7 @@ const ACCENTS: Record<string, { text: string; glow: string; spark: string }> = {
 
 /** DC-OS KPI card: dark panel + accent-glow + icon + big value + sub + real sparkline.
  *  Root is a <div role="button"> to allow nesting the ui/Tooltip (which contains a <button>). */
-export function KpiCard({ label, value, sub, icon: Icon, accent = 'cyan', series, onClick, tip, valueFormat, seriesLabel }: KpiCardProps) {
+export function KpiCard({ label, value, sub, icon: Icon, accent = 'cyan', series, onClick, tip, valueFormat, seriesLabel, trace }: KpiCardProps) {
     const a = ACCENTS[accent];
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -60,7 +63,15 @@ export function KpiCard({ label, value, sub, icon: Icon, accent = 'cyan', series
                     </span>
                 </div>
             </div>
-            <div className="relative text-xl font-bold text-slate-900 dark:text-white tabular-nums leading-none">{value}</div>
+            {trace ? (
+                <div className="relative" onClick={(e) => e.stopPropagation()}>
+                    <TraceValue traceId={trace}>
+                        <div className="text-xl font-bold text-slate-900 dark:text-white tabular-nums leading-none">{value}</div>
+                    </TraceValue>
+                </div>
+            ) : (
+                <div className="relative text-xl font-bold text-slate-900 dark:text-white tabular-nums leading-none">{value}</div>
+            )}
             {sub && <div className="relative text-[10px] text-slate-500 dark:text-slate-400 mt-1 truncate">{sub}</div>}
             <div className="relative mt-auto pt-1.5 -mb-1">
                 <Sparkline data={series} color={a.spark} height={26} valueFormat={valueFormat} seriesLabel={seriesLabel} />

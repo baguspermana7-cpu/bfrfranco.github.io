@@ -74,11 +74,18 @@ const EditableCell = ({ value, onChange, className = '' }: {
 };
 
 const FinancialDashboard = () => {
-    const { selectedCountry, inputs } = useSimulationStore();
+    const { selectedCountry, inputs, actions: simActions } = useSimulationStore();
     const effectiveInputs = useEffectiveInputs();
     const capexStore = useCapexStore();
     const capexResults = capexStore.results;
     const [isExporting, setIsExporting] = useState(false);
+
+    /* #333 dedup — Lease Term DERIVED reaktif dari Contract Duration
+     * (Requirements 1.1, satu sumber). Bukan input lagi di halaman ini. */
+    const reqOverview = useRequirementsStore((s) => s.overview);
+    const contractYearsDerived = typeof reqOverview.contractDurationYr === 'number'
+        ? reqOverview.contractDurationYr
+        : (reqOverview.contractDurationCustom ?? 10);
 
     // ─── Combined Financial + Revenue Inputs ────────────
     const [finInputs, setFinInputs] = useState({
@@ -161,15 +168,24 @@ const FinancialDashboard = () => {
             mrcEscalation: Math.round(eco.inflationRate * 100),
             mrcCrossConnectMonthly: 5000,
             /* #333 dedup — lease term ikut Contract Duration di Requirements 1.1 (satu sumber) */
-            contractYears: (() => {
-                try {
-                    const o = useRequirementsStore.getState().overview;
-                    return typeof o.contractDurationYr === 'number' ? o.contractDurationYr : (o.contractDurationCustom ?? 10);
-                } catch { return 10; }
-            })(),
+            contractYears: contractYearsDerived,
             takeOrPayPct: 70,
         });
-    }, [selectedCountry?.id, inputs.tierLevel, inputs.itLoad, capexResults?.total]);
+    }, [selectedCountry?.id, inputs.tierLevel, inputs.itLoad, capexResults?.total, contractYearsDerived]);
+
+    /* #333 dedup — Contract Duration berubah di Requirements → lease term ikut
+     * LANGSUNG (bukan input; sinkron reaktif, override manual tidak berlaku). */
+    useEffect(() => {
+        setRevInputs(prev => prev.contractYears === contractYearsDerived ? prev : { ...prev, contractYears: contractYearsDerived });
+    }, [contractYearsDerived]);
+
+    /* #333 dedup — Tax Rate SELALU ikut negara project (chip "country" harus
+     * jujur, termasuk setelah user override parameter lain → country berganti). */
+    useEffect(() => {
+        if (!selectedCountry) return;
+        const t = Math.round(selectedCountry.economy.taxRate * 1000) / 1000;
+        setFinInputs(prev => prev.taxRate === t ? prev : { ...prev, taxRate: t });
+    }, [selectedCountry?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Year-level overrides for the combined table
     const [yearOverrides, setYearOverrides] = useState<Record<number, Record<string, number>>>({});
@@ -380,22 +396,22 @@ const FinancialDashboard = () => {
                         {/* ── Financial Section ───────────── */}
                         <div className="text-[10px] uppercase text-indigo-600 dark:text-indigo-400 font-semibold tracking-wider border-b border-indigo-200 dark:border-indigo-800/40 pb-1">
                             Financial Analysis
-                        <p className="mt-1 rounded bg-violet-500/10 px-2 py-1 text-[9px] text-violet-500 dark:text-violet-300">Semua parameter panel ini PREDEFINED dari data (negara · tier · CAPEX · requirement) — boleh di-override; edit manual dipertahankan.</p></div>
+                        <p className="mt-1 rounded bg-violet-500/10 px-2 py-1 text-[9px] text-violet-500 dark:text-violet-300">Semua parameter panel ini PREDEFINED dari data (negara · tier · CAPEX · requirement) — boleh di-override; edit manual dipertahankan. Input yang tersisa = kontrol analisis halaman ini (bukan duplikat requirement); nilai kanonik (Tax Rate, Lease Term) tampil derived + link Edit di Requirements.</p></div>
                         <div className="space-y-1">
-                            <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Revenue per kW/month ($) <Tooltip content="Monthly colocation rate charged per kW of IT power. Industry range: $100-250/kW/month depending on market and tier." /></label>
+                            <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Revenue per kW/month ($) <Tooltip content="Monthly colocation rate charged per kW of IT power. Industry range: $100-250/kW/month depending on market and tier. Kontrol analisis halaman ini — angka revenue riil di-set DI SINI (single edit surface); default ilustratif diturunkan dari negara + tier." /></label>
                             <input type="number" className={inpCls}
                                 value={finInputs.revenuePerKwMonth}
                                 onChange={e => handleChange('revenuePerKwMonth', Number(e.target.value))} />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Discount Rate (%) <Tooltip content="Weighted Average Cost of Capital (WACC). Used to discount future cashflows to present value. Typical DC range: 8-12%." /></label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Discount Rate (%) <Tooltip content="Weighted Average Cost of Capital (WACC). Used to discount future cashflows to present value. Typical DC range: 8-12%. Kontrol analisis halaman ini (bukan duplikat requirement)." /></label>
                                 <input type="number" className={inpCls}
                                     value={(finInputs.discountRate * 100).toFixed(0)}
                                     onChange={e => handleChange('discountRate', Number(e.target.value) / 100)} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Project Life (yrs) <Tooltip content="Economic useful life of the facility for financial modeling. Typically 10-25 years for data centers." /></label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Project Life (yrs) <Tooltip content="Economic useful life of the facility for financial modeling. Typically 10-25 years for data centers. Kontrol analisis halaman ini." /></label>
                                 <input type="number" className={inpCls}
                                     value={finInputs.projectLifeYears}
                                     onChange={e => handleChange('projectLifeYears', Number(e.target.value))}
@@ -404,13 +420,13 @@ const FinancialDashboard = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Rev. Escalation (%) <Tooltip content="Monthly revenue per kW of IT capacity. Driven by market pricing and contract terms." /></label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Rev. Escalation (%) <Tooltip content="Annual revenue price escalation applied year-over-year. Default diturunkan dari inflasi negara — kontrol analisis halaman ini, boleh di-override." /></label>
                                 <input type="number" className={inpCls}
                                     value={(finInputs.escalationRate * 100).toFixed(0)}
                                     onChange={e => handleChange('escalationRate', Number(e.target.value) / 100)} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">OPEX Escalation (%) <Tooltip content="Annual operating expenditure normalized per kilowatt. Includes energy, maintenance, staffing, and overhead." /></label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">OPEX Escalation (%) <Tooltip content="Annual OPEX cost escalation applied year-over-year. Default diturunkan dari eskalasi labor negara — kontrol analisis halaman ini, boleh di-override." /></label>
                                 <input type="number" className={inpCls}
                                     value={(finInputs.opexEscalation * 100).toFixed(1)}
                                     onChange={e => handleChange('opexEscalation', Number(e.target.value) / 100)} />
@@ -419,13 +435,17 @@ const FinancialDashboard = () => {
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
                                 <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Tax Rate (%) <Tooltip content="DERIVED dari profil negara project (economy.taxRate) — satu sumber, edit lewat pemilihan Country di Requirements. (#333 dedup: input duplikat dihapus)" /></label>
-                                <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-2 py-1.5 text-sm font-bold tabular-nums text-emerald-500">
-                                    {(finInputs.taxRate * 100).toFixed(1)}%
-                                    <span className="ml-1.5 rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-emerald-500">country</span>
+                                <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-2 py-1.5">
+                                    <div className="text-sm font-bold tabular-nums text-emerald-500">
+                                        {(finInputs.taxRate * 100).toFixed(1)}%
+                                        <span className="ml-1.5 rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-emerald-500">country</span>
+                                    </div>
+                                    <button onClick={() => simActions.setActiveTab('requirements')}
+                                        className="text-[9px] text-violet-500 hover:underline">Edit di Requirements ↗</button>
                                 </div>
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Depreciation (yrs) <Tooltip content="Straight-line depreciation period for CAPEX assets. Affects taxable income. Building: 20-25 yrs, MEP: 15-20 yrs." /></label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Depreciation (yrs) <Tooltip content="Straight-line depreciation period for CAPEX assets. Affects taxable income. Building: 20-25 yrs, MEP: 15-20 yrs. Kontrol analisis halaman ini." /></label>
                                 <input type="number" className={inpCls}
                                     value={finInputs.depreciationYears}
                                     onChange={e => handleChange('depreciationYears', Number(e.target.value))}
@@ -488,9 +508,15 @@ const FinancialDashboard = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">Lease Term (yrs) <Tooltip content="Duration of the colocation lease agreement in years. Longer terms typically offer better rates and provide revenue predictability for the operator." /></label>
-                                <input type="number" className={inpCls}
-                                    value={revInputs.contractYears} onChange={e => handleRevChange('contractYears', Number(e.target.value))} min={3} max={25} />
+                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">Lease Term (yrs) <Tooltip content="DERIVED dari Contract Duration di Requirements 1.1 — satu sumber. (#333 dedup: input duplikat dihapus; edit di Requirements)" /></label>
+                                <div className="rounded border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-2 py-1.5">
+                                    <div className="text-sm font-bold tabular-nums text-slate-900 dark:text-white">
+                                        {contractYearsDerived}
+                                        <span className="ml-1.5 rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-emerald-500">requirements</span>
+                                    </div>
+                                    <button onClick={() => simActions.setActiveTab('requirements')}
+                                        className="text-[9px] text-violet-500 hover:underline">Edit di Requirements ↗</button>
+                                </div>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">Take-or-Pay (%) <Tooltip content="Minimum committed power/space usage regardless of actual consumption. Protects the provider's revenue baseline. Typically 70-100% of contracted capacity." /></label>

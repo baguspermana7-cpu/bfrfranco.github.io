@@ -135,10 +135,10 @@ export function CapexEnginePage() {
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
                             { label: 'Total CAPEX (P50)', value: fmtMoney(band.p50), sub: 'base estimate', trace: 'capex.total' },
-                            { label: 'P80 (Risk-Adjusted)', value: fmtMoney(band.p80), sub: `+${(((band.p80 - band.p50) / band.p50) * 100).toFixed(1)}% vs P50` },
-                            { label: 'P10 (Optimistic)', value: fmtMoney(band.p10), sub: `${(((band.p10 - band.p50) / band.p50) * 100).toFixed(1)}% vs P50` },
-                            { label: '$ / kW', value: `$${perKw.toLocaleString()}`, sub: `${(inputs.itLoad / 1000).toFixed(1)} MW IT` },
-                            { label: 'Contingency', value: fmtMoney(results.contingency ?? 0), sub: `${inputs.contingency}% (= design margin)` },
+                            { label: 'P80 (Risk-Adjusted)', value: fmtMoney(band.p80), sub: `+${(((band.p80 - band.p50) / band.p50) * 100).toFixed(1)}% vs P50`, trace: 'capex.p80' },
+                            { label: 'P10 (Optimistic)', value: fmtMoney(band.p10), sub: `${(((band.p10 - band.p50) / band.p50) * 100).toFixed(1)}% vs P50`, trace: 'capex.p10' },
+                            { label: '$ / kW', value: `$${perKw.toLocaleString()}`, sub: `${(inputs.itLoad / 1000).toFixed(1)} MW IT`, trace: 'capex.perKw' },
+                            { label: 'Contingency', value: fmtMoney(results.contingency ?? 0), sub: `${inputs.contingency}% (= design margin)`, trace: 'capex.contingency' },
                             { label: 'Estimate Class', value: 'AACE Class 4', sub: '−30% / +50% (engine truth)' },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
@@ -200,8 +200,13 @@ export function CapexEnginePage() {
                                 </ResponsiveContainer>
                             </div>
                             <div className="mt-1 grid grid-cols-4 gap-2 text-center text-[10px]">
-                                {[['P10', band.p10, 'text-emerald-500'], ['P50 · Base', band.p50, 'text-violet-500'], ['P80', band.p80, 'text-amber-500'], ['P90', band.p90, 'text-rose-500']].map(([l, v, c]) => (
-                                    <div key={l as string}><div className={`font-bold tabular-nums ${c}`}>{fmtMoney(v as number)}</div><div className="text-slate-500">{l}</div></div>
+                                {[['P10', band.p10, 'text-emerald-500', 'capex.p10'], ['P50 · Base', band.p50, 'text-violet-500', 'capex.total'], ['P80', band.p80, 'text-amber-500', 'capex.p80'], ['P90', band.p90, 'text-rose-500', 'capex.p90']].map(([l, v, c, t]) => (
+                                    <div key={l as string}>
+                                        <TraceValue traceId={t as string}>
+                                            <div className={`font-bold tabular-nums ${c}`}>{fmtMoney(v as number)}</div>
+                                        </TraceValue>
+                                        <div className="text-slate-500">{l}</div>
+                                    </div>
                                 ))}
                             </div>
                         </div>

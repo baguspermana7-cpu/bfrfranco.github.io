@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { TraceValue } from '@/components/ui/TraceValue';
 
 const CAT_LABELS: Record<string, string> = {
     building: 'Civil & Structure', electrical: 'Power Infrastructure', cooling: 'Cooling Infrastructure',
@@ -39,7 +40,11 @@ export function FinancialSnapshot({ costs, total }: { costs: Record<string, numb
                         </PieChart>
                     </ResponsiveContainer>
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">{fmtUsd(total)}</span>
+                        <span className="pointer-events-auto">
+                            <TraceValue traceId="capex.total">
+                                <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">{fmtUsd(total)}</span>
+                            </TraceValue>
+                        </span>
                         <span className="text-[9px] text-slate-500">Total CAPEX</span>
                     </div>
                 </div>

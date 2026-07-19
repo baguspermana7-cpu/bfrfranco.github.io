@@ -135,13 +135,38 @@ export function ProjectsPage() {
                     </div>
                 ) : (
                     <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                        {projects.projects.map((p) => (
-                            <div key={p.id} className={`rounded-2xl border p-3 ${p.id === projects.activeProjectId ? 'border-violet-500 bg-violet-600/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50'}`}>
+                        {projects.projects.map((p) => {
+                            /* DA3 honest snapshot — kartu ACTIVE membaca live sim saat
+                             * render; kartu tersimpan = snapshot berlabel tanggal; amber
+                             * kalau snapshot beda dari project aktif (countryId/itLoad). */
+                            const isActive = p.id === projects.activeProjectId;
+                            const differs = p.countryId !== (country?.id ?? '') || p.itLoadKw !== simInputs.itLoad;
+                            return (
+                            <div key={p.id} className={`rounded-2xl border p-3 ${isActive ? 'border-violet-500 bg-violet-600/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50'}`}>
                                 <div className="flex items-center gap-2">
                                     <span className="truncate text-sm font-semibold text-slate-900 dark:text-white">{p.name}</span>
-                                    {p.id === projects.activeProjectId && <span className="rounded-full bg-violet-600 px-1.5 py-0.5 text-[9px] font-semibold text-white">Active</span>}
+                                    {isActive && <span className="rounded-full bg-violet-600 px-1.5 py-0.5 text-[9px] font-semibold text-white">Active</span>}
                                 </div>
-                                <div className="mt-0.5 text-[10px] text-slate-500">{(p.itLoadKw / 1000).toFixed(1)} MW · {COUNTRIES[p.countryId]?.name ?? p.countryId} · updated {new Date(p.updatedAt).toLocaleDateString()}</div>
+                                <div className="mt-0.5 text-[10px] text-slate-500">
+                                    {isActive
+                                        ? `${(simInputs.itLoad / 1000).toFixed(1)} MW · ${country?.name ?? '—'}`
+                                        : `${(p.itLoadKw / 1000).toFixed(1)} MW · ${COUNTRIES[p.countryId]?.name ?? p.countryId}`}
+                                </div>
+                                <div className="mt-1 flex flex-wrap items-center gap-1">
+                                    {isActive ? (
+                                        <span title="Nilai kartu ini dibaca dari simulasi live saat render (bukan snapshot)" className="rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-emerald-500">live sim</span>
+                                    ) : (
+                                        <span title="Nilai kartu ini dari snapshot tersimpan — bukan state live" className="rounded bg-slate-500/15 px-1 py-0.5 text-[8px] font-semibold text-slate-500 dark:text-slate-400">saved snapshot · {new Date(p.updatedAt).toLocaleDateString()}</span>
+                                    )}
+                                    {isActive && differs && (
+                                        <span title={`Snapshot tersimpan (${COUNTRIES[p.countryId]?.name ?? p.countryId} · ${(p.itLoadKw / 1000).toFixed(1)} MW) beda dari state live — klik Update untuk sinkron`}
+                                            className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">snapshot ≠ live — Update</span>
+                                    )}
+                                    {!isActive && differs && (
+                                        <span title={`Snapshot ${COUNTRIES[p.countryId]?.name ?? p.countryId} · ${(p.itLoadKw / 1000).toFixed(1)} MW ≠ project aktif (${country?.name ?? '—'} · ${(simInputs.itLoad / 1000).toFixed(1)} MW)`}
+                                            className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">differs from current project</span>
+                                    )}
+                                </div>
                                 <div className="mt-2 flex gap-1.5">
                                     <button onClick={() => projects.openProject(p.id)}
                                         className="flex-1 rounded-lg bg-violet-600 py-1.5 text-[11px] font-semibold text-white hover:bg-violet-500">Open (restores all stores)</button>
@@ -149,7 +174,8 @@ export function ProjectsPage() {
                                         className="rounded-lg border border-rose-400/40 px-2 py-1.5 text-rose-400 hover:bg-rose-500/10"><Trash2 className="h-3.5 w-3.5" /></button>
                                 </div>
                             </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>

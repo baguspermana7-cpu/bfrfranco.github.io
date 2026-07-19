@@ -4,6 +4,7 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
+import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 import { calculateFinancials, defaultOccupancyRamp, FinancialInputs } from '@/modules/analytics/FinancialEngine';
 import { calculateCapex } from '@/lib/CapexEngine';
 import { calculateStaffing } from '@/modules/staffing/ShiftEngine';
@@ -26,7 +27,7 @@ import { fmtMoney } from '@/lib/format';
 type MCTab = 'distributions' | 'statistics' | 'risk' | 'convergence' | 'scatter';
 
 export default function MonteCarloDashboard() {
-    const { selectedCountry, inputs } = useSimulationStore();
+    const { selectedCountry, inputs, actions: simActions } = useSimulationStore();
     const capexStore = useCapexStore();
     const effectiveInputs = useEffectiveInputs();
 
@@ -61,7 +62,9 @@ export default function MonteCarloDashboard() {
         return {
             totalCapex: capexResult.total,
             annualOpex,
-            revenuePerKwMonth: 120,
+            /* #333 dedup — basis revenue SATU SUMBER (constants/finance). Dulu
+             * hardcode 120 di sini → MC diverge dari surface lain ($280). */
+            revenuePerKwMonth: DEFAULT_REVENUE_PER_KW_MONTH,
             itLoadKw: inputs.itLoad,
             discountRate: 0.10,
             projectLifeYears: 10,
@@ -156,6 +159,18 @@ export default function MonteCarloDashboard() {
             <div className="grid grid-cols-[300px_1fr] gap-6">
                 {/* Left: Controls */}
                 <div className="space-y-4">
+                    {/* #333 dedup — base case DERIVED dari project live (satu sumber);
+                        tidak ada input duplikat country/tarif/IT load/PUE di sini. */}
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-3">
+                        <div className="text-[10px] font-semibold uppercase text-slate-500 dark:text-slate-400 mb-1 flex items-center">Base Case <Tooltip content="Nilai dasar simulasi DERIVED dari konfigurasi project live (negara · tarif listrik · IT load · PUE · CAPEX · basis revenue single-source) — bukan input di halaman ini. Input di bawah (Iterations, Seed, Variables) = kontrol analisis halaman ini." /></div>
+                        <div className="text-[11px] text-slate-700 dark:text-slate-300">
+                            {selectedCountry.name} · {(inputs.itLoad / 1000).toFixed(1)} MW · Tier {inputs.tierLevel} · ${selectedCountry.economy.electricityRate.toFixed(2)}/kWh
+                            <span className="ml-1.5 rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-emerald-500">project</span>
+                        </div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400">Revenue basis ${DEFAULT_REVENUE_PER_KW_MONTH}/kW·mo (illustrative, single-source)</div>
+                        <button onClick={() => simActions.setActiveTab('requirements')}
+                            className="mt-0.5 text-[10px] text-violet-500 hover:underline">Edit di Requirements ↗</button>
+                    </div>
                     {/* Iteration Count */}
                     <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                         <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase block mb-2 flex items-center">Iterations <Tooltip content="Number of random iterations. Higher counts (10,000+) produce more stable confidence intervals but take longer." /></label>

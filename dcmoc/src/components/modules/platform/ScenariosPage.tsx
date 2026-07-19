@@ -60,6 +60,9 @@ export function ScenariosPage() {
     const st = useScenarioStore();
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
     const simActions = useSimulationStore((s) => s.actions);
+    /* DA3 honest snapshot — pembanding live untuk badge "differs from current project" */
+    const liveCountryId = useSimulationStore((s) => s.selectedCountry?.id);
+    const liveItLoad = useSimulationStore((s) => s.inputs.itLoad);
     const capexSetInputs = useCapexStore((s) => s.setInputs);
     const [q, setQ] = React.useState('');
     const [selId, setSelId] = React.useState<string | null>(null);
@@ -155,6 +158,13 @@ export function ScenariosPage() {
                         {!sel ? <p className="text-[10px] text-slate-400">Select a scenario.</p> : (
                             <div className="space-y-1 text-[11px]">
                                 <div className="text-xs font-bold text-slate-900 dark:text-white">{sel.name}</div>
+                                {/* DA3 honest snapshot — scenario = snapshot tersimpan, bukan state live */}
+                                <div className="flex flex-wrap gap-1">
+                                    <span title="Semua nilai di bawah dari snapshot tersimpan (engine-computed at save time)" className="rounded bg-slate-500/15 px-1 py-0.5 text-[8px] font-semibold text-slate-500 dark:text-slate-400">saved snapshot · {new Date(sel.timestamp).toLocaleDateString()}</span>
+                                    {(sel.countryId !== liveCountryId || (sel.simInputs?.itLoad ?? 0) !== liveItLoad) && (
+                                        <span title="Snapshot ini beda country/IT load dari project aktif (live sim)" className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">differs from current project</span>
+                                    )}
+                                </div>
                                 {([
                                     ['Country', COUNTRIES[sel.countryId]?.name ?? sel.countryId],
                                     ['IT Load', `${((sel.simInputs?.itLoad ?? 0) / 1000).toFixed(1)} MW`],
@@ -191,6 +201,9 @@ export function ScenariosPage() {
 export function ScenarioComparePage() {
     const st = useScenarioStore();
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
+    /* DA3 honest snapshot — pembanding live untuk badge amber di kartu compare */
+    const liveCountryId = useSimulationStore((s) => s.selectedCountry?.id);
+    const liveItLoad = useSimulationStore((s) => s.inputs.itLoad);
     const chosen: SavedScenario[] = (st.comparisonIds.length
         ? st.scenarios.filter((s) => st.comparisonIds.includes(s.id))
         : st.scenarios.slice(0, 3)).slice(0, 4);
@@ -278,6 +291,13 @@ export function ScenarioComparePage() {
                                 {scores[i] && <span className="ml-auto rounded bg-white/60 dark:bg-slate-900/60 px-1.5 py-0.5 text-[10px] font-bold" style={{ color: SC_COLORS[i] }}>{scores[i].grade} · {scores[i].total}</span>}
                             </div>
                             <div className="mt-1 text-[10px] text-slate-500">{COUNTRIES[s.countryId]?.name} · {((s.simInputs?.itLoad ?? 0) / 1000).toFixed(1)} MW · Tier {s.simInputs?.tierLevel} · {String(s.simInputs?.coolingType)}</div>
+                            {/* DA3 honest snapshot chips */}
+                            <div className="mt-1 flex flex-wrap gap-1">
+                                <span className="rounded bg-slate-500/15 px-1 py-0.5 text-[8px] font-semibold text-slate-500 dark:text-slate-400">saved snapshot · {new Date(s.timestamp).toLocaleDateString()}</span>
+                                {(s.countryId !== liveCountryId || (s.simInputs?.itLoad ?? 0) !== liveItLoad) && (
+                                    <span title="Snapshot ini beda country/IT load dari project aktif (live sim)" className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">differs from current project</span>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>

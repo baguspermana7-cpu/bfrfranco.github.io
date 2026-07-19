@@ -208,7 +208,7 @@ export function ArchitecturePage() {
                         {[
                             { label: 'Total IT Load', value: `${f.itMw} MW`, sub: `${eq.racks.toLocaleString()} racks`, trace: 'sim.itLoad' },
                             { label: 'Total Facility Load', value: `${f.facilityMw} MW`, sub: 'incl. losses & overhead', trace: 'arch.facilityMw' },
-                            { label: 'PUE (Design)', value: String(f.pue), sub: f.pue <= 1.2 ? 'Excellent' : f.pue <= 1.4 ? 'Good' : 'Standard', explain: 'pue' },
+                            { label: 'PUE (Design)', value: String(f.pue), sub: f.pue <= 1.2 ? 'Excellent' : f.pue <= 1.4 ? 'Good' : 'Standard', explain: 'pue', trace: 'engine.pueMatrix' },
                             { label: 'Cooling Approach', value: { liquid: 'D2C Liquid', rdhx: 'Rear-Door HX', inrow: 'In-Row', air: 'Air CRAC/CRAH' }[i.coolingType], sub: `${i.rackDensityKw} kW/rack` },
                             { label: 'Availability Target', value: `${f.availabilityPct}%`, sub: `Tier ${i.tier} · ${f.downtimeMinYr} min/yr`, trace: 'rel.tierTarget' },
                             { label: 'Redundancy Level', value: i.redundancy, sub: 'Power & Cooling', explain: 'redundancy' },

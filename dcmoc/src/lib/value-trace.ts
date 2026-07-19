@@ -20,6 +20,13 @@ import { plannedSchedule, evm, type PlannedSchedule, type EvmResult } from '@/st
 import { useCxTracking, checklistDerivedCompletion } from '@/store/cxTracking';
 import { CX_CHECKLIST, type ReadinessKey } from '@/lib/cx-procedures';
 import { densityToEngineBucket } from '@/lib/requirementsMappings';
+/* EB-cov wave (trace-coverage ≥60% halaman inti) — live readers */
+import { useOpsLog } from '@/store/opsLog';
+import { getPUE } from '@/constants/pue';
+import { riskBand } from '@/state/adapters/capex-adapter';
+import { sanitizeCap, facilitySnapshot, utilization, forecastSeries, type UtilRow } from '@/state/adapters/capacity-adapter';
+import { calculateFinancials, defaultOccupancyRamp, type FinancialResult } from '@/modules/analytics/FinancialEngine';
+import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 
 export type TraceProvenance = 'input' | 'engine' | 'derived' | 'screening';
 
@@ -524,6 +531,233 @@ export const TRACE: Record<string, TraceNode> = {
         deps: ['sim.itLoad'],
         get: () => assetReplacementValue(),
     },
+
+    /* ── EB-cov wave: trace-coverage ≥60% halaman inti (append-only) ─────────
+     * Leaves + derived chains for Dashboard / Capacity / CAPEX / Ops /
+     * Architecture KPI wraps. Every get() mirrors the OWNING surface exactly. */
+
+    /* leaves */
+    'engine.pueTier3': {
+        label: 'Design PUE (kolom tier-3 matriks cooling)', page: 'architecture', unit: 'ratio', provenance: 'engine', sourceKey: 'pueMatrix',
+        external: { href: '/glossary.html#pue', label: 'Glossary: PUE' },
+        get: () => { try { return getPUE(sim().inputs.coolingType); } catch { return null; } },
+    },
+    'req.rackDensityKw': {
+        label: 'Rack Density (Requirements)', page: 'requirements', unit: 'kW/rack', provenance: 'input',
+        get: () => req().workload.avgRackDensityKw ?? null,
+    },
+    'ops.occupancyPct': {
+        label: 'Occupancy (S-curve tahun-1)', page: 'ops', unit: '%', provenance: 'engine',
+        formulaTemplate: 'models.capacity.occupancyScurve(tahun-1, wholesale) × 100 — clamp 5–100%',
+        get: () => { const o = opsOccFrac(); return o == null ? null : Math.round(o * 100); },
+    },
+    'ops.activeAlarms': {
+        label: 'Active Alarms (ops log)', page: 'ops', provenance: 'input',
+        formulaTemplate: 'jumlah alarm berstatus Active pada ops log (user-entered; seed EXAMPLE di Plan Mode)',
+        get: () => useOpsLog.getState().alarms.filter((a) => a.status === 'Active').length,
+    },
+    'ops.openTickets': {
+        label: 'Open Tickets (ops log)', page: 'ops', provenance: 'input',
+        formulaTemplate: 'jumlah tiket berstatus ≠ Closed pada ops log (user-entered; seed EXAMPLE di Plan Mode)',
+        get: () => useOpsLog.getState().tickets.filter((t) => t.status !== 'Closed').length,
+    },
+    'ops.pmCompliancePct': {
+        label: 'PM Compliance', page: 'ops', unit: '%', provenance: 'input',
+        formulaTemplate: 'minggu PM ter-log ÷ 52 × 100 (cap 100%) — null bila belum ada minggu ter-log',
+        get: () => { const w = useOpsLog.getState().completedPmWeeks.length; return w > 0 ? Math.min(100, Math.round((w / 52) * 100)) : null; },
+    },
+
+    /* ops derived */
+    'ops.pueAtLoad': {
+        label: 'PUE (at load)', page: 'ops', unit: 'ratio', provenance: 'derived',
+        formulaTemplate: 'models.pue.partialLoadPUE(engine.pueMatrix, ops.occupancyPct)',
+        deps: ['engine.pueMatrix', 'ops.occupancyPct'],
+        get: () => opsPueAtLoad(),
+    },
+    'ops.activeItMw': {
+        label: 'Active IT Load', page: 'ops', unit: 'MW', provenance: 'derived',
+        formulaTemplate: 'sim.itLoad ÷ 1000 × ops.occupancyPct ÷ 100',
+        deps: ['sim.itLoad', 'ops.occupancyPct'],
+        get: () => { const o = opsOccFrac(); return o == null ? null : +((sim().inputs.itLoad / 1000) * o).toFixed(1); },
+    },
+
+    /* dashboard chains */
+    'rel.systemAvailability': {
+        label: 'System Availability (RBD seri)', page: 'reliability', unit: '%', provenance: 'engine',
+        formulaTemplate: 'models.reliability.systemAvailability(UPS · CRAC · genset · switchgear seri, redundansi power terpilih) × 100',
+        get: () => {
+            try {
+                const m = (rzModels() as { reliability?: { systemAvailability?: (c: string[], r: string) => number } }).reliability;
+                const av = m?.systemAvailability?.(['ups', 'crac', 'generator', 'switchgear'], redKeyLive());
+                return av != null ? +(av * 100).toFixed(3) : null;
+            } catch { return null; }
+        },
+    },
+    'sus.wue': {
+        label: 'WUE (Water Usage Effectiveness)', page: 'carbon', unit: 'L/kWh', provenance: 'engine',
+        formulaTemplate: 'models.water.wue(tipe cooling terpilih) — intensitas air per kWh IT',
+        external: { href: '/glossary.html#wue', label: 'Glossary: WUE' },
+        get: () => {
+            try {
+                const m = (rzModels() as { water?: { wue?: (c: string) => number } }).water;
+                const v = m?.wue?.(sim().inputs.coolingType);
+                return v != null ? +v.toFixed(2) : null;
+            } catch { return null; }
+        },
+    },
+    'sus.cue': {
+        label: 'CUE (Carbon Usage Effectiveness)', page: 'carbon', unit: 'kgCO₂/kWh', provenance: 'derived',
+        formulaTemplate: 'emisi tahunan (models.carbon.annualTonnes dari sim.itLoad, PUE desain, grid negara) ÷ energi fasilitas tahunan',
+        deps: ['sim.itLoad'],
+        get: () => {
+            try {
+                const m = (rzModels() as { carbon?: { annualTonnes?: (mw: number, pue: number, region: string) => number } }).carbon;
+                if (!m?.annualTonnes) return null;
+                const i = sim().inputs; const itMw = i.itLoad / 1000; const pue = getPUE(i.coolingType);
+                const t = m.annualTonnes(itMw, pue, sim().selectedCountry?.id || 'US');
+                const facilityMwh = itMw * 1000 * pue * 8760 / 1000;
+                return facilityMwh > 0 ? +(t * 1000 / (facilityMwh * 1000)).toFixed(3) : null;
+            } catch { return null; }
+        },
+    },
+    'opex.dashboardAnnual': {
+        label: 'Total OPEX / yr (basis dashboard)', page: 'finance', unit: '$', provenance: 'engine',
+        formulaTemplate: 'models.opex.totalAnnual(sim.itLoad dalam MW, PUE desain, negara, headcount manual) — basis DC-contract 100% util',
+        deps: ['sim.itLoad'],
+        get: () => dashOpexAnnual(),
+    },
+    'fin.lcc15': {
+        label: 'LCC 15 thn (TCO diskonto 10%)', page: 'finance', unit: '$', provenance: 'derived',
+        formulaTemplate: 'models.tco.totalCost(capex.total, opex.dashboardAnnual, 15 thn, 10% diskonto)',
+        deps: ['capex.total', 'opex.dashboardAnnual'],
+        get: () => {
+            try {
+                const m = (rzModels() as { tco?: { totalCost?: (c: number, o: number, y: number, r: number) => number } }).tco;
+                const c = cap().results?.total; const o = dashOpexAnnual();
+                return m?.totalCost && c && o ? Math.round(m.totalCost(c, o, 15, 0.10)) : null;
+            } catch { return null; }
+        },
+    },
+    'fin.ebitdaY5': {
+        label: 'EBITDA (tahun ke-5)', page: 'finance', unit: '$', provenance: 'derived',
+        formulaTemplate: 'DCF 15 thn: pendapatan (sim.itLoad × $280/kW·bln ilustratif × ramp okupansi, eskalasi 3%) − opex.dashboardAnnual — EBITDA tahun ke-5; modal awal capex.total',
+        deps: ['capex.total', 'opex.dashboardAnnual', 'sim.itLoad'],
+        get: () => { const cf = dashFinancial()?.cashflows?.[4]; return cf ? Math.round(cf.ebitda) : null; },
+    },
+    'fin.irrProject': {
+        label: 'IRR (proyek 15 thn)', page: 'finance', unit: '%', provenance: 'derived',
+        formulaTemplate: 'IRR arus kas DCF 15 thn — tahun-0 = −capex.total; arus tahunan = pendapatan ilustratif sim.itLoad − opex.dashboardAnnual − pajak',
+        deps: ['capex.total', 'opex.dashboardAnnual', 'sim.itLoad'],
+        get: () => { const f = dashFinancial(); return f ? +f.irr.toFixed(1) : null; },
+    },
+    'capex.racks': {
+        label: 'Rack Count (CAPEX metrics)', page: 'capex', provenance: 'derived',
+        formulaTemplate: 'ceil(sim.itLoad ÷ kW/rack kelas rack CAPEX — standard 6 · medium 12.5 · high 25 · extreme 75)',
+        deps: ['sim.itLoad'],
+        get: () => cap().results?.metrics?.racks ?? null,
+    },
+    'capex.rackDensity': {
+        label: 'Rack Density (implied)', page: 'capex', unit: 'kW/rack', provenance: 'derived',
+        formulaTemplate: 'sim.itLoad ÷ capex.racks',
+        deps: ['sim.itLoad', 'capex.racks'],
+        get: () => { const r = cap().results?.metrics?.racks; return r ? +(sim().inputs.itLoad / r).toFixed(1) : null; },
+    },
+
+    /* capex risk band (AACE Class 4, deterministic asymmetric normal) */
+    'capex.p10': {
+        label: 'CAPEX P10 (Optimistic)', page: 'capex', unit: '$', provenance: 'derived',
+        formulaTemplate: 'batas bawah band AACE Class 4 (−30%): models.capex.accuracyRange(capex.total).low',
+        deps: ['capex.total'],
+        get: () => capexBandLive()?.p10 ?? null,
+    },
+    'capex.p80': {
+        label: 'CAPEX P80 (Risk-Adjusted)', page: 'capex', unit: '$', provenance: 'derived',
+        formulaTemplate: 'capex.total + 0.8416 × σ_high; σ_high = (batas atas AACE Class 4 (+50%) − capex.total) ÷ 1.2816',
+        deps: ['capex.total'],
+        get: () => capexBandLive()?.p80 ?? null,
+    },
+    'capex.p90': {
+        label: 'CAPEX P90 (Conservative)', page: 'capex', unit: '$', provenance: 'derived',
+        formulaTemplate: 'batas atas band AACE Class 4 (+50%): models.capex.accuracyRange(capex.total).high',
+        deps: ['capex.total'],
+        get: () => capexBandLive()?.p90 ?? null,
+    },
+    'capex.contingency': {
+        label: 'Contingency (CAPEX)', page: 'capex', unit: '$', provenance: 'derived',
+        formulaTemplate: 'subtotal CAPEX sebelum kontinjensi × capex.contingencyPct ÷ 100 (CapexEngine)',
+        deps: ['capex.contingencyPct'],
+        get: () => cap().results?.contingency ?? null,
+    },
+
+    /* capacity planning (mirror CapacityPlanningPage adapter wiring exactly) */
+    'cap.peakForecastMw': {
+        label: 'Peak Forecast (growth plan)', page: 'capacity', unit: 'MW', provenance: 'derived',
+        formulaTemplate: 'max forecast MW horizon 10 thn — growth plan Requirements (Y1–Y5, Y10) + interpolasi geometrik; basis Y0 = sim.itLoad',
+        deps: ['sim.itLoad'],
+        get: () => capPlanModel()?.peak ?? null,
+    },
+    'cap.powerCapacityMva': {
+        label: 'Power Capacity (design)', page: 'capacity', unit: 'MVA', provenance: 'derived',
+        formulaTemplate: 'arch.facilityMw × (1 + req.designMarginPct ÷ 100) ÷ 0.9 (power factor)',
+        deps: ['arch.facilityMw', 'req.designMarginPct'],
+        get: () => capUtilRow('power')?.capacity ?? null,
+    },
+    'cap.coolingCapacityMw': {
+        label: 'Cooling Capacity (design)', page: 'capacity', unit: 'MW', provenance: 'derived',
+        formulaTemplate: '(arch.facilityMw − sim.itLoad ÷ 1000) × (1 + req.designMarginPct ÷ 100) + sim.itLoad ÷ 1000',
+        deps: ['arch.facilityMw', 'sim.itLoad', 'req.designMarginPct'],
+        get: () => capUtilRow('cooling')?.capacity ?? null,
+    },
+    'cap.rackCapacity': {
+        label: 'Rack Capacity (design)', page: 'capacity', unit: 'racks', provenance: 'derived',
+        formulaTemplate: 'max(ceil(sim.itLoad ÷ req.rackDensityKw), max racks by space — models.capacity.bindingConstraint(white space))',
+        deps: ['sim.itLoad', 'req.rackDensityKw'],
+        get: () => capUtilRow('rack')?.capacity ?? null,
+    },
+
+    /* architecture BOM (engine equipScale — same call as arch-adapter computeEquipCounts) */
+    'arch.racks': {
+        label: 'Racks (BOM)', page: 'architecture', provenance: 'derived',
+        formulaTemplate: 'ceil(sim.itLoad ÷ req.rackDensityKw)',
+        deps: ['sim.itLoad', 'req.rackDensityKw'],
+        get: () => Math.ceil(sim().inputs.itLoad / Math.max(1, req().workload.avgRackDensityKw || 12)),
+    },
+    'arch.eqSwitchgear': {
+        label: 'MV Switchgear (BOM)', page: 'architecture', provenance: 'engine',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah lineup switchgear MV',
+        deps: ['sim.itLoad'],
+        get: () => assetEquip()?.switchgear ?? null,
+    },
+    'arch.eqTransformers': {
+        label: 'Transformers (BOM)', page: 'architecture', provenance: 'engine',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah trafo',
+        deps: ['sim.itLoad'],
+        get: () => assetEquip()?.transformers ?? null,
+    },
+    'arch.eqGenerators': {
+        label: 'Generators (BOM)', page: 'architecture', provenance: 'engine',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah genset',
+        deps: ['sim.itLoad'],
+        get: () => assetEquip()?.generators ?? null,
+    },
+    'arch.eqUps': {
+        label: 'UPS Modules (BOM)', page: 'architecture', provenance: 'engine',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah modul UPS',
+        deps: ['sim.itLoad'],
+        get: () => assetEquip()?.ups_modules ?? null,
+    },
+    'arch.eqPdus': {
+        label: 'PDUs (BOM)', page: 'architecture', provenance: 'engine',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah PDU',
+        deps: ['sim.itLoad'],
+        get: () => assetEquip()?.pdus ?? null,
+    },
+    'arch.eqChillers': {
+        label: 'Chillers (BOM)', page: 'architecture', provenance: 'engine',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah chiller',
+        deps: ['sim.itLoad'],
+        get: () => assetEquip()?.chillers ?? null,
+    },
 };
 
 export interface ResolvedTrace {
@@ -774,4 +1008,111 @@ function assetReplacementValue(): number | null {
             .reduce((s, c) => s + (m.replacementSchedule?.(c, kw, 15)?.totalNominalUsd ?? 0), 0);
         return total > 0 ? Math.round(total) : null;
     } catch { return null; }
+}
+
+/* ═══ EB-cov wave live-reader helpers (appended — invoked lazily by get()) ═══
+ * Mirror the OWNING page computation exactly (useDashboardData /
+ * OperationsDashboard / CapacityPlanningPage / CapexEnginePage) so the popover
+ * number matches the rendered KPI. All null-safe. */
+
+const redKeyLive = (): string =>
+    ({ 'N+1': 'n1', '2N': '2n', '2N+1': '2n1' } as Record<string, string>)[sim().inputs.powerRedundancy] ?? 'n1';
+
+/** Year-1 occupancy fraction — mirrors OperationsDashboard occ (clamp 5–100%). */
+function opsOccFrac(): number | null {
+    try {
+        const m = (rzModels() as { capacity?: { occupancyScurve?: (y: number, mkt: string) => number } }).capacity;
+        if (!m?.occupancyScurve) return 0.85; // page default when engine absent
+        return Math.max(0.05, Math.min(1, m.occupancyScurve(1, 'wholesale')));
+    } catch { return null; }
+}
+
+/** Live PUE at partial load — mirrors OperationsDashboard livePue. */
+function opsPueAtLoad(): number | null {
+    try {
+        const design = pueLive() ?? getPUE(sim().inputs.coolingType);
+        const occ = opsOccFrac();
+        if (design == null || occ == null) return null;
+        const m = (rzModels() as { pue?: { partialLoadPUE?: (p: number, o: number) => number } }).pue;
+        return m?.partialLoadPUE ? +m.partialLoadPUE(design, occ).toFixed(2) : +design.toFixed(2);
+    } catch { return null; }
+}
+
+/** Annual OPEX on the DASHBOARD basis — mirrors useDashboardData opexAnnual
+ *  (legacy positional signature: MW, design PUE, region, manual headcount). */
+function dashOpexAnnual(): number | null {
+    try {
+        const m = (rzModels() as { opex?: { totalAnnual?: (mw: number, pue: number, region: string, hc: number) => { total?: number } | number } }).opex;
+        if (!m?.totalAnnual) return null;
+        const i = sim().inputs;
+        const hc = (i.headcount_ShiftLead ?? 0) + (i.headcount_Engineer ?? 0) + (i.headcount_Technician ?? 0) + (i.headcount_Admin ?? 0) + (i.headcount_Janitor ?? 0);
+        const r = m.totalAnnual(i.itLoad / 1000, getPUE(i.coolingType), sim().selectedCountry?.id || 'US', hc);
+        const v = typeof r === 'object' ? r?.total : r;
+        return v != null && Number.isFinite(v) ? Math.round(v) : null;
+    } catch { return null; }
+}
+
+/** Dashboard DCF (illustrative revenue) — mirrors useDashboardData financial. */
+let _finCache: { key: string; fin: FinancialResult } | null = null;
+function dashFinancial(): FinancialResult | null {
+    try {
+        const capexTotal = cap().results?.total;
+        if (!capexTotal) return null;
+        const i = sim().inputs;
+        const taxRate = sim().selectedCountry?.economy?.taxRate ?? 0.22;
+        const annualOpex = dashOpexAnnual() ?? Math.round(capexTotal * 0.06);
+        const key = [capexTotal, i.itLoad, taxRate, annualOpex, (i.occupancyRamp ?? []).join(',')].join('|');
+        if (_finCache?.key === key) return _finCache.fin;
+        const fin = calculateFinancials({
+            totalCapex: capexTotal, annualOpex, revenuePerKwMonth: DEFAULT_REVENUE_PER_KW_MONTH,
+            itLoadKw: i.itLoad, discountRate: 0.10, projectLifeYears: 15, escalationRate: 0.03,
+            opexEscalation: 0.03, occupancyRamp: i.occupancyRamp?.length ? i.occupancyRamp : defaultOccupancyRamp(15),
+            taxRate, depreciationYears: 15,
+        });
+        _finCache = { key, fin };
+        return fin;
+    } catch { return null; }
+}
+
+/** CAPEX risk band — same deterministic riskBand as CapexEnginePage. */
+function capexBandLive(): { p10: number; p80: number; p90: number } | null {
+    try {
+        const total = cap().results?.total;
+        if (!total) return null;
+        const b = riskBand(total);
+        return { p10: b.p10, p80: b.p80, p90: b.p90 };
+    } catch { return null; }
+}
+
+/** Capacity Planning model — mirrors CapacityPlanningPage `i`/snap/util/forecast wiring. */
+let _capPlanCache: { key: string; m: { peak: number; rows: UtilRow[] } } | null = null;
+function capPlanModel(): { peak: number; rows: UtilRow[] } | null {
+    try {
+        const inp = sim().inputs;
+        const r = req();
+        const g = r.growth.itLoadMwByYear;
+        const key = [inp.itLoad, inp.tierLevel, inp.coolingType, r.workload.avgRackDensityKw, inp.buildingSize, inp.baseYear, r.business.designMarginPct, g.y1, g.y2, g.y3, g.y4, g.y5, g.y10, inp.capacityPhases.map((p) => `${p.itLoadKw}:${p.startMonth}:${p.buildMonths}`).join(',')].join('|');
+        if (_capPlanCache?.key === key) return _capPlanCache.m;
+        const i = sanitizeCap({
+            itLoadKw: inp.itLoad, tier: inp.tierLevel as 2 | 3 | 4, coolingType: inp.coolingType,
+            rackKw: r.workload.avgRackDensityKw, whiteFloorM2: inp.buildingSize, baseYear: inp.baseYear,
+            marketType: 'wholesale', phases: inp.capacityPhases, designMarginPct: r.business.designMarginPct,
+            growthMwByYear: [
+                { label: 'Y0 (COD)', mw: inp.itLoad / 1000 },
+                { label: 'Y1', mw: g.y1 }, { label: 'Y2', mw: g.y2 }, { label: 'Y3', mw: g.y3 },
+                { label: 'Y4', mw: g.y4 }, { label: 'Y5', mw: g.y5 }, { label: 'Y10', mw: g.y10 },
+            ],
+        });
+        const snap = facilitySnapshot(i);
+        const util = utilization(i, snap.facilityMw);
+        const designPowerMw = (util.rows.find((u) => u.key === 'power')?.capacity ?? 0) * 0.9;
+        const forecast = forecastSeries(i, +designPowerMw.toFixed(0));
+        const m = { peak: Math.max(...forecast.map((f) => f.forecastMw)), rows: util.rows };
+        _capPlanCache = { key, m };
+        return m;
+    } catch { return null; }
+}
+
+function capUtilRow(rowKey: string): UtilRow | null {
+    return capPlanModel()?.rows.find((u) => u.key === rowKey) ?? null;
 }

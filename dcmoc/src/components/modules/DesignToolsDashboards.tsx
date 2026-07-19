@@ -162,12 +162,17 @@ function FireZonesSection({ volumeM3, agent }: { volumeM3: number; agent: string
     );
 }
 
-/* ── CDU / liquid-cooling — Phase W rebuild ───────────────────────────────────
- * Sections: CDU sizing + hydraulics (models.cdu) · refrigerant selection
- * (DATA.refrigerants, shared capex refrigerantType) · PUE impact (pueMatrix
- * liquid vs air) · DEEP-SEA ADVANCED when the shared capex deep-sea tick is
- * ON (models.cooling.deepSea — flow, intake temp @depth, pumps, chiller-less
- * PUE, marine capex/opex) · full-standard PDF export. */
+/* ── CDU / liquid-cooling — Phase W rebuild + DE UIUX section cards ───────────
+ * Sections: (a) Sizing & Control (models.cdu.size) · (b) Hydraulics & Thermal
+ * table (models.cdu.hydraulics when present) · (c) Cooling Efficiency PUE
+ * mini-bars (DATA.pueMatrix liquid vs air delta) · (d) Refrigerant Selection
+ * (DATA.refrigerants 9 rows + selected-summary) · (e) DEEP-SEA ADVANCED when
+ * the shared capex deep-sea tick is ON (models.cooling.deepSea — flow, intake
+ * temp @depth, pumps, chiller-less PUE ≤1.15 basis, marine capex/opex) ·
+ * full-standard PDF export. Presentation/consumption only — no engine math. */
+function EngChip({ src }: { src: string }) {
+    return <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[8px] font-bold normal-case text-emerald-500" title={`Engine source: ${src}`}>{src}</span>;
+}
 export function CduDashboard() {
     const { inputs } = useCfg();
     const capexInputs = useCapexStore((s) => s.inputs);
@@ -196,6 +201,9 @@ export function CduDashboard() {
     if (!m) return <Loading />;
     const rich = !!m.hydraulics;
     const r = rich ? m.hydraulics({ itKw: inputs.itLoad, deltaTK: dT, supplyC: 20 }) : m.size({ itKw: inputs.itLoad, deltaT: dT });
+    /* Sizing plane always from models.cdu.size (CDU unit count + N+1) even when
+     * the rich hydraulics model drives the thermal table. */
+    const sz = typeof m.size === 'function' ? m.size({ itKw: inputs.itLoad, deltaT: dT }) : null;
     const liquid = inputs.coolingType === 'liquid' || inputs.coolingType === 'rdhx';
     const tierKey = 'tier' + inputs.tierLevel;
     const pueLiquid = data.pueMatrix?.directToChip?.[tierKey] ?? data.pueMatrix?.liquid?.[tierKey] ?? 1.15;
@@ -272,55 +280,89 @@ export function CduDashboard() {
             </div>
             {!liquid && <p className="text-[11px] text-amber-500">Current cooling is {inputs.coolingType} — CDU sizing shown for a liquid-cooled scenario.</p>}
 
-            {/* sizing + hydraulics */}
-            <div className="flex items-center gap-2 text-xs">
-                <span className="text-slate-500">ΔT (K)</span>
-                <input type="range" min={5} max={20} value={dT} onChange={(e) => setDT(Number(e.target.value))} className="accent-cyan-500"
-                    title={`Loop ΔT: ${dT} K`} />
-                <span className="tabular-nums text-slate-600 dark:text-slate-300">{dT} K</span>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <Metric label="Coolant Flow" value={`${(r.flowLpm as number).toLocaleString()} L/min`} sub={rich ? `${r.velocityMs} m/s` : `${r.flowM3h} m³/h`} />
-                <Metric label="Heat Load" value={`${(inputs.itLoad / 1000).toFixed(1)} MW`} sub="IT load" />
-                {rich
-                    ? <Metric label="Pressure Drop" value={`${r.dpBar} bar`} sub={`Re ${(r.reynolds as number).toLocaleString()}`} />
-                    : <Metric label="CDU Units" value={`${r.cduUnits}`} sub={`${r.cduUnitsRedundant} with N+1`} />}
-                {rich
-                    ? <Metric label="Pump Power" value={`${r.pumpKw} kW`} sub={`${r.pumpsNplus1} pumps N+1`} />
-                    : <Metric label="ΔT" value={`${r.deltaT} K`} sub="supply→return" />}
-            </div>
-            {rich && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    <Metric label="Dew-Point Margin" value={`${r.dewMarginK} K`} sub={r.dewSafeOk ? '✓ no condensation' : '⚠ condensation risk'} />
-                    <Metric label="Dew Point" value={`${r.dewPointC} °C`} sub="at supply temp" />
-                    <Metric label="HX Approach" value={`${r.hxApproachK} K`} sub="facility → technical" />
+            {/* (a) Sizing & Control — models.cdu.size live */}
+            <Card>
+                <h3 className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                    Sizing &amp; Control <EngChip src="models.cdu.size" />
+                </h3>
+                <div className="mb-2 flex items-center gap-2 text-xs">
+                    <span className="text-slate-500">Loop ΔT (K)</span>
+                    <input type="range" min={5} max={20} value={dT} onChange={(e) => setDT(Number(e.target.value))} className="accent-cyan-500"
+                        title={`Loop ΔT setpoint: ${dT} K (supply→return)`} />
+                    <span className="tabular-nums text-slate-600 dark:text-slate-300">{dT} K</span>
                 </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <Metric label="Coolant Flow" value={`${(r.flowLpm as number).toLocaleString()} L/min`} sub={rich ? `${r.velocityMs} m/s` : `${r.flowM3h} m³/h`} />
+                    <Metric label="Heat Load" value={`${(inputs.itLoad / 1000).toFixed(1)} MW`} sub="IT load (project config)" />
+                    {sz
+                        ? <Metric label="CDU Units" value={`${sz.cduUnits}`} sub={`${sz.cduUnitsRedundant} with N+1`} />
+                        : !rich && <Metric label="CDU Units" value={`${r.cduUnits}`} sub={`${r.cduUnitsRedundant} with N+1`} />}
+                    <Metric label="ΔT Setpoint" value={`${dT} K`} sub="supply→return control" />
+                </div>
+            </Card>
+
+            {/* (b) Hydraulics & Thermal — table, only when the rich model exists */}
+            {rich && (
+                <Card>
+                    <h3 className="mb-1.5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                        Hydraulics &amp; Thermal <EngChip src="models.cdu.hydraulics" />
+                        <span className="text-[9px] normal-case text-slate-400">Darcy-Weisbach / Haaland + Magnus dew point</span>
+                    </h3>
+                    <table className="w-full text-[10.5px]">
+                        <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Metric</th><th className="text-right">Value</th><th className="pl-3 text-left">Basis</th></tr></thead>
+                        <tbody>
+                            {([
+                                ['Coolant flow', `${(r.flowLpm as number).toLocaleString()} L/min · ${r.velocityMs} m/s`, `ΔT ${dT} K loop`],
+                                ['Reynolds / friction', `Re ${(r.reynolds as number).toLocaleString()} · f ${r.frictionFactor}`, (r.reynolds as number) >= 2300 ? 'turbulent (Haaland)' : 'laminar (64/Re)'],
+                                ['Pressure drop / head', `${r.dpBar} bar ≈ ${(Number(r.dpBar) * 10.1972).toFixed(1)} m H₂O`, 'Darcy-Weisbach'],
+                                ['Pump power', `${r.pumpKw} kW · ${r.pumpsNplus1} pumps (N+1)`, 'hydraulic / pump·motor eff'],
+                                ['Dew point / margin', `${r.dewPointC} °C · margin ${r.dewMarginK} K`, r.dewSafeOk ? '✓ no condensation' : '⚠ condensation risk'],
+                                ['HX approach', `${r.hxApproachK} K`, 'facility → technical loop'],
+                            ] as [string, string, string][]).map(([lbl, val, basis]) => (
+                                <tr key={lbl} className="border-b border-slate-100 dark:border-slate-800/60">
+                                    <td className="py-1 text-slate-700 dark:text-slate-200">{lbl}</td>
+                                    <td className="text-right tabular-nums text-slate-600 dark:text-slate-300">{val}</td>
+                                    <td className="pl-3 text-[9px] text-slate-400">{basis}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </Card>
             )}
 
-            {/* PUE impact */}
+            {/* (c) Cooling Efficiency — PUE mini-bars, liquid vs air delta */}
             <Card>
-                <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">PUE Impact (engine pueMatrix · Tier {inputs.tierLevel})</h3>
-                <div className="grid grid-cols-3 gap-3 text-center">
-                    <div title={`Air cooling PUE at Tier ${inputs.tierLevel}: ${pueAir}`}>
-                        <div className="text-lg font-bold tabular-nums text-slate-500">{pueAir}</div>
-                        <div className="text-[9px] uppercase text-slate-400">Air (CRAC/CRAH)</div>
-                    </div>
-                    <div title={`Direct-to-chip liquid PUE at Tier ${inputs.tierLevel}: ${pueLiquid}`}>
-                        <div className="text-lg font-bold tabular-nums text-cyan-500">{pueLiquid}</div>
-                        <div className="text-[9px] uppercase text-slate-400">D2C Liquid</div>
-                    </div>
-                    <div title={`Current (${inputs.coolingType}) PUE: ${pueCurrent}`}>
-                        <div className="text-lg font-bold tabular-nums text-violet-500">{pueCurrent}</div>
-                        <div className="text-[9px] uppercase text-slate-400">Current ({inputs.coolingType})</div>
-                    </div>
+                <h3 className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                    Cooling Efficiency <EngChip src="DATA.pueMatrix" />
+                    <span className="text-[9px] normal-case text-slate-400">Tier {inputs.tierLevel} column</span>
+                </h3>
+                <div className="space-y-1.5">
+                    {([
+                        { lbl: 'Air (CRAC/CRAH)', pue: pueAir, tone: 'bg-slate-400' },
+                        { lbl: `Current (${inputs.coolingType})`, pue: pueCurrent, tone: 'bg-violet-500' },
+                        { lbl: 'D2C Liquid', pue: pueLiquid, tone: 'bg-cyan-500' },
+                    ]).map((row) => (
+                        <div key={row.lbl} className="flex items-center gap-2 text-[11px]" title={`${row.lbl} PUE at Tier ${inputs.tierLevel}: ${row.pue} (engine pueMatrix)`}>
+                            <span className="w-32 truncate text-slate-600 dark:text-slate-300">{row.lbl}</span>
+                            <div className="h-2.5 flex-1 overflow-hidden rounded bg-slate-100 dark:bg-slate-800">
+                                <div className={`h-2.5 rounded ${row.tone}`} style={{ width: `${Math.min(100, Math.max(4, ((row.pue - 1) / (Math.max(pueAir, pueCurrent, pueLiquid) - 1)) * 100))}%` }} />
+                            </div>
+                            <span className="w-12 text-right font-bold tabular-nums text-slate-700 dark:text-slate-200">{row.pue}</span>
+                        </div>
+                    ))}
                 </div>
-                <p className="mt-1.5 text-[9px] text-slate-400">Liquid vs air saves ≈ {(inputs.itLoad / 1000 * (pueAir - pueLiquid)).toFixed(2)} MW facility power at this IT load.</p>
+                <p className="mt-1.5 text-[9px] text-slate-400">
+                    Liquid vs air Δ = {(pueAir - pueLiquid).toFixed(2)} PUE ≈ {(inputs.itLoad / 1000 * (pueAir - pueLiquid)).toFixed(2)} MW facility power saved at this IT load. Bars scale (PUE − 1) overhead share.
+                </p>
             </Card>
 
             {/* refrigerant selection */}
             {Object.keys(refDb).length > 0 && (
                 <Card>
-                    <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Refrigerant Selection <span className="normal-case text-[9px] text-emerald-500">engine GWP/COP database · shared capex field</span></h3>
+                    <h3 className="mb-1.5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                        Refrigerant Selection <EngChip src="DATA.refrigerants" />
+                        <span className="text-[9px] normal-case text-slate-400">{Object.keys(refDb).length} refrigerants · shared capex field</span>
+                    </h3>
                     <div className="overflow-x-auto">
                         <table className="w-full text-[10.5px]">
                             <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Refrigerant</th><th className="text-right">GWP</th><th className="text-center">Safety</th><th className="text-right">COP idx</th><th className="text-right">CAPEX ×</th><th className="text-left pl-2">Note</th></tr></thead>
@@ -340,6 +382,20 @@ export function CduDashboard() {
                             </tbody>
                         </table>
                     </div>
+                    {/* selected-summary row */}
+                    {refDb[refKey] && (
+                        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-cyan-500/30 bg-cyan-500/5 px-2.5 py-1.5 text-[10px]"
+                            title={`Selected refrigerant summary — ${capexInputs.refrigerantType ? 'user-selected (shared capex field)' : `engine auto-select for ${inputs.coolingType} cooling (DATA.refrigerantAutoByCooling)`}`}>
+                            <span className="font-semibold text-cyan-600 dark:text-cyan-400">Selected: {refDb[refKey].label}</span>
+                            <span className="text-slate-500">GWP <b className="tabular-nums">{refDb[refKey].gwp}</b></span>
+                            <span className="text-slate-500">Safety <b>{refDb[refKey].safety}</b></span>
+                            <span className="text-slate-500">COP idx <b className="tabular-nums">{refDb[refKey].copIndex}</b></span>
+                            <span className="text-slate-500">CAPEX × <b className="tabular-nums">{refDb[refKey].capexMult}</b></span>
+                            <span className={`rounded px-1 py-0.5 text-[8.5px] font-semibold ${capexInputs.refrigerantType ? 'bg-violet-500/15 text-violet-500' : 'bg-emerald-500/15 text-emerald-500'}`}>
+                                {capexInputs.refrigerantType ? 'user' : `auto (${inputs.coolingType})`}
+                            </span>
+                        </div>
+                    )}
                 </Card>
             )}
 
@@ -371,7 +427,7 @@ export function CduDashboard() {
                         <Metric label="Seawater Flow" value={`${ds.flow.m3s} m³/s`} sub={`${ds.flow.m3h.toLocaleString()} m³/h`} />
                         <Metric label="Intake Temp" value={`${ds.intakeTempC} °C`} sub={`@ ${ds.depthM} m depth`} />
                         <Metric label="Pumps" value={`${ds.pumps.duty}+1 × ${ds.pumps.perPumpKw} kW`} sub={`head ${ds.pumps.headM} m`} />
-                        <Metric label="PUE (chiller-less)" value={String(ds.pue)} sub={`pPUE ${ds.pPUE} · WUE 0`} />
+                        <Metric label="PUE (chiller-less)" value={String(ds.pue)} sub={`pPUE ${ds.pPUE} · WUE 0 · basis ≤1.15`} />
                         <Metric label="Marine CAPEX" value={`$${(ds.capex.total / 1e6).toFixed(1)}M`} sub={`$${(ds.capex.perMw / 1e3).toFixed(0)}K/MW`} />
                         <Metric label="vs Baseline Cooling" value={`${ds.capex.vsBaselineCooling >= 0 ? '+' : ''}$${(ds.capex.vsBaselineCooling / 1e6).toFixed(1)}M`} sub="capex delta" />
                         <Metric label="OPEX" value={`$${(ds.opex.totalYr / 1e6).toFixed(2)}M/yr`} sub={`pumps ${ds.opex.pumpMwhYr.toLocaleString()} MWh/yr`} />
