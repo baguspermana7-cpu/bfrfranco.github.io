@@ -107,6 +107,17 @@ Every engine figure is traceable to the shared engine + its `DATA.sources`
 citation. Financial/decision outputs are educational/engineering guidance, not
 investment or professional advice.
 
+## 8. Engine & Data Reference — AUTO-GENERATED
+The Knowledge Base "Engine Models" tab and the FAQ "Engine & Data Reference"
+section render `src/lib/engine-catalog.json`, which is GENERATED from
+`rz-engine.js` by `tools/build-engine-catalog.mjs` (every model namespace,
+function, parameter list, data source, and the real consumers auto-detected
+from usage). A staleness gate (`tools/test-value-bindings.mjs`) blocks any
+engine change that skips regeneration — this reference cannot drift and is
+never hand-edited. PDF exports end with an algorithmic Executive Assessment
+(profile chip + narrative + prioritized actions) computed from the page's live
+numbers by `src/modules/reporting/pdf/ReportNarrative.ts`.
+
 ---
 *Status 2026-07-17: Financial + AI Decision + orchestrator engine-sourced and
 verified; remaining engines scheduled per `standarization/DCMOC_DCOS_STANDARD.md`.*

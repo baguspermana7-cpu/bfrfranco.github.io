@@ -9,6 +9,8 @@ import { useRequirementsStore } from '@/store/requirements';
 import { rzModels } from '@/lib/rz-engine';
 import { USE_CASE_TO_ENGINE } from '@/lib/requirementsMappings';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
+import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { SectionCard } from '../ui';
 import { FileDown } from 'lucide-react';
 import type { ReqDerived } from '../useRequirementsDerived';
@@ -27,6 +29,12 @@ export function SummarySection({ derived }: { derived: ReqDerived }) {
     const exportPdf = async () => {
         setBusy(true);
         try {
+            const haveCount = v?.have.length ?? 0;
+            const missingCount = v?.missing.length ?? 0;
+            const narrativeMetrics = {
+                completenessPct: haveCount + missingCount > 0 ? Math.round((haveCount / (haveCount + missingCount)) * 100) : derived.score,
+                flagsCount: v?.flags.length ?? 0,
+            };
             await generatePillarPDF({
                 title: 'Requirements & Workload', layer: 'Layer 1 · Requirements Intake', project: req.overview.projectName || country?.name || '—',
                 kpis: [
@@ -76,7 +84,9 @@ export function SummarySection({ derived }: { derived: ReqDerived }) {
                         tone: f.severity === 'critical' ? ('warn' as const) : ('info' as const),
                     }))
                     : [{ title: 'Validation Clean', body: 'All engine validation checks pass.', tone: 'good' as const }],
+                assessment: buildAssessment('requirements', narrativeMetrics),
                 actions: [
+                    ...buildActions('requirements', narrativeMetrics),
                     ...(v?.flags ?? []).map((f) => ({
                         priority: f.severity === 'critical' ? ('HIGH' as const) : ('MEDIUM' as const),
                         action: `Resolve: ${f.message}`,
@@ -92,7 +102,7 @@ export function SummarySection({ derived }: { derived: ReqDerived }) {
                     { label: 'CAGR (5y)', value: `${derived.cagrPct}%` },
                 ],
                 note: `Engine-real intake validation (models.requirements). ${derived.scoreBand.sub} Budgetary screening — not a design basis.`,
-            });
+            } as StandardReport);
         } finally { setBusy(false); }
     };
 

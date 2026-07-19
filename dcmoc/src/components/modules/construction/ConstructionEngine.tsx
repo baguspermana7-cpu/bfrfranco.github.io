@@ -17,6 +17,8 @@ import { plannedSchedule, evm, pvCurve, procurementRows, manpowerCurve, healthSc
 import { CreatableCombobox, type ComboValue } from '@/components/ui/CreatableCombobox';
 import GanttChart from '@/components/visualizations/GanttChart';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
+import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { fmtMoney } from '@/lib/format';
 import { HardHat, ChevronRight, FileDown } from 'lucide-react';
 
@@ -54,6 +56,7 @@ export function ConstructionEngine() {
     const exportPdf = async () => {
         setBusy(true);
         try {
+            const narrativeMetrics = { spi: e.spi, cpi: e.cpi };
             await generatePillarPDF({
                 title: 'Construction', layer: 'Layer 6 · Construction Engine', project: '—',
                 kpis: [
@@ -88,10 +91,14 @@ export function ConstructionEngine() {
                         tone: health.score >= 85 ? ('good' as const) : health.score >= 65 ? ('info' as const) : ('warn' as const),
                     }] : []),
                 ],
-                actions: t.risks.filter((r) => r.status !== 'closed').slice(0, 5).map((r) => ({
-                    priority: r.impact === 'high' ? ('HIGH' as const) : r.impact === 'medium' ? ('MEDIUM' as const) : ('LOW' as const),
-                    action: `${r.risk} — impact ${r.impact}, probability ${r.probability}, ${r.status}${r.isExample ? ' (example)' : ''}`,
-                })),
+                assessment: buildAssessment('construction', narrativeMetrics),
+                actions: [
+                    ...buildActions('construction', narrativeMetrics),
+                    ...t.risks.filter((r) => r.status !== 'closed').slice(0, 5).map((r) => ({
+                        priority: r.impact === 'high' ? ('HIGH' as const) : r.impact === 'medium' ? ('MEDIUM' as const) : ('LOW' as const),
+                        action: `${r.risk} — impact ${r.impact}, probability ${r.probability}, ${r.status}${r.isExample ? ' (example)' : ''}`,
+                    })),
+                ],
                 summaryBand: [
                     { label: 'Progress', value: `${e.overallPct}%` },
                     { label: 'Planned', value: `M${sched.totalMonths}` },
@@ -101,7 +108,7 @@ export function ConstructionEngine() {
                     { label: 'AC Spent', value: fmtMoney(e.acUsd) },
                 ],
                 note: 'Planned plane engine-real (CPM schedule + long-lead data); actuals user-entered; EVM deterministic. Lead times: 2024-26 supply-constrained market.',
-            });
+            } as StandardReport);
         } finally { setBusy(false); }
     };
 

@@ -23,6 +23,8 @@ import { ReportDashboard } from '@/components/modules/ReportDashboard';
 import { fmtMoney } from '@/lib/format';
 import { Trophy, ChevronRight, FileDown } from 'lucide-react';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
+import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 
 interface Dim { key: string; label: string; score: number; weight: number; basis: string }
 
@@ -111,6 +113,8 @@ export function ResultsEnginePage() {
         if (!model || !capexResults) return;
         setBusy(true);
         try {
+            const ranked = [...model.dims].sort((a, b) => b.score - a.score);
+            const narrativeMetrics = { score: model.overall, strongest: ranked[0]?.label, weakest: ranked[ranked.length - 1]?.label };
             await generatePillarPDF({
                 title: 'Results Scorecard', layer: 'Results Engine', project: req.overview.projectName || 'DC-OS Project',
                 kpis: [
@@ -139,10 +143,14 @@ export function ResultsEnginePage() {
                         ],
                     },
                 ],
-                actions: model.recs.map((r, i) => ({ priority: (i === 0 ? 'HIGH' : i < 3 ? 'MEDIUM' : 'LOW') as 'HIGH' | 'MEDIUM' | 'LOW', action: r })),
+                assessment: buildAssessment('results', narrativeMetrics),
+                actions: [
+                    ...buildActions('results', narrativeMetrics),
+                    ...model.recs.map((r, i) => ({ priority: (i === 0 ? 'HIGH' : i < 3 ? 'MEDIUM' : 'LOW') as 'HIGH' | 'MEDIUM' | 'LOW', action: r })),
+                ],
                 summaryBand: model.dims.slice(0, 6).map((d) => ({ label: d.label, value: String(d.score) })),
                 note: 'Composite scorecard — every dimension score is a documented deterministic composite from the engine/adapters; planning screening, not an audit.',
-            });
+            } as StandardReport);
         } finally { setBusy(false); }
     };
 

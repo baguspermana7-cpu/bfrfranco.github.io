@@ -24,6 +24,7 @@ export interface DiagBlock {
     sub?: string;
     badge?: string;
     glyphs?: number;         // repeated unit glyphs (≤6) inside the block
+    units?: number;          // REAL unit count (cascade ×N badge when > glyph cap)
     lane: 'power' | 'gen' | 'cooling' | 'it' | 'bms';
     kind?: SymbolKind;       // dynamic symbol palette key
     hover?: string;          // exact-value hover title
@@ -95,11 +96,11 @@ export function computeLayout(a: ArchInputs, eq: EquipCounts, f: FacilityCalc, e
     const txCount = Math.max(1, eq.transformers ?? Math.ceil(f.itMw / 2.5));
     const txPer = Math.ceil(txCount / (dual ? 2 : 1));
     if (dual) {
-        blocks.push({ id: 'txA', x: COL_X(2), y: PY, w: BW, h: 46, title: 'Transformers A', sub: `${txPer}× MV/LV`, glyphs: glyphCap(txPer), lane: 'power', kind: 'transformer', hover: `Transformer bank A — ${txPer}× ${a.gridVoltage}/LV` });
-        blocks.push({ id: 'txB', x: COL_X(2), y: PY + 62, w: BW, h: 46, title: 'Transformers B', sub: `${txPer}× MV/LV`, glyphs: glyphCap(txPer), lane: 'power', kind: 'transformer', hover: `Transformer bank B — ${txPer}× ${a.gridVoltage}/LV` });
+        blocks.push({ id: 'txA', x: COL_X(2), y: PY, w: BW, h: 46, title: 'Transformers A', sub: `${txPer}× MV/LV`, units: txPer, glyphs: glyphCap(txPer), lane: 'power', kind: 'transformer', hover: `Transformer bank A — ${txPer}× ${a.gridVoltage}/LV` });
+        blocks.push({ id: 'txB', x: COL_X(2), y: PY + 62, w: BW, h: 46, title: 'Transformers B', sub: `${txPer}× MV/LV`, units: txPer, glyphs: glyphCap(txPer), lane: 'power', kind: 'transformer', hover: `Transformer bank B — ${txPer}× ${a.gridVoltage}/LV` });
         edges.push({ from: 'mvA', to: 'txA', kind: 'normal' }, { from: 'mvB', to: 'txB', kind: 'normal' });
     } else {
-        blocks.push({ id: 'txA', x: COL_X(2), y: PY + 30, w: BW, h: 46, title: 'Transformers', sub: `${txCount}× MV/LV`, glyphs: glyphCap(txCount), lane: 'power', kind: 'transformer', hover: `Transformers — ${txCount}× ${a.gridVoltage}/LV` });
+        blocks.push({ id: 'txA', x: COL_X(2), y: PY + 30, w: BW, h: 46, title: 'Transformers', sub: `${txCount}× MV/LV`, units: txCount, glyphs: glyphCap(txCount), lane: 'power', kind: 'transformer', hover: `Transformers — ${txCount}× ${a.gridVoltage}/LV` });
         edges.push({ from: 'mvA', to: 'txA', kind: 'normal' });
     }
     // A/B bus bars (reference idiom): between transformers and UPS
@@ -113,11 +114,11 @@ export function computeLayout(a: ArchInputs, eq: EquipCounts, f: FacilityCalc, e
     const battMin = a.tier >= 4 ? 10 : a.tier === 3 ? 8 : 5;   // typical autonomy minutes per tier class (screening)
     const upsPer = Math.ceil(eq.ups_modules / (dual ? 2 : 1));
     if (dual) {
-        blocks.push({ id: 'upsA', x: COL_X(3), y: PY, w: BW, h: 46, title: 'UPS System A', sub: `${upsPer}× ${mwPerUps.toFixed(2)} MW · batt ${battMin} min`, glyphs: glyphCap(upsPer), lane: 'power', kind: 'ups', hover: `UPS A — ${upsPer} modules × ${mwPerUps.toFixed(2)} MW, battery ≈${battMin} min (Tier ${a.tier} screening)` });
-        blocks.push({ id: 'upsB', x: COL_X(3), y: PY + 62, w: BW, h: 46, title: 'UPS System B', sub: `${upsPer}× ${mwPerUps.toFixed(2)} MW · batt ${battMin} min`, glyphs: glyphCap(upsPer), lane: 'power', kind: 'ups', hover: `UPS B — ${upsPer} modules × ${mwPerUps.toFixed(2)} MW, battery ≈${battMin} min` });
+        blocks.push({ id: 'upsA', x: COL_X(3), y: PY, w: BW, h: 46, title: 'UPS System A', sub: `${upsPer}× ${mwPerUps.toFixed(2)} MW · batt ${battMin} min`, units: upsPer, glyphs: glyphCap(upsPer), lane: 'power', kind: 'ups', hover: `UPS A — ${upsPer} modules × ${mwPerUps.toFixed(2)} MW, battery ≈${battMin} min (Tier ${a.tier} screening)` });
+        blocks.push({ id: 'upsB', x: COL_X(3), y: PY + 62, w: BW, h: 46, title: 'UPS System B', sub: `${upsPer}× ${mwPerUps.toFixed(2)} MW · batt ${battMin} min`, units: upsPer, glyphs: glyphCap(upsPer), lane: 'power', kind: 'ups', hover: `UPS B — ${upsPer} modules × ${mwPerUps.toFixed(2)} MW, battery ≈${battMin} min` });
         edges.push({ from: 'txA', to: 'upsA', kind: 'normal' }, { from: 'txB', to: 'upsB', kind: 'normal' });
     } else {
-        blocks.push({ id: 'upsA', x: COL_X(3), y: PY + 30, w: BW, h: 46, title: 'UPS System', sub: `${eq.ups_modules}× ${mwPerUps.toFixed(2)} MW (+1 spare) · batt ${battMin} min`, glyphs: glyphCap(eq.ups_modules), lane: 'power', kind: 'ups', hover: `UPS — ${eq.ups_modules} modules × ${mwPerUps.toFixed(2)} MW (+1 spare)` });
+        blocks.push({ id: 'upsA', x: COL_X(3), y: PY + 30, w: BW, h: 46, title: 'UPS System', sub: `${eq.ups_modules}× ${mwPerUps.toFixed(2)} MW (+1 spare) · batt ${battMin} min`, units: eq.ups_modules, glyphs: glyphCap(eq.ups_modules), lane: 'power', kind: 'ups', hover: `UPS — ${eq.ups_modules} modules × ${mwPerUps.toFixed(2)} MW (+1 spare)` });
         edges.push({ from: 'txA', to: 'upsA', kind: 'normal' });
     }
     // stage 4 — PDU groups (lettered per path)
@@ -159,7 +160,7 @@ export function computeLayout(a: ArchInputs, eq: EquipCounts, f: FacilityCalc, e
 
     /* ── generation lane ── */
     const GY = PY + 152;
-    blocks.push({ id: 'gens', x: COL_X(0), y: GY, w: BW, h: 46, title: 'Generation', sub: `${eq.generators}× gensets ${spare ? '(dual+spare)' : a.redundancy}`, glyphs: glyphCap(eq.generators), lane: 'gen', kind: 'genset', hover: `Standby generation — ${eq.generators} gensets, ${a.redundancy}` });
+    blocks.push({ id: 'gens', x: COL_X(0), y: GY, w: BW, h: 46, title: 'Generation', sub: `${eq.generators}× gensets ${spare ? '(dual+spare)' : a.redundancy}`, units: eq.generators, glyphs: glyphCap(eq.generators), lane: 'gen', kind: 'genset', hover: `Standby generation — ${eq.generators} gensets, ${a.redundancy}` });
     blocks.push({ id: 'fuel', x: COL_X(1), y: GY, w: BW, h: 46, title: 'Fuel Farm', sub: `${a.fuelHours} h autonomy`, lane: 'gen', kind: 'fuel', hover: `Fuel storage — ${a.fuelHours} hours full-load autonomy` });
     edges.push({ from: 'fuel', to: 'gens', kind: 'backup' });
     edges.push({ from: 'gens', to: 'mvA', kind: 'backup' });
@@ -170,7 +171,7 @@ export function computeLayout(a: ArchInputs, eq: EquipCounts, f: FacilityCalc, e
     if (liquid) {
         const loops = Math.max(1, paths);
         const cduPerLoop = Math.ceil(eq.pumps / Math.max(1, loops));
-        blocks.push({ id: 'coolplant', x: COL_X(2), y: CY, w: BW, h: 46, title: 'CDU Plant (Liquid)', sub: `${loops}× loops · ${cduPerLoop} CDU/loop`, glyphs: glyphCap(loops), lane: 'cooling', kind: 'cdu', hover: `Liquid cooling — ${loops} CDU loops × ${cduPerLoop} CDUs` });
+        blocks.push({ id: 'coolplant', x: COL_X(2), y: CY, w: BW, h: 46, title: 'CDU Plant (Liquid)', sub: `${loops}× loops · ${cduPerLoop} CDU/loop`, units: loops, glyphs: glyphCap(loops), lane: 'cooling', kind: 'cdu', hover: `Liquid cooling — ${loops} CDU loops × ${cduPerLoop} CDUs` });
         blocks.push({ id: 'heatrej', x: COL_X(3), y: CY, w: BW, h: 46, title: 'Heat Rejection', sub: `${eq.chillers}× units`, lane: 'cooling', kind: 'coolingTower', hover: `Heat rejection — ${eq.chillers} units` });
         edges.push({ from: 'coolplant', to: 'heatrej', kind: 'coolSupply' });
         edges.push({ from: 'heatrej', to: 'coolplant', kind: 'coolReturn', offset: 6 });
@@ -179,7 +180,7 @@ export function computeLayout(a: ArchInputs, eq: EquipCounts, f: FacilityCalc, e
         });
         edges.push({ from: cells[0]?.id ?? 'itload', to: 'coolplant', kind: 'coolReturn', offset: 10 });
     } else {
-        blocks.push({ id: 'coolplant', x: COL_X(2), y: CY, w: BW, h: 46, title: 'Chiller Plant', sub: `${eq.chillers}× chillers ${a.redundancy}`, glyphs: glyphCap(eq.chillers), lane: 'cooling', kind: 'chiller', hover: `Chiller plant — ${eq.chillers} chillers, ${a.redundancy}` });
+        blocks.push({ id: 'coolplant', x: COL_X(2), y: CY, w: BW, h: 46, title: 'Chiller Plant', sub: `${eq.chillers}× chillers ${a.redundancy}`, units: eq.chillers, glyphs: glyphCap(eq.chillers), lane: 'cooling', kind: 'chiller', hover: `Chiller plant — ${eq.chillers} chillers, ${a.redundancy}` });
         blocks.push({ id: 'crah', x: COL_X(3), y: CY, w: BW, h: 46, title: 'CRAH / AHU', sub: `${eq.ahu + eq.cooling_units}× units`, lane: 'cooling', kind: 'crah', hover: `Air distribution — ${eq.ahu + eq.cooling_units} CRAH/AHU units` });
         edges.push({ from: 'coolplant', to: 'crah', kind: 'coolSupply' });
         edges.push({ from: 'crah', to: 'coolplant', kind: 'coolReturn', offset: 6 });

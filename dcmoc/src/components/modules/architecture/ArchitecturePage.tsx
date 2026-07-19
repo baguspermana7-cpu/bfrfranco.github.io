@@ -20,6 +20,8 @@ import { DiagramSvg } from './diagram/DiagramSvg';
 import { ArchRail } from './ArchRail';
 import { ThermalTopologyRow, BomSection, BottomCards } from './ArchSections';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
+import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { useScenarioStore } from '@/store/scenario';
 import { getPUE } from '@/constants/pue';
 import { Boxes, FileDown, Save, ChevronRight } from 'lucide-react';
@@ -101,6 +103,13 @@ export function ArchitecturePage() {
     const onExport = async () => {
         setBusy(true);
         try {
+            const narrativeMetrics = {
+                layersPassed: layers.filter((l) => l.pass).length,
+                layersTotal: layers.length,
+                redundancy: i.redundancy,
+                cooling: i.coolingType,
+                tier: String(i.tier),
+            };
             await generatePillarPDF({
                 title: 'Architecture', layer: 'Layer 3 · Architecture Engine', project: country?.name ?? '—',
                 kpis: [
@@ -131,7 +140,9 @@ export function ArchitecturePage() {
                         title: `${l.label} — Review Required`, body: l.note, tone: 'warn' as const,
                     })),
                 ],
+                assessment: buildAssessment('architecture', narrativeMetrics),
                 actions: [
+                    ...buildActions('architecture', narrativeMetrics),
                     ...layers.filter((l) => !l.pass).map((l) => ({ priority: 'HIGH' as const, action: `Resolve ${l.label} review item — ${l.note}` })),
                     { priority: 'MEDIUM' as const, action: 'Review architecture with stakeholders' },
                     { priority: 'MEDIUM' as const, action: 'Proceed to Capacity Planning Engine' },
@@ -147,7 +158,7 @@ export function ArchitecturePage() {
                     { label: 'Redundancy', value: i.redundancy },
                 ],
                 note: 'Engine-real architecture screening (models.architecture + equipScale). Pattern reference — not a certified design.',
-            });
+            } as StandardReport);
         } finally { setBusy(false); }
     };
 

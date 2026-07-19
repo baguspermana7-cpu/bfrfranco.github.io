@@ -23,6 +23,8 @@ import { REDUNDANCY_KEY } from '@/state/registry';
 import { ReliabilityDashboard } from '@/components/modules/ReliabilityDashboard';
 import { TierDashboard } from '@/components/modules/DesignToolsDashboards';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
+import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { ShieldCheck, ChevronRight, FileDown } from 'lucide-react';
 import { Explain } from '@/components/ui/Explain';
 
@@ -158,6 +160,7 @@ export function ReliabilityEnginePage() {
     const onExport = async () => {
         setBusy(true);
         try {
+            const relMetrics = { availPct: model.overall * 100, targetPct: model.tierTargetFrac * 100, spofCount: model.spof.length };
             await generatePillarPDF({
                 title: 'Reliability Engine', layer: 'Layer 10 · Reliability', project: country?.name ?? '—',
                 kpis: [
@@ -195,8 +198,18 @@ export function ReliabilityEnginePage() {
                         ? below.map((s) => ({ title: `${s.label} below tier budget`, body: `${fmtAvail(s.availability)} vs Tier ${inputs.tierLevel} target ${fmtAvail(model.tierTargetFrac)} — review ${s.chain}.`, tone: 'warn' as const }))
                         : [{ title: 'All systems within tier budget', body: `Every composed system meets or is within 10× of the Tier ${inputs.tierLevel} unavailability budget at ${inputs.powerRedundancy}.`, tone: 'good' as const }];
                 })(),
+                assessment: buildAssessment('reliability', relMetrics),
+                actions: buildActions('reliability', relMetrics),
+                summaryBand: [
+                    { label: 'Availability', value: fmtAvail(model.overall) },
+                    { label: 'Target', value: fmtAvail(model.tierTargetFrac) },
+                    { label: 'Downtime /yr', value: fmtDowntime(model.downtimeMin) },
+                    { label: 'MTTR (avg)', value: `${model.mttrAvg} h` },
+                    { label: 'SPOF', value: String(model.spof.length) },
+                    { label: 'Score', value: `${model.score}/100` },
+                ],
                 note: 'IEEE-493 component-MTBF/MTTR screening composed at the current redundancy, with a β=5% common-cause screening factor (assumption). Planned maintenance windows are excluded from the tier availability basis (Tier III/IV = concurrently maintainable); figures are unplanned-outage screening only — not a certified reliability study.',
-            });
+            } as StandardReport);
         } finally { setBusy(false); }
     };
 

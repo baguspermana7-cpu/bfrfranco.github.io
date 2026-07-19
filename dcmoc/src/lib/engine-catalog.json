@@ -1,0 +1,1873 @@
+{
+ "generator": "tools/build-engine-catalog.mjs",
+ "note": "AUTO-GENERATED from rz-engine.js — do not hand-edit. Consumers are grep-derived from real usage.",
+ "dataVersion": "2.5.1",
+ "modelCount": 34,
+ "functionCount": 160,
+ "sourceCount": 85,
+ "namespaces": [
+  {
+   "name": "aiFactory",
+   "functions": [
+    {
+     "name": "gpuBuild",
+     "params": [
+      "inp"
+     ]
+    },
+    {
+     "name": "readiness",
+     "params": [
+      "inp"
+     ]
+    }
+   ],
+   "consumers": [
+    "article-18.html",
+    "article-23.html"
+   ]
+  },
+  {
+   "name": "architecture",
+   "functions": [
+    {
+     "name": "band",
+     "params": [
+      "index"
+     ]
+    },
+    {
+     "name": "complexity",
+     "params": [
+      "inp"
+     ]
+    },
+    {
+     "name": "designFee",
+     "params": [
+      "constructionCapex",
+      "band"
+     ]
+    },
+    {
+     "name": "disciplines",
+     "params": [
+      "inp"
+     ]
+    },
+    {
+     "name": "floorLoading",
+     "params": [
+      "coolingType"
+     ]
+    },
+    {
+     "name": "thermalCheck",
+     "params": [
+      "inp"
+     ]
+    },
+    {
+     "name": "topology",
+     "params": [
+      "tier"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/components/modules/architecture/ArchitecturePage.tsx"
+   ]
+  },
+  {
+   "name": "asset",
+   "functions": [
+    {
+     "name": "designLife",
+     "params": [
+      "assetClass"
+     ]
+    },
+    {
+     "name": "failureProbability",
+     "params": [
+      "assetClass",
+      "ageYears"
+     ]
+    },
+    {
+     "name": "healthIndex",
+     "params": [
+      "inp"
+     ]
+    },
+    {
+     "name": "replacementSchedule",
+     "params": [
+      "component",
+      "itLoadKw",
+      "horizonYears"
+     ]
+    },
+    {
+     "name": "status",
+     "params": [
+      "health"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/lib/provenance/moduleSources.ts",
+    "dcmoc/src/lib/value-bindings.ts"
+   ]
+  },
+  {
+   "name": "capacity",
+   "functions": [
+    {
+     "name": "bindingConstraint",
+     "params": [
+      "committedKw",
+      "rackKw",
+      "whiteFloorM2"
+     ]
+    },
+    {
+     "name": "facilityLoad",
+     "params": [
+      "itLoadKw",
+      "coolingType",
+      "tier"
+     ]
+    },
+    {
+     "name": "occupancyAt",
+     "params": [
+      "ramp",
+      "year"
+     ]
+    },
+    {
+     "name": "occupancyScurve",
+     "params": [
+      "year",
+      "marketType"
+     ]
+    },
+    {
+     "name": "preset",
+     "params": [
+      "size"
+     ]
+    },
+    {
+     "name": "strandedCapacity",
+     "params": [
+      "committedKw",
+      "occupancy"
+     ]
+    },
+    {
+     "name": "totalMw",
+     "params": [
+      "phases"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/lib/provenance/moduleSources.ts",
+    "dcmoc/src/state/adapters/capacity-adapter.ts"
+   ]
+  },
+  {
+   "name": "capex",
+   "functions": [
+    {
+     "name": "accuracyRange",
+     "params": [
+      "pointEstimate",
+      "estimateClass"
+     ]
+    },
+    {
+     "name": "datacenterBuildCost",
+     "params": [
+      "mw",
+      "tier",
+      "region",
+      "cooling",
+      "opts"
+     ]
+    },
+    {
+     "name": "detailed",
+     "params": [
+      "inp"
+     ]
+    },
+    {
+     "name": "mepDistribution",
+     "params": [
+      "baseCapex",
+      "tier"
+     ]
+    },
+    {
+     "name": "modularPremium",
+     "params": [
+      "baseCost",
+      "modularPct",
+      "tier"
+     ]
+    },
+    {
+     "name": "regionCostIndex",
+     "params": [
+      "region"
+     ]
+    },
+    {
+     "name": "timelineDetailed",
+     "params": [
+      "redundancy",
+      "buildingType",
+      "coolingType",
+      "effectiveRegion",
+      "itLoad"
+     ]
+    },
+    {
+     "name": "totalCost",
+     "params": [
+      "mw",
+      "tier",
+      "region",
+      "opts"
+     ]
+    }
+   ],
+   "consumers": [
+    "capex-calculator.html",
+    "dcmoc/src/lib/provenance/moduleSources.ts",
+    "dcmoc/src/lib/value-bindings.ts"
+   ]
+  },
+  {
+   "name": "carbon",
+   "functions": [
+    {
+     "name": "annualCost",
+     "params": [
+      "mw",
+      "pue",
+      "region",
+      "hoursPerYear"
+     ]
+    },
+    {
+     "name": "annualTonnes",
+     "params": [
+      "mw",
+      "pue",
+      "region",
+      "hoursPerYear"
+     ]
+    },
+    {
+     "name": "embodiedTonnes",
+     "params": [
+      "mw"
+     ]
+    },
+    {
+     "name": "gridFactor",
+     "params": [
+      "region"
+     ]
+    },
+    {
+     "name": "offsetCost",
+     "params": [
+      "tonnes"
+     ]
+    },
+    {
+     "name": "scopes",
+     "params": [
+      "input"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/components/modules/sustainability/SustainabilityEnginePage.tsx"
+   ]
+  },
+  {
+   "name": "cdu",
+   "functions": [
+    {
+     "name": "hydraulics",
+     "params": [
+      "input"
+     ]
+    },
+    {
+     "name": "size",
+     "params": [
+      "input"
+     ]
+    }
+   ],
+   "consumers": [
+    "cdu-calculator.html",
+    "dcmoc/src/components/modules/DesignToolsDashboards.tsx"
+   ]
+  },
+  {
+   "name": "commissioning",
+   "functions": [
+    {
+     "name": "_randNorm",
+     "params": [
+      "mu",
+      "sigma",
+      "rng"
+     ]
+    },
+    {
+     "name": "_rate",
+     "params": [
+      "region"
+     ]
+    },
+    {
+     "name": "_rich",
+     "params": []
+    },
+    {
+     "name": "equipScale",
+     "params": [
+      "inp"
+     ]
+    },
+    {
+     "name": "levelCosts",
+     "params": [
+      "inp",
+      "dur",
+      "eq"
+     ]
+    },
+    {
+     "name": "levelDurations",
+     "params": [
+      "inp",
+      "eq"
+     ]
+    },
+    {
+     "name": "mapInput",
+     "params": [
+      "src"
+     ]
+    },
+    {
+     "name": "monteCarlo",
+     "params": [
+      "input",
+      "opts"
+     ]
+    },
+    {
+     "name": "programCost",
+     "params": [
+      "input"
+     ]
+    },
+    {
+     "name": "programRich",
+     "params": [
+      "input"
+     ]
+    },
+    {
+     "name": "programSchedule",
+     "params": [
+      "input"
+     ]
+    },
+    {
+     "name": "readinessIndex",
+     "params": [
+      "completion"
+     ]
+    },
+    {
+     "name": "sensitivity",
+     "params": [
+      "input",
+      "baseCost"
+     ]
+    },
+    {
+     "name": "status",
+     "params": [
+      "index"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/components/modules/NewEngineDashboards.tsx",
+    "dcmoc/src/components/modules/commissioning/CommissioningEnginePage.tsx",
+    "dcmoc/src/lib/value-bindings.ts",
+    "dcmoc/src/state/adapters/arch-adapter.ts"
+   ]
+  },
+  {
+   "name": "compliance",
+   "functions": [
+    {
+     "name": "annualCost",
+     "params": [
+      "items"
+     ]
+    },
+    {
+     "name": "baselineAnnual",
+     "params": [
+      "categories"
+     ]
+    },
+    {
+     "name": "categoryCost",
+     "params": [
+      "category"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/lib/provenance/moduleSources.ts"
+   ]
+  },
+  {
+   "name": "construction",
+   "functions": [
+    {
+     "name": "fromTimeline",
+     "params": [
+      "timeline"
+     ]
+    },
+    {
+     "name": "longLeadRisk",
+     "params": [
+      "input"
+     ]
+    },
+    {
+     "name": "schedule",
+     "params": [
+      "durations"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/state/adapters/construction-adapter.ts"
+   ]
+  },
+  {
+   "name": "cooling",
+   "functions": [
+    {
+     "name": "deepSea",
+     "params": [
+      "a"
+     ]
+    },
+    {
+     "name": "intakeTempForDepth",
+     "params": [
+      "depthM"
+     ]
+    },
+    {
+     "name": "refrigerant",
+     "params": [
+      "key",
+      "c"
+     ]
+    }
+   ],
+   "consumers": [
+    "capex-calculator.html",
+    "dcmoc/src/components/modules/CapexDashboard.tsx",
+    "dcmoc/src/components/modules/DesignToolsDashboards.tsx",
+    "dcmoc/src/components/modules/requirements/sections/InfrastructureOptionsSection.tsx",
+    "dcmoc/src/lib/CapexEngine.ts",
+    "dcmoc/src/lib/value-bindings.ts"
+   ]
+  },
+  {
+   "name": "decision",
+   "functions": [
+    {
+     "name": "rankOptions",
+     "params": [
+      "options",
+      "criteria"
+     ]
+    },
+    {
+     "name": "recommend",
+     "params": [
+      "ctx",
+      "constraints",
+      "objectives"
+     ]
+    }
+   ],
+   "consumers": []
+  },
+  {
+   "name": "energy",
+   "functions": [
+    {
+     "name": "hybridScreen",
+     "params": [
+      "a"
+     ]
+    },
+    {
+     "name": "lcoe",
+     "params": [
+      "tech",
+      "region",
+      "opts"
+     ]
+    }
+   ],
+   "consumers": [
+    "capex-calculator.html"
+   ]
+  },
+  {
+   "name": "fire",
+   "functions": [
+    {
+     "name": "agentQuantity",
+     "params": [
+      "input"
+     ]
+    },
+    {
+     "name": "assess",
+     "params": [
+      "input"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/components/modules/DesignToolsDashboards.tsx",
+    "fire-calculator.html"
+   ]
+  },
+  {
+   "name": "forecast",
+   "functions": [
+    {
+     "name": "compoundGrowth",
+     "params": [
+      "base",
+      "ratePct",
+      "years"
+     ]
+    },
+    {
+     "name": "linearTrend",
+     "params": [
+      "points"
+     ]
+    },
+    {
+     "name": "projectByYear",
+     "params": [
+      "startVal",
+      "ratePct",
+      "startYear",
+      "endYear",
+      "opts"
+     ]
+    },
+    {
+     "name": "scenarioBands",
+     "params": [
+      "startVal",
+      "rates",
+      "startYear",
+      "endYear"
+     ]
+    }
+   ],
+   "consumers": []
+  },
+  {
+   "name": "fuel",
+   "functions": [
+    {
+     "name": "annualFuelCost",
+     "params": [
+      "loadKw",
+      "runtimeHours",
+      "pricePerLiter"
+     ]
+    },
+    {
+     "name": "annualTestFuelLiters",
+     "params": [
+      "loadKw"
+     ]
+    },
+    {
+     "name": "consumptionLPerHour",
+     "params": [
+      "loadKw"
+     ]
+    },
+    {
+     "name": "storageHours",
+     "params": [
+      "tier"
+     ]
+    },
+    {
+     "name": "storageLiters",
+     "params": [
+      "loadKw",
+      "tier"
+     ]
+    }
+   ],
+   "consumers": []
+  },
+  {
+   "name": "grid",
+   "functions": [
+    {
+     "name": "annualOutageHours",
+     "params": [
+      "uptimePct"
+     ]
+    },
+    {
+     "name": "band",
+     "params": [
+      "uptimePct"
+     ]
+    },
+    {
+     "name": "score",
+     "params": [
+      "uptimePct"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/lib/provenance/moduleSources.ts"
+   ]
+  },
+  {
+   "name": "gridImpact",
+   "functions": [
+    {
+     "name": "residentialBillImpact",
+     "params": [
+      "input"
+     ]
+    }
+   ],
+   "consumers": [
+    "article-11.html"
+   ]
+  },
+  {
+   "name": "maintenance",
+   "functions": [
+    {
+     "name": "downtimeCost",
+     "params": [
+      "strategy",
+      "failures",
+      "costPerMinute"
+     ]
+    },
+    {
+     "name": "expectedFailures",
+     "params": [
+      "tier"
+     ]
+    },
+    {
+     "name": "modelMult",
+     "params": [
+      "maintenanceModel"
+     ]
+    },
+    {
+     "name": "predictiveFailures",
+     "params": [
+      "plannedFailures"
+     ]
+    },
+    {
+     "name": "reactiveFailures",
+     "params": [
+      "plannedFailures"
+     ]
+    },
+    {
+     "name": "staffingBenchmark",
+     "params": [
+      "mw",
+      "tier"
+     ]
+    }
+   ],
+   "consumers": []
+  },
+  {
+   "name": "market",
+   "functions": [
+    {
+     "name": "cagrBand",
+     "params": [
+      "cagr"
+     ]
+    },
+    {
+     "name": "colorByMaturity",
+     "params": [
+      "maturity"
+     ]
+    },
+    {
+     "name": "colorByRegion",
+     "params": [
+      "region"
+     ]
+    },
+    {
+     "name": "regions",
+     "params": []
+    },
+    {
+     "name": "summary",
+     "params": [
+      "region"
+     ]
+    }
+   ],
+   "consumers": [
+    "dc-market-tracker.html"
+   ]
+  },
+  {
+   "name": "opex",
+   "functions": [
+    {
+     "name": "contractCostAnnual",
+     "params": [
+      "scope",
+      "region"
+     ]
+    },
+    {
+     "name": "coolingEfficiency",
+     "params": [
+      "climate",
+      "designDeltaT"
+     ]
+    },
+    {
+     "name": "powerCostAnnual",
+     "params": [
+      "mw",
+      "pue",
+      "regionPower",
+      "hoursPerYear",
+      "opts"
+     ]
+    },
+    {
+     "name": "staffingCostAnnual",
+     "params": [
+      "headcount",
+      "region",
+      "role"
+     ]
+    },
+    {
+     "name": "totalAnnual",
+     "params": [
+      "mw",
+      "pue",
+      "region",
+      "headcount",
+      "opts"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/components/modules/StrategicPlanningDashboard.tsx",
+    "dcmoc/src/components/modules/financial/FinancialPage.tsx",
+    "dcmoc/src/lib/value-bindings.ts"
+   ]
+  },
+  {
+   "name": "pue",
+   "functions": [
+    {
+     "name": "annualEnergyCost",
+     "params": [
+      "itKw",
+      "pue",
+      "kwhRate",
+      "hoursPerYear"
+     ]
+    },
+    {
+     "name": "dcie",
+     "params": [
+      "pue"
+     ]
+    },
+    {
+     "name": "defaultFor",
+     "params": [
+      "cooling",
+      "tier"
+     ]
+    },
+    {
+     "name": "partialLoadPUE",
+     "params": [
+      "designPUE",
+      "loadFraction"
+     ]
+    },
+    {
+     "name": "pueFromInputs",
+     "params": [
+      "itLoad",
+      "totalLoad"
+     ]
+    },
+    {
+     "name": "wue",
+     "params": [
+      "cooling"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/lib/value-bindings.ts",
+    "dcmoc/src/state/adapters/arch-adapter.ts",
+    "pue-calculator.html"
+   ]
+  },
+  {
+   "name": "reliability",
+   "functions": [
+    {
+     "name": "annualDowntimeMinutes",
+     "params": [
+      "availability"
+     ]
+    },
+    {
+     "name": "availability",
+     "params": [
+      "mtbf",
+      "mttr"
+     ]
+    },
+    {
+     "name": "kOutOfN",
+     "params": [
+      "a",
+      "k",
+      "n"
+     ]
+    },
+    {
+     "name": "mtbfFor",
+     "params": [
+      "component"
+     ]
+    },
+    {
+     "name": "mttrFor",
+     "params": [
+      "component"
+     ]
+    },
+    {
+     "name": "parallelAvailability",
+     "params": [
+      "a",
+      "paths"
+     ]
+    },
+    {
+     "name": "seriesAvailability",
+     "params": [
+      "avails"
+     ]
+    },
+    {
+     "name": "systemAvailability",
+     "params": [
+      "components",
+      "redundancy"
+     ]
+    },
+    {
+     "name": "tierTarget",
+     "params": [
+      "tier"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/components/modules/ReliabilityDashboard.tsx",
+    "dcmoc/src/lib/value-bindings.ts"
+   ]
+  },
+  {
+   "name": "requirements",
+   "functions": [
+    {
+     "name": "completeness",
+     "params": [
+      "intake"
+     ]
+    },
+    {
+     "name": "densityBand",
+     "params": [
+      "rackKw"
+     ]
+    },
+    {
+     "name": "profile",
+     "params": [
+      "useCase"
+     ]
+    },
+    {
+     "name": "rackCount",
+     "params": [
+      "itLoadKw",
+      "rackKw"
+     ]
+    },
+    {
+     "name": "validate",
+     "params": [
+      "intake"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/components/modules/PlatformDashboards.tsx",
+    "dcmoc/src/components/modules/requirements/sections/SummarySection.tsx",
+    "dcmoc/src/components/modules/requirements/useRequirementsDerived.ts"
+   ]
+  },
+  {
+   "name": "risk",
+   "functions": [
+    {
+     "name": "geo",
+     "params": [
+      "hazards"
+     ]
+    },
+    {
+     "name": "insuranceMultiplier",
+     "params": [
+      "risk"
+     ]
+    },
+    {
+     "name": "siteScore",
+     "params": [
+      "risk"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/lib/provenance/moduleSources.ts"
+   ]
+  },
+  {
+   "name": "roi",
+   "functions": [
+    {
+     "name": "discountedPayback",
+     "params": [
+      "cashflows",
+      "discountRate"
+     ]
+    },
+    {
+     "name": "irr",
+     "params": [
+      "cashflows",
+      "guess"
+     ]
+    },
+    {
+     "name": "npv",
+     "params": [
+      "cashflows",
+      "discountRate"
+     ]
+    },
+    {
+     "name": "npvAuto",
+     "params": [
+      "cashflows",
+      "region"
+     ]
+    },
+    {
+     "name": "paybackPeriod",
+     "params": [
+      "initialCost",
+      "annualBenefit",
+      "annualCost"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/lib/provenance/moduleSources.ts",
+    "dcmoc/src/modules/analytics/FinancialEngine.ts",
+    "roi-calculator.html"
+   ]
+  },
+  {
+   "name": "sim",
+   "functions": [
+    {
+     "name": "monteCarlo",
+     "params": [
+      "fn",
+      "distributions",
+      "iterations",
+      "seed",
+      "opts"
+     ]
+    },
+    {
+     "name": "sensitivityGrid",
+     "params": [
+      "fn",
+      "baseInputs",
+      "xVar",
+      "xRange",
+      "yVar",
+      "yRange",
+      "steps"
+     ]
+    },
+    {
+     "name": "tornado",
+     "params": [
+      "fn",
+      "baseInputs",
+      "ranges"
+     ]
+    }
+   ],
+   "consumers": [
+    "capex-calculator.html",
+    "dcmoc/src/lib/provenance/moduleSources.ts",
+    "opex-calculator.html",
+    "roi-calculator.html",
+    "tco-calculator.html"
+   ]
+  },
+  {
+   "name": "site",
+   "functions": [
+    {
+     "name": "deriveFactors",
+     "params": [
+      "countryId",
+      "overrides"
+     ]
+    },
+    {
+     "name": "grade",
+     "params": [
+      "score"
+     ]
+    },
+    {
+     "name": "score",
+     "params": [
+      "factors"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/components/modules/NewEngineDashboards.tsx",
+    "dcmoc/src/components/modules/site-intel/SiteComparisonRail.tsx",
+    "dcmoc/src/components/modules/site-intel/SiteIntelligencePage.tsx",
+    "dcmoc/src/components/modules/site-intel/SiteMapRadar.tsx",
+    "dcmoc/src/constants/countries.ts",
+    "dcmoc/src/lib/site-adapter.ts",
+    "dcmoc/src/lib/value-bindings.ts"
+   ]
+  },
+  {
+   "name": "spares",
+   "functions": [
+    {
+     "name": "eoq",
+     "params": [
+      "input"
+     ]
+    },
+    {
+     "name": "newsvendor",
+     "params": [
+      "input"
+     ]
+    },
+    {
+     "name": "normCdf",
+     "params": [
+      "x"
+     ]
+    },
+    {
+     "name": "normInv",
+     "params": [
+      "p"
+     ]
+    },
+    {
+     "name": "poissonCdf",
+     "params": [
+      "k",
+      "lambda"
+     ]
+    },
+    {
+     "name": "reorderPoint",
+     "params": [
+      "input"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/components/modules/DesignToolsDashboards.tsx",
+    "dcmoc/src/lib/value-bindings.ts",
+    "dcmoc/src/state/adapters/spares-adapter.ts"
+   ]
+  },
+  {
+   "name": "tax",
+   "functions": [
+    {
+     "name": "bonusDepreciationShield",
+     "params": [
+      "capex",
+      "taxRate"
+     ]
+    },
+    {
+     "name": "importDuty",
+     "params": [
+      "equipmentCost",
+      "country"
+     ]
+    },
+    {
+     "name": "macrsDepreciation",
+     "params": [
+      "capex",
+      "recoveryClass",
+      "taxRate",
+      "discountRate"
+     ]
+    },
+    {
+     "name": "solarItc",
+     "params": [
+      "solarCapex",
+      "domesticContent"
+     ]
+    },
+    {
+     "name": "stateSalesTaxSaving",
+     "params": [
+      "equipmentCost",
+      "stateCode"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/lib/provenance/moduleSources.ts"
+   ]
+  },
+  {
+   "name": "tco",
+   "functions": [
+    {
+     "name": "cashflows",
+     "params": [
+      "capex",
+      "opexAnnual",
+      "years",
+      "annualRevenue",
+      "refreshPct"
+     ]
+    },
+    {
+     "name": "costPerMwYear",
+     "params": [
+      "totalTco",
+      "mw",
+      "years"
+     ]
+    },
+    {
+     "name": "lifecycle",
+     "params": [
+      "capex",
+      "opexAnnual",
+      "years",
+      "refreshPct"
+     ]
+    },
+    {
+     "name": "lifecycleNPV",
+     "params": [
+      "capex",
+      "opexAnnual",
+      "years",
+      "opts"
+     ]
+    },
+    {
+     "name": "replacementCycles",
+     "params": [
+      "assetLifeYears",
+      "totalYears"
+     ]
+    }
+   ],
+   "consumers": []
+  },
+  {
+   "name": "tier",
+   "functions": [
+    {
+     "name": "advise",
+     "params": [
+      "input"
+     ]
+    },
+    {
+     "name": "classify",
+     "params": [
+      "s"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/components/modules/DesignToolsDashboards.tsx"
+   ]
+  },
+  {
+   "name": "water",
+   "functions": [
+    {
+     "name": "aiQueryFootprint",
+     "params": [
+      "input"
+     ]
+    },
+    {
+     "name": "annualCost",
+     "params": [
+      "mw",
+      "cooling",
+      "region",
+      "hoursPerYear"
+     ]
+    },
+    {
+     "name": "annualM3",
+     "params": [
+      "mw",
+      "cooling",
+      "hoursPerYear"
+     ]
+    },
+    {
+     "name": "facilityFootprint",
+     "params": [
+      "input"
+     ]
+    },
+    {
+     "name": "wue",
+     "params": [
+      "cooling"
+     ]
+    }
+   ],
+   "consumers": [
+    "article-20.html"
+   ]
+  },
+  {
+   "name": "workforce",
+   "functions": [
+    {
+     "name": "annualHiresRequired",
+     "params": [
+      "currentStaff",
+      "targetStaff",
+      "attritionRate",
+      "yearsToTarget"
+     ]
+    },
+    {
+     "name": "attritionCost",
+     "params": [
+      "staff",
+      "attritionRate",
+      "avgSalary",
+      "replacementMult"
+     ]
+    },
+    {
+     "name": "attritionCostWeighted",
+     "params": [
+      "attritionRate",
+      "roles"
+     ]
+    },
+    {
+     "name": "cumulativeHires",
+     "params": [
+      "annualHires",
+      "years",
+      "retentionFactor"
+     ]
+    },
+    {
+     "name": "cumulativeHiresCompounded",
+     "params": [
+      "annualHires",
+      "years",
+      "retentionPerYear"
+     ]
+    },
+    {
+     "name": "hiringPlan",
+     "params": [
+      "currentStaff",
+      "targetStaff",
+      "yearsToTarget",
+      "opts"
+     ]
+    },
+    {
+     "name": "strategyFitScore",
+     "params": [
+      "strategy",
+      "mix"
+     ]
+    },
+    {
+     "name": "yearsToCloseGap",
+     "params": [
+      "staffGap",
+      "annualHires",
+      "strategyCoverage"
+     ]
+    }
+   ],
+   "consumers": [
+    "article-27.html",
+    "dcmoc/src/lib/provenance/moduleSources.ts"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "key": "aace",
+   "source": "AACE International Recommended Practice 18R-97 \"Cost Estimate Classification System\" — Class 1-5 by project definition maturity → accuracy ranges (Class 5 -50/+100% … Class 1 -10/+15%). Engine detailed capex is a Class 4 budgetary estimate",
+   "asOf": "2020"
+  },
+  {
+   "key": "aiDensity",
+   "source": "Uptime + NVIDIA/OCP rack-density guidance 2026",
+   "asOf": "2026"
+  },
+  {
+   "key": "aiFactory",
+   "source": "Article-18 AI-factory readiness rubric: cooling limits (air ~30 kW ceiling, DTC ~200 kW, immersion ~400 kW — vendor specs/OCP), floor loading bands (1500/2500/3500 kg per m2 by rack class), PUE bands (AI-native 1.10-1.25 vs industry avg 1.58 Uptime 2024), OPEX $/MW rates = screening estimates",
+   "asOf": "2026",
+   "method": "banded scoring rubric, screening-grade; annualEnergy ×1000 unit bug in the source article CORRECTED at promotion (MWh⇒kWh ×1e3, not ×1e6)"
+  },
+  {
+   "key": "aiWater",
+   "source": "Article-20 per-query AI water model: Li, P. et al. 2023 (Making AI Less Thirsty, Joule) per-query scaling; company env. reports 2024 (Microsoft/Google); per-model attribution = estimate-grade; upstream 3× = power-generation water (Macknick/NREL screening)",
+   "asOf": "2026",
+   "method": "estimate-grade per-model attribution, not vendor-published telemetry"
+  },
+  {
+   "key": "architecture",
+   "source": "Canonical DC design disciplines (electrical/mechanical/cooling/fire/security/network/building/structural/BMS) + relative design-complexity multipliers by cooling/tier/redundancy — engine heuristic",
+   "asOf": "2026",
+   "method": "normalized complexity screen; NOT a design deliverable"
+  },
+  {
+   "key": "architecture.ashraeClasses",
+   "source": "ASHRAE TC9.9 5th Ed. 2021 \"Thermal Guidelines for Data Processing Environments\" — A1/A2/A3/A4 air + H1 liquid supply-temp envelopes + ΔT limits",
+   "asOf": "2021"
+  },
+  {
+   "key": "architecture.designFeePct",
+   "source": "ASHRAE Guideline 0-2019 + industry A&E engineering-fee benchmarks (ARUP/Syska/Jacobs DC practice) by complexity band",
+   "asOf": "2024"
+  },
+  {
+   "key": "architecture.tierTopology",
+   "source": "Uptime Institute Tier Standard: Topology 2022 (T1-T4 redundancy paths); ANSI/TIA-942-C 2024 Rated-1..Rated-4",
+   "asOf": "2024"
+  },
+  {
+   "key": "asset",
+   "source": "ASHRAE Equipment Life Expectancy + manufacturer service-life data (design lives); health-index weighting is an engine asset-management heuristic; lifecycle replacement intervals + $/kW lifted from DCMOC CapexEngine (UPS/gen/CRAC/PDU/BMS/fire)",
+   "asOf": "2026",
+   "method": "screening health + lifecycle model; NOT a condition survey"
+  },
+  {
+   "key": "asset.weibull",
+   "source": "Weibull wear-out life distributions by asset class (shape β>1 = increasing hazard; scale η = characteristic life yr) — reliability engineering practice + IEEE 493 (Gold Book) component data + manufacturer MTBF",
+   "asOf": "2024"
+  },
+  {
+   "key": "attritionFactors",
+   "source": "Center for American Progress + DataX Connect 2024",
+   "asOf": "2024"
+  },
+  {
+   "key": "capacity",
+   "source": "Multi-phase DC build-out templates (small/medium/large) + occupancy ramp; lifted from DCMOC CapacityPlanningEngine",
+   "asOf": "2026",
+   "method": "planning templates; adjust per project"
+  },
+  {
+   "key": "capacity.rampProfiles",
+   "source": "Logistic lease-up S-curve calibrated to CBRE North America DC Trends H1 2025 (hyperscale ~84% pre-lease, 3% vacancy); Uptime Institute Global Survey 2024 (1-in-4 DCs <40% utilized = stranded); JLL DC Construction Cost 2025 (~12% phase premium)",
+   "asOf": "2025",
+   "method": "occupancy(t)=L/(1+e^-k(t-tMid)) per market type"
+  },
+  {
+   "key": "capexDefaults",
+   "source": "Engine model defaults (industry-typical ranges)",
+   "asOf": "2026"
+  },
+  {
+   "key": "capexDetail",
+   "source": "Turner & Townsend DCCI 2025 + Cushman & Wakefield DC Cost Guide 2025 (city $/W anchor table) + JLL 2026 escalation; category factors calibrated to the anchor (locMult = perW/4.65) — lineage: capex-calculator inline model, lifted v2.3.0",
+   "asOf": "2025",
+   "method": "budgetary estimate-grade; NOT detailed engineering"
+  },
+  {
+   "key": "capexDetail.costFactors.electrical",
+   "source": "calculator lineage 1200 $/kW (DCMOC A7 2025 used 1550 for a different model shape — NOT merged; engine detailed model is the shared source from v2.3.0)",
+   "asOf": "2025"
+  },
+  {
+   "key": "capexDetail.space",
+   "source": "Industry planning rules of thumb: 600mm racks at hot/cold-aisle pitch (Uptime/ASHRAE TC9.9 layout guidance); support-to-white-space ratios by redundancy from published DC space programs (white space typically 40-50% of gross); DLC rows +~8% for in-row CDU + manifolds",
+   "asOf": "2026",
+   "method": "screening-grade space program, not an architectural layout"
+  },
+  {
+   "key": "capexPerMw",
+   "source": "451 Research 2026 + JLL DC Cost 2026 + Cushman & Wakefield 2026",
+   "asOf": "2026"
+  },
+  {
+   "key": "carbon",
+   "source": "IEA 2026 + Ember grid intensity + ICAP carbon prices",
+   "asOf": "2026"
+  },
+  {
+   "key": "carbon.dieselKgCo2PerL",
+   "source": "GHG Protocol Corporate Standard scope 1/2/3 boundaries; EPA Emission Factors 2024 diesel 2.68 kgCO₂/L; refrigerant leakage per GHG Protocol + EPA GreenChill; embodied construction carbon amortized (RICS/LETI DC embodied-carbon studies)",
+   "asOf": "2024"
+  },
+  {
+   "key": "carbon.offsetPrice",
+   "source": "Voluntary carbon market 2026 blend (nature-based + engineered mid-range); reconciles DCMOC $45 vs legacy $18",
+   "asOf": "2026"
+  },
+  {
+   "key": "cdu.bands",
+   "source": "cdu-model.js BANDS — OCP cold-plate + ASHRAE TC9.9 CDU operational bounds (supply temp, ΔT, flow, dP, dew margin, pipe velocity)",
+   "asOf": "2026"
+  },
+  {
+   "key": "cdu.phys",
+   "source": "cdu-model.js PHYS — commercial-steel absolute roughness (Moody/Colebrook), barToPa, Magnus dew-point coefficients (Alduchov-Eskridge 2006)",
+   "asOf": "2026"
+  },
+  {
+   "key": "cdu.pump",
+   "source": "cdu-model.js PUMP — typical seal-less CDU pump (η=0.70) + IE3 motor (η=0.92) + 600 Lpm duty pump; ILLUSTRATIVE",
+   "asOf": "2026"
+  },
+  {
+   "key": "commissioning",
+   "source": "Standard DC commissioning sequence (ASHRAE Guideline 0 / BCxA + Uptime Cx) — L1–L5 levels + IST/SAT/FAT + punchlist; weights are an engine readiness heuristic",
+   "asOf": "2026",
+   "method": "weighted completion index; NOT a Cx authority sign-off"
+  },
+  {
+   "key": "commissioning.cx",
+   "source": "Commissioning program cost/schedule methodology promoted from cx-calculator.html. RICH engine (cx.rich): equipment quantities scaled from IT load + rack density → per-level (L0-L6) staffed durations at 30 regional day-rate cards ($/day cxDay/fieldDay/oemDay/witnessDay + per-diem + diesel $/L + cost mult), gm-normalized (^0.45) base blend vs level-sum, Monte-Carlo (N=10000) band + 7-param sensitivity tornado. Base rates + multipliers calibrated to DC Cx budgetary practice (ASHRAE Guideline 0 / BCxA / NETA ECS scope, Uptime IST scenario counts). Compact cx.* kept for back-compat.",
+   "asOf": "2026",
+   "method": "budgetary estimate-grade Cx program model; NOT a detailed Cx plan"
+  },
+  {
+   "key": "compliance",
+   "source": "DC regulatory compliance cost categories (fire/electrical/environmental/data-protection/building/security) + one-time amortization; lifted from DCMOC ComplianceEngine — per-country framework matrix stays in country profiles",
+   "asOf": "2026",
+   "method": "screening compliance cost; NOT a legal/permitting determination"
+  },
+  {
+   "key": "construction",
+   "source": "Canonical DC build phase sequence (design→permit→procurement→civil→MEP→commissioning) + typical fast-track overlap factors — engine scheduling heuristic",
+   "asOf": "2026",
+   "method": "CPM-style forward pass with per-phase overlap; screening schedule, NOT a resource-loaded programme"
+  },
+  {
+   "key": "construction.longLeadWeeks",
+   "source": "Critical long-lead electrical/mechanical equipment procurement lead times, 2024-26 supply-constrained market (MV/HV transformers 60-120 wk, MV switchgear 50-80 wk, gensets 40-70 wk, UPS 30-52 wk, chillers 30-50 wk) — EPRI/industry procurement trackers + OEM quotes",
+   "asOf": "2025"
+  },
+  {
+   "key": "contractCostBase",
+   "source": "DC O&M contract bid analysis 2026",
+   "asOf": "2026"
+  },
+  {
+   "key": "coolingClimate",
+   "source": "ASHRAE TC9.9 + engine internal model",
+   "asOf": "2026",
+   "method": "climate-zone base + ΔT bonus"
+  },
+  {
+   "key": "coolingTypes",
+   "source": "ASHRAE TC9.9 liquid-cooling taxonomy",
+   "asOf": "2026"
+  },
+  {
+   "key": "countries",
+   "source": "DCMOC country reference 2026-Q1 (per-country economy/labor/environment/gridReliability/naturalDisaster/talentPool/fuelDiesel/taxIncentives/compliance/constructionIndex); PLN/EMA/TEPCO/national tariff filings + IMF WEO + Ember grid-intensity + national labor statistics. GENERATED from dcmoc/src/constants/countries.ts — single source of truth for the site + DCMOC.",
+   "asOf": "2026-Q1"
+  },
+  {
+   "key": "currency",
+   "source": "ECB / central-bank reference rates",
+   "asOf": "2026-04",
+   "method": "spot, USD base"
+  },
+  {
+   "key": "decision",
+   "source": "Layer-13 planning benchmarks: Uptime Institute Tier Standard availability targets (99.741/99.982/99.995); cost/kW bands by tier from CBRE/JLL/Cushman & Wakefield DC Cost 2025; PUE best-practice bands ASHRAE TC9.9. Descriptive engineering guidance — not advice.",
+   "asOf": "2026"
+  },
+  {
+   "key": "deepSeaCooling",
+   "source": "Design basis: 150 MW AI DC deep-sea cooling reference architecture (owner, 2026) — chiller-less primary + hybrid trim backup; seawater properties: TEOS-10/IOC tables at S=35, 5 °C; intake-temp bands: NOAA World Ocean Atlas typical tropical/subtropical profiles; SWAC cost scaling: Makai Ocean Engineering SWAC studies + Hawaii/InterContinental SWAC projects (public figures), HDPE marine pipeline install multipliers 2.5-4x onshore",
+   "asOf": "2026",
+   "method": "poster mode reproduces the reference (cp 4.0, rho 1000): 172.5 MW / (4.0*5) = 8.625 m3/s = 31,050 m3/h, 4+1 pumps 2.9 m3/s @ 60 m ≈ 2.0 MW each; accurate mode uses rho 1025 / cp 3985"
+  },
+  {
+   "key": "discountDefaults",
+   "source": "Damodaran regional WACC + country risk 2026",
+   "asOf": "2026"
+  },
+  {
+   "key": "energy",
+   "source": "Lazard LCOE+ 2025 (solar/wind capex+CF ranges), IRENA Renewable Power Generation Costs 2024 (APAC/ID), BNEF BESS pack+BOS 2026 ~$180/kWh installed",
+   "asOf": "2026",
+   "method": "screening-grade; not an interconnection/reliability study"
+  },
+  {
+   "key": "fire.bands",
+   "source": "fire-model.js BANDS — NFPA 2001/72/855 operating limits (discharge time, hold time, spot-detector area, gas-alarm LFL)",
+   "asOf": "2026",
+   "method": "STANDARD per NFPA"
+  },
+  {
+   "key": "fire.battery",
+   "source": "fire-model.js BATTERY / TR_HEAT_FACTOR — Li-ion/VRLA thermal-runaway onset temperatures + off-gas volumes; NFPA 855 / UL 9540A",
+   "asOf": "2026",
+   "method": "screening; NOT a certified TR test result"
+  },
+  {
+   "key": "fuelGen",
+   "source": "EPA Tier 4 Final diesel genset fuel rate (~0.27 L/kWh @ 75%) + Uptime backup-autonomy hours by tier (48/72/96h); lifted from DCMOC FuelGenEngine",
+   "asOf": "2026",
+   "method": "screening sizing; NOT a genset selection"
+  },
+  {
+   "key": "geoRisk",
+   "source": "Natural-hazard weighting (seismic/flood/typhoon/volcano/tsunami/wildfire) + insurance-multiplier bands; lifted from DCMOC RiskEngine/DisasterRiskEngine — per-country hazard levels stay in the country profiles",
+   "asOf": "2026",
+   "method": "screening geo-risk; NOT a certified hazard/insurance assessment"
+  },
+  {
+   "key": "gridImpact",
+   "source": "Article-11 SEA citizen-bill model: residential tariffs (PLN/TNB/EMA/MEA/EVN/Meralco published 2025-2026 rates), national grid capacity (national utility/EIA country notes), avg household kWh (national statistics), IEA data-centre electricity growth ~15%/yr; 40% residential pass-through = screening assumption",
+   "asOf": "2026",
+   "method": "screening-grade allocation model, not a tariff filing analysis"
+  },
+  {
+   "key": "gridReliability",
+   "source": "Utility grid reliability bands (SAIDI-informed uptime tiers) + 0-1 grid score mapping; lifted from DCMOC GridReliabilityEngine — per-country uptime stays in the country profiles",
+   "asOf": "2026",
+   "method": "screening; NOT a utility interconnection study"
+  },
+  {
+   "key": "hoursPerYear",
+   "source": "Calendar constant (non-leap)",
+   "asOf": "const"
+  },
+  {
+   "key": "inflationAnnual",
+   "source": "IMF WEO 2026 regional CPI",
+   "asOf": "2026"
+  },
+  {
+   "key": "laborRates",
+   "source": "RSMeans + regional construction wage surveys 2026",
+   "asOf": "2026"
+  },
+  {
+   "key": "land",
+   "source": "JLL / CBRE industrial land + shell 2026",
+   "asOf": "2026"
+  },
+  {
+   "key": "maintenance",
+   "source": "DC O&M strategy economics — reactive/planned/predictive failure + downtime multipliers + in-house/hybrid/vendor labor blend; lifted from DCMOC MaintenanceStrategyEngine (RCM/CBM industry conventions)",
+   "asOf": "2026",
+   "method": "screening O&M cost model; NOT a vendor quote"
+  },
+  {
+   "key": "maintenance.staffing",
+   "source": "Uptime Institute critical-facilities staffing benchmark: 24/7 manned position needs ~4.2 FTE (shifts + relief/PTO); positions scale with tier; plus per-MW technicians",
+   "asOf": "2024"
+  },
+  {
+   "key": "marketViz",
+   "source": "Engine UI mapping — maturity/region accent colours + CAGR bands (single source for DC map/cards)",
+   "asOf": "2026",
+   "method": "presentation constants; not economically-material"
+  },
+  {
+   "key": "markets",
+   "source": "CBRE Global DC Market 2025 + JLL Outlook 2025 + Cushman & Wakefield 2025 + Synergy Research 2024 (capacity/vacancy/colo/pipeline per market); market-level powerCost from utility filings (PJM, ERCOT, Dominion, IMDA et al.)",
+   "asOf": "2026-04",
+   "method": "per-market figures; NOT interchangeable with regions.*.powerKwh macro blends (different denominators)"
+  },
+  {
+   "key": "mepPctOfCapex",
+   "source": "JLL / industry MEP cost share 2026",
+   "asOf": "2026"
+  },
+  {
+   "key": "modularPremiumPct",
+   "source": "Modular DC vendor bid analysis 2026",
+   "asOf": "2026"
+  },
+  {
+   "key": "opex.basisPresets",
+   "source": "Phase-Q shared-engine alignment: utilization presets parameterize the documented opex-calculator (retail 0.7 util) vs DCMOC (DC-contract 1.0 util) basis divergence",
+   "asOf": "2026",
+   "method": "multiplier on energy-driven lines (power/water/carbon); default 1.0 = legacy-identical"
+  },
+  {
+   "key": "opexDefaults",
+   "source": "Engine model defaults (industry-typical ranges)",
+   "asOf": "2026"
+  },
+  {
+   "key": "pue.partialLoad",
+   "source": "Screening model: fixed infrastructure-overhead share 0.55 at partial IT load (industry rule-of-thumb band 0.4-0.7; Green Grid partial-load PUE guidance)",
+   "asOf": "2026",
+   "method": "PUE(l) = 1 + overhead*(0.55/l + 0.45) — screening estimate, labeled"
+  },
+  {
+   "key": "pueDefaults",
+   "source": "Uptime Global PUE Survey 2026 by cooling architecture",
+   "asOf": "2026"
+  },
+  {
+   "key": "pueMatrix",
+   "source": "Uptime Global PUE Survey 2026 (tier x cooling)",
+   "asOf": "2026"
+  },
+  {
+   "key": "pueMatrix.inrow",
+   "source": "Uptime Institute Global Survey 2026 close-coupled cohort",
+   "asOf": "2026"
+  },
+  {
+   "key": "pueMatrix.rdhx",
+   "source": "Uptime Institute Global Survey 2026 rear-door cohort",
+   "asOf": "2026"
+  },
+  {
+   "key": "refresh",
+   "source": "Typical enterprise IT refresh cycle",
+   "asOf": "2026"
+  },
+  {
+   "key": "refrigerants",
+   "source": "GWP100 IPCC AR4 (consistent with sitewide published values); ASHRAE 34 safety classes; copIndex: AHRI/manufacturer typical relative cycle efficiency at water-cooled chiller conditions (R-134a=1.00) — estimate-grade; charge/leak: GHG Protocol + EPA GreenChill typical ranges",
+   "asOf": "2026",
+   "method": "copIndex and charge/leak are screening estimates, not equipment selections"
+  },
+  {
+   "key": "regions.APAC.powerKwh",
+   "source": "IEA/regional utility filings (blended)",
+   "asOf": "2026"
+  },
+  {
+   "key": "regions.EU.powerKwh",
+   "source": "Eurostat non-household electricity (normalized post-crisis)",
+   "asOf": "2026"
+  },
+  {
+   "key": "regions.LATAM.powerKwh",
+   "source": "Regional utility filings (blended)",
+   "asOf": "2026"
+  },
+  {
+   "key": "regions.US.powerKwh",
+   "source": "US EIA industrial electricity + DC PPA blend",
+   "asOf": "2026"
+  },
+  {
+   "key": "regionsCountry",
+   "source": "PLN/EMA/TEPCO/CEA/TNB tariff filings + national statistics",
+   "asOf": "2026"
+  },
+  {
+   "key": "reliability",
+   "source": "IEEE 493 (Gold Book) typical component MTBF/MTTR + Uptime Institute Tier Standard availability targets",
+   "asOf": "2026",
+   "method": "screening-grade RAM inputs; NOT a certified reliability/FMEA study"
+  },
+  {
+   "key": "requirements",
+   "source": "DC project brief required-field set + workload density/cooling profiles (AI/HPC/cloud/colo/enterprise/edge) — engine intake heuristic informed by Uptime/OCP rack-density guidance",
+   "asOf": "2026",
+   "method": "completeness + profile defaults; not a design basis"
+  },
+  {
+   "key": "requirements.coolingMaxRackKw",
+   "source": "ASHRAE TC9.9 5th Ed. 2021 (air ~20-25 kW/rack limit; H1-H3 liquid envelopes); NVIDIA GB200 NVL72 132 kW observed; OCP High Power Rack 92 kW+ (Meta/Rittal OCP Summit 2024); IEA 4E Liquid Cooling in Data Centres 2026",
+   "asOf": "2025"
+  },
+  {
+   "key": "roles",
+   "source": "Engine role taxonomy",
+   "asOf": "2026"
+  },
+  {
+   "key": "salaryBenchmarks",
+   "source": "Uptime Institute 2026 + AFCOM 2026 + US BLS 2025",
+   "asOf": "2026"
+  },
+  {
+   "key": "salaryRolesExt",
+   "source": "Uptime 2026 + Levels.fyi + AFCOM 2026 role survey",
+   "asOf": "2026"
+  },
+  {
+   "key": "site",
+   "source": "DC site-selection factor weighting (power + grid + seismic + talent + tax + carbon + flood + latency + water) — engine heuristic informed by 451/CBRE/Uptime site-selection criteria",
+   "asOf": "2026",
+   "method": "transparent weighted-factor screen; factor inputs are caller-supplied 0-1 goodness scores"
+  },
+  {
+   "key": "site.climateFreeHours",
+   "source": "ASHRAE 169-2021 climate zones → annual economizer (free-cooling) hours (DOE/NREL psychrometric bin analysis); site-selection factor weights per CBRE/JLL DC Site Selection frameworks 2025; per-country water-stress WRI Aqueduct 4.0 (2023); grid reliability IEEE 1366 SAIDI; seismic USGS PGA → IBC/ASCE 7-22 SDC",
+   "asOf": "2025"
+  },
+  {
+   "key": "spares.acklam",
+   "source": "P. J. Acklam (2003) rational approximation to the inverse normal CDF",
+   "asOf": "2026",
+   "method": "numerical approximation; |relative error| < 1.15e-9 (upgraded from BSM 1977, |e|<4.5e-4, in the M2b precision pass)"
+  },
+  {
+   "key": "staffingLoadFactor",
+   "source": "Industry fully-loaded cost convention",
+   "asOf": "2026"
+  },
+  {
+   "key": "tax",
+   "source": "US TCJA bonus depreciation (20% 2026 phase-down) + IRA §48 solar ITC (30% + 10% domestic-content) + state DC sales-tax exemptions (VA/TX/NV/OH/AZ) + representative import duty; lifted from DCMOC TaxIncentiveEngine",
+   "asOf": "2026",
+   "method": "US-federal + state incentives; NOT tax advice; per-country corporate tax in country profiles"
+  },
+  {
+   "key": "tax.macrs",
+   "source": "US IRS Publication 946 (How To Depreciate Property) — MACRS GDS percentage tables, half-year convention (5-yr IT, 7-yr MEP, 15-yr land improvements, 39-yr non-residential building SL)",
+   "asOf": "2025"
+  },
+  {
+   "key": "tier.scoreMaps",
+   "source": "tier-advisor.html SCORE_MAPS + WEIGHTS — 15 component maps for 6-band Uptime-style advisor; lifted v2.5.0",
+   "asOf": "2026",
+   "method": "engineering heuristic; NOT a certified Uptime Institute assessment"
+  },
+  {
+   "key": "tiers",
+   "source": "Uptime Institute Tier Standard (Topology)",
+   "asOf": "2026"
+  },
+  {
+   "key": "water",
+   "source": "ASHRAE WUE + regional utility water tariffs 2026",
+   "asOf": "2026"
+  },
+  {
+   "key": "waterFootprint",
+   "source": "Article-20 DC water model: WUE bases per cooling (Li et al. 2023 Joule; Uptime Institute 2024; ASHRAE TC9.9), company benchmarks (Google/Microsoft/Meta env. reports 2024, AWS est.), water $/kgal typical municipal/reclaimed/surface/well ranges; upstream-power water factor 1.5 L/kWh non-renewable = screening (Macknick et al. NREL ranges)",
+   "asOf": "2026",
+   "method": "screening-grade footprint, not a site water balance"
+  },
+  {
+   "key": "workforceParams",
+   "source": "Engine model tuning",
+   "asOf": "2026"
+  }
+ ]
+}

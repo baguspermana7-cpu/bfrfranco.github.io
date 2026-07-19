@@ -20,6 +20,8 @@ import { StaffingDashboard } from '@/components/modules/StaffingDashboard';
 import { MaintenanceDashboard } from '@/components/modules/MaintenanceDashboard';
 import { Wrench, ChevronRight, FileDown } from 'lucide-react';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
+import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 
 const PRI_COLORS: Record<string, string> = { P1: '#f43f5e', P2: '#f97316', P3: '#f59e0b', P4: '#64748b' };
 
@@ -103,6 +105,12 @@ export function OperationsDashboard() {
     const exportPdf = async () => {
         setBusy(true);
         try {
+            /* PM compliance from logged weeks (same basis as the Maintenance KPI); null → engine's Plan-Mode default */
+            const opsMetrics = {
+                maintCompliancePct: log.completedPmWeeks.length > 0 ? Math.min(100, Math.round((log.completedPmWeeks.length / 52) * 100)) : null,
+                avgHealthPct: model.assetHealth.avg,
+                activeAlarms: activeAlarms.length,
+            };
             await generatePillarPDF({
                 title: 'Operations', layer: 'Operations Engine', project: '—',
                 kpis: [
@@ -138,8 +146,10 @@ export function OperationsDashboard() {
                     { label: 'Tickets', value: String(openTickets.length) },
                     { label: 'Incidents', value: String(openIncidents.length) },
                 ],
+                assessment: buildAssessment('operations', opsMetrics),
+                actions: buildActions('operations', opsMetrics),
                 note: 'Derived plane engine-real (tier availability target, partial-load PUE at occupancy, energy cost from the country rate, Weibull asset health); log plane user-entered. 24h series = deterministic diurnal cosine — no random data.',
-            });
+            } as StandardReport);
         } finally { setBusy(false); }
     };
 

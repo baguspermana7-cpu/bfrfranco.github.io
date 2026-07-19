@@ -7,6 +7,8 @@ import { useSimulationStore } from '@/store/simulation';
 import { useSitesStore } from '@/store/sites';
 import { keyTakeaways, type SiteAnalyses } from '@/lib/site-adapter';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
+import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import type { CandidateSite, SiteScoreResult, AxisKey } from '@/types/site-intel';
 import { AXIS_LABELS } from '@/types/site-intel';
 import { Play, FileDown, ChevronRight } from 'lucide-react';
@@ -116,6 +118,11 @@ export function SiteRightRail({ sites, results, selectedId, onSelect, onEdit }: 
     const exportPdf = async () => {
         setBusy(true);
         try {
+            const weakestFactor = selResult ? [...selResult.engine.breakdown].sort((a, b) => a.value - b.value)[0] : null;
+            const narrativeMetrics = {
+                score: selResult?.engine.score,
+                keyRisk: weakestFactor ? `${weakestFactor.key} (${Math.round(weakestFactor.value * 100)}% factor score)` : undefined,
+            };
             await generatePillarPDF({
                 title: 'Site Intelligence', layer: 'Layer 2 · Multi-Site Comparison', project: sel?.name ?? '—',
                 kpis: results.slice(0, 3).map((r) => {
@@ -139,7 +146,9 @@ export function SiteRightRail({ sites, results, selectedId, onSelect, onEdit }: 
                     body: t,
                     tone: idx === 0 ? ('good' as const) : ('info' as const),
                 })),
+                assessment: buildAssessment('site', narrativeMetrics),
                 actions: [
+                    ...buildActions('site', narrativeMetrics),
                     { priority: 'HIGH' as const, action: 'Confirm site selection & secure land reservation' },
                     { priority: 'MEDIUM' as const, action: 'Initiate geotechnical & environmental survey' },
                     { priority: 'MEDIUM' as const, action: 'Engage utility providers for LOA' },
@@ -149,7 +158,7 @@ export function SiteRightRail({ sites, results, selectedId, onSelect, onEdit }: 
                     return { label: `Site ${s?.label ?? '—'}`, value: `${r.engine.score}/100` };
                 }),
                 note: 'Engine-real multi-site screening (models.site.score, factor overrides via site attributes). Not a site survey.',
-            });
+            } as StandardReport);
         } finally { setBusy(false); }
     };
 

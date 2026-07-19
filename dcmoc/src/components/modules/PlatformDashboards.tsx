@@ -20,6 +20,7 @@ import { useRequirementsStore } from '@/store/requirements';
 import { applyUseCaseProfile, USE_CASE_TO_ENGINE } from '@/lib/requirementsMappings';
 import { PlatformHeader, KpiChips } from '@/components/modules/platform/ScenariosPage';
 import { VALUE_BINDINGS, BINDING_GROUPS } from '@/lib/value-bindings';
+import ENGINE_CATALOG from '@/lib/engine-catalog.json';
 import { Database, Boxes, FolderOpen, HelpCircle, Zap, Wrench, ClipboardCheck, Users, Sun, Moon, Cpu, Server, Building, ArrowRight, CheckCircle2, Circle, ExternalLink } from 'lucide-react';
 
 function Head({ icon: Icon, title, sub, tone = 'from-cyan-500 to-blue-600' }: { icon: React.ElementType; title: string; sub: string; tone?: string }) {
@@ -313,8 +314,61 @@ export function KnowledgeDashboard() {
 
             {tab === 'models' && (<>
                 <Card>
-                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Engine models ({models.length})</h2>
-                    <div className="flex flex-wrap gap-1.5">{models.sort().map((m) => <span key={m} className="text-[10px] px-2 py-1 rounded bg-slate-100 dark:bg-white/[0.05] text-slate-600 dark:text-slate-300">{m}</span>)}</div>
+                    <div className="flex items-center justify-between mb-2">
+                        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                            Engine catalog — {ENGINE_CATALOG.modelCount} namespaces · {ENGINE_CATALOG.functionCount} functions · {ENGINE_CATALOG.sourceCount} sourced tables · DATA v{ENGINE_CATALOG.dataVersion}
+                        </h2>
+                        <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">auto-generated</span>
+                    </div>
+                    <p className="mb-2 text-[10px] text-slate-400">
+                        Generated from <code>rz-engine.js</code> by <code>tools/build-engine-catalog.mjs</code> — consumers are grep-derived from real usage across the site + DC-OS.
+                        The staleness gate (<code>test-value-bindings.mjs</code>) blocks any engine change that skips regeneration, so this page is current by construction.
+                        {models.length > 0 ? '' : ' (engine not loaded in this session — showing the committed catalog)'}
+                    </p>
+                    <div className="space-y-1.5">
+                        {ENGINE_CATALOG.namespaces.map((ns) => (
+                            <div key={ns.name} className="rounded-lg border border-slate-200 dark:border-slate-800">
+                                <button onClick={() => setOpen(open === 'ns:' + ns.name ? null : 'ns:' + ns.name)} className="flex w-full items-center gap-2 px-2.5 py-1.5 text-left">
+                                    <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-200">models.{ns.name}</span>
+                                    <span className="text-[9px] text-slate-400">{ns.functions.length} fn</span>
+                                    {ns.consumers.length > 0 && <span className="ml-auto rounded bg-cyan-500/10 px-1.5 py-0.5 text-[9px] text-cyan-600 dark:text-cyan-400">{ns.consumers.length} consumer{ns.consumers.length > 1 ? 's' : ''}</span>}
+                                </button>
+                                {open === 'ns:' + ns.name && (
+                                    <div className="border-t border-slate-100 dark:border-slate-800 px-2.5 py-2 space-y-2">
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {ns.functions.map((f) => (
+                                                <span key={f.name} className="rounded bg-slate-100 dark:bg-white/[0.05] px-2 py-0.5 text-[10px] font-mono text-slate-600 dark:text-slate-300" title={`models.${ns.name}.${f.name}(${f.params.join(', ')})`}>
+                                                    {f.name}({f.params.join(', ')})
+                                                </span>
+                                            ))}
+                                        </div>
+                                        {ns.consumers.length > 0 && (
+                                            <div>
+                                                <span className="text-[9px] font-semibold uppercase text-slate-400">Consumers (auto-detected)</span>
+                                                <div className="mt-0.5 flex flex-wrap gap-1">
+                                                    {ns.consumers.map((c) => (
+                                                        <span key={c} className="rounded border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 text-[9px] text-slate-500">{c}</span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </Card>
+                <Card>
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Data provenance ({ENGINE_CATALOG.sourceCount} sources)</h2>
+                    <div className="max-h-64 overflow-y-auto space-y-0.5 pr-1">
+                        {ENGINE_CATALOG.sources.map((s) => (
+                            <div key={s.key} className="flex items-baseline gap-2 text-[10px]">
+                                <span className="font-mono text-slate-600 dark:text-slate-300 shrink-0">{s.key}</span>
+                                <span className="text-slate-400 truncate" title={s.source}>{s.source}</span>
+                                <span className="ml-auto shrink-0 text-slate-400">{s.asOf}</span>
+                            </div>
+                        ))}
+                    </div>
                 </Card>
                 <Card>
                     <a href="/glossary.html" target="_blank" className="inline-flex items-center gap-1.5 text-xs text-cyan-600 dark:text-cyan-400 hover:underline"><ExternalLink className="w-3.5 h-3.5" /> Open the full DC glossary</a>

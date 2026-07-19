@@ -18,6 +18,8 @@ import { densityToEngineBucket } from '@/lib/requirementsMappings';
 import { AssetIntelDashboard } from '@/components/modules/NewEngineDashboards';
 import { CreatableCombobox, type ComboValue } from '@/components/ui/CreatableCombobox';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
+import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { Activity, ChevronRight, FileDown } from 'lucide-react';
 
 const CAT_COLORS = ['#3b82f6', '#06b6d4', '#a855f7', '#f59e0b', '#ef4444', '#64748b'];
@@ -84,6 +86,7 @@ export function AssetIntelligencePage() {
         if (!model) return;
         setBusy(true);
         try {
+            const narrativeMetrics = { avgHealthPct: model.avgHealth, atRiskCount: model.rows.filter((r) => r.fpPct >= 25).length };
             await generatePillarPDF({
                 title: 'Asset Intelligence', layer: 'Asset Engine', project: req.overview.projectName || 'DC-OS Project',
                 kpis: [
@@ -111,8 +114,18 @@ export function AssetIntelligencePage() {
                 callouts: (model.buckets.poor + model.buckets.critical) > 0
                     ? [{ title: 'Replacement planning', body: `${(model.buckets.poor + model.buckets.critical).toLocaleString()} units in Poor/Critical health at the modeled age — schedule replacement budget.`, tone: 'warn' as const }]
                     : [{ title: 'Fleet health', body: 'No units in Poor/Critical health at the modeled age.', tone: 'good' as const }],
+                assessment: buildAssessment('assets', narrativeMetrics),
+                actions: buildActions('assets', narrativeMetrics),
+                summaryBand: [
+                    { label: 'Units', value: model.total.toLocaleString() },
+                    { label: 'Avg Health', value: `${model.avgHealth}/100` },
+                    { label: 'Excellent', value: String(model.buckets.excellent) },
+                    { label: 'Good', value: String(model.buckets.good) },
+                    { label: 'Poor+Crit', value: String(model.buckets.poor + model.buckets.critical) },
+                    { label: 'At Risk', value: model.atRisk.toLocaleString() },
+                ],
                 note: 'Fleet generated from engine equipment scaling; health = engine Weibull model at the set fleet age/condition. MTBF/MTTR = IEEE-493 component data.',
-            });
+            } as StandardReport);
         } finally { setBusy(false); }
     };
 

@@ -11,6 +11,7 @@ import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { rzModels } from '@/lib/rz-engine';
 import { generatePillarPDF, type PillarReport } from '@/modules/reporting/pdf/PillarPdf';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import { MapPin, Boxes, HardHat, CheckCircle2, Activity, FileDown } from 'lucide-react';
 
 const REDUNDANCY_KEY: Record<string, string> = { 'N+1': 'n1', '2N': '2n', '2N+1': '2n1' };
@@ -61,6 +62,14 @@ export function SiteIntelDashboard() {
                     title: 'Site Intelligence', layer: 'Layer 2 · Site Score', project: '—',
                     kpis: [{ label: 'Site Score', value: `${r.score}/100`, sub: `Grade ${r.grade} · ${r.label}` }, { label: 'Coverage', value: `${Math.round(r.coverage * 100)}%` }, { label: 'Factors', value: String(r.breakdown.length) }],
                     sections: [{ title: 'Factor Breakdown', head: ['Factor', 'Score', 'Weight', 'Contribution'], rows: r.breakdown.map((f: { key: string; value: number; weight: number; contribution: number }) => [f.key, `${Math.round(f.value * 100)}%`, `${Math.round(f.weight * 100)}%`, f.contribution.toFixed(3)]) }],
+                    assessment: buildAssessment('site', { score: r.score, keyRisk: [...r.breakdown].sort((a: { value: number }, b: { value: number }) => a.value - b.value)[0]?.key ?? '' }),
+                    actions: buildActions('site', { score: r.score, keyRisk: [...r.breakdown].sort((a: { value: number }, b: { value: number }) => a.value - b.value)[0]?.key ?? '' }),
+                    summaryBand: [
+                        { label: 'Score', value: `${r.score}/100` },
+                        { label: 'Grade', value: r.grade },
+                        { label: 'Coverage', value: `${Math.round(r.coverage * 100)}%` },
+                        { label: 'Factors', value: String(r.breakdown.length) },
+                    ],
                     note: `Factors derived from the ${country?.name || 'selected country'} reference profile (DATA.countries) — engine-real, country-varying.`,
                 })} />
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -258,6 +267,26 @@ export function AssetIntelDashboard() {
                     title: 'Asset Intelligence', layer: 'Layer 9 · Asset Health & Lifecycle', project: '—',
                     kpis: [{ label: 'Sample Health (UPS 3yr)', value: `${health.health}/100`, sub: health.status }, { label: 'Remaining Life', value: `${health.remainingYears} yr`, sub: `of ${health.designLifeYears}` }, { label: 'Tracked Assets', value: String(rows.length) }],
                     sections: [{ title: '15-Year Replacement Schedule', head: ['Asset', 'Interval', 'Events', 'Nominal $M'], rows: rows.map((r: { label: string; intervalYears: number; events: number; totalNominalUsd: number }) => [r.label, `${r.intervalYears}yr`, r.events, (r.totalNominalUsd / 1e6).toFixed(2)]) }],
+                    assessment: buildAssessment('assets', {
+                        avgHealthPct: health.health,
+                        atRiskCount: m.failureProbability ? ['battery', 'ups', 'generator', 'crac', 'chiller', 'transformer'].filter((cls) => {
+                            const life = m.designLife(cls) || 15;
+                            return m.failureProbability(cls, Math.round(life * 0.6)).failureProb >= 0.25;
+                        }).length : 0,
+                    }),
+                    actions: buildActions('assets', {
+                        avgHealthPct: health.health,
+                        atRiskCount: m.failureProbability ? ['battery', 'ups', 'generator', 'crac', 'chiller', 'transformer'].filter((cls) => {
+                            const life = m.designLife(cls) || 15;
+                            return m.failureProbability(cls, Math.round(life * 0.6)).failureProb >= 0.25;
+                        }).length : 0,
+                    }),
+                    summaryBand: [
+                        { label: 'Health', value: `${health.health}/100` },
+                        { label: 'Remaining', value: `${health.remainingYears} yr` },
+                        { label: 'Assets', value: String(rows.length) },
+                        { label: 'Horizon', value: '15 yr' },
+                    ],
                     note: 'Screening health + lifecycle model — not a condition survey.',
                 })} />
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">

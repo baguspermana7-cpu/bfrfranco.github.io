@@ -75,27 +75,35 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
             <svg viewBox={`${vx} ${vy} ${vw} ${vh}`} className="w-full cursor-grab rounded-xl active:cursor-grabbing" style={{ background: '#0b1020', minHeight: 260 }}
                 onWheel={onWheel} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerLeave={onUp}>
                 <g transform={`translate(${panX},${panY}) scale(${zoom})`} style={{ transformOrigin: 'center' }}>
-                    {/* group containment boxes (under everything) */}
-                    {model.groups?.map((gr, i) => (
-                        <g key={'grp' + i}>
-                            <rect x={gr.x} y={gr.y} width={gr.w} height={gr.h} rx={6}
-                                fill={sld ? 'none' : LANE_FILL[gr.lane]} fillOpacity={sld ? 0 : 0.25}
-                                stroke={LANE_STROKE[gr.lane]} strokeWidth={0.6} strokeDasharray="5 4" opacity={0.7}>
-                                <title>{gr.title}</title>
-                            </rect>
-                            <text x={gr.x + 6} y={gr.y + 9} fontSize="6.5" fontWeight={700} letterSpacing="0.8"
-                                fill={LANE_STROKE[gr.lane]} opacity={0.9}>{gr.title}</text>
-                        </g>
-                    ))}
-                    {/* A/B bus bars */}
+                    {/* group containment boxes (under everything) — header rendered as a chip */}
+                    {model.groups?.map((gr, i) => {
+                        const chipW = gr.title.length * 3.6 + 12;
+                        return (
+                            <g key={'grp' + i}>
+                                <rect x={gr.x} y={gr.y} width={gr.w} height={gr.h} rx={6}
+                                    fill={sld ? 'none' : LANE_FILL[gr.lane]} fillOpacity={sld ? 0 : 0.25}
+                                    stroke={LANE_STROKE[gr.lane]} strokeWidth={0.6} strokeDasharray="5 4" opacity={0.7}>
+                                    <title>{gr.title}</title>
+                                </rect>
+                                <rect x={gr.x + 4} y={gr.y - 5} width={chipW} height={11} rx={5.5}
+                                    fill="#0b1020" stroke={LANE_STROKE[gr.lane]} strokeWidth={0.6} opacity={0.95} />
+                                <text x={gr.x + 10} y={gr.y + 3} fontSize="6.5" fontWeight={700} letterSpacing="0.8"
+                                    fill={LANE_STROKE[gr.lane]}>{gr.title}</text>
+                            </g>
+                        );
+                    })}
+                    {/* A/B bus bars — emphasized: end junction dots + tap points */}
                     {model.buses?.map((b, i) => (
                         <g key={'bus' + i}>
                             <line x1={b.x1} y1={b.y} x2={b.x2} y2={b.y}
-                                stroke={b.spare ? '#f97316' : '#3b82f6'} strokeWidth={b.spare ? 1.6 : 2.6}
-                                strokeDasharray={b.spare ? '4 3' : undefined} opacity={0.9}>
+                                stroke={b.spare ? '#f97316' : '#3b82f6'} strokeWidth={b.spare ? 1.8 : 3}
+                                strokeDasharray={b.spare ? '4 3' : undefined} opacity={0.95} strokeLinecap="round">
                                 <title>{b.label} — {b.spare ? 'spare trunk (2N+1)' : 'main distribution bus'}</title>
                             </line>
-                            <text x={(b.x1 + b.x2) / 2} y={b.y - 3} fontSize="5.5" fontWeight={700} textAnchor="middle"
+                            <circle cx={b.x1} cy={b.y} r={2.1} fill={b.spare ? '#f97316' : '#3b82f6'} />
+                            <circle cx={b.x2} cy={b.y} r={2.1} fill={b.spare ? '#f97316' : '#3b82f6'} />
+                            <circle cx={(b.x1 + b.x2) / 2} cy={b.y} r={1.4} fill="#0b1020" stroke={b.spare ? '#fb923c' : '#60a5fa'} strokeWidth={0.7} />
+                            <text x={(b.x1 + b.x2) / 2} y={b.y - 4} fontSize="5.5" fontWeight={700} textAnchor="middle"
                                 fill={b.spare ? '#fb923c' : '#60a5fa'}>{b.label}</text>
                         </g>
                     ))}
@@ -133,11 +141,17 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
                                         <text x={b.x + b.w - 19} y={b.y + 12.5} fontSize="6.5" textAnchor="middle" fill="#c4b5fd">{b.badge}</text>
                                     </>
                                 )}
+                                {/* stacked-unit cascade: offset repeated outlines + ×N when real count exceeds the drawn glyphs */}
                                 {b.glyphs != null && Array.from({ length: b.glyphs }, (_, gi) => (
                                     sld
-                                        ? <circle key={gi} cx={b.x + 12 + gi * 12} cy={b.y + b.h - 9} r={3.4} fill="none" stroke="#cbd5e1" strokeWidth={0.8} />
-                                        : <rect key={gi} x={b.x + 8 + gi * 12} y={b.y + b.h - 13} width={8} height={8} rx={1.5} fill={LANE_STROKE[b.lane]} opacity={0.55} />
+                                        ? <circle key={gi} cx={b.x + 12 + gi * 11} cy={b.y + b.h - 9} r={3.4} fill="none" stroke="#cbd5e1" strokeWidth={0.8} />
+                                        : <rect key={gi} x={b.x + 8 + gi * 10} y={b.y + b.h - 13 - gi * 1.2} width={9} height={9} rx={1.5}
+                                            fill={LANE_FILL[b.lane]} stroke={LANE_STROKE[b.lane]} strokeWidth={0.8} opacity={0.9} />
                                 ))}
+                                {b.units != null && b.glyphs != null && b.units > b.glyphs && (
+                                    <text x={b.x + 12 + b.glyphs * (sld ? 11 : 10)} y={b.y + b.h - 6.5} fontSize="7" fontWeight={700}
+                                        fill={sld ? '#cbd5e1' : LANE_STROKE[b.lane]}>×{b.units}</text>
+                                )}
                             </g>
                         );
                     })}

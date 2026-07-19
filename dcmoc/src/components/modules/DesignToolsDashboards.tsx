@@ -14,6 +14,8 @@ import { useRequirementsStore } from '@/store/requirements';
 import { rzModels, rzData } from '@/lib/rz-engine';
 import { densityToEngineBucket } from '@/lib/requirementsMappings';
 import { generatePillarPDF, type PillarReport } from '@/modules/reporting/pdf/PillarPdf';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
+import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import {
     computeSpares, defaultLeadWeeks, SPARES_CLASSES, UNIT_COST_SCREENING,
     UNDERSTOCK_COST_SCREENING, CARRY_RATE_PCT, PART_LIFE_YRS,
@@ -204,7 +206,8 @@ export function CduDashboard() {
     const exportPdf = async () => {
         setBusy(true);
         try {
-            const report: PillarReport = {
+            const narrativeMetrics = { pue: ds?.pue ?? pueLiquid, liquidSharePct: liquid ? 100 : 0 };
+            const report: StandardReport = {
                 title: 'CDU / Liquid Cooling', layer: 'Cooling Design', project: 'DC-OS Project',
                 kpis: [
                     { label: 'Coolant Flow', value: `${(r.flowLpm as number).toLocaleString()} L/min`, sub: `ΔT ${dT} K` },
@@ -241,6 +244,16 @@ export function CduDashboard() {
                     }] : []),
                 ],
                 callouts: ds && ds.warnings?.length ? ds.warnings.map((w: string) => ({ title: 'Deep-sea screening warning', body: w, tone: 'warn' as const })) : undefined,
+                assessment: buildAssessment('cooling', narrativeMetrics),
+                actions: buildActions('cooling', narrativeMetrics),
+                summaryBand: [
+                    { label: 'Coolant Flow', value: `${(r.flowLpm as number).toLocaleString()} L/min` },
+                    { label: 'IT Load', value: `${(inputs.itLoad / 1000).toFixed(1)} MW` },
+                    { label: 'PUE Liquid', value: String(pueLiquid) },
+                    { label: 'PUE Air', value: String(pueAir) },
+                    { label: 'Refrigerant', value: refDb[refKey]?.label ?? refKey },
+                    ...(ds ? [{ label: 'Deep-Sea PUE', value: String(ds.pue) }] : []),
+                ],
                 note: 'Thermohydraulic sizing estimate (Darcy-Weisbach + Magnus dew point) and deep-sea screening per the engine deepSeaCooling dataset — not a hydraulic or marine design.',
             };
             await generatePillarPDF(report);
@@ -431,7 +444,7 @@ export function SparesDashboard() {
         });
 
     const belowRows = rows.filter((r) => r.fillAchieved < r.fillTargetPct / 100);
-    const report = (): PillarReport => ({
+    const report = (): StandardReport => ({
         title: 'Spares Optimization',
         layer: 'Layer 9 · models.spares (newsvendor)',
         project: country?.name || '—',
@@ -460,6 +473,15 @@ export function SparesDashboard() {
         callouts: belowRows.length
             ? belowRows.map((r) => ({ title: `${r.label} below fill target`, body: `Achieved fill ${(r.fillAchieved * 100).toFixed(1)}% vs ${r.fillTargetPct}% target — consider raising Q*/safety stock or shortening the ${r.leadWeeks}-week lead time.`, tone: 'warn' as const }))
             : [{ title: 'All fill targets met', body: 'Every equipment class meets its service-level target at the recommended stock position.', tone: 'good' as const }],
+        assessment: buildAssessment('spares', { fillRatePct: totals.weightedFillPct, classesAtRisk: totals.belowTarget }),
+        actions: buildActions('spares', { fillRatePct: totals.weightedFillPct, classesAtRisk: totals.belowTarget }),
+        summaryBand: [
+            { label: 'Stock Value', value: money(totals.inventoryValue) },
+            { label: 'Annual Cost', value: money(totals.annualCost) },
+            { label: 'Fill Rate', value: `${totals.weightedFillPct}%` },
+            { label: 'Below Target', value: String(totals.belowTarget) },
+            { label: 'Classes', value: String(rows.length) },
+        ],
         note: 'MTBF/MTTR are IEEE-493 typical figures from the shared engine (DATA.reliability). Unit costs and lead times are screening-grade assumptions, user-overridable per class. Newsvendor critical-fractile output is a planning heuristic — not an inventory policy or a vendor-quoted spares program.',
     });
     const onExport = async () => { setBusy(true); try { await generatePillarPDF(report()); } finally { setBusy(false); } };

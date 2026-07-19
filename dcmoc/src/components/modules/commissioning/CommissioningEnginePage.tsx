@@ -17,6 +17,8 @@ import { rzModels, rzData } from '@/lib/rz-engine';
 import { CX_CHECKLIST, resolveProc, type ReadinessKey, type ChecklistItem } from '@/lib/cx-procedures';
 import { CommissioningDashboard } from '@/components/modules/NewEngineDashboards';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
+import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { CheckCircle2, ChevronRight, ChevronDown, FileDown, ListChecks } from 'lucide-react';
 
 const WITNESS_STYLE: Record<string, { label: string; cls: string }> = {
@@ -141,6 +143,7 @@ export function CommissioningEnginePage() {
                                     if (v) tickedRows.push([label, i.label, resolveProc(i.templateKey, i.params)?.witness ?? 'R', v.toUpperCase()]);
                                 }));
                             });
+                            const cxMetrics = { readinessPct: overall, testsFailed: failTotal, openIssues: openIssues.length };
                             await generatePillarPDF({
                                 title: 'Commissioning Program', layer: 'Commissioning Engine', project: country?.name ?? 'DC-OS Project',
                                 kpis: [
@@ -170,8 +173,18 @@ export function CommissioningEnginePage() {
                                     ...(tickedRows.length ? [{ title: 'Checklist Status', head: ['Level', 'Activity', 'Witness', 'Status'], rows: tickedRows }] : []),
                                     { title: 'Issues & Punch', head: ['Severity', 'Item', 'Kind', 'Status'], rows: t.issues.map((x) => [x.sev, x.title, x.kind, x.open ? 'OPEN' : 'closed']) },
                                 ],
+                                assessment: buildAssessment('commissioning', cxMetrics),
+                                actions: buildActions('commissioning', cxMetrics),
+                                summaryBand: [
+                                    { label: 'Readiness', value: readiness ? `${overall}%` : '—' },
+                                    { label: 'Passed', value: String(passTotal ?? '—') },
+                                    { label: 'Failed', value: String(failTotal ?? '—') },
+                                    { label: 'Open Issues', value: String(openIssues.length) },
+                                    { label: 'Punch', value: String(punch.length) },
+                                    { label: 'Duration', value: `~${rich.durationMonths} mo` },
+                                ],
                                 note: 'Program plan engine-real (rich cx model); readiness = engine readinessIndex over user-tracked completion; checklist activities trace to NETA/IEEE/ASHRAE test procedure templates.',
-                            });
+                            } as StandardReport);
                         } finally { setBusy(false); }
                     }} disabled={busy}
                         className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-violet-400 disabled:opacity-50">

@@ -16,12 +16,14 @@ import { useCapexStore } from '@/store/capex';
 import { useFinancialTracking } from '@/store/financialTracking';
 import { useConstructionTracking } from '@/store/constructionTracking';
 import { plannedSchedule, evm, pvCurve } from '@/state/adapters/construction-adapter';
-import { rzModels } from '@/lib/rz-engine';
+import { rzModels, rzData } from '@/lib/rz-engine';
 import FinancialDashboard from '@/components/modules/FinancialDashboard';
 import MonteCarloDashboard from '@/components/modules/MonteCarloDashboard';
 import { fmtMoney } from '@/lib/format';
 import { TrendingUp, ChevronRight, FileDown } from 'lucide-react';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
+import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 
 const OPEX_COLORS = ['#f59e0b', '#10b981', '#3b82f6', '#a855f7', '#64748b', '#14b8a6'];
 
@@ -86,6 +88,16 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
         setBusy(true);
         try {
             const overdue = fin.invoices.filter((iv) => iv.status === 'overdue');
+            // Screening pro-forma (same engine basis as the Results page): reference
+            // revenue × IT load vs the page's dcContract OPEX — roi model, no new data.
+            const m = rzModels();
+            const revenueYr = (rzData()?.decision?.revenuePerKwMonth ?? 280) * inputs.itLoad * 12;
+            const opexYr = model.opex ? (model.opex.totalExtended ?? model.opex.total) : revenueYr * 0.4;
+            const flows = Array.from({ length: 15 }, () => revenueYr - opexYr);
+            const npv = m?.roi?.npv ? m.roi.npv(flows, 0.1) - model.baseline : 0;
+            const irrFrac = m?.roi?.irr ? m.roi.irr([-model.baseline, ...flows]) : null;
+            const payback = m?.roi?.paybackPeriod ? m.roi.paybackPeriod(model.baseline, revenueYr, opexYr) : Infinity;
+            const narrativeMetrics = { npv, irrPct: (irrFrac ?? 0) * 100, paybackYr: Number.isFinite(payback) ? payback : 0, hurdlePct: 10 };
             await generatePillarPDF({
                 title: 'Financial', layer: 'Financial Engine', project: '—',
                 kpis: [
@@ -116,7 +128,9 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                     }] : []),
                 ],
                 callouts: insights.map((s, idx) => ({ title: `Key Insight ${idx + 1}`, body: s, tone: 'info' as const })),
+                assessment: buildAssessment('financial', narrativeMetrics),
                 actions: [
+                    ...buildActions('financial', narrativeMetrics),
                     ...(model.grade !== 'A' ? [{ priority: 'MEDIUM' as const, action: `Financial health grade ${model.grade} (${model.health}/100) — review budget variance, CPI and SPI drivers.` }] : []),
                     ...overdue.map((iv) => ({ priority: 'HIGH' as const, action: `Overdue invoice ${iv.invoiceNo} — ${iv.vendor} (${iv.direction}) ${fmtMoney(iv.amountFrac * model.baseline)}.` })),
                 ],
@@ -129,7 +143,7 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                     { label: 'Health', value: `${model.grade} · ${model.health}` },
                 ],
                 note: 'Budget baseline = engine capex P50 + approved revisions; CPI/SPI passthrough from the Construction EVM (single source — never recomputed here); annual OPEX via the engine dcContract basis preset.',
-            });
+            } as StandardReport);
         } finally { setBusy(false); }
     };
 

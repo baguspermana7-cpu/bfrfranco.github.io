@@ -20,6 +20,8 @@ import {
 import { Layers, ChevronRight, Zap, Snowflake, Boxes, Network, FileDown } from 'lucide-react';
 import { rzData } from '@/lib/rz-engine';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
+import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 
 const DONUT_COLORS = ['#a78bfa', '#14b8a6', '#3b82f6', '#f59e0b', '#64748b'];
 
@@ -60,6 +62,10 @@ export function CapacityPlanningPage() {
         setBusy(true);
         try {
             const firstUtil = util.rows[0];
+            const narrativeMetrics = {
+                strandedPct: (util.stranded?.fraction ?? 0) * 100,
+                utilizationPct: Math.max(0, ...util.rows.map((u) => u.pct)),
+            };
             await generatePillarPDF({
                 title: 'Capacity Planning', layer: 'Capacity Planning Engine', project: '—',
                 kpis: [
@@ -89,7 +95,11 @@ export function CapacityPlanningPage() {
                         tone: 'warn' as const,
                     }] : []),
                 ],
-                actions: recs.map((r) => ({ priority: 'MEDIUM' as const, action: `${r.title}: ${r.body}` })),
+                assessment: buildAssessment('capacity', narrativeMetrics),
+                actions: [
+                    ...buildActions('capacity', narrativeMetrics),
+                    ...recs.map((r) => ({ priority: 'MEDIUM' as const, action: `${r.title}: ${r.body}` })),
+                ],
                 summaryBand: [
                     { label: 'IT Load', value: `${(i.itLoadKw / 1000).toFixed(1)} MW` },
                     { label: 'Peak', value: `${peak.toFixed(0)} MW` },
@@ -99,7 +109,7 @@ export function CapacityPlanningPage() {
                     { label: 'Binding', value: util.binding ?? '—' },
                 ],
                 note: 'Engine-derived capacity analysis — committed = cumulative build phases, forecast = Requirements growth plan, design capacity incl. design margin. Network row is a screening assumption (no engine network model).',
-            });
+            } as StandardReport);
         } finally { setBusy(false); }
     };
 

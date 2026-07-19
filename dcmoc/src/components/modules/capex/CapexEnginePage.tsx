@@ -20,6 +20,7 @@ import { fmtMoney } from '@/lib/format';
 import { Building, ChevronRight, FileDown } from 'lucide-react';
 import { rzData } from '@/lib/rz-engine';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 
 export function CapexEnginePage() {
@@ -54,6 +55,7 @@ export function CapexEnginePage() {
     const exportPdf = async () => {
         setBusy(true);
         try {
+            const narrativeMetrics = { perKw, p50: band.p50, p80: band.p80, contingencyPct: inputs.contingency };
             await generatePillarPDF({
                 title: 'CAPEX Engine', layer: 'CAPEX Engine', project: '—',
                 kpis: [
@@ -81,6 +83,8 @@ export function CapexEnginePage() {
                 ],
                 donut: { title: 'CAPEX Breakdown (P50)', unitLabel: 'total CAPEX', slices: cats.rows.map((r) => ({ label: r.name, value: r.usd, color: r.color })) },
                 callouts: model.insights.map((s, idx) => ({ title: `Key Insight ${idx + 1}`, body: s, tone: 'info' as const })),
+                assessment: buildAssessment('capex', narrativeMetrics),
+                actions: buildActions('capex', narrativeMetrics),
                 summaryBand: [
                     { label: 'P10', value: fmtMoney(band.p10) },
                     { label: 'P50', value: fmtMoney(band.p50) },

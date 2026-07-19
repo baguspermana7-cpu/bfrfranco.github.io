@@ -19,6 +19,8 @@ import CarbonDashboard from '@/components/modules/CarbonDashboard';
 import { Leaf, ChevronRight, FileDown } from 'lucide-react';
 import { Explain } from '@/components/ui/Explain';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
+import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 
 const SCOPE_COLORS = ['#f59e0b', '#a78bfa', '#64748b'];
 const MIX_COLORS = ['#34d399', '#22d3ee', '#64748b'];
@@ -69,6 +71,7 @@ export function SustainabilityEnginePage() {
     const exportPdf = async () => {
         setBusy(true);
         try {
+            const susMetrics = { pue: model.pue, renewablePct: model.renewablePct };
             await generatePillarPDF({
                 title: 'Sustainability', layer: 'Sustainability Engine', project: '—',
                 kpis: [
@@ -104,6 +107,8 @@ export function SustainabilityEnginePage() {
                         tone: 'info' as const,
                     },
                 ],
+                assessment: buildAssessment('sustainability', susMetrics),
+                actions: buildActions('sustainability', susMetrics),
                 summaryBand: [
                     { label: 'PUE', value: String(model.pue) },
                     { label: 'Renewable', value: `${model.renewablePct}%` },
@@ -112,7 +117,7 @@ export function SustainabilityEnginePage() {
                     { label: 'Overall', value: `${model.overall}/100` },
                 ],
                 note: 'GHG scopes, WUE water volumes and PUE engine-real; energy mix derived from capex renewable/cert inputs (labeled); initiatives & certifications user-attested.',
-            });
+            } as StandardReport);
         } finally { setBusy(false); }
     };
 

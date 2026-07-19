@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.90.0 — 2026-07-19 (DCMOC revision round 3: PDF executive-assessment engine · architecture visual depth · auto-linking system)
+
+### Added
+- **PDF Executive Assessment engine** (`dcmoc/src/modules/reporting/pdf/ReportNarrative.ts`): every DC-OS export now ends with the min-standard algorithmic conclusion — a deterministic profile chip chosen by per-family threshold rubrics (16 families: capex $/kW bands, financial NPV/IRR-vs-hurdle, reliability nines-vs-tier-target, sustainability PUE bands, capacity stranded %, construction SPI/CPI, operations PM-compliance, commissioning readiness, results grade, site score, assets health, spares fill, staffing, requirements completeness, architecture layer validation, cooling) + a narrative built from the page's live numbers + prioritized HIGH/MED/LOW action items. Wired into ALL 16 export call sites (11 verified headless by the new `tools/_dcmoc_export_probe.mjs` — 44/0: Executive Assessment + actions + summary band present in every captured print document, 0 page errors).
+- **AUTO-LINKING system** (owner: "harus auto, tidak perlu Claude"): `tools/build-engine-catalog.mjs` generates `dcmoc/src/lib/engine-catalog.json` from `rz-engine.js` — 34 model namespaces · 160 functions with parameter lists · 85 sourced DATA tables · consumers GREP-DERIVED from real usage (site articles + DC-OS modules). Knowledge Base "Engine Models" tab + FAQ "Engine & Data Reference" section render the catalog LIVE (auto-generated, never hand-written). New SHIP GATE `tools/test-value-bindings.mjs` (73/0): value-bindings coherence (unique ids, engine-provenance entries carry engineFn, every engineFn resolves against the live engine, pages ⊆ real tab ids — caught 3 stale tab aliases + 1 missing engineFn on first run) + catalog STALENESS (regenerates in-memory and diffs vs committed — an engine change cannot ship with stale docs). Chain codified in ENGINE_UNIFICATION.md + CLAUDE.md + USER_MANUAL §8.
+- **Requirements 1.1 "Data Center Image (Dashboard hero)" upload card** restored where the owner expects it: same store as the CAPEX card (`useCapexStore.heroImage`, WebP-compressed client-side) — custom/default chip, preview ring, "Reset to default"; the Executive Dashboard falls back to the default DC-OS render when nothing is uploaded.
+
+### Changed
+- **Architecture diagram visual depth** (reference-parity round): transformer glyph now draws primary/secondary winding coil pairs; genset = engine block + shaft + alternator; UPS carries an integrated battery-cell stack; chiller = evap/cond barrels + compressor; rack = dense U-unit grid; fuel = saddle tank + level line; cooling tower gains fan + fill louvers; pylon + switchgear + PDU + CRAH/CDU detail passes. Stacked-unit CASCADE rendering with real ×N count badges (layout `units` field), group containment headers rendered as count-badged chips ("COOLING PLANT — 8 chillers"), A/B bus bars emphasized (3px, junction dots, tap points).
+- Owner Action Board (`setup-supabase.html`): `github-token-rotate` updated — rotation reported DONE 2026-07-19; remaining owner-typed step documented (store the new PAT in `~/.git-credentials`, verify `git push --dry-run`).
+
+---
+
 ## v1.89.1 — 2026-07-19 (article-calculator engine sweep, batch 2 — includes a REAL unit-bug fix)
 
 ### Added
