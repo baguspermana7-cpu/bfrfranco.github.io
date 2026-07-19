@@ -19,6 +19,7 @@ import { rzData, rzModels } from '@/lib/rz-engine';
 import { useRequirementsStore } from '@/store/requirements';
 import { applyUseCaseProfile, USE_CASE_TO_ENGINE } from '@/lib/requirementsMappings';
 import { PlatformHeader, KpiChips } from '@/components/modules/platform/ScenariosPage';
+import { VALUE_BINDINGS, BINDING_GROUPS } from '@/lib/value-bindings';
 import { Database, Boxes, FolderOpen, HelpCircle, Zap, Wrench, ClipboardCheck, Users, Sun, Moon, Cpu, Server, Building, ArrowRight, CheckCircle2, Circle, ExternalLink } from 'lucide-react';
 
 function Head({ icon: Icon, title, sub, tone = 'from-cyan-500 to-blue-600' }: { icon: React.ElementType; title: string; sub: string; tone?: string }) {
@@ -230,19 +231,96 @@ export function SettingsDashboard() {
 }
 
 /* ── Knowledge Base ── */
+const PROV_STYLE: Record<string, string> = {
+    input: 'bg-violet-500/15 text-violet-400', engine: 'bg-emerald-500/15 text-emerald-500',
+    derived: 'bg-cyan-500/15 text-cyan-500', tracking: 'bg-sky-500/15 text-sky-400',
+    assumption: 'bg-amber-500/15 text-amber-500', screening: 'bg-amber-500/15 text-amber-500',
+};
+
 export function KnowledgeDashboard() {
     const models = Object.keys(rzModels() || {});
+    const setActiveTab = useSimulationStore((x) => x.actions.setActiveTab);
+    const [tab, setTab] = React.useState<'bindings' | 'models'>('bindings');
+    const [q, setQ] = React.useState('');
+    const [grp, setGrp] = React.useState<string>('all');
+    const [open, setOpen] = React.useState<string | null>(null);
+    const rows = VALUE_BINDINGS.filter((b) =>
+        (grp === 'all' || b.group === grp) &&
+        (!q || (b.label + ' ' + b.id + ' ' + b.formula + ' ' + (b.engineFn ?? '') + ' ' + b.sourceParams.join(' ')).toLowerCase().includes(q.toLowerCase())));
     return (
         <div className="space-y-4">
-            <Head icon={HelpCircle} title="Knowledge Base" sub="Engine model reference + the site glossary" tone="from-amber-500 to-orange-600" />
-            <Card>
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Engine models ({models.length})</h2>
-                <div className="flex flex-wrap gap-1.5">{models.sort().map((m) => <span key={m} className="text-[10px] px-2 py-1 rounded bg-slate-100 dark:bg-white/[0.05] text-slate-600 dark:text-slate-300">{m}</span>)}</div>
-            </Card>
-            <Card>
-                <a href="/glossary.html" target="_blank" className="inline-flex items-center gap-1.5 text-xs text-cyan-600 dark:text-cyan-400 hover:underline"><ExternalLink className="w-3.5 h-3.5" /> Open the full DC glossary</a>
-                <p className="mt-1 text-[10px] text-slate-400">Every parameter across the platform carries an RZExplain tooltip sourced from this glossary.</p>
-            </Card>
+            <PlatformHeader icon={HelpCircle} title="Knowledge Base" sub="Value Binding & Sync Manual — where every number comes from, and who consumes it" tone="from-amber-500 to-orange-600"
+                actions={<div className="flex rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden">
+                    {([['bindings', 'Value Bindings'], ['models', 'Engine Models']] as const).map(([k, l]) => (
+                        <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
+                    ))}
+                </div>} />
+
+            {tab === 'bindings' && (<>
+                <KpiChips items={[
+                    { label: 'Documented Bindings', value: String(VALUE_BINDINGS.length), sub: 'per point/value' },
+                    { label: 'Groups', value: String(BINDING_GROUPS.length), sub: 'canonicals → results' },
+                    { label: 'Engine-computed', value: String(VALUE_BINDINGS.filter((b) => b.provenance === 'engine').length), sub: 'rz-engine / modules' },
+                    { label: 'Single-source rule', value: '100%', sub: 'every value one origin, N consumers' },
+                ]} />
+                <div className="flex flex-wrap items-center gap-2">
+                    <input className="w-64 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-violet-500 text-slate-900 dark:text-slate-100"
+                        placeholder="Search value, formula, engine fn…" value={q} onChange={(e) => setQ(e.target.value)} />
+                    <div className="flex flex-wrap gap-1">
+                        {['all', ...BINDING_GROUPS].map((g) => (
+                            <button key={g} onClick={() => setGrp(g)}
+                                className={`rounded-full px-2 py-1 text-[10px] ${grp === g ? 'bg-violet-600 text-white' : 'border border-slate-300 dark:border-slate-700 text-slate-500 hover:border-violet-400'}`}>{g}</button>
+                        ))}
+                    </div>
+                    <span className="ml-auto text-[10px] text-slate-400">{rows.length} of {VALUE_BINDINGS.length}</span>
+                </div>
+                <div className="space-y-1.5">
+                    {rows.map((b) => (
+                        <div key={b.id} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+                            <button onClick={() => setOpen(open === b.id ? null : b.id)} className="flex w-full items-center gap-2 px-3 py-2 text-left">
+                                <span className={`rounded px-1.5 py-0.5 text-[8.5px] font-bold uppercase ${PROV_STYLE[b.provenance]}`}>{b.provenance}</span>
+                                <span className="text-xs font-semibold text-slate-900 dark:text-white">{b.label}</span>
+                                <code className="text-[9px] text-slate-400">{b.id}</code>
+                                <span className="ml-auto hidden text-[9px] text-slate-400 md:block">{b.pages.length} page(s) · {b.consumers.length} consumer(s)</span>
+                            </button>
+                            {open === b.id && (
+                                <div className="grid gap-3 border-t border-slate-100 dark:border-slate-800/60 px-3 py-2.5 text-[11px] md:grid-cols-2">
+                                    <div className="space-y-1.5">
+                                        <div><span className="text-[9px] font-semibold uppercase text-slate-400">Formula / derivation</span>
+                                            <p className="text-slate-600 dark:text-slate-300">{b.formula}</p></div>
+                                        {b.engineFn && <div><span className="text-[9px] font-semibold uppercase text-slate-400">Engine function</span>
+                                            <p><code className="text-emerald-500">{b.engineFn}</code></p></div>}
+                                        <div><span className="text-[9px] font-semibold uppercase text-slate-400">Source parameters</span>
+                                            <div className="flex flex-wrap gap-1">{b.sourceParams.map((sp) => <code key={sp} className="rounded bg-violet-500/10 px-1.5 py-0.5 text-[9px] text-violet-400">{sp}</code>)}</div></div>
+                                        {b.notes && <p className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-2 py-1 text-[10px] text-amber-600 dark:text-amber-400">{b.notes}</p>}
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <div><span className="text-[9px] font-semibold uppercase text-slate-400">Rendered on</span>
+                                            <div className="flex flex-wrap gap-1">{b.pages.map((pg) => (
+                                                <button key={pg} onClick={() => setActiveTab(pg as never)}
+                                                    className="rounded border border-slate-300 dark:border-slate-700 px-1.5 py-0.5 text-[9px] text-slate-500 hover:border-violet-400 hover:text-violet-400">{pg} ↗</button>
+                                            ))}</div></div>
+                                        <div><span className="text-[9px] font-semibold uppercase text-slate-400">Consumers (sync targets)</span>
+                                            <ul className="list-disc pl-4 text-[10px] text-slate-600 dark:text-slate-300">{b.consumers.map((c, i) => <li key={i}>{c}</li>)}</ul></div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+                <p className="text-[10px] text-slate-400">Every entry: one origin (violet source params) → one formula/engine fn → N consumers. The synergy probe asserts cross-page equality per binding id; KPI elements carry matching <code>data-bind</code> anchors.</p>
+            </>)}
+
+            {tab === 'models' && (<>
+                <Card>
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Engine models ({models.length})</h2>
+                    <div className="flex flex-wrap gap-1.5">{models.sort().map((m) => <span key={m} className="text-[10px] px-2 py-1 rounded bg-slate-100 dark:bg-white/[0.05] text-slate-600 dark:text-slate-300">{m}</span>)}</div>
+                </Card>
+                <Card>
+                    <a href="/glossary.html" target="_blank" className="inline-flex items-center gap-1.5 text-xs text-cyan-600 dark:text-cyan-400 hover:underline"><ExternalLink className="w-3.5 h-3.5" /> Open the full DC glossary</a>
+                    <p className="mt-1 text-[10px] text-slate-400">Every parameter across the platform carries an RZExplain tooltip sourced from this glossary.</p>
+                </Card>
+            </>)}
         </div>
     );
 }

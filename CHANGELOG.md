@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.87.0 — 2026-07-19 (DCMOC audit round 2, batch AH: Value Binding & Sync Manual + synergy probe)
+
+### Added
+- **Value Binding & Sync catalog** (`src/lib/value-bindings.ts`): machine-readable documentation of every bound number in DC-OS — 38 rich entries across 7 groups (shared canonicals, CAPEX chain, PUE/OPEX, reliability & Cx, site & sibling engines, staff/assets/spares, financial & results). Each entry: source parameters → exact formula/engine function → every consumer page, with provenance (input/engine/derived/tracking/screening) and trap notes (pueMatrix-direct, EVM single-source, margin→contingency).
+- **Knowledge Base rebuilt as the manual**: searchable/filterable "Value Bindings" tab — expandable per-value detail with source-param chips, engine fn, consumer list and REAL page links; engine-models tab retained. FAQ gains a "Where does every number come from?" section linking to it.
+- **Cross-page synergy probe** (`tools/_dcmoc_synergy_probe.mjs`, permanent): drives the app and ASSERTS the same bound number renders identically everywhere — CAPEX total identical on 4 pages (Dashboard/CAPEX P50/Financial baseline/Investment), design PUE (Dashboard = Architecture), Ops partial-load PUE ≥ design (documented separate basis), IT load, dashboard design-capacity ≥ IT (margin basis), tier labels. 6/6 green.
+
+### Changed
+- **Strategic Planning "Estimated CAPEX"** now states its basis explicitly: CAPEX-module rate × the land/grid-CONSTRAINED MW — not the project MW (the audit's one confusable pair, now labeled + documented in the manual).
+
 ## v1.86.2 — 2026-07-19 (DCMOC audit round 2, batch AG: visual-audit fixes)
 
 ### Fixed

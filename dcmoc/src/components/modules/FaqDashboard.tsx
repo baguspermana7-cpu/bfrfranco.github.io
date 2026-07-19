@@ -1,5 +1,6 @@
 'use client';
 
+import { useSimulationStore } from '@/store/simulation';
 import React, { useState } from 'react';
 import { HelpCircle, ChevronDown, ChevronRight, BookOpen, Target, TrendingUp, BarChart3, FileText } from 'lucide-react';
 import clsx from 'clsx';
@@ -113,6 +114,19 @@ export function FaqDashboard() {
 
     return (
         <div className="space-y-6">
+            {/* AH2 — link to the Value Binding & Sync Manual */}
+            <div className="rounded-2xl border border-violet-500/30 bg-violet-600/5 p-4">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Where does every number come from?</h3>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    Every KPI and computed value in DC-OS is documented in the <b>Value Binding &amp; Sync Manual</b>:
+                    its source parameters, the exact formula or engine function, and every page that consumes it —
+                    one origin per value, verified by the cross-page synergy probe.
+                </p>
+                <button onClick={() => useSimulationStore.getState().actions.setActiveTab('knowledge')}
+                    className="mt-2 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">
+                    Open the Value Binding Manual →
+                </button>
+            </div>
             {/* Header */}
             <div className="p-6 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl backdrop-blur-sm shadow-sm dark:shadow-none">
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">

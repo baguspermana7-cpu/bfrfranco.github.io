@@ -417,7 +417,8 @@ export default function StrategicPlanningDashboard() {
                             <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{fmtMoney(feasibilityResults.estimatedCapex)}</div>
                             <div className="text-[10px] text-slate-400 mt-0.5">
                                 {fmtMoney(feasibilityResults.estimatedCapex / feasibilityResults.actualITMW / 1000)}/kW
-                                {' · '}based on CAPEX module rates
+                                {' · '}CAPEX-module rate × the land/grid-CONSTRAINED {feasibilityResults.actualITMW.toFixed(1)} MW
+                                {' — '}not the project {(inputs.itLoad / 1000).toFixed(1)} MW (see Value Bindings)
                             </div>
                             <div className="mt-3 h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                                 <div
