@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useFx } from '@/lib/fx';
 import { useSimulationStore } from '@/store/simulation';
 import { useRequirementsStore } from '@/store/requirements';
 import { useScenarioStore, SavedScenario } from '@/store/scenario';
@@ -101,6 +102,8 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
     const logout = useAuthStore((s) => s.logout);
     const { selectedCountry, activeTab, inputs, actions } = useSimulationStore();
     const projectName = useRequirementsStore((s) => s.overview.projectName);
+    const projCurrency = useRequirementsStore((s) => s.overview.currency);
+    const fx = useFx();
     const scenarioStore = useScenarioStore();
     const capexStore = useCapexStore();
     const { theme, setTheme } = useTheme();
@@ -614,6 +617,12 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                             <span>Tier {inputs.tierLevel}</span>
                             <span className="text-slate-300 dark:text-slate-600">·</span>
                             <span className="capitalize">{inputs.coolingType}</span>
+                            {projCurrency && projCurrency !== 'USD' && fx.rates[projCurrency] && (
+                                <span className="rounded bg-cyan-500/10 px-1.5 py-0.5 text-[10px] text-cyan-600 dark:text-cyan-400"
+                                    title={`Kurs ${fx.source === 'live' ? 'LIVE via gateway /fx' : 'snapshot engine (offline fallback)'} · ${fx.asOf}`}>
+                                    {projCurrency} {fx.rates[projCurrency]?.toLocaleString()} /USD · {fx.source}
+                                </span>
+                            )}
                             <span className="hidden sm:inline text-[10px] text-slate-400 dark:text-slate-500">· data 2026-Q1 ⓘ</span>
                         </span>
                         <button

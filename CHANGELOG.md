@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.92.2 — 2026-07-19 (live FX + shared currency list)
+
+### Added
+- **Live FX rates via the existing gateway `/fx`** (owner: "auto update pakai gate yang sudah ada"): `src/lib/fx.ts` — 1h-TTL cached live rates (verified live: GBP 0.744, CNY 6.78, IDR 17,945 /USD), offline fallback = engine DATA.currency snapshot with an honest source flag. Project-context bar shows the project currency's live rate chip ("IDR 17,945 /USD · live") when the project currency ≠ USD; `fmtInCurrency` ready for display-conversion adoption.
+- **Shared `CURRENCY_LIST`** — Settings default-currency dropdown gains GBP/CNY/AUD/INR (one list with Requirements 1.1, drift impossible).
+
+---
+
 ## v1.92.1 — 2026-07-19 (VALUE TRACE INDEX — Excel-style formula field, batch 1)
 
 ### Added
