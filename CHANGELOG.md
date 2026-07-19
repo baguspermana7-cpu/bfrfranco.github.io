@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.93.5 — 2026-07-19 (Financial input dedup — batch 1)
+
+### Changed
+- **Tax Rate is no longer a manual input on Financial** (owner: "input duplikat di menu lain hapus"): it renders as a derived read-only value from the project country's `economy.taxRate` (emerald "country" chip, single source — change the Country in Requirements and it follows). Revenue/escalation stay editable but are already country-predefined (auto-derive with manual-edit guard). More dedup (project life ↔ contract duration, Pro-Forma fields) continues per task #332/#333.
+
+---
+
 ## v1.93.4 — 2026-07-19 (tooltip coverage — Field primitive cascade)
 
 ### Added

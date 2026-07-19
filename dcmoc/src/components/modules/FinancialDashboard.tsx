@@ -411,10 +411,11 @@ const FinancialDashboard = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Tax Rate (%) <Tooltip content="Corporate income tax rate applied to taxable income after depreciation. Varies by jurisdiction." /></label>
-                                <input type="number" className={inpCls}
-                                    value={(finInputs.taxRate * 100).toFixed(0)}
-                                    onChange={e => handleChange('taxRate', Number(e.target.value) / 100)} />
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Tax Rate (%) <Tooltip content="DERIVED dari profil negara project (economy.taxRate) — satu sumber, edit lewat pemilihan Country di Requirements. (#333 dedup: input duplikat dihapus)" /></label>
+                                <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-2 py-1.5 text-sm font-bold tabular-nums text-emerald-500">
+                                    {(finInputs.taxRate * 100).toFixed(1)}%
+                                    <span className="ml-1.5 rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-emerald-500">country</span>
+                                </div>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Depreciation (yrs) <Tooltip content="Straight-line depreciation period for CAPEX assets. Affects taxable income. Building: 20-25 yrs, MEP: 15-20 yrs." /></label>
