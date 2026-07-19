@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.94.8 — 2026-07-19 (on-page guidance — Commissioning)
+
+### Added
+- Commissioning Engine gains the on-page readiness guidance panel (4th adoption): readiness band chip + narrative (level composition, failed tests / open issues gating) + top-3 prioritized actions — live above the progress view.
+
+---
+
 ## v1.94.7 — 2026-07-19 (on-page guidance — Results)
 
 ### Added
