@@ -916,6 +916,27 @@ if (M.capex && M.capex.accuracyRange) {
     ok('capex.accuracyRange Class-4 = -30/+50%', ar.lowPct === -0.30 && ar.highPct === 0.50);
     ok('capex.accuracyRange low<point<high', ar.low < ar.point && ar.point < ar.high);
 }
+/* A20 — water facilityFootprint (article-20 promoted) */
+if (M.water && M.water.facilityFootprint) {
+    const wf = M.water.facilityFootprint({ itLoadMw: 10, pue: 1.4, cooling: 'evaporative', climate: 'temperate', renewablePct: 30 });
+    near('waterFootprint.wue evaporative temperate', wf.wue, 1.8, 1e-12);
+    near('waterFootprint.annualL identity', wf.annualL, 10 * 1.4 * 1000 * 8760 * 1.8 * (1 + 0.7 * 1.5), 1e-3);
+    ok('waterFootprint.households positive', wf.householdsEquiv > 0);
+    near('waterFootprint.gal conversion', wf.annualGal, wf.annualL / 3.785, 1e-6);
+    ok('waterFootprint.method labeled screening', /screening/.test(wf.method));
+    near('waterFootprint.dlc cold lowest', M.water.facilityFootprint({ itLoadMw: 10, pue: 1.2, cooling: 'immersion', climate: 'cold' }).wue, 0.02 * 0.6, 1e-12);
+}
+
+/* A11 — gridImpact residential bill screening (article-11 promoted) */
+if (M.gridImpact && M.gridImpact.residentialBillImpact) {
+    const gi = M.gridImpact.residentialBillImpact({ countryKey: 'indonesia', targetYear: 2030, householdMonthlyKwh: 200, dcCapacityMw: 500 });
+    near('gridImpact.dcAnnualGWh 500MW@0.9', gi.dcAnnualGWh, 500 * 0.9 * 8760 / 1000, 1e-9);
+    ok('gridImpact.householdsEquiv formula', gi.householdsEquiv === Math.round((500 * 1000 * 0.9 * 730) / 111));
+    near('gridImpact.gridLoad 500MW/70GW', gi.gridLoadIncreasePct, (500 / 70000) * 100, 1e-9);
+    near('gridImpact.growth compounding 2030', gi.projectedIncreasePct, ((500 / 70000) * 100 * 0.4) * Math.pow(1.15, 4) * 1.2, 1e-9);
+    ok('gridImpact.method labeled screening', /screening/.test(gi.method));
+}
+
 if (M.reliability && M.reliability.kOutOfN) {
     ok('reliability.kOutOfN 2-of-3 @0.99 ≈ 0.9997', Math.abs(M.reliability.kOutOfN(0.99, 2, 3) - 0.999702) < 1e-4);
     ok('reliability.kOutOfN 1-of-1 = a', Math.abs(M.reliability.kOutOfN(0.95, 1, 1) - 0.95) < 1e-6);

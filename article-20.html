@@ -2240,22 +2240,32 @@ function dcwCalculate() {
     var rackDensity = parseFloat(document.getElementById('dcwRackDensity').value) || 40;
     var renewable = parseFloat(document.getElementById('dcwRenewable').value) || 30;
 
+    var annualLFull, annualGal, dailyL, dailyGal, households, cityPct, cost, pools, aiWater, rackCount, wue;
+    var engW = window.RZEngine && window.RZEngine.models && window.RZEngine.models.water && window.RZEngine.models.water.facilityFootprint;
+    if (engW) {
+        // ENGINE-BOUND (models.water.facilityFootprint — single source; inline math kept as fallback)
+        var r = engW({ itLoadMw: load, pue: pue, cooling: cool, climate: climate, hours: hours, sourceType: source, aiSharePct: aiPct, rackDensityKw: rackDensity, renewablePct: renewable });
+        wue = r.wue; annualLFull = r.annualL; annualGal = r.annualGal; dailyL = r.dailyL; dailyGal = r.dailyGal;
+        households = r.householdsEquiv; cityPct = r.cityPct.toFixed(2); cost = r.annualCostUsd;
+        pools = r.olympicPools.toFixed(1); aiWater = r.aiShareL; rackCount = r.rackCount;
+    } else {
     var facilityMW = load * pue;
     var totalKWh = facilityMW * 1000 * hours;
-    var wue = (dcwWUEBase[cool] || 1.8) * (dcwClimateMult[climate] || 1.0);
+    wue = (dcwWUEBase[cool] || 1.8) * (dcwClimateMult[climate] || 1.0);
     var annualL = totalKWh * wue;
     // Adjust for upstream water from non-renewable power
     var upstreamFactor = 1 + ((100 - renewable) / 100) * 1.5;
-    var annualLFull = annualL * upstreamFactor;
-    var annualGal = annualLFull / 3.785;
-    var dailyL = annualLFull / 365;
-    var dailyGal = annualGal / 365;
-    var households = Math.round(dailyL / 1135);
-    var cityPct = ((dailyL / (50000 * 1135)) * 100).toFixed(2);
-    var cost = (annualGal / 1000) * (dcwWaterCost[source] || 6.0);
-    var pools = (annualLFull / 2500000).toFixed(1);
-    var aiWater = annualLFull * (aiPct / 100);
-    var rackCount = Math.round((load * 1000) / rackDensity);
+    annualLFull = annualL * upstreamFactor;
+    annualGal = annualLFull / 3.785;
+    dailyL = annualLFull / 365;
+    dailyGal = annualGal / 365;
+    households = Math.round(dailyL / 1135);
+    cityPct = ((dailyL / (50000 * 1135)) * 100).toFixed(2);
+    cost = (annualGal / 1000) * (dcwWaterCost[source] || 6.0);
+    pools = (annualLFull / 2500000).toFixed(1);
+    aiWater = annualLFull * (aiPct / 100);
+    rackCount = Math.round((load * 1000) / rackDensity);
+    }
 
     document.getElementById('dcwResults').classList.add('show');
     document.getElementById('dcwAnnual').textContent = wcFmtVol(annualLFull) + ' L';
@@ -2893,6 +2903,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <script src="auth.js?v=2026-07-16b" defer></script>
-<script src="rz-engine.min.js?v=2026-07-19-accuracy" defer></script>
+<script src="rz-engine.min.js?v=2026-07-19-a11" defer></script>
 </body>
 </html>

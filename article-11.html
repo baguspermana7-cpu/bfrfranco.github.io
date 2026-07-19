@@ -2408,13 +2408,23 @@
             const dcCapacityMW = parseFloat(document.getElementById('calcDCCapacity').value) || 500;
 
             const data = countryData[country];
+            let dcAnnualGWh, householdsEquiv, projectedIncrease, monthlyImpactLocal, monthlyImpactUSD, annualImpactUSD, gridLoadIncrease;
+            const eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.gridImpact;
+            if (eng) {
+                // ENGINE-BOUND (models.gridImpact.residentialBillImpact — single source; inline math kept below as fallback)
+                const r = eng.residentialBillImpact({ countryKey: country, targetYear: year, householdMonthlyKwh: householdUsage, dcCapacityMw: dcCapacityMW });
+                dcAnnualGWh = r.dcAnnualGWh; householdsEquiv = r.householdsEquiv;
+                projectedIncrease = r.projectedIncreasePct; monthlyImpactLocal = r.monthlyImpactLocal;
+                monthlyImpactUSD = r.monthlyImpactUsd; annualImpactUSD = r.annualImpactUsd;
+                gridLoadIncrease = r.gridLoadIncreasePct;
+            } else {
             const yearsFromNow = year - 2026;
 
             // DC consumption calculation (90% capacity factor, 8760 hours/year)
-            const dcAnnualGWh = (dcCapacityMW * 0.90 * 8760) / 1000;
+            dcAnnualGWh = (dcCapacityMW * 0.90 * 8760) / 1000;
 
             // Households equivalent
-            const householdsEquiv = Math.round((dcCapacityMW * 1000 * 0.90 * 730) / (data.avgHouseholdKwh)); // monthly basis
+            householdsEquiv = Math.round((dcCapacityMW * 1000 * 0.90 * 730) / (data.avgHouseholdKwh)); // monthly basis
 
             // Growth projection using IEA 15% annual growth
             const growthFactor = Math.pow(1.15, yearsFromNow) * data.growthMultiplier;
@@ -2422,16 +2432,17 @@
             // Estimated tariff increase (based on infrastructure cost allocation model)
             // Assuming 40% of DC infrastructure costs passed to residential, spread over consumer base
             const baseIncrease = (dcCapacityMW / (data.nationalGridGW * 1000)) * 100 * 0.4;
-            const projectedIncrease = baseIncrease * growthFactor;
+            projectedIncrease = baseIncrease * growthFactor;
 
             // Monthly impact calculation
             const currentMonthlyBill = householdUsage * data.residentialTariff;
-            const monthlyImpactLocal = currentMonthlyBill * (projectedIncrease / 100);
-            const monthlyImpactUSD = monthlyImpactLocal / data.usdRate;
-            const annualImpactUSD = monthlyImpactUSD * 12;
+            monthlyImpactLocal = currentMonthlyBill * (projectedIncrease / 100);
+            monthlyImpactUSD = monthlyImpactLocal / data.usdRate;
+            annualImpactUSD = monthlyImpactUSD * 12;
 
             // Grid load increase
-            const gridLoadIncrease = (dcCapacityMW / (data.nationalGridGW * 1000)) * 100;
+            gridLoadIncrease = (dcCapacityMW / (data.nationalGridGW * 1000)) * 100;
+            }
 
             // Update display
             document.getElementById('dcConsumption').textContent = dcAnnualGWh.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -3401,7 +3412,7 @@
 <!-- Search: shared js/rz-command-palette.js -->
 <script src="js/rz-command-palette.js?v=2026-07-17" defer></script>
 <script src="auth.js?v=2026-07-16b" defer></script>
-<script src="rz-engine.min.js?v=2026-07-19-accuracy" defer></script>
+<script src="rz-engine.min.js?v=2026-07-19-a11" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

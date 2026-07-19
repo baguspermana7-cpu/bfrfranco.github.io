@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.89.0 — 2026-07-19 (article-calculator engine sweep, batch 1)
+
+### Added
+- **`models.gridImpact.residentialBillImpact`** + `DATA.gridImpact` (promoted from article-11): the SEA citizen-bill screening model — DC annual GWh at 90% CF, household equivalence, tariff pass-through (40% screening) × IEA 15%/yr growth, monthly/annual bill impact in local + USD, grid-load share — 6 SEA countries with sourced tariffs/grid data; 5 engine asserts.
+- **`models.water.facilityFootprint`** + `DATA.waterFootprint` (promoted from article-20): full facility water screening — WUE base per cooling class × climate multiplier + upstream-power water factor (1.5 L/kWh non-renewable), household/city/pool equivalences, water cost per source type, AI share, hyperscaler benchmarks (Google/Microsoft/Meta/AWS per-MW) — 6 engine asserts.
+
+### Changed
+- **article-11 & article-20 calculators now ENGINE-BOUND**: page computations delegate to the shared models (inline math retained as no-engine fallback); headless-verified page ≡ engine on both. `?v=2026-07-19-a11` bumped sitewide. Sweep progress: 2 of 22 pages; tracker in ENGINE_UNIFICATION.md.
+
 ## v1.88.3 — 2026-07-19 (Owner Action Board pindah ke setup-supabase.html)
 
 ### Changed

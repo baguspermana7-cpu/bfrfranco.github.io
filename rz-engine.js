@@ -4555,6 +4555,40 @@
                 gasDetectAlarmPctLfl: { max: 25 }
             }
         },
+        /* ── A20: facility water-footprint screening (promoted from the
+         * article-20 Data-Center-Water calculator). ── */
+        waterFootprint: {
+            wueBase: { evaporative: 1.8, hybrid: 0.8, aircooled: 0.1, dlc: 0.05, immersion: 0.02 },   // L/kWh at temperate
+            climateMult: { hotdry: 1.4, hothumid: 1.2, temperate: 1.0, cold: 0.6 },
+            waterCostPerKgal: { municipal: 6.0, reclaimed: 3.5, river: 2.0, groundwell: 1.5 },        // $/1000 gal
+            upstreamPowerLPerKwhFactor: 1.5,   // extra upstream water per non-renewable kWh (screening)
+            householdLPerDay: 1135, cityHouseholds: 50000, olympicPoolL: 2500000, lPerGal: 3.785,
+            benchmarksPerMwYr: [
+                { name: 'Google (Avg)',    perMW: 690000000 / 900,  wue: 0.50 },
+                { name: 'Microsoft (Avg)', perMW: 780000000 / 1100, wue: 0.70 },
+                { name: 'Meta (Avg)',      perMW: 350000000 / 700,  wue: 0.40 },
+                { name: 'AWS (Est.)',      perMW: 500000000 / 1000, wue: 0.60 },
+                { name: 'Industry Avg',    perMW: 800000,           wue: 1.20 }
+            ]
+        },
+
+        /* ── A11: residential grid/bill impact screening (promoted from
+         * article-11 inline calculator — SEA citizen-bill model). ── */
+        gridImpact: {
+            baseYear: 2026,
+            capacityFactor: 0.90,          // DC average utilization assumption
+            annualGrowth: 0.15,            // IEA data-centre electricity growth
+            passThroughShare: 0.40,        // infrastructure cost share allocated to residential (screening)
+            countries: {
+                indonesia:   { name: 'Indonesia',   currency: 'IDR', symbol: 'Rp', residentialTariff: 1153,   usdRate: 16000, avgHouseholdKwh: 111, nationalGridGW: 70, dcCapacity2024: 300,  growthMultiplier: 1.2 },
+                malaysia:    { name: 'Malaysia',    currency: 'MYR', symbol: 'RM', residentialTariff: 0.3996, usdRate: 4.7,   avgHouseholdKwh: 648, nationalGridGW: 35, dcCapacity2024: 505,  growthMultiplier: 1.3 },
+                singapore:   { name: 'Singapore',   currency: 'SGD', symbol: 'S$', residentialTariff: 0.33,   usdRate: 1.35,  avgHouseholdKwh: 400, nationalGridGW: 14, dcCapacity2024: 1000, growthMultiplier: 1.1 },
+                thailand:    { name: 'Thailand',    currency: 'THB', symbol: '\u0e3f', residentialTariff: 3.99, usdRate: 36,  avgHouseholdKwh: 300, nationalGridGW: 50, dcCapacity2024: 250,  growthMultiplier: 1.25 },
+                vietnam:     { name: 'Vietnam',     currency: 'VND', symbol: '\u20ab', residentialTariff: 2204, usdRate: 25000, avgHouseholdKwh: 150, nationalGridGW: 80, dcCapacity2024: 150, growthMultiplier: 1.4 },
+                philippines: { name: 'Philippines', currency: 'PHP', symbol: '\u20b1', residentialTariff: 13.01, usdRate: 57, avgHouseholdKwh: 200, nationalGridGW: 25, dcCapacity2024: 120,  growthMultiplier: 1.2 }
+            }
+        },
+
         cdu: {
             /* Water thermophysical constants for coolant-flow sizing. */
             waterRho: 997, waterCp: 4.18, /* kg/m3, kJ/kg·K */
@@ -4952,6 +4986,8 @@
             'cdu.bands':              { source: 'cdu-model.js BANDS — OCP cold-plate + ASHRAE TC9.9 CDU operational bounds (supply temp, ΔT, flow, dP, dew margin, pipe velocity)', asOf: '2026', unit: '°C / K / Lpm/kW / bar / m/s' },
             'cdu.pump':               { source: 'cdu-model.js PUMP — typical seal-less CDU pump (η=0.70) + IE3 motor (η=0.92) + 600 Lpm duty pump; ILLUSTRATIVE', asOf: '2026', unit: 'efficiency fraction + Lpm' },
             'cdu.phys':               { source: 'cdu-model.js PHYS — commercial-steel absolute roughness (Moody/Colebrook), barToPa, Magnus dew-point coefficients (Alduchov-Eskridge 2006)', asOf: '2026', unit: 'mm / Pa/bar / dimensionless' },
+            'waterFootprint':         { source: 'Article-20 DC water model: WUE bases per cooling (Li et al. 2023 Joule; Uptime Institute 2024; ASHRAE TC9.9), company benchmarks (Google/Microsoft/Meta env. reports 2024, AWS est.), water $/kgal typical municipal/reclaimed/surface/well ranges; upstream-power water factor 1.5 L/kWh non-renewable = screening (Macknick et al. NREL ranges)', asOf: '2026', method: 'screening-grade footprint, not a site water balance' },
+            'gridImpact':             { source: 'Article-11 SEA citizen-bill model: residential tariffs (PLN/TNB/EMA/MEA/EVN/Meralco published 2025-2026 rates), national grid capacity (national utility/EIA country notes), avg household kWh (national statistics), IEA data-centre electricity growth ~15%/yr; 40% residential pass-through = screening assumption', asOf: '2026', method: 'screening-grade allocation model, not a tariff filing analysis' },
             'pue.partialLoad':        { source: 'Screening model: fixed infrastructure-overhead share 0.55 at partial IT load (industry rule-of-thumb band 0.4-0.7; Green Grid partial-load PUE guidance)', asOf: '2026', method: 'PUE(l) = 1 + overhead*(0.55/l + 0.45) — screening estimate, labeled' },
             'spares.acklam':          { source: 'P. J. Acklam (2003) rational approximation to the inverse normal CDF', asOf: '2026', method: 'numerical approximation; |relative error| < 1.15e-9 (upgraded from BSM 1977, |e|<4.5e-4, in the M2b precision pass)' }
         },
@@ -5390,6 +5426,43 @@
                 }
             },
             /* ── Part F: DC market intelligence helpers over DATA.markets ── */
+            /* ── A11: residential bill-impact screening (article-11 promoted) ── */
+            gridImpact: {
+                /** Screening model: what one DC campus does to a citizen's power bill.
+                 *  input {countryKey, targetYear?, householdMonthlyKwh?, dcCapacityMw?}.
+                 *  Math preserved EXACTLY from the article calculator (screening-grade:
+                 *  40% infra-cost pass-through to residential, IEA 15%/yr growth). */
+                residentialBillImpact: function (input) {
+                    input = input || {};
+                    var G = DATA.gridImpact;
+                    var c = G.countries[input.countryKey] || G.countries.indonesia;
+                    var year = input.targetYear != null ? input.targetYear : G.baseYear;
+                    var hhKwh = input.householdMonthlyKwh != null ? input.householdMonthlyKwh : 200;
+                    var mw = input.dcCapacityMw != null ? input.dcCapacityMw : 500;
+                    var yearsFromNow = year - G.baseYear;
+                    var cf = G.capacityFactor;
+                    var dcAnnualGWh = (mw * cf * DATA.hoursPerYear) / 1000;
+                    var householdsEquiv = Math.round((mw * 1000 * cf * 730) / c.avgHouseholdKwh); // monthly basis
+                    var growthFactor = Math.pow(1 + G.annualGrowth, yearsFromNow) * c.growthMultiplier;
+                    var baseIncreasePct = (mw / (c.nationalGridGW * 1000)) * 100 * G.passThroughShare;
+                    var projectedIncreasePct = baseIncreasePct * growthFactor;
+                    var currentMonthlyBillLocal = hhKwh * c.residentialTariff;
+                    var monthlyImpactLocal = currentMonthlyBillLocal * (projectedIncreasePct / 100);
+                    var monthlyImpactUsd = monthlyImpactLocal / c.usdRate;
+                    var gridLoadIncreasePct = (mw / (c.nationalGridGW * 1000)) * 100;
+                    return {
+                        country: c.name, currency: c.currency,
+                        dcAnnualGWh: dcAnnualGWh,
+                        householdsEquiv: householdsEquiv,
+                        projectedIncreasePct: projectedIncreasePct,
+                        monthlyImpactLocal: monthlyImpactLocal,
+                        monthlyImpactUsd: monthlyImpactUsd,
+                        annualImpactUsd: monthlyImpactUsd * 12,
+                        gridLoadIncreasePct: gridLoadIncreasePct,
+                        method: 'screening: ' + Math.round(G.passThroughShare * 100) + '% infra pass-through to residential, IEA ' + Math.round(G.annualGrowth * 100) + '%/yr DC growth'
+                    };
+                }
+            },
             market: {
                 /** All distinct region labels in DATA.markets (sorted). */
                 regions: function () {
@@ -6471,6 +6544,41 @@
                 /** WUE (L/kWh) for a cooling type. */
                 wue: function (cooling) { return DATA.water.wueByType[cooling] != null ? DATA.water.wueByType[cooling] : DATA.water.wueByType.air; },
                 /** Annual water use (m³) — WUE × IT energy. mw = IT load. */
+                /** A20: full facility water-footprint screening (article-20 promoted).
+                 *  input {itLoadMw, pue, cooling(evaporative|hybrid|aircooled|dlc|immersion),
+                 *  climate, hours?, sourceType?, aiSharePct?, rackDensityKw?, renewablePct?}.
+                 *  Math preserved EXACTLY from the article calculator. */
+                facilityFootprint: function (input) {
+                    input = input || {};
+                    var W = DATA.waterFootprint;
+                    var load = input.itLoadMw != null ? input.itLoadMw : 10;
+                    var pue = input.pue != null ? input.pue : 1.4;
+                    var hours = input.hours != null ? input.hours : DATA.hoursPerYear;
+                    var renewable = input.renewablePct != null ? input.renewablePct : 30;
+                    var aiPct = input.aiSharePct != null ? input.aiSharePct : 50;
+                    var rackDensity = input.rackDensityKw != null ? input.rackDensityKw : 40;
+                    var facilityMW = load * pue;
+                    var totalKWh = facilityMW * 1000 * hours;
+                    var wue = (W.wueBase[input.cooling] || W.wueBase.evaporative) * (W.climateMult[input.climate] || 1.0);
+                    var annualL = totalKWh * wue;
+                    var upstreamFactor = 1 + ((100 - renewable) / 100) * W.upstreamPowerLPerKwhFactor;
+                    var annualLFull = annualL * upstreamFactor;
+                    var annualGal = annualLFull / W.lPerGal;
+                    var dailyL = annualLFull / 365;
+                    return {
+                        wue: wue, annualDirectL: annualL, annualL: annualLFull, annualGal: annualGal,
+                        dailyL: dailyL, dailyGal: annualGal / 365,
+                        householdsEquiv: Math.round(dailyL / W.householdLPerDay),
+                        cityPct: (dailyL / (W.cityHouseholds * W.householdLPerDay)) * 100,
+                        annualCostUsd: (annualGal / 1000) * (W.waterCostPerKgal[input.sourceType] || W.waterCostPerKgal.municipal),
+                        olympicPools: annualLFull / W.olympicPoolL,
+                        aiShareL: annualLFull * (aiPct / 100),
+                        rackCount: Math.round((load * 1000) / rackDensity),
+                        perMwYrL: load > 0 ? annualLFull / load : 0,
+                        benchmarks: W.benchmarksPerMwYr,
+                        method: 'screening: WUE base \u00d7 climate + upstream-power water factor ' + W.upstreamPowerLPerKwhFactor + ' \u00d7 non-renewable share'
+                    };
+                },
                 annualM3: function (mw, cooling, hoursPerYear) {
                     var hrs = hoursPerYear || DATA.hoursPerYear;
                     var itKwh = (mw || 0) * 1000 * hrs;
@@ -7936,7 +8044,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-19-accuracy"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-19-a11"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

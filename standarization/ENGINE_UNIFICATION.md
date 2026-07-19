@@ -58,7 +58,8 @@ by **`tools/build-countries-data.mjs`**. Edit the authoring source
 - **Resolved accuracy decision:** DC electricity rate — `DATA.countries.economy.electricityRate` = retail/display (single-sourced everywhere the user sees a rate); `models.opex` keeps the calibrated DC-contract blend (cockpit-gate-validated). Documented distinction, `ppaRate` override available. NOT force-merged (would break cockpit accuracy + fabricate DC rates for 32 countries).
 - **DCMOC apps LANDED v1.64.1:** the 8 Platform surfaces (Data Library / Templates / Projects / Settings / Knowledge / Integrations / Audit / Users) are real + engine-backed (`PlatformDashboards.tsx`). Strategic acquisition OPEX → `models.opex` (v1.64.2). Backend `/calc` redeployed with all v1.64 rich models live (Version 98973552).
 
-## NEXT PHASE — Article calculators → engine (scoped, not started)
+## NEXT PHASE — Article calculators → engine (IN PROGRESS — batch 1 shipped v1.89.0)
+**Progress:** article-11 → `models.gridImpact.residentialBillImpact` + `DATA.gridImpact` (SEA citizen-bill screening) · article-20 dcw → `models.water.facilityFootprint` + `DATA.waterFootprint` (WUE base×climate + upstream factor + benchmarks). Both pages delegate w/ inline fallback, headless-verified (page ≡ engine, 0 errors). Remaining 20 pages: 1/2/3/4/5/6/7/8/9/10/12/13/14/15/16/17/18/22/23/25 (+20 wfc/avh tabs).
 **Scope (grep-verified 2026-07-18):** **21 of the 22** `article-*.html` interactive calculators are self-contained INLINE JS (only 1 uses `RZEngine`). Owner mandate: bring every calculator/parameter under the shared engine so DCMOC can wire from all of them (full / partial / even a single parameter), with complex algorithms in `rz-engine.js`.
 **Pattern to apply per article calc** (same as the DC Hub tools):
 1. Read the article's `<script>` calc: extract formula + inputs + outputs.
