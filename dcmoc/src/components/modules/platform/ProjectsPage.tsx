@@ -17,6 +17,7 @@ import { rzData } from '@/lib/rz-engine';
 import { writeSharedItLoad, writeSharedCooling, writeSharedCountry } from '@/lib/requirementsMappings';
 import { COUNTRIES } from '@/constants/countries';
 import { FolderOpen, Plus, Trash2, Save, ChevronRight } from 'lucide-react';
+import { PlatformHeader, KpiChips } from './ScenariosPage';
 
 const LIFECYCLE: { id: string; label: string; tab: string }[] = [
     { id: 'req', label: 'Requirements', tab: 'requirements' },
@@ -78,15 +79,15 @@ export function ProjectsPage() {
 
     return (
         <div className="space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg"><FolderOpen className="h-6 w-6 text-white" /></div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Projects</h1>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">Full-state project bundles — every engine store snapshotted & restorable (the workflow spine)</p>
-                    </div>
-                </div>
-            </div>
+            <PlatformHeader icon={FolderOpen} title="Saved Projects" sub="Full-state project bundles — every engine store snapshotted & restorable (the workflow spine)" tone="from-cyan-500 to-blue-600" />
+
+            <KpiChips items={[
+                { label: 'Total Projects', value: `${projects.projects.length}/10`, sub: 'local bundles' },
+                { label: 'Active', value: projects.activeProjectId ? (projects.projects.find((p) => p.id === projects.activeProjectId)?.name.slice(0, 14) ?? '—') : 'unsaved', sub: 'current configuration' },
+                { label: 'Engines Ready', value: `${doneCount}/9`, sub: 'lifecycle completion' },
+                { label: 'Scenarios', value: String(scenarios.length), sub: 'input-only snapshots' },
+                { label: 'Countries', value: String(new Set(projects.projects.map((p) => p.countryId)).size || (country ? 1 : 0)), sub: 'covered' },
+            ]} />
 
             {/* active configuration + lifecycle strip */}
             <div className="rounded-2xl border border-violet-500/30 bg-violet-600/5 p-4">

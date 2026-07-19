@@ -11,6 +11,17 @@ release sections rather than semver.
 
 ---
 
+## v1.86.0 — 2026-07-19 (DCMOC batch 6: Platform group rebuilt to the reference UIUX)
+
+### Added
+- **Scenarios page** (was only a side panel): platform header, KPI chips (total/in-comparison/countries/baseline), search filter, rich table with per-scenario CAPEX/OPEX DELTA columns vs baseline (oldest save), ★ comparison selection, detail rail (full saved config + restore/compare quick actions), pagination footer.
+- **Scenario Comparison page**: scenario header cards (up to 4), KPI comparison table with best-cell highlight, dimension radar (cost/efficiency/financial/carbon normalized within the set), weighted score summary (cost 35 · efficiency 25 · financial 25 · carbon 15 → grade), deterministic scenario insights.
+- **Template Library** to reference: platform header + KPI chips, engine-profile cards with what-it-sets checklists; "Use This Template" now runs the FULL shared profile writer (density + cooling + tier floor + workload-mix preset — same path as Requirements 1.2).
+- **Data Library + Projects**: platform header + KPI chip rows (datasets/provenance/DATA version/as-of; projects/active/engines-ready/scenarios/countries) over the existing honest data.
+
+### Fixed
+- Settings/Integrations deep link now switches tabs correctly (React instance reuse keyed).
+
 ## v1.85.4 — 2026-07-19 (DCMOC batch 5: Settings & Integrations to the reference UIUX)
 
 ### Changed

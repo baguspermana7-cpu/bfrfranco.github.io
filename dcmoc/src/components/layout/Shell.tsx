@@ -223,7 +223,8 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
     // PLATFORM + SUPPORT sections (route to engine-backed where possible, else stub tabs)
     const PLATFORM: { label: string; icon: LucideIcon; id?: typeof activeTab; action?: () => void }[] = [
         { label: 'Projects', icon: FolderOpen, id: 'projects' },
-        { label: 'Scenarios', icon: Layers, action: () => { scenarioStore.togglePanel(); setSidebarOpen(false); } },
+        { label: 'Scenarios', icon: Layers, id: 'scenarios' },
+        { label: 'Scenario Comparison', icon: Layers, id: 'scenario-compare' },
         { label: 'Templates', icon: Boxes, id: 'templates' },
         { label: 'Data Library', icon: FileText, id: 'data-library' },
         { label: 'Knowledge Base', icon: HelpCircle, id: 'knowledge' },

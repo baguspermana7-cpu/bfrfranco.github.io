@@ -36,6 +36,7 @@ import { CapexEnginePage } from '@/components/modules/capex/CapexEnginePage';
 import { ConstructionEngine } from '@/components/modules/construction/ConstructionEngine';
 import { OperationsDashboard } from '@/components/modules/operations/OperationsDashboard';
 import { FinancialPage } from '@/components/modules/financial/FinancialPage';
+import { ScenariosPage, ScenarioComparePage } from '@/components/modules/platform/ScenariosPage';
 import { CommissioningEnginePage } from '@/components/modules/commissioning/CommissioningEnginePage';
 import { AssetIntelligencePage } from '@/components/modules/assets/AssetIntelligencePage';
 import { ReliabilityEnginePage } from '@/components/modules/reliability/ReliabilityEnginePage';
@@ -135,6 +136,10 @@ export default function Home() {
         return <CduDashboard />;
       case 'spares':
         return <SparesDashboard />;
+      case 'scenarios':
+        return <ScenariosPage />;
+      case 'scenario-compare':
+        return <ScenarioComparePage />;
       case 'projects':
         return <ProjectsPage />;
       case 'templates':
@@ -145,9 +150,9 @@ export default function Home() {
         return <KnowledgeDashboard />;
       case 'integrations':
         /* AD2: single integrations surface — the rebuilt Settings integrations tab */
-        return <SettingsPage initialTab="integrations" />;
+        return <SettingsPage key="integrations" initialTab="integrations" />;
       case 'settings':
-        return <SettingsPage />;
+        return <SettingsPage key="settings" />;
       case 'audit':
         return <AuditDashboard />;
       case 'users':

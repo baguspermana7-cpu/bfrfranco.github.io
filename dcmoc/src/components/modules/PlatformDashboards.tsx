@@ -14,6 +14,9 @@ import { useAiConfigStore } from '@/store/aiConfig';
 import { useAuthStore } from '@/store/auth';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { rzData, rzModels } from '@/lib/rz-engine';
+import { useRequirementsStore } from '@/store/requirements';
+import { applyUseCaseProfile, USE_CASE_TO_ENGINE } from '@/lib/requirementsMappings';
+import { PlatformHeader, KpiChips } from '@/components/modules/platform/ScenariosPage';
 import { Database, Boxes, FolderOpen, HelpCircle, Zap, Wrench, ClipboardCheck, Users, Sun, Moon, Cpu, Server, Building, ArrowRight, CheckCircle2, Circle, ExternalLink } from 'lucide-react';
 
 function Head({ icon: Icon, title, sub, tone = 'from-cyan-500 to-blue-600' }: { icon: React.ElementType; title: string; sub: string; tone?: string }) {
@@ -44,9 +47,18 @@ export function DataLibraryDashboard() {
         ['refrigerants', 'Refrigerants', Object.keys(refr).length],
         ['sources', 'Provenance', Object.keys(sources).length],
     ];
+    const totalRows = Object.keys(countries).length + Object.keys(markets).length + Object.keys(pue).length + Object.keys(refr).length;
+    const asOfYears = Object.values(sources).map((v) => v.asOf).filter(Boolean) as string[];
     return (
         <div className="space-y-4">
-            <Head icon={Database} title="Data Library" sub="The single-source engine reference (rz-engine.js DATA) every module reads" tone="from-sky-500 to-cyan-600" />
+            <PlatformHeader icon={Database} title="Data Library" sub="Centralized repository of all engine reference data, methods, and sources" tone="from-sky-500 to-cyan-600" />
+            <KpiChips items={[
+                { label: 'Datasets', value: String(tabs.length - 1), sub: `${totalRows} rows total` },
+                { label: 'Provenance Entries', value: String(Object.keys(sources).length), sub: 'gate-enforced' },
+                { label: 'DATA Version', value: (d as { version?: string }).version ? `v${(d as { version?: string }).version}` : '—', sub: 'rz-engine.js' },
+                { label: 'Latest As-Of', value: asOfYears.length ? asOfYears.sort().slice(-1)[0]!.slice(0, 10) : '—', sub: 'newest source date' },
+                { label: 'Access', value: 'Read-only', sub: 'single source of truth' },
+            ]} />
             <div className="flex gap-1.5 flex-wrap">
                 {tabs.map(([k, label, n]) => (
                     <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${tab === k ? 'border-cyan-400/60 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400' : 'border-slate-200 dark:border-white/10 text-slate-500 hover:border-cyan-400/40'}`}>{label} <span className="opacity-60">({n})</span></button>
@@ -111,33 +123,53 @@ export function DataLibraryDashboard() {
 /* ── Templates — apply an engine use-case profile to the project ── */
 const CoolMap: Record<string, 'air' | 'inrow' | 'rdhx' | 'liquid'> = { air: 'air', inrow: 'inrow', rdhx: 'rdhx', liquid: 'liquid' };
 export function TemplatesDashboard() {
-    const { actions } = useSimulationStore();
-    const profiles = (rzData().requirements?.useCaseProfiles || {}) as Record<string, { label: string; rackKw: number; cooling: string; tierFloor: number }>;
+    const profiles = (rzData().requirements?.useCaseProfiles || {}) as Record<string, { label: string; rackKw: number; cooling: string; tierFloor: number; note?: string }>;
     const [applied, setApplied] = React.useState<string | null>(null);
-    const apply = (key: string, p: { rackKw: number; cooling: string; tierFloor: number }) => {
-        actions.setInputs({ coolingType: CoolMap[p.cooling] || 'air', tierLevel: (p.tierFloor as 2 | 3 | 4) });
-        actions.setTierLevel(p.tierFloor as 2 | 3 | 4);
-        setApplied(key); setTimeout(() => setApplied(null), 1800);
+    const [toast, setToast] = React.useState<string | null>(null);
+    /* AE4: templates apply the FULL engine profile through the shared S2
+     * applier (density + cooling + tier floor + workload-mix preset — same
+     * path as picking the use case in Requirements 1.2). */
+    const apply = (engineKey: string) => {
+        const ui = (Object.entries(USE_CASE_TO_ENGINE).find(([, e]) => e === engineKey)?.[0] ?? 'ai') as Parameters<typeof applyUseCaseProfile>[0];
+        useRequirementsStore.getState().actions.setOverview({ useCase: ui });
+        const summary = applyUseCaseProfile(ui);
+        setApplied(engineKey); setToast(`${profiles[engineKey]?.label ?? engineKey}: ${summary}`);
+        setTimeout(() => { setApplied(null); setToast(null); }, 3500);
     };
     const icon: Record<string, React.ElementType> = { ai: Cpu, hpc: Server, cloud: Boxes, colo: Building, enterprise: Building, edge: Zap };
+    const entries = Object.entries(profiles);
     return (
         <div className="space-y-4">
-            <Head icon={Boxes} title="Templates" sub="Engine use-case profiles (models.requirements) — one click seeds the project" tone="from-violet-500 to-fuchsia-600" />
+            <PlatformHeader icon={Boxes} title="Template Library" sub="Pre-built engine profiles for data-center planning — one click seeds the whole project" tone="from-violet-500 to-fuchsia-600" />
+            <KpiChips items={[
+                { label: 'Templates', value: String(entries.length), sub: 'engine useCaseProfiles' },
+                { label: 'Cooling classes', value: String(new Set(entries.map(([, p]) => p.cooling)).size), sub: 'air → liquid' },
+                { label: 'Density range', value: entries.length ? `${Math.min(...entries.map(([, p]) => p.rackKw))}–${Math.max(...entries.map(([, p]) => p.rackKw))} kW` : '—', sub: 'per rack' },
+                { label: 'Source', value: 'engine', sub: 'models.requirements — live values' },
+            ]} />
+            {toast && <div className="rounded-lg border border-violet-500/40 bg-violet-600/10 px-3 py-2 text-[11px] text-violet-500">{toast}</div>}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {Object.entries(profiles).map(([k, p]) => { const Icon = icon[k] || Boxes; return (
+                {entries.map(([k, p]) => { const Icon = icon[k] || Boxes; return (
                     <Card key={k}>
-                        <div className="flex items-center gap-2 mb-2"><Icon className="w-4 h-4 text-violet-500" /><h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">{p.label}</h3></div>
-                        <div className="text-[11px] text-slate-500 space-y-0.5 mb-3">
-                            <div>Rack density: <span className="text-slate-700 dark:text-slate-300 font-medium tabular-nums">{p.rackKw} kW/rack</span></div>
-                            <div>Cooling: <span className="text-slate-700 dark:text-slate-300 font-medium capitalize">{p.cooling}</span></div>
-                            <div>Tier floor: <span className="text-slate-700 dark:text-slate-300 font-medium">Tier {p.tierFloor}</span></div>
+                        <div className="flex items-center gap-2 mb-2"><Icon className="w-4 h-4 text-violet-500" /><h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">{p.label}</h3>
+                            <span className="ml-auto rounded bg-emerald-500/10 px-1.5 py-0.5 text-[8px] font-semibold uppercase text-emerald-500" title="Values from the live engine profile">engine</span></div>
+                        <div className="text-[11px] text-slate-500 space-y-0.5 mb-2">
+                            {([
+                                ['Rack density', `${p.rackKw} kW/rack`],
+                                ['Cooling', p.cooling],
+                                ['Tier floor', `Tier ${p.tierFloor}`],
+                                ['Workload mix', 'preset applied (1.2)'],
+                            ] as [string, string][]).map(([l, v]) => (
+                                <div key={l} className="flex justify-between" title={`${l}: ${v}`}><span>✓ {l}</span><span className="font-medium capitalize text-slate-700 dark:text-slate-300">{v}</span></div>
+                            ))}
                         </div>
-                        <button onClick={() => apply(k, p)} className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-medium transition-colors">
-                            {applied === k ? <><CheckCircle2 className="w-3.5 h-3.5" /> Applied</> : <>Apply template <ArrowRight className="w-3.5 h-3.5" /></>}
+                        <button onClick={() => apply(k)} className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-medium transition-colors">
+                            {applied === k ? <><CheckCircle2 className="w-3.5 h-3.5" /> Applied</> : <>Use This Template <ArrowRight className="w-3.5 h-3.5" /></>}
                         </button>
                     </Card>
                 ); })}
             </div>
+            <p className="text-[10px] text-slate-400">Applying a template runs the same shared profile writer as Requirements 1.2 — density, cooling, tier floor and the workload-mix preset land in the real stores (adjustable afterwards).</p>
         </div>
     );
 }
