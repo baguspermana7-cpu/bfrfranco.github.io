@@ -99,6 +99,28 @@ export function SiteRightRail({ sites, results, selectedId, onSelect, onEdit }: 
                     { title: 'Ranking', head: ['#', 'Site', 'Score', 'Grade', 'Risk (lower better)'], rows: results.map((r) => { const s = sites.find((x) => x.id === r.siteId); return [String(r.rank), `${s?.label} · ${s?.name}`, String(r.engine.score), r.engine.grade, String(r.riskScore)]; }) },
                     { title: 'Key Takeaways (best site)', head: ['Item'], rows: takeaways.map((t) => [t]) },
                 ],
+                config: [
+                    ['Candidate Sites', String(sites.length)],
+                    ['Selected Site', sel ? `Site ${sel.label} — ${sel.name}` : '—'],
+                    ...(selResult
+                        ? selResult.engine.breakdown.map((b): [string, string] =>
+                            [`Weight · ${b.key}`, `${Math.round(b.weight * 100)}%`])
+                        : []),
+                ],
+                callouts: takeaways.map((t, idx) => ({
+                    title: idx === 0 ? `Takeaway — Site ${sel?.label}` : `Takeaway ${idx + 1}`,
+                    body: t,
+                    tone: idx === 0 ? ('good' as const) : ('info' as const),
+                })),
+                actions: [
+                    { priority: 'HIGH' as const, action: 'Confirm site selection & secure land reservation' },
+                    { priority: 'MEDIUM' as const, action: 'Initiate geotechnical & environmental survey' },
+                    { priority: 'MEDIUM' as const, action: 'Engage utility providers for LOA' },
+                ],
+                summaryBand: results.slice(0, 5).map((r) => {
+                    const s = sites.find((x) => x.id === r.siteId);
+                    return { label: `Site ${s?.label ?? '—'}`, value: `${r.engine.score}/100` };
+                }),
                 note: 'Engine-real multi-site screening (models.site.score, factor overrides via site attributes). Not a site survey.',
             });
         } finally { setBusy(false); }

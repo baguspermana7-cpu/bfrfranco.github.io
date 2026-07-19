@@ -10,7 +10,7 @@ import React from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useRequirementsStore } from '@/store/requirements';
 import { rzModels, rzData } from '@/lib/rz-engine';
-import { USE_CASE_TO_ENGINE, monthsToCod, cagr5 } from '@/lib/requirementsMappings';
+import { USE_CASE_TO_ENGINE, monthsToCod, cagr5, effectiveTotalRacks } from '@/lib/requirementsMappings';
 
 export interface SectionQuality { key: string; label: string; pct: number; missing: string[] }
 
@@ -69,7 +69,7 @@ export function useRequirementsDerived(): ReqDerived {
         const downtimeMinYr = +((1 - frac) * MIN_PER_YEAR).toFixed(1);
 
         const deadlineMonths = monthsToCod(req.overview.targetCod);
-        const totalRacks = req.workload.avgRackDensityKw > 0 ? Math.ceil(itLoadKw / req.workload.avgRackDensityKw) : 0;
+        const totalRacks = effectiveTotalRacks(itLoadKw, req.workload.avgRackDensityKw, req.workload.totalRacksOverride);
 
         /* engine validation (models.requirements.validate) */
         let validation: ReqDerived['validation'] = null;

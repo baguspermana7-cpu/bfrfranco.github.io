@@ -66,6 +66,40 @@ export function ConstructionEngine() {
                     { title: 'Schedule (engine CPM)', head: ['Phase', 'Start', 'End', 'Months'], rows: sched.rows.map((r) => [r.label, `M${r.startMonth}`, `M${r.endMonth.toFixed(1)}`, String(r.months)]) },
                     { title: 'Long-Lead Procurement', head: ['Item', 'Lead (mo)', 'PO by', 'ETA'], rows: proc.rows.map((r) => [r.item, String(r.leadMonths), `M${r.poMonth}`, `M${r.etaMonth}`]) },
                 ],
+                config: [
+                    ['Start', 'M0 (NTP)'],
+                    ['Status Month', t.statusMonth == null ? 'Plan Mode (no actuals)' : `M${t.statusMonth}`],
+                    ['Phases', String(sched.rows.length)],
+                    ['Budget (CAPEX total)', fmtMoney(budget)],
+                    ['Planned Duration', `${sched.totalMonths} mo`],
+                    ['Peak Crew (planned)', String(t.peakManpowerPlanned)],
+                ],
+                callouts: [
+                    {
+                        title: `EVM Health — SPI ${e.spi} / CPI ${e.cpi}`,
+                        body: planMode
+                            ? 'Plan Mode — baseline plan shown; no site actuals entered, so SPI/CPI = 1.00 by definition. Set a status month + phase actuals to start tracking.'
+                            : `Schedule performance ${e.spi >= 1 ? 'on/ahead of plan' : 'behind plan'} (SPI ${e.spi}); cost performance ${e.cpi >= 1 ? 'under budget' : 'over budget'} (CPI ${e.cpi}). Forecast completion M${e.forecastTotalMonths}${e.delayMonths > 0 ? ` (+${e.delayMonths} mo delay)` : ' (on plan)'}.`,
+                        tone: planMode ? ('info' as const) : (e.spi >= 1 && e.cpi >= 1 ? ('good' as const) : ('warn' as const)),
+                    },
+                    ...(health ? [{
+                        title: `Health Score ${health.score}/100 — ${health.band}`,
+                        body: `Composite of SPI (40) + CPI (30) + schedule (15) + open issues (15). ${openIssues} open issue(s).`,
+                        tone: health.score >= 85 ? ('good' as const) : health.score >= 65 ? ('info' as const) : ('warn' as const),
+                    }] : []),
+                ],
+                actions: t.risks.filter((r) => r.status !== 'closed').slice(0, 5).map((r) => ({
+                    priority: r.impact === 'high' ? ('HIGH' as const) : r.impact === 'medium' ? ('MEDIUM' as const) : ('LOW' as const),
+                    action: `${r.risk} — impact ${r.impact}, probability ${r.probability}, ${r.status}${r.isExample ? ' (example)' : ''}`,
+                })),
+                summaryBand: [
+                    { label: 'Progress', value: `${e.overallPct}%` },
+                    { label: 'Planned', value: `M${sched.totalMonths}` },
+                    { label: 'Forecast', value: `M${e.forecastTotalMonths}` },
+                    { label: 'SPI', value: String(e.spi) },
+                    { label: 'CPI', value: String(e.cpi) },
+                    { label: 'AC Spent', value: fmtMoney(e.acUsd) },
+                ],
                 note: 'Planned plane engine-real (CPM schedule + long-lead data); actuals user-entered; EVM deterministic. Lead times: 2024-26 supply-constrained market.',
             });
         } finally { setBusy(false); }

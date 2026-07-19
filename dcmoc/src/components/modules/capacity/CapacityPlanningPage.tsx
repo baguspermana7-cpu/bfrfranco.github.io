@@ -17,8 +17,9 @@ import {
     sanitizeCap, facilitySnapshot, overheadDonut, forecastSeries, utilization,
     equipmentTable, capRecommendations, capKeyInsights, type CapInputs,
 } from '@/state/adapters/capacity-adapter';
-import { Layers, ChevronRight, Zap, Snowflake, Boxes, Network } from 'lucide-react';
+import { Layers, ChevronRight, Zap, Snowflake, Boxes, Network, FileDown } from 'lucide-react';
 import { rzData } from '@/lib/rz-engine';
+import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 
 const DONUT_COLORS = ['#a78bfa', '#14b8a6', '#3b82f6', '#f59e0b', '#64748b'];
 
@@ -53,6 +54,54 @@ export function CapacityPlanningPage() {
 
     const peak = Math.max(...forecast.map((f) => f.forecastMw));
     const rackRow = util.rows.find((r) => r.key === 'rack');
+    const [busy, setBusy] = React.useState(false);
+
+    const exportPdf = async () => {
+        setBusy(true);
+        try {
+            const firstUtil = util.rows[0];
+            await generatePillarPDF({
+                title: 'Capacity Planning', layer: 'Capacity Planning Engine', project: '—',
+                kpis: [
+                    { label: 'IT Load (Total)', value: `${(i.itLoadKw / 1000).toFixed(1)} MW`, sub: 'current' },
+                    { label: 'Peak Forecast', value: `${peak.toFixed(0)} MW`, sub: 'growth plan' },
+                    { label: 'Total Facility Load', value: `${snap.facilityMw} MW`, sub: `PUE ${snap.pue} (${snap.source})` },
+                    ...(firstUtil ? [{ label: firstUtil.label, value: `${firstUtil.capacity.toLocaleString()} ${firstUtil.unit}`, sub: `${firstUtil.pct}% utilized` }] : []),
+                ],
+                config: [
+                    ['Tier', `Tier ${i.tier}`],
+                    ['Cooling', i.coolingType],
+                    ['Rack Density', `${i.rackKw} kW/rack`],
+                    ['White Space', `${i.whiteFloorM2.toLocaleString()} m²`],
+                    ['Design Margin', `${i.designMarginPct}%`],
+                    ['Market Type', i.marketType],
+                    ['Base Year', String(i.baseYear)],
+                ],
+                sections: [
+                    { title: 'IT Load Forecast & Growth', head: ['Year', 'Committed (MW)', 'Forecast (MW)', 'Design (MW)'], rows: forecast.map((f) => [String(f.year), String(f.committedMw), String(f.forecastMw), String(f.designMw)]) },
+                    { title: 'Capacity Utilization (Current)', head: ['System', 'Used', 'Capacity', 'Util %', 'Basis'], rows: util.rows.map((u) => [u.label, `${u.used.toLocaleString()} ${u.unit}`, `${u.capacity.toLocaleString()} ${u.unit}`, `${u.pct}%`, u.basis]) },
+                ],
+                callouts: [
+                    ...insights.map((s, idx) => ({ title: `Key Insight ${idx + 1}`, body: s, tone: 'info' as const })),
+                    ...(util.stranded?.isStranded ? [{
+                        title: 'Stranded-Capacity Risk',
+                        body: `${(util.stranded.fraction * 100).toFixed(0)}% idle at Y1 occupancy (Uptime 40% threshold).`,
+                        tone: 'warn' as const,
+                    }] : []),
+                ],
+                actions: recs.map((r) => ({ priority: 'MEDIUM' as const, action: `${r.title}: ${r.body}` })),
+                summaryBand: [
+                    { label: 'IT Load', value: `${(i.itLoadKw / 1000).toFixed(1)} MW` },
+                    { label: 'Peak', value: `${peak.toFixed(0)} MW` },
+                    { label: 'Facility', value: `${snap.facilityMw} MW` },
+                    { label: 'PUE', value: String(snap.pue) },
+                    { label: 'Racks', value: String(rackRow?.used ?? '—') },
+                    { label: 'Binding', value: util.binding ?? '—' },
+                ],
+                note: 'Engine-derived capacity analysis — committed = cumulative build phases, forecast = Requirements growth plan, design capacity incl. design margin. Network row is a screening assumption (no engine network model).',
+            });
+        } finally { setBusy(false); }
+    };
 
     return (
         <div className="space-y-4">
@@ -72,6 +121,7 @@ export function CapacityPlanningPage() {
                             </button>
                         ))}
                     </div>
+                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
                     <button onClick={() => setActiveTab('capex')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: CAPEX Engine <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>

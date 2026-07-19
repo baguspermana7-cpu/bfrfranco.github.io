@@ -20,6 +20,7 @@ import { useOpsLog } from '@/store/opsLog';
 import { useSustainability } from '@/store/sustainability';
 import { useSimulationStore } from '@/store/simulation';
 import { COUNTRIES } from '@/constants/countries';
+import { CountrySelect } from '@/components/ui/CountrySelect';
 import { Settings as SettingsIcon, Plug, Database, Trash2 } from 'lucide-react';
 
 const KINDS: { value: IntegrationKind; label: string; note: string }[] = [
@@ -85,10 +86,7 @@ export function SettingsPage() {
                         <label className="block">
                             <span className="text-[10px] font-semibold uppercase text-slate-500">Default country</span>
                             <div className="mt-0.5 flex gap-1.5">
-                                <select className="flex-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-violet-500 text-slate-900 dark:text-slate-100"
-                                    value={s.general.defaultCountryId} onChange={(e) => s.actions.setGeneral({ defaultCountryId: e.target.value })}>
-                                    {Object.values(COUNTRIES).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                </select>
+                                <CountrySelect className="flex-1" value={s.general.defaultCountryId} onChange={(v) => s.actions.setGeneral({ defaultCountryId: v })} />
                                 <button onClick={() => { writeSharedCountry(s.general.defaultCountryId); show(`Country applied: ${COUNTRIES[s.general.defaultCountryId]?.name}`); }}
                                     className="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Apply now</button>
                             </div>

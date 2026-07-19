@@ -1182,6 +1182,22 @@ export const initDoc = async (branding?: BrandingConfig) => {
 
     const doc = new JsPDFConstructor({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
+    /* Hardening chokepoint: every generator obtains its doc here, so coercing
+     * once protects all of them — jsPDF.text throws "Invalid arguments" on
+     * undefined/NaN, which store fields can be at render time. */
+    const rawText = doc.text.bind(doc);
+    doc.text = (text: unknown, x: unknown, y: unknown, ...rest: unknown[]) => {
+        const safe = Array.isArray(text)
+            ? text.map((s) => String(s ?? '—'))
+            : String(text ?? '—');
+        const sx = Number.isFinite(x as number) ? (x as number) : 14;
+        const sy = Number.isFinite(y as number) ? (y as number) : 20;
+        return rawText(safe, sx, sy, ...rest);
+    };
+    const rawSplit = doc.splitTextToSize.bind(doc);
+    doc.splitTextToSize = (text: unknown, maxWidth: number, ...rest: unknown[]) =>
+        rawSplit(String(text ?? '—'), Number.isFinite(maxWidth) ? maxWidth : 180, ...rest);
+
     const runAutoTable = (d: any, o: any) => {
         if (typeof autoTableFn === 'function') {
             return (autoTableFn as any)(d, o);

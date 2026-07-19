@@ -9,6 +9,7 @@ import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { COUNTRIES } from '@/constants/countries';
 import { sanitizeNum } from '@/state/registry';
+import { rzModels } from '@/lib/rz-engine';
 import { useRequirementsStore, type UseCase } from '@/store/requirements';
 
 /* UI use case → engine useCaseProfiles key (engine has no network/dr profile). */
@@ -90,4 +91,66 @@ export function monthsToCod(cod: { quarter: 1 | 2 | 3 | 4; year: number }, now =
 export function cagr5(y0Mw: number, y5Mw: number): number {
     if (y0Mw <= 0 || y5Mw <= 0) return 0;
     return Math.pow(y5Mw / y0Mw, 1 / 5) - 1;
+}
+
+/* ── Phase S: use-case → auto-apply engine profile (predefined for ease) ──
+ * Engine useCaseProfiles: ai 60kW/liquid/T3 · hpc 45/rdhx/T3 · cloud 20/inrow/T3
+ * · colo 12/inrow/T3 · enterprise 8/air/T2 · edge 10/air/T2. Mix presets are
+ * DCMOC-side predefined splits per profile (labeled, adjustable). */
+export const MIX_PRESETS: Record<UseCase, { aiGpu: number; storage: number; general: number; network: number }> = {
+    ai: { aiGpu: 70, storage: 15, general: 10, network: 5 },
+    hpc: { aiGpu: 60, storage: 20, general: 15, network: 5 },
+    cloud: { aiGpu: 30, storage: 25, general: 35, network: 10 },
+    enterprise: { aiGpu: 20, storage: 25, general: 45, network: 10 },
+    network: { aiGpu: 10, storage: 15, general: 25, network: 50 },
+    dr: { aiGpu: 15, storage: 45, general: 30, network: 10 },
+};
+
+export interface UseCaseProfileInfo { rackKw: number; cooling: string; tierFloor: number; label: string }
+
+export function engineProfileFor(useCase: UseCase): UseCaseProfileInfo | null {
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const req = (rzModels() as any)?.requirements;
+        const p = req?.profile ? req.profile(USE_CASE_TO_ENGINE[useCase]) : null;
+        if (p) return { rackKw: p.rackKw, cooling: p.cooling, tierFloor: p.tierFloor ?? 3, label: p.label };
+    } catch { /* */ }
+    return null;
+}
+
+/** Auto-apply the engine profile when the user picks a use case:
+ *  density + cooling (shared writers) + tier floor bump + mix preset.
+ *  Mix preset is skipped while the manual-override tick is on (owner S8).
+ *  Returns a human summary for the toast. */
+export function applyUseCaseProfile(useCase: UseCase): string {
+    const p = engineProfileFor(useCase);
+    const mix = MIX_PRESETS[useCase];
+    const parts: string[] = [];
+    if (p) {
+        writeSharedRackDensity(p.rackKw);
+        parts.push(`${p.rackKw} kW/rack`);
+        const coolKey = (p.cooling === 'liquid' || p.cooling === 'dlc') ? 'liquid'
+            : p.cooling === 'rdhx' ? 'rdhx' : p.cooling === 'inrow' ? 'inrow' : 'air';
+        writeSharedCooling(coolKey as 'air' | 'inrow' | 'rdhx' | 'liquid');
+        parts.push(coolKey === 'liquid' ? 'D2C liquid' : coolKey);
+        const curTier = useSimulationStore.getState().inputs.tierLevel;
+        if (p.tierFloor > curTier) {
+            useSimulationStore.getState().actions.setTierLevel(p.tierFloor as 2 | 3 | 4);
+            parts.push(`Tier ≥${p.tierFloor}`);
+        }
+    }
+    if (!useRequirementsStore.getState().workload.mixManual) {
+        useRequirementsStore.getState().actions.setWorkload({ workloadMix: { ...mix } });
+        parts.push(`mix ${mix.aiGpu}/${mix.storage}/${mix.general}/${mix.network}`);
+    } else {
+        parts.push('mix kept (manual override)');
+    }
+    return parts.join(' · ');
+}
+
+/** Owner S7: computed rack count is the basis, the user override wins when set. */
+export function effectiveTotalRacks(itLoadKw: number, densityKw: number, override: number | null): number {
+    const auto = densityKw > 0 ? Math.ceil(itLoadKw / densityKw) : 0;
+    if (override == null) return auto;
+    return Math.round(sanitizeNum(override, 1, 100_000, auto));
 }

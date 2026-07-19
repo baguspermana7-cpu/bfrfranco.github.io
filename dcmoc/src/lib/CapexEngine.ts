@@ -68,6 +68,16 @@ export interface CapexInput {
     siteCondition?: string;
     securityLevel?: string;
     fiberEntry?: string;
+    /* Owner S9 — capex-calculator questionnaire parity (shared single source;
+     * deepSea also drives models.cooling.deepSea + the CDU advanced section). */
+    seismicZone?: string;               // 'zone0'..'zone4'
+    refrigerantType?: string;           // engine DATA.refrigerants key
+    deepSea?: boolean;                  // Deep Sea Water Cooling enabled
+    dsDepthM?: number;                  // intake depth (m)
+    dsPipelineKm?: number;              // pipeline length (km)
+    dsDeltaTC?: number;                 // loop ΔT (°C)
+    renewSolarMwp?: number;             // on-site solar sizing
+    renewBessMwh?: number;              // BESS sizing
 }
 
 export interface CapexResult {

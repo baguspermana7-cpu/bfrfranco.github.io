@@ -373,7 +373,7 @@ export interface SparesOptimization {
 
 const HOLDING_COST_RATE = 0.15; // 15% of inventory value per year
 
-const LEAD_TIMES: Record<string, number> = {
+export const LEAD_TIMES: Record<string, number> = {
     'US': 5, 'SG': 7, 'JP': 7, 'MY': 14, 'ID': 21, 'AU': 10, 'IN': 18, 'DE': 7, 'GB': 5
 };
 

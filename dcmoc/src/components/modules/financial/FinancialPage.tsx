@@ -19,7 +19,8 @@ import { plannedSchedule, evm, pvCurve } from '@/state/adapters/construction-ada
 import { rzModels } from '@/lib/rz-engine';
 import FinancialDashboard from '@/components/modules/FinancialDashboard';
 import { fmtMoney } from '@/lib/format';
-import { TrendingUp, ChevronRight } from 'lucide-react';
+import { TrendingUp, ChevronRight, FileDown } from 'lucide-react';
+import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 
 const OPEX_COLORS = ['#f59e0b', '#10b981', '#3b82f6', '#a855f7', '#64748b', '#14b8a6'];
 
@@ -32,6 +33,7 @@ export function FinancialPage() {
     const fin = useFinancialTracking();
     const ct = useConstructionTracking();
     const [tab, setTab] = React.useState<'overview' | 'ledger' | 'proforma'>('overview');
+    const [busy, setBusy] = React.useState(false);
 
     React.useEffect(() => { if (!results) runCalculation(); }, [results, runCalculation]);
 
@@ -79,6 +81,57 @@ export function FinancialPage() {
         `Committed ${Math.round((model.committed / model.revised) * 100)}% · paid ${Math.round((model.paid / model.revised) * 100)}% of revised budget${fin.touched ? '' : ' (EXAMPLE ledger)'}.`,
     ];
 
+    const exportPdf = async () => {
+        setBusy(true);
+        try {
+            const overdue = fin.invoices.filter((iv) => iv.status === 'overdue');
+            await generatePillarPDF({
+                title: 'Financial', layer: 'Financial Engine', project: '—',
+                kpis: [
+                    { label: 'Total Budget (Baseline)', value: fmtMoney(model.baseline), sub: 'engine capex P50' },
+                    { label: 'Revised Budget', value: fmtMoney(model.revised), sub: `+${fmtMoney(model.approvedRev)} approved changes` },
+                    { label: 'Total Committed', value: fmtMoney(model.committed), sub: `${Math.round((model.committed / model.revised) * 100)}% of revised` },
+                    { label: 'Total Actual (Paid)', value: fmtMoney(model.paid), sub: `${Math.round((model.paid / model.revised) * 100)}% of revised` },
+                    { label: 'Forecast at Completion', value: fmtMoney(model.fac), sub: model.planMode ? 'Plan Mode ≡ revised' : `variance ${fmtMoney(model.fac - model.revised)}` },
+                    { label: 'CPI / SPI', value: `${model.cpi} / ${model.spi}`, sub: 'from Construction EVM (single source)' },
+                ],
+                sections: [
+                    {
+                        title: 'Budget Summary', head: ['Item', 'Value'], rows: [
+                            ['Baseline (engine capex P50)', fmtMoney(model.baseline)],
+                            ['Approved Changes', fmtMoney(model.approvedRev)],
+                            ['Revised Budget', fmtMoney(model.revised)],
+                            ['Committed', `${fmtMoney(model.committed)} (${Math.round((model.committed / model.revised) * 100)}%)`],
+                            ['Paid', `${fmtMoney(model.paid)} (${Math.round((model.paid / model.revised) * 100)}%)`],
+                            ['Forecast at Completion', fmtMoney(model.fac)],
+                            ['Variance (FAC − revised)', fmtMoney(model.fac - model.revised)],
+                        ],
+                    },
+                    ...(model.opex ? [{
+                        title: 'Annual OPEX by Type (DC-contract basis)', head: ['Type', 'Annual'], rows: [
+                            ...model.opexDonut.map((r) => [r.name, fmtMoney(r.v)]),
+                            ['Total', fmtMoney(model.opex.totalExtended ?? model.opex.total)],
+                        ],
+                    }] : []),
+                ],
+                callouts: insights.map((s, idx) => ({ title: `Key Insight ${idx + 1}`, body: s, tone: 'info' as const })),
+                actions: [
+                    ...(model.grade !== 'A' ? [{ priority: 'MEDIUM' as const, action: `Financial health grade ${model.grade} (${model.health}/100) — review budget variance, CPI and SPI drivers.` }] : []),
+                    ...overdue.map((iv) => ({ priority: 'HIGH' as const, action: `Overdue invoice ${iv.invoiceNo} — ${iv.vendor} (${iv.direction}) ${fmtMoney(iv.amountFrac * model.baseline)}.` })),
+                ],
+                summaryBand: [
+                    { label: 'Baseline', value: fmtMoney(model.baseline) },
+                    { label: 'Revised', value: fmtMoney(model.revised) },
+                    { label: 'Committed', value: fmtMoney(model.committed) },
+                    { label: 'Paid', value: fmtMoney(model.paid) },
+                    { label: 'FAC', value: fmtMoney(model.fac) },
+                    { label: 'Health', value: `${model.grade} · ${model.health}` },
+                ],
+                note: 'Budget baseline = engine capex P50 + approved revisions; CPI/SPI passthrough from the Construction EVM (single source — never recomputed here); annual OPEX via the engine dcContract basis preset.',
+            });
+        } finally { setBusy(false); }
+    };
+
     return (
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -96,6 +149,7 @@ export function FinancialPage() {
                         ))}
                     </div>
                     <button onClick={() => setActiveTab('invest')} className="rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400">Investment & Capitalization</button>
+                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
                     <button onClick={() => setActiveTab('report')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: Results <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>

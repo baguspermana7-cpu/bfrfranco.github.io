@@ -97,6 +97,39 @@ export function ArchitecturePage() {
                     { title: 'Design Validation', head: ['Layer', 'Status', 'Note'], rows: layers.map((l) => [l.label, l.pass ? 'Passed' : 'Review', l.note]) },
                     { title: 'Equipment BOM (engine equipScale)', head: ['Item', 'Count'], rows: Object.entries({ Switchgear: eq.switchgear, Transformers: eq.transformers, Generators: eq.generators, 'UPS Modules': eq.ups_modules, PDUs: eq.pdus, Chillers: eq.chillers, Racks: eq.racks }).map(([k, v]) => [k, String(v)]) },
                 ],
+                config: [
+                    ['IT Load', `${f.itMw} MW`],
+                    ['Tier', `Tier ${i.tier}`],
+                    ['Cooling', { liquid: 'D2C Liquid', rdhx: 'Rear-Door HX', inrow: 'In-Row', air: 'Air CRAC/CRAH' }[i.coolingType]],
+                    ['Redundancy', i.redundancy],
+                    ['Grid Voltage', i.gridVoltage],
+                    ['Rack Density', `${i.rackDensityKw} kW/rack`],
+                    ['PUE (Design)', String(f.pue)],
+                    ['Design Standard', DESIGN_STANDARDS.find((d) => d.id === arch.designStandard)?.label ?? '—'],
+                ],
+                callouts: [
+                    ...(overall
+                        ? [{ title: 'Design Validation — Passed', body: 'All architecture layers pass the engine screening checks (power, cooling, IT, building, security, BMS).', tone: 'good' as const }]
+                        : []),
+                    ...layers.filter((l) => !l.pass).map((l) => ({
+                        title: `${l.label} — Review Required`, body: l.note, tone: 'warn' as const,
+                    })),
+                ],
+                actions: [
+                    ...layers.filter((l) => !l.pass).map((l) => ({ priority: 'HIGH' as const, action: `Resolve ${l.label} review item — ${l.note}` })),
+                    { priority: 'MEDIUM' as const, action: 'Review architecture with stakeholders' },
+                    { priority: 'MEDIUM' as const, action: 'Proceed to Capacity Planning Engine' },
+                    { priority: 'LOW' as const, action: 'Run advanced simulation (Power & Cooling)' },
+                    { priority: 'LOW' as const, action: 'Export architecture package' },
+                ],
+                summaryBand: [
+                    { label: 'IT Load', value: `${f.itMw} MW` },
+                    { label: 'Facility', value: `${f.facilityMw} MW` },
+                    { label: 'PUE', value: String(f.pue) },
+                    { label: 'Racks', value: eq.racks.toLocaleString() },
+                    { label: 'Availability', value: `${f.availabilityPct}%` },
+                    { label: 'Redundancy', value: i.redundancy },
+                ],
                 note: 'Engine-real architecture screening (models.architecture + equipScale). Pattern reference — not a certified design.',
             });
         } finally { setBusy(false); }

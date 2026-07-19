@@ -27,7 +27,7 @@ export interface PillarReport {
 const MARGIN = 14;
 const lastY = (doc: unknown): number | undefined => (doc as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY;
 
-export async function generatePillarPDF(r: PillarReport): Promise<void> {
+export async function generatePillarPDF(r: PillarReport & { legacyJsPdf?: boolean }): Promise<void> {
     /* orgName auto-resolves from Settings when the caller doesn't pass one */
     if (!r.orgName && typeof window !== 'undefined') {
         try {
@@ -35,6 +35,13 @@ export async function generatePillarPDF(r: PillarReport): Promise<void> {
             const org = useSettingsStore.getState().general.orgName;
             if (org) r = { ...r, orgName: org };
         } catch { /* settings store absent — skip */ }
+    }
+    /* Min-standard render = print-window HTML (opex-report reference). The
+     * jsPDF path below stays only as an explicit legacy fallback. */
+    if (!r.legacyJsPdf) {
+        const { openStandardReport } = await import('./PrintReport');
+        if (openStandardReport(r)) return;
+        // popup blocked → fall through to the jsPDF download path
     }
     const { doc, autoTable } = await initDoc();
     const pageW = doc.internal.pageSize.width;

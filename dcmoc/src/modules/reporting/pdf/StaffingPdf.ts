@@ -131,8 +131,24 @@ export const generateStaffingPDF = async (
 
     y = drawSectionTitle(doc, y, 'Shift Model Comparison (8h vs 12h)', '2', branding);
 
-    if (shiftComparisons && shiftComparisons.length > 0) {
-        y = drawComparisonTable(doc, y, shiftComparisons, `8-Hour vs 12-Hour Model (${country.name})`);
+    /* Callers pass either ready-made {metric,value8h,value12h,winner} rows or the
+     * dashboard's raw {role, comparison:{model8h,model12h}} objects — map the
+     * latter so drawComparisonTable never receives undefined cell text. */
+    const compRows = (shiftComparisons ?? [])
+        .filter(Boolean)
+        .map((c: any) => {
+            if (c.metric != null) return c;
+            const m8 = c.comparison?.model8h, m12 = c.comparison?.model12h;
+            return {
+                metric: String(c.role ?? 'Role'),
+                value8h: fmtMoney(m8?.monthlyCost ?? 0),
+                value12h: fmtMoney(m12?.monthlyCost ?? 0),
+                winner: (m8?.monthlyCost ?? 0) <= (m12?.monthlyCost ?? 0) ? '8h' as const : '12h' as const,
+            };
+        });
+
+    if (compRows.length > 0) {
+        y = drawComparisonTable(doc, y, compRows, `8-Hour vs 12-Hour Model (${country.name})`);
     } else {
         // Generate basic comparison data
         const basicComparison = [

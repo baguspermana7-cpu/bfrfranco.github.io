@@ -17,18 +17,7 @@ import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 import { fmtMoney, fmt } from '@/lib/format';
 import { compressToWebp, dataUrlBytes } from '@/lib/imageCompress';
 
-// Group countries by region for hierarchy
-const REGIONS = Object.values(COUNTRIES).reduce((acc, c) => {
-    if (!acc[c.region]) acc[c.region] = [];
-    acc[c.region].push(c);
-    return acc;
-}, {} as Record<string, typeof COUNTRIES[keyof typeof COUNTRIES][]>);
-
-const REGION_LABELS: Record<string, string> = {
-    'APAC': '🌏 Asia Pacific',
-    'EMEA': '🌍 Europe, Middle East & Africa',
-    'AMER': '🌎 Americas',
-};
+import { REGIONS, REGION_LABELS } from '@/lib/regions';
 
 const CapexDashboard = () => {
     const { inputs, results, setInputs, runCalculation, narrative, heroImage, setHeroImage } = useCapexStore();

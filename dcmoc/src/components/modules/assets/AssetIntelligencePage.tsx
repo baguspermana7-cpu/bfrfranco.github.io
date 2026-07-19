@@ -17,7 +17,8 @@ import { rzModels, rzData } from '@/lib/rz-engine';
 import { densityToEngineBucket } from '@/lib/requirementsMappings';
 import { AssetIntelDashboard } from '@/components/modules/NewEngineDashboards';
 import { CreatableCombobox, type ComboValue } from '@/components/ui/CreatableCombobox';
-import { Activity, ChevronRight } from 'lucide-react';
+import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import { Activity, ChevronRight, FileDown } from 'lucide-react';
 
 const CAT_COLORS = ['#3b82f6', '#06b6d4', '#a855f7', '#f59e0b', '#ef4444', '#64748b'];
 
@@ -78,6 +79,43 @@ export function AssetIntelligencePage() {
         return { rows, total, catDonut, avgHealth, buckets, atRisk };
     }, [inputs.itLoad, req.workload.avgRackDensityKw, ageYears, condition]);
 
+    const [busy, setBusy] = React.useState(false);
+    const exportPdf = async () => {
+        if (!model) return;
+        setBusy(true);
+        try {
+            await generatePillarPDF({
+                title: 'Asset Intelligence', layer: 'Asset Engine', project: req.overview.projectName || 'DC-OS Project',
+                kpis: [
+                    { label: 'Tracked Units', value: model.total.toLocaleString(), sub: 'engine equipment scaling' },
+                    { label: 'Avg Health', value: `${model.avgHealth}/100`, sub: `age ${ageYears} yr` },
+                    { label: 'Poor / Critical', value: (model.buckets.poor + model.buckets.critical).toLocaleString(), sub: 'plan replacement' },
+                    { label: 'At Wear-Out Risk', value: model.atRisk.toLocaleString(), sub: '≥25% Weibull CDF' },
+                ],
+                config: [
+                    ['IT Load', `${(inputs.itLoad / 1000).toFixed(1)} MW`],
+                    ['Rack Density', `${req.workload.avgRackDensityKw} kW/rack`],
+                    ['Fleet Age', `${ageYears} yr`], ['Condition', `${Math.round(condition * 100)}%`],
+                ],
+                sections: [
+                    {
+                        title: 'Class Health & Reliability', head: ['Class', 'Units', 'Health', 'Weibull CDF', 'MTBF', 'MTTR'],
+                        rows: model.rows.map((r) => [r.label, r.count, `${r.health}/100`, `${r.fpPct}%`,
+                            r.mtbfHrs ? `${(r.mtbfHrs / 1000).toFixed(0)}k h` : '—', r.mttrHrs ? `${r.mttrHrs} h` : '—']),
+                    },
+                    {
+                        title: 'Fleet by Category', head: ['Category', 'Units'],
+                        rows: model.catDonut.map((c) => [c.name, c.value]),
+                    },
+                ],
+                callouts: (model.buckets.poor + model.buckets.critical) > 0
+                    ? [{ title: 'Replacement planning', body: `${(model.buckets.poor + model.buckets.critical).toLocaleString()} units in Poor/Critical health at the modeled age — schedule replacement budget.`, tone: 'warn' as const }]
+                    : [{ title: 'Fleet health', body: 'No units in Poor/Critical health at the modeled age.', tone: 'good' as const }],
+                note: 'Fleet generated from engine equipment scaling; health = engine Weibull model at the set fleet age/condition. MTBF/MTTR = IEEE-493 component data.',
+            });
+        } finally { setBusy(false); }
+    };
+
     if (!model) return <div className="p-8 text-center text-sm text-slate-500">Engine loading…</div>;
 
     const ageVal: ComboValue<number> = { value: ageYears, isCustom: ![1, 3, 5, 8, 12].includes(ageYears) };
@@ -105,6 +143,10 @@ export function AssetIntelligencePage() {
                             <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
                         ))}
                     </div>
+                    <button onClick={exportPdf} disabled={busy}
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-violet-400 disabled:opacity-50">
+                        <FileDown className="h-3.5 w-3.5" /> {busy ? 'Generating…' : 'Export PDF'}
+                    </button>
                     <button onClick={() => setActiveTab('spares')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Spares <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>

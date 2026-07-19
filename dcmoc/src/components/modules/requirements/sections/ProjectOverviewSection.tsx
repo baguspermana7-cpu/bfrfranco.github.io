@@ -5,10 +5,10 @@
 import React from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useRequirementsStore } from '@/store/requirements';
-import { COUNTRIES } from '@/constants/countries';
+import { CountrySelect } from '@/components/ui/CountrySelect';
 import { writeSharedCountry, USE_CASE_LABELS } from '@/lib/requirementsMappings';
-import { SectionCard, Field, TextInput, Select, Segmented, ChipRow, QuarterPicker, NumInput } from '../ui';
-import type { UseCase, SiteStatus, Industry, GridVoltage, ProjectType } from '@/store/requirements';
+import { SectionCard, Field, TextInput, Select, Segmented, QuarterPicker, NumInput } from '../ui';
+import type { SiteStatus, Industry, GridVoltage, ProjectType } from '@/store/requirements';
 
 const SITE_STATUS: { value: SiteStatus; label: string }[] = [
     { value: 'not_started', label: 'Not Started' }, { value: 'identified', label: 'Identified' },
@@ -27,14 +27,12 @@ export function ProjectOverviewSection() {
     const country = useSimulationStore((s) => s.selectedCountry);
     const set = req.actions.setOverview;
 
-    const countryOptions = Object.values(COUNTRIES).map((c) => ({ value: c.id, label: c.name }));
-
     return (
         <SectionCard num="1.1" title="Project Overview" caption="Basic information about the project and customer" id="sec-overview">
             <div className="grid gap-3 md:grid-cols-3">
                 <Field label="Project Name" required><TextInput value={o.projectName} onChange={(v) => set({ projectName: v })} placeholder="e.g. Green AI DC Campus" /></Field>
-                <Field label="Country" required>
-                    <Select value={country?.id ?? 'ID'} onChange={(v) => writeSharedCountry(v)} options={countryOptions} />
+                <Field label="Country" required hint="Grouped by region — construction & tariff basis follows the country">
+                    <CountrySelect value={country?.id ?? 'ID'} onChange={(v) => writeSharedCountry(v)} />
                 </Field>
                 <Field label="Project Owner"><TextInput value={o.projectOwner} onChange={(v) => set({ projectOwner: v })} placeholder="Owning entity" /></Field>
 
@@ -52,7 +50,7 @@ export function ProjectOverviewSection() {
                 </Field>
                 <Field label="Grid Voltage">
                     <Segmented<GridVoltage> value={o.gridVoltage} onChange={(v) => set({ gridVoltage: v })}
-                        options={(['11kV', '33kV', '132kV', '220kV'] as GridVoltage[]).map((g) => ({ value: g, label: g }))} />
+                        options={(['11kV', '20kV', '33kV', '132kV', '220kV'] as GridVoltage[]).map((g) => ({ value: g, label: g }))} />
                 </Field>
             </div>
 
@@ -79,9 +77,13 @@ export function ProjectOverviewSection() {
             </div>
 
             <div className="mt-3">
-                <Field label="Primary Use Case" required>
-                    <ChipRow<UseCase> value={o.useCase} onChange={(v) => set({ useCase: v })}
-                        options={(Object.keys(USE_CASE_LABELS) as UseCase[]).map((k) => ({ value: k, label: USE_CASE_LABELS[k] }))} />
+                {/* Owner S6: the single use-case picker lives in 1.2 (was duplicated
+                  * here as "Primary Use Case" next to Industry + Workload Category). */}
+                <Field label="IT Workload / Use Case" hint="Selected in 1.2 Workload Profile — one source">
+                    <a href="#sec-workload" className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/40 bg-violet-600/10 px-2.5 py-1 text-[11px] font-medium text-violet-600 dark:text-violet-300 hover:bg-violet-600/20">
+                        {USE_CASE_LABELS[o.useCase]}
+                        <span className="text-[9px] uppercase text-violet-400">edit in 1.2 ↓</span>
+                    </a>
                 </Field>
             </div>
         </SectionCard>

@@ -21,7 +21,8 @@ import { rzModels, rzData } from '@/lib/rz-engine';
 import { getPUE } from '@/constants/pue';
 import { ReportDashboard } from '@/components/modules/ReportDashboard';
 import { fmtMoney } from '@/lib/format';
-import { Trophy, ChevronRight } from 'lucide-react';
+import { Trophy, ChevronRight, FileDown } from 'lucide-react';
+import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 
 interface Dim { key: string; label: string; score: number; weight: number; basis: string }
 
@@ -105,6 +106,46 @@ export function ResultsEnginePage() {
         return { dims, overall, grade, perKw, npv, irr, opexPue: pue, siteBest: siteResults[0] ?? null, recs };
     }, [capexResults, inputs, country, req, ct, sites]);
 
+    const [busy, setBusy] = React.useState(false);
+    const exportPdf = async () => {
+        if (!model || !capexResults) return;
+        setBusy(true);
+        try {
+            await generatePillarPDF({
+                title: 'Results Scorecard', layer: 'Results Engine', project: req.overview.projectName || 'DC-OS Project',
+                kpis: [
+                    { label: 'Overall Score', value: `${model.overall}/100`, sub: model.grade },
+                    { label: 'CAPEX $/kW', value: `$${model.perKw.toLocaleString()}`, sub: 'vs reference band' },
+                    { label: 'IRR (screening)', value: model.irr != null ? `${(model.irr * 100).toFixed(1)}%` : '—', sub: '10% hurdle' },
+                    { label: 'PUE', value: String(model.opexPue), sub: `${inputs.coolingType} · Tier ${inputs.tierLevel}` },
+                ],
+                config: [
+                    ['IT Load', `${(inputs.itLoad / 1000).toFixed(1)} MW`], ['Tier', `Tier ${inputs.tierLevel}`],
+                    ['Cooling', inputs.coolingType], ['Redundancy', inputs.powerRedundancy],
+                    ['Country', country?.name ?? '—'],
+                    ['Best Site', sites.find((s) => s.id === model.siteBest?.siteId)?.name ?? '—'],
+                ],
+                sections: [
+                    {
+                        title: 'Dimension Scorecard', head: ['Dimension', 'Score', 'Weight', 'Basis'],
+                        rows: model.dims.map((d) => [d.label, `${d.score}/100`, `${Math.round(d.weight * 100)}%`, d.basis]),
+                    },
+                    {
+                        title: 'Key Financial Outcomes', head: ['Metric', 'Value'],
+                        rows: [
+                            ['Total CAPEX (P50)', `$${(capexResults.total / 1e6).toFixed(1)}M`],
+                            ['NPV @10% (15y screening)', model.npv != null ? `$${(model.npv / 1e6).toFixed(1)}M` : '—'],
+                            ['IRR (screening)', model.irr != null ? `${(model.irr * 100).toFixed(1)}%` : '—'],
+                        ],
+                    },
+                ],
+                actions: model.recs.map((r, i) => ({ priority: (i === 0 ? 'HIGH' : i < 3 ? 'MEDIUM' : 'LOW') as 'HIGH' | 'MEDIUM' | 'LOW', action: r })),
+                summaryBand: model.dims.slice(0, 6).map((d) => ({ label: d.label, value: String(d.score) })),
+                note: 'Composite scorecard — every dimension score is a documented deterministic composite from the engine/adapters; planning screening, not an audit.',
+            });
+        } finally { setBusy(false); }
+    };
+
     if (!capexResults || !model) return <div className="p-8 text-center text-sm text-slate-500">Calculating…</div>;
 
     const radarData = model.dims.map((d) => ({ axis: d.label, score: d.score }));
@@ -131,6 +172,10 @@ export function ResultsEnginePage() {
                             <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
                         ))}
                     </div>
+                    <button onClick={exportPdf} disabled={busy}
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-violet-400 disabled:opacity-50">
+                        <FileDown className="h-3.5 w-3.5" /> {busy ? 'Generating…' : 'Export PDF'}
+                    </button>
                     <button onClick={() => setActiveTab('dashboard')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Executive Dashboard <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>

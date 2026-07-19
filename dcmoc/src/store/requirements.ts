@@ -13,7 +13,7 @@ import { useSettingsStore } from '@/store/settings';
 
 export type SiteStatus = 'not_started' | 'identified' | 'shortlisted' | 'secured';
 export type Industry = 'csp' | 'colo_provider' | 'enterprise' | 'government' | 'telecom' | 'financial';
-export type GridVoltage = '11kV' | '33kV' | '132kV' | '220kV';
+export type GridVoltage = '11kV' | '20kV' | '33kV' | '132kV' | '220kV';
 export type ProjectType = 'new_build' | 'expansion' | 'retrofit' | 'colocation';
 export type UseCase = 'ai' | 'cloud' | 'hpc' | 'enterprise' | 'network' | 'dr';
 export type RackForm = 'std42u' | 'tall48u' | 'ocp';
@@ -49,6 +49,10 @@ export interface ReqWorkload {
     rackForm: RackForm;
     workloadMix: { aiGpu: number; storage: number; general: number; network: number }; // sums to 100
     aiChipType: AiChip;
+    /** Owner: computed rack count must be adjustable (e.g. 500 → actual 480). null = auto. */
+    totalRacksOverride: number | null;
+    /** Owner: mix is predefined from the use-case profile; sliders unlock via this tick. */
+    mixManual: boolean;
 }
 
 export interface ReqGrowth {
@@ -104,6 +108,7 @@ const DEFAULTS: Omit<RequirementsState, 'actions'> = {
         avgRackDensityKw: 60, maxRackDensityKw: 80, rackForm: 'std42u',
         workloadMix: { aiGpu: 70, storage: 15, general: 10, network: 5 },
         aiChipType: 'h100',
+        totalRacksOverride: null, mixManual: false,
     },
     growth: {
         growthType: 'linear',

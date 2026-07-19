@@ -6,6 +6,7 @@ import React from 'react';
 import { useSitesStore } from '@/store/sites';
 import { useSimulationStore } from '@/store/simulation';
 import { COUNTRIES } from '@/constants/countries';
+import { CountrySelect } from '@/components/ui/CountrySelect';
 import { CreatableCombobox, type ComboValue } from '@/components/ui/CreatableCombobox';
 import { ATTR_BOUNDS, type CandidateSite, type SiteAttributes } from '@/types/site-intel';
 import { X, Plus, Trash2 } from 'lucide-react';
@@ -97,10 +98,7 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
                     </label>
                     <label className="block">
                         <span className="text-[10px] font-semibold uppercase text-slate-500">Country</span>
-                        <select className="mt-0.5 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-violet-500 text-slate-900 dark:text-slate-100"
-                            value={site.countryId} onChange={(e) => updateSite(site.id, { countryId: e.target.value })}>
-                            {Object.values(COUNTRIES).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                        </select>
+                        <CountrySelect className="mt-0.5" value={site.countryId} onChange={(v) => updateSite(site.id, { countryId: v })} />
                     </label>
                 </div>
 

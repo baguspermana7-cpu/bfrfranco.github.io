@@ -17,8 +17,10 @@ import {
     escalationTable, PAYMENT_TERMS, boqRows, capexInsights,
 } from '@/state/adapters/capex-adapter';
 import { fmtMoney } from '@/lib/format';
-import { Building, ChevronRight } from 'lucide-react';
+import { Building, ChevronRight, FileDown } from 'lucide-react';
 import { rzData } from '@/lib/rz-engine';
+import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
+import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 
 export function CapexEnginePage() {
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
@@ -26,6 +28,7 @@ export function CapexEnginePage() {
     const results = useCapexStore((s) => s.results);
     const runCalculation = useCapexStore((s) => s.runCalculation);
     const [tab, setTab] = React.useState<'analysis' | 'config'>('analysis');
+    const [busy, setBusy] = React.useState(false);
 
     React.useEffect(() => { if (!results) runCalculation(); }, [results, runCalculation]);
 
@@ -48,6 +51,49 @@ export function CapexEnginePage() {
     const { cats, band } = model;
     const perKw = results.metrics?.perKw ?? Math.round(results.total / Math.max(1, inputs.itLoad));
 
+    const exportPdf = async () => {
+        setBusy(true);
+        try {
+            await generatePillarPDF({
+                title: 'CAPEX Engine', layer: 'CAPEX Engine', project: '—',
+                kpis: [
+                    { label: 'Total CAPEX (P50)', value: fmtMoney(band.p50), sub: 'base estimate' },
+                    { label: 'P80 (Risk-Adjusted)', value: fmtMoney(band.p80), sub: `+${(((band.p80 - band.p50) / band.p50) * 100).toFixed(1)}% vs P50` },
+                    { label: 'P10 (Optimistic)', value: fmtMoney(band.p10), sub: `${(((band.p10 - band.p50) / band.p50) * 100).toFixed(1)}% vs P50` },
+                    { label: '$ / kW', value: `$${perKw.toLocaleString()}`, sub: `${(inputs.itLoad / 1000).toFixed(1)} MW IT` },
+                    { label: 'Contingency', value: fmtMoney(results.contingency ?? 0), sub: `${inputs.contingency}% (= design margin)` },
+                    { label: 'Estimate Class', value: 'AACE Class 4', sub: '−30% / +50% (engine truth)' },
+                ],
+                config: [
+                    ['IT Load', `${(inputs.itLoad / 1000).toFixed(1)} MW`],
+                    ['Contingency', `${inputs.contingency}%`],
+                    ['Project Year', String(inputs.projYear)],
+                    ['Fuel Storage', `${inputs.fuelHours} h`],
+                    ['Renewable Option', String(inputs.renewableOption ?? 'none')],
+                    ['Green Certification', String(inputs.greenCert ?? 'none')],
+                    ['Estimate Class', 'AACE Class 4 (−30% / +50%)'],
+                ],
+                sections: [
+                    { title: 'CAPEX Breakdown (P50)', head: ['Category', 'Total', '%'], rows: cats.rows.map((r) => [r.name, fmtMoney(r.usd), `${r.pct}%`]) },
+                    { title: 'BOQ Summary (by category)', head: ['Line Item', 'Category', 'Total', '%'], rows: model.boq.map((r) => [r.line, r.category, fmtMoney(r.usd), `${r.pctOfTotal}%`]) },
+                    { title: 'Contingency & Soft Costs', head: ['Type', 'Basis', 'Total'], rows: model.cont.map((c) => [c.type, c.basis, fmtMoney(c.usd)]) },
+                    { title: 'Cost Escalation (projYear index)', head: ['Year', 'Multiplier'], rows: model.esc.map((e) => [`${e.year}${e.year === inputs.projYear ? ' · selected' : ''}`, `×${e.mult.toFixed(2)}`]) },
+                ],
+                donut: { title: 'CAPEX Breakdown (P50)', unitLabel: 'total CAPEX', slices: cats.rows.map((r) => ({ label: r.name, value: r.usd, color: r.color })) },
+                callouts: model.insights.map((s, idx) => ({ title: `Key Insight ${idx + 1}`, body: s, tone: 'info' as const })),
+                summaryBand: [
+                    { label: 'P10', value: fmtMoney(band.p10) },
+                    { label: 'P50', value: fmtMoney(band.p50) },
+                    { label: 'P80', value: fmtMoney(band.p80) },
+                    { label: 'P90', value: fmtMoney(band.p90) },
+                    { label: '$ / kW', value: `$${perKw.toLocaleString()}` },
+                    { label: 'Contingency', value: fmtMoney(results.contingency ?? 0) },
+                ],
+                note: `Deterministic engine-derived analysis — cost DB v${rzVersion()}. AACE Class 4 band (−30%/+50%), deterministic normal approximation; IT fit-out (racks/servers) excluded — no engine cost model.`,
+            } as StandardReport);
+        } finally { setBusy(false); }
+    };
+
     return (
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -66,6 +112,7 @@ export function CapexEnginePage() {
                             </button>
                         ))}
                     </div>
+                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
                     <button onClick={() => setActiveTab('construction')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: Construction <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>

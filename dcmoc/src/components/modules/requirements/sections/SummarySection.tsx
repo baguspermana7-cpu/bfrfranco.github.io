@@ -47,6 +47,50 @@ export function SummarySection({ derived }: { derived: ReqDerived }) {
                         rows: derived.sectionQuality.map((s) => [s.label, `${s.pct}%`, s.missing.join(', ') || '—']),
                     },
                 ],
+                config: [
+                    ['Project Name', req.overview.projectName || '—'],
+                    ['Country', country?.name ?? '—'],
+                    ['Use Case', req.overview.useCase.toUpperCase()],
+                    ['Industry', req.overview.industry.replace(/_/g, ' ')],
+                    ['Project Type', req.overview.projectType.replace(/_/g, ' ')],
+                    ['Site Status', req.overview.siteStatus.replace(/_/g, ' ')],
+                    ['Target COD', `Q${req.overview.targetCod.quarter} ${req.overview.targetCod.year}`],
+                    ['Grid Voltage', req.overview.gridVoltage],
+                    ['IT Load (Y0)', `${(inputs.itLoad / 1000).toFixed(1)} MW`],
+                    ['Avg Rack Density', `${req.workload.avgRackDensityKw} kW`],
+                    ['Max Rack Density', req.workload.maxRackDensityKw != null ? `${req.workload.maxRackDensityKw} kW` : '—'],
+                    ['Rack Form', req.workload.rackForm],
+                    ['Workload Mix', `AI ${req.workload.workloadMix.aiGpu}% · Sto ${req.workload.workloadMix.storage}% · Gen ${req.workload.workloadMix.general}% · Net ${req.workload.workloadMix.network}%`],
+                    ['AI Chip', req.workload.aiChipType.toUpperCase()],
+                    ['Growth Type', req.growth.growthType],
+                    ['Growth (Y0→Y5)', derived.growthYearsMw.slice(0, 6).map((g) => `${g.mw}`).join(' → ') + ' MW'],
+                    ['5-yr CAGR', `${derived.cagrPct}%`],
+                    ['SLA Target', req.availability.slaTargetPct != null ? `${req.availability.slaTargetPct}%` : `${derived.tierTargetPct}% (tier default)`],
+                    ['Downtime Budget', `${derived.downtimeMinYr} min/yr`],
+                    ['Months to COD', String(derived.deadlineMonths)],
+                ],
+                callouts: v && v.flags.length > 0
+                    ? v.flags.map((f) => ({
+                        title: f.severity === 'critical' ? 'Critical Flag' : 'Warning',
+                        body: f.message,
+                        tone: f.severity === 'critical' ? ('warn' as const) : ('info' as const),
+                    }))
+                    : [{ title: 'Validation Clean', body: 'All engine validation checks pass.', tone: 'good' as const }],
+                actions: [
+                    ...(v?.flags ?? []).map((f) => ({
+                        priority: f.severity === 'critical' ? ('HIGH' as const) : ('MEDIUM' as const),
+                        action: `Resolve: ${f.message}`,
+                    })),
+                    ...(v?.missing ?? []).map((f) => ({ priority: 'LOW' as const, action: `Provide missing intake field: ${f}` })),
+                ],
+                summaryBand: [
+                    { label: 'Score', value: `${derived.score}/100` },
+                    { label: 'IT Load', value: `${(inputs.itLoad / 1000).toFixed(1)} MW` },
+                    { label: 'Racks', value: derived.totalRacks.toLocaleString() },
+                    { label: 'Density', value: `${req.workload.avgRackDensityKw} kW` },
+                    { label: 'Availability', value: `${derived.tierTargetPct}%` },
+                    { label: 'CAGR (5y)', value: `${derived.cagrPct}%` },
+                ],
                 note: `Engine-real intake validation (models.requirements). ${derived.scoreBand.sub} Budgetary screening — not a design basis.`,
             });
         } finally { setBusy(false); }

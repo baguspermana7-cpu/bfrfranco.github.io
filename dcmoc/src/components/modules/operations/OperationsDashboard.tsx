@@ -18,7 +18,8 @@ import { rzModels, rzData } from '@/lib/rz-engine';
 import { getPUE } from '@/constants/pue';
 import { StaffingDashboard } from '@/components/modules/StaffingDashboard';
 import { MaintenanceDashboard } from '@/components/modules/MaintenanceDashboard';
-import { Wrench, ChevronRight } from 'lucide-react';
+import { Wrench, ChevronRight, FileDown } from 'lucide-react';
+import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 
 const PRI_COLORS: Record<string, string> = { P1: '#f43f5e', P2: '#f97316', P3: '#f59e0b', P4: '#64748b' };
 
@@ -97,6 +98,50 @@ export function OperationsDashboard() {
     }, [inputs.shiftModel, inputs.headcount_ShiftLead, inputs.headcount_Engineer, inputs.headcount_Technician]);
 
     const alarmDonut = (['P1', 'P2', 'P3', 'P4'] as const).map((p) => ({ name: p, value: byPri(p) })).filter((x) => x.value > 0);
+    const [busy, setBusy] = React.useState(false);
+
+    const exportPdf = async () => {
+        setBusy(true);
+        try {
+            await generatePillarPDF({
+                title: 'Operations', layer: 'Operations Engine', project: '—',
+                kpis: [
+                    { label: 'Availability Target', value: `${model.availTargetPct}%`, sub: `Tier ${inputs.tierLevel} design target` },
+                    { label: 'PUE (at load)', value: String(model.livePue), sub: `design ${model.designPue} · ${Math.round(model.occ * 100)}% occ` },
+                    { label: 'Active IT Load', value: `${model.activeItMw} MW`, sub: `of ${model.capMw.toFixed(1)} MW (${Math.round(model.occ * 100)}%)` },
+                    { label: 'Active Alarms', value: String(activeAlarms.length), sub: `P1:${byPri('P1')} P2:${byPri('P2')} P3:${byPri('P3')}` },
+                    { label: 'Open Tickets', value: String(openTickets.length), sub: `${openIncidents.length} incidents open` },
+                    { label: 'Energy Cost (24h)', value: `$${model.energyCostToday.toLocaleString()}`, sub: `@ $${model.rate}/kWh (${country?.name ?? '—'})` },
+                ],
+                config: [
+                    ['Tier', `Tier ${inputs.tierLevel}`],
+                    ['Cooling', inputs.coolingType],
+                    ['Shift Model', inputs.shiftModel],
+                    ['Occupancy', `${Math.round(model.occ * 100)}%`],
+                    ['Electricity Rate', `$${model.rate}/kWh`],
+                    ['Country', country?.name ?? '—'],
+                ],
+                sections: [
+                    { title: 'Recent Alarms (ops log)', head: ['Priority', 'Tag', 'Message', 'Status'], rows: log.alarms.slice(0, 10).map((a) => [a.priority, a.tag, a.message, a.status]) },
+                    { title: 'Asset Health (Weibull @ 40% design life)', head: ['Class', 'Health /100', 'Failure CDF %'], rows: model.assetHealth.rows.map((r) => [r.cls, String(Math.round(r.health)), `${r.fp}%`]) },
+                ],
+                callouts: planMode ? [{
+                    title: 'Plan Mode — EXAMPLE-seeded ops log',
+                    body: 'Alarm/incident/ticket counts come from the EXAMPLE-seeded ops log; edit or add entries to make them yours. Derived KPIs (availability target, PUE, load, energy) are engine-real from the planning state.',
+                    tone: 'info' as const,
+                }] : [],
+                summaryBand: [
+                    { label: 'Availability', value: `${model.availTargetPct}%` },
+                    { label: 'Live PUE', value: String(model.livePue) },
+                    { label: 'Active IT', value: `${model.activeItMw} MW` },
+                    { label: 'Alarms', value: String(activeAlarms.length) },
+                    { label: 'Tickets', value: String(openTickets.length) },
+                    { label: 'Incidents', value: String(openIncidents.length) },
+                ],
+                note: 'Derived plane engine-real (tier availability target, partial-load PUE at occupancy, energy cost from the country rate, Weibull asset health); log plane user-entered. 24h series = deterministic diurnal cosine — no random data.',
+            });
+        } finally { setBusy(false); }
+    };
 
     return (
         <div className="space-y-4">
@@ -114,6 +159,7 @@ export function OperationsDashboard() {
                             <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
                         ))}
                     </div>
+                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
                     <button onClick={() => setActiveTab('finance')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: Financial <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>

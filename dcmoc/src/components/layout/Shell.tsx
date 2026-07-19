@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useScenarioStore, SavedScenario } from '@/store/scenario';
 import { useCapexStore } from '@/store/capex';
@@ -119,6 +119,46 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
         localStorage.setItem('dcmoc-vintage-banner-dismissed', '1');
     };
 
+    // ── Resizable sidebar (lg+ only; mobile drawer keeps w-64) ──
+    const SIDEBAR_DEFAULT = 256;
+    const SIDEBAR_MIN = 200;
+    const SIDEBAR_MAX = 420;
+    const clampSidebarW = (w: number) => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, w));
+    const [sidebarW, setSidebarW] = useState(SIDEBAR_DEFAULT);
+    const dragRef = useRef<{ startX: number; startW: number } | null>(null);
+
+    useEffect(() => {
+        // Lazy init from localStorage post-mount (avoids SSR hydration mismatch)
+        const saved = localStorage.getItem('dcmoc-sidebar-w');
+        if (saved) {
+            const n = parseInt(saved, 10);
+            if (!Number.isNaN(n)) setSidebarW(Math.min(420, Math.max(200, n)));
+        }
+    }, []);
+
+    const onResizePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+        dragRef.current = { startX: e.clientX, startW: sidebarW };
+    };
+    const onResizePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+        const d = dragRef.current;
+        if (!d) return;
+        setSidebarW(clampSidebarW(d.startW + e.clientX - d.startX));
+    };
+    const onResizePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+        const d = dragRef.current;
+        if (!d) return;
+        dragRef.current = null;
+        const final = clampSidebarW(d.startW + e.clientX - d.startX);
+        setSidebarW(final);
+        localStorage.setItem('dcmoc-sidebar-w', String(final));
+    };
+    const onResizeReset = () => {
+        setSidebarW(SIDEBAR_DEFAULT);
+        localStorage.setItem('dcmoc-sidebar-w', String(SIDEBAR_DEFAULT));
+    };
+
     const navItems: { label: string; icon: LucideIcon; id: typeof activeTab; section?: string }[] = [
         { label: 'CAPEX Engine', icon: Building, id: 'capex' },
         { label: 'Operations Overview', icon: Activity, id: 'ops' },
@@ -170,7 +210,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
         { num: 7, label: 'Commissioning', icon: CheckCircle2, childIds: ['commissioning'] },
         { num: 8, label: 'Operations', icon: Wrench, childIds: ['ops', 'sim', 'staff', 'maint'] },
         { num: 9, label: 'Asset Intelligence', icon: Activity, childIds: ['asset-health', 'asset-lifecycle', 'cbm', 'spares'] },
-        { num: 10, label: 'Reliability', icon: ShieldCheck, childIds: ['risk', 'reliability', 'tier'] },
+        { num: 10, label: 'Reliability', icon: ShieldCheck, childIds: ['risk', 'reliability'] },
         { num: 11, label: 'Sustainability', icon: Leaf, childIds: ['carbon'] },
         { num: 12, label: 'Financial', icon: TrendingUp, childIds: ['finance', 'invest', 'montecarlo', 'portfolio', 'benchmark', 'strategic'] },
         { num: 13, label: 'AI Decision Engine', icon: BrainCircuit, childIds: [] },
@@ -234,7 +274,10 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
     const fmtMoney = (n: number) => n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(1)}M` : n >= 1_000 ? `$${(n / 1_000).toFixed(0)}K` : `$${n}`;
 
     return (
-        <div className="min-h-screen flex bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans selection:bg-cyan-500/30 transition-colors duration-300">
+        <div
+            className="min-h-screen flex bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans selection:bg-cyan-500/30 transition-colors duration-300"
+            style={{ '--sbw': `${sidebarW}px` } as React.CSSProperties}
+        >
             {/* Mobile sidebar overlay */}
             {sidebarOpen && (
                 <div
@@ -247,7 +290,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
             {/* Sidebar */}
             <aside
                 className={clsx(
-                    "w-64 border-r border-slate-200 dark:border-white/5 bg-white/95 dark:bg-[#0b1020]/95 backdrop-blur-xl flex flex-col fixed h-full z-40 transition-all duration-300",
+                    "w-64 lg:w-[var(--sbw)] border-r border-slate-200 dark:border-white/5 bg-white/95 dark:bg-[#0b1020]/95 backdrop-blur-xl flex flex-col fixed h-full z-40 transition-all duration-300",
                     // On large screens: always visible. On small screens: slide in/out
                     "lg:translate-x-0",
                     sidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:translate-x-0"
@@ -288,6 +331,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                         <div className="flex items-center">
                             <button
                                 onClick={() => { actions.setActiveTab('dashboard'); setSidebarOpen(false); }}
+                                title="Dashboard"
                                 aria-current={activeTab === 'dashboard' ? 'page' : undefined}
                                 className={clsx(
                                     "flex-1 flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition-all",
@@ -308,6 +352,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                                 <button
                                     key={p.label}
                                     onClick={() => { if (p.action) p.action(); else if (p.id) { actions.setActiveTab(p.id); setSidebarOpen(false); } }}
+                                    title={p.label}
                                     aria-current={active ? 'page' : undefined}
                                     className={clsx(
                                         "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
@@ -335,6 +380,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                                 <div key={g.num}>
                                     <button
                                         onClick={() => { if (hasChildren) toggleEngine(g.num); }}
+                                        title={g.label}
                                         aria-expanded={hasChildren ? open : undefined}
                                         disabled={!hasChildren}
                                         className={clsx(
@@ -358,6 +404,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                                                     <div key={id} className="flex items-center">
                                                         <button
                                                             onClick={() => { actions.setActiveTab(id); setSidebarOpen(false); }}
+                                                            title={item.label}
                                                             aria-current={activeTab === id ? 'page' : undefined}
                                                             className={clsx(
                                                                 "flex-1 flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all",
@@ -383,6 +430,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                         <div className="flex items-center mt-2 pt-2 border-t border-slate-200 dark:border-slate-800">
                             <button
                                 onClick={() => { actions.setActiveTab('report'); setSidebarOpen(false); }}
+                                title="Reports"
                                 aria-current={activeTab === 'report' ? 'page' : undefined}
                                 className={clsx(
                                     "flex-1 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
@@ -409,6 +457,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                                 <button
                                     key={s.id}
                                     onClick={() => { actions.setActiveTab(s.id); setSidebarOpen(false); }}
+                                    title={s.label}
                                     aria-current={active ? 'page' : undefined}
                                     className={clsx(
                                         "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
@@ -498,12 +547,25 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                         </button>
                     </div>
                 </div>
+
+                {/* Resize handle (lg+ only) — drag to resize, double-click to reset */}
+                <div
+                    role="separator"
+                    aria-orientation="vertical"
+                    aria-label="Resize sidebar"
+                    title="Drag to resize · double-click to reset"
+                    className="hidden lg:block absolute top-0 right-0 h-full w-1 cursor-col-resize hover:bg-violet-500/40 z-50 touch-none"
+                    onPointerDown={onResizePointerDown}
+                    onPointerMove={onResizePointerMove}
+                    onPointerUp={onResizePointerUp}
+                    onDoubleClick={onResizeReset}
+                />
             </aside>
 
             {/* Main Content Area */}
-            <main className="flex-1 lg:ml-64 min-h-screen relative overflow-x-hidden pt-16">
+            <main className="flex-1 lg:ml-[var(--sbw)] min-h-screen relative overflow-x-hidden pt-16">
                 {/* Top Navbar */}
-                <header className="h-16 border-b border-slate-200/50 dark:border-slate-800/50 backdrop-blur-md fixed top-0 left-0 right-0 lg:left-64 z-20 flex items-center px-4 lg:px-8 justify-between bg-white/80 dark:bg-slate-900/80 transition-colors duration-300">
+                <header className="h-16 border-b border-slate-200/50 dark:border-slate-800/50 backdrop-blur-md fixed top-0 left-0 right-0 lg:left-[var(--sbw)] z-20 flex items-center px-4 lg:px-8 justify-between bg-white/80 dark:bg-slate-900/80 transition-colors duration-300">
                     <div className="flex items-center gap-3">
                         {/* Mobile hamburger */}
                         <button

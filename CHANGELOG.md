@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.85.0 — 2026-07-19 (DCMOC revision round batch 1: PDF standard renderer + Cx checklist + spares engine + shell UIUX + reliability depth)
+
+### Fixed
+- **PDF export crash** ("Invalid arguments passed to jsPDF.text") on Operations → Staffing: `shiftComparisons` shape mismatch mapped correctly in StaffingPdf; systemic hardening at the `initDoc` chokepoint — `doc.text`/`splitTextToSize` now String-coerce and NaN-guard for all 12 legacy jsPDF generators.
+- **Sidebar tooltip clipped** at the sidebar edge: React Tooltip now renders via a body portal with fixed positioning + viewport flip — no overflow ancestor can clip it.
+- **Reliability fake precision**: "100.0000%" availability and "0.0 min/yr" downtime replaced by nines-formatted availability (with nines chip), seconds-scale downtime, and a β=5% common-cause screening factor on parallel paths.
+
+### Added
+- **Standard PDF renderer (print-window)**: new `PrintReport.ts` renders every DCMOC export in the OPEX-report min-standard visual language (header + headline chip, KPI cards, configuration table, colored section titles, navy-header tables, SVG donut, tinted callouts, executive assessment, prioritized actions with priority chips, dark summary band, disclaimer). `generatePillarPDF` now routes through it; jsPDF path retained as fallback.
+- **Export PDF on every engine page**: Capacity, CAPEX, Operations, Financial, Sustainability, Results (composite), Assets — plus full-standard upgrades (config/callouts/actions/summary band) for Architecture, Construction, Site rail and Requirements summary.
+- **Commissioning Cx Checklist** (DC Hub cx-calculator port): 20 real test-procedure templates (NETA/IEEE/ASHRAE basis — IR/megger, CT ratio, relay, breaker, transformer, UPS, genset load bank, chiller/DLC startup, balancing, IST scenarios, doc review, training, closeout) mapped per readiness level and system; PASS/FAIL tri-state ticks with witness badges (Hold/Witness/Review), expandable procedure detail (steps, acceptance + standard, tools, safety, logsheet fields); checklist-derived completion now drives the engine readinessIndex (sliders become coarse fallback with a "from checklist" chip); FAIL → one-click issue logging.
+- **Spares Optimization rebuilt engine-real**: fleet from engine equipment scaling × IEEE-493 MTBF → per-class newsvendor optimization (Q*, ROP, safety stock, fill rate, annual cost) with country lead times, criticality fill targets, per-class overrides and provenance chips — single spares model aligned with Maintenance.
+- **Resizable sidebar**: drag the right edge (200–420 px, persisted; double-click resets).
+- **Requirements calculator-basis parity**: use-case pick auto-applies the engine profile (density/cooling/tier floor/mix preset) with reference-guidance card; single use-case picker (Industry/Use-case/Workload-category duplication removed); Total Racks overridable (auto chip ⇄ manual); workload-mix manual-override tick; rack-class descriptions on density presets; Grid Voltage gains 20 kV (PLN MV standard).
+- **Reliability Engine deepened**: Tier Classification folded in as an in-page tab (sidebar sub-menu removed); per-component RAM table with fleet counts and unavailability contribution; downtime-budget waterfall; MTTR/path-loss sensitivity; maintenance-basis honesty note; Export PDF.
+
 ## v1.84.3 — 2026-07-19 (DCMOC: Data Library provenance browser)
 
 ### Added

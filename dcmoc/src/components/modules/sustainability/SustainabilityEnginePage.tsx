@@ -16,8 +16,9 @@ import { useSustainability } from '@/store/sustainability';
 import { rzModels, rzData } from '@/lib/rz-engine';
 import { getPUE } from '@/constants/pue';
 import CarbonDashboard from '@/components/modules/CarbonDashboard';
-import { Leaf, ChevronRight } from 'lucide-react';
+import { Leaf, ChevronRight, FileDown } from 'lucide-react';
 import { Explain } from '@/components/ui/Explain';
+import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 
 const SCOPE_COLORS = ['#f59e0b', '#a78bfa', '#64748b'];
 const MIX_COLORS = ['#34d399', '#22d3ee', '#64748b'];
@@ -63,6 +64,57 @@ export function SustainabilityEnginePage() {
     const scopeDonut = model.scopes ? [
         { name: 'Scope 1', v: model.scopes.scope1 }, { name: 'Scope 2 (location-based)', v: model.scopes.scope2 }, { name: 'Scope 3 (annualized)', v: model.scopes.scope3Annual },
     ] : [];
+    const [busy, setBusy] = React.useState(false);
+
+    const exportPdf = async () => {
+        setBusy(true);
+        try {
+            await generatePillarPDF({
+                title: 'Sustainability', layer: 'Sustainability Engine', project: '—',
+                kpis: [
+                    { label: 'PUE (Design)', value: String(model.pue), sub: `${inputs.coolingType} · Tier ${inputs.tierLevel}` },
+                    { label: 'Energy (Month)', value: `${model.monthlyMwh.toLocaleString()} MWh`, sub: `${model.mw.toFixed(1)} MW × PUE × 730h` },
+                    { label: 'Carbon (Annual)', value: model.scopes ? `${Math.round(model.scopes.totalAnnual).toLocaleString()} tCO₂e` : '—', sub: 'GHG Protocol scopes (engine)' },
+                    { label: 'Water (Annual)', value: model.waterM3Yr != null ? `${model.waterM3Yr.toLocaleString()} m³` : '—', sub: `WUE ${model.wue} L/kWh (engine)` },
+                    { label: 'Renewable Energy', value: `${model.renewablePct}%`, sub: 'derived from capex renewable/cert inputs' },
+                    { label: 'Sustainability Score', value: model.grade, sub: `${model.overall}/100 · documented composite` },
+                ],
+                sections: [
+                    ...(scopeDonut.length ? [{ title: 'Carbon Footprint (GHG scopes · engine)', head: ['Scope', 'tCO₂e / yr'], rows: scopeDonut.map((r) => [r.name, Math.round(r.v).toLocaleString()]) }] : []),
+                    { title: 'Energy Mix (derived from capex renewable + certification inputs)', head: ['Source', 'Share'], rows: model.mix.map((r) => [r.name, `${r.v}%`]) },
+                    {
+                        title: 'Sustainability Scorecard (documented composites)', head: ['Dimension', 'Score /100'], rows: [
+                            ['Energy Efficiency (PUE band)', String(model.energyScore)],
+                            ['Carbon Management (grid × mix)', String(model.carbonScore)],
+                            ['Water Stewardship (WUE band)', String(model.waterScore)],
+                            ['Waste Management', model.wasteScore != null ? String(model.wasteScore) : '—'],
+                        ],
+                    },
+                    { title: 'Initiatives in Progress', head: ['Category', 'Initiative', 'Progress', 'Status'], rows: sus.initiatives.map((i) => [i.category, i.title, `${i.progressPct}%`, i.status]) },
+                ],
+                callouts: [
+                    {
+                        title: `Sustainability Score ${model.grade} — ${model.overall}/100`,
+                        body: `Documented composite of energy (${model.energyScore}), carbon (${model.carbonScore}), water (${model.waterScore}) and waste (${model.wasteScore ?? '—'}) scores.`,
+                        tone: model.overall >= 70 ? ('good' as const) : model.overall >= 55 ? ('info' as const) : ('warn' as const),
+                    },
+                    {
+                        title: 'Energy mix derivation',
+                        body: 'Energy mix is DERIVED from the capex renewable/certification inputs (labeled assumption): solar+BESS → 25% on-site, solar → 15%; green cert silver/gold/platinum adds 10/20/35% off-site PPA; remainder = grid.',
+                        tone: 'info' as const,
+                    },
+                ],
+                summaryBand: [
+                    { label: 'PUE', value: String(model.pue) },
+                    { label: 'Renewable', value: `${model.renewablePct}%` },
+                    { label: 'Carbon /yr', value: model.scopes ? `${Math.round(model.scopes.totalAnnual).toLocaleString()} t` : '—' },
+                    { label: 'WUE', value: `${model.wue} L/kWh` },
+                    { label: 'Overall', value: `${model.overall}/100` },
+                ],
+                note: 'GHG scopes, WUE water volumes and PUE engine-real; energy mix derived from capex renewable/cert inputs (labeled); initiatives & certifications user-attested.',
+            });
+        } finally { setBusy(false); }
+    };
 
     return (
         <div className="space-y-4">
@@ -80,6 +132,7 @@ export function SustainabilityEnginePage() {
                             <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
                         ))}
                     </div>
+                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
                     <button onClick={() => setActiveTab('finance')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: Financial <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>
