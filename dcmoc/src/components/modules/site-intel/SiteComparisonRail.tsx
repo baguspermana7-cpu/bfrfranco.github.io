@@ -11,11 +11,18 @@ import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNar
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import type { CandidateSite, SiteScoreResult, AxisKey } from '@/types/site-intel';
 import { AXIS_LABELS, AXIS_EXPLAIN, axisBand } from '@/types/site-intel';
+import { AxisExplainPanel } from './AxisExplainPanel';
 import { Play, FileDown, ChevronRight } from 'lucide-react';
 
-export function SiteComparisonTable({ sites, results, selectedId, analysesById }: {
+/** Poor/Fair axis chip → opens the explain panel (owner mandate: no naked bad chips). */
+export interface AxisExplainSel { siteId: string; axis: AxisKey }
+
+export function SiteComparisonTable({ sites, results, selectedId, analysesById, axisExplain, onExplainAxis, onEdit }: {
     sites: CandidateSite[]; results: SiteScoreResult[]; selectedId: string | null;
     analysesById?: Map<string, SiteAnalyses>;
+    axisExplain?: AxisExplainSel | null;
+    onExplainAxis?: (sel: AxisExplainSel | null) => void;
+    onEdit?: () => void;
 }) {
     const axes = Object.keys(AXIS_LABELS) as AxisKey[];
     const bySite = (id: string) => results.find((r) => r.siteId === id);
@@ -50,8 +57,16 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById }
                                     const goodVals = results.map((x) => k === 'naturalRisks' ? 100 - x.riskScore : x.axes[k]);
                                     const good = r ? (k === 'naturalRisks' ? 100 - r.riskScore : r.axes[k]) : 0;
                                     const band = raw != null ? axisBand(raw, k === 'naturalRisks') : null;
+                                    const isBad = band != null && (band.label === 'Poor' || band.label === 'Fair');
+                                    const isOpen = axisExplain?.siteId === s.id && axisExplain?.axis === k;
                                     return <td key={s.id} className={`px-2 py-1.5 text-right tabular-nums ${r && best(goodVals, good) ? 'text-violet-500 font-semibold' : 'text-slate-600 dark:text-slate-400'}`}>
-                                        {raw ?? '—'}{band && <span className={`ml-1 text-[9px] ${band.cls}`}>· {band.label}</span>}
+                                        {raw ?? '—'}{band && (isBad && onExplainAxis ? (
+                                            <button onClick={() => onExplainAxis(isOpen ? null : { siteId: s.id, axis: k })}
+                                                title={`Kenapa ${band.label}? Klik untuk alasan + lever terukur`}
+                                                className={`ml-1 rounded px-1 text-[9px] font-semibold underline decoration-dotted underline-offset-2 ${band.cls} ${isOpen ? 'bg-amber-500/15' : 'hover:bg-amber-500/10'}`}>
+                                                · {band.label} ⓘ
+                                            </button>
+                                        ) : <span className={`ml-1 text-[9px] ${band.cls}`}>· {band.label}</span>)}
                                     </td>;
                                 })}
                             </tr>
@@ -85,6 +100,16 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById }
                     </tbody>
                 </table>
             </div>
+            {axisExplain && onExplainAxis && (() => {
+                const exSite = sites.find((s) => s.id === axisExplain.siteId);
+                const exResult = results.find((r) => r.siteId === axisExplain.siteId);
+                if (!exSite || !exResult) return null;
+                return (
+                    <AxisExplainPanel site={exSite} result={exResult} axis={axisExplain.axis}
+                        onEdit={onEdit ?? (() => { /* no drawer host */ })}
+                        onClose={() => onExplainAxis(null)} />
+                );
+            })()}
             {sel && (
                 <div className="mt-3">
                     <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Engine Factor Breakdown — selected site (10 factors · weight-renormalized)</h3>
@@ -106,9 +131,10 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById }
     );
 }
 
-export function SiteRightRail({ sites, results, selectedId, onSelect, onEdit }: {
+export function SiteRightRail({ sites, results, selectedId, onSelect, onEdit, onExplainAxis }: {
     sites: CandidateSite[]; results: SiteScoreResult[]; selectedId: string | null;
     onSelect: (id: string) => void; onEdit: () => void;
+    onExplainAxis?: (sel: AxisExplainSel) => void;
 }) {
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
     const runAnalysis = useSitesStore((s) => s.runAnalysis);
@@ -233,6 +259,31 @@ export function SiteRightRail({ sites, results, selectedId, onSelect, onEdit }: 
                 <ul className="space-y-1">
                     {takeaways.map((t, i) => <li key={i} className="flex gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"><span className="text-violet-500">✓</span>{t}</li>)}
                 </ul>
+                {/* Poor/Fair axis chips — click = reason + solved levers in the compare panel */}
+                {sel && selResult && onExplainAxis && (() => {
+                    const weak = (Object.keys(AXIS_LABELS) as AxisKey[])
+                        .map((k) => ({ k, g: selResult.axes[k], shown: k === 'naturalRisks' ? selResult.riskScore : selResult.axes[k] }))
+                        .filter((x) => x.g < 60);
+                    if (weak.length === 0) return null;
+                    return (
+                        <div className="mt-2">
+                            <p className="mb-1 text-[9px] font-semibold uppercase tracking-wide text-slate-500">Axis lemah — klik untuk alasan + lever</p>
+                            <div className="flex flex-wrap gap-1">
+                                {weak.map(({ k, g, shown }) => {
+                                    const band = axisBand(shown, k === 'naturalRisks');
+                                    return (
+                                        <button key={k}
+                                            onClick={() => { onExplainAxis({ siteId: sel.id, axis: k }); document.getElementById('sec-compare')?.scrollIntoView({ behavior: 'smooth' }); }}
+                                            title={`${AXIS_LABELS[k]} ${g}/100 — klik untuk kontributor terbesar + lever terukur`}
+                                            className={`rounded-full border px-2 py-0.5 text-[9px] font-semibold ${band.label === 'Poor' ? 'border-rose-500/40 bg-rose-500/10 text-rose-500' : 'border-amber-500/40 bg-amber-500/10 text-amber-500'} hover:bg-amber-500/20`}>
+                                            {AXIS_LABELS[k]} {shown} · {band.label} ⓘ
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    );
+                })()}
                 <p className="mt-1.5 text-[9px] text-slate-400">Deterministic engine rules — not an LLM.</p>
             </div>
 

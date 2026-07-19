@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { TraceValue } from '@/components/ui/TraceValue';
 
 /* ─── Schedule & Milestones — clean, responsive phase timeline ────────────────
  * Replaces the engineering Gantt inside the dashboard. Phase rows with a shared
@@ -11,6 +12,15 @@ import React from 'react';
  * ──────────────────────────────────────────────────────────────────────────── */
 
 interface Phase { name: string; start: number; end: number; color: string }
+
+/* CPM phase name → value-trace id (durations are engine-real, CapexEngine.computeTimeline) */
+const PHASE_TRACE: Partial<Record<string, string>> = {
+    'Design & Engineering': 'constr.phaseDesignMo',
+    'Permitting': 'constr.phasePermitMo',
+    'Civil Construction': 'constr.phaseCivilMo',
+    'MEP Installation': 'constr.phaseMepMo',
+    'Commissioning': 'constr.phaseCxMo',
+};
 
 const fmtQ = (month: number, startYear: number) => {
     const q = Math.floor(month / 3) % 4 + 1;
@@ -59,7 +69,13 @@ export function ScheduleTimeline({ phases, totalMonths, startYear = 2025 }: { ph
                                     style={{ left: `${(p.start / totalMonths) * 100}%`, width: `${(dur / totalMonths) * 100}%`, background: p.color, opacity: active ? 1 : 0.7 }}
                                     title={`${p.name} · month ${p.start}–${p.end} (${(p.end - p.start)}mo)`}
                                 >
-                                    <span className="text-[8px] font-bold text-white/90 drop-shadow tabular-nums whitespace-nowrap">{p.end - p.start}mo</span>
+                                    {PHASE_TRACE[p.name] ? (
+                                        <TraceValue traceId={PHASE_TRACE[p.name]!}>
+                                            <span className="text-[8px] font-bold text-white/90 drop-shadow tabular-nums whitespace-nowrap">{p.end - p.start}mo</span>
+                                        </TraceValue>
+                                    ) : (
+                                        <span className="text-[8px] font-bold text-white/90 drop-shadow tabular-nums whitespace-nowrap">{p.end - p.start}mo</span>
+                                    )}
                                 </div>
                             </div>
                         </div>

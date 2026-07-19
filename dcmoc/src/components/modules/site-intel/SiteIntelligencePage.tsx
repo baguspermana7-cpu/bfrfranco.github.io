@@ -16,7 +16,7 @@ import { scoreAllSites, buildAnalysisCtx, analyzeSite, type SiteAnalyses } from 
 import { COUNTRIES } from '@/constants/countries';
 import { SiteMapPanel, SiteRadarPanel } from './SiteMapRadar';
 import { SiteCards, SiteDetailPanels, IntegratedAnalysesPanels } from './SiteCardsPanels';
-import { SiteComparisonTable, SiteRightRail } from './SiteComparisonRail';
+import { SiteComparisonTable, SiteRightRail, type AxisExplainSel } from './SiteComparisonRail';
 import { SiteEditorDrawer } from './SiteEditorDrawer';
 import { MapPin, Loader2 } from 'lucide-react';
 
@@ -35,6 +35,8 @@ export function SiteIntelligencePage() {
     const { sites, selectedSiteId, selectSite } = useSitesStore();
     const [drawer, setDrawer] = React.useState(false);
     const [activeSec, setActiveSec] = React.useState(STRIP[0].id);
+    /* Poor/Fair axis chip → explain panel (reason + solved levers) in the compare card */
+    const [axisExplain, setAxisExplain] = React.useState<AxisExplainSel | null>(null);
 
     const results = React.useMemo(() => scoreAllSites(sites), [sites]);
 
@@ -138,7 +140,8 @@ export function SiteIntelligencePage() {
                         <SiteDetailPanels site={selected} />
                     </div>
 
-                    <SiteComparisonTable sites={sites} results={results} selectedId={selected?.id ?? null} analysesById={analysesById} />
+                    <SiteComparisonTable sites={sites} results={results} selectedId={selected?.id ?? null} analysesById={analysesById}
+                        axisExplain={axisExplain} onExplainAxis={setAxisExplain} onEdit={() => setDrawer(true)} />
 
                     <p className="text-[10px] text-slate-400">
                         Country marked “EXAMPLE” sites carry illustrative attributes — edit via Edit Criteria. Country: {selected ? COUNTRIES[selected.countryId]?.name : '—'}.
@@ -146,7 +149,8 @@ export function SiteIntelligencePage() {
                     </p>
                 </div>
 
-                <SiteRightRail sites={sites} results={results} selectedId={selected?.id ?? null} onSelect={selectSite} onEdit={() => setDrawer(true)} />
+                <SiteRightRail sites={sites} results={results} selectedId={selected?.id ?? null} onSelect={selectSite} onEdit={() => setDrawer(true)}
+                    onExplainAxis={setAxisExplain} />
             </div>
 
             <SiteEditorDrawer open={drawer} onClose={() => setDrawer(false)} />

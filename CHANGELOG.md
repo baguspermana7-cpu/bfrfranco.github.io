@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.97.3 — 2026-07-20 (WAVE 6 final malam: trace ~maks jujur + Site axis explain + Capacity chips solved)
+
+### Added
+- **EB final**: 21 node (Reliability chain composed/downtime/MTBF/score · 5 durasi fase CPM Dashboard · 5 BOM Architecture · 6 Staffing TCO/utilization/OT) — coverage: Reliability 6/6, Staffing 8/8, Architecture 16/17, Dashboard 23/29 (sisa = enum "N+1"/"Class 4"/badge meta — didokumentasikan, tidak dipaksakan node palsu).
+- **DL Site Intelligence**: chip band Poor/Fair klik → panel alasan (kontributor terbesar weight×value live) + lever DIHITUNG via scoreSite nyata ter-bisection ("SAIDI ≤407 → axis 60 Good"; "cable landings 1→4 → 66"; unreachable → catatan jujur) + tombol Edit Criteria / deep-dive tab.
+- **DL Capacity**: baris utilization dapat chip OK/Watch/At-Risk klik → panel reason + lever solved atas rantai adapter yang sama (defer IT load → keluar band; margin honesty note) + tombol Phase Plan/Requirements di remediation rows.
+
+### Notes (kandidat pagi, terdokumentasi jujur)
+- Staffing "Cost per MW" ternyata dibagi 1 (bukan MW aktual) — node trace mendokumentasikan basis; fix menyusul.
+- Capacity current-utilization ≈ 1/(1+margin) struktural (capacity-adapter) — keputusan banding design-vs-forecast menunggu owner.
+
+### Verified
+- tsc/build · walk 24/0 (Fin 7/7 · Sus 10/10 · Ops 7/7 · Rel 6/6 · Arch/Staff/Results 16/17 · Dash 23/29) · synergy 6/0 · export 44/0 · bindings 73/0.
+
 ## v1.97.2 — 2026-07-20 (WAVE 5 penutup malam: dead-data dikonsumsi + trace Financial/Sustainability 100%)
 
 ### Added

@@ -847,6 +847,139 @@ export const TRACE: Record<string, TraceNode> = {
         deps: ['sus.waterCost', 'sus.carbonCost', 'sus.wasteCost'],
         get: () => { const e = susEnvLive(); return e ? Math.round(e.waterCost + e.carbonCost + e.wasteCost) : null; },
     },
+
+    /* ── EB-cov100 wave (append-only): sisa KPI Dashboard / Reliability /
+     * Architecture BOM / Staffing — setiap get() MENIRU persis surface pemilik
+     * (ReliabilityEnginePage memo · CapexEngine.computeTimeline · equipScale ·
+     * StaffingDashboard results/efficiency memo). Semua null-safe. ─────────── */
+
+    /* RELIABILITY page KPIs (β=5% common-cause screening chain — halaman) */
+    'rel.composedAvailability': {
+        label: 'Composed Availability (β-adjusted)', page: 'reliability', unit: '%', provenance: 'derived',
+        formulaTemplate: 'RBD seri 5 sistem (power dist (swgr·pdu) · UPS · genset · chiller · CRAC) paralel per path redundansi terpilih, di-blend β=5% common-cause dengan chain single-path — komponen MTBF/MTTR IEEE-493 (DATA.reliability.components); β = asumsi screening',
+        deps: ['rel.mttrAvg'],
+        get: () => { const r = relPageModel(); return r ? +(r.overall * 100).toFixed(4) : null; },
+    },
+    'rel.downtimeMin': {
+        label: 'Downtime Unplanned /yr', page: 'reliability', unit: 'min/yr', provenance: 'derived',
+        formulaTemplate: '(1 − rel.composedAvailability ÷ 100) × 525,960 menit/tahun',
+        deps: ['rel.composedAvailability'],
+        get: () => { const r = relPageModel(); return r ? +r.downtimeMin.toFixed(1) : null; },
+    },
+    'rel.mtbfComposite': {
+        label: 'MTBF (series composite)', page: 'reliability', unit: 'h', provenance: 'engine', sourceKey: 'reliability',
+        formulaTemplate: '1 ÷ Σ(1/MTBF komponen) — komposit seri 6 kelas komponen IEEE-493 (mengabaikan redundansi; screening)',
+        get: () => relPageModel()?.mtbfAll ?? null,
+    },
+    'rel.mttrAvg': {
+        label: 'MTTR (component average)', page: 'reliability', unit: 'h', provenance: 'engine', sourceKey: 'reliability',
+        formulaTemplate: 'rata-rata MTTR 6 kelas komponen (DATA.reliability.components — IEEE-493)',
+        get: () => relPageModel()?.mttrAvg ?? null,
+    },
+    'rel.score': {
+        label: 'Reliability Score', page: 'reliability', unit: '/100', provenance: 'derived',
+        formulaTemplate: '40 × margin availability (posisi rel.composedAvailability vs rel.tierTarget) + 30 × min(1, paths ÷ 2) + 15 × maintainability (rel.mttrAvg ≤ 12 h) + 15 × faktor SPOF — komposit terdokumentasi halaman',
+        deps: ['rel.composedAvailability', 'rel.tierTarget', 'rel.mttrAvg'],
+        get: () => relPageModel()?.score ?? null,
+    },
+
+    /* DASHBOARD Schedule & Milestones — durasi fase CPM (CapexEngine.computeTimeline) */
+    'constr.phaseDesignMo': {
+        label: 'Design & Engineering (durasi)', page: 'construction', unit: 'mo', provenance: 'engine',
+        formulaTemplate: 'CPM engine: base durasi design per redundansi (N 4 · N+1 5 · 2N 6 · 2N+1 7 bln) — CapexEngine.computeTimeline',
+        get: () => phaseDurMo('Design & Engineering'),
+    },
+    'constr.phasePermitMo': {
+        label: 'Permitting (durasi)', page: 'construction', unit: 'mo', provenance: 'engine',
+        formulaTemplate: 'CPM engine: base permit (3–4 bln per redundansi) × multiplier regional 1.4 (SEA/India/China/Japan/Australia) — CapexEngine.computeTimeline',
+        get: () => phaseDurMo('Permitting'),
+    },
+    'constr.phaseCivilMo': {
+        label: 'Civil Construction (durasi)', page: 'construction', unit: 'mo', provenance: 'engine',
+        formulaTemplate: 'CPM engine: base civil (8–14 bln per redundansi) × multiplier tipe bangunan (warehouse 0.7 · modular 0.6 · highrise 1.4) — CapexEngine.computeTimeline',
+        get: () => phaseDurMo('Civil Construction'),
+    },
+    'constr.phaseMepMo': {
+        label: 'MEP Installation (durasi)', page: 'construction', unit: 'mo', provenance: 'engine',
+        formulaTemplate: 'CPM engine: base MEP (6–12 bln per redundansi) × multiplier cooling (liquid 1.3) — CapexEngine.computeTimeline',
+        get: () => phaseDurMo('MEP Installation'),
+    },
+    'constr.phaseCxMo': {
+        label: 'Commissioning (durasi)', page: 'construction', unit: 'mo', provenance: 'engine',
+        formulaTemplate: 'CPM engine: base commissioning per redundansi (N 2 · N+1 3 · 2N 4 · 2N+1 5 bln) — CapexEngine.computeTimeline',
+        get: () => phaseDurMo('Commissioning'),
+    },
+
+    /* ARCHITECTURE BOM — sisa kelas equipment (engine equipScale, sama seperti arch.eq*) */
+    'arch.eqSts': {
+        label: 'STS (BOM)', page: 'architecture', provenance: 'engine',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah static transfer switch',
+        deps: ['sim.itLoad'],
+        get: () => assetEquip()?.sts ?? null,
+    },
+    'arch.eqPumps': {
+        label: 'Pumps / CDU (BOM)', page: 'architecture', provenance: 'engine',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah pompa / CDU',
+        deps: ['sim.itLoad'],
+        get: () => assetEquip()?.pumps ?? null,
+    },
+    'arch.eqCoolingUnits': {
+        label: 'Cooling Units (BOM)', page: 'architecture', provenance: 'engine',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah CRAC/CRAH unit',
+        deps: ['sim.itLoad'],
+        get: () => assetEquip()?.cooling_units ?? null,
+    },
+    'arch.eqAhu': {
+        label: 'AHU (BOM)', page: 'architecture', provenance: 'engine',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah air handling unit',
+        deps: ['sim.itLoad'],
+        get: () => assetEquip()?.ahu ?? null,
+    },
+    'arch.eqFireZones': {
+        label: 'Fire Zones (BOM)', page: 'architecture', provenance: 'engine',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah zona fire suppression',
+        deps: ['sim.itLoad'],
+        get: () => assetEquip()?.fireZones ?? null,
+    },
+
+    /* STAFFING page KPIs + Efficiency Metrics (mirror StaffingDashboard memo) */
+    'staff.weeklyHours': {
+        label: 'Avg Weekly Hours (effective)', page: 'staff', unit: 'h/wk', provenance: 'derived',
+        formulaTemplate: 'properti pola shift terpilih: 8h Continental = 42 jam efektif (incl. 1.5h OT handover) · 12h 4-on/3-off = 40 jam (zero OT)',
+        get: () => (sim().inputs.shiftModel === '8h' ? 42 : 40),
+    },
+    'staff.tco5yr': {
+        label: '5-Year Staffing TCO (kumulatif)', page: 'staff', unit: '$', provenance: 'derived',
+        formulaTemplate: 'Σ tahun 0–5: staff.monthlyCost × 12 × (1 + eskalasi upah negara)^tahun — 6 titik proyeksi ShiftEngine generate5YearProjection',
+        deps: ['staff.monthlyCost'],
+        get: () => staffTco5yr(),
+    },
+    'staff.utilizationPct': {
+        label: 'Utilization Rate', page: 'staff', unit: '%', provenance: 'engine',
+        formulaTemplate: '(1 − shrinkage factor negara (DATA labor — break/training/cuti)) × 100',
+        get: () => { const s = staffShrinkage(); return s == null ? null : +((1 - s) * 100).toFixed(0); },
+    },
+    'staff.costPerMw': {
+        label: 'Cost per MW (basis tampilan halaman)', page: 'staff', unit: '$/mo', provenance: 'derived',
+        formulaTemplate: 'staff.monthlyCost ÷ 1 — CATATAN: tampilan halaman membagi 1 (bukan MW IT aktual), jadi angka = total payroll bulanan',
+        deps: ['staff.monthlyCost'],
+        get: () => { const p = staffCostParts(); return p ? Math.round(p.total) : null; },
+    },
+    'staff.otRatioPct': {
+        label: 'OT Ratio', page: 'staff', unit: '%', provenance: 'derived',
+        formulaTemplate: 'Σ komponen overtime per role (ShiftEngine breakdown) ÷ staff.monthlyCost × 100',
+        deps: ['staff.monthlyCost'],
+        get: () => { const p = staffCostParts(); return p && p.total > 0 ? +((p.ot / p.total) * 100).toFixed(1) : p ? 0 : null; },
+    },
+    'staff.shrinkageLoss': {
+        label: 'Shrinkage Loss /mo', page: 'staff', unit: '$/mo', provenance: 'derived',
+        formulaTemplate: 'staff.monthlyCost × shrinkage factor negara (staff.utilizationPct = 100% − faktor)',
+        deps: ['staff.monthlyCost', 'staff.utilizationPct'],
+        get: () => {
+            const p = staffCostParts(); const s = staffShrinkage();
+            return p && s != null ? Math.round(p.total * s) : null;
+        },
+    },
 };
 
 export interface ResolvedTrace {
@@ -1352,5 +1485,126 @@ function susEnvLive(): { waterCost: number; carbonCost: number; wasteCost: numbe
             (ec.wasteMgmt.generalTonnesPerMwItYr ?? 2.0) * mw * genRate
             + (ec.wasteMgmt.eWasteKgPerMwItYr ?? 150) * mw * (ec.wasteMgmt.eWasteUsdPerKg ?? 1.0));
         return { waterCost, carbonCost, wasteCost };
+    } catch { return null; }
+}
+
+/* ═══ EB-cov100 live-reader helpers (appended — invoked lazily by get()) ═════
+ * Mirror ReliabilityEnginePage memo / CapexEngine timeline / StaffingDashboard
+ * results+efficiency memos EXACTLY so popover numbers match rendered KPIs.
+ * All null-safe. */
+
+/** ReliabilityEnginePage memo mirror — β=5% common-cause screening chain
+ *  composed from DATA.reliability.components at the current redundancy paths.
+ *  Same code path as the page's buildSystems/ccOverall (CC_BETA = 0.05). */
+let _relCache: { key: string; m: { overall: number; downtimeMin: number; mtbfAll: number; mttrAvg: number; score: number; paths: number } } | null = null;
+function relPageModel(): { overall: number; downtimeMin: number; mtbfAll: number; mttrAvg: number; score: number; paths: number } | null {
+    try {
+        const eng = rzModels() as {
+            reliability?: {
+                availability?: (mtbf: number, mttr: number) => number;
+                seriesAvailability?: (arr: number[]) => number;
+                parallelAvailability?: (av: number, n: number) => number;
+            };
+        };
+        const m = eng?.reliability;
+        const D = rzData() as {
+            reliability?: {
+                components?: Record<string, { mtbf: number; mttr: number; label?: string }>;
+                redundancyPaths?: Record<string, number>;
+                tierAvailability?: Record<string, number>;
+            };
+        };
+        const d = D?.reliability;
+        if (!m?.availability || !d?.components) return null;
+        const comps = d.components;
+        const redKey = redKeyLive();
+        const tier = sim().inputs.tierLevel;
+        const key = [redKey, tier].join('|');
+        if (_relCache?.key === key) return _relCache.m;
+        const paths: number = d.redundancyPaths?.[redKey] ?? 2;
+        const avail = m.availability;
+        const par = (av: number, n: number) => m.parallelAvailability ? m.parallelAvailability(av, n) : 1 - Math.pow(1 - av, n);
+        const ser = (arr: number[]) => m.seriesAvailability ? m.seriesAvailability(arr) : arr.reduce((s, x) => s * x, 1);
+        const a = (cls: string) => comps[cls] ? avail(comps[cls].mtbf, comps[cls].mttr) : 0.999;
+        /* documented per-system chains — identical to the page's buildSystems(1, paths) */
+        const sys = [
+            par(ser([a('switchgear'), a('pdu')]), paths),
+            par(a('ups'), paths),
+            par(a('generator'), Math.max(2, paths)),
+            par(a('chiller'), 2),
+            par(a('crac'), 2),
+        ];
+        const overallPar = ser(sys);
+        const overallSingle = ser([ser([a('switchgear'), a('pdu')]), a('ups'), a('generator'), a('chiller'), a('crac')]);
+        const overall = overallPar * 0.95 + overallSingle * 0.05;   // β=5% common-cause screening (page CC_BETA)
+        const tierTarget: number = (d.tierAvailability ?? {})[String(tier)] ?? 0.99982;
+        const downtimeMin = (1 - overall) * 525960;                 // page MIN_PER_YEAR
+        const vals = Object.values(comps);
+        const mtbfAll = Math.round(1 / vals.map((c) => 1 / c.mtbf).reduce((s, x) => s + x, 0));
+        const mttrAvg = +(vals.reduce((s, c) => s + c.mttr, 0) / vals.length).toFixed(1);
+        const spofLen = paths <= 1 ? 3 : (redKey === 'n1' ? 1 : 0); // page SPOF list lengths
+        const availMargin = Math.min(1, Math.max(0, (overall - tierTarget) / (1 - tierTarget) * 0.5 + 0.5));
+        const score = Math.round(40 * availMargin + 30 * Math.min(1, paths / 2) + 15 * (mttrAvg <= 12 ? 1 : 12 / mttrAvg) + 15 * (spofLen === 0 ? 1 : Math.max(0, 1 - spofLen * 0.3)));
+        const out = { overall, downtimeMin, mtbfAll, mttrAvg, score, paths };
+        _relCache = { key, m: out };
+        return out;
+    } catch { return null; }
+}
+
+/** CPM phase duration (months) from the CAPEX engine timeline — same figure as
+ *  the Dashboard Schedule & Milestones chips (p.end − p.start). */
+function phaseDurMo(name: string): number | null {
+    try {
+        const p = cap().results?.timeline?.phases?.find((x) => x.name === name);
+        return p ? p.end - p.start : null;
+    } catch { return null; }
+}
+
+/** Staffing cost parts (unrounded) — Σ per-role calculateStaffing monthlyCost +
+ *  overtime component, mirrors StaffingDashboard results/efficiency memos. */
+function staffCostParts(): { total: number; ot: number } | null {
+    try {
+        const st = sim();
+        const country = st.selectedCountry;
+        if (!country) return null;
+        const i = st.inputs;
+        const hc = effHeadcounts();
+        const cfg: { role: StaffRole; qty: number; is24x7: boolean }[] = [
+            { role: 'shift-lead', qty: hc[0], is24x7: true },
+            { role: 'engineer', qty: hc[1], is24x7: true },
+            { role: 'technician', qty: hc[2], is24x7: false },
+            { role: 'admin', qty: hc[3], is24x7: false },
+            { role: 'janitor', qty: hc[4], is24x7: false },
+        ];
+        const opModel = i.staffingModel === 'outsourced' ? 'vendor' : i.staffingModel;
+        let total = 0, ot = 0;
+        for (const c of cfg) {
+            const r = calculateStaffing(c.role, Math.max(1, c.qty), i.shiftModel, country, c.is24x7, undefined, undefined, opModel, i.hybridRatio ?? 0.5);
+            total += r.monthlyCost;
+            ot += r.breakdown?.overtime ?? 0;
+        }
+        return { total, ot };
+    } catch { return null; }
+}
+
+/** Country shrinkage factor — page fallback 0.15 (StaffingDashboard efficiency memo). */
+function staffShrinkage(): number | null {
+    try {
+        const country = sim().selectedCountry as { labor?: { shrinkageFactor?: number } } | null;
+        if (!country) return null;
+        return country.labor?.shrinkageFactor ?? 0.15;
+    } catch { return null; }
+}
+
+/** 5-yr cumulative staffing TCO — Σ years 0–5 of monthlyCost×12 escalated by the
+ *  country labor escalation (mirrors generate5YearProjection + the page Σ). */
+function staffTco5yr(): number | null {
+    try {
+        const p = staffCostParts();
+        if (!p) return null;
+        const esc = (sim().selectedCountry as { economy?: { laborEscalation?: number } } | null)?.economy?.laborEscalation ?? 0.04;
+        let total = 0;
+        for (let y = 0; y <= 5; y++) total += p.total * 12 * Math.pow(1 + esc, y);
+        return Math.round(total);
     } catch { return null; }
 }

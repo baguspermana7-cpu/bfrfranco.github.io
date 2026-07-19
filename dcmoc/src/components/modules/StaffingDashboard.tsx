@@ -357,9 +357,11 @@ export function StaffingDashboard() {
                                 <span className="text-xs text-slate-400 flex items-center gap-1">Avg Weekly Hours <Tooltip content="Average scheduled hours per person per week including handover overlap" /></span>
                             </div>
                             <div className="mt-auto">
-                                <div className="text-3xl font-bold text-slate-900 dark:text-white">
-                                    {inputs.shiftModel === '8h' ? '42' : '40'}h <span className="text-sm font-normal text-slate-500">eff./person</span>
-                                </div>
+                                <TraceValue traceId="staff.weeklyHours">
+                                    <div className="text-3xl font-bold text-slate-900 dark:text-white">
+                                        {inputs.shiftModel === '8h' ? '42' : '40'}h <span className="text-sm font-normal text-slate-500">eff./person</span>
+                                    </div>
+                                </TraceValue>
                                 <div className="text-xs text-amber-500 mt-1">{inputs.shiftModel === '8h' ? '1.5h OT (handover)' : 'Zero OT (12h compressed)'}</div>
                             </div>
                         </div>
@@ -372,9 +374,11 @@ export function StaffingDashboard() {
                                 <span className="text-xs text-slate-400 flex items-center gap-1">5-Year TCO <Tooltip content="Total Cost of Ownership over 5 years with labor escalation factored in" /></span>
                             </div>
                             <div className="mt-auto">
-                                <div className="text-3xl font-bold text-slate-900 dark:text-white truncate" title={fmtMoney(results.projections.reduce((a, b) => a + b.totalAnnualCost, 0))}>
-                                    {fmtMoney(results.projections.reduce((a, b) => a + b.totalAnnualCost, 0))}
-                                </div>
+                                <TraceValue traceId="staff.tco5yr">
+                                    <div className="text-3xl font-bold text-slate-900 dark:text-white truncate" title={fmtMoney(results.projections.reduce((a, b) => a + b.totalAnnualCost, 0))}>
+                                        {fmtMoney(results.projections.reduce((a, b) => a + b.totalAnnualCost, 0))}
+                                    </div>
+                                </TraceValue>
                                 <div className="text-xs text-slate-500 mt-1">{new Date().getFullYear()}–{new Date().getFullYear() + 5} Cumulative</div>
                             </div>
                         </div>
@@ -540,24 +544,32 @@ export function StaffingDashboard() {
                                     <>
                                         <div className="bg-white dark:bg-black/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
                                             <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Utilization Rate <Tooltip content="Net productive hours as a percentage of total scheduled hours, after accounting for shrinkage (breaks, training, admin)." /></div>
-                                            <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">{((1 - shrinkage) * 100).toFixed(0)}%</div>
+                                            <TraceValue traceId="staff.utilizationPct">
+                                                <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">{((1 - shrinkage) * 100).toFixed(0)}%</div>
+                                            </TraceValue>
                                             <div className="text-[10px] text-slate-500">Net productive hours</div>
                                         </div>
                                         <div className="bg-white dark:bg-black/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
                                             <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Cost per MW <Tooltip content="Total monthly staffing cost divided by IT load in MW. Benchmark for comparing staffing efficiency across facilities." /></div>
-                                            <div className="text-xl font-bold text-cyan-600 dark:text-cyan-400">{fmtMoney(totalCost / 1)}</div>
+                                            <TraceValue traceId="staff.costPerMw">
+                                                <div className="text-xl font-bold text-cyan-600 dark:text-cyan-400">{fmtMoney(totalCost / 1)}</div>
+                                            </TraceValue>
                                             <div className="text-[10px] text-slate-500">Staff cost / MW IT load</div>
                                         </div>
                                         <div className="bg-white dark:bg-black/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
                                             <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">OT Ratio <Tooltip content="Overtime cost as a percentage of total payroll. Values above 15% indicate potential scheduling issues." /></div>
-                                            <div className={`text-xl font-bold ${totalCost > 0 && (totalOT / totalCost) > 0.15 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
-                                                {totalCost > 0 ? ((totalOT / totalCost) * 100).toFixed(1) : 0}%
-                                            </div>
+                                            <TraceValue traceId="staff.otRatioPct">
+                                                <div className={`text-xl font-bold ${totalCost > 0 && (totalOT / totalCost) > 0.15 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                                                    {totalCost > 0 ? ((totalOT / totalCost) * 100).toFixed(1) : 0}%
+                                                </div>
+                                            </TraceValue>
                                             <div className="text-[10px] text-slate-500">Overtime as % of total</div>
                                         </div>
                                         <div className="bg-white dark:bg-black/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
                                             <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Shrinkage Loss <Tooltip content="Monthly cost impact of non-productive time including breaks, training, sick leave, and admin duties." /></div>
-                                            <div className="text-xl font-bold text-rose-600 dark:text-rose-400">{fmtMoney(totalCost * shrinkage)}</div>
+                                            <TraceValue traceId="staff.shrinkageLoss">
+                                                <div className="text-xl font-bold text-rose-600 dark:text-rose-400">{fmtMoney(totalCost * shrinkage)}</div>
+                                            </TraceValue>
                                             <div className="text-[10px] text-slate-500">{(shrinkage * 100).toFixed(0)}% factor</div>
                                         </div>
                                     </>

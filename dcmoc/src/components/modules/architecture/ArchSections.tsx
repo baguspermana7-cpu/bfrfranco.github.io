@@ -20,6 +20,8 @@ import { TraceValue } from '@/components/ui/TraceValue';
 const BOM_TRACE: Partial<Record<string, string>> = {
     switchgear: 'arch.eqSwitchgear', transformers: 'arch.eqTransformers', generators: 'arch.eqGenerators',
     ups_modules: 'arch.eqUps', pdus: 'arch.eqPdus', chillers: 'arch.eqChillers', racks: 'arch.racks',
+    sts: 'arch.eqSts', pumps: 'arch.eqPumps', cooling_units: 'arch.eqCoolingUnits',
+    ahu: 'arch.eqAhu', fireZones: 'arch.eqFireZones',
 };
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {

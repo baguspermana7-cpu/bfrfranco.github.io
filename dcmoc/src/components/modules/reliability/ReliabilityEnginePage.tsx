@@ -371,12 +371,12 @@ export function ReliabilityEnginePage() {
                     )}
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'Composed Availability', value: fmtAvail(model.overall), sub: meetsTier ? `meets Tier ${inputs.tierLevel} target` : `BELOW Tier ${inputs.tierLevel} target`, chip: `${ninesOf(model.overall)} nines`, title: 'β=5% common-cause screening (assumption)' },
+                            { label: 'Composed Availability', value: fmtAvail(model.overall), sub: meetsTier ? `meets Tier ${inputs.tierLevel} target` : `BELOW Tier ${inputs.tierLevel} target`, chip: `${ninesOf(model.overall)} nines`, title: 'β=5% common-cause screening (assumption)', trace: 'rel.composedAvailability' },
                             { label: 'Tier Target', value: fmtAvail(model.tierTargetFrac), sub: `Tier ${inputs.tierLevel} (Uptime)`, trace: 'rel.tierTarget' },
-                            { label: 'Downtime (unplanned)', value: fmtDowntime(model.downtimeMin), sub: `budget ${fmtDowntime(model.budgetMin)}` },
-                            { label: 'MTBF (series composite)', value: `≈ ${(model.mtbfAll / 1000).toFixed(0)}k h`, sub: '1/Σλ serial — excl. redundancy', explain: 'mtbf' },
-                            { label: 'MTTR (avg)', value: `${model.mttrAvg} h`, sub: 'component average', explain: 'mttr' },
-                            { label: 'Reliability Score', value: `${model.score}/100`, sub: 'documented composite' },
+                            { label: 'Downtime (unplanned)', value: fmtDowntime(model.downtimeMin), sub: `budget ${fmtDowntime(model.budgetMin)}`, trace: 'rel.downtimeMin' },
+                            { label: 'MTBF (series composite)', value: `≈ ${(model.mtbfAll / 1000).toFixed(0)}k h`, sub: '1/Σλ serial — excl. redundancy', explain: 'mtbf', trace: 'rel.mtbfComposite' },
+                            { label: 'MTTR (avg)', value: `${model.mttrAvg} h`, sub: 'component average', explain: 'mttr', trace: 'rel.mttrAvg' },
+                            { label: 'Reliability Score', value: `${model.score}/100`, sub: 'documented composite', trace: 'rel.score' },
                         ].map((k) => (
                             <div key={k.label} title={(k as { title?: string }).title} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>
