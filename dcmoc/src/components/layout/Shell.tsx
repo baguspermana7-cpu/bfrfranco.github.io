@@ -55,6 +55,7 @@ import {
 import clsx from 'clsx';
 import { getPUE } from '@/constants/pue';
 import { useAuthStore } from '@/store/auth';
+import { useProjectsStore } from '@/store/projects';
 import { LoginScreen } from '@/components/ui/LoginScreen';
 import { Explain } from '@/components/ui/Explain';
 
@@ -101,6 +102,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
     const scenarioStore = useScenarioStore();
     const capexStore = useCapexStore();
     const { theme, setTheme } = useTheme();
+    const activeProject = useProjectsStore((s) => s.projects.find((p) => p.id === s.activeProjectId) ?? null);
 
     const [scenarioName, setScenarioName] = useState('');
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -512,8 +514,12 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                             <Menu className="w-5 h-5" />
                         </button>
                         <div className="text-sm breadcrumbs text-slate-500 dark:text-slate-400">
-                            <span className="hidden sm:inline text-slate-400 dark:text-slate-600">App</span>
+                            <button className="hidden sm:inline text-slate-400 dark:text-slate-600 hover:text-violet-500" onClick={() => actions.setActiveTab('projects')}>Projects</button>
                             <span className="hidden sm:inline"> / </span>
+                            {activeProject && (<>
+                                <span className="hidden sm:inline max-w-[160px] truncate align-bottom text-violet-500 font-medium">{activeProject.name}</span>
+                                <span className="hidden sm:inline"> / </span>
+                            </>)}
                             <span className="text-slate-800 dark:text-slate-200 font-medium">{activeTab === 'dashboard' ? 'Executive Overview' : navItems.find(n => n.id === activeTab)?.label || SUPPORT.find(s => s.id === activeTab)?.label || PLATFORM.find(p => p.id === activeTab)?.label || 'Overview'}</span>
                         </div>
                     </div>

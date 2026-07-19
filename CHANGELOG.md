@@ -11,6 +11,12 @@ release sections rather than semver.
 
 ---
 
+## v1.84.2 — 2026-07-19 (DCMOC platform perfection: promised bindings + project breadcrumb)
+
+### Changed
+- **Promised bindings now real** (no-placeholder mandate): Settings default currency actually seeds the Requirements currency default; Settings orgName auto-resolves into every PillarPdf export ("Prepared for …" footer) without per-caller changes.
+- **Project breadcrumb** per the DC-OS reference: header now reads `Projects / {active project} / {page}` — Projects clickable, active project name violet, wired to the projects store.
+
 ## v1.84.1 — 2026-07-19 (DCMOC polish: input-vs-derived convention + labels + Explain)
 
 ### Changed

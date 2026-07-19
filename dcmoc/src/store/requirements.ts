@@ -9,6 +9,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { registerReqProvider, sanitizeNum } from '@/state/registry';
+import { useSettingsStore } from '@/store/settings';
 
 export type SiteStatus = 'not_started' | 'identified' | 'shortlisted' | 'secured';
 export type Industry = 'csp' | 'colo_provider' | 'enterprise' | 'government' | 'telecom' | 'financial';
@@ -96,7 +97,7 @@ const DEFAULTS: Omit<RequirementsState, 'actions'> = {
         targetCod: { quarter: 2, year: 2027 },
         gridVoltage: '33kV', projectType: 'new_build',
         contractDurationYr: 15, contractDurationCustom: null,
-        currency: 'USD', useCase: 'ai',
+        currency: (typeof window !== 'undefined' ? useSettingsStore.getState().general.defaultCurrency : 'USD') || 'USD', useCase: 'ai',
     },
     workload: {
         itLoadUnit: 'MW', peakItLoadKw: null, avgItLoadKw: null,

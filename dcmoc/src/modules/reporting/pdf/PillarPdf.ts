@@ -28,6 +28,14 @@ const MARGIN = 14;
 const lastY = (doc: unknown): number | undefined => (doc as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY;
 
 export async function generatePillarPDF(r: PillarReport): Promise<void> {
+    /* orgName auto-resolves from Settings when the caller doesn't pass one */
+    if (!r.orgName && typeof window !== 'undefined') {
+        try {
+            const { useSettingsStore } = await import('@/store/settings');
+            const org = useSettingsStore.getState().general.orgName;
+            if (org) r = { ...r, orgName: org };
+        } catch { /* settings store absent — skip */ }
+    }
     const { doc, autoTable } = await initDoc();
     const pageW = doc.internal.pageSize.width;
     let page = 1;
