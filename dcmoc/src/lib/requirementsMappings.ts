@@ -67,6 +67,10 @@ export function writeSharedCountry(countryId: string): void {
     if (!profile) return;
     useSimulationStore.getState().actions.selectCountry(countryId);
     useCapexStore.getState().setInputs({ location: countryId, country: profile });
+    /* DA1 — the pristine scenario site FOLLOWS the project country (owner-caught
+     * bug: "Indonesia Site" persisting on a UAE project). Lazy import avoids a
+     * store import cycle. */
+    import('@/store/sites').then((m) => m.useSitesStore.getState().syncToCountry(countryId)).catch(() => {});
 }
 
 export function writeSharedTier(tier: 2 | 3 | 4): void {

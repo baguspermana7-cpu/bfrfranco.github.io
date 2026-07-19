@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { COUNTRIES, CountryProfile } from '@/constants/countries';
 import { rzData } from '@/lib/rz-engine';
 
@@ -31,6 +32,7 @@ export interface SimulationState {
         staffingAutoMode: boolean;
         // Capacity planning phases
         capacityPhases: { id: string; label: string; itLoadKw: number; startMonth: number; buildMonths: number; occupancyRamp: number[] }[];
+        capacityPhasesCustomized: boolean;
     };
     activeTab: 'dashboard' | 'ops' | 'sim' | 'staff' | 'maint' | 'risk' | 'report' | 'capex' | 'carbon' | 'finance' | 'invest' | 'benchmark' | 'montecarlo' | 'portfolio' | 'faq' | 'capacity' | 'phased-finance' | 'tax' | 'disaster' | 'grid' | 'talent' | 'compliance' | 'asset-lifecycle' | 'cbm' | 'fuel-gen' | 'strategic' | 'reliability' | 'requirements' | 'site' | 'architecture' | 'construction' | 'commissioning' | 'asset-health' | 'projects' | 'templates' | 'data-library' | 'knowledge' | 'integrations' | 'settings' | 'audit' | 'users' | 'tier' | 'fire' | 'cdu' | 'spares' | 'scenarios' | 'scenario-compare';
     isLoading: boolean;
@@ -48,7 +50,24 @@ export interface SimulationState {
     };
 }
 
-export const useSimulationStore = create<SimulationState>((set) => ({
+/** DA2 — screening 4-phase split of the IT load (25/25/25/25 staggered).
+ *  Pure + exported: the Capacity page "Seed from IT Load" button reuses it. */
+export function derivePhases(itLoadKw: number): { id: string; label: string; itLoadKw: number; startMonth: number; buildMonths: number; occupancyRamp: number[] }[] {
+    const kw = Math.max(100, Math.round(itLoadKw));
+    const share = Math.round(kw / 4);
+    const ramp = [0.3, 0.6, 0.85, 0.95];
+    return [
+        { id: 'p1', label: 'Phase 1', itLoadKw: share, startMonth: 0, buildMonths: 18, occupancyRamp: ramp },
+        { id: 'p2', label: 'Phase 2', itLoadKw: share, startMonth: 18, buildMonths: 14, occupancyRamp: ramp },
+        { id: 'p3', label: 'Phase 3', itLoadKw: share, startMonth: 36, buildMonths: 12, occupancyRamp: ramp },
+        { id: 'p4', label: 'Phase 4', itLoadKw: kw - share * 3, startMonth: 54, buildMonths: 12, occupancyRamp: ramp },
+    ];
+}
+
+/* DF1 — inputs + country + activeTab PERSIST (audit-critical: reload wiped
+ * tier/itLoad/cooling/phases while requirements persisted). selectedCountry
+ * rehydrates as an id → re-resolved to the live COUNTRIES profile. */
+export const useSimulationStore = create<SimulationState>()(persist((set) => ({
     selectedCountry: COUNTRIES['ID'],
     isLoading: false,
     inputs: {
@@ -81,11 +100,13 @@ export const useSimulationStore = create<SimulationState>((set) => ({
         // A12: Default occupancy ramp (editable per-year)
         occupancyRamp: [0.25, 0.50, 0.70, 0.85, 0.92, 0.95, 0.95, 0.95, 0.95, 0.95],
         staffingAutoMode: true,
-        capacityPhases: [
-            { id: 'p1', label: 'Phase 1', itLoadKw: 2000, startMonth: 0, buildMonths: 18, occupancyRamp: [0.3, 0.6, 0.85, 0.95] },
-            { id: 'p2', label: 'Phase 2', itLoadKw: 5000, startMonth: 18, buildMonths: 14, occupancyRamp: [0.3, 0.6, 0.85, 0.95] },
-            { id: 'p3', label: 'Phase 3', itLoadKw: 10000, startMonth: 36, buildMonths: 12, occupancyRamp: [0.3, 0.6, 0.85, 0.95] },
-        ],
+        /* DA2 — phases are DERIVED from itLoad (owner-caught bug: hardcoded
+         * 2/5/10 MW showed a 22 MW plan on a 500 MW project). Pristine phases
+         * re-derive on every itLoad change; a manual edit sets
+         * capacityPhasesCustomized and derivation stops (identity chip shows
+         * divergence on the Capacity page instead). */
+        capacityPhases: derivePhases(2500),
+        capacityPhasesCustomized: false,
     },
     activeTab: 'dashboard', // DC-OS: Executive Overview is the landing surface
     actions: {
@@ -126,6 +147,15 @@ export const useSimulationStore = create<SimulationState>((set) => ({
             set((state) => {
                 const validated = { ...newInputs };
                 if (validated.itLoad !== undefined) validated.itLoad = Math.max(100, Math.min(500000, validated.itLoad));
+                /* DA2 — pristine phases FOLLOW itLoad; a manual phase edit flags
+                 * customized and derivation stops (Capacity page shows the
+                 * divergence chip + "Seed from IT Load" instead). */
+                if (validated.capacityPhases !== undefined && newInputs.capacityPhasesCustomized === undefined) {
+                    validated.capacityPhasesCustomized = true;
+                }
+                if (validated.itLoad !== undefined && validated.capacityPhases === undefined && !state.inputs.capacityPhasesCustomized) {
+                    validated.capacityPhases = derivePhases(validated.itLoad);
+                }
                 if (validated.buildingSize !== undefined) validated.buildingSize = Math.max(100, Math.min(100000, validated.buildingSize));
                 if (validated.headcount_ShiftLead !== undefined) validated.headcount_ShiftLead = Math.max(0, Math.min(50, validated.headcount_ShiftLead));
                 if (validated.headcount_Engineer !== undefined) validated.headcount_Engineer = Math.max(0, Math.min(100, validated.headcount_Engineer));
@@ -140,5 +170,19 @@ export const useSimulationStore = create<SimulationState>((set) => ({
             }),
         setActiveTab: (tab) =>
             set(() => ({ activeTab: tab })),
+    },
+}), {
+    name: 'dcmoc-simulation',
+    version: 1,
+    partialize: (s) => ({ inputs: s.inputs, selectedCountry: s.selectedCountry ? ({ id: s.selectedCountry.id } as unknown as CountryProfile) : null }),
+    merge: (persisted, current) => {
+        const p = persisted as Partial<SimulationState> | undefined;
+        const cid = (p?.selectedCountry as { id?: string } | null)?.id;
+        return {
+            ...current,
+            ...(p ?? {}),
+            inputs: { ...current.inputs, ...(p?.inputs ?? {}) },
+            selectedCountry: cid && COUNTRIES[cid] ? COUNTRIES[cid] : current.selectedCountry,
+        };
     },
 }));

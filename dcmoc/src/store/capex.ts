@@ -1,5 +1,6 @@
 
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { CapexInput, CapexResult, calculateCapex, generateCapexNarrative } from '../lib/CapexEngine';
 
 export interface CapexStore {
@@ -47,7 +48,10 @@ const defaultInputs: CapexInput = {
     renewableOption: 'none'
 };
 
-export const useCapexStore = create<CapexStore>((set, get) => ({
+/* DF1 — inputs PERSIST (audit-critical: reload used to wipe every capex
+ * assumption incl. the deep-sea tick while requirements persisted → the
+ * cross-page contradiction the owner caught). Results recompute on load. */
+export const useCapexStore = create<CapexStore>()(persist((set, get) => ({
     currentModel: 'simple',
     inputs: defaultInputs,
     results: null,
@@ -79,4 +83,9 @@ export const useCapexStore = create<CapexStore>((set, get) => ({
         set({ inputs: defaultInputs, results: null, narrative: '' });
         get().runCalculation();
     }
+}), {
+    name: 'dcmoc-capex',
+    version: 1,
+    partialize: (s) => ({ currentModel: s.currentModel, inputs: s.inputs }),
+    onRehydrateStorage: () => (state) => { try { state?.runCalculation(); } catch { /* engine absent */ } },
 }));

@@ -11,7 +11,7 @@ import React from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useRequirementsStore } from '@/store/requirements';
-import { rzModels, rzData } from '@/lib/rz-engine';
+import { rzModels, rzData , useEngineReady } from '@/lib/rz-engine';
 import { densityToEngineBucket } from '@/lib/requirementsMappings';
 import { generatePillarPDF, type PillarReport } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
@@ -175,7 +175,8 @@ export function CduDashboard() {
     const [dT, setDT] = React.useState(10);
     const [busy, setBusy] = React.useState(false);
     const m = rzModels().cdu;
-    const dsModel = rzModels().cooling?.deepSea;
+    const engineReadyCdu = useEngineReady();
+    const dsModel = engineReadyCdu ? rzModels().cooling?.deepSea : undefined;
     const data = rzData() as {
         refrigerants?: Record<string, { label: string; gwp: number; safety: string; copIndex: number; capexMult: number; apps: string[]; note: string }>;
         pueMatrix?: Record<string, Record<string, number>>;
@@ -388,7 +389,7 @@ export function CduDashboard() {
             ) : (
                 <Card>
                     <p className="text-[11px] text-slate-500">
-                        Deep Sea Water Cooling is <b>off</b> — enable it in
+                        {!engineReadyCdu ? 'Engine is still loading — the marine section appears when ready. ' : ''}Deep Sea Water Cooling is <b>{capexInputs.deepSea ? 'enabled (waiting for engine)' : 'off'}</b> — enable it in
                         <button onClick={() => useSimulationStore.getState().actions.setActiveTab('requirements' as never)} className="mx-1 text-violet-500 hover:text-violet-400">Requirements 1.6</button>
                         or the CAPEX assumptions to unlock the advanced marine section (intake temp @ depth, seawater flow, pump energy, chiller-less PUE, marine capex/opex).
                     </p>
@@ -426,9 +427,10 @@ export function SparesDashboard() {
     const [ov, setOv] = React.useState<SparesOverrides>({});
     const [busy, setBusy] = React.useState(false);
     const bucket = densityToEngineBucket(rackKw);
+    const engineReadySp = useEngineReady();
     const res = React.useMemo(
         () => computeSpares({ itLoadKw: inputs.itLoad, densityBucket: bucket, countryId: country?.id, overrides: ov }),
-        [inputs.itLoad, bucket, country?.id, ov],
+        [inputs.itLoad, bucket, country?.id, ov, engineReadySp],
     );
     const defLead = defaultLeadWeeks(country?.id);
     if (!rzModels().spares || !res.engineReady || !res.totals) return <Loading />;

@@ -66,3 +66,32 @@ export function rzData(): any {
 export function rzModels(): any {
     return getRZ()?.models ?? {};
 }
+
+
+/* ── DF2: engine-ready signal (audit: deferred rz-engine.min.js could finish
+ * AFTER first render; useMemo captures of rzModels() never re-ran → stale
+ * "engine missing" states like the CDU deep-sea "off" banner). getRZ callers
+ * keep working; components that gate on the engine use useEngineReady(). ── */
+let readyFired = false;
+function fireReadyWhenPresent(): void {
+    if (typeof window === 'undefined' || readyFired) return;
+    if ((window as unknown as { RZEngine?: unknown }).RZEngine) {
+        readyFired = true;
+        window.dispatchEvent(new CustomEvent('rz-engine-ready'));
+        return;
+    }
+    window.setTimeout(fireReadyWhenPresent, 150);
+}
+if (typeof window !== 'undefined') fireReadyWhenPresent();
+
+import { useEffect, useState } from 'react';
+export function useEngineReady(): boolean {
+    const [ready, setReady] = useState<boolean>(() => typeof window !== 'undefined' && !!(window as unknown as { RZEngine?: unknown }).RZEngine);
+    useEffect(() => {
+        if (ready) return;
+        const on = () => setReady(true);
+        window.addEventListener('rz-engine-ready', on);
+        return () => window.removeEventListener('rz-engine-ready', on);
+    }, [ready]);
+    return ready;
+}

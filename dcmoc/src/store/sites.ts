@@ -8,6 +8,8 @@
 import { create } from 'zustand';
 import type { CandidateSite, SiteAttributes } from '@/types/site-intel';
 import { seedDefaultSites } from '@/lib/site-adapter';
+import { COUNTRIES } from '@/constants/countries';
+import { COUNTRY_GEO } from '@/constants/geo';
 
 const STORAGE_KEY = 'dcmoc_candidate_sites';
 const MAX_SITES = 5;
@@ -52,6 +54,37 @@ export interface SitesStore {
     toggleComparison: (id: string) => void;
     runAnalysis: () => void;
     resetToDefaults: (baseCountryId: string) => void;
+    /** DA1 — the pristine scenario-seeded site FOLLOWS the shared project country;
+     *  a user-customized site keeps its values (divergence chip rendered instead). */
+    syncToCountry: (countryId: string) => void;
+}
+
+/** Pristine = still the scenario seed: untouched attributes + auto-generated name. */
+function isPristinePrimary(s: CandidateSite): boolean {
+    return s.id === 'site_a_scenario'
+        && Object.keys(s.attributes ?? {}).length === 0
+        && (/ Site$/.test(s.name) || s.name === 'Primary Site');
+}
+
+/** DA1 rule applied both on live country change AND on load (stale localStorage rebase). */
+function applyCountrySync(sites: CandidateSite[], countryId: string): { sites: CandidateSite[]; changed: boolean } {
+    let changed = false;
+    const next = sites.map((s) => {
+        if (!isPristinePrimary(s) || s.countryId === countryId) return s;
+        changed = true;
+        const c = COUNTRIES[countryId];
+        const g = COUNTRY_GEO[countryId];
+        return {
+            ...s,
+            countryId,
+            name: c ? `${c.name} Site` : 'Primary Site',
+            city: g?.capital ?? '',
+            lat: g?.lat ?? s.lat,
+            lng: g?.lng ?? s.lng,
+            updatedAt: Date.now(),
+        };
+    });
+    return { sites: next, changed };
 }
 
 function relabel(sites: CandidateSite[]): CandidateSite[] {
@@ -60,7 +93,18 @@ function relabel(sites: CandidateSite[]): CandidateSite[] {
 
 export const useSitesStore = create<SitesStore>((set, get) => {
     const persisted = loadFromStorage();
-    const seed = persisted?.sites ?? seedDefaultSites('ID');
+    let seed = persisted?.sites ?? seedDefaultSites('ID');
+    /* DA1 stale-load rebase: a persisted pristine site follows the CURRENT project
+     * country (fixes legacy localStorage frozen on the 'ID' seed). Deferred one
+     * tick so the simulation store finishes initializing first. */
+    if (typeof window !== 'undefined') {
+        setTimeout(() => {
+            import('@/store/simulation').then((m) => {
+                const cid = m.useSimulationStore.getState().selectedCountry?.id;
+                if (cid) get().syncToCountry(cid);
+            }).catch(() => {});
+        }, 0);
+    }
     const initial = {
         sites: seed,
         selectedSiteId: persisted?.selectedSiteId ?? seed[0]?.id ?? null,
@@ -115,6 +159,10 @@ export const useSitesStore = create<SitesStore>((set, get) => {
             set({ comparisonIds: cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id] });
         },
         runAnalysis: () => commit({ lastRunAt: Date.now() }),
+        syncToCountry: (countryId) => {
+            const r = applyCountrySync(get().sites, countryId);
+            if (r.changed) commit({ sites: r.sites });
+        },
         resetToDefaults: (baseCountryId) => {
             const seedSites = seedDefaultSites(baseCountryId);
             commit({ sites: seedSites, selectedSiteId: seedSites[0].id, comparisonIds: seedSites.map((x) => x.id), lastRunAt: null });
