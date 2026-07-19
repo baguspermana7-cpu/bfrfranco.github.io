@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.92.0 — 2026-07-19 (DC DATA CORPUS — multi-source benchmarks land in the engine)
+
+### Added
+- **`DATA.benchmarksCorpus`** (owner mandate: "jangan cuma JLL/CBRE — crawl banyak DC operator/developer"): the engine now carries REAL multi-source distributions (n, p10-p90, company list, source count) per metric x segment, GENERATED from the new public-data corpus pipeline `tools/dc-corpus/` — sources.yaml (20 curated public sources: Digital Realty, NTT, Vantage, STACK, AirTrunk, Princeton Digital, CoreWeave, Oracle, Microsoft, Google, Meta, AWS, Uptime, IEA + Google Environmental Report 2024/2025 PDFs) → fetch (rate-limited curl + markitdown, PDF-aware) → extract (**every fact REQUIRES source_url + verbatim quote — rejected otherwise**) → aggregate (percentiles → engine between @@CORPUS markers, DATA.sources entry, auto-link chain). Seed corpus: 82 facts incl. 30 per-site fleet PUE values from Google's published site table. Append-only growth; refresh = rerun pipeline.
+
+---
+
 ## v1.91.6 — 2026-07-19 (on-page grade guidance — Carbon/ESG first)
 
 ### Added
