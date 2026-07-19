@@ -3,6 +3,7 @@
 /* ─── Site location map (stylized SVG, no map lib) + 8-axis radar (Phase B) ── */
 
 import React from 'react';
+import { RealMap } from './RealMap';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import type { CandidateSite, SiteScoreResult, AxisKey } from '@/types/site-intel';
 import { AXIS_LABELS } from '@/types/site-intel';
@@ -33,7 +34,11 @@ export function SiteMapPanel({ sites, results, selectedId, onSelect }: {
                     ))}
                 </div>
             </div>
-            <svg viewBox="0 0 100 62" className="w-full rounded-xl" style={{ background: skin.bg }}>
+            {/* CA — REAL geographic map (MapLibre + OpenFreeMap); schematic SVG
+              * below stays as the offline fallback (RealMap returns null on
+              * tile/style failure, so the schematic still shows). */}
+            <RealMap sites={sites} selectedId={selectedId} onSelect={onSelect} height={300} />
+            <svg viewBox="0 0 100 62" className="mt-2 w-full rounded-xl" style={{ background: skin.bg }}>
                 {/* schematic coast + grid (stylized, not geographic) */}
                 <path d="M0,44 C18,38 30,48 46,42 C64,35 78,46 100,40 L100,62 L0,62 Z" fill={skin.land} />
                 <path d="M0,44 C18,38 30,48 46,42 C64,35 78,46 100,40" fill="none" stroke={skin.grid} strokeWidth="0.4" />
@@ -52,7 +57,7 @@ export function SiteMapPanel({ sites, results, selectedId, onSelect }: {
                         </g>
                     );
                 })}
-                <text x="2" y="60" fontSize="2" fill="#64748b">Schematic site plot — not to geographic scale</text>
+                <text x="2" y="60" fontSize="2" fill="#64748b">Schematic fallback (offline) — peta nyata di atas</text>
             </svg>
         </div>
     );

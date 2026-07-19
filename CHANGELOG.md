@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.93.2 — 2026-07-19 (REAL MAP — MapLibre GL + OpenFreeMap)
+
+### Added
+- **Site Location & Overview now shows a REAL geographic map** (owner: "harus map tampilan beneran, jangan kolot"): MapLibre GL + OpenFreeMap vector tiles (no API key, production-allowed, researched 2026 stack) — dynamically imported so it loads only on the Site tab. Candidate-site pins at REAL WGS84 coordinates (legacy schematic 0-1 values auto-migrate to the country/city anchor), click-to-select, popups, fit-bounds, nav controls. The old schematic SVG demotes to an honest offline fallback below. Headless-verified: maplibre canvas + markers render, 0 errors.
+
+---
+
 ## v1.93.1 — 2026-07-19 (DC-hub city dropdown)
 
 ### Added
