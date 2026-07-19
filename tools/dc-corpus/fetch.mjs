@@ -32,7 +32,8 @@ let ok = 0, fail = 0, cached = 0;
 for (const src of sources) {
     const name = slug(src.company);
     if (only && name !== only) continue;
-    const htmlPath = join(RAW, `${name}.html`);
+    const ext = src.url.split('?')[0].toLowerCase().endsWith('.pdf') ? 'pdf' : 'html';
+    const htmlPath = join(RAW, `${name}.${ext}`);
     const mdPath = join(RAW, `${name}.md`);
     if (existsSync(mdPath)) { cached++; continue; }
     try {
