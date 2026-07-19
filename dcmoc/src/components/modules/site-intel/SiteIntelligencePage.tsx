@@ -114,7 +114,7 @@ export function SiteIntelligencePage() {
                             { label: 'Water & Cooling', value: `${kpi.waterCoolingScore}`, sub: 'water + climate' },
                             { label: 'Risk Score', value: `${kpi.riskScore}`, sub: 'lower is better' },
                         ].map((k) => (
-                            <div key={k.label} className={`rounded-xl border p-3 ${k.hi ? 'border-violet-500/50 bg-violet-600/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50'}`}>
+                            <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className={`rounded-xl border p-3 ${k.hi ? 'border-violet-500/50 bg-violet-600/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50'}`}>
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
                                 <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}<span className="text-[10px] text-slate-400">{k.hi ? '' : '/100'}</span></div>
                                 <div className="truncate text-[10px] text-slate-500">{k.sub}</div>

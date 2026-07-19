@@ -148,7 +148,7 @@ export function SustainabilityEnginePage() {
                             { label: 'Renewable Energy', value: `${model.renewablePct}%`, sub: 'derived from capex renewable/cert inputs' },
                             { label: 'Sustainability Score', value: model.grade, sub: `${model.overall}/100 · documented composite` },
                         ].map((k) => (
-                            <div key={k.label} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                            <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>
                                 <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
                                 <div className="truncate text-[10px] text-slate-500">{k.sub}</div>

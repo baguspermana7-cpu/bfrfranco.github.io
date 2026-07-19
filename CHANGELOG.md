@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.86.1 — 2026-07-19 (DCMOC batch 7: universal hover sweep)
+
+### Changed
+- **Every KPI card across the 10 engine pages is now hoverable** (Phase X): native title with the exact label/value/basis on Architecture, Capacity, CAPEX, Construction, Commissioning, Site Intelligence, Operations, Financial, Sustainability and Assets — on top of the hover titles already carried by the new diagram symbols, div-bars, comparison cells and radar/donut recharts Tooltips shipped in batches 1-6.
+
 ## v1.86.0 — 2026-07-19 (DCMOC batch 6: Platform group rebuilt to the reference UIUX)
 
 ### Added

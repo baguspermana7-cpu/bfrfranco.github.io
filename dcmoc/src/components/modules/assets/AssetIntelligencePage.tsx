@@ -162,7 +162,7 @@ export function AssetIntelligencePage() {
                             { label: 'Poor / Critical', value: (model.buckets.poor + model.buckets.critical).toLocaleString(), sub: 'plan replacement' },
                             { label: 'At Wear-Out Risk', value: model.atRisk.toLocaleString(), sub: '≥25% Weibull CDF' },
                         ].map((k) => (
-                            <div key={k.label} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                            <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
                                 <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
                                 <div className="truncate text-[10px] text-slate-500">{k.sub}</div>
