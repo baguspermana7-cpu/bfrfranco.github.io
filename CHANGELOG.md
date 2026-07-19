@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v1.89.1 — 2026-07-19 (article-calculator engine sweep, batch 2 — includes a REAL unit-bug fix)
+
+### Added
+- **`models.water.aiQueryFootprint`** + `DATA.aiWater` (promoted from article-20 "AI Water Footprint" + "AI Vs Human" tabs): per-query water model — 19 AI models (mL/query, sourced), complexity/cooling/region multipliers, upstream factor (×3 grid-power water), scale multipliers (personal → global 1e10), bottle/shower/drinking-day equivalences + CO₂ + cost; 12 engine asserts. Both article-20 tabs now delegate to the engine (inline fallback kept), headless-verified page ≡ engine.
+- **`models.aiFactory.readiness`** + `DATA.aiFactory` (promoted from article-18 AI-Factory readiness calculator): banded readiness rubric (cooling/structural/density/PUE/age weighted 35/25/20/10/10) + retrofit cost + opex delta (cooling maint per class, staffing floor, network/insurance per MW); 7 engine asserts.
+- **`models.aiFactory.gpuBuild`** + `DATA.aiFactory.gpuBuild` (promoted from article-23 Colossus calculator): GPU capex, annual power at PUE, build-speed vs the 122-day Colossus benchmark, $8M/MW infra screening, 5-yr TCO; 4 engine asserts. Article-23 delegates (verified: defaults $4.59B TCO ≡ engine; reactive input change $7.59B ≡ engine; 0 console errors).
+
+### Fixed
+- **article-18 annualEnergy ×1000 unit bug (REAL "angka ngawur" caught by the sweep)**: the article computed `facPowerMW × 8760 × elecRate × 1,000,000` — MWh→kWh conversion needs ×1e3, not ×1e6, so the annual-energy cost line was overstated **1000×** (a 1 MW facility at $0.08/kWh showed ~$700.8M instead of ~$700.8K). Fixed in the engine promotion AND the article's inline fallback; correction documented in `DATA.sources.aiFactory`; accuracy assert added proving the sane value. Headless-verified: page now shows $1.1M-scale energy ≡ engine.
+
+### Changed
+- Engine min rebuilt (terser); `?v=2026-07-19-a23` bumped sitewide (59 files + engine pdf scriptTagsHTML). Sweep tracker updated in ENGINE_UNIFICATION.md — 5 calculators engine-bound, 18 article pages remaining.
+
+---
+
 ## v1.89.0 — 2026-07-19 (article-calculator engine sweep, batch 1)
 
 ### Added

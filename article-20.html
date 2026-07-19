@@ -2028,20 +2028,30 @@ function wfcCalculate() {
     var users = parseFloat(document.getElementById('wfcUsers').value) || 1;
     var hours = parseFloat(document.getElementById('wfcHours').value) || 8;
 
+    var baseML, dailyML, dailyL, monthlyL, annualL, bottles, showers, drinkDays, co2, cost;
+    var engQ = window.RZEngine && window.RZEngine.models && window.RZEngine.models.water && window.RZEngine.models.water.aiQueryFootprint;
+    if (engQ) {
+        // ENGINE-BOUND (models.water.aiQueryFootprint — single source; inline kept as fallback)
+        var r = engQ({ modelKey: model, complexity: cmplx, cooling: cool, region: region, includeUpstream: upstream === 'yes', queriesPerDay: q, users: users, hoursPerDay: hours });
+        baseML = r.perQueryML; dailyML = r.dailyML; dailyL = r.dailyL; monthlyL = r.monthlyL; annualL = r.annualL;
+        bottles = r.bottles; showers = r.showers.toFixed(1); drinkDays = r.drinkDays.toFixed(1);
+        co2 = r.co2Kg.toFixed(1); cost = r.costUsd.toFixed(2);
+    } else {
     var modelWater = wcModelData[model] ? wcModelData[model].water : 0.5;
-    var baseML = modelWater * (wfcComplexityMult[cmplx] || 1.0) * (wfcCoolingMult[cool] || 1.0) * (wfcRegionMult[region] || 1.0);
+    baseML = modelWater * (wfcComplexityMult[cmplx] || 1.0) * (wfcCoolingMult[cool] || 1.0) * (wfcRegionMult[region] || 1.0);
     if (upstream === 'yes') baseML *= (1 + wfcUpstreamFactor);
 
     var totalQueries = q * users * (hours / 8);
-    var dailyML = baseML * totalQueries;
-    var dailyL = dailyML / 1000;
-    var monthlyL = dailyL * 30;
-    var annualL = dailyL * 365;
-    var bottles = Math.round(annualL / 0.5);
-    var showers = (annualL / 65).toFixed(1);
-    var drinkDays = (annualL / 2).toFixed(1);
-    var co2 = (annualL * 0.0005).toFixed(1);
-    var cost = (annualL * 0.006).toFixed(2);
+    dailyML = baseML * totalQueries;
+    dailyL = dailyML / 1000;
+    monthlyL = dailyL * 30;
+    annualL = dailyL * 365;
+    bottles = Math.round(annualL / 0.5);
+    showers = (annualL / 65).toFixed(1);
+    drinkDays = (annualL / 2).toFixed(1);
+    co2 = (annualL * 0.0005).toFixed(1);
+    cost = (annualL * 0.006).toFixed(2);
+    }
 
     document.getElementById('wfcResults').classList.add('show');
     document.getElementById('wfcDaily').textContent = dailyL < 1 ? dailyML.toFixed(0) + ' mL' : wcFmtVol(dailyL) + ' L';
@@ -2445,13 +2455,21 @@ function avhCalculate() {
     var upstream = document.getElementById('avhUpstream').value;
 
     var modelData = wcModelData[model] || { water: 0.5, name: model };
-    var perQueryML = modelData.water;
+    var perQueryML, totalQueries, waterML, waterL;
+    var engA = window.RZEngine && window.RZEngine.models && window.RZEngine.models.water && window.RZEngine.models.water.aiQueryFootprint;
+    if (engA) {
+        // ENGINE-BOUND (same shared kernel as the wfc tab; inline kept as fallback)
+        var rr = engA({ modelKey: model, includeUpstream: upstream === 'yes', queriesPerDay: q, users: 1, hoursPerDay: 8, scale: scale });
+        perQueryML = rr.perQueryML; totalQueries = rr.totalQueriesPerDay; waterML = rr.dailyML; waterL = rr.dailyL;
+    } else {
+    perQueryML = modelData.water;
     if (upstream === 'yes') perQueryML *= (1 + wfcUpstreamFactor);
 
     var scaleMult = avhScaleMultipliers[scale] || 1;
-    var totalQueries = q * scaleMult;
-    var waterML = perQueryML * totalQueries;
-    var waterL = waterML / 1000;
+    totalQueries = q * scaleMult;
+    waterML = perQueryML * totalQueries;
+    waterL = waterML / 1000;
+    }
 
     document.getElementById('avhResults').classList.add('show');
 
@@ -2903,6 +2921,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <script src="auth.js?v=2026-07-16b" defer></script>
-<script src="rz-engine.min.js?v=2026-07-19-a11" defer></script>
+<script src="rz-engine.min.js?v=2026-07-19-a23" defer></script>
 </body>
 </html>

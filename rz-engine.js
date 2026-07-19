@@ -4555,6 +4555,49 @@
                 gasDetectAlarmPctLfl: { max: 25 }
             }
         },
+        /* ── A18: AI-factory readiness screening (article-18 promoted). ── */
+        aiFactory: {
+            opex: { coolMaintPerMwYr: { air: 120000, dtc: 320000, immersion: 480000 },
+                    staffingPerMwYr: 450000, staffingMinYr: 350000,
+                    networkMaintPerMwYr: 160000, insurancePerMwYr: 70000 },
+            weights: { cooling: 0.35, structural: 0.25, density: 0.20, pue: 0.10, age: 0.10 },
+            /* A23: GPU-campus build screening (article-23 Colossus benchmark). */
+            gpuBuild: { colossusBenchmarkDays: 122, infraCostPerMw: 8000000, tcoYears: 5 }
+        },
+
+        /* ── A20b: per-query AI water footprint (article-20 wfc/avh tabs). ── */
+        aiWater: {
+            /* mL of water per query, direct datacenter use (Li et al. 2023 scaling +
+             * published env. reports; estimate-grade per-model attribution). */
+            models: {
+                gpt54:    { name: 'GPT-5.4',           water: 0.70, company: 'OpenAI',     type: 'text' },
+                gpt4o:    { name: 'GPT-4o',            water: 0.50, company: 'OpenAI',     type: 'text' },
+                gpt4turbo:{ name: 'GPT-4 Turbo',       water: 0.55, company: 'OpenAI',     type: 'text' },
+                o3:       { name: 'o3 (Reasoning)',    water: 2.50, company: 'OpenAI',     type: 'reasoning' },
+                o4mini:   { name: 'o4-mini',           water: 0.75, company: 'OpenAI',     type: 'reasoning' },
+                opus46:   { name: 'Claude Opus 4.6',   water: 0.60, company: 'Anthropic',  type: 'text' },
+                sonnet46: { name: 'Claude Sonnet 4.6', water: 0.40, company: 'Anthropic',  type: 'text' },
+                haiku45:  { name: 'Claude Haiku 4.5',  water: 0.20, company: 'Anthropic',  type: 'text' },
+                gemini25pro:  { name: 'Gemini 2.5 Pro',   water: 0.45, company: 'Google', type: 'text' },
+                gemini25flash:{ name: 'Gemini 2.5 Flash', water: 0.22, company: 'Google', type: 'text' },
+                llama4mav:   { name: 'Llama 4 Maverick', water: 0.42, company: 'Meta',       type: 'text' },
+                llama4scout: { name: 'Llama 4 Scout',    water: 0.30, company: 'Meta',       type: 'text' },
+                grok3:     { name: 'Grok 3',            water: 0.55, company: 'xAI',        type: 'text' },
+                copilot:   { name: 'GitHub Copilot',    water: 0.35, company: 'Microsoft',  type: 'text' },
+                deepseek3: { name: 'DeepSeek-V3',       water: 0.38, company: 'DeepSeek',   type: 'text' },
+                midjourney:{ name: 'Midjourney v7',     water: 5.00, company: 'Midjourney', type: 'image' },
+                dalle4:    { name: 'DALL-E 4',          water: 4.50, company: 'OpenAI',     type: 'image' },
+                sd3:       { name: 'Stable Diff. 3',    water: 3.50, company: 'Stability',  type: 'image' },
+                sora:      { name: 'Sora (Video)',      water: 50.0, company: 'OpenAI',     type: 'video' }
+            },
+            complexityMult: { simple: 0.6, medium: 1.0, complex: 3.0, image: 10.0, video: 50.0 },
+            coolingMult: { evaporative: 1.0, hybrid: 0.6, aircooled: 0.15, closedloop: 0.05 },
+            regionMult: { arid: 1.3, temperate: 1.0, cool: 0.7, tropical: 1.1 },
+            upstreamFactor: 3.0,               // upstream power-generation water multiplier (screening)
+            scaleMultipliers: { personal: 1, team: 50, company: 1000, city: 100000, global: 10000000000 },
+            equivalences: { bottleL: 0.5, showerL: 65, drinkLPerDay: 2, co2KgPerL: 0.0005, waterCostUsdPerL: 0.006, glassL: 0.25, householdLPerDay: 1135 }
+        },
+
         /* ── A20: facility water-footprint screening (promoted from the
          * article-20 Data-Center-Water calculator). ── */
         waterFootprint: {
@@ -4986,6 +5029,8 @@
             'cdu.bands':              { source: 'cdu-model.js BANDS — OCP cold-plate + ASHRAE TC9.9 CDU operational bounds (supply temp, ΔT, flow, dP, dew margin, pipe velocity)', asOf: '2026', unit: '°C / K / Lpm/kW / bar / m/s' },
             'cdu.pump':               { source: 'cdu-model.js PUMP — typical seal-less CDU pump (η=0.70) + IE3 motor (η=0.92) + 600 Lpm duty pump; ILLUSTRATIVE', asOf: '2026', unit: 'efficiency fraction + Lpm' },
             'cdu.phys':               { source: 'cdu-model.js PHYS — commercial-steel absolute roughness (Moody/Colebrook), barToPa, Magnus dew-point coefficients (Alduchov-Eskridge 2006)', asOf: '2026', unit: 'mm / Pa/bar / dimensionless' },
+            'aiFactory':              { source: 'Article-18 AI-factory readiness rubric: cooling limits (air ~30 kW ceiling, DTC ~200 kW, immersion ~400 kW — vendor specs/OCP), floor loading bands (1500/2500/3500 kg per m2 by rack class), PUE bands (AI-native 1.10-1.25 vs industry avg 1.58 Uptime 2024), OPEX $/MW rates = screening estimates', asOf: '2026', method: 'banded scoring rubric, screening-grade; annualEnergy \u00d71000 unit bug in the source article CORRECTED at promotion (MWh\u21d2kWh \u00d71e3, not \u00d71e6)' },
+            'aiWater':                { source: 'Article-20 per-query AI water model: Li, P. et al. 2023 (Making AI Less Thirsty, Joule) per-query scaling; company env. reports 2024 (Microsoft/Google); per-model attribution = estimate-grade; upstream 3\u00d7 = power-generation water (Macknick/NREL screening)', asOf: '2026', method: 'estimate-grade per-model attribution, not vendor-published telemetry' },
             'waterFootprint':         { source: 'Article-20 DC water model: WUE bases per cooling (Li et al. 2023 Joule; Uptime Institute 2024; ASHRAE TC9.9), company benchmarks (Google/Microsoft/Meta env. reports 2024, AWS est.), water $/kgal typical municipal/reclaimed/surface/well ranges; upstream-power water factor 1.5 L/kWh non-renewable = screening (Macknick et al. NREL ranges)', asOf: '2026', method: 'screening-grade footprint, not a site water balance' },
             'gridImpact':             { source: 'Article-11 SEA citizen-bill model: residential tariffs (PLN/TNB/EMA/MEA/EVN/Meralco published 2025-2026 rates), national grid capacity (national utility/EIA country notes), avg household kWh (national statistics), IEA data-centre electricity growth ~15%/yr; 40% residential pass-through = screening assumption', asOf: '2026', method: 'screening-grade allocation model, not a tariff filing analysis' },
             'pue.partialLoad':        { source: 'Screening model: fixed infrastructure-overhead share 0.55 at partial IT load (industry rule-of-thumb band 0.4-0.7; Green Grid partial-load PUE guidance)', asOf: '2026', method: 'PUE(l) = 1 + overhead*(0.55/l + 0.45) — screening estimate, labeled' },
@@ -5426,6 +5471,159 @@
                 }
             },
             /* ── Part F: DC market intelligence helpers over DATA.markets ── */
+            /* ── A18: AI-factory infrastructure readiness (article-18 promoted;
+             * rubric preserved EXACTLY — banded scoring, weighted composite,
+             * $-rates in DATA.aiFactory). input {density,racks,cooling(air|dtc|
+             * immersion),pue,elecRate($/kWh? NOTE: article uses $/kWh in MILLIONS
+             * scaling below — kept verbatim),age,floorLoad,lcInfra(none|partial|full)}. */
+            aiFactory: {
+                readiness: function (inp) {
+    var itLoadKW = inp.density * inp.racks;
+    var itLoadMW = itLoadKW / 1000;
+    var facPowerMW = itLoadMW * inp.pue;
+    var annualEnergy = facPowerMW * 8760 * 1000 * inp.elecRate; // MW×h×1000 = kWh × $/kWh (A18 UNIT FIX: the article multiplied by 1e6 — a ×1000 overstatement, corrected here + on the page)
+
+    // === 1. COOLING READINESS (35%) ===
+    // Benchmark: AI racks need 40kW minimum, 130kW state-of-art (GB300 NVL72)
+    var coolingMaxKW = inp.cooling === 'immersion' ? 400 : inp.cooling === 'dtc' ? 200 : 30;
+    var coolScore;
+    if (inp.cooling === 'air') {
+        // Air cooling: hard limit ~30kW. Cannot serve AI racks above that.
+        if (inp.density <= 10) coolScore = 18;
+        else if (inp.density <= 20) coolScore = 14;
+        else if (inp.density <= 30) coolScore = 10;
+        else coolScore = 3; // physically impossible above 30kW
+        // Partial/full LC infrastructure shows transition readiness
+        if (inp.lcInfra === 'full') coolScore += 8;
+        else if (inp.lcInfra === 'partial') coolScore += 4;
+    } else if (inp.cooling === 'dtc') {
+        // DTC: up to ~200kW. The 2025-2026 standard for AI deployments.
+        if (inp.density <= coolingMaxKW) {
+            var headroom = 1 - (inp.density / coolingMaxKW);
+            coolScore = 62 + headroom * 20; // 62-82 based on headroom
+        } else {
+            coolScore = 30; // over-capacity
+        }
+        if (inp.lcInfra === 'full') coolScore = Math.min(100, coolScore + 12);
+        else if (inp.lcInfra === 'partial') coolScore = Math.min(100, coolScore + 6);
+        else coolScore = Math.max(0, coolScore - 18); // DTC without LC infrastructure
+    } else { // immersion
+        if (inp.density <= coolingMaxKW) {
+            coolScore = 78 + Math.min(17, ((coolingMaxKW - inp.density) / coolingMaxKW) * 17);
+        } else {
+            coolScore = 40;
+        }
+        if (inp.lcInfra === 'full') coolScore = Math.min(100, coolScore + 8);
+        else if (inp.lcInfra === 'partial') coolScore = Math.min(100, coolScore + 4);
+        else coolScore = Math.max(0, coolScore - 22);
+    }
+    coolScore = Math.round(Math.max(0, Math.min(100, coolScore)));
+
+    // === 2. STRUCTURAL READINESS (25%) ===
+    // AI racks: 40kW class = ~1500 kg/m², 130kW class = ~2500 kg/m², 300kW+ = ~3500 kg/m²
+    var structScore;
+    var aiMinFloor = 1500, aiTargetFloor = 2500;
+    if (inp.floorLoad >= aiTargetFloor) {
+        structScore = 82 + Math.min(18, ((inp.floorLoad - aiTargetFloor) / 2500) * 18);
+    } else if (inp.floorLoad >= aiMinFloor) {
+        structScore = 38 + ((inp.floorLoad - aiMinFloor) / (aiTargetFloor - aiMinFloor)) * 44;
+    } else if (inp.floorLoad >= 800) {
+        structScore = 8 + ((inp.floorLoad - 800) / (aiMinFloor - 800)) * 30;
+    } else {
+        structScore = (inp.floorLoad / 800) * 8;
+    }
+    structScore = Math.round(Math.max(0, Math.min(100, structScore)));
+
+    // === 3. POWER DENSITY READINESS (20%) ===
+    // Below 15kW = traditional. 15-40kW = transition. 40-130kW = AI-capable. 130+ = cutting edge.
+    var densityScore;
+    if (inp.density >= 130) {
+        densityScore = 88 + Math.min(12, (inp.density - 130) / 470 * 12);
+    } else if (inp.density >= 40) {
+        densityScore = 42 + ((inp.density - 40) / 90) * 46;
+    } else if (inp.density >= 15) {
+        densityScore = 8 + ((inp.density - 15) / 25) * 34;
+    } else {
+        densityScore = (inp.density / 15) * 8;
+    }
+    densityScore = Math.round(Math.max(0, Math.min(100, densityScore)));
+
+    // === 4. PUE EFFICIENCY (10%) ===
+    // AI-native target: PUE 1.10-1.25. Industry avg 1.58. Air-cooled legacy: 1.6-2.0
+    var pueScore;
+    if (inp.pue <= 1.08) pueScore = 100;
+    else if (inp.pue <= 1.15) pueScore = 82 + ((1.15 - inp.pue) / 0.07) * 18;
+    else if (inp.pue <= 1.30) pueScore = 55 + ((1.30 - inp.pue) / 0.15) * 27;
+    else if (inp.pue <= 1.50) pueScore = 22 + ((1.50 - inp.pue) / 0.20) * 33;
+    else if (inp.pue <= 1.80) pueScore = 5 + ((1.80 - inp.pue) / 0.30) * 17;
+    else pueScore = Math.max(0, 5 - (inp.pue - 1.80) * 8);
+    pueScore = Math.round(Math.max(0, Math.min(100, pueScore)));
+
+    // === 5. AGE & ADAPTABILITY (10%) ===
+    var ageScore;
+    if (inp.age <= 1) ageScore = 95;
+    else if (inp.age <= 3) ageScore = 78 + ((3 - inp.age) / 2) * 17;
+    else if (inp.age <= 7) ageScore = 45 + ((7 - inp.age) / 4) * 33;
+    else if (inp.age <= 15) ageScore = 12 + ((15 - inp.age) / 8) * 33;
+    else if (inp.age <= 25) ageScore = ((25 - inp.age) / 10) * 12;
+    else ageScore = 0;
+    ageScore = Math.round(Math.max(0, Math.min(100, ageScore)));
+
+    // === WEIGHTED COMPOSITE ===
+    var W = DATA.aiFactory.weights;
+    var overall = Math.round(coolScore * W.cooling + structScore * W.structural + densityScore * W.density + pueScore * W.pue + ageScore * W.age);
+    overall = Math.max(0, Math.min(100, overall));
+
+    var grade = overall >= 85 ? 'A' : overall >= 70 ? 'B' : overall >= 50 ? 'C' : overall >= 30 ? 'D' : 'F';
+
+    // OPEX estimate (annual)
+    var OP = DATA.aiFactory.opex;
+    var coolMaint = itLoadMW * (OP.coolMaintPerMwYr[inp.cooling] || OP.coolMaintPerMwYr.immersion);
+    var staffing = Math.max(OP.staffingMinYr, itLoadMW * OP.staffingPerMwYr);
+    var networkMaint = itLoadMW * OP.networkMaintPerMwYr;
+    var insurance = itLoadMW * OP.insurancePerMwYr;
+    var totalOPEX = annualEnergy + coolMaint + staffing + networkMaint + insurance;
+
+    // Recommendation
+    var recommend;
+    if (overall >= 80) recommend = 'AI-Ready';
+    else if (overall >= 62) recommend = 'Targeted Retrofit';
+    else if (overall >= 42) recommend = 'Major Retrofit';
+    else if (overall >= 22 && inp.age <= 15) recommend = 'Extensive Retrofit or New Build';
+    else recommend = 'New Build Required';
+
+    return {
+        itLoadMW: itLoadMW, facPowerMW: facPowerMW, annualEnergy: annualEnergy,
+        coolScore: coolScore, structScore: structScore, densityScore: densityScore,
+        pueScore: pueScore, ageScore: ageScore, overall: overall, grade: grade,
+        totalOPEX: totalOPEX, recommend: recommend
+    };
+},
+                /** A23: GPU-campus build screening (article-23 promoted; math verbatim).
+                 *  input {gpuCount, powerMw, buildDays, costPerGpu, powerCostKwh, pue}. */
+                gpuBuild: function (inp) {
+                    inp = inp || {};
+                    var G = DATA.aiFactory.gpuBuild;
+                    var gpuCount = inp.gpuCount || 100000, powerMw = inp.powerMw || 150;
+                    var buildDays = inp.buildDays || G.colossusBenchmarkDays;
+                    var costPerGpu = inp.costPerGpu || 30000;
+                    var rate = inp.powerCostKwh != null ? inp.powerCostKwh : 0.08;
+                    var pue = inp.pue || 1.3;
+                    var gpuCost = gpuCount * costPerGpu;
+                    var annualPower = powerMw * 1000 * rate * 8760;
+                    var infraCost = powerMw * G.infraCostPerMw;
+                    return {
+                        gpuCapexUsd: gpuCost,
+                        annualPowerUsd: annualPower,
+                        speedVsColossusPct: (G.colossusBenchmarkDays / buildDays) * 100,
+                        powerPerGpuKw: (powerMw * 1000) / gpuCount,
+                        itPowerMw: powerMw / pue,
+                        infraCostUsd: infraCost,
+                        tco5yrUsd: gpuCost + annualPower * G.tcoYears + infraCost,
+                        method: 'screening: infra $' + (G.infraCostPerMw / 1e6) + 'M/MW, ' + G.tcoYears + '-yr power, Colossus ' + G.colossusBenchmarkDays + '-day benchmark'
+                    };
+                },
+            },
             /* ── A11: residential bill-impact screening (article-11 promoted) ── */
             gridImpact: {
                 /** Screening model: what one DC campus does to a citizen's power bill.
@@ -6544,6 +6742,38 @@
                 /** WUE (L/kWh) for a cooling type. */
                 wue: function (cooling) { return DATA.water.wueByType[cooling] != null ? DATA.water.wueByType[cooling] : DATA.water.wueByType.air; },
                 /** Annual water use (m³) — WUE × IT energy. mw = IT load. */
+                /** A20b: per-query AI water footprint (article-20 wfc/avh tabs).
+                 *  input {modelKey, complexity?, cooling?, region?, includeUpstream?,
+                 *  queriesPerDay?, users?, hoursPerDay?, scale?}. Math preserved EXACTLY. */
+                aiQueryFootprint: function (input) {
+                    input = input || {};
+                    var A = DATA.aiWater;
+                    var m = A.models[input.modelKey] || { name: input.modelKey || 'model', water: 0.5, type: 'text' };
+                    var perQueryML = m.water
+                        * (A.complexityMult[input.complexity] || 1.0)
+                        * (A.coolingMult[input.cooling] || 1.0)
+                        * (A.regionMult[input.region] || 1.0);
+                    if (input.includeUpstream !== false) perQueryML *= (1 + A.upstreamFactor);
+                    var q = input.queriesPerDay != null ? input.queriesPerDay : 50;
+                    var users = input.users != null ? input.users : 1;
+                    var hours = input.hoursPerDay != null ? input.hoursPerDay : 8;
+                    var scaleMult = input.scale != null ? (A.scaleMultipliers[input.scale] || 1) : 1;
+                    var totalQueries = q * users * (hours / 8) * scaleMult;
+                    var dailyML = perQueryML * totalQueries;
+                    var dailyL = dailyML / 1000;
+                    var annualL = dailyL * 365;
+                    var E = A.equivalences;
+                    return {
+                        model: m.name, perQueryML: perQueryML, totalQueriesPerDay: totalQueries,
+                        dailyML: dailyML, dailyL: dailyL, monthlyL: dailyL * 30, annualL: annualL,
+                        bottles: Math.round(annualL / E.bottleL),
+                        showers: annualL / E.showerL,
+                        drinkDays: annualL / E.drinkLPerDay,
+                        co2Kg: annualL * E.co2KgPerL,
+                        costUsd: annualL * E.waterCostUsdPerL,
+                        method: 'per-model mL/query \u00d7 complexity \u00d7 cooling \u00d7 region' + (input.includeUpstream !== false ? ' \u00d7 (1+' + A.upstreamFactor + ' upstream)' : ' (direct only)') + ' — estimate-grade attribution'
+                    };
+                },
                 /** A20: full facility water-footprint screening (article-20 promoted).
                  *  input {itLoadMw, pue, cooling(evaporative|hybrid|aircooled|dlc|immersion),
                  *  climate, hours?, sourceType?, aiSharePct?, rackDensityKw?, renewablePct?}.
@@ -8044,7 +8274,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-19-a11"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-19-a23"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

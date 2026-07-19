@@ -1642,13 +1642,22 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
         var inp = getInputs();
 
         // KPI calculations
-        var gpuCost = inp.gpuCount * inp.costPerGPU;
-        var annualPower = inp.powerMW * 1000 * inp.powerCost * 8760;
-        var speedVsColossus = (122 / inp.buildDays) * 100;
-        var powerPerGpu = (inp.powerMW * 1000) / inp.gpuCount;
-        var itPower = inp.powerMW / inp.pue;
-        var infraCost = inp.powerMW * 8000000;
-        var tco5yr = gpuCost + (annualPower * 5) + infraCost;
+        var gpuCost, annualPower, speedVsColossus, powerPerGpu, itPower, infraCost, tco5yr;
+        var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.aiFactory && window.RZEngine.models.aiFactory.gpuBuild;
+        if (eng) {
+            // ENGINE-BOUND (models.aiFactory.gpuBuild — single source; inline kept as fallback)
+            var r = eng({ gpuCount: inp.gpuCount, powerMw: inp.powerMW, buildDays: inp.buildDays, costPerGpu: inp.costPerGPU, powerCostKwh: inp.powerCost, pue: inp.pue });
+            gpuCost = r.gpuCapexUsd; annualPower = r.annualPowerUsd; speedVsColossus = r.speedVsColossusPct;
+            powerPerGpu = r.powerPerGpuKw; itPower = r.itPowerMw; infraCost = r.infraCostUsd; tco5yr = r.tco5yrUsd;
+        } else {
+        gpuCost = inp.gpuCount * inp.costPerGPU;
+        annualPower = inp.powerMW * 1000 * inp.powerCost * 8760;
+        speedVsColossus = (122 / inp.buildDays) * 100;
+        powerPerGpu = (inp.powerMW * 1000) / inp.gpuCount;
+        itPower = inp.powerMW / inp.pue;
+        infraCost = inp.powerMW * 8000000;
+        tco5yr = gpuCost + (annualPower * 5) + infraCost;
+        }
 
         // Update KPI cards
         getEl('colKpiGpuCost').textContent = formatCurrency(gpuCost);
@@ -1755,7 +1764,7 @@ function copyLink(){navigator.clipboard.writeText(shareUrl).then(function(){var 
 <script src="js/rz-article-toc.js?v=1.50.42" defer></script>
 
 <script src="auth.js?v=2026-07-16b" defer></script>
-<script src="rz-engine.min.js?v=2026-07-19-a11" defer></script>
+<script src="rz-engine.min.js?v=2026-07-19-a23" defer></script>
 
 
 

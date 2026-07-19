@@ -916,6 +916,41 @@ if (M.capex && M.capex.accuracyRange) {
     ok('capex.accuracyRange Class-4 = -30/+50%', ar.lowPct === -0.30 && ar.highPct === 0.50);
     ok('capex.accuracyRange low<point<high', ar.low < ar.point && ar.point < ar.high);
 }
+/* A23 — aiFactory gpuBuild (article-23 promoted) */
+if (M.aiFactory && M.aiFactory.gpuBuild) {
+    const gb = M.aiFactory.gpuBuild({ gpuCount: 100000, powerMw: 150, buildDays: 122, costPerGpu: 30000, powerCostKwh: 0.08, pue: 1.3 });
+    near('gpuBuild.capex 100k×30k', gb.gpuCapexUsd, 3e9, 1e-3);
+    near('gpuBuild.annualPower kWh math', gb.annualPowerUsd, 150 * 1000 * 0.08 * 8760, 1e-3);
+    near('gpuBuild.speed 122d = 100%', gb.speedVsColossusPct, 100, 1e-9);
+    near('gpuBuild.tco composition', gb.tco5yrUsd, gb.gpuCapexUsd + gb.annualPowerUsd * 5 + 150 * 8e6, 1e-3);
+}
+
+/* A18 — aiFactory readiness (article-18 promoted, unit bug fixed) */
+if (M.aiFactory && M.aiFactory.readiness) {
+    const af = M.aiFactory.readiness({ density: 100, racks: 100, cooling: 'dtc', pue: 1.2, elecRate: 0.08, age: 1, floorLoad: 2500, lcInfra: 'full' });
+    near('aiFactory.itLoad 100x100kW', af.itLoadMW, 10, 1e-12);
+    near('aiFactory.energy UNIT-FIXED', af.annualEnergy, 10 * 1.2 * 8760 * 1000 * 0.08, 1e-6); // $8.4M not $8.4B
+    ok('aiFactory.energy sane (<$100M for 10MW)', af.annualEnergy < 1e8);
+    ok('aiFactory.overall in [0,100]', af.overall >= 0 && af.overall <= 100);
+    ok('aiFactory.grade A-band config', af.grade === 'A' || af.grade === 'B');
+    const air = M.aiFactory.readiness({ density: 100, racks: 100, cooling: 'air', pue: 1.8, elecRate: 0.08, age: 20, floorLoad: 800, lcInfra: 'none' });
+    ok('aiFactory.legacy air scores worse', air.overall < af.overall);
+    ok('aiFactory.opex composition', Math.abs(af.totalOPEX - (af.annualEnergy + 10 * 320000 + Math.max(350000, 10 * 450000) + 10 * 160000 + 10 * 70000)) < 1);
+}
+
+/* A20b — aiQueryFootprint (article-20 wfc/avh promoted) */
+if (M.water && M.water.aiQueryFootprint) {
+    const af = M.water.aiQueryFootprint({ modelKey: 'gpt4o', complexity: 'medium', cooling: 'evaporative', region: 'temperate', includeUpstream: true, queriesPerDay: 50, users: 1, hoursPerDay: 8 });
+    near('aiWater.perQueryML gpt4o upstream', af.perQueryML, 0.5 * 4, 1e-12);
+    near('aiWater.dailyL 50q', af.dailyL, (0.5 * 4 * 50) / 1000, 1e-12);
+    near('aiWater.annualL identity', af.annualL, af.dailyL * 365, 1e-9);
+    ok('aiWater.bottles round', af.bottles === Math.round(af.annualL / 0.5));
+    const direct = M.water.aiQueryFootprint({ modelKey: 'gpt4o', includeUpstream: false });
+    near('aiWater.direct no upstream', direct.perQueryML, 0.5, 1e-12);
+    const glob = M.water.aiQueryFootprint({ modelKey: 'gpt4o', scale: 'global', queriesPerDay: 1, users: 1, hoursPerDay: 8 });
+    near('aiWater.global scale 1e10', glob.totalQueriesPerDay, 1e10, 1e-3);
+}
+
 /* A20 — water facilityFootprint (article-20 promoted) */
 if (M.water && M.water.facilityFootprint) {
     const wf = M.water.facilityFootprint({ itLoadMw: 10, pue: 1.4, cooling: 'evaporative', climate: 'temperate', renewablePct: 30 });
