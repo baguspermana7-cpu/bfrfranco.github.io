@@ -126,7 +126,9 @@ export const useSitesStore = create<SitesStore>((set, get) => {
                 id: `site_${now}_${s.sites.length}`,
                 name: name || `New Site ${s.sites.length + 1}`,
                 label: LABELS[s.sites.length] ?? String(s.sites.length + 1),
-                countryId, city: '', lat: 0.4 + 0.12 * s.sites.length, lng: 0.35 + 0.15 * s.sites.length,
+                countryId, city: COUNTRY_GEO[countryId]?.capital ?? '',
+                lat: (COUNTRY_GEO[countryId]?.lat ?? -6.2) + 0.05 * s.sites.length,
+                lng: (COUNTRY_GEO[countryId]?.lng ?? 106.8) + 0.05 * s.sites.length,
                 attributes: {}, createdAt: now, updatedAt: now,
             };
             commit({ sites: relabel([...s.sites, site]), comparisonIds: [...s.comparisonIds, site.id] });

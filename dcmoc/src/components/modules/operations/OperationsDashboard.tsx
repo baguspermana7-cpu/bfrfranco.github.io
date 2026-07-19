@@ -11,6 +11,7 @@
  * ──────────────────────────────────────────────────────────────────────── */
 
 import React from 'react';
+import { TraceValue } from '@/components/ui/TraceValue';
 import { ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useSimulationStore } from '@/store/simulation';
 import { useOpsLog } from '@/store/opsLog';

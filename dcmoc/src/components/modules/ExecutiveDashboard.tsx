@@ -55,7 +55,7 @@ export function ExecutiveDashboard() {
     // Populate the roll-up with real CAPEX on first view.
     React.useEffect(() => { if (!capexResults) runCapex(); }, [capexResults, runCapex]);
     const d = useDashboardData();
-    const [tab] = React.useState('Executive Overview');   // DI3 — single full view (tabs deleted)
+    const tab = 'Executive Overview' as const;   // DI3 — single full view (tabs deleted; VIEW_PANELS retained only as the full row list)
     const projName = useRequirementsStore((s2) => s2.overview.projectName);
     const [optNonce, setOptNonce] = React.useState(0);
     const [busy, setBusy] = React.useState<string | null>(null);

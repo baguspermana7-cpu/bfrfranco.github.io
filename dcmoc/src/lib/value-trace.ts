@@ -114,6 +114,35 @@ export const TRACE: Record<string, TraceNode> = {
             } catch { return null; }
         },
     },
+    'cap.totalMw': {
+        label: 'Total Capacity (committed phases)', page: 'capacity', unit: 'MW', provenance: 'derived',
+        formulaTemplate: 'Σ fase (capacityPhases) — pristine mengikuti sim.itLoad',
+        deps: ['sim.itLoad'],
+        get: () => +(sim().inputs.capacityPhases.reduce((a, p) => a + p.itLoadKw, 0) / 1000).toFixed(1),
+    },
+    'carbon.annualEmissions': {
+        label: 'Emisi Tahunan (Scope 1+2+3)', page: 'carbon', unit: 'tCO₂', provenance: 'derived',
+        formulaTemplate: 'ops.annualEnergyMwh × grid carbon intensity negara (+Scope 1 genset & Scope 3)',
+        deps: ['ops.annualEnergyMwh'],
+        get: () => {
+            const e = TRACE['ops.annualEnergyMwh'].get();
+            const gi = sim().selectedCountry?.environment.gridCarbonIntensity;
+            return e && gi ? +(e * gi).toFixed(0) : null;
+        },
+    },
+    'fin.npvScreening': {
+        label: 'NPV (screening 10 thn)', page: 'finance', unit: '$', provenance: 'derived',
+        formulaTemplate: '(pendapatan − opex.totalAnnual) diskonto 10% selama 10 thn − capex.total (screening; pro-forma penuh di Financial)',
+        deps: ['capex.total', 'opex.totalAnnual'],
+        get: () => {
+            const cap = TRACE['capex.total'].get(); const op = TRACE['opex.totalAnnual'].get();
+            if (!cap || !op) return null;
+            const rev = sim().inputs.itLoad * 150 * 12;   // basis screening lib/screening.ts
+            let npv = -cap;
+            for (let y = 1; y <= 10; y++) npv += (rev - op) / Math.pow(1.10, y);
+            return +npv.toFixed(0);
+        },
+    },
 };
 
 export interface ResolvedTrace {

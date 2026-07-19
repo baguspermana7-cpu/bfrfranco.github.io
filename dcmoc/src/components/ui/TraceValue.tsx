@@ -148,9 +148,11 @@ export function TraceValue({ traceId, children }: { traceId: string; children: R
     return (
         <>
             <button onClick={openAt} data-bind={traceId}
-                className="cursor-pointer border-b border-dotted border-violet-400/60 hover:border-violet-500 text-left"
+                className="group relative cursor-pointer border-b border-dotted border-violet-400/60 hover:border-violet-500 text-left"
                 title="Klik: lihat rumus & sumber angka ini (formula field)">
                 {children}
+                {/* DJ2 — affordance jelas: badge ƒx permanen (owner tak menemukan fitur trace) */}
+                <span aria-hidden className="absolute -right-4 top-0 rounded bg-violet-500/15 px-0.5 text-[9px] font-bold text-violet-500 group-hover:bg-violet-500/30">ƒx</span>
             </button>
             {anchor && tree && typeof document !== 'undefined' && createPortal(
                 <div className="fixed inset-0 z-[9998]" onClick={() => setAnchor(null)}>

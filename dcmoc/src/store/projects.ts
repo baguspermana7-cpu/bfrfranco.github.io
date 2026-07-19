@@ -110,7 +110,7 @@ function restoreSnapshot(s: ProjectBundle['snapshot']): void {
         if (s.sustainability) useSustainability.getState().actions.set(s.sustainability);
     } catch (err) {
         // degrade gracefully — partial restore is still a valid state
-        console.warn('[projects] partial restore:', err);
+        if (process.env.NODE_ENV !== 'production') console.warn('[projects] partial restore:', err);
     }
 }
 

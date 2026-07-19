@@ -181,7 +181,7 @@ export const useSimulationStore = create<SimulationState>()(persist((set) => ({
         return {
             ...current,
             ...(p ?? {}),
-            inputs: { ...current.inputs, ...(p?.inputs ?? {}) },
+            inputs: { ...current.inputs, ...(p?.inputs ?? {}), capacityPhasesCustomized: p?.inputs?.capacityPhasesCustomized ?? false },
             selectedCountry: cid && COUNTRIES[cid] ? COUNTRIES[cid] : current.selectedCountry,
         };
     },

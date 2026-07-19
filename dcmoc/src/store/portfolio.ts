@@ -55,7 +55,7 @@ let siteCounter = 1;
 const createDefaultSite = (label?: string): SiteConfig => ({
     id: `site_${Date.now()}_${siteCounter++}`,
     label: label || `Site ${siteCounter}`,
-    countryId: 'ID',
+    countryId: (typeof window !== 'undefined' ? (require('@/store/simulation') as { useSimulationStore: { getState: () => { selectedCountry: { id: string } | null } } }).useSimulationStore.getState().selectedCountry?.id : undefined) ?? 'ID',
     tierLevel: 3,
     itLoad: 2500,
     coolingType: 'air',

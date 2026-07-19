@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Search, Sparkles, ChevronDown } from 'lucide-react';
+import { Search, Sparkles } from 'lucide-react';
 import { AiAssistantModal } from './AiAssistantModal';
 import { useAiConfigStore } from '@/store/aiConfig';
 
@@ -12,7 +12,7 @@ const TABS = ['Executive Overview', 'Engineering', 'Construction', 'Operations',
  * now LIVE from the shared stores, passed by ExecutiveDashboard) and the
  * Engineering/Construction/…/Reports view tabs DELETED — they were honest
  * subsets of the full Executive Overview; the full view is the only view. */
-export function DashTopBar({ project }: { project: string; activeTab?: string; onTab?: (t: string) => void }) {
+export function DashTopBar({ project }: { project: string }) {
     const [aiOpen, setAiOpen] = React.useState(false);
     const aiEnabled = useAiConfigStore((s) => s.enabled);
     return (

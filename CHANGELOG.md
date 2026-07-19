@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.95.0 — 2026-07-19 (TRACE VISIBLE everywhere it exists + final-audit fixes)
+
+### Added
+- **Trace "ƒx" badge** (owner: "fitur trace kok belum ada" — it existed but was invisible): every traceable number now shows a small violet ƒx badge; graph +3 nodes (capacity committed MW, annual emissions chain, NPV screening chain); Capacity page KPIs (IT Load, Facility Load) now click-to-trace like Dashboard + CAPEX.
+
+### Fixed (final total audit, 2 agents)
+- localStorage migration: `capacityPhasesCustomized` gets a safe default on old persisted blobs (phase derivation can no longer break on reload).
+- New candidate sites + portfolio sites now seed from the LIVE project country + real capital coordinates (were hardcoded 'ID'/schematic).
+- Dead code from the tab deletion cleaned (DashTopBar props/ChevronDown, dashboard tab state); projects console.warn dev-guarded.
+
+---
+
 ## v1.94.9 — 2026-07-19 (on-page guidance — Site Intelligence; pattern complete)
 
 ### Added
