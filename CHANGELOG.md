@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.94.0 — 2026-07-19 (Pro-Forma predefined visible + lease-term dedup)
+
+### Changed
+- **Financial & Revenue parameters announce their predefined basis** (owner: "dibuat predefined, saya tidak perlu isi, tapi bisa override"): a violet banner states every parameter auto-derives from data (country tariff/tax/inflation · tier multipliers · CAPEX-linked NRC) with manual edits preserved (the auto-derive + userEdited guard already existed — now visible). **Lease term dedup**: contract years now follows Requirements 1.1 Contract Duration (one source) instead of a hardcoded 10.
+
+---
+
 ## v1.93.9 — 2026-07-19 (EA6b — Research Library in the Knowledge Base)
 
 ### Added

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import { useRequirementsStore } from '@/store/requirements';
 import { MAINT_PER_KW_YR } from '@/lib/screening';
 import { rzData } from '@/lib/rz-engine';
 import { useSimulationStore } from '@/store/simulation';
@@ -159,7 +160,13 @@ const FinancialDashboard = () => {
             mrcPerKwMonth: autoMrcPerKw,
             mrcEscalation: Math.round(eco.inflationRate * 100),
             mrcCrossConnectMonthly: 5000,
-            contractYears: 10,
+            /* #333 dedup — lease term ikut Contract Duration di Requirements 1.1 (satu sumber) */
+            contractYears: (() => {
+                try {
+                    const o = useRequirementsStore.getState().overview;
+                    return typeof o.contractDurationYr === 'number' ? o.contractDurationYr : (o.contractDurationCustom ?? 10);
+                } catch { return 10; }
+            })(),
             takeOrPayPct: 70,
         });
     }, [selectedCountry?.id, inputs.tierLevel, inputs.itLoad, capexResults?.total]);
@@ -373,7 +380,7 @@ const FinancialDashboard = () => {
                         {/* ── Financial Section ───────────── */}
                         <div className="text-[10px] uppercase text-indigo-600 dark:text-indigo-400 font-semibold tracking-wider border-b border-indigo-200 dark:border-indigo-800/40 pb-1">
                             Financial Analysis
-                        </div>
+                        <p className="mt-1 rounded bg-violet-500/10 px-2 py-1 text-[9px] text-violet-500 dark:text-violet-300">Semua parameter panel ini PREDEFINED dari data (negara · tier · CAPEX · requirement) — boleh di-override; edit manual dipertahankan.</p></div>
                         <div className="space-y-1">
                             <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Revenue per kW/month ($) <Tooltip content="Monthly colocation rate charged per kW of IT power. Industry range: $100-250/kW/month depending on market and tier." /></label>
                             <input type="number" className={inpCls}
