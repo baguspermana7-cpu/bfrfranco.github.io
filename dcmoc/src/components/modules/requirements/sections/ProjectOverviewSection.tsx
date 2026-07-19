@@ -3,6 +3,7 @@
 /* ─── 1.1 Project Overview (Phase A) ─────────────────────────────────────── */
 
 import React from 'react';
+import { CURRENCY_LIST } from '@/lib/screening';
 import { Upload, RotateCcw, Image as ImageIcon } from 'lucide-react';
 import { useSimulationStore } from '@/store/simulation';
 import { useRequirementsStore } from '@/store/requirements';
@@ -22,7 +23,7 @@ const INDUSTRIES: { value: Industry; label: string }[] = [
     { value: 'enterprise', label: 'Enterprise' }, { value: 'government', label: 'Government' },
     { value: 'telecom', label: 'Telecom' }, { value: 'financial', label: 'Financial Services' },
 ];
-const CURRENCIES = ['USD', 'EUR', 'GBP', 'SGD', 'JPY', 'IDR', 'AUD', 'INR', 'CNY'].map((c) => ({ value: c, label: c }));
+const CURRENCIES = CURRENCY_LIST.map((c) => ({ value: c, label: c }));
 
 /* ─── DC hero image upload (owner: "button masukkan gambar DC buat dashboard") ──
  * Same store field the CAPEX card uses (useCapexStore.heroImage) — one source,

@@ -9,6 +9,7 @@
  * ──────────────────────────────────────────────────────────────────────── */
 
 import React from 'react';
+import { CURRENCY_LIST } from '@/lib/screening';
 import { useSettingsStore, type IntegrationConfig, type IntegrationKind } from '@/store/settings';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { writeSharedCountry } from '@/lib/requirementsMappings';
@@ -176,7 +177,7 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
                                 <QuickRow icon={Coins} title="Default Currency" sub="Seeds the Requirements currency for new projects">
                                     <select className="w-24 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-violet-500 text-slate-900 dark:text-slate-100"
                                         value={s.general.defaultCurrency} onChange={(e) => s.actions.setGeneral({ defaultCurrency: e.target.value })}>
-                                        {['USD', 'EUR', 'IDR', 'SGD', 'JPY'].map((c) => <option key={c} value={c}>{c}</option>)}
+                                        {CURRENCY_LIST.map((c) => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </QuickRow>
                                 <QuickRow icon={SunMoon} title="Theme & Appearance" sub="Binds the real ThemeProvider (same as the sidebar toggle)">
@@ -275,7 +276,7 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
                             <span className="text-[10px] font-semibold uppercase text-slate-500">Default currency (display)</span>
                             <select className="mt-0.5 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-violet-500 text-slate-900 dark:text-slate-100"
                                 value={s.general.defaultCurrency} onChange={(e) => s.actions.setGeneral({ defaultCurrency: e.target.value })}>
-                                {['USD', 'EUR', 'IDR', 'SGD', 'JPY'].map((c) => <option key={c} value={c}>{c}</option>)}
+                                {CURRENCY_LIST.map((c) => <option key={c} value={c}>{c}</option>)}
                             </select>
                             <span className="text-[9px] text-slate-400">Seeds the Requirements currency default for new projects</span>
                         </label>

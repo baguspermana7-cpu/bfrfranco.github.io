@@ -12,3 +12,8 @@ export const MAINT_PER_KW_YR = 50;         // $/kW/yr — maintenance screening 
  * 62/24/8/6 while architecture used 60/30/5/5 → cross-page divergence).
  * Basis: cooling dominates DC overhead (~60%), electrical losses ~28%. */
 export const OVERHEAD_SPLIT = { cooling: 0.60, power: 0.28, lighting: 0.06, other: 0.06 } as const;
+
+/* ONE shared currency list (#337 — Settings & Requirements diverged; GBP/CNY
+ * absent from Settings). Display conversion uses live gateway /fx with the
+ * engine DATA.currency snapshot as offline fallback. */
+export const CURRENCY_LIST = ['USD', 'EUR', 'GBP', 'SGD', 'JPY', 'IDR', 'AUD', 'INR', 'CNY'] as const;
