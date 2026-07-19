@@ -124,8 +124,39 @@ export function FireDashboard() {
                     {r.spotDetectors != null && <Metric label="Spot Detectors" value={String(r.spotDetectors)} sub="NFPA 72 (≤84 m²)" />}
                 </div>
             )}
+            {/* AG5 — fire zones + capex + suppression basis */}
+            <FireZonesSection volumeM3={volumeM3} agent={agent} />
             <Card><p className="text-[11px] text-slate-500">NFPA-2001 clean-agent quantity + NOAEL occupant-safety margin + agent CO₂e (GWP100) + NFPA-72 detector count. Budgetary sizing, not a fire-protection design.</p></Card>
         </div>
+    );
+}
+
+/* AG5 — zones from equipScale + real capex fire/detection cost keys. */
+function FireZonesSection({ volumeM3, agent }: { volumeM3: number; agent: string }) {
+    const { inputs } = useCfg();
+    const capex = useCapexStore((s) => s.results);
+    const capexInputs = useCapexStore((s) => s.inputs);
+    const req = useRequirementsStore();
+    let zones = 0;
+    try {
+        const eq = rzModels()?.commissioning?.equipScale?.({ itLoad: inputs.itLoad, rackDensity: densityToEngineBucket(req.workload.avgRackDensityKw) });
+        zones = eq?.fireZones ?? 0;
+    } catch { /* */ }
+    const costs = (capex?.costs ?? {}) as Record<string, number>;
+    const fireCost = (costs.fire ?? 0) + (costs.fireDetection ?? 0) + (costs.fire_suppression ?? 0);
+    const perZoneM3 = zones > 0 ? Math.round(volumeM3 / zones) : volumeM3;
+    if (!zones && !fireCost) return null;
+    return (
+        <Card>
+            <h3 className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Suppression Zones & Cost Basis <span className="normal-case text-[9px] text-emerald-500">engine equipment scaling + capex engine</span></h3>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <Metric label="Fire Zones" value={String(zones)} sub="equipScale (1 per ~200 kW)" />
+                <Metric label="Volume / Zone" value={`${perZoneM3.toLocaleString()} m³`} sub="protected volume ÷ zones" />
+                <Metric label="Fire System CAPEX" value={fireCost > 0 ? money(fireCost) : '—'} sub={`${capexInputs.fireType} + ${capexInputs.alarmType} (capex engine)`} />
+                <Metric label="Selected Agent" value={agent === 'novec1230' ? 'Novec 1230' : agent === 'fm200' ? 'FM-200' : 'IG-541'} sub={`shared capex: ${capexInputs.fireType}`} />
+            </div>
+            <p className="mt-1.5 text-[9px] text-slate-400">Zone count and system cost read the SAME engine scaling + capex results as Commissioning and CAPEX — one source, no divergence.</p>
+        </Card>
     );
 }
 
@@ -405,7 +436,7 @@ export function SparesDashboard() {
         layer: 'Layer 9 · models.spares (newsvendor)',
         project: country?.name || '—',
         kpis: [
-            { label: 'Recommended Stock Value', value: money(totals.inventoryValue), sub: 'Σ Q* × unit cost' },
+            { label: 'Recommended Stock Value', value: money(totals.inventoryValue), sub: totals.inventoryValue === 0 ? 'all Q*=0 — ROP covers the low failure demand at this fleet size' : 'Σ Q* × unit cost' },
             { label: 'Annual Holding + Shortage', value: money(totals.annualCost), sub: 'all classes' },
             { label: 'Weighted Fill Rate', value: `${totals.weightedFillPct}%`, sub: 'demand-weighted' },
             { label: 'Classes Below Target', value: String(totals.belowTarget), sub: `of ${rows.length} classes` },
@@ -445,7 +476,7 @@ export function SparesDashboard() {
                 </button>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <Metric label="Recommended Stock Value" value={money(totals.inventoryValue)} sub="Σ Q* × unit cost" />
+                <Metric label="Recommended Stock Value" value={money(totals.inventoryValue)} sub={totals.inventoryValue === 0 ? "all Q*=0 — ROP covers demand at this fleet size" : "Σ Q* × unit cost"} />
                 <Metric label="Annual Cost" value={money(totals.annualCost)} sub="holding + shortage risk" />
                 <Metric label="Weighted Fill Rate" value={`${totals.weightedFillPct}%`} sub="demand-weighted" />
                 <Metric label="Below Fill Target" value={String(totals.belowTarget)} sub={`of ${rows.length} classes`} />

@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.86.2 — 2026-07-19 (DCMOC audit round 2, batch AG: visual-audit fixes)
+
+### Fixed
+- **Data Library** "Latest As-Of" KPI showed prose text ("const") — now filters to date-like source entries.
+- **Spares** "Recommended Stock Value $0" now explains itself honestly when every class' newsvendor Q* is zero at a small fleet (ROP covers the low failure demand).
+- **Audit Trail** was an explainer-only page — now shows the REAL local change history (settings change log + scenario saves + project updates, newest first) with KPI chips; server-side audit_log note retained.
+- **Fire Suppression** enriched: suppression-zones section (engine equipment scaling), volume per zone, fire-system CAPEX from the capex engine (fire + detection keys, same source as CAPEX page), shared fire/alarm type basis.
+- **Asset Lifecycle** depreciation-by-year strip capped with internal scroll (was dominating the page).
+- Audit verification: 43-tab full-page screenshot walk reviewed one-by-one; Grid/Talent "empty chart" appearances confirmed false positives (recharts entrance animation vs screenshot timing — bars verified present at runtime).
+
 ## v1.86.1 — 2026-07-19 (DCMOC batch 7: universal hover sweep)
 
 ### Changed

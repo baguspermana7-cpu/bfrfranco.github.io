@@ -12,6 +12,8 @@ import { useSimulationStore } from '@/store/simulation';
 import { useScenarioStore } from '@/store/scenario';
 import { useAiConfigStore } from '@/store/aiConfig';
 import { useAuthStore } from '@/store/auth';
+import { useSettingsStore } from '@/store/settings';
+import { useProjectsStore } from '@/store/projects';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { rzData, rzModels } from '@/lib/rz-engine';
 import { useRequirementsStore } from '@/store/requirements';
@@ -48,7 +50,8 @@ export function DataLibraryDashboard() {
         ['sources', 'Provenance', Object.keys(sources).length],
     ];
     const totalRows = Object.keys(countries).length + Object.keys(markets).length + Object.keys(pue).length + Object.keys(refr).length;
-    const asOfYears = Object.values(sources).map((v) => v.asOf).filter(Boolean) as string[];
+    // AG1: only date-like asOf values (some source entries carry prose here)
+    const asOfYears = (Object.values(sources).map((v) => v.asOf).filter(Boolean) as string[]).filter((v) => /^\d{4}/.test(v));
     return (
         <div className="space-y-4">
             <PlatformHeader icon={Database} title="Data Library" sub="Centralized repository of all engine reference data, methods, and sources" tone="from-sky-500 to-cyan-600" />
@@ -269,10 +272,43 @@ export function IntegrationsDashboard() {
 
 /* ── Audit ── */
 export function AuditDashboard() {
+    /* AG4: surface the REAL local audit — settings change log + saved
+     * scenario/project events (localStorage-backed). Server-side audit_log
+     * stays an honest note until the service role is configured. */
+    const activity = useSettingsStore((x) => x.activity ?? []);
+    const user = useAuthStore((x) => x.user);
+    const scenarios = useScenarioStore((x) => x.scenarios);
+    const projects = useProjectsStore((x) => x.projects);
+    const rows: { ts: number; action: string; kind: string }[] = [
+        ...activity.map((a) => ({ ts: a.ts, action: a.msg, kind: 'settings' })),
+        ...scenarios.map((sc) => ({ ts: sc.timestamp, action: `Scenario saved: ${sc.name}`, kind: 'scenario' })),
+        ...projects.map((pr) => ({ ts: pr.updatedAt, action: `Project updated: ${pr.name}`, kind: 'project' })),
+    ].sort((a, b) => b.ts - a.ts).slice(0, 50);
     return (
         <div className="space-y-4">
-            <Head icon={ClipboardCheck} title="Audit Trail" sub="Server-side calc + admin actions" tone="from-slate-500 to-slate-700" />
-            <Card><p className="text-xs text-slate-500">Every server-side <code>/calc</code> call and admin action is logged to the Supabase <code>audit_log</code> table (best-effort, non-blocking) when the service role is configured. The live audit view surfaces here for root users — the backend records actor, action, target, and outcome.</p></Card>
+            <PlatformHeader icon={ClipboardCheck} title="Audit Trail" sub="Local change history (real) + server-side audit scope" tone="from-slate-500 to-slate-700" />
+            <KpiChips items={[
+                { label: 'Local Events', value: String(rows.length), sub: 'settings · scenarios · projects' },
+                { label: 'Actor', value: user?.email?.split('@')[0] ?? 'local', sub: user?.role ?? 'session' },
+                { label: 'Scenarios', value: String(scenarios.length), sub: 'saved' },
+                { label: 'Projects', value: String(projects.length), sub: 'bundles' },
+            ]} />
+            <Card>
+                <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Local Change History</h2>
+                {rows.length === 0 && <p className="text-xs text-slate-400">No local events yet — settings changes, scenario saves and project updates land here.</p>}
+                <table className="w-full text-[11px]">
+                    <tbody>
+                        {rows.map((r, i) => (
+                            <tr key={i} className="border-b border-slate-100 dark:border-slate-800/60">
+                                <td className="w-40 py-1 tabular-nums text-slate-400">{new Date(r.ts).toLocaleString()}</td>
+                                <td className="w-20"><span className="rounded bg-slate-500/10 px-1.5 py-0.5 text-[9px] uppercase text-slate-500">{r.kind}</span></td>
+                                <td className="text-slate-600 dark:text-slate-300">{r.action}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </Card>
+            <Card><p className="text-xs text-slate-500">Server-side: every <code>/calc</code> call and admin action is logged to the Supabase <code>audit_log</code> table (best-effort, non-blocking) when the service role is configured — that view will surface here for root users.</p></Card>
         </div>
     );
 }

@@ -190,7 +190,7 @@ export default function AssetLifecycleDashboard() {
                         <div className="space-y-4">
                             <h4 className="font-semibold text-slate-900 dark:text-white flex items-center gap-1">Annual Depreciation by Category ({depMethod}) <Tooltip content="Yearly depreciation expense broken down by asset category. Shows how capital costs are allocated over each asset's useful life under the selected depreciation method." /></h4>
                             <p className="text-xs text-slate-500 dark:text-slate-400">Each bar shows category-level depreciation expense for that year. Width is proportional to total annual depreciation.</p>
-                            <div className="space-y-1">
+                            <div className="max-h-72 space-y-1 overflow-y-auto pr-1">{/* AG6: cap height */}
                                 {result.annualDepreciationSchedule.slice(0, 25).map(year => (
                                     <div key={year.year} className="flex items-center gap-2">
                                         <span className="w-10 text-right text-xs font-mono text-slate-500">Y{year.year}</span>
