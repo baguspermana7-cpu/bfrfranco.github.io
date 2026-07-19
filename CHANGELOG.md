@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.94.7 — 2026-07-19 (on-page guidance — Results)
+
+### Added
+- Results Engine gains the on-page guidance panel (3rd adoption of the pattern after Carbon + Reliability): composite grade chip + narrative (why the band, strongest/weakest dimension) + top-3 prioritized actions naming the dimension to work first — live beside the score hero.
+
+---
+
 ## v1.94.6 — 2026-07-19 (Strategic Planning — purpose + duplicate inputs locked)
 
 ### Changed
