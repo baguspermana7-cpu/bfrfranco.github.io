@@ -2812,18 +2812,27 @@
         function poissonQuantile(lambda, p) { var k = 0; while (poissonCDF(lambda, k) < p && k < 500) k++; return k; }
 
         function calcRate(totalDaily, operators, shiftHours) {
+            var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.alarms;
+            if (eng && eng.ratePer10Min) return eng.ratePer10Min(totalDaily, operators, shiftHours);
             var shiftsPerDay = 24 / shiftHours;
             var alarmsPerShift = totalDaily / shiftsPerDay;
             return alarmsPerShift / (operators * shiftHours * 6);
         }
 
         function cognitiveLoad(alarmsPerHour, responseTimeSec) {
+            var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.alarms;
+            if (eng && eng.cognitiveLoad) {
+                var r = eng.cognitiveLoad(alarmsPerHour, responseTimeSec);
+                return { utilization: r.utilizationPct, degradation: r.degradationPct, effective: r.effectivePct };
+            }
             var utilization = Math.min((alarmsPerHour * responseTimeSec) / 3600, 1.0);
             var degradation = utilization > 0.7 ? 1 - Math.exp(-3 * (utilization - 0.7)) : 0;
             return { utilization: utilization * 100, degradation: degradation * 100, effective: (1 - degradation) * 100 };
         }
 
         function floodProbability(avgDailyRate, threshold, windowMin, shiftHours) {
+            var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.alarms;
+            if (eng && eng.floodProbability) return eng.floodProbability(avgDailyRate, threshold, windowMin, shiftHours);
             var lambda = avgDailyRate * (windowMin / 1440);
             var pFloodPerWindow = 1 - poissonCDF(lambda, threshold - 1);
             var windowsPerShift = (shiftHours * 60) / windowMin;
@@ -2836,6 +2845,8 @@
         }
 
         function isaComplianceDetail(rate, actionableRatio, criticalPct, standingPct) {
+            var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.alarms;
+            if (eng && eng.isaCompliance) return eng.isaCompliance(rate, actionableRatio, criticalPct, standingPct);
             var rateScore = rate <= 1 ? 25 : rate <= 2 ? 15 : rate <= 5 ? 5 : 0;
             var actScore = actionableRatio >= 0.85 ? 25 : actionableRatio >= 0.6 ? 15 : 5;
             var critScore = criticalPct <= 0.05 ? 25 : criticalPct <= 0.1 ? 15 : criticalPct <= 0.2 ? 5 : 0;
@@ -2845,6 +2856,8 @@
 
         // Erlang-C formula
         function erlangC(lambda, mu, c) {
+            var engE = window.RZEngine && window.RZEngine.models && window.RZEngine.models.alarms;
+            if (engE && engE.erlangC) return engE.erlangC(lambda, mu, c);
             var rho = lambda / (c * mu);
             if (rho >= 1) return 1;
             var a = lambda / mu;
@@ -3631,6 +3644,12 @@ function clamp(val, min, max) {
 }
 
 function computeISAScore(dailyAlarms, operators, shiftHours) {
+    var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.alarms;
+    if (eng && eng.isaScore) {
+        // ENGINE-BOUND (models.alarms.isaScore — single source; inline below kept as fallback)
+        var r = eng.isaScore(dailyAlarms, operators, shiftHours);
+        return { isa: r.isa, flood: r.flood, rate: r.rate, cli: clamp(r.rate / 5, 0, 1) };
+    }
     var windows = shiftHours * 6; // 10-min windows per shift
     var lambda10 = dailyAlarms / (operators * 144);
     var alarmRate10 = dailyAlarms / (operators * 144);
@@ -3972,7 +3991,7 @@ function finalizeMC(results, N) {
 /* v1.9.1: subscribeNewsletter() moved to script.js (global, mailto: based) */
 </script>
 <script src="auth.js?v=2026-07-16b" defer></script>
-<script src="rz-engine.min.js?v=2026-07-19-a23" defer></script>
+<script src="rz-engine.min.js?v=2026-07-19-a3b" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

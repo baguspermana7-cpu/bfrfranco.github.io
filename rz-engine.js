@@ -4598,6 +4598,53 @@
             equivalences: { bottleL: 0.5, showerL: 65, drinkLPerDay: 2, co2KgPerL: 0.0005, waterCostUsdPerL: 0.006, glassL: 0.25, householdLPerDay: 1135 }
         },
 
+        /* ── A1: operations-maturity assessment (promoted from article-1). ── */
+        opsMaturity: {
+            dimensions: [
+                { id: 'doc',        label: 'Documentation', weight: 0.10, impact: 1.0 },
+                { id: 'train',      label: 'Training',      weight: 0.15, impact: 1.2 },
+                { id: 'change',     label: 'Change Mgmt',   weight: 0.15, impact: 1.3 },
+                { id: 'monitor',    label: 'Monitoring',    weight: 0.15, impact: 1.1 },
+                { id: 'maint',      label: 'Maintenance',   weight: 0.15, impact: 1.2 },
+                { id: 'emergency',  label: 'Emergency',     weight: 0.10, impact: 1.4 },
+                { id: 'improve',    label: 'Improvement',   weight: 0.10, impact: 1.0 },
+                { id: 'leadership', label: 'Leadership',    weight: 0.10, impact: 1.5 }
+            ],
+            levels: [
+                { max: 20,  label: 'Reactive',   level: 1 },
+                { max: 40,  label: 'Preventive', level: 2 },
+                { max: 60,  label: 'Predictive', level: 3 },
+                { max: 80,  label: 'Proactive',  level: 4 },
+                { max: 100, label: 'Generative', level: 5 }
+            ],
+            risk: { baseOutagesPerYr: 2.5, avgOutageCostUsd: 200000, maturityDivisor: 120, minFactor: 0.05 }
+        },
+
+        /* ── A2: alarm-management (ISA-18.2 / EEMUA-191) screening (article-2). ── */
+        alarmMgmt: {
+            isaTargetPer10Min: 1.0,            // ISA-18.2 target avg alarm rate
+            floodThresholdPer10Min: 10,        // ISA flood definition ≥10 alarms/10 min
+            windowsPerHour: 6,
+            cognitiveKneeUtil: 0.7,            // degradation onset (utilization)
+            cognitiveDecayK: 3,
+            scoreWeights: { rate: 0.5, flood: 0.3, actionable: 0.2 },
+            complianceBands: {
+                rate:       [ { max: 1, pts: 25 }, { max: 2, pts: 15 }, { max: 5, pts: 5 } ],
+                actionable: [ { min: 0.85, pts: 25 }, { min: 0.6, pts: 15 } ],
+                critical:   [ { max: 0.05, pts: 25 }, { max: 0.1, pts: 15 }, { max: 0.2, pts: 5 } ],
+                standing:   [ { max: 0.1, pts: 25 }, { max: 0.3, pts: 15 } ]
+            }
+        },
+
+        /* ── A3: maintenance-compliance capacity model (article-3). ── */
+        maintCompliance: {
+            frictionFactor: { High: 0.55, Medium: 0.70, Low: 0.85 },       // productive-time share by ops friction
+            cmmsMult: { 1: 0.70, 2: 0.80, 3: 0.90, 4: 0.97, 5: 1.0 },     // CMMS maturity multiplier
+            evidenceMult: { Unclear: 0.85, Adequate: 0.92, Excellent: 0.98 },
+            durationCv: { Low: 0.10, Medium: 0.20, High: 0.35 },
+            backlogWeight: { base: 0.3, perMonthAge: 0.02, cap: 0.5 }
+        },
+
         /* ── A20: facility water-footprint screening (promoted from the
          * article-20 Data-Center-Water calculator). ── */
         waterFootprint: {
@@ -5029,6 +5076,9 @@
             'cdu.bands':              { source: 'cdu-model.js BANDS — OCP cold-plate + ASHRAE TC9.9 CDU operational bounds (supply temp, ΔT, flow, dP, dew margin, pipe velocity)', asOf: '2026', unit: '°C / K / Lpm/kW / bar / m/s' },
             'cdu.pump':               { source: 'cdu-model.js PUMP — typical seal-less CDU pump (η=0.70) + IE3 motor (η=0.92) + 600 Lpm duty pump; ILLUSTRATIVE', asOf: '2026', unit: 'efficiency fraction + Lpm' },
             'cdu.phys':               { source: 'cdu-model.js PHYS — commercial-steel absolute roughness (Moody/Colebrook), barToPa, Magnus dew-point coefficients (Alduchov-Eskridge 2006)', asOf: '2026', unit: 'mm / Pa/bar / dimensionless' },
+            'opsMaturity':            { source: 'Article-1 ops-maturity assessment: 8 weighted dimensions (weights sum 1.0, expert screening), 5 maturity levels (Reactive..Generative); risk translation basis Uptime Institute 2024 Annual Outage Analysis (>55% outages ops/human factors, ~$200K median outage cost, 2.5 outages/yr low-maturity screening base)', asOf: '2026', method: 'weighted 1-5 composite scaled 0-100; risk factor max(0.05, 1-score/120) — screening-grade' },
+            'alarmMgmt':              { source: 'ISA-18.2 / EEMUA-191 alarm-management targets: avg rate <=1 alarm/10 min per operator, flood >=10 alarms/10 min, actionable >=85%; cognitive-load knee at 70% utilization (human-factors literature); Erlang-C standard queueing formula', asOf: '2026', method: 'Poisson flood probability via the shared Acklam/Poisson kernel (models.spares.poissonCdf); composite = rate 50% + flood 30% + actionable 20% (article-2 rubric)' },
+            'maintCompliance':        { source: 'Article-3 maintenance-compliance capacity model: friction factors (High .55/Med .70/Low .85 productive-time share), CMMS maturity multipliers (.70-.100), evidence multipliers (.85-.98), backlog aging weight (0.3 + 0.02/month, cap 0.5) — industry screening estimates', asOf: '2026', method: 'compliance = min(100, capacity/demand*100) x cmms x evidence; deterministic (page-side Monte Carlo stays page-side)' },
             'aiFactory':              { source: 'Article-18 AI-factory readiness rubric: cooling limits (air ~30 kW ceiling, DTC ~200 kW, immersion ~400 kW — vendor specs/OCP), floor loading bands (1500/2500/3500 kg per m2 by rack class), PUE bands (AI-native 1.10-1.25 vs industry avg 1.58 Uptime 2024), OPEX $/MW rates = screening estimates', asOf: '2026', method: 'banded scoring rubric, screening-grade; annualEnergy \u00d71000 unit bug in the source article CORRECTED at promotion (MWh\u21d2kWh \u00d71e3, not \u00d71e6)' },
             'aiWater':                { source: 'Article-20 per-query AI water model: Li, P. et al. 2023 (Making AI Less Thirsty, Joule) per-query scaling; company env. reports 2024 (Microsoft/Google); per-model attribution = estimate-grade; upstream 3\u00d7 = power-generation water (Macknick/NREL screening)', asOf: '2026', method: 'estimate-grade per-model attribution, not vendor-published telemetry' },
             'waterFootprint':         { source: 'Article-20 DC water model: WUE bases per cooling (Li et al. 2023 Joule; Uptime Institute 2024; ASHRAE TC9.9), company benchmarks (Google/Microsoft/Meta env. reports 2024, AWS est.), water $/kgal typical municipal/reclaimed/surface/well ranges; upstream-power water factor 1.5 L/kWh non-renewable = screening (Macknick et al. NREL ranges)', asOf: '2026', method: 'screening-grade footprint, not a site water balance' },
@@ -5622,6 +5672,125 @@
                         tco5yrUsd: gpuCost + annualPower * G.tcoYears + infraCost,
                         method: 'screening: infra $' + (G.infraCostPerMw / 1e6) + 'M/MW, ' + G.tcoYears + '-yr power, Colossus ' + G.colossusBenchmarkDays + '-day benchmark'
                     };
+                },
+            },
+            /* ── A1: operations-maturity assessment (article-1 promoted). ── */
+            opsMaturity: {
+                /** vals = 1-5 per dimension (DATA order); weights optional override. */
+                score: function (vals, weights) {
+                    var dims = DATA.opsMaturity.dimensions;
+                    var w = weights || dims.map(function (d) { return d.weight; });
+                    var ws = 0;
+                    for (var i = 0; i < vals.length; i++) ws += vals[i] * w[i];
+                    return ((ws - 1) / 4) * 100;
+                },
+                label: function (score) {
+                    var L = DATA.opsMaturity.levels;
+                    for (var i = 0; i < L.length; i++) if (score <= L[i].max) return L[i];
+                    return L[L.length - 1];
+                },
+                /** Deterministic risk translation (Uptime 2024 basis — screening). */
+                riskExposure: function (score) {
+                    var R = DATA.opsMaturity.risk;
+                    var factor = Math.max(R.minFactor, 1 - score / R.maturityDivisor);
+                    var outages = R.baseOutagesPerYr * factor;
+                    var exposure = outages * R.avgOutageCostUsd;
+                    var improvedFactor = Math.max(R.minFactor, 1 - (score + 10) / R.maturityDivisor);
+                    return {
+                        estOutagesPerYear: outages,
+                        annualExposureUsd: exposure,
+                        preventionValueUsd: exposure - R.baseOutagesPerYr * improvedFactor * R.avgOutageCostUsd,
+                        riskLevel: score >= 80 ? 'LOW' : score >= 60 ? 'MODERATE' : score >= 40 ? 'ELEVATED' : 'HIGH'
+                    };
+                },
+            },
+            /* ── A2: ISA-18.2 alarm-management screening (article-2 promoted;
+             * Poisson kernel reuses models.spares.poissonCdf — one implementation). ── */
+            alarms: {
+                /** Avg alarms per operator per 10-minute window. */
+                ratePer10Min: function (totalDaily, operators, shiftHours) {
+                    var shiftsPerDay = 24 / shiftHours;
+                    var alarmsPerShift = totalDaily / shiftsPerDay;
+                    return alarmsPerShift / (operators * shiftHours * DATA.alarmMgmt.windowsPerHour);
+                },
+                /** Operator utilization + performance degradation past the 70% knee. */
+                cognitiveLoad: function (alarmsPerHour, responseTimeSec) {
+                    var A = DATA.alarmMgmt;
+                    var utilization = Math.min((alarmsPerHour * responseTimeSec) / 3600, 1.0);
+                    var degradation = utilization > A.cognitiveKneeUtil ? 1 - Math.exp(-A.cognitiveDecayK * (utilization - A.cognitiveKneeUtil)) : 0;
+                    return { utilizationPct: utilization * 100, degradationPct: degradation * 100, effectivePct: (1 - degradation) * 100 };
+                },
+                /** P(≥1 flood window per shift), Poisson arrivals (shared kernel). */
+                floodProbability: function (avgDailyRate, threshold, windowMin, shiftHours) {
+                    var lambda = avgDailyRate * (windowMin / 1440);
+                    var pFloodPerWindow = 1 - RZEngine.models.spares.poissonCdf(threshold - 1, lambda);
+                    var windowsPerShift = (shiftHours * 60) / windowMin;
+                    return Math.min((1 - Math.pow(1 - pFloodPerWindow, windowsPerShift)) * 100, 100);
+                },
+                /** ISA-18.2 4-band compliance detail (25 pts each). */
+                isaCompliance: function (rate, actionableRatio, criticalPct, standingPct) {
+                    var rateScore = rate <= 1 ? 25 : rate <= 2 ? 15 : rate <= 5 ? 5 : 0;
+                    var actScore = actionableRatio >= 0.85 ? 25 : actionableRatio >= 0.6 ? 15 : 5;
+                    var critScore = criticalPct <= 0.05 ? 25 : criticalPct <= 0.1 ? 15 : criticalPct <= 0.2 ? 5 : 0;
+                    var standScore = standingPct <= 0.1 ? 25 : standingPct <= 0.3 ? 15 : 5;
+                    return { rate: rateScore, actionable: actScore, critical: critScore, standing: standScore, total: rateScore + actScore + critScore + standScore };
+                },
+                /** Erlang-C: probability an alarm waits (c operators, λ arrivals, μ service). */
+                erlangC: function (lambda, mu, c) {
+                    var rho = lambda / (c * mu);
+                    if (rho >= 1) return 1;
+                    var a = lambda / mu;
+                    var sum = 0, fact = 1;
+                    for (var k = 0; k < c; k++) { if (k > 0) fact *= k; sum += Math.pow(a, k) / fact; }
+                    fact *= c;
+                    var last = Math.pow(a, c) / fact * (1 / (1 - rho));
+                    return last / (sum + last);
+                },
+                /** Composite ISA score (rate 50% + flood 30% + est. actionable 20%). */
+                isaScore: function (dailyAlarms, operators, shiftHours) {
+                    var windows = shiftHours * DATA.alarmMgmt.windowsPerHour;
+                    var rate10 = dailyAlarms / (operators * 144);
+                    var rateScore = rate10 <= 1.0 ? 100 : Math.max(0, 100 - (rate10 - 1.0) * 20);
+                    var pFlood = Math.max(0, 1 - Math.pow(RZEngine.models.spares.poissonCdf(DATA.alarmMgmt.floodThresholdPer10Min - 1, rate10), windows));
+                    var floodScore = pFlood <= 0.1 ? 100 : Math.max(0, 100 - (pFlood - 0.1) * 120);
+                    var actionableEstimate = rate10 <= 1 ? 90 : Math.max(20, 90 - (rate10 - 1) * 15);
+                    var actionableScore = actionableEstimate >= 85 ? 100 : (actionableEstimate / 85) * 100;
+                    var W = DATA.alarmMgmt.scoreWeights;
+                    var composite = rateScore * W.rate + floodScore * W.flood + actionableScore * W.actionable;
+                    return { isa: Math.max(0, Math.min(100, composite)), flood: pFlood, rate: rate10 };
+                },
+            },
+            /* ── A3: maintenance-compliance capacity model (article-3 promoted).
+             * input p {tasks, techs, backlog, duration(h), hrsPerMonth, cmms(1-5),
+             * friction(Low|Medium|High), evidence(Unclear|Adequate|Excellent),
+             * wrenchPct(0-1)?, overheadPct(0-1)?, backlogAge(months)?, pro?}. ── */
+            maintCompliance: {
+                effectiveCapacity: function (p) {
+                    var M = DATA.maintCompliance;
+                    var raw = p.techs * p.hrsPerMonth;
+                    var ff = M.frictionFactor[p.friction] || 0.70;
+                    if (p.pro) return raw * ff * (p.wrenchPct || 0.35) * (1 - (p.overheadPct || 0.25));
+                    return raw * ff;
+                },
+                demand: function (p) {
+                    var B = DATA.maintCompliance.backlogWeight;
+                    var backlogWeight = Math.min(B.cap, B.base + (p.backlogAge || 0) * B.perMonthAge);
+                    return (p.tasks * p.duration) + ((p.backlog || 0) * p.duration * backlogWeight);
+                },
+                compliance: function (p) {
+                    var M = DATA.maintCompliance;
+                    var cap = RZEngine.models.maintCompliance.effectiveCapacity(p);
+                    var dem = RZEngine.models.maintCompliance.demand(p);
+                    var raw = Math.min(100, (cap / Math.max(1, dem)) * 100);
+                    return Math.min(100, raw * (M.cmmsMult[p.cmms] || 0.80) * (M.evidenceMult[p.evidence] || 0.92));
+                },
+                /** Smallest tech headcount hitting target compliance (0-1). */
+                techsForTarget: function (p, target) {
+                    for (var t = 1; t <= 100; t++) {
+                        var pp = Object.assign({}, p, { techs: t });
+                        if (RZEngine.models.maintCompliance.compliance(pp) >= target * 100) return t;
+                    }
+                    return null;
                 },
             },
             /* ── A11: residential bill-impact screening (article-11 promoted) ── */
@@ -8274,7 +8443,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-19-a23"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-19-a3b"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

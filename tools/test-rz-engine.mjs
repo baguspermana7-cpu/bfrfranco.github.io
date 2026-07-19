@@ -916,6 +916,57 @@ if (M.capex && M.capex.accuracyRange) {
     ok('capex.accuracyRange Class-4 = -30/+50%', ar.lowPct === -0.30 && ar.highPct === 0.50);
     ok('capex.accuracyRange low<point<high', ar.low < ar.point && ar.point < ar.high);
 }
+/* A1 — opsMaturity (article-1 promoted) */
+if (M.opsMaturity) {
+    const allThrees = [3, 3, 3, 3, 3, 3, 3, 3];
+    near('opsMaturity.score all-3 = 50', M.opsMaturity.score(allThrees), 50, 1e-12);
+    near('opsMaturity.score all-5 = 100', M.opsMaturity.score([5,5,5,5,5,5,5,5]), 100, 1e-12);
+    near('opsMaturity.score all-1 = 0', M.opsMaturity.score([1,1,1,1,1,1,1,1]), 0, 1e-12);
+    eq('opsMaturity.label 50 = Predictive', M.opsMaturity.label(50).label, 'Predictive');
+    ok('opsMaturity.weights sum 1.0', Math.abs(D.opsMaturity.dimensions.reduce((a, d) => a + d.weight, 0) - 1) < 1e-12);
+    const rx = M.opsMaturity.riskExposure(50);
+    near('opsMaturity.risk 50 outages', rx.estOutagesPerYear, 2.5 * (1 - 50 / 120), 1e-9);
+    near('opsMaturity.risk exposure', rx.annualExposureUsd, rx.estOutagesPerYear * 200000, 1e-9);
+    eq('opsMaturity.risk level 50', rx.riskLevel, 'ELEVATED');
+}
+
+/* A2 — alarms (article-2 promoted, ISA-18.2) */
+if (M.alarms) {
+    // 1200 alarms/day, 2 ops, 12h shifts: per-shift 600, rate = 600/(2*12*6) = 4.1667/10min
+    near('alarms.rate 1200/2/12', M.alarms.ratePer10Min(1200, 2, 12), 600 / (2 * 12 * 6), 1e-12);
+    const cl = M.alarms.cognitiveLoad(30, 60);   // 30/h × 60s = 50% util → no degradation
+    near('alarms.cogLoad util 50%', cl.utilizationPct, 50, 1e-9);
+    near('alarms.cogLoad no degradation below knee', cl.degradationPct, 0, 1e-12);
+    const cl2 = M.alarms.cognitiveLoad(60, 60);  // 100% util → degradation 1-e^-0.9
+    near('alarms.cogLoad degraded at 100%', cl2.degradationPct, (1 - Math.exp(-3 * 0.3)) * 100, 1e-9);
+    const isa = M.alarms.isaCompliance(0.8, 0.9, 0.03, 0.05);
+    eq('alarms.isaCompliance perfect = 100', isa.total, 100);
+    const ec = M.alarms.erlangC(4, 1, 5);        // λ=4, μ=1, c=5 → classic Erlang-C
+    ok('alarms.erlangC in (0,1)', ec > 0 && ec < 1);
+    near('alarms.erlangC rho>=1 saturates', M.alarms.erlangC(5, 1, 4), 1, 1e-12);
+    const sc = M.alarms.isaScore(288, 2, 12);    // rate = 288/288 = 1.0 → rateScore 100
+    near('alarms.isaScore rate at target', sc.rate, 1.0, 1e-12);
+    ok('alarms.isaScore composite in [0,100]', sc.isa >= 0 && sc.isa <= 100);
+    ok('alarms.flood grows with volume', M.alarms.isaScore(5000, 2, 12).flood > sc.flood);
+}
+
+/* A3 — maintCompliance (article-3 promoted) */
+if (M.maintCompliance) {
+    const p = { tasks: 400, techs: 6, backlog: 0, duration: 1.5, hrsPerMonth: 160, cmms: 2, friction: 'Medium', evidence: 'Adequate' };
+    near('maintComp.capacity free-mode', M.maintCompliance.effectiveCapacity(p), 6 * 160 * 0.70, 1e-9);
+    near('maintComp.demand no backlog', M.maintCompliance.demand(p), 400 * 1.5, 1e-9);
+    near('maintComp.compliance article default', M.maintCompliance.compliance(p),
+        Math.min(100, (672 / 600) * 100) * 0.80 * 0.92, 1e-9);
+    const pPro = { ...p, pro: true, wrenchPct: 0.35, overheadPct: 0.25 };
+    near('maintComp.capacity pro-mode', M.maintCompliance.effectiveCapacity(pPro), 6 * 160 * 0.70 * 0.35 * 0.75, 1e-9);
+    // ceiling: cmms/evidence multipliers cap compliance (cmms 2 + Adequate = 73.6 max — article-faithful)
+    eq('maintComp.ceiling at cmms2', M.maintCompliance.techsForTarget(p, 0.97), null);
+    const pBest = { ...p, cmms: 5, evidence: 'Excellent' };
+    const t = M.maintCompliance.techsForTarget(pBest, 0.97);
+    ok('maintComp.techsForTarget solves at cmms5', t != null && t >= 1 && t <= 100);
+    ok('maintComp.techsForTarget hits target', t != null && M.maintCompliance.compliance({ ...pBest, techs: t }) >= 97);
+}
+
 /* A23 — aiFactory gpuBuild (article-23 promoted) */
 if (M.aiFactory && M.aiFactory.gpuBuild) {
     const gb = M.aiFactory.gpuBuild({ gpuCount: 100000, powerMw: 150, buildDays: 122, costPerGpu: 30000, powerCostKwh: 0.08, pue: 1.3 });

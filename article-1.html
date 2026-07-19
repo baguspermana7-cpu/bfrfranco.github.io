@@ -3516,6 +3516,8 @@
         }
 
         function calculateScoreWithValues(vals, weights) {
+            var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.opsMaturity;
+            if (eng && eng.score) return eng.score(vals, weights || getActiveWeights());
             const ws = vals.reduce((s, v, i) => s + v * (weights || getActiveWeights())[i], 0);
             return ((ws - 1) / 4) * 100;
         }
@@ -3534,6 +3536,13 @@
             var estOutagesPerYear = baseOutageRate * maturityFactor;
             var avgOutageCost = 200000; // $200K median (Uptime 2024)
             var annualExposure = estOutagesPerYear * avgOutageCost;
+            var engRC = window.RZEngine && window.RZEngine.models && window.RZEngine.models.opsMaturity;
+            if (engRC && engRC.riskExposure) {
+                // ENGINE-BOUND (models.opsMaturity.riskExposure — single source; inline above kept as fallback)
+                var rx = engRC.riskExposure(compositeScore);
+                estOutagesPerYear = rx.estOutagesPerYear;
+                annualExposure = rx.annualExposureUsd;
+            }
 
             // Risk level
             var riskLevel, riskColor;
@@ -3579,7 +3588,11 @@
             }));
 
             const weightedSum = values.reduce((sum, d) => sum + d.value * d.weight, 0);
-            const compositeScore = ((weightedSum - 1) / 4) * 100;
+            var engM = window.RZEngine && window.RZEngine.models && window.RZEngine.models.opsMaturity;
+            // ENGINE-BOUND (models.opsMaturity.score — single source; inline kept as fallback)
+            const compositeScore = (engM && engM.score)
+                ? engM.score(values.map(d => d.value), weights)
+                : ((weightedSum - 1) / 4) * 100;
             const maturity = getMaturityLabel(compositeScore);
 
             document.getElementById('result-score').textContent = Math.round(compositeScore);
@@ -4847,7 +4860,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 /* v1.9.1: subscribeNewsletter() moved to script.js (global, mailto: based) */
 </script>
 <script src="auth.js?v=2026-07-16b" defer></script>
-<script src="rz-engine.min.js?v=2026-07-19-a23" defer></script>
+<script src="rz-engine.min.js?v=2026-07-19-a3b" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 <!-- ═══ Feature 22: Reading Progress Bar ═══ -->
