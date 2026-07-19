@@ -425,6 +425,13 @@ export function calculateAutoHeadcount(
     hybridRatio: number = 0.5
 ): AutoHeadcountResult {
     const mw = itLoadKw / 1000;
+    /* DH — SUB-LINEAR scaling (owner-caught bug: linear 0.4/MW x 500MW gave 834
+     * FTE vs the Uptime benchmark 204 on the same page). Economies of scale:
+     * effMw = 10 x (mw/10)^0.65 above the 10 MW reference anchor — calibrated so
+     * 10 MW reproduces the reference model exactly and 500 MW lands in the
+     * Uptime staffing-survey band (~0.3-0.5 FTE/MW at scale). Screening exponent
+     * 0.65; source: Uptime Institute staffing survey basis (see benchmark rail). */
+    const effMw = mw <= 10 ? mw : 10 * Math.pow(mw / 10, 0.65);
 
     // Base ratios per MW (from REFERENCE_STAFFING_10MW: 14 FTE / 10MW)
     const baseRatios = {
@@ -460,8 +467,10 @@ export function calculateAutoHeadcount(
     const rationale = {} as Record<'shift-lead' | 'engineer' | 'technician' | 'admin' | 'janitor', string>;
 
     for (const [role, baseRatio] of Object.entries(baseRatios) as [keyof typeof baseRatios, number][]) {
-        let count = baseRatio * mw;
-        const parts: string[] = [`${baseRatio}/MW x ${mw.toFixed(1)}MW = ${count.toFixed(1)}`];
+        let count = baseRatio * effMw;
+        const parts: string[] = [mw <= 10
+            ? `${baseRatio}/MW x ${mw.toFixed(1)}MW = ${count.toFixed(1)}`
+            : `${baseRatio}/MW x eff ${effMw.toFixed(1)}MW (scale^0.65 of ${mw.toFixed(0)}MW) = ${count.toFixed(1)}`];
 
         // Apply shift multiplier to shift roles
         if (role === 'shift-lead' || role === 'engineer') {

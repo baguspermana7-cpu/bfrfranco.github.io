@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.91.2 — 2026-07-19 (sub-linear staffing algorithm)
+
+### Fixed
+- **Auto headcount scaled LINEARLY per MW** (owner-caught: 834 FTE at 500 MW vs the Uptime benchmark 204 shown on the same page). `calculateAutoHeadcount` now applies economies of scale: effective MW = 10 x (MW/10)^0.65 above the 10 MW reference anchor — 10 MW reproduces the reference model exactly; 500 MW Tier-4 lands at ~203 FTE (benchmark 204). Per-role formula strings show the scale curve. Consumers (Staffing, Portfolio, Capacity engines) inherit automatically.
+
+---
+
 ## v1.91.1 — 2026-07-19 (chart tooltips dark-theme sweep)
 
 ### Fixed
