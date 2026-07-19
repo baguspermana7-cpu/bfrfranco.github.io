@@ -49,6 +49,69 @@
 
   <div class="ok">✅ SUDAH beres (otomatis, tak perlu diulang): <b>DATA.countries single-source</b> (32) + parity gate · engine <b>rz-engine.js v1.63.0 (321/0)</b> + 5 pillar engine baru (tier/fire/cdu/spares/decision) · DCMOC de-fake commissioning+site · 9 modul di-wire ke engine · 4 pillar baru di sidebar · kalkulator opex/carbon/tco single-source · UI/UX (tooltip, hover, AI Assistant modal). Halaman ini = <b>3 aksi manual</b> saja.</div>
 
+
+  <!-- OWNER ACTION BOARD (dipindah dari rz-ops per instruksi owner) -->
+  <div class="step" style="border-color:rgba(245,158,11,0.5);">
+    <h2><span class="num" style="background:#b45309;">📋</span> Owner Action Board — daftar hidup <span id="oaBadge" style="background:rgba(245,158,11,.18);color:#f59e0b;border-radius:10px;padding:1px 10px;font-size:0.75rem;font-weight:700;"></span></h2>
+    <p class="goal">Semua aksi yang hanya kamu bisa lakukan (Claude tidak punya akses/izin). Tick saat selesai — tersimpan lokal. Claude menambah item baru di sini setiap ada pekerjaan yang mentok butuh tanganmu.</p>
+    <div id="oaList" style="display:flex;flex-direction:column;gap:10px;"></div>
+  </div>
+
+  <script>
+  var OWNER_ACTIONS = [
+    { id:'github-token-rotate', added:'2026-07-17', title:'Ganti + revoke GitHub token (bocor di URL remote)',
+      why:'Rotasi kredensial GitHub = akun owner.',
+      steps:['Ikuti Step 1 di bawah (lengkap dengan perintah copy-paste)'] },
+    { id:'backend-deploy-v163', added:'2026-07-17', title:'Deploy backend engine v1.63.0 + tes',
+      why:'Deploy server = akses hosting owner.',
+      steps:['Ikuti Step 2 lalu Step 3 di bawah'] },
+    { id:'supabase-sql-step1', added:'2026-07-11', title:'Jalankan ulang SQL hardening Step 1 di Supabase (jika belum)',
+      why:'Butuh akses dashboard Supabase (kredensial owner).',
+      steps:['Supabase Dashboard \u2192 SQL Editor','Jalankan script Step 1 (profiles zero-client-write + RPC admin_set_tier) dari standarization/AUTH_STANDARD.md','Verifikasi: klien anon tidak bisa UPDATE profiles.tier'] },
+    { id:'supabase-edge-fn', added:'2026-07-11', title:'Deploy Edge Function admin-users (Step 2c) lalu jalankan Migrate',
+      why:'Deploy function + service_role hanya dari dashboard owner (secret tidak pernah di repo/browser).',
+      steps:['Supabase Dashboard \u2192 Edge Functions \u2192 New Function: admin-users (kode dari repo, Deno)','Deploy (service_role auto-injected)','rz-ops \u2192 panel Supabase Accounts \u2192 klik Migrate'] },
+    { id:'reset-exposed-pw', added:'2026-07-11', title:'Reset password akun bagus@/admin@ (dulu password publik)',
+      why:'Reset password akun nyata = keputusan + kredensial owner.',
+      steps:['rz-ops \u2192 Supabase Accounts \u2192 tombol \u26a0 Reset pada bagus@ dan admin@','Simpan password baru di password manager'] },
+    { id:'raise-spend-limit', added:'2026-07-19', title:'Naikkan monthly spend limit Claude',
+      why:'Limit billing hanya bisa diubah pemilik akun — fleet subagent sempat mati di tengah eksekusi DCMOC karena cap ini.',
+      steps:['Buka claude.ai/settings/usage','Naikkan monthly spend limit sesuai kebutuhan'] },
+    { id:'intro-music', added:'2026-07-03', title:'Sediakan track musik cinematic CC0 untuk intro video',
+      why:'Pilihan musik = selera owner; file disediakan manual.',
+      steps:['Cari track CC0 (mis. pixabay.com/music) durasi \u226590s','Simpan sebagai my-video/public/audio/intro-music.mp3','Bilang Claude \u2192 video di-render ulang (saat ini masih synth drone)'] },
+    { id:'dunia-taste-skill', added:'2026-06-28', title:'Instal taste-skill Dunia (terblokir classifier)',
+      why:'Instalasi skill diblokir platform classifier — butuh aksi sisi owner.',
+      steps:['Coba ulang instalasi dari sisi owner, atau sediakan file skill untuk dipasang manual'] }
+  ];
+  (function(){
+    var KEY='rz_owner_actions_v1';
+    var st={}; try{ st=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){}
+    function save(){ try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){} }
+    function render(){
+      var host=document.getElementById('oaList'); if(!host) return;
+      var open=0;
+      host.innerHTML=OWNER_ACTIONS.map(function(a){
+        var done=!!st[a.id]; if(!done) open++;
+        return '<div style="background:#0b1220;border:1px solid '+(done?'#1f2937':'#334155')+';border-radius:10px;padding:12px 14px;opacity:'+(done?'.55':'1')+'">'
+          +'<label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">'
+          +'<input type="checkbox" '+(done?'checked':'')+' data-oa="'+a.id+'" style="width:17px;height:17px;margin-top:2px;accent-color:#22c55e">'
+          +'<span style="flex:1">'
+          +'<b style="'+(done?'text-decoration:line-through;color:#64748b':'color:#e2e8f0')+'">'+a.title+'</b>'
+          +'<span style="display:block;font-size:0.72rem;color:#f59e0b;margin:2px 0 4px">Kenapa owner-only: '+a.why+'</span>'
+          +'<ol style="margin:0;padding-left:1.1rem;font-size:0.76rem;color:#94a3b8;line-height:1.5">'+a.steps.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ol>'
+          +'<span style="display:block;font-size:0.65rem;color:#475569;margin-top:4px">ditambahkan '+a.added+' \u00b7 id '+a.id+'</span>'
+          +'</span></label></div>';
+      }).join('');
+      var b=document.getElementById('oaBadge'); if(b) b.textContent=open?open+' terbuka':'semua selesai \u2713';
+      host.querySelectorAll('input[data-oa]').forEach(function(cb){
+        cb.addEventListener('change',function(){ st[cb.getAttribute('data-oa')]=cb.checked; save(); render(); });
+      });
+    }
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',render); else render();
+  })();
+  </script>
+
   <!-- STEP 1 — URGENT: token -->
   <div class="step urgent">
     <h2><span class="num red">1</span> WAJIB — Ganti GitHub token (bocor di URL remote)</h2>

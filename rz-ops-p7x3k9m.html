@@ -837,8 +837,8 @@
             <a class="nav-item" data-section="audit" onclick="showSection('audit')">
                 <i class="fas fa-clipboard-list"></i> Audit Log
             </a>
-            <a class="nav-item" data-section="owner-actions" onclick="showSection('owner-actions')">
-                <i class="fas fa-user-check"></i> Owner Actions <span id="oaBadge" style="margin-left:auto;background:rgba(245,158,11,.18);color:#f59e0b;border-radius:10px;padding:0 8px;font-size:0.7rem;font-weight:700"></span>
+            <a class="nav-item" href="setup-supabase.html" target="_blank" rel="noopener">
+                <i class="fas fa-user-check"></i> Owner Actions <i class="fas fa-external-link-alt" style="margin-left:auto;font-size:0.65rem;opacity:.6"></i>
             </a>
             <a class="nav-item" data-section="settings" onclick="showSection('settings')">
                 <i class="fas fa-cog"></i> Settings
@@ -946,67 +946,6 @@
 </div>
 
 <!-- ══════════════════════════════════════ REVENUE ══════════════════════════════════════ -->
-<div class="section" id="sec-owner-actions">
-    <div class="section-header">
-        <h1>Owner Actions</h1>
-        <p>Aksi yang hanya OWNER bisa lakukan — Claude tidak punya akses/izin untuk ini. Tick saat selesai (tersimpan lokal). Daftar ini di-update Claude setiap ada pekerjaan yang berakhir blocked-on-owner.</p>
-    </div>
-    <div id="oaList" style="display:flex;flex-direction:column;gap:12px"></div>
-</div>
-
-<script>
-/* ── OWNER ACTION BOARD ─────────────────────────────────────────────────────
- * Item baru ditambahkan Claude di array ini (append-only, id stabil).
- * Status tick per-item persist di localStorage rz_owner_actions_v1. */
-var OWNER_ACTIONS = [
-  { id:'supabase-sql-step1', added:'2026-07-11', title:'Jalankan ulang SQL hardening Step 1 di Supabase (jika belum)',
-    why:'Butuh akses dashboard Supabase (kredensial owner).',
-    steps:['Buka Supabase Dashboard → SQL Editor','Jalankan script Step 1 (profiles zero-client-write + RPC admin_set_tier) dari standarization/AUTH_STANDARD.md bagian Supabase','Verifikasi: klien anon tidak bisa UPDATE profiles.tier'] },
-  { id:'supabase-edge-fn', added:'2026-07-11', title:'Deploy Edge Function admin-users (Step 2c) lalu jalankan Migrate',
-    why:'Deploy function + service_role hanya bisa dari dashboard owner (secret tidak pernah ada di repo/browser).',
-    steps:['Supabase Dashboard → Edge Functions → New Function: admin-users (kode dari repo, Deno)','Deploy (service_role auto-injected)','Di rz-ops panel Supabase Accounts → klik Migrate','Selesai migrasi → lanjut item reset password'] },
-  { id:'reset-exposed-pw', added:'2026-07-11', title:'Reset password akun bagus@/admin@ (dulu memakai password publik)',
-    why:'Reset password akun nyata = keputusan + kredensial owner.',
-    steps:['rz-ops → Supabase Accounts → tombol ⚠ Reset pada bagus@ dan admin@','Simpan password baru di password manager'] },
-  { id:'raise-spend-limit', added:'2026-07-19', title:'Naikkan monthly spend limit Claude',
-    why:'Limit billing hanya bisa diubah pemilik akun — fleet subagent sempat mati di tengah eksekusi DCMOC karena cap ini.',
-    steps:['Buka claude.ai/settings/usage','Naikkan monthly spend limit sesuai kebutuhan'] },
-  { id:'intro-music', added:'2026-07-03', title:'Sediakan track musik cinematic CC0 untuk intro video',
-    why:'Pemilihan musik = keputusan rasa owner; file harus disediakan manual.',
-    steps:['Cari track CC0 (mis. pixabay.com/music) durasi ≥90s','Simpan sebagai my-video/public/audio/intro-music.mp3','Bilang Claude → video di-render ulang (saat ini masih synth drone)'] },
-  { id:'dunia-taste-skill', added:'2026-06-28', title:'Instal taste-skill Dunia (terblokir classifier)',
-    why:'Instalasi skill diblokir platform classifier — butuh approval/aksi sisi owner.',
-    steps:['Coba ulang instalasi dari sisi owner, atau','Sediakan alternatif file skill untuk dipasang manual'] }
-];
-(function(){
-  var KEY='rz_owner_actions_v1';
-  var st={}; try{ st=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){}
-  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){} }
-  function render(){
-    var host=document.getElementById('oaList'); if(!host) return;
-    var openCount=0;
-    host.innerHTML=OWNER_ACTIONS.map(function(a){
-      var done=!!st[a.id]; if(!done) openCount++;
-      return '<div class="fs-card" style="padding:1rem 1.25rem;opacity:'+(done?'.55':'1')+'">'
-        +'<div style="display:flex;align-items:flex-start;gap:12px">'
-        +'<input type="checkbox" '+(done?'checked':'')+' data-oa="'+a.id+'" style="width:18px;height:18px;margin-top:2px;accent-color:#22c55e;cursor:pointer">'
-        +'<div style="flex:1">'
-        +'<div style="font-weight:700;color:var(--fs-t1);font-size:0.95rem;'+(done?'text-decoration:line-through':'')+'">'+a.title+'</div>'
-        +'<div style="font-size:0.75rem;color:#f59e0b;margin:2px 0 6px">Kenapa owner-only: '+a.why+'</div>'
-        +'<ol style="margin:0;padding-left:1.1rem;font-size:0.78rem;color:var(--fs-t3);line-height:1.55">'
-        +a.steps.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ol>'
-        +'<div style="font-size:0.68rem;color:var(--fs-t4);margin-top:6px">ditambahkan '+a.added+' · id '+a.id+'</div>'
-        +'</div></div></div>';
-    }).join('');
-    var badge=document.getElementById('oaBadge'); if(badge) badge.textContent=openCount?String(openCount):'';
-    host.querySelectorAll('input[data-oa]').forEach(function(cb){
-      cb.addEventListener('change',function(){ st[cb.getAttribute('data-oa')]=cb.checked; save(); render(); });
-    });
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',render); else render();
-})();
-</script>
-
 <div class="section" id="sec-revenue">
     <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
         <div><h1>Revenue Analytics</h1><p>Subscription revenue, LTV, churn, and financial metrics</p></div>

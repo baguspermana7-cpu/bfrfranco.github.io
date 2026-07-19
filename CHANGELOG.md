@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.88.3 — 2026-07-19 (Owner Action Board pindah ke setup-supabase.html)
+
+### Changed
+- **Owner Action Board** dipindah dari rz-ops ke `setup-supabase.html` (halaman "Yang harus kamu lakukan" — rumah aslinya, per owner): 8 item hidup (rotasi GitHub token, deploy backend v1.63.0 + tes, SQL hardening Supabase, Edge Function admin-users + Migrate, reset password terekspos, naikkan spend limit Claude, musik intro CC0, taste-skill Dunia) dengan alasan owner-only + langkah + tick persist (`rz_owner_actions_v1`) + badge terbuka; item merujuk step detail ber-perintah di halaman yang sama. Nav rz-ops kini link eksternal ke halaman ini.
+
 ## v1.88.2 — 2026-07-19 (accuracy program M3-full: truth coverage across EVERY model family)
 
 ### Added
