@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.91.4 — 2026-07-19 (Maintenance Schedule performance — per-class aggregation)
+
+### Fixed
+- **Maintenance Schedule tab hung ~3 minutes at 500 MW** (owner-caught): the generator enumerated EVERY unit (x600 gensets, x15625 CRAC → ~300K+ event objects). Units now batch per class (≤26 stagger slots — beyond that duplicate slots add no scheduling information), each event carries `units` and hours multiply by batch size — ~130x fewer objects, totals identical, every task × frequency × stagger week still present. Batch labels show "(batch N — X units)".
+
+---
+
 ## v1.91.3 — 2026-07-19 (calc hygiene — Financial hardcodes bound to canonical sources)
 
 ### Fixed

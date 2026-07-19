@@ -3,6 +3,7 @@ import { AssetCount } from '@/lib/AssetGenerator';
 import { ASSETS, MaintenanceTask } from '@/constants/assets';
 
 export interface MaintenanceEvent {
+    units?: number;               // batch size (per-class aggregation, #327)
     id: string;
     assetId: string;
     assetName: string;
@@ -46,9 +47,20 @@ export const generateMaintenanceSchedule = (
         // e.g. Gen 1 in Week 2, Gen 2 in Week 3
         const spreadOffset = Math.ceil(weeksInYear / assetCount.count / 2); // Simple spacing logic
 
-        for (let i = 0; i < assetCount.count; i++) {
-            const unitName = `${assetTemplate.name} #${i + 1}`;
-            const unitOffset = i * 2; // Offset each unit by 2 weeks if possible
+        /* #327 PERF — per-CLASS aggregation. Enumerating every UNIT exploded to
+         * ~467k events at 500 MW (x600 gensets × tasks × weeks → 3-minute hang).
+         * Units are BATCHED: each batch shares a week slot and carries `units`
+         * (batch size); totals multiply by units. Content unchanged — every task
+         * × frequency × stagger week still appears, capped at 26 batches/class
+         * (staggering beyond 26 duplicate slots adds no information). */
+        const batches = Math.min(assetCount.count, 26);
+        const perBatch = assetCount.count / batches;
+        for (let i = 0; i < batches; i++) {
+            const unitsInBatch = Math.round(perBatch * (i + 1)) - Math.round(perBatch * i);
+            const unitName = batches === assetCount.count
+                ? `${assetTemplate.name} #${i + 1}`
+                : `${assetTemplate.name} (batch ${i + 1} — ${unitsInBatch} units)`;
+            const unitOffset = i * 2; // Offset each batch by 2 weeks if possible
 
             assetTemplate.maintenanceTasks.forEach((task) => {
                 const baseWeeks = getWeeks(task.frequency, (typeIndex + unitOffset) % 4); // Stagger by type too
@@ -74,7 +86,8 @@ export const generateMaintenanceSchedule = (
                         assetName: unitName,
                         task: task,
                         weekNumber: finalWeek,
-                        durationHours: task.standardHours,
+                        durationHours: task.standardHours * unitsInBatch,
+                        units: unitsInBatch,
                         techniciansRequired: task.category === 'Specialist' ? 0 : 2, // Assume specialist is vendor
                         color: color
                     });
