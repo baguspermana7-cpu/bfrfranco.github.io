@@ -84,7 +84,7 @@ export function AvailabilitySection({ derived }: { derived: ReqDerived }) {
     return (
         <SectionCard num="1.4" title="Availability Target" caption="Uptime Institute tier target drives the availability budget (engine-real)" id="sec-availability">
             <div className="grid gap-3 md:grid-cols-4">
-                <Field label="Target Tier">
+                <Field label="Target Tier" explainKey="tier">
                     <Segmented<number> value={inputs.tierLevel} onChange={(v) => writeSharedTier(v as 2 | 3 | 4)}
                         options={[...(inputs.tierLevel === 2 ? [{ value: 2, label: 'Tier II' }] : []), { value: 3, label: 'Tier III' }, { value: 4, label: 'Tier IV' }]} />
                 </Field>
@@ -94,7 +94,7 @@ export function AvailabilitySection({ derived }: { derived: ReqDerived }) {
                 <Field label="Downtime Budget">
                     <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 px-2 py-1.5 text-sm font-bold tabular-nums text-slate-900 dark:text-white">{derived.downtimeMinYr} min/yr</div>
                 </Field>
-                <Field label="SLA Target (%)" hint={sla != null && sla > derived.tierTargetPct ? 'Exceeds tier design availability!' : sla === derived.tierTargetPct ? 'predefined = tier target (editable)' : 'Defaults to tier target'}>
+                <Field label="SLA Target (%)" explainKey="sla" hint={sla != null && sla > derived.tierTargetPct ? 'Exceeds tier design availability!' : sla === derived.tierTargetPct ? 'predefined = tier target (editable)' : 'Defaults to tier target'}>
                     <NumInput value={sla} min={90} max={100} unit="%"
                         onChange={(v) => req.actions.setAvailability({ slaTargetPct: v })} />
                 </Field>
@@ -121,7 +121,7 @@ export function BusinessPrioritySection({ derived }: { derived: ReqDerived }) {
             <div className="grid gap-3 md:grid-cols-3">
                 <Field label="Budget (USD)" hint={b.budgetUsd != null && capexTotal != null && b.budgetUsd === Math.round(capexTotal * 1.2 / 1e5) * 1e5 ? 'predefined ≈ CAPEX P80 (editable)' : undefined}><NumInput value={b.budgetUsd} min={0} unit="USD" placeholder="Total budget"
                     onChange={(v) => req.actions.setBusiness({ budgetUsd: v })} /></Field>
-                <Field label="Design Margin" hint="Wired: writes CAPEX contingency % → investment cost & financial baseline move">
+                <Field label="Design Margin" explainKey="contingency" hint="Wired: writes CAPEX contingency % → investment cost & financial baseline move">
                     <CreatableCombobox<number> options={MARGIN_PRESETS} value={marginValue} min={0} max={30} unit="%"
                         onChange={(v) => setParam('req.designMarginPct', v == null ? 10 : v.value)} />
                 </Field>

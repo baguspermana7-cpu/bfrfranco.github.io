@@ -124,7 +124,7 @@ export function ProjectOverviewSection() {
                 <Field label="Target COD (Commercial Operation Date)" required>
                     <QuarterPicker value={o.targetCod} onChange={(v) => set({ targetCod: v })} />
                 </Field>
-                <Field label="Grid Voltage">
+                <Field label="Grid Voltage" explainKey="mv-switchgear">
                     <Segmented<GridVoltage> value={o.gridVoltage} onChange={(v) => set({ gridVoltage: v })}
                         options={(['11kV', '20kV', '33kV', '132kV', '220kV'] as GridVoltage[]).map((g) => ({ value: g, label: g }))} />
                 </Field>

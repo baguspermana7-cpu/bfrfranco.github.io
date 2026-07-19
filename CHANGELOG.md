@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.93.4 — 2026-07-19 (tooltip coverage — Field primitive cascade)
+
+### Added
+- **Every Requirements form label is now hoverable** (CC toward 100%): the shared `Field` primitive gains built-in hover — `explainKey` renders the RZExplain ⓘ panel (779-entry DB), otherwise the hint doubles as the hover title, otherwise a generated fallback — ONE primitive change cascades to all ~67 Field usages; cursor-help affordance on labels. First explain keys wired (tier, SLA, rack density, contingency/margin, grid voltage).
+
+---
+
 ## v1.93.3 — 2026-07-19 (predefined values batch 1 + cascading country select)
 
 ### Added

@@ -6,6 +6,7 @@
  * ──────────────────────────────────────────────────────────────────────── */
 
 import React from 'react';
+import { Explain } from '@/components/ui/Explain';
 
 export function SectionCard({ num, title, caption, id, children }: {
     num: string; title: string; caption?: string; id: string; children: React.ReactNode;
@@ -23,15 +24,20 @@ export function SectionCard({ num, title, caption, id, children }: {
     );
 }
 
-export function Field({ label, required, children, hint }: {
+export function Field({ label, required, children, hint, explainKey }: {
     label: string; required?: boolean; children: React.ReactNode; hint?: string;
+    /** CC — RZExplain DB key; when set, an ⓘ tooltip renders beside the label. */
+    explainKey?: string;
 }) {
     /* OWNER UX CONVENTION: editable INPUT areas carry a violet left-accent on the
-     * label — GENERATED values never do (they render as tinted read-only panels). */
+     * label — GENERATED values never do (they render as tinted read-only panels).
+     * CC cascade: EVERY Field label is hoverable — explainKey → RZExplain panel;
+     * else the hint doubles as the hover title; else a generated fallback. */
     return (
-        <label className="block">
-            <span className="mb-1 block border-l-2 border-violet-500 pl-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+        <label className="block" title={hint ?? `${label} — parameter input`}>
+            <span className="mb-1 flex items-center gap-1 border-l-2 border-violet-500 pl-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500 cursor-help">
                 {label}{required && <span className="text-violet-500 ml-0.5">*</span>}
+                {explainKey && <Explain k={explainKey} />}
             </span>
             {children}
             {hint && <span className="block text-[10px] text-slate-400 mt-0.5">{hint}</span>}
