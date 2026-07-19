@@ -21,6 +21,7 @@ import { applyUseCaseProfile, USE_CASE_TO_ENGINE } from '@/lib/requirementsMappi
 import { PlatformHeader, KpiChips } from '@/components/modules/platform/ScenariosPage';
 import { VALUE_BINDINGS, BINDING_GROUPS } from '@/lib/value-bindings';
 import ENGINE_CATALOG from '@/lib/engine-catalog.json';
+import RESEARCH_LIB from '@/lib/research-library.json';
 import { Database, Boxes, FolderOpen, HelpCircle, Zap, Wrench, ClipboardCheck, Users, Sun, Moon, Cpu, Server, Building, ArrowRight, CheckCircle2, Circle, ExternalLink } from 'lucide-react';
 
 function Head({ icon: Icon, title, sub, tone = 'from-cyan-500 to-blue-600' }: { icon: React.ElementType; title: string; sub: string; tone?: string }) {
@@ -400,6 +401,22 @@ export function KnowledgeDashboard() {
                             </div>
                         ))}
                     </div>
+                </Card>
+                <Card>
+                    <div className="mb-2 flex items-center gap-2">
+                        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Research Library — dokumen korpus publik ({RESEARCH_LIB.docs.length})</h2>
+                        <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">auto-generated</span>
+                    </div>
+                    <div className="space-y-1.5">
+                        {RESEARCH_LIB.docs.map((doc) => (
+                            <div key={doc.url} className="flex items-baseline gap-2 text-[11px]">
+                                <a href={doc.url} target="_blank" rel="noopener" className="font-medium text-cyan-600 dark:text-cyan-400 hover:underline">{doc.company}</a>
+                                <span className="text-[9px] text-slate-400">{doc.segment}</span>
+                                <span className="ml-auto text-[10px] tabular-nums text-slate-500">{doc.factCount} fakta · {doc.metrics.join(', ')}</span>
+                            </div>
+                        ))}
+                    </div>
+                    <p className="mt-1.5 text-[9px] text-slate-400">Sumber jurnal/laporan riset yang menyuplai korpus — setiap fakta tertelusur ke dokumen + kutipan aslinya (pipeline tools/dc-corpus).</p>
                 </Card>
                 <Card>
                     <a href="/glossary.html" target="_blank" className="inline-flex items-center gap-1.5 text-xs text-cyan-600 dark:text-cyan-400 hover:underline"><ExternalLink className="w-3.5 h-3.5" /> Open the full DC glossary</a>

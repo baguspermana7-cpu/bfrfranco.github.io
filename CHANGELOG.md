@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.93.9 — 2026-07-19 (EA6b — Research Library in the Knowledge Base)
+
+### Added
+- **Knowledge Base "Engine Models" tab gains a Research Library card** (owner: "journal/research masukkan ke knowledge base"): the corpus document index rendered from auto-generated `research-library.json` — each source document (Google Environmental Reports, operator sustainability hubs, Uptime/IEA pages) with a direct link, segment, fact count and metric coverage. The aggregate pipeline emits this index; corpus refresh updates the card automatically.
+
+---
+
 ## v1.93.8 — 2026-07-19 (Benchmarks — project position vs the live corpus)
 
 ### Added

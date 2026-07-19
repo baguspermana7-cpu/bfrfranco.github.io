@@ -53,4 +53,16 @@ if (!s.includes("'benchmarksCorpus':")) {
     s = s.replace(srcAnchor, `            'benchmarksCorpus':       { source: 'DC public-data corpus (tools/dc-corpus): operator/hyperscaler sustainability & annual reports + research bodies — every fact carries source_url + verbatim quote; distributions p10-p90 per metric x segment', asOf: '2026-07-19', method: 'markitdown ingestion + heuristic extraction + percentile aggregation; regenerate via the corpus pipeline (append-only)' },\n` + srcAnchor);
 }
 writeFileSync(ENGINE, s);
-console.log('AGGREGATE →', Object.keys(out).map((m) => `${m}(${Object.keys(out[m]).join(',')})`).join(' · '));
+
+/* EA6b — Research Library doc list for the Knowledge Base (auto-generated) */
+const docs = {};
+for (const f of facts) {
+    (docs[f.source_url] ??= { url: f.source_url, company: f.company, segment: f.segment, factCount: 0, metrics: new Set() });
+    docs[f.source_url].factCount++;
+    docs[f.source_url].metrics.add(f.metric);
+}
+const research = Object.values(docs).map((d) => ({ ...d, metrics: [...d.metrics].sort() }))
+    .sort((a, b) => b.factCount - a.factCount);
+writeFileSync(join(DIR, '..', '..', 'dcmoc', 'src', 'lib', 'research-library.json'),
+    JSON.stringify({ generated: '2026-07-19', note: 'AUTO-GENERATED doc index of the DC public-data corpus — regenerate via the corpus pipeline.', docs: research }, null, 1) + '\n');
+console.log('AGGREGATE →', Object.keys(out).map((m) => `${m}(${Object.keys(out[m]).join(',')})`).join(' · '), `· research docs: ${research.length}`);
