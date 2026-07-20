@@ -45,6 +45,7 @@ node   tools/audit-dark-coverage.mjs --strict      # NO white body/content in da
 node   tools/audit-article-charts.mjs --strict     # every article chart carries source + basisTag (v1.50.1)
 node   tools/audit-interactions.mjs --strict      # REAL-input gate: palette, living diagrams, scrolly, polish (v1.50.34)
 node   tools/audit-a11y.mjs --strict               # axe-core render gate: 0 critical/serious on 8-page set x both themes (v1.50.41)
+node   tools/audit-page-gates.mjs --strict         # tier access-gate: any page with #rootGate/.root-gate/<body class=locked> MUST call enforceTierFeatureAccess() + wire #rootLoginBtn (v1.99.x — LTC labs stayed locked for root)
 ```
 
 **Engine + accuracy tests** (v1.32.x accuracy-review work — gate any ship that touches the BMS cockpit pages):

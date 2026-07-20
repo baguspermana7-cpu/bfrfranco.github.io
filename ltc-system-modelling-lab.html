@@ -5527,7 +5527,28 @@
         </div>
     </div>
 
-    
+    <script>
+        /* ===== Tier-Feature Gate (root/pro/educator unlock; fail-closed for free/demo) ===== */
+        (function(){
+            function ag(){
+                if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){
+                    window._rzAuth.enforceTierFeatureAccess('ltc-system-modelling-lab');
+                }else{
+                    try{
+                        var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');
+                        var t=s&&s.tier,r=s&&s.role;
+                        var passes=!!s&&(t==='pro'||t==='root'||r==='root'||r==='pro'||r==='educator');
+                        document.body.classList.toggle('locked',!passes);
+                    }catch(e){document.body.classList.add('locked');}
+                }
+            }
+            var b=document.getElementById('rootLoginBtn');
+            if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();});
+            window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});
+            window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});
+            ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);
+        })();
+    </script>
 
     <script src="js/ltc-system-modelling-lab.js?v=2026-05-18" defer></script>
 
