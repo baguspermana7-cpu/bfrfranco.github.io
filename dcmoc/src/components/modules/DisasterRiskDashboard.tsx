@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { REVENUE_PER_KW_MONTH } from '@/lib/screening';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
-import { calculateDisasterRisk } from '@/modules/risk/DisasterRiskEngine';
-import { COUNTRIES } from '@/constants/countries';
+import { calculateDisasterRisk, DisasterRiskResult } from '@/modules/risk/DisasterRiskEngine';
+import { COUNTRIES, CountryProfile } from '@/constants/countries';
+import { rzModels, useEngineReady } from '@/lib/rz-engine';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
-import { CloudLightning, Shield, DollarSign, AlertTriangle, Waves, Mountain, Wind, Flame } from 'lucide-react';
+import { CloudLightning, Shield, DollarSign, AlertTriangle, Waves, Mountain, Wind, Flame, ChevronDown, ChevronUp, ArrowUpRight } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer, Cell,
     RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -22,9 +23,207 @@ const riskColors: Record<string, string> = {
     'Extreme': 'text-red-400 bg-red-500/10 border-red-500/30',
 };
 
+/* ─── DIAGNOSTICS Tier-2 (standarization/DIAGNOSTICS_STANDARD.md) ───────────
+ * Category thresholds — the SINGLE constant behind chip colouring (category →
+ * riskColors), the guidance-panel gate AND the collector. Values mirror
+ * DisasterRiskEngine's categorisation (score ≥70 Extreme, ≥45 High,
+ * ≥20 Moderate); runtime PARITY is verified against result.riskCategory —
+ * drift renders a warning chip instead of a silently wrong panel (rule 4). */
+export const RISK_CAT_THRESHOLDS = { extreme: 70, high: 45, moderate: 20 } as const;
+
+export const categoryFromScore = (score: number): DisasterRiskResult['riskCategory'] =>
+    score >= RISK_CAT_THRESHOLDS.extreme ? 'Extreme'
+        : score >= RISK_CAT_THRESHOLDS.high ? 'High'
+            : score >= RISK_CAT_THRESHOLDS.moderate ? 'Moderate' : 'Low';
+
+/** Amortization horizon for the structural adder — the engine's own
+ *  totalRiskAdjustedCost amortizes `structuralCostAdder / 20`; PhasedFinancial
+ *  folds the FULL adder into phase capex pro-rata IT load. Same constant here
+ *  so the panel's $/yr hardening figure matches the engine convention. */
+const STRUCTURAL_AMORT_YEARS = 20;
+
+const HAZARD_LABELS: Record<string, string> = {
+    seismic: 'Seismic', flood: 'Flood', typhoon: 'Typhoon/Cyclone',
+    volcano: 'Volcano', tsunami: 'Tsunami', wildfire: 'Wildfire',
+};
+
+/** Country hazard classes → 0-1 hazard levels — the SAME mapping
+ *  DisasterRiskEngine feeds `models.risk.geo`. Restated for the panel and
+ *  PARITY-VERIFIED against the live composite (rounded engine risk must equal
+ *  the rendered compositeScore) so any drift is reported, never hidden. */
+const hazardLevelsFromCountry = (nd: CountryProfile['naturalDisaster']) => ({
+    seismic: (nd?.seismicZone ?? 1) / 4,
+    flood: nd?.floodRisk === 'extreme' ? 1 : nd?.floodRisk === 'high' ? 0.7 : nd?.floodRisk === 'moderate' ? 0.4 : 0.1,
+    typhoon: nd?.typhoonRisk === 'high' ? 1 : nd?.typhoonRisk === 'moderate' ? 0.6 : nd?.typhoonRisk === 'low' ? 0.25 : 0,
+    volcano: nd?.volcanoRisk === 'moderate' ? 0.8 : nd?.volcanoRisk === 'low' ? 0.3 : 0,
+    tsunami: nd?.tsunamiRisk === 'high' ? 1 : nd?.tsunamiRisk === 'moderate' ? 0.6 : nd?.tsunamiRisk === 'low' ? 0.25 : 0,
+});
+
+export interface HazardContribution {
+    key: string;
+    label: string;
+    /** Raw model weight, % (engine DATA.geoRisk.weights or local fallback). */
+    weightPct: number;
+    /** Country hazard level 0-1 (1 = worst). */
+    level: number;
+    /** Points contributed to the 0-100 composite (weight renormalized over coverage × level). */
+    contribution: number;
+    /** Share of the composite, %. */
+    sharePct: number;
+}
+
+export interface HazardDecomposition {
+    /** 'engine' = live `models.risk.geo` breakdown; 'fallback' = local weighted scores. */
+    mode: 'engine' | 'fallback';
+    rows: HazardContribution[];
+    /** Un-rounded composite the rows sum to. */
+    total: number;
+    /** Rounded total equals the rendered compositeScore (rule-4 parity chip). */
+    parityOk: boolean;
+    /** Engine weight coverage (engine mode; <1 = weights renormalized, wildfire excluded). */
+    coverage?: number;
+    insuranceBand?: string;
+}
+
+/** Per-hazard decomposition of the composite score — engine-live when
+ *  `models.risk.geo` is available (same call path calculateDisasterRisk uses),
+ *  local riskBreakdown weights otherwise. Pure; safe for the collector. */
+export function buildHazardDecomposition(country: CountryProfile, result: DisasterRiskResult): HazardDecomposition {
+    const geoFn = rzModels().risk?.geo;
+    if (typeof geoFn === 'function') {
+        const geo = geoFn(hazardLevelsFromCountry(country.naturalDisaster));
+        const total: number = geo.risk || 0;
+        const rows: HazardContribution[] = (geo.breakdown as { key: string; weight: number; level: number }[])
+            .map(b => {
+                const contribution = geo.coverage > 0 ? (100 * b.weight * b.level) / geo.coverage : 0;
+                return {
+                    key: b.key,
+                    label: HAZARD_LABELS[b.key] ?? b.key,
+                    weightPct: b.weight * 100,
+                    level: b.level,
+                    contribution,
+                    sharePct: total > 0 ? (contribution / total) * 100 : 0,
+                };
+            })
+            .sort((a, b) => b.contribution - a.contribution);
+        return {
+            mode: 'engine',
+            rows,
+            total,
+            parityOk: Math.min(100, Math.round(total)) === result.compositeScore,
+            coverage: geo.coverage,
+            insuranceBand: geo.band,
+        };
+    }
+    // Engine absent → decompose with the local fallback the engine itself used
+    // (riskBreakdown weights incl. wildfire): contribution = score × weight%.
+    const rows: HazardContribution[] = result.riskBreakdown
+        .map(r => ({
+            key: r.type, label: r.type, weightPct: r.weight, level: r.score / 100,
+            contribution: (r.score * r.weight) / 100, sharePct: 0,
+        }))
+        .sort((a, b) => b.contribution - a.contribution);
+    const total = rows.reduce((s, r) => s + r.contribution, 0);
+    const withShare = rows.map(r => ({ ...r, sharePct: total > 0 ? (r.contribution / total) * 100 : 0 }));
+    return { mode: 'fallback', rows: withShare, total, parityOk: Math.min(100, Math.round(total)) === result.compositeScore };
+}
+
+export interface MitigationLever {
+    name: string;
+    cost: number;
+    /** $/yr avoided, on the SAME basis the engine's ROI formula used. */
+    savedPerYr: number;
+    basis: 'EAL' | 'revenue-at-risk';
+    roi: number;
+    /** true when the engine's published ROI reproduces from (basis, cost) — parity check. */
+    roiVerified: boolean;
+    description: string;
+}
+
+/** Measured mitigation levers from the SAME calculateDisasterRisk output the
+ *  page renders. The engine prices each option's benefit as either
+ *  EAL×reduction (physical hardening, 20-yr ROI) or revenueAtRisk×reduction
+ *  (DR site, annual ROI) — we detect the basis by REPRODUCING the engine's own
+ *  ROI number instead of guessing, and flag the lever honestly if neither
+ *  reproduces (roiVerified:false). No re-implemented math, no invented $. */
+export function mitigationLevers(result: DisasterRiskResult): MitigationLever[] {
+    return result.mitigationOptions
+        .map(o => {
+            const ealSaved = (result.expectedAnnualLoss * o.riskReduction) / 100;
+            const revSaved = (result.revenueAtRisk * o.riskReduction) / 100;
+            const roiEal = Math.round(((ealSaved * STRUCTURAL_AMORT_YEARS) / Math.max(1, o.cost)) * 100) / 100;
+            const roiRev = Math.round((revSaved / Math.max(1, o.cost)) * 100) / 100;
+            const isEal = Math.abs(o.roi - roiEal) <= 0.02;
+            const isRev = !isEal && Math.abs(o.roi - roiRev) <= 0.02;
+            return {
+                name: o.name,
+                cost: o.cost,
+                savedPerYr: Math.round(isRev ? revSaved : ealSaved),
+                basis: (isRev ? 'revenue-at-risk' : 'EAL') as MitigationLever['basis'],
+                roi: o.roi,
+                roiVerified: isEal || isRev,
+                description: o.description,
+            };
+        })
+        .sort((a, b) => b.roi - a.roi);
+}
+
+/** Diagnostics finding — canonical shape for the cross-module Diagnostics Center. */
+export interface Finding {
+    surface: 'disaster';
+    severity: 'critical' | 'warning';
+    metric: string;
+    value: number;
+    threshold: number;
+    linkTab: 'disaster';
+    title: string;
+    detail: string;
+}
+
+export interface DisasterDiagnosticsModel {
+    result: DisasterRiskResult | null;
+    country: CountryProfile | null;
+}
+
+/** Diagnostics Tier-2 collector — pure function over the SAME
+ *  calculateDisasterRisk output the dashboard renders (linkTab:'disaster').
+ *  Fires on riskCategory High (warning) / Extreme (critical), gated by the
+ *  same RISK_CAT_THRESHOLDS constants that colour the chip. */
+export function collectDisasterDiagnostics(model: DisasterDiagnosticsModel): Finding[] {
+    const { result, country } = model;
+    if (!result || !country) return [];
+    const category = categoryFromScore(result.compositeScore);
+    if (category !== 'High' && category !== 'Extreme') return [];
+    const threshold = category === 'Extreme' ? RISK_CAT_THRESHOLDS.extreme : RISK_CAT_THRESHOLDS.high;
+    const decomp = buildHazardDecomposition(country, result);
+    const top = decomp.rows[0];
+    const levers = mitigationLevers(result);
+    const best = levers[0];
+    const structuralPerYr = Math.round(result.structuralCostAdder / STRUCTURAL_AMORT_YEARS);
+    const hardeningText = result.structuralCostAdder > 0
+        ? `hardening ${fmtMoney(result.structuralCostAdder)} capex ≈ ${fmtMoney(structuralPerYr)}/yr @${STRUCTURAL_AMORT_YEARS}yr`
+        : 'hardening: model tidak punya structural adder untuk negara ini (structuralReinforcement 0% CAPEX) — lever tidak derivable';
+    const leverText = best
+        ? `Lever terukur terbaik: ${best.name} ${fmtMoney(best.cost)} → −${fmtMoney(best.savedPerYr)}/yr (basis ${best.basis}, ROI ${best.roi}x${best.roiVerified ? '' : ', basis tidak terverifikasi vs engine ROI'}).`
+        : 'Model tidak menghasilkan opsi mitigasi untuk profil ini — dalam model, skor hanya turun lewat pemilihan lokasi.';
+    return [{
+        surface: 'disaster',
+        severity: category === 'Extreme' ? 'critical' : 'warning',
+        metric: 'compositeScore',
+        value: result.compositeScore,
+        threshold,
+        linkTab: 'disaster',
+        title: `Disaster risk ${category}: composite ${result.compositeScore}/100 ≥ ambang ${threshold}`,
+        detail: `Kontributor terbesar: ${top ? `${top.label} ${top.contribution.toFixed(1)} pts (${top.sharePct.toFixed(0)}% komposit, ${decomp.mode === 'engine' ? 'engine models.risk.geo' : 'fallback lokal'})` : 'n/a'}. ` +
+            `Beban tahunan: asuransi ${fmtMoney(result.annualInsuranceCost)}/yr + EAL ${fmtMoney(result.expectedAnnualLoss)}/yr + ${hardeningText}. ${leverText}`,
+    }];
+}
+
 const DisasterRiskDashboard = () => {
-    const { selectedCountry, inputs } = useSimulationStore();
+    const { selectedCountry, inputs, actions } = useSimulationStore();
     const capexStore = useCapexStore();
+    const engineReady = useEngineReady(); // DF2 — recompute once models.risk.geo arrives
+    const [showGuidance, setShowGuidance] = useState(false);
 
     const result = useMemo(() => {
         if (!selectedCountry) return null;
@@ -37,7 +236,19 @@ const DisasterRiskDashboard = () => {
             itLoadKw: itLoad,
             annualRevenue,
         });
-    }, [selectedCountry, inputs, capexStore]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedCountry, inputs, capexStore, engineReady]);
+
+    // Guidance model — SAME thresholds as the chip colouring + collector.
+    const decomp = useMemo(
+        () => (result && selectedCountry ? buildHazardDecomposition(selectedCountry, result) : null),
+        [result, selectedCountry],
+    );
+    const levers = useMemo(() => (result ? mitigationLevers(result) : []), [result]);
+    const derivedCategory = result ? categoryFromScore(result.compositeScore) : null;
+    const categoryParityOk = !result || derivedCategory === result.riskCategory;
+    const guidanceEligible = derivedCategory === 'High' || derivedCategory === 'Extreme';
+    const categoryThreshold = derivedCategory === 'Extreme' ? RISK_CAT_THRESHOLDS.extreme : RISK_CAT_THRESHOLDS.high;
 
     const countryRiskData = useMemo(() => {
         return Object.values(COUNTRIES)
@@ -80,12 +291,30 @@ const DisasterRiskDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <AlertTriangle className="w-4 h-4 text-orange-500" />
                             <span className="text-xs text-slate-500 uppercase">Risk Score</span>
-                            <Tooltip content="Composite disaster risk score (0-100). Higher = more dangerous. Weighted: seismic 28%, flood 22%, typhoon 18%, volcano 12%, tsunami 10%, wildfire 10%." />
+                            <Tooltip content={`Composite disaster risk score (0-100). Higher = more dangerous. Live weighting (${decomp?.mode === 'engine' ? 'engine models.risk.geo' : 'local fallback'}): ${decomp ? decomp.rows.map(r => `${r.label} ${fmt(r.weightPct)}%`).join(', ') : '—'}.`} />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{result.compositeScore}</div>
-                        <div className={`text-xs mt-1 px-2 py-0.5 rounded border w-fit ${riskColors[result.riskCategory]}`}>
-                            {result.riskCategory}
-                        </div>
+                        {guidanceEligible && derivedCategory ? (
+                            <button
+                                type="button"
+                                onClick={() => setShowGuidance(v => !v)}
+                                aria-expanded={showGuidance}
+                                className={`text-xs mt-1 px-2 py-0.5 rounded border w-fit flex items-center gap-1 cursor-pointer hover:brightness-125 transition ${riskColors[derivedCategory]}`}
+                                title={`Composite ${result.compositeScore}/100 ≥ ambang ${categoryThreshold} — klik untuk dekomposisi per hazard + trade-off mitigasi`}
+                            >
+                                {derivedCategory} — mengapa?
+                                {showGuidance ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                            </button>
+                        ) : (
+                            <div className={`text-xs mt-1 px-2 py-0.5 rounded border w-fit ${riskColors[derivedCategory ?? result.riskCategory]}`}>
+                                {derivedCategory ?? result.riskCategory}
+                            </div>
+                        )}
+                        {!categoryParityOk && (
+                            <div className="text-[10px] mt-1 text-amber-500">
+                                ⚠ kategori engine ({result.riskCategory}) ≠ ambang panel ({derivedCategory}) — threshold drift
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
 
@@ -148,6 +377,155 @@ const DisasterRiskDashboard = () => {
                 </Card>
             </div>
 
+            {/* ── Tier-2 guidance panel: dekomposisi + trade-off mitigasi (DIAGNOSTICS_STANDARD) ── */}
+            {showGuidance && guidanceEligible && decomp && derivedCategory && (
+                <Card className="bg-white dark:bg-slate-800/50 border-orange-300 dark:border-orange-500/40">
+                    <CardContent className="pt-5 space-y-4">
+                        {/* (a) ALASAN — angka live dari model yang sama dengan render */}
+                        <div className="flex items-start justify-between gap-3 flex-wrap">
+                            <div>
+                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <AlertTriangle className={`w-4 h-4 ${derivedCategory === 'Extreme' ? 'text-red-500' : 'text-orange-500'}`} />
+                                    Mengapa {derivedCategory}? Composite {result.compositeScore}/100 ≥ ambang {categoryThreshold}
+                                </h3>
+                                <p className="text-xs text-slate-500 mt-1">
+                                    Dekomposisi per hazard — bobot model × level hazard negara ({selectedCountry.name}),{' '}
+                                    {decomp.mode === 'engine' ? 'live dari engine models.risk.geo (DATA.geoRisk.weights)' : 'fallback lokal (engine tidak tersedia)'}.
+                                </p>
+                            </div>
+                            <span className={`text-[10px] px-2 py-0.5 rounded border h-fit ${decomp.parityOk
+                                ? 'text-emerald-500 border-emerald-500/40 bg-emerald-500/10'
+                                : 'text-amber-500 border-amber-500/40 bg-amber-500/10'}`}>
+                                {decomp.parityOk
+                                    ? `≡ engine: Σ kontribusi ${decomp.total.toFixed(1)} → ${result.compositeScore}`
+                                    : `⚠ dekomposisi drift: Σ ${decomp.total.toFixed(1)} ≠ composite ${result.compositeScore} — angka di bawah indikatif`}
+                            </span>
+                        </div>
+
+                        <div className="space-y-1.5">
+                            {decomp.rows.map((r, i) => (
+                                <div key={r.key} className={`flex items-center gap-3 text-xs p-1.5 rounded ${i === 0 ? 'bg-orange-500/10' : 'bg-slate-50 dark:bg-slate-900/30'}`}>
+                                    <span className="w-32 shrink-0 text-slate-700 dark:text-slate-300">
+                                        {r.label}{i === 0 && <span className="ml-1 text-[10px] text-orange-500 font-semibold">← terbesar</span>}
+                                    </span>
+                                    <span className="w-28 shrink-0 font-mono text-slate-500">
+                                        {fmt(r.weightPct)}% × {(r.level * 100).toFixed(0)}/100
+                                    </span>
+                                    <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
+                                        <div
+                                            className={`h-1.5 rounded-full ${i === 0 ? 'bg-orange-500' : 'bg-slate-400 dark:bg-slate-500'}`}
+                                            style={{ width: `${Math.min(100, decomp.total > 0 ? (r.contribution / decomp.total) * 100 : 0)}%` }}
+                                        />
+                                    </div>
+                                    <span className="w-24 shrink-0 text-right font-mono text-slate-900 dark:text-white">
+                                        {r.contribution.toFixed(1)} pts ({r.sharePct.toFixed(0)}%)
+                                    </span>
+                                </div>
+                            ))}
+                            {decomp.mode === 'engine' && decomp.coverage != null && decomp.coverage < 1 && (
+                                <p className="text-[10px] text-slate-500">
+                                    Bobot engine dinormalisasi atas coverage {decomp.coverage.toFixed(2)} — wildfire tidak masuk komposit engine
+                                    (tampil di radar dengan bobot fallback lokal 10%).
+                                </p>
+                            )}
+                        </div>
+
+                        {/* (b) LEVER TERUKUR — trade-off tahunan, semua angka live dari result */}
+                        <div>
+                            <h4 className="text-xs font-semibold uppercase text-slate-500 mb-2">Trade-off mitigasi (angka live, basis tahunan)</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                                <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-700">
+                                    <div className="text-slate-500 mb-1">Premi asuransi</div>
+                                    <div className="text-base font-bold text-slate-900 dark:text-white">{fmtMoney(result.annualInsuranceCost)}/yr</div>
+                                    <div className="text-slate-500 mt-1">
+                                        {(selectedCountry.naturalDisaster?.insuranceMultiplier ?? 1.0)}x multiplier
+                                        {decomp.insuranceBand ? ` · band engine: ${decomp.insuranceBand}` : ''} · {result.insuranceTrend}
+                                    </div>
+                                </div>
+                                <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-700">
+                                    <div className="text-slate-500 mb-1">Structural hardening</div>
+                                    {result.structuralCostAdder > 0 ? (
+                                        <>
+                                            <div className="text-base font-bold text-slate-900 dark:text-white">
+                                                ≈ {fmtMoney(Math.round(result.structuralCostAdder / STRUCTURAL_AMORT_YEARS))}/yr
+                                            </div>
+                                            <div className="text-slate-500 mt-1">
+                                                {fmtMoney(result.structuralCostAdder)} capex ({((selectedCountry.naturalDisaster?.structuralReinforcement ?? 0) * 100).toFixed(0)}% CAPEX),
+                                                amortisasi {STRUCTURAL_AMORT_YEARS} th — adder yang sama masuk capex fase di Phased Financial (pro-rata IT load).
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="text-slate-500">
+                                            Model tidak punya structural adder untuk negara ini (structuralReinforcement 0% CAPEX) —
+                                            lever hardening tidak derivable dari model.
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-700">
+                                    <div className="text-slate-500 mb-1">Expected annual loss (EAL)</div>
+                                    <div className="text-base font-bold text-slate-900 dark:text-white">{fmtMoney(result.expectedAnnualLoss)}/yr</div>
+                                    <div className="text-slate-500 mt-1">
+                                        + interupsi {result.businessInterruptionDays} hari/yr → revenue-at-risk {fmtMoney(result.revenueAtRisk)}/yr.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {levers.length > 0 ? (
+                            <div>
+                                <h4 className="text-xs font-semibold uppercase text-slate-500 mb-2">Lever terukur (dari mitigationOptions engine, urut ROI)</h4>
+                                <div className="space-y-1.5">
+                                    {levers.map((l, i) => (
+                                        <div key={l.name} className={`flex items-center justify-between gap-3 text-xs p-2 rounded ${i === 0 ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-slate-50 dark:bg-slate-900/30'}`}>
+                                            <span className="text-slate-700 dark:text-slate-300">{l.name}</span>
+                                            <span className="font-mono text-right text-slate-900 dark:text-white shrink-0">
+                                                {fmtMoney(l.cost)} → −{fmtMoney(l.savedPerYr)}/yr <span className="text-slate-500">({l.basis})</span> · ROI {l.roi}x
+                                                {!l.roiVerified && <span className="text-amber-500"> · basis tak terverifikasi vs engine</span>}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <p className="text-xs text-slate-500">
+                                Model tidak menghasilkan opsi mitigasi untuk profil ini — tidak ada lever capex yang derivable.
+                            </p>
+                        )}
+
+                        {/* Honest scope + (c) navigasi ke parameter */}
+                        <div className="pt-2 border-t border-slate-200 dark:border-slate-700 space-y-2">
+                            <p className="text-[11px] text-slate-500">
+                                Jujur soal jangkauan lever: dalam model, opsi mitigasi menurunkan EAL / revenue-at-risk —
+                                <span className="font-semibold"> tidak menurunkan composite score</span> (skor = atribut hazard negara:
+                                zona seismik, kelas banjir, dst.). Satu-satunya lever skor dalam model adalah pemilihan lokasi
+                                {(() => {
+                                    const safer = countryRiskData.filter(c => c.score < RISK_CAT_THRESHOLDS.high && c.code !== selectedCountry.id).slice(0, 3);
+                                    return safer.length > 0
+                                        ? ` — ${safer.length}+ profil negara di bawah ambang High (<${RISK_CAT_THRESHOLDS.high}), mis. ${safer.map(c => `${c.country} (${c.score})`).join(', ')}.`
+                                        : '.';
+                                })()}
+                            </p>
+                            <div className="flex gap-2 flex-wrap">
+                                <button
+                                    type="button"
+                                    onClick={() => actions.setActiveTab('site')}
+                                    className="text-xs px-2.5 py-1 rounded border border-cyan-500/40 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10 flex items-center gap-1"
+                                >
+                                    Site Intelligence — bandingkan lokasi <ArrowUpRight className="w-3 h-3" />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => document.getElementById('disaster-hazard-detail')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                                    className="text-xs px-2.5 py-1 rounded border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-500/10 flex items-center gap-1"
+                                >
+                                    Detail per-hazard di radar <ArrowUpRight className="w-3 h-3" />
+                                </button>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Risk Radar */}
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
@@ -163,7 +541,7 @@ const DisasterRiskDashboard = () => {
                         </ResponsiveContainer>
 
                         {/* Risk Detail Table */}
-                        <div className="mt-4 space-y-2">
+                        <div id="disaster-hazard-detail" className="mt-4 space-y-2">
                             {result.riskBreakdown.map(r => (
                                 <div key={r.type} className="flex items-center justify-between text-sm p-2 rounded bg-slate-50 dark:bg-slate-900/30">
                                     <span className="text-slate-600 dark:text-slate-400">{r.type}</span>

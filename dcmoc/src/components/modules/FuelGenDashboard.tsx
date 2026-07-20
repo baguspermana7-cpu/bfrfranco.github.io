@@ -2,10 +2,12 @@
 
 import React, { useMemo, useState } from 'react';
 import { useSimulationStore } from '@/store/simulation';
-import { calculateFuelGen, FuelGenResult, EditableParam, TestingRegime } from '@/modules/infrastructure/FuelGenEngine';
+import { calculateFuelGen, FuelGenResult, FuelGenInput, EditableParam, TestingRegime } from '@/modules/infrastructure/FuelGenEngine';
+import { calculateGridReliability } from '@/modules/infrastructure/GridReliabilityEngine';
+import { rzData, useEngineReady } from '@/lib/rz-engine';
 import {
     Fuel, Pencil, Check, X, Gauge, Droplets, Calendar, DollarSign,
-    BarChart3, Globe, AlertTriangle, Flame, Clock, Truck
+    BarChart3, AlertTriangle, Flame, Clock, Truck, ArrowUpRight
 } from 'lucide-react';
 import clsx from 'clsx';
 import { fmtCompact, fmtMoney } from '@/lib/format';
@@ -21,13 +23,55 @@ const paramTooltips: Record<string, string> = {
 
 type TabId = 'overview' | 'consumption' | 'testing' | 'comparison' | 'environmental';
 
+/* ─── Diagnostics Tier-2: genset CO₂ (DIAGNOSTICS_STANDARD.md) ───────────────
+ * SINGLE SOURCE for (a) the environmental CO₂ card red coloring, (b) the
+ * click-to-explain panel gating, and (c) collectFuelGenDiagnostics — never
+ * duplicate the literal at a call site. The existing card rendered red
+ * unconditionally; the constant makes that gate explicit: any positive diesel
+ * Scope-1 tonnage is a red (reportable) exposure. */
+const CO2_RED_THRESHOLD_T = 0;        // t/yr — CO₂ > 0 → red card + panel + finding
+const CO2_KG_PER_LITER = 2.68;        // DEFRA diesel factor — same 2.68 the engine + card text use
+const FUELGEN_TAB = 'fuel-gen';       // shell tab hosting this page
+const GRID_TAB = 'grid';              // shell tab hosting the blended outage engine (run-hours driver)
+
+const co2Fails = (tons: number): boolean => tons > CO2_RED_THRESHOLD_T;
+
+/** Diagnostics finding — canonical Diagnostics Center shape (per standard §5). */
+export interface Finding {
+    surface: string;
+    severity: 'high' | 'medium';
+    metric: string;
+    value: number;
+    threshold: number;
+    linkTab: string;
+}
+
+/**
+ * Tier-2 collector — pure function over the SAME calculateFuelGen result the
+ * page renders (no hooks, no DOM), so a future Diagnostics Center can call it
+ * headlessly with identical numbers.
+ */
+export function collectFuelGenDiagnostics(model: FuelGenResult): Finding[] {
+    if (!co2Fails(model.co2EmissionsTonsPerYear)) return [];
+    return [{
+        surface: 'Infrastructure · Fuel & Generator',
+        severity: 'medium', // Scope-1 screening exposure — cost/compliance, not availability risk
+        metric: 'Genset CO₂ (Scope 1)',
+        value: model.co2EmissionsTonsPerYear,
+        threshold: CO2_RED_THRESHOLD_T,
+        linkTab: FUELGEN_TAB,
+    }];
+}
+
 export default function FuelGenDashboard() {
-    const { selectedCountry, inputs } = useSimulationStore();
+    const { selectedCountry, inputs, actions } = useSimulationStore();
     const [activeTab, setActiveTab] = useState<TabId>('overview');
     const [overrides, setOverrides] = useState<Record<string, number>>({});
     const [editingKey, setEditingKey] = useState<string | null>(null);
     const [editValue, setEditValue] = useState<string>('');
     const [testingRegime, setTestingRegime] = useState<TestingRegime>('minimal');
+    const [co2Open, setCo2Open] = useState(false);
+    const engineReady = useEngineReady(); // re-run envCosts memo once rz-engine.min.js lands
 
     const result = useMemo<FuelGenResult | null>(() => {
         if (!selectedCountry) return null;
@@ -39,7 +83,56 @@ export default function FuelGenDashboard() {
             coolingTopology: inputs.coolingTopology,
             powerRedundancy: inputs.powerRedundancy,
             testingRegime,
-            overrides: Object.keys(overrides).length > 0 ? overrides as any : undefined,
+            overrides: Object.keys(overrides).length > 0 ? overrides as FuelGenInput['overrides'] : undefined,
+        });
+    }, [selectedCountry, inputs.itLoad, inputs.tierLevel, inputs.coolingType, inputs.coolingTopology, inputs.powerRedundancy, testingRegime, overrides]);
+
+    /* ── Diagnostics Tier-2 models (all levers = measured re-runs / engine data,
+     * never fabricated numbers) ────────────────────────────────────────────── */
+
+    // Carbon price — engine DATA.envCosts, same read pattern as the
+    // Sustainability Engine page: country compliance price when a scheme
+    // exists, labeled voluntary-offset fallback otherwise.
+    const carbon = useMemo(() => {
+        const ec = rzData()?.envCosts;
+        if (!ec?.carbonPriceUsdPerT) return null; // engine absent → panel says so honestly
+        const cid = (selectedCountry?.id ?? 'US').toUpperCase();
+        const compliancePrice: number | undefined = ec.carbonPriceUsdPerT[cid];
+        const hasScheme = compliancePrice != null && compliancePrice > 0;
+        const rate: number = hasScheme ? compliancePrice : (ec.voluntaryOffsetUsdPerT ?? 10);
+        return { hasScheme, rate };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedCountry, engineReady]);
+
+    // Blended outage estimate — the SAME GridReliabilityEngine the Grid tab
+    // renders (0.5·SAIDI + 0.5·event blend), for the run-hours lever context.
+    const gridBlended = useMemo(() => {
+        if (!selectedCountry) return null;
+        const g = calculateGridReliability({
+            country: selectedCountry,
+            itLoadKw: inputs.itLoad,
+            tierLevel: inputs.tierLevel,
+            coolingType: inputs.coolingType,
+        });
+        return {
+            outageHoursPerYear: Math.round((g.annualOutageMinutes / 60) * 10) / 10,
+            annualExpectedOutages: g.annualExpectedOutages,
+        };
+    }, [selectedCountry, inputs.itLoad, inputs.tierLevel, inputs.coolingType]);
+
+    // Discrete re-run of the SAME fuel model at the other testing regime —
+    // measured run-hours lever (complete → minimal), not a generic tip.
+    const altRegimeResult = useMemo<FuelGenResult | null>(() => {
+        if (!selectedCountry) return null;
+        return calculateFuelGen({
+            country: selectedCountry,
+            itLoadKw: inputs.itLoad,
+            tierLevel: inputs.tierLevel,
+            coolingType: inputs.coolingType,
+            coolingTopology: inputs.coolingTopology,
+            powerRedundancy: inputs.powerRedundancy,
+            testingRegime: testingRegime === 'minimal' ? 'complete' : 'minimal',
+            overrides: Object.keys(overrides).length > 0 ? overrides as FuelGenInput['overrides'] : undefined,
         });
     }, [selectedCountry, inputs.itLoad, inputs.tierLevel, inputs.coolingType, inputs.coolingTopology, inputs.powerRedundancy, testingRegime, overrides]);
 
@@ -404,9 +497,26 @@ export default function FuelGenDashboard() {
                                     <Tooltip content="Environmental impact assessment and regulatory compliance requirements for on-site diesel generator operation. Includes emissions, permits, containment, and reporting obligations." />
                                 </h4>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="p-4 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-200 dark:border-red-800">
+                                    <div className={clsx(
+                                        "p-4 rounded-lg border",
+                                        co2Fails(result.co2EmissionsTonsPerYear)
+                                            ? "bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800"
+                                            : "bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800"
+                                    )}>
                                         <div className="text-xs text-red-600 dark:text-red-400 font-medium flex items-center gap-1">CO₂ Emissions<Tooltip content="Total Scope 1 carbon dioxide emissions from diesel combustion. Calculated at 2.68 kgCO₂ per liter, the standard DEFRA emission factor for diesel fuel." /></div>
-                                        <div className="text-2xl font-bold text-red-700 dark:text-red-300 mt-1">{result.co2EmissionsTonsPerYear} t/yr</div>
+                                        {co2Fails(result.co2EmissionsTonsPerYear) ? (
+                                            <button
+                                                type="button"
+                                                onClick={() => setCo2Open(o => !o)}
+                                                aria-expanded={co2Open}
+                                                title={`CO₂ genset ${result.co2EmissionsTonsPerYear} t/yr > ambang ${CO2_RED_THRESHOLD_T} t/yr. Klik untuk basis perhitungan + lever terukur (HVO, offset, run-hours) dari model yang sama.`}
+                                                className="text-2xl font-bold text-red-700 dark:text-red-300 mt-1 cursor-pointer underline decoration-dotted underline-offset-4"
+                                            >
+                                                {result.co2EmissionsTonsPerYear} t/yr
+                                            </button>
+                                        ) : (
+                                            <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-300 mt-1">{result.co2EmissionsTonsPerYear} t/yr</div>
+                                        )}
                                         <div className="text-[10px] text-red-500 mt-1">2.68 kgCO₂ per liter diesel</div>
                                     </div>
                                     <div className="p-4 bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-200 dark:border-green-800">
@@ -415,6 +525,129 @@ export default function FuelGenDashboard() {
                                         <div className="text-[10px] text-green-500 mt-1">Annual permits & reporting</div>
                                     </div>
                                 </div>
+
+                                {/* ── Diagnostics Tier-2 panel: why the CO₂ number is red + measured levers ── */}
+                                {co2Open && co2Fails(result.co2EmissionsTonsPerYear) && (() => {
+                                    const co2T = result.co2EmissionsTonsPerYear;
+                                    const liters = result.consumption.totalLitersPerYear;
+                                    // Parity check (standard §4): re-state the engine formula from the SAME
+                                    // rendered consumption and verify against the live engine number.
+                                    const recomputedKg = liters * CO2_KG_PER_LITER;
+                                    const parity = Math.abs(recomputedKg - result.co2EmissionsKgPerYear) < 3; // rounding tolerance (litres + kg both rounded)
+                                    const toT = (l: number) => Math.round((l * CO2_KG_PER_LITER) / 1000 * 10) / 10;
+                                    const srcRows = [
+                                        { label: 'Testing', liters: result.consumption.annualTestLiters },
+                                        { label: 'Grid outages', liters: result.consumption.annualOutageLiters },
+                                        { label: 'Fuel polishing', liters: result.consumption.annualPolishingLiters },
+                                    ];
+                                    const outageT = toT(result.consumption.annualOutageLiters);
+                                    const outagePct = liters > 0 ? Math.round(result.consumption.annualOutageLiters / liters * 100) : 0;
+                                    const hvo = result.hvo;
+                                    const hvoResidualT = hvo ? Math.max(0, Math.round((co2T - hvo.co2SavingsTonsPerYear) * 10) / 10) : null;
+                                    const hvoAbatement = hvo && hvo.co2SavingsTonsPerYear > 0
+                                        ? Math.round(hvo.annualDeltaVsDieselUsd / hvo.co2SavingsTonsPerYear)
+                                        : null;
+                                    const altT = altRegimeResult?.co2EmissionsTonsPerYear ?? null;
+                                    return (
+                                        <div className="p-4 rounded-lg border text-left bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800/40 space-y-3">
+                                            {/* (a) Why red — basis from the same model the card renders */}
+                                            <div>
+                                                <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1">
+                                                    Kenapa merah — basis emisi (model FuelGen yang sama)
+                                                </div>
+                                                <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-mono">
+                                                    {fmtCompact(liters)} L diesel/yr × {CO2_KG_PER_LITER} kgCO₂/L = {fmtCompact(recomputedKg)} kg ≈ {co2T} t/yr
+                                                    {parity ? (
+                                                        <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">≡ engine</span>
+                                                    ) : (
+                                                        <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300" title="Dekomposisi tidak lagi cocok dengan output engine — angka kartu tetap dari engine; faktor di atas indikatif.">≠ engine — angka kartu yang berlaku</span>
+                                                    )}
+                                                </p>
+                                                <div className="mt-1.5 space-y-0.5">
+                                                    {srcRows.map(r => (
+                                                        <div key={r.label} className="flex items-center gap-2 text-[11px]">
+                                                            <span className="w-28 shrink-0 text-slate-500 dark:text-slate-400">{r.label}</span>
+                                                            <span className="font-mono text-slate-700 dark:text-slate-300">{fmtCompact(r.liters)} L → {toT(r.liters)} t/yr</span>
+                                                            <span className="text-slate-400 dark:text-slate-500">({liters > 0 ? Math.round(r.liters / liters * 100) : 0}%)</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                                                    Ambang pewarnaan: merah bila CO₂ &gt; {CO2_RED_THRESHOLD_T} t/yr — setiap tonase Scope-1 positif adalah exposure pelaporan (konstanta yang sama memberi warna kartu, membuka panel ini, dan mengisi collector).
+                                                </p>
+                                            </div>
+
+                                            {/* (b) Measured levers */}
+                                            <div>
+                                                <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">
+                                                    Lever terukur (dihitung dari model / engine yang sama)
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    {/* Lever 1 — HVO swap (engine hvo comparison; honest when unavailable) */}
+                                                    {hvo ? (
+                                                        <div className="flex items-start gap-2 p-2 rounded-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
+                                                            <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">Ganti HVO100</span>
+                                                            <span className="flex-1 text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
+                                                                {fmtCompact(hvo.annualLiters)} L/yr (×1.03 densitas energi) × ${hvo.hvoPriceWithTax}/L = {fmtMoney(hvo.annualFuelCostUsd)}/yr — {hvo.annualDeltaVsDieselUsd >= 0 ? `premium +${fmtMoney(hvo.annualDeltaVsDieselUsd)}` : `hemat ${fmtMoney(Math.abs(hvo.annualDeltaVsDieselUsd))}`}/yr vs diesel. CO₂ −{hvo.co2SavingsTonsPerYear} t/yr (−90% lifecycle, EN 15940) → sisa {hvoResidualT} t/yr.
+                                                                {hvoAbatement != null && (
+                                                                    <> Abatement ≈ ${hvoAbatement.toLocaleString()}/tCO₂{carbon ? ` (harga karbon negara $${carbon.rate}/t — HVO ${hvoAbatement <= carbon.rate ? 'lebih murah' : 'lebih mahal'} per ton dihindari)` : ''}.</>
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex items-start gap-2 p-2 rounded-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
+                                                            <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">HVO100</span>
+                                                            <span className="flex-1 text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
+                                                                HVO belum tersedia di {selectedCountry?.name ?? 'negara ini'} — data negara tidak memuat pasokan/harga HVO, jadi delta biaya tidak dapat dihitung (dilaporkan, bukan disembunyikan). Reduksi −90% lifecycle baru berlaku bila pasokan lokal ada.
+                                                            </span>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Lever 2 — carbon offset cost (engine DATA.envCosts country price) */}
+                                                    <div className="flex items-start gap-2 p-2 rounded-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
+                                                        <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300">Offset karbon</span>
+                                                        <span className="flex-1 text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
+                                                            {carbon ? (
+                                                                <>{co2T} t/yr × ${carbon.rate}/t ({carbon.hasScheme ? 'harga compliance negara' : 'voluntary offset — negara tanpa skema compliance'}) = {fmtMoney(Math.round(co2T * carbon.rate))}/yr — engine DATA.envCosts (World Bank / OECD / NCCS 2025-26).</>
+                                                            ) : (
+                                                                <>Engine DATA.envCosts belum termuat — biaya offset tidak dapat dihitung pada render ini (bukan $0).</>
+                                                            )}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Lever 3 — reduce run-hours (decomposed outage share + blended grid engine) */}
+                                                    <div className="flex items-start gap-2 p-2 rounded-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
+                                                        <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">Kurangi run-hours</span>
+                                                        <span className="flex-1 text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
+                                                            Runtime outage grid menyumbang {fmtCompact(result.consumption.annualOutageLiters)} L → {outageT} t/yr ({outagePct}% dari CO₂). Menghilangkannya (grid lebih andal / dual feed): CO₂ {co2T} → {Math.round((co2T - outageT) * 10) / 10} t/yr.
+                                                            {gridBlended && (
+                                                                <> Blended outage engine memperkirakan {gridBlended.outageHoursPerYear} jam outage/yr ({gridBlended.annualExpectedOutages} kejadian) untuk negara ini.</>
+                                                            )}
+                                                            {' '}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => actions.setActiveTab(GRID_TAB)}
+                                                                className="inline-flex items-center gap-0.5 text-cyan-600 dark:text-cyan-400 underline decoration-dotted underline-offset-2"
+                                                                title="Buka Grid Reliability — driver outage (SAIDI + brownout) dan mitigasinya dimodelkan di sana."
+                                                            >
+                                                                Grid Reliability<ArrowUpRight className="w-3 h-3" />
+                                                            </button>
+                                                            {testingRegime === 'complete' && altT != null ? (
+                                                                <> · Turunkan regime testing Complete → Minimal (re-run model yang sama): CO₂ {co2T} → {altT} t/yr (−{Math.round((co2T - altT) * 10) / 10} t), fuel {fmtMoney(result.cost.annualFuelCostUsd)} → {fmtMoney(altRegimeResult!.cost.annualFuelCostUsd)}/yr — trade-off vs NFPA 110 best practice, bukan rekomendasi otomatis.</>
+                                                            ) : (
+                                                                <> · Regime testing sudah Minimal — sisa run-hours didorong keandalan grid (dan jadwal test wajib), bukan jadwal test berlebih{altT != null ? ` (Complete akan menaikkan CO₂ ke ${altT} t/yr)` : ''}.</>
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 leading-snug">
+                                                    Catatan jujur: selama genset tetap diesel dan wajib diuji, CO₂ tidak dapat mencapai 0 t/yr — lever di atas mengecilkan atau meng-offset tonase, tidak menghapusnya. Faktor 2.68 kg/L adalah basis DEFRA yang sama dengan kartu.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+
                                 <div className="space-y-2">
                                     <h5 className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">Compliance Checklist<Tooltip content="Key environmental and safety requirements for on-site diesel generator installations. Items marked REQUIRED are mandated by local regulations; others are recommended best practices." /></h5>
                                     {[

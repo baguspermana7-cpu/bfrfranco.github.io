@@ -40,6 +40,14 @@ import { fmtMoney, fmtMoneyFull } from '@/lib/format';
 
 type SectionId = 'kpis' | 'cost' | 'tco' | 'capex-shift' | 'risk' | 'insights' | 'maintStrategy' | 'sensitivity' | 'sankey';
 
+/* ─── DIAGNOSTICS_STANDARD — insight high-severity wajib bawa root-cause ───
+ * RichInsight menambah `detail` (root-cause dgn angka live) + `rule` (teks
+ * rule yang menghasilkan insight; fallback render bila detail tidak ada). */
+type RichInsight = ReportInsight & { detail?: string; rule?: string };
+
+/** Satu konstanta rule finansial — dipakai severity + teks rule (tanpa literal duplikat). */
+const INSIGHT_PAYBACK_STRONG_YRS = 3;
+
 const REPORT_SECTIONS: { id: SectionId; label: string; icon: React.ReactNode }[] = [
     { id: 'kpis', label: 'KPI Summary', icon: <BarChart3 className="w-3.5 h-3.5" /> },
     { id: 'cost', label: 'Cost Capitulation', icon: <DollarSign className="w-3.5 h-3.5" /> },
@@ -302,10 +310,42 @@ export function ReportDashboard() {
         // Narratives
         const staffingNarrative = generateStaffingNarrative(selectedCountry, { eng: engResults, tech: techResults }, inputs.shiftModel);
 
-        // Manual Insights Construction
-        const baseInsights: ReportInsight[] = [
-            { title: 'Strong Financials', description: 'Project NPV is positive with < 3 year payback.', category: 'Financial', severity: 'low', recommendation: 'Proceed to design.' },
-            { title: 'Staffing Risk', description: 'Turnover in region is high. Recommend retention bonus.', category: 'Operational', severity: 'medium', recommendation: 'Budget 5% for retention.' }
+        /* Insight DERIVED dari rule + angka LIVE financialResult (model
+         * calculateFinancials yang SAMA dgn render) — dulu hardcode "NPV is
+         * positive with < 3 year payback" tanpa cek data, bisa menyesatkan.
+         * Staffing memakai generateStaffingNarrative (overtime/headcount live). */
+        const npvLive = financialResult.npv;
+        const paybackLive = financialResult.paybackPeriodYears;
+        const financialInsight: RichInsight = npvLive > 0 && paybackLive <= INSIGHT_PAYBACK_STRONG_YRS
+            ? {
+                title: 'Strong Financials', category: 'Financial', severity: 'low',
+                description: `Project NPV ${fmtMoney(npvLive)} is positive with a ${paybackLive.toFixed(1)}-year payback (≤ ${INSIGHT_PAYBACK_STRONG_YRS} yr).`,
+                recommendation: 'Proceed to design.',
+                rule: `Rule: NPV > $0 AND payback ≤ ${INSIGHT_PAYBACK_STRONG_YRS} yr → low severity.`,
+            }
+            : npvLive > 0
+                ? {
+                    title: 'Moderate Financials', category: 'Financial', severity: 'medium',
+                    description: `Project NPV ${fmtMoney(npvLive)} is positive but payback ${paybackLive.toFixed(1)} yr exceeds the ${INSIGHT_PAYBACK_STRONG_YRS}-yr target.`,
+                    recommendation: 'Review revenue ramp and CAPEX phasing to shorten payback.',
+                    rule: `Rule: NPV > $0 AND payback > ${INSIGHT_PAYBACK_STRONG_YRS} yr → medium severity.`,
+                }
+                : {
+                    title: 'Negative NPV', category: 'Financial', severity: 'high',
+                    description: `Project NPV ${fmtMoney(npvLive)} is negative — IRR ${financialResult.irr.toFixed(1)}% is below the 8% discount rate` +
+                        `${Number.isFinite(paybackLive) && paybackLive > 0 && paybackLive <= projectLifeYears ? `; payback ${paybackLive.toFixed(1)} yr` : '; payback beyond project life'}.`,
+                    recommendation: 'Review CAPEX basis (CAPEX Engine) and the revenue assumption (Requirements) before proceeding.',
+                    detail: `Root cause (angka live): CAPEX ${fmtMoney(capexResults.total)} + OPEX tahunan ${fmtMoney(opexAnnual)} ` +
+                        `(labor ${fmtMoney(totalMonthlyLabor * 12)} + maintenance ${fmtMoney(stratCost)}) vs basis revenue ` +
+                        `$${DEFAULT_REVENUE_PER_KW_MONTH}/kW·mo @ IT load ${inputs.itLoad.toLocaleString()} kW, discount 8%, ${projectLifeYears} yr → NPV ${fmtMoney(npvLive)}.`,
+                    rule: 'Rule: NPV ≤ $0 → high severity.',
+                };
+        const baseInsights: RichInsight[] = [
+            financialInsight,
+            ...staffingNarrative.map((si): RichInsight => ({
+                ...si,
+                rule: 'Rule (NarrativeEngine.generateStaffingNarrative): headcount summary selalu tampil (low); overtime engineer > 10 hr/minggu → high. Angka live ada di description.',
+            })),
         ];
 
         // Roster
@@ -1056,6 +1096,18 @@ export function ReportDashboard() {
                                     <div className="text-xs font-semibold text-cyan-600 dark:text-cyan-500 mb-1 uppercase">Recommendation</div>
                                     <div className="text-sm text-slate-700 dark:text-slate-300">{insight.recommendation}</div>
                                 </div>
+                                {/* DIAGNOSTICS_STANDARD §1 — severity high wajib expandable root-cause:
+                                    render `detail` (angka live) bila ada, else teks rule penghasil insight */}
+                                {insight.severity === 'high' && (
+                                    <details className="mt-3">
+                                        <summary className="text-xs font-semibold text-red-600 dark:text-red-400 uppercase cursor-pointer select-none">
+                                            Root Cause
+                                        </summary>
+                                        <p className="mt-2 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                                            {insight.detail ?? insight.rule ?? insight.description}
+                                        </p>
+                                    </details>
+                                )}
                             </div>
                         ))}
                     </div>

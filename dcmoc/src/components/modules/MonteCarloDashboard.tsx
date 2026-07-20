@@ -26,6 +26,56 @@ import { fmtMoney } from '@/lib/format';
 
 type MCTab = 'distributions' | 'statistics' | 'risk' | 'convergence' | 'scatter';
 
+/* ─── DIAGNOSTICS_STANDARD §2 — SATU konstanta untuk pewarnaan + gate panel +
+ * collector (dilarang literal duplikat). P(NPV<0) di atas RED = merah + panel
+ * guidance wajib; di atas AMBER = kuning. ─────────────────────────────────── */
+export const MC_PROB_NPV_NEG_RED = 0.3;
+export const MC_PROB_NPV_NEG_AMBER = 0.05;
+/** Re-run singkat per variabel-dimatikan untuk atribusi driver (murah:
+ *  ~9 × 2.000 iterasi ≪ run utama 10.000; seed sama = deterministik). */
+const MC_ATTRIB_ITERATIONS = 2000;
+/** Kontribusi minimum (percentage point) supaya variabel dianggap driver/lever —
+ *  di bawah ini = noise sampling pada MC_ATTRIB_ITERATIONS (1 iterasi ≈ 0.05 pp). */
+const MC_DRIVER_MIN_PP = 0.5;
+
+/* ─── Diagnostics collector (kontrak Diagnostics Center — DIAGNOSTICS_STANDARD §5) ───
+ * Pure function, no hooks. Driver diambil dari tornado hasil run existing
+ * (tanpa re-run — kolektor harus murah); atribusi re-run per-variabel yang
+ * lebih presisi ada di panel on-page (klik kartu P(NPV<0)). */
+export interface MonteCarloFinding {
+    surface: 'montecarlo';
+    severity: 'critical' | 'warning';
+    metric: 'probNpvNegative';
+    value: number;
+    threshold: number;
+    linkTab: 'montecarlo';
+    title: string;
+    detail: string;
+}
+
+export function collectMonteCarloDiagnostics(model: { result: MonteCarloResult | null }): MonteCarloFinding[] {
+    const r = model.result;
+    if (!r || r.probNpvNegative <= MC_PROB_NPV_NEG_AMBER) return [];
+    const critical = r.probNpvNegative > MC_PROB_NPV_NEG_RED;
+    const threshold = critical ? MC_PROB_NPV_NEG_RED : MC_PROB_NPV_NEG_AMBER;
+    const top = r.sensitivity[0];
+    const driverNote = top
+        ? ` Driver korelasi terbesar (tornado run utama ${r.iterations.toLocaleString()} iterasi): ${top.variable} (r=${top.correlation.toFixed(2)}).`
+        : '';
+    return [{
+        surface: 'montecarlo',
+        severity: critical ? 'critical' : 'warning',
+        metric: 'probNpvNegative',
+        value: r.probNpvNegative,
+        threshold,
+        linkTab: 'montecarlo',
+        title: `P(NPV<0) ${(r.probNpvNegative * 100).toFixed(1)}% > ambang ${(threshold * 100).toFixed(0)}%`,
+        detail: `${(r.probNpvNegative * 100).toFixed(1)}% dari ${r.iterations.toLocaleString()} iterasi menghasilkan NPV negatif ` +
+            `(mean NPV ${fmtMoney(r.npvStats.mean)}, P5 ${fmtMoney(r.npvStats.p5)}).${driverNote} ` +
+            `Buka tab Risk Metrics → klik kartu P(NPV<0) untuk atribusi per-variabel + lever kunci-variabel.`,
+    }];
+}
+
 export default function MonteCarloDashboard() {
     const { selectedCountry, inputs, actions: simActions } = useSimulationStore();
     const capexStore = useCapexStore();
@@ -274,7 +324,15 @@ export default function MonteCarloDashboard() {
 
                             {activeTab === 'distributions' && <DistributionsTab result={result} />}
                             {activeTab === 'statistics' && <StatisticsTab result={result} />}
-                            {activeTab === 'risk' && <RiskTab result={result} />}
+                            {activeTab === 'risk' && (
+                                <RiskTab
+                                    result={result}
+                                    baseInputs={baseFinancialInputs}
+                                    variables={variables}
+                                    seed={seed}
+                                    onNavigate={(t) => simActions.setActiveTab(t)}
+                                />
+                            )}
                             {activeTab === 'convergence' && <ConvergenceTab result={result} />}
                             {activeTab === 'scatter' && <ScatterTab result={result} />}
                         </>
@@ -411,7 +469,44 @@ function StatisticsTab({ result }: { result: MonteCarloResult }) {
 
 // ─── RISK METRICS TAB ───────────────────────────────────────
 
-function RiskTab({ result }: { result: MonteCarloResult }) {
+function RiskTab({ result, baseInputs, variables, seed, onNavigate }: {
+    result: MonteCarloResult;
+    baseInputs: FinancialInputs | null;
+    variables: StochasticVariable[];
+    seed: number;
+    onNavigate: (tab: 'requirements' | 'capex') => void;
+}) {
+    const [showNpvPanel, setShowNpvPanel] = useState(false);
+    const npvRiskRed = result.probNpvNegative > MC_PROB_NPV_NEG_RED;
+
+    /* Atribusi driver ketidakpastian — RE-RUN SINGKAT per variabel dimatikan
+     * (MC_ATTRIB_ITERATIONS iterasi, seed sama → deterministik & murah).
+     * Dihitung lazy hanya saat panel dibuka. JUJUR: ini run ulang pendek,
+     * bukan run utama — P dasar re-run ditampilkan berdampingan. */
+    const attribution = useMemo(() => {
+        if (!showNpvPanel || !baseInputs) return null;
+        const enabled = variables.filter(v => v.enabled);
+        const pBase = runMonteCarlo(baseInputs, variables, MC_ATTRIB_ITERATIONS, seed).probNpvNegative;
+        const rows = enabled.map(v => {
+            const res = runMonteCarlo(
+                baseInputs,
+                variables.map(x => x.id === v.id ? { ...x, enabled: false } : x),
+                MC_ATTRIB_ITERATIONS,
+                seed,
+            );
+            return {
+                id: v.id,
+                name: v.name,
+                pWithout: res.probNpvNegative,
+                deltaPp: (pBase - res.probNpvNegative) * 100,
+            };
+        }).sort((a, b) => b.deltaPp - a.deltaPp);
+        return { pBase, rows };
+    }, [showNpvPanel, baseInputs, variables, seed]);
+
+    const topDriver = attribution?.rows.find(r => r.deltaPp >= MC_DRIVER_MIN_PP) ?? null;
+    const topTornado = result.sensitivity[0];
+
     return (
         <div className="space-y-4">
             {/* VaR Cards */}
@@ -427,10 +522,12 @@ function RiskTab({ result }: { result: MonteCarloResult }) {
                 <RiskCard
                     icon={<AlertTriangle className="w-5 h-5 text-amber-500" />}
                     label="P(NPV < 0)"
-                    tip="Percentage of simulation runs resulting in negative NPV. Key decision metric for risk-averse investors. Above 20% is generally considered high risk."
+                    tip={`Percentage of simulation runs resulting in negative NPV. Key decision metric for risk-averse investors. Above ${(MC_PROB_NPV_NEG_RED * 100).toFixed(0)}% is treated as high risk (red) on this dashboard.`}
                     value={`${(result.probNpvNegative * 100).toFixed(1)}%`}
                     description="Probability of a negative net present value"
-                    severity={result.probNpvNegative > 0.2 ? 'high' : result.probNpvNegative > 0.05 ? 'medium' : 'low'}
+                    severity={npvRiskRed ? 'high' : result.probNpvNegative > MC_PROB_NPV_NEG_AMBER ? 'medium' : 'low'}
+                    onClick={npvRiskRed ? () => setShowNpvPanel(p => !p) : undefined}
+                    clickHint={npvRiskRed ? (showNpvPanel ? 'tutup diagnosis ▲' : 'klik: driver + lever ▼') : undefined}
                 />
                 <RiskCard
                     icon={<Activity className="w-5 h-5 text-purple-500" />}
@@ -441,6 +538,88 @@ function RiskTab({ result }: { result: MonteCarloResult }) {
                     severity={result.probIrrBelow10 > 0.3 ? 'high' : result.probIrrBelow10 > 0.1 ? 'medium' : 'low'}
                 />
             </div>
+
+            {/* ── Guidance panel: kenapa P(NPV<0) merah + driver + lever (DIAGNOSTICS_STANDARD §1) ── */}
+            {npvRiskRed && showNpvPanel && (
+                <div className="rounded-xl border-2 border-red-300 dark:border-red-800 bg-red-50/50 dark:bg-red-950/20 p-4 space-y-3">
+                    <h4 className="text-sm font-bold text-red-700 dark:text-red-400 flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4" />
+                        Kenapa P(NPV&lt;0) {(result.probNpvNegative * 100).toFixed(1)}% &gt; ambang {(MC_PROB_NPV_NEG_RED * 100).toFixed(0)}%?
+                    </h4>
+                    <p className="text-xs text-slate-700 dark:text-slate-300">
+                        {(result.probNpvNegative * 100).toFixed(1)}% dari {result.iterations.toLocaleString()} iterasi menghasilkan NPV negatif
+                        — mean NPV <span className="font-mono">{fmtMoney(result.npvStats.mean)}</span>, P5 <span className="font-mono">{fmtMoney(result.npvStats.p5)}</span>.
+                    </p>
+
+                    {attribution ? (
+                        <>
+                            <div>
+                                <div className="text-[11px] font-semibold uppercase text-slate-500 dark:text-slate-400 mb-1">
+                                    Driver ketidakpastian (variabel dimatikan → P turun berapa)
+                                </div>
+                                <div className="space-y-1">
+                                    {attribution.rows.map(row => (
+                                        <div key={row.id} className="flex items-center justify-between text-xs">
+                                            <span className="text-slate-700 dark:text-slate-300">{row.name}</span>
+                                            <span className="font-mono text-slate-600 dark:text-slate-400">
+                                                dimatikan → P {(row.pWithout * 100).toFixed(1)}%
+                                                <span className={clsx('ml-2 font-semibold', row.deltaPp >= MC_DRIVER_MIN_PP ? 'text-red-500' : 'text-slate-400')}>
+                                                    ({row.deltaPp >= 0 ? '+' : ''}{row.deltaPp.toFixed(1)} pp kontribusi)
+                                                </span>
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Lever terukur — atau kejujuran bila tak ada satu variabel yang cukup */}
+                            {topDriver ? (
+                                <div className="rounded-lg bg-white dark:bg-slate-900/50 border border-red-200 dark:border-red-800/50 p-3">
+                                    <div className="text-[11px] font-semibold uppercase text-emerald-600 dark:text-emerald-400 mb-1">Lever</div>
+                                    <p className="text-xs text-slate-700 dark:text-slate-300">
+                                        Kunci <span className="font-semibold">{topDriver.name}</span> (mis. kontrak fixed-price / hedging)
+                                        → P(NPV&lt;0) turun {(attribution.pBase * 100).toFixed(1)}% → <span className="font-mono font-semibold">{(topDriver.pWithout * 100).toFixed(1)}%</span>
+                                        {' '}(−{topDriver.deltaPp.toFixed(1)} pp).
+                                        {topDriver.pWithout > MC_PROB_NPV_NEG_RED && (
+                                            <span className="text-amber-600 dark:text-amber-400"> Masih di atas ambang {(MC_PROB_NPV_NEG_RED * 100).toFixed(0)}% — mengunci satu variabel saja tidak cukup; perbaiki juga basis revenue/CAPEX.</span>
+                                        )}
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="rounded-lg bg-white dark:bg-slate-900/50 border border-amber-200 dark:border-amber-800/50 p-3">
+                                    <p className="text-xs text-slate-700 dark:text-slate-300">
+                                        <span className="font-semibold text-amber-600 dark:text-amber-400">Jujur:</span> tidak ada satu variabel yang jika dikunci menurunkan
+                                        P(NPV&lt;0) secara berarti — risiko didorong <span className="font-semibold">level basis</span> (mean NPV {fmtMoney(result.npvStats.mean)}),
+                                        bukan lebar ketidakpastian. Perbaiki basis revenue / CAPEX di bawah.
+                                    </p>
+                                </div>
+                            )}
+
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                                Metode (jujur): atribusi via re-run singkat {MC_ATTRIB_ITERATIONS.toLocaleString()} iterasi per variabel dimatikan
+                                (seed {seed} sama, deterministik) — bukan run utama {result.iterations.toLocaleString()} iterasi.
+                                P dasar re-run {(attribution.pBase * 100).toFixed(1)}% vs run utama {(result.probNpvNegative * 100).toFixed(1)}%.
+                                {topTornado && <> Cross-check tornado run utama: {topTornado.variable} r={topTornado.correlation.toFixed(2)}.</>}
+                            </p>
+                        </>
+                    ) : (
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                            {topTornado
+                                ? <>Driver dari tornado run utama: <span className="font-semibold">{topTornado.variable}</span> (r={topTornado.correlation.toFixed(2)}) — atribusi per-variabel butuh base inputs project (pilih country).</>
+                                : 'Atribusi per-variabel butuh base inputs project (pilih country).'}
+                        </p>
+                    )}
+
+                    <div className="flex gap-3 pt-1">
+                        <button onClick={() => onNavigate('requirements')} className="text-[11px] font-medium text-violet-500 hover:underline">
+                            ↗ Basis revenue (Requirements)
+                        </button>
+                        <button onClick={() => onNavigate('capex')} className="text-[11px] font-medium text-violet-500 hover:underline">
+                            ↗ Basis CAPEX (CAPEX Engine)
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Tornado Chart — Variable Sensitivity */}
             <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
@@ -478,17 +657,20 @@ function RiskTab({ result }: { result: MonteCarloResult }) {
     );
 }
 
-function RiskCard({ icon, label, tip, value, description, severity }: {
+function RiskCard({ icon, label, tip, value, description, severity, onClick, clickHint }: {
     icon: React.ReactNode;
     label: string;
     tip?: string;
     value: string;
     description: string;
     severity: 'low' | 'medium' | 'high';
+    /** DIAGNOSTICS_STANDARD §1 — indikator merah wajib klik-able ke panel guidance. */
+    onClick?: () => void;
+    clickHint?: string;
 }) {
     const borderColor = severity === 'high' ? 'border-red-300 dark:border-red-800' : severity === 'medium' ? 'border-amber-300 dark:border-amber-800' : 'border-emerald-300 dark:border-emerald-800';
-    return (
-        <div className={clsx('bg-white dark:bg-slate-800/50 rounded-xl border-2 p-4', borderColor)}>
+    const body = (
+        <>
             <div className="flex items-center gap-2 mb-2">
                 {icon}
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">{label}</span>
@@ -496,6 +678,23 @@ function RiskCard({ icon, label, tip, value, description, severity }: {
             </div>
             <div className="text-2xl font-bold text-slate-900 dark:text-white">{value}</div>
             <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">{description}</p>
+            {clickHint && <p className="text-[10px] font-semibold text-red-500 mt-1">{clickHint}</p>}
+        </>
+    );
+    if (onClick) {
+        return (
+            <button
+                type="button"
+                onClick={onClick}
+                className={clsx('bg-white dark:bg-slate-800/50 rounded-xl border-2 p-4 text-left w-full cursor-pointer hover:bg-red-50/50 dark:hover:bg-red-950/20 transition-colors', borderColor)}
+            >
+                {body}
+            </button>
+        );
+    }
+    return (
+        <div className={clsx('bg-white dark:bg-slate-800/50 rounded-xl border-2 p-4', borderColor)}>
+            {body}
         </div>
     );
 }

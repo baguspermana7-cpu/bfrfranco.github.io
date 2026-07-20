@@ -6,6 +6,7 @@ import { COUNTRIES } from '@/constants/countries';
 import { calculateCapex } from '@/lib/CapexEngine';
 import { calculateFinancials, defaultOccupancyRamp } from '@/modules/analytics/FinancialEngine';
 import { calculateStaffing } from '@/modules/staffing/ShiftEngine';
+import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
 import { GitCompare, X, ArrowLeftRight } from 'lucide-react';
 import clsx from 'clsx';
@@ -80,7 +81,10 @@ export function ScenarioComparisonPanel() {
             const financialResult = calculateFinancials({
                 totalCapex: capexResult.total,
                 annualOpex,
-                revenuePerKwMonth: 120,
+                /* #333 dedup — basis revenue SATU SUMBER (constants/finance).
+                 * Dulu hardcode 120 → IRR/NPV komparasi diverge dari MC dan
+                 * surface finansial lain yang pakai $280/kW·mo. */
+                revenuePerKwMonth: DEFAULT_REVENUE_PER_KW_MONTH,
                 itLoadKw: itLoad,
                 discountRate: 0.10,
                 projectLifeYears: 10,
@@ -144,6 +148,28 @@ export function ScenarioComparisonPanel() {
         return new Set(vals).size > 1;
     });
 
+    /* ── Guidance sel delta merah (DIAGNOSTICS_STANDARD §1): diff simInputs
+     * LIVE antara skenario vs baseline — dipakai di title tooltip supaya
+     * "lebih buruk $X" langsung menyebut parameter pembedanya. ── */
+    const humanKey = (key: string) => key.replace(/^headcount_/, 'headcount ').replace(/([A-Z])/g, ' $1').trim().toLowerCase();
+    const paramDiffText = (sc: SavedScenario): string => {
+        const base = compared[0];
+        const parts: string[] = [];
+        if (sc.countryId !== base.countryId) parts.push(`country ${base.countryId}→${sc.countryId}`);
+        for (const key of inputKeys) {
+            const a = base.simInputs[key];
+            const b = sc.simInputs[key];
+            if (String(a ?? '') !== String(b ?? '')) parts.push(`${humanKey(String(key))} ${String(a)}→${String(b)}`);
+        }
+        if (JSON.stringify(sc.capexInputs) !== JSON.stringify(base.capexInputs)) parts.push('capexInputs (CAPEX Engine) berbeda');
+        return parts.length > 0
+            ? parts.join(' · ')
+            : 'tidak ada input yang beda terdeteksi — selisih berasal dari data country/engine yang sama-sama live';
+    };
+    /** Title untuk sel delta merah: "lebih buruk X vs baseline — parameter pembeda: …". */
+    const worseTitle = (absFmt: string, sc: SavedScenario): string =>
+        `Lebih buruk ${absFmt} vs baseline "${baseline.scenario.name}" — parameter pembeda: ${paramDiffText(sc)}`;
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -182,12 +208,13 @@ export function ScenarioComparisonPanel() {
                             {i === 0 && <span className="text-[10px] bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-300">BASELINE</span>}
                         </div>
                         <div className="grid grid-cols-2 gap-3 text-xs">
-                            <KpiCell label="CAPEX" value={fmtMoney(m.capex)} delta={i > 0 ? fmtPct(delta(m.capex, baseline.capex)) : undefined} />
-                            <KpiCell label="OPEX/yr" value={fmtMoney(m.annualOpex)} delta={i > 0 ? fmtPct(delta(m.annualOpex, baseline.annualOpex)) : undefined} />
-                            <KpiCell label="PUE" value={m.pue.toFixed(2)} delta={i > 0 ? fmtPct(delta(m.pue, baseline.pue)) : undefined} />
-                            <KpiCell label="Staff" value={String(m.totalStaff)} delta={i > 0 ? fmtPct(delta(m.totalStaff, baseline.totalStaff)) : undefined} />
-                            <KpiCell label="IRR" value={`${m.irr.toFixed(1)}%`} delta={i > 0 ? fmtPct(delta(m.irr, baseline.irr)) : undefined} />
-                            <KpiCell label="Payback" value={`${m.paybackYears.toFixed(1)} yr`} delta={i > 0 ? fmtPct(delta(m.paybackYears, baseline.paybackYears)) : undefined} invertDelta />
+                            {/* Cost metrics: naik = merah (invertDelta) — konsisten dgn Delta Analysis; title merah = guidance parameter pembeda */}
+                            <KpiCell label="CAPEX" value={fmtMoney(m.capex)} delta={i > 0 ? fmtPct(delta(m.capex, baseline.capex)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(fmtMoney(Math.abs(m.capex - baseline.capex)), m.scenario) : undefined} />
+                            <KpiCell label="OPEX/yr" value={fmtMoney(m.annualOpex)} delta={i > 0 ? fmtPct(delta(m.annualOpex, baseline.annualOpex)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${fmtMoney(Math.abs(m.annualOpex - baseline.annualOpex))}/yr`, m.scenario) : undefined} />
+                            <KpiCell label="PUE" value={m.pue.toFixed(2)} delta={i > 0 ? fmtPct(delta(m.pue, baseline.pue)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${Math.abs(m.pue - baseline.pue).toFixed(2)} PUE`, m.scenario) : undefined} />
+                            <KpiCell label="Staff" value={String(m.totalStaff)} delta={i > 0 ? fmtPct(delta(m.totalStaff, baseline.totalStaff)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${Math.abs(m.totalStaff - baseline.totalStaff)} staf`, m.scenario) : undefined} />
+                            <KpiCell label="IRR" value={`${m.irr.toFixed(1)}%`} delta={i > 0 ? fmtPct(delta(m.irr, baseline.irr)) : undefined} worseTitle={i > 0 ? worseTitle(`${Math.abs(m.irr - baseline.irr).toFixed(1)} pp IRR`, m.scenario) : undefined} />
+                            <KpiCell label="Payback" value={`${m.paybackYears.toFixed(1)} yr`} delta={i > 0 ? fmtPct(delta(m.paybackYears, baseline.paybackYears)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${Math.abs(m.paybackYears - baseline.paybackYears).toFixed(1)} yr payback`, m.scenario) : undefined} />
                         </div>
                     </div>
                 ))}
@@ -243,21 +270,27 @@ export function ScenarioComparisonPanel() {
                             { label: 'OPEX/kW', get: (m: ScenarioMetrics) => m.opexPerKw, fmt: (n: number) => `$${Math.round(n).toLocaleString()}` },
                             { label: 'Total Staff', get: (m: ScenarioMetrics) => m.totalStaff, fmt: (n: number) => String(n) },
                             { label: 'PUE', get: (m: ScenarioMetrics) => m.pue, fmt: (n: number) => n.toFixed(2) },
-                            { label: 'IRR', get: (m: ScenarioMetrics) => m.irr, fmt: (n: number) => `${n.toFixed(1)}%` },
-                            { label: 'NPV', get: (m: ScenarioMetrics) => m.npv, fmt: fmtMoney },
+                            { label: 'IRR', get: (m: ScenarioMetrics) => m.irr, fmt: (n: number) => `${n.toFixed(1)}%`, higherIsBetter: true },
+                            { label: 'NPV', get: (m: ScenarioMetrics) => m.npv, fmt: fmtMoney, higherIsBetter: true },
                             { label: 'Payback', get: (m: ScenarioMetrics) => m.paybackYears, fmt: (n: number) => `${n.toFixed(1)} yr` },
-                        ].map(row => (
+                        ].map((row: { label: string; get: (m: ScenarioMetrics) => number; fmt: (n: number) => string; higherIsBetter?: boolean }) => (
                             <tr key={row.label} className="border-b border-slate-100 dark:border-slate-800">
                                 <td className="px-4 py-2 text-slate-700 dark:text-slate-300 font-medium">{row.label}</td>
                                 {metricsData.map((m, i) => {
                                     const val = row.get(m);
                                     const baseVal = row.get(baseline);
                                     const d = i > 0 && baseVal !== 0 ? ((val - baseVal) / Math.abs(baseVal)) * 100 : 0;
+                                    /* Merah = LEBIH BURUK (IRR/NPV: turun buruk; sisanya: naik buruk) */
+                                    const isWorse = row.higherIsBetter ? d < 0 : d > 0;
+                                    const isBetter = row.higherIsBetter ? d > 0 : d < 0;
                                     return (
                                         <td key={i} className="text-center px-3 py-2">
                                             <span className="text-slate-900 dark:text-white font-mono">{row.fmt(val)}</span>
                                             {i > 0 && (
-                                                <span className={clsx('ml-1', d > 0 ? 'text-red-500' : d < 0 ? 'text-emerald-500' : 'text-slate-400')}>
+                                                <span
+                                                    className={clsx('ml-1', isWorse ? 'text-red-500' : isBetter ? 'text-emerald-500' : 'text-slate-400')}
+                                                    title={isWorse ? worseTitle(row.fmt(Math.abs(val - baseVal)), m.scenario) : undefined}
+                                                >
                                                     ({fmtPct(d)})
                                                 </span>
                                             )}
@@ -314,7 +347,14 @@ export function ScenarioComparisonPanel() {
     );
 }
 
-function KpiCell({ label, value, delta, invertDelta }: { label: string; value: string; delta?: string; invertDelta?: boolean }) {
+function KpiCell({ label, value, delta, invertDelta, worseTitle }: {
+    label: string;
+    value: string;
+    delta?: string;
+    invertDelta?: boolean;
+    /** Guidance sel merah: "lebih buruk $X vs baseline — parameter pembeda: …" (title tooltip). */
+    worseTitle?: string;
+}) {
     const isPositive = delta?.startsWith('+');
     const isNegative = delta?.startsWith('-');
     let colorClass = 'text-slate-400';
@@ -325,12 +365,13 @@ function KpiCell({ label, value, delta, invertDelta }: { label: string; value: s
             colorClass = isPositive ? 'text-emerald-500' : isNegative ? 'text-red-500' : 'text-slate-400';
         }
     }
+    const isWorse = colorClass === 'text-red-500';
 
     return (
         <div>
             <span className="text-slate-500 dark:text-slate-400 block">{label}</span>
             <span className="text-slate-900 dark:text-white font-semibold">{value}</span>
-            {delta && <span className={clsx('ml-1', colorClass)}>{delta}</span>}
+            {delta && <span className={clsx('ml-1', colorClass)} title={isWorse ? worseTitle : undefined}>{delta}</span>}
         </div>
     );
 }

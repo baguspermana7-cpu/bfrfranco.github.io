@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { calculateTalentAvailability, TalentAvailabilityResult } from '@/modules/staffing/TalentAvailabilityEngine';
 import { calculateStaffing } from '@/modules/staffing/ShiftEngine';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
-import { COUNTRIES } from '@/constants/countries';
+import { COUNTRIES, CountryProfile } from '@/constants/countries';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { GraduationCap, Users, DollarSign, Clock, TrendingUp, Award } from 'lucide-react';
@@ -14,12 +14,80 @@ import {
 } from 'recharts';
 import { fmt, fmtMoney } from '@/lib/format';
 
+/* ── Difficulty banding constants (single source: pewarnaan + gate panel + collector).
+ * Band OWNER is TalentAvailabilityEngine (talentScore ≥75 Easy · ≥55 Moderate ·
+ * ≥35 Difficult · else Very Difficult) — the UI gates on the engine's own
+ * difficulty STRING so it can never mis-colour; the numeric mirrors below exist
+ * only for Finding.threshold and are parity-checked at runtime (chip "≡ engine"
+ * / drift warning, DIAGNOSTICS_STANDARD rule 4). ── */
+const HIRING_RED_DIFFICULTY = 'Very Difficult' as const;
+const HIRING_AMBER_DIFFICULTY = 'Difficult' as const;
+const TALENT_VERY_DIFFICULT_THRESHOLD = 35; // mirror: engine band 'Very Difficult' = talentScore < 35
+const TALENT_DIFFICULT_THRESHOLD = 55;      // mirror: engine band 'Difficult' = talentScore < 55
+/** Salary-premium sensitivity scenarios re-run against the live engine. */
+const PREMIUM_UPLIFTS = [0, 0.10, 0.20] as const;
+
 const difficultyColors: Record<string, string> = {
     'Easy': 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
     'Moderate': 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30',
-    'Difficult': 'text-amber-400 bg-amber-500/10 border-amber-500/30',
-    'Very Difficult': 'text-red-400 bg-red-500/10 border-red-500/30',
+    [HIRING_AMBER_DIFFICULTY]: 'text-amber-400 bg-amber-500/10 border-amber-500/30',
+    [HIRING_RED_DIFFICULTY]: 'text-red-400 bg-red-500/10 border-red-500/30',
 };
+
+/* Impact labels the breakdown renders red — shared by the factor list AND the
+ * guidance panel's "penyebab" line (no duplicate literal sets). */
+const POSITIVE_IMPACTS = ['Positive', 'Fast', 'Strong', 'Low'] as const;
+const NEGATIVE_IMPACTS = ['Negative', 'Slow', 'Limited', 'High', 'High Competition'] as const;
+const isNegativeImpact = (impact: string) => (NEGATIVE_IMPACTS as readonly string[]).includes(impact);
+const isPositiveImpact = (impact: string) => (POSITIVE_IMPACTS as readonly string[]).includes(impact);
+
+/* ── Diagnostics collector (DIAGNOSTICS_STANDARD §5) — pure, engine-backed, no hooks ── */
+export interface Finding {
+    surface: string;
+    severity: 'critical' | 'warning' | 'info';
+    metric: string;
+    value: number;
+    threshold: number;
+    linkTab: 'talent';
+}
+
+export interface TalentDiagnosticsModel {
+    country: CountryProfile | null;
+    totalFTE: number;
+    annualStaffCost: number;
+}
+
+/** Emits a Finding when hiring difficulty lands in the red/amber band — SAME
+ *  engine banding as the KPI chip colouring (gate on the engine's own string). */
+export function collectTalentDiagnostics(model: TalentDiagnosticsModel): Finding[] {
+    if (!model.country || model.totalFTE <= 0) return [];
+    const r = calculateTalentAvailability({
+        country: model.country,
+        totalFTE: model.totalFTE,
+        annualStaffCost: model.annualStaffCost,
+    });
+    if (r.hiringDifficulty === HIRING_RED_DIFFICULTY) {
+        return [{
+            surface: `Hiring Difficulty ${HIRING_RED_DIFFICULTY} — ${model.country.name}`,
+            severity: 'critical',
+            metric: 'talentScore',
+            value: r.talentScore,
+            threshold: TALENT_VERY_DIFFICULT_THRESHOLD,
+            linkTab: 'talent',
+        }];
+    }
+    if (r.hiringDifficulty === HIRING_AMBER_DIFFICULTY) {
+        return [{
+            surface: `Hiring Difficulty ${HIRING_AMBER_DIFFICULTY} — ${model.country.name}`,
+            severity: 'warning',
+            metric: 'talentScore',
+            value: r.talentScore,
+            threshold: TALENT_DIFFICULT_THRESHOLD,
+            linkTab: 'talent',
+        }];
+    }
+    return [];
+}
 
 const TalentDashboard = () => {
     const { selectedCountry } = useSimulationStore();
@@ -49,6 +117,30 @@ const TalentDashboard = () => {
 
         return { result: talentResult, annualStaffCost: staffCost, totalFTE: fte };
     }, [selectedCountry, inputs]);
+
+    /* ── Hiring-difficulty guidance panel (DIAGNOSTICS_STANDARD): klik chip merah/amber
+     * → matriks trade-off live (engine di-re-run per skenario premium) + lever. ── */
+    const [showDifficultyPanel, setShowDifficultyPanel] = useState(false);
+    const difficultyIsBad = result != null &&
+        (result.hiringDifficulty === HIRING_RED_DIFFICULTY || result.hiringDifficulty === HIRING_AMBER_DIFFICULTY);
+    const premiumScenarios = useMemo(() => {
+        if (!selectedCountry || !result || totalFTE <= 0) return null;
+        return PREMIUM_UPLIFTS.map((uplift) => ({
+            uplift,
+            r: calculateTalentAvailability({
+                country: selectedCountry,
+                totalFTE,
+                annualStaffCost: annualStaffCost * (1 + uplift),
+            }),
+        }));
+    }, [selectedCountry, result, totalFTE, annualStaffCost]);
+    // Honest sensitivity verdict: measured from the ACTUAL re-runs, not assumed.
+    const timeToStaffResponds = premiumScenarios != null &&
+        premiumScenarios.some((s) => s.r.timeToFullStaff !== premiumScenarios[0].r.timeToFullStaff);
+    // Parity (rule 4): numeric mirror vs engine's own band string — warn on drift.
+    const bandParityOk = result == null ||
+        ((result.talentScore < TALENT_VERY_DIFFICULT_THRESHOLD) === (result.hiringDifficulty === HIRING_RED_DIFFICULTY) &&
+         (result.talentScore < TALENT_DIFFICULT_THRESHOLD && result.talentScore >= TALENT_VERY_DIFFICULT_THRESHOLD) === (result.hiringDifficulty === HIRING_AMBER_DIFFICULTY));
 
     const countryComparison = useMemo(() => {
         return Object.values(COUNTRIES)
@@ -88,9 +180,18 @@ const TalentDashboard = () => {
                             <Tooltip content="Composite talent availability score (0-100) based on engineer pool, university pipeline, hyperscaler competition, hiring speed, and certifications." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{result.talentScore}</div>
-                        <div className={`text-xs mt-1 px-2 py-0.5 rounded border w-fit ${difficultyColors[result.hiringDifficulty]}`}>
-                            {result.hiringDifficulty}
-                        </div>
+                        {difficultyIsBad ? (
+                            <button
+                                onClick={() => setShowDifficultyPanel(v => !v)}
+                                title={`${result.hiringDifficulty}: talent score ${result.talentScore} — klik untuk trade-off terukur (engine live) + lever`}
+                                className={`text-xs mt-1 px-2 py-0.5 rounded border w-fit cursor-pointer hover:brightness-125 ${difficultyColors[result.hiringDifficulty]}`}>
+                                {result.hiringDifficulty} {showDifficultyPanel ? '▲' : '▼'}
+                            </button>
+                        ) : (
+                            <div className={`text-xs mt-1 px-2 py-0.5 rounded border w-fit ${difficultyColors[result.hiringDifficulty]}`}>
+                                {result.hiringDifficulty}
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
 
@@ -154,6 +255,88 @@ const TalentDashboard = () => {
                 </Card>
             </div>
 
+            {/* ── Guidance panel: alasan + matriks trade-off live + lever (DIAGNOSTICS_STANDARD) ── */}
+            {showDifficultyPanel && difficultyIsBad && premiumScenarios && (
+                <div className={`rounded-lg border p-4 text-left ${
+                    result.hiringDifficulty === HIRING_RED_DIFFICULTY
+                        ? 'border-red-500/30 bg-red-500/5'
+                        : 'border-amber-500/30 bg-amber-500/5'
+                }`}>
+                    {/* Alasan — angka live dari engine yang sama dengan pewarnaan */}
+                    <div className="flex items-start justify-between gap-2">
+                        <p className="text-[11px] leading-relaxed text-slate-700 dark:text-slate-300">
+                            Hiring <b>{result.hiringDifficulty}</b> karena talent score <b>{result.talentScore}</b> berada di band{' '}
+                            {result.hiringDifficulty === HIRING_RED_DIFFICULTY
+                                ? <>&lt; {TALENT_VERY_DIFFICULT_THRESHOLD}</>
+                                : <>{TALENT_VERY_DIFFICULT_THRESHOLD}–{TALENT_DIFFICULT_THRESHOLD - 1}</>} (banding TalentAvailabilityEngine).
+                            {' '}Faktor penekan: {result.talentBreakdown.filter(b => isNegativeImpact(b.impact)).map(b => `${b.metric} (${b.value})`).join(' · ') || 'profil faktor campuran — tidak ada faktor tunggal yang merah'}.
+                        </p>
+                        {bandParityOk ? (
+                            <span className="shrink-0 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[8.5px] font-semibold uppercase text-emerald-500" title="Banding numerik panel cocok dengan band string engine">≡ engine</span>
+                        ) : (
+                            <span className="shrink-0 rounded bg-red-500/10 px-1.5 py-0.5 text-[8.5px] font-semibold uppercase text-red-500" title="DRIFT: mirror threshold panel tidak lagi cocok dengan banding engine — perbarui konstanta mirror">band drift!</span>
+                        )}
+                    </div>
+
+                    {/* Matriks trade-off: salary premium ↑ → engine di-RE-RUN live */}
+                    <div className="mt-3 overflow-x-auto">
+                        <table className="w-full text-[11px]">
+                            <thead>
+                                <tr className="text-[9px] uppercase text-slate-500 border-b border-slate-200 dark:border-slate-700">
+                                    <th className="text-left py-1 pr-2 font-semibold">Skenario belanja gaji</th>
+                                    <th className="text-right py-1 px-2 font-semibold">Adjusted staff cost/yr</th>
+                                    <th className="text-right py-1 px-2 font-semibold">Turnover cost/yr</th>
+                                    <th className="text-right py-1 pl-2 font-semibold">Time to staff</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {premiumScenarios.map(({ uplift, r }) => (
+                                    <tr key={uplift} className="border-b border-slate-100 dark:border-slate-800 last:border-0">
+                                        <td className="py-1 pr-2 text-slate-600 dark:text-slate-400">{uplift === 0 ? 'Basis (premium negara saat ini)' : `+${(uplift * 100).toFixed(0)}% belanja gaji`}</td>
+                                        <td className="py-1 px-2 text-right font-mono text-slate-800 dark:text-slate-200">{fmtMoney(r.adjustedAnnualStaffCost)}</td>
+                                        <td className="py-1 px-2 text-right font-mono text-slate-800 dark:text-slate-200">{fmtMoney(r.annualTurnoverCost)}</td>
+                                        <td className="py-1 pl-2 text-right font-mono text-slate-800 dark:text-slate-200">{r.timeToFullStaff} bln</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Lever + honesty — dari re-run engine, bukan asumsi */}
+                    <div className="mt-2 space-y-1">
+                        {timeToStaffResponds ? (
+                            <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
+                                <span className="shrink-0 rounded bg-emerald-600 px-1 py-0.5 text-[8px] font-bold text-white">LEVER</span>
+                                <span><b>Naikkan belanja gaji</b> — re-run engine menunjukkan time-to-staff turun dari {premiumScenarios[0].r.timeToFullStaff} bln ke {premiumScenarios[premiumScenarios.length - 1].r.timeToFullStaff} bln pada +{(PREMIUM_UPLIFTS[PREMIUM_UPLIFTS.length - 1] * 100).toFixed(0)}% (angka di tabel).</span>
+                            </div>
+                        ) : (
+                            <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
+                                <span className="shrink-0 rounded bg-slate-500 px-1 py-0.5 text-[8px] font-bold text-white">NOTE</span>
+                                <span><b>Model tidak sensitif terhadap premium untuk kecepatan</b> — di TalentAvailabilityEngine, time-to-staff diturunkan hanya dari jumlah FTE ({totalFTE}) dan kecepatan hiring negara ({selectedCountry.talentPool?.avgHiringDays ?? 40} hari/hire, 2 paralel); menaikkan belanja gaji +{(PREMIUM_UPLIFTS[PREMIUM_UPLIFTS.length - 1] * 100).toFixed(0)}% tidak mengubahnya ({premiumScenarios[0].r.timeToFullStaff} bln di semua skenario — lihat tabel). Premium mempengaruhi kolom biaya, bukan kecepatan.</span>
+                            </div>
+                        )}
+                        <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
+                            <span className="shrink-0 rounded bg-emerald-600 px-1 py-0.5 text-[8px] font-bold text-white">LEVER</span>
+                            <span><b>Mulai rekrutmen {Math.ceil(result.timeToFullStaff)} bulan lebih awal</b> dari target operasi — pipeline {totalFTE} FTE butuh {result.timeToFullStaff} bln pada profil hiring {selectedCountry.name}; setiap bulan keterlambatan mulai ≈ {(totalFTE / Math.max(1, result.timeToFullStaff)).toFixed(1)} posisi belum terisi di hari-1.</span>
+                        </div>
+                        <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
+                            <span className="shrink-0 rounded bg-slate-500 px-1 py-0.5 text-[8px] font-bold text-white">LIVE</span>
+                            <span>Turnover {(result.adjustedTurnoverRate * 100).toFixed(0)}%/yr → {fmtMoney(result.annualTurnoverCost)}/yr · Recruitment {fmtMoney(result.totalRecruitmentCost)} sekali-jalan ({fmtMoney(result.recruitmentCostPerHire)}/hire) — semua dari engine run yang sama dengan KPI di atas.</span>
+                        </div>
+                    </div>
+
+                    <div className="mt-2 flex items-center justify-between">
+                        <p className="text-[9px] text-slate-400">Matriks = calculateTalentAvailability di-re-run per skenario (deterministik) — bukan tabel statis.</p>
+                        <button
+                            onClick={() => useSimulationStore.getState().actions.setActiveTab('staff' as never)}
+                            className="shrink-0 rounded bg-cyan-500/10 px-2 py-1 text-[9px] font-semibold uppercase text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/20"
+                            title="Edit headcount & shift model di Staffing">
+                            Staffing ↗
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Talent Breakdown */}
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
@@ -166,9 +349,9 @@ const TalentDashboard = () => {
                                     <div className="flex items-center gap-3">
                                         <span className="text-sm font-semibold text-slate-900 dark:text-white">{item.value}</span>
                                         <span className={`text-xs px-2 py-0.5 rounded ${
-                                            item.impact === 'Positive' || item.impact === 'Fast' || item.impact === 'Strong' || item.impact === 'Low'
+                                            isPositiveImpact(item.impact)
                                                 ? 'bg-emerald-500/10 text-emerald-400'
-                                                : item.impact === 'Negative' || item.impact === 'Slow' || item.impact === 'Limited' || item.impact === 'High' || item.impact === 'High Competition'
+                                                : isNegativeImpact(item.impact)
                                                     ? 'bg-red-500/10 text-red-400'
                                                     : 'bg-slate-500/10 text-slate-400'
                                         }`}>{item.impact}</span>

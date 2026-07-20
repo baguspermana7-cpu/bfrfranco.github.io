@@ -51,6 +51,101 @@ const CLIMATE_PUE_PENALTY: Record<FeasibilityInputs['climateZone'], number> = {
     tropical: 0.12,
 };
 
+/* ── Feasibility model constants (single source: pewarnaan + panel + collector) ── */
+const HALL_FLOOR_FRACTION = 0.40;      // 40% of land = data hall floor
+const IT_DENSITY_W_PER_M2 = 500;       // conservative mixed IT density
+const ACRE_M2 = 4046.86;               // m² per acre (same factor as the Site Intelligence derivation)
+const PUE_SLIDER_MIN = 1.10;           // best design PUE reachable on this page's slider
+const FALLBACK_CAPEX_PER_MW = 6_000_000;
+const FALLBACK_ELEC_RATE = 0.10;       // $/kWh
+
+/* ── Pure feasibility model (DIAGNOSTICS_STANDARD: shared by render + panel +
+ * collector — one formula, no duplicate literals). Mirrors exactly what the
+ * page renders; the useMemo below delegates here. ── */
+export interface FeasibilityModelInput {
+    landAreaM2: number;
+    gridCapacityMW: number;
+    climateZone: FeasibilityInputs['climateZone'];
+    targetPUE: number;
+    /** getPUE(coolingType) — engine floor for the chosen cooling. */
+    basePUE: number;
+    /** $/MW build rate (CAPEX engine result / project MW, or fallback). */
+    capexPerMwRate: number;
+    /** $/kWh (country economy, or fallback). */
+    electricityRate: number;
+}
+
+export interface FeasibilityModelResult {
+    effectivePUE: number;
+    buildableITMW: number;
+    gridConstrainedMW: number;
+    actualITMW: number;
+    gridHeadroomMW: number;
+    gridHeadroomPct: number;
+    estimatedCapex: number;
+    annualEnergyCost: number;
+    bottleneck: 'land' | 'grid';
+    hallFloorM2: number;
+    /** MW IT locked out by the binding constraint (gap to the looser one). */
+    lockedOutITMW: number;
+}
+
+export function computeFeasibility(m: FeasibilityModelInput): FeasibilityModelResult {
+    const climatePenalty = CLIMATE_PUE_PENALTY[m.climateZone];
+    const effectivePUE = Math.max(m.basePUE, m.targetPUE + climatePenalty);
+
+    const hallFloorM2 = m.landAreaM2 * HALL_FLOOR_FRACTION;
+    const buildableITMW = (hallFloorM2 * IT_DENSITY_W_PER_M2) / 1_000_000;
+
+    const gridConstrainedMW = m.gridCapacityMW / effectivePUE;
+    const actualITMW = Math.min(buildableITMW, gridConstrainedMW);
+
+    const gridHeadroomMW = m.gridCapacityMW - actualITMW * effectivePUE;
+    const gridHeadroomPct = (gridHeadroomMW / m.gridCapacityMW) * 100;
+
+    const estimatedCapex = actualITMW * m.capexPerMwRate;
+    const annualEnergyCost = actualITMW * 1000 * effectivePUE * 8760 * m.electricityRate;
+
+    const bottleneck: 'land' | 'grid' = buildableITMW < gridConstrainedMW ? 'land' : 'grid';
+    const lockedOutITMW = Math.abs(gridConstrainedMW - buildableITMW);
+
+    return {
+        effectivePUE, buildableITMW, gridConstrainedMW, actualITMW,
+        gridHeadroomMW, gridHeadroomPct, estimatedCapex, annualEnergyCost,
+        bottleneck, hallFloorM2, lockedOutITMW,
+    };
+}
+
+/* ── Diagnostics collector (DIAGNOSTICS_STANDARD §5) — pure, no hooks ── */
+export interface Finding {
+    surface: string;
+    severity: 'critical' | 'warning' | 'info';
+    metric: string;
+    value: number;
+    threshold: number;
+    linkTab: 'strategic';
+}
+
+export interface StrategicDiagnosticsModel {
+    feasibility: FeasibilityModelInput;
+}
+
+/** Emits the feasibility bottleneck as a Finding — SAME model + banding as the
+ *  banner colouring (grid-bound = rose → critical, land-bound = amber → warning).
+ *  value = MW IT locked out by the binding constraint; threshold 0 (any gap binds). */
+export function collectStrategicDiagnostics(model: StrategicDiagnosticsModel): Finding[] {
+    const r = computeFeasibility(model.feasibility);
+    if (r.lockedOutITMW <= 0) return [];
+    return [{
+        surface: `Feasibility binding constraint — ${r.bottleneck === 'grid' ? 'Grid Capacity' : 'Land Area'}`,
+        severity: r.bottleneck === 'grid' ? 'critical' : 'warning',
+        metric: 'lockedOutITMW',
+        value: r.lockedOutITMW,
+        threshold: 0,
+        linkTab: 'strategic',
+    }];
+}
+
 const CLIMATE_LABELS: Record<FeasibilityInputs['climateZone'], string> = {
     polar: 'Polar / Sub-arctic (Free-cooling advantage)',
     arid: 'Arid / Desert (High cooling load)',
@@ -99,7 +194,7 @@ export default function StrategicPlanningDashboard() {
     const activeSite = sites.find((s) => s.id === selectedSiteId) ?? sites[0] ?? null;
     const derivedFeas = useMemo(() => {
         const acres = activeSite?.attributes.usableAcres ?? activeSite?.attributes.totalAcres ?? null;
-        const landAreaM2 = acres != null ? Math.round(acres * 4046.86) : null;
+        const landAreaM2 = acres != null ? Math.round(acres * ACRE_M2) : null;
         const gridCapacityMW = activeSite?.attributes.availableCapacityMw ?? null;
         const ambient = activeSite?.attributes.avgAmbientC ?? null;
         const climateZone: FeasibilityInputs['climateZone'] | null =
@@ -142,47 +237,43 @@ export default function StrategicPlanningDashboard() {
         </button>
     );
 
-    // --- Feasibility Calculations ---
-    const feasibilityResults = useMemo(() => {
-        const basePUE = getPUE(inputs.coolingType);
-        const climatePenalty = CLIMATE_PUE_PENALTY[feasibility.climateZone];
-        const effectivePUE = Math.max(basePUE, feasibility.targetPUE + climatePenalty);
+    // --- Feasibility Calculations (delegates to the pure model shared with the
+    //     bottleneck guidance panel + collectStrategicDiagnostics — one formula) ---
+    const feasibilityModelInput = useMemo<FeasibilityModelInput>(() => ({
+        landAreaM2: feasibility.landAreaM2,
+        gridCapacityMW: feasibility.gridCapacityMW,
+        climateZone: feasibility.climateZone,
+        targetPUE: feasibility.targetPUE,
+        basePUE: getPUE(inputs.coolingType),
+        capexPerMwRate: capexResults ? (capexResults.total / (inputs.itLoad / 1000)) : FALLBACK_CAPEX_PER_MW,
+        electricityRate: selectedCountry?.economy?.electricityRate ?? FALLBACK_ELEC_RATE,
+    }), [feasibility, inputs.coolingType, inputs.itLoad, capexResults, selectedCountry]);
+    const feasibilityResults = useMemo(() => computeFeasibility(feasibilityModelInput), [feasibilityModelInput]);
 
-        // MW per 1000 m2 of data hall floor (standard ~500W/m2 IT density for mixed use)
-        const hallFloorM2 = feasibility.landAreaM2 * 0.40; // 40% of land = data hall
-        const itDensityWPerM2 = 500; // conservative mixed density
-        const buildableITKw = (hallFloorM2 * itDensityWPerM2) / 1000;
-        const buildableITMW = buildableITKw / 1000;
-
-        // Grid-constrained capacity
-        const gridConstrainedMW = feasibility.gridCapacityMW / effectivePUE;
-        const actualITMW = Math.min(buildableITMW, gridConstrainedMW);
-
-        // Utility headroom
-        const gridHeadroomMW = feasibility.gridCapacityMW - (actualITMW * effectivePUE);
-        const gridHeadroomPct = (gridHeadroomMW / feasibility.gridCapacityMW) * 100;
-
-        // Cost estimate
-        const estimatedCapex = actualITMW * (capexResults ? (capexResults.total / (inputs.itLoad / 1000)) : 6_000_000);
-
-        const elecRate = selectedCountry?.economy?.electricityRate ?? 0.10;
-        const annualEnergyCost = actualITMW * 1000 * effectivePUE * 8760 * elecRate;
-
-        const bottleneck = buildableITMW < gridConstrainedMW ? 'land' : 'grid';
-
-        return {
-            effectivePUE,
-            buildableITMW,
-            gridConstrainedMW,
-            actualITMW,
-            gridHeadroomMW,
-            gridHeadroomPct,
-            estimatedCapex,
-            annualEnergyCost,
-            bottleneck,
-            hallFloorM2,
-        };
-    }, [feasibility, inputs.coolingType, inputs.itLoad, capexResults, selectedCountry]);
+    /* ── Bottleneck guidance panel (DIAGNOSTICS_STANDARD: klik → alasan + lever
+     * terukur dari formula feasibility yang SAMA + ↗ Site Intelligence) ── */
+    const [showBottleneckPanel, setShowBottleneckPanel] = useState(false);
+    const bottleneckExplain = useMemo(() => {
+        const r = feasibilityResults;
+        const m = feasibilityModelInput;
+        if (r.bottleneck === 'grid') {
+            // Grid binds: how much extra intake unlocks the land-capable IT load.
+            const gridNeededMW = r.buildableITMW * r.effectivePUE;   // intake to match land
+            const deltaGridMW = gridNeededMW - m.gridCapacityMW;
+            const itPerGridMW = 1 / r.effectivePUE;                   // marginal MW IT per +1 MW intake
+            // Secondary lever from the SAME formula: best effective PUE reachable on
+            // this page (slider floor + climate penalty, still ≥ cooling-type floor).
+            const bestEffPUE = Math.max(m.basePUE, PUE_SLIDER_MIN + CLIMATE_PUE_PENALTY[m.climateZone]);
+            const pueUnlockMW = Math.min(r.buildableITMW, m.gridCapacityMW / bestEffPUE) - r.gridConstrainedMW;
+            return { kind: 'grid' as const, deltaGridMW, itPerGridMW, bestEffPUE, pueUnlockMW };
+        }
+        // Land binds: how many extra acres unlock the grid-capable IT load.
+        const landNeededM2 = (r.gridConstrainedMW * 1_000_000 / IT_DENSITY_W_PER_M2) / HALL_FLOOR_FRACTION;
+        const deltaLandM2 = landNeededM2 - m.landAreaM2;
+        const deltaAcres = deltaLandM2 / ACRE_M2;
+        const itPerAcre = (ACRE_M2 * HALL_FLOOR_FRACTION * IT_DENSITY_W_PER_M2) / 1_000_000; // MW IT per +1 acre
+        return { kind: 'land' as const, deltaLandM2, deltaAcres, itPerAcre };
+    }, [feasibilityResults, feasibilityModelInput]);
 
     // --- Acquisition Calculations ---
     const acquisitionResults = useMemo(() => {
@@ -387,17 +478,21 @@ export default function StrategicPlanningDashboard() {
 
                     {/* Results */}
                     <div className="space-y-4">
-                        <div className={clsx(
-                            'p-4 rounded-xl border',
-                            feasibilityResults.bottleneck === 'land'
-                                ? 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800'
-                                : 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800'
-                        )}>
+                        <button
+                            onClick={() => setShowBottleneckPanel(v => !v)}
+                            title="Klik untuk detail constraint yang mengikat + lever terukur (formula feasibility halaman ini)"
+                            className={clsx(
+                                'p-4 rounded-xl border w-full text-left cursor-pointer transition-colors',
+                                feasibilityResults.bottleneck === 'land'
+                                    ? 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-950/40'
+                                    : 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800 hover:bg-rose-100 dark:hover:bg-rose-950/40'
+                            )}>
                             <div className="flex items-center gap-2 mb-1">
                                 <AlertTriangle className={`w-4 h-4 ${feasibilityResults.bottleneck === 'land' ? 'text-amber-500' : 'text-rose-500'}`} />
                                 <span className="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
                                     Binding Constraint: {feasibilityResults.bottleneck === 'land' ? 'Land Area' : 'Grid Capacity'}
                                 </span>
+                                <span className="ml-auto text-[9px] font-semibold uppercase text-slate-400">{showBottleneckPanel ? '▲ tutup' : '▼ kenapa + lever'}</span>
                             </div>
                             <p className="text-xs text-slate-600 dark:text-slate-400">
                                 {feasibilityResults.bottleneck === 'land'
@@ -405,7 +500,60 @@ export default function StrategicPlanningDashboard() {
                                     : `Grid limits usable IT to ${feasibilityResults.gridConstrainedMW.toFixed(1)} MW — land could physically host ${feasibilityResults.buildableITMW.toFixed(1)} MW`
                                 }
                             </p>
-                        </div>
+                        </button>
+
+                        {showBottleneckPanel && (
+                            <div className={clsx(
+                                'rounded-lg border p-3 text-left',
+                                feasibilityResults.bottleneck === 'grid'
+                                    ? 'border-rose-500/30 bg-rose-500/5'
+                                    : 'border-amber-500/30 bg-amber-500/5'
+                            )}>
+                                {/* Alasan — angka live dari model yang SAMA dengan render */}
+                                <p className="text-[11px] leading-relaxed text-slate-700 dark:text-slate-300">
+                                    {bottleneckExplain.kind === 'grid'
+                                        ? <>Grid site <b>{feasibility.gridCapacityMW.toFixed(1)} MW</b> pada PUE efektif <b>{feasibilityResults.effectivePUE.toFixed(2)}</b> hanya mendukung <b>{feasibilityResults.gridConstrainedMW.toFixed(1)} MW IT</b>, sedangkan lahan ({Math.round(feasibilityResults.hallFloorM2).toLocaleString()} m² hall @ {IT_DENSITY_W_PER_M2} W/m²) mampu <b>{feasibilityResults.buildableITMW.toFixed(1)} MW</b> — <b>{feasibilityResults.lockedOutITMW.toFixed(1)} MW IT terkunci oleh grid</b>.</>
+                                        : <>Lahan <b>{feasibility.landAreaM2.toLocaleString()} m²</b> ({(feasibility.landAreaM2 / ACRE_M2).toFixed(1)} acres; hall {Math.round(feasibilityResults.hallFloorM2).toLocaleString()} m² @ {(HALL_FLOOR_FRACTION * 100).toFixed(0)}%, {IT_DENSITY_W_PER_M2} W/m²) hanya mendukung <b>{feasibilityResults.buildableITMW.toFixed(1)} MW IT</b>, sedangkan grid {feasibility.gridCapacityMW.toFixed(1)} MW @ PUE {feasibilityResults.effectivePUE.toFixed(2)} bisa <b>{feasibilityResults.gridConstrainedMW.toFixed(1)} MW</b> — <b>{feasibilityResults.lockedOutITMW.toFixed(1)} MW IT terkunci oleh lahan</b>.</>
+                                    }
+                                </p>
+                                {/* Lever terukur — dihitung dari formula feasibility yang sama */}
+                                <div className="mt-1.5 space-y-1">
+                                    {bottleneckExplain.kind === 'grid' ? (
+                                        <>
+                                            <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
+                                                <span className="shrink-0 rounded bg-emerald-600 px-1 py-0.5 text-[8px] font-bold text-white">LEVER</span>
+                                                <span><b>Tambah intake grid +{bottleneckExplain.deltaGridMW.toFixed(1)} MW</b> (≈ {bottleneckExplain.deltaGridMW.toFixed(1)} MVA pada PF≈1,0) → membuka +{feasibilityResults.lockedOutITMW.toFixed(1)} MW IT sampai lahan jadi binding. Marginal: setiap +1 MW intake ≈ +{bottleneckExplain.itPerGridMW.toFixed(2)} MW IT pada PUE {feasibilityResults.effectivePUE.toFixed(2)}.</span>
+                                            </div>
+                                            {bottleneckExplain.pueUnlockMW > 0.05 ? (
+                                                <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
+                                                    <span className="shrink-0 rounded bg-emerald-600 px-1 py-0.5 text-[8px] font-bold text-white">LEVER</span>
+                                                    <span><b>Perbaiki PUE efektif {feasibilityResults.effectivePUE.toFixed(2)} → {bottleneckExplain.bestEffPUE.toFixed(2)}</b> (target PUE {PUE_SLIDER_MIN.toFixed(2)} + penalti iklim, floor cooling-type dihormati) → +{bottleneckExplain.pueUnlockMW.toFixed(1)} MW IT pada grid yang sama, tanpa intake baru.</span>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
+                                                    <span className="shrink-0 rounded bg-slate-500 px-1 py-0.5 text-[8px] font-bold text-white">NOTE</span>
+                                                    <span>Lever PUE tidak tersedia: PUE efektif sudah di floor cooling-type ({feasibilityModelInput.basePUE.toFixed(2)}) — menurunkan target PUE di slider tidak menambah MW.</span>
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
+                                            <span className="shrink-0 rounded bg-emerald-600 px-1 py-0.5 text-[8px] font-bold text-white">LEVER</span>
+                                            <span><b>Tambah lahan +{bottleneckExplain.deltaAcres.toFixed(1)} acres</b> (+{Math.round(bottleneckExplain.deltaLandM2).toLocaleString()} m²) → membuka +{feasibilityResults.lockedOutITMW.toFixed(1)} MW IT sampai grid jadi binding. Marginal: setiap +1 acre ≈ +{bottleneckExplain.itPerAcre.toFixed(2)} MW IT ({(HALL_FLOOR_FRACTION * 100).toFixed(0)}% hall @ {IT_DENSITY_W_PER_M2} W/m²).</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="mt-2 flex items-center justify-between">
+                                    <p className="text-[9px] text-slate-400">Angka dari formula feasibility halaman ini (computeFeasibility) — bukan estimasi terpisah.</p>
+                                    <button
+                                        onClick={() => useSimulationStore.getState().actions.setActiveTab('site' as never)}
+                                        className="shrink-0 rounded bg-cyan-500/10 px-2 py-1 text-[9px] font-semibold uppercase text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/20"
+                                        title="Edit land/grid site di Site Intelligence">
+                                        Site Intelligence ↗
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
                         <div className="grid grid-cols-2 gap-3">
                             {[

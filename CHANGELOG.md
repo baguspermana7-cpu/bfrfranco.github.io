@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v1.99.4 — 2026-07-20 (Diagnostics Tier-2/3/4 — SEMUA indikator merah kini ber-guidance)
+
+### Added — guidance klik-able (pola DIAGNOSTICS_STANDARD; tiap file ekspor collector)
+- **AssetLifecycle**: chip critical + deferred-NPV premium → kurva biaya kegagalan d=0..5 + window optimal + parity 3-titik vs engine ±$1; lever ganti-sekarang-vs-tunda per aset.
+- **DesignTools**: spares fill-below → lever +N unit (fill→Y%, biaya) + lever lead-time **apply-able langsung** (parity newsvendor kernel engine); criticality Critical → spare/MTTR lever; refrigerant GWP>700 → alternatif GWP≤150 live "pilih →".
+- **GridReliability** F/D → dekomposisi skor & outage ganda ber-parity "≡ engine" + lever genset kW/fuel + UPS ride-through + dual-feed (angka model).
+- **DisasterRisk** High/Extreme → dekomposisi per hazard engine-live + trade-off asuransi vs hardening vs EAL (basis ROI mitigasi diverifikasi reproduksi angka engine).
+- **FuelGen** CO₂ → HVO swap delta live + abatement $/t vs harga carbon negara (DATA.envCosts) + offset compliance/voluntary + lever run-hours (re-run grid engine).
+- **Strategic** bottleneck → formula feasibility di-extract single-source + lever grid/land marginal (MW per MVA/acre); **Talent** Very-Difficult → matriks premium via re-run TalentAvailabilityEngine nyata (temuan jujur: time-to-staff engine tak sensitif salary → note).
+- **MonteCarlo** P(NPV<0)>30% → driver ketidakpastian via re-run per-variabel + lever "kunci variabel"; **ScenarioComparison/Report/CBM/Portfolio** sapu (tooltip param-pembeda, root-cause insight, variance driver, confirm-hapus berdampak).
+
+### Fixed
+- **ScenarioComparison arah warna delta kontradiktif** (CAPEX naik = hijau di KPI vs merah di tabel halaman sama) → merah = lebih buruk konsisten (higherIsBetter IRR/NPV + invertDelta CAPEX/OPEX/PUE/Staff).
+- **Bug #333 kambuh**: revenue $120 hardcode di ScenarioComparison → `DEFAULT_REVENUE_PER_KW_MONTH` 280 single-source (IRR/NPV komparasi kini konsisten dgn MC & surface finansial lain).
+- **ReportDashboard insight statis** ("NPV positif <3yr payback" bisa bohong) → rule-derived dari financialResult live.
+- Beberapa dashboard: `useEngineReady()` dep fix (recompute saat engine telat load).
+
+### Verified
+- tsc/build · walk 24/0 · synergy 6/0 · trace-parity 117/117 · export 44/0. Diagnostics program COMPLETE (kontrak collector siap Diagnostics Center — DEFER sadar).
+
 ## v1.99.3 — 2026-07-20 (ARC-4 Ship 1+2: CLOUD PROJECTS + SHARE · Diagnostics Tier-1 5 permukaan)
 
 ### Added — Cloud & Share (aktif setelah owner jalankan SQL Module 9 — Owner Action Board)

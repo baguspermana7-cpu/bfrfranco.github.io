@@ -8,6 +8,12 @@ import clsx from 'clsx';
 import { fmt, fmtMoney } from '@/lib/format';
 import { Tooltip } from '@/components/ui/Tooltip';
 
+/* ─── DIAGNOSTICS_STANDARD §2 — SATU konstanta untuk pewarnaan + gate guidance
+ * (dilarang literal duplikat 100/50/0 tersebar di JSX). ────────────────── */
+const CBM_ROI_GREEN_PCT = 100;
+const CBM_ROI_RED_PCT = 50;
+const CBM_NPV_RED_USD = 0;
+
 const SENSOR_COLORS: Record<SensorCategory, string> = {
     'temperature': 'bg-red-500',
     'humidity': 'bg-blue-500',
@@ -51,6 +57,28 @@ export default function CBMDashboard() {
 
     if (!result) return <div className="text-slate-500 text-center py-20">Select a country to begin.</div>;
 
+    /* ── Guidance KPI merah (DIAGNOSTICS_STANDARD §1): driver variance biaya
+     * dihitung dari result LIVE yang SAMA dgn render — komponen mana yang
+     * menekan ROI/NPV + anchor ke tabel/section pengaturnya. ── */
+    const netAnnual = result.totalAnnualBenefit - result.platformLicenseCostAnnual;
+    const licenseSharePct = result.totalAnnualBenefit > 0
+        ? (result.platformLicenseCostAnnual / result.totalAnnualBenefit) * 100
+        : null;
+    const enabledSensors = result.sensors.filter(s => s.enabled);
+    const topCostSensor = enabledSensors.length > 0
+        ? [...enabledSensors].sort((a, b) => b.totalCost - a.totalCost)[0]
+        : null;
+    const licenseDominates = result.platformLicenseCostAnnual >= result.totalAnnualBenefit * 0.5;
+    const varianceDriverText =
+        `Driver variance biaya: lisensi DCIM ${fmtMoney(result.platformLicenseCostAnnual)}/yr` +
+        (licenseSharePct !== null ? ` (${licenseSharePct.toFixed(0)}% dari benefit ${fmtMoney(result.totalAnnualBenefit)}/yr)` : ` (benefit $0/yr — tidak ada kategori sensor aktif?)`) +
+        (topCostSensor ? `; investasi sensor terbesar: ${topCostSensor.label} ${fmtMoney(topCostSensor.totalCost)} dari total ${fmtMoney(result.totalSensorInvestment)}` : '') +
+        `; net benefit ${fmtMoney(netAnnual)}/yr.` +
+        (licenseDominates ? ' Lever: turunkan tier DCIM (section DCIM Platform Tier di bawah).' : ' Lever: cek kategori sensor ber-ROI rendah (tabel Sensor Categories).') +
+        ' Klik kartu untuk lompat ke section terkait.';
+    const roiRed = result.roiPercent <= CBM_ROI_RED_PCT;
+    const npvRed = result.npv5Year <= CBM_NPV_RED_USD;
+    const jumpTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     const toggleCategory = (cat: SensorCategory) => {
         setEnabledCategories(prev =>
@@ -73,27 +101,40 @@ export default function CBMDashboard() {
 
             {/* KPIs */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {[
+                {([
                     { label: 'Sensor Investment', value: fmtMoney(result.totalSensorInvestment), sub: `${result.totalSensorCount} sensors`, icon: DollarSign, color: 'cyan', tip: 'Total one-time capital expenditure for all enabled sensor hardware. Does not include installation labor or DCIM platform licensing.' },
-                    { label: 'ROI', value: `${result.roiPercent}%`, sub: `Payback: ${result.paybackYears} yrs`, icon: TrendingUp, color: result.roiPercent > 100 ? 'emerald' : result.roiPercent > 50 ? 'amber' : 'red', tip: 'Return on Investment — annual net benefit divided by sensor investment. Above 100% means the system pays for itself within one year.' },
+                    { label: 'ROI', value: `${result.roiPercent}%`, sub: `Payback: ${result.paybackYears} yrs`, icon: TrendingUp, color: result.roiPercent > CBM_ROI_GREEN_PCT ? 'emerald' : result.roiPercent > CBM_ROI_RED_PCT ? 'amber' : 'red', tip: `Return on Investment — annual net benefit divided by sensor investment. Above ${CBM_ROI_GREEN_PCT}% means the system pays for itself within one year; ≤ ${CBM_ROI_RED_PCT}% is flagged red.`, redGuide: roiRed ? { title: `ROI ${result.roiPercent}% ≤ ambang ${CBM_ROI_RED_PCT}% — ${varianceDriverText}`, anchor: licenseDominates ? 'cbm-dcim-tiers' : 'cbm-sensor-table' } : undefined },
                     { label: 'Annual Benefit', value: fmtMoney(result.totalAnnualBenefit), sub: 'Downtime + Energy savings', icon: Shield, color: 'green', tip: 'Combined yearly value of avoided downtime costs and energy optimization savings from condition-based monitoring.' },
                     { label: 'Downtime Averted', value: fmtMoney(result.annualAvertedDowntimeCost), sub: 'Annual failure avoidance', icon: Zap, color: 'amber', tip: 'Annual cost avoidance from catching failures early vs reactive repair. Includes avoided downtime penalties and SLA credits.' },
                     { label: 'Energy Savings', value: fmtMoney(result.annualEnergySavings), sub: 'Annual energy optimization', icon: BarChart3, color: 'blue', tip: 'Yearly energy cost reduction from sensor-driven optimization — e.g., adjusting cooling setpoints, detecting airflow short-circuits, and load balancing.' },
-                    { label: '5-Year NPV', value: fmtMoney(result.npv5Year), sub: `${result.sensorDensityPerRack} sensors/rack`, icon: Clock, color: result.npv5Year > 0 ? 'emerald' : 'red', tip: 'Net Present Value over 5 years — total discounted benefits minus sensor investment. Positive NPV confirms the project is financially viable at standard discount rates.' },
-                ].map((kpi, i) => (
-                    <div key={i} className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
+                    { label: '5-Year NPV', value: fmtMoney(result.npv5Year), sub: `${result.sensorDensityPerRack} sensors/rack`, icon: Clock, color: result.npv5Year > CBM_NPV_RED_USD ? 'emerald' : 'red', tip: 'Net Present Value over 5 years — total discounted benefits minus sensor investment. Positive NPV confirms the project is financially viable at standard discount rates.', redGuide: npvRed ? { title: `5-Year NPV ${fmtMoney(result.npv5Year)} ≤ $0 — ${varianceDriverText}`, anchor: licenseDominates ? 'cbm-dcim-tiers' : 'cbm-sensor-table' } : undefined },
+                ] as { label: string; value: string; sub: string; icon: React.ElementType; color: string; tip: string; redGuide?: { title: string; anchor: string } }[]).map((kpi, i) => (
+                    /* KPI merah = klik-able + title driver variance (DIAGNOSTICS_STANDARD §1) */
+                    <div
+                        key={i}
+                        title={kpi.redGuide?.title}
+                        onClick={kpi.redGuide ? () => jumpTo(kpi.redGuide!.anchor) : undefined}
+                        role={kpi.redGuide ? 'button' : undefined}
+                        tabIndex={kpi.redGuide ? 0 : undefined}
+                        onKeyDown={kpi.redGuide ? (e) => { if (e.key === 'Enter' || e.key === ' ') jumpTo(kpi.redGuide!.anchor); } : undefined}
+                        className={clsx(
+                            'bg-white dark:bg-slate-800/50 rounded-xl border p-4',
+                            kpi.redGuide ? 'border-red-300 dark:border-red-800 cursor-pointer hover:bg-red-50/50 dark:hover:bg-red-950/20 transition-colors' : 'border-slate-200 dark:border-slate-700',
+                        )}
+                    >
                         <div className="flex items-center gap-2 mb-2">
                             <kpi.icon className={`w-4 h-4 text-${kpi.color}-500`} />
                             <span className="text-xs text-slate-500 flex items-center gap-1">{kpi.label}<Tooltip content={kpi.tip} /></span>
                         </div>
                         <div className="text-xl font-bold text-slate-900 dark:text-white">{kpi.value}</div>
                         <div className="text-[10px] text-slate-500 mt-1">{kpi.sub}</div>
+                        {kpi.redGuide && <div className="text-[10px] font-semibold text-red-500 mt-1">driver variance: hover · klik → section ↓</div>}
                     </div>
                 ))}
             </div>
 
             {/* Sensor Category Toggles */}
-            <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
+            <div id="cbm-sensor-table" className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
                 <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-1">Sensor Categories<Tooltip content="Toggle individual sensor types on/off to model different CBM deployment scopes. Each category targets specific failure modes and contributes to overall detection coverage." /></h3>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
@@ -200,7 +241,7 @@ export default function CBMDashboard() {
             </div>
 
             {/* DCIM Platform Tier Comparison */}
-            <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
+            <div id="cbm-dcim-tiers" className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
                 <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-1">DCIM Platform Tier<Tooltip content="Select the DCIM/BMS platform tier to model. Higher tiers offer better sensor integration, predictive analytics, and automation — but at higher annual license costs." /></h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     {result.dcimPlatforms.map(platform => (

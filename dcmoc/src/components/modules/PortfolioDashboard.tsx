@@ -93,7 +93,21 @@ export default function PortfolioDashboard() {
                         countryOptions={countryOptions}
                         onUpdate={(updates) => store.updateSite(site.id, updates)}
                         onDuplicate={() => store.duplicateSite(site.id)}
-                        onRemove={() => store.removeSite(site.id)}
+                        onRemove={() => {
+                            /* Confirm ringan + ringkas dampak dari SiteResult LIVE yang
+                             * sama dgn render (revenue = rata-rata tahunan cashflow model). */
+                            const sr = result?.sites.find(r => r.site.id === site.id) ?? null;
+                            const mw = (site.itLoad / 1000).toFixed(1);
+                            let msg: string;
+                            if (sr) {
+                                const opYears = sr.financial.cashflows.filter(c => c.year > 0).length || 1;
+                                const avgAnnualRevenue = sr.financial.totalRevenue / opYears;
+                                msg = `Hapus site "${site.label}"?\n\nDampak portofolio: −${mw} MW IT load · −${fmtMoney(avgAnnualRevenue)}/yr revenue (rata-rata model) · −${fmtMoney(sr.annualOpex)}/yr OPEX · NPV ${fmtMoney(sr.financial.npv)} keluar dari Portfolio NPV.`;
+                            } else {
+                                msg = `Hapus site "${site.label}"?\n\nDampak: −${mw} MW IT load dari portofolio (metrik finansial site belum terhitung — butuh ≥2 site valid).`;
+                            }
+                            if (window.confirm(msg)) store.removeSite(site.id);
+                        }}
                         canRemove={store.sites.length > 0}
                         canDuplicate={store.sites.length < 5}
                         isBest={result ? (result.bestIrr === site.id || result.bestPue === site.id) : false}
