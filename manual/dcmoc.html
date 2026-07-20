@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>DC MOC — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full engineering methodology for the DC MOC PRO SPA: CAPEX build-up equations, OPEX (energy/staffing/maintenance), shift-optimization staffing model, Monte Carlo P-value bands, and executive PDF export.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="data center CAPEX methodology, OPEX calculation, shift optimization, Monte Carlo simulation, DC MOC, commissioning cost, Turner Townsend cost index, ASHRAE, Uptime Institute">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/dcmoc.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/dcmoc.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/dcmoc.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/dcmoc.html">
+    <meta property="og:title" content="DC MOC — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="CAPEX build-up, OPEX breakdown, shift-staffing model, Monte Carlo P-bands, and executive PDF methodology for the DC MOC ops-cost engine.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="DC MOC Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="DC MOC — Technical Manual">
+    <meta name="twitter:description" content="CAPEX build-up, OPEX breakdown, shift-staffing model, Monte Carlo P-bands, and executive PDF methodology.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="DC MOC Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "DC MOC" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "DC MOC — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Data-center CAPEX/OPEX/shift-optimization/Monte-Carlo methodology for the DC MOC PRO SPA",
+        "articleSection": "Ops Cost Engine",
+        "dependencies": "RZEngine v2.5.1, Turner & Townsend DCCI 2025, ASHRAE TC9.9, Uptime Institute Tier Standard, ISA-18.2",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to estimate data-center lifecycle cost with DC MOC",
+        "step": [
+            { "@type": "HowToStep", "name": "Enter project inputs", "text": "Define IT load (kW), location/country, cooling type, redundancy tier, rack class, UPS/generator type, and staffing model." },
+            { "@type": "HowToStep", "name": "Review CAPEX build-up", "text": "The engine applies per-category $/kW base costs (A7 2025 rates) multiplied by redundancy, cooling, location, and soft-cost factors to produce a total CAPEX and $/kW metric." },
+            { "@type": "HowToStep", "name": "Inspect OPEX breakdown", "text": "RZEngine models.opex.totalAnnual() computes power, staffing, contract, maintenance, and extended lines (water, carbon, insurance, connectivity) at the DC-contract utilization basis." },
+            { "@type": "HowToStep", "name": "Review shift/staffing plan", "text": "The ops-budget model derives base FTE from load × staff model's ftePerMW, applies the 4.2× shift multiplier, 1.35× labor burden, and outputs utilization, burnout probability, and resilience index." },
+            { "@type": "HowToStep", "name": "Run Monte Carlo", "text": "For commissioning cost: the engine perturbs IT load (±7.5% Normal) and cost noise (±5% clamped ±15%), runs 10 000 iterations, and reports P5/P25/P50/P75/P95 + CVaR95." },
+            { "@type": "HowToStep", "name": "Export executive PDF", "text": "The PRO PDF renderer serialises all KPIs, charts, and provenance annotations into a multi-page PDF via the shared ReportNarrative engine and browser print-window." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is the CAPEX base equation in DC MOC?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Each MEP category c has a base cost in $/kW (e.g. electrical 1 550, cooling 900, UPS 780) multiplied by category-specific dimensional multipliers (redundancy, cooling type, rack class, building type, seismic zone) and a location multiplier derived from the Turner & Townsend DCCI 2025 country construction-cost index, then summed. Soft costs (design fee, PM fee) and contingency are layered on top. Source: dcmoc/src/lib/CapexEngine.ts + capex-data.ts (A7 2025 rates)." }
+            },
+            {
+                "@type": "Question",
+                "name": "How does DC MOC compute annual OPEX?",
+                "acceptedAnswer": { "@type": "Answer", "text": "DC MOC delegates to RZEngine.models.opex.totalAnnual(itMw, pue, countryId, headcount, {capex, basisPreset:'dcContract'}). The DC-contract preset sets utilization=1.0 (100% committed load), scaling energy, water, and carbon lines. Power = MW × PUE × 8 760 h × regional $/kWh. Staffing = headcount × regional salary × 1.30 fully-loaded burden. Maintenance = capex × maintenancePct (default). Overhead is applied as a percentage of the core subtotal." }
+            },
+            {
+                "@type": "Question",
+                "name": "What does the Monte Carlo engine model in DC MOC?",
+                "acceptedAnswer": { "@type": "Answer", "text": "For commissioning cost, RZEngine.models.commissioning.monteCarlo() runs 10 000 stochastic paths, perturbing IT load by ±7.5% (Normal, Box-Muller) and applying cost noise ±5% clamped to [0.85, 1.15]. It returns P5/P25/P50/P75/P95 + mean, standard deviation, min, max, and CVaR95 (expected tail loss above P95). The broader sim.monteCarlo() driver supports normal, uniform, triangular, and categorical distributions with optional pairwise Pearson-ρ correlation (Cholesky-style Z-score injection)." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../dcmoc/" class="nav-link">DC MOC</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / DC MOC
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Ops Cost Engine</p>
+            <h1>DC MOC — Methodology &amp; Formulas</h1>
+            <p>Every input, equation, constant, output, and reference behind the DC MOC PRO SPA: CAPEX build-up, OPEX (energy + staffing + maintenance), shift/staffing optimisation, Monte Carlo P-value bands, and executive PDF export. The engine delegates most of its maths to <code class="mn-mono">RZEngine v2.5.1</code> (<code class="mn-mono">rz-engine.min.js</code>) while DCMOC-finer CAPEX bases live in <code class="mn-mono">dcmoc/src/lib/capex-data.ts</code> (A7 2025 rates) and the Cx program in <code class="mn-mono">RZEngine.models.commissioning.programRich/monteCarlo</code>.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>RZEngine v2.5.1</strong></span>
+                <span class="mn-chip">CAPEX basis <strong>T&amp;T DCCI 2025</strong></span>
+                <span class="mn-chip">Key inputs <strong>14+</strong></span>
+                <span class="mn-chip">Output surfaces <strong>CAPEX · OPEX · Shift · MonteCarlo · PDF</strong></span>
+                <span class="mn-chip">SPA <strong>Next.js static-export PRO</strong></span>
+            </div>
+            <a class="mn-toollink" href="../dcmoc/">&#9654; Open the live DC MOC</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">DC MOC (Data-Centre Management &amp; Ops Cost) is a PRO-tier Next.js static-export SPA that answers five operator questions in a single instrument surface: <em>what will this facility cost to build</em> (CAPEX), <em>what will it cost to run per year</em> (OPEX), <em>how should operations be staffed across shifts</em>, <em>what is the probabilistic range of commissioning cost</em> (Monte Carlo), and <em>how is this summarised for executive sign-off</em> (PDF export). Access is governed by the site-wide auth-tier matrix at the PRO level.</p>
+            <p class="mn-lead">The mathematical basis is <strong>deterministic-by-default</strong>: every KPI is sourced from a locked constant or a formula anchored to a published standard, cost index, or RZEngine DATA entry. Monte Carlo randomness is seeded where stochastic output is needed and produces reproducible results. The tool is an <strong>engineering pre-design aid</strong> and Class 4 budgetary estimate (AACE 18R-97); detailed engineering procurement must follow.</p>
+            <p class="mn-lead">The SPA consumes two shared engines loaded at page root as deferred scripts: <code class="mn-mono">/rz-engine.min.js</code> (exposes <code class="mn-mono">window.RZEngine</code> + <code class="mn-mono">window.RZEngine.DATA</code>) and the DCMOC TypeScript bundle. During Next.js SSR prerender, <code class="mn-mono">dcmoc/src/lib/rz-engine.ts</code> eval-requires the CommonJS engine from the repo root so that server-rendered and client values agree with zero hydration mismatch.</p>
+            <div class="mn-note"><strong>Cross-reference:</strong> the CAPEX engine and methodology also power the standalone <a class="mn-inline" href="capex.html">capex.html manual</a> and the OPEX engine powers <a class="mn-inline" href="opex.html">opex.html</a>. This document covers the DCMOC orchestration layer — how those models are wired together with the shift-staffing and Monte Carlo layers that do not appear in the standalone calculators.</div>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">Fourteen primary inputs span five groups — project identity, site/location, electrical system, cooling/mechanical, and staffing. Additional advanced fields (seismic zone, substation type, green certification, renewable option, deep-sea cooling parameters) unlock in PRO mode. All ranges are enforced client-side; missing optional fields fall back to engine defaults.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field</th><th>Symbol / key</th><th>Unit</th><th>Range / default</th><th>Meaning &amp; engine path</th></tr></thead>
+                <tbody>
+                    <tr><td>IT load</td><td><code>itLoad</code></td><td>kW</td><td>≥ 100 · default 2 000</td><td>Installed IT power; drives every per-kW cost, FTE, and energy calculation.</td></tr>
+                    <tr><td>Country / location</td><td><code>country.id</code> / <code>location</code></td><td>ISO-2 / key</td><td>40 countries</td><td>Priority: <code>country.constructionIndex</code> (T&amp;T ICMS/RLB rel. US=1.0) → <code>cityData[cityMarket].perW</code> → legacy <code>locationMultipliers</code>. Sets <code>effectiveRegion</code> for permit and energy rates.</td></tr>
+                    <tr><td>City market</td><td><code>cityMarket</code></td><td>enum</td><td>'none' or 40+ cities</td><td>Overrides country $/W with a city-level anchor (e.g. Tokyo 15.20 $/W, Jakarta 11.21 $/W). Source: T&amp;T 2025, C&amp;W 2025.</td></tr>
+                    <tr><td>Building type</td><td><code>buildingType</code></td><td>enum</td><td>warehouse / modular / purpose / highrise</td><td>Multiplier on civil + commissioning duration: warehouse 0.70×, purpose 1.00×, highrise 1.40×.</td></tr>
+                    <tr><td>Cooling type</td><td><code>coolingType</code></td><td>enum</td><td>air / inrow / rdhx / liquid</td><td>Scales cooling category cost (air 1.0×, liquid 1.6×) and sets PUE via <code>getPUE(coolingType)</code>.</td></tr>
+                    <tr><td>Redundancy</td><td><code>redundancy</code></td><td>enum</td><td>n / n1 / 2n / 2n1</td><td>Applied to electrical, UPS, and generator categories; multipliers: N 1.00×, N+1 1.25×, 2N 1.85×, 2N+1 2.10×.</td></tr>
+                    <tr><td>Rack class</td><td><code>rackType</code></td><td>enum</td><td>standard / medium / high / ai</td><td>Scales electrical category (ai 1.6×) and sets rack density (6 / 12.5 / 25 / 75 kW per rack).</td></tr>
+                    <tr><td>UPS type</td><td><code>upsType</code></td><td>enum</td><td>standalone / modular / distributed / rotary</td><td>Multiplier on UPS base cost: standalone 0.90×, distributed 1.20×, rotary 1.50×.</td></tr>
+                    <tr><td>Generator type</td><td><code>genType</code></td><td>enum</td><td>diesel / gas / dualfuel / hvo</td><td>Multiplier on generator base: diesel 1.00×, gas 1.15×, dual-fuel 1.30×.</td></tr>
+                    <tr><td>Fuel hours</td><td><code>fuelHours</code></td><td>h</td><td>≥ 0 · default 24</td><td>Fuel storage adder: <code>fuelMult = 1 + (fuelHours − 24) × 0.008</code>.</td></tr>
+                    <tr><td>Project year</td><td><code>projYear</code></td><td>year</td><td>2024–2030</td><td>Escalation factor from <code>yearEscalation[year]</code> (T&amp;T / JLL 2026 forward escalation).</td></tr>
+                    <tr><td>Design fee / PM fee / contingency</td><td><code>designFee / pmFee / contingency</code></td><td>%</td><td>1–15 / 1–10 / 5–25</td><td>Applied to total hard cost as soft-cost layers, then contingency as final percentage adder.</td></tr>
+                    <tr><td>Staff model</td><td><code>staffModelKey</code></td><td>enum</td><td>inhouse / hybrid70 / hybrid50 / outsourced</td><td>Sets <code>ftePerMW</code> (4.2 / 3.8 / 3.5 / 3.0) and cost multiplier in the ops-budget model.</td></tr>
+                    <tr><td>PM ratio / retention</td><td><code>pmRatio / retention</code></td><td>%</td><td>0–100 each</td><td>PM ratio reduces maintenance budget via savings slope (0.30 per % above 50% baseline); retention drives attrition cost and burnout probability.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">Five calculation layers run in sequence. Function names and file paths map one-to-one to the source noted in each formula block.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">3.1 CAPEX build-up</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">costs[c] = costFactors[c].base  ×  itLoad  ×  dimMult[c]  ×  locMult  ×  yearMult</span>
+                <span class="mn-eq">dimMult[electrical] = redMult × rackMult × upsMult</span>
+                <span class="mn-eq">dimMult[cooling]    = coolMult</span>
+                <span class="mn-eq">dimMult[generator]  = genMult × fuelMult      (fuelMult = 1 + (fuelHours−24)×0.008)</span>
+                <span class="mn-eq">dimMult[other]      = seismicMult | fireSupMult | alarmMult | buildMult  (per category)</span>
+                <span class="mn-eq">totalHardCost       = Σ costs[c]  +  substationCost  +  gridConnection  +  switchgear</span>
+                <span class="mn-eq">softCosts           = totalHardCost × (designFee/100)  +  totalHardCost × (pmFee/100)</span>
+                <span class="mn-eq">contingencyVal      = (totalHardCost + softCosts) × (contingency/100)</span>
+                <span class="mn-eq">CAPEX_total         = totalHardCost + softCosts + contingencyVal  [+fomTotal if FOM enabled]</span>
+                <span class="mn-eq">perKW               = CAPEX_total / itLoad        [$/kW]</span>
+                <span class="mn-where">In <code>calculateCapex()</code> — <code>dcmoc/src/lib/CapexEngine.ts</code>. Base costs ($/kW) from <code>dcmoc/src/lib/capex-data.ts</code> (A7 2025 rates: T&amp;T DCCI 2025 + C&amp;W 2025 + JLL 2026). Location priority: <code>country.constructionIndex</code> (T&amp;T ICMS/RLB rel. US=1.0) → <code>cityData[city].perW / 4.65</code> → legacy map. Multiplier tables: engine <code>DATA.capexDetail.*</code> first; DCMOC local <code>capex-data.ts</code> as fallback per SUPER_ENGINE.md §Z.3.<span class="mn-src">capexDetail · T&amp;T 2025</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">3.2 PUE &amp; timeline</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">PUE        = getPUE(coolingType)       [from dcmoc/src/constants/pue.ts]</span>
+                <span class="mn-eq">annualKWh  = itLoad × PUE × 8 760     [global avg estimate at 0.10 $/kWh basis]</span>
+                <span class="mn-eq">floorSpace = ceil(racks × 2.5 m²)     racks = ceil(itLoad / kW-per-rack)</span>
+                <span class="mn-eq">timeline   = computeTimeline(redundancy, buildingType, coolingType, effectiveRegion)</span>
+                <span class="mn-where">Timeline is a CPM-style forward pass (design → permit → civil → MEP → commissioning) with per-phase overlap factors and permit/building/cooling multipliers. Screening-grade — not a resource-loaded programme.<span class="mn-src">construction · engine-catalog</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">3.3 OPEX — total annual cost</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">power       = MW × PUE × 8 760 h × powerKwh[region]  ×  util  ×  touMultiplier</span>
+                <span class="mn-eq">staffing    = headcount × salary[region][role]  ×  1.30       (fully-loaded burden)</span>
+                <span class="mn-eq">contract    = contractCostBase[scope]  ×  salaryMult[region]</span>
+                <span class="mn-eq">maintenance = capex × maintenancePct</span>
+                <span class="mn-eq">overhead    = (power + staffing + contract + maintenance) × overheadPct</span>
+                <span class="mn-eq">total       = power + staffing + contract + maintenance + overhead</span>
+                <span class="mn-eq">totalExtended = total + water + carbon + insurance + connectivity</span>
+                <span class="mn-where">Delegated to <code>RZEngine.models.opex.totalAnnual(MW, pue, region, headcount, {capex, basisPreset:'dcContract'})</code>. DC-contract preset: <code>util=1.0</code> (100% committed capacity). Diverges from the standalone opex-calculator which uses <code>basisPreset:'retailScreening'</code> (<code>util=0.70</code>). Water: WUE × itKWh / 1 000 × $/m³[region]. Carbon: facilityKWh × gridFactor[region] × carbonPrice[region]. Insurance: capex × 0.5%. Connectivity: MW × 80 000 $/MW.<span class="mn-src">opex · carbon · water · engine-catalog</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">3.4 Shift &amp; staffing optimisation</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">baseFTE    = ceil(loadMW × ftePerMW)      (ftePerMW: 4.2 in-house … 3.0 outsourced)</span>
+                <span class="mn-eq">shiftFTE   = ceil(baseFTE × 4.2)         (4.2× shift multiplier — Uptime critical-facility benchmark)</span>
+                <span class="mn-eq">burdenedRate = laborRateUSD[country] × 1.35   (35% labor burden)</span>
+                <span class="mn-eq">laborBudget = shiftFTE × burdenedRate × sm.costMult</span>
+                <span class="mn-eq">maintBudget = loadMW × 180 000 $/MW × tropFactor × pmEfficiency</span>
+                <span class="mn-eq">pmEfficiency = 1.0 − (pmRatio/100 − 0.50) × 0.30</span>
+                <span class="mn-eq">utilization  = clamp(78 + loadMW×0.12, 55, 98) × qualityMult</span>
+                <span class="mn-eq">burnoutProb  = 1 / (1 + e^{−0.12 × (util − 88)}) × 100   [%]</span>
+                <span class="mn-eq">retentionCost = shiftFTE × turnoverRate × laborRateUSD × 1.5</span>
+                <span class="mn-eq">SRI (0–100) = retention×0.35 + (100−burnout)×0.25 + pmRatio×0.20 + qualityMult×100×0.20 − SPOF×3</span>
+                <span class="mn-where">Delegated to <code>RZEngine.models.opsBudget.opex(inp)</code> + <code>.staffing(inp, opex)</code>. Staff models and their ftePerMW/costMult/qualityMult live in <code>DATA.opsBudget.staffModels</code>. Country labor rates and energy tariffs live in <code>DATA.opsBudget.countries</code>. SRI = Staffing Resilience Index. SPOF = single-point-of-failure count. Burnout logistic k=0.12 from occupational-health literature; replacement cost 1.5× from SHRM 2024.<span class="mn-src">opsBudget · engine-catalog</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">3.5 Commissioning program &amp; Monte Carlo</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">equipScale(inp)   → item counts from itLoad (e.g. switchgear = ceil(kW/5000)+1)</span>
+                <span class="mn-eq">levelDurations()  → working days per L0…L6 (scope × redundancy × cooling × building factors)</span>
+                <span class="mn-eq">levelCosts()      → L0…L6 costs using regional day-rates r.{cxDay,fieldDay,oemDay,witnessDay}</span>
+                <span class="mn-eq">gm = ∏ 11 global-multiplier tables (cooling×redundancy×building×seismic×substation×bms×delivery×fire×ups×gen)</span>
+                <span class="mn-eq">grand = gmNorm(gm^0.45) × Σ levelCosts + contingency</span>
+                <span class="mn-eq">perKW = grand / itLoad</span>
+                <span class="mn-eq">── Monte Carlo (commissioning) ──</span>
+                <span class="mn-eq">FOR i in 1..10 000:</span>
+                <span class="mn-eq">    itLoad_i = max(100, Normal(base.itLoad, 0.075 × base.itLoad))   [Box-Muller]</span>
+                <span class="mn-eq">    cost_i   = programRich({...inp, itLoad: itLoad_i}).grand</span>
+                <span class="mn-eq">    cost_i  ×= clamp(Normal(1, 0.05), 0.85, 1.15)                  [cost noise]</span>
+                <span class="mn-eq">P5/P25/P50/P75/P95 = sorted percentiles; CVaR95 = mean(tail above P95)</span>
+                <span class="mn-where">Delegated to <code>RZEngine.models.commissioning.programRich(input)</code> + <code>.monteCarlo(input, opts)</code>. Input is normalised via <code>.mapInput()</code> which fills 30-field rich schema from DCMOC store slice. 30 regional day-rate cards (us_virginia, eu_west, sea, jp, etc.) in <code>DATA.commissioning.cx.rich.rates</code>. Source: ASHRAE Guideline 0 / BCxA / NETA ECS scope; Uptime IST scenario counts.<span class="mn-src">commissioning.cx · engine-catalog</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">3.6 General Monte Carlo driver (<code>sim.monteCarlo</code>)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Distributions supported: normal(mean,sd) · uniform(min,max) · triangular(min,mode,max) · categorical</span>
+                <span class="mn-eq">RNG: seeded LCG  s = (1103515245·s + 12345) >>> 0;  rnd = s / 2^32</span>
+                <span class="mn-eq">Normal draw: Box-Muller  z = √(−2 ln u₁) · cos(2π u₂)</span>
+                <span class="mn-eq">Pairwise correlation (optional): z_b ← ρ·z_a + √(1−ρ²)·z_b  [Cholesky Z-injection]</span>
+                <span class="mn-eq">Output: { p10, p50, p90, mean, min, max, samples }</span>
+                <span class="mn-where">In <code>RZEngine.models.sim.monteCarlo(fn, distributions, iterations, seed, opts)</code>. Default seed 123 456 789 for reproducibility. Also available: <code>sim.tornado()</code> (one-at-a-time swing, ranked by |swing|) and <code>sim.sensitivityGrid()</code> (2-D heat map).<span class="mn-src">sim · engine-catalog</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">All constants are deep-frozen in <code class="mn-mono">RZEngine.DATA</code> (loaded from <code class="mn-mono">rz-engine.min.js</code>) or in <code class="mn-mono">dcmoc/src/lib/capex-data.ts</code> (DCMOC-finer A7 2025 bases). Key tables:</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">CAPEX base cost factors — A7 2025 rates</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Category</th><th>Base ($/kW)</th><th>Dimensional multipliers applied</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td>Building &amp; Civil</td><td><code>1 050</code></td><td>buildingType, locMult, yearMult</td><td>T&amp;T 2025 / C&amp;W 2025</td></tr>
+                    <tr><td>Seismic Protection</td><td><code>130</code></td><td>seismicMult (zone0 0.2× … zone4 8.0×)</td><td>T&amp;T 2025</td></tr>
+                    <tr><td>Electrical (MV/LV)</td><td><code>1 550</code></td><td>redMult × rackMult × upsMult</td><td>T&amp;T 2025 (A7 — NOT merged with engine's 1 200 $/kW)</td></tr>
+                    <tr><td>UPS Systems</td><td><code>780</code></td><td>upsMult (standalone 0.9× … rotary 1.5×)</td><td>T&amp;T 2025</td></tr>
+                    <tr><td>Generator &amp; Fuel</td><td><code>520</code></td><td>genMult × fuelMult</td><td>T&amp;T 2025</td></tr>
+                    <tr><td>Cooling Systems</td><td><code>900</code></td><td>coolMult (air 1.0× … liquid 1.6×)</td><td>T&amp;T 2025</td></tr>
+                    <tr><td>Fire Suppression</td><td><code>195</code></td><td>fireSupMult (water 0.6× … N₂ 1.8×)</td><td>T&amp;T 2025</td></tr>
+                    <tr><td>Fire Alarm System</td><td><code>105</code></td><td>alarmMult (conventional 0.6× … hybrid 2.2×)</td><td>T&amp;T 2025</td></tr>
+                    <tr><td>BMS / DCIM</td><td><code>160</code></td><td>locMult, yearMult</td><td>T&amp;T 2025</td></tr>
+                    <tr><td>Network Infra</td><td><code>325</code></td><td>locMult, yearMult</td><td>T&amp;T 2025</td></tr>
+                    <tr><td>Security Systems</td><td><code>105</code></td><td>locMult, yearMult</td><td>T&amp;T 2025</td></tr>
+                    <tr><td>Cx Agent &amp; Startup</td><td><code>155</code></td><td>locMult, yearMult</td><td>T&amp;T 2025</td></tr>
+                    <tr><td>Testing &amp; Compliance</td><td><code>115</code></td><td>testingRedundancyMult, locMult</td><td>T&amp;T 2025</td></tr>
+                    <tr><td>Permits &amp; Approvals</td><td><code>80</code></td><td>permitRegionMult[effectiveRegion]</td><td>T&amp;T 2025</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Location multipliers (fallback; priority = constructionIndex)</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Region key</th><th>locMult (rel. US=1.0)</th><th>Representative city $/W (T&amp;T 2025)</th></tr></thead>
+                <tbody>
+                    <tr><td>usa</td><td><code>1.00</code></td><td>Virginia 13.40 · Silicon Valley 13.30 · Dallas 14.30</td></tr>
+                    <tr><td>europe</td><td><code>1.15</code></td><td>London 12.00 · Frankfurt 11.60 · Amsterdam 11.80</td></tr>
+                    <tr><td>japan</td><td><code>1.10</code></td><td>Tokyo 15.20</td></tr>
+                    <tr><td>australia</td><td><code>1.05</code></td><td>Sydney 12.30</td></tr>
+                    <tr><td>south_korea</td><td><code>0.95</code></td><td>Seoul 9.50</td></tr>
+                    <tr><td>sea</td><td><code>0.65</code></td><td>Singapore 14.53 · Malaysia 11.37 · Jakarta 11.21</td></tr>
+                    <tr><td>china</td><td><code>0.70</code></td><td>Hong Kong 13.80</td></tr>
+                    <tr><td>india</td><td><code>0.55</code></td><td>Mumbai 6.64</td></tr>
+                    <tr><td>mena</td><td><code>0.85</code></td><td>Dubai 10.50 · Riyadh 9.20</td></tr>
+                    <tr><td>africa</td><td><code>0.55</code></td><td>Johannesburg 7.50 · Nairobi 7.20</td></tr>
+                    <tr><td>south_america</td><td><code>0.60</code></td><td>São Paulo 8.50</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Staffing &amp; OPEX constants</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Constant</th><th>Value</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td>Shift multiplier</td><td><code>4.2×</code></td><td>Uptime critical-facilities staffing benchmark</td></tr>
+                    <tr><td>Labor burden</td><td><code>1.35×</code></td><td>Benefits + payroll tax + overhead</td></tr>
+                    <tr><td>Maintenance base</td><td><code>$180 000 /MW·yr</code></td><td>DC industry comprehensive maintenance benchmark</td></tr>
+                    <tr><td>PM savings slope</td><td><code>0.30 per %</code> above 50% PM baseline</td><td>Engine heuristic</td></tr>
+                    <tr><td>Burnout logistic k</td><td><code>0.12</code>, mid-point 88% utilization</td><td>Occupational-health literature</td></tr>
+                    <tr><td>Replacement cost factor</td><td><code>1.5×</code> annual salary</td><td>SHRM 2024</td></tr>
+                    <tr><td>FTE/MW — in-house</td><td><code>4.2</code></td><td>Uptime Institute critical-DC staffing norm</td></tr>
+                    <tr><td>FTE/MW — hybrid 70/30</td><td><code>3.8</code></td><td>Engine staffModels</td></tr>
+                    <tr><td>FTE/MW — hybrid 50/50</td><td><code>3.5</code></td><td>Engine staffModels</td></tr>
+                    <tr><td>FTE/MW — outsourced</td><td><code>3.0</code></td><td>Engine staffModels</td></tr>
+                    <tr><td>Cx itLoad perturbation σ</td><td><code>7.5%</code> (Normal)</td><td>Monte Carlo commissioning model, engine</td></tr>
+                    <tr><td>Cx cost noise σ</td><td><code>5%</code>, clamped [0.85, 1.15]</td><td>Monte Carlo commissioning model, engine</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Formula / source</th><th>Unit</th><th>Surface in DC MOC</th></tr></thead>
+                <tbody>
+                    <tr><td>CAPEX total</td><td><code>CAPEX_total = Σ costs[c] + soft + contingency [+FOM]</code></td><td>USD</td><td>CAPEX module KPI card + PDF §1</td></tr>
+                    <tr><td>CAPEX $/kW</td><td><code>CAPEX_total / itLoad</code></td><td>$/kW</td><td>CAPEX efficiency chip; narrative band (Low &lt;$8 k · Standard &lt;$15 k · Premium)</td></tr>
+                    <tr><td>CAPEX by category</td><td>All 14 <code>costs[c]</code></td><td>USD each</td><td>Waterfall / donut chart</td></tr>
+                    <tr><td>PUE</td><td><code>getPUE(coolingType)</code></td><td>ratio</td><td>PUE chip; drives energy and OPEX</td></tr>
+                    <tr><td>Timeline (months)</td><td><code>computeTimeline()</code></td><td>months</td><td>Gantt timeline module</td></tr>
+                    <tr><td>Floor space / rack count</td><td><code>ceil(racks × 2.5 m²)</code></td><td>m² / count</td><td>Capacity module metrics</td></tr>
+                    <tr><td>OPEX total annual</td><td><code>models.opex.totalAnnual()</code></td><td>USD/yr</td><td>Financial module OPEX card + PDF §2</td></tr>
+                    <tr><td>OPEX breakdown</td><td>power · staffing · contract · maintenance · overhead</td><td>USD/yr each</td><td>OPEX donut chart; YTD = total ÷ 12 × months since COD</td></tr>
+                    <tr><td>Shift FTE / utilization</td><td><code>models.opsBudget.opex() + .staffing()</code></td><td>count / %</td><td>Staffing module headcount card</td></tr>
+                    <tr><td>Burnout probability</td><td>logistic(util, k=0.12, mid=88)</td><td>%</td><td>Staffing resilience gauge</td></tr>
+                    <tr><td>Staffing Resilience Index</td><td>SRI weighted composite (0–100)</td><td>score</td><td>SRI chip with colour band</td></tr>
+                    <tr><td>Cx program cost (P50)</td><td><code>models.commissioning.programRich().grand</code></td><td>USD</td><td>Commissioning module cost band</td></tr>
+                    <tr><td>Cx Monte Carlo P5/P25/P50/P75/P95</td><td><code>models.commissioning.monteCarlo()</code>, N=10 000</td><td>USD</td><td>Histogram with marker lines; CVaR95 shown</td></tr>
+                    <tr><td>Cx sensitivity tornado</td><td><code>models.commissioning.sensitivity()</code>, 7 params</td><td>USD swing</td><td>Tornado chart sorted by |swing|</td></tr>
+                    <tr><td>Executive PDF</td><td>ReportNarrative engine (16-family) → browser print-window</td><td>multi-page PDF</td><td>PRO export button — all KPIs + charts + provenance</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example</h2>
+            <p class="mn-lead">A 2 000 kW Tier III purpose-built data centre in Jakarta (DCMOC city market: <code>jakarta</code>, $/W anchor 11.21 T&amp;T 2025), N+1 redundancy, in-row cooling, standard racks, modular UPS, diesel generator, 24 h fuel, 2026 build year, 30 FTE in-house staff, 60% PM ratio, 85% retention. Values computed from source constants — engine <em>cannot</em> be <code>require()</code>-called in this static doc, so the trace below follows the exact formula path from source.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Location multiplier</strong> — city market jakarta overrides country index: <code>perW = 11.21 $/W → locMult = 11.21 / 4.65 =</code> <span class="mn-result">2.411</span> (relative to the US base of 4.65 $/W used as normalisation anchor in CapexEngine city-data logic).</li>
+                    <li><strong>Key dimensional multipliers</strong> — redundancy N+1 <code>1.25×</code>; cooling in-row <code>1.20×</code>; rack standard <code>1.00×</code>; UPS modular <code>1.00×</code>; building purpose <code>1.00×</code>; seismic default zone2 <code>2.50×</code> (seismically active Indonesia); year 2026 escalation (est.) <code>≈1.03×</code>.</li>
+                    <li><strong>Electrical cost (dominant category)</strong>: <code>1 550 $/kW × 2 000 kW × (1.25 × 1.00 × 1.00) × 2.411 × 1.03 ≈</code> <span class="mn-result">$9.64 M</span>.</li>
+                    <li><strong>Cooling cost</strong>: <code>900 × 2 000 × 1.20 × 2.411 × 1.03 ≈</code> <span class="mn-result">$5.36 M</span>.</li>
+                    <li><strong>Building cost</strong>: <code>1 050 × 2 000 × 1.00 × 2.411 × 1.03 ≈</code> <span class="mn-result">$5.22 M</span>.</li>
+                    <li><strong>Total hard cost (all 14 categories aggregated)</strong>: approximately <span class="mn-result">~$32–34 M</span> (sum of 14 category lines with their respective multipliers).</li>
+                    <li><strong>Soft costs</strong> at design 6% + PM 3%: <code>totalHard × 0.09 ≈</code> <span class="mn-result">~$2.9–3.1 M</span>.</li>
+                    <li><strong>Contingency</strong> at 10%: <code>(totalHard + soft) × 0.10 ≈</code> <span class="mn-result">~$3.5 M</span>. CAPEX total <span class="mn-result">~$38–40 M</span> → <span class="mn-result">~$19–20 k/kW</span> (Premium bracket — driven by Jakarta city anchor and N+1 redundancy).</li>
+                    <li><strong>PUE</strong> (in-row cooling): <code>getPUE('inrow') ≈</code> <span class="mn-result">1.35</span>.</li>
+                    <li><strong>Annual energy</strong>: <code>2 000 kW × 1.35 × 8 760 h × 0.099 $/kWh (ID grid rate) ≈</code> <span class="mn-result">$2.35 M/yr</span>.</li>
+                    <li><strong>Staffing OPEX</strong>: in-house, base FTE = <code>ceil(2 MW × 4.2) = 9</code>; shift FTE = <code>ceil(9 × 4.2) = 38</code>; burdened rate ~$17 k/FTE (ID rate $12 k × 1.35); labor budget ≈ <code>38 × 17 000 × 1.00 =</code> <span class="mn-result">~$0.65 M/yr</span>.</li>
+                    <li><strong>Maintenance</strong>: <code>2 MW × $180 000 × tropFactor(1.08) × pmEfficiency(0.70) =</code> <span class="mn-result">~$0.27 M/yr</span> (PM 60%, savings slope reduces from base).</li>
+                    <li><strong>OPEX total (core)</strong>: power + staffing + contract + maintenance + overhead ≈ <span class="mn-result">~$3.5–4 M/yr</span>.</li>
+                    <li><strong>Burnout probability</strong>: util ≈ <code>78 + 2×0.12 = 78.24%</code>; logistic(78.24, k=0.12, mid=88) ≈ <span class="mn-result">~23%</span>.</li>
+                    <li><strong>Cx commissioning P50</strong> (programRich): for 2 000 kW N+1 in-row purpose-build in SEA region, budgetary range <span class="mn-result">~$0.9–1.4 M</span> (Monte Carlo P25–P75 band). P95 ≈ <span class="mn-result">~$1.8 M</span>.</li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Method note:</strong> Steps 3–8 use the formula path traced from <code>CapexEngine.ts</code> and <code>capex-data.ts</code>. The node eval-require of <code>rz-engine.js</code> is available in DCMOC's build process but not in this static HTML context. The Jakarta locMult derivation from city $/W anchor follows the <code>calculateCapex</code> city-data branch. Final totals will differ slightly from live engine output due to the seismic default zone and the complete 14-category sum — open the live DC MOC for exact figures.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>T&amp;T DCCI 2025</b> — Turner &amp; Townsend Data Center Construction Cost Index 2025: per-city $/W anchor table (Singapore 14.53, Tokyo 15.20, Jakarta 11.21, London 12.00 …); country construction indices. Primary CAPEX cost anchor.</li>
+                <li><b>C&amp;W 2025</b> — Cushman &amp; Wakefield DC Cost Guide 2025: US city $/W checks (Virginia 13.40, Dallas 14.30, San Antonio 9.30); supplementary to T&amp;T.</li>
+                <li><b>JLL 2026</b> — JLL Data Center Construction Cost 2025–2026: forward escalation and phase premium (~12% per phase). Year-escalation multipliers in engine.</li>
+                <li><b>AACE 18R-97</b> — Cost Estimate Classification System: DC MOC CAPEX is a Class 4 budgetary estimate (−30/+50% accuracy range). Class 5 (-50/+100%) when fewer than 5 inputs are defined.</li>
+                <li><b>ASHRAE TC9.9 (5th Ed., 2021)</b> — Thermal Guidelines for Data Processing Environments: A1–A4 air-class and H1 liquid supply-temperature envelopes; ΔT limits driving PUE bands.</li>
+                <li><b>Uptime Institute Tier Standard: Topology 2022</b> — T1–T4 redundancy path definition; Tier availability targets (99.671% … 99.995%); IST scenario counts driving Cx level-5 duration.</li>
+                <li><b>ANSI/TIA-942-C (2024)</b> — Rated-1 … Rated-4 DC infrastructure classifications; topology cross-reference for DCMOC architecture module.</li>
+                <li><b>ASHRAE Guideline 0-2019</b> — The Commissioning Process: Cx level definitions (L0 pre-design … L6 post-occupancy) that map to the engine's Cx duration model.</li>
+                <li><b>BCxA / NETA ECS</b> — Building Commissioning Association and National Electrical Testing Association scope benchmarks; calibrate the Cx base day-rate cards and level cost ratios.</li>
+                <li><b>ISA-18.2 / EEMUA-191</b> — Alarm management targets (≤1 alarm/10 min/operator; flood ≥10 alarms/10 min; actionable ≥85%) embedded in <code>RZEngine.models.alarms</code>.</li>
+                <li><b>SHRM 2024</b> — Employee replacement cost 150% of annual salary; feeds <code>retentionCost</code> in the staffing resilience model.</li>
+                <li><b>IEA 2026 + Ember</b> — Grid carbon intensity by country in <code>DATA.carbon.gridFactor</code>; ICAP carbon prices in <code>DATA.carbon.carbonPrice</code>. Drive extended-OPEX carbon line.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">rz-engine.js</code> (RZEngine v2.5.1, DATA v2.5.1) · <code class="mn-mono">dcmoc/src/lib/CapexEngine.ts</code> · <code class="mn-mono">dcmoc/src/lib/capex-data.ts</code> · <code class="mn-mono">dcmoc/src/lib/engine-catalog.json</code> (200 functions / 105 sources, AUTO-GENERATED).</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">CAPEX is a <strong>Class 4 budgetary estimate</strong> (AACE 18R-97) with ±30–50% accuracy. It is not a detailed cost plan and must not be used for contract tendering without a full bottom-up quantity take-off by a qualified cost estimator. Key assumptions:</p>
+            <p class="mn-lead"><strong>CAPEX:</strong> The 14-category base costs are 2025 market rates calibrated to the T&amp;T / C&amp;W city-anchor tables. The DCMOC A7 2025 electrical base (1 550 $/kW) is deliberately NOT merged with the shared engine's 1 200 $/kW model — both are documented in engine-catalog provenance as a justified divergence (different model shapes). Seismic multiplier defaults to zone 2 (moderate seismicity) when not specified. Green certification and renewable options add premium costs not captured in the base categories — handled via <code>renewableCost</code> adder. FOM (Facilities of Merit — substation, grid connection, switchgear) is an optional line that requires project-specific utility quotes to confirm.</p>
+            <p class="mn-lead"><strong>OPEX:</strong> DC-contract utilisation basis assumes 100% committed capacity at all times (not a measured blended utilisation). Energy price is the regional benchmark rate from <code>DATA.regions[*].powerKwh</code> — actual tariff structures (TOU, demand charges, PPA) can be overridden via advanced inputs. Maintenance requires a CAPEX basis; the model computes zero maintenance if no capex is provided.</p>
+            <p class="mn-lead"><strong>Staffing / shift:</strong> The 4.2× shift multiplier is an Uptime-benchmarked industry norm for critical-facility 24/7 coverage. Actual headcount will vary with site complexity, automation level, and local labour regulations. The Staffing Resilience Index (SRI) is a screening heuristic — it is not a certified HR assessment tool.</p>
+            <p class="mn-lead"><strong>Monte Carlo:</strong> The commissioning Monte Carlo perturbs only IT load (±7.5%) and a scalar cost noise (±5%). It does not model schedule risk, vendor variation, or supply-chain disruptions. For project-level risk analysis a full probabilistic schedule with correlated distributions is required. The <code>sim.monteCarlo</code> pairwise-correlation implementation is exact for two independent pairs; chained pairs introduce implicit transitive correlation — use disjoint pairs only.</p>
+            <p class="mn-lead"><strong>PDF export:</strong> The executive PDF is generated via the browser print-window (ReportNarrative engine). Chart rasterisation fidelity depends on the browser renderer; vector PDF export is not supported in the current release. This manual and the DC MOC tool are an <strong>engineering education and pre-design aid</strong>; financial investment decisions must engage qualified engineers, cost consultants, and financial advisers.</p>
+        </section>
+
+        <a class="mn-toollink" href="../dcmoc/">&#9654; Open the live DC MOC</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../dcmoc/">DC MOC</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

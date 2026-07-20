@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.98.2 — 2026-07-20 (USER_MANUAL DCMOC dirombak total — mandat owner)
+
+### Changed
+- **dcmoc/USER_MANUAL.md 191 → 355 baris**: daftar LENGKAP 49/49 engine (26 dikonsumsi DCMOC — kegunaan detail + fungsi kunci + halaman pemakai; 19 site/artikel via KB; 4 no-consumer dijelaskan jujur) diverifikasi programatik ≡ engine-catalog.json; tabel 20+ keluarga DATA bersumber; fitur platform per menu (trace ƒx, panel Kenapa?, prefill, Env Costs, Data Library, KB, peta, PDF, kalender, kejujuran presentasi); gate kualitas; changelog ringkas v1.89→v1.98.1. Deskripsi "untuk apa" bersumber DATA.sources katalog, bukan karangan.
+
 ## v1.98.1 — 2026-07-20 (wave M/L audit tuntas: kontradiksi Architecture + kejujuran plan-mode + Asset MTBF + air ganda + LCC hidup)
 
 ### Fixed
