@@ -1601,6 +1601,7 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
             },
             options: {
                 responsive: true, maintainAspectRatio: true,
+                interaction: { mode: 'index', intersect: false },
                 plugins: { legend: { position: 'bottom', labels: { font: { size: 10, family: 'Inter' } } } },
                 scales: { y: { grid: { color: 'rgba(0,0,0,0.05)' } } }
             }
@@ -1622,6 +1623,7 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
             },
             options: {
                 responsive: true,
+                interaction: { mode: 'index', intersect: false },
                 plugins: { legend: { position: 'bottom', labels: { font: { size: 10, family: 'Inter' } } } },
                 scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } } }
             }
@@ -1722,7 +1724,7 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
         window._histChart = new Chart(ctx.getContext('2d'), {
             type: 'bar',
             data: { labels: labels, datasets: [{ data: counts, backgroundColor: colors, borderRadius: 2 }] },
-            options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+            options: { responsive: true, interaction: { intersect: false }, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
         });
     }
 
@@ -1764,7 +1766,7 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
                     borderRadius: 4
                 }]
             },
-            options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
+            options: { indexAxis: 'y', responsive: true, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
         });
     }
 

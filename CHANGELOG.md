@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.99.7 — 2026-07-21 (DC Hub calculator charts — fix stretching + hover tooltips)
+
+### Fixed
+- **Chart "continuous stretching"** (owner screenshot tco-calculator): `.tco-chart-canvas-wrap` + `.tco-pro-chart-wrap` pakai `flex:1 + height:100%!important` di flex-parent tanpa tinggi tetap → Chart.js responsive membaca clientHeight → set canvas → resize loop → canvas meledak vertikal saat hover. Fix: tinggi deterministik `height:340px/300px + max-height` (loop putus, mirror pola terbukti `.chart-container{height:280px}`). Verifikasi headless: canvas 340→340 STABLE setelah 5× hover (was: tumbuh tak terbatas).
+- **Tooltip value tidak keluar saat hover** ("banyak tooltip tidak ada"): Chart.js 4.4.x default `intersect:true` → tooltip hanya saat kursor TEPAT di titik. Fix: `interaction:{mode:'index',intersect:false}` di 17 chart (tco 3, cx 6, pue 4, roi 4) — line/bar mode 'index' (semua seri di X), doughnut/pie `intersect:false` saja (nearest). Verifikasi: tooltip muncul on-hover-near (pue/roi ✓ headless). opex-calculator TIDAK disentuh (standing order).
+
+### Verified
+- Headless: 4 kalkulator canvas height stabil pasca-hover, 0 pageerror; tooltip aktif · js-syntax + script-tags audit CLEAN.
+
 ## v1.99.6 — 2026-07-21 (DCMOC user-facing text → English, sitewide sweep)
 
 ### Changed (owner: "change it in english" — trace lalu seluruh UI)

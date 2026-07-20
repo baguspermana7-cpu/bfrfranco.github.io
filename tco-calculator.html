@@ -829,8 +829,12 @@
 
         .tco-chart-canvas-wrap {
             position: relative;
-            flex: 1;
-            min-height: 280px;
+            /* fixed deterministic height — breaks the Chart.js responsive resize
+               feedback loop (flex:1 + height:100% inside an unbounded flex parent
+               grew the canvas indefinitely on hover). Mirrors the proven
+               .chart-container{height:280px} pattern used by opex/pue/roi. */
+            height: 340px;
+            max-height: 340px;
         }
 
         .tco-chart-canvas-wrap canvas { width: 100% !important; height: 100% !important; }
@@ -972,8 +976,8 @@
 
         .tco-pro-chart-wrap {
             position: relative;
-            flex: 1;
-            min-height: 280px;
+            height: 300px;
+            max-height: 300px;
         }
 
         .tco-pro-chart-wrap canvas { width: 100% !important; height: 100% !important; }
@@ -3494,6 +3498,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
                     plugins: {
                         legend: {
                             position: 'bottom',
@@ -3690,6 +3695,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
                     layout: { padding: { top: 4, bottom: 4, left: 0, right: 0 } },
                     plugins: {
                         legend: { display: false },
@@ -3871,6 +3877,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
                     plugins: {
                         legend: {
                             labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12, boxHeight: 3, padding: 16 }

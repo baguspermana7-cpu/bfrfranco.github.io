@@ -4018,7 +4018,7 @@ function cxRenderChartLevel(res){
       data:[res.levels.l0,res.levels.l1,res.levels.l2,res.levels.l3,res.levels.l4,res.levels.l5,res.levels.l6],
       backgroundColor:['#64748b','#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444','#f97316'],borderRadius:4
     }]},
-    options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return cxFmt(c.raw);}}}},scales:{y:{ticks:{callback:function(v){return cxFmt(v);}},grid:{color:'rgba(148,163,184,0.08)'}},x:{grid:{display:false}}}}
+    options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return cxFmt(c.raw);}}}},scales:{y:{ticks:{callback:function(v){return cxFmt(v);}},grid:{color:'rgba(148,163,184,0.08)'}},x:{grid:{display:false}}}}
   });
 }
 
@@ -4031,7 +4031,7 @@ function cxRenderChartSchedule(res){
       data:[Math.ceil(res.duration.l0/5),Math.ceil(res.duration.l1/5),Math.ceil(res.duration.l2/5),Math.ceil(res.duration.l3/5),Math.ceil(res.duration.l4/5),Math.ceil(res.duration.l5/5),Math.ceil(res.duration.l6/5)],
       backgroundColor:['#64748b','#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444','#f97316'],borderRadius:4
     }]},
-    options:{responsive:true,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+' weeks';}}}},scales:{x:{ticks:{callback:function(v){return v+'w';}},grid:{color:'rgba(148,163,184,0.08)'}},y:{grid:{display:false}}}}
+    options:{responsive:true,interaction:{mode:'index',intersect:false},indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+' weeks';}}}},scales:{x:{ticks:{callback:function(v){return v+'w';}},grid:{color:'rgba(148,163,184,0.08)'}},y:{grid:{display:false}}}}
   });
 }
 
@@ -4045,7 +4045,7 @@ function cxRenderChartDiscipline(res){
       data:[d.electrical,d.mechanical,d.fire,d.security,d.it,d.controls,d.building,d.management],
       backgroundColor:['#3b82f6','#22d3ee','#ef4444','#f59e0b','#8b5cf6','#10b981','#64748b','#f97316']
     }]},
-    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11}}},tooltip:{callbacks:{label:function(c){return c.label+': '+cxFmt(c.raw)+' ('+cxPct(c.raw,res.grandTotal)+')';}}}}}
+    options:{responsive:true,interaction:{intersect:false},plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11}}},tooltip:{callbacks:{label:function(c){return c.label+': '+cxFmt(c.raw)+' ('+cxPct(c.raw,res.grandTotal)+')';}}}}}
   });
 }
 
@@ -4060,7 +4060,7 @@ function cxRenderChartMC(mc){
   cxChartInstances.mc=new Chart(ctx,{
     type:'bar',
     data:{labels:labels,datasets:[{data:counts,backgroundColor:'rgba(59,130,246,0.6)',borderRadius:1}]},
-    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(148,163,184,0.08)'}},x:{display:false}}}
+    options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(148,163,184,0.08)'}},x:{display:false}}}
   });
 }
 
@@ -4078,7 +4078,7 @@ function cxRenderChartTornado(sens,baseCost){
       {label:'Low (-20%)',data:lows,backgroundColor:'rgba(16,185,129,0.7)',borderRadius:3},
       {label:'High (+20%)',data:highs,backgroundColor:'rgba(239,68,68,0.7)',borderRadius:3}
     ]},
-    options:{responsive:true,indexAxis:'y',plugins:{legend:{labels:{color:'#94a3b8'}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+cxFmt(c.raw);}}}},scales:{x:{ticks:{callback:function(v){return cxFmt(v);}},grid:{color:'rgba(148,163,184,0.08)'}},y:{grid:{display:false}}}}
+    options:{responsive:true,interaction:{mode:'index',intersect:false},indexAxis:'y',plugins:{legend:{labels:{color:'#94a3b8'}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+cxFmt(c.raw);}}}},scales:{x:{ticks:{callback:function(v){return cxFmt(v);}},grid:{color:'rgba(148,163,184,0.08)'}},y:{grid:{display:false}}}}
   });
 }
 
@@ -5026,7 +5026,7 @@ function cxRenderResourceHistogram(res,inp){
       {label:'OEM Specialists',data:oemData,backgroundColor:'#f59e0b'},
       {label:'Witnesses',data:witnessData,backgroundColor:'#a855f7'}
     ]},
-    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#64748b',font:{size:8}}},y:{stacked:true,title:{display:true,text:'Person-Days',color:'#64748b'},ticks:{color:'#64748b'},grid:{color:'rgba(148,163,184,0.08)'}}}}
+    options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#64748b',font:{size:8}}},y:{stacked:true,title:{display:true,text:'Person-Days',color:'#64748b'},ticks:{color:'#64748b'},grid:{color:'rgba(148,163,184,0.08)'}}}}
   });
 }
 
