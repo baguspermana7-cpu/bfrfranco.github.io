@@ -168,7 +168,7 @@ export function ExecutiveDashboard() {
 
             {/* Row 1 — KPI cards */}
             {has('kpi') && (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
+            <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-2.5">
                 <KpiCard label="Project Capacity" value={`${d.itLoadMw.toFixed(0)} MW`} sub={`${d.itLoadKw.toLocaleString()} kW IT`} icon={Cpu} accent="cyan" series={capacitySeries} seriesLabel="IT Load (MW)" valueFormat={(n) => `${n.toFixed(2)} MW`} trace="sim.itLoad" tip="Total IT load capacity in megawatts, derived from the Requirements engine (rack count × kW/rack). The trend shows the occupancy ramp schedule." />
                 <KpiCard label="Tier Design" value={`Tier ${d.tier}`} sub={d.availabilityTarget ? `Target ${d.availabilityTarget}%` : d.redundancy} icon={Server} accent="violet" trace="sim.tierLevel" tip="Uptime Institute Tier classification (II–IV) set in the Requirements engine. Determines redundancy architecture, availability target, and CAPEX uplift." />
                 <KpiCard label="Total CAPEX" value={fmtUsd(d.capexTotal)} sub={d.perKw ? `${fmtUsd(d.perKw)}/kW` : 'Open CAPEX'} icon={Building} accent="emerald" onClick={() => go('capex')} trace="capex.total" tip="Total design CAPEX from the CAPEX engine, including civil, M&E, IT, and contingency. Click to open the full CAPEX breakdown." />
@@ -245,7 +245,7 @@ export function ExecutiveDashboard() {
             {has('extras') && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 <KpiEfficiencyRow d={d} />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <DataFlowRail stats={{ inputs: 5, outputs: 7, decisions: ai?.recommendations.length ?? 0 }} />
                     <QuickActions onAction={handleAction} />
                 </div>

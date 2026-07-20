@@ -519,7 +519,7 @@ const InvestmentDashboard = () => {
                                 <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300">Debt Amortization Schedule</h3>
                             </div>
                             <div className="overflow-x-auto">
-                                <table className="w-full text-xs">
+                                <table className="w-full min-w-[640px] text-xs">
                                     <thead>
                                         <tr className="bg-slate-100 dark:bg-slate-900/50 text-slate-500 uppercase font-semibold">
                                             <th className="px-4 py-2 text-left">Year</th>
@@ -595,7 +595,7 @@ const InvestmentDashboard = () => {
                                 <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300">Levered Free Cashflow</h3>
                             </div>
                             <div className="overflow-x-auto">
-                                <table className="w-full text-xs">
+                                <table className="w-full min-w-[640px] text-xs">
                                     <thead>
                                         <tr className="bg-slate-100 dark:bg-slate-900/50 text-slate-500 uppercase font-semibold">
                                             <th className="px-4 py-2 text-left">Year</th>
@@ -764,7 +764,7 @@ const InvestmentDashboard = () => {
                             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300 mb-1">Terminal Value Sensitivity</h3>
                             <p className="text-[11px] text-slate-400 mb-4">Stabilized NOI of {fmtMoney(noi)} capitalized across a range of cap rates</p>
                             <div className="overflow-x-auto">
-                                <table className="w-full text-xs">
+                                <table className="w-full min-w-[420px] text-xs">
                                     <thead>
                                         <tr className="bg-slate-100 dark:bg-slate-900/50 text-slate-500 uppercase font-semibold">
                                             <th className="px-4 py-2 text-left">Cap Rate</th>
@@ -826,7 +826,7 @@ const InvestmentDashboard = () => {
                                 <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300">Acquisition Price Sensitivity</h3>
                             </div>
                             <div className="overflow-x-auto">
-                                <table className="w-full text-xs">
+                                <table className="w-full min-w-[480px] text-xs">
                                     <thead>
                                         <tr className="bg-slate-100 dark:bg-slate-900/50 text-slate-500 uppercase font-semibold">
                                             <th className="px-4 py-2 text-left">Multiple</th>
@@ -920,7 +920,7 @@ const InvestmentDashboard = () => {
                             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300 mb-4">Equity IRR Sensitivity Matrix<Explain k="sensitivity-matrix" /></h3>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Debt Ratio (rows) x Exit EV/EBITDA Multiple (columns)</p>
                             <div className="overflow-x-auto">
-                                <table className="w-full text-xs">
+                                <table className="w-full min-w-[560px] text-xs">
                                     <thead>
                                         <tr>
                                             <th className="px-3 py-2 text-left text-slate-500 font-medium">Debt %</th>

@@ -31,7 +31,7 @@ const errors = [];
 page.on('pageerror', (e) => errors.push(String(e).slice(0, 180)));
 
 await page.evaluateOnNewDocument(() => {
-    localStorage.setItem('dcmoc-auth', JSON.stringify({ state: { user: { email: 'b@r.com', role: 'root' } }, version: 0 }));
+    localStorage.setItem('dcmoc.tour.v1', 'seen'); localStorage.setItem('dcmoc-auth', JSON.stringify({ state: { user: { email: 'b@r.com', role: 'root' } }, version: 0 }));
     // capture the print-window document instead of opening it
     window.__pdfCaptures = [];
     window.open = () => {

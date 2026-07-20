@@ -350,7 +350,7 @@ export default function AssetLifecycleDashboard() {
                         <h4 className="font-semibold text-slate-900 dark:text-white flex items-center gap-1">Asset Detail ({result.assets.length} asset types) <Tooltip content="Total number of tracked asset types across all categories in the facility. Each row shows per-unit and aggregate cost, depreciation, and replacement year." /></h4>
                         <p className="text-xs text-slate-500 dark:text-slate-400">Complete inventory of tracked assets with cost, lifecycle, and depreciation data. Health column shows current condition assessment.</p>
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
+                            <table className="w-full min-w-[720px] text-sm">
                                 <thead>
                                     <tr className="bg-slate-50 dark:bg-slate-800/80">
                                         <th className="text-left px-3 py-2 text-slate-500 font-medium"><span className="flex items-center gap-0.5">Asset <Tooltip content="Equipment name and category. Color dot indicates the asset category grouping." /></span></th>

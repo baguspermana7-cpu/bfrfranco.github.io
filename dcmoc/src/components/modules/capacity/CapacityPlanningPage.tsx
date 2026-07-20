@@ -315,7 +315,7 @@ export function CapacityPlanningPage() {
                                     {util.rows.map((u) => (
                                         <React.Fragment key={u.key}>
                                             <div className="flex items-center gap-2 text-[11px]">
-                                                <span className="w-28 text-slate-600 dark:text-slate-300">{u.label}{u.basis === 'assumption' && <span className="ml-1 rounded bg-amber-500/15 px-1 text-[8px] text-amber-500">ASSUMPTION</span>}</span>
+                                                <span className="w-24 sm:w-28 truncate text-slate-600 dark:text-slate-300">{u.label}{u.basis === 'assumption' && <span className="ml-1 rounded bg-amber-500/15 px-1 text-[8px] text-amber-500">ASSUMPTION</span>}</span>
                                                 <div className="h-2 flex-1 rounded bg-slate-100 dark:bg-slate-800">
                                                     <div className={`h-2 rounded ${u.pct >= 85 ? 'bg-rose-500' : u.pct >= 70 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(100, u.pct)}%` }} />
                                                 </div>

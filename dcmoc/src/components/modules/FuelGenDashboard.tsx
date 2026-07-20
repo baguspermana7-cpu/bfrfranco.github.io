@@ -76,7 +76,7 @@ export default function FuelGenDashboard() {
     ];
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
@@ -91,7 +91,7 @@ export default function FuelGenDashboard() {
             </div>
 
             {/* Two-column layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
                 {/* Left: Editable Parameters */}
                 <div className="lg:col-span-4 space-y-4">
                     <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">

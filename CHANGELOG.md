@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.99.2 — 2026-07-20 (SHIP 3 Arc-3 UX — plan 4-ship KOMPLET)
+
+### Added
+- **Guided tour DCMOC** (`TourOverlay.tsx`): 8 langkah spotlight (context bar → 13 engine → angka ƒx → panel "kenapa?" → chip rec: → Data Library → Knowledge Base → Export PDF) — teknik spotlight spares di-port ke React portal, positioning clamp viewport + fallback center, Esc/klik tutup, a11y dialog+focus; auto-launch sekali (flag `dcmoc.tour.v1`), tombol `?` replay di header. Probe di-seed flag agar tak terhalang.
+- **Chip global "⚠ perubahan tidak tersimpan"** di Shell header — `usePersistHealth()` subscribe flag persistFailed 5 store tracking; tooltip menyebut store yang gagal.
+
+### Changed
+- **Responsive 10 titik** (17 baris, 8 file, desktop tak bergeser): KPI grid clamp xl (Executive 7-col, GridReliability 6-col), nested grid md:, `min-w` semua tabel lebar (AssetLifecycle 720px, ScenarioComparison/Report/Investment 420-640px ×11 tabel), gap sm: FuelGen, label utilization w-24 sm:w-28 truncate.
+
+### Verified
+- tsc/build · walk 24/0 · synergy 6/0 (probe seed diperbaiki — sed arrow-body) · trace-parity 117/117 · export 44/0 · screenshot tour step-3 spotlight ƒx.
+
 ## v1.99.1 — 2026-07-20 (SHIP 2 Arc-2: KORPUS LOOP HIDUP + sumber APAC/Indonesia)
 
 ### Added

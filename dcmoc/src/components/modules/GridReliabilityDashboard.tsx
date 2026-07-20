@@ -64,7 +64,7 @@ const GridReliabilityDashboard = () => {
             </div>
 
             {/* KPIs */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-2 mb-1">

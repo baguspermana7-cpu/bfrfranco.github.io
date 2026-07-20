@@ -133,7 +133,7 @@ page.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text(
 page.on('pageerror', (e) => consoleErrors.push('PAGE: ' + String(e).slice(0, 160)));
 
 await page.evaluateOnNewDocument(() => {
-    localStorage.setItem('dcmoc-auth', JSON.stringify({ state: { user: { email: 'b@r.com', role: 'root' } }, version: 0 }));
+    localStorage.setItem('dcmoc.tour.v1', 'seen'); localStorage.setItem('dcmoc-auth', JSON.stringify({ state: { user: { email: 'b@r.com', role: 'root' } }, version: 0 }));
 });
 await page.goto(`http://localhost:${PORT}/dcmoc/`, { waitUntil: 'networkidle2', timeout: 60000 });
 await new Promise((r) => setTimeout(r, 2500));

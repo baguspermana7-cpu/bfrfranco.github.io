@@ -643,7 +643,7 @@ export function ReportDashboard() {
                             ];
                             return (
                                 <div className="overflow-x-auto">
-                                <table className="w-full text-sm">
+                                <table className="w-full min-w-[480px] text-sm">
                                     <thead>
                                         <tr className="border-b border-slate-200 dark:border-slate-700">
                                             <th className="py-2 text-left text-xs text-slate-500 font-medium">Metric</th>
@@ -787,7 +787,7 @@ export function ReportDashboard() {
                     {(expandedSection === 'cost' || expandedSection === null) && (
                         <div className="px-6 pb-6">
                             <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
+                            <table className="w-full min-w-[480px] text-sm">
                                 <thead>
                                     <tr className="border-b border-slate-200 dark:border-slate-700">
                                         <th className="py-2 text-left text-xs text-slate-500 font-medium">Cost Category</th>
@@ -855,7 +855,7 @@ export function ReportDashboard() {
                     {(expandedSection === 'tco' || expandedSection === null) && (
                         <div className="px-6 pb-6">
                             <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
+                            <table className="w-full min-w-[640px] text-sm">
                                 <thead>
                                     <tr className="border-b border-slate-200 dark:border-slate-700">
                                         <th className="py-2 text-left text-xs text-slate-500 font-medium">Year</th>

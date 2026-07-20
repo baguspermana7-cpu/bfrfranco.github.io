@@ -224,7 +224,7 @@ export function ScenarioComparisonPanel() {
                     </h3>
                 </div>
                 <div className="overflow-x-auto">
-                <table className="w-full text-xs">
+                <table className="w-full min-w-[640px] text-xs">
                     <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-700">
                             <th className="text-left px-4 py-2 text-slate-500 font-medium">Metric</th>
@@ -278,7 +278,7 @@ export function ScenarioComparisonPanel() {
                         <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Input Differences</h3>
                     </div>
                     <div className="overflow-x-auto">
-                    <table className="w-full text-xs">
+                    <table className="w-full min-w-[640px] text-xs">
                         <thead>
                             <tr className="border-b border-slate-200 dark:border-slate-700">
                                 <th className="text-left px-4 py-2 text-slate-500 font-medium">Parameter</th>

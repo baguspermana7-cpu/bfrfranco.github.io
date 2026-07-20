@@ -60,6 +60,11 @@ import { useAuthStore } from '@/store/auth';
 import { useProjectsStore } from '@/store/projects';
 import { LoginScreen } from '@/components/ui/LoginScreen';
 import { Explain } from '@/components/ui/Explain';
+import { TourOverlay } from '@/components/ui/TourOverlay';
+import { usePersistHealth } from '@/hooks/usePersistHealth';
+
+/* Guided-tour "seen" flag (Ship-3c) — set on finish/close, gates auto-launch. */
+const TOUR_SEEN_KEY = 'dcmoc.tour.v1';
 
 interface ShellProps {
     children: React.ReactNode;
@@ -108,6 +113,25 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
     const capexStore = useCapexStore();
     const { theme, setTheme } = useTheme();
     const activeProject = useProjectsStore((s) => s.projects.find((p) => p.id === s.activeProjectId) ?? null);
+
+    const persistHealth = usePersistHealth();
+
+    /* ── Guided tour (Ship-3c) — client-only mount (state only flips in
+     * effects/clicks, so static export / SSR never renders the overlay).
+     * Auto-launch ONCE, 1.5s after the logged-in shell mounts, unless the
+     * user has already seen/closed it. */
+    const [tourOpen, setTourOpen] = useState(false);
+    useEffect(() => {
+        try {
+            if (localStorage.getItem(TOUR_SEEN_KEY)) return;
+        } catch { return; }
+        const t = setTimeout(() => setTourOpen(true), 1500);
+        return () => clearTimeout(t);
+    }, []);
+    const closeTour = () => {
+        setTourOpen(false);
+        try { localStorage.setItem(TOUR_SEEN_KEY, '1'); } catch { /* quota/private mode — non-fatal */ }
+    };
 
     const [scenarioName, setScenarioName] = useState('');
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -591,11 +615,31 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                             <span className="text-slate-800 dark:text-slate-200 font-medium">{activeTab === 'dashboard' ? 'Executive Overview' : navItems.find(n => n.id === activeTab)?.label || SUPPORT.find(s => s.id === activeTab)?.label || PLATFORM.find(p => p.id === activeTab)?.label || ({ faq: 'FAQ', montecarlo: 'Monte Carlo', tier: 'Tier Classification' } as Record<string, string>)[activeTab] || 'Overview'}</span>
                         </div>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
+                        {/* Ship-3a — global persist-health chip: any tracking store whose
+                          * localStorage write failed (quota / private mode) surfaces here. */}
+                        {persistHealth.anyFailed && (
+                            <span
+                                className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400"
+                                title={`Penyimpanan lokal gagal — perubahan hanya di memori sesi ini. Store: ${persistHealth.failedStores.join(', ')}`}
+                                role="status"
+                            >
+                                ⚠ perubahan tidak tersimpan
+                            </span>
+                        )}
                         <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 dark:bg-emerald-500/10 rounded-full border border-emerald-500/20">
                             <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-500">SYSTEM ONLINE</span>
                         </div>
+                        {/* Ship-3c — replay guided tour */}
+                        <button
+                            onClick={() => setTourOpen(true)}
+                            className="w-6 h-6 flex items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/10 text-[11px] font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors"
+                            title="Putar ulang tur panduan"
+                            aria-label="Putar ulang tur panduan DCMOC"
+                        >
+                            ?
+                        </button>
                     </div>
                 </header>
 
@@ -603,7 +647,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                   * project it is working on — live from the shared stores; the old
                   * static data-vintage note shrinks into a hover title). */}
                 {!vintageBannerDismissed && (
-                    <div className="mx-4 sm:mx-6 lg:mx-8 mt-4 flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs text-slate-500 dark:text-slate-400">
+                    <div data-tour="context-bar" className="mx-4 sm:mx-6 lg:mx-8 mt-4 flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs text-slate-500 dark:text-slate-400">
                         <span className="flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0">
                             <span className="font-semibold text-violet-600 dark:text-violet-300 truncate">
                                 {projectName || 'Untitled Project'}
@@ -637,6 +681,9 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                     {children}
                 </div>
             </main>
+
+            {/* Guided tour overlay (Ship-3c) — portal to body, client-only */}
+            {tourOpen && <TourOverlay onClose={closeTour} />}
 
             {/* Floating FAQ / Manual button */}
             {activeTab !== 'faq' && (
