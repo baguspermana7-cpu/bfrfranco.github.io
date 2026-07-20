@@ -57,7 +57,7 @@ export function buildAssessment(family: ReportFamily, m: AssessMetrics): ReportA
             const npv = num(m, 'npv'), irr = num(m, 'irrPct'), hurdle = num(m, 'hurdlePct', 10), payback = num(m, 'paybackYr');
             if (!hasNpv) {
                 return {
-                    label: 'Not Evaluated', color: C.warn, valueLine: 'NPV / IRR — (belum dihitung)',
+                    label: 'Not Evaluated', color: C.warn, valueLine: 'NPV / IRR — (not yet computed)',
                     narrative: `The screening pro-forma has not been computed yet — the ROI engine has no result for this configuration. ` +
                         `NPV, IRR and payback appear once the engine evaluates the revenue and OPEX basis; no investment verdict is implied until then.`,
                 };
@@ -136,7 +136,7 @@ export function buildAssessment(family: ReportFamily, m: AssessMetrics): ReportA
             const compliance = num(m, 'maintCompliancePct', 100), health = num(m, 'avgHealthPct', 100), alarms = num(m, 'activeAlarms');
             if (!hasCompliance) {
                 return {
-                    label: 'Plan Mode', color: C.warn, valueLine: `PM — (belum ada tracking) · ${alarms} alarm${alarms === 1 ? '' : 's'}`,
+                    label: 'Plan Mode', color: C.warn, valueLine: `PM — (no tracking yet) · ${alarms} alarm${alarms === 1 ? '' : 's'}`,
                     narrative: `Maintenance compliance has no recorded tracking entries yet — the operations page is in plan mode. ` +
                         `Average asset health stands at ${health.toFixed(0)}% with ${alarms} active alarm${alarms === 1 ? '' : 's'}. ` +
                         `Log completed PM weeks in the operations log to begin measuring compliance against the maintenance schedule engine.`,
@@ -160,7 +160,7 @@ export function buildAssessment(family: ReportFamily, m: AssessMetrics): ReportA
             const ready = num(m, 'readinessPct'), failed = num(m, 'testsFailed'), issues = num(m, 'openIssues');
             if (!hasReady) {
                 return {
-                    label: 'Not Started', color: C.warn, valueLine: 'readiness — (belum ada progres)',
+                    label: 'Not Started', color: C.warn, valueLine: 'readiness — (no progress yet)',
                     narrative: `Commissioning readiness has no recorded progress yet — the program is in plan mode. ` +
                         `Tick checklist items (L1–L5 / IST / SAT / FAT) or set level completion to begin tracking readiness.`,
                 };
@@ -194,7 +194,7 @@ export function buildAssessment(family: ReportFamily, m: AssessMetrics): ReportA
             const score = num(m, 'score');
             if (!hasScore) {
                 return {
-                    label: 'Not Analyzed', color: C.warn, valueLine: 'score — (belum dianalisis)',
+                    label: 'Not Analyzed', color: C.warn, valueLine: 'score — (not analyzed yet)',
                     narrative: `No site score has been computed for this candidate yet — run the multi-site analysis to score it across power cost, grid reliability, disaster exposure, tax regime, connectivity, water stress and climate factors. ` +
                         `No siting verdict is implied until the analysis runs.`,
                 };

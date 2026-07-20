@@ -114,9 +114,9 @@ function computeGridDiag(result: GridReliabilityResult, grid: CountryProfile['gr
     return {
         components: [
             { label: 'Grid uptime', live: `${gridUptime}%`, sub: Math.round(uptimeScore), weightPct: 40 },
-            { label: 'Stabilitas tegangan', live: voltageStability, sub: voltageScore, weightPct: 20 },
-            { label: 'Frekuensi brownout', live: `${brownoutFreq}×/thn`, sub: Math.round(brownoutScore), weightPct: 20 },
-            { label: 'Durasi outage rata-rata', live: `${avgOutageDuration} mnt`, sub: Math.round(durationScore), weightPct: 20 },
+            { label: 'Voltage stability', live: voltageStability, sub: voltageScore, weightPct: 20 },
+            { label: 'Brownout frequency', live: `${brownoutFreq}×/yr`, sub: Math.round(brownoutScore), weightPct: 20 },
+            { label: 'Average outage duration', live: `${avgOutageDuration} min`, sub: Math.round(durationScore), weightPct: 20 },
         ],
         localScore,
         engineHalf,
@@ -136,7 +136,7 @@ function computeGridDiag(result: GridReliabilityResult, grid: CountryProfile['gr
 const ParityChip = ({ ok }: { ok: boolean }) => (
     ok
         ? <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">≡ engine</span>
-        : <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">⚠ drift vs engine — dekomposisi runtime tidak cocok, percayai angka KPI</span>
+        : <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">⚠ drift vs engine — runtime decomposition does not match, trust the KPI numbers</span>
 );
 
 /* ─── EXPORTED COLLECTOR (Diagnostics Center contract) ────────────────────── */
@@ -160,8 +160,8 @@ export function collectGridDiagnostics(model: { result: GridReliabilityResult; c
         surface: 'Grid Reliability · Grade',
         severity: result.reliabilityGrade === 'F' ? 'critical' : 'warning',
         metric: `Grid reliability score${countryName ? ` (${countryName})` : ''}`,
-        value: `${result.reliabilityGrade} (${result.reliabilityScore}/100) · outage ${(result.annualOutageMinutes / 60).toFixed(1)} jam/thn · mitigasi ${result.gridRiskAdjustedOpex.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })}/thn`,
-        threshold: `grade C butuh skor ≥ ${GRADE_C_MIN_SCORE} (band engine: ${GRADE_BAND_TEXT})`,
+        value: `${result.reliabilityGrade} (${result.reliabilityScore}/100) · outage ${(result.annualOutageMinutes / 60).toFixed(1)} hr/yr · mitigation ${result.gridRiskAdjustedOpex.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })}/yr`,
+        threshold: `grade C requires score ≥ ${GRADE_C_MIN_SCORE} (engine band: ${GRADE_BAND_TEXT})`,
         linkTab: 'grid',
     }];
 }
@@ -248,7 +248,7 @@ const GridReliabilityDashboard = () => {
                             className={`text-xs mt-1 px-2 py-0.5 rounded border w-fit ${gradeColors[result.reliabilityGrade]} ${diag ? 'cursor-pointer underline decoration-dotted underline-offset-2' : ''}`}
                             role={diag ? 'button' : undefined}
                             tabIndex={diag ? 0 : undefined}
-                            title={diag ? `Grade ${result.reliabilityGrade} — klik untuk lihat kenapa (SAIDI/brownout/uptime live) + mitigasi terukur dari model.` : undefined}
+                            title={diag ? `Grade ${result.reliabilityGrade} — click to see why (live SAIDI/brownout/uptime) + measured mitigation from the model.` : undefined}
                             onClick={diag ? () => setGradeOpen(o => !o) : undefined}
                             onKeyDown={diag ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setGradeOpen(o => !o); } } : undefined}
                         >
@@ -323,33 +323,33 @@ const GridReliabilityDashboard = () => {
                     <div className="flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4 shrink-0 text-red-500" />
                         <span className="text-sm font-semibold text-slate-900 dark:text-white">
-                            Kenapa grade {result.reliabilityGrade}? — {selectedCountry.name} skor {result.reliabilityScore}/100
+                            Why grade {result.reliabilityGrade}? — {selectedCountry.name} score {result.reliabilityScore}/100
                         </span>
                     </div>
                     <p className="mt-1.5 text-[11px] leading-relaxed text-slate-600 dark:text-slate-400">
-                        Grade dari band skor yang sama dengan pewarnaan badge ({GRADE_BAND_TEXT}) — butuh ≥{GRADE_C_MIN_SCORE} untuk
-                        grade C, kurang {diag.deficitToC} poin. Kualitas grid adalah data negara (bukan input yang bisa di-tune),
-                        jadi lever-nya adalah mitigasi backup terukur di bawah — atau pindah negara (bagian alternatif).
+                        Grade derives from the same score bands as the badge colouring ({GRADE_BAND_TEXT}) — needs ≥{GRADE_C_MIN_SCORE} for
+                        grade C, short by {diag.deficitToC} points. Grid quality is country data (not a tunable input),
+                        so the levers are the measured backup mitigations below — or relocate to another country (alternatives section).
                     </p>
 
-                    {/* (a) ALASAN — dekomposisi skor dari data grid live, parity-verified */}
+                    {/* (a) REASON — score decomposition from live grid data, parity-verified */}
                     <div className="mt-3 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                        Dekomposisi skor (data grid {selectedCountry.name} live)
+                        Score decomposition (live {selectedCountry.name} grid data)
                     </div>
                     <div className="mt-1.5 space-y-1">
                         {diag.components.map(c => (
                             <div key={c.label} className="flex items-center gap-2 text-xs">
                                 <span className="text-slate-700 dark:text-slate-300">{c.label}</span>
                                 <span className="font-mono tabular-nums text-slate-500 dark:text-slate-400">{c.live}</span>
-                                <span className="ml-auto font-mono tabular-nums text-slate-600 dark:text-slate-300">{c.sub}/100 · bobot {c.weightPct}%</span>
+                                <span className="ml-auto font-mono tabular-nums text-slate-600 dark:text-slate-300">{c.sub}/100 · weight {c.weightPct}%</span>
                             </div>
                         ))}
                         <div className="flex items-center gap-2 border-t border-red-200/60 pt-1.5 text-xs dark:border-red-800/30">
                             <span className="text-slate-700 dark:text-slate-300">
-                                Komposit lokal {diag.localScore}
+                                Local composite {diag.localScore}
                                 {diag.engineHalf != null
-                                    ? ` → blend 50/50 dengan model SAIDI RZEngine grid.score (${Math.round(diag.engineHalf)}/100)`
-                                    : ' (RZEngine belum termuat — skor lokal saja, sama dengan jalur fallback engine)'}
+                                    ? ` → 50/50 blend with the RZEngine SAIDI model grid.score (${Math.round(diag.engineHalf)}/100)`
+                                    : ' (RZEngine not loaded yet — local score only, same as the engine fallback path)'}
                             </span>
                             <span className="ml-auto font-mono tabular-nums font-bold text-slate-900 dark:text-white">
                                 = {diag.recomputedScore}
@@ -358,78 +358,78 @@ const GridReliabilityDashboard = () => {
                         </div>
                     </div>
 
-                    {/* (a) ALASAN — blended outage minutes, engine yang sama dengan KPI Outage Hrs/Yr */}
+                    {/* (a) REASON — blended outage minutes, same engine as the Outage Hrs/Yr KPI */}
                     <div className="mt-3 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                        Menit outage blended (engine yang sama dengan KPI di atas)
+                        Blended outage minutes (same engine as the KPI above)
                     </div>
                     {diag.hasOutageData ? (
                         <div className="mt-1.5 space-y-1 text-xs">
                             <div className="flex items-center gap-2">
                                 <span className="text-slate-700 dark:text-slate-300">
-                                    SAIDI dari uptime {grid?.gridUptime}% {diag.saidiFromEngine ? '(RZEngine grid.annualOutageHours)' : '(fallback lokal, matematika sama)'}
+                                    SAIDI from uptime {grid?.gridUptime}% {diag.saidiFromEngine ? '(RZEngine grid.annualOutageHours)' : '(local fallback, same math)'}
                                 </span>
-                                <span className="ml-auto font-mono tabular-nums text-slate-600 dark:text-slate-300">{fmt(Math.round(diag.saidiMin))} mnt/thn × 0.5</span>
+                                <span className="ml-auto font-mono tabular-nums text-slate-600 dark:text-slate-300">{fmt(Math.round(diag.saidiMin))} min/yr × 0.5</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <span className="text-slate-700 dark:text-slate-300">
-                                    Event-based: {grid?.brownoutFrequency}×/thn × {grid?.averageOutageDuration} mnt
+                                    Event-based: {grid?.brownoutFrequency}×/yr × {grid?.averageOutageDuration} min
                                 </span>
-                                <span className="ml-auto font-mono tabular-nums text-slate-600 dark:text-slate-300">{fmt(Math.round(diag.eventMin))} mnt/thn × 0.5</span>
+                                <span className="ml-auto font-mono tabular-nums text-slate-600 dark:text-slate-300">{fmt(Math.round(diag.eventMin))} min/yr × 0.5</span>
                             </div>
                             <div className="flex items-center gap-2 border-t border-red-200/60 pt-1.5 dark:border-red-800/30">
-                                <span className="text-slate-700 dark:text-slate-300">Blend 50/50 → {result.annualExpectedOutages} event/thn</span>
+                                <span className="text-slate-700 dark:text-slate-300">50/50 blend → {result.annualExpectedOutages} events/yr</span>
                                 <span className="ml-auto font-mono tabular-nums font-bold text-slate-900 dark:text-white">
-                                    = {fmt(result.annualOutageMinutes)} mnt ({(result.annualOutageMinutes / 60).toFixed(1)} jam)/thn
+                                    = {fmt(result.annualOutageMinutes)} min ({(result.annualOutageMinutes / 60).toFixed(1)} hr)/yr
                                 </span>
                                 <ParityChip ok={diag.blendParity === true} />
                             </div>
                         </div>
                     ) : (
                         <p className="mt-1.5 text-[11px] text-slate-600 dark:text-slate-400">
-                            Data brownout/durasi negara ini tidak tersedia — engine memakai jalur SAIDI-uptime saja:
-                            {' '}{fmt(result.annualOutageMinutes)} mnt ({(result.annualOutageMinutes / 60).toFixed(1)} jam)/thn, {result.annualExpectedOutages} event.
+                            Brownout/duration data unavailable for this country — the engine uses the SAIDI-uptime path only:
+                            {' '}{fmt(result.annualOutageMinutes)} min ({(result.annualOutageMinutes / 60).toFixed(1)} hr)/yr, {result.annualExpectedOutages} events.
                         </p>
                     )}
 
-                    {/* (b) LEVER TERUKUR — angka model, bukan saran generik */}
+                    {/* (b) MEASURED LEVERS — model numbers, not generic advice */}
                     <div className="mt-3 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                        Mitigasi terukur (angka dari model yang sama dengan KPI, bukan generik)
+                        Measured mitigation (numbers from the same model as the KPIs, not generic)
                     </div>
                     <div className="mt-1.5 space-y-1.5">
                         <div className="flex items-start gap-2 rounded-md border border-slate-200 bg-white/70 p-2 dark:border-slate-700 dark:bg-slate-900/50">
                             <span className="shrink-0 whitespace-nowrap rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">Genset {fmt(result.requiredGenCapacity)} kW</span>
                             <span className="flex-1 text-[11px] leading-snug text-slate-600 dark:text-slate-400">
-                                Kapasitas dibutuhkan = IT load × PUE × redundansi Tier {inputs.tierLevel} → {fmt(result.requiredGenCapacity)} kW.
-                                Run-hours outage ≈ {(result.annualOutageMinutes / 60).toFixed(1)} jam/thn → fuel {fmtMoney(result.annualFuelCost)}/thn
-                                (termasuk uji berkala + premi fuel negara; reserve on-site {result.recommendedFuelHours} jam).
+                                Required capacity = IT load × PUE × Tier {inputs.tierLevel} redundancy → {fmt(result.requiredGenCapacity)} kW.
+                                Outage run-hours ≈ {(result.annualOutageMinutes / 60).toFixed(1)} hr/yr → fuel {fmtMoney(result.annualFuelCost)}/yr
+                                (includes periodic testing + country fuel premium; on-site reserve {result.recommendedFuelHours} hr).
                             </span>
                         </div>
                         <div className="flex items-start gap-2 rounded-md border border-slate-200 bg-white/70 p-2 dark:border-slate-700 dark:bg-slate-900/50">
                             <span className="shrink-0 whitespace-nowrap rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">UPS ride-through</span>
                             <span className="flex-1 text-[11px] leading-snug text-slate-600 dark:text-slate-400">
                                 {grid?.voltageStability === 'unstable'
-                                    ? 'Grid unstable → baterai Li-Ion direkomendasikan (stres brownout tinggi mempercepat degradasi VRLA)'
-                                    : 'VRLA standar memadai untuk stabilitas tegangan saat ini'}
-                                {' '}— biaya penggantian baterai {fmtMoney(result.annualUpsReplacementCost)}/thn (stres brownout sudah dihitung model).
-                                {result.batteryStorageROI < 50 ? ` BESS 30-mnt payback ${result.batteryStorageROI} thn (KPI BESS ROI).` : ' BESS 30-mnt tidak ekonomis (ROI N/A).'}
+                                    ? 'Grid unstable → Li-Ion batteries recommended (high brownout stress accelerates VRLA degradation)'
+                                    : 'Standard VRLA is adequate for the current voltage stability'}
+                                {' '}— battery replacement cost {fmtMoney(result.annualUpsReplacementCost)}/yr (brownout stress already factored into the model).
+                                {result.batteryStorageROI < 50 ? ` BESS 30-min payback ${result.batteryStorageROI} yr (BESS ROI KPI).` : ' BESS 30-min not economical (ROI N/A).'}
                             </span>
                         </div>
                         <div className="flex items-start gap-2 rounded-md border border-slate-200 bg-white/70 p-2 dark:border-slate-700 dark:bg-slate-900/50">
-                            <span className="shrink-0 whitespace-nowrap rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">Hasil dengan backup</span>
+                            <span className="shrink-0 whitespace-nowrap rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">Result with backup</span>
                             <span className="flex-1 text-[11px] leading-snug text-slate-600 dark:text-slate-400">
-                                {result.dualFeedRecommendation ? `Dual feed A+B direkomendasikan (${fmtMoney(dualFeedCost)}/thn teranualisasi) + ` : ''}
-                                arsitektur backup di atas menaikkan availability {grid?.gridUptime ?? 99}% (grid saja)
-                                → {result.availabilityWithBackup.toFixed(3)}% — total biaya mitigasi {fmtMoney(result.gridRiskAdjustedOpex)}/thn
-                                (breakdown di kartu bawah).
+                                {result.dualFeedRecommendation ? `Dual feed A+B recommended (${fmtMoney(dualFeedCost)}/yr annualized) + ` : ''}
+                                the backup architecture above raises availability from {grid?.gridUptime ?? 99}% (grid alone)
+                                → {result.availabilityWithBackup.toFixed(3)}% — total mitigation cost {fmtMoney(result.gridRiskAdjustedOpex)}/yr
+                                (breakdown in the card below).
                             </span>
                         </div>
                     </div>
 
-                    {/* (b/c) Negara vs alternatif — HANYA dari data comparison yang sudah ada di halaman */}
+                    {/* (b/c) Country vs alternatives — ONLY from comparison data already on the page */}
                     {alternatives.length > 0 && selComparison && (
                         <>
                             <div className="mt-3 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                                {selectedCountry.name} vs alternatif (dari chart perbandingan di halaman ini — basis normalisasi 1 MW · Tier 3 · air)
+                                {selectedCountry.name} vs alternatives (from the comparison chart on this page — normalized basis 1 MW · Tier 3 · air)
                             </div>
                             <div className="mt-1.5 space-y-1">
                                 {alternatives.map(a => (
@@ -437,7 +437,7 @@ const GridReliabilityDashboard = () => {
                                         <span className="text-slate-700 dark:text-slate-300">{a.country}</span>
                                         <span className="font-mono tabular-nums text-slate-500 dark:text-slate-400">uptime {a.uptime}%</span>
                                         <span className="ml-auto font-mono tabular-nums text-slate-600 dark:text-slate-300">
-                                            skor {a.score}/100 (+{a.score - selComparison.score} vs {selectedCountry.name} {selComparison.score})
+                                            score {a.score}/100 (+{a.score - selComparison.score} vs {selectedCountry.name} {selComparison.score})
                                         </span>
                                     </div>
                                 ))}
@@ -447,7 +447,7 @@ const GridReliabilityDashboard = () => {
                                 className="mt-2 text-[11px] font-semibold text-cyan-700 hover:underline dark:text-cyan-400"
                                 onClick={() => comparisonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                             >
-                                Lihat perbandingan negara lengkap ↗
+                                View full country comparison ↗
                             </button>
                         </>
                     )}

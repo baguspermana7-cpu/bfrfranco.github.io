@@ -241,7 +241,7 @@ export function SimulationDashboard() {
                     <div className="mb-8 space-y-2">
                         <label className="text-xs font-semibold text-slate-700 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
                             <Globe2 className="w-3 h-3" /> Location
-                            <Tooltip content="Lokasi project (satu sumber, diinput di Requirements 1.1). Biaya, regulasi, dan pasar tenaga kerja mengikuti negara ini." />
+                            <Tooltip content="Project location (single source, entered in Requirements 1.1). Costs, regulations, and the labor market follow this country." />
                         </label>
                         <div className="flex items-center justify-between rounded-md border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/60 px-3 py-2">
                             <span className="text-sm text-slate-900 dark:text-white">
@@ -249,12 +249,12 @@ export function SimulationDashboard() {
                                 <span className="ml-2 rounded bg-emerald-500/15 px-1 text-[9px] font-bold text-emerald-500">project</span>
                             </span>
                             <button onClick={() => actions.setActiveTab('requirements')}
-                                className="text-[11px] text-violet-500 hover:underline">Edit di Requirements ↗</button>
+                                className="text-[11px] text-violet-500 hover:underline">Edit in Requirements ↗</button>
                         </div>
                     </div>
                     <div className="mb-8">
                         <label className="text-xs font-semibold text-slate-700 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                            Simulation Year <Tooltip content={`Kontrol analisis halaman ini (BUKAN duplikat requirement): memproyeksikan biaya staf ke tahun operasi memakai eskalasi inflasi/benefit. Multiplier: x${laborMultiplier.toFixed(2)}. Basis COD project ada di Requirements 1.1.`} />
+                            Simulation Year <Tooltip content={`This page's analysis control (NOT a duplicate requirement): projects staff cost to the operating year using inflation/benefit escalation. Multiplier: x${laborMultiplier.toFixed(2)}. The project COD basis lives in Requirements 1.1.`} />
                         </label>
                         <select
                             className="w-full p-2 border border-slate-300 dark:border-slate-700 rounded-md text-sm text-slate-900 dark:text-white bg-white dark:bg-slate-800 focus:ring-2 focus:ring-cyan-500 outline-none"
@@ -321,10 +321,10 @@ export function SimulationDashboard() {
                         />
                         <div className="mt-1 flex items-center gap-2 text-[10px]">
                             {scenarioAQI === baselineAqi
-                                ? <span className="rounded bg-cyan-500/15 px-1.5 py-0.5 font-bold text-cyan-500" title={`Predefined dari tabel environment negara ${selectedCountry.name} (baselineAQI) — geser untuk override manual`}>≡ baseline {selectedCountry.id}: {baselineAqi} AQI</span>
+                                ? <span className="rounded bg-cyan-500/15 px-1.5 py-0.5 font-bold text-cyan-500" title={`Predefined from the ${selectedCountry.name} environment table (baselineAQI) — drag to override manually`}>≡ baseline {selectedCountry.id}: {baselineAqi} AQI</span>
                                 : <>
                                     <span className="rounded bg-violet-500/15 px-1.5 py-0.5 font-bold text-violet-500">manual override</span>
-                                    <button className="text-cyan-500 hover:underline" onClick={() => { setScenarioAQI(baselineAqi); setAqiTouched(false); }}>reset ke baseline {selectedCountry.id} ({baselineAqi})</button>
+                                    <button className="text-cyan-500 hover:underline" onClick={() => { setScenarioAQI(baselineAqi); setAqiTouched(false); }}>reset to baseline {selectedCountry.id} ({baselineAqi})</button>
                                 </>}
                         </div>
                         <div className="flex justify-between mt-2 text-sm">
@@ -357,10 +357,10 @@ export function SimulationDashboard() {
                         />
                         <div className="mt-1 flex items-center gap-2 text-[10px]">
                             {Math.abs(scenarioTurnover - baselineTurnover) < 0.005
-                                ? <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 font-bold text-emerald-500" title="Predefined dari engine DATA.attritionFactors.voluntaryAttritionAvg (sourced) — geser untuk override manual">≡ engine baseline: {(baselineTurnover * 100).toFixed(0)}%</span>
+                                ? <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 font-bold text-emerald-500" title="Predefined from engine DATA.attritionFactors.voluntaryAttritionAvg (sourced) — drag to override manually">≡ engine baseline: {(baselineTurnover * 100).toFixed(0)}%</span>
                                 : <>
                                     <span className="rounded bg-violet-500/15 px-1.5 py-0.5 font-bold text-violet-500">manual override</span>
-                                    <button className="text-cyan-500 hover:underline" onClick={() => { setScenarioTurnover(baselineTurnover); setTurnoverTouched(false); }}>reset ke engine baseline ({(baselineTurnover * 100).toFixed(0)}%)</button>
+                                    <button className="text-cyan-500 hover:underline" onClick={() => { setScenarioTurnover(baselineTurnover); setTurnoverTouched(false); }}>reset to engine baseline ({(baselineTurnover * 100).toFixed(0)}%)</button>
                                 </>}
                         </div>
                         <div className="flex justify-between mt-2 text-sm items-center">
@@ -369,43 +369,43 @@ export function SimulationDashboard() {
                             <span className="text-slate-500 dark:text-slate-400 text-xs">50%</span>
                         </div>
                         <button onClick={() => setShowLossDetail((v) => !v)}
-                            title="Klik: kenapa angka ini muncul, parameter penyebab, dan yang perlu diubah"
+                            title="Click: why this number appears, the parameters causing it, and what needs changing"
                             className="mt-2 w-full text-left text-xs text-amber-400 bg-amber-950/20 p-2 rounded flex items-center gap-2 hover:bg-amber-950/40 transition-colors">
                             <DollarSign className="w-3 h-3" />
                             +{fmtMoneyFull(turnoverAmortizedMonthly)} Monthly Hidden Loss
-                            <span className="ml-auto text-[9px] text-amber-500/80">{showLossDetail ? '▾ tutup' : '▸ kenapa?'}</span>
+                            <span className="ml-auto text-[9px] text-amber-500/80">{showLossDetail ? '▾ close' : '▸ why?'}</span>
                         </button>
                         {showLossDetail && (
                             <div className="mt-1 rounded border border-amber-500/30 bg-slate-900/60 p-2 text-[11px] text-slate-300 space-y-1.5">
                                 <div>
-                                    <span className="font-bold text-amber-400">Kenapa:</span>{' '}
-                                    ceil({eng.headcount} FTE × {(scenarioTurnover * 100).toFixed(0)}% turnover) = {Math.ceil(eng.headcount * scenarioTurnover)} penggantian/thn
-                                    × {fmtMoneyFull(coT.totalCostPerHire)}/hire ÷ 12 × eskalasi {laborMultiplier.toFixed(2)}.
+                                    <span className="font-bold text-amber-400">Why:</span>{' '}
+                                    ceil({eng.headcount} FTE × {(scenarioTurnover * 100).toFixed(0)}% turnover) = {Math.ceil(eng.headcount * scenarioTurnover)} replacements/yr
+                                    × {fmtMoneyFull(coT.totalCostPerHire)}/hire ÷ 12 × escalation {laborMultiplier.toFixed(2)}.
                                 </div>
                                 <div className="text-slate-400">
-                                    Per hire: severance {fmtMoneyFull(coT.separationCost)} + rekrutmen {fmtMoneyFull(coT.replacementCost)} + training {fmtMoneyFull(coT.trainingCost)} + ramp-up produktivitas {fmtMoneyFull(coT.productivityLoss)}
-                                    {' '}(basis gaji engineer {selectedCountry.name}: {fmtMoneyFull(selectedCountry.labor.baseSalary_Engineer)}/bln — tabel labor per negara).
+                                    Per hire: severance {fmtMoneyFull(coT.separationCost)} + recruitment {fmtMoneyFull(coT.replacementCost)} + training {fmtMoneyFull(coT.trainingCost)} + productivity ramp-up {fmtMoneyFull(coT.productivityLoss)}
+                                    {' '}({selectedCountry.name} engineer salary basis: {fmtMoneyFull(selectedCountry.labor.baseSalary_Engineer)}/mo — per-country labor table).
                                 </div>
-                                <div className="font-bold text-slate-200">Yang perlu diubah:</div>
+                                <div className="font-bold text-slate-200">What needs changing:</div>
                                 <ul className="space-y-1">
                                     {scenarioTurnover > baselineTurnover + 0.004 && (
                                         <li>
                                             <button className="text-cyan-400 hover:underline" onClick={() => { setScenarioTurnover(baselineTurnover); setTurnoverTouched(false); }}>
-                                                ▸ Turunkan turnover ke baseline {(baselineTurnover * 100).toFixed(0)}% → hemat {fmtMoneyFull(lossSavedAtBaseline)}/bln
+                                                ▸ Lower turnover to baseline {(baselineTurnover * 100).toFixed(0)}% → save {fmtMoneyFull(lossSavedAtBaseline)}/mo
                                             </button>{' '}
-                                            <span className="text-slate-500">(program retensi/benefit — lihat tabel benefit negara)</span>
+                                            <span className="text-slate-500">(retention/benefit program — see the country benefit table)</span>
                                         </li>
                                     )}
                                     {inputs.shiftModel === '8h' && (
                                         <li>
                                             <button className="text-cyan-400 hover:underline" onClick={() => actions.setInputs({ shiftModel: '12h' })}>
-                                                ▸ Shift 12h (2 tim) → headcount turun → paparan turnover mengecil
+                                                ▸ 12h shift (2 teams) → headcount drops → turnover exposure shrinks
                                             </button>
                                         </li>
                                     )}
                                     <li>
                                         <button className="text-cyan-400 hover:underline" onClick={() => actions.setActiveTab('requirements')}>
-                                            ▸ Basis gaji mengikuti negara project — ubah lokasi di Requirements ↗
+                                            ▸ Salary basis follows the project country — change the location in Requirements ↗
                                         </button>
                                     </li>
                                 </ul>

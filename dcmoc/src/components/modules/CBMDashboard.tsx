@@ -70,12 +70,12 @@ export default function CBMDashboard() {
         : null;
     const licenseDominates = result.platformLicenseCostAnnual >= result.totalAnnualBenefit * 0.5;
     const varianceDriverText =
-        `Driver variance biaya: lisensi DCIM ${fmtMoney(result.platformLicenseCostAnnual)}/yr` +
-        (licenseSharePct !== null ? ` (${licenseSharePct.toFixed(0)}% dari benefit ${fmtMoney(result.totalAnnualBenefit)}/yr)` : ` (benefit $0/yr — tidak ada kategori sensor aktif?)`) +
-        (topCostSensor ? `; investasi sensor terbesar: ${topCostSensor.label} ${fmtMoney(topCostSensor.totalCost)} dari total ${fmtMoney(result.totalSensorInvestment)}` : '') +
+        `Cost variance driver: DCIM license ${fmtMoney(result.platformLicenseCostAnnual)}/yr` +
+        (licenseSharePct !== null ? ` (${licenseSharePct.toFixed(0)}% of the ${fmtMoney(result.totalAnnualBenefit)}/yr benefit)` : ` (benefit $0/yr — no sensor categories enabled?)`) +
+        (topCostSensor ? `; largest sensor investment: ${topCostSensor.label} ${fmtMoney(topCostSensor.totalCost)} of ${fmtMoney(result.totalSensorInvestment)} total` : '') +
         `; net benefit ${fmtMoney(netAnnual)}/yr.` +
-        (licenseDominates ? ' Lever: turunkan tier DCIM (section DCIM Platform Tier di bawah).' : ' Lever: cek kategori sensor ber-ROI rendah (tabel Sensor Categories).') +
-        ' Klik kartu untuk lompat ke section terkait.';
+        (licenseDominates ? ' Lever: lower the DCIM tier (DCIM Platform Tier section below).' : ' Lever: check low-ROI sensor categories (Sensor Categories table).') +
+        ' Click the card to jump to the related section.';
     const roiRed = result.roiPercent <= CBM_ROI_RED_PCT;
     const npvRed = result.npv5Year <= CBM_NPV_RED_USD;
     const jumpTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -103,7 +103,7 @@ export default function CBMDashboard() {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {([
                     { label: 'Sensor Investment', value: fmtMoney(result.totalSensorInvestment), sub: `${result.totalSensorCount} sensors`, icon: DollarSign, color: 'cyan', tip: 'Total one-time capital expenditure for all enabled sensor hardware. Does not include installation labor or DCIM platform licensing.' },
-                    { label: 'ROI', value: `${result.roiPercent}%`, sub: `Payback: ${result.paybackYears} yrs`, icon: TrendingUp, color: result.roiPercent > CBM_ROI_GREEN_PCT ? 'emerald' : result.roiPercent > CBM_ROI_RED_PCT ? 'amber' : 'red', tip: `Return on Investment — annual net benefit divided by sensor investment. Above ${CBM_ROI_GREEN_PCT}% means the system pays for itself within one year; ≤ ${CBM_ROI_RED_PCT}% is flagged red.`, redGuide: roiRed ? { title: `ROI ${result.roiPercent}% ≤ ambang ${CBM_ROI_RED_PCT}% — ${varianceDriverText}`, anchor: licenseDominates ? 'cbm-dcim-tiers' : 'cbm-sensor-table' } : undefined },
+                    { label: 'ROI', value: `${result.roiPercent}%`, sub: `Payback: ${result.paybackYears} yrs`, icon: TrendingUp, color: result.roiPercent > CBM_ROI_GREEN_PCT ? 'emerald' : result.roiPercent > CBM_ROI_RED_PCT ? 'amber' : 'red', tip: `Return on Investment — annual net benefit divided by sensor investment. Above ${CBM_ROI_GREEN_PCT}% means the system pays for itself within one year; ≤ ${CBM_ROI_RED_PCT}% is flagged red.`, redGuide: roiRed ? { title: `ROI ${result.roiPercent}% ≤ ${CBM_ROI_RED_PCT}% threshold — ${varianceDriverText}`, anchor: licenseDominates ? 'cbm-dcim-tiers' : 'cbm-sensor-table' } : undefined },
                     { label: 'Annual Benefit', value: fmtMoney(result.totalAnnualBenefit), sub: 'Downtime + Energy savings', icon: Shield, color: 'green', tip: 'Combined yearly value of avoided downtime costs and energy optimization savings from condition-based monitoring.' },
                     { label: 'Downtime Averted', value: fmtMoney(result.annualAvertedDowntimeCost), sub: 'Annual failure avoidance', icon: Zap, color: 'amber', tip: 'Annual cost avoidance from catching failures early vs reactive repair. Includes avoided downtime penalties and SLA credits.' },
                     { label: 'Energy Savings', value: fmtMoney(result.annualEnergySavings), sub: 'Annual energy optimization', icon: BarChart3, color: 'blue', tip: 'Yearly energy cost reduction from sensor-driven optimization — e.g., adjusting cooling setpoints, detecting airflow short-circuits, and load balancing.' },
@@ -128,7 +128,7 @@ export default function CBMDashboard() {
                         </div>
                         <div className="text-xl font-bold text-slate-900 dark:text-white">{kpi.value}</div>
                         <div className="text-[10px] text-slate-500 mt-1">{kpi.sub}</div>
-                        {kpi.redGuide && <div className="text-[10px] font-semibold text-red-500 mt-1">driver variance: hover · klik → section ↓</div>}
+                        {kpi.redGuide && <div className="text-[10px] font-semibold text-red-500 mt-1">variance driver: hover · click → section ↓</div>}
                     </div>
                 ))}
             </div>

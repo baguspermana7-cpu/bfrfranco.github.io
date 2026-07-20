@@ -76,23 +76,23 @@ const AXIS_ATTRS: Record<AxisKey, { key: keyof SiteAttributes; label: string }[]
 interface NumLeverDef { attr: keyof SiteAttributes; label: string; hi: number; fmt: (v: number) => string; hint: string }
 const NUM_LEVERS: Partial<Record<AxisKey, NumLeverDef[]>> = {
     powerAvailability: [
-        { attr: 'saidiMinYr', label: 'SAIDI', hi: 30, fmt: (v) => `${Math.round(v)} min/yr`, hint: 'feeder khusus / gardu dedicated / substation dual-source' },
-        { attr: 'powerCostKwh', label: 'Tarif listrik', hi: 0.05, fmt: (v) => `$${v.toFixed(3)}/kWh`, hint: 'negosiasi tarif industri / PPA' },
+        { attr: 'saidiMinYr', label: 'SAIDI', hi: 30, fmt: (v) => `${Math.round(v)} min/yr`, hint: 'dedicated feeder / dedicated substation / dual-source substation' },
+        { attr: 'powerCostKwh', label: 'Power tariff', hi: 0.05, fmt: (v) => `$${v.toFixed(3)}/kWh`, hint: 'industrial tariff negotiation / PPA' },
     ],
     waterCooling: [
-        { attr: 'waterStress0to5', label: 'Water stress (WRI)', hi: 0.2, fmt: (v) => `${v.toFixed(1)}/5`, hint: 'sumber air alternatif / recycled water' },
-        { attr: 'coolingDegreeDays', label: 'Cooling degree days', hi: 800, fmt: (v) => `${Math.round(v)} CDD`, hint: 'faktor iklim lokasi — mikro-lokasi dataran tinggi' },
+        { attr: 'waterStress0to5', label: 'Water stress (WRI)', hi: 0.2, fmt: (v) => `${v.toFixed(1)}/5`, hint: 'alternative water source / recycled water' },
+        { attr: 'coolingDegreeDays', label: 'Cooling degree days', hi: 800, fmt: (v) => `${Math.round(v)} CDD`, hint: 'local climate factor — highland micro-location' },
     ],
     landInfra: [
-        { attr: 'permitMonths', label: 'Permit', hi: 3, fmt: (v) => `${Math.round(v)} bln`, hint: 'jalur perizinan dipercepat / KEK' },
-        { attr: 'distPortKm', label: 'Jarak port', hi: 5, fmt: (v) => `${Math.round(v)} km`, hint: 'pilihan lahan lebih dekat pelabuhan' },
+        { attr: 'permitMonths', label: 'Permit', hi: 3, fmt: (v) => `${Math.round(v)} mo`, hint: 'fast-tracked permitting / SEZ' },
+        { attr: 'distPortKm', label: 'Port distance', hi: 5, fmt: (v) => `${Math.round(v)} km`, hint: 'land option closer to the port' },
     ],
     environmental: [
-        { attr: 'airQualityIndex', label: 'AQI', hi: 10, fmt: (v) => `AQI ${Math.round(v)}`, hint: 'mikro-lokasi menjauh dari kawasan industri berat' },
+        { attr: 'airQualityIndex', label: 'AQI', hi: 10, fmt: (v) => `AQI ${Math.round(v)}`, hint: 'micro-location away from heavy-industrial zones' },
     ],
     costIncentives: [
-        { attr: 'effectiveTaxRate', label: 'Effective tax rate', hi: 0, fmt: (v) => `${(v * 100).toFixed(0)}%`, hint: 'tax holiday / insentif KEK' },
-        { attr: 'landCostPerM2', label: 'Land cost', hi: 30, fmt: (v) => `$${Math.round(v)}/m²`, hint: 'lahan industrial di luar zona prime' },
+        { attr: 'effectiveTaxRate', label: 'Effective tax rate', hi: 0, fmt: (v) => `${(v * 100).toFixed(0)}%`, hint: 'tax holiday / SEZ incentive' },
+        { attr: 'landCostPerM2', label: 'Land cost', hi: 30, fmt: (v) => `$${Math.round(v)}/m²`, hint: 'industrial land outside the prime zone' },
     ],
 };
 
@@ -136,7 +136,7 @@ function solveDiscrete(site: CandidateSite, axis: AxisKey, cur: number, moves: D
         if (g >= GOOD_TARGET) {
             return {
                 label: `${def.label} ${def.from} → ${def.to}`,
-                detail: `${def.label} ${def.from} → ${def.to} (${def.hint}) menaikkan axis ${cur} → ${g} (+${g - cur} poin, mencapai Good ≥${GOOD_TARGET}) — dihitung dari formula axis live.`,
+                detail: `${def.label} ${def.from} → ${def.to} (${def.hint}) raises the axis ${cur} → ${g} (+${g - cur} pts, reaching Good ≥${GOOD_TARGET}) — computed from the live axis formula.`,
                 targetTab: EDIT_CRITERIA_TAB,
                 priority: 'HIGH',
             };
@@ -147,7 +147,7 @@ function solveDiscrete(site: CandidateSite, axis: AxisKey, cur: number, moves: D
         const { def, g } = bestFallback;
         return {
             label: `${def.label} ${def.from} → ${def.to} (+${g - cur})`,
-            detail: `${def.label} ${def.from} → ${def.to} (${def.hint}) menaikkan axis ${cur} → ${g} (+${g - cur} poin) — belum mencapai Good ${GOOD_TARGET}; kombinasikan dengan lever lain.`,
+            detail: `${def.label} ${def.from} → ${def.to} (${def.hint}) raises the axis ${cur} → ${g} (+${g - cur} pts) — not yet reaching Good ${GOOD_TARGET}; combine with other levers.`,
             targetTab: EDIT_CRITERIA_TAB,
             priority: 'MED',
         };
@@ -172,9 +172,9 @@ export function explainAxis(site: CandidateSite, result: SiteScoreResult, axis: 
     if (weakest) {
         const pts = Math.round(weakest.w * weakest.value * 100);
         const cap = Math.round(weakest.w * 100);
-        reason += ` Kontributor terlemah: faktor ${weakest.key} — nilai live ${Math.round(weakest.value * 100)}% (deriveFactors) × bobot axis ${cap}% = ${pts} dari ${cap} poin.`;
+        reason += ` Weakest contributor: factor ${weakest.key} — live value ${Math.round(weakest.value * 100)}% (deriveFactors) × axis weight ${cap}% = ${pts} of ${cap} pts.`;
     } else {
-        reason += ' Axis ini dihitung dari atribut site/negara (bukan faktor engine langsung) — lihat lever di bawah.';
+        reason += ' This axis is computed from site/country attributes (not a direct engine factor) — see levers below.';
     }
 
     /* ── baseline provenance note + "isi atribut" lever ── */
@@ -184,14 +184,14 @@ export function explainAxis(site: CandidateSite, result: SiteScoreResult, axis: 
         return v == null || (Array.isArray(v) && v.length === 0);
     });
     const baselineNote = unset.length
-        ? `Atribut masih baseline negara / screening: ${unset.map((a) => a.label).join(', ')} — isi nilai site-spesifik via Edit Criteria untuk mempertajam skor.`
+        ? `Attributes still on country / screening baseline: ${unset.map((a) => a.label).join(', ')} — enter site-specific values via Edit Criteria to sharpen the score.`
         : null;
 
     const levers: DecisionLever[] = [];
     if (unset.length) {
         levers.push({
-            label: `Isi atribut site (${unset.length} kosong)`,
-            detail: `${unset.map((a) => a.label).join(', ')} masih memakai baseline ${site.countryId}${baseline && Object.keys(baseline).length ? '' : ' / screening typical'} — buka Edit Criteria dan isi data site aktual; skor menghitung ulang live.`,
+            label: `Fill in site attributes (${unset.length} empty)`,
+            detail: `${unset.map((a) => a.label).join(', ')} still use the ${site.countryId} baseline${baseline && Object.keys(baseline).length ? '' : ' / screening typical'} — open Edit Criteria and enter actual site data; the score recomputes live.`,
             targetTab: EDIT_CRITERIA_TAB,
             priority: 'MED',
         });
@@ -210,16 +210,16 @@ export function explainAxis(site: CandidateSite, result: SiteScoreResult, axis: 
             metricAt: (x) => axisAt(site, axis, { [def.attr]: x } as Partial<SiteAttributes>) ?? goodness,
             render: (x, achieved) => (Math.abs(x - cur) < Math.abs(cur - def.hi) * 1e-6
                 ? { // solver landed on the current effective value: attribute was unset — materializing it already passes
-                    label: `Isi ${def.label} = ${def.fmt(cur)} (site attribute)`,
-                    detail: `Mengisi ${def.label} ${def.fmt(cur)} sebagai atribut site (kini baseline/screening) sudah membawa axis ke ${achieved} (≥${GOOD_TARGET} Good) — konfirmasi nilai aktual via Edit Criteria.`,
+                    label: `Fill in ${def.label} = ${def.fmt(cur)} (site attribute)`,
+                    detail: `Filling in ${def.label} ${def.fmt(cur)} as a site attribute (currently baseline/screening) already brings the axis to ${achieved} (≥${GOOD_TARGET} Good) — confirm the actual value via Edit Criteria.`,
                 }
                 : {
                     label: `${def.label} ${def.fmt(cur)} → ${def.fmt(x)}`,
-                    detail: `${def.label} ${def.fmt(cur)} → target ${def.fmt(x)} (${def.hint}) menaikkan axis ${goodness} → ${achieved} (+${achieved - goodness} poin, ≥${GOOD_TARGET} Good) — delta dihitung dari formula axis live (scoreSite).`,
+                    detail: `${def.label} ${def.fmt(cur)} → target ${def.fmt(x)} (${def.hint}) raises the axis ${goodness} → ${achieved} (+${achieved - goodness} pts, ≥${GOOD_TARGET} Good) — delta computed from the live axis formula (scoreSite).`,
                 }),
             unreachable: (atHi) => ({
-                label: `${def.label}: tidak cukup sendirian`,
-                detail: `Bahkan ${def.label} → ${def.fmt(def.hi)} hanya membawa axis ke ${Math.round(atHi)} (<${GOOD_TARGET}) — kombinasikan beberapa atribut atau faktor negara yang mengikat.`,
+                label: `${def.label}: not enough on its own`,
+                detail: `Even ${def.label} → ${def.fmt(def.hi)} only brings the axis to ${Math.round(atHi)} (<${GOOD_TARGET}) — combine several attributes or the binding country factors.`,
             }),
             targetTab: EDIT_CRITERIA_TAB,
         });
@@ -241,7 +241,7 @@ export function explainAxis(site: CandidateSite, result: SiteScoreResult, axis: 
     if (axis === 'connectivity' || axis === 'marketProximity') {
         const cur = effectiveAttr(site, 'submarineCableLandings') ?? 0;
         for (let c = Math.floor(cur) + 1; c <= 6; c++) {
-            discrete.push({ label: 'Cable landings', from: String(cur), to: String(c), mods: { submarineCableLandings: c }, hint: 'rute kabel/IXP tambahan' });
+            discrete.push({ label: 'Cable landings', from: String(cur), to: String(c), mods: { submarineCableLandings: c }, hint: 'additional cable route/IXP' });
         }
     }
     if (axis === 'naturalRisks') {
@@ -250,18 +250,18 @@ export function explainAxis(site: CandidateSite, result: SiteScoreResult, axis: 
             // engine pgaToScore band edges (site-adapter FALLBACK_PGA_TO_SCORE): <5 / <15 / <30 / <60
             // [59,29,14,4] is already least→most aggressive (engine band edges 60/30/15/5)
             for (const cand of [59, 29, 14, 4].filter((c) => c < pga)) {
-                discrete.push({ label: 'PGA', from: `${pga}%g`, to: `<${cand + 1}%g`, mods: { pgaPct2in50yr: cand }, hint: 'mikro-lokasi zona seismik lebih rendah' });
+                discrete.push({ label: 'PGA', from: `${pga}%g`, to: `<${cand + 1}%g`, mods: { pgaPct2in50yr: cand }, hint: 'micro-location in a lower seismic zone' });
             }
         }
         if ((site.attributes.floodRisk ?? 'moderate') !== 'low') {
-            discrete.push({ label: 'Flood risk', from: site.attributes.floodRisk ?? 'baseline', to: 'low', mods: { floodRisk: 'low' }, hint: 'elevasi platform / flood defence' });
+            discrete.push({ label: 'Flood risk', from: site.attributes.floodRisk ?? 'baseline', to: 'low', mods: { floodRisk: 'low' }, hint: 'platform elevation / flood defence' });
         }
         if ((site.attributes.cycloneRisk ?? 'moderate') !== 'low') {
-            discrete.push({ label: 'Cyclone risk', from: site.attributes.cycloneRisk ?? 'baseline', to: 'low', mods: { cycloneRisk: 'low' }, hint: 'lokasi di luar jalur siklon' });
+            discrete.push({ label: 'Cyclone risk', from: site.attributes.cycloneRisk ?? 'baseline', to: 'low', mods: { cycloneRisk: 'low' }, hint: 'location outside the cyclone track' });
         }
     }
     if (axis === 'landInfra' && site.attributes.roadAccess !== 'excellent') {
-        discrete.push({ label: 'Road access', from: site.attributes.roadAccess ?? 'baseline', to: 'excellent', mods: { roadAccess: 'excellent' }, hint: 'akses jalan berat/oversize cargo' });
+        discrete.push({ label: 'Road access', from: site.attributes.roadAccess ?? 'baseline', to: 'excellent', mods: { roadAccess: 'excellent' }, hint: 'heavy-haul / oversize cargo road access' });
     }
     if (discrete.length) {
         const lever = solveDiscrete(site, axis, goodness, discrete);
@@ -271,16 +271,16 @@ export function explainAxis(site: CandidateSite, result: SiteScoreResult, axis: 
     /* ── honesty notes: country-level factors no site attribute can move ── */
     if (axis === 'environmental' && weakest?.key === 'carbon') {
         levers.push({
-            label: 'Carbon: faktor grid negara',
-            detail: `Kontributor terlemah adalah intensitas karbon grid (country-level, bobot 50% axis) — bukan atribut site. Lever nyata: PPA renewable / pilih negara grid rendah karbon.`,
+            label: 'Carbon: country grid factor',
+            detail: `The weakest contributor is grid carbon intensity (country-level, 50% axis weight) — not a site attribute. Real levers: renewable PPA / choose a country with a low-carbon grid.`,
             targetTab: '',
             priority: 'MED',
         });
     }
     if (axis === 'marketProximity') {
         levers.push({
-            label: 'Ekosistem hyperscaler = country-level',
-            detail: 'Komponen hyperscaler presence (bobot 40% axis) berasal dari tabel negara — tidak bisa diubah per site; fokus pada latensi & cable landings.',
+            label: 'Hyperscaler ecosystem = country-level',
+            detail: 'The hyperscaler-presence component (40% axis weight) comes from the country table — it cannot be changed per site; focus on latency & cable landings.',
             targetTab: '',
             priority: 'MED',
         });

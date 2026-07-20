@@ -139,9 +139,9 @@ function computeGradeDiagnostics(result: BenchmarkResult, tier: 2 | 3 | 4, cooli
         .filter(([, c]) => isAlertGrade(c.grade))
         .map(([id, c]) => `${BENCHMARK_CATEGORIES[id].label} (${c.grade}, ${c.score}/100)`);
     const formulaNote =
-        `Skor overall = rata-rata (100 − persentil) dari ${result.metrics.length} metrik; grade dari batas persentil ` +
-        `yang sama dengan pewarnaan (A ≤25 · B ≤50 · C ≤75 · D ≤90 · F >90). ` +
-        `Kategori penyeret: ${catDrag.join(' · ') || '—'}.`;
+        `Overall score = average of (100 − percentile) across ${result.metrics.length} metrics; grade from the same percentile ` +
+        `boundaries as the colouring (A ≤25 · B ≤50 · C ≤75 · D ≤90 · F >90). ` +
+        `Dragging categories: ${catDrag.join(' · ') || '—'}.`;
 
     const levers: { label: string; detail: string }[] = [];
 
@@ -166,8 +166,8 @@ function computeGradeDiagnostics(result: BenchmarkResult, tier: 2 | 3 | 4, cooli
                 label: `Cooling → ${COOLING_LABELS[c] ?? c}`,
                 detail:
                     `PUE ${pueScore.userValue.toFixed(2)} = p${Math.round(pueScore.percentile)} (grade ${pueScore.grade}) — ` +
-                    `upgrade cooling ke ${COOLING_LABELS[c] ?? c} (PUE ${pue.toFixed(2)}, DATA.pueMatrix ${tierKey}) → ` +
-                    `p${Math.round(newPct)} (grade metrik ${percentileToGrade(newPct)}); ` +
+                    `upgrade cooling to ${COOLING_LABELS[c] ?? c} (PUE ${pue.toFixed(2)}, DATA.pueMatrix ${tierKey}) → ` +
+                    `p${Math.round(newPct)} (metric grade ${percentileToGrade(newPct)}); ` +
                     `overall ${result.overallScore} → ${after.score} (grade ${result.overallGrade} → ${after.grade}).`,
             });
         }
@@ -187,7 +187,7 @@ function computeGradeDiagnostics(result: BenchmarkResult, tier: 2 | 3 | 4, cooli
                 threshold: band.p75,
                 direction: 'atMost',
                 fmtValue: (v) => formatMetricValue(v, m.metric.unit),
-                because: `posisi live p${Math.round(m.percentile)} > batas band C p${GRADE_C_MAX_PCTILE} (tier ${tier})`,
+                because: `live position p${Math.round(m.percentile)} > band C boundary p${GRADE_C_MAX_PCTILE} (tier ${tier})`,
                 levers: [{
                     lo: 0,
                     hi: LEVER_CUT_MAX,
@@ -195,16 +195,16 @@ function computeGradeDiagnostics(result: BenchmarkResult, tier: 2 | 3 | 4, cooli
                     render: (x, achieved) => ({
                         label: `${m.metric.name} −${(x * 100).toFixed(0)}%`,
                         detail:
-                            `${m.metric.name} turun −${(x * 100).toFixed(1)}% ` +
+                            `${m.metric.name} down −${(x * 100).toFixed(1)}% ` +
                             `(${formatMetricValue(m.userValue, m.metric.unit)} → ${formatMetricValue(achieved, m.metric.unit)}) ` +
-                            `mencapai band C (≤ p75 ${formatMetricValue(band.p75, m.metric.unit)} tier ${tier}); ${overallNote}.`,
+                            `reaches band C (≤ p75 ${formatMetricValue(band.p75, m.metric.unit)} tier ${tier}); ${overallNote}.`,
                     }),
                     unreachable: (atHi) => ({
-                        label: `${m.metric.name}: −${(LEVER_CUT_MAX * 100).toFixed(0)}% belum cukup`,
+                        label: `${m.metric.name}: −${(LEVER_CUT_MAX * 100).toFixed(0)}% not enough`,
                         detail:
-                            `Bahkan −${(LEVER_CUT_MAX * 100).toFixed(0)}% (ke ${formatMetricValue(atHi, m.metric.unit)}) ` +
-                            `belum mencapai band C p75 ${formatMetricValue(band.p75, m.metric.unit)} — ` +
-                            `struktur input perlu ditinjau, bukan sekadar tuning.`,
+                            `Even −${(LEVER_CUT_MAX * 100).toFixed(0)}% (to ${formatMetricValue(atHi, m.metric.unit)}) ` +
+                            `does not reach band C p75 ${formatMetricValue(band.p75, m.metric.unit)} — ` +
+                            `the input structure needs review, not just tuning.`,
                     }),
                     targetTab: 'benchmark',
                 }],
@@ -213,11 +213,11 @@ function computeGradeDiagnostics(result: BenchmarkResult, tier: 2 | 3 | 4, cooli
         } else {
             const delta = band.p75 - m.userValue;
             levers.push({
-                label: `${m.metric.name} naik`,
+                label: `${m.metric.name} up`,
                 detail:
                     `${m.metric.name} ${formatMetricValue(m.userValue, m.metric.unit)} = p${Math.round(m.percentile)} — ` +
-                    `perlu naik +${formatMetricValue(Math.abs(delta), m.metric.unit)} ke ≥ p75 ` +
-                    `${formatMetricValue(band.p75, m.metric.unit)} (tier ${tier}) untuk band C; ${overallNote}.`,
+                    `needs to rise +${formatMetricValue(Math.abs(delta), m.metric.unit)} to ≥ p75 ` +
+                    `${formatMetricValue(band.p75, m.metric.unit)} (tier ${tier}) for band C; ${overallNote}.`,
             });
         }
     }
@@ -234,18 +234,18 @@ function driftCorrectionOf(label: string): string {
         const v = parseFloat(band[1]);
         const lo = parseFloat(band[2]);
         const hi = parseFloat(band[3]);
-        if (v < lo) return `Nilai engine ${v} DI BAWAH band korpus [${lo}, ${hi}] → arah koreksi: naikkan/verifikasi konstanta engine terhadap sumbernya — band korpus TIDAK dilonggarkan.`;
-        if (v > hi) return `Nilai engine ${v} DI ATAS band korpus [${lo}, ${hi}] → arah koreksi: turunkan/verifikasi konstanta engine terhadap sumbernya — band korpus TIDAK dilonggarkan.`;
+        if (v < lo) return `Engine value ${v} is BELOW the corpus band [${lo}, ${hi}] → correction direction: raise/verify the engine constant against its source — the corpus band is NOT loosened.`;
+        if (v > hi) return `Engine value ${v} is ABOVE the corpus band [${lo}, ${hi}] → correction direction: lower/verify the engine constant against its source — the corpus band is NOT loosened.`;
     }
     const cap = label.match(/(-?\d+(?:\.\d+)?)\s*≤\s.*?(-?\d+(?:\.\d+)?)\s*$/);
     if (cap) {
         const v = parseFloat(cap[1]);
         const c = parseFloat(cap[2]);
         if (Number.isFinite(v) && Number.isFinite(c) && v > c) {
-            return `Nilai engine ${v} melebihi plafon korpus ${c} → arah koreksi: turunkan/verifikasi konstanta engine — band TIDAK dilonggarkan.`;
+            return `Engine value ${v} exceeds the corpus ceiling ${c} → correction direction: lower/verify the engine constant — the band is NOT loosened.`;
         }
     }
-    return 'Check gagal — koreksi diarahkan ke konstanta engine / regen korpus; band korpus tidak dilonggarkan.';
+    return 'Check failed — correction is directed at the engine constant / corpus regen; the corpus band is not loosened.';
 }
 
 /* ─── EXPORTED COLLECTOR (parent diagnostics surface) ─────────────────────── */
@@ -275,7 +275,7 @@ export function collectBenchmarkDiagnostics(model: {
             severity: result.overallGrade === 'F' ? 'critical' : 'warning',
             metric: 'Overall benchmark score',
             value: `${result.overallGrade} (${result.overallScore}/100)`,
-            threshold: `grade C butuh skor ≥ ${100 - GRADE_C_MAX_PCTILE} (persentil komposit ≤ ${GRADE_C_MAX_PCTILE})`,
+            threshold: `grade C needs score ≥ ${100 - GRADE_C_MAX_PCTILE} (composite percentile ≤ ${GRADE_C_MAX_PCTILE})`,
             linkTab: 'benchmark',
         });
     }
@@ -423,7 +423,7 @@ export default function BenchmarkDashboard() {
         { key: 'pue', label: 'PUE', project: projPue, fmt: (v) => v.toFixed(2) },
         { key: 'wue', label: 'WUE', project: projWue, fmt: (v) => v.toFixed(2) },
         { key: 'capacity_mw', label: 'Site Capacity', project: inputs.itLoad / 1000, fmt: (v) => v.toLocaleString(undefined, { maximumFractionDigits: 1 }) },
-        { key: 'investment_busd', label: 'Investment (total)', project: projCapexB, projectNote: 'total CAPEX proyek — korpus = nilai investasi terumumkan per dokumen ($B), bukan $/MW (rasio persentil tidak dapat diturunkan secara jujur)', fmt: (v) => v.toLocaleString(undefined, { maximumFractionDigits: 1 }) },
+        { key: 'investment_busd', label: 'Investment (total)', project: projCapexB, projectNote: 'total project CAPEX — corpus = announced investment value per document ($B), not $/MW (a percentile ratio cannot be derived honestly)', fmt: (v) => v.toLocaleString(undefined, { maximumFractionDigits: 1 }) },
         { key: 'renewable_share', label: 'Renewable Share', project: projRenew, fmt: (v) => v.toLocaleString(undefined, { maximumFractionDigits: 1 }) },
     ];
     /* interpolasi linear piecewise antar titik p10..p90 → "~pXX" — SHARED
@@ -440,7 +440,7 @@ export default function BenchmarkDashboard() {
             {corpusGroups.length > 0 && (
                 <div className="rounded-2xl border border-emerald-500/30 bg-white dark:bg-slate-900/50 p-4">
                     <div className="mb-2 flex items-center gap-2">
-                        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Corpus Distributions — Posisi Proyek vs Korpus Publik Multi-Sumber</h3>
+                        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Corpus Distributions — Project Position vs Multi-Source Public Corpus</h3>
                         <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">live corpus</span>
                     </div>
                     <div className="space-y-4">
@@ -451,7 +451,7 @@ export default function BenchmarkDashboard() {
                                     <span className="text-[9px] text-slate-400">({segs[0][1].unit})</span>
                                     {def.project != null && (
                                         <span className="rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-violet-600 dark:text-violet-300" title={def.projectNote}>
-                                            proyek Anda: {def.fmt(def.project)} {segs[0][1].unit}
+                                            your project: {def.fmt(def.project)} {segs[0][1].unit}
                                         </span>
                                     )}
                                 </div>
@@ -466,19 +466,19 @@ export default function BenchmarkDashboard() {
                                                 <div className="flex flex-wrap items-baseline gap-2 text-[11px]">
                                                     <span className="w-24 rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-center text-[9px] font-medium uppercase tracking-wide text-slate-500">{seg}</span>
                                                     <span className="tabular-nums text-slate-500">n={d.n} · p10 {d.p10.toLocaleString()} · p50 <b className="text-slate-900 dark:text-white">{d.p50.toLocaleString()}</b> · p90 {d.p90.toLocaleString()}</span>
-                                                    {d.n < 5 && <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-medium text-amber-600 dark:text-amber-400">n kecil — indikatif</span>}
+                                                    {d.n < 5 && <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-medium text-amber-600 dark:text-amber-400">small n — indicative</span>}
                                                     {rank != null && (
                                                         <span className="ml-auto rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-violet-600 dark:text-violet-300">
-                                                            {def.label} {def.fmt(def.project as number)} = persentil {rank.label} di {seg} (n={d.n})
+                                                            {def.label} {def.fmt(def.project as number)} = percentile {rank.label} in {seg} (n={d.n})
                                                         </span>
                                                     )}
                                                 </div>
                                                 <div className="relative mt-1 h-2 rounded bg-slate-100 dark:bg-slate-800">
                                                     <div className="absolute h-2 rounded bg-emerald-500/30" style={{ left: `${((d.p25 - d.p10) / span) * 100}%`, width: `${((d.p75 - d.p25) / span) * 100}%` }} />
                                                     <div className="absolute top-[-2px] h-3 w-0.5 bg-slate-400" style={{ left: `${((d.p50 - d.p10) / span) * 100}%` }} />
-                                                    {pos != null && <div className="absolute top-[-3px] h-4 w-1 rounded bg-violet-500" style={{ left: `${pos}%` }} title={`Proyek Anda: ${def.fmt(def.project as number)} ${d.unit} (${rank?.label})`} />}
+                                                    {pos != null && <div className="absolute top-[-3px] h-4 w-1 rounded bg-violet-500" style={{ left: `${pos}%` }} title={`Your project: ${def.fmt(def.project as number)} ${d.unit} (${rank?.label})`} />}
                                                 </div>
-                                                <div className="mt-0.5 text-[9px] text-slate-400">{d.sources} dokumen · {d.companies.slice(0, 4).join(', ')}{d.companies.length > 4 ? ` +${d.companies.length - 4}` : ''}</div>
+                                                <div className="mt-0.5 text-[9px] text-slate-400">{d.sources} documents · {d.companies.slice(0, 4).join(', ')}{d.companies.length > 4 ? ` +${d.companies.length - 4}` : ''}</div>
                                             </div>
                                         );
                                     })}
@@ -486,7 +486,7 @@ export default function BenchmarkDashboard() {
                             </div>
                         ))}
                     </div>
-                    <p className="mt-2 text-[9px] text-slate-400">Distribusi p10–p90 dari korpus publik multi-sumber (DATA.benchmarksCorpus, {Object.values(corpusData).reduce((s, m) => s + Object.values(m).reduce((t, d) => t + d.n, 0), 0)} fakta ber-source_url + kutipan verbatim, gate-enforced). Persentil proyek = interpolasi linear antar titik persentil — marker di luar rentang p10–p90 ditampilkan sebagai &lt;p10 / &gt;p90. Drill-down per-fakta: Data Library → DC Corpus.</p>
+                    <p className="mt-2 text-[9px] text-slate-400">p10–p90 distribution from the multi-source public corpus (DATA.benchmarksCorpus, {Object.values(corpusData).reduce((s, m) => s + Object.values(m).reduce((t, d) => t + d.n, 0), 0)} facts with source_url + verbatim quote, gate-enforced). Project percentile = linear interpolation between percentile points — a marker outside the p10–p90 range is shown as &lt;p10 / &gt;p90. Per-fact drill-down: Data Library → DC Corpus.</p>
                 </div>
             )}
             {/* Arc-1 — MODEL CALIBRATION: konstanta engine vs korpus dunia nyata.
@@ -501,7 +501,7 @@ export default function BenchmarkDashboard() {
                             className="flex min-w-0 flex-1 items-center gap-2 text-left"
                         >
                             <ChevronDown className={clsx('h-3.5 w-3.5 text-slate-400 transition-transform', !calibOpen && '-rotate-90')} />
-                            <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Model Calibration — engine vs dunia nyata</h3>
+                            <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Model Calibration — engine vs real world</h3>
                             <span className="rounded-full bg-cyan-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-cyan-500">gate-mirrored</span>
                             <span className="ml-auto flex items-center gap-1">
                                 {calib.rows.map((r) => (
@@ -526,7 +526,7 @@ export default function BenchmarkDashboard() {
                                     setDriftRowOpen(driftRows[0].id);
                                     window.setTimeout(() => calibTableRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
                                 }}
-                                title={`${driftRows.length} mapping drift terhadap band korpus live — klik untuk detail engine vs band + arah koreksi.`}
+                                title={`${driftRows.length} mappings drift against the live corpus band — click for engine vs band detail + correction direction.`}
                                 className="shrink-0 rounded bg-rose-500/15 px-2 py-0.5 text-[9px] font-semibold uppercase text-rose-600 hover:bg-rose-500/25 dark:text-rose-400"
                             >
                                 ⚠ {driftRows.length} drift
@@ -539,9 +539,9 @@ export default function BenchmarkDashboard() {
                                 <table className="w-full text-[10px]">
                                     <thead>
                                         <tr className="border-b border-slate-200 dark:border-slate-700 text-left text-[9px] uppercase tracking-wide text-slate-400">
-                                            <th className="py-1.5 pr-3 font-medium">Konstanta engine</th>
-                                            <th className="py-1.5 pr-3 font-medium">Korpus</th>
-                                            <th className="py-1.5 pr-3 font-medium">Posisi / rasio</th>
+                                            <th className="py-1.5 pr-3 font-medium">Engine constant</th>
+                                            <th className="py-1.5 pr-3 font-medium">Corpus</th>
+                                            <th className="py-1.5 pr-3 font-medium">Position / ratio</th>
                                             <th className="py-1.5 pr-3 font-medium">Verdict</th>
                                             <th className="py-1.5 font-medium">Limitation</th>
                                         </tr>
@@ -571,7 +571,7 @@ export default function BenchmarkDashboard() {
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => setDriftRowOpen((o) => (o === r.id ? null : r.id))}
-                                                                    title="Klik untuk detail drift: engine vs band korpus live + arah koreksi."
+                                                                    title="Click for drift detail: engine vs live corpus band + correction direction."
                                                                     className="cursor-pointer rounded bg-rose-500/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase text-rose-600 underline decoration-dotted underline-offset-2 hover:bg-rose-500/25 dark:text-rose-400"
                                                                 >{r.verdict}</button>
                                                             ) : (
@@ -593,8 +593,8 @@ export default function BenchmarkDashboard() {
                                                                         Drift — {r.id} ({r.engineLabel})
                                                                     </div>
                                                                     <div className="mt-1.5 grid gap-1 text-[10px] text-slate-600 dark:text-slate-300 md:grid-cols-2">
-                                                                        <div><span className="text-slate-400">Nilai engine: </span><span className="tabular-nums">{r.engineValueText}</span></div>
-                                                                        <div><span className="text-slate-400">Band korpus live: </span><span className="tabular-nums">{r.corpusLabel}</span></div>
+                                                                        <div><span className="text-slate-400">Engine value: </span><span className="tabular-nums">{r.engineValueText}</span></div>
+                                                                        <div><span className="text-slate-400">Live corpus band: </span><span className="tabular-nums">{r.corpusLabel}</span></div>
                                                                     </div>
                                                                     <div className="mt-2 space-y-1">
                                                                         {r.checks.filter((c) => !c.ok).map((c, ci) => (
@@ -605,15 +605,15 @@ export default function BenchmarkDashboard() {
                                                                         ))}
                                                                     </div>
                                                                     <p className="mt-2 text-[9px] italic text-slate-500 dark:text-slate-400">
-                                                                        Kebijakan drift: temuan DILAPORKAN (CHANGELOG + gate <span className="font-mono">tools/test-model-calibration.mjs</span> merah
-                                                                        untuk tier fail) — band korpus TIDAK pernah dilonggarkan diam-diam.
+                                                                        Drift policy: findings are REPORTED (CHANGELOG + the <span className="font-mono">tools/test-model-calibration.mjs</span> gate goes red
+                                                                        for a fail tier) — the corpus band is NEVER quietly loosened.
                                                                     </p>
                                                                     <button
                                                                         type="button"
                                                                         onClick={() => calibCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                                                                         className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-medium text-cyan-600 hover:underline dark:text-cyan-400"
                                                                     >
-                                                                        <ArrowUpRight className="h-3 w-3" /> Section Model Calibration (metodologi &amp; tabel lengkap)
+                                                                        <ArrowUpRight className="h-3 w-3" /> Model Calibration section (methodology &amp; full table)
                                                                     </button>
                                                                 </div>
                                                             </td>
@@ -627,7 +627,7 @@ export default function BenchmarkDashboard() {
                             </div>
                             {calib.notMappable.length > 0 && (
                                 <div className="rounded-lg border border-slate-200 bg-slate-50 p-2.5 dark:border-slate-700 dark:bg-slate-800/40">
-                                    <div className="text-[9px] font-semibold uppercase tracking-wide text-slate-500">Tidak dapat dikalibrasi &amp; alasannya</div>
+                                    <div className="text-[9px] font-semibold uppercase tracking-wide text-slate-500">Not calibratable &amp; why</div>
                                     <ul className="mt-1 space-y-0.5 text-[10px] text-slate-500">
                                         {calib.notMappable.map((nm) => (
                                             <li key={nm.metric}><b className="text-slate-600 dark:text-slate-300">{nm.metric}</b> — {nm.reason}</li>
@@ -636,10 +636,10 @@ export default function BenchmarkDashboard() {
                                 </div>
                             )}
                             <p className="text-[9px] text-slate-400">
-                                Kebijakan drift: band mereferensikan persentil korpus LIVE — regen korpus dapat menggeser verdict. Temuan drift DILAPORKAN
-                                (CHANGELOG + gate <span className="font-mono">tools/test-model-calibration.mjs</span> merah untuk tier fail), band tidak pernah
-                                dilonggarkan diam-diam. Validasi agregat saja — fakta korpus tidak berpasangan per dokumen, kalibrasi per-proyek tidak feasible.
-                                Metodologi: standarization/MODEL_CALIBRATION_STANDARD.md.
+                                Drift policy: the band references LIVE corpus percentiles — a corpus regen can shift the verdict. Drift findings are REPORTED
+                                (CHANGELOG + the <span className="font-mono">tools/test-model-calibration.mjs</span> gate goes red for a fail tier), the band is never
+                                quietly loosened. Aggregate validation only — corpus facts are not paired per document, so per-project calibration is not feasible.
+                                Methodology: standarization/MODEL_CALIBRATION_STANDARD.md.
                             </p>
                         </div>
                     )}
@@ -730,7 +730,7 @@ function ScorecardTab({ result, tier, coolingType }: { result: ReturnType<typeof
                                     gradeColor.darkText,
                                     diag && 'cursor-pointer underline decoration-dotted underline-offset-8',
                                 )}
-                                title={diag ? `Grade ${result.overallGrade} — klik untuk lihat kontributor terburuk + lever perbaikan terhitung dari model live.` : undefined}
+                                title={diag ? `Grade ${result.overallGrade} — click to see the worst contributors + improvement levers computed from the live model.` : undefined}
                                 onClick={diag ? () => setGradeOpen((o) => !o) : undefined}
                             >{result.overallGrade}</span>
                             <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-0.5">{result.overallScore}/100 <InfoTooltip content={TOOLTIP_TEXTS.overallScore} /></span>
@@ -745,10 +745,10 @@ function ScorecardTab({ result, tier, coolingType }: { result: ReturnType<typeof
                     <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-left dark:border-red-800/40 dark:bg-red-950/20">
                         <div className="flex items-center gap-2">
                             <AlertTriangle className="h-4 w-4 shrink-0 text-red-500" />
-                            <span className="text-sm font-semibold text-slate-900 dark:text-white">Kenapa grade {result.overallGrade}?</span>
+                            <span className="text-sm font-semibold text-slate-900 dark:text-white">Why grade {result.overallGrade}?</span>
                         </div>
                         <p className="mt-1.5 text-[11px] leading-relaxed text-slate-600 dark:text-slate-400">{diag.formulaNote}</p>
-                        <div className="mt-3 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Kontributor terburuk (live model)</div>
+                        <div className="mt-3 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Worst contributors (live model)</div>
                         <div className="mt-1.5 space-y-1">
                             {diag.dragging.slice(0, 4).map((m) => (
                                 <div key={m.metric.id} className="flex items-center gap-2 text-xs">
@@ -760,7 +760,7 @@ function ScorecardTab({ result, tier, coolingType }: { result: ReturnType<typeof
                         </div>
                         {diag.levers.length > 0 && (
                             <>
-                                <div className="mt-3 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Lever perbaikan terhitung (dari model live, bukan generik)</div>
+                                <div className="mt-3 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Computed improvement levers (from the live model, not generic)</div>
                                 <div className="mt-1.5 space-y-1.5">
                                     {diag.levers.map((lv, i) => (
                                         <div key={i} className="flex items-start gap-2 rounded-md border border-slate-200 bg-white/70 p-2 dark:border-slate-700 dark:bg-slate-900/50">

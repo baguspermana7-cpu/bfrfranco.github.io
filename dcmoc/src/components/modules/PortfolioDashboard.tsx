@@ -102,9 +102,9 @@ export default function PortfolioDashboard() {
                             if (sr) {
                                 const opYears = sr.financial.cashflows.filter(c => c.year > 0).length || 1;
                                 const avgAnnualRevenue = sr.financial.totalRevenue / opYears;
-                                msg = `Hapus site "${site.label}"?\n\nDampak portofolio: −${mw} MW IT load · −${fmtMoney(avgAnnualRevenue)}/yr revenue (rata-rata model) · −${fmtMoney(sr.annualOpex)}/yr OPEX · NPV ${fmtMoney(sr.financial.npv)} keluar dari Portfolio NPV.`;
+                                msg = `Remove site "${site.label}"?\n\nPortfolio impact: −${mw} MW IT load · −${fmtMoney(avgAnnualRevenue)}/yr revenue (model average) · −${fmtMoney(sr.annualOpex)}/yr OPEX · NPV ${fmtMoney(sr.financial.npv)} drops out of Portfolio NPV.`;
                             } else {
-                                msg = `Hapus site "${site.label}"?\n\nDampak: −${mw} MW IT load dari portofolio (metrik finansial site belum terhitung — butuh ≥2 site valid).`;
+                                msg = `Remove site "${site.label}"?\n\nImpact: −${mw} MW IT load from the portfolio (site financial metrics not yet computed — needs ≥2 valid sites).`;
                             }
                             if (window.confirm(msg)) store.removeSite(site.id);
                         }}
@@ -209,10 +209,10 @@ function SiteCard({ site, index, differsFromLive, countryOptions, onUpdate, onDu
             {/* DA3 honest snapshot chips — entry portfolio = konfigurasi tersimpan */}
             <div className="flex flex-wrap gap-1">
                 {site.savedAt && (
-                    <span title="Konfigurasi site ini tersimpan lokal (bukan state live)" className="rounded bg-slate-500/15 px-1 py-0.5 text-[8px] font-semibold text-slate-500 dark:text-slate-400">saved snapshot · {new Date(site.savedAt).toLocaleDateString()}</span>
+                    <span title="This site's configuration is saved locally (not live state)" className="rounded bg-slate-500/15 px-1 py-0.5 text-[8px] font-semibold text-slate-500 dark:text-slate-400">saved snapshot · {new Date(site.savedAt).toLocaleDateString()}</span>
                 )}
                 {differsFromLive && (
-                    <span title="Country/IT load site ini beda dari project aktif (live sim) — sengaja untuk perbandingan multi-site, tapi jangan dibaca sebagai state project" className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">differs from current project</span>
+                    <span title="This site's country/IT load differs from the active project (live sim) — intentional for multi-site comparison, but do not read it as project state" className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">differs from current project</span>
                 )}
             </div>
 

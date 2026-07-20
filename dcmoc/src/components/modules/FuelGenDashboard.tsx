@@ -509,7 +509,7 @@ export default function FuelGenDashboard() {
                                                 type="button"
                                                 onClick={() => setCo2Open(o => !o)}
                                                 aria-expanded={co2Open}
-                                                title={`CO₂ genset ${result.co2EmissionsTonsPerYear} t/yr > ambang ${CO2_RED_THRESHOLD_T} t/yr. Klik untuk basis perhitungan + lever terukur (HVO, offset, run-hours) dari model yang sama.`}
+                                                title={`Genset CO₂ ${result.co2EmissionsTonsPerYear} t/yr > threshold ${CO2_RED_THRESHOLD_T} t/yr. Click for the calculation basis + measured levers (HVO, offset, run-hours) from the same model.`}
                                                 className="text-2xl font-bold text-red-700 dark:text-red-300 mt-1 cursor-pointer underline decoration-dotted underline-offset-4"
                                             >
                                                 {result.co2EmissionsTonsPerYear} t/yr
@@ -553,14 +553,14 @@ export default function FuelGenDashboard() {
                                             {/* (a) Why red — basis from the same model the card renders */}
                                             <div>
                                                 <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1">
-                                                    Kenapa merah — basis emisi (model FuelGen yang sama)
+                                                    Why red — emissions basis (same FuelGen model)
                                                 </div>
                                                 <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-mono">
                                                     {fmtCompact(liters)} L diesel/yr × {CO2_KG_PER_LITER} kgCO₂/L = {fmtCompact(recomputedKg)} kg ≈ {co2T} t/yr
                                                     {parity ? (
                                                         <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">≡ engine</span>
                                                     ) : (
-                                                        <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300" title="Dekomposisi tidak lagi cocok dengan output engine — angka kartu tetap dari engine; faktor di atas indikatif.">≠ engine — angka kartu yang berlaku</span>
+                                                        <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300" title="Decomposition no longer matches the engine output — the card figure still comes from the engine; the factors above are indicative.">≠ engine — card figure prevails</span>
                                                     )}
                                                 </p>
                                                 <div className="mt-1.5 space-y-0.5">
@@ -573,24 +573,24 @@ export default function FuelGenDashboard() {
                                                     ))}
                                                 </div>
                                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                                                    Ambang pewarnaan: merah bila CO₂ &gt; {CO2_RED_THRESHOLD_T} t/yr — setiap tonase Scope-1 positif adalah exposure pelaporan (konstanta yang sama memberi warna kartu, membuka panel ini, dan mengisi collector).
+                                                    Colour threshold: red when CO₂ &gt; {CO2_RED_THRESHOLD_T} t/yr — any positive Scope-1 tonnage is a reporting exposure (the same constant colours the card, opens this panel, and fills the collector).
                                                 </p>
                                             </div>
 
                                             {/* (b) Measured levers */}
                                             <div>
                                                 <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">
-                                                    Lever terukur (dihitung dari model / engine yang sama)
+                                                    Measured levers (computed from the same model / engine)
                                                 </div>
                                                 <div className="space-y-1.5">
                                                     {/* Lever 1 — HVO swap (engine hvo comparison; honest when unavailable) */}
                                                     {hvo ? (
                                                         <div className="flex items-start gap-2 p-2 rounded-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
-                                                            <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">Ganti HVO100</span>
+                                                            <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">Switch to HVO100</span>
                                                             <span className="flex-1 text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
-                                                                {fmtCompact(hvo.annualLiters)} L/yr (×1.03 densitas energi) × ${hvo.hvoPriceWithTax}/L = {fmtMoney(hvo.annualFuelCostUsd)}/yr — {hvo.annualDeltaVsDieselUsd >= 0 ? `premium +${fmtMoney(hvo.annualDeltaVsDieselUsd)}` : `hemat ${fmtMoney(Math.abs(hvo.annualDeltaVsDieselUsd))}`}/yr vs diesel. CO₂ −{hvo.co2SavingsTonsPerYear} t/yr (−90% lifecycle, EN 15940) → sisa {hvoResidualT} t/yr.
+                                                                {fmtCompact(hvo.annualLiters)} L/yr (×1.03 energy density) × ${hvo.hvoPriceWithTax}/L = {fmtMoney(hvo.annualFuelCostUsd)}/yr — {hvo.annualDeltaVsDieselUsd >= 0 ? `premium +${fmtMoney(hvo.annualDeltaVsDieselUsd)}` : `saves ${fmtMoney(Math.abs(hvo.annualDeltaVsDieselUsd))}`}/yr vs diesel. CO₂ −{hvo.co2SavingsTonsPerYear} t/yr (−90% lifecycle, EN 15940) → {hvoResidualT} t/yr remaining.
                                                                 {hvoAbatement != null && (
-                                                                    <> Abatement ≈ ${hvoAbatement.toLocaleString()}/tCO₂{carbon ? ` (harga karbon negara $${carbon.rate}/t — HVO ${hvoAbatement <= carbon.rate ? 'lebih murah' : 'lebih mahal'} per ton dihindari)` : ''}.</>
+                                                                    <> Abatement ≈ ${hvoAbatement.toLocaleString()}/tCO₂{carbon ? ` (country carbon price $${carbon.rate}/t — HVO is ${hvoAbatement <= carbon.rate ? 'cheaper' : 'more expensive'} per ton avoided)` : ''}.</>
                                                                 )}
                                                             </span>
                                                         </div>
@@ -598,50 +598,50 @@ export default function FuelGenDashboard() {
                                                         <div className="flex items-start gap-2 p-2 rounded-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
                                                             <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">HVO100</span>
                                                             <span className="flex-1 text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
-                                                                HVO belum tersedia di {selectedCountry?.name ?? 'negara ini'} — data negara tidak memuat pasokan/harga HVO, jadi delta biaya tidak dapat dihitung (dilaporkan, bukan disembunyikan). Reduksi −90% lifecycle baru berlaku bila pasokan lokal ada.
+                                                                HVO is not yet available in {selectedCountry?.name ?? 'this country'} — the country data carries no HVO supply/price, so the cost delta cannot be computed (reported, not hidden). The −90% lifecycle reduction only applies once local supply exists.
                                                             </span>
                                                         </div>
                                                     )}
 
                                                     {/* Lever 2 — carbon offset cost (engine DATA.envCosts country price) */}
                                                     <div className="flex items-start gap-2 p-2 rounded-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
-                                                        <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300">Offset karbon</span>
+                                                        <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300">Carbon offset</span>
                                                         <span className="flex-1 text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
                                                             {carbon ? (
-                                                                <>{co2T} t/yr × ${carbon.rate}/t ({carbon.hasScheme ? 'harga compliance negara' : 'voluntary offset — negara tanpa skema compliance'}) = {fmtMoney(Math.round(co2T * carbon.rate))}/yr — engine DATA.envCosts (World Bank / OECD / NCCS 2025-26).</>
+                                                                <>{co2T} t/yr × ${carbon.rate}/t ({carbon.hasScheme ? 'country compliance price' : 'voluntary offset — country without a compliance scheme'}) = {fmtMoney(Math.round(co2T * carbon.rate))}/yr — engine DATA.envCosts (World Bank / OECD / NCCS 2025-26).</>
                                                             ) : (
-                                                                <>Engine DATA.envCosts belum termuat — biaya offset tidak dapat dihitung pada render ini (bukan $0).</>
+                                                                <>Engine DATA.envCosts not yet loaded — offset cost cannot be computed on this render (not $0).</>
                                                             )}
                                                         </span>
                                                     </div>
 
                                                     {/* Lever 3 — reduce run-hours (decomposed outage share + blended grid engine) */}
                                                     <div className="flex items-start gap-2 p-2 rounded-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
-                                                        <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">Kurangi run-hours</span>
+                                                        <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">Reduce run-hours</span>
                                                         <span className="flex-1 text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
-                                                            Runtime outage grid menyumbang {fmtCompact(result.consumption.annualOutageLiters)} L → {outageT} t/yr ({outagePct}% dari CO₂). Menghilangkannya (grid lebih andal / dual feed): CO₂ {co2T} → {Math.round((co2T - outageT) * 10) / 10} t/yr.
+                                                            Grid outage runtime contributes {fmtCompact(result.consumption.annualOutageLiters)} L → {outageT} t/yr ({outagePct}% of CO₂). Eliminating it (more reliable grid / dual feed): CO₂ {co2T} → {Math.round((co2T - outageT) * 10) / 10} t/yr.
                                                             {gridBlended && (
-                                                                <> Blended outage engine memperkirakan {gridBlended.outageHoursPerYear} jam outage/yr ({gridBlended.annualExpectedOutages} kejadian) untuk negara ini.</>
+                                                                <> The blended outage engine estimates {gridBlended.outageHoursPerYear} outage hours/yr ({gridBlended.annualExpectedOutages} events) for this country.</>
                                                             )}
                                                             {' '}
                                                             <button
                                                                 type="button"
                                                                 onClick={() => actions.setActiveTab(GRID_TAB)}
                                                                 className="inline-flex items-center gap-0.5 text-cyan-600 dark:text-cyan-400 underline decoration-dotted underline-offset-2"
-                                                                title="Buka Grid Reliability — driver outage (SAIDI + brownout) dan mitigasinya dimodelkan di sana."
+                                                                title="Open Grid Reliability — the outage drivers (SAIDI + brownout) and their mitigations are modeled there."
                                                             >
                                                                 Grid Reliability<ArrowUpRight className="w-3 h-3" />
                                                             </button>
                                                             {testingRegime === 'complete' && altT != null ? (
-                                                                <> · Turunkan regime testing Complete → Minimal (re-run model yang sama): CO₂ {co2T} → {altT} t/yr (−{Math.round((co2T - altT) * 10) / 10} t), fuel {fmtMoney(result.cost.annualFuelCostUsd)} → {fmtMoney(altRegimeResult!.cost.annualFuelCostUsd)}/yr — trade-off vs NFPA 110 best practice, bukan rekomendasi otomatis.</>
+                                                                <> · Lower the testing regime Complete → Minimal (re-run the same model): CO₂ {co2T} → {altT} t/yr (−{Math.round((co2T - altT) * 10) / 10} t), fuel {fmtMoney(result.cost.annualFuelCostUsd)} → {fmtMoney(altRegimeResult!.cost.annualFuelCostUsd)}/yr — a trade-off vs NFPA 110 best practice, not an automatic recommendation.</>
                                                             ) : (
-                                                                <> · Regime testing sudah Minimal — sisa run-hours didorong keandalan grid (dan jadwal test wajib), bukan jadwal test berlebih{altT != null ? ` (Complete akan menaikkan CO₂ ke ${altT} t/yr)` : ''}.</>
+                                                                <> · The testing regime is already Minimal — remaining run-hours are driven by grid reliability (and mandatory test schedules), not excess testing{altT != null ? ` (Complete would raise CO₂ to ${altT} t/yr)` : ''}.</>
                                                             )}
                                                         </span>
                                                     </div>
                                                 </div>
                                                 <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 leading-snug">
-                                                    Catatan jujur: selama genset tetap diesel dan wajib diuji, CO₂ tidak dapat mencapai 0 t/yr — lever di atas mengecilkan atau meng-offset tonase, tidak menghapusnya. Faktor 2.68 kg/L adalah basis DEFRA yang sama dengan kartu.
+                                                    Honest note: as long as the genset stays diesel and must be tested, CO₂ cannot reach 0 t/yr — the levers above shrink or offset the tonnage, they do not eliminate it. The 2.68 kg/L factor is the same DEFRA basis as the card.
                                                 </p>
                                             </div>
                                         </div>

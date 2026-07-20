@@ -454,7 +454,7 @@ export default function AssetLifecycleDashboard() {
                                             <button
                                                 type="button"
                                                 onClick={() => setOpenHealth(openHealth === h.assetId ? null : h.assetId)}
-                                                title={`Health ${h.healthPct}% ≤ ambang critical ${HEALTH_CRITICAL_PCT}%. Klik untuk alasan (umur vs design life, failure probability) + lever ganti-sekarang-vs-tunda terukur dari model NPV yang sama.`}
+                                                title={`Health ${h.healthPct}% ≤ critical threshold ${HEALTH_CRITICAL_PCT}%. Click for the reason (age vs design life, failure probability) + a measured replace-now-vs-defer lever from the same NPV model.`}
                                                 className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-2"
                                             >{h.riskLevel}</button>
                                         ) : (
@@ -498,44 +498,44 @@ export default function AssetLifecycleDashboard() {
                             return (
                                 <div className="p-4 rounded-lg border text-left bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800/40 space-y-3">
                                     <div className="flex items-start justify-between gap-2">
-                                        <div className="text-xs font-bold text-slate-900 dark:text-white">{a.name} — kenapa CRITICAL (angka model live)</div>
-                                        <button type="button" onClick={() => setOpenHealth(null)} className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">tutup ✕</button>
+                                        <div className="text-xs font-bold text-slate-900 dark:text-white">{a.name} — why CRITICAL (live model numbers)</div>
+                                        <button type="button" onClick={() => setOpenHealth(null)} className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">close ✕</button>
                                     </div>
                                     {/* Why — age vs design life + failure probability decomposition */}
                                     <div>
                                         <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
-                                            Umur asumsi model <span className="font-mono">{ENGINE_ASSUMED_AGE_YR} th</span> vs design life <span className="font-mono">{a.usefulLifeYears} th</span> → sisa umur <span className="font-mono">{h.remainingLife} th</span>; health <span className="font-mono font-bold">{h.healthPct}%</span> ≤ ambang critical <span className="font-mono">{HEALTH_CRITICAL_PCT}%</span> (satu konstanta: pewarnaan chip + gate panel + collector).
+                                            Model assumed age <span className="font-mono">{ENGINE_ASSUMED_AGE_YR} yr</span> vs design life <span className="font-mono">{a.usefulLifeYears} yr</span> → remaining life <span className="font-mono">{h.remainingLife} yr</span>; health <span className="font-mono font-bold">{h.healthPct}%</span> ≤ critical threshold <span className="font-mono">{HEALTH_CRITICAL_PCT}%</span> (one constant: chip colouring + panel gate + collector).
                                         </p>
                                         <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-mono mt-1">
                                             Failure prob = min({ENGINE_FAILPROB_CAP}, {ENGINE_FAILPROB_BASE} × e^({ENGINE_FAILPROB_K} × {fp.ageRatio.toFixed(3)} × 5)) = {(fp.prob * 100).toFixed(1)}%/yr
                                             {parityFp ? (
                                                 <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">≡ engine</span>
                                             ) : (
-                                                <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300" title="Dekomposisi tidak lagi cocok dengan output engine — angka kartu tetap dari engine; faktor di atas indikatif.">≠ engine — angka kartu yang berlaku</span>
+                                                <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300" title="The decomposition no longer matches the engine output — the card numbers still come from the engine; the factors above are indicative.">≠ engine — card numbers apply</span>
                                             )}
                                         </p>
                                         <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                                            healthPct dihitung engine <span className="font-mono">rzModels().asset.healthIndex</span> (condition 0.9, duty 0.6) bila model tersedia, fallback rasio umur — nilai di kartu adalah angka model live, bukan re-implementasi panel ini.
+                                            healthPct is computed by the engine <span className="font-mono">rzModels().asset.healthIndex</span> (condition 0.9, duty 0.6) when the model is available, falling back to the age ratio — the card value is the live model number, not a re-implementation in this panel.
                                         </p>
                                     </div>
                                     {/* Measured lever — replace now vs defer, same NPV model per-asset */}
                                     <div>
-                                        <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">Lever terukur — ganti sekarang vs tunda (formula NPV model yang sama, per aset)</div>
+                                        <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">Measured lever — replace now vs defer (same NPV model formula, per asset)</div>
                                         <div className="space-y-1 text-[11px] font-mono">
-                                            <div className="flex items-center gap-2"><span className="w-40 shrink-0 text-slate-500 dark:text-slate-400">Early (−{ENGINE_DEFER_YEARS} th)</span><span className="text-slate-700 dark:text-slate-300">{fmtMoney(early.npv)} NPV</span></div>
+                                            <div className="flex items-center gap-2"><span className="w-40 shrink-0 text-slate-500 dark:text-slate-400">Early (−{ENGINE_DEFER_YEARS} yr)</span><span className="text-slate-700 dark:text-slate-300">{fmtMoney(early.npv)} NPV</span></div>
                                             <div className="flex items-center gap-2"><span className="w-40 shrink-0 text-slate-500 dark:text-slate-400">On-time (Y{a.usefulLifeYears})</span><span className="text-slate-700 dark:text-slate-300">{fmtMoney(onTime.npv)} NPV</span></div>
-                                            <div className="flex items-center gap-2"><span className="w-40 shrink-0 text-slate-500 dark:text-slate-400">Tunda (+{ENGINE_DEFER_YEARS} th, ×{(1 + ENGINE_DEFER_PENALTY_PER_YR * ENGINE_DEFER_YEARS).toFixed(2)})</span><span className="text-red-600 dark:text-red-400">{fmtMoney(deferred.npv)} NPV (+{fmtMoney(deferDelta)})</span></div>
+                                            <div className="flex items-center gap-2"><span className="w-40 shrink-0 text-slate-500 dark:text-slate-400">Defer (+{ENGINE_DEFER_YEARS} yr, ×{(1 + ENGINE_DEFER_PENALTY_PER_YR * ENGINE_DEFER_YEARS).toFixed(2)})</span><span className="text-red-600 dark:text-red-400">{fmtMoney(deferred.npv)} NPV (+{fmtMoney(deferDelta)})</span></div>
                                         </div>
                                         <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-1.5 leading-snug">
-                                            Menunda +{ENGINE_DEFER_YEARS} th menambah <span className="font-mono font-bold">{fmtMoney(deferDelta)}</span> NPV vs on-time (penalti kegagalan {ENGINE_DEFER_PENALTY_PER_YR * 100}%/th); ganti lebih awal menghindari penalti itu — hemat <span className="font-mono font-bold">{fmtMoney(earlyVsDefer)}</span> vs menunda. Biaya maintenance penuaan aset ini saat umur {ENGINE_ASSUMED_AGE_YR} th: <span className="font-mono">{fmtMoney(agingMaint)}/yr</span> (bagian dari {fmtMoney(fi.maintenanceCostOfAging)}/yr portfolio, formula 2% × cost × ageRatio² yang sama).
+                                            Deferring +{ENGINE_DEFER_YEARS} yr adds <span className="font-mono font-bold">{fmtMoney(deferDelta)}</span> NPV vs on-time (failure penalty {ENGINE_DEFER_PENALTY_PER_YR * 100}%/yr); replacing earlier avoids that penalty — saving <span className="font-mono font-bold">{fmtMoney(earlyVsDefer)}</span> vs deferring. Aging maintenance cost of this asset at age {ENGINE_ASSUMED_AGE_YR} yr: <span className="font-mono">{fmtMoney(agingMaint)}/yr</span> (part of the {fmtMoney(fi.maintenanceCostOfAging)}/yr portfolio, same 2% × cost × ageRatio² formula).
                                         </p>
                                     </div>
                                     {/* Honest-unreachable + nav */}
                                     <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-snug">
-                                        Catatan jujur: model tidak memiliki opsi mid-life repair/refurbishment — tidak ada angka yang bisa ditampilkan untuk lever itu. NPV model juga hanya menghukum penundaan (penalti {ENGINE_DEFER_PENALTY_PER_YR * 100}%/th); manfaat risiko-kegagalan-terhindar dari early replacement tidak diberi kredit finansial, sehingga on-time selalu termurah secara NPV murni.
+                                        Honest note: the model has no mid-life repair/refurbishment option — there is no number to show for that lever. The NPV model also only penalises deferral (penalty {ENGINE_DEFER_PENALTY_PER_YR * 100}%/yr); the avoided-failure-risk benefit of early replacement is given no financial credit, so on-time is always cheapest in pure NPV terms.
                                     </p>
                                     <button type="button" onClick={() => setActiveView('replacement')} className="text-[11px] font-medium text-cyan-700 dark:text-cyan-400 hover:underline">
-                                        Lihat Replacement Timeline ↗
+                                        View Replacement Timeline ↗
                                     </button>
                                 </div>
                             );
@@ -657,7 +657,7 @@ export default function AssetLifecycleDashboard() {
                             <button
                                 type="button"
                                 onClick={() => setOpenDefer(!openDefer)}
-                                title={`Menunda +${ENGINE_DEFER_YEARS} th menambah ${fmtMoney(diag.deferPremium)} NPV vs on-time (ambang merah > ${fmtMoney(DEFER_PREMIUM_RED_USD)}). Klik untuk kurva biaya kegagalan per tahun penundaan + window penundaan optimal (model yang sama).`}
+                                title={`Deferring +${ENGINE_DEFER_YEARS} yr adds ${fmtMoney(diag.deferPremium)} NPV vs on-time (red threshold > ${fmtMoney(DEFER_PREMIUM_RED_USD)}). Click for the failure-cost curve per deferral year + the optimal deferral window (same model).`}
                                 className="text-lg font-bold text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4"
                             >{fmtMoney(fi.deferredReplacementNpv)}</button>
                         ) : (
@@ -676,20 +676,20 @@ export default function AssetLifecycleDashboard() {
                 {openDefer && diag && diag.deferPremium > DEFER_PREMIUM_RED_USD && (
                     <div className="mt-3 p-4 rounded-lg border text-left bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800/40 space-y-3">
                         <div className="flex items-start justify-between gap-2">
-                            <div className="text-xs font-bold text-slate-900 dark:text-white">Kenapa merah — biaya penundaan (angka model live)</div>
-                            <button type="button" onClick={() => setOpenDefer(false)} className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">tutup ✕</button>
+                            <div className="text-xs font-bold text-slate-900 dark:text-white">Why red — deferral cost (live model numbers)</div>
+                            <button type="button" onClick={() => setOpenDefer(false)} className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">close ✕</button>
                         </div>
                         <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-mono">
-                            Deferred NPV {fmtMoney(fi.deferredReplacementNpv)} = on-time {fmtMoney(result.npvOfReplacements)} + premium {fmtMoney(diag.deferPremium)} (penalti kegagalan {ENGINE_DEFER_PENALTY_PER_YR * 100}%/th × {ENGINE_DEFER_YEARS} th = ×{(1 + ENGINE_DEFER_PENALTY_PER_YR * ENGINE_DEFER_YEARS).toFixed(2)}, diskonto {ENGINE_DISCOUNT_RATE * 100}%, inflasi {(diag.inflationRate * 100).toFixed(1)}%)
+                            Deferred NPV {fmtMoney(fi.deferredReplacementNpv)} = on-time {fmtMoney(result.npvOfReplacements)} + premium {fmtMoney(diag.deferPremium)} (failure penalty {ENGINE_DEFER_PENALTY_PER_YR * 100}%/yr × {ENGINE_DEFER_YEARS} yr = ×{(1 + ENGINE_DEFER_PENALTY_PER_YR * ENGINE_DEFER_YEARS).toFixed(2)}, discount {ENGINE_DISCOUNT_RATE * 100}%, inflation {(diag.inflationRate * 100).toFixed(1)}%)
                             {diag.parityAll ? (
-                                <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300" title="Titik d=0, d=2 dan early (−2) pada kurva identik dengan npvOfReplacements / deferredReplacementNpv / earlyReplacementNpv engine (±$1).">≡ engine</span>
+                                <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300" title="The d=0, d=2 and early (−2) points on the curve are identical to the engine's npvOfReplacements / deferredReplacementNpv / earlyReplacementNpv (±$1).">≡ engine</span>
                             ) : (
-                                <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300" title="Rekomputasi kurva tidak lagi cocok dengan output engine — angka kartu tetap dari engine; kurva di bawah indikatif.">≠ engine — angka kartu yang berlaku</span>
+                                <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300" title="The curve recomputation no longer matches the engine output — the card numbers still come from the engine; the curve below is indicative.">≠ engine — card numbers apply</span>
                             )}
                         </p>
                         {/* Failure-cost curve vs deferral years */}
                         <div>
-                            <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">Kurva biaya kegagalan vs tahun penundaan (portfolio, model yang sama)</div>
+                            <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">Failure-cost curve vs deferral years (portfolio, same model)</div>
                             <div className="space-y-1">
                                 {diag.curve.map(p => {
                                     const maxNpv = Math.max(...diag.curve.map(c => c.npv));
@@ -697,14 +697,14 @@ export default function AssetLifecycleDashboard() {
                                     const truncated = p.events < diag.curve[0].events;
                                     return (
                                         <div key={p.d} className="flex items-center gap-2 text-[11px]">
-                                            <span className={clsx("w-24 shrink-0 font-mono", p.d === ENGINE_DEFER_YEARS ? "font-bold text-red-600 dark:text-red-400" : "text-slate-500 dark:text-slate-400")}>+{p.d} th ×{p.penaltyFactor.toFixed(2)}</span>
+                                            <span className={clsx("w-24 shrink-0 font-mono", p.d === ENGINE_DEFER_YEARS ? "font-bold text-red-600 dark:text-red-400" : "text-slate-500 dark:text-slate-400")}>+{p.d} yr ×{p.penaltyFactor.toFixed(2)}</span>
                                             <div className="flex-1 h-3 bg-slate-100 dark:bg-slate-800 rounded overflow-hidden">
                                                 <div className={clsx("h-full rounded", p.d === 0 ? "bg-blue-500" : "bg-red-500/80")} style={{ width: `${(p.npv / maxNpv) * 100}%` }} />
                                             </div>
                                             <span className="w-44 shrink-0 text-right font-mono text-slate-700 dark:text-slate-300">
                                                 {fmtMoney(p.npv)}{p.d > 0 && <span className={delta > 0 ? " text-red-600 dark:text-red-400" : " text-emerald-600 dark:text-emerald-400"}> ({delta >= 0 ? '+' : '−'}{fmtMoney(Math.abs(delta))})</span>}
                                             </span>
-                                            {truncated && <span className="text-[9px] text-amber-600 dark:text-amber-400" title={`${diag.curve[0].events - p.events} siklus penggantian keluar dari horizon ${result.projectionYears} th pada penundaan ini`}>⚠ horizon</span>}
+                                            {truncated && <span className="text-[9px] text-amber-600 dark:text-amber-400" title={`${diag.curve[0].events - p.events} replacement cycles fall outside the ${result.projectionYears}-yr horizon at this deferral`}>⚠ horizon</span>}
                                         </div>
                                     );
                                 })}
@@ -712,16 +712,16 @@ export default function AssetLifecycleDashboard() {
                         </div>
                         {/* Optimal deferral window — derived from the same curve */}
                         <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
-                            Window penundaan optimal (NPV terendah pada kurva): <span className="font-mono font-bold">+{diag.optimal.d} th</span> — {fmtMoney(diag.optimal.npv)}.
+                            Optimal deferral window (lowest NPV on the curve): <span className="font-mono font-bold">+{diag.optimal.d} yr</span> — {fmtMoney(diag.optimal.npv)}.
                             {diag.optimal.d === 0
-                                ? ` Penalti ${ENGINE_DEFER_PENALTY_PER_YR * 100}%/th melebihi keuntungan diskonto ${ENGINE_DISCOUNT_RATE * 100}%/th − inflasi ${(diag.inflationRate * 100).toFixed(1)}%/th, jadi setiap tahun penundaan menambah biaya — window optimal = tidak menunda.`
-                                : ' Perhatikan tanda ⚠ horizon: NPV yang lebih rendah pada penundaan ini sebagian berasal dari siklus penggantian yang keluar dari horizon proyeksi (artefak horizon, bukan penghematan nyata).'}
+                                ? ` The ${ENGINE_DEFER_PENALTY_PER_YR * 100}%/yr penalty exceeds the discount benefit ${ENGINE_DISCOUNT_RATE * 100}%/yr − inflation ${(diag.inflationRate * 100).toFixed(1)}%/yr, so every year of deferral adds cost — the optimal window is not to defer.`
+                                : ' Note the ⚠ horizon flags: the lower NPV at this deferral partly comes from replacement cycles that fall outside the projection horizon (a horizon artifact, not a real saving).'}
                         </p>
                         <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-snug">
-                            Catatan jujur: engine hanya menghitung titik d={ENGINE_DEFER_YEARS} (dan early −{ENGINE_DEFER_YEARS}); titik kurva lainnya adalah generalisasi aturan penalti {ENGINE_DEFER_PENALTY_PER_YR * 100}%/th yang dinyatakan model itu sendiri, dengan titik d=0 dan d={ENGINE_DEFER_YEARS} diverifikasi identik terhadap engine (chip di atas). Ambang merah kartu: premium &gt; {fmtMoney(DEFER_PREMIUM_RED_USD)} (satu konstanta dengan collector).
+                            Honest note: the engine only computes the d={ENGINE_DEFER_YEARS} point (and early −{ENGINE_DEFER_YEARS}); the other curve points are a generalisation of the {ENGINE_DEFER_PENALTY_PER_YR * 100}%/yr penalty rule the model itself states, with the d=0 and d={ENGINE_DEFER_YEARS} points verified identical to the engine (chip above). Card red threshold: premium &gt; {fmtMoney(DEFER_PREMIUM_RED_USD)} (one constant shared with the collector).
                         </p>
                         <button type="button" onClick={() => setActiveView('health')} className="text-[11px] font-medium text-cyan-700 dark:text-cyan-400 hover:underline">
-                            Lihat Health &amp; Risk per aset ↗
+                            View Health &amp; Risk per asset ↗
                         </button>
                     </div>
                 )}

@@ -105,25 +105,25 @@ export function explainPhaseDecision(input: DecisionExplainInput): DecisionExpla
 
     if (verdict === 'go') {
         const reason =
-            `GO karena IRR ${fmtPct(irrPct)} ≥ hurdle ${fmtPct(hurdlePct, 0)} dengan NPV ${fmtMoney(npv)}` +
-            (Number.isFinite(payback) && payback > 0 ? ` dan payback ${payback.toFixed(1)} th` : '') +
-            ' pada discount rate yang dipakai.';
+            `GO because IRR ${fmtPct(irrPct)} ≥ hurdle ${fmtPct(hurdlePct, 0)} with NPV ${fmtMoney(npv)}` +
+            (Number.isFinite(payback) && payback > 0 ? ` and payback ${payback.toFixed(1)} yr` : '') +
+            ' at the discount rate used.';
 
         const levers: DecisionLever[] = [];
         const headroom = solveRevenueHeadroom(input);
         if (headroom === null) {
             levers.push({
-                label: 'Headroom revenue > 60%',
-                detail: `Sangat kokoh — bahkan revenue −60% (ke ${revBase ? fmtMoney(revBase * REV_HEADROOM_MIN) + '/kW/bln' : '40% dari basis'}) IRR masih ≥ hurdle ${fmtPct(hurdlePct, 0)}.`,
+                label: 'Revenue headroom > 60%',
+                detail: `Very robust — even revenue −60% (to ${revBase ? fmtMoney(revBase * REV_HEADROOM_MIN) + '/kW/mo' : '40% of base'}) keeps IRR ≥ hurdle ${fmtPct(hurdlePct, 0)}.`,
                 targetTab: 'finance',
             });
         } else {
             const dropPct = headroom * 100;
             levers.push({
-                label: `Headroom revenue −${dropPct.toFixed(0)}%`,
-                detail: `Revenue bisa turun hingga −${dropPct.toFixed(1)}%` +
-                    (revBase ? ` (ke ${fmtMoney(revBase * (1 - headroom))}/kW/bln)` : '') +
-                    ` sebelum IRR jatuh di bawah hurdle ${fmtPct(hurdlePct, 0)} — buffer terhadap asumsi tarif/okupansi.`,
+                label: `Revenue headroom −${dropPct.toFixed(0)}%`,
+                detail: `Revenue can fall up to −${dropPct.toFixed(1)}%` +
+                    (revBase ? ` (to ${fmtMoney(revBase * (1 - headroom))}/kW/mo)` : '') +
+                    ` before IRR drops below hurdle ${fmtPct(hurdlePct, 0)} — a buffer against rate/occupancy assumptions.`,
                 targetTab: 'finance',
             });
         }
@@ -132,8 +132,8 @@ export function explainPhaseDecision(input: DecisionExplainInput): DecisionExpla
 
     // ── NO-GO ──
     const reason =
-        `NO-GO karena IRR ${fmtPct(irrPct)} < hurdle ${fmtPct(hurdlePct, 0)}` +
-        (npv < 0 ? ` dan NPV ${fmtMoney(npv)} negatif pada discount rate yang dipakai` : ` meski NPV ${fmtMoney(npv)} positif`) +
+        `NO-GO because IRR ${fmtPct(irrPct)} < hurdle ${fmtPct(hurdlePct, 0)}` +
+        (npv < 0 ? ` and NPV ${fmtMoney(npv)} is negative at the discount rate used` : ` even though NPV ${fmtMoney(npv)} is positive`) +
         '.';
 
     const levers: DecisionLever[] = [];
@@ -141,8 +141,8 @@ export function explainPhaseDecision(input: DecisionExplainInput): DecisionExpla
     const revMult = solveRevenueUplift(input);
     if (revMult === null) {
         levers.push({
-            label: 'Revenue: struktur biaya perlu ditinjau',
-            detail: `Bahkan +${((REV_MULT_MAX - 1) * 100).toFixed(0)}% revenue tidak mencapai hurdle ${fmtPct(hurdlePct, 0)} — struktur biaya (CAPEX + OPEX adders) perlu ditinjau, bukan sekadar tarif.`,
+            label: 'Revenue: cost structure needs review',
+            detail: `Even +${((REV_MULT_MAX - 1) * 100).toFixed(0)}% revenue does not reach hurdle ${fmtPct(hurdlePct, 0)} — the cost structure (CAPEX + OPEX adders) needs review, not just the rate.`,
             targetTab: 'finance',
         });
     } else if (revMult > 1) {
@@ -150,9 +150,9 @@ export function explainPhaseDecision(input: DecisionExplainInput): DecisionExpla
         const check = input.recompute({ revMult });
         levers.push({
             label: `Revenue +${upPct.toFixed(0)}%`,
-            detail: `Revenue perlu naik +${upPct.toFixed(1)}%` +
-                (revBase ? ` (ke ${fmtMoney(revBase * revMult)}/kW/bln dari ${fmtMoney(revBase)})` : '') +
-                ` agar IRR mencapai ${fmtPct(check.irrPct)} ≥ hurdle ${fmtPct(hurdlePct, 0)}.`,
+            detail: `Revenue must rise +${upPct.toFixed(1)}%` +
+                (revBase ? ` (to ${fmtMoney(revBase * revMult)}/kW/mo from ${fmtMoney(revBase)})` : '') +
+                ` for IRR to reach ${fmtPct(check.irrPct)} ≥ hurdle ${fmtPct(hurdlePct, 0)}.`,
             targetTab: 'finance',
         });
     }
@@ -160,15 +160,15 @@ export function explainPhaseDecision(input: DecisionExplainInput): DecisionExpla
     const capexCut = solveCapexCut(input);
     if (capexCut === null) {
         levers.push({
-            label: 'CAPEX: pengurangan saja tidak cukup',
-            detail: `Bahkan CAPEX −${((1 - CAPEX_MULT_MIN) * 100).toFixed(0)}% (ke ${fmtMoney(capex * CAPEX_MULT_MIN)}) tidak mencapai hurdle ${fmtPct(hurdlePct, 0)} — sisi pendapatan/OPEX yang mengikat.`,
+            label: 'CAPEX: reduction alone is not enough',
+            detail: `Even CAPEX −${((1 - CAPEX_MULT_MIN) * 100).toFixed(0)}% (to ${fmtMoney(capex * CAPEX_MULT_MIN)}) does not reach hurdle ${fmtPct(hurdlePct, 0)} — the revenue/OPEX side is binding.`,
             targetTab: 'capex',
         });
     } else if (capexCut > 0) {
         const check = input.recompute({ capexMult: 1 - capexCut });
         levers.push({
             label: `CAPEX −${(capexCut * 100).toFixed(0)}%`,
-            detail: `ATAU CAPEX turun −${(capexCut * 100).toFixed(1)}% (ke ${fmtMoney(capex * (1 - capexCut))} dari ${fmtMoney(capex)}) agar IRR mencapai ${fmtPct(check.irrPct)} ≥ hurdle ${fmtPct(hurdlePct, 0)}.`,
+            detail: `OR CAPEX falls −${(capexCut * 100).toFixed(1)}% (to ${fmtMoney(capex * (1 - capexCut))} from ${fmtMoney(capex)}) for IRR to reach ${fmtPct(check.irrPct)} ≥ hurdle ${fmtPct(hurdlePct, 0)}.`,
             targetTab: 'capex',
         });
     }
@@ -176,8 +176,8 @@ export function explainPhaseDecision(input: DecisionExplainInput): DecisionExpla
     // Informational screening note: passes a typical 10% hurdle but not the chosen one.
     if (hurdlePct > TYPICAL_HURDLE_PCT && irrPct >= TYPICAL_HURDLE_PCT) {
         levers.push({
-            label: `Layak pada hurdle ${TYPICAL_HURDLE_PCT}%`,
-            detail: `IRR ${fmtPct(irrPct)} melewati hurdle tipikal ${TYPICAL_HURDLE_PCT}% tetapi di bawah hurdle terpilih ${fmtPct(hurdlePct, 0)} — verdict sensitif terhadap pilihan hurdle (screening, bukan kegagalan absolut).`,
+            label: `Viable at ${TYPICAL_HURDLE_PCT}% hurdle`,
+            detail: `IRR ${fmtPct(irrPct)} clears the typical ${TYPICAL_HURDLE_PCT}% hurdle but is below the selected hurdle ${fmtPct(hurdlePct, 0)} — the verdict is sensitive to the hurdle choice (a screening flag, not an absolute failure).`,
             targetTab: 'finance',
         });
     }
@@ -248,7 +248,7 @@ export function explainThresholdMetric(input: ThresholdMetricInput): ThresholdMe
     const cmp = direction === 'atLeast' ? (pass ? '≥' : '<') : (pass ? '≤' : '>');
     const reason =
         `${metricLabel} ${fmtValue(value)} ${cmp} threshold ${fmtValue(threshold)}` +
-        (because ? (pass ? ` — ${because}` : ` karena ${because}`) : '') + '.';
+        (because ? (pass ? ` — ${because}` : ` because ${because}`) : '') + '.';
 
     if (pass) return { pass, reason, levers: [] };
 

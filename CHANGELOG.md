@@ -11,6 +11,17 @@ release sections rather than semver.
 
 ---
 
+## v1.99.6 — 2026-07-21 (DCMOC user-facing text → English, sitewide sweep)
+
+### Changed (owner: "change it in english" — trace lalu seluruh UI)
+- **~230+ string Bahasa Indonesia user-facing diterjemahkan ke English** di ~22 file (6 agent paralel, ownership eksklusif, teks-only): panel guidance diagnostik (Financial/Investment/PhasedFinancial/Benchmark/GridReliability/DisasterRisk/Reliability/AssetLifecycle/Maintenance/DesignTools/Capacity/Strategic/Talent/MonteCarlo/Compliance/FuelGen/Simulation) + explain logic (`decision-explain.ts` feeds 3 halaman — verdict/lever kini konsisten EN, `axis-explain`, `dimension-explain`, capacity-adapter remediation) + ScenarioComparison/Report/CBM/Portfolio + `cloudProjects` error/label + ReportNarrative plan-mode markers + Diagnostics Center 5 fragmen sisa (`ambang`/`nilai`/empty-state) + CapacityPlanningPage/ConstructionEngine lever & basis notes.
+- Istilah teknis dipertahankan (NPV/IRR/PUE/CAPEX/tier/DSCR/MTBF/SAIDI/GWP/HVO/CO₂...); konvensi teks $/kW/bln→/kW/mo, th→yr, bln→mo. NILAI/logika/traceId/threshold/className UTUH.
+- Komentar kode ID dibiarkan (bukan user-facing).
+
+### Verified
+- Adversarial verify v1.99.5 (deploy): Diagnostics Center struktur/deep-link/skip-chip + Trace English + 3 enhance (Copy chain/Expand all/leaf summary) semua PASS; menemukan 5 fragmen ID sisa di Center → difix di ronde ini.
+- tsc/build · walk 24/0 · synergy 6/0 · **trace-parity 117/117** (teks-only) · export 44/0 · residual-ID grep bersih (kecuali komentar).
+
 ## v1.99.5 — 2026-07-20 (DIAGNOSTICS CENTER + Trace notes → English + enhance)
 
 ### Added

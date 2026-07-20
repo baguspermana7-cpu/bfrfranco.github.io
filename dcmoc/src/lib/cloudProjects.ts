@@ -34,7 +34,7 @@ export interface SharedProjectPayload {
 
 /** Pesan jujur saat SQL Module 9 belum dijalankan owner (tabel belum ada). */
 export const CLOUD_TABLE_MISSING =
-    'Tabel cloud belum tersedia — lihat Owner Action Board di setup-supabase';
+    'Cloud tables are not available yet — see the Owner Action Board in setup-supabase';
 
 const MAX_BUNDLE_BYTES = 240 * 1024; // client pre-guard; DB caps at 256 KB
 
@@ -57,8 +57,8 @@ function mapError(raw: unknown): string {
     if (/relation .* does not exist|could not find the table|schema cache|database not set up/i.test(msg)) {
         return CLOUD_TABLE_MISSING;
     }
-    if (/not signed in|silakan login/i.test(msg)) return 'Silakan login dulu untuk memakai fitur cloud.';
-    if (/failed to fetch|networkerror|load failed/i.test(msg)) return 'Tidak bisa terhubung ke cloud — periksa koneksi lalu coba lagi.';
+    if (/not signed in|silakan login/i.test(msg)) return 'Please sign in first to use cloud features.';
+    if (/failed to fetch|networkerror|load failed/i.test(msg)) return 'Cannot connect to the cloud — check your connection and try again.';
     return msg;
 }
 
@@ -66,10 +66,10 @@ function mapError(raw: unknown): string {
 async function getCloudApi(): Promise<CloudResult<DcmocSupa>> {
     try {
         const supa = await getRzSupa();
-        if (!supa) return { ok: false, error: 'Modul Supabase gagal dimuat — periksa koneksi lalu muat ulang halaman.' };
+        if (!supa) return { ok: false, error: 'The Supabase module failed to load — check your connection and reload the page.' };
         const api = supa as unknown as Partial<DcmocSupa>;
         if (typeof api.saveDcmocProject !== 'function' || typeof api.getSharedProject !== 'function') {
-            return { ok: false, error: 'Modul cloud belum tersedia di versi rz-supabase.js yang termuat — muat ulang halaman (hard refresh).' };
+            return { ok: false, error: 'Cloud module not available in the loaded rz-supabase.js version — reload the page (hard refresh).' };
         }
         if (api.ready) await api.ready; // wait for session restore
         return { ok: true, data: api as DcmocSupa };
@@ -111,14 +111,14 @@ export async function uploadProject(
     cloudId?: string | null
 ): Promise<CloudResult<{ id: string; updated_at: string }>> {
     if (!project || project.version !== 1 || !project.snapshot) {
-        return { ok: false, error: 'Bundle project tidak valid — buka/simpan ulang project lalu coba lagi.' };
+        return { ok: false, error: 'Invalid project bundle — reopen/re-save the project and try again.' };
     }
     const size = bundleSizeBytes(project);
     if (size > MAX_BUNDLE_BYTES) {
         const kb = Math.ceil(size / 1024);
         return {
             ok: false,
-            error: `Project ${kb} KB / 240 KB — kurangi log tracking (Ops/Construction/Financial) lalu coba lagi`,
+            error: `Project ${kb} KB / 240 KB — reduce tracking logs (Ops/Construction/Financial) and try again`,
         };
     }
     const api = await getCloudApi();
@@ -126,7 +126,7 @@ export async function uploadProject(
     try {
         const res = await api.data.saveDcmocProject(cloudId ?? null, project.name, project);
         if (res.error) return { ok: false, error: mapError(res.error) };
-        if (!res.data?.id) return { ok: false, error: 'Cloud tidak mengembalikan ID — coba lagi.' };
+        if (!res.data?.id) return { ok: false, error: 'The cloud did not return an ID — try again.' };
         return { ok: true, data: { id: res.data.id, updated_at: res.data.updated_at } };
     } catch (err) {
         return { ok: false, error: mapError(err) };
@@ -148,7 +148,7 @@ export async function listCloud(): Promise<CloudResult<CloudProjectMeta[]>> {
 
 /** Ambil satu project cloud (dengan bundle) + validasi version/shape SEBELUM return. */
 export async function loadCloud(id: string): Promise<CloudResult<ProjectBundle>> {
-    if (!id) return { ok: false, error: 'ID project cloud kosong.' };
+    if (!id) return { ok: false, error: 'Cloud project ID is empty.' };
     const api = await getCloudApi();
     if (!api.ok) return api;
     try {
@@ -156,7 +156,7 @@ export async function loadCloud(id: string): Promise<CloudResult<ProjectBundle>>
         if (res.error) return { ok: false, error: mapError(res.error) };
         const bundle = validateBundle(res.data?.bundle);
         if (!bundle) {
-            return { ok: false, error: 'Bundle cloud rusak / versi tidak dikenal (butuh version 1) — data lokal TIDAK diubah.' };
+            return { ok: false, error: 'Cloud bundle corrupt / unknown version (requires version 1) — local data was NOT changed.' };
         }
         return { ok: true, data: bundle };
     } catch (err) {
@@ -166,7 +166,7 @@ export async function loadCloud(id: string): Promise<CloudResult<ProjectBundle>>
 
 /** Hapus project cloud (data lokal tidak tersentuh). */
 export async function removeCloud(id: string): Promise<CloudResult<null>> {
-    if (!id) return { ok: false, error: 'ID project cloud kosong.' };
+    if (!id) return { ok: false, error: 'Cloud project ID is empty.' };
     const api = await getCloudApi();
     if (!api.ok) return api;
     try {
@@ -180,13 +180,13 @@ export async function removeCloud(id: string): Promise<CloudResult<null>> {
 
 /** Buat share token (link lihat-saja) untuk satu project cloud. */
 export async function share(id: string): Promise<CloudResult<{ share_token: string }>> {
-    if (!id) return { ok: false, error: 'ID project cloud kosong.' };
+    if (!id) return { ok: false, error: 'Cloud project ID is empty.' };
     const api = await getCloudApi();
     if (!api.ok) return api;
     try {
         const res = await api.data.shareDcmocProject(id);
         if (res.error) return { ok: false, error: mapError(res.error) };
-        if (!res.data?.share_token) return { ok: false, error: 'Cloud tidak mengembalikan token share — coba lagi.' };
+        if (!res.data?.share_token) return { ok: false, error: 'The cloud did not return a share token — try again.' };
         return { ok: true, data: { share_token: res.data.share_token } };
     } catch (err) {
         return { ok: false, error: mapError(err) };
@@ -195,7 +195,7 @@ export async function share(id: string): Promise<CloudResult<{ share_token: stri
 
 /** Cabut share token — link lama langsung mati. */
 export async function unshare(id: string): Promise<CloudResult<null>> {
-    if (!id) return { ok: false, error: 'ID project cloud kosong.' };
+    if (!id) return { ok: false, error: 'Cloud project ID is empty.' };
     const api = await getCloudApi();
     if (!api.ok) return api;
     try {
@@ -209,7 +209,7 @@ export async function unshare(id: string): Promise<CloudResult<null>> {
 
 /** Ambil project dibagikan via token (RPC anon — TANPA login). Bundle divalidasi. */
 export async function fetchShared(token: string): Promise<CloudResult<SharedProjectPayload>> {
-    if (!token) return { ok: false, error: 'Token share kosong.' };
+    if (!token) return { ok: false, error: 'Share token is empty.' };
     const api = await getCloudApi();
     if (!api.ok) return api;
     try {
@@ -220,11 +220,11 @@ export async function fetchShared(token: string): Promise<CloudResult<SharedProj
             | { name?: string; bundle?: unknown; version?: number; shared_at?: string | null }
             | null | undefined;
         if (!row || row.bundle == null) {
-            return { ok: false, error: 'Link share tidak ditemukan / sudah dicabut oleh pemiliknya.' };
+            return { ok: false, error: 'Share link not found / already revoked by its owner.' };
         }
         const bundle = validateBundle(row.bundle);
         if (!bundle) {
-            return { ok: false, error: 'Bundle yang dibagikan rusak / versi tidak dikenal (butuh version 1).' };
+            return { ok: false, error: 'The shared bundle is corrupt / an unknown version (requires version 1).' };
         }
         return {
             ok: true,

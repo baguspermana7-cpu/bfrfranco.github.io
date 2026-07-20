@@ -38,7 +38,7 @@ export function collectCapacityDiagnostics(model: CapacityPlanResult): Finding[]
             id: `capacity-phase-risk-${d.id}`,
             severity: 'warn' as const,
             title: `${d.label} At-Risk — risk score ${d.riskScore} ≥ ${RISK_AT_RISK_THRESHOLD}`,
-            detail: `${d.riskFactors.join('; ')}. Klik badge risk di tab Capacity untuk alasan + lever terukur (bisection di atas calculateCapacityPlan).`,
+            detail: `${d.riskFactors.join('; ')}. Click the risk badge in the Capacity tab for the reason + measured levers (bisection over calculateCapacityPlan).`,
             linkTab: 'capacity' as const,
         }));
 }
@@ -74,13 +74,13 @@ function explainPhaseRisk(input: CapacityPlanInput, idx: number): ThresholdMetri
 
     // Live component attribution: delta ketika satu driver dinetralkan (re-run model, bukan salin formula)
     const parts: string[] = [];
-    if (phase.itLoadKw >= 20000) parts.push(`skala ${fmtKw(phase.itLoadKw)} (+${current - riskAt({ itLoadKw: 15000 })} vs <20 MW)`);
-    if (phase.buildMonths > 18) parts.push(`build ${phase.buildMonths} bln (+${current - riskAt({ buildMonths: 18 })} vs ≤18 bln)`);
+    if (phase.itLoadKw >= 20000) parts.push(`scale ${fmtKw(phase.itLoadKw)} (+${current - riskAt({ itLoadKw: 15000 })} vs <20 MW)`);
+    if (phase.buildMonths > 18) parts.push(`build ${phase.buildMonths} mo (+${current - riskAt({ buildMonths: 18 })} vs ≤18 mo)`);
     if (idx > 0) {
         const soloRisk = calculateCapacityPlan({ ...input, phases: [phase] }).phaseDetails[0]?.riskScore ?? current;
-        parts.push(`fase lanjutan #${idx + 1} (+${current - soloRisk} koordinasi antar-fase)`);
+        parts.push(`follow-on phase #${idx + 1} (+${current - soloRisk} cross-phase coordination)`);
     }
-    if (input.coolingType === 'liquid') parts.push(`liquid cooling (+${current - riskAt({ coolingType: 'inrow' })} lead time supply chain)`);
+    if (input.coolingType === 'liquid') parts.push(`liquid cooling (+${current - riskAt({ coolingType: 'inrow' })} supply-chain lead time)`);
     if (input.tierLevel === 4) parts.push(`Tier IV (+${current - riskAt({ tierLevel: 3 })} concurrent maintainability)`);
 
     const specs: ThresholdLeverSpec[] = [];
@@ -91,12 +91,12 @@ function explainPhaseRisk(input: CapacityPlanInput, idx: number): ThresholdMetri
             const mw = Math.floor(x / 100) / 10; // konservatif: bulatkan ke bawah agar tetap lolos band
             return {
                 label: `IT load ${(phase.itLoadKw / 1000).toFixed(1)} → ≤${mw.toFixed(1)} MW`,
-                detail: `Turunkan IT load fase ini ke ≤${mw.toFixed(1)} MW (defer −${((phase.itLoadKw - mw * 1000) / 1000).toFixed(1)} MW ke fase tambahan) → risk score ${Math.round(achieved)} < ${RISK_AT_RISK_THRESHOLD} — edit IT Load (kW) di Phase Configuration.`,
+                detail: `Lower this phase's IT load to ≤${mw.toFixed(1)} MW (defer −${((phase.itLoadKw - mw * 1000) / 1000).toFixed(1)} MW to an additional phase) → risk score ${Math.round(achieved)} < ${RISK_AT_RISK_THRESHOLD} — edit IT Load (kW) in Phase Configuration.`,
             };
         },
         unreachable: (atHi) => ({
-            label: 'Defer beban saja tidak cukup',
-            detail: `Bahkan IT load 15 MW risk score masih ${Math.round(atHi)} ≥ ${RISK_AT_RISK_THRESHOLD} — kombinasikan dengan lever/catatan lain di bawah.`,
+            label: 'Deferring load alone is not enough',
+            detail: `Even at 15 MW IT load the risk score is still ${Math.round(atHi)} ≥ ${RISK_AT_RISK_THRESHOLD} — combine with the other levers/notes below.`,
         }),
         targetTab: 'capacity',
     });
@@ -106,13 +106,13 @@ function explainPhaseRisk(input: CapacityPlanInput, idx: number): ThresholdMetri
         render: (x, achieved) => {
             const mo = Math.floor(x + 0.01);
             return {
-                label: `Build ${phase.buildMonths} → ≤${mo} bln`,
-                detail: `Persingkat build fase ini ke ≤${mo} bln (modular/prefab, paralelkan fit-out) → risk score ${Math.round(achieved)} < ${RISK_AT_RISK_THRESHOLD} — edit Build (Mo) di Phase Configuration.`,
+                label: `Build ${phase.buildMonths} → ≤${mo} mo`,
+                detail: `Shorten this phase's build to ≤${mo} mo (modular/prefab, parallelize fit-out) → risk score ${Math.round(achieved)} < ${RISK_AT_RISK_THRESHOLD} — edit Build (Mo) in Phase Configuration.`,
             };
         },
         unreachable: (atHi) => ({
-            label: 'Kompresi jadwal saja tidak cukup',
-            detail: `Bahkan build 12 bln risk score masih ${Math.round(atHi)} ≥ ${RISK_AT_RISK_THRESHOLD} — kombinasikan dengan lever/catatan lain.`,
+            label: 'Schedule compression alone is not enough',
+            detail: `Even a 12 mo build leaves the risk score at ${Math.round(atHi)} ≥ ${RISK_AT_RISK_THRESHOLD} — combine with the other levers/notes.`,
         }),
         targetTab: 'capacity',
     });
@@ -123,7 +123,7 @@ function explainPhaseRisk(input: CapacityPlanInput, idx: number): ThresholdMetri
         threshold: RISK_AT_RISK_THRESHOLD - 1, // pass = keluar band At-Risk (< 60)
         direction: 'atMost',
         fmtValue: (v) => `${Math.round(v)}`,
-        because: `band At-Risk mulai ${RISK_AT_RISK_THRESHOLD} — komponen penyebab: ${parts.join(', ') || 'profil risiko standar'}`,
+        because: `the At-Risk band starts at ${RISK_AT_RISK_THRESHOLD} — driving components: ${parts.join(', ') || 'standard risk profile'}`,
         levers: specs,
     });
     if (ex.pass) return ex;
@@ -134,7 +134,7 @@ function explainPhaseRisk(input: CapacityPlanInput, idx: number): ThresholdMetri
         const achieved = riskAt({ coolingType: 'rdhx' });
         extra.push({
             label: 'Cooling liquid → rear-door HX (global)',
-            detail: `Mengganti cooling liquid → RDHx menurunkan risk score fase ini ${current} → ${achieved}${achieved < RISK_AT_RISK_THRESHOLD ? ` < ${RISK_AT_RISK_THRESHOLD} (keluar At-Risk)` : ` (masih ≥ ${RISK_AT_RISK_THRESHOLD})`} — input cooling berlaku untuk seluruh desain; evaluasi dampak densitas rack dulu.`,
+            detail: `Switching cooling liquid → RDHx lowers this phase's risk score ${current} → ${achieved}${achieved < RISK_AT_RISK_THRESHOLD ? ` < ${RISK_AT_RISK_THRESHOLD} (out of At-Risk)` : ` (still ≥ ${RISK_AT_RISK_THRESHOLD})`} — the cooling input applies to the whole design; evaluate the rack-density impact first.`,
             targetTab: 'capacity',
             priority: achieved < RISK_AT_RISK_THRESHOLD ? 'HIGH' : 'MED',
         });
@@ -143,7 +143,7 @@ function explainPhaseRisk(input: CapacityPlanInput, idx: number): ThresholdMetri
         const achieved = riskAt({ tierLevel: 3 });
         extra.push({
             label: 'Tier IV → Tier III (global)',
-            detail: `Menurunkan tier 4 → 3 mengurangi risk score fase ini ${current} → ${achieved}${achieved < RISK_AT_RISK_THRESHOLD ? ` < ${RISK_AT_RISK_THRESHOLD} (keluar At-Risk)` : ` (masih ≥ ${RISK_AT_RISK_THRESHOLD})`} — trade-off availability/concurrent-maintainability, hanya bila SLA mengizinkan.`,
+            detail: `Lowering tier 4 → 3 reduces this phase's risk score ${current} → ${achieved}${achieved < RISK_AT_RISK_THRESHOLD ? ` < ${RISK_AT_RISK_THRESHOLD} (out of At-Risk)` : ` (still ≥ ${RISK_AT_RISK_THRESHOLD})`} — an availability/concurrent-maintainability trade-off, only if the SLA allows.`,
             targetTab: 'capacity',
             priority: achieved < RISK_AT_RISK_THRESHOLD ? 'HIGH' : 'MED',
         });
@@ -202,7 +202,7 @@ const CapacityDashboardMod = () => {
                     </div>
                 ))}
             </div>
-            <p className="mt-1.5 text-[9px] text-slate-400">Angka lever di-solve ulang dari calculateCapacityPlan live (bisection deterministik, bukan estimasi statis).</p>
+            <p className="mt-1.5 text-[9px] text-slate-400">Lever figures are re-solved from the live calculateCapacityPlan (deterministic bisection, not a static estimate).</p>
         </div>
     );
 
@@ -607,7 +607,7 @@ const CapacityDashboardMod = () => {
                                                             detail.riskScore >= RISK_AT_RISK_THRESHOLD ? (
                                                                 <button
                                                                     onClick={() => setRiskExplainIdx(riskExplainIdx === idx ? null : idx)}
-                                                                    title={`At-Risk: risk score ${detail.riskScore} ≥ ${RISK_AT_RISK_THRESHOLD} — klik untuk alasan + lever terukur`}
+                                                                    title={`At-Risk: risk score ${detail.riskScore} ≥ ${RISK_AT_RISK_THRESHOLD} — click for the reason + measured levers`}
                                                                     className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-2 ${riskExplainIdx === idx ? 'ring-1 ring-red-400' : ''}`}
                                                                 >
                                                                     {detail.riskScore} ⓘ
@@ -687,7 +687,7 @@ const CapacityDashboardMod = () => {
                                             {detail.riskScore >= RISK_AT_RISK_THRESHOLD ? (
                                                 <button
                                                     onClick={() => setRiskExplainIdx(riskExplainIdx === idx ? null : idx)}
-                                                    title={`At-Risk: risk score ${detail.riskScore} ≥ ${RISK_AT_RISK_THRESHOLD} — klik untuk alasan + lever terukur`}
+                                                    title={`At-Risk: risk score ${detail.riskScore} ≥ ${RISK_AT_RISK_THRESHOLD} — click for the reason + measured levers`}
                                                     className={`text-sm font-bold text-red-500 cursor-pointer underline decoration-dotted underline-offset-2 ${riskExplainIdx === idx ? 'ring-1 ring-red-400 rounded px-1' : ''}`}
                                                 >
                                                     {detail.riskScore}/100 ⓘ

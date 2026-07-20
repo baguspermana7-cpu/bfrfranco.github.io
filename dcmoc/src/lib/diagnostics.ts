@@ -146,7 +146,7 @@ export function normalize(raw: RawFinding, fallbackSurface: string, fallbackTab:
             title = surface;
         }
         if (raw.threshold !== undefined && numValue !== undefined) {
-            title += ` (ambang ${String(raw.threshold)})`;
+            title += ` (threshold ${String(raw.threshold)})`;
         }
     }
 
@@ -155,8 +155,8 @@ export function normalize(raw: RawFinding, fallbackSurface: string, fallbackTab:
     let detail = raw.detail;
     if (!detail) {
         const parts: string[] = [];
-        if (typeof raw.value === 'string') parts.push(`Nilai: ${raw.value}`);
-        if (typeof raw.threshold === 'string') parts.push(`Ambang: ${raw.threshold}`);
+        if (typeof raw.value === 'string') parts.push(`Value: ${raw.value}`);
+        if (typeof raw.threshold === 'string') parts.push(`Threshold: ${raw.threshold}`);
         if (parts.length) detail = parts.join(' · ');
     }
 

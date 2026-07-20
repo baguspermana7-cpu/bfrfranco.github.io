@@ -83,13 +83,13 @@ const slaUpgradeLevers = (tier: SLATier, tiers: SLATier[]): SlaLever[] =>
             const dFee = f.annualCost - tier.annualCost;
             const netDelta = f.netAnnualCost - tier.netAnnualCost;
             const bandNote = f.contractPerKwYr && f.omTierKey
-                ? ` (kontrak ${f.omTierKey} $${f.contractPerKwYr.mid}/kW-yr mid dari DATA.omContracts)`
+                ? ` (${f.omTierKey} contract $${f.contractPerKwYr.mid}/kW-yr mid from DATA.omContracts)`
                 : '';
             return {
                 label: `Upgrade SLA ${tier.label} → ${f.label}`,
                 detail: `Exposure ${fmtMoney(tier.riskExposure)} → ${fmtMoney(f.riskExposure)}/yr (−${fmtMoney(dRisk)}); ` +
-                    `biaya kontrak ${dFee >= 0 ? '+' : '−'}${fmtMoney(Math.abs(dFee))}/yr${bandNote} — ` +
-                    `net ${netDelta <= 0 ? 'hemat' : 'tambah'} ${fmtMoney(Math.abs(netDelta))}/yr.`,
+                    `contract cost ${dFee >= 0 ? '+' : '−'}${fmtMoney(Math.abs(dFee))}/yr${bandNote} — ` +
+                    `net ${netDelta <= 0 ? 'saving' : 'added cost'} ${fmtMoney(Math.abs(netDelta))}/yr.`,
                 netDelta,
             };
         });
@@ -123,13 +123,13 @@ export function collectMaintenanceDiagnostics(model: MaintenanceDiagnosticsModel
         const leverText = bestSaving
             ? ` Lever: ${bestSaving.detail}`
             : levers.length > 0
-                ? ` Upgrade SLA menambah net cost (trade-off, bukan penghematan): ${levers[0].detail}`
-                : ' SLA tercepat sudah dipilih — sisa exposure didorong incident rate × downtime cost (keputusan desain/lokasi, bukan kontrak).';
+                ? ` Upgrading the SLA adds net cost (trade-off, not a saving): ${levers[0].detail}`
+                : ' The fastest SLA is already selected — the remaining exposure is driven by incident rate × downtime cost (a design/location decision, not the contract).';
         findings.push({
             id: `sla-risk-${tier.id}`,
             severity: tone === 'red' ? 'critical' : 'warning',
-            title: `Risk exposure ${tier.label} ${fmtMoney(tier.riskExposure)}/yr > ambang ${fmtMoney(threshold)}/yr`,
-            detail: `Exposure downtime tak ter-cover SLA ${tier.label} adalah ${fmtMoney(tier.riskExposure)}/yr ` +
+            title: `Risk exposure ${tier.label} ${fmtMoney(tier.riskExposure)}/yr > threshold ${fmtMoney(threshold)}/yr`,
+            detail: `The downtime exposure not covered by the ${tier.label} SLA is ${fmtMoney(tier.riskExposure)}/yr ` +
                 `(net annual cost ${fmtMoney(tier.netAnnualCost)}/yr).${leverText}`,
             linkTab: 'maint',
             value: tier.riskExposure,
@@ -1235,7 +1235,7 @@ function SLATab({ data, fmt, thirdParty, onThirdParty, facilityAged, onFacilityA
                                                     <button
                                                         type="button"
                                                         onClick={() => setOpenRisk(openRisk === tier.id ? null : tier.id)}
-                                                        title={`Risk exposure ${fmt(tier.riskExposure)}/yr melewati ambang merah ${fmt(SLA_RISK_RED_USD)}/yr. Klik untuk dekomposisi + lever terukur (dihitung dari model SLA yang sama).`}
+                                                        title={`Risk exposure ${fmt(tier.riskExposure)}/yr crosses the red threshold ${fmt(SLA_RISK_RED_USD)}/yr. Click for the decomposition + measured levers (computed from the same SLA model).`}
                                                         className={clsx("font-mono cursor-pointer underline decoration-dotted underline-offset-4", RISK_TONE_CLASS.red)}
                                                     >
                                                         {fmt(tier.riskExposure)}
@@ -1259,32 +1259,32 @@ function SLATab({ data, fmt, thirdParty, onThirdParty, facilityAged, onFacilityA
                                                         {/* Why red — decomposition of the same engine formula */}
                                                         <div>
                                                             <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1">
-                                                                Kenapa merah — dekomposisi exposure (model SLA yang sama)
+                                                                Why red — exposure decomposition (same SLA model)
                                                             </div>
                                                             <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-mono">
-                                                                {baseFailures} insiden kritis/yr × {respMin.toLocaleString()} min jendela respons × {fmt(downtimeCostPerMin)}/min biaya downtime × {SLA_PROB_WEIGHT * 100}% bobot probabilitas = {fmt(recomputed)}/yr
+                                                                {baseFailures} critical incidents/yr × {respMin.toLocaleString()} min response window × {fmt(downtimeCostPerMin)}/min downtime cost × {SLA_PROB_WEIGHT * 100}% probability weight = {fmt(recomputed)}/yr
                                                                 {parity ? (
                                                                     <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">≡ engine</span>
                                                                 ) : (
-                                                                    <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300" title="Dekomposisi faktor tidak lagi cocok dengan output engine — angka total di tabel tetap dari engine; faktor di atas indikatif.">≠ engine — total tabel yang berlaku</span>
+                                                                    <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300" title="The factor decomposition no longer matches the engine output — the table total still comes from the engine; the factors above are indicative.">≠ engine — table total applies</span>
                                                                 )}
                                                             </p>
                                                             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                                                                Ambang pewarnaan: merah &gt; {fmt(SLA_RISK_RED_USD)}/yr · amber &gt; {fmt(SLA_RISK_AMBER_USD)}/yr · di bawahnya hijau.
+                                                                Colouring thresholds: red &gt; {fmt(SLA_RISK_RED_USD)}/yr · amber &gt; {fmt(SLA_RISK_AMBER_USD)}/yr · below that green.
                                                             </p>
                                                         </div>
 
                                                         {/* Live per-tier contributors */}
                                                         <div>
                                                             <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">
-                                                                Exposure per SLA tier (angka live)
+                                                                Exposure per SLA tier (live numbers)
                                                             </div>
                                                             <div className="space-y-1">
                                                                 {data.tiers.map(t => (
                                                                     <div key={t.id} className="flex items-center gap-2 text-[11px]">
                                                                         <span className={clsx("w-32 shrink-0", t.id === tier.id ? "font-semibold text-slate-900 dark:text-white" : "text-slate-500 dark:text-slate-400")}>{t.label}</span>
                                                                         <span className={clsx("font-mono", RISK_TONE_CLASS[riskTone(t.riskExposure)])}>{fmt(t.riskExposure)}/yr</span>
-                                                                        <span className="text-slate-400 dark:text-slate-500">· kontrak {fmt(t.annualCost)}/yr · net {fmt(t.netAnnualCost)}/yr</span>
+                                                                        <span className="text-slate-400 dark:text-slate-500">· contract {fmt(t.annualCost)}/yr · net {fmt(t.netAnnualCost)}/yr</span>
                                                                     </div>
                                                                 ))}
                                                             </div>
@@ -1293,7 +1293,7 @@ function SLATab({ data, fmt, thirdParty, onThirdParty, facilityAged, onFacilityA
                                                         {/* Measured levers — same model, no fabricated numbers */}
                                                         <div>
                                                             <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">
-                                                                Lever terukur (dihitung dari model yang sama)
+                                                                Measured levers (computed from the same model)
                                                             </div>
                                                             <div className="space-y-1.5">
                                                                 {levers.map((lv, li) => (
@@ -1309,20 +1309,20 @@ function SLATab({ data, fmt, thirdParty, onThirdParty, facilityAged, onFacilityA
                                                                 ))}
                                                                 {altTier && (
                                                                     <div className="flex items-start gap-2 p-2 rounded-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
-                                                                        <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 whitespace-nowrap">Desain Tier IV</span>
+                                                                        <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 whitespace-nowrap">Tier IV design</span>
                                                                         <span className="flex-1 text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
-                                                                            Expected incidents {slaBaseFailures(3)} → {slaBaseFailures(4)}/yr → exposure {tier.label} {fmt(tier.riskExposure)} → {fmt(altTier.riskExposure)}/yr (−{fmt(tier.riskExposure - altTier.riskExposure)}) — hasil re-run model yang sama pada tier level 4 (keputusan desain, bukan kontrak).
+                                                                            Expected incidents {slaBaseFailures(3)} → {slaBaseFailures(4)}/yr → exposure {tier.label} {fmt(tier.riskExposure)} → {fmt(altTier.riskExposure)}/yr (−{fmt(tier.riskExposure - altTier.riskExposure)}) — the result of re-running the same model at tier level 4 (a design decision, not the contract).
                                                                         </span>
                                                                     </div>
                                                                 )}
                                                                 {levers.length === 0 && (
                                                                     <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
-                                                                        SLA tercepat sudah dipilih — sisa exposure didorong incident rate × biaya downtime, bukan waktu respons kontrak.
+                                                                        The fastest SLA is already selected — the remaining exposure is driven by incident rate × downtime cost, not the contract response time.
                                                                     </p>
                                                                 )}
                                                             </div>
                                                             <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 leading-snug">
-                                                                Catatan jujur: breakdown per kelas aset dan efek penambahan spares terhadap exposure tidak dapat diturunkan dari model SLA ini (incident rate dimodelkan skalar per fasilitas). Optimasi inventori spares memakai model terpisah di tab Spares.
+                                                                Honest note: a per-asset-class breakdown and the effect of adding spares on exposure cannot be derived from this SLA model (incident rate is modelled as a per-facility scalar). Spares inventory optimisation uses a separate model in the Spares tab.
                                                             </p>
                                                         </div>
                                                     </div>

@@ -161,14 +161,14 @@ export function ScenarioComparisonPanel() {
             const b = sc.simInputs[key];
             if (String(a ?? '') !== String(b ?? '')) parts.push(`${humanKey(String(key))} ${String(a)}→${String(b)}`);
         }
-        if (JSON.stringify(sc.capexInputs) !== JSON.stringify(base.capexInputs)) parts.push('capexInputs (CAPEX Engine) berbeda');
+        if (JSON.stringify(sc.capexInputs) !== JSON.stringify(base.capexInputs)) parts.push('capexInputs (CAPEX Engine) differ');
         return parts.length > 0
             ? parts.join(' · ')
-            : 'tidak ada input yang beda terdeteksi — selisih berasal dari data country/engine yang sama-sama live';
+            : 'no differing inputs detected — the gap comes from country/engine data that is equally live';
     };
-    /** Title untuk sel delta merah: "lebih buruk X vs baseline — parameter pembeda: …". */
+    /** Title for the red delta cell: "Worse by X vs baseline — differentiating parameter: …". */
     const worseTitle = (absFmt: string, sc: SavedScenario): string =>
-        `Lebih buruk ${absFmt} vs baseline "${baseline.scenario.name}" — parameter pembeda: ${paramDiffText(sc)}`;
+        `Worse by ${absFmt} vs baseline "${baseline.scenario.name}" — differentiating parameter: ${paramDiffText(sc)}`;
 
     return (
         <div className="space-y-6">
@@ -212,7 +212,7 @@ export function ScenarioComparisonPanel() {
                             <KpiCell label="CAPEX" value={fmtMoney(m.capex)} delta={i > 0 ? fmtPct(delta(m.capex, baseline.capex)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(fmtMoney(Math.abs(m.capex - baseline.capex)), m.scenario) : undefined} />
                             <KpiCell label="OPEX/yr" value={fmtMoney(m.annualOpex)} delta={i > 0 ? fmtPct(delta(m.annualOpex, baseline.annualOpex)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${fmtMoney(Math.abs(m.annualOpex - baseline.annualOpex))}/yr`, m.scenario) : undefined} />
                             <KpiCell label="PUE" value={m.pue.toFixed(2)} delta={i > 0 ? fmtPct(delta(m.pue, baseline.pue)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${Math.abs(m.pue - baseline.pue).toFixed(2)} PUE`, m.scenario) : undefined} />
-                            <KpiCell label="Staff" value={String(m.totalStaff)} delta={i > 0 ? fmtPct(delta(m.totalStaff, baseline.totalStaff)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${Math.abs(m.totalStaff - baseline.totalStaff)} staf`, m.scenario) : undefined} />
+                            <KpiCell label="Staff" value={String(m.totalStaff)} delta={i > 0 ? fmtPct(delta(m.totalStaff, baseline.totalStaff)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${Math.abs(m.totalStaff - baseline.totalStaff)} staff`, m.scenario) : undefined} />
                             <KpiCell label="IRR" value={`${m.irr.toFixed(1)}%`} delta={i > 0 ? fmtPct(delta(m.irr, baseline.irr)) : undefined} worseTitle={i > 0 ? worseTitle(`${Math.abs(m.irr - baseline.irr).toFixed(1)} pp IRR`, m.scenario) : undefined} />
                             <KpiCell label="Payback" value={`${m.paybackYears.toFixed(1)} yr`} delta={i > 0 ? fmtPct(delta(m.paybackYears, baseline.paybackYears)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${Math.abs(m.paybackYears - baseline.paybackYears).toFixed(1)} yr payback`, m.scenario) : undefined} />
                         </div>
@@ -352,7 +352,7 @@ function KpiCell({ label, value, delta, invertDelta, worseTitle }: {
     value: string;
     delta?: string;
     invertDelta?: boolean;
-    /** Guidance sel merah: "lebih buruk $X vs baseline — parameter pembeda: …" (title tooltip). */
+    /** Red-cell guidance: "Worse by $X vs baseline — differentiating parameter: …" (title tooltip). */
     worseTitle?: string;
 }) {
     const isPositive = delta?.startsWith('+');

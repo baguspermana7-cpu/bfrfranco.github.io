@@ -335,8 +335,8 @@ export function ReportDashboard() {
                     description: `Project NPV ${fmtMoney(npvLive)} is negative — IRR ${financialResult.irr.toFixed(1)}% is below the 8% discount rate` +
                         `${Number.isFinite(paybackLive) && paybackLive > 0 && paybackLive <= projectLifeYears ? `; payback ${paybackLive.toFixed(1)} yr` : '; payback beyond project life'}.`,
                     recommendation: 'Review CAPEX basis (CAPEX Engine) and the revenue assumption (Requirements) before proceeding.',
-                    detail: `Root cause (angka live): CAPEX ${fmtMoney(capexResults.total)} + OPEX tahunan ${fmtMoney(opexAnnual)} ` +
-                        `(labor ${fmtMoney(totalMonthlyLabor * 12)} + maintenance ${fmtMoney(stratCost)}) vs basis revenue ` +
+                    detail: `Root cause (live figures): CAPEX ${fmtMoney(capexResults.total)} + annual OPEX ${fmtMoney(opexAnnual)} ` +
+                        `(labor ${fmtMoney(totalMonthlyLabor * 12)} + maintenance ${fmtMoney(stratCost)}) vs revenue basis ` +
                         `$${DEFAULT_REVENUE_PER_KW_MONTH}/kW·mo @ IT load ${inputs.itLoad.toLocaleString()} kW, discount 8%, ${projectLifeYears} yr → NPV ${fmtMoney(npvLive)}.`,
                     rule: 'Rule: NPV ≤ $0 → high severity.',
                 };
@@ -344,7 +344,7 @@ export function ReportDashboard() {
             financialInsight,
             ...staffingNarrative.map((si): RichInsight => ({
                 ...si,
-                rule: 'Rule (NarrativeEngine.generateStaffingNarrative): headcount summary selalu tampil (low); overtime engineer > 10 hr/minggu → high. Angka live ada di description.',
+                rule: 'Rule (NarrativeEngine.generateStaffingNarrative): headcount summary always shows (low); engineer overtime > 10 hr/week → high. Live figures are in the description.',
             })),
         ];
 

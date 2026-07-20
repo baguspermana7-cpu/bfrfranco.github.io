@@ -183,7 +183,7 @@ const TalentDashboard = () => {
                         {difficultyIsBad ? (
                             <button
                                 onClick={() => setShowDifficultyPanel(v => !v)}
-                                title={`${result.hiringDifficulty}: talent score ${result.talentScore} — klik untuk trade-off terukur (engine live) + lever`}
+                                title={`${result.hiringDifficulty}: talent score ${result.talentScore} — click for the measured trade-off (live engine) + levers`}
                                 className={`text-xs mt-1 px-2 py-0.5 rounded border w-fit cursor-pointer hover:brightness-125 ${difficultyColors[result.hiringDifficulty]}`}>
                                 {result.hiringDifficulty} {showDifficultyPanel ? '▲' : '▼'}
                             </button>
@@ -265,16 +265,16 @@ const TalentDashboard = () => {
                     {/* Alasan — angka live dari engine yang sama dengan pewarnaan */}
                     <div className="flex items-start justify-between gap-2">
                         <p className="text-[11px] leading-relaxed text-slate-700 dark:text-slate-300">
-                            Hiring <b>{result.hiringDifficulty}</b> karena talent score <b>{result.talentScore}</b> berada di band{' '}
+                            Hiring <b>{result.hiringDifficulty}</b> because talent score <b>{result.talentScore}</b> falls in the band{' '}
                             {result.hiringDifficulty === HIRING_RED_DIFFICULTY
                                 ? <>&lt; {TALENT_VERY_DIFFICULT_THRESHOLD}</>
-                                : <>{TALENT_VERY_DIFFICULT_THRESHOLD}–{TALENT_DIFFICULT_THRESHOLD - 1}</>} (banding TalentAvailabilityEngine).
-                            {' '}Faktor penekan: {result.talentBreakdown.filter(b => isNegativeImpact(b.impact)).map(b => `${b.metric} (${b.value})`).join(' · ') || 'profil faktor campuran — tidak ada faktor tunggal yang merah'}.
+                                : <>{TALENT_VERY_DIFFICULT_THRESHOLD}–{TALENT_DIFFICULT_THRESHOLD - 1}</>} (TalentAvailabilityEngine banding).
+                            {' '}Depressing factors: {result.talentBreakdown.filter(b => isNegativeImpact(b.impact)).map(b => `${b.metric} (${b.value})`).join(' · ') || 'mixed factor profile — no single factor is red'}.
                         </p>
                         {bandParityOk ? (
-                            <span className="shrink-0 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[8.5px] font-semibold uppercase text-emerald-500" title="Banding numerik panel cocok dengan band string engine">≡ engine</span>
+                            <span className="shrink-0 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[8.5px] font-semibold uppercase text-emerald-500" title="Panel numeric banding matches the engine's band string">≡ engine</span>
                         ) : (
-                            <span className="shrink-0 rounded bg-red-500/10 px-1.5 py-0.5 text-[8.5px] font-semibold uppercase text-red-500" title="DRIFT: mirror threshold panel tidak lagi cocok dengan banding engine — perbarui konstanta mirror">band drift!</span>
+                            <span className="shrink-0 rounded bg-red-500/10 px-1.5 py-0.5 text-[8.5px] font-semibold uppercase text-red-500" title="DRIFT: the panel mirror threshold no longer matches the engine banding — update the mirror constant">band drift!</span>
                         )}
                     </div>
 
@@ -283,7 +283,7 @@ const TalentDashboard = () => {
                         <table className="w-full text-[11px]">
                             <thead>
                                 <tr className="text-[9px] uppercase text-slate-500 border-b border-slate-200 dark:border-slate-700">
-                                    <th className="text-left py-1 pr-2 font-semibold">Skenario belanja gaji</th>
+                                    <th className="text-left py-1 pr-2 font-semibold">Salary spend scenario</th>
                                     <th className="text-right py-1 px-2 font-semibold">Adjusted staff cost/yr</th>
                                     <th className="text-right py-1 px-2 font-semibold">Turnover cost/yr</th>
                                     <th className="text-right py-1 pl-2 font-semibold">Time to staff</th>
@@ -292,10 +292,10 @@ const TalentDashboard = () => {
                             <tbody>
                                 {premiumScenarios.map(({ uplift, r }) => (
                                     <tr key={uplift} className="border-b border-slate-100 dark:border-slate-800 last:border-0">
-                                        <td className="py-1 pr-2 text-slate-600 dark:text-slate-400">{uplift === 0 ? 'Basis (premium negara saat ini)' : `+${(uplift * 100).toFixed(0)}% belanja gaji`}</td>
+                                        <td className="py-1 pr-2 text-slate-600 dark:text-slate-400">{uplift === 0 ? 'Base (current country premium)' : `+${(uplift * 100).toFixed(0)}% salary spend`}</td>
                                         <td className="py-1 px-2 text-right font-mono text-slate-800 dark:text-slate-200">{fmtMoney(r.adjustedAnnualStaffCost)}</td>
                                         <td className="py-1 px-2 text-right font-mono text-slate-800 dark:text-slate-200">{fmtMoney(r.annualTurnoverCost)}</td>
-                                        <td className="py-1 pl-2 text-right font-mono text-slate-800 dark:text-slate-200">{r.timeToFullStaff} bln</td>
+                                        <td className="py-1 pl-2 text-right font-mono text-slate-800 dark:text-slate-200">{r.timeToFullStaff} mo</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -307,30 +307,30 @@ const TalentDashboard = () => {
                         {timeToStaffResponds ? (
                             <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
                                 <span className="shrink-0 rounded bg-emerald-600 px-1 py-0.5 text-[8px] font-bold text-white">LEVER</span>
-                                <span><b>Naikkan belanja gaji</b> — re-run engine menunjukkan time-to-staff turun dari {premiumScenarios[0].r.timeToFullStaff} bln ke {premiumScenarios[premiumScenarios.length - 1].r.timeToFullStaff} bln pada +{(PREMIUM_UPLIFTS[PREMIUM_UPLIFTS.length - 1] * 100).toFixed(0)}% (angka di tabel).</span>
+                                <span><b>Raise salary spend</b> — the engine re-run shows time-to-staff dropping from {premiumScenarios[0].r.timeToFullStaff} mo to {premiumScenarios[premiumScenarios.length - 1].r.timeToFullStaff} mo at +{(PREMIUM_UPLIFTS[PREMIUM_UPLIFTS.length - 1] * 100).toFixed(0)}% (figures in the table).</span>
                             </div>
                         ) : (
                             <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
                                 <span className="shrink-0 rounded bg-slate-500 px-1 py-0.5 text-[8px] font-bold text-white">NOTE</span>
-                                <span><b>Model tidak sensitif terhadap premium untuk kecepatan</b> — di TalentAvailabilityEngine, time-to-staff diturunkan hanya dari jumlah FTE ({totalFTE}) dan kecepatan hiring negara ({selectedCountry.talentPool?.avgHiringDays ?? 40} hari/hire, 2 paralel); menaikkan belanja gaji +{(PREMIUM_UPLIFTS[PREMIUM_UPLIFTS.length - 1] * 100).toFixed(0)}% tidak mengubahnya ({premiumScenarios[0].r.timeToFullStaff} bln di semua skenario — lihat tabel). Premium mempengaruhi kolom biaya, bukan kecepatan.</span>
+                                <span><b>The model is not sensitive to premium for speed</b> — in TalentAvailabilityEngine, time-to-staff is derived only from FTE count ({totalFTE}) and the country's hiring speed ({selectedCountry.talentPool?.avgHiringDays ?? 40} days/hire, 2 in parallel); raising salary spend +{(PREMIUM_UPLIFTS[PREMIUM_UPLIFTS.length - 1] * 100).toFixed(0)}% does not change it ({premiumScenarios[0].r.timeToFullStaff} mo across all scenarios — see table). Premium affects the cost columns, not speed.</span>
                             </div>
                         )}
                         <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
                             <span className="shrink-0 rounded bg-emerald-600 px-1 py-0.5 text-[8px] font-bold text-white">LEVER</span>
-                            <span><b>Mulai rekrutmen {Math.ceil(result.timeToFullStaff)} bulan lebih awal</b> dari target operasi — pipeline {totalFTE} FTE butuh {result.timeToFullStaff} bln pada profil hiring {selectedCountry.name}; setiap bulan keterlambatan mulai ≈ {(totalFTE / Math.max(1, result.timeToFullStaff)).toFixed(1)} posisi belum terisi di hari-1.</span>
+                            <span><b>Start recruiting {Math.ceil(result.timeToFullStaff)} months earlier</b> than the operations target — a {totalFTE} FTE pipeline needs {result.timeToFullStaff} mo on the {selectedCountry.name} hiring profile; every month of delayed start ≈ {(totalFTE / Math.max(1, result.timeToFullStaff)).toFixed(1)} positions unfilled on day one.</span>
                         </div>
                         <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
                             <span className="shrink-0 rounded bg-slate-500 px-1 py-0.5 text-[8px] font-bold text-white">LIVE</span>
-                            <span>Turnover {(result.adjustedTurnoverRate * 100).toFixed(0)}%/yr → {fmtMoney(result.annualTurnoverCost)}/yr · Recruitment {fmtMoney(result.totalRecruitmentCost)} sekali-jalan ({fmtMoney(result.recruitmentCostPerHire)}/hire) — semua dari engine run yang sama dengan KPI di atas.</span>
+                            <span>Turnover {(result.adjustedTurnoverRate * 100).toFixed(0)}%/yr → {fmtMoney(result.annualTurnoverCost)}/yr · Recruitment {fmtMoney(result.totalRecruitmentCost)} one-time ({fmtMoney(result.recruitmentCostPerHire)}/hire) — all from the same engine run as the KPIs above.</span>
                         </div>
                     </div>
 
                     <div className="mt-2 flex items-center justify-between">
-                        <p className="text-[9px] text-slate-400">Matriks = calculateTalentAvailability di-re-run per skenario (deterministik) — bukan tabel statis.</p>
+                        <p className="text-[9px] text-slate-400">Matrix = calculateTalentAvailability re-run per scenario (deterministic) — not a static table.</p>
                         <button
                             onClick={() => useSimulationStore.getState().actions.setActiveTab('staff' as never)}
                             className="shrink-0 rounded bg-cyan-500/10 px-2 py-1 text-[9px] font-semibold uppercase text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/20"
-                            title="Edit headcount & shift model di Staffing">
+                            title="Edit headcount & shift model in Staffing">
                             Staffing ↗
                         </button>
                     </div>

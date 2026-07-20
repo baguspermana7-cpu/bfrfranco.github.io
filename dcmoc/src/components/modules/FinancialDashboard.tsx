@@ -344,11 +344,11 @@ const FinancialDashboard = () => {
                 metricAt: (m) => metricOf(recompute({ revMult: m })),
                 render: (m, achieved) => ({
                     label: `Revenue +${((m - 1) * 100).toFixed(0)}%`,
-                    detail: `Revenue perlu naik +${((m - 1) * 100).toFixed(1)}% — dari ${fmtMoney(revBase)} ke ${fmtMoney(revBase * m)}/kW/bln — agar ${metricName} mencapai ${fmtA(achieved)} ${passLabel}. Edit "Revenue per kW/month" di sidebar halaman ini.`,
+                    detail: `Revenue must rise +${((m - 1) * 100).toFixed(1)}% — from ${fmtMoney(revBase)} to ${fmtMoney(revBase * m)}/kW/mo — for ${metricName} to reach ${fmtA(achieved)} ${passLabel}. Edit "Revenue per kW/month" in this page's sidebar.`,
                 }),
                 unreachable: (atHi) => ({
-                    label: 'Revenue saja tidak cukup',
-                    detail: `Bahkan revenue +${((DIAG_REV_MULT_MAX - 1) * 100).toFixed(0)}% (ke ${fmtMoney(revBase * DIAG_REV_MULT_MAX)}/kW/bln) hanya membawa ${metricName} ke ${fmtA(atHi)} — struktur biaya (CAPEX + OPEX) yang mengikat, bukan sekadar tarif.`,
+                    label: 'Revenue alone is not enough',
+                    detail: `Even revenue +${((DIAG_REV_MULT_MAX - 1) * 100).toFixed(0)}% (to ${fmtMoney(revBase * DIAG_REV_MULT_MAX)}/kW/mo) only brings ${metricName} to ${fmtA(atHi)} — the cost structure (CAPEX + OPEX) is binding, not just the rate.`,
                 }),
                 targetTab: FINANCE_TAB, // parameter lives in this page's sidebar — no tab hop
             },
@@ -358,11 +358,11 @@ const FinancialDashboard = () => {
                 metricAt: (cut) => metricOf(recompute({ capexMult: 1 - cut })),
                 render: (cut, achieved) => ({
                     label: `CAPEX −${(cut * 100).toFixed(0)}%`,
-                    detail: `ATAU CAPEX turun −${(cut * 100).toFixed(1)}% — dari ${fmtMoney(capexBase)} ke ${fmtMoney(capexBase * (1 - cut))} — agar ${metricName} mencapai ${fmtA(achieved)} ${passLabel}.`,
+                    detail: `OR CAPEX falls −${(cut * 100).toFixed(1)}% — from ${fmtMoney(capexBase)} to ${fmtMoney(capexBase * (1 - cut))} — for ${metricName} to reach ${fmtA(achieved)} ${passLabel}.`,
                 }),
                 unreachable: (atHi) => ({
-                    label: 'CAPEX saja tidak cukup',
-                    detail: `Bahkan CAPEX −${((1 - DIAG_CAPEX_MULT_MIN) * 100).toFixed(0)}% (ke ${fmtMoney(capexBase * DIAG_CAPEX_MULT_MIN)}) hanya membawa ${metricName} ke ${fmtA(atHi)} — sisi pendapatan/OPEX yang mengikat.`,
+                    label: 'CAPEX alone is not enough',
+                    detail: `Even CAPEX −${((1 - DIAG_CAPEX_MULT_MIN) * 100).toFixed(0)}% (to ${fmtMoney(capexBase * DIAG_CAPEX_MULT_MIN)}) only brings ${metricName} to ${fmtA(atHi)} — the revenue/OPEX side is binding.`,
                 }),
                 targetTab: CAPEX_TAB,
             },
@@ -375,7 +375,7 @@ const FinancialDashboard = () => {
                 threshold: NPV_THRESHOLD,
                 direction: 'atLeast',
                 fmtValue: fmtMoney,
-                because: `PV cashflow ${fmtMoney(base.npv + capexBase)} < CAPEX ${fmtMoney(capexBase)} pada discount rate ${(finInputs.discountRate * 100).toFixed(0)}%`,
+                because: `PV of cashflow ${fmtMoney(base.npv + capexBase)} < CAPEX ${fmtMoney(capexBase)} at discount rate ${(finInputs.discountRate * 100).toFixed(0)}%`,
                 levers: leversFor('NPV', (r) => r.npv, fmtMoney, `≥ ${fmtMoney(NPV_THRESHOLD)}`),
             })
             : null;
@@ -387,7 +387,7 @@ const FinancialDashboard = () => {
                 threshold: ROI_THRESHOLD_PCT,
                 direction: 'atLeast',
                 fmtValue: fmtPct,
-                because: `total net income ${fmtMoney(base.totalProfit)} < CAPEX ${fmtMoney(capexBase)} selama ${finInputs.projectLifeYears} th`,
+                because: `total net income ${fmtMoney(base.totalProfit)} < CAPEX ${fmtMoney(capexBase)} over ${finInputs.projectLifeYears} yr`,
                 levers: leversFor('ROI', (r) => r.roiPercent, fmtPct, `> ${fmtPct(ROI_THRESHOLD_PCT, 0)}`),
             })
             : null;
@@ -550,22 +550,22 @@ const FinancialDashboard = () => {
                         {/* ── Financial Section ───────────── */}
                         <div className="text-[10px] uppercase text-indigo-600 dark:text-indigo-400 font-semibold tracking-wider border-b border-indigo-200 dark:border-indigo-800/40 pb-1">
                             Financial Analysis
-                        <p className="mt-1 rounded bg-violet-500/10 px-2 py-1 text-[9px] text-violet-500 dark:text-violet-300">Semua parameter panel ini PREDEFINED dari data (negara · tier · CAPEX · requirement) — boleh di-override; edit manual dipertahankan. Input yang tersisa = kontrol analisis halaman ini (bukan duplikat requirement); nilai kanonik (Tax Rate, Lease Term) tampil derived + link Edit di Requirements.</p></div>
+                        <p className="mt-1 rounded bg-violet-500/10 px-2 py-1 text-[9px] text-violet-500 dark:text-violet-300">All parameters in this panel are PREDEFINED from data (country · tier · CAPEX · requirements) — you may override them; manual edits are preserved. The remaining inputs are this page's analysis controls (not duplicates of requirements); canonical values (Tax Rate, Lease Term) are shown derived + with an Edit link in Requirements.</p></div>
                         <div className="space-y-1">
-                            <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Revenue per kW/month ($) <Tooltip content="Monthly colocation rate charged per kW of IT power. Industry range: $100-250/kW/month depending on market and tier. Kontrol analisis halaman ini — angka revenue riil di-set DI SINI (single edit surface); default ilustratif diturunkan dari negara + tier." /></label>
+                            <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Revenue per kW/month ($) <Tooltip content="Monthly colocation rate charged per kW of IT power. Industry range: $100-250/kW/month depending on market and tier. This page's analysis control — the real revenue figure is set HERE (single edit surface); the illustrative default is derived from country + tier." /></label>
                             <input type="number" className={inpCls}
                                 value={finInputs.revenuePerKwMonth}
                                 onChange={e => handleChange('revenuePerKwMonth', Number(e.target.value))} />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Discount Rate (%) <Tooltip content="Weighted Average Cost of Capital (WACC). Used to discount future cashflows to present value. Typical DC range: 8-12%. Kontrol analisis halaman ini (bukan duplikat requirement)." /></label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Discount Rate (%) <Tooltip content="Weighted Average Cost of Capital (WACC). Used to discount future cashflows to present value. Typical DC range: 8-12%. This page's analysis control (not a duplicate of requirements)." /></label>
                                 <input type="number" className={inpCls}
                                     value={(finInputs.discountRate * 100).toFixed(0)}
                                     onChange={e => handleChange('discountRate', Number(e.target.value) / 100)} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Project Life (yrs) <Tooltip content="Economic useful life of the facility for financial modeling. Typically 10-25 years for data centers. Kontrol analisis halaman ini." /></label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Project Life (yrs) <Tooltip content="Economic useful life of the facility for financial modeling. Typically 10-25 years for data centers. This page's analysis control." /></label>
                                 <input type="number" className={inpCls}
                                     value={finInputs.projectLifeYears}
                                     onChange={e => handleChange('projectLifeYears', Number(e.target.value))}
@@ -574,13 +574,13 @@ const FinancialDashboard = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Rev. Escalation (%) <Tooltip content="Annual revenue price escalation applied year-over-year. Default diturunkan dari inflasi negara — kontrol analisis halaman ini, boleh di-override." /></label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Rev. Escalation (%) <Tooltip content="Annual revenue price escalation applied year-over-year. Default derived from country inflation — this page's analysis control, may be overridden." /></label>
                                 <input type="number" className={inpCls}
                                     value={(finInputs.escalationRate * 100).toFixed(0)}
                                     onChange={e => handleChange('escalationRate', Number(e.target.value) / 100)} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">OPEX Escalation (%) <Tooltip content="Annual OPEX cost escalation applied year-over-year. Default diturunkan dari eskalasi labor negara — kontrol analisis halaman ini, boleh di-override." /></label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">OPEX Escalation (%) <Tooltip content="Annual OPEX cost escalation applied year-over-year. Default derived from country labor escalation — this page's analysis control, may be overridden." /></label>
                                 <input type="number" className={inpCls}
                                     value={(finInputs.opexEscalation * 100).toFixed(1)}
                                     onChange={e => handleChange('opexEscalation', Number(e.target.value) / 100)} />
@@ -588,18 +588,18 @@ const FinancialDashboard = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Tax Rate (%) <Tooltip content="DERIVED dari profil negara project (economy.taxRate) — satu sumber, edit lewat pemilihan Country di Requirements. (#333 dedup: input duplikat dihapus)" /></label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Tax Rate (%) <Tooltip content="DERIVED from the project's country profile (economy.taxRate) — single source, edit via Country selection in Requirements. (#333 dedup: duplicate input removed)" /></label>
                                 <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-2 py-1.5">
                                     <div className="text-sm font-bold tabular-nums text-emerald-500">
                                         {(finInputs.taxRate * 100).toFixed(1)}%
                                         <span className="ml-1.5 rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-emerald-500">country</span>
                                     </div>
                                     <button onClick={() => simActions.setActiveTab('requirements')}
-                                        className="text-[9px] text-violet-500 hover:underline">Edit di Requirements ↗</button>
+                                        className="text-[9px] text-violet-500 hover:underline">Edit in Requirements ↗</button>
                                 </div>
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Depreciation (yrs) <Tooltip content="Straight-line depreciation period for CAPEX assets. Affects taxable income. Building: 20-25 yrs, MEP: 15-20 yrs. Kontrol analisis halaman ini." /></label>
+                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Depreciation (yrs) <Tooltip content="Straight-line depreciation period for CAPEX assets. Affects taxable income. Building: 20-25 yrs, MEP: 15-20 yrs. This page's analysis control." /></label>
                                 <input type="number" className={inpCls}
                                     value={finInputs.depreciationYears}
                                     onChange={e => handleChange('depreciationYears', Number(e.target.value))}
@@ -662,14 +662,14 @@ const FinancialDashboard = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">Lease Term (yrs) <Tooltip content="DERIVED dari Contract Duration di Requirements 1.1 — satu sumber. (#333 dedup: input duplikat dihapus; edit di Requirements)" /></label>
+                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">Lease Term (yrs) <Tooltip content="DERIVED from Contract Duration in Requirements 1.1 — single source. (#333 dedup: duplicate input removed; edit in Requirements)" /></label>
                                 <div className="rounded border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-2 py-1.5">
                                     <div className="text-sm font-bold tabular-nums text-slate-900 dark:text-white">
                                         {contractYearsDerived}
                                         <span className="ml-1.5 rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-emerald-500">requirements</span>
                                     </div>
                                     <button onClick={() => simActions.setActiveTab('requirements')}
-                                        className="text-[9px] text-violet-500 hover:underline">Edit di Requirements ↗</button>
+                                        className="text-[9px] text-violet-500 hover:underline">Edit in Requirements ↗</button>
                                 </div>
                             </div>
                             <div className="space-y-1">
@@ -736,7 +736,7 @@ const FinancialDashboard = () => {
                             </div>
                             <div
                                 className={`text-2xl font-bold ${!npvFails(result.npv) ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
-                                title={npvFails(result.npv) ? `${diag?.npv?.reason ?? `NPV ${fmtMoney(result.npv)} negatif pada discount rate yang dipakai.`} Klik untuk lihat alasan & lever kuantitatif.` : undefined}
+                                title={npvFails(result.npv) ? `${diag?.npv?.reason ?? `NPV ${fmtMoney(result.npv)} negative at the discount rate used.`} Click to see the reason & quantified levers.` : undefined}
                                 onClick={npvFails(result.npv) ? (e) => { e.stopPropagation(); setOpenDiag(d => d === 'npv' ? null : 'npv'); } : undefined}
                             >
                                 {fmtMoney(result.npv)}
@@ -780,7 +780,7 @@ const FinancialDashboard = () => {
                             </div>
                             <div
                                 className={`text-2xl font-bold ${!roiFails(result.roiPercent) ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
-                                title={roiFails(result.roiPercent) ? `${diag?.roi?.reason ?? `ROI ${fmtPct(result.roiPercent, 0)} tidak positif.`} Klik untuk lihat alasan & lever kuantitatif.` : undefined}
+                                title={roiFails(result.roiPercent) ? `${diag?.roi?.reason ?? `ROI ${fmtPct(result.roiPercent, 0)} not positive.`} Click to see the reason & quantified levers.` : undefined}
                                 onClick={roiFails(result.roiPercent) ? (e) => { e.stopPropagation(); setOpenDiag(d => d === 'roi' ? null : 'roi'); } : undefined}
                             >
                                 {Number.isFinite(result.roiPercent) ? `${result.roiPercent.toFixed(0)}%` : 'N/A'}
@@ -803,12 +803,12 @@ const FinancialDashboard = () => {
                                     onClick={() => setOpenDiag(null)}
                                     className="shrink-0 text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                                 >
-                                    Tutup ✕
+                                    Close ✕
                                 </button>
                             </div>
                             {ex.levers.length > 0 && (
                                 <div className="mt-2">
-                                    <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">Yang perlu diubah</div>
+                                    <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">What needs to change</div>
                                     <div className="space-y-1.5">
                                         {ex.levers.map((lv, li) => {
                                             const external = lv.targetTab !== FINANCE_TAB;
@@ -817,7 +817,7 @@ const FinancialDashboard = () => {
                                                     key={li}
                                                     type="button"
                                                     onClick={external ? (e) => { e.stopPropagation(); simActions.setActiveTab(lv.targetTab as 'capex'); } : undefined}
-                                                    title={external ? `Buka tab "${lv.targetTab}" untuk fine-tune parameter ini` : 'Parameter ini di-edit di sidebar halaman ini'}
+                                                    title={external ? `Open the "${lv.targetTab}" tab to fine-tune this parameter` : "This parameter is edited in this page's sidebar"}
                                                     className={`w-full flex items-start gap-2 p-2 rounded-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-left group ${external ? 'hover:border-blue-400 dark:hover:border-blue-500 transition-colors' : 'cursor-default'}`}
                                                 >
                                                     <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 whitespace-nowrap">{lv.label}</span>

@@ -144,18 +144,18 @@ export function ReliabilityEnginePage() {
             threshold: model.tierTargetFrac,
             direction: 'atLeast',
             fmtValue: fmtAvail,
-            because: `gap ${gapNines.toFixed(2)} nines — downtime ${fmtDowntime(model.downtimeMin)} vs budget Tier ${inputs.tierLevel} ${fmtDowntime(model.budgetMin)}; kontributor downtime terbesar: ${topTxt}`,
+            because: `gap ${gapNines.toFixed(2)} nines — downtime ${fmtDowntime(model.downtimeMin)} vs Tier ${inputs.tierLevel} budget ${fmtDowntime(model.budgetMin)}; largest downtime contributors: ${topTxt}`,
             levers: [
                 {
                     lo: 0, hi: 0.9,
                     metricAt: (x) => model.recompute({ mttrFactor: 1 - x }),
                     render: (x, achieved) => ({
                         label: `MTTR −${(x * 100).toFixed(0)}%`,
-                        detail: `Pangkas MTTR rata-rata ${model.mttrAvg} h → ${(model.mttrAvg * (1 - x)).toFixed(1)} h (kontrak comprehensive + spares on-site + respons 24/7): availability naik ke ${fmtAvail(achieved)} ≥ target — dihitung bisection pada chain β-adjusted halaman ini.`,
+                        detail: `Cut average MTTR ${model.mttrAvg} h → ${(model.mttrAvg * (1 - x)).toFixed(1)} h (comprehensive contract + on-site spares + 24/7 response): availability rises to ${fmtAvail(achieved)} ≥ target — computed by bisection on this page's β-adjusted chain.`,
                     }),
                     unreachable: (atHi) => ({
-                        label: 'MTTR −90% belum cukup',
-                        detail: `Bahkan MTTR −90% hanya memberi ${fmtAvail(atHi)} < target ${fmtAvail(model.tierTargetFrac)} — kombinasikan dengan redundancy: +1 path & MTTR −50% memberi ${fmtAvail(model.recompute({ paths: model.paths + 1, mttrFactor: 0.5 }))} (dihitung).`,
+                        label: 'MTTR −90% not enough',
+                        detail: `Even MTTR −90% only gives ${fmtAvail(atHi)} < target ${fmtAvail(model.tierTargetFrac)} — combine with redundancy: +1 path & MTTR −50% gives ${fmtAvail(model.recompute({ paths: model.paths + 1, mttrFactor: 0.5 }))} (computed).`,
                     }),
                     targetTab: 'maint',
                 },
@@ -169,7 +169,7 @@ export function ReliabilityEnginePage() {
         const reaches = aPlus >= model.tierTargetFrac;
         const pathsLever: DecisionLever = {
             label: `Paths ${model.paths} → ${model.paths + 1}`,
-            detail: `Naikkan power redundancy dari ${inputs.powerRedundancy} (+1 path pada power chain): availability ${fmtAvail(model.overall)} → ${fmtAvail(aPlus)} (+${nGain.toFixed(2)} nines, downtime −${fmtDowntime(Math.max(0, model.downtimeMin - dtPlus))}) ${reaches ? '— MENCAPAI target tier' : `— masih di bawah target ${fmtAvail(model.tierTargetFrac)}`} — dihitung dari chain yang sama.`,
+            detail: `Raise power redundancy from ${inputs.powerRedundancy} (+1 path on the power chain): availability ${fmtAvail(model.overall)} → ${fmtAvail(aPlus)} (+${nGain.toFixed(2)} nines, downtime −${fmtDowntime(Math.max(0, model.downtimeMin - dtPlus))}) ${reaches ? '— MEETS the tier target' : `— still below target ${fmtAvail(model.tierTargetFrac)}`} — computed from the same chain.`,
             targetTab: 'sim',
             priority: reaches ? 'HIGH' : 'MED',
         };
@@ -183,13 +183,13 @@ export function ReliabilityEnginePage() {
         if (s.startsWith('Utility intake')) {
             const swMttr = model.comps['switchgear']?.mttr;
             return {
-                fix: `Dual utility feed + ATS (2N intake) menghilangkan SPOF pra-ATS — eksposur single-feed: MTTR switchgear ${swMttr ?? '—'} h per event (data IEEE-493 model ini).`,
+                fix: `Dual utility feed + ATS (2N intake) removes the pre-ATS SPOF — single-feed exposure: switchgear MTTR ${swMttr ?? '—'} h per event (IEEE-493 data in this model).`,
                 targetTab: 'sim',
             };
         }
         const a2 = model.recompute({ paths: 2 });
         return {
-            fix: `Naikkan redundancy ke ≥ N+1 (2 paths): composed availability ${fmtAvail(model.overall)} → ${fmtAvail(a2)} — dihitung dari chain model yang sama.`,
+            fix: `Raise redundancy to ≥ N+1 (2 paths): composed availability ${fmtAvail(model.overall)} → ${fmtAvail(a2)} — computed from the same model chain.`,
             targetTab: 'sim',
         };
     }, [model]);
@@ -322,14 +322,14 @@ export function ReliabilityEnginePage() {
                             </div>
                             <p className="text-xs leading-relaxed text-slate-700 dark:text-slate-300">{availExplain.reason}</p>
                             <div className="mt-2">
-                                <div className="mb-1.5 text-[10px] font-semibold uppercase text-slate-500">Lever terukur — dihitung pada chain model halaman ini</div>
+                                <div className="mb-1.5 text-[10px] font-semibold uppercase text-slate-500">Measured levers — computed on this page's model chain</div>
                                 <div className="space-y-1.5">
                                     {availExplain.levers.map((lv, i) => (
                                         <button
                                             key={i}
                                             type="button"
                                             onClick={() => setActiveTab(lv.targetTab as Parameters<typeof setActiveTab>[0])}
-                                            title={`Buka tab "${lv.targetTab}" untuk ubah parameter ini`}
+                                            title={`Open the "${lv.targetTab}" tab to change this parameter`}
                                             className="group flex w-full items-start gap-2 rounded-md border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/50 p-2 text-left transition-colors hover:border-violet-400 dark:hover:border-violet-500"
                                         >
                                             <span className={`mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold text-white ${lv.priority === 'HIGH' ? 'bg-red-600' : 'bg-amber-600'}`}>{lv.priority ?? 'MED'}</span>
@@ -427,7 +427,7 @@ export function ReliabilityEnginePage() {
                                                         <button
                                                             type="button"
                                                             onClick={() => setActiveTab(r.targetTab)}
-                                                            title={`Buka tab "${r.targetTab}" untuk ubah redundancy`}
+                                                            title={`Open the "${r.targetTab}" tab to change redundancy`}
                                                             className="group mt-0.5 flex w-full items-start gap-1.5 rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-2 py-1 text-left text-[10px] text-slate-600 dark:text-slate-300 transition-colors hover:border-violet-400 dark:hover:border-violet-500"
                                                         >
                                                             <span className="mt-0.5 shrink-0 rounded bg-amber-600 px-1 py-0.5 text-[8px] font-bold text-white">FIX</span>

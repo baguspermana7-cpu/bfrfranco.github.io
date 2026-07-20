@@ -176,7 +176,7 @@ export function DiagnosticsCenter() {
                     </p>
                     <p className="max-w-md text-sm text-slate-500 dark:text-slate-400">
                         All wired collectors ({DIAG_COVERAGE.wired}/{DIAG_COVERAGE.total}) report values within their thresholds.
-                        Ubah parameter negara / IT load / tier / cooling untuk melihat diagnosa muncul.
+                        Change the country / IT load / tier / cooling parameters to surface diagnostics.
                     </p>
                 </div>
             ) : (
@@ -221,7 +221,7 @@ export function DiagnosticsCenter() {
                                                     <div className="flex items-center gap-3 text-[11px]">
                                                         {f.value !== undefined && (
                                                             <span className="text-slate-600 dark:text-slate-300">
-                                                                <span className="text-slate-400">nilai </span>
+                                                                <span className="text-slate-400">value </span>
                                                                 <b className="tabular-nums">{fmtNum(f.value)}</b>
                                                             </span>
                                                         )}

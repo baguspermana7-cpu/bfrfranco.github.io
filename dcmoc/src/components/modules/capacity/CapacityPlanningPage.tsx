@@ -63,11 +63,11 @@ function explainUtilRow(i: CapInputs, u: UtilRow): ThresholdMetricExplain {
             metricAt: (m) => pctAt({ designMarginPct: m }),
             render: (x, achieved) => ({
                 label: `Design margin ${i.designMarginPct}% → ${x.toFixed(0)}%`,
-                detail: `Naikkan design margin ${i.designMarginPct}% → ${x.toFixed(1)}% agar utilisasi ${u.label} turun ke ${Math.round(achieved)}% (${targetLabel}) — parameter di Requirements → Business (design margin).`,
+                detail: `Raise design margin ${i.designMarginPct}% → ${x.toFixed(1)}% so ${u.label} utilization drops to ${Math.round(achieved)}% (${targetLabel}) — parameter in Requirements → Business (design margin).`,
             }),
             unreachable: (atHi) => ({
-                label: 'Design margin maks 30% tidak cukup',
-                detail: `Bahkan margin 30% hanya menurunkan utilisasi ${u.label} ke ${Math.round(atHi)}% — kombinasikan dengan defer beban di phase plan.`,
+                label: 'Design margin max 30% not enough',
+                detail: `Even a 30% margin only lowers ${u.label} utilization to ${Math.round(atHi)}% — combine with load deferral in the phase plan.`,
             }),
             targetTab: 'requirements',
         };
@@ -76,10 +76,10 @@ function explainUtilRow(i: CapInputs, u: UtilRow): ThresholdMetricExplain {
             metricAt: (x) => pctAt({ whiteFloorM2: x }),
             render: (x, achieved) => ({
                 label: `White space ${i.whiteFloorM2.toLocaleString()} → ${Math.ceil(x).toLocaleString()} m²`,
-                detail: `Tambah white space ke ${Math.ceil(x).toLocaleString()} m² (+${Math.ceil(x - i.whiteFloorM2).toLocaleString()} m²) → utilisasi ${u.label} ${Math.round(achieved)}% (${targetLabel}) — parameter building size di Simulation setup.`,
+                detail: `Add white space to ${Math.ceil(x).toLocaleString()} m² (+${Math.ceil(x - i.whiteFloorM2).toLocaleString()} m²) → ${u.label} utilization ${Math.round(achieved)}% (${targetLabel}) — building-size parameter in Simulation setup.`,
             }),
             unreachable: (atHi) => ({
-                label: 'White space ×3 tidak cukup',
+                label: 'White space ×3 not enough',
                 detail: `Bahkan ${(i.whiteFloorM2 * 3).toLocaleString()} m² hanya mencapai ${Math.round(atHi)}% — konstrain lain yang mengikat (cek binding constraint / rack density).`,
             }),
             targetTab: 'sim',
@@ -89,17 +89,17 @@ function explainUtilRow(i: CapInputs, u: UtilRow): ThresholdMetricExplain {
             metricAt: (x) => pctAt({ itLoadKw: x }),
             render: (x, achieved) => ({
                 label: `IT load ${(i.itLoadKw / 1000).toFixed(1)} → ${(x / 1000).toFixed(1)} MW`,
-                detail: `ATAU tahan IT load saat ini di ≤${(x / 1000).toFixed(1)} MW (defer −${((i.itLoadKw - x) / 1000).toFixed(1)} MW ke fase berikut) → utilisasi ${u.label} ${Math.round(achieved)}% (${targetLabel}) — atur di Phase Plan & Economics.`,
+                detail: `OR hold current IT load at ≤${(x / 1000).toFixed(1)} MW (defer −${((i.itLoadKw - x) / 1000).toFixed(1)} MW to a later phase) → ${u.label} utilization ${Math.round(achieved)}% (${targetLabel}) — set in Phase Plan & Economics.`,
             }),
             unreachable: (atHi) => ({
-                label: 'Defer −60% beban tidak cukup',
+                label: 'Defer −60% load not enough',
                 detail: `Bahkan IT load −60% hanya mencapai ${Math.round(atHi)}% — kapasitas desain perlu dinaikkan, bukan sekadar defer.`,
             }),
             targetTab: 'phases-local',
         };
     });
     return explainThresholdMetric({
-        metricLabel: `Utilisasi ${u.label}`,
+        metricLabel: `${u.label} utilization`,
         value: u.pct,
         threshold: target,  // band-aware: At Risk solves to <85, Watch to <70 (matching the adapter bands)
         direction: 'atMost',
@@ -308,8 +308,8 @@ export function CapacityPlanningPage() {
                             </div>
                             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Capacity Utilization (Current)</h2>
-                                <p className="mb-1.5 text-[10px] text-slate-500" title="Kapasitas power/cooling didesain = IT load + design margin, jadi utilization saat ini secara konstruksi ≈ 1/(1+margin). Yang bergerak dgn waktu adalah FORECAST (tab Forecast & Growth) — exhaustion year per sistem ada di Key Insights.">
-                                    Basis: kapasitas design = IT + margin (util saat ini ≈ 1/(1+margin) secara konstruksi) — STATUS band memakai puncak FORECAST pertumbuhan + estimasi tahun exhaust per sistem. ⓘ
+                                <p className="mb-1.5 text-[10px] text-slate-500" title="Power/cooling capacity is designed = IT load + design margin, so current utilization is structurally ≈ 1/(1+margin). What moves over time is the FORECAST (Forecast & Growth tab) — the exhaustion year per system is in Key Insights.">
+                                    Basis: design capacity = IT + margin (current util ≈ 1/(1+margin) by construction) — the STATUS band uses the FORECAST growth peak + estimated exhaustion year per system. ⓘ
                                 </p>
                                 <div className="space-y-1.5">
                                     {util.rows.map((u) => (
@@ -321,11 +321,11 @@ export function CapacityPlanningPage() {
                                                 </div>
                                                 <span className="w-24 text-right tabular-nums text-slate-500">{u.used.toLocaleString()}/{u.capacity.toLocaleString()} {u.unit}</span>
                                                 <span className="w-9 text-right tabular-nums font-semibold text-slate-700 dark:text-slate-300"
-                                                    title={u.forecastPct != null ? `Sekarang ${u.pct}% · puncak forecast ${u.forecastPct}%${u.exhaustYear ? ` · exhaust ~${u.exhaustYear}` : ''}` : undefined}>{u.pct}%</span>
+                                                    title={u.forecastPct != null ? `Now ${u.pct}% · forecast peak ${u.forecastPct}%${u.exhaustYear ? ` · exhaust ~${u.exhaustYear}` : ''}` : undefined}>{u.pct}%</span>
                                                 {(() => {
                                                     /* Banding forecast-aware (keputusan owner): status dari tekanan pertumbuhan */
                                                     const bandPct = u.forecastPct ?? u.pct;
-                                                    const chipTitle = `Band dari puncak FORECAST ${bandPct}% (sekarang ${u.pct}%)${u.exhaustYear ? ` — kapasitas habis ~${u.exhaustYear} tanpa fase baru` : ''} · klik utk lever terukur`;
+                                                    const chipTitle = `Band from FORECAST peak ${bandPct}% (now ${u.pct}%)${u.exhaustYear ? ` — capacity exhausted ~${u.exhaustYear} without new phases` : ''} · click for quantified levers`;
                                                     return bandPct >= 70 ? (
                                                         <button onClick={() => setUtilExplain(utilExplain === u.key ? null : u.key)}
                                                             title={chipTitle}
@@ -381,7 +381,7 @@ export function CapacityPlanningPage() {
                                                 <td className="py-1.5 text-slate-700 dark:text-slate-200">{r.label}</td>
                                                 <td className="text-right tabular-nums text-slate-500">{r.config}</td>
                                                 <td className="text-right tabular-nums text-slate-500">{r.utilPct}%</td>
-                                                <td className="text-right"><span title={r.remediation ?? 'Utilisasi sehat (<70%)'} className={`cursor-help rounded px-1.5 py-0.5 text-[9px] font-semibold ${r.status === 'OK' ? 'bg-emerald-500/15 text-emerald-500' : r.status === 'Watch' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{r.status}{r.remediation ? ' ⓘ' : ''}</span></td>
+                                                <td className="text-right"><span title={r.remediation ?? 'Healthy utilization (<70%)'} className={`cursor-help rounded px-1.5 py-0.5 text-[9px] font-semibold ${r.status === 'OK' ? 'bg-emerald-500/15 text-emerald-500' : r.status === 'Watch' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{r.status}{r.remediation ? ' ⓘ' : ''}</span></td>
                                             </tr>
                                         ))}
                                     </tbody>

@@ -72,8 +72,8 @@ interface RefrigerantRow {
 function refCompatNote(cur: RefrigerantRow, alt: RefrigerantRow): string {
     const shared = alt.apps.filter((a) => cur.apps.includes(a));
     const appTxt = shared.length
-        ? `apps cocok: ${shared.join('/')}`
-        : `⚠ envelope beda (${alt.apps.join('/')} vs ${cur.apps.join('/')}) — bukan drop-in`;
+        ? `apps match: ${shared.join('/')}`
+        : `⚠ different envelope (${alt.apps.join('/')} vs ${cur.apps.join('/')}) — not a drop-in`;
     const safetyTxt = alt.safety === 'A1' ? ''
         : alt.safety === 'A2L' ? ' · A2L mildly-flammable: leak detection + charge limit (ASHRAE 34 / ISO 5149)'
             : alt.safety === 'A3' ? ' · A3 highly-flammable: strict charge limit, outdoor/packaged only'
@@ -514,7 +514,7 @@ export function CduDashboard() {
                                         <td className="py-1 font-medium text-slate-700 dark:text-slate-200">{k === refKey ? '● ' : ''}{v.label}</td>
                                         <td
                                             className={`text-right tabular-nums ${v.gwp > REF_GWP_RED ? 'text-rose-400 font-semibold cursor-pointer underline decoration-dotted underline-offset-2' : v.gwp > REF_GWP_AMBER ? 'text-amber-500' : 'text-emerald-500'}`}
-                                            title={v.gwp > REF_GWP_RED ? `GWP100 ${v.gwp} > ${REF_GWP_RED} (US AIM Act 2025 / EU F-Gas phase-down) — klik untuk alternatif GWP rendah dari DATA.refrigerants` : undefined}
+                                            title={v.gwp > REF_GWP_RED ? `GWP100 ${v.gwp} > ${REF_GWP_RED} (US AIM Act 2025 / EU F-Gas phase-down) — click for low-GWP alternatives from DATA.refrigerants` : undefined}
                                             onClick={v.gwp > REF_GWP_RED ? (e) => { e.stopPropagation(); setGwpDiag((d) => d === k ? null : k); } : undefined}
                                         >{v.gwp}</td>
                                         <td className="text-center text-slate-500">{v.safety}</td>
@@ -538,16 +538,16 @@ export function CduDashboard() {
                             <div className="mt-2 rounded-lg border border-rose-300 dark:border-rose-800/50 bg-rose-50 dark:bg-rose-950/20 p-2.5">
                                 <div className="flex items-start justify-between gap-2">
                                     <p className="text-[11px] leading-relaxed text-slate-700 dark:text-slate-300">
-                                        <b>{cur.label}</b> GWP100 <b className="tabular-nums">{cur.gwp}</b> &gt; ambang {REF_GWP_RED} — {cur.note}.
-                                        {' '}Alternatif GWP ≤ {REF_GWP_AMBER} dari database engine (Δ vs {cur.label}):
+                                        <b>{cur.label}</b> GWP100 <b className="tabular-nums">{cur.gwp}</b> &gt; threshold {REF_GWP_RED} — {cur.note}.
+                                        {' '}Alternatives with GWP ≤ {REF_GWP_AMBER} from the engine database (Δ vs {cur.label}):
                                     </p>
                                     <button type="button" onClick={() => setGwpDiag(null)}
-                                        className="shrink-0 text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">Tutup ✕</button>
+                                        className="shrink-0 text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">Close ✕</button>
                                 </div>
                                 <div className="mt-2 space-y-1.5">
                                     {alts.length === 0 && (
                                         /* honest-empty: engine DB carries no row at/below the low-GWP line */
-                                        <p className="text-[10.5px] text-slate-500">Tidak ada refrigerant GWP ≤ {REF_GWP_AMBER} di DATA.refrigerants saat ini.</p>
+                                        <p className="text-[10.5px] text-slate-500">No refrigerant with GWP ≤ {REF_GWP_AMBER} in DATA.refrigerants at present.</p>
                                     )}
                                     {alts.map(([ak, av]) => {
                                         const dCop = av.copIndex - cur.copIndex;
@@ -555,7 +555,7 @@ export function CduDashboard() {
                                         return (
                                             <button key={ak} type="button"
                                                 onClick={() => { setCapexInputs({ refrigerantType: ak }); setGwpDiag(null); }}
-                                                title={`Pilih ${av.label} (shared capex field refrigerantType)`}
+                                                title={`Select ${av.label} (shared capex field refrigerantType)`}
                                                 className="group flex w-full items-start gap-2 rounded-md border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/50 p-2 text-left transition-colors hover:border-cyan-400 dark:hover:border-cyan-500">
                                                 <span className="mt-0.5 shrink-0 rounded bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 text-[10px] font-bold whitespace-nowrap text-emerald-700 dark:text-emerald-300">{av.label}</span>
                                                 <span className="flex-1 text-[10.5px] leading-snug text-slate-600 dark:text-slate-400">
@@ -564,12 +564,12 @@ export function CduDashboard() {
                                                     {' '}· CAPEX × <b className="tabular-nums">{av.capexMult}</b> ({dCapex >= 0 ? '+' : ''}{(dCapex * 100).toFixed(0)}%)
                                                     {' '}· safety <b>{av.safety}</b> — {refCompatNote(cur, av)}
                                                 </span>
-                                                <span className="mt-0.5 shrink-0 text-[9px] font-semibold text-slate-400 group-hover:text-cyan-500">pilih →</span>
+                                                <span className="mt-0.5 shrink-0 text-[9px] font-semibold text-slate-400 group-hover:text-cyan-500">select →</span>
                                             </button>
                                         );
                                     })}
                                 </div>
-                                <p className="mt-1.5 text-[9px] text-slate-400">Semua angka live dari DATA.refrigerants (GWP100 IPCC AR4, ASHRAE 34, COP idx R-134a = 1.00, capexMult = mitigasi flammability/toxicity). Klik alternatif = set shared capex refrigerantType — screening, bukan seleksi equipment.</p>
+                                <p className="mt-1.5 text-[9px] text-slate-400">All figures live from DATA.refrigerants (GWP100 IPCC AR4, ASHRAE 34, COP idx R-134a = 1.00, capexMult = flammability/toxicity mitigation). Clicking an alternative sets the shared capex refrigerantType — screening, not equipment selection.</p>
                             </div>
                         );
                     })()}
@@ -816,7 +816,7 @@ export function SparesDashboard() {
                                             {r.criticality === 'Critical'
                                                 ? <button type="button"
                                                     onClick={() => setSpDiag((d) => d?.kind === 'crit' && d.key === k ? null : { kind: 'crit', key: k })}
-                                                    title={`Kelas Critical — klik untuk lever spare/MTTR terukur (models.spares + DATA.reliability)`}
+                                                    title={`Critical class — click for measured spare/MTTR levers (models.spares + DATA.reliability)`}
                                                     className="rounded px-1 py-px text-[9px] font-semibold bg-rose-500/15 text-rose-600 dark:text-rose-300 cursor-pointer underline decoration-dotted underline-offset-2">Critical</button>
                                                 : <span className="rounded px-1 py-px text-[9px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-300">{r.criticality}</span>}
                                         </td>
@@ -829,7 +829,7 @@ export function SparesDashboard() {
                                         <td className="py-2 pr-3 tabular-nums">
                                             <span
                                                 className={below ? 'text-rose-500 font-semibold cursor-pointer underline decoration-dotted underline-offset-2' : 'text-slate-600 dark:text-slate-300'}
-                                                title={below ? `Fill ${(r.fillAchieved * 100).toFixed(1)}% < target ${r.fillTargetPct}% — klik untuk lever terukur (Q* / lead time) dari adapter spares yang sama` : undefined}
+                                                title={below ? `Fill ${(r.fillAchieved * 100).toFixed(1)}% < target ${r.fillTargetPct}% — click for measured levers (Q* / lead time) from the same spares adapter` : undefined}
                                                 onClick={below ? () => setSpDiag((d) => d?.kind === 'fill' && d.key === k ? null : { kind: 'fill', key: k }) : undefined}
                                             >{(r.fillAchieved * 100).toFixed(1)}%</span>
                                             {r.usedPoissonMode && <span className="ml-1 rounded px-1 py-px text-[9px] font-semibold bg-violet-500/15 text-violet-600 dark:text-violet-300" title="Low-demand mover — Poisson CDF">Poisson</span>}
@@ -917,81 +917,81 @@ export function SparesDashboard() {
                                     {spDiag.kind === 'fill' ? (
                                         <>
                                             <b>{r.label}</b> fill <b className="tabular-nums">{fillPct(r.fillAchieved)}</b> &lt; target <b className="tabular-nums">{r.fillTargetPct}%</b> (gap {((target - r.fillAchieved) * 100).toFixed(1)} pp).
-                                            {' '}Newsvendor mengunci Q* = {r.qStar} pada CR {(r.cr * 100).toFixed(1)}% (Cu {money(UNDERSTOCK_COST_SCREENING[r.criticality])}/event vs Co carry) — CR di bawah target fill, jadi stok optimal-biaya tidak mencapai service level.
+                                            {' '}Newsvendor locks Q* = {r.qStar} at CR {(r.cr * 100).toFixed(1)}% (Cu {money(UNDERSTOCK_COST_SCREENING[r.criticality])}/event vs Co carry) — CR is below the fill target, so the cost-optimal stock does not reach the service level.
                                             {er && <> Lead-time demand μLT = {er.muLT} ({er.usedPoissonMode ? 'Poisson' : 'Normal'} mode, lead {r.leadWeeks} wk).</>}
                                         </>
                                     ) : (
                                         <>
-                                            <b>{r.label}</b> kelas <b>Critical</b> (fill target {r.fillTargetPct}%, understock {money(UNDERSTOCK_COST_SCREENING[r.criticality])}/event): fleet {r.fleet}× · MTBF {r.mtbf.toLocaleString()} h → ekspektasi <b className="tabular-nums">{r.demandYr}</b> kegagalan/yr (DATA.reliability IEEE-493).
-                                            {' '}Dengan spare di rak, restore ≈ MTTR <b className="tabular-nums">{r.mttr} h</b>; tanpa stok, demand menunggu lead pengadaan <b className="tabular-nums">{r.leadWeeks} wk ≈ {(r.leadWeeks * 168).toLocaleString()} h</b> (~{Math.round((r.leadWeeks * 168) / Math.max(r.mttr, 1)).toLocaleString()}× lebih lama).
-                                            {' '}Posisi kini: Q* {r.qStar} → fill {fillPct(r.fillAchieved)}, uncovered ≈ {(r.demandYr * (1 - r.fillAchieved)).toFixed(2)} event/yr.
+                                            <b>{r.label}</b> is a <b>Critical</b> class (fill target {r.fillTargetPct}%, understock {money(UNDERSTOCK_COST_SCREENING[r.criticality])}/event): fleet {r.fleet}× · MTBF {r.mtbf.toLocaleString()} h → expected <b className="tabular-nums">{r.demandYr}</b> failures/yr (DATA.reliability IEEE-493).
+                                            {' '}With a spare on the shelf, restore ≈ MTTR <b className="tabular-nums">{r.mttr} h</b>; without stock, demand waits the procurement lead <b className="tabular-nums">{r.leadWeeks} wk ≈ {(r.leadWeeks * 168).toLocaleString()} h</b> (~{Math.round((r.leadWeeks * 168) / Math.max(r.mttr, 1)).toLocaleString()}× longer).
+                                            {' '}Current position: Q* {r.qStar} → fill {fillPct(r.fillAchieved)}, uncovered ≈ {(r.demandYr * (1 - r.fillAchieved)).toFixed(2)} event/yr.
                                         </>
                                     )}
                                 </p>
                                 <div className="flex shrink-0 items-center gap-1.5">
                                     {er && (er.parity
-                                        ? <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[8px] font-bold text-emerald-500" title="Re-run models.spares.newsvendor mereproduksi Q* + fill yang dirender">≡ engine</span>
-                                        : <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[8px] font-bold text-amber-500" title="Re-run engine tidak persis mereproduksi baris — periksa drift adapter">⚠ drift</span>)}
+                                        ? <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[8px] font-bold text-emerald-500" title="Re-running models.spares.newsvendor reproduces the rendered Q* + fill">≡ engine</span>
+                                        : <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[8px] font-bold text-amber-500" title="Engine re-run does not exactly reproduce the row — check adapter drift">⚠ drift</span>)}
                                     <button type="button" onClick={() => setSpDiag(null)}
-                                        className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">Tutup ✕</button>
+                                        className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">Close ✕</button>
                                 </div>
                             </div>
                             <div className="mt-2">
-                                <div className="mb-1.5 text-[10px] font-semibold uppercase text-slate-500">Lever terukur (model yang sama)</div>
+                                <div className="mb-1.5 text-[10px] font-semibold uppercase text-slate-500">Measured levers (same model)</div>
                                 <div className="space-y-1.5">
                                     {/* Lever A — Q* / stock position (engine kernels) */}
                                     {er ? (
                                         spDiag.kind === 'crit' && r.qStar === 0 ? (
                                             <div className={leverBtn}>
-                                                <span className={leverChip}>Stok 1 unit</span>
-                                                <span className={leverTxt}>Stok 1 spare (+{money(r.unitCost)} unit cost {r.prov.unitCost === 'engine' ? 'DATA.sparesPricing' : r.prov.unitCost}) → fill {fillPct(er.fillAt(1))} dari {fillPct(er.fillAt(0))}; restore pada stockout ter-cover turun dari lead {r.leadWeeks} wk ke MTTR {r.mttr} h.</span>
+                                                <span className={leverChip}>Stock 1 unit</span>
+                                                <span className={leverTxt}>Stock 1 spare (+{money(r.unitCost)} unit cost {r.prov.unitCost === 'engine' ? 'DATA.sparesPricing' : r.prov.unitCost}) → fill {fillPct(er.fillAt(1))} from {fillPct(er.fillAt(0))}; a covered-stockout restore drops from the {r.leadWeeks} wk lead to MTTR {r.mttr} h.</span>
                                             </div>
                                         ) : addN != null ? (
                                             <div className={leverBtn}>
                                                 <span className={leverChip}>Q* +{addN} unit</span>
-                                                <span className={leverTxt}>Naikkan stok {r.qStar} → {r.qStar + addN} unit → fill <b className="tabular-nums">{fillPct(er.fillAt(r.qStar + addN))}</b> ≥ target {r.fillTargetPct}% · biaya stok +<b>{money(addN * r.unitCost)}</b> ({addN} × {money(r.unitCost)} unit cost, {r.prov.unitCost === 'engine' ? 'DATA.sparesPricing mid' : r.prov.unitCost}); carrying ≈ +{money(addN * r.unitCost * CARRY_RATE_PCT / 100)}/yr ({CARRY_RATE_PCT}%/yr).</span>
+                                                <span className={leverTxt}>Raise stock {r.qStar} → {r.qStar + addN} units → fill <b className="tabular-nums">{fillPct(er.fillAt(r.qStar + addN))}</b> ≥ target {r.fillTargetPct}% · stock cost +<b>{money(addN * r.unitCost)}</b> ({addN} × {money(r.unitCost)} unit cost, {r.prov.unitCost === 'engine' ? 'DATA.sparesPricing mid' : r.prov.unitCost}); carrying ≈ +{money(addN * r.unitCost * CARRY_RATE_PCT / 100)}/yr ({CARRY_RATE_PCT}%/yr).</span>
                                             </div>
                                         ) : (
                                             /* honest-unreachable within the search bound */
                                             <div className={leverBtn}>
-                                                <span className={leverChip}>Q* saja tidak cukup</span>
-                                                <span className={leverTxt}>Bahkan +{SP_QSTAR_SEARCH_MAX} unit hanya membawa fill ke {fillPct(er.fillAt(r.qStar + SP_QSTAR_SEARCH_MAX))} — demand lead-time terlalu besar; kombinasikan dengan lead time yang lebih pendek.</span>
+                                                <span className={leverChip}>Q* alone is not enough</span>
+                                                <span className={leverTxt}>Even +{SP_QSTAR_SEARCH_MAX} units only brings fill to {fillPct(er.fillAt(r.qStar + SP_QSTAR_SEARCH_MAX))} — the lead-time demand is too large; combine with a shorter lead time.</span>
                                             </div>
                                         )
                                     ) : (
-                                        <div className={leverBtn}><span className={leverTxt}>Engine kernels belum tersedia — lever Q* muncul saat rz-engine siap.</span></div>
+                                        <div className={leverBtn}><span className={leverTxt}>Engine kernels not available yet — the Q* lever appears once rz-engine is ready.</span></div>
                                     )}
                                     {/* Lever B — shorten lead time (adapter re-run, apply-able) */}
                                     {leadHit ? (
                                         <button type="button" onClick={() => patchOv(r.classKey, { leadWeeks: leadHit.weeks })}
-                                            title="Terapkan sebagai override lead time kelas ini (kolom Lead wk)"
+                                            title="Apply as this class's lead-time override (Lead wk column)"
                                             className={`${leverBtn} group transition-colors hover:border-blue-400 dark:hover:border-blue-500`}>
                                             <span className={leverChip}>Lead {r.leadWeeks} → {leadHit.weeks} wk</span>
-                                            <span className={leverTxt}>Perpendek lead time ke {leadHit.weeks} wk (vendor stocking/kontrak konsinyasi) → adapter re-run: fill <b className="tabular-nums">{fillPct(leadHit.row.fillAchieved)}</b> ≥ target, Q* {leadHit.row.qStar}, annual cost {money(leadHit.row.annualCost)} (vs {money(r.annualCost)}). Klik untuk terapkan override.</span>
-                                            <span className="mt-0.5 shrink-0 text-[9px] font-semibold text-slate-400 group-hover:text-blue-500">terapkan →</span>
+                                            <span className={leverTxt}>Shorten lead time to {leadHit.weeks} wk (vendor stocking/consignment contract) → adapter re-run: fill <b className="tabular-nums">{fillPct(leadHit.row.fillAchieved)}</b> ≥ target, Q* {leadHit.row.qStar}, annual cost {money(leadHit.row.annualCost)} (vs {money(r.annualCost)}). Click to apply the override.</span>
+                                            <span className="mt-0.5 shrink-0 text-[9px] font-semibold text-slate-400 group-hover:text-blue-500">apply →</span>
                                         </button>
                                     ) : leadFloor ? (
                                         /* honest-unreachable: even the shortest lead option misses the target */
                                         <div className={leverBtn}>
-                                            <span className={leverChip}>Lead saja tidak cukup</span>
-                                            <span className={leverTxt}>Bahkan lead {leadFloor.weeks} wk hanya membawa fill ke {fillPct(leadFloor.row.fillAchieved)} (Q* {leadFloor.row.qStar}) — kombinasikan dengan stok tambahan di atas.</span>
+                                            <span className={leverChip}>Lead alone is not enough</span>
+                                            <span className={leverTxt}>Even a {leadFloor.weeks} wk lead only brings fill to {fillPct(leadFloor.row.fillAchieved)} (Q* {leadFloor.row.qStar}) — combine with the extra stock above.</span>
                                         </div>
                                     ) : (
                                         <div className={leverBtn}>
-                                            <span className={leverChip}>Lead minimum</span>
-                                            <span className={leverTxt}>Lead {r.leadWeeks} wk sudah opsi tersingkat halaman ini — sisa gap didorong stok (lever Q* di atas), bukan pengadaan.</span>
+                                            <span className={leverChip}>Minimum lead</span>
+                                            <span className={leverTxt}>The {r.leadWeeks} wk lead is already the shortest option on this page — the remaining gap is driven by stock (the Q* lever above), not procurement.</span>
                                         </div>
                                     )}
                                     {/* Navigation ↗ ke surface maintenance (MTTR/SLA levers hidup di sana) */}
                                     <button type="button" onClick={() => useSimulationStore.getState().actions.setActiveTab('maint')}
                                         className={`${leverBtn} group transition-colors hover:border-blue-400 dark:hover:border-blue-500`}>
                                         <span className={leverChip}>Maintenance ↗</span>
-                                        <span className={leverTxt}>MTTR {r.mttr} h adalah data engine (IEEE-493) — lever respons/SLA & strategi maintenance dianalisis terukur di Maintenance › Spares/SLA.</span>
-                                        <span className="mt-0.5 shrink-0 text-[9px] font-semibold text-slate-400 group-hover:text-blue-500">buka →</span>
+                                        <span className={leverTxt}>MTTR {r.mttr} h is engine data (IEEE-493) — response/SLA levers & maintenance strategy are analyzed with measured detail in Maintenance › Spares/SLA.</span>
+                                        <span className="mt-0.5 shrink-0 text-[9px] font-semibold text-slate-400 group-hover:text-blue-500">open →</span>
                                     </button>
                                 </div>
                             </div>
-                            <p className="mt-1.5 text-[9px] text-slate-400">Semua angka dari adapter computeSpares + kernel models.spares yang sama dengan tabel (μLT/σLT/fill dari engine; biaya dari unit cost per baris). Screening heuristic — bukan kebijakan inventori.</p>
+                            <p className="mt-1.5 text-[9px] text-slate-400">All figures from the same computeSpares adapter + models.spares kernels as the table (μLT/σLT/fill from the engine; cost from per-row unit cost). Screening heuristic — not an inventory policy.</p>
                         </div>
                     );
                 })()}

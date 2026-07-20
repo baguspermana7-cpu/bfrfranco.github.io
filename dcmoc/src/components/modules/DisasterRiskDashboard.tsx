@@ -202,10 +202,10 @@ export function collectDisasterDiagnostics(model: DisasterDiagnosticsModel): Fin
     const structuralPerYr = Math.round(result.structuralCostAdder / STRUCTURAL_AMORT_YEARS);
     const hardeningText = result.structuralCostAdder > 0
         ? `hardening ${fmtMoney(result.structuralCostAdder)} capex ≈ ${fmtMoney(structuralPerYr)}/yr @${STRUCTURAL_AMORT_YEARS}yr`
-        : 'hardening: model tidak punya structural adder untuk negara ini (structuralReinforcement 0% CAPEX) — lever tidak derivable';
+        : 'hardening: the model has no structural adder for this country (structuralReinforcement 0% CAPEX) — lever not derivable';
     const leverText = best
-        ? `Lever terukur terbaik: ${best.name} ${fmtMoney(best.cost)} → −${fmtMoney(best.savedPerYr)}/yr (basis ${best.basis}, ROI ${best.roi}x${best.roiVerified ? '' : ', basis tidak terverifikasi vs engine ROI'}).`
-        : 'Model tidak menghasilkan opsi mitigasi untuk profil ini — dalam model, skor hanya turun lewat pemilihan lokasi.';
+        ? `Best measured lever: ${best.name} ${fmtMoney(best.cost)} → −${fmtMoney(best.savedPerYr)}/yr (basis ${best.basis}, ROI ${best.roi}x${best.roiVerified ? '' : ', basis not verified vs engine ROI'}).`
+        : 'The model produces no mitigation options for this profile — in the model, the score only drops through location selection.';
     return [{
         surface: 'disaster',
         severity: category === 'Extreme' ? 'critical' : 'warning',
@@ -213,9 +213,9 @@ export function collectDisasterDiagnostics(model: DisasterDiagnosticsModel): Fin
         value: result.compositeScore,
         threshold,
         linkTab: 'disaster',
-        title: `Disaster risk ${category}: composite ${result.compositeScore}/100 ≥ ambang ${threshold}`,
-        detail: `Kontributor terbesar: ${top ? `${top.label} ${top.contribution.toFixed(1)} pts (${top.sharePct.toFixed(0)}% komposit, ${decomp.mode === 'engine' ? 'engine models.risk.geo' : 'fallback lokal'})` : 'n/a'}. ` +
-            `Beban tahunan: asuransi ${fmtMoney(result.annualInsuranceCost)}/yr + EAL ${fmtMoney(result.expectedAnnualLoss)}/yr + ${hardeningText}. ${leverText}`,
+        title: `Disaster risk ${category}: composite ${result.compositeScore}/100 ≥ threshold ${threshold}`,
+        detail: `Largest contributor: ${top ? `${top.label} ${top.contribution.toFixed(1)} pts (${top.sharePct.toFixed(0)}% of composite, ${decomp.mode === 'engine' ? 'engine models.risk.geo' : 'local fallback'})` : 'n/a'}. ` +
+            `Annual burden: insurance ${fmtMoney(result.annualInsuranceCost)}/yr + EAL ${fmtMoney(result.expectedAnnualLoss)}/yr + ${hardeningText}. ${leverText}`,
     }];
 }
 
@@ -300,9 +300,9 @@ const DisasterRiskDashboard = () => {
                                 onClick={() => setShowGuidance(v => !v)}
                                 aria-expanded={showGuidance}
                                 className={`text-xs mt-1 px-2 py-0.5 rounded border w-fit flex items-center gap-1 cursor-pointer hover:brightness-125 transition ${riskColors[derivedCategory]}`}
-                                title={`Composite ${result.compositeScore}/100 ≥ ambang ${categoryThreshold} — klik untuk dekomposisi per hazard + trade-off mitigasi`}
+                                title={`Composite ${result.compositeScore}/100 ≥ threshold ${categoryThreshold} — click for per-hazard decomposition + mitigation trade-offs`}
                             >
-                                {derivedCategory} — mengapa?
+                                {derivedCategory} — why?
                                 {showGuidance ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                             </button>
                         ) : (
@@ -312,7 +312,7 @@ const DisasterRiskDashboard = () => {
                         )}
                         {!categoryParityOk && (
                             <div className="text-[10px] mt-1 text-amber-500">
-                                ⚠ kategori engine ({result.riskCategory}) ≠ ambang panel ({derivedCategory}) — threshold drift
+                                ⚠ engine category ({result.riskCategory}) ≠ panel threshold ({derivedCategory}) — threshold drift
                             </div>
                         )}
                     </CardContent>
@@ -381,24 +381,24 @@ const DisasterRiskDashboard = () => {
             {showGuidance && guidanceEligible && decomp && derivedCategory && (
                 <Card className="bg-white dark:bg-slate-800/50 border-orange-300 dark:border-orange-500/40">
                     <CardContent className="pt-5 space-y-4">
-                        {/* (a) ALASAN — angka live dari model yang sama dengan render */}
+                        {/* (a) REASON — live numbers from the same model as the render */}
                         <div className="flex items-start justify-between gap-3 flex-wrap">
                             <div>
                                 <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
                                     <AlertTriangle className={`w-4 h-4 ${derivedCategory === 'Extreme' ? 'text-red-500' : 'text-orange-500'}`} />
-                                    Mengapa {derivedCategory}? Composite {result.compositeScore}/100 ≥ ambang {categoryThreshold}
+                                    Why {derivedCategory}? Composite {result.compositeScore}/100 ≥ threshold {categoryThreshold}
                                 </h3>
                                 <p className="text-xs text-slate-500 mt-1">
-                                    Dekomposisi per hazard — bobot model × level hazard negara ({selectedCountry.name}),{' '}
-                                    {decomp.mode === 'engine' ? 'live dari engine models.risk.geo (DATA.geoRisk.weights)' : 'fallback lokal (engine tidak tersedia)'}.
+                                    Per-hazard decomposition — model weight × country hazard level ({selectedCountry.name}),{' '}
+                                    {decomp.mode === 'engine' ? 'live from engine models.risk.geo (DATA.geoRisk.weights)' : 'local fallback (engine unavailable)'}.
                                 </p>
                             </div>
                             <span className={`text-[10px] px-2 py-0.5 rounded border h-fit ${decomp.parityOk
                                 ? 'text-emerald-500 border-emerald-500/40 bg-emerald-500/10'
                                 : 'text-amber-500 border-amber-500/40 bg-amber-500/10'}`}>
                                 {decomp.parityOk
-                                    ? `≡ engine: Σ kontribusi ${decomp.total.toFixed(1)} → ${result.compositeScore}`
-                                    : `⚠ dekomposisi drift: Σ ${decomp.total.toFixed(1)} ≠ composite ${result.compositeScore} — angka di bawah indikatif`}
+                                    ? `≡ engine: Σ contributions ${decomp.total.toFixed(1)} → ${result.compositeScore}`
+                                    : `⚠ decomposition drift: Σ ${decomp.total.toFixed(1)} ≠ composite ${result.compositeScore} — numbers below are indicative`}
                             </span>
                         </div>
 
@@ -406,7 +406,7 @@ const DisasterRiskDashboard = () => {
                             {decomp.rows.map((r, i) => (
                                 <div key={r.key} className={`flex items-center gap-3 text-xs p-1.5 rounded ${i === 0 ? 'bg-orange-500/10' : 'bg-slate-50 dark:bg-slate-900/30'}`}>
                                     <span className="w-32 shrink-0 text-slate-700 dark:text-slate-300">
-                                        {r.label}{i === 0 && <span className="ml-1 text-[10px] text-orange-500 font-semibold">← terbesar</span>}
+                                        {r.label}{i === 0 && <span className="ml-1 text-[10px] text-orange-500 font-semibold">← largest</span>}
                                     </span>
                                     <span className="w-28 shrink-0 font-mono text-slate-500">
                                         {fmt(r.weightPct)}% × {(r.level * 100).toFixed(0)}/100
@@ -424,22 +424,22 @@ const DisasterRiskDashboard = () => {
                             ))}
                             {decomp.mode === 'engine' && decomp.coverage != null && decomp.coverage < 1 && (
                                 <p className="text-[10px] text-slate-500">
-                                    Bobot engine dinormalisasi atas coverage {decomp.coverage.toFixed(2)} — wildfire tidak masuk komposit engine
-                                    (tampil di radar dengan bobot fallback lokal 10%).
+                                    Engine weights renormalized over coverage {decomp.coverage.toFixed(2)} — wildfire is excluded from the engine composite
+                                    (shown in the radar with the 10% local fallback weight).
                                 </p>
                             )}
                         </div>
 
-                        {/* (b) LEVER TERUKUR — trade-off tahunan, semua angka live dari result */}
+                        {/* (b) MEASURED LEVERS — annual trade-offs, all numbers live from result */}
                         <div>
-                            <h4 className="text-xs font-semibold uppercase text-slate-500 mb-2">Trade-off mitigasi (angka live, basis tahunan)</h4>
+                            <h4 className="text-xs font-semibold uppercase text-slate-500 mb-2">Mitigation trade-offs (live numbers, annual basis)</h4>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                                 <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-700">
-                                    <div className="text-slate-500 mb-1">Premi asuransi</div>
+                                    <div className="text-slate-500 mb-1">Insurance premium</div>
                                     <div className="text-base font-bold text-slate-900 dark:text-white">{fmtMoney(result.annualInsuranceCost)}/yr</div>
                                     <div className="text-slate-500 mt-1">
                                         {(selectedCountry.naturalDisaster?.insuranceMultiplier ?? 1.0)}x multiplier
-                                        {decomp.insuranceBand ? ` · band engine: ${decomp.insuranceBand}` : ''} · {result.insuranceTrend}
+                                        {decomp.insuranceBand ? ` · engine band: ${decomp.insuranceBand}` : ''} · {result.insuranceTrend}
                                     </div>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-700">
@@ -451,13 +451,13 @@ const DisasterRiskDashboard = () => {
                                             </div>
                                             <div className="text-slate-500 mt-1">
                                                 {fmtMoney(result.structuralCostAdder)} capex ({((selectedCountry.naturalDisaster?.structuralReinforcement ?? 0) * 100).toFixed(0)}% CAPEX),
-                                                amortisasi {STRUCTURAL_AMORT_YEARS} th — adder yang sama masuk capex fase di Phased Financial (pro-rata IT load).
+                                                amortized over {STRUCTURAL_AMORT_YEARS} yr — the same adder enters phase capex in Phased Financial (pro-rata IT load).
                                             </div>
                                         </>
                                     ) : (
                                         <div className="text-slate-500">
-                                            Model tidak punya structural adder untuk negara ini (structuralReinforcement 0% CAPEX) —
-                                            lever hardening tidak derivable dari model.
+                                            The model has no structural adder for this country (structuralReinforcement 0% CAPEX) —
+                                            the hardening lever is not derivable from the model.
                                         </div>
                                     )}
                                 </div>
@@ -465,7 +465,7 @@ const DisasterRiskDashboard = () => {
                                     <div className="text-slate-500 mb-1">Expected annual loss (EAL)</div>
                                     <div className="text-base font-bold text-slate-900 dark:text-white">{fmtMoney(result.expectedAnnualLoss)}/yr</div>
                                     <div className="text-slate-500 mt-1">
-                                        + interupsi {result.businessInterruptionDays} hari/yr → revenue-at-risk {fmtMoney(result.revenueAtRisk)}/yr.
+                                        + interruption {result.businessInterruptionDays} days/yr → revenue-at-risk {fmtMoney(result.revenueAtRisk)}/yr.
                                     </div>
                                 </div>
                             </div>
@@ -473,14 +473,14 @@ const DisasterRiskDashboard = () => {
 
                         {levers.length > 0 ? (
                             <div>
-                                <h4 className="text-xs font-semibold uppercase text-slate-500 mb-2">Lever terukur (dari mitigationOptions engine, urut ROI)</h4>
+                                <h4 className="text-xs font-semibold uppercase text-slate-500 mb-2">Measured levers (from engine mitigationOptions, sorted by ROI)</h4>
                                 <div className="space-y-1.5">
                                     {levers.map((l, i) => (
                                         <div key={l.name} className={`flex items-center justify-between gap-3 text-xs p-2 rounded ${i === 0 ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-slate-50 dark:bg-slate-900/30'}`}>
                                             <span className="text-slate-700 dark:text-slate-300">{l.name}</span>
                                             <span className="font-mono text-right text-slate-900 dark:text-white shrink-0">
                                                 {fmtMoney(l.cost)} → −{fmtMoney(l.savedPerYr)}/yr <span className="text-slate-500">({l.basis})</span> · ROI {l.roi}x
-                                                {!l.roiVerified && <span className="text-amber-500"> · basis tak terverifikasi vs engine</span>}
+                                                {!l.roiVerified && <span className="text-amber-500"> · basis not verified vs engine</span>}
                                             </span>
                                         </div>
                                     ))}
@@ -488,20 +488,20 @@ const DisasterRiskDashboard = () => {
                             </div>
                         ) : (
                             <p className="text-xs text-slate-500">
-                                Model tidak menghasilkan opsi mitigasi untuk profil ini — tidak ada lever capex yang derivable.
+                                The model produces no mitigation options for this profile — no derivable capex lever.
                             </p>
                         )}
 
                         {/* Honest scope + (c) navigasi ke parameter */}
                         <div className="pt-2 border-t border-slate-200 dark:border-slate-700 space-y-2">
                             <p className="text-[11px] text-slate-500">
-                                Jujur soal jangkauan lever: dalam model, opsi mitigasi menurunkan EAL / revenue-at-risk —
-                                <span className="font-semibold"> tidak menurunkan composite score</span> (skor = atribut hazard negara:
-                                zona seismik, kelas banjir, dst.). Satu-satunya lever skor dalam model adalah pemilihan lokasi
+                                Honest about lever reach: in the model, mitigation options lower EAL / revenue-at-risk —
+                                <span className="font-semibold"> they do not lower the composite score</span> (score = country hazard attributes:
+                                seismic zone, flood class, etc.). The only score lever in the model is location selection
                                 {(() => {
                                     const safer = countryRiskData.filter(c => c.score < RISK_CAT_THRESHOLDS.high && c.code !== selectedCountry.id).slice(0, 3);
                                     return safer.length > 0
-                                        ? ` — ${safer.length}+ profil negara di bawah ambang High (<${RISK_CAT_THRESHOLDS.high}), mis. ${safer.map(c => `${c.country} (${c.score})`).join(', ')}.`
+                                        ? ` — ${safer.length}+ country profiles below the High threshold (<${RISK_CAT_THRESHOLDS.high}), e.g. ${safer.map(c => `${c.country} (${c.score})`).join(', ')}.`
                                         : '.';
                                 })()}
                             </p>
@@ -511,14 +511,14 @@ const DisasterRiskDashboard = () => {
                                     onClick={() => actions.setActiveTab('site')}
                                     className="text-xs px-2.5 py-1 rounded border border-cyan-500/40 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10 flex items-center gap-1"
                                 >
-                                    Site Intelligence — bandingkan lokasi <ArrowUpRight className="w-3 h-3" />
+                                    Site Intelligence — compare locations <ArrowUpRight className="w-3 h-3" />
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => document.getElementById('disaster-hazard-detail')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
                                     className="text-xs px-2.5 py-1 rounded border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-500/10 flex items-center gap-1"
                                 >
-                                    Detail per-hazard di radar <ArrowUpRight className="w-3 h-3" />
+                                    Per-hazard detail in the radar <ArrowUpRight className="w-3 h-3" />
                                 </button>
                             </div>
                         </div>

@@ -170,8 +170,8 @@ export function equipmentTable(i: CapInputs): { rows: ComponentRow[]; source: st
             const maxLoadKw = Math.floor(count * ratingKw * 0.8);
             const shedKw = Math.max(0, loadKw - maxLoadKw);
             remediation = status === 'At Risk'
-                ? `Utilisasi ${pct}% > 85%: tambah +${addUnits} unit (${count}→${needed}) untuk target ≤80%, ATAU turunkan beban ${(shedKw / 1000).toFixed(1)} MW (phase plan / IT load), ATAU naikkan rating unit di atas ${(ratingKw / 1000).toFixed(1)} MW.`
-                : `Utilisasi ${pct}% (Watch 70-85%): fase berikutnya akan melewati 85% — rencanakan +${Math.max(1, addUnits)} unit atau tahan pertumbuhan beban di ≤${(maxLoadKw / 1000).toFixed(1)} MW.`;
+                ? `Utilization ${pct}% > 85%: add +${addUnits} unit(s) (${count}→${needed}) to target ≤80%, OR shed ${(shedKw / 1000).toFixed(1)} MW of load (phase plan / IT load), OR raise the unit rating above ${(ratingKw / 1000).toFixed(1)} MW.`
+                : `Utilization ${pct}% (Watch 70-85%): the next phase will cross 85% — plan +${Math.max(1, addUnits)} unit(s) or hold load growth at ≤${(maxLoadKw / 1000).toFixed(1)} MW.`;
         }
         return { label, config: `${count}× ${(ratingKw / 1000).toFixed(1)} MW`, utilPct: pct, status, remediation };
     };

@@ -255,7 +255,7 @@ const PhasedFinancialDashboard = () => {
             `${goPhases === phaseResults.length ? 'All phases pass the GO threshold' : `${goPhases} of ${phaseResults.length} phases meet the hurdle`}. ` +
             `Interest during construction adds ${fmtMoney(totalIDC)} to the effective cost base over ${constructionMonths} months of build activity. ` +
             `The profitability index of ${pi.toFixed(2)}x indicates ${pi > 1.5 ? 'strong value creation' : pi > 1 ? 'positive but modest returns' : 'value destruction'}. ` +
-            `Penilaian: ${overallExplain.reason}${overallExplain.levers.length > 0 ? ` ${overallExplain.levers[0].detail}` : ''}`;
+            `Assessment: ${overallExplain.reason}${overallExplain.levers.length > 0 ? ` ${overallExplain.levers[0].detail}` : ''}`;
 
         return {
             capacityResult: capPlan,
@@ -361,7 +361,7 @@ const PhasedFinancialDashboard = () => {
                         <TraceValue traceId="pf.blendedIrr">
                             <div
                                 className={`text-2xl font-bold ${blendedIrr >= 12 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
-                                title={blendedIrr < 12 ? (overallExplain?.reason ?? 'IRR di bawah hurdle') + ' Klik untuk lihat lever per fase.' : undefined}
+                                title={blendedIrr < 12 ? (overallExplain?.reason ?? 'IRR below hurdle') + ' Click to see per-phase levers.' : undefined}
                                 onClick={blendedIrr < 12 ? (e) => { e.stopPropagation(); openWorstPhase(); } : undefined}
                             >
                                 {blendedIrr.toFixed(1)}%
@@ -379,7 +379,7 @@ const PhasedFinancialDashboard = () => {
                         <TraceValue traceId="pf.totalNpv">
                             <div
                                 className={`text-2xl font-bold ${blendedNpv >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
-                                title={blendedNpv < 0 ? `NPV negatif ${fmtMoney(blendedNpv)} pada discount rate yang dipakai. Klik untuk lihat alasan & lever fase terlemah.` : undefined}
+                                title={blendedNpv < 0 ? `NPV negative ${fmtMoney(blendedNpv)} at the discount rate used. Click to see the reason & levers of the weakest phase.` : undefined}
                                 onClick={blendedNpv < 0 ? (e) => { e.stopPropagation(); openWorstPhase(); } : undefined}
                             >
                                 {fmtMoney(blendedNpv)}
@@ -422,7 +422,7 @@ const PhasedFinancialDashboard = () => {
                         <TraceValue traceId="pf.pi">
                             <div
                                 className={`text-2xl font-bold ${profitabilityIndex >= 1 ? 'text-slate-900 dark:text-white' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
-                                title={profitabilityIndex < 1 ? `PI ${profitabilityIndex}x < 1.0 — PV manfaat lebih kecil dari investasi. Klik untuk lihat lever fase terlemah.` : undefined}
+                                title={profitabilityIndex < 1 ? `PI ${profitabilityIndex}x < 1.0 — PV of benefits is less than the investment. Click to see the levers of the weakest phase.` : undefined}
                                 onClick={profitabilityIndex < 1 ? (e) => { e.stopPropagation(); openWorstPhase(); } : undefined}
                             >
                                 {profitabilityIndex}x
@@ -446,7 +446,7 @@ const PhasedFinancialDashboard = () => {
                 <Card ref={decisionRef} className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 scroll-mt-4">
                     <CardContent className="pt-6">
                         <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Investment Decision Matrix (12% Hurdle)</h3>
-                        <p className="text-[11px] text-slate-400 mb-3">Klik baris untuk lihat alasan verdict &amp; lever kuantitatif — dihitung dengan bisection pada model cashflow yang sama.</p>
+                        <p className="text-[11px] text-slate-400 mb-3">Click a row to see the verdict reason &amp; quantified levers — computed by bisection on the same cashflow model.</p>
                         <div className="overflow-x-auto">
                             <table className="w-full text-xs">
                                 <thead>
@@ -494,7 +494,7 @@ const PhasedFinancialDashboard = () => {
                                                             {pf.explain.levers.length > 0 && (
                                                                 <div className="mt-2">
                                                                     <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">
-                                                                        {pf.goNoGo ? 'Margin keamanan' : 'Yang perlu diubah'}
+                                                                        {pf.goNoGo ? 'Safety margin' : 'What needs to change'}
                                                                     </div>
                                                                     <div className="space-y-1.5">
                                                                         {pf.explain.levers.map((lv, li) => (
@@ -502,7 +502,7 @@ const PhasedFinancialDashboard = () => {
                                                                                 key={li}
                                                                                 type="button"
                                                                                 onClick={(e) => { e.stopPropagation(); goToTab(lv.targetTab); }}
-                                                                                title={`Buka tab "${lv.targetTab}" untuk fine-tune parameter ini`}
+                                                                                title={`Open the "${lv.targetTab}" tab to fine-tune this parameter`}
                                                                                 className="w-full flex items-start gap-2 p-2 rounded-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition-colors text-left group"
                                                                             >
                                                                                 <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 whitespace-nowrap">{lv.label}</span>

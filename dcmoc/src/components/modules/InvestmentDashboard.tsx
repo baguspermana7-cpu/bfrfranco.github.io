@@ -181,18 +181,18 @@ const InvestmentDashboard = () => {
             threshold: 1.25,
             direction: 'atLeast',
             fmtValue: (v) => `${v.toFixed(2)}x`,
-            because: `debt service tahunan ${fmtMoney(result.annualDebtPayment)} vs EBITDA tahun terlemah ${fmtMoney(worstYearEbitda)} pada debt ratio ${drPct.toFixed(0)}% — covenant lender tipikal 1.25x`,
+            because: `annual debt service ${fmtMoney(result.annualDebtPayment)} vs weakest-year EBITDA ${fmtMoney(worstYearEbitda)} at debt ratio ${drPct.toFixed(0)}% — typical lender covenant 1.25x`,
             levers: [
                 {
                     lo: 0, hi: Math.max(0, inv.debtRatio - DR_FLOOR),
                     metricAt: (x) => runModel({ debtRatio: inv.debtRatio - x }).minDSCR,
                     render: (x, achieved) => ({
                         label: `Debt ratio → ${drAt(x).toFixed(0)}%`,
-                        detail: `Turunkan debt ratio ${drPct.toFixed(0)}% → ${drAt(x).toFixed(1)}% (debt ${fmtMoney(capexResults.total * (inv.debtRatio - x))} dari ${fmtMoney(result.totalDebt)}): Min DSCR jadi ${achieved.toFixed(2)}x ≥ 1.25x — bisection pada model investasi yang sama.`,
+                        detail: `Lower debt ratio ${drPct.toFixed(0)}% → ${drAt(x).toFixed(1)}% (debt ${fmtMoney(capexResults.total * (inv.debtRatio - x))} from ${fmtMoney(result.totalDebt)}): Min DSCR becomes ${achieved.toFixed(2)}x ≥ 1.25x — bisection on the same investment model.`,
                     }),
                     unreachable: (atHi) => ({
-                        label: 'Debt ratio saja tidak cukup',
-                        detail: `Bahkan debt ratio ${(DR_FLOOR * 100).toFixed(0)}% hanya memberi Min DSCR ${atHi.toFixed(2)}x < 1.25x — sisi pendapatan/OPEX yang mengikat, bukan leverage.`,
+                        label: 'Debt ratio alone is not enough',
+                        detail: `Even a ${(DR_FLOOR * 100).toFixed(0)}% debt ratio only gives Min DSCR ${atHi.toFixed(2)}x < 1.25x — the revenue/OPEX side is binding, not leverage.`,
                     }),
                     targetTab: 'invest', targetSelector: 'inv-param-debtRatio',
                 },
@@ -201,11 +201,11 @@ const InvestmentDashboard = () => {
                     metricAt: (m) => runModel({ revMult: m }).minDSCR,
                     render: (m, achieved) => ({
                         label: `Revenue +${((m - 1) * 100).toFixed(0)}%`,
-                        detail: `ATAU revenue naik +${((m - 1) * 100).toFixed(1)}% (ke ${fmtMoney(inv.revenuePerKwMonth * m)}/kW/bln dari ${fmtMoney(inv.revenuePerKwMonth)}): Min DSCR jadi ${achieved.toFixed(2)}x ≥ 1.25x.`,
+                        detail: `OR revenue rises +${((m - 1) * 100).toFixed(1)}% (to ${fmtMoney(inv.revenuePerKwMonth * m)}/kW/mo from ${fmtMoney(inv.revenuePerKwMonth)}): Min DSCR becomes ${achieved.toFixed(2)}x ≥ 1.25x.`,
                     }),
                     unreachable: (atHi) => ({
-                        label: 'Revenue +50% belum cukup',
-                        detail: `Bahkan revenue +50% hanya memberi Min DSCR ${atHi.toFixed(2)}x < 1.25x — struktur debt yang mengikat, turunkan leverage.`,
+                        label: 'Revenue +50% not yet enough',
+                        detail: `Even revenue +50% only gives Min DSCR ${atHi.toFixed(2)}x < 1.25x — the debt structure is binding, lower the leverage.`,
                     }),
                     targetTab: 'finance',
                 },
@@ -218,18 +218,18 @@ const InvestmentDashboard = () => {
             threshold: 15,
             direction: 'atLeast',
             fmtValue: (v) => fmtPct(v),
-            because: `levered FCF atas equity ${fmtMoney(result.totalEquity)} (${((1 - inv.debtRatio) * 100).toFixed(0)}% dari CAPEX ${fmtMoney(capexResults.total)}) + exit equity value ${fmtMoney(result.exitEquityValue)} pada ${inv.exitEbitdaMultiple}x EBITDA di tahun ${inv.exitYear} — target institusional 15%`,
+            because: `levered FCF on equity ${fmtMoney(result.totalEquity)} (${((1 - inv.debtRatio) * 100).toFixed(0)}% of CAPEX ${fmtMoney(capexResults.total)}) + exit equity value ${fmtMoney(result.exitEquityValue)} at ${inv.exitEbitdaMultiple}x EBITDA in year ${inv.exitYear} — institutional target 15%`,
             levers: [
                 {
                     lo: 1, hi: 1.5,
                     metricAt: (m) => runModel({ revMult: m }).equityIRR,
                     render: (m, achieved) => ({
                         label: `Revenue +${((m - 1) * 100).toFixed(0)}%`,
-                        detail: `Revenue perlu naik +${((m - 1) * 100).toFixed(1)}% (ke ${fmtMoney(inv.revenuePerKwMonth * m)}/kW/bln dari ${fmtMoney(inv.revenuePerKwMonth)}): Equity IRR jadi ${fmtPct(achieved)} ≥ 15% — bisection pada model yang sama.`,
+                        detail: `Revenue must rise +${((m - 1) * 100).toFixed(1)}% (to ${fmtMoney(inv.revenuePerKwMonth * m)}/kW/mo from ${fmtMoney(inv.revenuePerKwMonth)}): Equity IRR becomes ${fmtPct(achieved)} ≥ 15% — bisection on the same model.`,
                     }),
                     unreachable: (atHi) => ({
-                        label: 'Revenue +50% belum cukup',
-                        detail: `Bahkan revenue +50% hanya memberi Equity IRR ${fmtPct(atHi)} < 15% — struktur biaya (CAPEX ${fmtMoney(capexResults.total)} + OPEX ${fmtMoney(annualOpex)}/th) perlu ditinjau.`,
+                        label: 'Revenue +50% not yet enough',
+                        detail: `Even revenue +50% only gives Equity IRR ${fmtPct(atHi)} < 15% — the cost structure (CAPEX ${fmtMoney(capexResults.total)} + OPEX ${fmtMoney(annualOpex)}/yr) needs review.`,
                     }),
                     targetTab: 'finance',
                 },
@@ -238,11 +238,11 @@ const InvestmentDashboard = () => {
                     metricAt: (em) => runModel({ exitMultiple: em }).equityIRR,
                     render: (em, achieved) => ({
                         label: `Exit multiple → ${em.toFixed(1)}x`,
-                        detail: `ATAU exit EV/EBITDA ${inv.exitEbitdaMultiple}x → ${em.toFixed(1)}x (masih dalam range pasar DC 15-25x): Equity IRR jadi ${fmtPct(achieved)} ≥ 15%.`,
+                        detail: `OR exit EV/EBITDA ${inv.exitEbitdaMultiple}x → ${em.toFixed(1)}x (still within the DC market range 15-25x): Equity IRR becomes ${fmtPct(achieved)} ≥ 15%.`,
                     }),
                     unreachable: (atHi) => ({
-                        label: 'Exit multiple 25x belum cukup',
-                        detail: `Bahkan exit 25x hanya memberi Equity IRR ${fmtPct(atHi)} < 15% — masalahnya di cashflow operasional, bukan asumsi exit.`,
+                        label: 'Exit multiple 25x not yet enough',
+                        detail: `Even a 25x exit only gives Equity IRR ${fmtPct(atHi)} < 15% — the problem is in operating cashflow, not the exit assumption.`,
                     }),
                     targetTab: 'invest', targetSelector: 'inv-param-exitMultiple',
                 },
@@ -254,19 +254,19 @@ const InvestmentDashboard = () => {
             value: result.paybackYear,
             threshold: 7,
             direction: 'atMost',
-            fmtValue: (v) => `${v.toFixed(0)} th`,
-            because: `kumulatif levered FCF baru positif di tahun ${result.paybackYear} — Y1 levered FCF ${fmtMoney(result.leveredFCFTable[0]?.leveredFCF ?? 0)} akibat ramp okupansi + debt service ${fmtMoney(result.annualDebtPayment)}/th`,
+            fmtValue: (v) => `${v.toFixed(0)} yr`,
+            because: `cumulative levered FCF only turns positive in year ${result.paybackYear} — Y1 levered FCF ${fmtMoney(result.leveredFCFTable[0]?.leveredFCF ?? 0)} due to the occupancy ramp + debt service ${fmtMoney(result.annualDebtPayment)}/yr`,
             levers: [
                 {
                     lo: 1, hi: 1.5,
                     metricAt: (m) => runModel({ revMult: m }).paybackYear,
                     render: (m, achieved) => ({
                         label: `Revenue +${((m - 1) * 100).toFixed(0)}%`,
-                        detail: `Revenue naik +${((m - 1) * 100).toFixed(1)}% (ke ${fmtMoney(inv.revenuePerKwMonth * m)}/kW/bln) memangkas levered payback ke ${achieved.toFixed(0)} th ≤ 7 th — bisection pada model yang sama.`,
+                        detail: `Revenue up +${((m - 1) * 100).toFixed(1)}% (to ${fmtMoney(inv.revenuePerKwMonth * m)}/kW/mo) cuts levered payback to ${achieved.toFixed(0)} yr ≤ 7 yr — bisection on the same model.`,
                     }),
                     unreachable: (atHi) => ({
-                        label: 'Revenue +50% belum cukup',
-                        detail: `Bahkan revenue +50% masih payback ${atHi.toFixed(0)} th > 7 th — struktur biaya perlu ditinjau.`,
+                        label: 'Revenue +50% not yet enough',
+                        detail: `Even revenue +50% still has payback ${atHi.toFixed(0)} yr > 7 yr — the cost structure needs review.`,
                     }),
                     targetTab: 'finance',
                 },
@@ -275,11 +275,11 @@ const InvestmentDashboard = () => {
                     metricAt: (x) => runModel({ debtRatio: inv.debtRatio - x }).paybackYear,
                     render: (x, achieved) => ({
                         label: `Debt ratio → ${drAt(x).toFixed(0)}%`,
-                        detail: `ATAU turunkan debt ratio ${drPct.toFixed(0)}% → ${drAt(x).toFixed(1)}% (debt service lebih ringan): levered payback jadi ${achieved.toFixed(0)} th ≤ 7 th.`,
+                        detail: `OR lower debt ratio ${drPct.toFixed(0)}% → ${drAt(x).toFixed(1)}% (lighter debt service): levered payback becomes ${achieved.toFixed(0)} yr ≤ 7 yr.`,
                     }),
                     unreachable: (atHi) => ({
-                        label: 'Debt ratio saja tidak cukup',
-                        detail: `Bahkan debt ratio ${(DR_FLOOR * 100).toFixed(0)}% masih payback ${atHi.toFixed(0)} th > 7 th — pendapatan yang mengikat.`,
+                        label: 'Debt ratio alone is not enough',
+                        detail: `Even a ${(DR_FLOOR * 100).toFixed(0)}% debt ratio still has payback ${atHi.toFixed(0)} yr > 7 yr — revenue is binding.`,
                     }),
                     targetTab: 'invest', targetSelector: 'inv-param-debtRatio',
                 },
@@ -562,9 +562,9 @@ const InvestmentDashboard = () => {
                           * reasons + bisection-solved levers (click → parameter). */}
                         {explains && (
                             <>
-                                <ThresholdExplainPanel title="Min DSCR di bawah covenant 1.25x" ex={explains.dscr} />
-                                <ThresholdExplainPanel title="Equity IRR di bawah target 15%" ex={explains.irr} />
-                                <ThresholdExplainPanel title="Levered payback di atas 7 tahun" ex={explains.payback} />
+                                <ThresholdExplainPanel title="Min DSCR below the 1.25x covenant" ex={explains.dscr} />
+                                <ThresholdExplainPanel title="Equity IRR below the 15% target" ex={explains.irr} />
+                                <ThresholdExplainPanel title="Levered payback above 7 years" ex={explains.payback} />
                             </>
                         )}
 
@@ -905,9 +905,9 @@ const InvestmentDashboard = () => {
                           * measured levers as the Returns tab (self-hides when pass). */}
                         {explains && (
                             <>
-                                <ThresholdExplainPanel title="Min DSCR di bawah covenant 1.25x" ex={explains.dscr} />
-                                <ThresholdExplainPanel title="Equity IRR di bawah target 15%" ex={explains.irr} />
-                                <ThresholdExplainPanel title="Levered payback di atas 7 tahun" ex={explains.payback} />
+                                <ThresholdExplainPanel title="Min DSCR below the 1.25x covenant" ex={explains.dscr} />
+                                <ThresholdExplainPanel title="Equity IRR below the 15% target" ex={explains.irr} />
+                                <ThresholdExplainPanel title="Levered payback above 7 years" ex={explains.payback} />
                             </>
                         )}
                     </div>
@@ -1004,14 +1004,14 @@ function ThresholdExplainPanel({ title, ex }: { title: string; ex: ThresholdMetr
             <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{ex.reason}</p>
             {ex.levers.length > 0 && (
                 <div className="mt-2">
-                    <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">Yang perlu diubah — dihitung pada model yang sama</div>
+                    <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">What needs to change — computed on the same model</div>
                     <div className="space-y-1.5">
                         {ex.levers.map((lv, i) => (
                             <button
                                 key={i}
                                 type="button"
                                 onClick={() => goToLever(lv)}
-                                title={lv.targetSelector ? 'Klik untuk lompat ke parameter input' : `Buka tab "${lv.targetTab}" untuk fine-tune parameter ini`}
+                                title={lv.targetSelector ? 'Click to jump to the parameter input' : `Open the "${lv.targetTab}" tab to fine-tune this parameter`}
                                 className="w-full flex items-start gap-2 p-2 rounded-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition-colors text-left group"
                             >
                                 <span className={clsx('shrink-0 mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded text-white', lv.priority === 'HIGH' ? 'bg-red-600' : 'bg-amber-600')}>{lv.priority ?? 'MED'}</span>

@@ -371,7 +371,7 @@ export default function StrategicPlanningDashboard() {
             </div>
             {/* #335 — PURPOSE (owner bingung fungsinya): halaman OUTPUT analisis strategis. */}
             <p className="rounded-lg border border-violet-500/30 bg-violet-600/5 px-3 py-2 text-[11px] text-slate-600 dark:text-slate-300">
-                <b>Untuk apa halaman ini:</b> analisis strategis TURUNAN dari data project yang sudah kamu isi — (1) <b>Feasibility</b>: apakah lahan/grid/iklim site sanggup menampung target MW; (2) <b>Expansion</b>: kapan & berapa fase ekspansi berdasar pertumbuhan demand; (3) <b>Acquisition</b>: banding beli-vs-bangun dgn comparables pasar. Input yang sudah ada di menu lain TERKUNCI di sini (satu sumber) — edit di menu asalnya; hanya parameter analisis lokal (growth, horizon, comparables) yang diisi di sini.
+                <b>What this page is for:</b> strategic analysis DERIVED from the project data you've already entered — (1) <b>Feasibility</b>: whether the site's land/grid/climate can host the target MW; (2) <b>Expansion</b>: when & how many expansion phases based on demand growth; (3) <b>Acquisition</b>: buy-vs-build comparison against market comparables. Inputs that already exist in other menus are LOCKED here (single source) — edit them in their origin menu; only local analysis parameters (growth, horizon, comparables) are entered here.
             </p>
 
             {/* Mode Selector */}
@@ -418,7 +418,7 @@ export default function StrategicPlanningDashboard() {
                                 className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
                                 value={feasibility.landAreaM2}
                                 disabled={derivedFeas.landAreaM2 != null}
-                                title={derivedFeas.landAreaM2 != null ? 'Derived dari Site Intelligence — edit di sana (#335 dedup)' : undefined}
+                                title={derivedFeas.landAreaM2 != null ? 'Derived from Site Intelligence — edit it there (#335 dedup)' : undefined}
                                 onChange={e => setFeasibility(f => ({ ...f, landAreaM2: Number(e.target.value) }))}
                             />
                             <div className="text-[10px] text-slate-400 mt-0.5">Hall floor approx: {Math.round(feasibility.landAreaM2 * 0.40).toLocaleString()} m²</div>
@@ -434,7 +434,7 @@ export default function StrategicPlanningDashboard() {
                                 className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
                                 value={feasibility.gridCapacityMW}
                                 disabled={derivedFeas.gridCapacityMW != null}
-                                title={derivedFeas.gridCapacityMW != null ? 'Derived dari Site Intelligence — edit di sana (#335 dedup)' : undefined}
+                                title={derivedFeas.gridCapacityMW != null ? 'Derived from Site Intelligence — edit it there (#335 dedup)' : undefined}
                                 onChange={e => setFeasibility(f => ({ ...f, gridCapacityMW: Number(e.target.value) }))}
                             />
                         </div>
@@ -448,7 +448,7 @@ export default function StrategicPlanningDashboard() {
                                 className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
                                 value={feasibility.climateZone}
                                 disabled={derivedFeas.climateZone != null}
-                                title={derivedFeas.climateZone != null ? 'Derived dari negara/site — edit di sana (#335 dedup)' : undefined}
+                                title={derivedFeas.climateZone != null ? 'Derived from country/site — edit it there (#335 dedup)' : undefined}
                                 onChange={e => setFeasibility(f => ({ ...f, climateZone: e.target.value as FeasibilityInputs['climateZone'] }))}
                             >
                                 {(Object.keys(CLIMATE_LABELS) as FeasibilityInputs['climateZone'][]).map(z => (
@@ -480,7 +480,7 @@ export default function StrategicPlanningDashboard() {
                     <div className="space-y-4">
                         <button
                             onClick={() => setShowBottleneckPanel(v => !v)}
-                            title="Klik untuk detail constraint yang mengikat + lever terukur (formula feasibility halaman ini)"
+                            title="Click for the binding constraint detail + measured levers (this page's feasibility formula)"
                             className={clsx(
                                 'p-4 rounded-xl border w-full text-left cursor-pointer transition-colors',
                                 feasibilityResults.bottleneck === 'land'
@@ -492,7 +492,7 @@ export default function StrategicPlanningDashboard() {
                                 <span className="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
                                     Binding Constraint: {feasibilityResults.bottleneck === 'land' ? 'Land Area' : 'Grid Capacity'}
                                 </span>
-                                <span className="ml-auto text-[9px] font-semibold uppercase text-slate-400">{showBottleneckPanel ? '▲ tutup' : '▼ kenapa + lever'}</span>
+                                <span className="ml-auto text-[9px] font-semibold uppercase text-slate-400">{showBottleneckPanel ? '▲ close' : '▼ why + lever'}</span>
                             </div>
                             <p className="text-xs text-slate-600 dark:text-slate-400">
                                 {feasibilityResults.bottleneck === 'land'
@@ -512,8 +512,8 @@ export default function StrategicPlanningDashboard() {
                                 {/* Alasan — angka live dari model yang SAMA dengan render */}
                                 <p className="text-[11px] leading-relaxed text-slate-700 dark:text-slate-300">
                                     {bottleneckExplain.kind === 'grid'
-                                        ? <>Grid site <b>{feasibility.gridCapacityMW.toFixed(1)} MW</b> pada PUE efektif <b>{feasibilityResults.effectivePUE.toFixed(2)}</b> hanya mendukung <b>{feasibilityResults.gridConstrainedMW.toFixed(1)} MW IT</b>, sedangkan lahan ({Math.round(feasibilityResults.hallFloorM2).toLocaleString()} m² hall @ {IT_DENSITY_W_PER_M2} W/m²) mampu <b>{feasibilityResults.buildableITMW.toFixed(1)} MW</b> — <b>{feasibilityResults.lockedOutITMW.toFixed(1)} MW IT terkunci oleh grid</b>.</>
-                                        : <>Lahan <b>{feasibility.landAreaM2.toLocaleString()} m²</b> ({(feasibility.landAreaM2 / ACRE_M2).toFixed(1)} acres; hall {Math.round(feasibilityResults.hallFloorM2).toLocaleString()} m² @ {(HALL_FLOOR_FRACTION * 100).toFixed(0)}%, {IT_DENSITY_W_PER_M2} W/m²) hanya mendukung <b>{feasibilityResults.buildableITMW.toFixed(1)} MW IT</b>, sedangkan grid {feasibility.gridCapacityMW.toFixed(1)} MW @ PUE {feasibilityResults.effectivePUE.toFixed(2)} bisa <b>{feasibilityResults.gridConstrainedMW.toFixed(1)} MW</b> — <b>{feasibilityResults.lockedOutITMW.toFixed(1)} MW IT terkunci oleh lahan</b>.</>
+                                        ? <>The site grid <b>{feasibility.gridCapacityMW.toFixed(1)} MW</b> at effective PUE <b>{feasibilityResults.effectivePUE.toFixed(2)}</b> only supports <b>{feasibilityResults.gridConstrainedMW.toFixed(1)} MW IT</b>, whereas the land ({Math.round(feasibilityResults.hallFloorM2).toLocaleString()} m² hall @ {IT_DENSITY_W_PER_M2} W/m²) can host <b>{feasibilityResults.buildableITMW.toFixed(1)} MW</b> — <b>{feasibilityResults.lockedOutITMW.toFixed(1)} MW IT locked out by the grid</b>.</>
+                                        : <>The land <b>{feasibility.landAreaM2.toLocaleString()} m²</b> ({(feasibility.landAreaM2 / ACRE_M2).toFixed(1)} acres; hall {Math.round(feasibilityResults.hallFloorM2).toLocaleString()} m² @ {(HALL_FLOOR_FRACTION * 100).toFixed(0)}%, {IT_DENSITY_W_PER_M2} W/m²) only supports <b>{feasibilityResults.buildableITMW.toFixed(1)} MW IT</b>, whereas the grid {feasibility.gridCapacityMW.toFixed(1)} MW @ PUE {feasibilityResults.effectivePUE.toFixed(2)} could do <b>{feasibilityResults.gridConstrainedMW.toFixed(1)} MW</b> — <b>{feasibilityResults.lockedOutITMW.toFixed(1)} MW IT locked out by the land</b>.</>
                                     }
                                 </p>
                                 {/* Lever terukur — dihitung dari formula feasibility yang sama */}
@@ -522,29 +522,29 @@ export default function StrategicPlanningDashboard() {
                                         <>
                                             <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
                                                 <span className="shrink-0 rounded bg-emerald-600 px-1 py-0.5 text-[8px] font-bold text-white">LEVER</span>
-                                                <span><b>Tambah intake grid +{bottleneckExplain.deltaGridMW.toFixed(1)} MW</b> (≈ {bottleneckExplain.deltaGridMW.toFixed(1)} MVA pada PF≈1,0) → membuka +{feasibilityResults.lockedOutITMW.toFixed(1)} MW IT sampai lahan jadi binding. Marginal: setiap +1 MW intake ≈ +{bottleneckExplain.itPerGridMW.toFixed(2)} MW IT pada PUE {feasibilityResults.effectivePUE.toFixed(2)}.</span>
+                                                <span><b>Add grid intake +{bottleneckExplain.deltaGridMW.toFixed(1)} MW</b> (≈ {bottleneckExplain.deltaGridMW.toFixed(1)} MVA at PF≈1.0) → unlocks +{feasibilityResults.lockedOutITMW.toFixed(1)} MW IT until the land becomes binding. Marginal: every +1 MW intake ≈ +{bottleneckExplain.itPerGridMW.toFixed(2)} MW IT at PUE {feasibilityResults.effectivePUE.toFixed(2)}.</span>
                                             </div>
                                             {bottleneckExplain.pueUnlockMW > 0.05 ? (
                                                 <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
                                                     <span className="shrink-0 rounded bg-emerald-600 px-1 py-0.5 text-[8px] font-bold text-white">LEVER</span>
-                                                    <span><b>Perbaiki PUE efektif {feasibilityResults.effectivePUE.toFixed(2)} → {bottleneckExplain.bestEffPUE.toFixed(2)}</b> (target PUE {PUE_SLIDER_MIN.toFixed(2)} + penalti iklim, floor cooling-type dihormati) → +{bottleneckExplain.pueUnlockMW.toFixed(1)} MW IT pada grid yang sama, tanpa intake baru.</span>
+                                                    <span><b>Improve effective PUE {feasibilityResults.effectivePUE.toFixed(2)} → {bottleneckExplain.bestEffPUE.toFixed(2)}</b> (target PUE {PUE_SLIDER_MIN.toFixed(2)} + climate penalty, cooling-type floor respected) → +{bottleneckExplain.pueUnlockMW.toFixed(1)} MW IT on the same grid, without new intake.</span>
                                                 </div>
                                             ) : (
                                                 <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
                                                     <span className="shrink-0 rounded bg-slate-500 px-1 py-0.5 text-[8px] font-bold text-white">NOTE</span>
-                                                    <span>Lever PUE tidak tersedia: PUE efektif sudah di floor cooling-type ({feasibilityModelInput.basePUE.toFixed(2)}) — menurunkan target PUE di slider tidak menambah MW.</span>
+                                                    <span>PUE lever unavailable: effective PUE is already at the cooling-type floor ({feasibilityModelInput.basePUE.toFixed(2)}) — lowering the target PUE on the slider adds no MW.</span>
                                                 </div>
                                             )}
                                         </>
                                     ) : (
                                         <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
                                             <span className="shrink-0 rounded bg-emerald-600 px-1 py-0.5 text-[8px] font-bold text-white">LEVER</span>
-                                            <span><b>Tambah lahan +{bottleneckExplain.deltaAcres.toFixed(1)} acres</b> (+{Math.round(bottleneckExplain.deltaLandM2).toLocaleString()} m²) → membuka +{feasibilityResults.lockedOutITMW.toFixed(1)} MW IT sampai grid jadi binding. Marginal: setiap +1 acre ≈ +{bottleneckExplain.itPerAcre.toFixed(2)} MW IT ({(HALL_FLOOR_FRACTION * 100).toFixed(0)}% hall @ {IT_DENSITY_W_PER_M2} W/m²).</span>
+                                            <span><b>Add land +{bottleneckExplain.deltaAcres.toFixed(1)} acres</b> (+{Math.round(bottleneckExplain.deltaLandM2).toLocaleString()} m²) → unlocks +{feasibilityResults.lockedOutITMW.toFixed(1)} MW IT until the grid becomes binding. Marginal: every +1 acre ≈ +{bottleneckExplain.itPerAcre.toFixed(2)} MW IT ({(HALL_FLOOR_FRACTION * 100).toFixed(0)}% hall @ {IT_DENSITY_W_PER_M2} W/m²).</span>
                                         </div>
                                     )}
                                 </div>
                                 <div className="mt-2 flex items-center justify-between">
-                                    <p className="text-[9px] text-slate-400">Angka dari formula feasibility halaman ini (computeFeasibility) — bukan estimasi terpisah.</p>
+                                    <p className="text-[9px] text-slate-400">Figures from this page's feasibility formula (computeFeasibility) — not a separate estimate.</p>
                                     <button
                                         onClick={() => useSimulationStore.getState().actions.setActiveTab('site' as never)}
                                         className="shrink-0 rounded bg-cyan-500/10 px-2 py-1 text-[9px] font-semibold uppercase text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/20"
@@ -713,7 +713,7 @@ export default function StrategicPlanningDashboard() {
                                 type="number" min={0.5} step={0.5}
                                 className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
                                 value={expansion.currentFootprintMW}
-                                disabled title="≡ IT Load project (Requirements) — satu sumber, edit di sana (#335 dedup)"
+                                disabled title="≡ Project IT Load (Requirements) — single source, edit it there (#335 dedup)"
                                 onChange={e => setExpansion(x => ({ ...x, currentFootprintMW: Number(e.target.value) }))}
                             />
                         </div>
@@ -759,7 +759,7 @@ export default function StrategicPlanningDashboard() {
                                 type="number" step={100000}
                                 className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
                                 value={expansion.capexPerMW}
-                                disabled title="≡ CAPEX engine $/MW hasil — edit asumsi CAPEX (#335 dedup)"
+                                disabled title="≡ CAPEX engine $/MW result — edit CAPEX assumptions (#335 dedup)"
                                 onChange={e => setExpansion(x => ({ ...x, capexPerMW: Number(e.target.value) }))}
                             />
                         </div>

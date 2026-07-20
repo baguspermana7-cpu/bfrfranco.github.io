@@ -231,7 +231,7 @@ export default function ComplianceDashboard() {
                     {result.complianceScore < SCORE_GOOD ? (
                         <button
                             onClick={() => setShowScorePanel(v => !v)}
-                            title={`Skor ${result.complianceScore} di bawah ${result.complianceScore < SCORE_CRITICAL ? SCORE_CRITICAL : SCORE_GOOD}. Klik untuk breakdown formula + item mandatory yang belum tercakup + lever terukur.`}
+                            title={`Score ${result.complianceScore} below ${result.complianceScore < SCORE_CRITICAL ? SCORE_CRITICAL : SCORE_GOOD}. Click for the formula breakdown + uncovered mandatory items + measured levers.`}
                             className={clsx(
                                 "text-2xl font-bold cursor-pointer underline decoration-dotted underline-offset-4",
                                 result.complianceScore >= SCORE_CRITICAL ? "text-amber-500" : "text-red-500"
@@ -262,16 +262,16 @@ export default function ComplianceDashboard() {
                         <div className="flex items-start gap-2">
                             <AlertTriangle className={clsx("w-4 h-4 mt-0.5 shrink-0", result.complianceScore < SCORE_CRITICAL ? "text-red-500" : "text-amber-500")} />
                             <p className="text-xs text-slate-700 dark:text-slate-300">
-                                Skor <b>{diag.score}</b> &lt; {result.complianceScore < SCORE_CRITICAL ? SCORE_CRITICAL : SCORE_GOOD} karena
-                                coverage framework <b>{diag.count}/{SCORE_MAX_ITEMS}</b> item terdokumentasi
-                                (<b>{diag.coveragePts.toFixed(1)}</b> dari 60 pts) + mandatory-ratio <b>{diag.mandatoryCount}/{diag.count}</b>
-                                {' '}(<b>{diag.mandatoryPts.toFixed(1)}</b> dari 40 pts) — formula ComplianceEngine: coverage ×0.6 + mandatory-ratio ×40.
+                                Score <b>{diag.score}</b> &lt; {result.complianceScore < SCORE_CRITICAL ? SCORE_CRITICAL : SCORE_GOOD} because
+                                framework coverage is <b>{diag.count}/{SCORE_MAX_ITEMS}</b> documented items
+                                (<b>{diag.coveragePts.toFixed(1)}</b> of 60 pts) + mandatory-ratio <b>{diag.mandatoryCount}/{diag.count}</b>
+                                {' '}(<b>{diag.mandatoryPts.toFixed(1)}</b> of 40 pts) — ComplianceEngine formula: coverage ×0.6 + mandatory-ratio ×40.
                             </p>
                         </div>
 
                         {!diag.formulaVerified && (
                             <p className="text-[10px] text-red-600 dark:text-red-400">
-                                ⚠ Formula mirror tidak cocok dengan skor engine — angka lever di bawah bersifat indikatif (engine mungkin berubah).
+                                ⚠ The formula mirror does not match the engine score — the lever figures below are indicative (the engine may have changed).
                             </p>
                         )}
 
@@ -279,7 +279,7 @@ export default function ComplianceDashboard() {
                         {diag.categoryGaps.length > 0 && (
                             <div>
                                 <p className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                                    Kategori framework belum setara benchmark engine ({COUNTRIES[BENCHMARK_COUNTRY_ID]?.name ?? BENCHMARK_COUNTRY_ID}, framework terlengkap):
+                                    Framework categories not yet on par with the engine benchmark ({COUNTRIES[BENCHMARK_COUNTRY_ID]?.name ?? BENCHMARK_COUNTRY_ID}, the most complete framework):
                                 </p>
                                 <div className="flex flex-wrap gap-1.5 mb-2">
                                     {diag.categoryGaps.map(g => (
@@ -299,7 +299,7 @@ export default function ComplianceDashboard() {
                                     <table className="w-full text-[11px]">
                                         <thead>
                                             <tr className="text-slate-500">
-                                                <th className="text-left py-1 font-medium">Item mandatory belum tercakup</th>
+                                                <th className="text-left py-1 font-medium">Uncovered mandatory item</th>
                                                 <th className="text-left py-1 font-medium">Standard</th>
                                                 <th className="text-right py-1 font-medium">Initial</th>
                                                 <th className="text-right py-1 font-medium">Annual</th>
@@ -327,18 +327,18 @@ export default function ComplianceDashboard() {
                                 <div className="flex items-start gap-2 rounded-md bg-white/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 p-2.5">
                                     <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0 text-emerald-500" />
                                     <p className="text-xs text-slate-700 dark:text-slate-300">
-                                        <b>Lever:</b> melengkapi <b>{diag.missingMandatory.length} item mandatory</b> di atas menaikkan skor
-                                        {' '}<b>{diag.score} → {diag.projectedScore}</b> (dihitung dari formula yang sama:
+                                        <b>Lever:</b> completing the <b>{diag.missingMandatory.length} mandatory items</b> above raises the score
+                                        {' '}<b>{diag.score} → {diag.projectedScore}</b> (computed from the same formula:
                                         coverage {diag.count + diag.missingMandatory.length}/{SCORE_MAX_ITEMS} ×0.6 + mandatory-ratio
                                         {' '}{diag.mandatoryCount + diag.missingMandatory.length}/{diag.count + diag.missingMandatory.length} ×40).
-                                        Biaya total dari engine: <b>{fmtMoneyFull(diag.addInitialCost)}</b> initial + <b>{fmtMoneyFull(diag.addAnnualCost)}/yr</b>.
+                                        Total cost from the engine: <b>{fmtMoneyFull(diag.addInitialCost)}</b> initial + <b>{fmtMoneyFull(diag.addAnnualCost)}/yr</b>.
                                     </p>
                                 </div>
                             </>
                         ) : (
                             <p className="text-xs text-slate-600 dark:text-slate-400">
-                                Framework aktif sudah setara benchmark per kategori — sisa gap skor berasal dari konstanta coverage engine
-                                ({diag.count}/{SCORE_MAX_ITEMS} item) dan {diag.optionalCount} item Optional yang menahan mandatory-ratio.
+                                The active framework is already on par with the benchmark per category — the remaining score gap comes from the engine's coverage constant
+                                ({diag.count}/{SCORE_MAX_ITEMS} items) and the {diag.optionalCount} Optional items that hold down the mandatory-ratio.
                             </p>
                         )}
                     </div>

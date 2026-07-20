@@ -155,7 +155,7 @@ export function ConstructionEngine() {
                     { label: 'SPI', value: String(e.spi), sub: planMode ? 'baseline' : e.spi >= 1 ? 'on/ahead' : 'behind', trace: 'constr.spi', baselineChip: planMode },
                     { label: 'CPI', value: String(e.cpi), sub: planMode ? 'baseline' : e.cpi >= 1 ? 'under budget' : 'over budget', trace: 'constr.cpi', baselineChip: planMode },
                 ].map((k) => (
-                    <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}${(k as { baselineChip?: boolean }).baselineChip ? ' — Plan Mode: nilai baseline definisional, belum ada actuals' : ''}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                    <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}${(k as { baselineChip?: boolean }).baselineChip ? ' — Plan Mode: definitional baseline values, no actuals yet' : ''}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                         <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
                         {(k as { trace?: string }).trace ? (
                             <TraceValue traceId={(k as { trace?: string }).trace!}>
