@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.98.5 — 2026-07-20 (null-honesty 16 family + hardening 5 store tracking + smoke produksi)
+
+### Fixed
+- **Sweep null-honesty narasi (16 family)**: 3 klaim palsu lagi terbunuh — Operations "Healthy · 100% PM Compliance" saat belum ada log PM → "Plan Mode — belum ada tracking"; Site Intelligence "0/100 · Challenged" + false HIGH sebelum analisis → "Not Analyzed"; Financial NPV null → "Not Evaluated" (bukan "$0 · NPV negatif"). 13 family lain diverifikasi aman (metric selalu terhitung); jalur nilai-nyata byte-identical. Konsumen PDF + panel on-page ikut jujur.
+- **Hardening 5 store tracking** (sisa audit A 19-Jul): opsLog/cxTracking/financialTracking/constructionTracking/sustainability — payload localStorage versioned {version:1} + migrasi legacy transparan; quota-fail tidak lagi senyap (flag `persistFailed` non-persisted + warn dev sekali + auto-clear saat pulih); cap FIFO 500 pada semua array unbounded (alarms/incidents/tickets/issues/punch/revisions/initiatives); seed hygiene diverifikasi (seed hanya first-run, tidak pernah menimpa data user).
+
+### Verified
+- **Smoke produksi live** (resistancezero.com): manual hub tampil 33 manual · pill "Technical Manual ↗" live di kalkulator · dcmoc serve normal.
+- tsc/build · walk 24/0 · synergy 6/0 · trace-parity 117/117 · export 44/0.
+
 ## v1.98.4 — 2026-07-20 (follow-up sweep: theme sync manual/ + llms.txt + hygiene)
 
 ### Fixed

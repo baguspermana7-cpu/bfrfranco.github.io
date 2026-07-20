@@ -52,7 +52,16 @@ export function buildAssessment(family: ReportFamily, m: AssessMetrics): ReportA
             };
         }
         case 'financial': {
+            /* npv null (pro-forma belum dihitung / ROI engine belum load) ≠ $0 — narasi jujur plan-mode */
+            const hasNpv = typeof m['npv'] === 'number' && Number.isFinite(m['npv'] as number);
             const npv = num(m, 'npv'), irr = num(m, 'irrPct'), hurdle = num(m, 'hurdlePct', 10), payback = num(m, 'paybackYr');
+            if (!hasNpv) {
+                return {
+                    label: 'Not Evaluated', color: C.warn, valueLine: 'NPV / IRR — (belum dihitung)',
+                    narrative: `The screening pro-forma has not been computed yet — the ROI engine has no result for this configuration. ` +
+                        `NPV, IRR and payback appear once the engine evaluates the revenue and OPEX basis; no investment verdict is implied until then.`,
+                };
+            }
             const p: Profile = npv > 0 && irr >= hurdle + 5 ? { label: 'Strong Investment', color: C.good }
                 : npv > 0 && irr >= hurdle ? { label: 'Viable', color: C.ok }
                     : npv > 0 ? { label: 'Marginal', color: C.warn }
@@ -122,7 +131,17 @@ export function buildAssessment(family: ReportFamily, m: AssessMetrics): ReportA
             };
         }
         case 'operations': {
+            /* compliance null (belum ada PM tracking di log) ≠ 100% — narasi jujur plan-mode */
+            const hasCompliance = typeof m['maintCompliancePct'] === 'number' && Number.isFinite(m['maintCompliancePct'] as number);
             const compliance = num(m, 'maintCompliancePct', 100), health = num(m, 'avgHealthPct', 100), alarms = num(m, 'activeAlarms');
+            if (!hasCompliance) {
+                return {
+                    label: 'Plan Mode', color: C.warn, valueLine: `PM — (belum ada tracking) · ${alarms} alarm${alarms === 1 ? '' : 's'}`,
+                    narrative: `Maintenance compliance has no recorded tracking entries yet — the operations page is in plan mode. ` +
+                        `Average asset health stands at ${health.toFixed(0)}% with ${alarms} active alarm${alarms === 1 ? '' : 's'}. ` +
+                        `Log completed PM weeks in the operations log to begin measuring compliance against the maintenance schedule engine.`,
+                };
+            }
             const worst = Math.min(compliance, health);
             const p: Profile = worst >= 90 && alarms === 0 ? { label: 'Healthy', color: C.good }
                 : worst >= 80 ? { label: 'Stable', color: C.ok }
@@ -170,7 +189,16 @@ export function buildAssessment(family: ReportFamily, m: AssessMetrics): ReportA
             };
         }
         case 'site': {
+            /* score null/undefined (analisis multi-site belum dijalankan) ≠ 0/100 — narasi jujur */
+            const hasScore = typeof m['score'] === 'number' && Number.isFinite(m['score'] as number);
             const score = num(m, 'score');
+            if (!hasScore) {
+                return {
+                    label: 'Not Analyzed', color: C.warn, valueLine: 'score — (belum dianalisis)',
+                    narrative: `No site score has been computed for this candidate yet — run the multi-site analysis to score it across power cost, grid reliability, disaster exposure, tax regime, connectivity, water stress and climate factors. ` +
+                        `No siting verdict is implied until the analysis runs.`,
+                };
+            }
             const p: Profile = score >= 80 ? { label: 'Prime Site', color: C.good }
                 : score >= 65 ? { label: 'Strong', color: C.ok }
                     : score >= 50 ? { label: 'Workable', color: C.warn }
@@ -270,8 +298,11 @@ export function buildActions(family: ReportFamily, m: AssessMetrics): PillarActi
             break;
         }
         case 'financial': {
+            /* npv null (belum dihitung) must NOT read as negative — no false HIGH */
+            const hasNpv = typeof m['npv'] === 'number' && Number.isFinite(m['npv'] as number);
             const npv = num(m, 'npv'), irr = num(m, 'irrPct'), hurdle = num(m, 'hurdlePct', 10);
-            if (npv <= 0) add('HIGH', 'NPV is negative on current assumptions — revisit tariff basis, capex scope or phasing before commitment.');
+            if (!hasNpv) add('MEDIUM', 'The screening pro-forma has not been computed yet — evaluate NPV/IRR before drawing an investment conclusion.');
+            else if (npv <= 0) add('HIGH', 'NPV is negative on current assumptions — revisit tariff basis, capex scope or phasing before commitment.');
             else if (irr < hurdle) add('HIGH', 'IRR is below the hurdle rate — the project destroys value at the current cost of capital.');
             else if (irr < hurdle + 5) add('MEDIUM', 'IRR margin over the hurdle is thin — stress-test utilization ramp and opex escalation.');
             add('LOW', 'Refresh the pro-forma when CAPEX P80 or the staffing model changes — both feed this page single-source.');
@@ -336,8 +367,11 @@ export function buildActions(family: ReportFamily, m: AssessMetrics): PillarActi
             break;
         }
         case 'site': {
+            /* score null (analisis belum dijalankan) must NOT read as 0 — no false HIGH */
+            const hasScore = typeof m['score'] === 'number' && Number.isFinite(m['score'] as number);
             const score = num(m, 'score');
-            if (score < 50) add('HIGH', 'Site score below 50 — the leading risk factors are structural; compare candidates before committing.');
+            if (!hasScore) add('MEDIUM', 'Run the multi-site analysis to compute the site score — no siting verdict exists until it runs.');
+            else if (score < 50) add('HIGH', 'Site score below 50 — the leading risk factors are structural; compare candidates before committing.');
             if (str(m, 'keyRisk')) add('MEDIUM', `Mitigation plan needed for the leading risk: ${str(m, 'keyRisk')}.`);
             add('LOW', 'Enter site-specific attributes to replace country-default factors — the score sharpens with real data.');
             break;

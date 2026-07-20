@@ -13,6 +13,9 @@ export interface SustainabilityState {
     certs: CertEntry[];
     wasteDiversionPct: number | null;
     touched: boolean;
+    /** NON-persisted session flag: true once a localStorage write failed
+     *  (quota / private mode). UI may render a "not saved" chip off this. */
+    persistFailed: boolean;
     actions: {
         upsertInitiative: (i: Initiative) => void;
         setInitiativeProgress: (id: string, pct: number) => void;
@@ -23,6 +26,9 @@ export interface SustainabilityState {
 }
 
 const KEY = 'dcmoc_sustainability_v1';
+/* FIFO cap on initiatives/certs — upserts append at the tail, so slice(-CAP)
+ * trims the OLDEST entries once the cap is hit. */
+const CAP = 500;
 const SEED_INIT: Initiative[] = [
     { id: 's1', title: 'Solar PV expansion — phase 2', category: 'Energy', progressPct: 60, target: 'next FY', owner: 'Energy Team', status: 'On Track', isExample: true },
     { id: 's2', title: 'Chiller plant optimization program', category: 'Energy', progressPct: 80, target: 'Q4', owner: 'Ops', status: 'On Track', isExample: true },
@@ -35,23 +41,48 @@ const SEED_CERTS: CertEntry[] = [
     { id: 'c3', name: 'LEED (target per greenCert input)', status: 'In Progress', isExample: true },
 ];
 
-function load(): Partial<SustainabilityState> | null {
+/* Versioned payload (scenario.ts pattern): v1 = { version: 1, ...state }.
+ * Legacy v0 blobs were the bare state object (same field shape) — migrated
+ * transparently. persistFailed is session-local and never restored. */
+function load(): Partial<Omit<SustainabilityState, 'actions' | 'persistFailed'>> | null {
     if (typeof window === 'undefined') return null;
-    try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
+    try {
+        const raw = localStorage.getItem(KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (parsed == null || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+        const { version, persistFailed: _pf, ...state } = parsed;
+        if (version != null && version !== 1) return null; // unknown future schema → fall back to seed
+        return state;
+    } catch { return null; }
 }
 
 export const useSustainability = create<SustainabilityState>((set, get) => {
     const persisted = load();
     const commit = (p: Partial<SustainabilityState>) => {
         set({ ...p, touched: true });
-        try { const { actions: _a, ...rest } = get(); localStorage.setItem(KEY, JSON.stringify(rest)); } catch { /* */ }
+        try {
+            const { actions: _a, persistFailed: _pf, ...rest } = get();
+            localStorage.setItem(KEY, JSON.stringify({ version: 1, ...rest }));
+            if (get().persistFailed) set({ persistFailed: false }); // storage recovered
+        } catch (e) {
+            /* Quota / private-mode failure: non-fatal but NEVER silent — flag once
+             * so the UI can surface it; state keeps working in-memory. */
+            if (!get().persistFailed) {
+                set({ persistFailed: true });
+                if (process.env.NODE_ENV !== 'production') console.warn('[sustainability] localStorage persist failed — changes are in-memory only', e);
+            }
+        }
     };
+    /* SEED hygiene: example initiatives/certs apply ONLY when no persisted
+     * payload exists (first run) — any persisted key wins over the seeds below,
+     * so seeds never overwrite user data on rehydrate. */
     return {
-        initiatives: SEED_INIT, certs: SEED_CERTS, wasteDiversionPct: null, touched: false, ...(persisted ?? {}),
+        initiatives: SEED_INIT, certs: SEED_CERTS, wasteDiversionPct: null, touched: false, ...(persisted ?? {}), persistFailed: false,
         actions: {
-            upsertInitiative: (i) => commit({ initiatives: [...get().initiatives.filter((x) => x.id !== i.id), { ...i, isExample: undefined }] }),
+            upsertInitiative: (i) => commit({ initiatives: [...get().initiatives.filter((x) => x.id !== i.id), { ...i, isExample: undefined }].slice(-CAP) }),
             setInitiativeProgress: (id, pct) => commit({ initiatives: get().initiatives.map((x) => x.id === id ? { ...x, progressPct: Math.min(100, Math.max(0, pct)), isExample: undefined } : x) }),
-            upsertCert: (c) => commit({ certs: [...get().certs.filter((x) => x.id !== c.id), { ...c, isExample: undefined }] }),
+            upsertCert: (c) => commit({ certs: [...get().certs.filter((x) => x.id !== c.id), { ...c, isExample: undefined }].slice(-CAP) }),
             set: (p) => commit(p),
             reset: () => { set({ initiatives: SEED_INIT, certs: SEED_CERTS, wasteDiversionPct: null, touched: false }); try { localStorage.removeItem(KEY); } catch { /* */ } },
         },

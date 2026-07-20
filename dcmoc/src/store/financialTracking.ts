@@ -18,6 +18,9 @@ export interface FinancialTrackingState {
     invoices: InvoiceEntry[];
     revisions: BudgetRevision[];
     touched: boolean;
+    /** NON-persisted session flag: true once a localStorage write failed
+     *  (quota / private mode). UI may render a "not saved" chip off this. */
+    persistFailed: boolean;
     actions: {
         addTxn: (t: Omit<FinancialTxn, 'id'>) => void;
         setTxnStatus: (id: string, status: TxnStatus) => void;
@@ -30,6 +33,11 @@ export interface FinancialTrackingState {
 }
 
 const KEY = 'dcmoc_financial_tracking_v1';
+/* FIFO caps — entries are prepended (newest first), so slice(0, cap) trims the
+ * OLDEST entries once the cap is hit. Keeps payload well under localStorage quota. */
+const TXN_CAP = 500;
+const INV_CAP = 200;
+const REV_CAP = 200;
 let idc = 1;
 const nid = () => `fx_${Date.now()}_${idc++}`;
 
@@ -52,25 +60,50 @@ const SEED: Pick<FinancialTrackingState, 'transactions' | 'invoices' | 'revision
     ],
 };
 
-function load(): Partial<FinancialTrackingState> | null {
+/* Versioned payload (scenario.ts pattern): v1 = { version: 1, ...state }.
+ * Legacy v0 blobs were the bare state object (same field shape) — migrated
+ * transparently. persistFailed is session-local and never restored. */
+function load(): Partial<Omit<FinancialTrackingState, 'actions' | 'persistFailed'>> | null {
     if (typeof window === 'undefined') return null;
-    try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
+    try {
+        const raw = localStorage.getItem(KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (parsed == null || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+        const { version, persistFailed: _pf, ...state } = parsed;
+        if (version != null && version !== 1) return null; // unknown future schema → fall back to seed
+        return state;
+    } catch { return null; }
 }
 
 export const useFinancialTracking = create<FinancialTrackingState>((set, get) => {
     const persisted = load();
     const commit = (p: Partial<FinancialTrackingState>) => {
         set({ ...p, touched: true });
-        try { const { actions: _a, ...rest } = get(); localStorage.setItem(KEY, JSON.stringify(rest)); } catch { /* */ }
+        try {
+            const { actions: _a, persistFailed: _pf, ...rest } = get();
+            localStorage.setItem(KEY, JSON.stringify({ version: 1, ...rest }));
+            if (get().persistFailed) set({ persistFailed: false }); // storage recovered
+        } catch (e) {
+            /* Quota / private-mode failure: non-fatal but NEVER silent — flag once
+             * so the UI can surface it; state keeps working in-memory. */
+            if (!get().persistFailed) {
+                set({ persistFailed: true });
+                if (process.env.NODE_ENV !== 'production') console.warn('[financialTracking] localStorage persist failed — changes are in-memory only', e);
+            }
+        }
     };
+    /* SEED hygiene: example ledger applies ONLY when no persisted payload exists
+     * (first run) — any persisted key wins over SEED below, so seeds never
+     * overwrite user data on rehydrate. */
     return {
-        ...SEED, touched: false, ...(persisted ?? {}),
+        ...SEED, touched: false, ...(persisted ?? {}), persistFailed: false,
         actions: {
-            addTxn: (t) => commit({ transactions: [{ ...t, id: nid() }, ...get().transactions].slice(0, 300) }),
+            addTxn: (t) => commit({ transactions: [{ ...t, id: nid() }, ...get().transactions].slice(0, TXN_CAP) }),
             setTxnStatus: (id, status) => commit({ transactions: get().transactions.map((x) => x.id === id ? { ...x, status, isExample: undefined } : x) }),
-            addInvoice: (i) => commit({ invoices: [{ ...i, id: nid() }, ...get().invoices].slice(0, 200) }),
+            addInvoice: (i) => commit({ invoices: [{ ...i, id: nid() }, ...get().invoices].slice(0, INV_CAP) }),
             setInvoiceStatus: (id, status) => commit({ invoices: get().invoices.map((x) => x.id === id ? { ...x, status, isExample: undefined } : x) }),
-            addRevision: (r) => commit({ revisions: [{ ...r, id: nid() }, ...get().revisions] }),
+            addRevision: (r) => commit({ revisions: [{ ...r, id: nid() }, ...get().revisions].slice(0, REV_CAP) }),
             toggleRevision: (id) => commit({ revisions: get().revisions.map((x) => x.id === id ? { ...x, approved: !x.approved, isExample: undefined } : x) }),
             reset: () => { set({ ...SEED, touched: false }); try { localStorage.removeItem(KEY); } catch { /* */ } },
         },

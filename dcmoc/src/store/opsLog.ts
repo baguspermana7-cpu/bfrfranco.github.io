@@ -17,6 +17,9 @@ export interface OpsLogState {
     tickets: OpsTicket[];
     completedPmWeeks: number[];
     touched: boolean;
+    /** NON-persisted session flag: true once a localStorage write failed
+     *  (quota / private mode). UI may render a "not saved" chip off this. */
+    persistFailed: boolean;
     actions: {
         addAlarm: (a: Omit<OpsAlarm, 'id'>) => void;
         setAlarmStatus: (id: string, status: OpsAlarm['status']) => void;
@@ -30,6 +33,10 @@ export interface OpsLogState {
 }
 
 const KEY = 'dcmoc_ops_log_v1';
+/* FIFO cap per log list — entries are prepended (newest first), so slice(0, CAP)
+ * trims the OLDEST entries once the cap is hit. Keeps the payload well under
+ * localStorage quota. */
+const CAP = 500;
 let idc = 1;
 const nid = () => `op_${Date.now()}_${idc++}`;
 
@@ -49,9 +56,20 @@ const SEED: Pick<OpsLogState, 'alarms' | 'incidents' | 'tickets'> = {
     ],
 };
 
-function load(): Partial<OpsLogState> | null {
+/* Versioned payload (scenario.ts pattern): v1 = { version: 1, ...state }.
+ * Legacy v0 blobs were the bare state object (same field shape) — migrated
+ * transparently. persistFailed is session-local and never restored. */
+function load(): Partial<Omit<OpsLogState, 'actions' | 'persistFailed'>> | null {
     if (typeof window === 'undefined') return null;
-    try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
+    try {
+        const raw = localStorage.getItem(KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (parsed == null || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+        const { version, persistFailed: _pf, ...state } = parsed;
+        if (version != null && version !== 1) return null; // unknown future schema → fall back to seed
+        return state;
+    } catch { return null; }
 }
 
 export const useOpsLog = create<OpsLogState>((set, get) => {
@@ -59,18 +77,29 @@ export const useOpsLog = create<OpsLogState>((set, get) => {
     const commit = (p: Partial<OpsLogState>) => {
         set({ ...p, touched: true });
         try {
-            const { actions: _a, ...rest } = get();
-            localStorage.setItem(KEY, JSON.stringify(rest));
-        } catch { /* */ }
+            const { actions: _a, persistFailed: _pf, ...rest } = get();
+            localStorage.setItem(KEY, JSON.stringify({ version: 1, ...rest }));
+            if (get().persistFailed) set({ persistFailed: false }); // storage recovered
+        } catch (e) {
+            /* Quota / private-mode failure: non-fatal but NEVER silent — flag once
+             * so the UI can surface it; state keeps working in-memory. */
+            if (!get().persistFailed) {
+                set({ persistFailed: true });
+                if (process.env.NODE_ENV !== 'production') console.warn('[opsLog] localStorage persist failed — changes are in-memory only', e);
+            }
+        }
     };
+    /* SEED hygiene: examples apply ONLY when no persisted payload exists (first
+     * run) — any persisted key wins over SEED below, so seeds never overwrite
+     * user data on rehydrate. */
     return {
-        ...SEED, completedPmWeeks: [], touched: false, ...(persisted ?? {}),
+        ...SEED, completedPmWeeks: [], touched: false, ...(persisted ?? {}), persistFailed: false,
         actions: {
-            addAlarm: (a) => commit({ alarms: [{ ...a, id: nid() }, ...get().alarms] }),
+            addAlarm: (a) => commit({ alarms: [{ ...a, id: nid() }, ...get().alarms].slice(0, CAP) }),
             setAlarmStatus: (id, status) => commit({ alarms: get().alarms.map((x) => x.id === id ? { ...x, status, isExample: undefined } : x) }),
-            addIncident: (i) => commit({ incidents: [{ ...i, id: nid() }, ...get().incidents] }),
+            addIncident: (i) => commit({ incidents: [{ ...i, id: nid() }, ...get().incidents].slice(0, CAP) }),
             setIncidentStatus: (id, status) => commit({ incidents: get().incidents.map((x) => x.id === id ? { ...x, status, isExample: undefined } : x) }),
-            addTicket: (tk) => commit({ tickets: [{ ...tk, id: nid() }, ...get().tickets] }),
+            addTicket: (tk) => commit({ tickets: [{ ...tk, id: nid() }, ...get().tickets].slice(0, CAP) }),
             setTicketStatus: (id, status) => commit({ tickets: get().tickets.map((x) => x.id === id ? { ...x, status, isExample: undefined } : x) }),
             togglePmWeek: (week) => {
                 const cur = get().completedPmWeeks;

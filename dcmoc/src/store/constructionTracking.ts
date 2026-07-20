@@ -20,6 +20,9 @@ export interface ConstructionTrackingState {
     qaqc: { inspections: number | null; openPunch: number | null; ftrPct: number | null; passRatePct: number | null; manHours: number | null; trir: number | null; daysSinceLti: number | null };
     risks: TrackedRisk[];
     issues: TrackedIssue[];
+    /** NON-persisted session flag: true once a localStorage write failed
+     *  (quota / private mode). UI may render a "not saved" chip off this. */
+    persistFailed: boolean;
     actions: {
         set: (p: Partial<Omit<ConstructionTrackingState, 'actions'>>) => void;
         setPhasePct: (key: string, pct: number | null) => void;
@@ -32,6 +35,9 @@ export interface ConstructionTrackingState {
 }
 
 const KEY = 'dcmoc_construction_tracking_v1';
+/* FIFO cap on risks/issues — upserts append at the tail, so slice(-CAP) trims
+ * the OLDEST entries once the cap is hit. */
+const CAP = 500;
 
 const SEED_RISKS: TrackedRisk[] = [
     { id: 'r1', risk: 'Chiller delivery delay', impact: 'high', probability: 'medium', status: 'open', isExample: true },
@@ -47,32 +53,58 @@ const DEFAULTS: Omit<ConstructionTrackingState, 'actions'> = {
     statusMonth: null, phaseActualPct: {}, acSpentUsd: null, manpowerOnSite: null,
     peakManpowerPlanned: 800,
     qaqc: { inspections: null, openPunch: null, ftrPct: null, passRatePct: null, manHours: null, trir: null, daysSinceLti: null },
-    risks: SEED_RISKS, issues: SEED_ISSUES,
+    risks: SEED_RISKS, issues: SEED_ISSUES, persistFailed: false,
 };
 
-function load(): Partial<Omit<ConstructionTrackingState, 'actions'>> | null {
+/* Versioned payload (scenario.ts pattern): v1 = { version: 1, ...state }.
+ * Legacy v0 blobs were the bare state object (same field shape) — migrated
+ * transparently. persistFailed is session-local and never restored. */
+function load(): Partial<Omit<ConstructionTrackingState, 'actions' | 'persistFailed'>> | null {
     if (typeof window === 'undefined') return null;
-    try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
-}
-function save(s: ConstructionTrackingState): void {
-    if (typeof window === 'undefined') return;
     try {
-        const { actions: _a, ...rest } = s;
-        localStorage.setItem(KEY, JSON.stringify(rest));
-    } catch { /* quota */ }
+        const raw = localStorage.getItem(KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (parsed == null || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+        const { version, persistFailed: _pf, ...state } = parsed;
+        if (version != null && version !== 1) return null; // unknown future schema → fall back to seed
+        return state;
+    } catch { return null; }
+}
+/** @returns false when the write failed (quota / private mode) — caller flags it. */
+function save(s: ConstructionTrackingState): boolean {
+    if (typeof window === 'undefined') return true;
+    try {
+        const { actions: _a, persistFailed: _pf, ...rest } = s;
+        localStorage.setItem(KEY, JSON.stringify({ version: 1, ...rest }));
+        return true;
+    } catch { return false; }
 }
 
 export const useConstructionTracking = create<ConstructionTrackingState>((set, get) => {
     const persisted = load();
-    const commit = (p: Partial<Omit<ConstructionTrackingState, 'actions'>>) => { set(p); save(get()); };
+    const commit = (p: Partial<Omit<ConstructionTrackingState, 'actions'>>) => {
+        set(p);
+        if (save(get())) {
+            if (get().persistFailed) set({ persistFailed: false }); // storage recovered
+        } else if (!get().persistFailed) {
+            /* Quota / private-mode failure: non-fatal but NEVER silent — flag once
+             * so the UI can surface it; state keeps working in-memory. */
+            set({ persistFailed: true });
+            if (process.env.NODE_ENV !== 'production') console.warn('[constructionTracking] localStorage persist failed — changes are in-memory only');
+        }
+    };
+    /* SEED hygiene: example risks/issues apply ONLY when no persisted payload
+     * exists (first run) — any persisted key wins over DEFAULTS below, so seeds
+     * never overwrite user data on rehydrate. */
     return {
-        ...DEFAULTS, ...(persisted ?? {}),
+        ...DEFAULTS, ...(persisted ?? {}), persistFailed: false,
         actions: {
             set: (p) => commit(p),
             setPhasePct: (key, pct) => commit({ phaseActualPct: { ...get().phaseActualPct, [key]: pct == null ? null : Math.min(100, Math.max(0, pct)) } }),
-            upsertRisk: (r) => commit({ risks: [...get().risks.filter((x) => x.id !== r.id), { ...r, isExample: undefined }] }),
+            upsertRisk: (r) => commit({ risks: [...get().risks.filter((x) => x.id !== r.id), { ...r, isExample: undefined }].slice(-CAP) }),
             removeRisk: (id) => commit({ risks: get().risks.filter((x) => x.id !== id) }),
-            upsertIssue: (i) => commit({ issues: [...get().issues.filter((x) => x.id !== i.id), { ...i, isExample: undefined }] }),
+            upsertIssue: (i) => commit({ issues: [...get().issues.filter((x) => x.id !== i.id), { ...i, isExample: undefined }].slice(-CAP) }),
             removeIssue: (id) => commit({ issues: get().issues.filter((x) => x.id !== id) }),
             reset: () => commit({ ...DEFAULTS }),
         },
