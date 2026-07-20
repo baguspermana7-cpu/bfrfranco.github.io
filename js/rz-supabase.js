@@ -140,6 +140,76 @@ const api = {
     return { error: friendly(error) };
   },
 
+  /* ── DCMOC cloud projects (Arc-4, 2026-07-20). localStorage stays PRIMARY in
+   *    the DCMOC app; cloud = optional logged-in backup. bundle cap 256 KB DB-side
+   *    (client pre-guards at 240 KB). Share = client-generated 32-byte base64url
+   *    token; anon read ONLY via the get_shared_project() RPC (no table SELECT). ── */
+  async saveDcmocProject(id, name, bundle) {
+    if (!client) return { error: initError };
+    const user = await this.getUser();
+    if (!user) return { error: 'Silakan login dulu untuk menyimpan ke cloud.' };
+    if (id) {
+      const { data, error } = await client.from('dcmoc_projects')
+        .update({ name, bundle }).eq('id', id).eq('user_id', user.id)
+        .select('id, updated_at').single();
+      return { data, error: friendly(error) };
+    }
+    const { data, error } = await client.from('dcmoc_projects')
+      .insert({ user_id: user.id, name, bundle }).select('id, updated_at').single();
+    return { data, error: friendly(error) };
+  },
+  async listDcmocProjects() {
+    if (!client) return { data: [], error: initError };
+    const user = await this.getUser();
+    if (!user) return { data: [], error: 'not signed in' };
+    // no `bundle` column here — list stays light (bundle can be ~200 KB/row)
+    const { data, error } = await client.from('dcmoc_projects')
+      .select('id, name, version, share_token, created_at, updated_at')
+      .eq('user_id', user.id).order('updated_at', { ascending: false });
+    return { data: data || [], error: friendly(error) };
+  },
+  async getDcmocProject(id) {
+    if (!client) return { error: initError };
+    const user = await this.getUser();
+    if (!user) return { error: 'not signed in' };
+    const { data, error } = await client.from('dcmoc_projects')
+      .select('*').eq('id', id).eq('user_id', user.id).single();
+    return { data, error: friendly(error) };
+  },
+  async deleteDcmocProject(id) {
+    if (!client) return { error: initError };
+    const user = await this.getUser();
+    if (!user) return { error: 'not signed in' };
+    const { error } = await client.from('dcmoc_projects').delete().eq('id', id).eq('user_id', user.id);
+    return { error: friendly(error) };
+  },
+  async shareDcmocProject(id) {
+    if (!client) return { error: initError };
+    const user = await this.getUser();
+    if (!user) return { error: 'not signed in' };
+    const bytes = new Uint8Array(32);
+    crypto.getRandomValues(bytes);
+    const token = btoa(String.fromCharCode.apply(null, bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const { data, error } = await client.from('dcmoc_projects')
+      .update({ share_token: token, shared_at: new Date().toISOString() })
+      .eq('id', id).eq('user_id', user.id).select('id, share_token').single();
+    return { data, error: friendly(error) };
+  },
+  async unshareDcmocProject(id) {
+    if (!client) return { error: initError };
+    const user = await this.getUser();
+    if (!user) return { error: 'not signed in' };
+    const { error } = await client.from('dcmoc_projects')
+      .update({ share_token: null, shared_at: null }).eq('id', id).eq('user_id', user.id);
+    return { error: friendly(error) };
+  },
+  async getSharedProject(token) {
+    if (!client) return { error: initError };
+    // anon-callable by design — no auth guard (share links work logged-out)
+    const { data, error } = await client.rpc('get_shared_project', { p_token: token });
+    return { data, error: friendly(error) };
+  },
+
   /* ── Admin (root-only). Security is enforced ENTIRELY by RLS in the database
    *    (the `is_root()` policies) — these helpers just call the API. A non-root
    *    caller gets an empty result (read) or 0 rows updated (write); no service_role

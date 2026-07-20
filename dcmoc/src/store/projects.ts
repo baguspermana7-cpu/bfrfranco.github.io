@@ -45,6 +45,10 @@ export interface ProjectBundle {
 export interface ProjectsState {
     projects: ProjectBundle[];
     activeProjectId: string | null;
+    /** Share-view guard (Arc-4) — TRUE while a shared read-only copy is loaded.
+     *  NOT persisted (session-only); all mutating actions early-return while set. */
+    readOnly: boolean;
+    setReadOnly: (v: boolean) => void;
     saveCurrentAs: (name: string) => void;
     updateActive: () => void;
     openProject: (id: string) => void;
@@ -68,7 +72,10 @@ function save(s: Pick<ProjectsState, 'projects' | 'activeProjectId'>): void {
     try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* quota — drop oldest */ }
 }
 
-function takeSnapshot(): ProjectBundle['snapshot'] {
+/** Full store-family snapshot — exported (Arc-4) so the cloud/share layer
+ *  (lib/cloudProjects.ts, Shell ?share= viewer) reuses the ONE canonical
+ *  snapshot path instead of inventing its own. */
+export function takeSnapshot(): ProjectBundle['snapshot'] {
     const strip = (o: any) => { const { actions: _a, ...rest } = o ?? {}; return JSON.parse(JSON.stringify(rest)); };
     return {
         simInputs: JSON.parse(JSON.stringify(useSimulationStore.getState().inputs)),
@@ -84,8 +91,9 @@ function takeSnapshot(): ProjectBundle['snapshot'] {
     };
 }
 
-/** Ordered restore — each store's own setters/sanitizers do the clamping. */
-function restoreSnapshot(s: ProjectBundle['snapshot']): void {
+/** Ordered restore — each store's own setters/sanitizers do the clamping.
+ *  Exported (Arc-4): the canonical restore path for cloud loads + share views. */
+export function restoreSnapshot(s: ProjectBundle['snapshot']): void {
     try {
         // 1) sim (canonical shared inputs)
         if (s.simInputs) useSimulationStore.getState().actions.setInputs(s.simInputs);
@@ -123,7 +131,10 @@ export const useProjectsStore = create<ProjectsState>((set, get) => {
     return {
         projects: persisted?.projects ?? [],
         activeProjectId: persisted?.activeProjectId ?? null,
+        readOnly: false,
+        setReadOnly: (v) => set({ readOnly: v }),
         saveCurrentAs: (name) => {
+            if (get().readOnly) return; // share-view guard
             const sim = useSimulationStore.getState();
             const now = Date.now();
             const proj: ProjectBundle = {
@@ -137,6 +148,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => {
             commit({ projects: [proj, ...get().projects].slice(0, MAX), activeProjectId: proj.id });
         },
         updateActive: () => {
+            if (get().readOnly) return; // share-view guard
             const id = get().activeProjectId;
             if (!id) return;
             const sim = useSimulationStore.getState();
@@ -147,12 +159,14 @@ export const useProjectsStore = create<ProjectsState>((set, get) => {
             });
         },
         openProject: (id) => {
+            if (get().readOnly) return; // share-view guard
             const p = get().projects.find((x) => x.id === id);
             if (!p || p.version !== 1) return;
             restoreSnapshot(p.snapshot);
             commit({ activeProjectId: id });
         },
         deleteProject: (id) => {
+            if (get().readOnly) return; // share-view guard
             commit({ projects: get().projects.filter((x) => x.id !== id), activeProjectId: get().activeProjectId === id ? null : get().activeProjectId });
         },
     };

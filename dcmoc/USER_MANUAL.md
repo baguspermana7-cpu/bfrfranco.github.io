@@ -371,3 +371,12 @@ engine-sourced & parity-verified; 22/22 kalkulator artikel engine-bound; 26
 namespace engine dikonsumsi DCMOC + 19 site + 4 utility = 49 total; semua gate
 hijau (engine 599/0 · corpus 2451/0 · parity 155/0 · bindings 73/0 ·
 trace-parity 117/117 · walk 24/0 · synergy 6/0 · export 44/0).*
+
+
+## §16 — Cloud Projects & Share Link (Arc-4, 2026-07-20)
+- **Simpan ke cloud (opsional)**: Projects → kartu project → "☁ Simpan ke cloud" (butuh login). localStorage TETAP penyimpanan utama; cloud = cadangan/multi-device, tanpa sinkron otomatis. Cap 20 project/akun, 240 KB/project (log tracking besar bisa perlu dikurangi).
+- **Share view-only**: project cloud → Share → salin URL `?share=TOKEN`. Siapa pun dengan link MELIHAT salinan (bukan live, bukan edit) tanpa login; banner "Mode lihat-saja" + tombol keluar mengembalikan data viewer utuh (backup otomatis sebelum melihat). "Cabut share" mematikan link seketika.
+- **Aktivasi**: fitur menyala setelah owner menjalankan SQL Module 9 (Owner Action Board di setup-supabase) — sebelum itu UI menampilkan pesan jujur.
+
+## §17 — Diagnostics guidance (semua yang merah bisa diklik)
+Setiap indikator merah/grade jelek kini klik-able → panel "kenapa" (angka live) + lever terukur (dihitung, dgn catatan jujur bila target tak tercapai) + navigasi ke parameter. Cakupan & aturan: standarization/DIAGNOSTICS_STANDARD.md.

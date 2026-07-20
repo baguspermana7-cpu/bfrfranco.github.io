@@ -18,7 +18,7 @@ interface AuthState {
 // + real Supabase password check. Never embed a password in the client bundle.
 const ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
 
-interface RzSupa {
+export interface RzSupa {
     ready?: Promise<unknown>;
     signIn: (email: string, password: string) => Promise<{ error?: unknown } | null>;
 }
@@ -63,6 +63,14 @@ function ensureSupa(): Promise<RzSupa | null> {
         });
     }
     return supaPromise;
+}
+
+/** Shared lazy loader for the sitewide Supabase client (window.rzSupa).
+ *  Exported so lib/cloudProjects.ts reuses the exact same script-injection
+ *  path as login — one loader, one client instance. Resolves null when the
+ *  scripts can't load (offline / blocked). */
+export function getRzSupa(): Promise<RzSupa | null> {
+    return ensureSupa();
 }
 
 // Adopt an existing sitewide root session (rz_premium_session, written by the shared

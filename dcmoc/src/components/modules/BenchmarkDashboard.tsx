@@ -1,20 +1,22 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { rzData } from '@/lib/rz-engine';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
-import { calculateBenchmark, MetricScore } from '@/modules/analytics/BenchmarkEngine';
+import { calculateBenchmark, MetricScore, BenchmarkResult } from '@/modules/analytics/BenchmarkEngine';
 import { calculateFinancials, defaultOccupancyRamp } from '@/modules/analytics/FinancialEngine';
 import { calculateCapex } from '@/lib/CapexEngine';
 import { calculateStaffing } from '@/modules/staffing/ShiftEngine';
 import { calculateCarbonFootprint } from '@/modules/analytics/CarbonEngine';
-import { BENCHMARK_CATEGORIES, BenchmarkCategory, GRADE_COLORS, Grade, getBenchmarkForTier } from '@/data/benchmarks';
+import { BENCHMARK_CATEGORIES, BenchmarkCategory, GRADE_COLORS, Grade, getBenchmarkForTier, getPercentileRank, percentileToGrade } from '@/data/benchmarks';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
-import { Target, Trophy, AlertTriangle, TrendingUp, Info, ChevronRight, ChevronDown } from 'lucide-react';
+import { Target, Trophy, AlertTriangle, TrendingUp, Info, ChevronRight, ChevronDown, ArrowUpRight } from 'lucide-react';
 import { Tooltip as InfoTooltip } from '@/components/ui/Tooltip';
-import { computeCalibration, pctileLabelOf } from '@/lib/calibration';
+import { computeCalibration, pctileLabelOf, type CalibrationResult } from '@/lib/calibration';
+import { explainThresholdMetric } from '@/lib/decision-explain';
+import { PUE_BY_COOLING } from '@/constants/pue';
 import { TraceValue } from '@/components/ui/TraceValue';
 import clsx from 'clsx';
 
@@ -89,16 +91,234 @@ const CATEGORY_TOOLTIP_MAP: Record<BenchmarkCategory, string> = {
     carbon: TOOLTIP_TEXTS.carbonEsg,
 };
 
+/* ─── DIAGNOSTICS TIER-1 (owner mandate: no naked red grade / drift chip) ────
+ * Template: PhasedFinancialDashboard clickable red-KPI → computed reason +
+ * quantified levers (lib/decision-explain.ts explainThresholdMetric). Every
+ * number below comes from the LIVE model (BenchmarkEngine percentiles,
+ * DATA.pueMatrix, tier band table) — nothing generic, nothing fabricated.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/** Grades rendered in alert colours (orange `D` / red `F`) by GRADE_COLORS +
+ *  the score-ring ternary — the SAME set gates the click-to-explain panel and
+ *  `collectBenchmarkDiagnostics`. Derived from `percentileToGrade` boundaries
+ *  (A ≤25 · B ≤50 · C ≤75 · D ≤90 · F >90). */
+const ALERT_GRADES: readonly Grade[] = ['D', 'F'];
+const isAlertGrade = (g: Grade): boolean => ALERT_GRADES.includes(g);
+/** Band-C ceiling — identical to the `percentile <= 75 → 'C'` colouring constant. */
+const GRADE_C_MAX_PCTILE = 75;
+/** Lever search bound — same −60% honesty bound decision-explain uses for CAPEX. */
+const LEVER_CUT_MAX = 0.6;
+
+const COOLING_LABELS: Record<string, string> = {
+    air: 'air (CRAC/CRAH)',
+    inrow: 'in-row',
+    rdhx: 'rear-door HX',
+    liquid: 'direct liquid',
+};
+
+/** Recompute the overall score/grade with ONE metric's percentile replaced —
+ *  same formula as BenchmarkEngine (mean of 100 − percentile), immutable. */
+function overallAfterReplace(result: BenchmarkResult, metricId: string, newPercentile: number): { score: number; grade: Grade } {
+    const score = Math.round(
+        result.metrics.reduce((sum, m) => sum + (100 - (m.metric.id === metricId ? newPercentile : m.percentile)), 0) /
+        result.metrics.length,
+    );
+    return { score, grade: percentileToGrade(100 - score) };
+}
+
+interface GradeDiag {
+    formulaNote: string;
+    /** Alert-grade metrics, worst percentile first — the grade's real draggers. */
+    dragging: MetricScore[];
+    levers: { label: string; detail: string }[];
+}
+
+function computeGradeDiagnostics(result: BenchmarkResult, tier: 2 | 3 | 4, coolingType: string): GradeDiag {
+    const dragging = result.metrics.filter((m) => isAlertGrade(m.grade)).sort((a, b) => b.percentile - a.percentile);
+    const catDrag = (Object.entries(result.categoryScores) as [BenchmarkCategory, { score: number; grade: Grade }][])
+        .filter(([, c]) => isAlertGrade(c.grade))
+        .map(([id, c]) => `${BENCHMARK_CATEGORIES[id].label} (${c.grade}, ${c.score}/100)`);
+    const formulaNote =
+        `Skor overall = rata-rata (100 − persentil) dari ${result.metrics.length} metrik; grade dari batas persentil ` +
+        `yang sama dengan pewarnaan (A ≤25 · B ≤50 · C ≤75 · D ≤90 · F >90). ` +
+        `Kategori penyeret: ${catDrag.join(' · ') || '—'}.`;
+
+    const levers: { label: string; detail: string }[] = [];
+
+    /* ── PUE lever: DISCRETE cooling options from the real DATA.pueMatrix
+     *    (tier-matched column), re-ranked through the SAME getPercentileRank
+     *    the page scores with → new metric grade + new overall grade. ── */
+    const pueScore = result.metrics.find((m) => m.metric.id === 'pue');
+    if (pueScore && pueScore.percentile > 50) {
+        const pm = (rzData() as { pueMatrix?: Record<string, Record<string, number>> }).pueMatrix;
+        const tierKey = `tier${tier}`;
+        const opts: { c: string; pue: number }[] = [];
+        for (const c of ['liquid', 'rdhx', 'inrow']) {
+            if (c === coolingType) continue;
+            const p = pm?.[c]?.[tierKey] ?? pm?.[c]?.tier3 ?? PUE_BY_COOLING[c];
+            if (typeof p === 'number' && p < pueScore.userValue - 1e-9) opts.push({ c, pue: p });
+        }
+        opts.sort((a, b) => a.pue - b.pue);
+        for (const { c, pue } of opts.slice(0, 2)) {
+            const newPct = getPercentileRank(pue, pueScore.metric, tier);
+            const after = overallAfterReplace(result, 'pue', newPct);
+            levers.push({
+                label: `Cooling → ${COOLING_LABELS[c] ?? c}`,
+                detail:
+                    `PUE ${pueScore.userValue.toFixed(2)} = p${Math.round(pueScore.percentile)} (grade ${pueScore.grade}) — ` +
+                    `upgrade cooling ke ${COOLING_LABELS[c] ?? c} (PUE ${pue.toFixed(2)}, DATA.pueMatrix ${tierKey}) → ` +
+                    `p${Math.round(newPct)} (grade metrik ${percentileToGrade(newPct)}); ` +
+                    `overall ${result.overallScore} → ${after.score} (grade ${result.overallGrade} → ${after.grade}).`,
+            });
+        }
+    }
+
+    /* ── Continuous levers on the other draggers: magnitude SOLVED by
+     *    explainThresholdMetric bisection against a linear scaling of the live
+     *    value, threshold = tier-band p75 (the grade-C colouring boundary). ── */
+    for (const m of dragging.filter((d) => d.metric.id !== 'pue').slice(0, 3)) {
+        const band = m.tierBenchmarks;
+        const after = overallAfterReplace(result, m.metric.id, GRADE_C_MAX_PCTILE);
+        const overallNote = `overall ${result.overallScore} → ${after.score} (grade ${result.overallGrade} → ${after.grade})`;
+        if (m.metric.lowerIsBetter) {
+            const ex = explainThresholdMetric({
+                metricLabel: m.metric.name,
+                value: m.userValue,
+                threshold: band.p75,
+                direction: 'atMost',
+                fmtValue: (v) => formatMetricValue(v, m.metric.unit),
+                because: `posisi live p${Math.round(m.percentile)} > batas band C p${GRADE_C_MAX_PCTILE} (tier ${tier})`,
+                levers: [{
+                    lo: 0,
+                    hi: LEVER_CUT_MAX,
+                    metricAt: (x) => m.userValue * (1 - x),
+                    render: (x, achieved) => ({
+                        label: `${m.metric.name} −${(x * 100).toFixed(0)}%`,
+                        detail:
+                            `${m.metric.name} turun −${(x * 100).toFixed(1)}% ` +
+                            `(${formatMetricValue(m.userValue, m.metric.unit)} → ${formatMetricValue(achieved, m.metric.unit)}) ` +
+                            `mencapai band C (≤ p75 ${formatMetricValue(band.p75, m.metric.unit)} tier ${tier}); ${overallNote}.`,
+                    }),
+                    unreachable: (atHi) => ({
+                        label: `${m.metric.name}: −${(LEVER_CUT_MAX * 100).toFixed(0)}% belum cukup`,
+                        detail:
+                            `Bahkan −${(LEVER_CUT_MAX * 100).toFixed(0)}% (ke ${formatMetricValue(atHi, m.metric.unit)}) ` +
+                            `belum mencapai band C p75 ${formatMetricValue(band.p75, m.metric.unit)} — ` +
+                            `struktur input perlu ditinjau, bukan sekadar tuning.`,
+                    }),
+                    targetTab: 'benchmark',
+                }],
+            });
+            for (const lv of ex.levers) levers.push({ label: lv.label, detail: lv.detail });
+        } else {
+            const delta = band.p75 - m.userValue;
+            levers.push({
+                label: `${m.metric.name} naik`,
+                detail:
+                    `${m.metric.name} ${formatMetricValue(m.userValue, m.metric.unit)} = p${Math.round(m.percentile)} — ` +
+                    `perlu naik +${formatMetricValue(Math.abs(delta), m.metric.unit)} ke ≥ p75 ` +
+                    `${formatMetricValue(band.p75, m.metric.unit)} (tier ${tier}) untuk band C; ${overallNote}.`,
+            });
+        }
+    }
+
+    return { formulaNote, dragging, levers };
+}
+
+/** Best-effort correction direction parsed from a failing gate-mirrored check
+ *  label ("v ∈ [lo, hi]" / "v ≤ cap") — live numbers come from the label
+ *  itself; when unparseable, an honest generic policy line is returned. */
+function driftCorrectionOf(label: string): string {
+    const band = label.match(/(-?\d+(?:\.\d+)?)\s*∈\s*\[\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\]/);
+    if (band) {
+        const v = parseFloat(band[1]);
+        const lo = parseFloat(band[2]);
+        const hi = parseFloat(band[3]);
+        if (v < lo) return `Nilai engine ${v} DI BAWAH band korpus [${lo}, ${hi}] → arah koreksi: naikkan/verifikasi konstanta engine terhadap sumbernya — band korpus TIDAK dilonggarkan.`;
+        if (v > hi) return `Nilai engine ${v} DI ATAS band korpus [${lo}, ${hi}] → arah koreksi: turunkan/verifikasi konstanta engine terhadap sumbernya — band korpus TIDAK dilonggarkan.`;
+    }
+    const cap = label.match(/(-?\d+(?:\.\d+)?)\s*≤\s.*?(-?\d+(?:\.\d+)?)\s*$/);
+    if (cap) {
+        const v = parseFloat(cap[1]);
+        const c = parseFloat(cap[2]);
+        if (Number.isFinite(v) && Number.isFinite(c) && v > c) {
+            return `Nilai engine ${v} melebihi plafon korpus ${c} → arah koreksi: turunkan/verifikasi konstanta engine — band TIDAK dilonggarkan.`;
+        }
+    }
+    return 'Check gagal — koreksi diarahkan ke konstanta engine / regen korpus; band korpus tidak dilonggarkan.';
+}
+
+/* ─── EXPORTED COLLECTOR (parent diagnostics surface) ─────────────────────── */
+
+export interface Finding {
+    surface: string;
+    severity: 'critical' | 'warning';
+    metric: string;
+    value: string;
+    threshold: string;
+    linkTab: 'benchmark';
+}
+
+/** Pure Tier-1 diagnostics collector: overall/metric grades ≤ D (same
+ *  ALERT_GRADES set that colours them orange/red) + active calibration drift
+ *  rows. Deterministic — reads only the passed live-model results. */
+export function collectBenchmarkDiagnostics(model: {
+    result: BenchmarkResult;
+    calibration?: CalibrationResult | null;
+}): Finding[] {
+    const findings: Finding[] = [];
+    const { result, calibration } = model;
+
+    if (isAlertGrade(result.overallGrade)) {
+        findings.push({
+            surface: 'Industry Benchmarks · Overall Grade',
+            severity: result.overallGrade === 'F' ? 'critical' : 'warning',
+            metric: 'Overall benchmark score',
+            value: `${result.overallGrade} (${result.overallScore}/100)`,
+            threshold: `grade C butuh skor ≥ ${100 - GRADE_C_MAX_PCTILE} (persentil komposit ≤ ${GRADE_C_MAX_PCTILE})`,
+            linkTab: 'benchmark',
+        });
+    }
+    for (const m of result.metrics.filter((x) => isAlertGrade(x.grade))) {
+        findings.push({
+            surface: 'Industry Benchmarks · Detailed Metrics',
+            severity: m.grade === 'F' ? 'critical' : 'warning',
+            metric: m.metric.name,
+            value: `${formatMetricValue(m.userValue, m.metric.unit)} (p${Math.round(m.percentile)}, grade ${m.grade})`,
+            threshold: `band C: ≤ p${GRADE_C_MAX_PCTILE} (${formatMetricValue(m.tierBenchmarks.p75, m.metric.unit)})`,
+            linkTab: 'benchmark',
+        });
+    }
+    for (const r of (calibration?.rows ?? []).filter((x) => x.verdict === 'drift')) {
+        const failed = r.checks.filter((c) => !c.ok);
+        findings.push({
+            surface: 'Industry Benchmarks · Model Calibration',
+            severity: r.severity === 'fail' ? 'critical' : 'warning',
+            metric: r.engineLabel,
+            value: r.engineValueText,
+            threshold: failed.map((c) => c.label).join(' ; ') || r.corpusLabel,
+            linkTab: 'benchmark',
+        });
+    }
+    return findings;
+}
+
 export default function BenchmarkDashboard() {
     const { selectedCountry, inputs } = useSimulationStore();
     const capexStore = useCapexStore();
     const effectiveInputs = useEffectiveInputs();
     const [activeTab, setActiveTab] = useState<BenchmarkTab>('scorecard');
     const [calibOpen, setCalibOpen] = useState(false);
+    /* Diagnostics Tier-1: per-row drift explain panel (template:
+     * PhasedFinancialDashboard expandable decision rows). */
+    const [driftRowOpen, setDriftRowOpen] = useState<string | null>(null);
+    const calibCardRef = useRef<HTMLDivElement | null>(null);
+    const calibTableRef = useRef<HTMLDivElement | null>(null);
     /* Arc-1 — Model Calibration: engine constants vs live corpus, evaluated by
      * lib/calibration.ts (SAME single-source spec + rule semantics as the ship
      * gate tools/test-model-calibration.mjs). Static at runtime → memo once. */
     const calib = useMemo(() => computeCalibration(), []);
+    const driftRows = useMemo(() => (calib?.rows ?? []).filter((r) => r.verdict === 'drift'), [calib]);
 
     const result = useMemo(() => {
         if (!selectedCountry) return null;
@@ -273,31 +493,49 @@ export default function BenchmarkDashboard() {
              * Sumber tunggal DATA.calibrationSpec; semantik rule identik dengan
              * gate tools/test-model-calibration.mjs (lib/calibration.ts). */}
             {calib && calib.rows.length > 0 && (
-                <div className="rounded-2xl border border-cyan-500/30 bg-white dark:bg-slate-900/50 p-4">
-                    <button
-                        type="button"
-                        onClick={() => setCalibOpen((o) => !o)}
-                        className="flex w-full items-center gap-2 text-left"
-                    >
-                        <ChevronDown className={clsx('h-3.5 w-3.5 text-slate-400 transition-transform', !calibOpen && '-rotate-90')} />
-                        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Model Calibration — engine vs dunia nyata</h3>
-                        <span className="rounded-full bg-cyan-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-cyan-500">gate-mirrored</span>
-                        <span className="ml-auto flex items-center gap-1">
-                            {calib.rows.map((r) => (
-                                <span
-                                    key={r.id}
-                                    className={clsx(
-                                        'h-1.5 w-1.5 rounded-full',
-                                        r.verdict === 'in-band' ? 'bg-emerald-500' : r.verdict === 'drift' ? 'bg-rose-500' : 'bg-slate-400',
-                                    )}
-                                    title={`${r.id}: ${r.verdict}`}
-                                />
-                            ))}
-                        </span>
-                    </button>
+                <div ref={calibCardRef} className="rounded-2xl border border-cyan-500/30 bg-white dark:bg-slate-900/50 p-4">
+                    <div className="flex w-full items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setCalibOpen((o) => !o)}
+                            className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                        >
+                            <ChevronDown className={clsx('h-3.5 w-3.5 text-slate-400 transition-transform', !calibOpen && '-rotate-90')} />
+                            <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Model Calibration — engine vs dunia nyata</h3>
+                            <span className="rounded-full bg-cyan-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-cyan-500">gate-mirrored</span>
+                            <span className="ml-auto flex items-center gap-1">
+                                {calib.rows.map((r) => (
+                                    <span
+                                        key={r.id}
+                                        className={clsx(
+                                            'h-1.5 w-1.5 rounded-full',
+                                            r.verdict === 'in-band' ? 'bg-emerald-500' : r.verdict === 'drift' ? 'bg-rose-500' : 'bg-slate-400',
+                                        )}
+                                        title={`${r.id}: ${r.verdict}`}
+                                    />
+                                ))}
+                            </span>
+                        </button>
+                        {/* Diagnostics Tier-1: drift is no longer tooltip-only — a
+                          * visible chip opens the per-mapping correction panel. */}
+                        {driftRows.length > 0 && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setCalibOpen(true);
+                                    setDriftRowOpen(driftRows[0].id);
+                                    window.setTimeout(() => calibTableRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+                                }}
+                                title={`${driftRows.length} mapping drift terhadap band korpus live — klik untuk detail engine vs band + arah koreksi.`}
+                                className="shrink-0 rounded bg-rose-500/15 px-2 py-0.5 text-[9px] font-semibold uppercase text-rose-600 hover:bg-rose-500/25 dark:text-rose-400"
+                            >
+                                ⚠ {driftRows.length} drift
+                            </button>
+                        )}
+                    </div>
                     {calibOpen && (
                         <div className="mt-3 space-y-4">
-                            <div className="overflow-x-auto">
+                            <div ref={calibTableRef} className="overflow-x-auto">
                                 <table className="w-full text-[10px]">
                                     <thead>
                                         <tr className="border-b border-slate-200 dark:border-slate-700 text-left text-[9px] uppercase tracking-wide text-slate-400">
@@ -316,28 +554,72 @@ export default function BenchmarkDashboard() {
                                                 <span className="tabular-nums text-slate-700 dark:text-slate-300">{r.positionText}</span>
                                             );
                                             return (
-                                                <tr key={r.id} className="border-b border-slate-100 align-top dark:border-slate-800">
-                                                    <td className="py-2 pr-3">
-                                                        <div className="font-medium text-slate-800 dark:text-slate-100">{r.engineLabel}</div>
-                                                        <div className="mt-0.5 tabular-nums text-slate-500">{r.engineValueText}</div>
-                                                        <div className="mt-0.5 text-[9px] text-slate-400">{r.engineSource}</div>
-                                                    </td>
-                                                    <td className="py-2 pr-3 tabular-nums text-slate-500">{r.corpusLabel}</td>
-                                                    <td className="py-2 pr-3">
-                                                        {traceId ? <TraceValue traceId={traceId}>{posEl}</TraceValue> : posEl}
-                                                        <div className="mt-0.5 text-[9px] italic text-slate-400">{r.basisNote}</div>
-                                                    </td>
-                                                    <td className="py-2 pr-3">
-                                                        <span className={clsx(
-                                                            'rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase',
-                                                            r.verdict === 'in-band' && 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
-                                                            r.verdict === 'drift' && 'bg-rose-500/15 text-rose-600 dark:text-rose-400',
-                                                            r.verdict === 'indicative' && 'bg-slate-500/15 text-slate-500 dark:text-slate-400',
-                                                        )}>{r.verdict}</span>
-                                                        <div className="mt-0.5 text-[9px] text-slate-400">tier {r.severity} · {r.checks.filter((c) => c.ok).length}/{r.checks.length} checks</div>
-                                                    </td>
-                                                    <td className="py-2 text-[9px] text-slate-400">{r.limitation}</td>
-                                                </tr>
+                                                <React.Fragment key={r.id}>
+                                                    <tr className="border-b border-slate-100 align-top dark:border-slate-800">
+                                                        <td className="py-2 pr-3">
+                                                            <div className="font-medium text-slate-800 dark:text-slate-100">{r.engineLabel}</div>
+                                                            <div className="mt-0.5 tabular-nums text-slate-500">{r.engineValueText}</div>
+                                                            <div className="mt-0.5 text-[9px] text-slate-400">{r.engineSource}</div>
+                                                        </td>
+                                                        <td className="py-2 pr-3 tabular-nums text-slate-500">{r.corpusLabel}</td>
+                                                        <td className="py-2 pr-3">
+                                                            {traceId ? <TraceValue traceId={traceId}>{posEl}</TraceValue> : posEl}
+                                                            <div className="mt-0.5 text-[9px] italic text-slate-400">{r.basisNote}</div>
+                                                        </td>
+                                                        <td className="py-2 pr-3">
+                                                            {r.verdict === 'drift' ? (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setDriftRowOpen((o) => (o === r.id ? null : r.id))}
+                                                                    title="Klik untuk detail drift: engine vs band korpus live + arah koreksi."
+                                                                    className="cursor-pointer rounded bg-rose-500/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase text-rose-600 underline decoration-dotted underline-offset-2 hover:bg-rose-500/25 dark:text-rose-400"
+                                                                >{r.verdict}</button>
+                                                            ) : (
+                                                                <span className={clsx(
+                                                                    'rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase',
+                                                                    r.verdict === 'in-band' && 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+                                                                    r.verdict === 'indicative' && 'bg-slate-500/15 text-slate-500 dark:text-slate-400',
+                                                                )}>{r.verdict}</span>
+                                                            )}
+                                                            <div className="mt-0.5 text-[9px] text-slate-400">tier {r.severity} · {r.checks.filter((c) => c.ok).length}/{r.checks.length} checks</div>
+                                                        </td>
+                                                        <td className="py-2 text-[9px] text-slate-400">{r.limitation}</td>
+                                                    </tr>
+                                                    {r.verdict === 'drift' && driftRowOpen === r.id && (
+                                                        <tr className="border-b border-slate-100 dark:border-slate-800">
+                                                            <td colSpan={5} className="p-0">
+                                                                <div className="m-2 rounded-lg border border-rose-200 bg-rose-50 p-3 text-left dark:border-rose-800/40 dark:bg-rose-950/20">
+                                                                    <div className="text-[10px] font-semibold uppercase tracking-wide text-rose-600 dark:text-rose-400">
+                                                                        Drift — {r.id} ({r.engineLabel})
+                                                                    </div>
+                                                                    <div className="mt-1.5 grid gap-1 text-[10px] text-slate-600 dark:text-slate-300 md:grid-cols-2">
+                                                                        <div><span className="text-slate-400">Nilai engine: </span><span className="tabular-nums">{r.engineValueText}</span></div>
+                                                                        <div><span className="text-slate-400">Band korpus live: </span><span className="tabular-nums">{r.corpusLabel}</span></div>
+                                                                    </div>
+                                                                    <div className="mt-2 space-y-1">
+                                                                        {r.checks.filter((c) => !c.ok).map((c, ci) => (
+                                                                            <div key={ci} className="rounded border border-rose-200/70 bg-white/70 p-1.5 text-[10px] dark:border-rose-800/40 dark:bg-slate-900/50">
+                                                                                <div className="font-mono text-rose-600 dark:text-rose-400">✗ {c.label}</div>
+                                                                                <div className="mt-0.5 text-slate-500 dark:text-slate-400">{driftCorrectionOf(c.label)}</div>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                    <p className="mt-2 text-[9px] italic text-slate-500 dark:text-slate-400">
+                                                                        Kebijakan drift: temuan DILAPORKAN (CHANGELOG + gate <span className="font-mono">tools/test-model-calibration.mjs</span> merah
+                                                                        untuk tier fail) — band korpus TIDAK pernah dilonggarkan diam-diam.
+                                                                    </p>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => calibCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                                                                        className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-medium text-cyan-600 hover:underline dark:text-cyan-400"
+                                                                    >
+                                                                        <ArrowUpRight className="h-3 w-3" /> Section Model Calibration (metodologi &amp; tabel lengkap)
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    )}
+                                                </React.Fragment>
                                             );
                                         })}
                                     </tbody>
@@ -403,7 +685,7 @@ export default function BenchmarkDashboard() {
             </div>
 
             {/* Tab Content */}
-            {activeTab === 'scorecard' && <ScorecardTab result={result} />}
+            {activeTab === 'scorecard' && <ScorecardTab result={result} tier={inputs.tierLevel} coolingType={inputs.coolingType} />}
             {activeTab === 'detailed' && <DetailedTab metrics={result.metrics} tier={inputs.tierLevel} />}
             {activeTab === 'strengths' && <StrengthsTab result={result} />}
             {activeTab === 'comparison' && <ComparisonTab metrics={result.metrics} />}
@@ -413,8 +695,16 @@ export default function BenchmarkDashboard() {
 
 // ─── SCORECARD TAB ──────────────────────────────────────────
 
-function ScorecardTab({ result }: { result: ReturnType<typeof calculateBenchmark> }) {
+function ScorecardTab({ result, tier, coolingType }: { result: ReturnType<typeof calculateBenchmark>; tier: 2 | 3 | 4; coolingType: string }) {
     const gradeColor = GRADE_COLORS[result.overallGrade];
+    /* Diagnostics Tier-1: red/orange grade (ALERT_GRADES = same set the ring
+     * ternary colours orange/red) is clickable → computed contributors + levers
+     * from the live model (template: PhasedFinancialDashboard red KPIs). */
+    const [gradeOpen, setGradeOpen] = useState(false);
+    const diag = useMemo(
+        () => (isAlertGrade(result.overallGrade) ? computeGradeDiagnostics(result, tier, coolingType) : null),
+        [result, tier, coolingType],
+    );
 
     return (
         <div className="space-y-6">
@@ -433,7 +723,16 @@ function ScorecardTab({ result }: { result: ReturnType<typeof calculateBenchmark
                             />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className={clsx('text-4xl font-bold', gradeColor.text, gradeColor.darkText)}>{result.overallGrade}</span>
+                            <span
+                                className={clsx(
+                                    'text-4xl font-bold',
+                                    gradeColor.text,
+                                    gradeColor.darkText,
+                                    diag && 'cursor-pointer underline decoration-dotted underline-offset-8',
+                                )}
+                                title={diag ? `Grade ${result.overallGrade} — klik untuk lihat kontributor terburuk + lever perbaikan terhitung dari model live.` : undefined}
+                                onClick={diag ? () => setGradeOpen((o) => !o) : undefined}
+                            >{result.overallGrade}</span>
                             <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-0.5">{result.overallScore}/100 <InfoTooltip content={TOOLTIP_TEXTS.overallScore} /></span>
                         </div>
                     </div>
@@ -442,6 +741,38 @@ function ScorecardTab({ result }: { result: ReturnType<typeof calculateBenchmark
                         <InfoTooltip content={TOOLTIP_TEXTS.overallGrade} />
                     </p>
                 </div>
+                {diag && gradeOpen && (
+                    <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-left dark:border-red-800/40 dark:bg-red-950/20">
+                        <div className="flex items-center gap-2">
+                            <AlertTriangle className="h-4 w-4 shrink-0 text-red-500" />
+                            <span className="text-sm font-semibold text-slate-900 dark:text-white">Kenapa grade {result.overallGrade}?</span>
+                        </div>
+                        <p className="mt-1.5 text-[11px] leading-relaxed text-slate-600 dark:text-slate-400">{diag.formulaNote}</p>
+                        <div className="mt-3 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Kontributor terburuk (live model)</div>
+                        <div className="mt-1.5 space-y-1">
+                            {diag.dragging.slice(0, 4).map((m) => (
+                                <div key={m.metric.id} className="flex items-center gap-2 text-xs">
+                                    <span className={clsx('rounded px-1.5 py-0.5 text-[10px] font-bold', GRADE_COLORS[m.grade].bg, GRADE_COLORS[m.grade].text, GRADE_COLORS[m.grade].darkBg, GRADE_COLORS[m.grade].darkText)}>{m.grade}</span>
+                                    <span className="text-slate-700 dark:text-slate-300">{m.metric.name}</span>
+                                    <span className="ml-auto font-mono tabular-nums text-slate-500 dark:text-slate-400">{formatMetricValue(m.userValue, m.metric.unit)} · p{Math.round(m.percentile)}</span>
+                                </div>
+                            ))}
+                        </div>
+                        {diag.levers.length > 0 && (
+                            <>
+                                <div className="mt-3 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Lever perbaikan terhitung (dari model live, bukan generik)</div>
+                                <div className="mt-1.5 space-y-1.5">
+                                    {diag.levers.map((lv, i) => (
+                                        <div key={i} className="flex items-start gap-2 rounded-md border border-slate-200 bg-white/70 p-2 dark:border-slate-700 dark:bg-slate-900/50">
+                                            <span className="shrink-0 whitespace-nowrap rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">{lv.label}</span>
+                                            <span className="flex-1 text-[11px] leading-snug text-slate-600 dark:text-slate-400">{lv.detail}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Category Cards */}

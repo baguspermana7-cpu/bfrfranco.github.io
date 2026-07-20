@@ -11,13 +11,29 @@ import React from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useRequirementsStore } from '@/store/requirements';
-import { useProjectsStore } from '@/store/projects';
+import { useProjectsStore, restoreSnapshot, type ProjectBundle } from '@/store/projects';
 import { useScenarioStore } from '@/store/scenario';
+import { useAuthStore } from '@/store/auth';
+import { listCloud, loadCloud, removeCloud, share, unshare, uploadProject, CLOUD_TABLE_MISSING, type CloudProjectMeta } from '@/lib/cloudProjects';
 import { rzData } from '@/lib/rz-engine';
 import { writeSharedItLoad, writeSharedCooling, writeSharedCountry } from '@/lib/requirementsMappings';
 import { COUNTRIES } from '@/constants/countries';
-import { FolderOpen, Plus, Trash2, Save, ChevronRight } from 'lucide-react';
+import { FolderOpen, Plus, Trash2, Save, ChevronRight, Cloud, Download, Share2, Copy, RefreshCw, Link2 } from 'lucide-react';
 import { PlatformHeader, KpiChips } from './ScenariosPage';
+
+/* ── Arc-4: local→cloud mapping (kecil, hanya id + waktu upload terakhir) ── */
+const CLOUD_MAP_KEY = 'dcmoc_cloud_map';
+type CloudMap = Record<string, { cloudId: string; at: number }>;
+function readCloudMap(): CloudMap {
+    if (typeof window === 'undefined') return {};
+    try {
+        const p = JSON.parse(localStorage.getItem(CLOUD_MAP_KEY) || '{}');
+        return p && typeof p === 'object' && !Array.isArray(p) ? p : {};
+    } catch { return {}; }
+}
+function writeCloudMap(m: CloudMap): void {
+    try { localStorage.setItem(CLOUD_MAP_KEY, JSON.stringify(m)); } catch { /* quota — badge saja yang hilang */ }
+}
 
 const LIFECYCLE: { id: string; label: string; tab: string }[] = [
     { id: 'req', label: 'Requirements', tab: 'requirements' },
@@ -39,7 +55,103 @@ export function ProjectsPage() {
     const req = useRequirementsStore();
     const projects = useProjectsStore();
     const scenarios = useScenarioStore((s) => s.scenarios);
+    const user = useAuthStore((s) => s.user);
+    const readOnly = useProjectsStore((s) => s.readOnly);
     const [name, setName] = React.useState('');
+
+    /* ── Arc-4 cloud state (opsional; localStorage tetap primer) ── */
+    const [cloudItems, setCloudItems] = React.useState<CloudProjectMeta[] | null>(null);
+    const [cloudErr, setCloudErr] = React.useState<string | null>(null);
+    const [cloudMsg, setCloudMsg] = React.useState<string | null>(null);
+    const [cloudBusy, setCloudBusy] = React.useState<string | null>(null);
+    const [cloudMap, setCloudMap] = React.useState<CloudMap>({});
+    const [copiedId, setCopiedId] = React.useState<string | null>(null);
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+
+    const refreshCloud = React.useCallback(async () => {
+        setCloudBusy('list');
+        setCloudErr(null);
+        const res = await listCloud();
+        setCloudBusy(null);
+        if (res.ok) setCloudItems(res.data);
+        else { setCloudItems(null); setCloudErr(res.error); }
+    }, []);
+
+    React.useEffect(() => {
+        if (!user) return;
+        setCloudMap(readCloudMap());
+        void refreshCloud();
+    }, [user, refreshCloud]);
+
+    const handleUploadToCloud = async (p: ProjectBundle) => {
+        setCloudBusy(`up:${p.id}`);
+        setCloudErr(null); setCloudMsg(null);
+        const existing = cloudMap[p.id]?.cloudId ?? null;
+        let res = await uploadProject(p, existing);
+        // row cloud lama sudah dihapus? — fallback jujur: buat row baru
+        if (!res.ok && existing && res.error !== CLOUD_TABLE_MISSING) res = await uploadProject(p, null);
+        setCloudBusy(null);
+        if (!res.ok) { setCloudErr(res.error); return; }
+        const next: CloudMap = { ...cloudMap, [p.id]: { cloudId: res.data.id, at: Date.now() } };
+        setCloudMap(next); writeCloudMap(next);
+        setCloudMsg(`"${p.name}" tersimpan ke cloud (cadangan — bukan sinkron otomatis).`);
+        void refreshCloud();
+    };
+
+    const handleLoadCloud = async (item: CloudProjectMeta) => {
+        if (useProjectsStore.getState().readOnly) { setCloudErr('Mode lihat-saja aktif — keluar dari share view dulu.'); return; }
+        setCloudBusy(`load:${item.id}`);
+        setCloudErr(null); setCloudMsg(null);
+        const res = await loadCloud(item.id);
+        setCloudBusy(null);
+        if (!res.ok) { setCloudErr(res.error); return; }
+        // jalur restore KANONIK dari store/projects.ts — bukan jalur baru
+        restoreSnapshot(res.data.snapshot);
+        setCloudMsg(`"${res.data.name}" dimuat dari cloud ke state aktif — "Save as Project" bila ingin menyimpannya sebagai project lokal.`);
+    };
+
+    const handleRemoveCloud = async (item: CloudProjectMeta) => {
+        if (typeof window !== 'undefined' && !window.confirm(`Hapus "${item.name}" dari cloud? Data lokal tidak tersentuh.`)) return;
+        setCloudBusy(`del:${item.id}`);
+        setCloudErr(null); setCloudMsg(null);
+        const res = await removeCloud(item.id);
+        setCloudBusy(null);
+        if (!res.ok) { setCloudErr(res.error); return; }
+        const next: CloudMap = Object.fromEntries(Object.entries(cloudMap).filter(([, v]) => v.cloudId !== item.id));
+        setCloudMap(next); writeCloudMap(next);
+        void refreshCloud();
+    };
+
+    const handleShare = async (item: CloudProjectMeta) => {
+        setCloudBusy(`share:${item.id}`);
+        setCloudErr(null); setCloudMsg(null);
+        const res = await share(item.id);
+        setCloudBusy(null);
+        if (!res.ok) { setCloudErr(res.error); return; }
+        void refreshCloud();
+    };
+
+    const handleUnshare = async (item: CloudProjectMeta) => {
+        setCloudBusy(`unshare:${item.id}`);
+        setCloudErr(null); setCloudMsg(null);
+        const res = await unshare(item.id);
+        setCloudBusy(null);
+        if (!res.ok) { setCloudErr(res.error); return; }
+        setCloudMsg('Share dicabut — link lama langsung mati.');
+        void refreshCloud();
+    };
+
+    const handleCopyShareUrl = async (item: CloudProjectMeta) => {
+        if (!item.share_token) return;
+        const url = `${origin}/dcmoc/?share=${item.share_token}`;
+        try {
+            await navigator.clipboard.writeText(url);
+            setCopiedId(item.id);
+            setTimeout(() => setCopiedId(null), 2000);
+        } catch {
+            setCloudErr('Gagal menyalin ke clipboard — salin URL secara manual dari kotak di kartu.');
+        }
+    };
 
     /* live lifecycle completion for the ACTIVE configuration (documented booleans) */
     const completion: Record<string, boolean> = {
@@ -166,10 +278,22 @@ export function ProjectsPage() {
                                         <span title={`Snapshot ${COUNTRIES[p.countryId]?.name ?? p.countryId} · ${(p.itLoadKw / 1000).toFixed(1)} MW ≠ project aktif (${country?.name ?? '—'} · ${(simInputs.itLoad / 1000).toFixed(1)} MW)`}
                                             className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">differs from current project</span>
                                     )}
+                                    {user && cloudMap[p.id] && (
+                                        <span title={`Terakhir diunggah ke cloud ${new Date(cloudMap[p.id].at).toLocaleString()} — cadangan manual, BUKAN sinkron otomatis`}
+                                            className="rounded bg-cyan-500/15 px-1 py-0.5 text-[8px] font-semibold text-cyan-500">☁ tersinkron {new Date(cloudMap[p.id].at).toLocaleString()}</span>
+                                    )}
                                 </div>
                                 <div className="mt-2 flex gap-1.5">
                                     <button onClick={() => projects.openProject(p.id)}
                                         className="flex-1 rounded-lg bg-violet-600 py-1.5 text-[11px] font-semibold text-white hover:bg-violet-500">Open (restores all stores)</button>
+                                    {user && (
+                                        <button onClick={() => void handleUploadToCloud(p)}
+                                            disabled={cloudBusy === `up:${p.id}`}
+                                            title="Simpan salinan project ini ke cloud (cadangan opsional — localStorage tetap primer)"
+                                            className="inline-flex items-center gap-1 rounded-lg border border-cyan-500/40 px-2 py-1.5 text-[10px] font-medium text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10 disabled:opacity-50">
+                                            <Cloud className="h-3.5 w-3.5" /> {cloudBusy === `up:${p.id}` ? 'Mengunggah…' : 'Simpan ke cloud'}
+                                        </button>
+                                    )}
                                     <button onClick={() => projects.deleteProject(p.id)}
                                         className="rounded-lg border border-rose-400/40 px-2 py-1.5 text-rose-400 hover:bg-rose-500/10"><Trash2 className="h-3.5 w-3.5" /></button>
                                 </div>
@@ -179,6 +303,100 @@ export function ProjectsPage() {
                     </div>
                 )}
             </div>
+
+            {/* ── Cloud (opsional) — Arc-4; hanya render saat login ── */}
+            {user && (
+                <div>
+                    <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                        <Cloud className="h-3.5 w-3.5" /> Cloud (opsional)
+                        <button onClick={() => void refreshCloud()} disabled={cloudBusy === 'list'}
+                            title="Muat ulang daftar cloud"
+                            className="ml-1 rounded border border-slate-300 dark:border-slate-700 p-0.5 text-slate-500 hover:border-cyan-400 disabled:opacity-50">
+                            <RefreshCw className={`h-3 w-3 ${cloudBusy === 'list' ? 'animate-spin' : ''}`} />
+                        </button>
+                    </h2>
+                    <p className="mb-2 text-[10px] text-slate-500">
+                        localStorage tetap penyimpanan utama; cloud = cadangan opsional; tidak ada sinkron otomatis.
+                    </p>
+
+                    {cloudErr && (
+                        <div className="mb-2 rounded-xl border border-amber-500/40 bg-amber-500/10 p-2.5 text-[11px] text-amber-600 dark:text-amber-400">
+                            {cloudErr}
+                            {cloudErr === CLOUD_TABLE_MISSING && (
+                                <> — <a href="/setup-supabase.html" target="_blank" rel="noopener noreferrer" className="underline font-semibold">buka setup-supabase ↗</a></>
+                            )}
+                        </div>
+                    )}
+                    {cloudMsg && (
+                        <div className="mb-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-2.5 text-[11px] text-emerald-600 dark:text-emerald-400">{cloudMsg}</div>
+                    )}
+
+                    {cloudItems && cloudItems.length === 0 && !cloudErr && (
+                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 text-center text-[11px] text-slate-500">
+                            Belum ada project di cloud — pakai tombol “☁ Simpan ke cloud” pada kartu project lokal di atas.
+                        </div>
+                    )}
+                    {cloudItems && cloudItems.length > 0 && (
+                        <div className="grid gap-3 md:grid-cols-2">
+                            {cloudItems.map((item) => (
+                                <div key={item.id} className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                                    <div className="flex items-center gap-2">
+                                        <Cloud className="h-3.5 w-3.5 shrink-0 text-cyan-500" />
+                                        <span className="truncate text-sm font-semibold text-slate-900 dark:text-white">{item.name}</span>
+                                        {item.share_token && (
+                                            <span className="rounded-full bg-cyan-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-cyan-500">shared</span>
+                                        )}
+                                    </div>
+                                    <div className="mt-0.5 text-[10px] text-slate-500">
+                                        diperbarui {new Date(item.updated_at).toLocaleString()} · v{item.version}
+                                    </div>
+                                    <div className="mt-2 flex flex-wrap gap-1.5">
+                                        <button onClick={() => void handleLoadCloud(item)}
+                                            disabled={cloudBusy === `load:${item.id}` || readOnly}
+                                            title="Ambil bundle dari cloud, validasi, lalu restore ke semua store (jalur restore kanonik)"
+                                            className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-2.5 py-1.5 text-[11px] font-semibold text-white hover:bg-violet-500 disabled:opacity-50">
+                                            <Download className="h-3.5 w-3.5" /> {cloudBusy === `load:${item.id}` ? 'Memuat…' : 'Muat'}
+                                        </button>
+                                        {!item.share_token ? (
+                                            <button onClick={() => void handleShare(item)}
+                                                disabled={cloudBusy === `share:${item.id}`}
+                                                className="inline-flex items-center gap-1 rounded-lg border border-cyan-500/40 px-2.5 py-1.5 text-[11px] font-medium text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10 disabled:opacity-50">
+                                                <Share2 className="h-3.5 w-3.5" /> {cloudBusy === `share:${item.id}` ? 'Membuat…' : 'Share'}
+                                            </button>
+                                        ) : (
+                                            <button onClick={() => void handleUnshare(item)}
+                                                disabled={cloudBusy === `unshare:${item.id}`}
+                                                className="inline-flex items-center gap-1 rounded-lg border border-amber-500/40 px-2.5 py-1.5 text-[11px] font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 disabled:opacity-50">
+                                                <Link2 className="h-3.5 w-3.5" /> {cloudBusy === `unshare:${item.id}` ? 'Mencabut…' : 'Cabut share'}
+                                            </button>
+                                        )}
+                                        <button onClick={() => void handleRemoveCloud(item)}
+                                            disabled={cloudBusy === `del:${item.id}`}
+                                            title="Hapus dari cloud (data lokal tidak tersentuh)"
+                                            className="rounded-lg border border-rose-400/40 px-2 py-1.5 text-rose-400 hover:bg-rose-500/10 disabled:opacity-50">
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                        </button>
+                                    </div>
+                                    {item.share_token && (
+                                        <div className="mt-2 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-2">
+                                            <div className="flex items-center gap-1.5">
+                                                <code className="min-w-0 flex-1 truncate text-[10px] text-slate-600 dark:text-slate-300">{origin}/dcmoc/?share={item.share_token}</code>
+                                                <button onClick={() => void handleCopyShareUrl(item)}
+                                                    className="inline-flex shrink-0 items-center gap-1 rounded border border-slate-300 dark:border-slate-700 px-1.5 py-1 text-[10px] text-slate-600 dark:text-slate-300 hover:border-cyan-400">
+                                                    <Copy className="h-3 w-3" /> {copiedId === item.id ? 'Tersalin ✓' : 'Salin'}
+                                                </button>
+                                            </div>
+                                            <div className="mt-1 text-[9px] text-slate-500">
+                                                siapa pun dengan link bisa MELIHAT salinan (bukan live, bukan edit)
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* templates */}
             <div>

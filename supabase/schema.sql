@@ -31,6 +31,7 @@
 --   6  newsletter      — newsletter_subscribers + subscribe_newsletter()
 --   7  billing scaffold— subscriptions / payments (Mayar; webhook/service_role only)
 --   8  grants          — schema-level grants (RLS does the row-level authorization)
+--   9  dcmoc_projects  — DCMOC cloud project bundles + share-by-token RPC
 -- ============================================================================
 
 
@@ -877,6 +878,79 @@ drop policy if exists "payments: read own" on public.payments;
 -- Read own only. NO insert/update/delete policy → writes come solely from the webhook.
 create policy "payments: read own" on public.payments for select using ((select auth.uid()) = user_id);
 
+
+-- ===== Module 9 — dcmoc_projects (cloud project bundles + share-by-token) ===
+-- DCMOC ProjectBundle v1 saved per user. localStorage stays PRIMARY in the app;
+-- cloud is an optional logged-in backup. bundle excludes heroImage (stored
+-- separately client-side). share_token null = private; a 32-byte random
+-- base64url token (client-generated) makes the row readable via the anon RPC
+-- get_shared_project() ONLY — the table itself never allows anon SELECT.
+
+create table if not exists public.dcmoc_projects (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references auth.users (id) on delete cascade,
+  name        text not null,
+  bundle      jsonb not null,
+  version     int  not null default 1,
+  share_token text unique,
+  shared_at   timestamptz,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz default now()
+);
+create index if not exists dcmoc_projects_user_idx  on public.dcmoc_projects (user_id, updated_at desc);
+create index if not exists dcmoc_projects_token_idx on public.dcmoc_projects (share_token) where share_token is not null;
+
+alter table public.dcmoc_projects drop constraint if exists dcmoc_projects_name_chk;
+alter table public.dcmoc_projects add  constraint dcmoc_projects_name_chk   check (char_length(name) between 1 and 120);
+alter table public.dcmoc_projects drop constraint if exists dcmoc_projects_bundle_chk;
+alter table public.dcmoc_projects add  constraint dcmoc_projects_bundle_chk check (pg_column_size(bundle) <= 262144);  -- 256 KB
+alter table public.dcmoc_projects drop constraint if exists dcmoc_projects_token_chk;
+alter table public.dcmoc_projects add  constraint dcmoc_projects_token_chk  check (share_token is null or share_token ~ '^[A-Za-z0-9_-]{22,64}$');
+
+alter table public.dcmoc_projects enable row level security;
+drop policy if exists "dcmoc: read own"   on public.dcmoc_projects;
+drop policy if exists "dcmoc: insert own" on public.dcmoc_projects;
+drop policy if exists "dcmoc: update own" on public.dcmoc_projects;
+drop policy if exists "dcmoc: delete own" on public.dcmoc_projects;
+create policy "dcmoc: read own"   on public.dcmoc_projects for select using ((select auth.uid()) = user_id);
+create policy "dcmoc: insert own" on public.dcmoc_projects for insert with check ((select auth.uid()) = user_id);
+create policy "dcmoc: update own" on public.dcmoc_projects for update using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
+create policy "dcmoc: delete own" on public.dcmoc_projects for delete using ((select auth.uid()) = user_id);
+
+create or replace function public.enforce_dcmoc_project_limit()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if (select count(*) from public.dcmoc_projects where user_id = new.user_id) >= 20 then
+    raise exception 'project limit reached (20).';
+  end if;
+  return new;
+end;
+$$;
+drop trigger if exists trg_dcmoc_project_limit on public.dcmoc_projects;
+create trigger trg_dcmoc_project_limit before insert on public.dcmoc_projects
+  for each row execute function public.enforce_dcmoc_project_limit();
+
+drop trigger if exists trg_dcmoc_projects_updated_at on public.dcmoc_projects;
+create trigger trg_dcmoc_projects_updated_at before update on public.dcmoc_projects
+  for each row execute function public.set_updated_at();
+
+-- Anon share read: token-gated RPC only (mirrors subscribe_newsletter template).
+-- Returns NO PII (no user_id/email); uniform 'not found' on any miss.
+create or replace function public.get_shared_project(p_token text)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare r jsonb;
+begin
+  if p_token is null or p_token !~ '^[A-Za-z0-9_-]{22,64}$' then
+    raise exception 'not found';
+  end if;
+  select jsonb_build_object('name', name, 'bundle', bundle, 'version', version, 'shared_at', shared_at)
+    into r
+    from public.dcmoc_projects
+   where share_token = p_token;
+  if r is null then raise exception 'not found'; end if;
+  return r;
+end;
+$$;
 
 -- ===== Module 8 — grants (RLS does the row-level authorization) =============
 -- The anon + authenticated roles get USAGE on the schema only; every table's access is then

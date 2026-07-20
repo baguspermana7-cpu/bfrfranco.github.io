@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.99.3 — 2026-07-20 (ARC-4 Ship 1+2: CLOUD PROJECTS + SHARE · Diagnostics Tier-1 5 permukaan)
+
+### Added — Cloud & Share (aktif setelah owner jalankan SQL Module 9 — Owner Action Board)
+- **SQL Module 9** (`supabase/schema.sql`): tabel `dcmoc_projects` (bundle jsonb cap 256KB, RLS own-row 4 policy, trigger cap 20/user, share_token regex+partial index) + RPC anon `get_shared_project(token)` SECURITY DEFINER (tanpa PII, error seragam 'not found'). Item Owner Action Board `supabase-dcmoc-projects` (langkah + verifikasi RLS anon-0-rows).
+- **rzSupa +7 helper** (save/list-tanpa-bundle/get/delete/share 32-byte-token/unshare/getShared-anon).
+- **DCMOC**: `lib/cloudProjects.ts` (size-guard 240KB pesan jujur tanpa auto-trim; validasi bundle version+10-slice; error tabel-belum-ada → link Owner Action Board), section "Cloud (opsional)" di Projects (label jujur "localStorage tetap primer, tanpa sinkron otomatis"; badge ☁ tersinkron; Share modal salin URL + Cabut), **view-only `?share=TOKEN`**: backup viewer ke sessionStorage DULU → fetch anon → restore → readOnly lock (guard store) + banner "Mode lihat-saja · Keluar & kembali ke data saya" (restore utuh + strip query); share view bypass login (pseudo-viewer), StrictMode-safe.
+
+### Added — Diagnostics Tier-1 (standarization/DIAGNOSTICS_STANDARD.md baru; kontrak collectDiagnostics per file)
+- **Financial** NPV/ROI merah klik → lever bisection nyata ("Revenue +117% ke $357/kW/bln utk NPV=0; capex-saja unreachable — jujur").
+- **Benchmark** grade F/D klik → kontributor terburuk + lever PUE diskret live ("1.50 p50 → RDHx 1.18 p23, overall D→C") + lever kontinu ke band p75; chip drift → panel nilai vs band + arah koreksi + kebijakan drift + ↗ Model Calibration.
+- **Compliance** <80 klik → item mandatory yang belum + biaya per item + lever "79→93 · $10,000 initial" (formula runtime-verified vs engine).
+- **CapacityDashboard** At-Risk ≥60 klik → atribusi kontributor via neutralize-rerun + lever defer-IT/kompresi-jadwal ter-bisection.
+- **Maintenance** riskExposure >50k klik → dekomposisi ber-chip parity "≡ engine" + lever upgrade SLA (net hemat/tambah vs DATA.omContracts) + lever desain Tier IV.
+- Semua: threshold satu konstanta dgn pewarnaan; honest-unreachable; ekspor collector.
+
+### Verified
+- tsc/build · walk 24/0 · synergy 6/0 · trace-parity 117/117 · export 44/0 · js-syntax clean (board+rzSupa) · opex-calculator untouched.
+
 ## v1.99.2 — 2026-07-20 (SHIP 3 Arc-3 UX — plan 4-ship KOMPLET)
 
 ### Added

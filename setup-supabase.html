@@ -59,6 +59,9 @@
 
   <script>
   var OWNER_ACTIONS = [
+    { id:'supabase-dcmoc-projects', added:'2026-07-20', title:'Jalankan SQL Module 9 \u2014 dcmoc_projects (cloud save + share DCMOC)',
+      why:'SQL hanya dijalankan owner via dashboard Supabase; secrets/akses DB tidak pernah lewat Claude/repo runtime.',
+      steps:['Supabase Dashboard \u2192 SQL Editor','Copy-paste blok \u2018Module 9 \u2014 dcmoc_projects\u2019 dari supabase/schema.sql \u2192 Run','Verifikasi RLS: select relrowsecurity from pg_class where relname=\u0027dcmoc_projects\u0027; \u2192 true','Verifikasi anon: sebagai anon, select * from dcmoc_projects \u2192 0 rows (RLS bekerja)','Verifikasi share RPC: select public.get_shared_project(\u0027xxxxxxxxxxxxxxxxxxxxxx\u0027); \u2192 error \u2018not found\u2019 (bukan error lain)','Setelah itu tombol \u2018Simpan ke cloud\u2019 + Share di DCMOC \u2192 Projects otomatis aktif'] },
     { id:'github-token-rotate', added:'2026-07-17', title:'Ganti + revoke GitHub token — SELESAI PENUH ✓ (2026-07-19)',
       why:'Token = rahasia owner — jangan pernah kirim/paste ke Claude; ketik sendiri di terminal.',
       steps:['Token baru fine-grained dibuat \u2713','URL remote dibersihkan + credential.helper=store \u2713','git push nyata BERHASIL, token baru (github_pat_\u2026) tersimpan di ~/.git-credentials \u2713','Token lama classic (resistancezero_1) di-REVOKE \u2713','TERVERIFIKASI Claude: auth remote tetap jalan pakai token baru \u2014 rotasi 100% tuntas, centang selesai \u2713'] },

@@ -3,7 +3,8 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { rzModels } from '@/lib/rz-engine';
-import { calculateCapacityPlan, CAPACITY_PRESETS, CapacityPhase, CapacityPlanResult } from '@/modules/capacity/CapacityPlanningEngine';
+import { calculateCapacityPlan, CAPACITY_PRESETS, CapacityPhase, CapacityPlanResult, CapacityPlanInput } from '@/modules/capacity/CapacityPlanningEngine';
+import { explainThresholdMetric, type ThresholdLeverSpec, type ThresholdMetricExplain, type DecisionLever } from '@/lib/decision-explain';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { Layers, DollarSign, Zap, Users, TrendingUp, Plus, Trash2, AlertTriangle, ShieldCheck, FileText, BarChart3 } from 'lucide-react';
@@ -16,6 +17,140 @@ import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 
 const PHASE_COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ec4899'];
 
+/* ─── Diagnostics Tier-1: risk-score bands (single source — badge, panel, collector) ─── */
+export const RISK_AT_RISK_THRESHOLD = 60; // red At-Risk band starts here
+export const RISK_WATCH_THRESHOLD = 35;   // amber Watch band starts here
+
+/** Shared diagnostics finding shape (Tier-1 collector contract). */
+export interface Finding {
+    id: string;
+    severity: 'warn' | 'info';
+    title: string;
+    detail: string;
+    linkTab: 'capacity';
+}
+
+/** Tier-1 diagnostics: every phase whose risk score sits in the At-Risk band (≥ RISK_AT_RISK_THRESHOLD). */
+export function collectCapacityDiagnostics(model: CapacityPlanResult): Finding[] {
+    return model.phaseDetails
+        .filter((d) => d.riskScore >= RISK_AT_RISK_THRESHOLD)
+        .map((d) => ({
+            id: `capacity-phase-risk-${d.id}`,
+            severity: 'warn' as const,
+            title: `${d.label} At-Risk — risk score ${d.riskScore} ≥ ${RISK_AT_RISK_THRESHOLD}`,
+            detail: `${d.riskFactors.join('; ')}. Klik badge risk di tab Capacity untuk alasan + lever terukur (bisection di atas calculateCapacityPlan).`,
+            linkTab: 'capacity' as const,
+        }));
+}
+
+/* ─── At-Risk phase explain (klik badge → alasan + lever, owner mandate: no naked bad chips) ─
+ * Alasan = komponen risk-score penyebab dengan angka live, di-derive dengan me-rerun
+ * calculateCapacityPlan (rantai model halaman INI) dengan satu driver dinetralkan — bukan
+ * menyalin ulang konstanta formula engine. Lever kontinu (defer IT load / kompresi build)
+ * di-solve bisection via explainThresholdMetric di atas rantai yang sama; driver global
+ * diskrit (cooling / tier) dirender sebagai catatan terukur dari re-run model yang sama.
+ * SENGAJA tidak memakai remediation CapacityPlanningPage — halaman itu membaca adapter
+ * berbeda (sanitizeCap → facilitySnapshot → utilization), hanya polanya yang direferensikan. */
+function explainPhaseRisk(input: CapacityPlanInput, idx: number): ThresholdMetricExplain {
+    const phase = input.phases[idx];
+    type RiskMods = {
+        itLoadKw?: number;
+        buildMonths?: number;
+        coolingType?: CapacityPlanInput['coolingType'];
+        tierLevel?: CapacityPlanInput['tierLevel'];
+    };
+    const riskAt = (mods: RiskMods): number => {
+        const phases = input.phases.map((p, i) => i === idx
+            ? { ...p, itLoadKw: mods.itLoadKw ?? p.itLoadKw, buildMonths: mods.buildMonths ?? p.buildMonths }
+            : p);
+        return calculateCapacityPlan({
+            ...input,
+            phases,
+            coolingType: mods.coolingType ?? input.coolingType,
+            tierLevel: mods.tierLevel ?? input.tierLevel,
+        }).phaseDetails[idx]?.riskScore ?? 0;
+    };
+    const current = riskAt({});
+
+    // Live component attribution: delta ketika satu driver dinetralkan (re-run model, bukan salin formula)
+    const parts: string[] = [];
+    if (phase.itLoadKw >= 20000) parts.push(`skala ${fmtKw(phase.itLoadKw)} (+${current - riskAt({ itLoadKw: 15000 })} vs <20 MW)`);
+    if (phase.buildMonths > 18) parts.push(`build ${phase.buildMonths} bln (+${current - riskAt({ buildMonths: 18 })} vs ≤18 bln)`);
+    if (idx > 0) {
+        const soloRisk = calculateCapacityPlan({ ...input, phases: [phase] }).phaseDetails[0]?.riskScore ?? current;
+        parts.push(`fase lanjutan #${idx + 1} (+${current - soloRisk} koordinasi antar-fase)`);
+    }
+    if (input.coolingType === 'liquid') parts.push(`liquid cooling (+${current - riskAt({ coolingType: 'inrow' })} lead time supply chain)`);
+    if (input.tierLevel === 4) parts.push(`Tier IV (+${current - riskAt({ tierLevel: 3 })} concurrent maintainability)`);
+
+    const specs: ThresholdLeverSpec[] = [];
+    if (phase.itLoadKw >= 20000) specs.push({
+        lo: phase.itLoadKw, hi: 15000,
+        metricAt: (x) => riskAt({ itLoadKw: x }),
+        render: (x, achieved) => {
+            const mw = Math.floor(x / 100) / 10; // konservatif: bulatkan ke bawah agar tetap lolos band
+            return {
+                label: `IT load ${(phase.itLoadKw / 1000).toFixed(1)} → ≤${mw.toFixed(1)} MW`,
+                detail: `Turunkan IT load fase ini ke ≤${mw.toFixed(1)} MW (defer −${((phase.itLoadKw - mw * 1000) / 1000).toFixed(1)} MW ke fase tambahan) → risk score ${Math.round(achieved)} < ${RISK_AT_RISK_THRESHOLD} — edit IT Load (kW) di Phase Configuration.`,
+            };
+        },
+        unreachable: (atHi) => ({
+            label: 'Defer beban saja tidak cukup',
+            detail: `Bahkan IT load 15 MW risk score masih ${Math.round(atHi)} ≥ ${RISK_AT_RISK_THRESHOLD} — kombinasikan dengan lever/catatan lain di bawah.`,
+        }),
+        targetTab: 'capacity',
+    });
+    if (phase.buildMonths > 18) specs.push({
+        lo: phase.buildMonths, hi: 12,
+        metricAt: (x) => riskAt({ buildMonths: x }),
+        render: (x, achieved) => {
+            const mo = Math.floor(x + 0.01);
+            return {
+                label: `Build ${phase.buildMonths} → ≤${mo} bln`,
+                detail: `Persingkat build fase ini ke ≤${mo} bln (modular/prefab, paralelkan fit-out) → risk score ${Math.round(achieved)} < ${RISK_AT_RISK_THRESHOLD} — edit Build (Mo) di Phase Configuration.`,
+            };
+        },
+        unreachable: (atHi) => ({
+            label: 'Kompresi jadwal saja tidak cukup',
+            detail: `Bahkan build 12 bln risk score masih ${Math.round(atHi)} ≥ ${RISK_AT_RISK_THRESHOLD} — kombinasikan dengan lever/catatan lain.`,
+        }),
+        targetTab: 'capacity',
+    });
+
+    const ex = explainThresholdMetric({
+        metricLabel: `Risk score ${phase.label}`,
+        value: current,
+        threshold: RISK_AT_RISK_THRESHOLD - 1, // pass = keluar band At-Risk (< 60)
+        direction: 'atMost',
+        fmtValue: (v) => `${Math.round(v)}`,
+        because: `band At-Risk mulai ${RISK_AT_RISK_THRESHOLD} — komponen penyebab: ${parts.join(', ') || 'profil risiko standar'}`,
+        levers: specs,
+    });
+    if (ex.pass) return ex;
+
+    // Driver global diskrit (berlaku seluruh desain) — angka dari re-run model yang sama
+    const extra: DecisionLever[] = [];
+    if (input.coolingType === 'liquid') {
+        const achieved = riskAt({ coolingType: 'rdhx' });
+        extra.push({
+            label: 'Cooling liquid → rear-door HX (global)',
+            detail: `Mengganti cooling liquid → RDHx menurunkan risk score fase ini ${current} → ${achieved}${achieved < RISK_AT_RISK_THRESHOLD ? ` < ${RISK_AT_RISK_THRESHOLD} (keluar At-Risk)` : ` (masih ≥ ${RISK_AT_RISK_THRESHOLD})`} — input cooling berlaku untuk seluruh desain; evaluasi dampak densitas rack dulu.`,
+            targetTab: 'capacity',
+            priority: achieved < RISK_AT_RISK_THRESHOLD ? 'HIGH' : 'MED',
+        });
+    }
+    if (input.tierLevel === 4) {
+        const achieved = riskAt({ tierLevel: 3 });
+        extra.push({
+            label: 'Tier IV → Tier III (global)',
+            detail: `Menurunkan tier 4 → 3 mengurangi risk score fase ini ${current} → ${achieved}${achieved < RISK_AT_RISK_THRESHOLD ? ` < ${RISK_AT_RISK_THRESHOLD} (keluar At-Risk)` : ` (masih ≥ ${RISK_AT_RISK_THRESHOLD})`} — trade-off availability/concurrent-maintainability, hanya bila SLA mengizinkan.`,
+            targetTab: 'capacity',
+            priority: achieved < RISK_AT_RISK_THRESHOLD ? 'HIGH' : 'MED',
+        });
+    }
+    return { ...ex, levers: [...ex.levers, ...extra] };
+}
+
 const CapacityDashboardMod = () => {
     const { selectedCountry, inputs, actions } = useSimulationStore();
     const [localPhases, setLocalPhases] = useState<CapacityPhase[]>(inputs.capacityPhases);
@@ -27,9 +162,9 @@ const CapacityDashboardMod = () => {
     const [activeTab, setActiveTab] = useState<'overview' | 'details' | 'assumptions'>('overview');
     const [isExporting, setIsExporting] = useState(false);
 
-    const result: CapacityPlanResult | null = useMemo(() => {
+    const planInput: CapacityPlanInput | null = useMemo(() => {
         if (!selectedCountry || localPhases.length === 0) return null;
-        return calculateCapacityPlan({
+        return {
             phases: localPhases,
             country: selectedCountry,
             coolingType: inputs.coolingType,
@@ -37,8 +172,39 @@ const CapacityDashboardMod = () => {
             shiftModel: inputs.shiftModel,
             maintenanceModel: inputs.maintenanceModel,
             hybridRatio: inputs.hybridRatio,
-        });
+        };
     }, [selectedCountry, localPhases, inputs]);
+
+    const result: CapacityPlanResult | null = useMemo(
+        () => (planInput ? calculateCapacityPlan(planInput) : null),
+        [planInput],
+    );
+
+    /* At-Risk badge → solved explain panel (alasan + lever bisection atas rantai model halaman ini) */
+    const [riskExplainIdx, setRiskExplainIdx] = useState<number | null>(null);
+    const riskEx = useMemo(() => {
+        if (riskExplainIdx == null || !planInput || !result) return null;
+        const detail = result.phaseDetails[riskExplainIdx];
+        if (!detail || detail.riskScore < RISK_AT_RISK_THRESHOLD) return null;
+        return { idx: riskExplainIdx, detail, ex: explainPhaseRisk(planInput, riskExplainIdx) };
+    }, [riskExplainIdx, planInput, result]);
+
+    const riskPanel = (rx: NonNullable<typeof riskEx>) => (
+        <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-3 text-left">
+            <p className="text-[11px] leading-relaxed text-slate-700 dark:text-slate-300">{rx.ex.reason}</p>
+            <div className="mt-1.5 space-y-1">
+                {rx.ex.levers.map((l, i) => (
+                    <div key={i} className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
+                        <span className={`shrink-0 rounded px-1 py-0.5 text-[8px] font-bold text-white ${l.priority !== 'MED' ? 'bg-emerald-600' : 'bg-slate-500'}`}>
+                            {l.priority !== 'MED' ? 'LEVER' : 'NOTE'}
+                        </span>
+                        <span><b>{l.label}</b> — {l.detail}</span>
+                    </div>
+                ))}
+            </div>
+            <p className="mt-1.5 text-[9px] text-slate-400">Angka lever di-solve ulang dari calculateCapacityPlan live (bisection deterministik, bukan estimasi statis).</p>
+        </div>
+    );
 
     const applyPreset = useCallback((preset: 'small' | 'medium' | 'large') => {
         setLocalPhases([...CAPACITY_PRESETS[preset]]);
@@ -423,7 +589,8 @@ const CapacityDashboardMod = () => {
                                         {result.phases.map((phase, idx) => {
                                             const detail = result.phaseDetails[idx];
                                             return (
-                                                <tr key={phase.id} className="border-b border-slate-100 dark:border-slate-800">
+                                                <React.Fragment key={phase.id}>
+                                                <tr className="border-b border-slate-100 dark:border-slate-800">
                                                     <td className="py-2 px-2 font-medium text-slate-900 dark:text-white flex items-center gap-2">
                                                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: PHASE_COLORS[idx % PHASE_COLORS.length] }} />
                                                         {phase.label}
@@ -437,16 +604,31 @@ const CapacityDashboardMod = () => {
                                                     <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{detail ? `${detail.roiYears}yr` : '-'}</td>
                                                     <td className="text-right py-2 px-2">
                                                         {detail && (
-                                                            <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                                                                detail.riskScore >= 60 ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' :
-                                                                detail.riskScore >= 35 ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' :
-                                                                'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
-                                                            }`}>
-                                                                {detail.riskScore}
-                                                            </span>
+                                                            detail.riskScore >= RISK_AT_RISK_THRESHOLD ? (
+                                                                <button
+                                                                    onClick={() => setRiskExplainIdx(riskExplainIdx === idx ? null : idx)}
+                                                                    title={`At-Risk: risk score ${detail.riskScore} ≥ ${RISK_AT_RISK_THRESHOLD} — klik untuk alasan + lever terukur`}
+                                                                    className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-2 ${riskExplainIdx === idx ? 'ring-1 ring-red-400' : ''}`}
+                                                                >
+                                                                    {detail.riskScore} ⓘ
+                                                                </button>
+                                                            ) : (
+                                                                <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                                                                    detail.riskScore >= RISK_WATCH_THRESHOLD ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' :
+                                                                    'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                                                                }`}>
+                                                                    {detail.riskScore}
+                                                                </span>
+                                                            )
                                                         )}
                                                     </td>
                                                 </tr>
+                                                {riskEx && riskEx.idx === idx && (
+                                                    <tr className="border-b border-slate-100 dark:border-slate-800">
+                                                        <td colSpan={9} className="py-2 px-2">{riskPanel(riskEx)}</td>
+                                                    </tr>
+                                                )}
+                                                </React.Fragment>
                                             );
                                         })}
                                         <tr className="font-bold">
@@ -502,10 +684,19 @@ const CapacityDashboardMod = () => {
                                         </div>
                                         <div className="text-center">
                                             <div className="text-[10px] text-slate-400 uppercase">Risk</div>
-                                            <div className={`text-sm font-bold ${
-                                                detail.riskScore >= 60 ? 'text-red-500' :
-                                                detail.riskScore >= 35 ? 'text-amber-500' : 'text-emerald-500'
-                                            }`}>{detail.riskScore}/100</div>
+                                            {detail.riskScore >= RISK_AT_RISK_THRESHOLD ? (
+                                                <button
+                                                    onClick={() => setRiskExplainIdx(riskExplainIdx === idx ? null : idx)}
+                                                    title={`At-Risk: risk score ${detail.riskScore} ≥ ${RISK_AT_RISK_THRESHOLD} — klik untuk alasan + lever terukur`}
+                                                    className={`text-sm font-bold text-red-500 cursor-pointer underline decoration-dotted underline-offset-2 ${riskExplainIdx === idx ? 'ring-1 ring-red-400 rounded px-1' : ''}`}
+                                                >
+                                                    {detail.riskScore}/100 ⓘ
+                                                </button>
+                                            ) : (
+                                                <div className={`text-sm font-bold ${
+                                                    detail.riskScore >= RISK_WATCH_THRESHOLD ? 'text-amber-500' : 'text-emerald-500'
+                                                }`}>{detail.riskScore}/100</div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -537,6 +728,10 @@ const CapacityDashboardMod = () => {
                                         </ul>
                                     </div>
                                 </div>
+
+                                {riskEx && riskEx.idx === idx && (
+                                    <div className="mt-4">{riskPanel(riskEx)}</div>
+                                )}
                             </CardContent>
                         </Card>
                     ))}

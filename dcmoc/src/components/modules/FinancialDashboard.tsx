@@ -21,7 +21,66 @@ import {
 import { generateFinancialPDF } from '@/modules/reporting/PdfGenerator';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 import html2canvas from 'html2canvas';
-import { fmt, fmtMoney } from '@/lib/format';
+import { fmt, fmtMoney, fmtPct } from '@/lib/format';
+import { explainThresholdMetric, ThresholdLeverSpec, ThresholdMetricExplain } from '@/lib/decision-explain';
+
+/* ─── Diagnostics Tier-1: NPV / ROI thresholds ───────────────────────────────
+ * SINGLE SOURCE for (a) KPI red/green coloring, (b) the click-to-explain
+ * panel gating, and (c) collectFinancialDiagnostics — never duplicate the
+ * literal 0 at a call site. Fail predicates mirror the original coloring
+ * exactly: NPV green when `npv >= 0`, ROI green when `roiPercent > 0`. */
+const NPV_THRESHOLD = 0;      // NPV ≥ 0 → value-creating at the chosen discount rate
+const ROI_THRESHOLD_PCT = 0;  // ROI > 0% → lifetime net income exceeds CAPEX
+const FINANCE_TAB = 'finance'; // shell tab hosting this page (revenue lever lives in the sidebar here)
+const CAPEX_TAB = 'capex';     // shell tab where the CAPEX lever is fine-tuned
+
+const npvFails = (npv: number): boolean => !(npv >= NPV_THRESHOLD);
+const roiFails = (roiPercent: number): boolean => !(roiPercent > ROI_THRESHOLD_PCT);
+
+/* Lever search bounds (mirrors decision-explain conventions): beyond these the
+ * honest answer is "structure, not tuning". */
+const DIAG_REV_MULT_MAX = 2.5;   // up to +150% revenue
+const DIAG_CAPEX_MULT_MIN = 0.4; // up to −60% CAPEX
+
+/* ─── Diagnostics Center collector (pure — no hooks, no DOM) ──────────────── */
+export interface Finding {
+    surface: string;
+    severity: 'high' | 'medium';
+    metric: string;
+    value: number;
+    threshold: number;
+    linkTab: string;
+}
+
+/**
+ * Return the ACTIVE Tier-1 findings for this page (NPV < 0, ROI ≤ 0) from an
+ * already-computed FinancialResult. Pure + deterministic so a future
+ * Diagnostics Center can call it headlessly with the same model the page uses.
+ */
+export function collectFinancialDiagnostics(model: Pick<FinancialResult, 'npv' | 'roiPercent'>): Finding[] {
+    const findings: Finding[] = [];
+    if (npvFails(model.npv)) {
+        findings.push({
+            surface: 'Finance · Pro-Forma & Revenue',
+            severity: 'high', // value destruction at the chosen discount rate
+            metric: 'NPV',
+            value: model.npv,
+            threshold: NPV_THRESHOLD,
+            linkTab: FINANCE_TAB,
+        });
+    }
+    if (roiFails(model.roiPercent)) {
+        findings.push({
+            surface: 'Finance · Pro-Forma & Revenue',
+            severity: 'medium', // undiscounted corroborating signal — NPV is the primary lens
+            metric: 'ROI',
+            value: model.roiPercent,
+            threshold: ROI_THRESHOLD_PCT,
+            linkTab: FINANCE_TAB,
+        });
+    }
+    return findings;
+}
 
 // ─── Editable Cell Component ─────────────────────────────────
 // Shows calculated value but allows user override. Yellow border = edited
@@ -243,6 +302,97 @@ const FinancialDashboard = () => {
             taxRate: finInputs.taxRate,
             depreciationYears: finInputs.depreciationYears,
         });
+    }, [capexResults, annualOpex, inputs.itLoad, finInputs]);
+
+    /* ─── Diagnostics Tier-1: NPV / ROI explain (owner mandate: no naked red numbers)
+     * Recompute closure re-runs the SAME chain the KPIs use (capexResults.total →
+     * annualOpex → calculateFinancials with identical finInputs + occupancy ramp),
+     * only scaling revenue / CAPEX. explainThresholdMetric bisects on it — this
+     * component never re-implements or fabricates cashflow math. */
+    const [openDiag, setOpenDiag] = useState<'npv' | 'roi' | null>(null);
+    const diag = useMemo((): { npv: ThresholdMetricExplain | null; roi: ThresholdMetricExplain | null } | null => {
+        if (!capexResults) return null;
+        const occupancyRamp = defaultOccupancyRamp(finInputs.projectLifeYears);
+        const recompute = (mods: { revMult?: number; capexMult?: number }): FinancialResult =>
+            calculateFinancials({
+                totalCapex: capexResults.total * (mods.capexMult ?? 1),
+                annualOpex,
+                revenuePerKwMonth: finInputs.revenuePerKwMonth * (mods.revMult ?? 1),
+                itLoadKw: inputs.itLoad,
+                discountRate: finInputs.discountRate,
+                projectLifeYears: finInputs.projectLifeYears,
+                escalationRate: finInputs.escalationRate,
+                opexEscalation: finInputs.opexEscalation,
+                occupancyRamp,
+                taxRate: finInputs.taxRate,
+                depreciationYears: finInputs.depreciationYears,
+            });
+        const base = recompute({});
+        const revBase = finInputs.revenuePerKwMonth;
+        const capexBase = capexResults.total;
+
+        /* Same two levers for both metrics — only the metric read + formatter differ. */
+        const leversFor = (
+            metricName: string,
+            metricOf: (r: FinancialResult) => number,
+            fmtA: (v: number) => string,
+            passLabel: string,
+        ): ThresholdLeverSpec[] => [
+            {
+                lo: 1,
+                hi: DIAG_REV_MULT_MAX,
+                metricAt: (m) => metricOf(recompute({ revMult: m })),
+                render: (m, achieved) => ({
+                    label: `Revenue +${((m - 1) * 100).toFixed(0)}%`,
+                    detail: `Revenue perlu naik +${((m - 1) * 100).toFixed(1)}% — dari ${fmtMoney(revBase)} ke ${fmtMoney(revBase * m)}/kW/bln — agar ${metricName} mencapai ${fmtA(achieved)} ${passLabel}. Edit "Revenue per kW/month" di sidebar halaman ini.`,
+                }),
+                unreachable: (atHi) => ({
+                    label: 'Revenue saja tidak cukup',
+                    detail: `Bahkan revenue +${((DIAG_REV_MULT_MAX - 1) * 100).toFixed(0)}% (ke ${fmtMoney(revBase * DIAG_REV_MULT_MAX)}/kW/bln) hanya membawa ${metricName} ke ${fmtA(atHi)} — struktur biaya (CAPEX + OPEX) yang mengikat, bukan sekadar tarif.`,
+                }),
+                targetTab: FINANCE_TAB, // parameter lives in this page's sidebar — no tab hop
+            },
+            {
+                lo: 0,
+                hi: 1 - DIAG_CAPEX_MULT_MIN,
+                metricAt: (cut) => metricOf(recompute({ capexMult: 1 - cut })),
+                render: (cut, achieved) => ({
+                    label: `CAPEX −${(cut * 100).toFixed(0)}%`,
+                    detail: `ATAU CAPEX turun −${(cut * 100).toFixed(1)}% — dari ${fmtMoney(capexBase)} ke ${fmtMoney(capexBase * (1 - cut))} — agar ${metricName} mencapai ${fmtA(achieved)} ${passLabel}.`,
+                }),
+                unreachable: (atHi) => ({
+                    label: 'CAPEX saja tidak cukup',
+                    detail: `Bahkan CAPEX −${((1 - DIAG_CAPEX_MULT_MIN) * 100).toFixed(0)}% (ke ${fmtMoney(capexBase * DIAG_CAPEX_MULT_MIN)}) hanya membawa ${metricName} ke ${fmtA(atHi)} — sisi pendapatan/OPEX yang mengikat.`,
+                }),
+                targetTab: CAPEX_TAB,
+            },
+        ];
+
+        const npvExplain = npvFails(base.npv)
+            ? explainThresholdMetric({
+                metricLabel: 'NPV',
+                value: base.npv,
+                threshold: NPV_THRESHOLD,
+                direction: 'atLeast',
+                fmtValue: fmtMoney,
+                because: `PV cashflow ${fmtMoney(base.npv + capexBase)} < CAPEX ${fmtMoney(capexBase)} pada discount rate ${(finInputs.discountRate * 100).toFixed(0)}%`,
+                levers: leversFor('NPV', (r) => r.npv, fmtMoney, `≥ ${fmtMoney(NPV_THRESHOLD)}`),
+            })
+            : null;
+
+        const roiExplain = roiFails(base.roiPercent)
+            ? explainThresholdMetric({
+                metricLabel: 'ROI',
+                value: base.roiPercent,
+                threshold: ROI_THRESHOLD_PCT,
+                direction: 'atLeast',
+                fmtValue: fmtPct,
+                because: `total net income ${fmtMoney(base.totalProfit)} < CAPEX ${fmtMoney(capexBase)} selama ${finInputs.projectLifeYears} th`,
+                levers: leversFor('ROI', (r) => r.roiPercent, fmtPct, `> ${fmtPct(ROI_THRESHOLD_PCT, 0)}`),
+            })
+            : null;
+
+        return { npv: npvExplain, roi: roiExplain };
     }, [capexResults, annualOpex, inputs.itLoad, finInputs]);
 
     // Revenue model
@@ -578,13 +728,17 @@ const FinancialDashboard = () => {
 
                 {/* ── Financial KPIs ────────────────── */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <Card className={`border shadow-sm dark:shadow-none ${result.npv >= 0 ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/50' : 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800/50'}`}>
+                    <Card className={`border shadow-sm dark:shadow-none ${!npvFails(result.npv) ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/50' : 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800/50'}`}>
                         <CardContent className="pt-4">
                             <div className="flex items-center gap-1.5 mb-1">
                                 <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                                 <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">NPV</span><Tooltip content="Net Present Value — sum of all discounted future cashflows minus initial investment. Positive = value-creating project." /><Explain k="npv" />
                             </div>
-                            <div className={`text-2xl font-bold ${result.npv >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                            <div
+                                className={`text-2xl font-bold ${!npvFails(result.npv) ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
+                                title={npvFails(result.npv) ? `${diag?.npv?.reason ?? `NPV ${fmtMoney(result.npv)} negatif pada discount rate yang dipakai.`} Klik untuk lihat alasan & lever kuantitatif.` : undefined}
+                                onClick={npvFails(result.npv) ? (e) => { e.stopPropagation(); setOpenDiag(d => d === 'npv' ? null : 'npv'); } : undefined}
+                            >
                                 {fmtMoney(result.npv)}
                             </div>
                             <div className="text-xs text-slate-500 mt-1">@ {(finInputs.discountRate * 100).toFixed(0)}% discount rate</div>
@@ -624,13 +778,60 @@ const FinancialDashboard = () => {
                                 <Percent className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                                 <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">ROI</span><Tooltip content="Return on Investment — total profit as percentage of initial CAPEX. PI (Profitability Index) = PV of cashflows / investment." />
                             </div>
-                            <div className={`text-2xl font-bold ${result.roiPercent > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                            <div
+                                className={`text-2xl font-bold ${!roiFails(result.roiPercent) ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
+                                title={roiFails(result.roiPercent) ? `${diag?.roi?.reason ?? `ROI ${fmtPct(result.roiPercent, 0)} tidak positif.`} Klik untuk lihat alasan & lever kuantitatif.` : undefined}
+                                onClick={roiFails(result.roiPercent) ? (e) => { e.stopPropagation(); setOpenDiag(d => d === 'roi' ? null : 'roi'); } : undefined}
+                            >
                                 {Number.isFinite(result.roiPercent) ? `${result.roiPercent.toFixed(0)}%` : 'N/A'}
                             </div>
                             <div className="text-xs text-slate-500 mt-1">PI: {Number.isFinite(result.profitabilityIndex) ? `${result.profitabilityIndex.toFixed(2)}x` : 'N/A'}</div>
                         </CardContent>
                     </Card>
                 </div>
+
+                {/* ── Diagnostics panel — reason + quantified levers (bisection on the SAME model) ── */}
+                {openDiag && (() => {
+                    const ex = openDiag === 'npv' ? diag?.npv : diag?.roi;
+                    if (!ex) return null; // metric recovered → panel disappears with it
+                    return (
+                        <div className="p-3 rounded-lg border bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800/40">
+                            <div className="flex items-start justify-between gap-2">
+                                <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{ex.reason}</p>
+                                <button
+                                    type="button"
+                                    onClick={() => setOpenDiag(null)}
+                                    className="shrink-0 text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                >
+                                    Tutup ✕
+                                </button>
+                            </div>
+                            {ex.levers.length > 0 && (
+                                <div className="mt-2">
+                                    <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">Yang perlu diubah</div>
+                                    <div className="space-y-1.5">
+                                        {ex.levers.map((lv, li) => {
+                                            const external = lv.targetTab !== FINANCE_TAB;
+                                            return (
+                                                <button
+                                                    key={li}
+                                                    type="button"
+                                                    onClick={external ? (e) => { e.stopPropagation(); simActions.setActiveTab(lv.targetTab as 'capex'); } : undefined}
+                                                    title={external ? `Buka tab "${lv.targetTab}" untuk fine-tune parameter ini` : 'Parameter ini di-edit di sidebar halaman ini'}
+                                                    className={`w-full flex items-start gap-2 p-2 rounded-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-left group ${external ? 'hover:border-blue-400 dark:hover:border-blue-500 transition-colors' : 'cursor-default'}`}
+                                                >
+                                                    <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 whitespace-nowrap">{lv.label}</span>
+                                                    <span className="flex-1 text-[11px] text-slate-600 dark:text-slate-400 leading-snug">{lv.detail}</span>
+                                                    {external && <ArrowUpRight className="shrink-0 w-3.5 h-3.5 text-slate-400 group-hover:text-blue-500 mt-0.5" />}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    );
+                })()}
 
                 {/* ── Revenue KPIs ──────────────────── */}
                 {revResult && (

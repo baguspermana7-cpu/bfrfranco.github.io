@@ -2,11 +2,158 @@
 
 import React, { useMemo, useState } from 'react';
 import { useSimulationStore } from '@/store/simulation';
-import { calculateCompliance, ComplianceResult, ComplianceCategory } from '@/modules/compliance/ComplianceEngine';
+import { calculateCompliance, ComplianceResult, ComplianceCategory, ComplianceItem } from '@/modules/compliance/ComplianceEngine';
+import { COUNTRIES, CountryProfile } from '@/constants/countries';
 import { ClipboardCheck, Shield, DollarSign, AlertTriangle, CheckCircle2, BarChart3 } from 'lucide-react';
 import clsx from 'clsx';
 import { fmtMoney, fmtMoneyFull } from '@/lib/format';
 import { Tooltip } from '@/components/ui/Tooltip';
+
+/* ─── Score thresholds — SINGLE source for colouring, click-gating, and the
+ * diagnostics collector. Mirrors the colour bands that were previously
+ * hardcoded inline (≥80 emerald · 60–79 amber · <60 red). ─────────────────── */
+const SCORE_GOOD = 80;
+const SCORE_CRITICAL = 60;
+/** Mirrors ComplianceEngine's internal `maxItems` coverage benchmark.
+ *  Runtime-verified: `formulaVerified` re-derives the engine score from these
+ *  constants and flags drift instead of showing wrong lever numbers. */
+const SCORE_MAX_ITEMS = 14;
+/** Richest documented framework in the engine (13 items) — used as the
+ *  coverage benchmark to name WHICH mandatory items are not yet covered. */
+const BENCHMARK_COUNTRY_ID = 'ID';
+
+/** The engine's own score formula (ComplianceEngine.calculateCompliance):
+ *  round(min(100, count/14 × 100) × 0.6 + mandatory/count × 40), capped at 100. */
+const scoreFromCounts = (count: number, mandatoryCount: number): number => {
+    const coverage = Math.min(100, (count / SCORE_MAX_ITEMS) * 100);
+    const ratio = mandatoryCount / Math.max(1, count);
+    return Math.min(100, Math.round(coverage * 0.6 + ratio * 40));
+};
+
+interface CategoryGap {
+    category: ComplianceCategory;
+    label: string;
+    activeCount: number;
+    benchmarkCount: number;
+}
+
+interface ComplianceScoreDiagnostics {
+    score: number;
+    count: number;
+    mandatoryCount: number;
+    optionalCount: number;
+    /** Coverage contribution: min(100, count/14×100) × 0.6 — of 60 pts. */
+    coveragePts: number;
+    /** Mandatory-ratio contribution: mandatory/count × 40 — of 40 pts. */
+    mandatoryPts: number;
+    /** True when re-deriving the score from the mirrored formula matches the engine. */
+    formulaVerified: boolean;
+    /** Categories where the active framework has fewer items than the benchmark. */
+    categoryGaps: CategoryGap[];
+    /** Benchmark mandatory items beyond the active framework's per-category depth. */
+    missingMandatory: ComplianceItem[];
+    /** Engine costs of completing `missingMandatory`. */
+    addInitialCost: number;
+    addAnnualCost: number;
+    /** Score after adding the missing mandatory items — SAME formula. */
+    projectedScore: number;
+}
+
+function buildScoreDiagnostics(country: CountryProfile, itLoadKw: number): ComplianceScoreDiagnostics {
+    const result = calculateCompliance(country, itLoadKw);
+    const count = result.totalCount;
+    const mandatoryCount = result.mandatoryCount;
+    const coveragePts = Math.min(100, (count / SCORE_MAX_ITEMS) * 100) * 0.6;
+    const mandatoryPts = (mandatoryCount / Math.max(1, count)) * 40;
+    const formulaVerified = scoreFromCounts(count, mandatoryCount) === result.complianceScore;
+
+    const benchCountry = COUNTRIES[BENCHMARK_COUNTRY_ID];
+    const bench = benchCountry && country.id !== BENCHMARK_COUNTRY_ID
+        ? calculateCompliance(benchCountry, itLoadKw)
+        : null;
+
+    const categoryGaps: CategoryGap[] = [];
+    const missingMandatory: ComplianceItem[] = [];
+    if (bench) {
+        const benchCategories = [...new Set(bench.items.map(i => i.category))];
+        for (const cat of benchCategories) {
+            const benchItems = bench.items.filter(i => i.category === cat);
+            const activeCount = result.items.filter(i => i.category === cat).length;
+            if (benchItems.length > activeCount) {
+                categoryGaps.push({
+                    category: cat,
+                    label: bench.categoryBreakdown.find(c => c.category === cat)?.label ?? cat,
+                    activeCount,
+                    benchmarkCount: benchItems.length,
+                });
+                missingMandatory.push(...benchItems.slice(activeCount).filter(i => i.mandatory));
+            }
+        }
+    }
+
+    const addInitialCost = missingMandatory.reduce((s, i) => s + i.initialCost, 0);
+    const addAnnualCost = missingMandatory.reduce((s, i) => s + i.annualCost, 0);
+    const projectedScore = scoreFromCounts(count + missingMandatory.length, mandatoryCount + missingMandatory.length);
+
+    return {
+        score: result.complianceScore,
+        count,
+        mandatoryCount,
+        optionalCount: count - mandatoryCount,
+        coveragePts,
+        mandatoryPts,
+        formulaVerified,
+        categoryGaps,
+        missingMandatory,
+        addInitialCost,
+        addAnnualCost,
+        projectedScore,
+    };
+}
+
+/* ─── Diagnostics collector (Tier-1) — pure, engine-backed, no React ──────── */
+export interface Finding {
+    surface: string;
+    severity: 'critical' | 'warning' | 'info';
+    metric: string;
+    value: number;
+    threshold: number;
+    linkTab: 'compliance';
+}
+
+export interface ComplianceDiagnosticsModel {
+    selectedCountry: CountryProfile | null;
+    itLoadKw: number;
+}
+
+/** Emits a Finding when the Compliance Coverage Score falls below the SAME
+ *  thresholds used for colouring: <60 critical (red), 60–79 warning (amber). */
+export function collectComplianceDiagnostics(model: ComplianceDiagnosticsModel): Finding[] {
+    if (!model.selectedCountry) return [];
+    const result = calculateCompliance(model.selectedCountry, model.itLoadKw);
+    const score = result.complianceScore;
+    if (score < SCORE_CRITICAL) {
+        return [{
+            surface: `Compliance Coverage Score — ${result.countryName}`,
+            severity: 'critical',
+            metric: 'complianceScore',
+            value: score,
+            threshold: SCORE_CRITICAL,
+            linkTab: 'compliance',
+        }];
+    }
+    if (score < SCORE_GOOD) {
+        return [{
+            surface: `Compliance Coverage Score — ${result.countryName}`,
+            severity: 'warning',
+            metric: 'complianceScore',
+            value: score,
+            threshold: SCORE_GOOD,
+            linkTab: 'compliance',
+        }];
+    }
+    return [];
+}
 
 const CATEGORY_COLORS: Record<ComplianceCategory, string> = {
     fire: 'bg-red-500',
@@ -29,10 +176,16 @@ const CATEGORY_BG: Record<ComplianceCategory, string> = {
 export default function ComplianceDashboard() {
     const { selectedCountry, inputs } = useSimulationStore();
     const [activeCategory, setActiveCategory] = useState<ComplianceCategory | 'all'>('all');
+    const [showScorePanel, setShowScorePanel] = useState(false);
 
     const result = useMemo<ComplianceResult | null>(() => {
         if (!selectedCountry) return null;
         return calculateCompliance(selectedCountry, inputs.itLoad);
+    }, [selectedCountry, inputs.itLoad]);
+
+    const diag = useMemo<ComplianceScoreDiagnostics | null>(() => {
+        if (!selectedCountry) return null;
+        return buildScoreDiagnostics(selectedCountry, inputs.itLoad);
     }, [selectedCountry, inputs.itLoad]);
 
     if (!result) return <div className="text-slate-500 text-center py-20">Select a country to begin.</div>;
@@ -74,17 +227,122 @@ export default function ComplianceDashboard() {
             {/* Compliance Score */}
             <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                 <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">Compliance Coverage Score <Tooltip content="Weighted score (0-100) based on percentage of mandatory requirements met. Score ≥80 is good, 60-79 needs attention, <60 is critical risk." /></h3>
-                    <span className={clsx("text-2xl font-bold", result.complianceScore >= 80 ? "text-emerald-500" : result.complianceScore >= 60 ? "text-amber-500" : "text-red-500")}>
-                        {result.complianceScore}/100
-                    </span>
+                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">Compliance Coverage Score <Tooltip content={`Weighted score (0-100): framework coverage (items/${SCORE_MAX_ITEMS}, weight 60) + mandatory ratio (weight 40). Score ≥${SCORE_GOOD} is good, ${SCORE_CRITICAL}-${SCORE_GOOD - 1} needs attention, <${SCORE_CRITICAL} is critical risk.`} /></h3>
+                    {result.complianceScore < SCORE_GOOD ? (
+                        <button
+                            onClick={() => setShowScorePanel(v => !v)}
+                            title={`Skor ${result.complianceScore} di bawah ${result.complianceScore < SCORE_CRITICAL ? SCORE_CRITICAL : SCORE_GOOD}. Klik untuk breakdown formula + item mandatory yang belum tercakup + lever terukur.`}
+                            className={clsx(
+                                "text-2xl font-bold cursor-pointer underline decoration-dotted underline-offset-4",
+                                result.complianceScore >= SCORE_CRITICAL ? "text-amber-500" : "text-red-500"
+                            )}
+                        >
+                            {result.complianceScore}/100
+                        </button>
+                    ) : (
+                        <span className="text-2xl font-bold text-emerald-500">{result.complianceScore}/100</span>
+                    )}
                 </div>
                 <div className="h-3 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                     <div className={clsx(
                         "h-full rounded-full transition-all",
-                        result.complianceScore >= 80 ? "bg-emerald-500" : result.complianceScore >= 60 ? "bg-amber-500" : "bg-red-500"
+                        result.complianceScore >= SCORE_GOOD ? "bg-emerald-500" : result.complianceScore >= SCORE_CRITICAL ? "bg-amber-500" : "bg-red-500"
                     )} style={{ width: `${result.complianceScore}%` }} />
                 </div>
+
+                {/* Score diagnostics panel — engine-formula breakdown + quantified lever */}
+                {diag && showScorePanel && result.complianceScore < SCORE_GOOD && (
+                    <div className={clsx(
+                        "mt-4 rounded-lg border p-4 space-y-3",
+                        result.complianceScore < SCORE_CRITICAL
+                            ? "bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800"
+                            : "bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800"
+                    )}>
+                        {/* Reason — live numbers from the engine's own formula */}
+                        <div className="flex items-start gap-2">
+                            <AlertTriangle className={clsx("w-4 h-4 mt-0.5 shrink-0", result.complianceScore < SCORE_CRITICAL ? "text-red-500" : "text-amber-500")} />
+                            <p className="text-xs text-slate-700 dark:text-slate-300">
+                                Skor <b>{diag.score}</b> &lt; {result.complianceScore < SCORE_CRITICAL ? SCORE_CRITICAL : SCORE_GOOD} karena
+                                coverage framework <b>{diag.count}/{SCORE_MAX_ITEMS}</b> item terdokumentasi
+                                (<b>{diag.coveragePts.toFixed(1)}</b> dari 60 pts) + mandatory-ratio <b>{diag.mandatoryCount}/{diag.count}</b>
+                                {' '}(<b>{diag.mandatoryPts.toFixed(1)}</b> dari 40 pts) — formula ComplianceEngine: coverage ×0.6 + mandatory-ratio ×40.
+                            </p>
+                        </div>
+
+                        {!diag.formulaVerified && (
+                            <p className="text-[10px] text-red-600 dark:text-red-400">
+                                ⚠ Formula mirror tidak cocok dengan skor engine — angka lever di bawah bersifat indikatif (engine mungkin berubah).
+                            </p>
+                        )}
+
+                        {/* Which frameworks are not yet covered vs benchmark */}
+                        {diag.categoryGaps.length > 0 && (
+                            <div>
+                                <p className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Kategori framework belum setara benchmark engine ({COUNTRIES[BENCHMARK_COUNTRY_ID]?.name ?? BENCHMARK_COUNTRY_ID}, framework terlengkap):
+                                </p>
+                                <div className="flex flex-wrap gap-1.5 mb-2">
+                                    {diag.categoryGaps.map(g => (
+                                        <span key={g.category} className="text-[10px] px-1.5 py-0.5 rounded bg-white/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                                            <span className={`w-1.5 h-1.5 rounded-full ${CATEGORY_COLORS[g.category]}`} />
+                                            {g.label} {g.activeCount}/{g.benchmarkCount}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Missing mandatory items with engine costs */}
+                        {diag.missingMandatory.length > 0 ? (
+                            <>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-[11px]">
+                                        <thead>
+                                            <tr className="text-slate-500">
+                                                <th className="text-left py-1 font-medium">Item mandatory belum tercakup</th>
+                                                <th className="text-left py-1 font-medium">Standard</th>
+                                                <th className="text-right py-1 font-medium">Initial</th>
+                                                <th className="text-right py-1 font-medium">Annual</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {diag.missingMandatory.map(item => (
+                                                <tr key={item.id} className="border-t border-slate-200/60 dark:border-slate-700/60">
+                                                    <td className="py-1 pr-2">
+                                                        <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                                                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${CATEGORY_COLORS[item.category]}`} />
+                                                            {item.requirement}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-1 pr-2 font-mono text-slate-500">{item.standard}</td>
+                                                    <td className="py-1 text-right font-mono text-slate-700 dark:text-slate-300">{fmtMoneyFull(item.initialCost)}</td>
+                                                    <td className="py-1 text-right font-mono text-slate-700 dark:text-slate-300">{fmtMoneyFull(item.annualCost)}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {/* Quantified lever — SAME formula, engine costs */}
+                                <div className="flex items-start gap-2 rounded-md bg-white/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 p-2.5">
+                                    <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0 text-emerald-500" />
+                                    <p className="text-xs text-slate-700 dark:text-slate-300">
+                                        <b>Lever:</b> melengkapi <b>{diag.missingMandatory.length} item mandatory</b> di atas menaikkan skor
+                                        {' '}<b>{diag.score} → {diag.projectedScore}</b> (dihitung dari formula yang sama:
+                                        coverage {diag.count + diag.missingMandatory.length}/{SCORE_MAX_ITEMS} ×0.6 + mandatory-ratio
+                                        {' '}{diag.mandatoryCount + diag.missingMandatory.length}/{diag.count + diag.missingMandatory.length} ×40).
+                                        Biaya total dari engine: <b>{fmtMoneyFull(diag.addInitialCost)}</b> initial + <b>{fmtMoneyFull(diag.addAnnualCost)}/yr</b>.
+                                    </p>
+                                </div>
+                            </>
+                        ) : (
+                            <p className="text-xs text-slate-600 dark:text-slate-400">
+                                Framework aktif sudah setara benchmark per kategori — sisa gap skor berasal dari konstanta coverage engine
+                                ({diag.count}/{SCORE_MAX_ITEMS} item) dan {diag.optionalCount} item Optional yang menahan mandatory-ratio.
+                            </p>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Category Summary Cards */}
