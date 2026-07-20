@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.99.1 — 2026-07-20 (SHIP 2 Arc-2: KORPUS LOOP HIDUP + sumber APAC/Indonesia)
+
+### Added
+- **3 extractor pattern baru** (+unit test positif/negatif di gate, guard "$/kWh"): `construction_months`, `capex_usd_per_kw`, `rack_density_kw` — fakta jadwal konstruksi NYATA pertama masuk (EIAR Google Dublin 27 bln, Vantage 30/60 bln) + rack density Uptime (7/9/50 kW).
+- **9 sumber APAC/Indonesia** (7 ter-fetch): DCI Indonesia (IDX), NeutraDC Nxera Batam 18→54 MW (Telkom), Komdigi PDN 2024, IMDA Green DC Roadmap (300 MW, PUE ≤1.3) + factsheet, NEXTDC FY24 (capex A$1B, 172,6 MW contracted), YTL Kulai 500-600 MW, METI Energy Plan 2025. Gagal jujur: BKPM (TLS chain rusak — dicatat), 1 lainnya. fetch.mjs +flag per-source `insecure`/`referer`.
+- **corpus-facts.json kini output pipeline deterministik** (aggregate.mjs; sort stabil, quote 240 char) — langkah manual dihapus; diff migrasi diverifikasi (+fakta baru saja, 0 hilang). Konsumen Data Library dibetulkan (`count` → `facts.length`).
+- README recipe refresh lengkap + kebijakan drift.
+
+### Verified — LOOP TERBUKTI
+- Regen penuh (fetch→extract→aggregate→terser→catalog) → **dc-corpus 2491/0** (fakta 597→**649**, research docs 35→**39**) → **kalibrasi tetap 19/0** (band bergeser mengikuti korpus, engine tetap in-band — inilah loop-nya).
+- Engine 604/0 · parity 155/0 · bindings 85/0 · tsc/build · walk 24/0 · synergy 6/0 · trace-parity 117/117 · export 44/0 · ?v `2026-07-20-h`.
+
 ## v1.99.0 — 2026-07-20 (SHIP 1 Arc-1: MODEL CALIBRATION — engine terbukti in-band vs dunia nyata)
 
 ### Added

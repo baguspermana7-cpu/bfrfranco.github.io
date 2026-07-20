@@ -39,9 +39,11 @@ for (const src of sources) {
     try {
         /* EA-2 (owner): markitdown-only storage — download size-capped 60MB, binary
          * DELETED after conversion; only the small .md survives on disk. */
-        execFileSync('curl', ['-sL', '--max-time', '120', '--max-filesize', '62914560', '-A',
-            'Mozilla/5.0 (compatible; rz-dc-corpus/1.0; research; +https://resistancezero.com; contact: resistancezero.com)',
-            '-o', htmlPath, src.url], { timeout: 150000 });
+        const curlArgs = ['-sL', '--max-time', '120', '--max-filesize', '62914560', '-A',
+            'Mozilla/5.0 (compatible; rz-dc-corpus/1.0; research; +https://resistancezero.com; contact: resistancezero.com)'];
+        if (src.insecure) curlArgs.push('-k');           // per-source: broken TLS chain (mis. BKPM)
+        if (src.referer) curlArgs.push('-e', src.referer); // per-source: WAF butuh Referer (mis. YTL)
+        execFileSync('curl', [...curlArgs, '-o', htmlPath, src.url], { timeout: 150000 });
         execFileSync(MARKITDOWN, [htmlPath, '-o', mdPath], { timeout: 180000 });
         try { unlinkSync(htmlPath); } catch { /* already gone */ }
         const size = readFileSync(mdPath, 'utf8').length;

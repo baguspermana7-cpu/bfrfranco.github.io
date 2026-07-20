@@ -796,7 +796,7 @@ function CorpusSection({ corpus }: { corpus: Record<string, Record<string, Corpu
                     return trs;
                 })}</tbody>
             </table></div>
-            <p className="mt-1.5 text-[9px] text-slate-400">Distribusi dihitung ulang oleh tools/dc-corpus/aggregate.mjs (append-only); fakta drill-down dari corpus-facts.json — mirror slim dc-facts.json ({CORPUS_FACTS.count} fakta, kutipan dipotong 240 karakter). Segmen: finance = laporan keuangan operator/REIT · hyperscale = laporan sustainability hyperscaler · pm = dokumen perencanaan/perizinan · research = badan riset (IEA/LBNL/DOE/Uptime) · spec = standar teknis (ASHRAE/Green Grid).</p>
+            <p className="mt-1.5 text-[9px] text-slate-400">Distribusi dihitung ulang oleh tools/dc-corpus/aggregate.mjs (append-only); fakta drill-down dari corpus-facts.json — mirror slim dc-facts.json ({CORPUS_FACTS.facts.length} fakta, kutipan dipotong 240 karakter). Segmen: finance = laporan keuangan operator/REIT · hyperscale = laporan sustainability hyperscaler · pm = dokumen perencanaan/perizinan · research = badan riset (IEA/LBNL/DOE/Uptime) · spec = standar teknis (ASHRAE/Green Grid).</p>
         </Card>
     );
 }

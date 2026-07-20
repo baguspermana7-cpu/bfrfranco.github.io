@@ -5823,13 +5823,13 @@
         benchmarksCorpus: {
                 "capacity_mw": {
                         "finance": {
-                                "n": 103,
+                                "n": 135,
                                 "unit": "MW",
-                                "p10": 23,
-                                "p25": 68,
-                                "p50": 150,
-                                "p75": 450,
-                                "p90": 650,
+                                "p10": 20,
+                                "p25": 50,
+                                "p50": 120,
+                                "p75": 433,
+                                "p90": 635,
                                 "companies": [
                                         "DLR 10-K FY25",
                                         "DLR 1Q26 Release",
@@ -5839,9 +5839,11 @@
                                         "IronMountain 10-K FY25",
                                         "IronMountain Q2-25 Deck",
                                         "KeppelDC AR2024",
-                                        "NTT IR Nov25"
+                                        "NEXTDC FY24",
+                                        "NTT IR Nov25",
+                                        "YTL Power AR2024"
                                 ],
-                                "sources": 9
+                                "sources": 11
                         },
                         "hyperscale": {
                                 "n": 29,
@@ -5860,37 +5862,39 @@
                                 "sources": 4
                         },
                         "pm": {
-                                "n": 51,
+                                "n": 53,
                                 "unit": "MW",
                                 "p10": 30,
-                                "p25": 100,
-                                "p50": 350,
-                                "p75": 636,
+                                "p25": 58,
+                                "p50": 314,
+                                "p75": 624,
                                 "p90": 835,
                                 "companies": [
                                         "Dominion 2024 IRP",
                                         "EIAR CyrusOne Grid",
                                         "EIAR Google Dublin DC3",
-                                        "EIAR Vantage DUB11"
+                                        "EIAR Vantage DUB11",
+                                        "NeutraDC Batam"
                                 ],
-                                "sources": 4
+                                "sources": 5
                         },
                         "research": {
-                                "n": 66,
+                                "n": 67,
                                 "unit": "MW",
                                 "p10": 42,
                                 "p25": 115,
-                                "p50": 330,
+                                "p50": 320,
                                 "p75": 600,
                                 "p90": 800,
                                 "companies": [
                                         "DOE Powering AI",
                                         "IEA Electricity 2025",
                                         "IEA Energy AI 2025",
+                                        "IMDA Green DC Roadmap",
                                         "LBNL DC 2016",
                                         "LBNL DC Water 2021"
                                 ],
-                                "sources": 5
+                                "sources": 6
                         }
                 },
                 "construction_months": {
@@ -5910,6 +5914,20 @@
                         }
                 },
                 "energy_gwh": {
+                        "finance": {
+                                "n": 4,
+                                "unit": "GWh",
+                                "p10": 17,
+                                "p25": 1240,
+                                "p50": 7530,
+                                "p75": 10644,
+                                "p90": 10644,
+                                "companies": [
+                                        "DLR 10-K FY25",
+                                        "YTL Power AR2024"
+                                ],
+                                "sources": 2
+                        },
                         "pm": {
                                 "n": 3,
                                 "unit": "GWh",
@@ -5940,7 +5958,7 @@
                 },
                 "investment_busd": {
                         "finance": {
-                                "n": 121,
+                                "n": 122,
                                 "unit": "$B",
                                 "p10": 1.1,
                                 "p25": 1.6,
@@ -5955,9 +5973,10 @@
                                         "Equinix Q2-25 Deck",
                                         "IronMountain 10-K FY25",
                                         "IronMountain Q2-25 Deck",
-                                        "KeppelDC AR2024"
+                                        "KeppelDC AR2024",
+                                        "NEXTDC FY24"
                                 ],
-                                "sources": 8
+                                "sources": 9
                         },
                         "hyperscale": {
                                 "n": 3,
@@ -6018,22 +6037,23 @@
                                 "sources": 2
                         },
                         "research": {
-                                "n": 15,
+                                "n": 17,
                                 "unit": "ratio",
                                 "p10": 1.034,
-                                "p25": 1.07,
-                                "p50": 1.13,
+                                "p25": 1.1,
+                                "p50": 1.15,
                                 "p75": 1.5,
                                 "p90": 1.56,
                                 "companies": [
                                         "IEA Electricity 2025",
                                         "IEA Energy AI 2025",
+                                        "IMDA Green DC Roadmap",
                                         "LBNL DC 2024",
                                         "LBNL DC Water 2021",
                                         "NREL Thermosyphon",
                                         "Uptime Survey 2024"
                                 ],
-                                "sources": 6
+                                "sources": 7
                         },
                         "spec": {
                                 "n": 22,
@@ -6053,17 +6073,18 @@
                 },
                 "rack_density_kw": {
                         "research": {
-                                "n": 3,
+                                "n": 6,
                                 "unit": "kW/rack",
                                 "p10": 7,
-                                "p25": 7,
-                                "p50": 9,
+                                "p25": 8.4,
+                                "p50": 20,
                                 "p75": 50,
-                                "p90": 50,
+                                "p90": 100,
                                 "companies": [
+                                        "IMDA Green DC Roadmap",
                                         "Uptime Survey 2024"
                                 ],
-                                "sources": 1
+                                "sources": 2
                         }
                 },
                 "renewable_share": {
@@ -6147,19 +6168,20 @@
                 },
                 "wue": {
                         "research": {
-                                "n": 11,
+                                "n": 13,
                                 "unit": "L/kWh",
                                 "p10": 0.2,
                                 "p25": 0.36,
                                 "p50": 0.45,
-                                "p75": 4.4,
+                                "p75": 2,
                                 "p90": 4.5,
                                 "companies": [
                                         "IEA Energy AI 2025",
+                                        "IMDA Green DC Roadmap",
                                         "LBNL DC 2024",
                                         "NREL Thermosyphon"
                                 ],
-                                "sources": 3
+                                "sources": 4
                         }
                 }
         },
