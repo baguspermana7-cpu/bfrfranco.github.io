@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.99.0 — 2026-07-20 (SHIP 1 Arc-1: MODEL CALIBRATION — engine terbukti in-band vs dunia nyata)
+
+### Added
+- **`DATA.calibrationSpec` (@@CALIB, engine)** — spec kalibrasi SATU sumber utk UI + gate: 4 mapping (PUE design-vs-fleet FAIL-tier · CAPEX $/MW agregat FAIL-tier · WUE binned WARN · koherensi energi↔kapasitas WARN) + 4 notMappable eksplisit dgn alasan (renewable scope, staffing, uptime, per-project capex). Band mereferensikan persentil korpus LIVE — regen korpus menggeser band; drift = temuan dilaporkan, band tidak pernah dilonggarkan diam-diam.
+- **Gate permanen `tools/test-model-calibration.mjs`** (terdaftar CLAUDE.md): **19/0 GREEN perdana** — liquid t3 1.15 = p69 fleet hyperscale (n=30), air t3 1.5 = p81, best-design liquid t4 1.10 ≤ median fleet 1.12, rasio capex total-project/raw-build finance 1.59 · pm 1.10 ∈ [1,4], WUE bins OK, CF research 8.6%.
+- **Section "Model Calibration" di Benchmarks** (collapsible): tabel konstanta engine (nilai+sumber) · korpus (p50, n) · posisi/rasio · chip verdict in-band/drift/indicative · limitation per baris + blok "tidak dapat dikalibrasi & alasannya" + footnote kebijakan drift. Angka render ≡ gate (modul `lib/calibration.ts`, algoritma persentil SATU — pctileOf diekstrak shared).
+- 2 trace node (`calib.pueLiquidPctile`, `calib.capexRatioFinance`) + 4 value-bindings (73→**85**); `standarization/MODEL_CALIBRATION_STANDARD.md` baru (metodologi, band+justifikasi, kebijakan drift, DoD); USER_MANUAL §9.
+- Catatan metodologi jujur: mapping-4 di-downgrade dari rencana "fleet-PUE inferens" ke "koherensi capacity-factor" — PUE tak dapat diinferensikan sahih tanpa energi IT per dokumen.
+
+### Verified
+- Engine 604/0 · parity 155/0 · bindings 85/0 · **calibration 19/0** · tsc/build · walk 24/0 · synergy 6/0 · trace-parity 117/117 · export 44/0 · ?v `2026-07-20-f`.
+
 ## v1.98.6 — 2026-07-20 (Ship 0 — bugfix input IT Load owner report)
 
 ### Fixed

@@ -348,6 +348,24 @@ Nilai screening-grade selalu berlabel; lever yang tak tercapai dinyatakan
 "unreachable" jujur; basis setiap metrik eksplisit.
 
 ---
+
+## 9. Model Calibration — engine vs dunia nyata
+
+Menu **Benchmarks** memuat section collapsible "Model Calibration — engine vs
+dunia nyata": konstanta engine (PUE matrix, CAPEX $/MW, WUE base) divalidasi
+terhadap distribusi korpus publik LIVE (`DATA.benchmarksCorpus`) memakai 4
+mapping `DATA.calibrationSpec` — sumber tunggal yang sama dengan ship gate
+`tools/test-model-calibration.mjs`, jadi verdict di layar ≡ verdict gate.
+Chip verdict: **in-band** (emerald, tier fail lolos) · **drift** (rose, keluar
+band — temuan dilaporkan, band tidak dilonggarkan) · **indicative** (slate,
+tier warn / n kecil). Blok "Tidak dapat dikalibrasi" menyatakan jujur metrik
+yang tak bisa divalidasi (renewable scope beda, staffing/uptime tanpa fakta,
+capex per-proyek tak berpasangan). Validasi AGREGAT saja — kalibrasi
+per-proyek tidak feasible dari korpus. Angka posisi utama ber-trace ƒx
+(`calib.pueLiquidPctile`, `calib.capexRatioFinance`). Metodologi:
+`standarization/MODEL_CALIBRATION_STANDARD.md`.
+
+---
 *Status 2026-07-20 (v1.98.1): Financial + AI Decision + orchestrator
 engine-sourced & parity-verified; 22/22 kalkulator artikel engine-bound; 26
 namespace engine dikonsumsi DCMOC + 19 site + 4 utility = 49 total; semua gate

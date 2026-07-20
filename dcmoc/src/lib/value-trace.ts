@@ -1984,3 +1984,29 @@ function assetBuckets(): { exGood: number; fair: number; poorCrit: number; atRis
         return any ? { exGood, fair, poorCrit, atRisk } : null;
     } catch { return null; }
 }
+
+/* ═══ CALIBRATION wave (Arc-1, append-bottom) — Model Calibration nodes ══════
+ * Verdict/posisi headline dari section "Model Calibration — engine vs dunia
+ * nyata" (BenchmarkDashboard). get() delegates to computeCalibration()
+ * (lib/calibration.ts), yang mengevaluasi DATA.calibrationSpec — SUMBER
+ * TUNGGAL yang sama dengan ship gate tools/test-model-calibration.mjs (satu
+ * semantik rule; band = persentil korpus LIVE, bukan angka beku). Nilai
+ * KONSTANTA engine (liquid tier3 / liquidCooledTier3) — sengaja TIDAK
+ * bergantung cooling terpilih user, maka tanpa deps ke pue.design. */
+Object.assign(TRACE, {
+    'calib.pueLiquidPctile': {
+        label: 'Kalibrasi PUE — posisi liquid tier3 di fleet hyperscale', page: 'benchmark', unit: 'pctile', provenance: 'engine',
+        formulaTemplate: 'pctileOf(DATA.pueMatrix.liquid.tier3, korpus pue.hyperscale p10–p90) — rule pueBand (DATA.calibrationSpec, mapping pue.design.vs.fleet): interpolasi persentil piecewise-linear vs distribusi fleet hyperscale LIVE (design-basis vs fleet-trailing, gap 5–15% expected); identik dengan output gate tools/test-model-calibration.mjs',
+        sourceKey: 'pueMatrix',
+        get: () => computeCalibration()?.pueLiquidT3Pctile ?? null,
+    },
+    'calib.capexRatioFinance': {
+        label: 'Kalibrasi CAPEX — rasio korpus finance ÷ engine', page: 'benchmark', unit: 'x', provenance: 'engine',
+        formulaTemplate: '(investment_busd.finance.p50 × 1e9 ÷ capacity_mw.finance.p50) ÷ DATA.capexPerMw.liquidCooledTier3 — rule capexRatio (DATA.calibrationSpec, mapping capex.aggregate.ratio), band [1.0, 4.0] = scope total-project (land+IT+contingency+build) vs raw-build; agregat p50-per-p50, fakta korpus tidak berpasangan per dokumen',
+        sourceKey: 'capexPerMw',
+        get: () => computeCalibration()?.capexRatioFinance ?? null,
+    },
+} satisfies Record<string, TraceNode>);
+TRACE_IDS.push('calib.pueLiquidPctile', 'calib.capexRatioFinance');
+
+import { computeCalibration } from '@/lib/calibration';

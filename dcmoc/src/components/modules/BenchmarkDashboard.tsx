@@ -12,8 +12,10 @@ import { calculateStaffing } from '@/modules/staffing/ShiftEngine';
 import { calculateCarbonFootprint } from '@/modules/analytics/CarbonEngine';
 import { BENCHMARK_CATEGORIES, BenchmarkCategory, GRADE_COLORS, Grade, getBenchmarkForTier } from '@/data/benchmarks';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
-import { Target, Trophy, AlertTriangle, TrendingUp, Info, ChevronRight } from 'lucide-react';
+import { Target, Trophy, AlertTriangle, TrendingUp, Info, ChevronRight, ChevronDown } from 'lucide-react';
 import { Tooltip as InfoTooltip } from '@/components/ui/Tooltip';
+import { computeCalibration, pctileLabelOf } from '@/lib/calibration';
+import { TraceValue } from '@/components/ui/TraceValue';
 import clsx from 'clsx';
 
 type BenchmarkTab = 'scorecard' | 'detailed' | 'strengths' | 'comparison';
@@ -92,6 +94,11 @@ export default function BenchmarkDashboard() {
     const capexStore = useCapexStore();
     const effectiveInputs = useEffectiveInputs();
     const [activeTab, setActiveTab] = useState<BenchmarkTab>('scorecard');
+    const [calibOpen, setCalibOpen] = useState(false);
+    /* Arc-1 — Model Calibration: engine constants vs live corpus, evaluated by
+     * lib/calibration.ts (SAME single-source spec + rule semantics as the ship
+     * gate tools/test-model-calibration.mjs). Static at runtime → memo once. */
+    const calib = useMemo(() => computeCalibration(), []);
 
     const result = useMemo(() => {
         if (!selectedCountry) return null;
@@ -199,20 +206,10 @@ export default function BenchmarkDashboard() {
         { key: 'investment_busd', label: 'Investment (total)', project: projCapexB, projectNote: 'total CAPEX proyek — korpus = nilai investasi terumumkan per dokumen ($B), bukan $/MW (rasio persentil tidak dapat diturunkan secara jujur)', fmt: (v) => v.toLocaleString(undefined, { maximumFractionDigits: 1 }) },
         { key: 'renewable_share', label: 'Renewable Share', project: projRenew, fmt: (v) => v.toLocaleString(undefined, { maximumFractionDigits: 1 }) },
     ];
-    /* interpolasi linear piecewise antar titik p10..p90 → "~pXX" */
-    const pctileOf = (v: number, d: CorpusDist): { label: string; approx: number } => {
-        const pts: [number, number][] = [[10, d.p10], [25, d.p25], [50, d.p50], [75, d.p75], [90, d.p90]];
-        if (v < pts[0][1]) return { label: '<p10', approx: 10 };
-        if (v > pts[4][1]) return { label: '>p90', approx: 90 };
-        for (let i = 0; i < 4; i++) {
-            const [pa, va] = pts[i]; const [pb, vb] = pts[i + 1];
-            if (v <= vb) {
-                const p = vb === va ? pb : pa + (pb - pa) * ((v - va) / (vb - va));
-                return { label: `~p${Math.round(p)}`, approx: p };
-            }
-        }
-        return { label: '~p90', approx: 90 };
-    };
+    /* interpolasi linear piecewise antar titik p10..p90 → "~pXX" — SHARED
+     * module (lib/calibration.ts pctileLabelOf): satu algoritma untuk marker
+     * korpus INI, section Model Calibration, dan gate test-model-calibration. */
+    const pctileOf = (v: number, d: CorpusDist): { label: string; approx: number } => pctileLabelOf(v, d);
     const corpusGroups = corpusMetricDefs
         .map((def) => ({ def, segs: Object.entries(corpusData[def.key] ?? {}) }))
         .filter((g) => g.segs.length > 0);
@@ -270,6 +267,100 @@ export default function BenchmarkDashboard() {
                         ))}
                     </div>
                     <p className="mt-2 text-[9px] text-slate-400">Distribusi p10–p90 dari korpus publik multi-sumber (DATA.benchmarksCorpus, {Object.values(corpusData).reduce((s, m) => s + Object.values(m).reduce((t, d) => t + d.n, 0), 0)} fakta ber-source_url + kutipan verbatim, gate-enforced). Persentil proyek = interpolasi linear antar titik persentil — marker di luar rentang p10–p90 ditampilkan sebagai &lt;p10 / &gt;p90. Drill-down per-fakta: Data Library → DC Corpus.</p>
+                </div>
+            )}
+            {/* Arc-1 — MODEL CALIBRATION: konstanta engine vs korpus dunia nyata.
+             * Sumber tunggal DATA.calibrationSpec; semantik rule identik dengan
+             * gate tools/test-model-calibration.mjs (lib/calibration.ts). */}
+            {calib && calib.rows.length > 0 && (
+                <div className="rounded-2xl border border-cyan-500/30 bg-white dark:bg-slate-900/50 p-4">
+                    <button
+                        type="button"
+                        onClick={() => setCalibOpen((o) => !o)}
+                        className="flex w-full items-center gap-2 text-left"
+                    >
+                        <ChevronDown className={clsx('h-3.5 w-3.5 text-slate-400 transition-transform', !calibOpen && '-rotate-90')} />
+                        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Model Calibration — engine vs dunia nyata</h3>
+                        <span className="rounded-full bg-cyan-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-cyan-500">gate-mirrored</span>
+                        <span className="ml-auto flex items-center gap-1">
+                            {calib.rows.map((r) => (
+                                <span
+                                    key={r.id}
+                                    className={clsx(
+                                        'h-1.5 w-1.5 rounded-full',
+                                        r.verdict === 'in-band' ? 'bg-emerald-500' : r.verdict === 'drift' ? 'bg-rose-500' : 'bg-slate-400',
+                                    )}
+                                    title={`${r.id}: ${r.verdict}`}
+                                />
+                            ))}
+                        </span>
+                    </button>
+                    {calibOpen && (
+                        <div className="mt-3 space-y-4">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-[10px]">
+                                    <thead>
+                                        <tr className="border-b border-slate-200 dark:border-slate-700 text-left text-[9px] uppercase tracking-wide text-slate-400">
+                                            <th className="py-1.5 pr-3 font-medium">Konstanta engine</th>
+                                            <th className="py-1.5 pr-3 font-medium">Korpus</th>
+                                            <th className="py-1.5 pr-3 font-medium">Posisi / rasio</th>
+                                            <th className="py-1.5 pr-3 font-medium">Verdict</th>
+                                            <th className="py-1.5 font-medium">Limitation</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {calib.rows.map((r) => {
+                                            const traceId = r.id === 'pue.design.vs.fleet' ? 'calib.pueLiquidPctile'
+                                                : r.id === 'capex.aggregate.ratio' ? 'calib.capexRatioFinance' : null;
+                                            const posEl = (
+                                                <span className="tabular-nums text-slate-700 dark:text-slate-300">{r.positionText}</span>
+                                            );
+                                            return (
+                                                <tr key={r.id} className="border-b border-slate-100 align-top dark:border-slate-800">
+                                                    <td className="py-2 pr-3">
+                                                        <div className="font-medium text-slate-800 dark:text-slate-100">{r.engineLabel}</div>
+                                                        <div className="mt-0.5 tabular-nums text-slate-500">{r.engineValueText}</div>
+                                                        <div className="mt-0.5 text-[9px] text-slate-400">{r.engineSource}</div>
+                                                    </td>
+                                                    <td className="py-2 pr-3 tabular-nums text-slate-500">{r.corpusLabel}</td>
+                                                    <td className="py-2 pr-3">
+                                                        {traceId ? <TraceValue traceId={traceId}>{posEl}</TraceValue> : posEl}
+                                                        <div className="mt-0.5 text-[9px] italic text-slate-400">{r.basisNote}</div>
+                                                    </td>
+                                                    <td className="py-2 pr-3">
+                                                        <span className={clsx(
+                                                            'rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase',
+                                                            r.verdict === 'in-band' && 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+                                                            r.verdict === 'drift' && 'bg-rose-500/15 text-rose-600 dark:text-rose-400',
+                                                            r.verdict === 'indicative' && 'bg-slate-500/15 text-slate-500 dark:text-slate-400',
+                                                        )}>{r.verdict}</span>
+                                                        <div className="mt-0.5 text-[9px] text-slate-400">tier {r.severity} · {r.checks.filter((c) => c.ok).length}/{r.checks.length} checks</div>
+                                                    </td>
+                                                    <td className="py-2 text-[9px] text-slate-400">{r.limitation}</td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {calib.notMappable.length > 0 && (
+                                <div className="rounded-lg border border-slate-200 bg-slate-50 p-2.5 dark:border-slate-700 dark:bg-slate-800/40">
+                                    <div className="text-[9px] font-semibold uppercase tracking-wide text-slate-500">Tidak dapat dikalibrasi &amp; alasannya</div>
+                                    <ul className="mt-1 space-y-0.5 text-[10px] text-slate-500">
+                                        {calib.notMappable.map((nm) => (
+                                            <li key={nm.metric}><b className="text-slate-600 dark:text-slate-300">{nm.metric}</b> — {nm.reason}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                            <p className="text-[9px] text-slate-400">
+                                Kebijakan drift: band mereferensikan persentil korpus LIVE — regen korpus dapat menggeser verdict. Temuan drift DILAPORKAN
+                                (CHANGELOG + gate <span className="font-mono">tools/test-model-calibration.mjs</span> merah untuk tier fail), band tidak pernah
+                                dilonggarkan diam-diam. Validasi agregat saja — fakta korpus tidak berpasangan per dokumen, kalibrasi per-proyek tidak feasible.
+                                Metodologi: standarization/MODEL_CALIBRATION_STANDARD.md.
+                            </p>
+                        </div>
+                    )}
                 </div>
             )}
             {/* Header */}

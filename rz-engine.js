@@ -6134,6 +6134,73 @@
         },
         /* @@CORPUS_END */
 
+        /* @@CALIB_START — MODEL CALIBRATION SPEC (Arc-1, 2026-07-20).
+         * Single source for BOTH the DCMOC "Model Calibration" section and the
+         * tools/test-model-calibration.mjs gate. Bands reference LIVE corpus
+         * percentiles (resolved at read time), never frozen numbers — corpus
+         * regen shifts the band, drift becomes a REPORTED finding, bands are
+         * never silently loosened. Honest scope: AGGREGATE validation only;
+         * per-project calibration is NOT possible (corpus facts are not stored
+         * as per-document pairs). */
+        calibrationSpec: {
+            mappings: [
+                {
+                    id: 'pue.design.vs.fleet',
+                    severity: 'fail',
+                    engineRef: 'DATA.pueMatrix (design-basis, Uptime Survey 2026)',
+                    corpusMetric: 'pue',
+                    /* Guard band: each cooling-class tier-3 design PUE must sit inside
+                     * [p10 of pooled hyperscale∪research fleet, p90 of pooled ∪ spec].
+                     * Sharp rule: best design (liquid tier4) must be ≤ hyperscale fleet
+                     * MEDIAN (best-in-class fleet cannot be beaten by a screening design). */
+                    rule: { kind: 'pueBand', pooledLow: ['hyperscale', 'research'], pooledHigh: ['hyperscale', 'research', 'spec'], bestDesign: { cooling: 'liquid', tier: 'tier4', mustBeAtOrBelow: { segment: 'hyperscale', pctile: 'p50' } } },
+                    basisNote: 'Design-basis vs fleet-trailing: gap 5-15% EXPECTED (design margin); band = fleet distribution guard, bukan klaim akurasi titik.',
+                    limitation: 'Corpus PUE campuran fleet/design; ~40-50 dari 69 fakta ber-tag cooling; hyperscale segment didominasi fleet Google (best-in-class).'
+                },
+                {
+                    id: 'capex.aggregate.ratio',
+                    severity: 'fail',
+                    engineRef: 'DATA.capexPerMw.liquidCooledTier3 (raw-build, T&T/JLL/C&W 2026)',
+                    corpusMetric: 'investment_busd',
+                    /* corpus_p50($/MW total-project) / engine raw-build $/MW must be in
+                     * [1.0, 4.0] per segment with n>=5 investment facts (total project =
+                     * land + IT + contingency + build ≈ 1-4x raw build). */
+                    rule: { kind: 'capexRatio', segments: ['finance', 'pm'], nFloor: 5, ratioLow: 1.0, ratioHigh: 4.0, engineKey: 'liquidCooledTier3' },
+                    basisNote: 'AACE Class-4 ±30% adalah band estimasi engine — DI SINI hanya catatan basis, bukan kriteria; kriteria = rasio scope total-project/raw-build.',
+                    limitation: 'Fakta investment & capacity TIDAK berpasangan per dokumen — rasio dihitung dari p50 masing-masing (agregat, bukan per-proyek).'
+                },
+                {
+                    id: 'wue.binned',
+                    severity: 'warn',
+                    engineRef: 'DATA.waterFootprint.wueBase (ASHRAE screening)',
+                    corpusMetric: 'wue',
+                    /* n kecil (12) → indicative only: evaporative engine (1.8) harus di
+                     * [p50, p90] corpus; low-water types (<=0.1) harus <= p25. */
+                    rule: { kind: 'wueBins', highType: 'evaporative', highBand: ['p50', 'p90'], lowTypes: ['aircooled', 'dlc', 'immersion'], lowCeilPctile: 'p25', segment: 'research' },
+                    basisNote: 'Binned high(>1.0 L/kWh) vs low(<0.2) — order-of-magnitude sanity, bukan kalibrasi per tipe.',
+                    limitation: 'n=12, mayoritas tanpa tag cooling; iklim tidak terstratifikasi.'
+                },
+                {
+                    id: 'energy.capacity.coherence',
+                    severity: 'warn',
+                    engineRef: 'implied capacity factor = energy_gwh / (capacity_mw × 8.76)',
+                    corpusMetric: 'energy_gwh',
+                    /* Downgrade jujur dari rencana "fleet-PUE inferens": tanpa energi IT
+                     * per dokumen, PUE tidak dapat diinferensikan sahih. Yang bisa: sanity
+                     * capacity factor tersirat per segment ∈ (2%, 100%). */
+                    rule: { kind: 'capacityFactor', segments: ['research'], cfLow: 0.02, cfHigh: 1.0 },
+                    basisNote: 'Disclosure mencampur kapasitas pipeline vs energi operasi — CF rendah wajar.',
+                    limitation: 'Fakta energi & kapasitas dari dokumen berbeda; murni koherensi orde besaran.'
+                }
+            ],
+            notMappable: [
+                { metric: 'renewable_share', reason: 'Scope beda: corpus mencampur PPA off-site vs on-site; engine screening on-site only.' },
+                { metric: 'staffing', reason: 'Tidak ada fakta korpus FTE/labor cost.' },
+                { metric: 'availability/uptime', reason: 'Tidak ada fakta empiris downtime; tierAvailability = definisi standar Uptime, bukan pengukuran.' },
+                { metric: 'capex per-project', reason: 'Fakta investment & MW tidak berpasangan per dokumen — hanya validasi agregat yang jujur.' }
+            ]
+        },
+
         /* ── A1: operations-maturity assessment (promoted from article-1). ── */
         opsMaturity: {
             dimensions: [
@@ -6848,6 +6915,7 @@
             'salaryRolesExt':         { source: 'Uptime 2026 + Levels.fyi + AFCOM 2026 role survey', asOf: '2026', unit: 'USD/yr, base' },
             'attritionFactors':       { source: 'Center for American Progress + DataX Connect 2024', asOf: '2024' },
             'envCosts':               { source: 'Carbon: World Bank Carbon Pricing Dashboard + OECD Effective Carbon Rates 2025 + NCCS Singapore (S$45/t from 2026) + national schemes — compliance snapshot 2025-26; Waste: industrial disposal + certified e-waste/ITAD screening bands', asOf: '2026-07', method: 'per-country compliance price, voluntary-offset fallback labeled; waste screening' },
+            'calibrationSpec':        { source: 'Arc-1 model-calibration spec — band mereferensikan persentil korpus LIVE (benchmarksCorpus); metodologi & justifikasi di standarization/MODEL_CALIBRATION_STANDARD.md', asOf: '2026-07-20', method: 'aggregate-only validation; per-project calibration dinyatakan tidak feasible' },
             'omContracts':            { source: 'SCREENING bands — datacentres.com cost guide 2026 (preventive $200-400K/yr per 10MW; OEM +40-60% vs third-party), Schneider Electric maintenance-ROI blog 2024, TechTarget/thenetworkinstallers OPEX guides 2026', asOf: '2026-07', method: 'public benchmark synthesis, fixed-fee $/kW-yr bands' },
             'sparesPricing':          { source: 'SCREENING list-price bands — Schneider/APC Galaxy VS 50kW module class, criticalpowerbatterysolutions.com VRLA string TCO 2026 (~$10K/string), Schneider CRAH VFD retrofit kit ~$15K installed, OnPoint/secondwatt genset maintenance guides 2026, industrial MCCB distributor ranges', asOf: '2026-07', method: 'public list/retrofit price synthesis per class' },
             'pueDefaults':            { source: 'Uptime Global PUE Survey 2026 by cooling architecture', asOf: '2026', unit: 'ratio' },

@@ -1253,6 +1253,16 @@ if (M.opex && M.opex.totalAnnual) {
     ok('opex basisPresets provenance', !!D.sources['opex.basisPresets']);
 }
 
+/* ── Arc-1 calibrationSpec structural ── */
+{
+    const cs = D.calibrationSpec;
+    ok('calibrationSpec present', !!cs && Array.isArray(cs.mappings) && cs.mappings.length === 4);
+    ok('calibrationSpec ids stable', cs.mappings.map(m => m.id).join(',') === 'pue.design.vs.fleet,capex.aggregate.ratio,wue.binned,energy.capacity.coherence');
+    ok('calibrationSpec severities', cs.mappings.filter(m => m.severity === 'fail').length === 2 && cs.mappings.filter(m => m.severity === 'warn').length === 2);
+    ok('calibrationSpec notMappable ≥4 w/ reasons', cs.notMappable.length >= 4 && cs.notMappable.every(x => x.reason.length > 15));
+    ok('calibrationSpec sourced', !!D.sources['calibrationSpec']);
+}
+
 /* ── v2.5.2 DG environmental cost tables ── */
 {
     const ec = D.envCosts;
