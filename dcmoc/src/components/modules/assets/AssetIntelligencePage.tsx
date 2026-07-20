@@ -171,10 +171,10 @@ export function AssetIntelligencePage() {
                         {[
                             { label: 'Total Tracked Units', value: model.total.toLocaleString(), sub: 'engine equipment scaling', trace: 'asset.fleetUnits' },
                             { label: 'Avg Health', value: `${model.avgHealth}/100`, sub: `age ${ageYears} yr · condition ${Math.round(condition * 100)}%`, trace: 'asset.avgHealth' },
-                            { label: 'Excellent / Good', value: (model.buckets.excellent + model.buckets.good).toLocaleString(), sub: `${model.buckets.excellent.toLocaleString()} excellent` },
-                            { label: 'Fair', value: model.buckets.fair.toLocaleString(), sub: 'monitor' },
-                            { label: 'Poor / Critical', value: (model.buckets.poor + model.buckets.critical).toLocaleString(), sub: 'plan replacement' },
-                            { label: 'At Wear-Out Risk', value: model.atRisk.toLocaleString(), sub: '≥25% Weibull CDF' },
+                            { label: 'Excellent / Good', value: (model.buckets.excellent + model.buckets.good).toLocaleString(), sub: `${model.buckets.excellent.toLocaleString()} excellent`, trace: 'asset.healthExcellentGood' },
+                            { label: 'Fair', value: model.buckets.fair.toLocaleString(), sub: 'monitor', trace: 'asset.healthFair' },
+                            { label: 'Poor / Critical', value: (model.buckets.poor + model.buckets.critical).toLocaleString(), sub: 'plan replacement', trace: 'asset.healthPoorCritical' },
+                            { label: 'At Wear-Out Risk', value: model.atRisk.toLocaleString(), sub: '≥25% Weibull CDF', trace: 'asset.atRiskUnits' },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>

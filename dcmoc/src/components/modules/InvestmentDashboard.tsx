@@ -23,6 +23,7 @@ import {
 import clsx from 'clsx';
 import { fmt, fmtMoney, fmtPct } from '@/lib/format';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
+import { TraceValue } from '@/components/ui/TraceValue';
 
 type InvestTab = 'cap' | 'returns' | 'valuation' | 'ipo' | 'readiness' | 'sensitivity';
 
@@ -468,10 +469,10 @@ const InvestmentDashboard = () => {
                     <div className="space-y-4 animate-in fade-in duration-300">
                         {/* KPI Cards */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <KPICard label="Total CAPEX" value={fmtMoney(capexResults.total)} icon={<Building className="w-4 h-4" />} color="slate" tooltip="Total capital expenditure including land, building, MEP, and IT infrastructure. This is the total investment amount to be financed." />
-                            <KPICard label="Debt Amount" value={fmtMoney(result.totalDebt)} sub={`${(investInputs.debtRatio * 100).toFixed(0)}% leverage`} icon={<DollarSign className="w-4 h-4" />} color="red" tooltip="Total debt financing amount based on CAPEX and debt ratio. This is the principal amount to be repaid over the debt term." />
-                            <KPICard label="Equity Required" value={fmtMoney(result.totalEquity)} sub={`${((1 - investInputs.debtRatio) * 100).toFixed(0)}% equity`} icon={<DollarSign className="w-4 h-4" />} color="emerald" tooltip="Equity capital required from sponsors/investors. This is the portion of CAPEX not covered by debt financing." />
-                            <KPICard label="WACC" value={fmtPct(result.wacc * 100)} sub="Weighted avg cost" icon={<TrendingUp className="w-4 h-4" />} color="indigo" tooltipKey="wacc" tooltip="Weighted Average Cost of Capital — blended cost of debt and equity financing. Used as discount rate for DCF analysis." />
+                            <KPICard label="Total CAPEX" value={fmtMoney(capexResults.total)} icon={<Building className="w-4 h-4" />} color="slate" tooltip="Total capital expenditure including land, building, MEP, and IT infrastructure. This is the total investment amount to be financed." trace="capex.total" />
+                            <KPICard label="Debt Amount" value={fmtMoney(result.totalDebt)} sub={`${(investInputs.debtRatio * 100).toFixed(0)}% leverage`} icon={<DollarSign className="w-4 h-4" />} color="red" tooltip="Total debt financing amount based on CAPEX and debt ratio. This is the principal amount to be repaid over the debt term." trace="inv.totalDebt" />
+                            <KPICard label="Equity Required" value={fmtMoney(result.totalEquity)} sub={`${((1 - investInputs.debtRatio) * 100).toFixed(0)}% equity`} icon={<DollarSign className="w-4 h-4" />} color="emerald" tooltip="Equity capital required from sponsors/investors. This is the portion of CAPEX not covered by debt financing." trace="inv.totalEquity" />
+                            <KPICard label="WACC" value={fmtPct(result.wacc * 100)} sub="Weighted avg cost" icon={<TrendingUp className="w-4 h-4" />} color="indigo" tooltipKey="wacc" tooltip="Weighted Average Cost of Capital — blended cost of debt and equity financing. Used as discount rate for DCF analysis." trace="inv.wacc" />
                         </div>
 
                         {/* Donut Chart */}
@@ -551,10 +552,10 @@ const InvestmentDashboard = () => {
                 {activeTab === 'returns' && (
                     <div className="space-y-4 animate-in fade-in duration-300">
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <KPICard label="Equity IRR" value={fmtPct(result.equityIRR)} sub={result.equityIRR > 15 ? 'Above 15% target' : 'Below 15% target'} icon={<TrendingUp className="w-4 h-4" />} color={result.equityIRR >= 15 ? 'emerald' : 'red'} tooltipKey="equity-irr" tooltip="Levered Internal Rate of Return on equity invested. Target is 15%+ for institutional data center PE investments." />
-                            <KPICard label="MOIC" value={Number.isFinite(result.moic) ? `${result.moic.toFixed(2)}x` : 'N/A'} sub="Multiple on invested capital" icon={<ArrowUpRight className="w-4 h-4" />} color={result.moic >= 2 ? 'emerald' : 'amber'} tooltip="Multiple on Invested Capital — total value returned divided by total capital invested. Target is 2-3x for PE." />
-                            <KPICard label="Min DSCR" value={Number.isFinite(result.minDSCR) ? `${result.minDSCR.toFixed(2)}x` : 'N/A'} sub={result.minDSCR >= 1.25 ? 'Above 1.25x threshold' : 'Below 1.25x threshold'} icon={<Shield className="w-4 h-4" />} color={result.minDSCR >= 1.25 ? 'emerald' : 'red'} tooltipKey="dscr" tooltip="Minimum Debt Service Coverage Ratio across all years. Lenders typically require 1.25x+ DSCR as a covenant threshold." />
-                            <KPICard label="Y1 Cash-on-Cash" value={fmtPct(result.year1CashOnCash)} sub="Year 1 levered yield" icon={<DollarSign className="w-4 h-4" />} color={result.year1CashOnCash >= 8 ? 'emerald' : 'amber'} tooltip="Year 1 levered free cashflow divided by total equity invested. Measures the immediate cash yield on equity. Target: 8%+ for stabilized assets." />
+                            <KPICard label="Equity IRR" value={fmtPct(result.equityIRR)} sub={result.equityIRR > 15 ? 'Above 15% target' : 'Below 15% target'} icon={<TrendingUp className="w-4 h-4" />} color={result.equityIRR >= 15 ? 'emerald' : 'red'} tooltipKey="equity-irr" tooltip="Levered Internal Rate of Return on equity invested. Target is 15%+ for institutional data center PE investments." trace="inv.equityIrr" />
+                            <KPICard label="MOIC" value={Number.isFinite(result.moic) ? `${result.moic.toFixed(2)}x` : 'N/A'} sub="Multiple on invested capital" icon={<ArrowUpRight className="w-4 h-4" />} color={result.moic >= 2 ? 'emerald' : 'amber'} tooltip="Multiple on Invested Capital — total value returned divided by total capital invested. Target is 2-3x for PE." trace="inv.moic" />
+                            <KPICard label="Min DSCR" value={Number.isFinite(result.minDSCR) ? `${result.minDSCR.toFixed(2)}x` : 'N/A'} sub={result.minDSCR >= 1.25 ? 'Above 1.25x threshold' : 'Below 1.25x threshold'} icon={<Shield className="w-4 h-4" />} color={result.minDSCR >= 1.25 ? 'emerald' : 'red'} tooltipKey="dscr" tooltip="Minimum Debt Service Coverage Ratio across all years. Lenders typically require 1.25x+ DSCR as a covenant threshold." trace="inv.minDscr" />
+                            <KPICard label="Y1 Cash-on-Cash" value={fmtPct(result.year1CashOnCash)} sub="Year 1 levered yield" icon={<DollarSign className="w-4 h-4" />} color={result.year1CashOnCash >= 8 ? 'emerald' : 'amber'} tooltip="Year 1 levered free cashflow divided by total equity invested. Measures the immediate cash yield on equity. Target: 8%+ for stabilized assets." trace="inv.year1CoC" />
                         </div>
 
                         {/* Owner-mandate explain panels: failing verdicts carry computed
@@ -1027,12 +1028,15 @@ function ThresholdExplainPanel({ title, ex }: { title: string; ex: ThresholdMetr
 }
 
 // ─── KPI Card Component ─────────────────────────────────────
-function KPICard({ label, value, sub, icon, color, tooltip, tooltipKey }: {
+function KPICard({ label, value, sub, icon, color, tooltip, tooltipKey, trace }: {
     label: string; value: string; sub?: string; icon: React.ReactNode; color: string; tooltip?: string;
     /** RZ_EXPLAIN_DB key — when it resolves, its definition replaces `tooltip` (which stays the fallback). */
     tooltipKey?: string;
+    /** value-trace id — wraps the value in the ƒx TraceValue popover */
+    trace?: string;
 }) {
     const resolvedTooltip = (tooltipKey && explainText(tooltipKey)) || tooltip;
+    const valueEl = <div className="text-2xl font-bold text-slate-900 dark:text-white">{value}</div>;
     return (
         <div className={`bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm dark:shadow-none`}>
             <div className="flex items-center gap-1.5 mb-1">
@@ -1040,7 +1044,7 @@ function KPICard({ label, value, sub, icon, color, tooltip, tooltipKey }: {
                 <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">{label}</span>
                 {resolvedTooltip && <Tooltip content={resolvedTooltip} />}
             </div>
-            <div className="text-2xl font-bold text-slate-900 dark:text-white">{value}</div>
+            {trace ? <TraceValue traceId={trace}>{valueEl}</TraceValue> : valueEl}
             {sub && <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">{sub}</div>}
         </div>
     );

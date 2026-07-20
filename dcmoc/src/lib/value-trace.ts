@@ -30,6 +30,15 @@ import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 /* EB-finsus wave (Financial + Sustainability telemetry ≥60%) — live readers */
 import { useFinancialTracking } from '@/store/financialTracking';
 import { useSustainability } from '@/store/sustainability';
+/* EB-walk4 wave (Maintenance / Investment / Phased-Finance / Assets KPI ƒx) — live readers */
+import { generateAssetCounts } from '@/lib/AssetGenerator';
+import { generateMaintenanceSchedule } from '@/modules/maintenance/ScheduleEngine';
+import { calculateStrategyComparison } from '@/modules/maintenance/MaintenanceStrategyEngine';
+import { calculateInvestment, type InvestmentResult } from '@/modules/analytics/InvestmentEngine';
+import { calculateCapacityPlan } from '@/modules/capacity/CapacityPlanningEngine';
+import { calculateDisasterRisk } from '@/modules/risk/DisasterRiskEngine';
+import { calculateGridReliability } from '@/modules/infrastructure/GridReliabilityEngine';
+import { calculateTalentAvailability } from '@/modules/staffing/TalentAvailabilityEngine';
 
 export type TraceProvenance = 'input' | 'engine' | 'derived' | 'screening';
 
@@ -984,6 +993,152 @@ export const TRACE: Record<string, TraceNode> = {
             return p && s != null ? Math.round(p.total * s) : null;
         },
     },
+
+    /* ── EB-walk4 wave (append-only): KPI ƒx Maintenance / Investment /
+     * Phased Financial / Asset Intelligence — halaman 0-coverage pada walk
+     * probe. Setiap get() MENIRU persis rantai model halaman pemilik; bila KPI
+     * bergantung state LOKAL halaman (pencil-mode / panel parameter / slider),
+     * trace memakai basis default halaman — didokumentasikan per node. ────── */
+
+    /* MAINTENANCE page KPI row (fleet auto-generated dari desain; pencil-mode
+     * manual counts adalah state lokal halaman — trace basis auto-generate) */
+    'maint.plannedHours': {
+        label: 'Planned Maintenance Hours /yr', page: 'maint', unit: 'h', provenance: 'derived',
+        formulaTemplate: 'Σ durasi event jadwal SFG20 (standard hours per task × unit per batch) — jadwal dari fleet auto-generate (sim.itLoad, sim.tierLevel, cooling, redundansi)',
+        deps: ['sim.itLoad', 'sim.tierLevel'],
+        get: () => maintModel()?.hours ?? null,
+    },
+    'maint.events': {
+        label: 'Maintenance Events /yr', page: 'maint', provenance: 'derived',
+        formulaTemplate: 'jumlah event jadwal SFG20 per tahun — regime per kelas asset × jumlah unit fleet (auto-generate dari sim.itLoad; edit manual pencil-mode tidak tercermin di trace)',
+        deps: ['sim.itLoad'],
+        get: () => maintModel()?.events ?? null,
+    },
+    'maint.activeAssets': {
+        label: 'Active Assets (fleet)', page: 'maint', provenance: 'derived',
+        formulaTemplate: 'Σ unit per kelas asset — AssetGenerator scale-aware (CRAC/CRAH/fan-wall block per skala MW, chiller, genset, UPS, dll) dari sim.itLoad, sim.tierLevel, cooling topology, redundansi power',
+        deps: ['sim.itLoad', 'sim.tierLevel'],
+        get: () => maintModel()?.units ?? null,
+    },
+    'maint.annualBudget': {
+        label: 'Annual Maintenance Budget (strategi terpilih)', page: 'maint', unit: '$', provenance: 'derived',
+        formulaTemplate: 'strategi terpilih (reactive/planned/predictive): labor (maint.plannedHours × tarif labor negara × multiplier model in-house/hybrid/vendor) + parts + downtime risk — MaintenanceStrategyEngine, ekonomi DATA.maintenance bersumber',
+        deps: ['maint.plannedHours'],
+        get: () => maintModel()?.annualBudget ?? null,
+    },
+    'maint.fiveYearSavings': {
+        label: '5-Year Savings (optimal vs worst)', page: 'maint', unit: '$', provenance: 'derived',
+        formulaTemplate: 'NPV 5 thn strategi terburuk − NPV 5 thn strategi terbaik (diskonto 8%, eskalasi biaya 3%; CBM menambah sensor CAPEX) — biaya labor tiap strategi dari maint.plannedHours; perbandingan 3 strategi MaintenanceStrategyEngine',
+        deps: ['maint.plannedHours'],
+        get: () => maintModel()?.fiveYearSavings ?? null,
+    },
+
+    /* INVESTMENT page KPI rows (basis trace: panel parameter halaman pada nilai
+     * DEFAULT — debt 65% · cost of debt 5% · term 12 thn · CoE 12% · exit thn-7
+     * @18× EBITDA · rev $150/kW·bln · tax 25% · life 10 thn; ubah slider di
+     * halaman untuk skenario lain — state lokal, tidak tercermin di trace) */
+    'inv.totalDebt': {
+        label: 'Debt Amount', page: 'invest', unit: '$', provenance: 'derived',
+        formulaTemplate: 'capex.total × debt ratio (basis trace: default 65%)',
+        deps: ['capex.total'],
+        get: () => { const m = invModel(); return m ? Math.round(m.totalDebt) : null; },
+    },
+    'inv.totalEquity': {
+        label: 'Equity Required', page: 'invest', unit: '$', provenance: 'derived',
+        formulaTemplate: 'capex.total × (1 − debt ratio) (basis trace: default 35% equity)',
+        deps: ['capex.total'],
+        get: () => { const m = invModel(); return m ? Math.round(m.totalEquity) : null; },
+    },
+    'inv.wacc': {
+        label: 'WACC', page: 'invest', unit: '%', provenance: 'derived',
+        formulaTemplate: 'debt ratio × cost of debt × (1 − tax) + equity ratio × cost of equity — basis trace default: 65% × 5% × 75% + 35% × 12%',
+        get: () => { const m = invModel(); return m ? +(m.wacc * 100).toFixed(1) : null; },
+    },
+    'inv.equityIrr': {
+        label: 'Equity IRR (levered)', page: 'invest', unit: '%', provenance: 'derived',
+        formulaTemplate: 'IRR arus kas equity: tahun-0 −inv.totalEquity; tahunan = FCF unlevered (pendapatan sim.itLoad × $150/kW·bln × ramp okupansi − OPEX − pajak; depresiasi dari capex.total) − debt service; + exit thn-7 @18× EBITDA − sisa utang',
+        deps: ['inv.totalEquity', 'sim.itLoad', 'capex.total'],
+        get: () => { const m = invModel(); return m ? +m.equityIRR.toFixed(1) : null; },
+    },
+    'inv.moic': {
+        label: 'MOIC', page: 'invest', unit: 'x', provenance: 'derived',
+        formulaTemplate: '(Σ distribusi levered FCF + nilai equity saat exit) ÷ inv.totalEquity',
+        deps: ['inv.totalEquity'],
+        get: () => { const m = invModel(); return m && Number.isFinite(m.moic) ? +m.moic.toFixed(2) : null; },
+    },
+    'inv.minDscr': {
+        label: 'Min DSCR', page: 'invest', unit: 'x', provenance: 'derived',
+        formulaTemplate: 'min tahunan (EBITDA ÷ debt service) sepanjang tenor utang — debt service anuitas dari inv.totalDebt @5%, 12 thn; covenant lender tipikal 1.25x',
+        deps: ['inv.totalDebt'],
+        get: () => { const m = invModel(); return m && Number.isFinite(m.minDSCR) ? +m.minDSCR.toFixed(2) : null; },
+    },
+    'inv.year1CoC': {
+        label: 'Y1 Cash-on-Cash', page: 'invest', unit: '%', provenance: 'derived',
+        formulaTemplate: 'levered FCF tahun-1 ÷ inv.totalEquity × 100',
+        deps: ['inv.totalEquity'],
+        get: () => { const m = invModel(); return m ? +m.year1CashOnCash.toFixed(1) : null; },
+    },
+
+    /* PHASED FINANCE page KPI row (mirror memo halaman: capacity plan per fase →
+     * adjustment lintas modul (disaster/grid/talent) → calculateFinancials per
+     * fase 20 thn → agregasi blended berbobot CAPEX) */
+    'pf.totalCapex': {
+        label: 'Total Investment (Σ fase)', page: 'phased-finance', unit: '$', provenance: 'derived',
+        formulaTemplate: 'Σ CAPEX fase — CapacityPlanningEngine ($/kW dasar × mult tier (sim.tierLevel) × mult cooling × construction index negara × kW fase) + alokasi structural adder risiko bencana per fase',
+        deps: ['sim.tierLevel'],
+        get: () => pfModel()?.capex ?? null,
+    },
+    'pf.blendedIrr': {
+        label: 'Blended IRR (weighted)', page: 'phased-finance', unit: '%', provenance: 'derived',
+        formulaTemplate: 'Σ IRR fase × (CAPEX fase ÷ pf.totalCapex) — IRR per fase dari DCF 20 thn: rev $150/kW·bln × ramp okupansi fase, OPEX + adder grid/asuransi/talent, diskonto 10% + premi risiko bencana, pajak efektif negara (insentif)',
+        deps: ['pf.totalCapex'],
+        get: () => pfModel()?.irr ?? null,
+    },
+    'pf.totalNpv': {
+        label: 'Total NPV (Σ fase)', page: 'phased-finance', unit: '$', provenance: 'derived',
+        formulaTemplate: 'Σ NPV fase pada discount rate risk-adjusted (10% + premi 0–2% per skor komposit risiko bencana negara) — DCF 20 thn per fase; modal = alokasi pf.totalCapex',
+        deps: ['pf.totalCapex'],
+        get: () => pfModel()?.npv ?? null,
+    },
+    'pf.payback': {
+        label: 'Payback (weighted)', page: 'phased-finance', unit: 'yr', provenance: 'derived',
+        formulaTemplate: 'Σ payback fase × (CAPEX fase ÷ pf.totalCapex) — simple payback per fase dari kumulatif FCF',
+        deps: ['pf.totalCapex'],
+        get: () => pfModel()?.payback ?? null,
+    },
+    'pf.pi': {
+        label: 'Profitability Index', page: 'phased-finance', unit: 'x', provenance: 'derived',
+        formulaTemplate: '(pf.totalNpv + pf.totalCapex) ÷ pf.totalCapex — PV manfaat per $ investasi, clamp ≥0',
+        deps: ['pf.totalNpv', 'pf.totalCapex'],
+        get: () => pfModel()?.pi ?? null,
+    },
+
+    /* ASSET INTELLIGENCE page — sisa KPI bucket kesehatan (basis trace: umur 3
+     * thn · kondisi 85% = default slider halaman, sama seperti asset.avgHealth) */
+    'asset.healthExcellentGood': {
+        label: 'Units Excellent / Good (health ≥70)', page: 'asset-health', provenance: 'derived',
+        formulaTemplate: 'Σ unit kelas dengan health ≥70 (subset asset.fleetUnits) — health per kelas = models.asset.healthIndex (Weibull remaining-life + condition + duty) pada basis trace umur 3 thn · kondisi 85%',
+        deps: ['asset.fleetUnits'],
+        get: () => assetBuckets()?.exGood ?? null,
+    },
+    'asset.healthFair': {
+        label: 'Units Fair (health 50–69)', page: 'asset-health', provenance: 'derived',
+        formulaTemplate: 'Σ unit kelas dengan health 50–69 (monitor; subset asset.fleetUnits) — models.asset.healthIndex pada basis trace umur 3 thn · kondisi 85%',
+        deps: ['asset.fleetUnits'],
+        get: () => assetBuckets()?.fair ?? null,
+    },
+    'asset.healthPoorCritical': {
+        label: 'Units Poor / Critical (health <50)', page: 'asset-health', provenance: 'derived',
+        formulaTemplate: 'Σ unit kelas dengan health <50 (plan replacement; subset asset.fleetUnits) — models.asset.healthIndex pada basis trace umur 3 thn · kondisi 85%',
+        deps: ['asset.fleetUnits'],
+        get: () => assetBuckets()?.poorCrit ?? null,
+    },
+    'asset.atRiskUnits': {
+        label: 'Units at Wear-Out Risk (Weibull CDF ≥25%)', page: 'asset-health', provenance: 'derived',
+        formulaTemplate: 'Σ unit kelas dengan probabilitas gagal kumulatif ≥25% (subset asset.fleetUnits) — models.asset.failureProbability (Weibull CDF) pada basis trace umur 3 thn',
+        deps: ['asset.fleetUnits'],
+        get: () => assetBuckets()?.atRisk ?? null,
+    },
 };
 
 export interface ResolvedTrace {
@@ -1610,5 +1765,191 @@ function staffTco5yr(): number | null {
         let total = 0;
         for (let y = 0; y <= 5; y++) total += p.total * 12 * Math.pow(1 + esc, y);
         return Math.round(total);
+    } catch { return null; }
+}
+
+/* ═══ EB-walk4 live-reader helpers (appended — invoked lazily by get()) ══════
+ * Mirror MaintenanceDashboard / InvestmentDashboard / PhasedFinancialDashboard
+ * / AssetIntelligencePage model chains EXACTLY so the popover number matches
+ * the rendered KPI. Page-LOCAL state (pencil-mode counts, investment parameter
+ * panel, fleet-age slider) is mirrored at the page DEFAULTS — documented on
+ * each node's formulaTemplate. All null-safe. */
+
+/** MAINTENANCE — auto-generated fleet → SFG20 schedule → strategy comparison
+ *  (mirrors MaintenanceDashboard: assetCounts effect + schedule/strategyData
+ *  memos + KPI-row reductions; pencil-mode manual counts are page-local). */
+let _maintCache: { key: string; m: { events: number; hours: number; units: number; annualBudget: number | null; fiveYearSavings: number | null } } | null = null;
+function maintModel(): { events: number; hours: number; units: number; annualBudget: number | null; fiveYearSavings: number | null } | null {
+    try {
+        const st = sim();
+        const country = st.selectedCountry;
+        if (!country) return null;
+        const i = st.inputs;
+        const key = [i.itLoad, i.tierLevel, i.coolingType, i.coolingTopology, i.powerRedundancy, i.maintenanceModel, i.maintenanceStrategy, i.hybridRatio ?? 0.5, country.id].join('|');
+        if (_maintCache?.key === key) return _maintCache.m;
+        const coolingMap: 'air' | 'pumped' = i.coolingType === 'liquid' || i.coolingType === 'rdhx' ? 'pumped' : 'air';
+        const counts = generateAssetCounts(i.itLoad, i.tierLevel === 4 ? 4 : 3, coolingMap, i.itLoad * 1.5, i.coolingTopology, i.powerRedundancy);
+        const schedule = generateMaintenanceSchedule(counts);
+        const hours = Math.round(schedule.reduce((a, e) => a + e.durationHours, 0));
+        const units = counts.reduce((a, c) => a + c.count, 0);
+        let annualBudget: number | null = null, fiveYearSavings: number | null = null;
+        try {
+            const strat = calculateStrategyComparison(
+                counts, schedule, i.tierLevel === 4 ? 4 : 3, country,
+                i.maintenanceModel as 'in-house' | 'hybrid' | 'vendor', i.hybridRatio ?? 0.5);
+            const active = i.maintenanceStrategy || 'planned';
+            const a = strat.strategies.find((s) => s.id === active)?.totalAnnualCost;
+            annualBudget = a != null ? Math.round(a) : null;
+            fiveYearSavings = strat.fiveYearSavings != null ? Math.round(strat.fiveYearSavings) : null;
+        } catch { /* keep nulls */ }
+        const m = { events: schedule.length, hours, units, annualBudget, fiveYearSavings };
+        _maintCache = { key, m };
+        return m;
+    } catch { return null; }
+}
+
+/** INVESTMENT page parameter-panel DEFAULTS (page useState seed — local state;
+ *  trace baseline documented on the inv.* nodes). */
+const INV_DEFAULTS = {
+    debtRatio: 0.65, debtCostAnnual: 0.05, debtTermYears: 12, equityCostOfCapital: 0.12,
+    exitYear: 7, exitEbitdaMultiple: 18, terminalCapRate: 0.065, controlPremiumPct: 0.25,
+    revenuePerKwMonth: 150, opexEscalation: 0.035, escalationRate: 0.03, taxRate: 0.25,
+    depreciationYears: 15, projectLifeYears: 10,
+};
+
+/** INVESTMENT — mirrors the page chain annualOpex → calculateFinancials →
+ *  calculateInvestment at the DEFAULT parameter panel (effective headcounts
+ *  per useEffectiveInputs, same as the page). */
+let _invCache: { key: string; m: InvestmentResult } | null = null;
+function invModel(): InvestmentResult | null {
+    try {
+        const st = sim();
+        const country = st.selectedCountry;
+        const capexTotal = cap().results?.total;
+        if (!country || !capexTotal) return null;
+        const i = st.inputs;
+        const hc = effHeadcounts();
+        const key = [capexTotal, i.itLoad, i.coolingType, country.id, hc.join('.')].join('|');
+        if (_invCache?.key === key) return _invCache.m;
+        const labor = country.labor;
+        const staffCost = (
+            hc[0] * labor.baseSalary_ShiftLead + hc[1] * labor.baseSalary_Engineer +
+            hc[2] * labor.baseSalary_Technician + hc[3] * labor.baseSalary_Admin +
+            hc[4] * labor.baseSalary_Janitor
+        ) * 12;
+        const elecRate = country.economy?.electricityRate ?? 0.10;
+        const annualOpex = staffCost + i.itLoad * getPUE(i.coolingType ?? 'air') * 8760 * elecRate + i.itLoad * 50;
+        const d = INV_DEFAULTS;
+        const fin = calculateFinancials({
+            totalCapex: capexTotal, annualOpex, revenuePerKwMonth: d.revenuePerKwMonth,
+            itLoadKw: i.itLoad, discountRate: d.equityCostOfCapital, projectLifeYears: d.projectLifeYears,
+            escalationRate: d.escalationRate, opexEscalation: d.opexEscalation,
+            occupancyRamp: defaultOccupancyRamp(d.projectLifeYears), taxRate: d.taxRate,
+            depreciationYears: d.depreciationYears,
+        });
+        const m = calculateInvestment({
+            totalCapex: capexTotal, unleveredCashflows: fin.cashflows, itLoadKw: i.itLoad,
+            taxRate: d.taxRate, debtRatio: d.debtRatio, debtCostAnnual: d.debtCostAnnual,
+            debtTermYears: d.debtTermYears, equityCostOfCapital: d.equityCostOfCapital,
+            exitYear: d.exitYear, exitEbitdaMultiple: d.exitEbitdaMultiple,
+            terminalCapRate: d.terminalCapRate, controlPremiumPct: d.controlPremiumPct,
+        });
+        _invCache = { key, m };
+        return m;
+    } catch { return null; }
+}
+
+/** PHASED FINANCE — mirrors the page's big memo steps 1-4 EXACTLY: capacity
+ *  plan → cross-module adjustments (disaster/grid/talent; tax-incentive value
+ *  is narrative-only) → per-phase calculateFinancials (20 yr, risk-adjusted
+ *  discount, country effective tax) → CAPEX-weighted blended aggregation with
+ *  the page's rounding. */
+let _pfCache: { key: string; m: { irr: number; npv: number; payback: number; capex: number; pi: number } } | null = null;
+function pfModel(): { irr: number; npv: number; payback: number; capex: number; pi: number } | null {
+    try {
+        const st = sim();
+        const country = st.selectedCountry;
+        if (!country) return null;
+        const i = st.inputs;
+        const key = [
+            country.id, i.coolingType, i.tierLevel, i.shiftModel, i.maintenanceModel, i.hybridRatio ?? 0.5,
+            i.capacityPhases.map((p) => `${p.itLoadKw}:${p.startMonth}:${p.buildMonths}:${(p.occupancyRamp ?? []).join(',')}`).join(';'),
+        ].join('|');
+        if (_pfCache?.key === key) return _pfCache.m;
+        const capPlan = calculateCapacityPlan({
+            phases: i.capacityPhases, country, coolingType: i.coolingType, tierLevel: i.tierLevel,
+            shiftModel: i.shiftModel, maintenanceModel: i.maintenanceModel, hybridRatio: i.hybridRatio,
+        });
+        if (!capPlan.phases.length || !(capPlan.totalItLoadKw > 0)) return null;
+        const disaster = calculateDisasterRisk({
+            country, totalCapex: capPlan.totalCapex, itLoadKw: capPlan.totalItLoadKw,
+            annualRevenue: capPlan.totalItLoadKw * 150 * 12,
+        });
+        const grid = calculateGridReliability({
+            country, itLoadKw: capPlan.totalItLoadKw, tierLevel: i.tierLevel, coolingType: i.coolingType,
+        });
+        const lastFte = capPlan.phases[capPlan.phases.length - 1]?.fte ?? 10;
+        const talent = calculateTalentAvailability({
+            country, totalFTE: lastFte, annualStaffCost: lastFte * 3000 * 12,
+        });
+        const effectiveTaxRate = country.taxIncentives?.effectiveTaxRate ?? country.economy.taxRate;
+        const riskPremium = disaster.compositeScore > 50 ? 0.02 : disaster.compositeScore > 30 ? 0.01 : 0;
+        const adjustedDiscount = 0.10 + riskPremium;
+        const adders = grid.gridRiskAdjustedOpex + disaster.annualInsuranceCost
+            + (talent.adjustedSalaryMultiplier - 1) * lastFte * 3000 * 12;
+        const phases = capPlan.phases.map((phase, idx) => {
+            const phaseOccRamp = i.capacityPhases[idx]?.occupancyRamp ?? [0.3, 0.6, 0.85, 0.95];
+            const phaseCapex = phase.capex + disaster.structuralCostAdder * (phase.itLoadKw / capPlan.totalItLoadKw);
+            const f = calculateFinancials({
+                totalCapex: phaseCapex,
+                annualOpex: phase.itLoadKw * 50 * 12 + adders * (phase.itLoadKw / capPlan.totalItLoadKw),
+                revenuePerKwMonth: 150, itLoadKw: phase.itLoadKw, discountRate: adjustedDiscount,
+                projectLifeYears: 20, escalationRate: 0.03, opexEscalation: country.economy.inflationRate,
+                occupancyRamp: phaseOccRamp.concat(Array(16).fill(0.95)), taxRate: effectiveTaxRate,
+                depreciationYears: 20,
+            });
+            return { capex: phaseCapex, irr: f.irr, npv: f.npv, payback: f.paybackPeriodYears };
+        });
+        const totalCapex = phases.reduce((s, p) => s + p.capex, 0);
+        if (!(totalCapex > 0)) return null;
+        const irr = phases.reduce((s, p) => s + p.irr * (p.capex / totalCapex), 0);
+        const npv = phases.reduce((s, p) => s + p.npv, 0);
+        const payback = phases.reduce((s, p) => s + p.payback * (p.capex / totalCapex), 0);
+        const pi = Math.max(0, (npv + totalCapex) / totalCapex);
+        const m = {
+            irr: Math.round(irr * 10) / 10, npv: Math.round(npv),
+            payback: Math.round(payback * 10) / 10, capex: Math.round(totalCapex),
+            pi: Math.round(pi * 100) / 100,
+        };
+        _pfCache = { key, m };
+        return m;
+    } catch { return null; }
+}
+
+/** ASSET INTELLIGENCE health buckets + wear-out risk at the trace baseline
+ *  (age 3 yr / condition 85% = page slider defaults) — same class rows +
+ *  count>0 filter + thresholds as AssetIntelligencePage model memo. */
+function assetBuckets(): { exGood: number; fair: number; poorCrit: number; atRisk: number } | null {
+    try {
+        const eq = assetEquip();
+        if (!eq) return null;
+        const m = (rzModels() as {
+            asset?: {
+                healthIndex?: (inp: Record<string, unknown>) => { health?: number } | null;
+                failureProbability?: (cls: string, age: number) => { failureProb?: number } | null;
+            };
+        }).asset;
+        if (!m?.healthIndex) return null;
+        let exGood = 0, fair = 0, poorCrit = 0, atRisk = 0, any = 0;
+        for (const c of ASSET_CLASSES) {
+            const count = eq[c.eqKey] ?? 0;
+            if (!count) continue;
+            any += count;
+            const h = Math.round(m.healthIndex({ assetClass: c.cls, ageYears: 3, condition: 0.85, duty: 0.5 })?.health ?? 0);
+            if (h >= 70) exGood += count; else if (h >= 50) fair += count; else poorCrit += count;
+            const fp = Math.round((m.failureProbability?.(c.cls, 3)?.failureProb ?? 0) * 100);
+            if (fp >= 25) atRisk += count;
+        }
+        return any ? { exGood, fair, poorCrit, atRisk } : null;
     } catch { return null; }
 }

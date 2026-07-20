@@ -18,6 +18,7 @@ import {
 } from 'recharts';
 import { fmt, fmtMoney, fmtPct } from '@/lib/format';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
+import { TraceValue } from '@/components/ui/TraceValue';
 
 interface PhaseFinancialResult {
     phaseLabel: string;
@@ -357,13 +358,15 @@ const PhasedFinancialDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">Blended IRR</span>
                             <Tooltip content="Investment-weighted internal rate of return across all phases, adjusted for tax incentives and risk." />
                         </div>
-                        <div
-                            className={`text-2xl font-bold ${blendedIrr >= 12 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
-                            title={blendedIrr < 12 ? (overallExplain?.reason ?? 'IRR di bawah hurdle') + ' Klik untuk lihat lever per fase.' : undefined}
-                            onClick={blendedIrr < 12 ? openWorstPhase : undefined}
-                        >
-                            {blendedIrr.toFixed(1)}%
-                        </div>
+                        <TraceValue traceId="pf.blendedIrr">
+                            <div
+                                className={`text-2xl font-bold ${blendedIrr >= 12 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
+                                title={blendedIrr < 12 ? (overallExplain?.reason ?? 'IRR di bawah hurdle') + ' Klik untuk lihat lever per fase.' : undefined}
+                                onClick={blendedIrr < 12 ? (e) => { e.stopPropagation(); openWorstPhase(); } : undefined}
+                            >
+                                {blendedIrr.toFixed(1)}%
+                            </div>
+                        </TraceValue>
                     </CardContent>
                 </Card>
 
@@ -373,13 +376,15 @@ const PhasedFinancialDashboard = () => {
                             <DollarSign className="w-4 h-4 text-emerald-500" />
                             <span className="text-xs text-slate-500 uppercase">Total NPV</span>
                         </div>
-                        <div
-                            className={`text-2xl font-bold ${blendedNpv >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
-                            title={blendedNpv < 0 ? `NPV negatif ${fmtMoney(blendedNpv)} pada discount rate yang dipakai. Klik untuk lihat alasan & lever fase terlemah.` : undefined}
-                            onClick={blendedNpv < 0 ? openWorstPhase : undefined}
-                        >
-                            {fmtMoney(blendedNpv)}
-                        </div>
+                        <TraceValue traceId="pf.totalNpv">
+                            <div
+                                className={`text-2xl font-bold ${blendedNpv >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
+                                title={blendedNpv < 0 ? `NPV negatif ${fmtMoney(blendedNpv)} pada discount rate yang dipakai. Klik untuk lihat alasan & lever fase terlemah.` : undefined}
+                                onClick={blendedNpv < 0 ? (e) => { e.stopPropagation(); openWorstPhase(); } : undefined}
+                            >
+                                {fmtMoney(blendedNpv)}
+                            </div>
+                        </TraceValue>
                     </CardContent>
                 </Card>
 
@@ -389,7 +394,9 @@ const PhasedFinancialDashboard = () => {
                             <Target className="w-4 h-4 text-amber-500" />
                             <span className="text-xs text-slate-500 uppercase">Payback</span>
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white">{blendedPayback} yr</div>
+                        <TraceValue traceId="pf.payback">
+                            <div className="text-2xl font-bold text-slate-900 dark:text-white">{blendedPayback} yr</div>
+                        </TraceValue>
                     </CardContent>
                 </Card>
 
@@ -399,7 +406,9 @@ const PhasedFinancialDashboard = () => {
                             <DollarSign className="w-4 h-4 text-blue-500" />
                             <span className="text-xs text-slate-500 uppercase">Investment</span>
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(totalInvestment)}</div>
+                        <TraceValue traceId="pf.totalCapex">
+                            <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(totalInvestment)}</div>
+                        </TraceValue>
                     </CardContent>
                 </Card>
 
@@ -410,13 +419,15 @@ const PhasedFinancialDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">PI</span>
                             <Tooltip content="Profitability Index: (NPV + Investment) / Investment. Above 1.0 = value-creating." />
                         </div>
-                        <div
-                            className={`text-2xl font-bold ${profitabilityIndex >= 1 ? 'text-slate-900 dark:text-white' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
-                            title={profitabilityIndex < 1 ? `PI ${profitabilityIndex}x < 1.0 — PV manfaat lebih kecil dari investasi. Klik untuk lihat lever fase terlemah.` : undefined}
-                            onClick={profitabilityIndex < 1 ? openWorstPhase : undefined}
-                        >
-                            {profitabilityIndex}x
-                        </div>
+                        <TraceValue traceId="pf.pi">
+                            <div
+                                className={`text-2xl font-bold ${profitabilityIndex >= 1 ? 'text-slate-900 dark:text-white' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
+                                title={profitabilityIndex < 1 ? `PI ${profitabilityIndex}x < 1.0 — PV manfaat lebih kecil dari investasi. Klik untuk lihat lever fase terlemah.` : undefined}
+                                onClick={profitabilityIndex < 1 ? (e) => { e.stopPropagation(); openWorstPhase(); } : undefined}
+                            >
+                                {profitabilityIndex}x
+                            </div>
+                        </TraceValue>
                     </CardContent>
                 </Card>
             </div>

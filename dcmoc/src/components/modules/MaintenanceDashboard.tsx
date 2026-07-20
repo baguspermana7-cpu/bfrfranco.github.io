@@ -29,6 +29,7 @@ import clsx from 'clsx';
 import { fmtMoney } from '@/lib/format';
 import { useEngineReady } from '@/lib/rz-engine';
 import { sparesPricingBands, SparesPriceBandRow } from '@/state/adapters/spares-adapter';
+import { TraceValue } from '@/components/ui/TraceValue';
 
 type TabId = 'assets' | 'schedule' | 'strategy' | 'sla' | 'spares';
 
@@ -288,10 +289,10 @@ export function MaintenanceDashboard() {
             {/* ═══ KPI ROW ═══ */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                    { label: 'Annual Maint Budget', value: fmtMoney(annualBudget), sub: strategyName, icon: DollarSign, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10', tip: 'Total annual maintenance budget based on selected strategy (labor + parts + downtime risk)' },
-                    { label: 'Maintenance Events', value: `${schedule.length}`, sub: `${totalMaintHours.toFixed(0)} total hours`, icon: Wrench, color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50 dark:bg-cyan-500/10', tip: 'Number of scheduled maintenance events per year based on SFG20 regimes' },
-                    { label: 'Active Assets', value: `${assetCounts.reduce((a, c) => a + c.count, 0)}`, sub: `${activeAssets.length} asset types`, icon: Zap, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-500/10', tip: 'Total physical assets requiring maintenance, auto-generated from CAPEX config' },
-                    { label: '5-Year Savings', value: fmtMoney(predictedSavings), sub: 'Optimal vs Worst', icon: TrendingUp, color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-500/10', tip: 'Projected savings over 5 years comparing optimal vs worst maintenance strategy' },
+                    { label: 'Annual Maint Budget', value: fmtMoney(annualBudget), sub: strategyName, icon: DollarSign, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10', tip: 'Total annual maintenance budget based on selected strategy (labor + parts + downtime risk)', trace: 'maint.annualBudget' },
+                    { label: 'Maintenance Events', value: `${schedule.length}`, sub: `${totalMaintHours.toFixed(0)} total hours`, icon: Wrench, color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50 dark:bg-cyan-500/10', tip: 'Number of scheduled maintenance events per year based on SFG20 regimes', trace: 'maint.events' },
+                    { label: 'Active Assets', value: `${assetCounts.reduce((a, c) => a + c.count, 0)}`, sub: `${activeAssets.length} asset types`, icon: Zap, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-500/10', tip: 'Total physical assets requiring maintenance, auto-generated from CAPEX config', trace: 'maint.activeAssets' },
+                    { label: '5-Year Savings', value: fmtMoney(predictedSavings), sub: 'Optimal vs Worst', icon: TrendingUp, color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-500/10', tip: 'Projected savings over 5 years comparing optimal vs worst maintenance strategy', trace: 'maint.fiveYearSavings' },
                 ].map((kpi, i) => (
                     <div key={i} className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-sm dark:shadow-none">
                         <div className="flex items-center gap-2 mb-2">
@@ -300,7 +301,13 @@ export function MaintenanceDashboard() {
                             </div>
                             <span className="text-xs text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1">{kpi.label} <Tooltip content={(kpi as any).tip} /></span>
                         </div>
-                        <div className="text-xl font-bold text-slate-900 dark:text-white truncate" title={kpi.value.toString()}>{kpi.value}</div>
+                        {kpi.trace ? (
+                            <TraceValue traceId={kpi.trace}>
+                                <div className="text-xl font-bold text-slate-900 dark:text-white truncate" title={kpi.value.toString()}>{kpi.value}</div>
+                            </TraceValue>
+                        ) : (
+                            <div className="text-xl font-bold text-slate-900 dark:text-white truncate" title={kpi.value.toString()}>{kpi.value}</div>
+                        )}
                         <div className="text-xs text-slate-500 mt-1">{kpi.sub}</div>
                     </div>
                 ))}

@@ -32,7 +32,40 @@ or module re-implements economically-material math or re-declares reference data
 | Cooling taxonomy | `DATA.coolingTypes` (label + capex/pue/wue keys) | `RZEngine.data.coolingTypes` |
 | Currency | `DATA.currency` (26) | `RZEngine.data.currency` |
 | DC markets (MW/colo/vacancy) | `DATA.markets` | already shared |
+| O&M contract pricing bands | `DATA.omContracts` (v1.96.0) | DCMOC Maintenance SLA cost + Spares price band + Data Library |
+| Spares list-price bands (8 classes) | `DATA.sparesPricing` (v1.96.0) | `spares-adapter` unitCost + Data Library |
+| Environmental costs (carbon price 40 countries + waste bands) | `DATA.envCosts` (v1.97.0) | Sustainability "Environmental Costs" + trace nodes + Data Library |
+| Labor statutory (6 fields × 40 countries) | `DATA.countries` (generated) | ShiftEngine / site-adapter / FuelGenEngine / capex-data |
 | Every lifecycle calc | `models.*` (13 pillars) | `RZEngine.models.*` / `rzModels()` |
+
+## New DATA tables — v1.96.0 → v1.97.0 (O&M pricing + env costs + labor statutory)
+All three tables are **sourced screening bands** (`DATA.sources` rows
+`omContracts` / `sparesPricing` / `envCosts`, asOf 2026-07) with gate asserts
+(monotonic + sourced); DCMOC consumers keep verbatim fallbacks if the engine is
+unavailable.
+
+| DATA key | Contents | Consumer chain |
+|---|---|---|
+| `DATA.omContracts` | Contract tiers Comprehensive / Preventive / On-call, $/kW-yr bands 30-60 / 20-40 / 10-20 · multipliers third-party ×0.65, aging ×1.5 | DCMOC Maintenance SLA contract cost (mapping NBD≈on-call, 4hr≈preventive, 2hr≈comprehensive × IT kW), Spares tab price band, Data Library "O&M Contracts" dataset |
+| `DATA.sparesPricing` | 8 spares classes (UPS 50kW module $25-60K, VRLA string $8-15K, genset PM kit & top-overhaul, chiller compressor $80-250K, CRAH EC-fan kit, MCCB, filters) | `dcmoc/src/state/adapters/spares-adapter.ts` unitCost (provenance chip flips to emerald `engine`; screening fallback), Data Library "Spares Pricing" |
+| `DATA.envCosts` | Carbon compliance price 40 countries (SG $33, EU-ETS $61, SE $120, CH $130, NO $100, JP $2 …; no scheme → voluntary $10/t labeled) + waste bands (2 t/MW-IT + e-waste 150 kg/MW × developed/emerging) | Sustainability Environmental Costs section (water/carbon/waste/total + forecast ramp), `value-trace.ts` env nodes, Data Library "Env Costs" |
+
+**Labor statutory fields (DM fase 1-2, v1.97.0)** — 6 new per-country fields in
+the authoring source `dcmoc/src/constants/countries.ts`, flowed into
+`DATA.countries` by the generator: `socialSecurityRate` (AU super 12%, GB NIC
+15%, FR 38%, BR 28%, SG CPF 17% …), `benefitsOverheadRate`,
+`nightShiftPremiumRate` (statutory JP 25% / KR 30% / VN 30% / BR 20%),
+`workingHoursPerMonth` (150-161, from leave data), `constructionIndex` (now
+40/40 — CapexEngine priority logic active; capex-data uses it fallback-only),
+`environmentalPermitCostPerYear`. Consumers: `ShiftEngine` (×3 points),
+`site-adapter` labor burden (was flat 1.3 → per-country), `FuelGenEngine`
+permit cost.
+
+**Regen rule (unchanged, now with more reach):** ANY edit to labor/economic
+country fields happens in `countries.ts` → `node tools/build-countries-data.mjs`
+→ terser → parity gate (155/0). ANY new DATA table needs its `DATA.sources` row
++ `test-rz-engine.mjs` asserts → `node tools/build-engine-catalog.mjs` →
+`node tools/test-value-bindings.mjs` (staleness gate) — see AUTO-LINKING CHAIN.
 
 ## Generated data — never hand-edit
 `DATA.countries` is written between `/* @@COUNTRIES_START */` … `/* @@COUNTRIES_END */`
@@ -43,7 +76,7 @@ by **`tools/build-countries-data.mjs`**. Edit the authoring source
 ## Definition of done for any engine/data change
 1. `node tools/build-countries-data.mjs` (if country data changed).
 2. `terser rz-engine.js -c -m -o rz-engine.min.js` (never hand-edit the min).
-3. `node tools/test-rz-engine.mjs` (395/0 as of v1.67.x — was 299/0 at program start) + `node tools/test-reference-parity.mjs` (126/0).
+3. `node tools/test-rz-engine.mjs` (599/0 as of v1.97.0 — was 299/0 at program start) + `node tools/test-reference-parity.mjs` (155/0).
 4. Bump `js/rz-version.js` + `CHANGELOG.md` + `python3 tools/build-changelog-html.py --apply`.
 5. Bump `?v=` on pages loading `rz-engine.min.js`; for DCMOC rebuild + copy `out/`→`dcmoc/`.
 6. Update this doc + `SUPER_ENGINE.md` if a new `models.*` namespace or DATA key was added.
@@ -61,10 +94,19 @@ by **`tools/build-countries-data.mjs`**. Edit the authoring source
 ## AUTO-LINKING CHAIN (owner mandate 2026-07-19: "bener2 auto linking satu sama lain — harus AUTO, tidak perlu Claude")
 `rz-engine.js (single truth)` → **`tools/build-engine-catalog.mjs`** (generates `dcmoc/src/lib/engine-catalog.json`: every models.* namespace/function + param names + DATA.sources provenance + CONSUMERS grep-derived from real usage across site *.html + dcmoc/src) → **rendered LIVE** by DCMOC Knowledge Base "Engine Models" tab + FAQ "Engine & Data Reference" (auto-generated sections — never hand-written per change) → **`tools/test-value-bindings.mjs`** (SHIP GATE): (a) value-bindings.ts coherence — unique ids, engine-provenance entries carry engineFn, every engineFn resolves against the live engine, pages ⊆ real tab ids; (b) catalog STALENESS — regenerates in-memory and diffs vs committed JSON, so an engine change cannot ship with stale docs.
 **VALUE TRACE (lihat `VALUE_TRACE_STANDARD.md`):** setiap angka baru yang dirender di DCMOC WAJIB registrasi traceId (graf `value-trace.ts` + wrap `TraceValue`) — klik-to-trace Excel-style sampai leaf + sumber eksternal.
+**DECISION EXPLAINABILITY (v1.96.0-v1.97.4):** panel "kenapa?"/lever pada verdict & status chip (Phased Financial GO/NO-GO via `lib/decision-explain.ts`, threshold generik `explainThresholdMetric` bisection untuk Investment/Reliability, Site axis `axis-explain.ts`, Capacity chips, Results `dimension-explain.ts`) WAJIB menghitung lever lewat MODEL YANG SAMA dengan render (bisection atas rantai engine nyata) — bukan teks statis; target tak tercapai → catatan jujur "unreachable", bukan lever palsu.
 **Definition of Done for ANY engine/algo/DATA/logic change now includes:** `node tools/build-engine-catalog.mjs` (regen) + `node tools/test-value-bindings.mjs` green + add a curated value-bindings.ts entry ONLY when a DCMOC KPI consumes the new value (cross-page semantics can't be grep'd) + check the auto-detected consumers list for related articles/calculators that must be re-verified.
 
-## NEXT PHASE — Article calculators → engine (IN PROGRESS — batch 4 shipped v1.90.2)
-**Progress:** article-11 → `models.gridImpact.residentialBillImpact` + `DATA.gridImpact` · article-20 dcw/wfc/avh → `models.water.facilityFootprint` + `aiQueryFootprint` + `DATA.waterFootprint`/`aiWater` · article-18 → `models.aiFactory.readiness` (**×1000 annualEnergy unit bug FIXED at promotion**) · article-23 → `models.aiFactory.gpuBuild` · **batch 3:** article-1 → `models.opsMaturity` (score/label/riskExposure + `DATA.opsMaturity` 8-dimension weights, Uptime-2024 risk basis) · article-2 → `models.alarms` (ratePer10Min/cognitiveLoad/floodProbability/isaCompliance/erlangC/isaScore + `DATA.alarmMgmt` ISA-18.2 targets; Poisson via shared `models.spares.poissonCdf` kernel) · article-3 → `models.maintCompliance` (effectiveCapacity/demand/compliance/techsForTarget + `DATA.maintCompliance` FF/CMMS/evidence multipliers). All pages delegate w/ inline fallback, headless-verified (engine fn call-counted live, 0 errors). **batch 4:** article-4 → `models.mttr` (phases/compare + `DATA.mttrResponse` category/skill/coverage tables) · article-5 → `models.techDebt` (weibullHazard/riskScore/escalation/costRoi/weibullParams Lanczos-Γ/capacity + `DATA.techDebt`) · article-6 → `models.rca.effectivenessScore` (+ `DATA.rcaScore` 6-weight rubric). Remaining 12 pages: 7/8/9/10/12/13/14/15/16/17/22/25.
+## Article calculators → engine — **COMPLETE 22/22 (v1.96.0)**
+**Final sweep (v1.96.0):** the remaining 14 pages landed — 12 wired to the
+engine (`models.resilience`, `safetyCulture`, `hvac`, `water.stressCost`,
+`dcValue`, reliability (a13), `communityImpact`, `opsBudget`,
+`dcMarket.bubbleRisk/opportunity`, `interconnect`, `gridReserve`) + a19/a21 are
+pure prose (no calculator — legitimate skip). 66 new asserts (goldens computed
+independently from the original page formulas), headless probe 12/12, engine
+gate 590/0 at ship. Every article calculator now delegates to `models.*` with
+inline fallback.
+**Earlier batches:** article-11 → `models.gridImpact.residentialBillImpact` + `DATA.gridImpact` · article-20 dcw/wfc/avh → `models.water.facilityFootprint` + `aiQueryFootprint` + `DATA.waterFootprint`/`aiWater` · article-18 → `models.aiFactory.readiness` (**×1000 annualEnergy unit bug FIXED at promotion**) · article-23 → `models.aiFactory.gpuBuild` · **batch 3:** article-1 → `models.opsMaturity` (score/label/riskExposure + `DATA.opsMaturity` 8-dimension weights, Uptime-2024 risk basis) · article-2 → `models.alarms` (ratePer10Min/cognitiveLoad/floodProbability/isaCompliance/erlangC/isaScore + `DATA.alarmMgmt` ISA-18.2 targets; Poisson via shared `models.spares.poissonCdf` kernel) · article-3 → `models.maintCompliance` (effectiveCapacity/demand/compliance/techsForTarget + `DATA.maintCompliance` FF/CMMS/evidence multipliers). All pages delegate w/ inline fallback, headless-verified (engine fn call-counted live, 0 errors). **batch 4:** article-4 → `models.mttr` (phases/compare + `DATA.mttrResponse` category/skill/coverage tables) · article-5 → `models.techDebt` (weibullHazard/riskScore/escalation/costRoi/weibullParams Lanczos-Γ/capacity + `DATA.techDebt`) · article-6 → `models.rca.effectivenessScore` (+ `DATA.rcaScore` 6-weight rubric). (The 12 then-remaining pages closed in the v1.96.0 final sweep above.)
 **Scope (grep-verified 2026-07-18):** **21 of the 22** `article-*.html` interactive calculators are self-contained INLINE JS (only 1 uses `RZEngine`). Owner mandate: bring every calculator/parameter under the shared engine so DCMOC can wire from all of them (full / partial / even a single parameter), with complex algorithms in `rz-engine.js`.
 **Pattern to apply per article calc** (same as the DC Hub tools):
 1. Read the article's `<script>` calc: extract formula + inputs + outputs.

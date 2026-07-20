@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.97.6 — 2026-07-20 (docs sync + adversarial verify 7/8 PASS + trace tail 4 halaman)
+
+### Added
+- **Trace tail**: 21 node (maint.annualBudget/events/plannedHours · inv.equityIrr/moic/minDscr/wacc · pf.blendedIrr/totalNpv/payback/pi · asset health buckets) — coverage Maintenance 4/4, Investment 4/4, PhasedFinancial 5/5, Assets 5/5 (+7 halaman telemetri baru di walk probe, Site 31/31).
+- **FAQ +6 Q&A** (ƒx trace, panel "kenapa?", labor statutory, At-Risk forecast-aware, env costs, harga O&M).
+
+### Changed (disiplin dokumentasi — fitur malam masuk semua doc)
+- VALUE_TRACE_STANDARD: konvensi data-trace + kebijakan enum-tidak-di-trace + status coverage & gate.
+- ENGINE_UNIFICATION: 4 tabel DATA baru + 6 field labor + rantai konsumen + regen rules; angka gate di-refresh (599/0, 155/0); article sweep COMPLETE 22/22.
+- USER_MANUAL: 6 section fitur baru (trace, decision explain, env costs, coverage, kalender, prefill).
+
+### Verified — ADVERSARIAL AUDIT klaim semalam (agent independen, build ter-deploy): 7/8 PASS
+- Env costs benar KOMPUTASI per negara (SG $520K vs ID $116K vs US voluntary $185K, chip+basis+band flip). ƒx popover angka live + drill. NO-GO lever bisection nyata ("Revenue +22% ATAU CAPEX −29%"). Kalender per-class ×N tanpa baris #unit. Capacity chip forecast-aware. Site axis explain. Coverage 98.3% render.
+- 1 FAIL environmental: CORS `/fx` dari origin localhost (worker allowlist — fallback snapshot jalan; bukan bug kode; produksi origin resmi tak terdampak).
+- Gates: tsc/build · walk 24/0 · synergy 6/0 · export 44/0 · bindings 73/0.
+
 ## v1.97.5 — 2026-07-20 (Capacity banding forecast-aware — keputusan owner "go ahead")
 
 ### Changed

@@ -160,6 +160,14 @@ const TRACE_PAGES = [
     { group: 'Architecture', leaf: 'Architecture Engine', name: 'Architecture' },
     { group: 'Operations', leaf: 'Staffing', name: 'Staffing' },
     { group: 'Results', leaf: 'Results Engine', name: 'Results' },
+    /* Telemetri tambahan (2026-07-20) — belum masuk floor assert, log-only dulu */
+    { group: 'Site Intelligence', leaf: 'Site Intelligence', name: 'Site' },
+    { group: 'Commissioning', leaf: 'Commissioning Engine', name: 'Commissioning' },
+    { group: 'Construction', leaf: 'Construction Engine', name: 'Construction' },
+    { group: 'Operations', leaf: 'Maintenance', name: 'Maintenance' },
+    { group: 'Financial', leaf: 'Investment', name: 'Investment' },
+    { group: 'Financial', leaf: 'Phased', name: 'PhasedFinancial' },
+    { group: 'Asset Intelligence', leaf: 'Asset Intelligence', name: 'Assets' },
 ];
 let tracedPages = 0;
 for (const pg of TRACE_PAGES) {

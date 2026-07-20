@@ -119,8 +119,9 @@ never hand-edited. PDF exports end with an algorithmic Executive Assessment
 numbers by `src/modules/reporting/pdf/ReportNarrative.ts`.
 
 ---
-*Status 2026-07-17: Financial + AI Decision + orchestrator engine-sourced and
-verified; remaining engines scheduled per `standarization/DCMOC_DCOS_STANDARD.md`.*
+*Status 2026-07-20: Financial + AI Decision + orchestrator engine-sourced and
+verified; all 22 article calculators engine-bound (v1.96.0); remaining engine
+sections scheduled per `standarization/DCMOC_DCOS_STANDARD.md`.*
 
 ## 9. Trace Angka (Formula Field) — AUDIT SETIAP ANGKA
 Angka dengan garis-bawah titik violet bisa DIKLIK: popover "Trace Angka"
@@ -128,4 +129,63 @@ menampilkan rumusnya dengan angka live sebagai pill berwarna (violet = input
 kamu, emerald = konstanta engine bersumber, cyan = dihitung, amber = screening).
 Klik pill mana pun untuk masuk ke rumus pill itu — rekursif sampai titik paling
 ujung; leaf menyediakan "Edit di menu" dan link sumber eksternal (glossary,
-dokumen publik korpus). Standar: `standarization/VALUE_TRACE_STANDARD.md`.
+dokumen publik korpus). Coverage kini mencakup semua halaman engine inti
+(Financial 7/7, Sustainability 10/10, Ops 7/7, Reliability 6/6, Staffing 8/8 —
+sisa non-trace = label/enum, bukan angka). Standar:
+`standarization/VALUE_TRACE_STANDARD.md`.
+
+## 10. Panel "Kenapa?" — decision explainability (v1.96–v1.97)
+Verdict dan status chip bukan sekadar warna — KLIK untuk melihat alasannya
+dengan angka live + **lever terukur** (dihitung dengan bisection pada model
+yang sama dengan yang merender angka, bukan saran generik):
+- **Phased Financial**: verdict GO/NO-GO → alasan + "Revenue +X% ke $Y/kW/bln"
+  / "CAPEX −Z%"; KPI merah → panel fase terburuk; PDF memuat section
+  "Decision Rationale & Required Changes".
+- **Investment**: threshold Min DSCR ≥1.25x, Equity IRR ≥15%, payback ≤7 th —
+  chip klik → lever debt-ratio/revenue/exit; target tak tercapai → catatan
+  jujur "unreachable".
+- **Reliability**: availability di bawah target tier → gap nines + kontributor
+  terbesar + lever ("paths +1", "MTTR −46%"); baris SPOF punya tombol FIX.
+- **Site Intelligence**: band Poor/Fair per axis → kontributor weight×value +
+  lever via scoreSite nyata ("SAIDI ≤407 → axis 60 Good").
+- **Capacity**: chip OK/Watch/At-Risk → reason + lever (defer IT load) +
+  tombol Phase Plan/Requirements.
+- **Results**: skor dimensi <60 → chip ⓘ → formula + lever per dimensi; grade
+  <B → ringkasan 2 dimensi terlemah + apakah lever cukup mencapai 70.
+- **Staff Model**: Monthly Hidden Loss "▸ kenapa?" → formula + breakdown
+  per-hire + lever terukur.
+
+## 11. Environmental Costs (Sustainability) — country-auto
+Section baru menjawab "di mana biaya air/waste/carbon?": **Water** (WUE engine
+× climate multiplier ASHRAE × $/kgal per sumber; deep-sea ON → basis seawater
+$0), **Carbon** (scope-2 × harga karbon compliance per negara dari
+`DATA.envCosts` — 40 negara; tanpa skema → voluntary $10/t berlabel amber),
+**Waste** (2 t/MW-IT + e-waste 150 kg/MW × band developed/emerging), plus total
++ forecast ramp. Ganti negara → semua rate ikut otomatis.
+
+## 12. Data Library — dataset baru + Country Coverage
+- Dataset live baru: **O&M Contracts** (band $/kW-yr per tier kontrak),
+  **Spares Pricing** (8 kelas suku cadang), **Env Costs** (harga karbon +
+  waste, 40 negara, sortable) — semua bersumber (`DATA.sources`).
+- **Country Coverage**: matriks 40 negara × 30 field ✓/— dihitung live dari
+  tabel negara (98.3%); klik negara → daftar field yang kosong.
+
+## 13. Kalender maintenance per-system
+Kalender dirombak: satu baris per SYSTEM ×count (bukan per unit — 500 MW: 20
+baris, bukan 34.815), toggle **Week/Month**, blok ×N berwarna per tipe
+maintenance, hover → panel ringkas, klik → detail event di bawah grid.
+
+## 14. Prefill & rekomendasi (tanpa overwrite diam-diam)
+- **Edit Criteria (Site)**: field kosong menampilkan nilai efektif — chip cyan
+  = baseline negara, chip amber = screening typical; store tetap unset.
+- **Requirements 1.6**: chip `rec: X` dihitung live dari parameter proyek
+  (`lib/recommended.ts`, 13 rule — substation by band MW, refrigerant
+  lowest-GWP, fee AACE band, solar 10% IT + BESS 2h, dll). Klik chip =
+  terapkan satu; "Terapkan semua rekomendasi" = terapkan semuanya. Tidak ada
+  nilai yang ditimpa tanpa aksi user.
+
+## 15. Capacity Utilization — forecast-aware (v1.97.5)
+Chip OK/Watch/At-Risk dihitung dari **puncak forecast pertumbuhan** (share
+kapasitas design), bukan utilisasi saat ini (yang struktural ≈ 1/(1+margin));
+tiap sistem mendapat estimasi **tahun exhaust** ("At Risk ·~2029"). Hover % =
+"Sekarang X% · puncak forecast Y% · exhaust ~tahun".
