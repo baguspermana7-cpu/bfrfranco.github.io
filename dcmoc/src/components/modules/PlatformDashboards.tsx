@@ -22,6 +22,7 @@ import { PlatformHeader, KpiChips } from '@/components/modules/platform/Scenario
 import { VALUE_BINDINGS, BINDING_GROUPS } from '@/lib/value-bindings';
 import ENGINE_CATALOG from '@/lib/engine-catalog.json';
 import RESEARCH_LIB from '@/lib/research-library.json';
+import CORPUS_FACTS from '@/lib/corpus-facts.json';
 import { Database, Boxes, FolderOpen, HelpCircle, Zap, Wrench, ClipboardCheck, Users, Sun, Moon, Cpu, Server, Building, ArrowRight, CheckCircle2, Circle, ExternalLink } from 'lucide-react';
 import { COUNTRIES, type CountryProfile } from '@/constants/countries';
 
@@ -306,35 +307,7 @@ export function DataLibraryDashboard() {
                     <p className="mt-1.5 text-[9px] text-slate-400">Every economically-material DATA value in the engine carries a source + as-of date (gate-enforced). Read-only.</p>
                 </Card>
             )}
-            {tab === 'corpus' && (
-                <Card>
-                    <div className="mb-2 flex items-center gap-2">
-                        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">DC Public-Data Corpus — distribusi multi-sumber</h2>
-                        <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">auto-generated</span>
-                    </div>
-                    <p className="mb-2 text-[10px] text-slate-400">Setiap fakta di baliknya membawa source_url + kutipan verbatim (gate-enforced) — pipeline tools/dc-corpus (markitdown). Persentil p10-p90 per metrik × segmen.</p>
-                    <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-[11px]">
-                        <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-left text-slate-500">
-                            <th className="py-1.5 pr-3">Metrik</th><th className="py-1.5 pr-3">Segmen</th><th className="py-1.5 pr-3">n</th>
-                            <th className="py-1.5 pr-3">p10</th><th className="py-1.5 pr-3">p25</th><th className="py-1.5 pr-3 font-bold">p50</th>
-                            <th className="py-1.5 pr-3">p75</th><th className="py-1.5 pr-3">p90</th><th className="py-1.5">Perusahaan</th>
-                        </tr></thead>
-                        <tbody>{Object.entries(corpus).flatMap(([metric, segs]) => Object.entries(segs).map(([seg, dta]) => (
-                            <tr key={metric + seg} className="border-b border-slate-100 dark:border-slate-800/60">
-                                <td className="py-1.5 pr-3 font-medium text-slate-700 dark:text-slate-200">{metric} <span className="text-[9px] text-slate-400">({dta.unit})</span></td>
-                                <td className="py-1.5 pr-3 text-slate-500">{seg}</td>
-                                <td className="py-1.5 pr-3 tabular-nums">{dta.n}</td>
-                                <td className="py-1.5 pr-3 tabular-nums text-slate-500">{dta.p10.toLocaleString()}</td>
-                                <td className="py-1.5 pr-3 tabular-nums text-slate-500">{dta.p25.toLocaleString()}</td>
-                                <td className="py-1.5 pr-3 tabular-nums font-bold text-slate-900 dark:text-white">{dta.p50.toLocaleString()}</td>
-                                <td className="py-1.5 pr-3 tabular-nums text-slate-500">{dta.p75.toLocaleString()}</td>
-                                <td className="py-1.5 pr-3 tabular-nums text-slate-500">{dta.p90.toLocaleString()}</td>
-                                <td className="py-1.5 text-[10px] text-slate-400" title={dta.companies.join(', ')}>{dta.companies.slice(0, 3).join(', ')}{dta.companies.length > 3 ? ` +${dta.companies.length - 3}` : ''} · {dta.sources} dok</td>
-                            </tr>
-                        )))}</tbody>
-                    </table></div>
-                </Card>
-            )}
+            {tab === 'corpus' && <CorpusSection corpus={corpus} />}
             {tab === 'countries' && (
                     <table className="w-full text-xs min-w-[560px]">
                         <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Country</th><th className="pr-3">Region</th><th className="pr-3 text-right">Electricity $/kWh</th><th className="pr-3 text-right">Tax</th><th className="pr-3 text-right">Grid kgCO₂/kWh</th><th className="text-right">Constr. idx</th></tr></thead>
@@ -735,6 +708,101 @@ export function KnowledgeDashboard() {
             </>)}
         </div>
     );
+}
+
+/* ── Data Library › DC Corpus tab — segment filter + per-fact drill-down.
+ * Setiap baris distribusi bisa diklik → daftar fakta mentah di baliknya
+ * (value + company + source_url + kutipan verbatim, dari corpus-facts.json —
+ * mirror auto-generated dari tools/dc-corpus/dc-facts.json). ── */
+type CorpusDistRow = { n: number; unit: string; p10: number; p25: number; p50: number; p75: number; p90: number; companies: string[]; sources: number };
+interface CorpusFact { metric: string; segment: string; value: number; unit: string; company: string; year: number | null; source_url: string; quote: string }
+
+function CorpusSection({ corpus }: { corpus: Record<string, Record<string, CorpusDistRow>> }) {
+    const [segFilter, setSegFilter] = React.useState<string>('all');
+    const [openRow, setOpenRow] = React.useState<string | null>(null);
+    const facts = CORPUS_FACTS.facts as CorpusFact[];
+    const segments = React.useMemo(
+        () => [...new Set(Object.values(corpus).flatMap((m) => Object.keys(m)))].sort(),
+        [corpus]
+    );
+    const rows = Object.entries(corpus)
+        .flatMap(([metric, segs]) => Object.entries(segs).map(([seg, dta]) => ({ metric, seg, dta })))
+        .filter((r) => segFilter === 'all' || r.seg === segFilter);
+    const totalFacts = rows.reduce((s, r) => s + r.dta.n, 0);
+    const host = (u: string): string => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return u; } };
+    return (
+        <Card>
+            <div className="mb-2 flex items-center gap-2">
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">DC Public-Data Corpus — distribusi multi-sumber</h2>
+                <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">auto-generated</span>
+            </div>
+            <p className="mb-2 text-[10px] text-slate-400">Setiap fakta membawa source_url + kutipan verbatim (gate-enforced) — pipeline tools/dc-corpus (markitdown). Persentil p10-p90 per metrik × segmen. Klik baris untuk drill-down fakta mentah.</p>
+            <div className="mb-2 flex flex-wrap items-center gap-1.5">
+                <span className="text-[9px] font-semibold uppercase text-slate-400">Segmen:</span>
+                {['all', ...segments].map((s) => (
+                    <button key={s} onClick={() => { setSegFilter(s); setOpenRow(null); }}
+                        className={`rounded-lg border px-2 py-0.5 text-[10px] font-medium transition-colors ${segFilter === s ? 'border-cyan-400/60 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400' : 'border-slate-200 dark:border-white/10 text-slate-500 hover:border-cyan-400/40'}`}>
+                        {s === 'all' ? `semua (${totalFactsAll(corpus)})` : s}
+                    </button>
+                ))}
+                <span className="ml-auto text-[9px] tabular-nums text-slate-400">{rows.length} distribusi · {totalFacts} fakta</span>
+            </div>
+            <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-[11px]">
+                <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-left text-slate-500">
+                    <th className="py-1.5 pr-3">Metrik</th><th className="py-1.5 pr-3">Segmen</th><th className="py-1.5 pr-3">n</th>
+                    <th className="py-1.5 pr-3">p10</th><th className="py-1.5 pr-3">p25</th><th className="py-1.5 pr-3 font-bold">p50</th>
+                    <th className="py-1.5 pr-3">p75</th><th className="py-1.5 pr-3">p90</th><th className="py-1.5">Perusahaan</th>
+                </tr></thead>
+                <tbody>{rows.flatMap(({ metric, seg, dta }) => {
+                    const key = metric + '|' + seg;
+                    const open = openRow === key;
+                    const rowFacts = open ? facts.filter((f) => f.metric === metric && f.segment === seg) : [];
+                    const trs = [(
+                        <tr key={key} onClick={() => setOpenRow(open ? null : key)}
+                            className={`cursor-pointer border-b border-slate-100 dark:border-slate-800/60 ${open ? 'bg-cyan-500/[0.04]' : 'hover:bg-slate-50 dark:hover:bg-white/[0.03]'}`}>
+                            <td className="py-1.5 pr-3 font-medium text-slate-700 dark:text-slate-200"><span className={`mr-1 inline-block text-[9px] transition-transform ${open ? 'rotate-90' : ''}`}>▸</span>{metric} <span className="text-[9px] text-slate-400">({dta.unit})</span></td>
+                            <td className="py-1.5 pr-3 text-slate-500">{seg}</td>
+                            <td className="py-1.5 pr-3 tabular-nums">{dta.n}{dta.n < 5 && <span className="ml-1.5 rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-medium text-amber-600 dark:text-amber-400">n kecil — indikatif</span>}</td>
+                            <td className="py-1.5 pr-3 tabular-nums text-slate-500">{dta.p10.toLocaleString()}</td>
+                            <td className="py-1.5 pr-3 tabular-nums text-slate-500">{dta.p25.toLocaleString()}</td>
+                            <td className="py-1.5 pr-3 tabular-nums font-bold text-slate-900 dark:text-white">{dta.p50.toLocaleString()}</td>
+                            <td className="py-1.5 pr-3 tabular-nums text-slate-500">{dta.p75.toLocaleString()}</td>
+                            <td className="py-1.5 pr-3 tabular-nums text-slate-500">{dta.p90.toLocaleString()}</td>
+                            <td className="py-1.5 text-[10px] text-slate-400" title={dta.companies.join(', ')}>{dta.companies.slice(0, 3).join(', ')}{dta.companies.length > 3 ? ` +${dta.companies.length - 3}` : ''} · {dta.sources} dok</td>
+                        </tr>
+                    )];
+                    if (open) trs.push(
+                        <tr key={key + ':facts'} className="border-b border-slate-100 dark:border-slate-800/60 bg-slate-50/60 dark:bg-white/[0.02]">
+                            <td colSpan={9} className="px-3 py-2">
+                                <div className="mb-1 text-[9px] font-semibold uppercase tracking-wide text-slate-400">Fakta mentah — {metric} × {seg} ({rowFacts.length})</div>
+                                <div className="max-h-64 space-y-1.5 overflow-y-auto pr-1">
+                                    {rowFacts.map((f, i) => (
+                                        <div key={i} className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 px-2 py-1.5">
+                                            <div className="flex flex-wrap items-baseline gap-2 text-[10px]">
+                                                <span className="font-mono font-semibold tabular-nums text-slate-800 dark:text-slate-100">{f.value.toLocaleString()} {f.unit}</span>
+                                                <span className="text-slate-500">{f.company}{f.year != null ? ` · ${f.year}` : ''}</span>
+                                                <a href={f.source_url} target="_blank" rel="noopener" onClick={(e) => e.stopPropagation()}
+                                                    className="ml-auto inline-flex items-center gap-1 text-cyan-600 dark:text-cyan-400 hover:underline">
+                                                    <ExternalLink className="h-3 w-3" />{host(f.source_url)}
+                                                </a>
+                                            </div>
+                                            {f.quote && <blockquote className="mt-0.5 border-l-2 border-slate-200 dark:border-slate-700 pl-2 text-[9px] italic leading-relaxed text-slate-500 dark:text-slate-400">“{f.quote}”</blockquote>}
+                                        </div>
+                                    ))}
+                                </div>
+                            </td>
+                        </tr>
+                    );
+                    return trs;
+                })}</tbody>
+            </table></div>
+            <p className="mt-1.5 text-[9px] text-slate-400">Distribusi dihitung ulang oleh tools/dc-corpus/aggregate.mjs (append-only); fakta drill-down dari corpus-facts.json — mirror slim dc-facts.json ({CORPUS_FACTS.count} fakta, kutipan dipotong 240 karakter). Segmen: finance = laporan keuangan operator/REIT · hyperscale = laporan sustainability hyperscaler · pm = dokumen perencanaan/perizinan · research = badan riset (IEA/LBNL/DOE/Uptime) · spec = standar teknis (ASHRAE/Green Grid).</p>
+        </Card>
+    );
+}
+
+function totalFactsAll(corpus: Record<string, Record<string, CorpusDistRow>>): number {
+    return Object.values(corpus).reduce((s, m) => s + Object.values(m).reduce((t, d) => t + d.n, 0), 0);
 }
 
 /* ── Integrations — real status ── */

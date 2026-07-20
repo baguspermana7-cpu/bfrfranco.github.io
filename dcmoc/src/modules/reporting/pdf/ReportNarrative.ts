@@ -136,7 +136,16 @@ export function buildAssessment(family: ReportFamily, m: AssessMetrics): ReportA
             };
         }
         case 'commissioning': {
+            /* readiness null (belum ada progres checklist) ≠ 0% — narasi jujur plan-mode */
+            const hasReady = typeof m['readinessPct'] === 'number' && Number.isFinite(m['readinessPct'] as number);
             const ready = num(m, 'readinessPct'), failed = num(m, 'testsFailed'), issues = num(m, 'openIssues');
+            if (!hasReady) {
+                return {
+                    label: 'Not Started', color: C.warn, valueLine: 'readiness — (belum ada progres)',
+                    narrative: `Commissioning readiness has no recorded progress yet — the program is in plan mode. ` +
+                        `Tick checklist items (L1–L5 / IST / SAT / FAT) or set level completion to begin tracking readiness.`,
+                };
+            }
             const p: Profile = ready >= 90 ? { label: 'Handover-Ready', color: C.good }
                 : ready >= 70 ? { label: 'Advanced', color: C.ok }
                     : ready >= 40 ? { label: 'Mid-Program', color: C.warn }

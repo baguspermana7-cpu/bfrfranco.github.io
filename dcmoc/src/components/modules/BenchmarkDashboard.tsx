@@ -161,6 +161,10 @@ export default function BenchmarkDashboard() {
         });
     }, [selectedCountry, inputs, capexStore.inputs, effectiveInputs]);
 
+    /* #334b — live engine values for the corpus position markers (PUE/CAPEX
+     * from the real CapexEngine run, not a static matrix lookup). */
+    const capexLive = useMemo(() => calculateCapex(capexStore.inputs), [capexStore.inputs]);
+
     if (!result || !selectedCountry) {
         return (
             <div className="text-center py-20 text-slate-500 dark:text-slate-400">
@@ -177,48 +181,95 @@ export default function BenchmarkDashboard() {
         { id: 'comparison', label: 'Industry Comparison' },
     ];
 
-    /* #334 — CORPUS LIVE: posisi proyek dalam distribusi publik multi-sumber
-     * (DATA.benchmarksCorpus — setiap fakta ber-source_url+kutipan). */
-    const corpusData = (rzData() as { benchmarksCorpus?: Record<string, Record<string, { n: number; unit: string; p10: number; p25: number; p50: number; p75: number; p90: number; companies: string[]; sources: number }>> }).benchmarksCorpus ?? {};
-    const pueMx = (rzData() as { pueMatrix?: Record<string, Record<string, number>> }).pueMatrix;
-    const projPue = pueMx?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? null;
-    const corpusRows: { metric: string; unit: string; project: number | null; d: { n: number; p10: number; p25: number; p50: number; p75: number; p90: number; companies: string[]; sources: number } }[] = [];
-    if (corpusData.pue?.hyperscale) corpusRows.push({ metric: 'PUE', unit: 'ratio', project: projPue, d: corpusData.pue.hyperscale });
-    if (corpusData.capacity_mw?.hyperscale) corpusRows.push({ metric: 'Site Capacity', unit: 'MW', project: inputs.itLoad / 1000, d: corpusData.capacity_mw.hyperscale });
-    if (corpusData.renewable_share?.hyperscale) corpusRows.push({ metric: 'Renewable Share', unit: '%', project: null, d: corpusData.renewable_share.hyperscale });
-    const pctile = (v: number, d: { p10: number; p25: number; p50: number; p75: number; p90: number }): string =>
-        v <= d.p10 ? '≤p10' : v <= d.p25 ? 'p10-25' : v <= d.p50 ? 'p25-50' : v <= d.p75 ? 'p50-75' : v <= d.p90 ? 'p75-90' : '>p90';
+    /* #334 → #334b — CORPUS DISTRIBUTIONS: posisi proyek dalam distribusi publik
+     * multi-sumber (DATA.benchmarksCorpus — setiap fakta ber-source_url+kutipan),
+     * kini per metrik × SEMUA segmen (finance/hyperscale/pm/research/spec) dengan
+     * persentil proyek terinterpolasi dari nilai engine live. */
+    type CorpusDist = { n: number; unit: string; p10: number; p25: number; p50: number; p75: number; p90: number; companies: string[]; sources: number };
+    const corpusData = (rzData() as { benchmarksCorpus?: Record<string, Record<string, CorpusDist>> }).benchmarksCorpus ?? {};
+    const projPue = capexLive.pue;                                   // live CapexEngine PUE (cooling-type driven)
+    const projCapexB = capexLive.total / 1e9;                        // live total CAPEX in $B
+    const projWue = result.metrics.find((m) => m.metric.id === 'wue')?.userValue ?? null;
+    const projRenew = result.metrics.find((m) => m.metric.id === 'renewable_pct')?.userValue ?? null;
+    /* lowerIsBetter hanya anotasi arah — persentil tetap posisi distribusi mentah */
+    const corpusMetricDefs: { key: string; label: string; project: number | null; projectNote?: string; fmt: (v: number) => string }[] = [
+        { key: 'pue', label: 'PUE', project: projPue, fmt: (v) => v.toFixed(2) },
+        { key: 'wue', label: 'WUE', project: projWue, fmt: (v) => v.toFixed(2) },
+        { key: 'capacity_mw', label: 'Site Capacity', project: inputs.itLoad / 1000, fmt: (v) => v.toLocaleString(undefined, { maximumFractionDigits: 1 }) },
+        { key: 'investment_busd', label: 'Investment (total)', project: projCapexB, projectNote: 'total CAPEX proyek — korpus = nilai investasi terumumkan per dokumen ($B), bukan $/MW (rasio persentil tidak dapat diturunkan secara jujur)', fmt: (v) => v.toLocaleString(undefined, { maximumFractionDigits: 1 }) },
+        { key: 'renewable_share', label: 'Renewable Share', project: projRenew, fmt: (v) => v.toLocaleString(undefined, { maximumFractionDigits: 1 }) },
+    ];
+    /* interpolasi linear piecewise antar titik p10..p90 → "~pXX" */
+    const pctileOf = (v: number, d: CorpusDist): { label: string; approx: number } => {
+        const pts: [number, number][] = [[10, d.p10], [25, d.p25], [50, d.p50], [75, d.p75], [90, d.p90]];
+        if (v < pts[0][1]) return { label: '<p10', approx: 10 };
+        if (v > pts[4][1]) return { label: '>p90', approx: 90 };
+        for (let i = 0; i < 4; i++) {
+            const [pa, va] = pts[i]; const [pb, vb] = pts[i + 1];
+            if (v <= vb) {
+                const p = vb === va ? pb : pa + (pb - pa) * ((v - va) / (vb - va));
+                return { label: `~p${Math.round(p)}`, approx: p };
+            }
+        }
+        return { label: '~p90', approx: 90 };
+    };
+    const corpusGroups = corpusMetricDefs
+        .map((def) => ({ def, segs: Object.entries(corpusData[def.key] ?? {}) }))
+        .filter((g) => g.segs.length > 0);
 
     return (
         <div className="space-y-6">
-            {/* #334 — corpus live section */}
-            {corpusRows.length > 0 && (
+            {/* #334b — corpus distributions (metric × segment) */}
+            {corpusGroups.length > 0 && (
                 <div className="rounded-2xl border border-emerald-500/30 bg-white dark:bg-slate-900/50 p-4">
                     <div className="mb-2 flex items-center gap-2">
-                        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Posisi Proyek vs Korpus Publik Multi-Sumber</h3>
+                        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Corpus Distributions — Posisi Proyek vs Korpus Publik Multi-Sumber</h3>
                         <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">live corpus</span>
                     </div>
-                    <div className="space-y-2.5">
-                        {corpusRows.map((r) => {
-                            const span = Math.max(1e-9, r.d.p90 - r.d.p10);
-                            const pos = r.project != null ? Math.min(100, Math.max(0, ((r.project - r.d.p10) / span) * 100)) : null;
-                            return (
-                                <div key={r.metric}>
-                                    <div className="flex items-baseline gap-2 text-[11px]">
-                                        <span className="w-32 font-medium text-slate-700 dark:text-slate-200">{r.metric}</span>
-                                        <span className="tabular-nums text-slate-500">p10 {r.d.p10.toLocaleString()} · p50 <b className="text-slate-900 dark:text-white">{r.d.p50.toLocaleString()}</b> · p90 {r.d.p90.toLocaleString()} {r.unit}</span>
-                                        {r.project != null && <span className="ml-auto rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-violet-500 dark:text-violet-300">proyekmu: {r.project.toLocaleString()} ({pctile(r.project, r.d)})</span>}
-                                    </div>
-                                    <div className="relative mt-1 h-2 rounded bg-slate-100 dark:bg-slate-800">
-                                        <div className="absolute h-2 rounded bg-emerald-500/30" style={{ left: `${((r.d.p25 - r.d.p10) / span) * 100}%`, width: `${((r.d.p75 - r.d.p25) / span) * 100}%` }} />
-                                        <div className="absolute top-[-2px] h-3 w-0.5 bg-slate-400" style={{ left: `${((r.d.p50 - r.d.p10) / span) * 100}%` }} />
-                                        {pos != null && <div className="absolute top-[-3px] h-4 w-1 rounded bg-violet-500" style={{ left: `${pos}%` }} title={`Proyekmu: ${r.project}`} />}
-                                    </div>
-                                    <div className="mt-0.5 text-[9px] text-slate-400">n={r.d.n} fakta · {r.d.sources} dokumen · {r.d.companies.slice(0, 4).join(', ')}{r.d.companies.length > 4 ? '…' : ''}</div>
+                    <div className="space-y-4">
+                        {corpusGroups.map(({ def, segs }) => (
+                            <div key={def.key}>
+                                <div className="flex items-baseline gap-2 text-[11px]">
+                                    <span className="font-semibold text-slate-800 dark:text-slate-100">{def.label}</span>
+                                    <span className="text-[9px] text-slate-400">({segs[0][1].unit})</span>
+                                    {def.project != null && (
+                                        <span className="rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-violet-600 dark:text-violet-300" title={def.projectNote}>
+                                            proyek Anda: {def.fmt(def.project)} {segs[0][1].unit}
+                                        </span>
+                                    )}
                                 </div>
-                            );
-                        })}
+                                {def.projectNote && <div className="mt-0.5 text-[9px] italic text-slate-400">{def.projectNote}</div>}
+                                <div className="mt-1.5 space-y-2">
+                                    {segs.map(([seg, d]) => {
+                                        const span = Math.max(1e-9, d.p90 - d.p10);
+                                        const pos = def.project != null ? Math.min(100, Math.max(0, ((def.project - d.p10) / span) * 100)) : null;
+                                        const rank = def.project != null ? pctileOf(def.project, d) : null;
+                                        return (
+                                            <div key={seg} className="pl-2">
+                                                <div className="flex flex-wrap items-baseline gap-2 text-[11px]">
+                                                    <span className="w-24 rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-center text-[9px] font-medium uppercase tracking-wide text-slate-500">{seg}</span>
+                                                    <span className="tabular-nums text-slate-500">n={d.n} · p10 {d.p10.toLocaleString()} · p50 <b className="text-slate-900 dark:text-white">{d.p50.toLocaleString()}</b> · p90 {d.p90.toLocaleString()}</span>
+                                                    {d.n < 5 && <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-medium text-amber-600 dark:text-amber-400">n kecil — indikatif</span>}
+                                                    {rank != null && (
+                                                        <span className="ml-auto rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-violet-600 dark:text-violet-300">
+                                                            {def.label} {def.fmt(def.project as number)} = persentil {rank.label} di {seg} (n={d.n})
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="relative mt-1 h-2 rounded bg-slate-100 dark:bg-slate-800">
+                                                    <div className="absolute h-2 rounded bg-emerald-500/30" style={{ left: `${((d.p25 - d.p10) / span) * 100}%`, width: `${((d.p75 - d.p25) / span) * 100}%` }} />
+                                                    <div className="absolute top-[-2px] h-3 w-0.5 bg-slate-400" style={{ left: `${((d.p50 - d.p10) / span) * 100}%` }} />
+                                                    {pos != null && <div className="absolute top-[-3px] h-4 w-1 rounded bg-violet-500" style={{ left: `${pos}%` }} title={`Proyek Anda: ${def.fmt(def.project as number)} ${d.unit} (${rank?.label})`} />}
+                                                </div>
+                                                <div className="mt-0.5 text-[9px] text-slate-400">{d.sources} dokumen · {d.companies.slice(0, 4).join(', ')}{d.companies.length > 4 ? ` +${d.companies.length - 4}` : ''}</div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))}
                     </div>
+                    <p className="mt-2 text-[9px] text-slate-400">Distribusi p10–p90 dari korpus publik multi-sumber (DATA.benchmarksCorpus, {Object.values(corpusData).reduce((s, m) => s + Object.values(m).reduce((t, d) => t + d.n, 0), 0)} fakta ber-source_url + kutipan verbatim, gate-enforced). Persentil proyek = interpolasi linear antar titik persentil — marker di luar rentang p10–p90 ditampilkan sebagai &lt;p10 / &gt;p90. Drill-down per-fakta: Data Library → DC Corpus.</p>
                 </div>
             )}
             {/* Header */}

@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.98.3 — 2026-07-20 (manual/ de-orphan 41 halaman + Benchmarks korpus 6× + narasi Cx null-safe)
+
+### Added
+- **Section manual/ (41 halaman technical manual) de-orphan**: sitemap 115→156 URL (generator build-sitemap sudah include, tinggal stale — regen); 39 inlink baru (footer+dropdown index.html "Technical Manuals" + pill "📖 Technical Manual & Methodology ↗" di 37 halaman tool, theme-aware AA; opex-calculator TIDAK disentuh per standing order); search-index 98→139 entri (command palette otomatis). Dark-coverage 116 CLEAN.
+- **Benchmarks "Corpus Distributions"**: 12 baris distribusi (PUE/WUE/Capacity/Investment $B/Renewable × segmen finance/hyperscale/pm/research/spec) — n + p10/p50/p90 + bar interkuartil + **marker proyek live via interpolasi persentil piecewise** ("PUE 1.50 = ~p81 di hyperscale n=30"); chip "n kecil — indikatif" (n<5); nilai proyek dari calculateCapex live (bukan lookup statis).
+- **Data Library DC Corpus**: filter segmen dinamis + drill-down klik baris → 597 fakta mentah (nilai, company, tahun, link source_url, kutipan verbatim) via artifact baru `corpus-facts.json`.
+
+### Fixed
+- Narasi assessment Commissioning: readiness null tidak lagi dirender "0% Early Stage" → "Not Started — plan mode" jujur (kelas bug advisory phantom v1.98.1).
+
+### Verified
+- tsc/build · walk 24/0 · synergy 6/0 · trace-parity 117/117 · js-syntax/script-tags/dark-coverage CLEAN.
+- Catatan follow-up: manual/ pakai theme key `rz_theme` vs sitewide `theme` (pre-existing, tidak sinkron) — kandidat penyatuan.
+
 ## v1.98.2 — 2026-07-20 (USER_MANUAL DCMOC dirombak total — mandat owner)
 
 ### Changed
