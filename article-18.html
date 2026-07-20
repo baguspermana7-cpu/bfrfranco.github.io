@@ -2431,7 +2431,7 @@ function aifRunMonteCarlo(inp) {
         data: { labels: labels, datasets: [{ label: 'Frequency', data: bins,
             backgroundColor: bins.map(function(_,i){var mid=i*5+2.5;return mid>=70?'rgba(34,197,94,0.65)':mid>=40?'rgba(251,191,36,0.65)':'rgba(239,68,68,0.65)';}),
             borderColor: bins.map(function(_,i){var mid=i*5+2.5;return mid>=70?'#22c55e':mid>=40?'#f59e0b':'#ef4444';}), borderWidth: 1 }] },
-        options: { responsive: true, plugins: { legend: { display: false } }, scales: {
+        options: { responsive: true, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false } }, scales: {
             x: { ticks: { color: '#94a3b8', font: { size: 8 }, maxRotation: 45 }, grid: { display: false } },
             y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
     });
@@ -2503,7 +2503,7 @@ function aifRunTCO(inp) {
                 { label: 'Greenfield', data: rows.map(function(r){return r[3];}), backgroundColor: 'rgba(6,182,212,0.65)', borderColor: '#06b6d4', borderWidth: 1 }
             ]
         },
-        options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } }, scales: {
+        options: { responsive: true, interaction: { mode: 'index', intersect: false }, plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } }, scales: {
             x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
             y: { ticks: { color: '#94a3b8', callback: function(v){return fmtMoney(v);} }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
     });
@@ -2541,7 +2541,7 @@ function aifRunTornado(inp) {
                 { label: '+20%', data: results.map(function(r){return r.high;}), backgroundColor: 'rgba(34,197,94,0.6)', borderColor: '#22c55e', borderWidth: 1 }
             ]
         },
-        options: { indexAxis: 'y', responsive: true, plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } }, scales: {
+        options: { indexAxis: 'y', responsive: true, interaction: { mode: 'index', intersect: false }, plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } }, scales: {
             x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
             y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } } } }
     });
@@ -2599,7 +2599,7 @@ function aifRunStrandedAsset(inp) {
                 pointBackgroundColor: '#22c55e'
             }]
         },
-        options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } },
+        options: { responsive: true, interaction: { intersect: false }, plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } },
             scales: { r: { ticks: { color: '#64748b', backdropColor: 'transparent', font: { size: 9 } },
             grid: { color: 'rgba(255,255,255,0.08)' }, pointLabels: { color: '#94a3b8', font: { size: 10 } }, min: 0, max: 100 } } }
     });

@@ -1153,7 +1153,7 @@
                 hoverBackgroundColor: [gradeColor + 'dd', '#d1d5db'],
                 borderWidth: 0, borderRadius: 4
             }] },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '72%',
+            options: { responsive: true, interaction:{intersect:false}, maintainAspectRatio: false, cutout: '72%',
                 plugins: {
                     legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 12 }, padding: 16 } },
                     centerText: { text: Math.round(overall) + '%', color: gradeColor, sub: 'Compliance' }
@@ -1175,7 +1175,7 @@
                 label: 'Score %', data: pcts,
                 backgroundColor: bgColors, borderColor: colors, borderWidth: 2, borderRadius: 8
             }] },
-            options: { responsive: true, maintainAspectRatio: false,
+            options: { responsive: true, interaction:{mode:'index',intersect:false}, maintainAspectRatio: false,
                 scales: {
                     y: { beginAtZero: true, max: 100, ticks: { font: { family: 'JetBrains Mono', size: 10 }, callback: function(v){return v+'%';} },
                         grid: { color: 'rgba(0,0,0,0.05)' } },
@@ -1228,7 +1228,7 @@
         mcChart = new Chart(mcCtx, {
             type: 'bar',
             data: { labels: mcResults.bins.map(function(b) { return b.label; }), datasets: [{ label: 'Frequency', data: mcResults.bins.map(function(b) { return b.count; }), backgroundColor: binColors, borderColor: binBorders, borderWidth: 1.5, borderRadius: 3 }] },
-            options: { responsive: true, maintainAspectRatio: false,
+            options: { responsive: true, interaction:{mode:'index',intersect:false}, maintainAspectRatio: false,
                 plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx){return ctx.parsed.y + ' iterations (' + (ctx.parsed.y/100).toFixed(1) + '%)';} } } },
                 scales: { y: { ticks: { font: { size: 9 } }, title: { display: true, text: 'Frequency', font: { size: 10 } } }, x: { ticks: { font: { size: 8 }, maxRotation: 45 }, title: { display: true, text: 'Score Range', font: { size: 10 } } } }
             }
@@ -1250,7 +1250,7 @@
         radarChart = new Chart(radarCtx, {
             type: 'radar',
             data: { labels: CATEGORIES.map(function(c) { return c.label.split('/')[0].trim(); }), datasets: tierDatasets },
-            options: { responsive: true, maintainAspectRatio: false, scales: { r: { beginAtZero: true, max: 100, ticks: { stepSize: 25, font: { size: 9 } } } }, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
+            options: { responsive: true, interaction:{mode:'index',intersect:false}, maintainAspectRatio: false, scales: { r: { beginAtZero: true, max: 100, ticks: { stepSize: 25, font: { size: 9 } } } }, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
         });
 
         // Tier Comparison table

@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.99.8 — 2026-07-21 (chart hover-tooltip sweep sitewide + article-25 stretch)
+
+### Fixed
+- **Hover tooltip sitewide** (owner "banyak tooltip tidak ada"): ~85 chart Chart.js di 21 halaman user-facing (article-2/3/17/18/24/25/26/27, tier-advisor, carbon-footprint, dc-market-tracker, tia-942-checklist, water-system, geopolitics-3, FF-1/2/3, spares-readiness — melengkapi v1.99.7 tco/cx/pue/roi) dapat `interaction:{mode:'index',intersect:false}` (line/bar/scatter/radar) atau `{intersect:false}` (doughnut/pie/bubble) → tooltip muncul saat hover-dekat, bukan hanya di titik persis. Callbacks existing dipertahankan; chart yang sudah ber-interaction dilewati.
+- **article-25 continuous stretching** (owner off-by-one — article-24 = pola aman referensi): `.pjm-chart-container` tanpa height + `maintainAspectRatio:true` = Chart.js resize loop → canvas meledak. Fix: `height:280px + max-height` + `maintainAspectRatio:false` (mirror article-24). Verifikasi headless 300→300 stabil.
+
+### Deferred (jujur)
+- opex-calculator (standing order — read-only), rz-ops 41 chart + Apps/finance-terminal 19 chart (app admin/terpisah, owner-only) — belum di-sweep; follow-up.
+- tier-advisor 2 pageerror PRE-EXISTING (plugin annotation/visibleElements tak dimuat — bukan dari sweep) — temuan terpisah.
+
+### Verified
+- js-syntax + script-tags audit CLEAN (133/606 file) · headless: article-25/tier-advisor/carbon canvas height stabil pasca-hover · residual interaction-gap = 0 di semua kalkulator/artikel user-facing.
+
 ## v1.99.7 — 2026-07-21 (DC Hub calculator charts — fix stretching + hover tooltips)
 
 ### Fixed

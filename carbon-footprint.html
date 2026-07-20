@@ -2131,7 +2131,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
         scopeChartInstance = new Chart(ctx1.getContext('2d'), {
             type: 'doughnut',
             data: { labels: chartLabels, datasets: [{ data: chartData, backgroundColor: chartColors, borderWidth: 2, borderColor: '#ffffff' }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, padding: 12 } } } }
+            options: { responsive: true, interaction:{intersect:false}, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, padding: 12 } } } }
         });
 
         // Comparison Bar Chart
@@ -2148,7 +2148,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
                     labels: ['Your Facility', 'Industry Average', 'Best Practice'],
                     datasets: [{ label: 'tCO\u2082e/yr', data: [total, industryAvg, industryAvg * 0.3], backgroundColor: ['#22c55e', '#94a3b8', '#06b6d4'], borderRadius: 6 }]
                 },
-                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } } } }
+                options: { responsive: true, interaction:{mode:'index',intersect:false}, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } } } }
             });
         } else if (currentTab === 'lifecycle') {
             var phases = [materials, itEmb + battery + mep, construction, eol, Math.abs(moduleD)];
@@ -2158,7 +2158,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
                     labels: ['A1-A3\nMaterials', 'B1-B7\nEquipment', 'A4-A5\nConstruction', 'C1-C4\nEnd-of-Life', 'D\nRecycling'],
                     datasets: [{ label: 'tCO\u2082e', data: phases, backgroundColor: ['#64748b', '#6366f1', '#6b7280', '#ef4444', '#22c55e'], borderRadius: 6 }]
                 },
-                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                options: { responsive: true, interaction:{mode:'index',intersect:false}, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
             });
         } else {
             // Budget: renewable procurement timeline
@@ -2177,7 +2177,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
                     labels: years,
                     datasets: [{ label: 'Renewable %', data: renewables, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', fill: true, tension: 0.3, pointRadius: 4 }]
                 },
-                options: { responsive: true, scales: { y: { min: 0, max: 100, ticks: { callback: function(v) { return v + '%'; } } } }, plugins: { legend: { display: false } } }
+                options: { responsive: true, interaction:{mode:'index',intersect:false}, scales: { y: { min: 0, max: 100, ticks: { callback: function(v) { return v + '%'; } } } }, plugins: { legend: { display: false } } }
             });
         }
     }
@@ -2245,7 +2245,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
             type: 'bar',
             data: { labels: labels, datasets: [{ data: counts, backgroundColor: colors, borderRadius: 2 }] },
             options: {
-                responsive: true,
+                responsive: true, interaction:{mode:'index',intersect:false},
                 plugins: { legend: { display: false } },
                 scales: { x: { display: false }, y: { display: false } }
             }
@@ -2296,7 +2296,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
                     borderRadius: 4
                 }]
             },
-            options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
+            options: { indexAxis: 'y', responsive: true, interaction:{mode:'index',intersect:false}, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
         });
     }
 
@@ -2336,7 +2336,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
                 labels: scenarios.map(function(s) { return s.name; }),
                 datasets: [{ data: values, backgroundColor: scenarios.map(function(s) { return s.color; }), borderRadius: 6 }]
             },
-            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+            options: { responsive: true, interaction:{mode:'index',intersect:false}, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
         });
     }
 
