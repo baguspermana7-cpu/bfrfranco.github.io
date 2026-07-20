@@ -159,14 +159,25 @@ export function NumInput({ value, onChange, min, max, placeholder, unit }: {
     value: number | null; onChange: (v: number | null) => void;
     min?: number; max?: number; placeholder?: string; unit?: string;
 }) {
+    /* Ship-0 bugfix (owner: "IT Load nggak bisa dihapus angkanya"): fully-controlled
+     * value + konsumen yang hanya commit saat valid (mis. writeSharedItLoad ≥100 kW)
+     * membuat setiap ketikan di bawah ambang snap balik ke nilai store. Solusi:
+     * DRAFT buffer saat fokus — user bebas mengosongkan/mengetik; onChange tetap
+     * dipanggil per ketik (kontrak konsumen tidak berubah); on blur draft di-reset
+     * ke nilai prop (nilai valid terakhir) bila konsumen tidak meng-commit. */
+    const [draft, setDraft] = React.useState<string | null>(null);
+    const shown = draft != null ? draft : (value ?? '');
     return (
         <div className="flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 focus-within:border-violet-500">
             <input
                 type="number" min={min} max={max}
                 className="w-full bg-transparent py-1.5 text-xs text-slate-900 dark:text-slate-100 outline-none placeholder:text-slate-400"
-                value={value ?? ''} placeholder={placeholder}
+                value={shown} placeholder={placeholder}
+                onFocus={() => setDraft(value != null ? String(value) : '')}
+                onBlur={() => setDraft(null)}
                 onChange={(e) => {
                     const raw = e.target.value;
+                    setDraft(raw);
                     if (raw === '') { onChange(null); return; }
                     const n = parseFloat(raw);
                     onChange(Number.isFinite(n) ? n : null);

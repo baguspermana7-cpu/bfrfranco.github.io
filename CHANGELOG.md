@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.98.6 — 2026-07-20 (Ship 0 — bugfix input IT Load owner report)
+
+### Fixed
+- **IT Load (Requirements) tidak bisa dihapus/ketik ulang digitnya** (owner): NumInput fully-controlled + konsumen hanya commit bila valid (≥100 kW) → tiap ketikan di bawah ambang snap balik. Fix: draft buffer saat fokus di NumInput (berlaku semua field angka Requirements) — bebas kosongkan/ketik, commit tetap tervalidasi, blur mengembalikan nilai valid terakhir bila input tak sah. Probe headless: clear ✓, 1 digit ✓, komit desimal ✓.
+
 ## v1.98.5 — 2026-07-20 (null-honesty 16 family + hardening 5 store tracking + smoke produksi)
 
 ### Fixed
