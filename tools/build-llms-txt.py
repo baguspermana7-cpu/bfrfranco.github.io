@@ -143,6 +143,20 @@ def main():
         url = f"{SITE_URL}/{fname}"
         files.append((category, fname, title, desc, url))
 
+    # Collect the manual/ subfolder (per-calculator methodology pages)
+    manual_dir = os.path.join(SITE_ROOT, "manual")
+    if os.path.isdir(manual_dir):
+        for fname in os.listdir(manual_dir):
+            if not fname.endswith(".html") or fname in EXCLUDE_FILES:
+                continue
+            filepath = os.path.join(manual_dir, fname)
+            if not os.path.isfile(filepath):
+                continue
+            title, desc = extract_meta(filepath)
+            url = f"{SITE_URL}/manual/" if fname == "index.html" else f"{SITE_URL}/manual/{fname}"
+            # sort key "manual/<fname>" keeps the index first (empty stem sorts before names)
+            files.append(("Technical Manuals", f"manual/{fname}", title, desc, url))
+
     # Group by category
     categories = {}
     for cat, fname, title, desc, url in files:
@@ -167,7 +181,7 @@ def main():
     ]
 
     CATEGORY_ORDER = [
-        "About", "Calculators", "Technical Articles", "Comparisons",
+        "About", "Calculators", "Technical Manuals", "Technical Articles", "Comparisons",
         "Tools", "Simulations", "Insight Series", "Reports",
         "Pillar Pages", "Hubs", "Legal", "Other",
     ]
@@ -175,6 +189,7 @@ def main():
     SECTION_NOTES = {
         "About": "Profile and background",
         "Calculators": "Decision support tools — free, no signup required",
+        "Technical Manuals": "Per-calculator methodology — inputs, formulas, constants, worked examples, references",
         "Technical Articles": "27 deep-dive engineering articles (Operations Journal series)",
         "Comparisons": "Side-by-side infrastructure technology analysis",
         "Tools": "Interactive monitors, checklists, and labs",
