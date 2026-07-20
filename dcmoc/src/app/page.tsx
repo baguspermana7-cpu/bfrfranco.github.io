@@ -48,6 +48,7 @@ import { RequirementsPage } from '@/components/modules/requirements/Requirements
 import { SiteIntelligencePage } from '@/components/modules/site-intel/SiteIntelligencePage';
 import { TierDashboard, FireDashboard, CduDashboard, SparesDashboard } from '@/components/modules/DesignToolsDashboards';
 import { DataLibraryDashboard, TemplatesDashboard, ProjectsDashboard, KnowledgeDashboard, AuditDashboard, UsersDashboard } from '@/components/modules/PlatformDashboards';
+import { DiagnosticsCenter } from '@/components/modules/DiagnosticsCenter';
 import { useScenarioStore } from '@/store/scenario';
 import { Calculator } from 'lucide-react';
 
@@ -157,6 +158,8 @@ export default function Home() {
         return <AuditDashboard />;
       case 'users':
         return <UsersDashboard />;
+      case 'diagnostics':
+        return <DiagnosticsCenter />;
       default: // 'sim'
         return (
           <div className="text-center space-y-4 max-w-2xl mx-auto pt-20">

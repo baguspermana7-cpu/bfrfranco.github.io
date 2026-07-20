@@ -15,10 +15,19 @@
   - `external?: { href, label }` — link keluar DCMOC: glossary.html#term, artikel
     kalkulator site (dari engine-catalog consumers), source_url dokumen korpus,
     endpoint gateway live. Rantai audit penuh: angka → param → konstanta → dokumen publik.
-- **UI**: `dcmoc/src/components/ui/TraceValue.tsx` — popover "Trace Angka":
-  header nilai besar + chip provenance bahasa sederhana; rumus = PILL VISUAL
-  klik-able berwarna provenance dengan nilai live; klik pill = drill-down +
-  breadcrumb; leaf = kartu penjelasan + "↗ Edit di menu" + "🌐 Buka sumber eksternal".
+- **UI**: `dcmoc/src/components/ui/TraceValue.tsx` — popover "Trace Number"
+  (**teks UI bahasa Inggris** sejak 2026-07-20): header nilai besar + chip
+  provenance kata sederhana (Your input / Engine (sourced) / Computed /
+  Screening estimate); rumus = PILL VISUAL klik-able berwarna provenance dengan
+  nilai live; klik pill = drill-down + breadcrumb; leaf = kartu penjelasan +
+  "↗ Open / edit in tab" + "🌐 External source".
+  - **Enhance (2026-07-20, additif — nilai/parity tak berubah):** tombol
+    **⧉ Copy** (salin seluruh rantai trace = rumus+nilai+sumber sebagai pohon
+    teks ter-indentasi ke clipboard, artefak audit), **▸ Expand all** (buka
+    seluruh pohon dep sekaligus sampai leaf, daftar rata + filter dep saat
+    banyak), dan ringkasan **"Made up of…"** (komposisi leaf per provenance,
+    mis. "3 inputs · 2 engine constants · 1 screening estimate"). Semua tombol
+    ber-`aria-label`; struktur `resolveTrace`/`Panel` tetap.
 - **Resolver**: `resolveTrace(id)` → pohon dengan rumus ter-substitusi angka live.
 
 ## Konvensi id

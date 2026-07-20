@@ -53,6 +53,7 @@ import {
     Flame,
     Waves,
     Package,
+    Stethoscope,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { getPUE } from '@/constants/pue';
@@ -356,6 +357,7 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
         { label: 'Knowledge Base', icon: HelpCircle, id: 'knowledge' },
     ];
     const SUPPORT: { label: string; icon: LucideIcon; id: typeof activeTab }[] = [
+        { label: 'Diagnostics', icon: Stethoscope, id: 'diagnostics' },
         { label: 'Integrations', icon: Zap, id: 'integrations' },
         { label: 'Settings', icon: Wrench, id: 'settings' },
         { label: 'Audit Trail', icon: ClipboardCheck, id: 'audit' },
@@ -709,7 +711,7 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
                                 <span className="hidden sm:inline max-w-[160px] truncate align-bottom text-violet-500 font-medium">{activeProject.name}</span>
                                 <span className="hidden sm:inline"> / </span>
                             </>)}
-                            <span className="text-slate-800 dark:text-slate-200 font-medium">{activeTab === 'dashboard' ? 'Executive Overview' : navItems.find(n => n.id === activeTab)?.label || SUPPORT.find(s => s.id === activeTab)?.label || PLATFORM.find(p => p.id === activeTab)?.label || ({ faq: 'FAQ', montecarlo: 'Monte Carlo', tier: 'Tier Classification' } as Record<string, string>)[activeTab] || 'Overview'}</span>
+                            <span className="text-slate-800 dark:text-slate-200 font-medium">{activeTab === 'dashboard' ? 'Executive Overview' : navItems.find(n => n.id === activeTab)?.label || SUPPORT.find(s => s.id === activeTab)?.label || PLATFORM.find(p => p.id === activeTab)?.label || ({ faq: 'FAQ', montecarlo: 'Monte Carlo', tier: 'Tier Classification', diagnostics: 'Diagnostics Center' } as Record<string, string>)[activeTab] || 'Overview'}</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">

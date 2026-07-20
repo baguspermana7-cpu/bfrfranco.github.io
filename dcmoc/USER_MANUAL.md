@@ -192,15 +192,28 @@ screening). 105 sumber di katalog; keluarga utama:
 ## 5. Fitur platform per menu
 
 ### 5.1 Trace Angka "ƒx" — audit SETIAP angka (VALUE_TRACE_STANDARD)
-Angka ber-badge ƒx violet bisa DIKLIK: popover menampilkan rumus dgn angka live
-sebagai pill berwarna (violet = input kamu, emerald = konstanta engine
-bersumber, cyan = dihitung, amber = screening). Klik pill → drill rekursif
-sampai leaf; leaf punya "Edit di menu" + link sumber eksternal (glossary,
-dokumen publik korpus) — rantai audit: angka DCMOC → parameter → konstanta
-engine → dokumen sumber. Coverage semua halaman engine inti (Financial 7/7,
-Sustainability 10/10, Ops 7/7, Reliability 6/6, Staffing 8/8, Maintenance 4/4,
-Investment 4/4, Phased 5/5, Assets 5/5, Site 31/31; sisa non-trace = label/enum
-terdokumentasi). Dijaga gate **trace-parity 117/117** (popover ≡ KPI render).
+Angka ber-badge ƒx violet bisa DIKLIK: popover "Trace Number" menampilkan rumus
+dgn angka live sebagai pill berwarna (violet = Your input, emerald = Engine
+(sourced), cyan = Computed, amber = Screening estimate — **teks UI kini bahasa
+Inggris**). Klik pill → drill rekursif sampai leaf; leaf punya "Open / edit in
+tab" + link "External source" (glossary, dokumen publik korpus) — rantai audit:
+angka DCMOC → parameter → konstanta engine → dokumen sumber.
+
+**Enhance (2026-07-20):** popover kini punya tiga alat audit tambahan (additif,
+nilai tak berubah):
+- **⧉ Copy** — menyalin SELURUH rantai trace (rumus + nilai live + sumber, pohon
+  ter-indentasi teks) ke clipboard untuk ditempel ke laporan/audit.
+- **▸ Expand all** — membuka seluruh pohon dependensi sekaligus sampai leaf
+  (daftar rata ter-indentasi, klik baris = lompat trace); saat dep banyak muncul
+  kolom **filter** untuk mencari dep by nama.
+- **Made up of…** — ringkasan komposisi leaf per jenis di dasar popover (mis.
+  "3 inputs · 2 engine constants · 1 screening estimate") supaya jelas angka
+  disusun dari apa.
+
+Coverage semua halaman engine inti (Financial 7/7, Sustainability 10/10, Ops
+7/7, Reliability 6/6, Staffing 8/8, Maintenance 4/4, Investment 4/4, Phased 5/5,
+Assets 5/5, Site 31/31; sisa non-trace = label/enum terdokumentasi). Dijaga gate
+**trace-parity 117/117** (popover ≡ KPI render).
 
 ### 5.2 Panel "Kenapa?" — decision explainability
 Verdict/status chip bukan sekadar warna — KLIK untuk alasan angka live +

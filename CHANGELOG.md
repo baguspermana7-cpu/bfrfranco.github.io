@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.99.5 — 2026-07-20 (DIAGNOSTICS CENTER + Trace notes → English + enhance)
+
+### Added
+- **Diagnostics Center** (tab SUPPORT baru): agregasi 12/13 collector diagnostik ke satu permukaan — semua indikator merah/amber aktif lintas engine, dikelompokkan per severity (N critical · M warning), tiap temuan → kartu (surface chip, metric, angka value/threshold, detail) + tombol "Open →" setActiveTab ke halaman sumber. `lib/diagnostics.ts` type kanonik `DiagFinding` + normalizer (menyatukan 4 bentuk Finding berbeda antar file) + registry (tiap run membangun model dari store + adapter/engine chain SAMA dgn halaman; try/catch per collector). MonteCarlo di-skip JUJUR (10k iterasi sinkron = jank) + chip "skipped (honest)". Empty-state jujur "No active red indicators — everything within limits ✓". Cakupan 12/13 dinyatakan.
+- **Trace enhance** (owner): tombol **Copy trace chain** (seluruh rantai formula+nilai+sumber tree text → clipboard), **Expand all** (buka seluruh pohon dep sekaligus + filter saat >6 dep), **leaf composition summary** ("3 inputs · 2 engine constants · 1 screening").
+
+### Changed
+- **Trace notes DCMOC → English** (owner "change it in english"): 147 node value-trace.ts (label + formulaTemplate kata penghubung + provenance) + seluruh UI string TraceValue.tsx ("Your input / Engine (sourced) / Computed / Screening estimate", "This number is computed from:", "Open / edit in tab", "External source", tooltip) → English natural. **traceId/deps/sourceKey/external.href/nilai UTUH** → trace-parity tetap 117/117. Diagnostics Center juga English.
+
+### Verified
+- tsc/build · walk 24/0 · synergy 6/0 · **trace-parity 117/117** (teks-only, nilai popover tak berubah) · export 44/0 · bindings 85/0 (catalog regen — Center consumer baru) · screenshot Center + trace-EN.
+
 ## v1.99.4 — 2026-07-20 (Diagnostics Tier-2/3/4 — SEMUA indikator merah kini ber-guidance)
 
 ### Added — guidance klik-able (pola DIAGNOSTICS_STANDARD; tiap file ekspor collector)

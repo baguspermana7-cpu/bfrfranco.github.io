@@ -34,7 +34,7 @@ export interface SimulationState {
         capacityPhases: { id: string; label: string; itLoadKw: number; startMonth: number; buildMonths: number; occupancyRamp: number[] }[];
         capacityPhasesCustomized: boolean;
     };
-    activeTab: 'dashboard' | 'ops' | 'sim' | 'staff' | 'maint' | 'risk' | 'report' | 'capex' | 'carbon' | 'finance' | 'invest' | 'benchmark' | 'montecarlo' | 'portfolio' | 'faq' | 'capacity' | 'phased-finance' | 'tax' | 'disaster' | 'grid' | 'talent' | 'compliance' | 'asset-lifecycle' | 'cbm' | 'fuel-gen' | 'strategic' | 'reliability' | 'requirements' | 'site' | 'architecture' | 'construction' | 'commissioning' | 'asset-health' | 'projects' | 'templates' | 'data-library' | 'knowledge' | 'integrations' | 'settings' | 'audit' | 'users' | 'tier' | 'fire' | 'cdu' | 'spares' | 'scenarios' | 'scenario-compare';
+    activeTab: 'dashboard' | 'ops' | 'sim' | 'staff' | 'maint' | 'risk' | 'report' | 'capex' | 'carbon' | 'finance' | 'invest' | 'benchmark' | 'montecarlo' | 'portfolio' | 'faq' | 'capacity' | 'phased-finance' | 'tax' | 'disaster' | 'grid' | 'talent' | 'compliance' | 'asset-lifecycle' | 'cbm' | 'fuel-gen' | 'strategic' | 'reliability' | 'requirements' | 'site' | 'architecture' | 'construction' | 'commissioning' | 'asset-health' | 'projects' | 'templates' | 'data-library' | 'knowledge' | 'integrations' | 'settings' | 'audit' | 'users' | 'tier' | 'fire' | 'cdu' | 'spares' | 'scenarios' | 'scenario-compare' | 'diagnostics';
     isLoading: boolean;
     actions: {
         setLoading: (loading: boolean) => void;

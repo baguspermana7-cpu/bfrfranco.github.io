@@ -1,8 +1,8 @@
 /* ─── VALUE TRACE INDEX (PHASE EB) ───────────────────────────────────────────
  * Excel-style precedent tracing: every instrumented number resolves to a LIVE
  * tree — value, formula with live numbers substituted, and its source values,
- * recursively down to leaf inputs / DATA constants ("sampai titik paling
- * ujung"). ids stay consistent with value-bindings.ts + data-bind anchors.
+ * recursively down to leaf inputs / DATA constants ("all the way to the
+ * furthest endpoint"). ids stay consistent with value-bindings.ts + data-bind anchors.
  * Graph MUST be acyclic (gate-checked in tools/test-value-bindings.mjs).
  * ──────────────────────────────────────────────────────────────────────── */
 
@@ -21,7 +21,7 @@ import { plannedSchedule, evm, type PlannedSchedule, type EvmResult } from '@/st
 import { useCxTracking, checklistDerivedCompletion } from '@/store/cxTracking';
 import { CX_CHECKLIST, type ReadinessKey } from '@/lib/cx-procedures';
 import { densityToEngineBucket } from '@/lib/requirementsMappings';
-/* EB-cov wave (trace-coverage ≥60% halaman inti) — live readers */
+/* EB-cov wave (trace-coverage ≥60% of core pages) — live readers */
 import { useOpsLog } from '@/store/opsLog';
 import { getPUE } from '@/constants/pue';
 import { riskBand } from '@/state/adapters/capex-adapter';
@@ -116,10 +116,10 @@ const siteAn = (): SiteAnalyses | null => {
 };
 
 export const TRACE: Record<string, TraceNode> = {
-    /* ── LEAF INPUTS (titik paling ujung — user-owned) ── */
+    /* ── LEAF INPUTS (furthest endpoint — user-owned) ── */
     'sim.itLoad': { label: 'IT Load', page: 'requirements', unit: 'kW', provenance: 'input', get: () => sim().inputs.itLoad },
     'sim.tierLevel': { label: 'Tier Level', page: 'requirements', provenance: 'input', get: () => sim().inputs.tierLevel },
-    'sim.electricityRate': { label: 'Electricity Tariff (country)', page: 'requirements', unit: '$/kWh', provenance: 'input', external: { href: '/dc-market-tracker.html', label: 'DC market tracker (tarif per negara)' }, get: () => sim().selectedCountry?.economy.electricityRate ?? null },
+    'sim.electricityRate': { label: 'Electricity Tariff (country)', page: 'requirements', unit: '$/kWh', provenance: 'input', external: { href: '/dc-market-tracker.html', label: 'DC market tracker (tariff per country)' }, get: () => sim().selectedCountry?.economy.electricityRate ?? null },
     'req.designMarginPct': { label: 'Design Margin', page: 'requirements', unit: '%', provenance: 'input', get: () => req().business.designMarginPct ?? 10 },
     'capex.contingencyPct': { label: 'Contingency %', page: 'capex', unit: '%', provenance: 'input', get: () => cap().inputs.contingency },
 
@@ -151,7 +151,7 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'capex.total': {
         label: 'CAPEX Total (P50)', page: 'capex', unit: '$', provenance: 'engine',
-        formulaTemplate: 'CapexEngine.calculateCapex(sim.itLoad, capex.contingencyPct, …semua asumsi CAPEX)',
+        formulaTemplate: 'CapexEngine.calculateCapex(sim.itLoad, capex.contingencyPct, …all CAPEX assumptions)',
         deps: ['sim.itLoad', 'capex.contingencyPct'],
         get: () => cap().results?.total ?? null,
     },
@@ -164,7 +164,7 @@ export const TRACE: Record<string, TraceNode> = {
     /* ── EB batch-3: opex / staffing / availability chains ── */
     'staff.fte': {
         label: 'Total FTE (auto headcount)', page: 'staff', provenance: 'derived',
-        formulaTemplate: 'Σ headcount efektif per role via ShiftEngine.calculateStaffing (sub-linear sim.itLoad, kalibrasi Uptime) — mirror totalHeadcount halaman (parity-fix 2026-07-20)',
+        formulaTemplate: 'Σ effective headcount per role via ShiftEngine.calculateStaffing (sub-linear sim.itLoad, Uptime calibration) — mirrors the page totalHeadcount (parity-fix 2026-07-20)',
         deps: ['sim.itLoad'],
         get: () => { const p = staffCostParts(); return p ? p.headcount : null; },
     },
@@ -177,12 +177,12 @@ export const TRACE: Record<string, TraceNode> = {
         },
     },
     'opex.totalAnnual': {
-        label: 'OPEX Tahunan (dcContract)', page: 'finance', unit: '$', provenance: 'engine',
-        formulaTemplate: 'models.opex.totalAnnual(sim.itLoad, negara, staff.fte — basis dcContract)',
+        label: 'Annual OPEX (dcContract)', page: 'finance', unit: '$', provenance: 'engine',
+        formulaTemplate: 'models.opex.totalAnnual(sim.itLoad, country, staff.fte — dcContract basis)',
         deps: ['sim.itLoad', 'staff.fte'],
         get: () => {
             try {
-                /* parity-fix 2026-07-20: engine signature POSITIONAL (mw, pue, region, headcount, opts) — mirror FinancialPage call persis */
+                /* parity-fix 2026-07-20: engine signature POSITIONAL (mw, pue, region, headcount, opts) — mirrors the FinancialPage call exactly */
                 const m = (rzModels() as { opex?: { totalAnnual?: (mw: number, pue: number | undefined, region: string, headcount: number, opts?: Record<string, unknown>) => { total?: number } } }).opex;
                 const st = sim(); const i = st.inputs;
                 const hc = (i.headcount_ShiftLead ?? 0) + (i.headcount_Engineer ?? 0) + (i.headcount_Technician ?? 0) + (i.headcount_Admin ?? 0);
@@ -194,13 +194,13 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'cap.totalMw': {
         label: 'Total Capacity (committed phases)', page: 'capacity', unit: 'MW', provenance: 'derived',
-        formulaTemplate: 'Σ fase (capacityPhases) — pristine mengikuti sim.itLoad',
+        formulaTemplate: 'Σ phases (capacityPhases) — pristine follows sim.itLoad',
         deps: ['sim.itLoad'],
         get: () => +(sim().inputs.capacityPhases.reduce((a, p) => a + p.itLoadKw, 0) / 1000).toFixed(1),
     },
     'carbon.annualEmissions': {
-        label: 'Emisi Tahunan (Scope 1+2+3)', page: 'carbon', unit: 'tCO₂', provenance: 'derived',
-        formulaTemplate: 'ops.annualEnergyMwh × grid carbon intensity negara (+Scope 1 genset & Scope 3)',
+        label: 'Annual Emissions (Scope 1+2+3)', page: 'carbon', unit: 'tCO₂', provenance: 'derived',
+        formulaTemplate: 'ops.annualEnergyMwh × country grid carbon intensity (+Scope 1 genset & Scope 3)',
         deps: ['ops.annualEnergyMwh'],
         get: () => {
             const e = TRACE['ops.annualEnergyMwh'].get();
@@ -209,13 +209,13 @@ export const TRACE: Record<string, TraceNode> = {
         },
     },
     'fin.npvScreening': {
-        label: 'NPV (screening 10 thn)', page: 'finance', unit: '$', provenance: 'derived',
-        formulaTemplate: '(pendapatan − opex.totalAnnual) diskonto 10% selama 10 thn − capex.total (screening; pro-forma penuh di Financial)',
+        label: 'NPV (10-yr screening)', page: 'finance', unit: '$', provenance: 'derived',
+        formulaTemplate: '(revenue − opex.totalAnnual) discounted 10% over 10 yr − capex.total (screening; full pro-forma on Financial)',
         deps: ['capex.total', 'opex.totalAnnual'],
         get: () => {
             const cap = TRACE['capex.total'].get(); const op = TRACE['opex.totalAnnual'].get();
             if (!cap || !op) return null;
-            const rev = sim().inputs.itLoad * 150 * 12;   // basis screening lib/screening.ts
+            const rev = sim().inputs.itLoad * 150 * 12;   // screening basis, lib/screening.ts
             let npv = -cap;
             for (let y = 1; y <= 10; y++) npv += (rev - op) / Math.pow(1.10, y);
             return +npv.toFixed(0);
@@ -224,7 +224,7 @@ export const TRACE: Record<string, TraceNode> = {
     /* ── EB-instrument: page-KPI nodes (append-only) ── */
     'ops.energyCostDaily': {
         label: 'Energy Cost (24h)', page: 'ops', unit: '$', provenance: 'derived',
-        formulaTemplate: 'IT aktif (sim.itLoad × occupancy S-curve) × PUE partial-load × 24h × sim.electricityRate — mirror halaman Ops (parity-fix 2026-07-20; basis design penuh ada di ops.energyCost)',
+        formulaTemplate: 'active IT (sim.itLoad × occupancy S-curve) × partial-load PUE × 24h × sim.electricityRate — mirrors the Ops page (parity-fix 2026-07-20; full design basis is in ops.energyCost)',
         deps: ['sim.itLoad', 'engine.pueMatrix', 'sim.electricityRate'],
         get: () => {
             try {
@@ -245,46 +245,46 @@ export const TRACE: Record<string, TraceNode> = {
     /* Grid Reliability card (GridReliabilityEngine) */
     'site.gridScore': {
         label: 'Grid Reliability Score', page: 'grid', unit: '/100', provenance: 'engine',
-        formulaTemplate: '50% skor lokal (uptime grid 40% + stabilitas tegangan 20% + frekuensi brownout 20% + durasi outage 20%) + 50% × models.grid.score(gridUptime) — baseline grid negara situs terpilih',
+        formulaTemplate: '50% local score (grid uptime 40% + voltage stability 20% + brownout frequency 20% + outage duration 20%) + 50% × models.grid.score(gridUptime) — grid baseline of the selected site country',
         get: () => { const g = siteAn()?.grid; return g ? Math.round(g.reliabilityScore) : null; },
     },
     'site.gridOutages': {
         label: 'Expected Outages', page: 'grid', unit: '/yr', provenance: 'engine',
-        formulaTemplate: 'brownoutFrequency + (100 − gridUptime%) × 365 ÷ 100 — baseline grid negara situs',
+        formulaTemplate: 'brownoutFrequency + (100 − gridUptime%) × 365 ÷ 100 — site country grid baseline',
         get: () => { const g = siteAn()?.grid; return g ? +g.annualExpectedOutages.toFixed(1) : null; },
     },
     'site.gridOutageMin': {
         label: 'Outage Minutes', page: 'grid', unit: 'min/yr', provenance: 'engine',
-        formulaTemplate: 'models.grid.annualOutageHours(gridUptime) × 60 (fallback: expected outages × durasi rata-rata outage negara)',
+        formulaTemplate: 'models.grid.annualOutageHours(gridUptime) × 60 (fallback: expected outages × country average outage duration)',
         get: () => { const g = siteAn()?.grid; return g ? Math.round(g.annualOutageMinutes) : null; },
     },
     'site.gridGenCapacity': {
         label: 'Required Gen Capacity', page: 'grid', unit: 'MW', provenance: 'derived',
-        formulaTemplate: 'ceil(sim.itLoad × PUE(cooling) × redundansi tier — sim.tierLevel 4→2.0 / 3→1.5 / 2→1.25) ÷ 1000',
+        formulaTemplate: 'ceil(sim.itLoad × PUE(cooling) × tier redundancy — sim.tierLevel 4→2.0 / 3→1.5 / 2→1.25) ÷ 1000',
         deps: ['sim.itLoad', 'sim.tierLevel'],
         get: () => { const g = siteAn()?.grid; return g ? +(g.requiredGenCapacity / 1000).toFixed(1) : null; },
     },
     'site.gridFuelCost': {
         label: 'Annual Fuel Cost (genset)', page: 'grid', unit: '$/yr', provenance: 'derived',
-        formulaTemplate: 'kapasitas genset (site.gridGenCapacity, dalam kW) × jam operasi (site.gridOutageMin ÷ 60 + 12% jam uji berkala) × 0.27 L/kWh × $1.25/L × (1 + premium BBM negara)',
+        formulaTemplate: 'genset capacity (site.gridGenCapacity, in kW) × operating hours (site.gridOutageMin ÷ 60 + 12% periodic test hours) × 0.27 L/kWh × $1.25/L × (1 + country fuel premium)',
         deps: ['site.gridGenCapacity', 'site.gridOutageMin'],
         get: () => siteAn()?.grid?.annualFuelCost ?? null,
     },
     /* Disaster Risk card (DisasterRiskEngine) */
     'site.riskComposite': {
         label: 'Composite Disaster Risk', page: 'disaster', unit: '/100', provenance: 'engine',
-        formulaTemplate: 'models.risk.geo(bahaya negara) — bobot: seismik 28% + banjir 22% + topan 18% + vulkanik 12% + tsunami 10% + wildfire 10% (lebih rendah = lebih baik)',
+        formulaTemplate: 'models.risk.geo(country hazards) — weights: seismic 28% + flood 22% + typhoon 18% + volcanic 12% + tsunami 10% + wildfire 10% (lower = better)',
         get: () => { const d = siteAn()?.disaster; return d ? Math.round(d.compositeScore) : null; },
     },
     'site.riskInsurance': {
         label: 'Annual Insurance Cost', page: 'disaster', unit: '$/yr', provenance: 'derived',
-        formulaTemplate: 'capex.total (fallback sim.itLoad × $10,500/kW) × tarif asuransi per band site.riskComposite (≥60→0.35% · ≥35→0.22% · <35→0.18%) × insuranceMultiplier negara',
+        formulaTemplate: 'capex.total (fallback sim.itLoad × $10,500/kW) × insurance rate per site.riskComposite band (≥60→0.35% · ≥35→0.22% · <35→0.18%) × country insuranceMultiplier',
         deps: ['capex.total', 'sim.itLoad', 'site.riskComposite'],
         get: () => siteAn()?.disaster?.annualInsuranceCost ?? null,
     },
     'site.riskEal': {
         label: 'Expected Annual Loss', page: 'disaster', unit: '$/yr', provenance: 'derived',
-        formulaTemplate: '(site.riskComposite ÷ 1250 probabilitas loss) × (15% × capex.total + 25% × pendapatan tahunan screening dari sim.itLoad)',
+        formulaTemplate: '(site.riskComposite ÷ 1250 loss probability) × (15% × capex.total + 25% × annual screening revenue from sim.itLoad)',
         deps: ['site.riskComposite', 'capex.total', 'sim.itLoad'],
         get: () => siteAn()?.disaster?.expectedAnnualLoss ?? null,
     },
@@ -296,122 +296,122 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'site.riskRevenueAtRisk': {
         label: 'Revenue at Risk', page: 'disaster', unit: '$', provenance: 'derived',
-        formulaTemplate: 'site.riskBiDays × pendapatan harian (revenuePerKwMonth × sim.itLoad × 12 ÷ 365)',
+        formulaTemplate: 'site.riskBiDays × daily revenue (revenuePerKwMonth × sim.itLoad × 12 ÷ 365)',
         deps: ['site.riskBiDays', 'sim.itLoad'],
         get: () => siteAn()?.disaster?.revenueAtRisk ?? null,
     },
     /* Tax & Incentives card (TaxIncentiveEngine) */
     'site.taxIncentiveValue': {
-        label: 'Total Incentive Value (15 thn)', page: 'tax', unit: '$', provenance: 'derived',
-        formulaTemplate: 'site.taxFtz + subsidi lahan + ITC/bonus-depresiasi (US) + Σ penghematan pajak tahunan (tax holiday vs tarif standar negara, atas laba screening dari sim.itLoad & capex.total) terdiskonto 10%',
+        label: 'Total Incentive Value (15 yr)', page: 'tax', unit: '$', provenance: 'derived',
+        formulaTemplate: 'site.taxFtz + land subsidy + ITC/bonus-depreciation (US) + Σ annual tax savings (tax holiday vs country standard rate, on screening profit from sim.itLoad & capex.total) discounted 10%',
         deps: ['site.taxFtz', 'capex.total', 'sim.itLoad'],
         get: () => siteAn()?.tax?.totalIncentiveValue ?? null,
     },
     'site.taxFtz': {
-        label: 'FTZ Benefits (bea impor)', page: 'tax', unit: '$', provenance: 'derived',
-        formulaTemplate: 'exemption bea impor: capex.total (fallback sim.itLoad × $10,500/kW) × 60% porsi equipment × tarif bea negara (ID/IN 7.5% · US 3% · CN 8% · lainnya 5%); 0 bila negara tanpa exemption',
+        label: 'FTZ Benefits (import duty)', page: 'tax', unit: '$', provenance: 'derived',
+        formulaTemplate: 'import duty exemption: capex.total (fallback sim.itLoad × $10,500/kW) × 60% equipment share × country duty rate (ID/IN 7.5% · US 3% · CN 8% · others 5%); 0 if country has no exemption',
         deps: ['capex.total', 'sim.itLoad'],
         get: () => siteAn()?.tax?.ftzBenefits ?? null,
     },
     'site.taxNpvWith': {
         label: 'NPV with Incentives', page: 'tax', unit: '$', provenance: 'derived',
-        formulaTemplate: 'NPV 15 thn @10%: −capex.total + Σ (pendapatan eskalasi 3% − opex eskalasi 4% − pajak tarif efektif dgn insentif); pendapatan screening dari sim.itLoad',
+        formulaTemplate: 'NPV 15 yr @10%: −capex.total + Σ (revenue escalated 3% − opex escalated 4% − tax at effective rate with incentives); screening revenue from sim.itLoad',
         deps: ['capex.total', 'sim.itLoad'],
         get: () => siteAn()?.tax?.npvWithIncentives ?? null,
     },
     'site.taxNpvUplift': {
-        label: 'NPV Uplift (insentif)', page: 'tax', unit: '$', provenance: 'derived',
-        formulaTemplate: 'max(0, site.taxNpvWith − NPV tanpa insentif (tarif pajak standar penuh))',
+        label: 'NPV Uplift (incentives)', page: 'tax', unit: '$', provenance: 'derived',
+        formulaTemplate: 'max(0, site.taxNpvWith − NPV without incentives (full standard tax rate))',
         deps: ['site.taxNpvWith'],
         get: () => { const t = siteAn()?.tax; return t ? Math.max(0, t.npvWithIncentives - t.npvWithoutIncentives) : null; },
     },
     'site.taxIrrWith': {
         label: 'IRR with Incentives', page: 'tax', unit: '%', provenance: 'derived',
-        formulaTemplate: 'IRR arus kas 15 thn dengan insentif (models.roi.irr; tahun-0 = −capex.total, arus tahunan = pendapatan screening sim.itLoad − opex − pajak efektif)',
+        formulaTemplate: 'IRR of 15-yr cashflow with incentives (models.roi.irr; year-0 = −capex.total, annual flow = screening revenue sim.itLoad − opex − effective tax)',
         deps: ['capex.total', 'sim.itLoad'],
         get: () => { const t = siteAn()?.tax; return t ? +t.irrWithIncentives.toFixed(1) : null;  /* engine already returns percent */ },
     },
     /* Talent Availability card (TalentAvailabilityEngine) */
     'site.talentScore': {
         label: 'Talent Score', page: 'talent', unit: '/100', provenance: 'engine',
-        formulaTemplate: 'pool engineer DC 30% + pipeline universitas 20% + kompetisi hyperscaler 25% + kecepatan hiring 15% + sertifikasi profesional 10% — baseline talentPool negara situs',
+        formulaTemplate: 'DC engineer pool 30% + university pipeline 20% + hyperscaler competition 25% + hiring speed 15% + professional certification 10% — site country talentPool baseline',
         get: () => { const t = siteAn()?.talent; return t ? Math.round(t.talentScore) : null; },
     },
     'site.talentTimeToStaff': {
         label: 'Time to Full Staff', page: 'talent', unit: 'mo', provenance: 'derived',
-        formulaTemplate: 'staff.fte ÷ hire per bulan (2 rekrutmen paralel, avgHiringDays negara ÷ 30)',
+        formulaTemplate: 'staff.fte ÷ hires per month (2 parallel recruitments, country avgHiringDays ÷ 30)',
         deps: ['staff.fte'],
         get: () => { const t = siteAn()?.talent; return t ? +t.timeToFullStaff.toFixed(1) : null; },
     },
     'site.talentRecruitCost': {
         label: 'Total Recruitment Cost', page: 'talent', unit: '$', provenance: 'derived',
-        formulaTemplate: '(avgHiringDays negara × $150/hari biaya rekruter × premi gaji negara) × staff.fte',
+        formulaTemplate: '(country avgHiringDays × $150/day recruiter cost × country salary premium) × staff.fte',
         deps: ['staff.fte'],
         get: () => siteAn()?.talent?.totalRecruitmentCost ?? null,
     },
     'site.talentTraining': {
         label: 'Annual Training Cost', page: 'talent', unit: '$/yr', provenance: 'derived',
-        formulaTemplate: 'ceil(staff.fte × site.talentTurnover) hire baru/thn × $4,200 CDCP/CDCS × 1.5 overhead onboarding',
+        formulaTemplate: 'ceil(staff.fte × site.talentTurnover) new hires/yr × $4,200 CDCP/CDCS × 1.5 onboarding overhead',
         deps: ['staff.fte', 'site.talentTurnover'],
         get: () => siteAn()?.talent?.annualTrainingCost ?? null,
     },
     'site.talentTurnover': {
         label: 'Adjusted Turnover Rate', page: 'talent', unit: '%/yr', provenance: 'engine',
-        formulaTemplate: 'baseline 15% + penyesuaian kelangkaan pool (0–12%) + penyesuaian kompetisi hyperscaler (0–4%) — talentPool negara situs',
+        formulaTemplate: 'baseline 15% + pool scarcity adjustment (0–12%) + hyperscaler competition adjustment (0–4%) — site country talentPool',
         get: () => { const t = siteAn()?.talent; return t ? +(t.adjustedTurnoverRate * 100).toFixed(1) : null; },
     },
     /* Compliance card (ComplianceEngine) */
     'site.compScore': {
         label: 'Compliance Score', page: 'compliance', unit: '/100', provenance: 'engine',
-        formulaTemplate: 'cakupan framework (jumlah item ÷ 14) × 60 + rasio item mandatory × 40 — framework regulasi negara situs',
+        formulaTemplate: 'framework coverage (item count ÷ 14) × 60 + mandatory item ratio × 40 — site country regulatory framework',
         get: () => { const c = siteAn()?.compliance; return c ? Math.round(c.complianceScore) : null; },
     },
     'site.compMandatory': {
         label: 'Mandatory Compliance Items', page: 'compliance', provenance: 'engine',
-        formulaTemplate: 'jumlah item wajib pada framework kepatuhan negara situs (fire / electrical / environmental / building / data-protection / telecom)',
+        formulaTemplate: 'number of mandatory items in the site country compliance framework (fire / electrical / environmental / building / data-protection / telecom)',
         get: () => siteAn()?.compliance?.mandatoryCount ?? null,
     },
     'site.compInitialCost': {
         label: 'Compliance Initial Cost', page: 'compliance', unit: '$', provenance: 'derived',
-        formulaTemplate: 'Σ biaya awal semua item framework negara — item skala-fasilitas (AMDAL / building permit) dikali max(1, sim.itLoad ÷ 2500)',
+        formulaTemplate: 'Σ initial cost of all country framework items — facility-scale items (EIA / building permit) multiplied by max(1, sim.itLoad ÷ 2500)',
         deps: ['sim.itLoad'],
         get: () => siteAn()?.compliance?.totalInitialCost ?? null,
     },
     'site.compAnnualCost': {
         label: 'Compliance Annual Cost', page: 'compliance', unit: '$/yr', provenance: 'derived',
-        formulaTemplate: 'Σ biaya tahunan item framework negara (blend dgn models.compliance.annualCost bila selisih <50%) — beberapa item diskala sim.itLoad',
+        formulaTemplate: 'Σ annual cost of country framework items (blended with models.compliance.annualCost if the gap is <50%) — some items scaled by sim.itLoad',
         deps: ['sim.itLoad'],
         get: () => siteAn()?.compliance?.totalAnnualCost ?? null,
     },
     /* SITE detail-panel country-baseline leaves (site attribute override → else DATA.countries baseline) */
     'site.saidi': {
-        label: 'SAIDI (situs terpilih)', page: 'site', unit: 'min/yr', provenance: 'input',
-        formulaTemplate: 'atribut situs bila diisi (Edit Criteria), else country baseline (DATA.countries environment.saidiMinYr)',
+        label: 'SAIDI (selected site)', page: 'site', unit: 'min/yr', provenance: 'input',
+        formulaTemplate: 'site attribute if set (Edit Criteria), else country baseline (DATA.countries environment.saidiMinYr)',
         get: () => { const s = siteSel(); return s?.attributes.saidiMinYr ?? siteCountry()?.environment?.saidiMinYr ?? null; },
     },
     'site.powerCostKwh': {
-        label: 'Power Cost (situs terpilih)', page: 'site', unit: '$/kWh', provenance: 'input',
-        formulaTemplate: 'atribut situs bila diisi (Edit Criteria), else country baseline (DATA.countries economy.electricityRate)',
+        label: 'Power Cost (selected site)', page: 'site', unit: '$/kWh', provenance: 'input',
+        formulaTemplate: 'site attribute if set (Edit Criteria), else country baseline (DATA.countries economy.electricityRate)',
         get: () => { const s = siteSel(); return s?.attributes.powerCostKwh ?? siteCountry()?.economy?.electricityRate ?? null; },
     },
     'site.airQuality': {
-        label: 'Air Quality Index (situs terpilih)', page: 'site', provenance: 'input',
-        formulaTemplate: 'atribut situs bila diisi (Edit Criteria), else country baseline (DATA.countries environment.baselineAQI)',
+        label: 'Air Quality Index (selected site)', page: 'site', provenance: 'input',
+        formulaTemplate: 'site attribute if set (Edit Criteria), else country baseline (DATA.countries environment.baselineAQI)',
         get: () => { const s = siteSel(); return s?.attributes.airQualityIndex ?? siteCountry()?.environment?.baselineAQI ?? null; },
     },
     'site.waterStress': {
-        label: 'Water Stress WRI (situs terpilih)', page: 'site', unit: '/5', provenance: 'input',
-        formulaTemplate: 'atribut situs bila diisi (Edit Criteria), else country baseline (DATA.countries environment.aqueductStressScore — WRI Aqueduct)',
+        label: 'Water Stress WRI (selected site)', page: 'site', unit: '/5', provenance: 'input',
+        formulaTemplate: 'site attribute if set (Edit Criteria), else country baseline (DATA.countries environment.aqueductStressScore — WRI Aqueduct)',
         get: () => { const s = siteSel(); return s?.attributes.waterStress0to5 ?? siteCountry()?.environment?.aqueductStressScore ?? null; },
     },
     'site.pga': {
-        label: 'PGA 2% in 50yr (situs terpilih)', page: 'site', unit: '%g', provenance: 'input',
-        formulaTemplate: 'atribut situs bila diisi (Edit Criteria), else country baseline (DATA.countries environment.pgaPct2in50yr — USGS/GSHAP)',
+        label: 'PGA 2% in 50yr (selected site)', page: 'site', unit: '%g', provenance: 'input',
+        formulaTemplate: 'site attribute if set (Edit Criteria), else country baseline (DATA.countries environment.pgaPct2in50yr — USGS/GSHAP)',
         get: () => { const s = siteSel(); return s?.attributes.pgaPct2in50yr ?? siteCountry()?.environment?.pgaPct2in50yr ?? null; },
     },
     'site.effTaxRate': {
-        label: 'Effective Tax Rate (situs terpilih)', page: 'site', unit: '%', provenance: 'input',
-        formulaTemplate: 'atribut situs bila diisi (Edit Criteria), else country baseline (DATA.countries economy.taxRate) × 100',
+        label: 'Effective Tax Rate (selected site)', page: 'site', unit: '%', provenance: 'input',
+        formulaTemplate: 'site attribute if set (Edit Criteria), else country baseline (DATA.countries economy.taxRate) × 100',
         get: () => {
             const s = siteSel();
             const r = s?.attributes.effectiveTaxRate ?? siteCountry()?.economy?.taxRate;
@@ -422,7 +422,7 @@ export const TRACE: Record<string, TraceNode> = {
     /* ── EB wave: STAFFING page KPIs ── */
     'staff.monthlyCost': {
         label: 'Monthly Payroll (Total)', page: 'staff', unit: '$/mo', provenance: 'derived',
-        formulaTemplate: 'Σ per role calculateStaffing(headcount efektif — staff.fte, shift model, negara): base salary + shift allowance + overtime + benefit (ShiftEngine)',
+        formulaTemplate: 'Σ per role calculateStaffing(effective headcount — staff.fte, shift model, country): base salary + shift allowance + overtime + benefit (ShiftEngine)',
         deps: ['staff.fte'],
         get: () => staffMonthlyCost(),
     },
@@ -439,7 +439,7 @@ export const TRACE: Record<string, TraceNode> = {
     /* ── EB wave: CONSTRUCTION page (EVM — planned plane engine CPM, actuals user-tracked) ── */
     'constr.progressPct': {
         label: 'Overall Progress (EV)', page: 'construction', unit: '%', provenance: 'derived',
-        formulaTemplate: 'Σ bobot fase (durasi CPM) × % aktual fase — Plan Mode: % planned pada status month; jadwal CPM dari timeline CAPEX (capex.total)',
+        formulaTemplate: 'Σ phase weight (CPM duration) × phase actual % — Plan Mode: % planned at status month; CPM schedule from CAPEX timeline (capex.total)',
         deps: ['capex.total'],
         get: () => constrPlan()?.e.overallPct ?? null,
     },
@@ -451,19 +451,19 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'constr.spi': {
         label: 'SPI (Schedule Performance)', page: 'construction', unit: 'ratio', provenance: 'derived',
-        formulaTemplate: 'constr.evUsd ÷ PV (planned value $ pada status month) — Plan Mode = 1.00 by definition',
+        formulaTemplate: 'constr.evUsd ÷ PV (planned value $ at status month) — Plan Mode = 1.00 by definition',
         deps: ['constr.evUsd'],
         get: () => constrPlan()?.e.spi ?? null,
     },
     'constr.cpi': {
         label: 'CPI (Cost Performance)', page: 'construction', unit: 'ratio', provenance: 'derived',
-        formulaTemplate: 'constr.evUsd ÷ AC (actual cost yang di-input di tracking) — Plan Mode = 1.00 by definition',
+        formulaTemplate: 'constr.evUsd ÷ AC (actual cost entered in tracking) — Plan Mode = 1.00 by definition',
         deps: ['constr.evUsd'],
         get: () => constrPlan()?.e.cpi ?? null,
     },
     'constr.forecastMonths': {
         label: 'Forecast Completion', page: 'construction', unit: 'mo', provenance: 'derived',
-        formulaTemplate: 'durasi jadwal total (CPM) ÷ clamp(constr.spi, 0.5–1.5)',
+        formulaTemplate: 'total schedule duration (CPM) ÷ clamp(constr.spi, 0.5–1.5)',
         deps: ['constr.spi'],
         get: () => constrPlan()?.e.forecastTotalMonths ?? null,
     },
@@ -471,7 +471,7 @@ export const TRACE: Record<string, TraceNode> = {
     /* ── EB wave: COMMISSIONING page (readiness = engine readinessIndex, real linkage) ── */
     'cx.testsPassed': {
         label: 'Cx Tests Passed', page: 'commissioning', provenance: 'input',
-        formulaTemplate: 'jumlah tick PASS pada Cx checklist (NETA/IEEE/ASHRAE templates) — fallback input manual bila belum ada tick',
+        formulaTemplate: 'number of PASS ticks on the Cx checklist (NETA/IEEE/ASHRAE templates) — falls back to manual input when there are no ticks yet',
         get: () => {
             const s = cxStats(); if (!s) return null;
             return s.anyTicks ? s.pass : (useCxTracking.getState().testsPassed ?? null);
@@ -479,7 +479,7 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'cx.testsFailed': {
         label: 'Cx Tests Failed', page: 'commissioning', provenance: 'input',
-        formulaTemplate: 'jumlah tick FAIL pada Cx checklist — fallback input manual bila belum ada tick',
+        formulaTemplate: 'number of FAIL ticks on the Cx checklist — falls back to manual input when there are no ticks yet',
         get: () => {
             const s = cxStats(); if (!s) return null;
             return s.anyTicks ? s.fail : (useCxTracking.getState().testsFailed ?? null);
@@ -487,13 +487,13 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'cx.testsTotal': {
         label: 'Cx Tests in Scope (screening)', page: 'commissioning', provenance: 'derived',
-        formulaTemplate: 'Σ unit equipment (models.commissioning.equipScale dari sim.itLoad) × tests-per-unit per sistem — switchgear 12 · UPS 4 · genset 8 · chiller 6 · CRAC 2 · PDU 1 · fire 3; override manual menang',
+        formulaTemplate: 'Σ equipment units (models.commissioning.equipScale from sim.itLoad) × tests-per-unit per system — switchgear 12 · UPS 4 · genset 8 · chiller 6 · CRAC 2 · PDU 1 · fire 3; manual override wins',
         deps: ['sim.itLoad'],
         get: () => cxTestsTotal(),
     },
     'cx.readiness': {
         label: 'Readiness Index', page: 'commissioning', unit: '%', provenance: 'engine',
-        formulaTemplate: 'models.commissioning.readinessIndex: Σ weight level (L1–L5/IST/SAT/FAT/punchlist) × completion level — completion dari checklist PASS (cx.testsPassed) menang atas slider',
+        formulaTemplate: 'models.commissioning.readinessIndex: Σ level weight (L1–L5/IST/SAT/FAT/punchlist) × level completion — completion from checklist PASS (cx.testsPassed) wins over the slider',
         deps: ['cx.testsPassed'],
         get: () => {
             try {
@@ -507,19 +507,19 @@ export const TRACE: Record<string, TraceNode> = {
     /* ── EB wave: RESULTS page (composite scorecard — mirrors ResultsEnginePage dims) ── */
     'results.capexScore': {
         label: 'CAPEX Efficiency Score', page: 'report', unit: '/100', provenance: 'derived',
-        formulaTemplate: 'clamp(100 − (capex.perKw − 60% band) ÷ (80% band) × 60, 10–100) — band $/kW standar DATA.commissioning cx.rich.capexPerKw',
+        formulaTemplate: 'clamp(100 − (capex.perKw − 60% band) ÷ (80% band) × 60, 10–100) — standard $/kW band DATA.commissioning cx.rich.capexPerKw',
         deps: ['capex.perKw'],
         get: () => resultsDims()?.capexScore ?? null,
     },
     'results.susScore': {
         label: 'Sustainability Score', page: 'report', unit: '/100', provenance: 'derived',
-        formulaTemplate: 'clamp((1.60 − engine.pueMatrix) ÷ 0.50 × 100, 0–100) — posisi PUE desain pada band 1.10–1.60',
+        formulaTemplate: 'clamp((1.60 − engine.pueMatrix) ÷ 0.50 × 100, 0–100) — design PUE position on the 1.10–1.60 band',
         deps: ['engine.pueMatrix'],
         get: () => resultsDims()?.susScore ?? null,
     },
     'results.finScore': {
         label: 'Financial Score', page: 'report', unit: '/100', provenance: 'derived',
-        formulaTemplate: 'clamp(50 + (IRR screening 15 thn − 10% hurdle) × 400, 10–100) — IRR = models.roi.irr(tahun-0 −capex.total; arus tahunan = pendapatan sim.itLoad × revenuePerKwMonth − opex dcContract)',
+        formulaTemplate: 'clamp(50 + (15-yr screening IRR − 10% hurdle) × 400, 10–100) — IRR = models.roi.irr(year-0 −capex.total; annual flow = revenue sim.itLoad × revenuePerKwMonth − dcContract opex)',
         deps: ['capex.total', 'sim.itLoad'],
         get: () => resultsDims()?.finScore ?? null,
     },
@@ -531,7 +531,7 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'results.score': {
         label: 'Overall Score (Weighted)', page: 'report', unit: '/100', provenance: 'derived',
-        formulaTemplate: 'rata-rata berbobot 8 dimensi: results.capexScore 13% + results.susScore 13% + results.finScore 13% + results.constrScore 12% + Requirements 12% + Site 13% + Architecture 12% + Ops Readiness 12%',
+        formulaTemplate: 'weighted average of 8 dimensions: results.capexScore 13% + results.susScore 13% + results.finScore 13% + results.constrScore 12% + Requirements 12% + Site 13% + Architecture 12% + Ops Readiness 12%',
         deps: ['results.capexScore', 'results.susScore', 'results.finScore', 'results.constrScore'],
         get: () => resultsDims()?.overall ?? null,
     },
@@ -539,7 +539,7 @@ export const TRACE: Record<string, TraceNode> = {
     /* ── EB wave: ASSET INTELLIGENCE page (fleet engine-generated) ── */
     'asset.fleetUnits': {
         label: 'Total Tracked Units (fleet)', page: 'asset-health', provenance: 'derived',
-        formulaTemplate: 'Σ unit per kelas armada — models.commissioning.equipScale(sim.itLoad, rack density Requirements): switchgear/trafo/genset/UPS/PDU/chiller/CRAC/battery/BMS',
+        formulaTemplate: 'Σ units per fleet class — models.commissioning.equipScale(sim.itLoad, Requirements rack density): switchgear/transformer/genset/UPS/PDU/chiller/CRAC/battery/BMS',
         deps: ['sim.itLoad'],
         get: () => {
             const eq = assetEquip(); if (!eq) return null;
@@ -548,24 +548,24 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'asset.avgHealth': {
         label: 'Avg Fleet Health', page: 'asset-health', unit: '/100', provenance: 'engine',
-        formulaTemplate: 'Σ (health kelas × unit) ÷ asset.fleetUnits — health = models.asset.healthIndex (Weibull remaining-life + condition + duty); basis trace: umur 3 thn · kondisi 85% (ubah di slider halaman)',
+        formulaTemplate: 'Σ (class health × units) ÷ asset.fleetUnits — health = models.asset.healthIndex (Weibull remaining-life + condition + duty); trace basis: age 3 yr · condition 85% (change on the page slider)',
         deps: ['asset.fleetUnits'],
         get: () => assetAvgHealth(),
     },
     'asset.replacementValue': {
-        label: 'Replacement Value (15 thn, nominal)', page: 'asset-health', unit: '$', provenance: 'derived',
-        formulaTemplate: 'Σ models.asset.replacementSchedule(kelas, sim.itLoad, 15 thn).totalNominalUsd — 6 kelas: UPS Li-Ion / genset / CRAC / PDU / BMS / fire',
+        label: 'Replacement Value (15 yr, nominal)', page: 'asset-health', unit: '$', provenance: 'derived',
+        formulaTemplate: 'Σ models.asset.replacementSchedule(class, sim.itLoad, 15 yr).totalNominalUsd — 6 classes: UPS Li-Ion / genset / CRAC / PDU / BMS / fire',
         deps: ['sim.itLoad'],
         get: () => assetReplacementValue(),
     },
 
-    /* ── EB-cov wave: trace-coverage ≥60% halaman inti (append-only) ─────────
+    /* ── EB-cov wave: trace-coverage ≥60% of core pages (append-only) ────────
      * Leaves + derived chains for Dashboard / Capacity / CAPEX / Ops /
      * Architecture KPI wraps. Every get() mirrors the OWNING surface exactly. */
 
     /* leaves */
     'engine.pueTier3': {
-        label: 'Design PUE (kolom tier-3 matriks cooling)', page: 'architecture', unit: 'ratio', provenance: 'engine', sourceKey: 'pueMatrix',
+        label: 'Design PUE (tier-3 column of the cooling matrix)', page: 'architecture', unit: 'ratio', provenance: 'engine', sourceKey: 'pueMatrix',
         external: { href: '/glossary.html#pue', label: 'Glossary: PUE' },
         get: () => { try { return getPUE(sim().inputs.coolingType); } catch { return null; } },
     },
@@ -574,23 +574,23 @@ export const TRACE: Record<string, TraceNode> = {
         get: () => req().workload.avgRackDensityKw ?? null,
     },
     'ops.occupancyPct': {
-        label: 'Occupancy (S-curve tahun-1)', page: 'ops', unit: '%', provenance: 'engine',
-        formulaTemplate: 'models.capacity.occupancyScurve(tahun-1, wholesale) × 100 — clamp 5–100%',
+        label: 'Occupancy (S-curve year-1)', page: 'ops', unit: '%', provenance: 'engine',
+        formulaTemplate: 'models.capacity.occupancyScurve(year-1, wholesale) × 100 — clamp 5–100%',
         get: () => { const o = opsOccFrac(); return o == null ? null : Math.round(o * 100); },
     },
     'ops.activeAlarms': {
         label: 'Active Alarms (ops log)', page: 'ops', provenance: 'input',
-        formulaTemplate: 'jumlah alarm berstatus Active pada ops log (user-entered; seed EXAMPLE di Plan Mode)',
+        formulaTemplate: 'number of Active-status alarms in the ops log (user-entered; EXAMPLE seed in Plan Mode)',
         get: () => useOpsLog.getState().alarms.filter((a) => a.status === 'Active').length,
     },
     'ops.openTickets': {
         label: 'Open Tickets (ops log)', page: 'ops', provenance: 'input',
-        formulaTemplate: 'jumlah tiket berstatus ≠ Closed pada ops log (user-entered; seed EXAMPLE di Plan Mode)',
+        formulaTemplate: 'number of tickets with status ≠ Closed in the ops log (user-entered; EXAMPLE seed in Plan Mode)',
         get: () => useOpsLog.getState().tickets.filter((t) => t.status !== 'Closed').length,
     },
     'ops.pmCompliancePct': {
         label: 'PM Compliance', page: 'ops', unit: '%', provenance: 'input',
-        formulaTemplate: 'minggu PM ter-log ÷ 52 × 100 (cap 100%) — null bila belum ada minggu ter-log',
+        formulaTemplate: 'logged PM weeks ÷ 52 × 100 (cap 100%) — null when no weeks are logged yet',
         get: () => { const w = useOpsLog.getState().completedPmWeeks.length; return w > 0 ? Math.min(100, Math.round((w / 52) * 100)) : null; },
     },
 
@@ -611,7 +611,7 @@ export const TRACE: Record<string, TraceNode> = {
     /* dashboard chains */
     'rel.systemAvailability': {
         label: 'System Availability (β common-cause)', page: 'reliability', unit: '%', provenance: 'engine',
-        formulaTemplate: 'availabilityChain.ccOverall — chain RBD + β=5% common-cause (sama dgn halaman Reliability; fake-100% fix 2026-07-20) × 100',
+        formulaTemplate: 'availabilityChain.ccOverall — RBD chain + β=5% common-cause (same as the Reliability page; fake-100% fix 2026-07-20) × 100',
         get: () => {
             try {
                 const m = (rzModels() as { reliability?: unknown }).reliability;
@@ -625,7 +625,7 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'sus.wue': {
         label: 'WUE (Water Usage Effectiveness)', page: 'carbon', unit: 'L/kWh', provenance: 'engine',
-        formulaTemplate: 'models.water.wue(tipe cooling terpilih) — intensitas air per kWh IT',
+        formulaTemplate: 'models.water.wue(selected cooling type) — water intensity per IT kWh',
         external: { href: '/glossary.html#wue', label: 'Glossary: WUE' },
         get: () => {
             try {
@@ -637,7 +637,7 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'sus.cue': {
         label: 'CUE (Carbon Usage Effectiveness)', page: 'carbon', unit: 'kgCO₂/kWh', provenance: 'derived',
-        formulaTemplate: 'emisi tahunan (models.carbon.annualTonnes dari sim.itLoad, PUE desain, grid negara) ÷ energi fasilitas tahunan',
+        formulaTemplate: 'annual emissions (models.carbon.annualTonnes from sim.itLoad, design PUE, country grid) ÷ annual facility energy',
         deps: ['sim.itLoad'],
         get: () => {
             try {
@@ -651,14 +651,14 @@ export const TRACE: Record<string, TraceNode> = {
         },
     },
     'opex.dashboardAnnual': {
-        label: 'Total OPEX / yr (basis dashboard)', page: 'finance', unit: '$', provenance: 'engine',
-        formulaTemplate: 'models.opex.totalAnnual(sim.itLoad dalam MW, PUE desain, negara, headcount manual) — basis DC-contract 100% util',
+        label: 'Total OPEX / yr (dashboard basis)', page: 'finance', unit: '$', provenance: 'engine',
+        formulaTemplate: 'models.opex.totalAnnual(sim.itLoad in MW, design PUE, country, manual headcount) — DC-contract basis at 100% util',
         deps: ['sim.itLoad'],
         get: () => dashOpexAnnual(),
     },
     'fin.lcc15': {
-        label: 'LCC 15 thn (TCO diskonto 10%)', page: 'finance', unit: '$', provenance: 'derived',
-        formulaTemplate: 'models.tco.lifecycleNPV(capex.total, opex.dashboardAnnual, 15 thn, diskonto 10%) — TCO diskonto termasuk siklus refresh (parity-fix: fn engine bernama lifecycleNPV, bukan totalCost)',
+        label: 'LCC 15 yr (TCO discounted 10%)', page: 'finance', unit: '$', provenance: 'derived',
+        formulaTemplate: 'models.tco.lifecycleNPV(capex.total, opex.dashboardAnnual, 15 yr, 10% discount) — discounted TCO including the refresh cycle (parity-fix: the engine fn is named lifecycleNPV, not totalCost)',
         deps: ['capex.total', 'opex.dashboardAnnual'],
         get: () => {
             try {
@@ -672,20 +672,20 @@ export const TRACE: Record<string, TraceNode> = {
         },
     },
     'fin.ebitdaY5': {
-        label: 'EBITDA (tahun ke-5)', page: 'finance', unit: '$', provenance: 'derived',
-        formulaTemplate: 'DCF 15 thn: pendapatan (sim.itLoad × $280/kW·bln ilustratif × ramp okupansi, eskalasi 3%) − opex.dashboardAnnual — EBITDA tahun ke-5; modal awal capex.total',
+        label: 'EBITDA (year 5)', page: 'finance', unit: '$', provenance: 'derived',
+        formulaTemplate: '15-yr DCF: revenue (sim.itLoad × $280/kW·mo illustrative × occupancy ramp, 3% escalation) − opex.dashboardAnnual — year-5 EBITDA; initial capital capex.total',
         deps: ['capex.total', 'opex.dashboardAnnual', 'sim.itLoad'],
         get: () => { const cf = dashFinancial()?.cashflows?.[4]; return cf ? Math.round(cf.ebitda) : null; },
     },
     'fin.irrProject': {
-        label: 'IRR (proyek 15 thn)', page: 'finance', unit: '%', provenance: 'derived',
-        formulaTemplate: 'IRR arus kas DCF 15 thn — tahun-0 = −capex.total; arus tahunan = pendapatan ilustratif sim.itLoad − opex.dashboardAnnual − pajak',
+        label: 'IRR (15-yr project)', page: 'finance', unit: '%', provenance: 'derived',
+        formulaTemplate: 'IRR of 15-yr DCF cashflow — year-0 = −capex.total; annual flow = illustrative revenue sim.itLoad − opex.dashboardAnnual − tax',
         deps: ['capex.total', 'opex.dashboardAnnual', 'sim.itLoad'],
         get: () => { const f = dashFinancial(); return f ? +f.irr.toFixed(1) : null; },
     },
     'capex.racks': {
         label: 'Rack Count (CAPEX metrics)', page: 'capex', provenance: 'derived',
-        formulaTemplate: 'ceil(sim.itLoad ÷ kW/rack kelas rack CAPEX — standard 6 · medium 12.5 · high 25 · extreme 75)',
+        formulaTemplate: 'ceil(sim.itLoad ÷ kW/rack of the CAPEX rack class — standard 6 · medium 12.5 · high 25 · extreme 75)',
         deps: ['sim.itLoad'],
         get: () => cap().results?.metrics?.racks ?? null,
     },
@@ -699,25 +699,25 @@ export const TRACE: Record<string, TraceNode> = {
     /* capex risk band (AACE Class 4, deterministic asymmetric normal) */
     'capex.p10': {
         label: 'CAPEX P10 (Optimistic)', page: 'capex', unit: '$', provenance: 'derived',
-        formulaTemplate: 'batas bawah band AACE Class 4 (−30%): models.capex.accuracyRange(capex.total).low',
+        formulaTemplate: 'lower bound of the AACE Class 4 band (−30%): models.capex.accuracyRange(capex.total).low',
         deps: ['capex.total'],
         get: () => capexBandLive()?.p10 ?? null,
     },
     'capex.p80': {
         label: 'CAPEX P80 (Risk-Adjusted)', page: 'capex', unit: '$', provenance: 'derived',
-        formulaTemplate: 'capex.total + 0.8416 × σ_high; σ_high = (batas atas AACE Class 4 (+50%) − capex.total) ÷ 1.2816',
+        formulaTemplate: 'capex.total + 0.8416 × σ_high; σ_high = (AACE Class 4 upper bound (+50%) − capex.total) ÷ 1.2816',
         deps: ['capex.total'],
         get: () => capexBandLive()?.p80 ?? null,
     },
     'capex.p90': {
         label: 'CAPEX P90 (Conservative)', page: 'capex', unit: '$', provenance: 'derived',
-        formulaTemplate: 'batas atas band AACE Class 4 (+50%): models.capex.accuracyRange(capex.total).high',
+        formulaTemplate: 'upper bound of the AACE Class 4 band (+50%): models.capex.accuracyRange(capex.total).high',
         deps: ['capex.total'],
         get: () => capexBandLive()?.p90 ?? null,
     },
     'capex.contingency': {
         label: 'Contingency (CAPEX)', page: 'capex', unit: '$', provenance: 'derived',
-        formulaTemplate: 'subtotal CAPEX sebelum kontinjensi × capex.contingencyPct ÷ 100 (CapexEngine)',
+        formulaTemplate: 'CAPEX subtotal before contingency × capex.contingencyPct ÷ 100 (CapexEngine)',
         deps: ['capex.contingencyPct'],
         get: () => cap().results?.contingency ?? null,
     },
@@ -725,7 +725,7 @@ export const TRACE: Record<string, TraceNode> = {
     /* capacity planning (mirror CapacityPlanningPage adapter wiring exactly) */
     'cap.peakForecastMw': {
         label: 'Peak Forecast (growth plan)', page: 'capacity', unit: 'MW', provenance: 'derived',
-        formulaTemplate: 'max forecast MW horizon 10 thn — growth plan Requirements (Y1–Y5, Y10) + interpolasi geometrik; basis Y0 = sim.itLoad',
+        formulaTemplate: 'max forecast MW over a 10-yr horizon — Requirements growth plan (Y1–Y5, Y10) + geometric interpolation; Y0 basis = sim.itLoad',
         deps: ['sim.itLoad'],
         get: () => capPlanModel()?.peak ?? null,
     },
@@ -757,37 +757,37 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'arch.eqSwitchgear': {
         label: 'MV Switchgear (BOM)', page: 'architecture', provenance: 'engine',
-        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah lineup switchgear MV',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, rack density bucket) — number of MV switchgear lineups',
         deps: ['sim.itLoad'],
         get: () => assetEquip()?.switchgear ?? null,
     },
     'arch.eqTransformers': {
         label: 'Transformers (BOM)', page: 'architecture', provenance: 'engine',
-        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah trafo',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, rack density bucket) — number of transformers',
         deps: ['sim.itLoad'],
         get: () => assetEquip()?.transformers ?? null,
     },
     'arch.eqGenerators': {
         label: 'Generators (BOM)', page: 'architecture', provenance: 'engine',
-        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah genset',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, rack density bucket) — number of gensets',
         deps: ['sim.itLoad'],
         get: () => assetEquip()?.generators ?? null,
     },
     'arch.eqUps': {
         label: 'UPS Modules (BOM)', page: 'architecture', provenance: 'engine',
-        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah modul UPS',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, rack density bucket) — number of UPS modules',
         deps: ['sim.itLoad'],
         get: () => assetEquip()?.ups_modules ?? null,
     },
     'arch.eqPdus': {
         label: 'PDUs (BOM)', page: 'architecture', provenance: 'engine',
-        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah PDU',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, rack density bucket) — number of PDUs',
         deps: ['sim.itLoad'],
         get: () => assetEquip()?.pdus ?? null,
     },
     'arch.eqChillers': {
         label: 'Chillers (BOM)', page: 'architecture', provenance: 'engine',
-        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah chiller',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, rack density bucket) — number of chillers',
         deps: ['sim.itLoad'],
         get: () => assetEquip()?.chillers ?? null,
     },
@@ -798,19 +798,19 @@ export const TRACE: Record<string, TraceNode> = {
      * revised budget as on the page. All null-safe. */
     'fin.revisedBudget': {
         label: 'Revised Budget', page: 'finance', unit: '$', provenance: 'derived',
-        formulaTemplate: 'capex.total + Σ revisi disetujui (change orders financialTracking — amountFrac × baseline)',
+        formulaTemplate: 'capex.total + Σ approved revisions (financialTracking change orders — amountFrac × baseline)',
         deps: ['capex.total'],
         get: () => finRevisedBudget(),
     },
     'fin.committed': {
         label: 'Total Committed', page: 'finance', unit: '$', provenance: 'derived',
-        formulaTemplate: 'Σ transaksi ledger financialTracking berstatus committed/approved/paid — amountFrac × capex.total',
+        formulaTemplate: 'Σ financialTracking ledger transactions with status committed/approved/paid — amountFrac × capex.total',
         deps: ['capex.total'],
         get: () => finLedgerSum(['committed', 'approved', 'paid']),
     },
     'fin.paid': {
         label: 'Total Actual (Paid)', page: 'finance', unit: '$', provenance: 'derived',
-        formulaTemplate: 'Σ transaksi ledger financialTracking berstatus paid — amountFrac × capex.total',
+        formulaTemplate: 'Σ financialTracking ledger transactions with status paid — amountFrac × capex.total',
         deps: ['capex.total'],
         get: () => finLedgerSum(['paid']),
     },
@@ -822,7 +822,7 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'fin.healthScore': {
         label: 'Financial Health Score', page: 'finance', unit: '/100', provenance: 'derived',
-        formulaTemplate: '100 × (0.3 × skor varian budget (1 − |fin.fac − fin.revisedBudget| ÷ fin.revisedBudget × 5) + 0.35 × min(1, constr.cpi) + 0.35 × min(1, constr.spi)) — komposit terdokumentasi',
+        formulaTemplate: '100 × (0.3 × budget variance score (1 − |fin.fac − fin.revisedBudget| ÷ fin.revisedBudget × 5) + 0.35 × min(1, constr.cpi) + 0.35 × min(1, constr.spi)) — documented composite',
         deps: ['fin.fac', 'fin.revisedBudget', 'constr.cpi', 'constr.spi'],
         get: () => finHealthLive(),
     },
@@ -832,142 +832,142 @@ export const TRACE: Record<string, TraceNode> = {
      * :68-115 — country-auto rates; water basis municipal = page default). */
     'sus.energyMonthlyMwh': {
         label: 'Energy (Month)', page: 'carbon', unit: 'MWh', provenance: 'derived',
-        formulaTemplate: 'sim.itLoad ÷ 1000 × engine.pueMatrix × 730 jam',
+        formulaTemplate: 'sim.itLoad ÷ 1000 × engine.pueMatrix × 730 hours',
         deps: ['sim.itLoad', 'engine.pueMatrix'],
         get: () => { const p = susPueLive(); return p == null ? null : Math.round((sim().inputs.itLoad / 1000) * p * 730); },
     },
     'sus.waterAnnualM3': {
         label: 'Water (Annual)', page: 'carbon', unit: 'm³', provenance: 'engine',
-        formulaTemplate: 'models.water.annualM3(sim.itLoad dalam MW, tipe cooling) — sus.wue × IT kWh tahunan',
+        formulaTemplate: 'models.water.annualM3(sim.itLoad in MW, cooling type) — sus.wue × annual IT kWh',
         deps: ['sim.itLoad', 'sus.wue'],
         get: () => susWaterM3(),
     },
     'sus.renewablePct': {
         label: 'Renewable Energy Share', page: 'carbon', unit: '%', provenance: 'derived',
-        formulaTemplate: 'on-site dari input CAPEX renewable (solar+BESS 25% · solar 15%) + off-site PPA dari green cert (silver 10% · gold 20% · platinum 35%) — derivasi berlabel',
+        formulaTemplate: 'on-site from CAPEX renewable input (solar+BESS 25% · solar 15%) + off-site PPA from green cert (silver 10% · gold 20% · platinum 35%) — labeled derivation',
         get: () => susRenewablePct(),
     },
     'sus.overallScore': {
         label: 'Sustainability Score (composite)', page: 'carbon', unit: '/100', provenance: 'derived',
-        formulaTemplate: 'rata-rata 4 skor terdokumentasi: energi (band engine.pueMatrix 1.10–1.60) + karbon (grid intensity negara × porsi grid dari sus.renewablePct) + air (band sus.wue 0–2.2) + waste (slider diversion, default 60)',
+        formulaTemplate: 'average of 4 documented scores: energy (engine.pueMatrix band 1.10–1.60) + carbon (country grid intensity × grid share from sus.renewablePct) + water (sus.wue band 0–2.2) + waste (diversion slider, default 60)',
         deps: ['engine.pueMatrix', 'sus.renewablePct', 'sus.wue'],
         get: () => susOverallScore(),
     },
     'sus.waterCost': {
         label: 'Water Cost /yr', page: 'carbon', unit: '$/yr', provenance: 'derived',
-        formulaTemplate: 'sus.waterAnnualM3 × climate multiplier (zona ASHRAE negara → DATA.waterFootprint.climateMult) → kgal × $/kgal (basis municipal — dropdown halaman dapat memilih sumber lain); deep-sea ON → $0 (seawater basis, no potable draw)',
+        formulaTemplate: 'sus.waterAnnualM3 × climate multiplier (country ASHRAE zone → DATA.waterFootprint.climateMult) → kgal × $/kgal (municipal basis — the page dropdown can pick another source); deep-sea ON → $0 (seawater basis, no potable draw)',
         deps: ['sus.waterAnnualM3'],
         get: () => susEnvLive()?.waterCost ?? null,
     },
     'sus.carbonCost': {
         label: 'Carbon Cost /yr', page: 'carbon', unit: '$/yr', provenance: 'derived',
-        formulaTemplate: 'scope-2 tCO₂e (models.carbon.scopes dari sim.itLoad & engine.pueMatrix, grid negara) × harga karbon negara (compliance DATA.envCosts.carbonPriceUsdPerT; fallback voluntary offset)',
+        formulaTemplate: 'scope-2 tCO₂e (models.carbon.scopes from sim.itLoad & engine.pueMatrix, country grid) × country carbon price (compliance DATA.envCosts.carbonPriceUsdPerT; fallback voluntary offset)',
         deps: ['sim.itLoad', 'engine.pueMatrix'],
         get: () => susEnvLive()?.carbonCost ?? null,
     },
     'sus.wasteCost': {
         label: 'Waste Mgmt Cost /yr', page: 'carbon', unit: '$/yr', provenance: 'derived',
-        formulaTemplate: '(tonase umum per MW-IT × band tarif developed/emerging + e-waste kg per MW-IT × $/kg — DATA.envCosts.wasteMgmt) × sim.itLoad ÷ 1000',
+        formulaTemplate: '(general tonnage per MW-IT × developed/emerging rate band + e-waste kg per MW-IT × $/kg — DATA.envCosts.wasteMgmt) × sim.itLoad ÷ 1000',
         deps: ['sim.itLoad'],
         get: () => susEnvLive()?.wasteCost ?? null,
     },
     'sus.envTotal': {
         label: 'Total Environmental Cost /yr', page: 'carbon', unit: '$/yr', provenance: 'derived',
-        formulaTemplate: 'sus.waterCost + sus.carbonCost + sus.wasteCost — tarif auto-switch per negara',
+        formulaTemplate: 'sus.waterCost + sus.carbonCost + sus.wasteCost — rates auto-switch per country',
         deps: ['sus.waterCost', 'sus.carbonCost', 'sus.wasteCost'],
         get: () => { const e = susEnvLive(); return e ? Math.round(e.waterCost + e.carbonCost + e.wasteCost) : null; },
     },
 
-    /* ── EB-cov100 wave (append-only): sisa KPI Dashboard / Reliability /
-     * Architecture BOM / Staffing — setiap get() MENIRU persis surface pemilik
+    /* ── EB-cov100 wave (append-only): remaining KPIs Dashboard / Reliability /
+     * Architecture BOM / Staffing — each get() MIRRORS the owning surface exactly
      * (ReliabilityEnginePage memo · CapexEngine.computeTimeline · equipScale ·
-     * StaffingDashboard results/efficiency memo). Semua null-safe. ─────────── */
+     * StaffingDashboard results/efficiency memo). All null-safe. ───────────── */
 
-    /* RELIABILITY page KPIs (β=5% common-cause screening chain — halaman) */
+    /* RELIABILITY page KPIs (β=5% common-cause screening chain — page) */
     'rel.composedAvailability': {
         label: 'Composed Availability (β-adjusted)', page: 'reliability', unit: '%', provenance: 'derived',
-        formulaTemplate: 'RBD seri 5 sistem (power dist (swgr·pdu) · UPS · genset · chiller · CRAC) paralel per path redundansi terpilih, di-blend β=5% common-cause dengan chain single-path — komponen MTBF/MTTR IEEE-493 (DATA.reliability.components); β = asumsi screening',
+        formulaTemplate: 'RBD series of 5 systems (power dist (swgr·pdu) · UPS · genset · chiller · CRAC) in parallel per the selected redundancy paths, blended β=5% common-cause with the single-path chain — MTBF/MTTR components IEEE-493 (DATA.reliability.components); β = screening assumption',
         deps: ['rel.mttrAvg'],
         get: () => { const r = relPageModel(); return r ? +(r.overall * 100).toFixed(4) : null; },
     },
     'rel.downtimeMin': {
         label: 'Downtime Unplanned /yr', page: 'reliability', unit: 'min/yr', provenance: 'derived',
-        formulaTemplate: '(1 − rel.composedAvailability ÷ 100) × 525,960 menit/tahun',
+        formulaTemplate: '(1 − rel.composedAvailability ÷ 100) × 525,960 minutes/year',
         deps: ['rel.composedAvailability'],
         get: () => { const r = relPageModel(); return r ? +r.downtimeMin.toFixed(1) : null; },
     },
     'rel.mtbfComposite': {
         label: 'MTBF (series composite)', page: 'reliability', unit: 'h', provenance: 'engine', sourceKey: 'reliability',
-        formulaTemplate: '1 ÷ Σ(1/MTBF komponen) — komposit seri 6 kelas komponen IEEE-493 (mengabaikan redundansi; screening)',
+        formulaTemplate: '1 ÷ Σ(1/component MTBF) — series composite of 6 IEEE-493 component classes (ignores redundancy; screening)',
         get: () => relPageModel()?.mtbfAll ?? null,
     },
     'rel.mttrAvg': {
         label: 'MTTR (component average)', page: 'reliability', unit: 'h', provenance: 'engine', sourceKey: 'reliability',
-        formulaTemplate: 'rata-rata MTTR 6 kelas komponen (DATA.reliability.components — IEEE-493)',
+        formulaTemplate: 'average MTTR of 6 component classes (DATA.reliability.components — IEEE-493)',
         get: () => relPageModel()?.mttrAvg ?? null,
     },
     'rel.score': {
         label: 'Reliability Score', page: 'reliability', unit: '/100', provenance: 'derived',
-        formulaTemplate: '40 × margin availability (posisi rel.composedAvailability vs rel.tierTarget) + 30 × min(1, paths ÷ 2) + 15 × maintainability (rel.mttrAvg ≤ 12 h) + 15 × faktor SPOF — komposit terdokumentasi halaman',
+        formulaTemplate: '40 × availability margin (rel.composedAvailability position vs rel.tierTarget) + 30 × min(1, paths ÷ 2) + 15 × maintainability (rel.mttrAvg ≤ 12 h) + 15 × SPOF factor — documented page composite',
         deps: ['rel.composedAvailability', 'rel.tierTarget', 'rel.mttrAvg'],
         get: () => relPageModel()?.score ?? null,
     },
 
-    /* DASHBOARD Schedule & Milestones — durasi fase CPM (CapexEngine.computeTimeline) */
+    /* DASHBOARD Schedule & Milestones — CPM phase durations (CapexEngine.computeTimeline) */
     'constr.phaseDesignMo': {
-        label: 'Design & Engineering (durasi)', page: 'construction', unit: 'mo', provenance: 'engine',
-        formulaTemplate: 'CPM engine: base durasi design per redundansi (N 4 · N+1 5 · 2N 6 · 2N+1 7 bln) — CapexEngine.computeTimeline',
+        label: 'Design & Engineering (duration)', page: 'construction', unit: 'mo', provenance: 'engine',
+        formulaTemplate: 'CPM engine: base design duration per redundancy (N 4 · N+1 5 · 2N 6 · 2N+1 7 mo) — CapexEngine.computeTimeline',
         get: () => phaseDurMo('Design & Engineering'),
     },
     'constr.phasePermitMo': {
-        label: 'Permitting (durasi)', page: 'construction', unit: 'mo', provenance: 'engine',
-        formulaTemplate: 'CPM engine: base permit (3–4 bln per redundansi) × multiplier regional 1.4 (SEA/India/China/Japan/Australia) — CapexEngine.computeTimeline',
+        label: 'Permitting (duration)', page: 'construction', unit: 'mo', provenance: 'engine',
+        formulaTemplate: 'CPM engine: base permit (3–4 mo per redundancy) × regional multiplier 1.4 (SEA/India/China/Japan/Australia) — CapexEngine.computeTimeline',
         get: () => phaseDurMo('Permitting'),
     },
     'constr.phaseCivilMo': {
-        label: 'Civil Construction (durasi)', page: 'construction', unit: 'mo', provenance: 'engine',
-        formulaTemplate: 'CPM engine: base civil (8–14 bln per redundansi) × multiplier tipe bangunan (warehouse 0.7 · modular 0.6 · highrise 1.4) — CapexEngine.computeTimeline',
+        label: 'Civil Construction (duration)', page: 'construction', unit: 'mo', provenance: 'engine',
+        formulaTemplate: 'CPM engine: base civil (8–14 mo per redundancy) × building-type multiplier (warehouse 0.7 · modular 0.6 · highrise 1.4) — CapexEngine.computeTimeline',
         get: () => phaseDurMo('Civil Construction'),
     },
     'constr.phaseMepMo': {
-        label: 'MEP Installation (durasi)', page: 'construction', unit: 'mo', provenance: 'engine',
-        formulaTemplate: 'CPM engine: base MEP (6–12 bln per redundansi) × multiplier cooling (liquid 1.3) — CapexEngine.computeTimeline',
+        label: 'MEP Installation (duration)', page: 'construction', unit: 'mo', provenance: 'engine',
+        formulaTemplate: 'CPM engine: base MEP (6–12 mo per redundancy) × cooling multiplier (liquid 1.3) — CapexEngine.computeTimeline',
         get: () => phaseDurMo('MEP Installation'),
     },
     'constr.phaseCxMo': {
-        label: 'Commissioning (durasi)', page: 'construction', unit: 'mo', provenance: 'engine',
-        formulaTemplate: 'CPM engine: base commissioning per redundansi (N 2 · N+1 3 · 2N 4 · 2N+1 5 bln) — CapexEngine.computeTimeline',
+        label: 'Commissioning (duration)', page: 'construction', unit: 'mo', provenance: 'engine',
+        formulaTemplate: 'CPM engine: base commissioning per redundancy (N 2 · N+1 3 · 2N 4 · 2N+1 5 mo) — CapexEngine.computeTimeline',
         get: () => phaseDurMo('Commissioning'),
     },
 
-    /* ARCHITECTURE BOM — sisa kelas equipment (engine equipScale, sama seperti arch.eq*) */
+    /* ARCHITECTURE BOM — remaining equipment classes (engine equipScale, same as arch.eq*) */
     'arch.eqSts': {
         label: 'STS (BOM)', page: 'architecture', provenance: 'engine',
-        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah static transfer switch',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, rack density bucket) — number of static transfer switches',
         deps: ['sim.itLoad'],
         get: () => assetEquip()?.sts ?? null,
     },
     'arch.eqPumps': {
         label: 'Pumps / CDU (BOM)', page: 'architecture', provenance: 'engine',
-        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah pompa / CDU',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, rack density bucket) — number of pumps / CDUs',
         deps: ['sim.itLoad'],
         get: () => assetEquip()?.pumps ?? null,
     },
     'arch.eqCoolingUnits': {
         label: 'Cooling Units (BOM)', page: 'architecture', provenance: 'engine',
-        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah CRAC/CRAH unit',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, rack density bucket) — number of CRAC/CRAH units',
         deps: ['sim.itLoad'],
         get: () => assetEquip()?.cooling_units ?? null,
     },
     'arch.eqAhu': {
         label: 'AHU (BOM)', page: 'architecture', provenance: 'engine',
-        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah air handling unit',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, rack density bucket) — number of air handling units',
         deps: ['sim.itLoad'],
         get: () => assetEquip()?.ahu ?? null,
     },
     'arch.eqFireZones': {
         label: 'Fire Zones (BOM)', page: 'architecture', provenance: 'engine',
-        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, bucket rack density) — jumlah zona fire suppression',
+        formulaTemplate: 'models.commissioning.equipScale(sim.itLoad, rack density bucket) — number of fire suppression zones',
         deps: ['sim.itLoad'],
         get: () => assetEquip()?.fireZones ?? null,
     },
@@ -975,23 +975,23 @@ export const TRACE: Record<string, TraceNode> = {
     /* STAFFING page KPIs + Efficiency Metrics (mirror StaffingDashboard memo) */
     'staff.weeklyHours': {
         label: 'Avg Weekly Hours (effective)', page: 'staff', unit: 'h/wk', provenance: 'derived',
-        formulaTemplate: 'properti pola shift terpilih: 8h Continental = 42 jam efektif (incl. 1.5h OT handover) · 12h 4-on/3-off = 40 jam (zero OT)',
+        formulaTemplate: 'property of the selected shift pattern: 8h Continental = 42 effective hours (incl. 1.5h OT handover) · 12h 4-on/3-off = 40 hours (zero OT)',
         get: () => (sim().inputs.shiftModel === '8h' ? 42 : 40),
     },
     'staff.tco5yr': {
-        label: '5-Year Staffing TCO (kumulatif)', page: 'staff', unit: '$', provenance: 'derived',
-        formulaTemplate: 'Σ tahun 0–5: staff.monthlyCost × 12 × (1 + eskalasi upah negara)^tahun — 6 titik proyeksi ShiftEngine generate5YearProjection',
+        label: '5-Year Staffing TCO (cumulative)', page: 'staff', unit: '$', provenance: 'derived',
+        formulaTemplate: 'Σ years 0–5: staff.monthlyCost × 12 × (1 + country wage escalation)^year — 6 projection points ShiftEngine generate5YearProjection',
         deps: ['staff.monthlyCost'],
         get: () => staffTco5yr(),
     },
     'staff.utilizationPct': {
         label: 'Utilization Rate', page: 'staff', unit: '%', provenance: 'engine',
-        formulaTemplate: '(1 − shrinkage factor negara (DATA labor — break/training/cuti)) × 100',
+        formulaTemplate: '(1 − country shrinkage factor (DATA labor — break/training/leave)) × 100',
         get: () => { const s = staffShrinkage(); return s == null ? null : +((1 - s) * 100).toFixed(0); },
     },
     'staff.costPerMw': {
         label: 'Cost per MW', page: 'staff', unit: '$/MW/mo', provenance: 'derived',
-        formulaTemplate: 'staff.monthlyCost ÷ max(0.5, sim.itLoad ÷ 1000) — payroll bulanan per MW IT (fixed 2026-07-20; sebelumnya tampilan membagi 1)',
+        formulaTemplate: 'staff.monthlyCost ÷ max(0.5, sim.itLoad ÷ 1000) — monthly payroll per MW IT (fixed 2026-07-20; previously the display divided by 1)',
         deps: ['staff.monthlyCost', 'sim.itLoad'],
         get: () => {
             const p = staffCostParts();
@@ -1001,13 +1001,13 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'staff.otRatioPct': {
         label: 'OT Ratio', page: 'staff', unit: '%', provenance: 'derived',
-        formulaTemplate: 'Σ komponen overtime per role (ShiftEngine breakdown) ÷ staff.monthlyCost × 100',
+        formulaTemplate: 'Σ overtime component per role (ShiftEngine breakdown) ÷ staff.monthlyCost × 100',
         deps: ['staff.monthlyCost'],
         get: () => { const p = staffCostParts(); return p && p.total > 0 ? +((p.ot / p.total) * 100).toFixed(1) : p ? 0 : null; },
     },
     'staff.shrinkageLoss': {
         label: 'Shrinkage Loss /mo', page: 'staff', unit: '$/mo', provenance: 'derived',
-        formulaTemplate: 'staff.monthlyCost × shrinkage factor negara (staff.utilizationPct = 100% − faktor)',
+        formulaTemplate: 'staff.monthlyCost × country shrinkage factor (staff.utilizationPct = 100% − factor)',
         deps: ['staff.monthlyCost', 'staff.utilizationPct'],
         get: () => {
             const p = staffCostParts(); const s = staffShrinkage();
@@ -1016,147 +1016,147 @@ export const TRACE: Record<string, TraceNode> = {
     },
 
     /* ── EB-walk4 wave (append-only): KPI ƒx Maintenance / Investment /
-     * Phased Financial / Asset Intelligence — halaman 0-coverage pada walk
-     * probe. Setiap get() MENIRU persis rantai model halaman pemilik; bila KPI
-     * bergantung state LOKAL halaman (pencil-mode / panel parameter / slider),
-     * trace memakai basis default halaman — didokumentasikan per node. ────── */
+     * Phased Financial / Asset Intelligence — pages at 0-coverage on the walk
+     * probe. Each get() MIRRORS the owning page's model chain exactly; when a KPI
+     * depends on page-LOCAL state (pencil-mode / parameter panel / slider),
+     * the trace uses the page defaults — documented per node. ─────────────── */
 
-    /* MAINTENANCE page KPI row (fleet auto-generated dari desain; pencil-mode
-     * manual counts adalah state lokal halaman — trace basis auto-generate) */
+    /* MAINTENANCE page KPI row (fleet auto-generated from the design; pencil-mode
+     * manual counts are page-local state — trace basis is the auto-generated fleet) */
     'maint.plannedHours': {
         label: 'Planned Maintenance Hours /yr', page: 'maint', unit: 'h', provenance: 'derived',
-        formulaTemplate: 'Σ durasi event jadwal SFG20 (standard hours per task × unit per batch) — jadwal dari fleet auto-generate (sim.itLoad, sim.tierLevel, cooling, redundansi)',
+        formulaTemplate: 'Σ SFG20 schedule event durations (standard hours per task × units per batch) — schedule from auto-generated fleet (sim.itLoad, sim.tierLevel, cooling, redundancy)',
         deps: ['sim.itLoad', 'sim.tierLevel'],
         get: () => maintModel()?.hours ?? null,
     },
     'maint.events': {
         label: 'Maintenance Events /yr', page: 'maint', provenance: 'derived',
-        formulaTemplate: 'jumlah event jadwal SFG20 per tahun — regime per kelas asset × jumlah unit fleet (auto-generate dari sim.itLoad; edit manual pencil-mode tidak tercermin di trace)',
+        formulaTemplate: 'number of SFG20 schedule events per year — regime per asset class × fleet unit count (auto-generated from sim.itLoad; manual pencil-mode edits are not reflected in the trace)',
         deps: ['sim.itLoad'],
         get: () => maintModel()?.events ?? null,
     },
     'maint.activeAssets': {
         label: 'Active Assets (fleet)', page: 'maint', provenance: 'derived',
-        formulaTemplate: 'Σ unit per kelas asset — AssetGenerator scale-aware (CRAC/CRAH/fan-wall block per skala MW, chiller, genset, UPS, dll) dari sim.itLoad, sim.tierLevel, cooling topology, redundansi power',
+        formulaTemplate: 'Σ units per asset class — AssetGenerator scale-aware (CRAC/CRAH/fan-wall block per MW scale, chiller, genset, UPS, etc.) from sim.itLoad, sim.tierLevel, cooling topology, power redundancy',
         deps: ['sim.itLoad', 'sim.tierLevel'],
         get: () => maintModel()?.units ?? null,
     },
     'maint.annualBudget': {
-        label: 'Annual Maintenance Budget (strategi terpilih)', page: 'maint', unit: '$', provenance: 'derived',
-        formulaTemplate: 'strategi terpilih (reactive/planned/predictive): labor (maint.plannedHours × tarif labor negara × multiplier model in-house/hybrid/vendor) + parts + downtime risk — MaintenanceStrategyEngine, ekonomi DATA.maintenance bersumber',
+        label: 'Annual Maintenance Budget (selected strategy)', page: 'maint', unit: '$', provenance: 'derived',
+        formulaTemplate: 'selected strategy (reactive/planned/predictive): labor (maint.plannedHours × country labor rate × in-house/hybrid/vendor model multiplier) + parts + downtime risk — MaintenanceStrategyEngine, sourced DATA.maintenance economics',
         deps: ['maint.plannedHours'],
         get: () => maintModel()?.annualBudget ?? null,
     },
     'maint.fiveYearSavings': {
         label: '5-Year Savings (optimal vs worst)', page: 'maint', unit: '$', provenance: 'derived',
-        formulaTemplate: 'NPV 5 thn strategi terburuk − NPV 5 thn strategi terbaik (diskonto 8%, eskalasi biaya 3%; CBM menambah sensor CAPEX) — biaya labor tiap strategi dari maint.plannedHours; perbandingan 3 strategi MaintenanceStrategyEngine',
+        formulaTemplate: '5-yr NPV of the worst strategy − 5-yr NPV of the best strategy (8% discount, 3% cost escalation; CBM adds sensor CAPEX) — labor cost of each strategy from maint.plannedHours; 3-strategy comparison MaintenanceStrategyEngine',
         deps: ['maint.plannedHours'],
         get: () => maintModel()?.fiveYearSavings ?? null,
     },
 
-    /* INVESTMENT page KPI rows (basis trace: panel parameter halaman pada nilai
-     * DEFAULT — debt 65% · cost of debt 5% · term 12 thn · CoE 12% · exit thn-7
-     * @18× EBITDA · rev $150/kW·bln · tax 25% · life 10 thn; ubah slider di
-     * halaman untuk skenario lain — state lokal, tidak tercermin di trace) */
+    /* INVESTMENT page KPI rows (trace basis: page parameter panel at DEFAULT
+     * values — debt 65% · cost of debt 5% · term 12 yr · CoE 12% · exit yr-7
+     * @18× EBITDA · rev $150/kW·mo · tax 25% · life 10 yr; change the sliders on
+     * the page for other scenarios — local state, not reflected in the trace) */
     'inv.totalDebt': {
         label: 'Debt Amount', page: 'invest', unit: '$', provenance: 'derived',
-        formulaTemplate: 'capex.total × debt ratio (basis trace: default 65%)',
+        formulaTemplate: 'capex.total × debt ratio (trace basis: default 65%)',
         deps: ['capex.total'],
         get: () => { const m = invModel(); return m ? Math.round(m.totalDebt) : null; },
     },
     'inv.totalEquity': {
         label: 'Equity Required', page: 'invest', unit: '$', provenance: 'derived',
-        formulaTemplate: 'capex.total × (1 − debt ratio) (basis trace: default 35% equity)',
+        formulaTemplate: 'capex.total × (1 − debt ratio) (trace basis: default 35% equity)',
         deps: ['capex.total'],
         get: () => { const m = invModel(); return m ? Math.round(m.totalEquity) : null; },
     },
     'inv.wacc': {
         label: 'WACC', page: 'invest', unit: '%', provenance: 'derived',
-        formulaTemplate: 'debt ratio × cost of debt × (1 − tax) + equity ratio × cost of equity — basis trace default: 65% × 5% × 75% + 35% × 12%',
+        formulaTemplate: 'debt ratio × cost of debt × (1 − tax) + equity ratio × cost of equity — trace basis default: 65% × 5% × 75% + 35% × 12%',
         get: () => { const m = invModel(); return m ? +(m.wacc * 100).toFixed(1) : null; },
     },
     'inv.equityIrr': {
         label: 'Equity IRR (levered)', page: 'invest', unit: '%', provenance: 'derived',
-        formulaTemplate: 'IRR arus kas equity: tahun-0 −inv.totalEquity; tahunan = FCF unlevered (pendapatan sim.itLoad × $150/kW·bln × ramp okupansi − OPEX − pajak; depresiasi dari capex.total) − debt service; + exit thn-7 @18× EBITDA − sisa utang',
+        formulaTemplate: 'IRR of equity cashflow: year-0 −inv.totalEquity; annual = unlevered FCF (revenue sim.itLoad × $150/kW·mo × occupancy ramp − OPEX − tax; depreciation from capex.total) − debt service; + exit yr-7 @18× EBITDA − remaining debt',
         deps: ['inv.totalEquity', 'sim.itLoad', 'capex.total'],
         get: () => { const m = invModel(); return m ? +m.equityIRR.toFixed(1) : null; },
     },
     'inv.moic': {
         label: 'MOIC', page: 'invest', unit: 'x', provenance: 'derived',
-        formulaTemplate: '(Σ distribusi levered FCF + nilai equity saat exit) ÷ inv.totalEquity',
+        formulaTemplate: '(Σ levered FCF distributions + equity value at exit) ÷ inv.totalEquity',
         deps: ['inv.totalEquity'],
         get: () => { const m = invModel(); return m && Number.isFinite(m.moic) ? +m.moic.toFixed(2) : null; },
     },
     'inv.minDscr': {
         label: 'Min DSCR', page: 'invest', unit: 'x', provenance: 'derived',
-        formulaTemplate: 'min tahunan (EBITDA ÷ debt service) sepanjang tenor utang — debt service anuitas dari inv.totalDebt @5%, 12 thn; covenant lender tipikal 1.25x',
+        formulaTemplate: 'annual min (EBITDA ÷ debt service) over the debt tenor — annuity debt service from inv.totalDebt @5%, 12 yr; typical lender covenant 1.25x',
         deps: ['inv.totalDebt'],
         get: () => { const m = invModel(); return m && Number.isFinite(m.minDSCR) ? +m.minDSCR.toFixed(2) : null; },
     },
     'inv.year1CoC': {
         label: 'Y1 Cash-on-Cash', page: 'invest', unit: '%', provenance: 'derived',
-        formulaTemplate: 'levered FCF tahun-1 ÷ inv.totalEquity × 100',
+        formulaTemplate: 'year-1 levered FCF ÷ inv.totalEquity × 100',
         deps: ['inv.totalEquity'],
         get: () => { const m = invModel(); return m ? +m.year1CashOnCash.toFixed(1) : null; },
     },
 
-    /* PHASED FINANCE page KPI row (mirror memo halaman: capacity plan per fase →
-     * adjustment lintas modul (disaster/grid/talent) → calculateFinancials per
-     * fase 20 thn → agregasi blended berbobot CAPEX) */
+    /* PHASED FINANCE page KPI row (mirrors the page memo: capacity plan per phase →
+     * cross-module adjustment (disaster/grid/talent) → calculateFinancials per
+     * phase 20 yr → CAPEX-weighted blended aggregation) */
     'pf.totalCapex': {
-        label: 'Total Investment (Σ fase)', page: 'phased-finance', unit: '$', provenance: 'derived',
-        formulaTemplate: 'Σ CAPEX fase — CapacityPlanningEngine ($/kW dasar × mult tier (sim.tierLevel) × mult cooling × construction index negara × kW fase) + alokasi structural adder risiko bencana per fase',
+        label: 'Total Investment (Σ phases)', page: 'phased-finance', unit: '$', provenance: 'derived',
+        formulaTemplate: 'Σ phase CAPEX — CapacityPlanningEngine (base $/kW × tier mult (sim.tierLevel) × cooling mult × country construction index × phase kW) + per-phase allocation of the disaster-risk structural adder',
         deps: ['sim.tierLevel'],
         get: () => pfModel()?.capex ?? null,
     },
     'pf.blendedIrr': {
         label: 'Blended IRR (weighted)', page: 'phased-finance', unit: '%', provenance: 'derived',
-        formulaTemplate: 'Σ IRR fase × (CAPEX fase ÷ pf.totalCapex) — IRR per fase dari DCF 20 thn: rev $150/kW·bln × ramp okupansi fase, OPEX + adder grid/asuransi/talent, diskonto 10% + premi risiko bencana, pajak efektif negara (insentif)',
+        formulaTemplate: 'Σ phase IRR × (phase CAPEX ÷ pf.totalCapex) — per-phase IRR from a 20-yr DCF: rev $150/kW·mo × phase occupancy ramp, OPEX + grid/insurance/talent adders, 10% discount + disaster-risk premium, country effective tax (incentives)',
         deps: ['pf.totalCapex'],
         get: () => pfModel()?.irr ?? null,
     },
     'pf.totalNpv': {
-        label: 'Total NPV (Σ fase)', page: 'phased-finance', unit: '$', provenance: 'derived',
-        formulaTemplate: 'Σ NPV fase pada discount rate risk-adjusted (10% + premi 0–2% per skor komposit risiko bencana negara) — DCF 20 thn per fase; modal = alokasi pf.totalCapex',
+        label: 'Total NPV (Σ phases)', page: 'phased-finance', unit: '$', provenance: 'derived',
+        formulaTemplate: 'Σ phase NPV at a risk-adjusted discount rate (10% + 0–2% premium per country disaster-risk composite score) — 20-yr DCF per phase; capital = pf.totalCapex allocation',
         deps: ['pf.totalCapex'],
         get: () => pfModel()?.npv ?? null,
     },
     'pf.payback': {
         label: 'Payback (weighted)', page: 'phased-finance', unit: 'yr', provenance: 'derived',
-        formulaTemplate: 'Σ payback fase × (CAPEX fase ÷ pf.totalCapex) — simple payback per fase dari kumulatif FCF',
+        formulaTemplate: 'Σ phase payback × (phase CAPEX ÷ pf.totalCapex) — simple payback per phase from cumulative FCF',
         deps: ['pf.totalCapex'],
         get: () => pfModel()?.payback ?? null,
     },
     'pf.pi': {
         label: 'Profitability Index', page: 'phased-finance', unit: 'x', provenance: 'derived',
-        formulaTemplate: '(pf.totalNpv + pf.totalCapex) ÷ pf.totalCapex — PV manfaat per $ investasi, clamp ≥0',
+        formulaTemplate: '(pf.totalNpv + pf.totalCapex) ÷ pf.totalCapex — PV of benefits per $ invested, clamp ≥0',
         deps: ['pf.totalNpv', 'pf.totalCapex'],
         get: () => pfModel()?.pi ?? null,
     },
 
-    /* ASSET INTELLIGENCE page — sisa KPI bucket kesehatan (basis trace: umur 3
-     * thn · kondisi 85% = default slider halaman, sama seperti asset.avgHealth) */
+    /* ASSET INTELLIGENCE page — remaining health-bucket KPIs (trace basis: age 3
+     * yr · condition 85% = page slider defaults, same as asset.avgHealth) */
     'asset.healthExcellentGood': {
         label: 'Units Excellent / Good (health ≥70)', page: 'asset-health', provenance: 'derived',
-        formulaTemplate: 'Σ unit kelas dengan health ≥70 (subset asset.fleetUnits) — health per kelas = models.asset.healthIndex (Weibull remaining-life + condition + duty) pada basis trace umur 3 thn · kondisi 85%',
+        formulaTemplate: 'Σ class units with health ≥70 (subset of asset.fleetUnits) — per-class health = models.asset.healthIndex (Weibull remaining-life + condition + duty) at trace basis age 3 yr · condition 85%',
         deps: ['asset.fleetUnits'],
         get: () => assetBuckets()?.exGood ?? null,
     },
     'asset.healthFair': {
         label: 'Units Fair (health 50–69)', page: 'asset-health', provenance: 'derived',
-        formulaTemplate: 'Σ unit kelas dengan health 50–69 (monitor; subset asset.fleetUnits) — models.asset.healthIndex pada basis trace umur 3 thn · kondisi 85%',
+        formulaTemplate: 'Σ class units with health 50–69 (monitor; subset of asset.fleetUnits) — models.asset.healthIndex at trace basis age 3 yr · condition 85%',
         deps: ['asset.fleetUnits'],
         get: () => assetBuckets()?.fair ?? null,
     },
     'asset.healthPoorCritical': {
         label: 'Units Poor / Critical (health <50)', page: 'asset-health', provenance: 'derived',
-        formulaTemplate: 'Σ unit kelas dengan health <50 (plan replacement; subset asset.fleetUnits) — models.asset.healthIndex pada basis trace umur 3 thn · kondisi 85%',
+        formulaTemplate: 'Σ class units with health <50 (plan replacement; subset of asset.fleetUnits) — models.asset.healthIndex at trace basis age 3 yr · condition 85%',
         deps: ['asset.fleetUnits'],
         get: () => assetBuckets()?.poorCrit ?? null,
     },
     'asset.atRiskUnits': {
         label: 'Units at Wear-Out Risk (Weibull CDF ≥25%)', page: 'asset-health', provenance: 'derived',
-        formulaTemplate: 'Σ unit kelas dengan probabilitas gagal kumulatif ≥25% (subset asset.fleetUnits) — models.asset.failureProbability (Weibull CDF) pada basis trace umur 3 thn',
+        formulaTemplate: 'Σ class units with cumulative failure probability ≥25% (subset of asset.fleetUnits) — models.asset.failureProbability (Weibull CDF) at trace basis age 3 yr',
         deps: ['asset.fleetUnits'],
         get: () => assetBuckets()?.atRisk ?? null,
     },
@@ -1986,23 +1986,23 @@ function assetBuckets(): { exGood: number; fair: number; poorCrit: number; atRis
 }
 
 /* ═══ CALIBRATION wave (Arc-1, append-bottom) — Model Calibration nodes ══════
- * Verdict/posisi headline dari section "Model Calibration — engine vs dunia
- * nyata" (BenchmarkDashboard). get() delegates to computeCalibration()
- * (lib/calibration.ts), yang mengevaluasi DATA.calibrationSpec — SUMBER
- * TUNGGAL yang sama dengan ship gate tools/test-model-calibration.mjs (satu
- * semantik rule; band = persentil korpus LIVE, bukan angka beku). Nilai
- * KONSTANTA engine (liquid tier3 / liquidCooledTier3) — sengaja TIDAK
- * bergantung cooling terpilih user, maka tanpa deps ke pue.design. */
+ * Headline verdict/position from the "Model Calibration — engine vs real world"
+ * section (BenchmarkDashboard). get() delegates to computeCalibration()
+ * (lib/calibration.ts), which evaluates DATA.calibrationSpec — the SAME SINGLE
+ * SOURCE as the ship gate tools/test-model-calibration.mjs (one rule semantics;
+ * band = LIVE corpus percentile, not a frozen number). These are engine
+ * CONSTANT values (liquid tier3 / liquidCooledTier3) — deliberately NOT
+ * dependent on the user's selected cooling, hence no deps to pue.design. */
 Object.assign(TRACE, {
     'calib.pueLiquidPctile': {
-        label: 'Kalibrasi PUE — posisi liquid tier3 di fleet hyperscale', page: 'benchmark', unit: 'pctile', provenance: 'engine',
-        formulaTemplate: 'pctileOf(DATA.pueMatrix.liquid.tier3, korpus pue.hyperscale p10–p90) — rule pueBand (DATA.calibrationSpec, mapping pue.design.vs.fleet): interpolasi persentil piecewise-linear vs distribusi fleet hyperscale LIVE (design-basis vs fleet-trailing, gap 5–15% expected); identik dengan output gate tools/test-model-calibration.mjs',
+        label: 'PUE Calibration — liquid tier3 position in the hyperscale fleet', page: 'benchmark', unit: 'pctile', provenance: 'engine',
+        formulaTemplate: 'pctileOf(DATA.pueMatrix.liquid.tier3, pue.hyperscale corpus p10–p90) — pueBand rule (DATA.calibrationSpec, mapping pue.design.vs.fleet): piecewise-linear percentile interpolation vs the LIVE hyperscale fleet distribution (design-basis vs fleet-trailing, gap 5–15% expected); identical to the output of gate tools/test-model-calibration.mjs',
         sourceKey: 'pueMatrix',
         get: () => computeCalibration()?.pueLiquidT3Pctile ?? null,
     },
     'calib.capexRatioFinance': {
-        label: 'Kalibrasi CAPEX — rasio korpus finance ÷ engine', page: 'benchmark', unit: 'x', provenance: 'engine',
-        formulaTemplate: '(investment_busd.finance.p50 × 1e9 ÷ capacity_mw.finance.p50) ÷ DATA.capexPerMw.liquidCooledTier3 — rule capexRatio (DATA.calibrationSpec, mapping capex.aggregate.ratio), band [1.0, 4.0] = scope total-project (land+IT+contingency+build) vs raw-build; agregat p50-per-p50, fakta korpus tidak berpasangan per dokumen',
+        label: 'CAPEX Calibration — finance corpus ÷ engine ratio', page: 'benchmark', unit: 'x', provenance: 'engine',
+        formulaTemplate: '(investment_busd.finance.p50 × 1e9 ÷ capacity_mw.finance.p50) ÷ DATA.capexPerMw.liquidCooledTier3 — capexRatio rule (DATA.calibrationSpec, mapping capex.aggregate.ratio), band [1.0, 4.0] = total-project scope (land+IT+contingency+build) vs raw-build; p50-per-p50 aggregate, corpus facts not paired per document',
         sourceKey: 'capexPerMw',
         get: () => computeCalibration()?.capexRatioFinance ?? null,
     },
