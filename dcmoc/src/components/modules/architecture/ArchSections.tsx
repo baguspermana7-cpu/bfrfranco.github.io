@@ -11,7 +11,7 @@ import React from 'react';
 import { rzModels } from '@/lib/rz-engine';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
-import { computeCompliance, referenceDesignId, type ArchInputs, type EquipCounts } from '@/state/adapters/arch-adapter';
+import { computeCompliance, referenceDesignId, redundancyTopologyLabel, type ArchInputs, type EquipCounts } from '@/state/adapters/arch-adapter';
 import { useScenarioStore } from '@/store/scenario';
 import { ChevronRight } from 'lucide-react';
 import { TraceValue } from '@/components/ui/TraceValue';
@@ -60,8 +60,9 @@ export function ThermalTopologyRow({ i }: { i: ArchInputs }) {
                 {topo ? (
                     <div className="space-y-1 text-[11px]">
                         <div className="flex justify-between gap-2"><span className="text-slate-500">Rating</span><span className="font-medium text-slate-800 dark:text-slate-200">{topo.tiaRating}</span></div>
-                        <div className="flex justify-between gap-2"><span className="text-slate-500">Power Path</span><span className="max-w-[60%] text-right text-slate-800 dark:text-slate-200">{topo.powerPath}</span></div>
-                        <div className="flex justify-between gap-2"><span className="text-slate-500">Cooling Path</span><span className="max-w-[60%] text-right text-slate-800 dark:text-slate-200">{topo.coolingPath}</span></div>
+                        <div className="flex justify-between gap-2"><span className="text-slate-500">Selected Redundancy</span><span className="font-medium text-slate-800 dark:text-slate-200">{i.redundancy}</span></div>
+                        <div className="flex justify-between gap-2"><span className="text-slate-500">Tier Power Path (baseline)</span><span className="max-w-[55%] text-right text-slate-800 dark:text-slate-200">{topo.powerPath}</span></div>
+                        <div className="flex justify-between gap-2"><span className="text-slate-500">Tier Cooling Path (baseline)</span><span className="max-w-[55%] text-right text-slate-800 dark:text-slate-200">{topo.coolingPath}</span></div>
                         <div className="flex justify-between gap-2"><span className="text-slate-500">Maintainability</span><span className="text-slate-800 dark:text-slate-200">{topo.maintainability}</span></div>
                         {floor != null && <div className="flex justify-between"><span className="text-slate-500">Floor Loading</span><span className="tabular-nums text-slate-800 dark:text-slate-200">{floor} kN/m²</span></div>}
                     </div>
@@ -132,11 +133,11 @@ export function BottomCards({ i, targetTier }: { i: ArchInputs; targetTier: 3 | 
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
     const scenarios = useScenarioStore((s) => s.scenarios);
     const compliance = computeCompliance(i, targetTier);
-    const m = rzModels()?.architecture;
-    let topoPath = '—';
-    try { topoPath = m?.topology ? (m.topology(i.tier)?.powerPath ?? '—') : '—'; } catch { /* */ }
+    /* Power Topology binds to sim.powerRedundancy — the SAME source the rail
+     * "Power Redundancy" row shows (was tier-only engine text, which said
+     * "N+1, dual-bus" while the summary said 2N). */
     const decisions: [string, string][] = [
-        ['Power Topology', topoPath],
+        ['Power Topology', redundancyTopologyLabel(i.redundancy, i.tier)],
         ['Cooling Strategy', { liquid: 'D2C liquid cooling', rdhx: 'Rear-door HX', inrow: 'In-row cooling', air: 'CRAC/CRAH air' }[i.coolingType]],
         ['Rack Configuration', `${Math.ceil(i.itLoadKw / i.rackDensityKw).toLocaleString()} racks @ ${i.rackDensityKw} kW`],
         ['PDU Topology', `${i.redKey === '2n1' ? '3' : '2'}× lettered groups · ${i.redundancy}`],

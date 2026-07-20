@@ -116,7 +116,17 @@ export function useDashboardData(): DashboardData {
             const cf5 = financial.cashflows?.[4];
             ebitda = cf5 ? Math.round(cf5.ebitda) : null;
         }
-        try { if (m.tco?.totalCost && capex?.total && opexAnnual) lcc = Math.round(m.tco.totalCost(capex.total, opexAnnual, 15, 0.10)); } catch { }
+        /* LCC (audit #13 fix, 2026-07-20): the engine has NO models.tco.totalCost —
+         * the guard was permanently false, so the card always showed "—". The real
+         * engine fn with the intended semantics (discounted TCO incl. 5-yr refresh
+         * cycles) is models.tco.lifecycleNPV(capex, opexAnnual, years, { discountRate }).
+         * totalCost kept as first preference in case the engine ever ships it. */
+        try {
+            if (capex?.total && opexAnnual) {
+                if (m.tco?.totalCost) lcc = Math.round(m.tco.totalCost(capex.total, opexAnnual, 15, 0.10));
+                else if (m.tco?.lifecycleNPV) lcc = Math.round(m.tco.lifecycleNPV(capex.total, opexAnnual, 15, { discountRate: 0.10 }));
+            }
+        } catch { }
 
         return {
             country: selectedCountry?.name || '—', itLoadKw, itLoadMw, tier: inputs.tierLevel,

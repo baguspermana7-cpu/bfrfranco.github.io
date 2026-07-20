@@ -29,6 +29,7 @@ EXCLUDE_DIRS = {
 INCLUDE_SUBDIRS = {
     "dc-market": "dc-market",
     "id": "id",
+    "manual": "manual",
 }
 
 # Files to exclude
@@ -134,6 +135,10 @@ def get_priority_changefreq_subdir(subdir, fname):
         if fname == "index.html":
             return 0.85, "weekly"
         return 0.8, "monthly"
+    if subdir == "manual":
+        if fname == "index.html":
+            return 0.8, "weekly"
+        return 0.7, "monthly"
     return 0.7, "monthly"
 
 

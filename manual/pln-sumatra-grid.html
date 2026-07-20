@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>PLN Sumatera Grid Monitor — Methodology &amp; Data Basis | ResistanceZero</title>
+    <meta name="description" content="Full technical methodology for the PLN Sumatera 150/275 kV interconnected grid monitor: topology basis, node atlas, voltage levels, metric definitions, published data provenance, and Batam-Bintan island grid.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="PLN Sumatera grid methodology, Sumatra 275 kV interconnected, Batam-Bintan grid, Asahan hydro, Bukit Asam, Pangkalan Susu, Tarahan, RUPTL 2025-2034, PLN AR 2024, Medco Power">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/pln-sumatra-grid.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/pln-sumatra-grid.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/pln-sumatra-grid.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/pln-sumatra-grid.html">
+    <meta property="og:title" content="PLN Sumatera Grid Monitor — Methodology &amp; Data Basis">
+    <meta property="og:description" content="Topology basis, node atlas, voltage levels, metric definitions, and published data provenance behind the PLN Sumatera 150/275 kV interconnected grid monitor.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="PLN Sumatera Grid Monitor Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="PLN Sumatera Grid Monitor — Methodology">
+    <meta name="twitter:description" content="Topology basis, voltage levels, node atlas, metric definitions, and published data provenance for the Sumatera 275/150 kV grid monitor.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="PLN Sumatera Grid Monitor Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "PLN Sumatera Grid Monitor" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "PLN Sumatera Grid Monitor — Methodology & Data Basis",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Technical methodology for the PLN Sumatera 150/275 kV interconnected grid reference monitor",
+        "articleSection": "Power Grid",
+        "dependencies": "RUPTL PLN 2025-2034, PLN Annual Report 2024, IEC 60038, IEC 60287",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to read the PLN Sumatera Grid Monitor",
+        "step": [
+            { "@type": "HowToStep", "name": "Select a region or layer", "text": "Use the map layer toggles to filter by voltage (275 kV backbone, 150 kV regional, Batam island) or node type (substation, plant, DC cluster)." },
+            { "@type": "HowToStep", "name": "Read the node popup", "text": "Click any substation or plant marker to see its name, voltage, capacity (MVA or MW), operator, province, and confidence level." },
+            { "@type": "HowToStep", "name": "Consult the atlas table", "text": "The sortable atlas below the map lists all 31+ nodes with capacity, region, and provenance notes. Filter by province or node type." },
+            { "@type": "HowToStep", "name": "Check provenance", "text": "Each node is tagged high / medium / low confidence. High = published PLN filing or address; medium = area-geocoded from RUPTL/AR; low = inferred centroid." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Is the Batam grid connected to the mainland Sumatra grid?",
+                "acceptedAnswer": { "@type": "Answer", "text": "No. The Batam-Bintan-Rempang-Galang (Barelang) 150 kV grid is operated by b'right PLN Batam as a separate islanded system and is NOT synchronously interconnected to the mainland Sumatera 275/150 kV system. Its primary base-load is Medco Power's Panaran gas-fired plants and PLTU Tanjung Kasam." }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the data source for this monitor?",
+                "acceptedAnswer": { "@type": "Answer", "text": "All node capacities, voltage levels, and plant data are curated from RUPTL PLN 2025-2034, PLN Annual Report 2024, PLN UIP Sumbagut/Sumbagsel public filings, and public plant operator disclosures. This is a published-data reference monitor — not a live SCADA feed." }
+            },
+            {
+                "@type": "Question",
+                "name": "What does the confidence level mean on each node?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Confidence describes the geocoding certainty: 'high' means coordinates are from a published address or official filing; 'medium' means the location is area-geocoded from RUPTL/PLN AR region data; 'low' means the coordinate is inferred from a province/city centroid. Capacity figures carry the same three-level provenance tag in the source dataset." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../pln-sumatra-grid.html" class="nav-link">PLN Sumatera Grid</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / PLN Sumatera Grid
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Power Grid</p>
+            <h1>PLN Sumatera Grid Monitor — Methodology &amp; Data Basis</h1>
+            <p>Every topological choice, metric definition, node, voltage level, and data source behind the PLN Sumatera 150/275 kV interconnected grid monitor. This is a <strong>published-data reference monitor</strong> curated from RUPTL 2025-2034 and PLN AR 2024 — not a live SCADA feed, not an AC power-flow solver. All coordinates are city/plant centroids (approximate); all capacities are as published.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Dataset <strong>v2026-06-26</strong></span>
+                <span class="mn-chip">Nodes <strong>31</strong></span>
+                <span class="mn-chip">Voltage levels <strong>275 kV / 150 kV / 20 kV</strong></span>
+                <span class="mn-chip">Basis <strong>RUPTL 2025-2034 · PLN AR 2024</strong></span>
+            </div>
+            <a class="mn-toollink" href="../pln-sumatra-grid.html">▶ Open the live grid monitor</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The PLN Sumatera Grid Monitor is a <strong>published-data reference tool for data-center siting analysis</strong>. It answers three questions: where is high-voltage transmission capacity available in Sumatera, which major generating plants (coal, gas, hydro) serve each load zone, and how does the separate Batam-Bintan island grid connect to DC-relevant demand clusters (Nongsa Digital Park, Medan edge, Palembang edge).</p>
+            <p class="mn-lead">The monitor renders a <strong>single-line diagram (SLD) approximation</strong> as an interactive Leaflet map. Nodes are substations, power plants, and DC clusters. Edges are transmission corridors at the published voltage level. No AC power-flow equations are executed; line impedances, short-circuit currents, and real-time loading are not modelled. The tool is a <strong>visual atlas and capacity reference</strong>, not a grid simulator.</p>
+            <p class="mn-lead">Basis of content: <strong>RUPTL PLN 2025-2034</strong> (Rencana Usaha Penyediaan Tenaga Listrik — PLN's 10-year power supply plan, publicly released), <strong>PLN Annual Report 2024</strong>, PLN UIP Sumbagut / Sumbagsel public capital-project filings, and public operator disclosures (Medco Power, b'right PLN Batam). Wikipedia plant infoboxes are used for geocoding cross-reference only — capacity figures always defer to RUPTL/PLN AR.</p>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs &amp; user controls</h2>
+            <p class="mn-lead">The monitor exposes layer and region filters. Selections drive which node markers and transmission edges are rendered on the Leaflet map; the atlas table below always shows the full dataset.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Control</th><th>Values</th><th>Effect</th></tr></thead>
+                <tbody>
+                    <tr><td>Voltage layer</td><td><code>275 kV</code> / <code>150 kV</code> / <code>Batam island</code> / <code>All</code></td><td>Filters edges to the selected voltage tier. 275 kV shows the north–centre–south backbone only; 150 kV shows regional distribution ties; Batam island isolates the separate islanded grid.</td></tr>
+                    <tr><td>Node type</td><td><code>Substations</code> / <code>Plants</code> / <code>DC clusters</code> / <code>All</code></td><td>Filters circle markers by <code>kind</code> field (<code>station</code>, <code>plant</code>, <code>dc</code>).</td></tr>
+                    <tr><td>Region / province</td><td>Aceh · North Sumatra · Riau · West Sumatra · Jambi · South Sumatra · Bengkulu · Lampung · Riau Islands</td><td>Highlights nodes in the selected province; map re-centres on the provincial bounding box.</td></tr>
+                    <tr><td>Map click / popup</td><td>Any node marker</td><td>Shows node name, kind, voltage, capacity (MVA or MW), operator, province, notes, and confidence level from <code>js/pln-sumatra-grid-data.js</code>.</td></tr>
+                    <tr><td>Scroll-wheel zoom</td><td>Enabled on first map click</td><td>Disabled on load to prevent accidental zoom during page scroll; activates on first map interaction.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Methodology — topology &amp; metric definitions</h2>
+            <p class="mn-lead">The grid is modelled as a <strong>node-edge graph</strong> stored in <code class="mn-mono">js/pln-sumatra-grid-data.js</code> (window object <code>PLN_SUMATRA_GRID</code>). The schema mirrors the Java-Bali monitor for consistency. No power-flow mathematics are applied; all quantities are as published.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Topology structure</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">G = (V, E)</span>
+                <span class="mn-eq">V  — nodes: substations (GI/GITET), power plants (PLTU/PLTGU/PLTA), DC clusters</span>
+                <span class="mn-eq">E  — edges: transmission corridors tagged { from, to, voltage, island? }</span>
+                <span class="mn-where">North–centre–south backbone follows the published RUPTL corridor sequence: Aceh → Lhokseumawe → Pangkalan Susu → Binjai → Galang → Garuda Sakti (Pekanbaru) → Aur Duri (Jambi) → Muara Enim → Sutami (Lampung). Batam-Bintan edges are tagged <code>island:true</code> and rendered as dashed cyan lines to visually separate the islanded system.<span class="mn-src">RUPTL 2025-2034 · REFERENCE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Voltage level definitions (IEC 60038)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">275 kV — Extra High Voltage (EHV): long-distance inter-regional bulk transmission backbone</span>
+                <span class="mn-eq">150 kV — High Voltage (HV): sub-regional distribution and plant evacuation</span>
+                <span class="mn-eq"> 20 kV — Medium Voltage (MV): on-premises DC campus intake (metered at PLN boundary)</span>
+                <span class="mn-where">Voltage nominal values per IEC 60038:2009 Table 1 (AC systems). PLN's 275 kV backbone is the highest-voltage public transmission tier in Sumatera; 500 kV is used in Java-Bali but not yet commissioned in Sumatera per RUPTL 2025-2034.<span class="mn-src">IEC 60038 · STANDARD</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Hydro availability factor (displayed metric)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Availability% = (Actual energy output [MWh] / (Installed capacity [MW] × 8 760 h)) × 100</span>
+                <span class="mn-where">Where shown in node popups, the availability figure is the RUPTL/PLN AR quoted annual availability rate for the specific plant. It is a <strong>published figure</strong> taken directly from PLN documents — the monitor does not compute it from hydrology data. Sumatera hydro plants (Asahan, Singkarak) quote ~45–60% annual availability given seasonal Batang Asahan / Singkarak inflow variability.<span class="mn-src">PLN AR 2024 · REFERENCE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Tie-line flow (display only — no solver)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">P_tie [MW] — not computed; displayed as directional annotation where published in RUPTL</span>
+                <span class="mn-eq">Flow direction: South Sumatra (coal surplus) → North Sumatra (deficit) during peak demand</span>
+                <span class="mn-where">The monitor does NOT execute a DC or AC load-flow solver. Tie-line directions and approximate transfer limits are narrative annotations sourced from RUPTL congestion notes. Real transfer capacity is a function of line impedance, N-1 contingency limits, and real-time dispatch — none of which are modelled here.<span class="mn-src">RUPTL 2025-2034 · REFERENCE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Reserve margin (displayed statistic)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Reserve margin% = ((Installed capacity [MW] − Peak demand [MW]) / Peak demand [MW]) × 100</span>
+                <span class="mn-where">The aggregate Sumatera reserve margin shown in the stats bar is sourced directly from RUPTL 2025-2034 projected figures for the Sumatera system. It is a <strong>planning margin</strong>, not a real-time operating reserve. PLN typically targets ≥ 30% planning reserve for the Sumatera system per RUPTL guidance.<span class="mn-src">RUPTL 2025-2034 · REFERENCE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Node marker scaling</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Plant radius [px] = max(5, min(12, sqrt(MW) / 2))</span>
+                <span class="mn-eq">275 kV substation radius = 7 px · 150 kV substation radius = 5 px · DC cluster = 5 px</span>
+                <span class="mn-where">Marker radius is a visual encoding only — proportional to installed capacity for plants, fixed by voltage tier for substations. It is not a geographic scale.<span class="mn-src">REFERENCE</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants, node atlas &amp; data provenance</h2>
+            <p class="mn-lead">The dataset contains <strong>31 nodes</strong> across three system zones: North Sumatra (Sumbagut), Centre (Sumbagteng), South (Sumbagsel), and the separate Batam-Bintan (Barelang) island grid. Key plants and substations:</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Node</th><th>Kind</th><th>kV</th><th>Capacity</th><th>Fuel / type</th><th>Province</th><th>Confidence</th></tr></thead>
+                <tbody>
+                    <tr><td>PLTU Pangkalan Susu</td><td>Plant</td><td>275</td><td>800 MW</td><td>Coal</td><td>North Sumatra</td><td>high</td></tr>
+                    <tr><td>GITET Binjai</td><td>Substation</td><td>275</td><td>500 MVA</td><td>—</td><td>North Sumatra</td><td>medium</td></tr>
+                    <tr><td>GITET Galang</td><td>Substation</td><td>275</td><td>500 MVA</td><td>—</td><td>North Sumatra</td><td>medium</td></tr>
+                    <tr><td>PLTGU Belawan</td><td>Plant</td><td>150</td><td>1 100 MW</td><td>Gas (CCGT)</td><td>North Sumatra</td><td>high</td></tr>
+                    <tr><td>PLTA Asahan (Sigura-gura + Tangga)</td><td>Plant</td><td>150</td><td>603 MW</td><td>Hydro</td><td>North Sumatra</td><td>high</td></tr>
+                    <tr><td>GI Medan (metro)</td><td>Substation</td><td>150</td><td>500 MVA</td><td>—</td><td>North Sumatra</td><td>medium</td></tr>
+                    <tr><td>GITET Garuda Sakti (Pekanbaru)</td><td>Substation</td><td>275</td><td>500 MVA</td><td>—</td><td>Riau</td><td>medium</td></tr>
+                    <tr><td>PLTG Balai Pungut / Riau gas (Medco)</td><td>Plant</td><td>150</td><td>130 MW</td><td>Gas</td><td>Riau</td><td>low</td></tr>
+                    <tr><td>PLTA Singkarak</td><td>Plant</td><td>150</td><td>175 MW</td><td>Hydro</td><td>West Sumatra</td><td>high</td></tr>
+                    <tr><td>PLTU Ombilin</td><td>Plant</td><td>150</td><td>200 MW</td><td>Coal</td><td>West Sumatra</td><td>medium</td></tr>
+                    <tr><td>GITET Aur Duri (Jambi)</td><td>Substation</td><td>275</td><td>500 MVA</td><td>—</td><td>Jambi</td><td>medium</td></tr>
+                    <tr><td>PLTU Bukit Asam (Tanjung Enim)</td><td>Plant</td><td>275</td><td>1 900 MW</td><td>Coal (mine-mouth)</td><td>South Sumatra</td><td>high</td></tr>
+                    <tr><td>GITET Muara Enim</td><td>Substation</td><td>275</td><td>500 MVA</td><td>—</td><td>South Sumatra</td><td>medium</td></tr>
+                    <tr><td>PLTGU Gunung Megang / Sumsel gas (Medco)</td><td>Plant</td><td>150</td><td>80 MW</td><td>Gas</td><td>South Sumatra</td><td>low</td></tr>
+                    <tr><td>GI Palembang</td><td>Substation</td><td>150</td><td>500 MVA</td><td>—</td><td>South Sumatra</td><td>medium</td></tr>
+                    <tr><td>GITET Sutami (Lampung)</td><td>Substation</td><td>275</td><td>500 MVA</td><td>—</td><td>Lampung</td><td>medium</td></tr>
+                    <tr><td>PLTU Tarahan</td><td>Plant</td><td>150</td><td>200 MW</td><td>Coal</td><td>Lampung</td><td>high</td></tr>
+                    <tr><td>GI Bandar Lampung</td><td>Substation</td><td>150</td><td>300 MVA</td><td>—</td><td>Lampung</td><td>medium</td></tr>
+                    <tr><td>PLTGU Panaran (Medco Power)</td><td>Plant</td><td>150</td><td>165 MW</td><td>Gas · island</td><td>Riau Islands</td><td>high</td></tr>
+                    <tr><td>PLTU Tanjung Kasam</td><td>Plant</td><td>150</td><td>110 MW</td><td>Coal · island</td><td>Riau Islands</td><td>medium</td></tr>
+                    <tr><td>GI Batam Centre</td><td>Substation</td><td>150</td><td>300 MVA</td><td>— · island</td><td>Riau Islands</td><td>medium</td></tr>
+                    <tr><td>Batam DC cluster (Nongsa / data island)</td><td>DC</td><td>20</td><td>40 MW</td><td>— · island</td><td>Riau Islands</td><td>medium</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Confidence levels:</strong> <strong>high</strong> = capacity from a published PLN filing or official operator disclosure; <strong>medium</strong> = area-geocoded from RUPTL/PLN AR regional data (coordinates accurate to city/district level); <strong>low</strong> = capacity or coordinate inferred from a province centroid or secondary industry source. All low-confidence entries are visually distinguished in the atlas notes column.</div>
+            <div class="mn-note"><strong>Batam-Bintan island grid:</strong> Operated by <strong>b'right PLN Batam</strong> (formerly Bright PLN Batam). System frequency and dispatch are fully independent of the mainland Sumatera interconnected system. <strong>Medco Power</strong> operates the Panaran I &amp; II gas-fired peakers (165 MW combined) as the island's key dispatchable base-load. The Nongsa Digital Park subsea-cable DC hub is the primary large-load growth driver per PLN Batam's published capacity plans.</div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Derivation</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>Substation count</td><td>Count of nodes where <code>kind === 'station'</code></td><td>count</td><td>Total mapped 150/275 kV substations in the dataset.</td></tr>
+                    <tr><td>Power plant count</td><td>Count of nodes where <code>kind === 'plant'</code></td><td>count</td><td>Total mapped generation points (all fuels).</td></tr>
+                    <tr><td>Mapped generation</td><td>Sum of <code>node.mw</code> for all plant nodes</td><td>MW</td><td>Total installed capacity represented in the dataset. Not a system total — only nodes curated from RUPTL are included.</td></tr>
+                    <tr><td>275 kV nodes</td><td>Count of nodes where <code>voltage === 275</code></td><td>count</td><td>Backbone EHV nodes in the mainland system.</td></tr>
+                    <tr><td>Batam island generation</td><td>Sum of <code>node.mw</code> for nodes where <code>island === true</code> and <code>kind === 'plant'</code></td><td>MW</td><td>Total mapped Batam-Bintan island generation capacity.</td></tr>
+                    <tr><td>Medco-operated MW</td><td>Sum of <code>node.mw</code> for nodes where <code>operator === 'Medco'</code></td><td>MW</td><td>Aggregate Medco Power generation footprint across Batam and Riau/Sumsel gas plants.</td></tr>
+                    <tr><td>Interactive map</td><td>Leaflet.js render of node/edge graph</td><td>visual</td><td>Colour-coded by voltage (275 kV = dark blue, 150 kV = blue, Batam = dashed cyan) and node type (substation = blue, coal plant = red, hydro = cyan, gas = amber, DC = purple).</td></tr>
+                    <tr><td>Atlas table</td><td>Sorted <code>G.nodes</code> array rendered as HTML table</td><td>visual</td><td>Full node list with capacity, province, and notes; province-sorted for regional scanning.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example — Batam-Bintan island grid reading</h2>
+            <p class="mn-lead">Reading the Batam-Bintan node cluster from published data, as the monitor presents it. This example shows how to interpret an islanded grid node set for DC-siting analysis.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Identify the island cluster:</strong> Filter the map to "Batam island" layer. Four nodes appear: GI Batam Centre (150 kV, 300 MVA), GI Tanjung Uncang (150 kV, 250 MVA), GI Tanjung Uban / Bintan (150 kV, 120 MVA), and Batam DC cluster (Nongsa, 20 kV, ~40 MW estimated).</li>
+                    <li><strong>Read generation:</strong> Two plant nodes — PLTGU Panaran / Medco Power (<span class="mn-result">165 MW gas</span>) and PLTU Tanjung Kasam (<span class="mn-result">110 MW coal</span>). Total mapped island generation: <span class="mn-result">275 MW</span>.</li>
+                    <li><strong>Isolation check:</strong> All island edges are tagged <code>island: true</code> and drawn as dashed cyan. No edge connects any Batam node to the mainland Sumatera 275/150 kV backbone — confirming the system is islanded (not synchronously interconnected).</li>
+                    <li><strong>DC load context:</strong> The Nongsa DC node is tagged <code>~40 MW estimated, confidence: medium</code> — drawn from public DC operator filings. This represents the Singapore-adjacent AI/edge load footprint as of 2024.</li>
+                    <li><strong>Provenance check:</strong> Panaran / Medco Power = <code>confidence: high</code> (Medco Power corporate disclosures + PLN Batam published capacity plan). Tanjung Uban = <code>confidence: low</code> — geocoded from Bintan island centroid, capacity from RUPTL regional estimate.</li>
+                    <li><strong>Planning reading:</strong> Island available capacity surplus ≈ <span class="mn-result">275 MW − 40 MW (DC) − other island loads ≈ constrained</span>. The RUPTL 2025-2034 notes a Batam-island capacity addition programme to support the Nongsa data-centre cluster growth. This is a planning signal, not an operational dispatch figure.</li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Engineering reading:</strong> the Batam grid's islanded status means every MW of new DC load competes directly with the island generation base. Unlike the mainland Sumatera backbone, there is no synchronous import path. New subsea interconnection to the mainland or new gas/renewable capacity on Batam is the only relief — both are flagged in RUPTL 2025-2034 as medium-term projects.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>RUPTL PLN 2025-2034</b> — Rencana Usaha Penyediaan Tenaga Listrik: primary capacity figures, plant commissioning schedule, transmission corridor plans (275 kV backbone, Batam capacity additions), and reserve margin projections for the Sumatera system.</li>
+                <li><b>PLN AR 2024</b> — PLN Annual Report 2024: installed capacity totals by system (Sumbagut / Sumbagteng / Sumbagsel), plant-level operational performance including availability rates, and b'right PLN Batam island generation summary.</li>
+                <li><b>PLN UIP Sumbagut / Sumbagsel filings</b> — Unit Induk Pembangunan public project filings: substation coordinates, 275 kV backbone project status (Galang–Garuda Sakti corridor, Sutami upgrade).</li>
+                <li><b>Medco Power corporate disclosures</b> — Medco Power Indonesia public disclosures: Panaran I &amp; II capacity (165 MW), Batam PPA counterparty (b'right PLN Batam), and Riau/Sumsel gas plant portfolio.</li>
+                <li><b>b'right PLN Batam capacity plan</b> — Batam island supply plan: Nongsa Digital Park load growth projection, PLTU Tanjung Kasam status, and new island generation pipeline.</li>
+                <li><b>IEC 60038:2009</b> — IEC Standard Voltages: nominal voltage definitions for EHV (275 kV), HV (150 kV), and MV (20 kV) tiers used in node classification.</li>
+                <li><b>IEC 60287 series</b> — Electric cables — Calculation of current rating: referenced for MV (20 kV) feeder cable rating context at DC campus intake; not directly computed by the monitor.</li>
+                <li><b>Dataset source</b> — <code class="mn-mono">js/pln-sumatra-grid-data.js</code> (window.PLN_SUMATRA_GRID, dataset v2026-06-26): 31 nodes, ~20 edges, disclaimer tag embedded in the dataset object.</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">This is a <strong>curated visualization built from published PLN documents</strong>. The following limitations apply and are documented in the dataset's embedded <code>disclaimer</code> field:</p>
+            <div class="mn-note"><strong>Not a live SCADA feed.</strong> No real-time generation dispatch, line loading, voltage levels, or contingency status are shown. All data is static and sourced from documents published as of mid-2025.</div>
+            <div class="mn-note"><strong>Coordinates are approximate.</strong> Node coordinates are city/plant centroids from published addresses or geographic centroids — not precise GPS survey coordinates. Transmission line routes on the map are straight-line segments between node centroids, not actual tower-by-tower alignments.</div>
+            <div class="mn-note"><strong>Partial topology.</strong> The dataset covers major 275 kV backbone nodes and significant 150 kV substations. Not every 150 kV switching station, distribution substation, or 70 kV node in the Sumatera system is included. The atlas is a representative reference, not a complete network inventory.</div>
+            <div class="mn-note"><strong>Capacity figures are as published.</strong> Installed capacity (MW for plants, MVA for substations) is taken directly from RUPTL/PLN AR — it is not a net-available capacity figure, does not account for planned or forced outages, and does not reflect seasonal hydro derating. Low-confidence nodes are tagged explicitly.</div>
+            <div class="mn-note"><strong>No power-flow computation.</strong> The monitor does not run a DC or AC load-flow solver. Tie-line transfer directions and reserve-margin figures are narrative annotations from RUPTL — not the output of a network solver. For real power-system studies, use licensed PSS/E, PowerWorld, or PSCAD models with authorised PLN data.</div>
+            <p class="mn-lead" style="margin-top:0.9rem;">This manual and the monitor are an <strong>engineering reference and data-centre siting aid</strong>; transmission adequacy assessments for a specific DC project require engagement with PLN's regional transmission unit (UIP/UID) and a connection study under PLN's published SPLN D3 connection standards.</p>
+        </section>
+
+        <a class="mn-toollink" href="../pln-sumatra-grid.html">▶ Open the live PLN Sumatera Grid Monitor</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../pln-sumatra-grid.html">PLN Sumatera Grid</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

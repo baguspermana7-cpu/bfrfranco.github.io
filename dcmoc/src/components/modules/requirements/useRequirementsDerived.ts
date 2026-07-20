@@ -18,7 +18,7 @@ export interface ReqDerived {
     validation: {
         completenessPct: number;
         have: string[]; missing: string[];
-        flags: { severity: 'critical' | 'warn'; message: string }[];
+        flags: { severity: 'critical' | 'warn'; message: string; field?: string }[];
         rackCount: number | null;
         recommendedTierFloor: number | null;
     } | null;
@@ -90,10 +90,10 @@ export function useRequirementsDerived(): ReqDerived {
                     completenessPct: v?.completeness?.pct ?? 0,
                     have: v?.completeness?.have ?? [],
                     missing: v?.completeness?.missing ?? [],
-                    flags: (v?.flags ?? []).map((f: { level?: string; severity?: string; message?: string } | string) =>
+                    flags: (v?.flags ?? []).map((f: { level?: string; severity?: string; message?: string; field?: string } | string) =>
                         typeof f === 'string'
                             ? { severity: 'warn' as const, message: f }
-                            : { severity: ((f.level ?? f.severity) === 'critical' ? 'critical' : 'warn') as 'critical' | 'warn', message: f.message ?? String(f) }),
+                            : { severity: ((f.level ?? f.severity) === 'critical' ? 'critical' : 'warn') as 'critical' | 'warn', message: f.message ?? String(f), field: f.field }),
                     rackCount: v?.rackCount ?? null,
                     recommendedTierFloor: v?.recommendedTierFloor ?? null,
                 };
@@ -147,21 +147,29 @@ export function useRequirementsDerived(): ReqDerived {
                 ? { label: 'Good', sub: 'Some fields need attention.' }
                 : { label: 'Incomplete', sub: `Complete required fields (${missingCount}).` };
 
-        /* deterministic insights */
+        /* deterministic insights — DEDUP rule: local rules and engine validation
+         * flags cover the same facts (density vs cooling ceiling, SLA vs tier);
+         * track which engine fields the local rules already covered and skip the
+         * matching flags so the rail never shows the same insight twice. */
         const insights: string[] = [];
+        const coveredFields = new Set<string>();
         if (w.workloadMix.aiGpu >= 50) insights.push(`Workload is AI-dominant (${w.workloadMix.aiGpu}%) with ${w.avgRackDensityKw} kW/rack density.`);
         const maxKw: Record<string, number> = d?.requirements?.coolingMaxRackKw ?? { air: 20, inrow: 30, rdhx: 50, liquid: 132, immersion: 200 };
         const ceil = maxKw[inputs.coolingType] ?? 20;
-        if (w.avgRackDensityKw > ceil) insights.push(`${w.avgRackDensityKw} kW/rack exceeds the ${inputs.coolingType} cooling ceiling (${ceil} kW) — liquid cooling required.`);
+        if (w.avgRackDensityKw > ceil) { insights.push(`${w.avgRackDensityKw} kW/rack exceeds the ${inputs.coolingType} cooling ceiling (${ceil} kW) — liquid cooling required.`); coveredFields.add('coolingType'); }
         else if (inputs.coolingType === 'liquid' && w.avgRackDensityKw >= 40) insights.push('Liquid cooling (D2C) matches the high-density band — optimal for this workload.');
         const sla = req.availability.slaTargetPct ?? tierTargetPct;
         if (sla <= tierTargetPct) insights.push(`Tier ${inputs.tierLevel === 4 ? 'IV' : inputs.tierLevel === 3 ? 'III' : 'II'} design suits the ${sla}% availability target (${downtimeMinYr} min/yr budget).`);
         else insights.push(`SLA ${sla}% exceeds Tier ${inputs.tierLevel} design availability (${tierTargetPct}%) — raise the tier.`);
+        coveredFields.add('slaUptimePct'); // both SLA branches emit a local insight
         const mw = itLoadKw / 1000;
         const recVolt = mw > 100 ? '132kV' : mw > 20 ? '33kV' : '11kV';
         if (o.gridVoltage !== recVolt && (recVolt === '132kV' || (recVolt === '33kV' && o.gridVoltage === '11kV')))
             insights.push(`Consider ${recVolt} utility intake for ${mw.toFixed(0)} MW — better scalability and losses.`);
-        validation?.flags.slice(0, 2).forEach((f) => insights.push(f.message));
+        validation?.flags
+            .filter((f) => !(f.field && coveredFields.has(f.field)) && !insights.includes(f.message))
+            .slice(0, 2)
+            .forEach((f) => insights.push(f.message));
 
         return {
             validation, score, scoreBand, insights: insights.slice(0, 5), sectionQuality,

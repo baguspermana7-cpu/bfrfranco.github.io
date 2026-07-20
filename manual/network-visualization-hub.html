@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Network Visualization Hub — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full technical methodology for the Network Visualization Hub: protocol parameters, frame structures, computed metrics (latency, link utilisation), constants, and references for Modbus, BACnet, OPC-UA, DNP3, PROFINET, EtherNet/IP, and EtherCAT.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="Modbus RTU, BACnet MSTP, OPC-UA, DNP3, PROFINET, EtherNet/IP, EtherCAT, industrial protocol methodology, network visualization, CompTIA Network+">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/network-visualization-hub.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/network-visualization-hub.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/network-visualization-hub.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/network-visualization-hub.html">
+    <meta property="og:title" content="Network Visualization Hub — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="Protocol parameters, frame structures, timing tables, and computed metrics behind the animated industrial protocol visualization labs: Modbus, BACnet, OPC-UA, DNP3, PROFINET, EtherNet/IP, EtherCAT.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="Network Visualization Hub Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Network Visualization Hub — Technical Manual">
+    <meta name="twitter:description" content="Protocol parameters, frame structures, and timing tables for Modbus, BACnet, OPC-UA, DNP3, PROFINET, EtherNet/IP, EtherCAT.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Network Visualization Hub Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "Network Visualization Hub" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Network Visualization Hub — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Industrial protocol visualizations: Modbus, BACnet, OPC-UA, DNP3, PROFINET, EtherNet/IP, EtherCAT — frame structures, timing tables, and computed metrics",
+        "articleSection": "Network & Protocols",
+        "dependencies": "IEC 61158, IEEE 1815, ASHRAE 135, IEC 62541, ODVA CIP, RFC 3393",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to interpret the Network Visualization Hub protocol labs",
+        "step": [
+            { "@type": "HowToStep", "name": "Select a protocol lane", "text": "Choose one of 5 lanes (Industrial OT, Foundations, DC Management, Security, APIs+Agents) or open compare mode for side-by-side analysis." },
+            { "@type": "HowToStep", "name": "Read the animated frame chip", "text": "Each animated chip segment corresponds to a real protocol field (e.g. Function Code, Length, CRC for Modbus; MBAP Transaction ID + Unit ID for Modbus TCP)." },
+            { "@type": "HowToStep", "name": "Check the computed metrics strip", "text": "In compare mode, the normalised instrument strip shows throughput (bps), per-frame latency (µs or ms), and header overhead (bytes) derived from the protocol parameters." },
+            { "@type": "HowToStep", "name": "Trigger a failure scenario", "text": "Use the failure scenario control where available to see CRC errors, token-loss recovery (BACnet MS/TP), unsolicited response retry (DNP3), or redundant path switchover." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Is the hub a calculator or a teaching tool?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Primarily a teaching tool. Each lane animates the real on-wire frame structure, timing, and addressing for each protocol. The compare mode derives a small set of computed metrics (bit-rate, per-frame latency, header overhead) from the canonical protocol parameters, but does not attempt to size a network or perform traffic engineering — that is out of scope." }
+            },
+            {
+                "@type": "Question",
+                "name": "How is per-frame latency estimated in compare mode?",
+                "acceptedAnswer": { "@type": "Answer", "text": "For serial protocols: t_frame = frame_bytes × 8 / baud_rate (µs). For Ethernet-based protocols: t_frame = frame_bytes × 8 / link_rate_bps. Propagation delay = cable_length_m / (2×10^8 m/s). Both are display metrics derived from the fixed protocol constants in the visualization; they are not field measurements." }
+            },
+            {
+                "@type": "Question",
+                "name": "Which protocols have redundant-path or failure-scenario support?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The Lane B Industrial OT labs visualize: BACnet MS/TP token-loss recovery (pass-token retry, claim-token), DNP3 unsolicited response retry, EtherCAT distributed-clock fault detection, and PROFINET media-redundancy ring failover. Modbus RTU/TCP CRC error and MBAP transaction-ID mismatch are also demonstrated." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../network-visualization-hub.html" class="nav-link">Network Hub</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / Network Visualization Hub
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Network &amp; Protocols</p>
+            <h1>Network Visualization Hub — Methodology</h1>
+            <p>Every protocol parameter, frame structure, timing basis, and computed display metric behind the animated industrial protocol labs. Modbus, BACnet, OPC-UA, DNP3, PROFINET, EtherNet/IP, EtherCAT — all anchored to their governing standards. This is primarily a <strong>teaching tool</strong>; formulas documented here drive the compare-mode instrument strip and the per-protocol timing animations, not a network-sizing calculator.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Lane B <strong>9 Industrial OT topics LIVE</strong></span>
+                <span class="mn-chip">Alignment <strong>CompTIA Net+ N10-009 · Sec+ SY0-701</strong></span>
+                <span class="mn-chip">Compare mode <strong>LIVE</strong></span>
+                <span class="mn-chip">Computed metrics <strong>latency · utilisation · overhead</strong></span>
+            </div>
+            <a class="mn-toollink" href="../network-visualization-hub.html">▶ Open the live Network Visualization Hub</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The Network Visualization Hub is an animated protocol teaching tool, not a network-sizing calculator. It renders the real on-wire frame structure, bit timing, addressing, and handshake choreography for each industrial and IT protocol, so learners can see <em>why</em> Modbus RTU has lower overhead than Modbus TCP, why BACnet MS/TP needs a token before transmitting, and why EtherCAT can achieve sub-millisecond cycle times where PROFINET IRT targets 1 ms.</p>
+            <p class="mn-lead">The Lane B Industrial OT set (9 protocols LIVE) is the primary focus of this manual. The compare mode derives a normalised instrument strip — throughput, per-frame latency, header overhead — from the canonical protocol parameters tabulated in §§ 3–4. All other lanes (A: Foundations, C: DC Management, D: Security, E: APIs+Agents) follow the same animation methodology but have no computed numeric strip beyond the visualisation itself.</p>
+            <p class="mn-lead">Alignment: <strong>CompTIA Network+ N10-009</strong> (industrial protocols, OSI model, TCP/IP, subnetting) and <strong>CompTIA Security+ SY0-701</strong> (TLS, OAuth, mTLS, zero-trust). Protocol specifications are the governing authority; CompTIA exam objectives provide the pedagogical framing.</p>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs &amp; controls</h2>
+            <p class="mn-lead">The hub has no numeric input fields — it is parameter-driven by the protocol constants embedded in each lab. User controls select the context; the visualisation responds deterministically.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Control</th><th>Type</th><th>Effect</th></tr></thead>
+                <tbody>
+                    <tr><td>Topic / protocol selector</td><td>Card click / lane nav</td><td>Loads the selected protocol animation lab. Each lab hard-codes the canonical frame for that protocol.</td></tr>
+                    <tr><td>Compare panel (compare mode)</td><td>Multi-select (up to 4)</td><td>Renders up to 4 protocol lanes side-by-side with a normalised instrument chip strip below each.</td></tr>
+                    <tr><td>Failure scenario toggle</td><td>Per-lab control (where present)</td><td>Triggers protocol-specific fault: CRC error (Modbus), token-loss (BACnet MS/TP), unsolicited retry (DNP3), ring failover (PROFINET), distributed-clock fault (EtherCAT).</td></tr>
+                    <tr><td>Theme (dark / light)</td><td>Global toggle</td><td>Switches canvas background and token colours. Instrument-cyan and signal-amber are preserved in both themes.</td></tr>
+                    <tr><td>Animation speed</td><td>Per-lab slider (where present)</td><td>Scales animation frame rate; does not change the protocol parameters or computed metrics.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>No user-entered protocol parameters:</strong> baud rates, frame sizes, and addresses shown in the animations are the standards-mandated or most-common values for each protocol, not user-configurable. This is by design — the goal is calibrated teaching, not a protocol analyser or traffic generator.</div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Methodology — computed display metrics</h2>
+            <p class="mn-lead">The compare mode instrument strip shows three computed metrics per protocol, derived entirely from the protocol constants in § 4. These are display metrics for comparison and education — not field measurements or engineering estimates for production traffic.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Serial-link frame transmission time</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">t_frame = frame_bytes × 8 / baud_rate        [µs]</span>
+                <span class="mn-where">Applies to Modbus RTU (RS-485), BACnet MS/TP (RS-485), DNP3 (serial). <code>frame_bytes</code> = PDU + framing overhead per standard. <code>baud_rate</code> from § 4 protocol table.<span class="mn-src">IEC 61158 · STANDARD</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Ethernet-link frame transmission time</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">t_frame = frame_bytes × 8 / link_rate_bps        [µs]</span>
+                <span class="mn-where">Applies to Modbus TCP, BACnet/IP, OPC-UA (TCP), PROFINET, EtherNet/IP, EtherCAT. <code>link_rate_bps</code> = 100 Mbps (100BASE-TX) or 1 Gbps (1000BASE-T) per lab configuration.<span class="mn-src">IEEE 802.3 · STANDARD</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">One-way propagation delay</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">t_prop = d / v_prop        [µs]</span>
+                <span class="mn-eq">v_prop ≈ 2 × 10⁸ m/s   (copper Ethernet, NVP ≈ 0.67c)</span>
+                <span class="mn-where">Used in the latency animation to show segment delay between nodes. <code>d</code> = segment length (visualisation default 100 m). This is a pure propagation estimate.<span class="mn-src">RFC 3393 · INFORMATIONAL</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Link utilisation (compare strip)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">utilisation% = (protocol_payload_bytes / frame_bytes) × 100</span>
+                <span class="mn-where">Shows what fraction of the on-wire frame is carrying application data vs. protocol overhead (headers, CRC, framing bytes). Displayed as a horizontal bar in the instrument strip.<span class="mn-src">Derived · no external standard</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Redundant-path count (topology annotation)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">redundant_paths = number of alternate physical paths in the topology diagram</span>
+                <span class="mn-where">A simple count displayed in the topology annotation panel. PROFINET MRP ring = 1 redundant path. EtherCAT ring = 1. Modbus bus (no ring) = 0. This is structural, not a computed metric.<span class="mn-src">IEC 61158 / IEC 62439 · STANDARD</span></span>
+            </div>
+
+            <div class="mn-note"><strong>Scope note:</strong> the hub does not compute round-trip time, jitter, queuing delay, or traffic engineering metrics. For those, use the RFC 3393 (IPPM) framework with actual field measurements. The compare-mode strip is a relative educational display only.</div>
+        </section>
+
+        <!-- 4. PROTOCOL PARAMETERS & TIMING TABLES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Protocol parameters &amp; constants</h2>
+            <p class="mn-lead">Every value the hub uses is sourced from the governing standard for that protocol. Constants are hard-coded in each lab; no back-solved or estimated values are used.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Lane B — Serial industrial protocols</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Protocol</th><th>Physical</th><th>Default baud</th><th>Address space</th><th>Max nodes</th><th>CRC type</th><th>Year / std</th></tr></thead>
+                <tbody>
+                    <tr><td>Modbus RTU</td><td>RS-485 half-duplex</td><td><code>9 600</code> bps (common); up to 115 200</td><td>1–247 (slave ID)</td><td>247</td><td>CRC-16/IBM (poly 0x8005)</td><td>1979 · Modicon spec</td></tr>
+                    <tr><td>BACnet MS/TP</td><td>RS-485 half-duplex</td><td><code>38 400</code> bps typical; 9 600–115 200</td><td>0–254 (MAC address)</td><td>128 (practical)</td><td>CRC-8 (header) + CRC-16 (data)</td><td>1995 · ASHRAE 135</td></tr>
+                    <tr><td>DNP3 (serial)</td><td>RS-485 / RS-232</td><td><code>9 600</code> bps; up to 115 200</td><td>0–65 519 (address)</td><td>Network-wide</td><td>CRC-16/DNP (poly 0x3D65)</td><td>1990 · IEEE 1815-2012</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Lane B — Ethernet industrial protocols</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Protocol</th><th>Transport</th><th>Frame overhead (bytes)</th><th>Payload max (bytes)</th><th>Cycle time target</th><th>Redundancy</th><th>Std</th></tr></thead>
+                <tbody>
+                    <tr><td>Modbus TCP</td><td>TCP/IP (port 502)</td><td>MBAP 7 + FC 1 = 8 typical header</td><td>253 (ADU data)</td><td>None mandated (poll-driven)</td><td>None built-in</td><td>Modbus.org spec</td></tr>
+                    <tr><td>BACnet/IP</td><td>UDP/IP (port 47808)</td><td>BVLC 4 + NPDU 2+ + APDU variable</td><td>1476 (1 500 − BVLC/NPDU)</td><td>None mandated</td><td>BACnet/IP failover (BBMD)</td><td>ASHRAE 135 / ISO 16484-5</td></tr>
+                    <tr><td>OPC-UA</td><td>TCP (port 4840) or HTTPS</td><td>UA Secure Channel + Message header ≥ 28</td><td>~65 000 (chunked)</td><td>Subscription period user-defined (≥ 0 ms)</td><td>Redundant server pairs</td><td>IEC 62541</td></tr>
+                    <tr><td>DNP3 (TCP)</td><td>TCP (port 20 000)</td><td>Data-link 10 + Transport 1 + App 2 = 13 min</td><td>249 per segment</td><td>None mandated</td><td>Dual-path (optional)</td><td>IEEE 1815-2012</td></tr>
+                    <tr><td>PROFINET RT</td><td>Ethernet (EtherType 0x8892)</td><td>~14 (Eth) + 4 (VLAN) + 2 (frame ID) = 20</td><td>1 440</td><td>1 ms (RT) / 250 µs (IRT)</td><td>MRP ring (IEC 62439-2)</td><td>IEC 61158-6-10</td></tr>
+                    <tr><td>EtherNet/IP</td><td>TCP (explicit) / UDP (implicit, port 2222)</td><td>ENIP 24 + CPF 12 + CIP variable</td><td>~1 460 (explicit); 504 (I/O)</td><td>RPI user-defined (min ~1 ms)</td><td>DLR ring (IEC 62439-6)</td><td>ODVA CIP Vol. 2</td></tr>
+                    <tr><td>EtherCAT</td><td>Ethernet (EtherType 0x88A4); or UDP</td><td>14 (Eth) + 2 (EtherCAT header) + per-datagram 10</td><td>44 bytes per datagram (process data)</td><td>31.25 µs min (DC sync)</td><td>Ring topology auto-close</td><td>IEC 61158-3-12 / IEC 61784-2</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">BACnet MS/TP token-passing timing constants</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Constant</th><th>Value</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td><code>Tslot</code></td><td>10 ms</td><td>Time slot per node in token-passing cycle</td></tr>
+                    <tr><td><code>Nretry_token</code></td><td>1</td><td>Retries before skipping a silent node</td></tr>
+                    <tr><td><code>Tusage_delay</code></td><td>10 ms max</td><td>Delay after receiving token before transmitting</td></tr>
+                    <tr><td><code>Treply_delay</code></td><td>255 ms max</td><td>Max wait for a reply frame</td></tr>
+                    <tr><td>Max nodes</td><td>128</td><td>Practical limit before token-rotation latency exceeds 1.28 s</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Modbus RTU frame structure</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field</th><th>Bytes</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td>Slave address</td><td>1</td><td>1–247 (0 = broadcast, 248–255 reserved)</td></tr>
+                    <tr><td>Function code</td><td>1</td><td>e.g. 0x03 = Read Holding Registers</td></tr>
+                    <tr><td>Data</td><td>0–252</td><td>PDU payload; varies by function code</td></tr>
+                    <tr><td>CRC</td><td>2</td><td>CRC-16/IBM, LSB first</td></tr>
+                    <tr><td><em>Silent interval</em></td><td>≥ 3.5 char times</td><td>Frame delimiter; at 9 600 bps ≈ 3.6 ms</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Modbus TCP — MBAP header</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field</th><th>Bytes</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td>Transaction identifier</td><td>2</td><td>Client-generated; echoed by server</td></tr>
+                    <tr><td>Protocol identifier</td><td>2</td><td>Always 0x0000 (Modbus)</td></tr>
+                    <tr><td>Length</td><td>2</td><td>Byte count of remaining ADU</td></tr>
+                    <tr><td>Unit identifier</td><td>1</td><td>Slave address (1–247); 255 = no bridging</td></tr>
+                    <tr><td>PDU (FC + data)</td><td>1–253</td><td>Same as RTU minus CRC</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">EtherCAT distributed-clock (DC) sync parameters</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Parameter</th><th>Value</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td>Sync0 cycle period min</td><td>31.25 µs</td><td>Fastest deterministic sync interval</td></tr>
+                    <tr><td>DC reference clock drift</td><td>&lt; 100 ns (typ.)</td><td>Slave clocks synchronised to reference master</td></tr>
+                    <tr><td>Telegram processing delay</td><td>~100–300 ns per slave</td><td>On-the-fly read/write per slave in ring</td></tr>
+                    <tr><td>Ring latency per slave</td><td>~ns</td><td>Telegram modified in-flight; no store-and-forward</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <p class="mn-lead">The hub produces visual and numeric outputs. Numeric outputs appear only in compare mode.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Source</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>Animated frame chip</td><td>Canvas 2D animation</td><td>Visual</td><td>Each chip segment is colour-coded to a named protocol field (address / function / data / CRC / header). Field labels appear on hover.</td></tr>
+                    <tr><td>Frame transmission time</td><td><code>t_frame = bytes×8 / baud</code></td><td>µs</td><td>Compare-strip metric. How long the frame occupies the wire.</td></tr>
+                    <tr><td>Header overhead</td><td><code>1 − payload/frame_bytes</code></td><td>%</td><td>Protocol efficiency indicator in compare strip.</td></tr>
+                    <tr><td>Link utilisation</td><td><code>payload / frame × 100</code></td><td>%</td><td>Horizontal bar in compare strip. Higher = more efficient use of bandwidth.</td></tr>
+                    <tr><td>Cycle / poll period</td><td>Protocol constant (§ 4)</td><td>ms or µs</td><td>Shown as annotation on the timeline ruler. EtherCAT sub-ms; PROFINET RT 1 ms; Modbus poll-driven.</td></tr>
+                    <tr><td>Redundant paths</td><td>Topology count (§ 3)</td><td>count</td><td>Topology panel annotation: 0 (Modbus bus), 1 (PROFINET MRP ring, EtherCAT ring).</td></tr>
+                    <tr><td>Failure scenario state</td><td>Animation state machine</td><td>Visual</td><td>CRC fault / token-loss / retry / ring-close drawn on the canvas when failure toggle is active.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example — Modbus RTU frame walk-through</h2>
+            <p class="mn-lead">Master reads 10 holding registers from slave 3 (FC 03) at 9 600 bps. This is the canonical request shown in the Modbus RTU lab.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Request frame bytes:</strong> Slave ID (1) + FC (1) + Start addr (2) + Quantity (2) + CRC (2) = <span class="mn-result">8 bytes</span></li>
+                    <li><strong>Frame transmission time:</strong> <code>8 × 8 / 9 600 =</code> <span class="mn-result">6.67 ms</span></li>
+                    <li><strong>Silent interval (3.5 char times):</strong> at 9 600 bps, 1 char = 10 bits (8N1+stop) → 1/9 600 × 10 = 1.04 ms → 3.5 × 1.04 ms = <span class="mn-result">≈ 3.6 ms</span> — animated as gap between chips</li>
+                    <li><strong>Response frame bytes</strong> (10 registers = 20 bytes data): Slave ID (1) + FC (1) + Byte count (1) + Data (20) + CRC (2) = <span class="mn-result">25 bytes</span></li>
+                    <li><strong>Response transmission time:</strong> <code>25 × 8 / 9 600 =</code> <span class="mn-result">20.83 ms</span></li>
+                    <li><strong>Total round-trip (idealized, no processing delay):</strong> 6.67 + 3.6 + 20.83 + 3.6 ms = <span class="mn-result">≈ 34.7 ms</span></li>
+                    <li><strong>Link utilisation (response):</strong> payload 20 / frame 25 = <span class="mn-result">80.0%</span></li>
+                    <li><strong>Header overhead (response):</strong> 1 − 0.80 = <span class="mn-result">20.0%</span> (address + FC + byte-count + CRC)</li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Compare with Modbus TCP for the same request:</strong> MBAP adds 7 bytes of header and removes the 2-byte CRC (TCP handles integrity). Response frame = 7 (MBAP) + 1 (FC) + 1 (byte count) + 20 (data) = 29 bytes over TCP, but at 100 Mbps Ethernet: <code>29×8 / 100×10⁶</code> = <span style="font-family:var(--mn-mono);color:var(--mn-cyan);">2.3 µs</span> — three orders of magnitude faster than RS-485 serial, illustrating the throughput gain the Modbus TCP lab visualises.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>Modbus spec (2012)</b> — Modbus Application Protocol Specification v1.1b3; Modbus over Serial Line Specification v1.02. Serial framing, CRC-16, function codes, address space.</li>
+                <li><b>ASHRAE 135 / ISO 16484-5</b> — BACnet: A Data Communication Protocol for Building Automation and Control Networks. MS/TP token-passing, BACnet/IP BVLC, timing constants.</li>
+                <li><b>IEC 62541 (OPC Foundation)</b> — OPC Unified Architecture. Parts 1–14: information model, services, transport (TCP/HTTPS), security (Secure Channel), subscription model.</li>
+                <li><b>IEEE 1815-2012 / DNP3</b> — IEEE Standard for Electric Power Systems Communications — Distributed Network Protocol (DNP3). Framing, CRC-16/DNP, unsolicited responses, addressing.</li>
+                <li><b>IEC 61158 / IEC 61784-2</b> — Fieldbus standards family. PROFINET (IEC 61158-6-10), EtherNet/IP (IEC 61158-3-2/6-2), EtherCAT (IEC 61158-3-12).</li>
+                <li><b>ODVA CIP Vol. 2</b> — EtherNet/IP Adaptation of CIP. ENIP encapsulation header, CPF items, CIP services, DLR ring redundancy.</li>
+                <li><b>ETG.1000 series</b> — EtherCAT Technology Group specifications: EtherCAT frame format (EtherType 0x88A4), distributed clocks, on-the-fly processing, ring topology.</li>
+                <li><b>RFC 3393 (IPPM)</b> — IP Packet Delay Variation Metric for IPPM. Framework for one-way delay and jitter. Basis for propagation delay formula <code>t_prop = d / v_prop</code>.</li>
+                <li><b>IEC 62439-2 (MRP)</b> — Media Redundancy Protocol for PROFINET ring failover. Recovery time ≤ 200 ms (typ. &lt; 30 ms with fast MRP).</li>
+                <li><b>IEC 62439-6 (DLR)</b> — Device Level Ring for EtherNet/IP ring redundancy. Single-fault recovery &lt; 3 ms (typ.).</li>
+                <li><b>CompTIA Network+ N10-009 / Security+ SY0-701</b> — Exam objectives providing pedagogical framing for OSI model, TCP/IP, industrial protocols, TLS, OAuth coverage.</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS & LIMITS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">Frame sizes shown are for the most common request/response pair in each protocol (e.g. FC 03 read 10 registers for Modbus) — not worst-case maximum frames. Timing calculations assume ideal wire conditions: no collisions, no retransmissions, no queuing delay, and no switch latency for Ethernet-based protocols. Processing delay at master and slave/server is not modelled.</p>
+            <p class="mn-lead">Baud rates shown are the most common field deployments; each protocol supports a range (Modbus RTU 1 200–115 200 bps; BACnet MS/TP up to 115 200 bps; DNP3 serial up to 115 200 bps). The compare-mode metrics change linearly with baud rate but the user cannot adjust this in the current hub — it is fixed to the default for each protocol.</p>
+            <p class="mn-lead">Propagation velocity <code>v_prop ≈ 2×10⁸ m/s</code> assumes standard Cat-5e/Cat-6 twisted pair (NVP ≈ 0.67c). Fiber would use <code>~2×10⁸ m/s</code> as well (multimode, NVP ≈ 0.67–0.69c). RS-485 cable velocity factor is similarly ~0.67. The 100 m segment length used in the latency display is the visualization default, not a configurable field.</p>
+            <p class="mn-lead">This hub and its manual are an <strong>engineering education aid</strong> aligned to CompTIA certification domains. For production network design, always consult the governing protocol standard, the vendor's implementation guide, and a qualified network engineer. Frame sizes, timing, and addressing must be validated against the actual devices deployed.</p>
+        </section>
+
+        <a class="mn-toollink" href="../network-visualization-hub.html">▶ Open the live Network Visualization Hub</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../network-visualization-hub.html">Network Visualization Hub</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

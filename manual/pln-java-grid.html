@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>PLN Java-Bali Grid Monitor — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full methodology for the PLN Java-Bali Grid Monitor: topology basis, voltage levels, electrical metric definitions, data provenance (RUPTL 2025-2034 + PLN AR 2024), animation basis, and assumptions.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="PLN Java-Bali grid, Jamali transmission, 500 kV substations, RUPTL 2025-2034, single-line diagram methodology, reserve margin, load factor, renewable penetration, transmission loss, SLD">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/pln-java-grid.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/pln-java-grid.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/pln-java-grid.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/pln-java-grid.html">
+    <meta property="og:title" content="PLN Java-Bali Grid Monitor — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="Topology basis, voltage levels, electrical metric definitions, data provenance, and animation basis behind the PLN Java-Bali Grid Monitor.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="PLN Java-Bali Grid Monitor Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="PLN Java-Bali Grid Monitor — Technical Manual">
+    <meta name="twitter:description" content="Topology, voltage levels, metric definitions, RUPTL/PLN AR data provenance, and animation basis for the Java-Bali grid SLD + atlas.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="PLN Java-Bali Grid Monitor Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "PLN Java-Bali Grid Monitor" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "PLN Java-Bali Grid Monitor — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Single-line diagram and geographic atlas of the PLN Jamali (Java-Bali) transmission system methodology",
+        "articleSection": "Power Grid",
+        "dependencies": "RUPTL 2025-2034, PLN Annual Report 2024, IEC 60038, ASEAN Grid Code",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to read the PLN Java-Bali Grid Monitor",
+        "step": [
+            { "@type": "HowToStep", "name": "Select a view", "text": "Choose Geographic Map (Leaflet/CARTO dark) or Single-Line Diagram (SVG IEC 60617 topology) via the view switcher." },
+            { "@type": "HowToStep", "name": "Filter voltage and plant layers", "text": "Use the fieldset toggles to show or hide 500/275/150/70/20 kV tiers and plant fuel types (coal, gas, hydro, geo, solar, biomass, wind)." },
+            { "@type": "HowToStep", "name": "Drill down to a province", "text": "Click a province card (Jakarta+Banten, Jawa Barat, Jawa Tengah+DIY, Jawa Timur) to see the per-province substation inventory, generation mix, and data-centre operator list." },
+            { "@type": "HowToStep", "name": "Read generation-mix KPIs", "text": "The Live Energy Dashboard section shows demand, reserve, renewable share, carbon intensity, and frequency — all static representative figures sourced from PLN AR 2024 and RUPTL 2025-2034, not real-time SCADA telemetry." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Is the Java-Bali Grid Monitor showing live real-time data?",
+                "acceptedAnswer": { "@type": "Answer", "text": "No. The monitor is a reference SLD and geographic atlas sourced from published PLN data (RUPTL 2025-2034, PLN Annual Report 2024, PLN P2B 2016 single-line diagram). All generation, demand, reserve, and carbon-intensity figures are static representative values from these publications. There is no connection to PLN P2B SCADA or any real-time telemetry feed." }
+            },
+            {
+                "@type": "Question",
+                "name": "How is reserve margin calculated in the monitor?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Reserve margin = (installed capacity − peak demand) / peak demand, expressed as a percentage. The Java-Bali system target is ≥25% per RUPTL 2025-2034. The monitor displays the published PLN AR 2024 headline figure of ~31% at the national level, and province-level estimates sourced from the same report." }
+            },
+            {
+                "@type": "Question",
+                "name": "What does the animated power-flow line represent?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The dashed-stroke CSS animation on 500/275/150 kV lines in the SLD is a visual convention indicating energised transmission corridors — it is NOT a real-time power-flow solution. Direction and magnitude are not computed from load-flow equations; the animation is purely decorative to convey 'these lines are in service based on published PLN data'." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../pln-java-grid.html" class="nav-link">Java-Bali Grid</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / PLN Java-Bali Grid Monitor
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Power Grid</p>
+            <h1>PLN Java-Bali Grid Monitor — Methodology &amp; Reference Basis</h1>
+            <p>Every topology decision, electrical metric definition, data provenance item, and display convention behind the Java-Bali Grid Monitor. The monitor is a <strong>reference SLD + substation atlas</strong> sourced from published PLN data — not a real-time SCADA feed or a live power-flow solver.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Monitor <strong>PLN-JBG v3</strong></span>
+                <span class="mn-chip">Basis <strong>RUPTL 2025-2034 + PLN AR 2024</strong></span>
+                <span class="mn-chip">Provinces <strong>4</strong></span>
+                <span class="mn-chip">Voltage tiers <strong>500 / 275 / 150 kV</strong></span>
+            </div>
+            <a class="mn-toollink" href="../pln-java-grid.html">&#9654; Open the live monitor</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The PLN Java-Bali Grid Monitor is a <strong>single-line diagram (SLD) + geographic atlas</strong> of the Jamali (Java–Madura–Bali) high-voltage transmission backbone. It answers four reference questions: <em>where are the major substations and power plants located</em>, <em>at what voltage tier do they operate</em>, <em>what published capacity and reserve-margin figures apply to each province</em>, and <em>how does the generation mix break down by fuel type</em>.</p>
+            <p class="mn-lead">The monitor provides two views: a <strong>geographic map</strong> (Leaflet with CARTO dark basemap, substation and plant markers, transmission-line overlays) and an <strong>inline SVG single-line diagram</strong> built to IEC 60617 graphical conventions. Both views share the same underlying node-and-edge dataset loaded from <code class="mn-mono">js/pln-java-grid-data.js</code>.</p>
+            <p class="mn-lead">Data provenance is entirely <strong>published PLN documents</strong> — primarily the PLN P2B 2016 single-line diagram, RUPTL 2025–2034, and PLN Annual Report 2024. The monitor does not connect to any PLN P2B SCADA system, real-time telemetry API, or automated data feed.</p>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs &amp; user controls</h2>
+            <p class="mn-lead">The monitor has no numeric entry fields. User controls select which subset of the static dataset is displayed.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Control</th><th>Type</th><th>Options</th><th>Effect</th></tr></thead>
+                <tbody>
+                    <tr><td>View mode</td><td>Segment toggle</td><td>Geographic Map / Single-Line Diagram</td><td>Switches between the Leaflet geographic view and the inline SVG SLD canvas.</td></tr>
+                    <tr><td>Voltage layer</td><td>Checkboxes</td><td>500 kV / 275 kV / 150 kV / 70 kV / 20 kV</td><td>Shows or hides the corresponding line tier and associated substations via CSS <code>.hide-v500</code> / <code>.hide-v275</code> etc. class toggling on the SVG root.</td></tr>
+                    <tr><td>Plant fuel type</td><td>Checkboxes</td><td>Coal / Gas / Hydro / Geo / Solar / Biomass / Wind</td><td>Shows or hides plant markers by fuel via <code>.hide-coal</code> / <code>.hide-hydro</code> etc. classes.</td></tr>
+                    <tr><td>Display options</td><td>Checkboxes</td><td>Labels / Capacity / kV badges</td><td>Toggles text overlays on SLD nodes: station name labels, installed-capacity chips, and voltage-class badges.</td></tr>
+                    <tr><td>Show all 150 kV</td><td>Button toggle</td><td>On / Off</td><td>Reveals the full tier-2 (150 kV) substation layer, which is hidden by default at low zoom to reduce visual clutter.</td></tr>
+                    <tr><td>Province tabs</td><td>Tab navigation</td><td>DKI Jakarta+Banten / Jawa Barat / Jawa Tengah+DIY / Jawa Timur</td><td>Loads the province snapshot panel with per-province headline numbers from PLN AR 2024.</td></tr>
+                    <tr><td>Generation-mix pills</td><td>Filter pills</td><td>All Sources / Renewables / Low Carbon / Fossil Fuels</td><td>Highlights or dims fuel segments in the stacked-bar and breakdown table (display only — no recalculation).</td></tr>
+                    <tr><td>Time-range pills</td><td>Filter pills</td><td>24h / 2d / 7d / 1M / 3M / 1Y</td><td>Switches the stacked-area and carbon-intensity charts between representative diurnal, weekly, monthly, and annual profiles derived from PLN AR 2024 patterns.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Methodology — electrical metric definitions</h2>
+            <p class="mn-lead">The monitor displays four headline grid metrics. These are standard power-systems definitions applied to the published PLN figures — they are not computed by a load-flow solver. Each metric is tagged <span class="mn-src">REFERENCE</span> to indicate it is read from published data, not derived.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Load factor</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Load factor = Average demand [MW] / Peak demand [MW]   (dimensionless, 0–1)</span>
+                <span class="mn-where">Standard IEEE / IEC grid planning definition. A value near 1.0 indicates flat, high-utilisation load; lower values indicate a peaky residential-dominated profile. Java-Bali: evening peak 18:00–20:00 WIB (residential + AC + lighting) yields a load factor of approximately 0.72 per PLN AR 2024 system statistics.<span class="mn-src">PLN AR 2024 · REFERENCE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Reserve margin</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Reserve margin = (Installed capacity [MW] − Peak demand [MW]) / Peak demand [MW] × 100%</span>
+                <span class="mn-where">Spinning + standby reserve expressed as a percentage of peak demand. Java-Bali RUPTL 2025–2034 target: ≥ 25%. Published PLN AR 2024 headline for Java-Bali: ~31.0% (installed 47,000 MW / peak ~32,000 MW). Per-province estimates from the same report are shown in the province snapshot panel.<span class="mn-src">RUPTL 2025-2034 · REFERENCE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Renewable penetration</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Renewable share = Generation from renewables [GWh] / Total generation [GWh] × 100%</span>
+                <span class="mn-where">Renewables counted: hydro, geothermal, biomass, solar (wind currently negligible on Java-Bali). Published PLN AR 2024 figure: 13.5% for Java-Bali. RUPTL 2025–2034 national target: 23% by 2025, 51% by 2034. The monitor displays the PLN AR 2024 as-built figure, not the RUPTL target.<span class="mn-src">PLN AR 2024 · REFERENCE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Transmission loss rate</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Transmission loss = (Generation dispatched [GWh] − Energy delivered [GWh]) / Generation dispatched [GWh] × 100%</span>
+                <span class="mn-where">Includes resistive I²R losses in 500/275/150 kV lines, transformer core and copper losses, and auxiliary station power. PLN AR 2024 reports Java-Bali system losses of approximately 8–9% (transmission + distribution combined). The monitor does not compute per-line losses; the figure is a published PLN aggregate.<span class="mn-src">PLN AR 2024 · REFERENCE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Grid carbon intensity</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Carbon intensity [gCO₂/kWh] = Σ (fuel_i dispatched [GWh] × emission_factor_i [gCO₂/kWh]) / Total generation [GWh]</span>
+                <span class="mn-where">Emission factors per fuel: coal ~820, gas ~450, oil ~650 gCO₂/kWh (IEA lifecycle median). Renewables and geothermal assigned 0 for operational direct emissions. Java-Bali published intensity: ~781 gCO₂/kWh (coal-dominant, PLN AR 2024 + IEA 2024). Reference comparisons shown in the monitor: OECD average ~350, RUPTL 2030 target ~580.<span class="mn-src">PLN AR 2024 + IEA 2024 · REFERENCE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">SLD topology — node and edge structure</h3>
+            <p class="mn-lead" style="margin-top:0.5rem;">Nodes are typed as <code class="mn-mono">station</code> (substation) or <code class="mn-mono">plant</code> (generating unit). Edges carry a <code class="mn-mono">voltage</code> attribute (500 / 275 / 150 / 70 / 20), an optional <code class="mn-mono">km</code> length, and a <code class="mn-mono">source</code> provenance tag (<code class="mn-mono">pln-p2b-2016</code>, <code class="mn-mono">ruptl-2025</code>, or <code class="mn-mono">inferred</code>). Inferred edges — flagged with <code class="mn-mono">data-source="inferred"</code> — are visually de-emphasised (opacity 0.35, no animation) to distinguish them from confirmed PLN P2B topology.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Animated power-flow lines</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Animation: CSS stroke-dashoffset cycle, 2.4 s (500 kV) / 2.6 s (275 kV) / 2.8 s (150 kV)</span>
+                <span class="mn-where">The moving dashed stroke is a <strong>visual convention only</strong> — it conveys "this corridor is in service per published PLN data". It is NOT a real-time power-flow direction or magnitude. No load-flow equations are solved. Direction is fixed left-to-right in the SLD's geographic orientation; actual power direction varies with system conditions and is not modelled.<span class="mn-src">CSS ANIMATION · DISPLAY ONLY</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS & SOURCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">All quantitative values in the monitor are sourced from one of the three primary PLN publications. No values are back-solved or estimated without citation.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Parameter</th><th>Value</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td>Java-Bali installed capacity</td><td>~47,000 MW</td><td>PLN AR 2024</td></tr>
+                    <tr><td>Java-Bali peak demand (2024)</td><td>~32,000 MW</td><td>PLN AR 2024</td></tr>
+                    <tr><td>Java-Bali reserve margin</td><td>~31.0%</td><td>PLN AR 2024 (derived: (47,000−32,000)/32,000)</td></tr>
+                    <tr><td>Renewable generation share</td><td>13.5%</td><td>PLN AR 2024</td></tr>
+                    <tr><td>Grid carbon intensity</td><td>~781 gCO₂/kWh</td><td>PLN AR 2024 + IEA Indonesia 2024</td></tr>
+                    <tr><td>System frequency nominal</td><td>50.00 Hz</td><td>IEC 60038 + ASEAN Grid Code</td></tr>
+                    <tr><td>UFLS trigger frequency</td><td>49.30 Hz</td><td>PLN P2B grid code (under-frequency load shedding)</td></tr>
+                    <tr><td>500 kV substations (named)</td><td>~28</td><td>PLN P2B 2016 SLD</td></tr>
+                    <tr><td>150 kV substations (named)</td><td>60+</td><td>PLN P2B 2016 SLD + RUPTL 2025-2034</td></tr>
+                    <tr><td>Generating plants (in dataset)</td><td>25+</td><td>PLN P2B 2016 SLD + PLN AR 2024</td></tr>
+                    <tr><td>Provinces covered</td><td>4 (DKI Jakarta+Banten, Jawa Barat, Jawa Tengah+DIY, Jawa Timur)</td><td>PLN AR 2024 provincial breakdown</td></tr>
+                    <tr><td>DC-feeder overlay substations</td><td>~142 total named 500/275/150 kV</td><td>PLN P2B 2016 + RUPTL 2025-2034</td></tr>
+                    <tr><td>RUPTL 2025-2034 reserve margin target</td><td>≥ 25% Java-Bali</td><td>RUPTL 2025-2034 §4</td></tr>
+                    <tr><td>RUPTL renewable target (2025)</td><td>23% national generation share</td><td>RUPTL 2025-2034 §6</td></tr>
+                    <tr><td>RUPTL carbon target (2030)</td><td>~580 gCO₂/kWh</td><td>RUPTL 2025-2034 §7</td></tr>
+                    <tr><td>Nominal system voltage tiers</td><td>500 kV / 275 kV / 150 kV / 70 kV / 20 kV</td><td>IEC 60038 standard voltages + PLN grid</td></tr>
+                    <tr><td>Paiton coal complex (Java's largest)</td><td>4,710 MW</td><td>PLN AR 2024 / RUPTL 2025-2034</td></tr>
+                    <tr><td>Suralaya coal complex</td><td>3,400 MW</td><td>PLN AR 2024</td></tr>
+                    <tr><td>Cirata hydro reservoir</td><td>1,008 MW</td><td>PLN AR 2024</td></tr>
+                    <tr><td>Banyuwangi-Bali submarine link</td><td>275 kV HVAC submarine cable</td><td>RUPTL 2025-2034 + PLN P2B 2016</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Voltage colour coding</h3>
+            <div class="mn-tablewrap" style="margin-top:0.2rem;">
+            <table class="mn-table">
+                <thead><tr><th>Tier</th><th>Colour (dark view)</th><th>Stroke width (SLD)</th><th>Use</th></tr></thead>
+                <tbody>
+                    <tr><td>500 kV</td><td><code>#3b82f6</code> (blue)</td><td>1.6 px</td><td>Extra-high voltage backbone; animated flow</td></tr>
+                    <tr><td>275 kV</td><td><code>#a78bfa</code> (violet)</td><td>1.4 px</td><td>Sub-transmission; Sumatra links + Bali cable</td></tr>
+                    <tr><td>150 kV</td><td><code>#f87171</code> (red)</td><td>1.0 px</td><td>High-voltage distribution backbone; animated</td></tr>
+                    <tr><td>70 kV</td><td><code>#fbbf24</code> (amber)</td><td>0.7 px</td><td>Legacy sub-transmission; not animated</td></tr>
+                    <tr><td>20 kV</td><td><code>#14b8a6</code> (teal)</td><td>0.6 px</td><td>Medium-voltage distribution; DC-feeder overlay</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <p class="mn-lead">The monitor does not produce downloadable results or calculated outputs. It is a display tool. The following table describes what is rendered on screen and how each element is derived.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output element</th><th>Derived from</th><th>Nature</th></tr></thead>
+                <tbody>
+                    <tr><td>Geographic substation markers</td><td>Lat/lng from <code>pln-java-grid-data.js</code>, sourced PLN P2B 2016 + OSM cross-check</td><td>Published static</td></tr>
+                    <tr><td>Transmission-line polylines (map)</td><td>Node-pair edges; straight-line approximation between known substation coordinates</td><td>Published static (topology confirmed; routing is approximate)</td></tr>
+                    <tr><td>SLD nodes and edges (SVG)</td><td>IEC 60617-style symbols generated from the same node-edge dataset at fixed viewBox coordinates (1800 × 900)</td><td>Published static</td></tr>
+                    <tr><td>System headline KPIs (stat tiles)</td><td>PLN AR 2024: installed MW, peak MW, reserve %, renewable %, substation count, DC subscribed MW</td><td>Published static</td></tr>
+                    <tr><td>Province snapshot (peak, reserve, mix)</td><td>PLN AR 2024 provincial breakdown; generation-mix percentages rounded to nearest integer</td><td>Published static</td></tr>
+                    <tr><td>Generation-mix stacked bar</td><td>Province-level fuel-share percentages from PLN AR 2024, rendered as proportional CSS flex segments</td><td>Published static</td></tr>
+                    <tr><td>Carbon-intensity line chart</td><td>Representative 24 h diurnal profile parameterised from PLN AR 2024 mean (~781 gCO₂/kWh) with ±5% day/night swing</td><td>Illustrative profile (not SCADA)</td></tr>
+                    <tr><td>Stacked-area generation chart</td><td>Diurnal/weekly/monthly profiles derived from PLN AR 2024 system averages; fuel shares held constant at annual mean</td><td>Illustrative profile (not SCADA)</td></tr>
+                    <tr><td>Substation side-panel detail</td><td>Node attributes from <code>pln-java-grid-data.js</code>: name, voltage, MVA rating, province, commission year, confidence tier</td><td>Published static</td></tr>
+                    <tr><td>Coordinate confidence badges</td><td>HI = surveyed GPS / PLN official; MED = OSM-derived; LOW = geometrically estimated between known points</td><td>Data quality flag</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example — reading Jawa Barat from published data</h2>
+            <p class="mn-lead">The following shows exactly how to read the Jawa Barat province snapshot from the published PLN AR 2024 data, as the monitor displays it. No calculation is required — every number is extracted directly from the source document.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Peak demand:</strong> PLN AR 2024 provincial statistics, Jawa Barat: <span class="mn-result">8,200 MW</span></li>
+                    <li><strong>Installed capacity (Jawa Barat share):</strong> PLN AR 2024 provincial breakdown: ~10,500 MW → Reserve margin = (10,500 − 8,200) / 8,200 × 100 = <span class="mn-result">28.0%</span></li>
+                    <li><strong>Generation mix:</strong> PLN AR 2024 — Coal 48%, Gas 18%, Hydro 22%, Geothermal 10%, Solar 2% → <span class="mn-result">Hydro 22% + Geo 10% + Solar 2% = 34% renewable</span></li>
+                    <li><strong>Key substations (500 kV, Jawa Barat):</strong> Cibatu, Cirebon, Ungaran (cross-provincial), Balaraja — sourced PLN P2B 2016 SLD</li>
+                    <li><strong>Key plants:</strong> Cirata 1,008 MW (hydro) · Cirebon 1,660 MW (coal) · Indramayu 990 MW (coal) · Wayang Windu 227 MW (geothermal) — all from PLN AR 2024</li>
+                    <li><strong>DC operators:</strong> Telkomsigma Sentul · EDGE DC Bandung · Lintasarta Bandung — from public operator disclosures, cross-checked against <span class="mn-result">6 known operators</span></li>
+                    <li><strong>20 kV DC-feeder overlay:</strong> ~30 endpoints (available in the dedicated Jawa Barat sub-page <code>pln-java-grid-jabar.html</code>)</li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>How to use this in practice:</strong> when a data-centre operator asks "which PLN substation feeds my site in Sentul?", the monitor locates the nearest 150 kV substation from the PLN P2B dataset, shows its published MVA rating and confidence tier, and links to the province sub-page for 20 kV feeder detail. The answer is a <em>reference starting point</em> — the operator must confirm actual connection point with PLN directly.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>RUPTL 2025-2034</b> — PLN Rencana Usaha Penyediaan Tenaga Listrik 2025–2034: installed capacity by province, reserve margin targets (≥25% Java-Bali), renewable generation targets (23% by 2025), HVDC / submarine interconnect plans.</li>
+                <li><b>PLN Annual Report 2024</b> — primary source for Java-Bali system headlines: installed capacity 47 GW, peak demand 32 GW, renewable share 13.5%, carbon intensity ~781 gCO₂/kWh, provincial peak and generation-mix breakdowns.</li>
+                <li><b>PLN P2B 2016 Single-Line Diagram</b> — topology source for named 500/275/150 kV substations and transmission corridors. The PLN P2B (Pusat Pengaturan Beban) 2016 SLD is the most recent publicly available full-system SLD for the Jamali interconnection.</li>
+                <li><b>BPS Statistical Indonesia 2024</b> — cross-check for provincial energy consumption and GDP-energy intensity figures.</li>
+                <li><b>IEA Indonesia 2024</b> — national energy balance, carbon intensity benchmarks, and OECD comparison values shown in the carbon-intensity chart.</li>
+                <li><b>IEC 60038 (2009)</b> — IEC standard voltages: defines 500 kV, 275 kV, 150 kV, 70 kV, 20 kV as standard nominal system voltages.</li>
+                <li><b>IEC 60617</b> — Graphical symbols for diagrams: basis for node symbols (substation, generator, transformer) used in the inline SVG SLD.</li>
+                <li><b>ASEAN Grid Code</b> — regional interconnection standards; frequency band 50 Hz ± 0.05 Hz control target.</li>
+                <li><b>OpenStreetMap contributors</b> — geographic basemap via Leaflet + CARTO dark tile; substation coordinate cross-check source for MED-confidence nodes.</li>
+                <li><b>Monitor source</b> — node/edge dataset: <code class="mn-mono">js/pln-java-grid-data.js</code> · energy-dashboard data: <code class="mn-mono">js/pln-energy-data.js</code> · rendering engine: <code class="mn-mono">js/pln-energy-dashboard.js</code> · map layer: <code class="mn-mono">js/rz-map.js</code>.</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS & LIMITS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead"><strong>Published-data vintage:</strong> the topology, capacity, and metric figures reflect the PLN P2B 2016 SLD (topology) and PLN AR 2024 / RUPTL 2025-2034 (capacity and KPIs). New substations commissioned after April 2026 (the dataset refresh date) are not included. The dataset was last updated 2026-04-29.</p>
+            <p class="mn-lead"><strong>Not real-time SCADA:</strong> the monitor has no connection to PLN P2B's Energy Management System (EMS) or any SCADA/ICCP telemetry. All generation, demand, reserve, frequency, and carbon-intensity values are static representative figures from the above publications. The "Live Energy Dashboard" label refers to the dashboard's <em>design pattern</em> (mirroring energydashboard.co.uk/live) — not to a live data feed.</p>
+            <p class="mn-lead"><strong>Power-flow animation:</strong> the animated dashed strokes on 500/275/150 kV lines are a visual convention for "energised corridor per published data". They do not represent computed real-time power flow, direction, or loading. Inferred edges (flagged <code class="mn-mono">data-source="inferred"</code>) are de-emphasised and carry the lowest confidence.</p>
+            <p class="mn-lead"><strong>Coordinate accuracy:</strong> 500 kV substation coordinates are generally HI confidence (GPS-accurate per PLN official records or engineering site data). Many 150 kV substations are MED confidence (OSM cross-check) or LOW confidence (estimated geometrically between confirmed anchor points). Do not use these coordinates for civil engineering or permitting purposes.</p>
+            <p class="mn-lead"><strong>Province-level figures:</strong> per-province peak demand and generation mix are PLN AR 2024 estimates rounded to three significant figures. They represent annual system averages; instantaneous figures vary with time of day, season, and dispatch order.</p>
+            <p class="mn-lead"><strong>This monitor is a reference and education tool</strong> for data-centre infrastructure professionals who need to understand the Java-Bali grid context. It is not a replacement for direct engagement with PLN for connection planning, nor for the official RUPTL or PLN Engineering documents when making investment decisions.</p>
+        </section>
+
+        <a class="mn-toollink" href="../pln-java-grid.html">&#9654; Open the PLN Java-Bali Grid Monitor</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../pln-java-grid.html">Java-Bali Grid Monitor</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

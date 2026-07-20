@@ -139,6 +139,7 @@ function FireZonesSection({ volumeM3, agent }: { volumeM3: number; agent: string
     const capex = useCapexStore((s) => s.results);
     const capexInputs = useCapexStore((s) => s.inputs);
     const req = useRequirementsStore();
+    const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
     let zones = 0;
     try {
         const eq = rzModels()?.commissioning?.equipScale?.({ itLoad: inputs.itLoad, rackDensity: densityToEngineBucket(req.workload.avgRackDensityKw) });
@@ -154,10 +155,21 @@ function FireZonesSection({ volumeM3, agent }: { volumeM3: number; agent: string
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <Metric label="Fire Zones" value={String(zones)} sub="equipScale (1 per ~200 kW)" />
                 <Metric label="Volume / Zone" value={`${perZoneM3.toLocaleString()} m³`} sub="protected volume ÷ zones" />
-                <Metric label="Fire System CAPEX" value={fireCost > 0 ? money(fireCost) : '—'} sub={`${capexInputs.fireType} + ${capexInputs.alarmType} (capex engine)`} />
+                {fireCost > 0
+                    ? <Metric label="Fire System CAPEX" value={money(fireCost)} sub={`${capexInputs.fireType} + ${capexInputs.alarmType} (capex engine)`} />
+                    : (
+                        /* capex results absent — honest empty state with a route to the source */
+                        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                            <div className="text-[10px] uppercase tracking-wide text-slate-500">Fire System CAPEX</div>
+                            <div className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">—</div>
+                            <button onClick={() => setActiveTab('capex')} className="text-[10px] font-medium text-violet-500 hover:text-violet-400">run the CAPEX Engine →</button>
+                        </div>
+                    )}
                 <Metric label="Selected Agent" value={agent === 'novec1230' ? 'Novec 1230' : agent === 'fm200' ? 'FM-200' : 'IG-541'} sub={`shared capex: ${capexInputs.fireType}`} />
             </div>
-            <p className="mt-1.5 text-[9px] text-slate-400">Zone count and system cost read the SAME engine scaling + capex results as Commissioning and CAPEX — one source, no divergence.</p>
+            <p className="mt-1.5 text-[9px] text-slate-400">{fireCost > 0
+                ? 'Zone count and system cost read the SAME engine scaling + capex results as Commissioning and CAPEX — one source, no divergence.'
+                : 'Zone count reads the engine equipment scaling; system cost appears after the CAPEX Engine has been run — same source as the CAPEX page.'}</p>
         </Card>
     );
 }

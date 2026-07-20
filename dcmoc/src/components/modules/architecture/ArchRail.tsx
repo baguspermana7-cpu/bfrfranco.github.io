@@ -29,7 +29,9 @@ export function ArchRail({ i, eq, f, layers, overall }: {
         ['Tier Classification', `${topo.tiaRating ?? `Tier ${i.tier}`}`],
         ['Concurrent Maintainability', topo.maintainability ?? '—'],
         ['Power Redundancy', i.redundancy],
-        ['Cooling Redundancy', topo.coolingPath ?? i.redundancy],
+        /* single source sim.powerRedundancy — KPI declares it covers Power & Cooling;
+         * tier-baseline engine text lives in the Power topology card, not here */
+        ['Cooling Redundancy', i.redundancy],
         ['IT Distribution', `${groups}× PDU group${groups > 1 ? 's' : ''} (${['A', 'A/B', 'A/B/C'][groups - 1]})`],
         ['Rack Type', `${bucket.replace('_', '/')} · ${i.rackDensityKw} kW`],
     ];

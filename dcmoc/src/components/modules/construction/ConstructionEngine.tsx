@@ -145,14 +145,17 @@ export function ConstructionEngine() {
             {/* KPI row */}
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                 {[
-                    { label: 'Overall Progress', value: `${e.overallPct}%`, sub: planMode ? 'baseline' : `PV ${e.pvPct}%`, trace: 'constr.progressPct' },
+                    /* audit #8: `baselineChip` marks KPIs that are DEFINITIONAL in Plan Mode
+                     * (EV≡PV → 100% progress, AC≡PV → 100% spend, SPI/CPI≡1.00) — a grey chip
+                     * keeps the perfect-looking figures honest. Presentation only, no math change. */
+                    { label: 'Overall Progress', value: `${e.overallPct}%`, sub: planMode ? 'baseline' : `PV ${e.pvPct}%`, trace: 'constr.progressPct', baselineChip: planMode },
                     { label: 'Planned Completion', value: `M${sched.totalMonths}`, sub: `${Math.round(sched.totalMonths / 12 * 10) / 10} years` },
                     { label: 'Forecast Completion', value: `M${e.forecastTotalMonths}`, sub: e.delayMonths > 0 ? `+${e.delayMonths} mo delay` : 'on plan', trace: 'constr.forecastMonths' },
-                    { label: 'Budget (Cumulative)', value: fmtMoney(budget), sub: `AC ${fmtMoney(e.acUsd)} (${budget > 0 ? Math.round((e.acUsd / budget) * 100) : 0}%)`, trace: 'capex.total' },
-                    { label: 'SPI', value: String(e.spi), sub: planMode ? 'baseline' : e.spi >= 1 ? 'on/ahead' : 'behind', trace: 'constr.spi' },
-                    { label: 'CPI', value: String(e.cpi), sub: planMode ? 'baseline' : e.cpi >= 1 ? 'under budget' : 'over budget', trace: 'constr.cpi' },
+                    { label: 'Budget (Cumulative)', value: fmtMoney(budget), sub: `AC ${fmtMoney(e.acUsd)} (${budget > 0 ? Math.round((e.acUsd / budget) * 100) : 0}%)`, trace: 'capex.total', baselineChip: planMode },
+                    { label: 'SPI', value: String(e.spi), sub: planMode ? 'baseline' : e.spi >= 1 ? 'on/ahead' : 'behind', trace: 'constr.spi', baselineChip: planMode },
+                    { label: 'CPI', value: String(e.cpi), sub: planMode ? 'baseline' : e.cpi >= 1 ? 'under budget' : 'over budget', trace: 'constr.cpi', baselineChip: planMode },
                 ].map((k) => (
-                    <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                    <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}${(k as { baselineChip?: boolean }).baselineChip ? ' — Plan Mode: nilai baseline definisional, belum ada actuals' : ''}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                         <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
                         {(k as { trace?: string }).trace ? (
                             <TraceValue traceId={(k as { trace?: string }).trace!}>
@@ -162,6 +165,9 @@ export function ConstructionEngine() {
                             <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
                         )}
                         <div className="truncate text-[10px] text-slate-500">{k.sub}</div>
+                        {(k as { baselineChip?: boolean }).baselineChip && (
+                            <span className="mt-1 inline-block rounded bg-slate-400/15 px-1 py-0.5 text-[8px] font-semibold leading-tight text-slate-500">Plan Mode — baseline (belum ada actuals)</span>
+                        )}
                     </div>
                 ))}
             </div>
@@ -267,6 +273,9 @@ export function ConstructionEngine() {
                             <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Health Score</h3>
                             <div className={`text-3xl font-bold tabular-nums ${health.score >= 85 ? 'text-emerald-500' : health.score >= 65 ? 'text-amber-500' : 'text-rose-500'}`}>{health.score}<span className="text-sm text-slate-400">/100</span></div>
                             <div className="text-[10px] text-slate-500">{health.band} · SPI 40 + CPI 30 + schedule 15 + issues 15</div>
+                            {planMode && (
+                                <span className="mt-1 inline-block rounded bg-slate-400/15 px-1 py-0.5 text-[8px] font-semibold text-slate-500">Plan Mode — baseline (belum ada actuals)</span>
+                            )}
                         </div>
                     )}
                     <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">

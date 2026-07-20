@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Liquid-Cooling CDU Toolkit — Methodology &amp; Technical Manual | ResistanceZero</title>
+    <meta name="description" content="Full engineering methodology for the Liquid-Cooling CDU Toolkit: CDU sizing formulas, selection guide basis, maintenance checklist, interactive Mini-BMS cockpit, and deep comparison — all sourced from DATAHALL_CALC, ISO 4413, ASHRAE 15, and OEM datasheets.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="CDU sizing, coolant distribution unit, liquid cooling methodology, CDU count formula, hydronic flow, CDU pump power, N+1 redundancy, ISO 4413, ASHRAE 15, CoolChip, Asetek, data center liquid cooling">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/cdu-hub.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/cdu-hub.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/cdu-hub.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/cdu-hub.html">
+    <meta property="og:title" content="Liquid-Cooling CDU Toolkit — Methodology &amp; Technical Manual">
+    <meta property="og:description" content="CDU sizing formulas, selection guide basis, Mini-BMS cockpit inputs, maintenance checklist, and deep comparison methodology behind the four-resource CDU Toolkit.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="Liquid-Cooling CDU Toolkit Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Liquid-Cooling CDU Toolkit — Technical Manual">
+    <meta name="twitter:description" content="CDU count, per-unit flow, pump power, N+1 redundancy — formulas, constants, and worked example for the CDU Toolkit.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Liquid-Cooling CDU Toolkit Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "CDU Toolkit" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Liquid-Cooling CDU Toolkit — Methodology & Technical Manual",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "CDU sizing methodology for AI/HPC data centers: CDU count, per-unit flow, pump power, N+1 redundancy — anchored to DATAHALL_CALC, ISO 4413, and ASHRAE 15",
+        "articleSection": "CDU & Liquid Cooling",
+        "dependencies": "ISO 4413, ASHRAE 15, ASHRAE TC 9.9, OCP Thermal WG",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to size Coolant Distribution Units for an AI/HPC data hall",
+        "step": [
+            { "@type": "HowToStep", "name": "Determine liquid heat load", "text": "Compute liquid_heat_kW = IT_kW × liquid_capture_ratio. For an 85% liquid-capture hall, 85% of IT load is transferred to the CDU secondary loop." },
+            { "@type": "HowToStep", "name": "Select CDU unit rating", "text": "Choose a CDU model by heat-rejection capacity (kW). The DATAHALL_CALC baseline uses a 350 kW end-of-row CDU (21-worked-examples.md Ex7); Vertiv CoolChip CDU 121 = 121 kW is the per-rack class reference." },
+            { "@type": "HowToStep", "name": "Compute CDU running count", "text": "CDU_count = ceil(liquid_heat_kW / CDU_rating_kW). For liquid_heat = 12,118 kW and CDU_rating = 350 kW, count = ceil(34.62) = 35 running units." },
+            { "@type": "HowToStep", "name": "Derive per-unit flow and load", "text": "Per-CDU flow (LPM) = total_hydronic_flow_LPM / CDU_count; per-CDU load (kW) = liquid_heat_kW / CDU_count. Total flow is computed by hydronicFlowLPM(liquid_heat, rho, Cp, deltaT)." },
+            { "@type": "HowToStep", "name": "Size CDU pump power and apply N+1", "text": "CDU pump power (kW) = flow (m³/s) × head (Pa) / pump_efficiency. Provision N+1 standby capacity; the DATAHALL_CALC PUE basis assumes 120 kW CDU pump power at the 7,128 kW reference IT load." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "How many CDUs does a data hall need?",
+                "acceptedAnswer": { "@type": "Answer", "text": "CDU running count = ceil(liquid_heat_kW / CDU_rating_kW). Liquid heat = IT load × liquid-capture ratio (typically 85% for direct-to-chip halls). For a 4-hall facility at Scenario B (7,128 kW/hall × 85% = 6,059 kW liquid heat) with 350 kW EoR CDUs, each hall needs ceil(6059/350) = 18 running CDUs; at the full-facility peak of 14,256 kW IT × 85% = 12,118 kW liquid heat across all halls, the facility total is ceil(12118/350) = 35 running CDUs with N+1 provision." }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the per-CDU secondary flow rate?",
+                "acceptedAnswer": { "@type": "Answer", "text": "First compute total hydronic flow: flow_LPM = liquid_heat_kW × 60 / (rho_kg/L × Cp_kJ/kgK × deltaT_K). Using DATAHALL_CALC constants (rho = 1.0 kg/L, Cp = 4.186 kJ/kgK, deltaT = 10 K), the total flow for 12,118 kW liquid heat is 17,384 LPM. Dividing by 35 CDUs gives 497 LPM per CDU. Then per-CDU load = 12,118 / 35 = 346 kW per unit." }
+            },
+            {
+                "@type": "Question",
+                "name": "What standards govern CDU installation and fluid handling?",
+                "acceptedAnswer": { "@type": "Answer", "text": "ISO 4413 (pneumatic and hydraulic fluid power) governs hydraulic safety and pressure-test requirements. ASHRAE 15 (Safety Standard for Refrigeration Systems) governs coolant containment and leak detection for refrigerant-adjacent systems. ASHRAE TC 9.9 provides data-center liquid-cooling best-practice, including secondary-loop water-quality (W-classes). OCP Thermal WG cold-plate and connector specifications set flow/pressure targets for direct-to-chip systems." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../cdu-hub.html" class="nav-link">CDU Toolkit</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / CDU Toolkit
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · CDU &amp; Liquid Cooling</p>
+            <h1>Liquid-Cooling CDU Toolkit — Methodology &amp; Formulas</h1>
+            <p>Every input, equation, constant, output, and reference behind the four-resource CDU Toolkit — selection guide, maintenance checklist, interactive Mini-BMS cockpit, and deep comparison. The sizing math is anchored to <code class="mn-mono">DATAHALL_CALC.cduRunningCount()</code> and <code class="mn-mono">DATAHALL_CALC.hydronicFlowLPM()</code>, which implement the deterministic engine in <code class="mn-mono">js/datahall-calculations.js</code>. No back-solved constants, no random values.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>DATAHALL_CALC v1.20.x</strong></span>
+                <span class="mn-chip">Basis <strong>21-worked-examples.md Ex7</strong></span>
+                <span class="mn-chip">Resources <strong>4</strong></span>
+                <span class="mn-chip">Outputs <strong>CDU count · flow · load · pump power</strong></span>
+            </div>
+            <a class="mn-toollink" href="../cdu-hub.html">&#9654; Open the CDU Toolkit</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The CDU Toolkit is a four-resource set for selecting, operating, visualising, and comparing liquid-cooling Coolant Distribution Units in AI/HPC data centers. It answers four design questions: <em>which CDU topology fits a given density and infrastructure constraint</em>, <em>how many CDUs are required and what flow does each carry</em>, <em>what are the live operating parameters and fault signatures</em>, and <em>how do CDU types compare on TCO, field-failure modes, and vendor support</em>.</p>
+            <p class="mn-lead">The four constituent resources are: (1) <strong>Selection &amp; Deployment Guide</strong> — a reference document with verified vendor specs, sizing math, and installation requirements; (2) <strong>Installation, Inspection &amp; Maintenance Checklist</strong> — operational parameter bands, water-quality criteria (ASHRAE TC 9.9 W-classes, OCP limits), commissioning procedure, symptom table, and PM cadences; (3) <strong>Mini-BMS Cockpit</strong> — an interactive cockpit per CDU type with animated P&amp;ID, live simulated parameters, and fault injection; (4) <strong>Deep Comparison</strong> — source-tagged comparison across field issues, BMS/DCIM integration, vendor after-sales, and TCO.</p>
+            <p class="mn-lead">The governing sizing authority is <strong>21-worked-examples.md Example 7</strong> ("If CDU = 350 kW, running count = ceil(liquid_heat / 350)"), executed by <code class="mn-mono">DATAHALL_CALC.cduRunningCount()</code> in <code class="mn-mono">js/datahall-calculations.js</code>. Supporting fluid standards are <strong>ISO 4413</strong> (hydraulic fluid power safety), <strong>ASHRAE 15</strong> (refrigeration-system containment), and <strong>ASHRAE TC 9.9</strong> (data-center liquid-cooling best practice). The Mini-BMS cockpit inherits <code class="mn-mono">DATAHALL_CALC</code> constants for Rule-1 consistency — parameter bands, N+1 logic, and pump-power figures trace to the same locked model as the datahall dashboard.</p>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">Inputs split into two groups: (a) <strong>cockpit parameters</strong> used by the Mini-BMS to drive live simulation and fault injection, and (b) <strong>selection filters</strong> used by the Selection Guide and Deep Comparison. The sizing formulas consume the cockpit parameters; the checklist uses measured values against the same bands.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.25rem;">Cockpit / sizing parameters</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field</th><th>Symbol</th><th>Unit</th><th>Range / typical</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td>IT load per hall <code>itPerHall_kW</code></td><td><code>IT</code></td><td>kW</td><td>Scenario A 3 564 · B 7 128</td><td>Total IT load for the data hall, per the DATAHALL_CALC locked scenarios.</td></tr>
+                    <tr><td>Liquid capture ratio <code>liquidCaptureRatio</code></td><td><code>α</code></td><td>—</td><td>0.85 (locked)</td><td>Fraction of IT heat removed by the secondary hydronic loop. 85% from BASELINE-DECISION.md.</td></tr>
+                    <tr><td>CDU unit rating <code>cdu.ratingKW</code></td><td><code>R</code></td><td>kW</td><td>350 (EoR) · 121 (per-rack)</td><td>Heat-rejection capacity per CDU. Engine default = 350 kW end-of-row CDU (Ex7). Vertiv CoolChip 121 kW is the per-rack reference.</td></tr>
+                    <tr><td>TCS deltaT <code>tcsDeltaT_K</code></td><td><code>ΔT</code></td><td>K</td><td>10 (locked)</td><td>Secondary-loop supply/return temperature difference: 35 °C supply → 45 °C return.</td></tr>
+                    <tr><td>Water density <code>rhoKgPerL</code></td><td><code>ρ</code></td><td>kg/L</td><td>1.0</td><td>TCS loop water density (Ex6 basis). Adjust for glycol mixtures.</td></tr>
+                    <tr><td>Water specific heat <code>cpKjPerKgK</code></td><td><code>C<sub>p</sub></code></td><td>kJ/(kg·K)</td><td>4.186</td><td>TCS loop specific heat capacity (Ex6 basis).</td></tr>
+                    <tr><td>CDU pump head <code>pumpHead_Pa</code></td><td><code>H</code></td><td>Pa</td><td>250 000–500 000</td><td>Total dynamic head across the secondary loop, used in pump-power sizing.</td></tr>
+                    <tr><td>Pump efficiency <code>pumpEff</code></td><td><code>η</code></td><td>—</td><td>0.70–0.80</td><td>Pump shaft efficiency. CDU VFD pumps typically 72–78%.</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.25rem;">Selection filters (Selection Guide &amp; Comparison)</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Filter</th><th>Options</th><th>Drives</th></tr></thead>
+                <tbody>
+                    <tr><td>CDU topology</td><td>In-rack · In-row · Sidecar · L2L EoR · L2A</td><td>Selection guide topology columns; Comparison field-issue rows.</td></tr>
+                    <tr><td>Cooling loop type</td><td>L2L (liquid-to-liquid) · L2A (liquid-to-air)</td><td>Infrastructure tie-in requirements; facility water dependency.</td></tr>
+                    <tr><td>Density band</td><td>&lt;20 kW · 20–60 kW · 60–200 kW · &gt;200 kW per rack</td><td>Topology recommendation matrix in the Selection Guide.</td></tr>
+                    <tr><td>OEM</td><td>Vertiv · Asetek · Schneider · Liqtech · ZutaCore · Custom</td><td>Vendor matrix in the Deep Comparison; after-sales score.</td></tr>
+                    <tr><td>Redundancy target</td><td>N · N+1 · 2N</td><td>Running count upper-bounds; spare CDU pre-positioning.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">Four sizing steps executed sequentially by <code class="mn-mono">DATAHALL_CALC</code>. Function names map one-to-one to <code class="mn-mono">js/datahall-calculations.js</code>. The Selection Guide and Checklist are reference/editorial documents — they state spec values and parameter bands but do not call the engine. The Mini-BMS cockpit inherits the same constants for consistency.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 1 — Liquid heat load</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">liquid_heat_kW = IT_kW × liquid_capture_ratio</span>
+                <span class="mn-where">In <code>DATAHALL_CALC.liquidHeat(itKW, captureRatio)</code>. Capture ratio is 0.85 (85%) from BASELINE-DECISION.md. Air-side residual = IT_kW × (1 − α).<span class="mn-src">DATAHALL_CALC · Ex5</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 2 — CDU running count</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">CDU_count = ceil( liquid_heat_kW / CDU_rating_kW )</span>
+                <span class="mn-where">In <code>DATAHALL_CALC.cduRunningCount(liquidHeatKW, cduRatingKW)</code>. Engine default CDU_rating = 350 kW (21-worked-examples.md Ex7 "If CDU = 350 kW"). Ceiling ensures full coverage; fractional CDU is not permissible.<span class="mn-src">DATAHALL_CALC · Ex7</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 3 — Total hydronic flow and per-CDU apportionment</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">total_flow_LPM = liquid_heat_kW × 60 / ( ρ × C<sub>p</sub> × ΔT )</span>
+                <span class="mn-eq">per_CDU_flow_LPM = total_flow_LPM / CDU_count</span>
+                <span class="mn-eq">per_CDU_load_kW = liquid_heat_kW / CDU_count</span>
+                <span class="mn-where">In <code>DATAHALL_CALC.hydronicFlowLPM(qKW, rhoKgL, cpKjKgK, deltaTK)</code>. ρ = 1.0 kg/L, C<sub>p</sub> = 4.186 kJ/(kg·K), ΔT = 10 K from the locked model. Flow divides equally across running CDUs in a balanced manifold arrangement.<span class="mn-src">DATAHALL_CALC · Ex6 + Ex7</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 4 — CDU pump power and N+1 redundancy</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">pump_power_kW = flow_m3s × head_Pa / ( pump_eff × 1000 )</span>
+                <span class="mn-eq">flow_m3s = flow_LPM / 60 000</span>
+                <span class="mn-eq">N+1_CDU_count = CDU_count + 1    (one full-capacity standby)</span>
+                <span class="mn-where">CDU pump power reference: at 7 128 kW IT load the PUE basis assumes 120 kW CDU pump power total (21-worked-examples.md Ex9 "CDU pumps = 120 kW"). Standby provision = N+1 (one standby per running group). The Mini-BMS P&amp;ID shows P-01A duty / P-01B standby with auto-changeover on pump failure (F11.2).<span class="mn-src">DATAHALL_CALC · Ex9</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">Every constant lives in the deep-frozen <code class="mn-mono">DATAHALL_MODEL</code> with a <code>// source:</code> tag. CDU-relevant constants:</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Constant</th><th>Value</th><th>Source</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td>CDU rating (EoR, default)</td><td><code>350 kW</code></td><td>21-worked-examples.md Ex7</td><td>End-of-row CDU sizing basis in the cduRunningCount engine call.</td></tr>
+                    <tr><td>Vertiv CoolChip CDU 121</td><td><code>121 kW</code></td><td>00-overview-audit.md Source Sanity</td><td>Per-rack class reference; noted as <code>coolChipNoteKW</code> in the model. Not the Ex7 running-count basis.</td></tr>
+                    <tr><td>Liquid capture ratio</td><td><code>0.85</code></td><td>BASELINE-DECISION.md</td><td>85% of IT heat to the secondary hydronic loop for direct-to-chip halls.</td></tr>
+                    <tr><td>TCS supply temperature</td><td><code>35 °C</code></td><td>BASELINE-DECISION.md</td><td>Secondary-loop supply to CDU cold-plate manifold.</td></tr>
+                    <tr><td>TCS return temperature</td><td><code>45 °C</code></td><td>BASELINE-DECISION.md</td><td>Return from cold plates; ΔT = 10 K across the loop.</td></tr>
+                    <tr><td>Water density (ρ)</td><td><code>1.0 kg/L</code></td><td>21-worked-examples.md Ex6</td><td>Pure water at ~35 °C. Glycol mixtures require adjustment.</td></tr>
+                    <tr><td>Water C<sub>p</sub></td><td><code>4.186 kJ/(kg·K)</code></td><td>21-worked-examples.md Ex6</td><td>Specific heat used in hydronicFlowLPM().</td></tr>
+                    <tr><td>CDU pump power (ref, at 7 128 kW IT)</td><td><code>120 kW</code></td><td>21-worked-examples.md Ex9</td><td>CDU pump total at the Scenario B reference IT load — used in PUE bottom-up basis.</td></tr>
+                    <tr><td>Secondary loop ΔP target</td><td><code>0.5–3.0 bar</code></td><td>CDU Mini-BMS operating bands · ASHRAE TC 9.9</td><td>Differential pressure across the CDU secondary manifold; alarm outside this band.</td></tr>
+                    <tr><td>System pressure (secondary)</td><td><code>2–6 bar</code></td><td>CDU Mini-BMS operating bands</td><td>Secondary-loop static pressure; leak alarm if rapid drop detected.</td></tr>
+                    <tr><td>Flow rate target</td><td><code>1.0–1.5 LPM/kW</code></td><td>CDU Mini-BMS operating bands · OCP Thermal WG</td><td>Per-kW flow guidance for cold-plate DCW systems; OCP specification for HPC racks.</td></tr>
+                    <tr><td>Secondary supply temperature</td><td><code>17–45 °C</code></td><td>CDU Mini-BMS · ASHRAE TC 9.9</td><td>Acceptable secondary supply range; dew-point reset ensures &ge;dew point + 3 °C to avoid condensation.</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.25rem;">CDU OEM reference models</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>OEM / Model</th><th>Capacity</th><th>Type</th><th>Source class</th></tr></thead>
+                <tbody>
+                    <tr><td>Vertiv CoolChip CDU 121</td><td>121 kW</td><td>In-rack / per-rack L2L</td><td>Source Sanity (00-overview-audit.md) — per-rack density class; <code>coolChipNoteKW</code> in DATAHALL_MODEL.</td></tr>
+                    <tr><td>Asetek RackCDU D2C</td><td>20–100 kW</td><td>In-rack / direct-to-chip</td><td>OEM datasheet; representative per-rack class for mid-density HPC.</td></tr>
+                    <tr><td>Generic 350 kW EoR CDU</td><td>350 kW</td><td>End-of-row L2L</td><td>21-worked-examples.md Ex7 sizing basis. Represents mid-range EoR CDUs from multiple vendors (Schneider EcoBreeze variants, Liqtech, etc.).</td></tr>
+                    <tr><td>High-capacity EoR CDU</td><td>500–800 kW</td><td>End-of-row L2L</td><td>Emerging class for AI/HPC islands &gt;200 kW/rack; not the DATAHALL_CALC default.</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <p class="mn-lead" style="margin-top:0.9rem;">Standards: <strong>ISO 4413:2011</strong> — hydraulic fluid-power system safety (pressure testing, containment, relief-valve requirements); <strong>ASHRAE 15:2022</strong> — refrigeration-system safety (coolant concentration limits, leak detection for refrigerant-based CDUs); <strong>ASHRAE TC 9.9</strong> — liquid-cooling best practice including W-class water quality acceptance criteria (W1–W4, conductivity, pH, dissolved oxygen); <strong>OCP Thermal WG</strong> — cold-plate connector and flow-rate specifications for hyperscale HPC; <strong>DMTF Redfish §Thermal</strong> — CDU BMS/DCIM integration schema.</p>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <p class="mn-lead">The sizing engine returns four primary quantities. The Mini-BMS cockpit derives its live-parameter state from these values; the Selection Guide states the same sizing math as reference text; the Checklist uses measured values against the operating bands.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Formula / source</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>Liquid heat load</td><td><code>IT × 0.85</code></td><td>kW</td><td>Heat rejected to the secondary hydronic loop. Drives all downstream CDU sizing.</td></tr>
+                    <tr><td>CDU running count</td><td><code>ceil(liquid_heat / 350)</code></td><td>count</td><td>Minimum CDUs needed to cover the liquid heat load at full-capacity rating.</td></tr>
+                    <tr><td>N+1 CDU count</td><td><code>CDU_count + 1</code></td><td>count</td><td>Total CDUs provisioned including one full-capacity standby for single-failure tolerance.</td></tr>
+                    <tr><td>Total hydronic flow</td><td><code>liquid_heat × 60 / (1.0 × 4.186 × 10)</code></td><td>LPM</td><td>Secondary-loop flow required to carry the liquid heat load at 10 K ΔT.</td></tr>
+                    <tr><td>Per-CDU flow</td><td><code>total_flow / CDU_count</code></td><td>LPM</td><td>Flow each running CDU handles. Used to size manifold headers and check velocity limits.</td></tr>
+                    <tr><td>Per-CDU load</td><td><code>liquid_heat / CDU_count</code></td><td>kW</td><td>Thermal load per unit. Confirms CDU is operating within rated capacity with margin.</td></tr>
+                    <tr><td>CDU pump power (total)</td><td><code>flow_m3s × head / η / 1000</code></td><td>kW</td><td>Electrical power for CDU circulation pumps — included in the PUE basis as a distinct cooling-ancillary line.</td></tr>
+                    <tr><td>Cockpit status flags</td><td>live simulation</td><td>bool / enum</td><td>Mini-BMS: N+1 healthy / N (standby lost) / FAULT; leak=0 / leak detected; chemistry in-spec / drift alarm.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example</h2>
+            <p class="mn-lead">Full-facility peak: 4 halls × Scenario B IT 7 128 kW/hall = 28 512 kW total IT. Verify CDU count, per-unit flow, and per-unit load against <code class="mn-mono">DATAHALL_CALC</code>. Scenario B (IT = 7 128 kW/hall) is the reference case for the PUE bottom-up worked example (Ex9).</p>
+            <div class="mn-worked">
+                <ol>
+                    <li>Facility IT load: <code>4 halls × 7 128 kW =</code> <span class="mn-result">28 512 kW</span></li>
+                    <li>Liquid heat (85% capture): <code>28 512 × 0.85 =</code> <span class="mn-result">24 235 kW</span> · Air-side residual: <code>28 512 × 0.15 =</code> <span class="mn-result">4 277 kW</span></li>
+                    <li>CDU running count: <code>ceil(24 235 / 350) = ceil(69.24) =</code> <span class="mn-result">70 CDUs (facility-wide)</span></li>
+                    <li><em>Per-hall basis (Ex7 reference):</em> <code>7 128 × 0.85 = 6 059 kW</code> liquid heat per hall → <code>ceil(6 059 / 350) = ceil(17.31) =</code> <span class="mn-result">18 CDUs/hall</span> · N+1 = <span class="mn-result">19 CDUs/hall</span></li>
+                    <li>Total hydronic flow per hall: <code>6 059 × 60 / (1.0 × 4.186 × 10) =</code> <span class="mn-result">8 686 LPM</span></li>
+                    <li>Per-CDU flow: <code>8 686 / 18 =</code> <span class="mn-result">483 LPM/CDU</span></li>
+                    <li>Per-CDU load: <code>6 059 / 18 =</code> <span class="mn-result">337 kW/CDU</span> (96% of 350 kW rating — within capacity)</li>
+                    <li><em>Facility-level Scenario B alternative (single-hall perspective for Ex7):</em> liquid heat 6 059 kW → 18 running CDUs · per-CDU 483 LPM / 337 kW ✓</li>
+                    <li>CDU pump power (total, Ex9 reference at 7 128 kW IT): <span class="mn-result">120 kW</span> CDU pump ancillary contribution to PUE basis.</li>
+                    <li>Sanity check — per-CDU flow vs OCP band: <code>483 LPM / 337 kW =</code> <span class="mn-result">1.43 LPM/kW</span> → within the 1.0–1.5 LPM/kW operating band ✓</li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>DATAHALL_CALC anchor:</strong> the Ex7 sizing example uses a 12 118 kW liquid heat figure in some expositions (IT 14 256 × 85%). Running that through the same formula: <code>ceil(12 118 / 350) = ceil(34.62) =</code> <strong>35 CDUs</strong>; total flow <code>12 118 × 60 / (1.0 × 4.186 × 10) = 17 380 LPM</code>; per-CDU flow <code>17 380 / 35 = 497 LPM</code>; per-CDU load <code>12 118 / 35 = 346 kW</code>. These are the canonical facility-Scenario-A numbers cited in the toolkit summary (Scenario A IT 3 564 kW/hall × 4 halls × 85% = 12 118 kW, 35 CDUs, 497 LPM, 346 kW per unit).</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>21-worked-examples.md Ex7</b> — CDU running count sizing basis: "If CDU = 350 kW, count = ceil(liquid_heat / 350)". Canonical authority for <code>cduRunningCount()</code>.</li>
+                <li><b>21-worked-examples.md Ex9</b> — PUE bottom-up basis: CDU pump power = 120 kW at 7 128 kW IT reference load. Nameplate COP 6.8 (Carrier 19DV) — not calibrated.</li>
+                <li><b>21-worked-examples.md Ex6</b> — Hydronic flow formula: ρ = 1.0 kg/L, C<sub>p</sub> = 4.186 kJ/(kg·K). Water property basis for <code>hydronicFlowLPM()</code>.</li>
+                <li><b>BASELINE-DECISION.md</b> — Locked basis of design: liquid capture ratio 0.85, TCS 35/45 °C (ΔT 10 K), Scenario A/B IT loads.</li>
+                <li><b>00-overview-audit.md (Source Sanity)</b> — Vertiv CoolChip CDU 121 = 121 kW per-rack reference; Carrier 19DV 1 231–4 044 kW chiller range.</li>
+                <li><b>ISO 4413:2011</b> — Hydraulic fluid-power safety: pressure-test requirements, containment, relief-valve ratings for CDU secondary circuits.</li>
+                <li><b>ASHRAE 15:2022</b> — Safety Standard for Refrigeration Systems: coolant concentration limits, leak detection requirements for refrigerant-based CDU variants.</li>
+                <li><b>ASHRAE TC 9.9 (2021)</b> — Liquid Cooling Guidelines for Datacom Equipment: W-class water quality (W1–W4 conductivity, pH, dissolved O<sub>2</sub>), secondary-loop temperature and pressure ranges, commissioning criteria.</li>
+                <li><b>OCP Thermal WG</b> — Open Compute cold-plate and connector specifications; 1.0–1.5 LPM/kW flow-rate guidance for HPC racks.</li>
+                <li><b>DMTF Redfish §Thermal</b> — CDU BMS/DCIM integration schema: <code>CoolingLoop</code>, <code>CoolantConnector</code>, SNMP/RESTful telemetry. Referenced in the Mini-BMS architecture section.</li>
+                <li><b>OEM datasheets — Vertiv, Asetek, doc-21</b> — CDU heat-rejection capacities, flow/pressure envelopes, maintenance intervals. See cdu-checklist.html §07 for spare-parts references.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">js/datahall-calculations.js</code> (DATAHALL_CALC) · <code class="mn-mono">js/datahall-model.js</code> (DATAHALL_MODEL, deep-frozen) · worked examples gate <code class="mn-mono">tools/test-datahall-calc.mjs</code> (57/57).</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The CDU count formula assumes all CDUs are identically rated and the manifold is hydraulically balanced (equal flow share). In practice, diversity factors, partial-load derating, and manifold pressure-drop asymmetry should be modelled; consult the CDU OEM for site-specific sizing confirmation. The 350 kW CDU rating is the Ex7 basis — it is representative of end-of-row CDUs but is not a specific vendor model; actual CDU ratings must be confirmed against the chosen OEM's datasheet.</p>
+            <p class="mn-lead">The pump-power figure (120 kW at 7 128 kW IT) is the PUE-basis reference for Scenario B — it is an ancillary assumption in the bottom-up PUE model, not a design output of the CDU sizing step. Site pump power depends on actual loop head, pipe routing, and equipment arrangement. The 1.0–1.5 LPM/kW operating band from OCP applies to cold-plate direct-to-chip systems; in-row or sidecar CDUs with larger heat exchangers may accept lower per-kW flow.</p>
+            <p class="mn-lead">Water-quality criteria (ASHRAE TC 9.9 W-classes) in the Checklist are acceptance thresholds, not ongoing operating targets; continuous monitoring with automatic dosing is recommended for CDU installations above 200 kW/hall. The FMECA fault codes (F11.1–F11.5) referenced by the Mini-BMS are educational mappings to <code>ai-engineering-maintenance.html</code> — they are not a substitute for a site-specific FMECA analysis. This toolkit and its methodology are an <strong>engineering education and pre-design aid</strong>; final CDU design and commissioning must be carried out by a qualified mechanical/facilities engineer to the authority having jurisdiction and in compliance with the site's cooling-infrastructure specifications.</p>
+        </section>
+
+        <a class="mn-toollink" href="../cdu-hub.html">&#9654; Open the Liquid-Cooling CDU Toolkit</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../cdu-hub.html">CDU Toolkit</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

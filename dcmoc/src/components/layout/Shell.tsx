@@ -395,7 +395,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                                             active ? "text-cyan-700 dark:text-cyan-400" : "text-slate-600 dark:text-slate-300"
                                         )}
                                     >
-                                        <span className="text-[10px] font-mono font-bold w-5 h-5 rounded flex items-center justify-center shrink-0 text-white" style={{ background: ENGINE_COLORS[g.num] }}>{g.num}</span>
+                                        <span className="text-[10px] font-mono font-bold w-5 h-5 rounded flex items-center justify-center shrink-0 text-slate-900" style={{ background: ENGINE_COLORS[g.num] }}>{g.num}</span>
                                         <GroupIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
                                         <span className="flex-1 text-left truncate">{g.label}</span>
                                         {!hasChildren && <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-400 shrink-0">soon</span>}

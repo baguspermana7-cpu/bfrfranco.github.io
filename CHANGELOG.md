@@ -11,6 +11,25 @@ release sections rather than semver.
 
 ---
 
+## v1.98.1 — 2026-07-20 (wave M/L audit tuntas: kontradiksi Architecture + kejujuran plan-mode + Asset MTBF + air ganda + LCC hidup)
+
+### Fixed
+- **Architecture 3 kontradiksi**: profil default "ai-liquid" tak pernah ter-apply → chip drift amber "Profile recommends D2C Liquid — not applied · apply"; Power Topology bind `sim.powerRedundancy` (bukan tabel tier) — "2N — two fully independent active paths"; ASHRAE compliance kini baca density ceiling (air+60kW → 40% + "liquid/D2C required", rail Review + PDF ikut).
+- **Asset MTBF/MTTR "—" semua baris**: field mismatch `mtbfHours` vs engine `mtbf` — kini terisi IEEE-493 per class; "—" tinggal class yang memang tak ada di tabel (header jujur).
+- **Dashboard LCC (15yr) "—"**: guard memanggil `models.tco.totalCost` yang tidak ada — fn engine sebenarnya `lifecycleNPV` → KPI hidup (TCO diskonto 15 thn + siklus refresh); node trace `fin.lcc15` mirror (parity 117/117).
+- **Readiness advisory phantom** (readiness null dianggap 0) + Ops PM Compliance sub jujur; insight duplikat Requirements dedup (rule lokal vs flag engine).
+- Kontras: badge sidebar slate-900, legend chart light-theme terbaca.
+
+### Changed (kejujuran presentasi — math tak berubah)
+- **Plan-mode tidak lagi "berprestasi"**: Construction Progress/AC/SPI/CPI + Financial health "A (baseline)" + Results dimensi Construction/Financial ber-chip "baseline" + footnote komposit "2 dimensi masih baseline plan-mode".
+- **4 IRR diberi basis eksplisit** + tooltip rekonsiliasi lintas halaman (Dashboard "unlevered after-tax · ramp · 15 thn"; Results "screening — unlevered 15y flat"; angka memang sah berbeda — kini dijelaskan, bukan disamakan).
+- **Air Sustainability disatukan berlabel**: KPI = volume engine pre-climate (≡ node trace), kartu Env menampilkan kedua baris (engine → ×climate ×1.2 → biaya) — tidak ada lagi dua angka tanpa penjelasan.
+- Site single-site tidak lagi "Recommended/Best" (komparatif butuh ≥2 site); basis note outage blended vs SAIDI mentah. Fire CAPEX "—" → tombol "run the CAPEX Engine →". Jahitan bahasa EN/ID dirapikan ("Penilaian: …").
+- 16 halaman `manual/*.html` (technical manual per kalkulator, sudah lama ada tapi untracked) ikut tercommit.
+
+### Verified
+- tsc/build · walk 24/0 · synergy 6/0 · **trace-parity 117/117** · export 44/0 · syntax audits clean.
+
 ## v1.98.0 — 2026-07-20 (EA-2 KORPUS BESAR 47 dokumen + audit visual 2 ronde: 4 bug kalkulasi HIGH fixed)
 
 ### Added — EA-2 Big-Project Corpus (owner: "crawl semua — PM, tech spec, tender, research, calculation")

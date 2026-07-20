@@ -309,9 +309,16 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 text-center">
                                 <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Financial Health</h3>
                                 <TraceValue traceId="fin.healthScore">
-                                    <div className={`text-4xl font-bold ${model.grade === 'A' ? 'text-emerald-500' : model.grade === 'B' ? 'text-lime-500' : model.grade === 'C' ? 'text-amber-500' : 'text-rose-500'}`}>{model.grade}</div>
+                                    <div className={`text-4xl font-bold ${model.grade === 'A' ? 'text-emerald-500' : model.grade === 'B' ? 'text-lime-500' : model.grade === 'C' ? 'text-amber-500' : 'text-rose-500'}`}>
+                                        {model.grade}{model.planMode && <span className="text-base font-semibold text-slate-400"> (baseline)</span>}
+                                    </div>
                                 </TraceValue>
                                 <div className="text-[10px] text-slate-500">{model.health}/100 · 0.3 budget-var + 0.35 CPI + 0.35 SPI</div>
+                                {/* audit #8: in Plan Mode the composite is DEFINITIONAL (CPI/SPI≡1, FAC≡revised
+                                  * → budget-var 0) — grey chip keeps the perfect grade honest. Math unchanged. */}
+                                {model.planMode && (
+                                    <span className="mt-1 inline-block rounded bg-slate-400/15 px-1 py-0.5 text-[8px] font-semibold text-slate-500">Plan Mode — baseline (belum ada actuals)</span>
+                                )}
                                 <div className="mt-1.5 space-y-0.5 text-left text-[11px]">
                                     <div className="flex justify-between"><span className="text-slate-500">Budget Variance</span><span className={`tabular-nums ${Math.abs(model.fac - model.revised) / model.revised < 0.02 ? 'text-emerald-500' : 'text-amber-500'}`}>{((model.fac - model.revised) / model.revised * 100).toFixed(1)}%</span></div>
                                     <div className="flex justify-between"><span className="text-slate-500">CPI</span><span className="tabular-nums text-slate-700 dark:text-slate-200">{model.cpi}</span></div>

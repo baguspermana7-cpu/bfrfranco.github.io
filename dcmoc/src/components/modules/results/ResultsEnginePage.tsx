@@ -154,7 +154,7 @@ export function ResultsEnginePage() {
                 kpis: [
                     { label: 'Overall Score', value: `${model.overall}/100`, sub: model.grade },
                     { label: 'CAPEX $/kW', value: `$${model.perKw.toLocaleString()}`, sub: 'vs reference band' },
-                    { label: 'IRR (screening)', value: model.irr != null ? `${(model.irr * 100).toFixed(1)}%` : '—', sub: '10% hurdle' },
+                    { label: 'IRR (screening)', value: model.irr != null ? `${(model.irr * 100).toFixed(1)}%` : '—', sub: 'unlevered 15y flat · 10% hurdle' },
                     { label: 'PUE', value: String(model.opexPue), sub: `${inputs.coolingType} · Tier ${inputs.tierLevel}` },
                 ],
                 config: [
@@ -191,6 +191,11 @@ export function ResultsEnginePage() {
     if (!capexResults || !model) return <div className="p-8 text-center text-sm text-slate-500">Calculating…</div>;
 
     const radarData = model.dims.map((d) => ({ axis: d.label, score: d.score }));
+    /* audit #8: no actuals tracking (plan mode) ⇒ Construction (SPI/CPI≡1.00) and
+     * Financial (screening pro-forma) dimension scores are BASELINE-definitional —
+     * chip + composite footnote keep the perfect rows honest. Math unchanged. */
+    const planBase = model.dimCtx.evm?.planMode ?? true;
+    const baselineDimKeys = planBase ? ['constr', 'fin'] : [];
     const validation = [
         { label: 'Engine loaded', ok: !!rzModels()?.site },
         { label: 'CAPEX computed', ok: !!capexResults },
@@ -277,6 +282,11 @@ export function ResultsEnginePage() {
                                 <div className="text-5xl font-bold tabular-nums text-violet-500">{model.overall}<span className="text-lg text-slate-400">/100</span></div>
                             </TraceValue>
                             <div className={`mt-1 text-sm font-semibold ${model.overall >= 85 ? 'text-emerald-500' : model.overall >= 70 ? 'text-lime-500' : 'text-amber-500'}`}>{model.grade}</div>
+                            {baselineDimKeys.length > 0 && (
+                                <p className="mt-1 text-[9px] leading-snug text-slate-400">
+                                    {baselineDimKeys.length} dimensi masih baseline plan-mode (Construction SPI/CPI 1.00 definisional · Financial screening pro-forma) — belum ada actuals tracking; komposit ikut terangkat oleh baseline ini.
+                                </p>
+                            )}
                             <div className="mt-3 space-y-1 text-left">
                                 {[...model.dims].sort((a, b) => b.score - a.score).map((d, idx) => (
                                     <div key={d.key} className="flex items-center gap-2 text-[11px]">
@@ -307,16 +317,21 @@ export function ResultsEnginePage() {
                             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Key Financial Outcomes</h3>
                                 <div className="space-y-1 text-[11px]">
+                                    {/* audit #5: screening IRR basis made explicit — this page's IRR is
+                                      * unlevered 15y FLAT-flow screening; other surfaces legitimately
+                                      * differ (tooltip reconciles the bases, numbers are NOT equalized). */}
                                     {([
                                         ['Total CAPEX (P50)', fmtMoney(capexResults.total), 'capex.total'],
                                         ['$ / kW', `$${model.perKw.toLocaleString()}`, 'capex.perKw'],
-                                        ['NPV (15y @10%)', model.npv != null ? fmtMoney(model.npv) : '—'],
-                                        ['IRR (screening)', model.irr != null ? `${(model.irr * 100).toFixed(1)}%` : '—'],
+                                        ['NPV (15y @10%)', model.npv != null ? fmtMoney(model.npv) : '—', undefined,
+                                            'Basis screening: arus kas flat 15 thn (revenue referensi × IT load, okupansi penuh, tanpa ramp/pajak/utang), didiskonto 10%.'],
+                                        ['IRR (screening — unlevered 15y flat)', model.irr != null ? `${(model.irr * 100).toFixed(1)}%` : '—', undefined,
+                                            'Basis IRR screening: unlevered, arus kas FLAT 15 thn (revenue referensi × IT load, okupansi penuh, tanpa ramp/pajak/utang).\nHalaman lain memakai basis BERBEDA dan sah (angka tidak harus sama):\n· Dashboard — project IRR unlevered after-tax, ramp okupansi, 15 thn\n· Financial Pro-Forma — aproksimasi model pro-forma sendiri\n· Site w/ incentives — screening + insentif pajak lokasi'],
                                         ['Design PUE', String(model.opexPue), 'engine.pueMatrix'],
                                         ['Best Site', model.siteBest ? `${model.siteBest.engine.score}/100 (${model.siteBest.engine.grade})` : '—'],
-                                    ] as [string, string, string?][]).map(([k, v, tr]) => (
-                                        <div key={k} className="flex justify-between">
-                                            <span className="text-slate-500">{k}</span>
+                                    ] as [string, string, string?, string?][]).map(([k, v, tr, tip]) => (
+                                        <div key={k} className="flex justify-between" title={tip}>
+                                            <span className="text-slate-500">{k}{tip ? ' ⓘ' : ''}</span>
                                             {tr ? (
                                                 <TraceValue traceId={tr}>
                                                     <span className="tabular-nums font-medium text-slate-800 dark:text-slate-200">{v}</span>
@@ -357,7 +372,12 @@ export function ResultsEnginePage() {
                                     return (
                                     <React.Fragment key={d.key}>
                                     <tr className="border-b border-slate-100 dark:border-slate-800/60">
-                                        <td className="py-1 text-slate-700 dark:text-slate-200">{d.label}</td>
+                                        <td className="py-1 text-slate-700 dark:text-slate-200">
+                                            {d.label}
+                                            {baselineDimKeys.includes(d.key) && (
+                                                <span title="Plan Mode — skor definisional dari baseline (belum ada actuals tracking)" className="ml-1.5 rounded bg-slate-400/15 px-1 py-0.5 text-[8px] font-semibold text-slate-500">baseline</span>
+                                            )}
+                                        </td>
                                         <td className="text-right whitespace-nowrap">
                                             {tr ? <TraceValue traceId={tr}>{scoreEl}</TraceValue> : scoreEl}
                                             {low && (

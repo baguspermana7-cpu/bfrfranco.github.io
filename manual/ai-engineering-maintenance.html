@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>AI Engineering Maintenance — Methodology | ResistanceZero</title>
+    <meta name="description" content="Full engineering methodology for the AI Engineering Maintenance advisor concept: FMECA RPN, MTBF/failure-rate, Weibull reliability, spares readiness, Knowledge Graph, and ML advisor — 109 fault modes across 20 DC asset families.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="FMECA, RPN, MTBF, Weibull reliability, knowledge graph, predictive maintenance, prescriptive maintenance, MIL-STD-1629, IEC 60812, Telcordia SR-332, spares readiness, lead-time risk, data center maintenance">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/ai-engineering-maintenance.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/ai-engineering-maintenance.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/ai-engineering-maintenance.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/ai-engineering-maintenance.html">
+    <meta property="og:title" content="AI Engineering Maintenance — Methodology">
+    <meta property="og:description" content="FMECA + Knowledge Graph + ML advisor concept methodology: RPN scoring, MTBF/Weibull, spares readiness, 109 fault modes, and data provenance from Lin &amp; Ompusunggu (2026).">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="AI Engineering Maintenance Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="AI Engineering Maintenance — Methodology">
+    <meta name="twitter:description" content="FMECA RPN, MTBF, Weibull reliability, spares readiness — methodology behind the 109-fault-mode AI maintenance advisor concept.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="AI Engineering Maintenance Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "AI Engineering Maintenance" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "AI Engineering Maintenance — Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "FMECA + Knowledge Graph + ML prescriptive maintenance advisor concept for data-centre engineered assets",
+        "articleSection": "Predictive Maintenance",
+        "dependencies": "MIL-STD-1629A, IEC 60812, Telcordia SR-332, IEEE 493, CIGRE TB-642",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to score fault modes with FMECA RPN",
+        "step": [
+            { "@type": "HowToStep", "name": "Rate Severity", "text": "Score S 1–10: impact on mission-critical load if this failure mode reaches its effect (10 = loss of critical redundancy or human safety)." },
+            { "@type": "HowToStep", "name": "Rate Occurrence", "text": "Score O 1–10: likelihood of the failure mode occurring within the maintenance interval, informed by MTBF from NPRD-2016, IEEE 493, CIGRE TB-642, or OREDA." },
+            { "@type": "HowToStep", "name": "Rate Detection", "text": "Score D 1–10: likelihood that current controls will fail to detect the fault before effect (10 = no monitoring, no scheduled inspection)." },
+            { "@type": "HowToStep", "name": "Compute RPN", "text": "RPN = S × O × D. Prioritise RPN ≥ 200 as Tier-1 actions; RPN 100–199 as Tier-2; RPN < 100 as Tier-3." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is the FMECA RPN formula?",
+                "acceptedAnswer": { "@type": "Answer", "text": "RPN = Severity × Occurrence × Detection, each rated 1–10. Severity reflects mission impact; Occurrence reflects failure likelihood given historical MTBF data (IEEE 493, CIGRE, OREDA); Detection reflects the probability that monitoring or inspection will miss the fault. Per MIL-STD-1629A, RPN ≥ 200 triggers mandatory corrective action." }
+            },
+            {
+                "@type": "Question",
+                "name": "How is Weibull reliability used in this advisor?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Weibull two-parameter reliability R(t) = exp(−(t/η)^β) models the survival probability of a component at mission time t, where η is the characteristic life (63.2% failure point) and β is the shape parameter (β < 1 = early-life; β ≈ 1 = random; β > 1 = wear-out). The advisor uses published β and η values from Telcordia SR-332 and IEEE 493 to rank components by projected reliability at the next planned outage window." }
+            },
+            {
+                "@type": "Question",
+                "name": "Is this a live ML model or a concept/demo?",
+                "acceptedAnswer": { "@type": "Answer", "text": "This is a concept and illustrative demonstration. The 109 fault modes and 834 Knowledge Graph rows are synthesised from published research (Lin & Ompusunggu 2026) and the RZ FMECA seed dataset. The ML advisor pathway is described as a proposed architecture — no live Random Forest or graph-inference model is deployed on this page. All numerical outputs are deterministic calculations from the FMECA formulas and reliability databooks, not predictions from a trained model." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../ai-engineering-maintenance.html" class="nav-link">AI Maintenance</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / AI Engineering Maintenance
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Predictive Maintenance</p>
+            <h1>AI Engineering Maintenance — Methodology &amp; Formulas</h1>
+            <p>Every input, equation, constant, output, and reference behind the AI Engineering Maintenance advisor concept. The advisor synthesises FMECA risk-priority scoring, Weibull reliability modelling, and spares-readiness analysis across 109 fault modes and 20 DC asset families — grounded in Lin &amp; Ompusunggu (2026) and the RZ FMECA seed dataset. This is an illustrative concept and pre-design aid, not a deployed ML model.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Concept <strong>FMECA + KG + ML-advisor</strong></span>
+                <span class="mn-chip">Fault modes <strong>109</strong></span>
+                <span class="mn-chip">KG rows <strong>834</strong></span>
+                <span class="mn-chip">Asset families <strong>20</strong></span>
+                <span class="mn-chip">Basis <strong>Lin &amp; Ompusunggu (2026)</strong></span>
+            </div>
+            <a class="mn-toollink" href="../ai-engineering-maintenance.html">&#9654; Open the live AI Maintenance advisor</a>
+        </header>
+
+        <!-- 1. PURPOSE & BASIS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The AI Engineering Maintenance advisor is a <strong>concept demonstration</strong> of a prescriptive maintenance system for data-centre engineered assets. It answers three design questions: <em>which fault modes carry the highest risk-priority</em>, <em>what is the projected reliability at the next outage window</em>, and <em>is the spares inventory adequate given lead-time and current stock</em>.</p>
+            <p class="mn-lead">Basis of design follows Lin &amp; Ompusunggu (2026), <em>Intelligent Advisor System for Prescriptive Maintenance of Engineered Assets Using FMECA, Knowledge Graph and Machine Learning</em> (IET Artificial Intelligence for Engineering, doi:10.1049/aie2.70019). The paper proposes a four-layer architecture: (1) FMECA fault-mode database, (2) Neo4j Knowledge Graph linking assets → faults → actions → effects → mechanisms, (3) a Random Forest ML classifier trained on historical work-order data, and (4) a rule-based NLP interface for technician queries. This manual documents layers 1–2 and the underlying reliability mathematics.</p>
+            <div class="mn-note"><strong>Concept / Demo notice:</strong> The 109 fault modes and 834 KG rows described here are synthesised from the Lin &amp; Ompusunggu (2026) framework and the RZ FMECA seed dataset (RZ Research Team, 2026-05-23). No live Random Forest model or Neo4j graph is deployed in the current advisor implementation. All numerical outputs in the tool are deterministic, using the FMECA formulas and published reliability databooks below.</div>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">Six inputs across three groups — component identity, part-stock BOM, and lead-time / OEM support. The FMECA SOD scores are drawn from the preloaded 109-fault-mode database; the user may override per site.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field</th><th>Symbol</th><th>Unit</th><th>Range / default</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td>Asset family</td><td><code>A</code></td><td>enum</td><td>20 families</td><td>Selects the FMECA fault-mode block (transformer, switchgear, UPS, etc.).</td></tr>
+                    <tr><td>Severity score</td><td><code>S</code></td><td>1–10</td><td>Per fault mode</td><td>Mission impact if the failure effect is reached. 10 = loss of critical redundancy or human safety.</td></tr>
+                    <tr><td>Occurrence score</td><td><code>O</code></td><td>1–10</td><td>Derived from MTBF</td><td>Likelihood of fault mode within maintenance interval, informed by IEEE 493, CIGRE TB-642, NPRD-2016, OREDA.</td></tr>
+                    <tr><td>Detection score</td><td><code>D</code></td><td>1–10</td><td>Per monitoring rig</td><td>Probability that current controls will fail to detect the fault. 10 = no monitoring, no scheduled inspection.</td></tr>
+                    <tr><td>Current stock qty</td><td><code>Q<sub>s</sub></code></td><td>pcs</td><td>≥ 0</td><td>On-hand inventory of the critical spare part.</td></tr>
+                    <tr><td>Supplier lead time</td><td><code>L</code></td><td>days</td><td>≥ 0</td><td>Procurement lead time from order to delivery, used in spares-readiness and lead-time risk scoring.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">Five calculation layers: FMECA RPN, MTBF / failure-rate conversion, Weibull reliability, spares readiness, and lead-time risk. All formulas are deterministic; the ML-advisor layer is described as a proposed enhancement.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">FMECA Risk Priority Number (RPN)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">RPN = S × O × D        (dimensionless, range 1–1000)</span>
+                <span class="mn-where">S = Severity (1–10), O = Occurrence (1–10), D = Detection (1–10). Tier-1 action required if RPN ≥ 200; Tier-2 at 100–199; Tier-3 below 100. Per MIL-STD-1629A and IEC 60812 guidelines.<span class="mn-src">MIL-STD-1629A · STANDARD</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">MTBF and failure rate</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">λ = 1 / MTBF        (failures per operating hour)</span>
+                <span class="mn-eq">MTBF = η · Γ(1 + 1/β)        (Weibull mean life)</span>
+                <span class="mn-where">λ is the failure rate (constant-hazard assumption, exponential model). For exponential failure, MTBF = 1/λ exactly. For Weibull: Γ is the gamma function; MTBF reduces to 1/λ only when β = 1. Databook sources: NPRD-2016 for electronic/mechanical parts, IEEE Std 493 (Gold Book) for power equipment, CIGRE TB-642 for transformers, OREDA for offshore/process plant.<span class="mn-src">Telcordia SR-332 · STANDARD</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Weibull reliability function</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">R(t) = exp( −(t / η)^β )        (survival probability at mission time t)</span>
+                <span class="mn-eq">F(t) = 1 − R(t)        (cumulative failure probability)</span>
+                <span class="mn-eq">h(t) = (β / η) · (t / η)^(β−1)        (hazard rate)</span>
+                <span class="mn-where">η = characteristic life (scale, 63.2% failure point) [hours]. β = shape parameter: β &lt; 1 early-life failures; β ≈ 1 random/exponential; β &gt; 1 wear-out. The advisor ranks components by R(t) at the next planned maintenance interval to prioritise pre-emptive replacement.<span class="mn-src">Weibull (1951) · PUBLISHED</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Spares readiness %</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Readiness% = (Q<sub>s</sub> / Q<sub>min</sub>) × 100        [%]</span>
+                <span class="mn-eq">Q<sub>min</sub> = ceil( N<sub>assets</sub> × F(t<sub>interval</sub>) + safety-stock )</span>
+                <span class="mn-where">Q<sub>s</sub> = on-hand stock; Q<sub>min</sub> = minimum required stock. Q<sub>min</sub> uses F(t) to estimate expected demand over the maintenance interval across N<sub>assets</sub> installed units, plus a safety-stock factor (typically 1–2 units for critical Tier-1 faults). Readiness% ≥ 100 = fully covered; below 100 = gap.<span class="mn-src">RZ FMECA Seed · INTERNAL</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Lead-time risk score</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">LT_risk = ( L / MTTR<sub>target</sub> ) × S        (dimensionless)</span>
+                <span class="mn-where">L = supplier lead time [days]; MTTR<sub>target</sub> = maximum acceptable mean-time-to-restore [days] (Tier-III default 4 h = 0.17 day; Tier-IV 1 h = 0.042 day); S = severity score. LT_risk &gt; 1 indicates that the procurement lead time exceeds the restoration target — the part must be stocked on-site.<span class="mn-src">RZ FMECA Seed · INTERNAL</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">ML advisor (proposed architecture)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Proposed: Random Forest classifier → P(action | fault_mode, sensor_vector, work_order_history)</span>
+                <span class="mn-eq">Knowledge Graph query: MATCH (a:Asset)-[:HAS_FAULT]->(f)-[:TRIGGERS_ACTION]->(act) WHERE f.rpn &gt; threshold RETURN act</span>
+                <span class="mn-where">The ML layer — as described in Lin &amp; Ompusunggu (2026) — would rank corrective and preventive actions given live sensor inputs and historical CMMS work-order data. The KG Cypher query retrieves the recommended actions from the 834-row graph. <strong>This layer is illustrative in the current implementation</strong>; the tool returns rule-based FMECA recommendations.<span class="mn-src">Lin &amp; Ompusunggu 2026 · PROPOSED</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS & SOURCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data provenance</h2>
+            <p class="mn-lead">The 109 fault modes across 20 asset families were synthesised by the RZ Research Team (2026-05-23) from the sources listed below. Each fault mode carries a <code>source:</code> tag in the seed CSV. Representative MTBF and SOD templates are reproduced here for transparency.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Asset family</th><th>Fault modes</th><th>Key MTBF source</th><th>RPN range (seed)</th></tr></thead>
+                <tbody>
+                    <tr><td>Transformers (oil-filled, dry-type)</td><td>5</td><td>CIGRE TB-642</td><td>72–168</td></tr>
+                    <tr><td>Switchgear (LV/MV)</td><td>5</td><td>IEEE 493 Gold Book</td><td>108–160</td></tr>
+                    <tr><td>UPS (static, rotary, flywheel)</td><td>6</td><td>IEEE 493; Eaton / Vertiv white papers</td><td>90–180</td></tr>
+                    <tr><td>Generators / Gensets</td><td>6</td><td>NPRD-2016; ISO 8528-11</td><td>96–200</td></tr>
+                    <tr><td>Battery systems (VRLA, Li-ion)</td><td>6</td><td>IEEE 1188; IEC 62619; NFPA 855</td><td>80–216</td></tr>
+                    <tr><td>PDU / RPP / Busway</td><td>5</td><td>IEEE 493; NPRD-2016</td><td>60–140</td></tr>
+                    <tr><td>Chillers</td><td>6</td><td>ASHRAE HVAC Applications; OREDA</td><td>80–168</td></tr>
+                    <tr><td>CRAH / CRAC units</td><td>5</td><td>ASHRAE; Schneider APC field data</td><td>72–160</td></tr>
+                    <tr><td>Pumps (CW, condenser, tower)</td><td>6</td><td>OREDA; Hydraulic Institute</td><td>84–180</td></tr>
+                    <tr><td>Cooling towers</td><td>5</td><td>EPRD-2014; CTI publications</td><td>60–140</td></tr>
+                    <tr><td>Liquid cooling (DLC, immersion)</td><td>5</td><td>ASHRAE TC 9.9; OEM data sheets</td><td>72–160</td></tr>
+                    <tr><td>Valves + actuators</td><td>5</td><td>OREDA; ISA-75</td><td>60–120</td></tr>
+                    <tr><td>PLCs / DDC controllers</td><td>5</td><td>NPRD-2016; IEC 61511</td><td>54–150</td></tr>
+                    <tr><td>Sensors</td><td>5</td><td>NPRD-2016; Telcordia SR-332</td><td>36–120</td></tr>
+                    <tr><td>Variable frequency drives (VFDs)</td><td>5</td><td>IEEE 519; NPRD-2016</td><td>72–160</td></tr>
+                    <tr><td>Network equipment (ICS/BMS)</td><td>5</td><td>Telcordia SR-332</td><td>48–120</td></tr>
+                    <tr><td>Pre-action fire systems</td><td>5</td><td>NFPA 25; FM Global DS 3-7</td><td>60–160</td></tr>
+                    <tr><td>Clean-agent suppression</td><td>5</td><td>NFPA 2001; NFPA 25 (recharge timelines)</td><td>72–160</td></tr>
+                    <tr><td>Diesel fuel storage / day tanks</td><td>5</td><td>EPRD-2014; NFPA 30</td><td>48–140</td></tr>
+                    <tr><td>Raised access flooring</td><td>3</td><td>Owner inspection data; BICSI 002</td><td>30–80</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <p class="mn-lead" style="margin-top:0.9rem;">KG structure: 834 rows across 8 node/edge types — <code>Component</code>, <code>Fault</code>, <code>Failure</code>, <code>Mechanism</code>, <code>Effect</code>, <code>Action</code>, <code>Step</code>, <code>SOD_RPN</code>. Companion CSV seed files: <code>components</code>, <code>faults</code>, <code>failures</code>, <code>actions</code>, <code>mechanisms</code>, <code>effects</code>, <code>steps</code>, <code>sod_rpn</code> (see <code>docs/research/2026-05-23-fmeca-kg-worldwide-asset-failure-data.md</code>).</p>
+            <div class="mn-note"><strong>NFPA 2001 recharge note:</strong> For clean-agent suppression, the OEM support window and recharge lead time are critical to the LT_risk score. Novec 1230 and FM-200 cylinders typically require 24–72 h for recharge by a certified contractor. Spares-readiness analysis should account for whether a spare cylinder set is held on-site or relies on third-party recharge.</div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Formula</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>RPN</td><td><code>S × O × D</code></td><td>1–1000</td><td>Tier-1 ≥ 200; Tier-2 100–199; Tier-3 &lt; 100.</td></tr>
+                    <tr><td>Reliability R(t)</td><td><code>exp(−(t/η)^β)</code></td><td>%</td><td>Survival probability at mission time t; low R(t) drives replacement recommendation.</td></tr>
+                    <tr><td>Failure probability F(t)</td><td><code>1 − R(t)</code></td><td>%</td><td>Cumulative probability of failure by time t.</td></tr>
+                    <tr><td>Hazard rate h(t)</td><td><code>(β/η)(t/η)^(β−1)</code></td><td>failures/hr</td><td>Instantaneous risk; rising h(t) signals wear-out regime.</td></tr>
+                    <tr><td>Spares readiness</td><td><code>(Q<sub>s</sub>/Q<sub>min</sub>)×100</code></td><td>%</td><td>≥ 100% = adequate; below 100% = procurement gap.</td></tr>
+                    <tr><td>Lead-time risk</td><td><code>(L/MTTR<sub>target</sub>)×S</code></td><td>dimensionless</td><td>&gt; 1 = must stock on-site; ≤ 1 = JIT procurement feasible.</td></tr>
+                    <tr><td>KG action recommendation</td><td>Graph query on RPN threshold</td><td>text</td><td>Corrective or preventive action text from the KG node, with estimated downtime impact.</td></tr>
+                    <tr><td>Priority tier</td><td>RPN band</td><td>T1/T2/T3</td><td>Work-order scheduling priority for the CMMS.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example</h2>
+            <p class="mn-lead">UPS static inverter — IGBT bridge failure mode. Operating time t = 43,800 h (5 yr at 8,760 h/yr), Weibull β = 1.8 (wear-out regime), η = 87,600 h (10 yr characteristic life), installed units N = 4, MTTR target = 4 h = 0.167 day, lead time L = 21 days, S = 9.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li>RPN: <code>S=9, O=4, D=5</code> → <code>RPN = 9 × 4 × 5 =</code> <span class="mn-result">180</span> → <strong>Tier-2</strong> (plan within 30 days).</li>
+                    <li>Weibull R(t): <code>R(43800) = exp(−(43800/87600)^1.8) = exp(−(0.5)^1.8) = exp(−0.2871) =</code> <span class="mn-result">75.1%</span></li>
+                    <li>Failure probability: <code>F(43800) = 1 − 0.751 =</code> <span class="mn-result">24.9%</span></li>
+                    <li>Expected demand over next year (t = 8,760 h more): <code>F(52560) − F(43800)</code>. <code>R(52560) = exp(−(52560/87600)^1.8) = exp(−(0.6)^1.8) = exp(−0.4038) = 66.8%</code>, so incremental F ≈ <span class="mn-result">8.3% per unit</span>.</li>
+                    <li>Q<sub>min</sub>: <code>ceil(4 × 0.083 + 1 safety) = ceil(1.33) =</code> <span class="mn-result">2 spare IGBT modules needed</span>.</li>
+                    <li>If Q<sub>s</sub> = 1: Readiness% = <code>(1/2) × 100 =</code> <span class="mn-result">50% — gap</span> → raise PO immediately.</li>
+                    <li>Lead-time risk: <code>(21 / 0.167) × 9 =</code> <span class="mn-result">LT_risk = 1132</span> → must stock on-site (lead time >> MTTR target).</li>
+                    <li>KG recommendation (Tier-2 RPN 180): <em>Schedule IGBT module health-check within 30 days; thermographic scan of power stack; replace if junction temperature deviation &gt; 15 °C from baseline. Estimated downtime: 4–6 h with pre-staged spare.</em></li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Engineering reading:</strong> The combination of RPN 180 (Tier-2), 24.9% cumulative failure probability, and LT_risk of 1132 makes this component a clear spares-stocking candidate. Waiting for JIT procurement against a 21-day lead time with a 4-hour MTTR target is not viable — the part must be on the shelf before the next planned shutdown.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>MIL-STD-1629A (1980)</b> — Procedures for Performing a Failure Mode, Effects and Criticality Analysis (FMECA): SOD scoring definitions, RPN computation, criticality matrix.</li>
+                <li><b>IEC 60812 (2018)</b> — Analysis techniques for system reliability — Procedure for failure mode and effects analysis (FMEA): harmonised SOD scoring for industrial systems.</li>
+                <li><b>Telcordia SR-332 Issue 4 (2016)</b> — Reliability Prediction Procedure for Electronic Equipment: Weibull β and η parameters for electronic components, MTBF conversion.</li>
+                <li><b>IEEE Std 493-2007 (Gold Book)</b> — IEEE Recommended Practice for the Design of Reliable Industrial and Commercial Power Systems: failure rates for switchgear, breakers, transformers, motors.</li>
+                <li><b>CIGRE Technical Brochure 642 (2015)</b> — Transformer Reliability Survey (WG A2.37): 964 major failures across 167,459 transformer-years, bushing / OLTC / winding failure rates.</li>
+                <li><b>NPRD-2016</b> (Quanterion Solutions) — Nonelectronic Parts Reliability Data: mechanical / electromechanical failure rates.</li>
+                <li><b>OREDA Handbook (6th Ed., 2015)</b> — Offshore Reliability Data: pumps, valves, instrumentation; proxy for process plant mechanical equipment.</li>
+                <li><b>NFPA 2001 (2022)</b> — Clean Agent Fire Extinguishing Systems: cylinder recharge timelines and support-window guidance.</li>
+                <li><b>ASHRAE TC 9.9</b> — Mission Critical Facilities publications: chiller, CRAC/CRAH reliability context.</li>
+                <li><b>Weibull W. (1951)</b> — "A Statistical Distribution Function of Wide Applicability", <em>J. Applied Mechanics</em> 18:293–297.</li>
+                <li><b>Lin H. &amp; Ompusunggu A. P. (2026)</b> — "Intelligent Advisor System for Prescriptive Maintenance of Engineered Assets Using FMECA, Knowledge Graph and Machine Learning", <em>IET Artificial Intelligence for Engineering</em>, doi:10.1049/aie2.70019.</li>
+                <li><b>RZ FMECA Seed Dataset (2026-05-23)</b> — RZ Research Team, <em>FMECA-Knowledge-Graph Seed Data: Worldwide Industrial Asset Failure-Mode Research</em>, internal report + 8 CSV seed files. Located at <code class="mn-mono">docs/research/2026-05-23-fmeca-kg-worldwide-asset-failure-data.md</code>.</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS & LIMITS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The FMECA SOD templates and MTBF figures in the seed dataset are <strong>representative starting points</strong>, not site-calibrated values. Engineers must localise O scores using actual CMMS work-order history and installed-fleet age for each site. Weibull parameters (β, η) are literature-derived; confidence intervals are not propagated through the formulas in the current concept implementation. Spares readiness uses a simplified demand model (Poisson-in-expectation from F(t)); a full multi-echelon inventory optimisation is outside scope. The ML-advisor layer (Random Forest + KG inference) is a proposed architecture from Lin &amp; Ompusunggu (2026) — no live ML model is trained or deployed in the current tool. This manual and the associated tool are an <strong>engineering education and pre-design aid</strong>; final maintenance strategies must be developed by qualified reliability engineers with site-specific data, and reviewed against the authority having jurisdiction and applicable OEM warranty terms.</p>
+        </section>
+
+        <a class="mn-toollink" href="../ai-engineering-maintenance.html">&#9654; Open the live AI Engineering Maintenance advisor</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../ai-engineering-maintenance.html">AI Maintenance</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

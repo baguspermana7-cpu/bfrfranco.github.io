@@ -119,6 +119,42 @@ export function computeEquipCounts(i: ArchInputs): { eq: EquipCounts; source: 'e
     return { eq: equipScaleLocal(i.itLoadKw, i.rackDensityKw), source: 'fallback' };
 }
 
+/* ── Density-vs-cooling-ceiling check (ASHRAE TC9.9, engine DATA.requirements.
+ *    coolingMaxRackKw). The Requirements engine flags this as CRITICAL — the
+ *    architecture validation/compliance surfaces must agree, never claim
+ *    "100% thermal compliant" while the rack density exceeds the air ceiling. */
+export interface DensityCheck { ok: boolean; ceilKw: number | null; note: string }
+
+const LOCAL_DENSITY_CEIL: Record<string, number> = { air: 20, inrow: 30, rdhx: 50, liquid: 132 };
+
+export function computeDensityCheck(i: ArchInputs): DensityCheck {
+    const maxKw = rzData()?.requirements?.coolingMaxRackKw as Record<string, number> | undefined;
+    const ceil = maxKw?.[i.coolingType] ?? LOCAL_DENSITY_CEIL[i.coolingType] ?? null;
+    if (ceil == null) return { ok: true, ceilKw: null, note: 'no ceiling data' };
+    const ok = i.rackDensityKw <= ceil;
+    return {
+        ok, ceilKw: ceil,
+        note: ok
+            ? `${i.rackDensityKw} kW/rack within the ${i.coolingType} ceiling (${ceil} kW)`
+            : `${i.rackDensityKw} kW/rack above the ${i.coolingType} cooling ceiling (${ceil} kW) — liquid/D2C required`,
+    };
+}
+
+/* ── Single-source power-topology text: derived from sim.powerRedundancy (the
+ *    same source the Summary "Power Redundancy" row displays) — never from the
+ *    tier alone, which contradicted the selected redundancy (e.g. 2N summary
+ *    vs "N+1, dual-bus" decision). Tier-4 baseline mismatch is called out. */
+const REDUNDANCY_TOPOLOGY: Record<ArchInputs['redundancy'], string> = {
+    'N+1': 'N+1 — redundant components, dual-bus (one path maintained)',
+    '2N': '2N — two fully independent active paths',
+    '2N+1': '2N+1 — dual independent paths + reserve module, fault tolerant',
+};
+
+export function redundancyTopologyLabel(red: ArchInputs['redundancy'], tier: ArchInputs['tier']): string {
+    const base = REDUNDANCY_TOPOLOGY[red];
+    return tier === 4 && red === 'N+1' ? `${base} · below Tier 4 2N baseline` : base;
+}
+
 export interface LayerCheck { key: string; label: string; pass: boolean; note: string }
 
 export function computeValidation(i: ArchInputs, eq: EquipCounts): { layers: LayerCheck[]; overall: boolean } {
@@ -140,9 +176,10 @@ export function computeValidation(i: ArchInputs, eq: EquipCounts): { layers: Lay
             topoNote = t?.tiaRating ?? 'screening';
         }
     } catch { /* keep */ }
+    const dens = computeDensityCheck(i);
     const layers: LayerCheck[] = [
         { key: 'power', label: 'Power Architecture', pass: topoOk && eq.ups_modules > 0 && eq.generators > 0, note: topoNote },
-        { key: 'cooling', label: 'Cooling Architecture', pass: thermalOk, note: thermalNote },
+        { key: 'cooling', label: 'Cooling Architecture', pass: thermalOk && dens.ok, note: dens.ok ? thermalNote : dens.note },
         { key: 'it', label: 'IT & Network Architecture', pass: eq.pdus > 0 && eq.racks > 0, note: `${eq.pdus} PDU · ${eq.racks} racks` },
         { key: 'building', label: 'Building Architecture', pass: (m?.floorLoading ? m.floorLoading(i.coolingType) : 8) > 0, note: `${m?.floorLoading ? m.floorLoading(i.coolingType) : '—'} kN/m²` },
         { key: 'security', label: 'Security & Safety', pass: !!d?.fire, note: d?.fire ? 'NFPA agent data present' : 'no data' },
@@ -165,10 +202,17 @@ export function computeCompliance(i: ArchInputs, targetTier: 3 | 4): ComplianceR
             thermalCompliant = !!t?.compliant; flags = t?.flags?.length ?? 0;
         }
     } catch { /* keep */ }
+    /* ASHRAE compliance = thermal envelope AND density-to-cooling compatibility
+     * (same physics check the Requirements engine raises as CRITICAL). */
+    const dens = computeDensityCheck(i);
+    const ashraeOk = thermalCompliant && dens.ok;
+    const ashraeNote = ashraeOk
+        ? 'thermal envelope compliant'
+        : [thermalCompliant ? null : `${flags} envelope flag(s)`, dens.ok ? null : dens.note].filter(Boolean).join(' · ');
     return [
         { standard: `Uptime Institute Tier ${targetTier === 4 ? 'IV' : 'III'}`, pct: achieved >= targetTier ? 100 : 50, note: achieved >= targetTier ? 'meets target' : 'below target — review' },
         { standard: 'ANSI/TIA-942-C', pct: achieved >= targetTier ? 100 : 50, note: tia },
-        { standard: 'ASHRAE TC 9.9', pct: thermalCompliant ? 100 : Math.max(40, 100 - 15 * flags), note: thermalCompliant ? 'thermal envelope compliant' : `${flags} flag(s)` },
+        { standard: 'ASHRAE TC 9.9', pct: ashraeOk ? 100 : Math.max(40, 100 - 15 * flags - (dens.ok ? 0 : 45)), note: ashraeNote },
         { standard: 'NFPA 75/76/110', pct: null, note: 'screening — agent data present, no page-level pass/fail model' },
         { standard: 'ISO/IEC 22237', pct: null, note: 'screening — no engine evaluation model' },
     ];

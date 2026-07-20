@@ -191,7 +191,7 @@ export function OperationsDashboard() {
                             { label: 'Active IT Load', value: `${model.activeItMw} MW`, sub: `of ${model.capMw.toFixed(1)} MW (${Math.round(model.occ * 100)}%)`, trace: 'ops.activeItMw' },
                             { label: 'Active Alarms', value: String(activeAlarms.length), sub: `P1:${byPri('P1')} P2:${byPri('P2')} P3:${byPri('P3')}`, trace: 'ops.activeAlarms' },
                             { label: 'Open Tickets', value: String(openTickets.length), sub: `${openIncidents.length} incidents open`, trace: 'ops.openTickets' },
-                            { label: 'PM Compliance', value: log.completedPmWeeks.length > 0 ? `${Math.min(100, Math.round((log.completedPmWeeks.length / 52) * 100))}%` : '—', sub: log.completedPmWeeks.length > 0 ? `${log.completedPmWeeks.length}/52 weeks logged` : 'no PM logged yet', trace: 'ops.pmCompliancePct' },
+                            { label: 'PM Compliance', value: log.completedPmWeeks.length > 0 ? `${Math.min(100, Math.round((log.completedPmWeeks.length / 52) * 100))}%` : '—', sub: log.completedPmWeeks.length > 0 ? `${log.completedPmWeeks.length}/52 weeks logged` : 'no PM logged yet — log PM weeks in the Maintenance tab', trace: 'ops.pmCompliancePct' },
                             { label: 'Energy Cost (24h)', value: `$${model.energyCostToday.toLocaleString()}`, sub: `@ $${model.rate}/kWh (${country?.name ?? '—'})`, trace: 'ops.energyCostDaily' },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">

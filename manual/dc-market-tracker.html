@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Global DC Market Tracker — Methodology | ResistanceZero</title>
+    <meta name="description" content="Full methodology for the Global DC Market Tracker: market capacity/pricing/carbon inputs, site-scoring formulas, electricity cost model, DATA provenance (CBRE, JLL, IEA, Uptime), worked example, and assumptions.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="data center market tracker, DC capacity methodology, site score formula, electricity cost model, colocation pricing, carbon intensity, global DC market, CBRE JLL Uptime IEA">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/dc-market-tracker.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/dc-market-tracker.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/dc-market-tracker.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/dc-market-tracker.html">
+    <meta property="og:title" content="Global DC Market Tracker — Methodology">
+    <meta property="og:description" content="Market capacity/pricing/carbon inputs, site-scoring formulas, electricity cost model, and provenance for the Global DC Market Tracker.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="Global DC Market Tracker Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Global DC Market Tracker — Methodology">
+    <meta name="twitter:description" content="Market capacity/pricing/carbon inputs, site-scoring formulas, and data provenance for the Global DC Market Tracker.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Global DC Market Tracker Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "DC Market Tracker" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Global DC Market Tracker — Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Data-provenance and formula documentation for the Global DC Market Tracker: 25+ market capacity/pricing/carbon dataset + 10-factor site-score model",
+        "articleSection": "Market Intelligence",
+        "dependencies": "RZEngine DATA.markets, DATA.countries, DATA.site, models.site, DATA.sources",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How the DC Market Tracker scores and compares global markets",
+        "step": [
+            { "@type": "HowToStep", "name": "Select markets and set filters", "text": "Choose region, maturity level, capacity range, and sort order. Weighting sliders adjust site-score factor emphasis." },
+            { "@type": "HowToStep", "name": "Compute annual electricity cost", "text": "Electricity cost = powerCost ($/kWh) × 8,760 h/yr × IT load (MW) × 1,000 × PUE. Market-level powerCost is a DC-contract industrial rate from utility filings — not the macro region blend." },
+            { "@type": "HowToStep", "name": "Derive site score", "text": "Derive per-factor 0-1 goodness scores from DATA.countries profiles (electricity rate, grid SAIDI, seismic PGA, talent, tax, carbon, flood, latency, water stress, climate zone). Run models.site.score(factors) → weighted sum renormalized over supplied factors → 0-100 + grade A-E." },
+            { "@type": "HowToStep", "name": "Read outputs", "text": "Dashboard shows operational MW, pipeline MW, vacancy %, colo price, CAGR, site score, and annual power cost. Carbon intensity from DATA.countries[*].environment.gridCarbonIntensity (kg CO2/kWh)." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Where do the per-market capacity figures come from?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Operational and pipeline MW come from DATA.markets in rz-engine.js, sourced from CBRE Global DC Market 2025, JLL Data Center Outlook 2025, Cushman & Wakefield 2025, and Synergy Research 2024. These are market-level snapshots, not project-by-project databases." }
+            },
+            {
+                "@type": "Question",
+                "name": "How is the Site Score computed?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Site Score = weighted sum of 10 goodness factors (0-1 each, 1=best): power 17%, grid 14%, talent 11%, seismic 10%, water 8%, climate 8%, tax 9%, carbon 9%, flood 7%, latency 7%. Weights are renormalized over supplied factors. Factor inputs are derived from DATA.countries profiles via models.site.deriveFactors(). Grade bands: A≥85, B≥70, C≥55, D≥40, E<40." }
+            },
+            {
+                "@type": "Question",
+                "name": "Why does the power cost differ from the region macro blends?",
+                "acceptedAnswer": { "@type": "Answer", "text": "DATA.markets[*].powerCost is a market-level DC-contract industrial rate sourced from utility filings (PJM, ERCOT, Dominion, IMDA, etc.). DATA.regions[*].powerKwh is a macro blend used by TCO/opex calculators. They have different denominators and purposes — they are not interchangeable." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../dc-market-tracker.html" class="nav-link">DC Market Tracker</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / DC Market Tracker
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Market Intelligence</p>
+            <h1>Global DC Market Tracker — Methodology &amp; Data Provenance</h1>
+            <p>Every input, data lookup, scoring formula, and external source behind the Global DC Market Tracker. All per-market figures are stored in <code class="mn-mono">DATA.markets</code> inside <code class="mn-mono">rz-engine.js</code>; site scoring runs through <code class="mn-mono">models.site.score()</code> using factor vectors derived from <code class="mn-mono">DATA.countries</code>. No numbers are interpolated or back-solved — every field traces to a named source in <code class="mn-mono">DATA.sources</code>.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>RZEngine v2.5.x</strong></span>
+                <span class="mn-chip">Markets <strong>25+</strong></span>
+                <span class="mn-chip">Site factors <strong>10</strong></span>
+                <span class="mn-chip">Basis <strong>CBRE / JLL / IEA / Uptime 2025-26</strong></span>
+            </div>
+            <a class="mn-toollink" href="../dc-market-tracker.html">&#9654; Open the live DC Market Tracker</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The DC Market Tracker answers three distinct questions in a single dashboard: <em>where is capacity being built right now</em>, <em>how does per-market power cost and carbon intensity compare</em>, and <em>which markets score highest on a multi-factor site-selection screen</em>. It is a decision-support tool for site screening, not a real-estate data feed or investment prospectus.</p>
+            <p class="mn-lead">The tracker is DATA-provenance heavy by design. Every per-market field in <code class="mn-mono">DATA.markets</code> traces to <code class="mn-mono">DATA.sources['markets']</code>; every per-country environment and economy field used in site scoring traces to <code class="mn-mono">DATA.sources['countries']</code>. The provenance chain is: <strong>raw research report → <code>dcmoc/src/constants/countries.ts</code> (single source of truth) → <code>tools/build-countries-data.mjs</code> (generator) → <code>DATA.countries</code> in <code>rz-engine.js</code></strong>. Regenerate after editing <code>countries.ts</code> and bump the <code>?v=</code> stamp.</p>
+            <div class="mn-note"><strong>Scope:</strong> the tracker is a screening-grade market-intelligence surface. Figures are sourced from publicly available brokerage research and utility filings; they carry the accuracy range of their source (~Class 4–5 per AACE 18R-97). They do not substitute for due diligence, utility interconnection studies, or site acquisition analysis.</div>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs — filters, sliders, and capacity range</h2>
+            <p class="mn-lead">The tracker exposes four user-controlled input surfaces. All filter/sort/weight operations run client-side against the in-memory <code class="mn-mono">DATA.markets</code> snapshot — no server round-trip.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Input</th><th>Type</th><th>Values / range</th><th>Effect</th></tr></thead>
+                <tbody>
+                    <tr><td>Region filter</td><td>Button group</td><td>All · North America · Europe · Asia Pacific · Latin America · Middle East &amp; Africa</td><td>Restricts displayed markets to the selected <code>region</code> field in <code>DATA.markets</code>.</td></tr>
+                    <tr><td>Maturity filter</td><td>Button group</td><td>All · Established · Growing · Emerging</td><td>Filters on the <code>maturity</code> field: <em>established</em> = deep-liquid hyperscale corridors, <em>growing</em> = active build-out, <em>emerging</em> = early-stage pipeline.</td></tr>
+                    <tr><td>Capacity range</td><td>Range slider (MW)</td><td>0 – max operational in dataset</td><td>Hides markets whose <code>operational</code> MW falls below the slider value. Useful for screening out micro-markets.</td></tr>
+                    <tr><td>Sort column</td><td>Select + table header click</td><td>Name · Operational MW · CAGR · Power Cost · Vacancy % · Colo Price · Site Score</td><td>Re-orders the market table and card grid. All sorts are client-side stable sorts on the filtered set.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Site-score weighting sliders (Pro panel):</strong> the 10-factor weight vector defaults to <code>DATA.site.weights</code> (see Section 03). Pro-tier users can drag individual factor weights; the tracker renormalizes and recomputes all site scores live. Weight changes are session-only — they do not persist or alter the engine constants.</div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">Three formula families: annual electricity cost, site score, and carbon footprint. Function names map to <code class="mn-mono">models.site.*</code> in <code class="mn-mono">rz-engine.js</code>. Market-level lookups (operational/pipeline MW, vacancy, colo price) are direct table reads, not computed.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Annual electricity cost per market</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">annualPowerCostUsd = powerCost · 8760 · itLoadMW · 1000 · PUE</span>
+                <span class="mn-where">
+                    <code>powerCost</code> = market-level $/kWh from <code>DATA.markets[id].powerCost</code> (DC-contract industrial rate from utility filings). <br>
+                    <code>8760</code> = hours per year (calendar constant; <code>DATA.sources['hoursPerYear']</code>).<br>
+                    <code>itLoadMW</code> = user-supplied IT load in MW (default 10 MW for comparison cards).<br>
+                    <code>PUE</code> = assumed from <code>DATA.pueMatrix</code> (default Tier III air 1.50, Uptime 2026); user can override.<br>
+                    Result is a screening comparison — not a tariff filing or utility bill.<span class="mn-src">DATA.sources['markets'] · DATA.sources['hoursPerYear']</span>
+                </span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Site Score — 10-factor weighted model</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">siteScore = 100 × ( Σ w_k · f_k ) / ( Σ w_k )   [over supplied factors only]</span>
+                <span class="mn-eq">grade: A ≥ 85 · B ≥ 70 · C ≥ 55 · D ≥ 40 · E &lt; 40</span>
+                <span class="mn-where">
+                    Implemented in <code>models.site.score(factors)</code>. Weights renormalize over present factors so a partial factor set scores fairly. Factor values are 0-1 goodness scores (1 = best).<span class="mn-src">DATA.site.weights · models.site.score</span>
+                </span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Factor derivation from DATA.countries</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">power   = clamp( 1 − (electricityRate − 0.05) / 0.30 )</span>
+                <span class="mn-eq">grid    = clamp( (gridUptime% − 95) / 5 )              [or SAIDI path: 1 − saidiMin/500]</span>
+                <span class="mn-eq">seismic = pgaToScore lookup (USGS PGA %g → IBC SDC band)</span>
+                <span class="mn-eq">talent  = clamp( talentScore / 100 )</span>
+                <span class="mn-eq">tax     = clamp( 1 − taxRate / 0.35 )</span>
+                <span class="mn-eq">carbon  = clamp( 1 − gridCarbonIntensity / 0.90 )     [kgCO₂/kWh]</span>
+                <span class="mn-eq">flood   = { low: 1.0 · moderate: 0.66 · high: 0.33 · extreme: 0 }</span>
+                <span class="mn-eq">latency = clamp( hyperscalerPresence / 10 )            [0-10 scale]</span>
+                <span class="mn-eq">water   = clamp( 1 − aqueductStressScore / 5 )         [WRI 0-5]</span>
+                <span class="mn-eq">climate = clamp( climateFreeHours[ashraeZone] / 5800 ) [ASHRAE 169-2021]</span>
+                <span class="mn-where">
+                    Implemented in <code>models.site.deriveFactors(countryId, overrides)</code>. Missing fields fall back to a neutral 0.6. SAIDI path preferred if <code>env.saidiMinYr</code> is present; otherwise uptime% path. PGA path preferred if <code>env.pgaPct2in50yr</code> is present; otherwise seismicZone (0-4) scale.<span class="mn-src">DATA.countries · DATA.site · models.site.deriveFactors</span>
+                </span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Carbon intensity lookup</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">annualCarbonT = itLoadMW × 1000 × 8760 × PUE × gridCarbonIntensity / 1000</span>
+                <span class="mn-where">
+                    <code>gridCarbonIntensity</code> = <code>DATA.countries[countryId].environment.gridCarbonIntensity</code> in kgCO₂/kWh. Sourced from IEA 2026 + Ember grid intensity (see <code>DATA.sources['carbon']</code>). Values for the 25 tracker markets range from 0.01 kgCO₂/kWh (Stockholm) to 0.90 kgCO₂/kWh (high-coal grids). This is a grid-average intensity; market-level 24/7 CFE contracts are not modelled.<span class="mn-src">DATA.sources['carbon'] · DATA.sources['countries']</span>
+                </span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">PUE climate adjustment (partial-load model)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">PUE(l) = 1 + overhead × ( 0.55/l + 0.45 )     [overhead = PUE_rated − 1]</span>
+                <span class="mn-where">
+                    Screening-grade partial-load PUE model. At rated load (l=1) reproduces rated PUE. Infrastructure overhead share 0.55 at partial IT load (industry rule-of-thumb band 0.4-0.7; Green Grid partial-load PUE guidance). Used only when user adjusts load fraction — display cards default to rated PUE from <code>DATA.pueMatrix</code>.<span class="mn-src">DATA.sources['pue.partialLoad']</span>
+                </span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS & SOURCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data provenance</h2>
+            <p class="mn-lead">Per-market reference data. All figures are lookups from <code class="mn-mono">DATA.markets</code> in <code class="mn-mono">rz-engine.js</code>. Source: CBRE Global DC Market 2025, JLL Outlook 2025, Cushman &amp; Wakefield 2025, Synergy Research 2024. Power cost from utility filings (PJM, ERCOT, Dominion, IMDA et al.). As-of date: 2026-04. <span class="mn-src">DATA.sources['markets']</span></p>
+
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Market</th><th>Region</th><th>Op. MW</th><th>Pipe MW</th><th>Power $/kWh</th><th>Vac. %</th><th>Colo $/kW·mo</th><th>CAGR</th><th>Maturity</th></tr></thead>
+                <tbody>
+                    <tr><td>Northern Virginia</td><td>North America</td><td>4,040</td><td>6,600</td><td><code>0.065</code></td><td>1.4</td><td>$215</td><td>25%</td><td>Established</td></tr>
+                    <tr><td>Dallas/Fort Worth</td><td>North America</td><td>1,200</td><td>2,600</td><td><code>0.055</code></td><td>2.1</td><td>$160</td><td>22%</td><td>Established</td></tr>
+                    <tr><td>Phoenix</td><td>North America</td><td>800</td><td>2,000</td><td><code>0.058</code></td><td>3.5</td><td>$150</td><td>20%</td><td>Established</td></tr>
+                    <tr><td>Chicago</td><td>North America</td><td>700</td><td>1,100</td><td><code>0.072</code></td><td>2.8</td><td>$175</td><td>15%</td><td>Established</td></tr>
+                    <tr><td>Silicon Valley</td><td>North America</td><td>600</td><td>700</td><td><code>0.095</code></td><td>1.8</td><td>$250</td><td>8%</td><td>Established</td></tr>
+                    <tr><td>Toronto</td><td>North America</td><td>400</td><td>800</td><td><code>0.085</code></td><td>4.2</td><td>$155</td><td>18%</td><td>Growing</td></tr>
+                    <tr><td>London</td><td>Europe</td><td>1,500</td><td>1,600</td><td><code>0.170</code></td><td>2.5</td><td>$200</td><td>10%</td><td>Established</td></tr>
+                    <tr><td>Frankfurt</td><td>Europe</td><td>900</td><td>1,100</td><td><code>0.150</code></td><td>5.1</td><td>$195</td><td>10%</td><td>Established</td></tr>
+                    <tr><td>Amsterdam</td><td>Europe</td><td>600</td><td>550</td><td><code>0.130</code></td><td>7.2</td><td>$180</td><td>8%</td><td>Established</td></tr>
+                    <tr><td>Paris</td><td>Europe</td><td>450</td><td>700</td><td><code>0.140</code></td><td>4.0</td><td>$190</td><td>12%</td><td>Growing</td></tr>
+                    <tr><td>Dublin</td><td>Europe</td><td>400</td><td>400</td><td><code>0.155</code></td><td>3.8</td><td>$185</td><td>6%</td><td>Growing</td></tr>
+                    <tr><td>Singapore</td><td>Asia Pacific</td><td>850</td><td>650</td><td><code>0.180</code></td><td>0.8</td><td>$390</td><td>12%</td><td>Established</td></tr>
+                    <tr><td>Tokyo</td><td>Asia Pacific</td><td>1,200</td><td>1,200</td><td><code>0.160</code></td><td>1.2</td><td>$270</td><td>8%</td><td>Established</td></tr>
+                    <tr><td>Hong Kong</td><td>Asia Pacific</td><td>500</td><td>400</td><td><code>0.145</code></td><td>2.0</td><td>$280</td><td>6%</td><td>Established</td></tr>
+                    <tr><td>Sydney</td><td>Asia Pacific</td><td>600</td><td>750</td><td><code>0.140</code></td><td>3.2</td><td>$180</td><td>14%</td><td>Established</td></tr>
+                    <tr><td>Mumbai</td><td>Asia Pacific</td><td>500</td><td>1,100</td><td><code>0.085</code></td><td>6.0</td><td>$125</td><td>20%</td><td>Growing</td></tr>
+                    <tr><td>Jakarta</td><td>Asia Pacific</td><td>350</td><td>700</td><td><code>0.080</code></td><td>4.5</td><td>$160</td><td>18%</td><td>Growing</td></tr>
+                    <tr><td>Seoul</td><td>Asia Pacific</td><td>700</td><td>600</td><td><code>0.095</code></td><td>2.5</td><td>$210</td><td>10%</td><td>Established</td></tr>
+                    <tr><td>Kuala Lumpur</td><td>Asia Pacific</td><td>250</td><td>550</td><td><code>0.060</code></td><td>5.5</td><td>$140</td><td>22%</td><td>Growing</td></tr>
+                    <tr><td>São Paulo</td><td>Latin America</td><td>400</td><td>450</td><td><code>0.100</code></td><td>5.0</td><td>$165</td><td>16%</td><td>Growing</td></tr>
+                    <tr><td>Santiago</td><td>Latin America</td><td>100</td><td>200</td><td><code>0.090</code></td><td>8.0</td><td>$145</td><td>18%</td><td>Emerging</td></tr>
+                    <tr><td>Querétaro</td><td>Latin America</td><td>200</td><td>400</td><td><code>0.070</code></td><td>4.0</td><td>$135</td><td>20%</td><td>Growing</td></tr>
+                    <tr><td>Dubai</td><td>Middle East &amp; Africa</td><td>200</td><td>500</td><td><code>0.065</code></td><td>3.0</td><td>$220</td><td>25%</td><td>Growing</td></tr>
+                    <tr><td>Johannesburg</td><td>Middle East &amp; Africa</td><td>150</td><td>280</td><td><code>0.075</code></td><td>6.0</td><td>$170</td><td>20%</td><td>Emerging</td></tr>
+                    <tr><td>Nairobi</td><td>Middle East &amp; Africa</td><td>50</td><td>130</td><td><code>0.115</code></td><td>10.0</td><td>$200</td><td>25%</td><td>Emerging</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <p class="mn-lead" style="margin-top:1.1rem;">Site-score factor weights (from <code class="mn-mono">DATA.site.weights</code>, sum = 1.0):</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Factor</th><th>Key</th><th>Weight</th><th>Source field in DATA.countries</th><th>Derivation</th></tr></thead>
+                <tbody>
+                    <tr><td>Electricity cost</td><td><code>power</code></td><td>17%</td><td><code>economy.electricityRate</code> ($/kWh)</td><td><code>clamp(1−(rate−0.05)/0.30)</code></td></tr>
+                    <tr><td>Grid reliability</td><td><code>grid</code></td><td>14%</td><td><code>env.saidiMinYr</code> or <code>gridReliability.gridUptime</code></td><td>SAIDI path: <code>1−saidi/500</code>; uptime path: <code>(uptime%−95)/5</code></td></tr>
+                    <tr><td>Talent pool</td><td><code>talent</code></td><td>11%</td><td><code>talentPool.talentScore</code> (0-100)</td><td><code>talentScore/100</code></td></tr>
+                    <tr><td>Seismic risk</td><td><code>seismic</code></td><td>10%</td><td><code>env.pgaPct2in50yr</code> or <code>naturalDisaster.seismicZone</code></td><td>PGA lookup table (IBC/ASCE-7 SDC) or <code>1−zone/4</code></td></tr>
+                    <tr><td>Tax environment</td><td><code>tax</code></td><td>9%</td><td><code>economy.taxRate</code> (fraction)</td><td><code>1−taxRate/0.35</code></td></tr>
+                    <tr><td>Carbon intensity</td><td><code>carbon</code></td><td>9%</td><td><code>environment.gridCarbonIntensity</code> (kgCO₂/kWh)</td><td><code>1−gridCarbon/0.90</code></td></tr>
+                    <tr><td>Water availability</td><td><code>water</code></td><td>8%</td><td><code>env.aqueductStressScore</code> (WRI 0-5)</td><td><code>1−stress/5</code></td></tr>
+                    <tr><td>Climate / free-cooling</td><td><code>climate</code></td><td>8%</td><td><code>env.ashraeClimateZone</code> (1-8)</td><td>Lookup: free-cooling hr/yr / 5,800</td></tr>
+                    <tr><td>Flood risk</td><td><code>flood</code></td><td>7%</td><td><code>naturalDisaster.floodRisk</code> (low/moderate/high/extreme)</td><td>Map: {low:1, moderate:0.66, high:0.33, extreme:0}</td></tr>
+                    <tr><td>Network latency</td><td><code>latency</code></td><td>7%</td><td><code>talentPool.hyperscalerPresence</code> (0-10 scale)</td><td><code>hyperscalerPresence/10</code></td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <p class="mn-lead" style="margin-top:1.1rem;">Grid carbon intensity for major tracker markets (from <code class="mn-mono">DATA.countries[*].environment.gridCarbonIntensity</code>; source: IEA 2026 + Ember <span class="mn-src">DATA.sources['carbon']</span>):</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Country / Market</th><th>Grid Carbon (kgCO₂/kWh)</th><th>Electricity Rate ($/kWh)</th><th>Tax Rate</th><th>As-of</th></tr></thead>
+                <tbody>
+                    <tr><td>United States (N. Virginia)</td><td>0.39</td><td>~0.065</td><td>~21%</td><td>2026</td></tr>
+                    <tr><td>Germany (Frankfurt)</td><td>0.35</td><td>0.150</td><td>~30%</td><td>2026</td></tr>
+                    <tr><td>Netherlands (Amsterdam)</td><td>0.40</td><td>0.130</td><td>~25%</td><td>2026</td></tr>
+                    <tr><td>United Kingdom (London)</td><td>0.30 est.</td><td>0.170</td><td>~19%</td><td>2026</td></tr>
+                    <tr><td>Ireland (Dublin)</td><td>0.35 est.</td><td>0.155</td><td>~12.5%</td><td>2026</td></tr>
+                    <tr><td>Sweden (Stockholm)</td><td>0.01</td><td>~0.09</td><td>~20.6%</td><td>2026</td></tr>
+                    <tr><td>Singapore</td><td>0.41</td><td>0.180</td><td>~17%</td><td>2026</td></tr>
+                    <tr><td>Japan (Tokyo)</td><td>0.48</td><td>0.160</td><td>~23.2%</td><td>2026</td></tr>
+                    <tr><td>Australia (Sydney)</td><td>0.55</td><td>0.140</td><td>~30%</td><td>2026</td></tr>
+                    <tr><td>India (Mumbai)</td><td>0.70</td><td>0.085</td><td>~24%</td><td>2026</td></tr>
+                    <tr><td>Indonesia (Jakarta)</td><td>0.78</td><td>0.080</td><td>~22%</td><td>2026</td></tr>
+                    <tr><td>Malaysia (KL)</td><td>0.60</td><td>0.060</td><td>~24%</td><td>2026</td></tr>
+                    <tr><td>UAE (Dubai)</td><td>0.45</td><td>0.065</td><td>~9%</td><td>2026</td></tr>
+                    <tr><td>South Africa (Johannesburg)</td><td>0.90</td><td>0.075</td><td>~27%</td><td>2026</td></tr>
+                    <tr><td>Brazil (São Paulo)</td><td>0.20 est.</td><td>0.100</td><td>~34%</td><td>2026</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <p class="mn-lead">The tracker surfaces nine per-market outputs across the map, card grid, and data table views.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Source / formula</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>Operational capacity</td><td><code>DATA.markets[id].operational</code> — direct lookup</td><td>MW</td><td>Live commissioned and leased capacity at time of research snapshot.</td></tr>
+                    <tr><td>Pipeline (construction + planned)</td><td><code>operational + construction + planned</code></td><td>MW</td><td>Total addressable supply including current build and permitted pipeline. High pipeline / low absorption = supply overhang signal.</td></tr>
+                    <tr><td>Vacancy rate</td><td><code>DATA.markets[id].vacancy</code> — direct lookup</td><td>%</td><td>Percentage of operational capacity available for lease. &lt;2% = tight market, &gt;7% = loose.</td></tr>
+                    <tr><td>Power cost</td><td><code>DATA.markets[id].powerCost</code> — direct lookup</td><td>$/kWh</td><td>Market-level DC-contract industrial blended rate from utility filings. Distinct from <code>DATA.regions[*].powerKwh</code> macro blends.</td></tr>
+                    <tr><td>Colo price</td><td><code>DATA.markets[id].coloPrice</code> — direct lookup</td><td>$/kW/month</td><td>Retail colocation asking price per kW per month. Headline rate; actual contracted rates vary 15-30% below ask in most markets.</td></tr>
+                    <tr><td>CAGR (2025-2030)</td><td><code>DATA.markets[id].cagr</code> — direct lookup</td><td>fraction</td><td>Compound annual growth rate projection for operational MW. Sourced from broker reports; projection quality varies by market.</td></tr>
+                    <tr><td>Annual power cost (comparison)</td><td><code>powerCost × 8760 × itLoadMW × 1000 × PUE</code></td><td>USD/yr</td><td>Computed for a reference load (default 10 MW IT at rated PUE) to normalize power cost across markets with different rate structures.</td></tr>
+                    <tr><td>Site Score</td><td><code>models.site.score(deriveFactors(countryId))</code></td><td>0-100 + A-E grade</td><td>Weighted composite of 10 site-selection factors. Reflects the country profile anchored to the market; does not reflect sub-national variation within large countries.</td></tr>
+                    <tr><td>Carbon intensity</td><td><code>DATA.countries[*].environment.gridCarbonIntensity</code></td><td>kgCO₂/kWh</td><td>Grid-average intensity. Used for annual carbon footprint comparison at the reference IT load. CFE contracts not modelled.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example — Singapore market</h2>
+            <p class="mn-lead">Singapore (<code class="mn-mono">DATA.markets['singapore']</code>) is a useful reference: very high colo pricing, extremely low vacancy, and a moderate-carbon grid. Numbers are verifiable against the engine constants — no interpolation.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Market lookup:</strong> <code>op=850 MW, pipe=500 MW, vacancy=0.8%, powerCost=$0.180/kWh, coloPrice=$390/kW·mo, cagr=12%, region='Asia Pacific', maturity='established'</code><span class="mn-result"> → direct read from DATA.markets['singapore']</span></li>
+                    <li><strong>Annual power cost at 10 MW IT, PUE 1.50 (Tier III air):</strong>
+                        <code>0.180 × 8760 × 10 × 1000 × 1.50 =</code>
+                        <span class="mn-result">$23,652,000 / yr</span>
+                    </li>
+                    <li><strong>Carbon footprint at 10 MW IT, PUE 1.50, grid 0.41 kgCO₂/kWh:</strong>
+                        <code>10 × 1000 × 8760 × 1.50 × 0.41 / 1000 =</code>
+                        <span class="mn-result">53,898 t CO₂/yr</span>
+                    </li>
+                    <li><strong>Factor derivation from DATA.countries['SG']:</strong><br>
+                        <code>power = clamp(1−(0.180−0.05)/0.30) =</code> <span class="mn-result">0.567</span><br>
+                        <code>grid = clamp((99.5−95)/5) =</code> <span class="mn-result">0.90</span> (SAIDI path preferred if available)<br>
+                        <code>talent = talentScore/100 → ~72/100 =</code> <span class="mn-result">0.72</span><br>
+                        <code>seismic = pgaToScore[pgaPct2in50yr&lt;5] =</code> <span class="mn-result">1.00</span> (low seismicity)<br>
+                        <code>tax = clamp(1−0.17/0.35) =</code> <span class="mn-result">0.514</span><br>
+                        <code>carbon = clamp(1−0.41/0.90) =</code> <span class="mn-result">0.544</span><br>
+                        <code>flood = moderate → </code> <span class="mn-result">0.66</span><br>
+                        <code>latency = hyperscalerPresence=8/10 =</code> <span class="mn-result">0.80</span><br>
+                        <code>water = clamp(1−aqueductStress/5) → est. 0.55</code><br>
+                        <code>climate = climateFreeHours['1']/5800 = 800/5800 =</code> <span class="mn-result">0.138</span> (tropical — minimal free cooling)
+                    </li>
+                    <li><strong>Site Score (10 factors, full weight vector):</strong><br>
+                        Weighted sum = (0.17×0.567) + (0.14×0.90) + (0.11×0.72) + (0.10×1.00) + (0.09×0.514) + (0.09×0.544) + (0.08×0.55) + (0.08×0.138) + (0.07×0.66) + (0.07×0.80)<br>
+                        = 0.096 + 0.126 + 0.079 + 0.100 + 0.046 + 0.049 + 0.044 + 0.011 + 0.046 + 0.056<br>
+                        = <span class="mn-result">0.653 → score 65.3 / 100 → Grade C "Viable"</span>
+                    </li>
+                    <li><strong>Reading:</strong> Singapore scores strongly on grid, seismic, and latency factors, but the high electricity tariff, tropical climate (minimal free-cooling hours), and moderate carbon intensity pull the composite to grade C. Premium positioning shows in the colo rate ($390/kW·mo) and near-zero vacancy (0.8%).</li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Verify via node:</strong> <code>node -e "var e=require('./rz-engine.js'); var f=e.models.site.deriveFactors('SG'); console.log(e.models.site.score(f));"</code> — the live engine result should match within rounding of the worked values above.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; data lineage</h2>
+            <ul class="mn-refs">
+                <li><b>DATA.sources['markets']</b> — CBRE Global DC Market Report 2025 + JLL Data Center Outlook 2025 + Cushman &amp; Wakefield DC Market Update 2025 + Synergy Research Q4 2024 (capacity/vacancy/colo/pipeline per market). Market-level <code>powerCost</code> from utility tariff filings: PJM, ERCOT, Dominion Virginia Power, IMDA Singapore, TEPCO, regional utility databases. As-of 2026-04.</li>
+                <li><b>DATA.sources['countries']</b> — DCMOC country reference 2026-Q1. Economy fields: IMF WEO 2026 + national tariff filings. Environment fields: Ember Grid Carbon Intensity 2026 + IEA 2026 + WRI Aqueduct 4.0 water-stress scores + ASHRAE 169-2021 climate zones + USGS PGA maps. Grid reliability: IEEE 1366 SAIDI per country + utility reliability disclosures. Talent: AFCOM/Uptime labor market data 2026. Single source of truth: <code>dcmoc/src/constants/countries.ts</code> → regenerated via <code>tools/build-countries-data.mjs</code>.</li>
+                <li><b>DATA.sources['site']</b> — Site factor weighting derived from published DC site-selection frameworks: CBRE/JLL/451 Research site-selection criteria 2025. Power + grid dominate (17% + 14%); climate added in v2.5.0 per CBRE/JLL inclusion of free-cooling hours. <code>DATA.sources['site.climateFreeHours']</code>: ASHRAE 169-2021 climate zones → annual economizer hours (DOE/NREL psychrometric bin analysis).</li>
+                <li><b>DATA.sources['carbon']</b> — IEA 2026 + Ember grid intensity dataset (kgCO₂/kWh per country grid average). Voluntary carbon offset basis $10/t CO₂e (<code>DATA.sources['carbon.offsetPrice']</code>). Carbon compliance prices by country: World Bank Carbon Pricing Dashboard + OECD ECR 2025 (<code>DATA.sources['envCosts']</code>).</li>
+                <li><b>DATA.sources['pueMatrix']</b> — Uptime Institute Global Survey 2026 by cooling architecture and tier. Default Tier III air-cooled PUE: 1.50.</li>
+                <li><b>Uptime Global DC Index 2025/2026</b> — global operational MW baseline, PUE/WUE/CUE benchmark distribution, vacancy and absorption benchmarks.</li>
+                <li><b>IEA Data Centres and Data Transmission Networks 2026</b> — global DC electricity consumption growth (~15%/yr) + grid-intensity trends.</li>
+                <li><b>tools/build-countries-data.mjs</b> — generator that regenerates <code>DATA.countries</code> from <code>dcmoc/src/constants/countries.ts</code>. Run after any countries.ts edit; then <code>terser rz-engine.js -c -m -o rz-engine.min.js</code> and bump <code>?v=</code>. Gate: <code>node tools/test-reference-parity.mjs</code> asserts no drift (126 assertions).</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS & LIMITATIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The tracker is a screening-grade market-intelligence dashboard. Key limitations to understand before using the outputs for decisions:</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Item</th><th>Assumption / limitation</th><th>Implication</th></tr></thead>
+                <tbody>
+                    <tr><td>Capacity figures</td><td>Snapshot from broker research (CBRE/JLL/C&amp;W) as of 2025-2026. Figures are reported operational MW — not independently audited.</td><td>Fast-moving markets (N. Virginia, Johor, Indonesia) can diverge from snapshot within one quarter. Treat as order-of-magnitude context.</td></tr>
+                    <tr><td>Power cost</td><td>DC-contract industrial blended rate per market from utility filings. Not an actual contracted PPA rate. Does not include network charges, taxes, or surcharges in all markets.</td><td>Actual contracted energy cost can differ 10-25% from the listed rate depending on load profile, PPA term, and regulatory regime.</td></tr>
+                    <tr><td>Site Score geography</td><td>Site Score is anchored to the <em>country</em> profile, not sub-national variation. A score for "Jakarta" uses Indonesia country data — it does not reflect Batam vs. Bekasi vs. Cibitung sub-market differences.</td><td>Sub-national site selection requires a dedicated country-level assessment beyond this engine's scope.</td></tr>
+                    <tr><td>Carbon intensity</td><td>Grid-average intensity. Does not model 24/7 carbon-free energy (CFE) contracts, Power Purchase Agreements, or regional dispatch mix.</td><td>Operators with CFE contracts (Google, Microsoft, Meta) experience effective carbon intensities well below the listed grid averages.</td></tr>
+                    <tr><td>Vacancy rate</td><td>Market-level vacancy from broker research. Definition varies: some sources report pre-committed but not yet occupied space as vacant; others do not.</td><td>Use vacancy as a directionality signal (tight vs. loose), not as a precise availability figure for procurement.</td></tr>
+                    <tr><td>CAGR projection</td><td>2025-2030 CAGR from broker research. Projections reflect demand-side scenarios (AI inference, sovereign cloud, enterprise migration) that carry material uncertainty.</td><td>High-CAGR markets (N. Virginia 25%, Dubai 25%, Nairobi 25%) reflect strong pipeline confidence; realized growth depends on power availability, permitting, and capital formation.</td></tr>
+                    <tr><td>Site Score neutrality</td><td>Default factor weights are a transparent heuristic informed by published DC site-selection frameworks. They are not calibrated to any single operator's proprietary weighting.</td><td>Users with different priorities (e.g., carbon-first, lowest-cost-power) should adjust the Pro-panel weight sliders to reflect their actual criteria.</td></tr>
+                    <tr><td>Not investment advice</td><td>This tool is an engineering education and pre-screening aid. It does not constitute investment advice, real-estate advice, or site-acquisition recommendation.</td><td>Any site-acquisition or investment decision requires independent due diligence, utility studies, and qualified professional advice.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <a class="mn-toollink" href="../dc-market-tracker.html">&#9654; Open the live Global DC Market Tracker</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../dc-market-tracker.html">DC Market Tracker</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>TIA-942 Compliance Checklist — Methodology &amp; Scoring | ResistanceZero</title>
+    <meta name="description" content="Full methodology for the TIA-942-B compliance checklist: weighted scoring engine, 56 items across 6 domains, 4 tier levels, gap analysis formula, facility-type filtering, and worked example.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="TIA-942-B, ANSI TIA-942, data center compliance, tier classification, weighted scoring, gap analysis, infrastructure standard, enterprise colocation hyperscale edge modular">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/tia-942-checklist.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/tia-942-checklist.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/tia-942-checklist.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/tia-942-checklist.html">
+    <meta property="og:title" content="TIA-942 Compliance Checklist — Methodology &amp; Scoring">
+    <meta property="og:description" content="Weighted scoring methodology, 56 items across 6 domains, 4 tiers, gap analysis formula, and worked example behind the TIA-942-B compliance checklist.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="TIA-942 Compliance Checklist Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="TIA-942 Compliance Checklist — Methodology">
+    <meta name="twitter:description" content="Weighted scoring engine, 56 items / 6 domains / 4 tiers, gap analysis, and worked example.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="TIA-942 Compliance Checklist Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "TIA-942 Checklist" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "TIA-942 Compliance Checklist — Methodology & Scoring",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "ANSI/TIA-942-B weighted compliance scoring methodology for data center infrastructure",
+        "articleSection": "Compliance",
+        "dependencies": "ANSI/TIA-942-B, Uptime Institute Tier Standard, NFPA 70, IEC 60364",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to score a data center for TIA-942-B compliance",
+        "step": [
+            { "@type": "HowToStep", "name": "Select tier and facility type", "text": "Choose the target tier (I–IV) and facility type (Enterprise, Colo, Hyperscale, Edge, or Modular) to filter the applicable item set." },
+            { "@type": "HowToStep", "name": "Complete per-item yes/no assessment", "text": "For each of the 56+ applicable items, mark met (yes) or unmet (no). N/A items are automatically excluded by the facility-type filter." },
+            { "@type": "HowToStep", "name": "Compute per-domain weighted score", "text": "For each domain, sum item weights for met items divided by total item weights, then multiply by the domain importance factor." },
+            { "@type": "HowToStep", "name": "Compute overall compliance score", "text": "Sum all domain weighted scores and divide by the sum of maximum possible domain scores to get the overall compliance percentage." },
+            { "@type": "HowToStep", "name": "Identify gaps and remediation priority", "text": "Items not met are sorted by weight (W3 = Critical, W2 = Important, W1 = Standard) to form a prioritized remediation roadmap." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "How is the overall TIA-942 compliance score calculated?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Each domain computes a weighted raw score: sum of met-item weights divided by total domain item weights, expressed as a percentage. The overall score is the sum of (domain_pct × domain_importance_factor) divided by the sum of (100 × domain_importance_factor) across all six domains." }
+            },
+            {
+                "@type": "Question",
+                "name": "What are the six TIA-942 compliance domains?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Site & Architecture (weight 1.0×), Electrical (1.5×), Mechanical/Cooling (1.3×), Telecommunications (1.0×), Fire Protection (1.1×), and Physical Security (0.9×). Electrical and Mechanical carry the highest importance factors reflecting their criticality to continuous IT operations." }
+            },
+            {
+                "@type": "Question",
+                "name": "How does facility-type filtering work?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Each checklist item carries a dcTypes array. When the user selects a facility type (Enterprise, Colo, Hyperscale, Edge, or Modular) the engine filters ITEMS to only those whose dcTypes array contains the selected type AND whose tiers array contains the selected tier. The resulting applicable set varies from roughly 40 (Edge Tier 1) to 80+ (Hyperscale Tier 4) items." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../tia-942-checklist.html" class="nav-link">TIA-942 Checklist</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / TIA-942 Checklist
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Compliance</p>
+            <h1>TIA-942 Compliance Checklist — Methodology &amp; Scoring</h1>
+            <p>Every input, scoring formula, domain weight, constant, and output behind the TIA-942-B compliance checklist. All logic runs client-side in a deterministic ES5 engine — no server calls, no stochastic defaults. The weighted scoring and gap-analysis algorithms are traced directly from the inline source.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Standard <strong>ANSI/TIA-942-B</strong></span>
+                <span class="mn-chip">Items <strong>56 baseline + facility-type extensions</strong></span>
+                <span class="mn-chip">Domains <strong>6</strong></span>
+                <span class="mn-chip">Tiers <strong>4</strong></span>
+                <span class="mn-chip">Facility Types <strong>5</strong></span>
+            </div>
+            <a class="mn-toollink" href="../tia-942-checklist.html">&#9654; Open the live TIA-942 Checklist</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The checklist is a prescriptive, weighted self-assessment tool for rating a data center against <strong>ANSI/TIA-942-B</strong> — the Telecommunications Infrastructure Standard for Data Centers published by the Telecommunications Industry Association. It answers three questions: <em>what is the facility's current compliance score against a chosen tier</em>, <em>which specific items are unmet (the gap list)</em>, and <em>what is the remediation priority order</em>.</p>
+            <p class="mn-lead">The governing standard is <strong>ANSI/TIA-942-B (2017)</strong> with supplemental references from the <strong>Uptime Institute Tier Classification System</strong> and <strong>BICSI 002-2019</strong>. Tier definitions (Basic · Redundant Components · Concurrently Maintainable · Fault Tolerant) follow the TIA-942-B four-tier ladder. Each tier is <em>additive</em>: a Tier 3 facility must satisfy all Tier 1 and Tier 2 requirements plus its own.</p>
+            <div class="mn-note"><strong>Prescriptive checklist, not a certified audit.</strong> The tool produces an indicative compliance score for pre-design, gap analysis, and engineering education. A formal TIA-942 certification requires an on-site audit by an accredited third party. See §8 (Assumptions &amp; Limitations) for full scope disclaimer.</div>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">Three filter inputs scope the applicable item set; one per-item binary input drives scoring. No numeric quantities are entered — this is a yes/no compliance gate, not a sizing calculator.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Input</th><th>Values</th><th>Effect</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Tier level</strong> <code>currentTier</code></td><td>1, 2, 3, 4 (default 3)</td><td>Filters items whose <code>tiers[]</code> array contains the selected tier. Items are cumulative — Tier 3 shows all items marked for tiers 1, 2, and 3.</td></tr>
+                    <tr><td><strong>Facility type</strong> <code>currentDcType</code></td><td><code>ent</code> / <code>colo</code> / <code>hyper</code> / <code>edge</code> / <code>mod</code> (default <code>ent</code>)</td><td>Filters items whose <code>dcTypes[]</code> array contains the selected type. Certain items are facility-type-exclusive (e.g. liquid-cooling infrastructure only for <code>hyper</code>; ruggedised enclosure only for <code>edge</code>).</td></tr>
+                    <tr><td><strong>Per-item met/not-met</strong> <code>checkedItems[id]</code></td><td>true / false (default false)</td><td>Boolean flag for each applicable item. The scoring engine sums weights for all <code>true</code> items against the domain total.</td></tr>
+                    <tr><td><strong>Evidence (N/A path)</strong></td><td>Implicit — item excluded by filter</td><td>Items outside the tier or facility-type filter are not shown and do not count toward any score. There is no explicit N/A toggle; the filter pair acts as the N/A gate.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <p class="mn-lead" style="margin-top:0.9rem;">Item counts by facility type at Tier 3 (the default): Enterprise 46 items · Colo 53 items · Hyperscale 58 items · Edge 39 items · Modular 44 items. Tier 4 adds items with <code>tiers:[4]</code> or <code>tiers:[3,4]</code>.</p>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">The scoring engine runs in <code class="mn-mono">calculate()</code>. It computes a per-domain weighted score, then folds the six domains into an overall compliance percentage using importance multipliers. A Composite Risk Index (CRI) applies an imbalance penalty when domain scores are highly uneven.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 1 — Per-domain item-weight score</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">domain_pct(d) = ( Σ w(i) for all met items i in domain d ) / ( Σ w(i) for all applicable items i in domain d ) × 100</span>
+                <span class="mn-where">In <code>calculate()</code>: <code>checkedW / totalW * 100</code> per domain. Each item carries weight <code>w ∈ {1, 2, 3}</code> (Standard / Important / Critical). Met = <code>checkedItems[it.id] === true</code>.<span class="mn-src">inline JS · calculate()</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 2 — Domain importance factors</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">totalWeightedScore = Σ ( domain_pct(d) × importance(d) )    over all 6 domains</span>
+                <span class="mn-eq">totalMaxWeight    = Σ ( 100 × importance(d) )               over all 6 domains</span>
+                <span class="mn-where">Domain importance factors (from <code>CATEGORIES[].weight</code>): Site &amp; Architecture 1.0 · Electrical 1.5 · Mechanical/Cooling 1.3 · Telecommunications 1.0 · Fire Protection 1.1 · Physical Security 0.9. Total max weight = 6.8 × 100 = 680 points.<span class="mn-src">CATEGORIES · data model</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 3 — Overall compliance percentage</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">overall = totalWeightedScore / totalMaxWeight × 100    [%]</span>
+                <span class="mn-where">This is the primary displayed score (the large percentage in the results panel). Grade thresholds: A+ ≥95%, A ≥85%, B ≥75%, C ≥65%, D ≥50%, F &lt;50%.<span class="mn-src">inline JS · calculate()</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 4 — Composite Risk Index (CRI) with imbalance penalty</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">avgPct          = mean( domain_pct[0..5] )</span>
+                <span class="mn-eq">variance        = Σ ( domain_pct(d) − avgPct )² / 6</span>
+                <span class="mn-eq">imbalancePenalty = min( 0.15 ,  √variance / 200 )</span>
+                <span class="mn-eq">CRI             = max( 0 ,  overall × ( 1 − imbalancePenalty ) )</span>
+                <span class="mn-where">The CRI penalises facilities that score high in some domains but very low in others. Maximum penalty is 15%. A perfectly balanced facility (all domains equal) has zero penalty. A facility with σ = 40 pp carries a 20%/200 = 10% penalty.<span class="mn-src">inline JS · calculate()</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 5 — Maturity level</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">maturity = CRI ≥ 95 → L5 Optimized</span>
+                <span class="mn-eq">         CRI ≥ 80 → L4 Managed</span>
+                <span class="mn-eq">         CRI ≥ 60 → L3 Defined</span>
+                <span class="mn-eq">         CRI ≥ 40 → L2 Developing</span>
+                <span class="mn-eq">         CRI &lt; 40  → L1 Initial</span>
+                <span class="mn-where">5-level maturity model derived from CRI (not raw overall %). A high-scoring but imbalanced facility may be L3 rather than L4 due to the imbalance penalty.<span class="mn-src">inline JS · calculate()</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Gap count and remediation path</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">gaps = { item : all applicable items where checkedItems[item.id] is false }</span>
+                <span class="mn-eq">gaps sorted by w descending (W3 first, then W2, then W1)</span>
+                <span class="mn-eq">gap_count = |gaps|    (total unmet applicable items)</span>
+                <span class="mn-eq">compliance_path_timeline = gap_count / closure_rate    (user-defined, not computed)</span>
+                <span class="mn-where">The checklist computes gap count and sorted priority; it does not compute closure-rate or timeline (those are site-specific). Estimated remediation cost bands from the roadmap: W3 (Critical) $50K–200K / 3–6 months · W2 (Important) $10K–50K / 1–3 months · W1 (Standard) &lt;$10K / &lt;1 month.<span class="mn-src">inline JS · updateProPanels()</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Sensitivity impact per unmet item</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">impact(item) = overall_if_item_checked − overall_current</span>
+                <span class="mn-where">Computed by simulating the score with item temporarily set to met, then subtracting the current score. Ranks unmet items by marginal overall-score improvement. Top 10 items form the Sensitivity panel.<span class="mn-src">inline JS · updateProPanels() / sensItems</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS & STRUCTURE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">All structural constants live in the inline <code class="mn-mono">CATEGORIES</code>, <code class="mn-mono">DC_TYPES</code>, and <code class="mn-mono">ITEMS</code> arrays. No external data files are loaded.</p>
+
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Domain</th><th>ID</th><th>Importance Factor</th><th>Item weights</th><th>Rationale</th></tr></thead>
+                <tbody>
+                    <tr><td>Site &amp; Architecture</td><td><code>site</code></td><td>1.0×</td><td>W1–W3</td><td>Structural/location foundation — critical but lower operational frequency than power/cooling.</td></tr>
+                    <tr><td>Electrical</td><td><code>elec</code></td><td><strong>1.5×</strong></td><td>W1–W3</td><td>Highest impact: power failure is the primary cause of data center downtime.</td></tr>
+                    <tr><td>Mechanical / Cooling</td><td><code>mech</code></td><td><strong>1.3×</strong></td><td>W1–W3</td><td>Thermal events are the second largest failure cause; long recovery times.</td></tr>
+                    <tr><td>Telecommunications</td><td><code>tel</code></td><td>1.0×</td><td>W1–W3</td><td>Cabling and connectivity infrastructure — critical but more easily remediated.</td></tr>
+                    <tr><td>Fire Protection</td><td><code>fire</code></td><td>1.1×</td><td>W1–W3</td><td>Life-safety and catastrophic-loss risk; slightly elevated above site/telecom.</td></tr>
+                    <tr><td>Physical Security</td><td><code>sec</code></td><td>0.9×</td><td>W1–W3</td><td>Important but failures are lower-frequency and more reversible than infrastructure failures.</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <div class="mn-tablewrap" style="margin-top:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>Item Weight</th><th>Label</th><th>CSS class</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td><code>w: 3</code></td><td>Critical</td><td><code>.w3</code></td><td>Non-negotiable for the tier. Failure to meet = high-impact gap (P1). Examples: UPS 2N for Tier 4, dual utility feeds, VESDA detection.</td></tr>
+                    <tr><td><code>w: 2</code></td><td>Important</td><td><code>.w2</code></td><td>Significant operational risk if absent. P2 gap. Examples: N+1 cooling redundancy, clean agent suppression, hot/cold aisle containment.</td></tr>
+                    <tr><td><code>w: 1</code></td><td>Standard</td><td><code>.w1</code></td><td>Good practice; lower risk if deferred. P3 gap. Examples: TIA-606 labeling, Cat 6A copper, branch circuit monitoring.</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <div class="mn-tablewrap" style="margin-top:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>Facility Type</th><th>ID</th><th>Typical item count (Tier 3)</th><th>Key exclusive items</th></tr></thead>
+                <tbody>
+                    <tr><td>Enterprise</td><td><code>ent</code></td><td>~46</td><td>Standard full set including raised floor, humidity control.</td></tr>
+                    <tr><td>Colocation</td><td><code>colo</code></td><td>~53</td><td>Per-tenant revenue-grade metering, cross-connect room, SLA monitoring, multi-tenant cage isolation.</td></tr>
+                    <tr><td>Hyperscale / Cloud</td><td><code>hyper</code></td><td>~58</td><td>Direct-to-chip liquid cooling, immersion cooling, medium-voltage row distribution, overhead busway, solid floor with overhead cable management.</td></tr>
+                    <tr><td>Edge / Micro</td><td><code>edge</code></td><td>~39</td><td>IP55+ ruggedised enclosure, cellular/satellite backup connectivity, remote monitoring, compact self-contained cooling, BESS, aerosol suppression.</td></tr>
+                    <tr><td>Modular / Prefab</td><td><code>mod</code></td><td>~44</td><td>Modular anchoring, pre-terminated trunk cables, factory-integrated suppression, hot-swappable components, BESS, remote monitoring.</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <p class="mn-lead" style="margin-top:0.9rem;">The base ITEMS array contains <strong>56 canonical items</strong> plus <strong>facility-type-specific extension items</strong> (liquid cooling, BESS, remote management, etc.) for a total of 79 items in the array. At any given tier/facility-type combination, the visible applicable set is always a subset of these 79.</p>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Formula / source</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>Overall compliance score</td><td><code>totalWeightedScore / totalMaxWeight × 100</code></td><td>%</td><td>Primary headline metric. Weighted across all 6 domains by importance factor.</td></tr>
+                    <tr><td>Grade</td><td>Threshold lookup on overall%</td><td>A+/A/B/C/D/F</td><td>A+ ≥95% · A ≥85% · B ≥75% · C ≥65% · D ≥50% · F &lt;50%.</td></tr>
+                    <tr><td>Composite Risk Index (CRI)</td><td><code>overall × (1 − imbalancePenalty)</code></td><td>integer 0–100</td><td>Penalised score; equal to overall when all domains score identically. Drives the maturity level.</td></tr>
+                    <tr><td>Maturity level</td><td>CRI threshold ladder</td><td>L1–L5</td><td>Initial / Developing / Defined / Managed / Optimized.</td></tr>
+                    <tr><td>Weakest category</td><td><code>min(domain_pct[0..5])</code></td><td>%</td><td>Lowest-scoring domain — the bottleneck for tier progression.</td></tr>
+                    <tr><td>Per-domain scores</td><td><code>checkedW / totalW × 100</code> per domain</td><td>% each</td><td>Six individual domain percentages shown in category bars and radar chart.</td></tr>
+                    <tr><td>Gap list</td><td>All applicable unchecked items, sorted by weight desc</td><td>item list</td><td>P1-Critical (W3) → P2-Important (W2) → P3-Standard (W1). Direct remediation input.</td></tr>
+                    <tr><td>Tier badge / readiness</td><td>Implicit from overall% and gap count of W3 items</td><td>qualitative</td><td>A facility with zero W3 gaps and overall ≥75% is broadly tier-ready; formal certification still requires third-party audit.</td></tr>
+                    <tr><td>Sensitivity ranking</td><td><code>impact(item) = overall_if_met − overall_current</code></td><td>Δ% each</td><td>Marginal overall-score gain from closing each gap. Guides where effort has the most impact.</td></tr>
+                    <tr><td>Monte Carlo (PRO)</td><td>10,000 iterations, ±15% weight variance</td><td>mean / σ / P5–P95</td><td>Probabilistic score distribution accounting for measurement uncertainty in weight assignments.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example</h2>
+            <p class="mn-lead">Enterprise facility, Tier 3 target. Assume the assessor marks <em>all</em> Electrical items met and <em>none</em> of the other five domains met (a degenerate stress-test to illustrate the weighting arithmetic). Electrical domain at Tier 3 Enterprise has 14 applicable items with a mix of W1–W3 weights; total domain weight = 35.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Electrical domain (only domain with any items met):</strong>
+                        <code>checkedW_elec = 35</code>, <code>totalW_elec = 35</code> → <span class="mn-result">domain_pct_elec = 100%</span></li>
+                    <li><strong>Other five domains:</strong> all 0% (nothing checked).</li>
+                    <li><strong>Weighted score sum:</strong>
+                        <code>totalWeightedScore = 100×1.5 + 0×1.3 + 0×1.0 + 0×1.1 + 0×1.0 + 0×0.9 =</code> <span class="mn-result">150</span></li>
+                    <li><strong>Max weight:</strong>
+                        <code>totalMaxWeight = 100×(1.5+1.3+1.0+1.1+1.0+0.9) =</code> <span class="mn-result">680</span></li>
+                    <li><strong>Overall:</strong>
+                        <code>150 / 680 × 100 =</code> <span class="mn-result">22.1%</span> → Grade F</li>
+                    <li><strong>Imbalance penalty:</strong> domain_pcts = [0,100,0,0,0,0], avg = 16.7, variance = (5×(0−16.7)² + (100−16.7)²)/6 = (5×278.9 + 6933.9)/6 ≈ 1388.
+                        σ = √1388 ≈ 37.3, imbalancePenalty = min(0.15, 37.3/200) = min(0.15, 0.187) = <span class="mn-result">0.15</span></li>
+                    <li><strong>CRI:</strong>
+                        <code>22.1 × (1 − 0.15) =</code> <span class="mn-result">18.8</span> → Maturity L1 (Initial)</li>
+                    <li><strong>Weakest category:</strong> <span class="mn-result">0%</span> (Site, Mech, Telecom, Fire, Security all at 0%)</li>
+                    <li><strong>Gap count:</strong> 46 total applicable items − 14 electrical items = <span class="mn-result">32 unmet items</span>; sorted by weight for the remediation roadmap.</li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Engineering reading:</strong> even 100% Electrical compliance delivers only 22% overall due to the importance-factor weighting. A Tier 3 Enterprise facility needs balanced compliance across all six domains — Mechanical/Cooling and Site gaps are the next highest-impact domains to close after Electrical.</div>
+
+            <p class="mn-lead" style="margin-top:1.1rem;">A more realistic scenario — Tier 3 Enterprise, all W3 items met but no W2 or W1 items:</p>
+            <div class="mn-worked">
+                <ol>
+                    <li>Approximate W3 item count at Tier 3 Enterprise: 22 items across all domains (e.g. dual utility feeds, UPS, generator, ATS, VESDA, clean-agent suppression, access control, etc.).</li>
+                    <li>Each domain: checkedW(d) ≈ domain's W3 weight sum; totalW(d) = domain's total weight sum including W2+W1 items.</li>
+                    <li>Electrical domain illustration: W3 items weight ≈ 18 of 35 total → <code>domain_pct_elec ≈ 51%</code></li>
+                    <li>Aggregating across all domains in this scenario: <span class="mn-result">overall ≈ 48–55%</span> → Grade D to low-C</li>
+                    <li>Gap list: all W2 and W1 items (P2 and P3 priority) — estimated 24 items to close.</li>
+                    <li>This illustrates that meeting only Critical items places a facility at the borderline of Grade D — W2 items are essential to reach B-grade readiness.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>ANSI/TIA-942-B (2017)</b> — Telecommunications Infrastructure Standard for Data Centers: six-domain structure, tier definitions, item-level requirements including floor loads, redundancy configurations, cable pathways, and fire systems referenced throughout the checklist (§5–§10).</li>
+                <li><b>Uptime Institute Tier Standard</b> — Tier I–IV definitions for redundancy (N, N+1, 2N) and fault tolerance; used in the tier-level filter and concurrent-maintainability items.</li>
+                <li><b>BICSI 002-2019</b> — Data Center Design and Implementation Best Practices: supplemental design guidance for entrance rooms, MDA/HDA topology, and cabling management.</li>
+                <li><b>NFPA 70 (NEC)</b> — National Electrical Code: referenced for EPO requirements (NEC 645.10/11), TGB/TMGB grounding (§6.5), and emergency lighting.</li>
+                <li><b>NFPA 101</b> — Life Safety Code: maximum travel distance for emergency egress, exit sign requirements (§9.4).</li>
+                <li><b>ASHRAE TC 9.9</b> — Thermal Guidelines for Data Processing Environments: A1 recommended envelope (18–27°C, 40–60% RH) and A2–A4 expanded envelopes used in mechanical domain items (§7.2, §7.3).</li>
+                <li><b>IEC 60364</b> — Low Voltage Electrical Installations: international basis for electrical system design and grounding.</li>
+                <li><b>TIA-568</b> — Structured Cabling Standard: cabling performance and installation requirements (§8.3.1).</li>
+                <li><b>TIA-607</b> — Telecommunications Grounding and Bonding: TGB/TMGB busbar requirements (§6.5).</li>
+                <li><b>TIA-606</b> — Administration Standard for Telecommunications Infrastructure: labeling standard (§8.6).</li>
+                <li><b>NIST 800-88</b> — Guidelines for Media Sanitization: referenced in secure decommissioning item (§10.9).</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The checklist is a prescriptive yes/no self-assessment calibrated to ANSI/TIA-942-B section references. It does not perform engineering calculations (load sizing, airflow modelling, power-flow analysis) — those are handled by the complementary CAPEX, OPEX, PUE, and cooling calculators on this site.</p>
+            <p class="mn-lead">Item counts and weights are fixed constants in the source code; they are not dynamically loaded or user-adjustable in free mode. The facility-type filter is a hard-coded <code>dcTypes[]</code> membership check — a facility spanning multiple types (e.g. a hyperscale colo) should run the assessment for each applicable type and compare.</p>
+            <p class="mn-lead">Remediation cost estimates (W3 = $50K–200K, W2 = $10K–50K, W1 = &lt;$10K) are broad order-of-magnitude benchmarks only. Actual costs vary by site, region, existing infrastructure baseline, and labour rates. The Monte Carlo ±15% weight variance models <em>scoring uncertainty</em> in the assessment process — it does not model cost uncertainty or construction risk.</p>
+            <p class="mn-lead">This tool is an <strong>engineering education and pre-design aid</strong>. Formal TIA-942 certification requires an on-site audit by a TIA-942-accredited assessor. The checklist authors and ResistanceZero accept no liability for compliance decisions made solely on the basis of this tool.</p>
+        </section>
+
+        <a class="mn-toollink" href="../tia-942-checklist.html">&#9654; Open the live TIA-942 Compliance Checklist</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../tia-942-checklist.html">TIA-942 Checklist</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

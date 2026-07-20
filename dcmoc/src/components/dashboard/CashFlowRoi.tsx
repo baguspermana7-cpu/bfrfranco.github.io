@@ -17,9 +17,15 @@ export function CashFlowRoi({ financial }: { financial: FinancialResult | null }
     const payback = financial.paybackPeriodYears;
     return (
         <Panel>
-            <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center justify-between mb-1 gap-2">
                 <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Cash Flow &amp; ROI</h2>
-                <span className="text-[10px] text-emerald-500">IRR {financial.irr.toFixed(1)}%</span>
+                {/* audit #5: explicit IRR basis label — each surface computes IRR on a
+                  * DIFFERENT (legitimate) basis; label + tooltip reconcile them. */}
+                <span className="text-right text-[10px] text-emerald-500"
+                    title={'Basis IRR Dashboard: project IRR unlevered after-tax — revenue ilustratif $/kW·bln × ramp okupansi, eskalasi 3%, 15 tahun, pajak negara (calculateFinancials).\nHalaman lain memakai basis BERBEDA dan sah (angka tidak harus sama):\n· Financial Pro-Forma — aproksimasi model pro-forma sendiri (arus kas bersih/CAPEX)\n· Results "screening" — unlevered 15 thn flat, okupansi penuh, tanpa ramp/pajak\n· Site w/ incentives — screening + insentif pajak lokasi'}>
+                    IRR {financial.irr.toFixed(1)}%
+                    <span className="block text-[8.5px] font-normal normal-case text-slate-500">unlevered after-tax · ramp okupansi · 15 thn ⓘ</span>
+                </span>
             </div>
             <div className="h-[150px]">
                 <ResponsiveContainer width="100%" height="100%">

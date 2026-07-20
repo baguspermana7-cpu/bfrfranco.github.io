@@ -20,7 +20,10 @@ export function SiteCards({ sites, results, selectedId, onSelect }: {
         <div className="grid gap-3 md:grid-cols-3">
             {sites.map((s, i) => {
                 const r = results.find((x) => x.siteId === s.id);
-                const badge = r?.rank === 1 ? 'Recommended' : (r?.engine.grade === 'A' || r?.engine.grade === 'B') ? 'Good' : r?.engine.label ?? '—';
+                /* "Recommended" is a COMPARATIVE label — never render it when only one
+                 * site exists (no comparison basis); fall back to the engine grade. */
+                const isTop = results.length > 1 && r?.rank === 1;
+                const badge = isTop ? 'Recommended' : (r?.engine.grade === 'A' || r?.engine.grade === 'B') ? 'Good' : r?.engine.label ?? '—';
                 return (
                     <button key={s.id} onClick={() => onSelect(s.id)}
                         className={`rounded-2xl border p-3 text-left transition-colors ${s.id === selectedId ? 'border-violet-500 bg-violet-600/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-violet-400/60'}`}>
@@ -28,7 +31,7 @@ export function SiteCards({ sites, results, selectedId, onSelect }: {
                             <span className="flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold text-slate-900" style={{ background: SITE_COLORS[i] }}>{s.label}</span>
                             <span className="truncate text-xs font-semibold text-slate-900 dark:text-white">{s.name}</span>
                             {s.isExample && <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">EXAMPLE</span>}
-                            <span className={`ml-auto rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${r?.rank === 1 ? 'bg-emerald-500/15 text-emerald-500' : 'bg-slate-500/15 text-slate-400'}`}>{badge}</span>
+                            <span className={`ml-auto rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${isTop ? 'bg-emerald-500/15 text-emerald-500' : 'bg-slate-500/15 text-slate-400'}`}>{badge}</span>
                         </div>
                         <div className="mt-1.5 text-xl font-bold tabular-nums text-slate-900 dark:text-white">{r ? r.engine.score : '—'}<span className="text-xs text-slate-400">/100</span></div>
                         <div className="mt-1 flex flex-wrap gap-1 text-[9px] text-slate-500">
@@ -154,6 +157,7 @@ export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSi
                             {row('Annual fuel cost', fm(grid.annualFuelCost), undefined, 'site.gridFuelCost')}
                         </div>
                     ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
+                    <p className="mt-1 text-[9px] text-slate-400">Outage min/yr = blended engine model (brownout events + SAIDI-derived interruptions) — the SAIDI figure in Detail Panels is the raw country baseline, so the two differ by design.</p>
                     <button onClick={() => setActiveTab('grid' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Grid deep-dive →</button>
                 </div>
                 <div className={card}>

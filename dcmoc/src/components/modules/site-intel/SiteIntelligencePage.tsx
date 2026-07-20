@@ -109,7 +109,11 @@ export function SiteIntelligencePage() {
                     {/* KPI row */}
                     <div id="sec-overview" className="grid scroll-mt-24 grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'Overall Best Site', value: bestSite ? `Site ${bestSite.label}` : '—', sub: bestSite?.name ?? '', hi: true },
+                            /* "Overall Best" is comparative — with a single site there is no
+                             * comparison basis, so the card degrades to a neutral label. */
+                            sites.length > 1
+                                ? { label: 'Overall Best Site', value: bestSite ? `Site ${bestSite.label}` : '—', sub: bestSite?.name ?? '', hi: true }
+                                : { label: 'Candidate Site', value: bestSite ? `Site ${bestSite.label}` : '—', sub: `${bestSite?.name ?? ''} · single site — add another to compare`, hi: true },
                             { label: 'Total Score', value: `${kpi.engine.score}`, sub: `${kpi.engine.grade} · ${kpi.engine.label}` },
                             { label: 'Availability Score', value: `${kpi.availabilityScore}`, sub: 'power + grid' },
                             { label: 'Connectivity Score', value: `${kpi.connectivityScore}`, sub: 'latency + cables' },

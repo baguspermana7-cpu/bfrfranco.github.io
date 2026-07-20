@@ -255,7 +255,7 @@ const PhasedFinancialDashboard = () => {
             `${goPhases === phaseResults.length ? 'All phases pass the GO threshold' : `${goPhases} of ${phaseResults.length} phases meet the hurdle`}. ` +
             `Interest during construction adds ${fmtMoney(totalIDC)} to the effective cost base over ${constructionMonths} months of build activity. ` +
             `The profitability index of ${pi.toFixed(2)}x indicates ${pi > 1.5 ? 'strong value creation' : pi > 1 ? 'positive but modest returns' : 'value destruction'}. ` +
-            `${overallExplain.reason}${overallExplain.levers.length > 0 ? ` ${overallExplain.levers[0].detail}` : ''}`;
+            `Penilaian: ${overallExplain.reason}${overallExplain.levers.length > 0 ? ` ${overallExplain.levers[0].detail}` : ''}`;
 
         return {
             capacityResult: capPlan,

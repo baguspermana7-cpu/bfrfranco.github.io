@@ -269,7 +269,7 @@ export function CapacityPlanningPage() {
                                         <XAxis dataKey="year" tick={{ fontSize: 9 }} />
                                         <YAxis tick={{ fontSize: 9 }} unit=" MW" />
                                         <Tooltip contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
-                                        <Legend wrapperStyle={{ fontSize: 10 }} />
+                                        <Legend wrapperStyle={{ fontSize: 10 }} formatter={(value) => <span className="text-slate-600 dark:text-slate-300">{value}</span>} />
                                         <Area dataKey="committedMw" name="Committed (phases)" fill="#22d3ee" stroke="#22d3ee" fillOpacity={0.15} />
                                         <Line dataKey="forecastMw" name="Forecast (growth plan)" stroke="#a78bfa" strokeWidth={2} dot={{ r: 2 }} />
                                         <Line dataKey="designMw" name="Design Capacity" stroke="#f59e0b" strokeDasharray="6 4" dot={false} />

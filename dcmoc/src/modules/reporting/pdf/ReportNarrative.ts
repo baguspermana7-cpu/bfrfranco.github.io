@@ -308,10 +308,13 @@ export function buildActions(family: ReportFamily, m: AssessMetrics): PillarActi
             break;
         }
         case 'commissioning': {
+            /* readiness null (no checklist progress yet) must NOT read as 0% —
+             * the "below 70%" advisory only fires on a real number. */
+            const hasReady = typeof m['readinessPct'] === 'number' && Number.isFinite(m['readinessPct'] as number);
             const ready = num(m, 'readinessPct'), failed = num(m, 'testsFailed'), issues = num(m, 'openIssues');
             if (failed > 0) add('HIGH', `Close or waiver the ${failed} failed test${failed > 1 ? 's' : ''} — failed tests block level sign-off.`);
             if (issues > 0) add('MEDIUM', `Work the ${issues} open issue${issues > 1 ? 's' : ''} on the punch list before IST windows.`);
-            if (ready < 70) add('MEDIUM', 'Readiness below 70% — verify the L1–L3 checklist items are being ticked as work completes, not batched at the end.');
+            if (hasReady && ready < 70) add('MEDIUM', 'Readiness below 70% — verify the L1–L3 checklist items are being ticked as work completes, not batched at the end.');
             add('LOW', 'Schedule the IST scenarios against the tier requirement early — they are the long-pole witness events.');
             break;
         }

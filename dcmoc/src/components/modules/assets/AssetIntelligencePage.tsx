@@ -52,7 +52,9 @@ export function AssetIntelligencePage() {
         let eq: Record<string, number> | null = null;
         try { eq = m?.commissioning?.equipScale ? m.commissioning.equipScale({ itLoad: inputs.itLoad, rackDensity: densityToEngineBucket(req.workload.avgRackDensityKw) }) : null; } catch { /* */ }
         if (!eq) return null;
-        const comps: Record<string, { mtbfHours?: number; mttrHours?: number }> = rzData()?.reliability?.components ?? {};
+        /* engine table fields are mtbf/mttr (hours) — DATA.reliability.components;
+         * accept legacy mtbfHours/mttrHours aliases defensively. */
+        const comps: Record<string, { mtbf?: number; mttr?: number; mtbfHours?: number; mttrHours?: number }> = rzData()?.reliability?.components ?? {};
         const rows: ClassRow[] = CLASS_MAP.map((c) => {
             const count = eq![c.eqKey] ?? 0;
             let health = 0, status = '—', fp = 0;
@@ -64,7 +66,7 @@ export function AssetIntelligencePage() {
                 if (m?.asset?.failureProbability) fp = (m.asset.failureProbability(c.cls, ageYears)?.failureProb ?? 0) * 100;
             } catch { /* */ }
             const comp = comps[c.cls] ?? {};
-            return { cls: c.cls, label: c.label, category: c.category, count, health: Math.round(health), status, mtbfHrs: comp.mtbfHours ?? null, mttrHrs: comp.mttrHours ?? null, fpPct: Math.round(fp) };
+            return { cls: c.cls, label: c.label, category: c.category, count, health: Math.round(health), status, mtbfHrs: comp.mtbf ?? comp.mtbfHours ?? null, mttrHrs: comp.mttr ?? comp.mttrHours ?? null, fpPct: Math.round(fp) };
         }).filter((r) => r.count > 0);
         const total = rows.reduce((s, r) => s + r.count, 0);
         const byCat = new Map<string, number>();
@@ -229,7 +231,7 @@ export function AssetIntelligencePage() {
                         </div>
 
                         <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Class Health & Reliability <span className="text-[9px] normal-case text-slate-400">MTBF/MTTR = engine IEEE-493 component data</span></h2>
+                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Class Health & Reliability <span className="text-[9px] normal-case text-slate-400">MTBF/MTTR = engine IEEE-493 component data · — = class not in the component table</span></h2>
                             <table className="w-full text-[11px]">
                                 <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Class</th><th className="text-right">Units</th><th className="text-right">Health</th><th className="text-right">Weibull CDF</th><th className="text-right">MTBF</th><th className="text-right">MTTR</th></tr></thead>
                                 <tbody>

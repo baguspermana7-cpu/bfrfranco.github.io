@@ -14,7 +14,7 @@ import { useRequirementsStore } from '@/store/requirements';
 import { useArchitectureStore, DESIGN_STANDARDS, type DesignStandard } from '@/store/architecture';
 import { ARCH_PROFILES, applyProfile } from '@/state/presets';
 import { rzModels } from '@/lib/rz-engine';
-import { readArchInputs, computeFacility, computeEquipCounts, computeValidation } from '@/state/adapters/arch-adapter';
+import { readArchInputs, computeFacility, computeEquipCounts, computeValidation, computeDensityCheck } from '@/state/adapters/arch-adapter';
 import { computeLayout } from './diagram/layout';
 import { DiagramSvg } from './diagram/DiagramSvg';
 import { ArchRail } from './ArchRail';
@@ -27,6 +27,8 @@ import { getPUE } from '@/constants/pue';
 import { Boxes, FileDown, Save, ChevronRight } from 'lucide-react';
 import { Explain } from '@/components/ui/Explain';
 import { TraceValue } from '@/components/ui/TraceValue';
+
+const COOL_LABEL: Record<string, string> = { liquid: 'D2C Liquid', rdhx: 'Rear-Door HX', inrow: 'In-Row', air: 'Air CRAC/CRAH' };
 
 const STRIP = [
     { id: 'sec-arch-overview', label: '1 Overview' },
@@ -79,6 +81,31 @@ export function ArchitecturePage() {
     let complexity: { index: number; band: string } | null = null;
     try { complexity = m?.complexity ? m.complexity({ coolingType: i.coolingType, tier: i.tier, redundancy: i.redKey }) : null; } catch { /* */ }
 
+    const dens = React.useMemo(() => computeDensityCheck(i), [i]);
+
+    /* Honest profile label: the select is a PICKER — the header must not imply
+     * the profile is active when the actual store differs (e.g. profile says
+     * liquid while sim.coolingType is still air). Compare the selected
+     * profile's writes against the live store values; on drift show an amber
+     * "recommended — not applied" chip (click applies the profile). */
+    const profileDrift = React.useMemo(() => {
+        const p = ARCH_PROFILES.find((x) => x.id === arch.profileId);
+        if (!p) return null;
+        const actual: Record<string, unknown> = {
+            'sim.coolingType': i.coolingType,
+            'req.avgRackDensityKw': i.rackDensityKw,
+            'sim.powerRedundancy': i.redundancy,
+            'sim.tierLevel': i.tier,
+        };
+        const diffs = Object.entries(p.writes).filter(([k, v]) => k in actual && actual[k] !== v).map(([k]) => k);
+        if (diffs.length === 0) return null;
+        const wantsCooling = p.writes['sim.coolingType'] as string | undefined;
+        const msg = diffs.includes('sim.coolingType') && wantsCooling
+            ? `Profile recommends ${COOL_LABEL[wantsCooling] ?? wantsCooling} — not applied (current: ${COOL_LABEL[i.coolingType]})`
+            : `Profile not fully applied — ${diffs.length} setting(s) differ`;
+        return { msg };
+    }, [arch.profileId, i]);
+
     const targetTier = DESIGN_STANDARDS.find((d) => d.id === arch.designStandard)?.tier ?? 3;
     const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 2200); };
 
@@ -126,7 +153,7 @@ export function ArchitecturePage() {
                 config: [
                     ['IT Load', `${f.itMw} MW`],
                     ['Tier', `Tier ${i.tier}`],
-                    ['Cooling', { liquid: 'D2C Liquid', rdhx: 'Rear-Door HX', inrow: 'In-Row', air: 'Air CRAC/CRAH' }[i.coolingType]],
+                    ['Cooling', COOL_LABEL[i.coolingType]],
                     ['Redundancy', i.redundancy],
                     ['Grid Voltage', i.gridVoltage],
                     ['Rack Density', `${i.rackDensityKw} kW/rack`],
@@ -184,10 +211,16 @@ export function ArchitecturePage() {
                     </label>
                     <label className="text-[10px] uppercase text-slate-500">Profile
                         <select value={arch.profileId} onChange={(e) => onProfile(e.target.value)}
-                            className="ml-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs normal-case text-slate-900 dark:text-slate-100 outline-none focus:border-violet-500">
+                            className={`ml-1.5 rounded-lg border ${profileDrift ? 'border-amber-500/70' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs normal-case text-slate-900 dark:text-slate-100 outline-none focus:border-violet-500`}>
                             {ARCH_PROFILES.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
                         </select>
                     </label>
+                    {profileDrift && (
+                        <button onClick={() => onProfile(arch.profileId)} title="The selected profile has NOT been applied to the design — click to apply it"
+                            className="max-w-xs truncate rounded-full bg-amber-500/15 px-2.5 py-1 text-left text-[10px] font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-500/25">
+                            ⚠ {profileDrift.msg} · apply
+                        </button>
+                    )}
                     <button onClick={onExport} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
                     <button onClick={onSave} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><Save className="h-3.5 w-3.5" />Save</button>
                     <button onClick={() => setActiveTab('capacity')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: Capacity Planning <ChevronRight className="h-3.5 w-3.5" /></button>
@@ -209,7 +242,7 @@ export function ArchitecturePage() {
                             { label: 'Total IT Load', value: `${f.itMw} MW`, sub: `${eq.racks.toLocaleString()} racks`, trace: 'sim.itLoad' },
                             { label: 'Total Facility Load', value: `${f.facilityMw} MW`, sub: 'incl. losses & overhead', trace: 'arch.facilityMw' },
                             { label: 'PUE (Design)', value: String(f.pue), sub: f.pue <= 1.2 ? 'Excellent' : f.pue <= 1.4 ? 'Good' : 'Standard', explain: 'pue', trace: 'engine.pueMatrix' },
-                            { label: 'Cooling Approach', value: { liquid: 'D2C Liquid', rdhx: 'Rear-Door HX', inrow: 'In-Row', air: 'Air CRAC/CRAH' }[i.coolingType], sub: `${i.rackDensityKw} kW/rack` },
+                            { label: 'Cooling Approach', value: COOL_LABEL[i.coolingType], sub: dens.ok ? `${i.rackDensityKw} kW/rack` : `${i.rackDensityKw} kW/rack — above ${dens.ceilKw} kW ${i.coolingType} ceiling`, warn: !dens.ok },
                             { label: 'Availability Target', value: `${f.availabilityPct}%`, sub: `Tier ${i.tier} · ${f.downtimeMinYr} min/yr`, trace: 'rel.tierTarget' },
                             { label: 'Redundancy Level', value: i.redundancy, sub: 'Power & Cooling', explain: 'redundancy' },
                         ].map((k) => (
@@ -222,7 +255,7 @@ export function ArchitecturePage() {
                                 ) : (
                                     <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
                                 )}
-                                <div className="truncate text-[10px] text-slate-500">{k.sub}</div>
+                                <div className={`truncate text-[10px] ${(k as { warn?: boolean }).warn ? 'font-medium text-amber-500' : 'text-slate-500'}`} title={k.sub}>{k.sub}</div>
                             </div>
                         ))}
                     </div>

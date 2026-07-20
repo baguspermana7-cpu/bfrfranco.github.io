@@ -658,13 +658,16 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'fin.lcc15': {
         label: 'LCC 15 thn (TCO diskonto 10%)', page: 'finance', unit: '$', provenance: 'derived',
-        formulaTemplate: 'models.tco.totalCost(capex.total, opex.dashboardAnnual, 15 thn, 10% diskonto)',
+        formulaTemplate: 'models.tco.lifecycleNPV(capex.total, opex.dashboardAnnual, 15 thn, diskonto 10%) — TCO diskonto termasuk siklus refresh (parity-fix: fn engine bernama lifecycleNPV, bukan totalCost)',
         deps: ['capex.total', 'opex.dashboardAnnual'],
         get: () => {
             try {
-                const m = (rzModels() as { tco?: { totalCost?: (c: number, o: number, y: number, r: number) => number } }).tco;
+                const m = (rzModels() as { tco?: { totalCost?: (c: number, o: number, y: number, r: number) => number; lifecycleNPV?: (c: number, o: number, y: number, opts?: Record<string, unknown>) => number } }).tco;
                 const c = cap().results?.total; const o = dashOpexAnnual();
-                return m?.totalCost && c && o ? Math.round(m.totalCost(c, o, 15, 0.10)) : null;
+                if (!c || !o) return null;
+                if (m?.totalCost) return Math.round(m.totalCost(c, o, 15, 0.10));
+                if (m?.lifecycleNPV) return Math.round(m.lifecycleNPV(c, o, 15, { discountRate: 0.10 }));
+                return null;
             } catch { return null; }
         },
     },

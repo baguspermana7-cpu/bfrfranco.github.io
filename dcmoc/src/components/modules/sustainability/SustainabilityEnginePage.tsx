@@ -208,7 +208,7 @@ export function SustainabilityEnginePage() {
                             { label: 'PUE (Design)', value: String(model.pue), sub: `${inputs.coolingType} · Tier ${inputs.tierLevel}`, explain: 'pue', trace: 'engine.pueMatrix' },
                             { label: 'Energy (Month)', value: `${model.monthlyMwh.toLocaleString()} MWh`, sub: `${model.mw.toFixed(1)} MW × PUE × 730h`, trace: 'sus.energyMonthlyMwh' },
                             { label: 'Carbon (Annual)', value: model.scopes ? `${Math.round(model.scopes.totalAnnual).toLocaleString()} tCO₂e` : '—', sub: 'GHG Protocol scopes (engine)', trace: 'carbon.annualEmissions' },
-                            { label: 'Water (Annual)', value: model.waterM3Yr != null ? `${model.waterM3Yr.toLocaleString()} m³` : '—', sub: `WUE ${model.wue} L/kWh (engine)`, explain: 'wue', trace: 'sus.waterAnnualM3' },
+                            { label: 'Water (Annual)', value: model.waterM3Yr != null ? `${model.waterM3Yr.toLocaleString()} m³` : '—', sub: `WUE ${model.wue} L/kWh (engine) · pre-climate basis${env ? ` — env cost ×${env.climateMult} climate` : ''}`, explain: 'wue', trace: 'sus.waterAnnualM3' },
                             { label: 'Renewable Energy', value: `${model.renewablePct}%`, sub: 'derived from capex renewable/cert inputs', trace: 'sus.renewablePct' },
                             { label: 'Sustainability Score', value: model.grade, sub: `${model.overall}/100 · documented composite`, trace: 'sus.overallScore' },
                         ].map((k) => (
@@ -324,7 +324,8 @@ export function SustainabilityEnginePage() {
                                     <TraceValue traceId="sus.waterCost">
                                         <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{fmtMoney(env.waterCost)}</div>
                                     </TraceValue>
-                                    <div className="text-[10px] text-slate-500">{fmt(env.waterM3)} m³ = WUE {model.wue} L/kWh × IT kWh × climate ×{env.climateMult} ({env.climate}) → {fmt(env.kgal)} kgal × ${env.waterRate}/kgal ({waterSource})</div>
+                                    <div className="text-[10px] text-slate-500">engine volume {fmt(model.waterM3Yr ?? 0)} m³ (= Water KPI, WUE {model.wue} L/kWh × IT kWh)</div>
+                                    <div className="text-[10px] text-slate-500">× climate ×{env.climateMult} ({env.climate}, ASHRAE zone) = {fmt(env.waterM3)} m³ → {fmt(env.kgal)} kgal × ${env.waterRate}/kgal ({waterSource})</div>
                                     {env.deepSea && <div className="mt-1 inline-block rounded bg-cyan-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-cyan-600 dark:text-cyan-400">deep-sea ON — seawater basis, no potable draw</div>}
                                 </div>
                                 <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
@@ -365,7 +366,7 @@ export function SustainabilityEnginePage() {
                                             <XAxis dataKey="year" tick={{ fontSize: 9 }} />
                                             <YAxis tick={{ fontSize: 9 }} tickFormatter={(v) => fmtMoney(Number(v))} width={52} />
                                             <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
-                                            <Legend wrapperStyle={{ fontSize: 10 }} />
+                                            <Legend wrapperStyle={{ fontSize: 10 }} formatter={(value) => <span className="text-slate-600 dark:text-slate-300">{value}</span>} />
                                             <Bar dataKey="water" name="Water" stackId="env" fill="#22d3ee" />
                                             <Bar dataKey="carbon" name="Carbon" stackId="env" fill="#f59e0b" />
                                             <Bar dataKey="waste" name="Waste" stackId="env" fill="#64748b" radius={[3, 3, 0, 0]} />

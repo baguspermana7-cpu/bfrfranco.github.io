@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Air vs Liquid Cooling — Comparison Methodology | ResistanceZero</title>
+    <meta name="description" content="Editorial comparison methodology for air cooling vs direct liquid cooling in data centers: cited PUE ranges, rack density physics, heat-transfer fundamentals, water usage, and financial payback basis.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="air cooling vs liquid cooling, data center PUE, direct liquid cooling methodology, rack density comparison, ASHRAE liquid cooling, cooling physics, specific heat capacity water vs air">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/compare-air-vs-liquid-cooling.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/compare-air-vs-liquid-cooling.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/compare-air-vs-liquid-cooling.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/compare-air-vs-liquid-cooling.html">
+    <meta property="og:title" content="Air vs Liquid Cooling — Comparison Methodology">
+    <meta property="og:description" content="Editorial comparison basis for air vs liquid cooling: cited PUE ranges 1.30–1.60 vs 1.02–1.15, density ranges, heat-transfer physics, and payback methodology.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="Air vs Liquid Cooling Comparison Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Air vs Liquid Cooling — Comparison Methodology">
+    <meta name="twitter:description" content="Cited PUE ranges, rack density physics, heat-transfer fundamentals, and payback methodology behind the cooling comparison.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Air vs Liquid Cooling Comparison Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "Air vs Liquid Cooling" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Air vs Liquid Cooling — Comparison Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Editorial comparison methodology for air cooling versus direct liquid cooling in data centers",
+        "articleSection": "Cooling Comparison",
+        "dependencies": "ASHRAE A5.1-2021, Uptime Institute PUE Survey, NVIDIA DGX specification, IEA Water Stress Index",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to evaluate air cooling vs liquid cooling for a data center",
+        "step": [
+            { "@type": "HowToStep", "name": "Determine rack density range", "text": "Identify your peak and average rack power density (kW/rack). Air cooling is practical up to 15-20 kW/rack with containment; above 40 kW/rack liquid cooling is required." },
+            { "@type": "HowToStep", "name": "Compare PUE ranges", "text": "Air-cooled facilities achieve PUE 1.30-1.60 (cited range); direct liquid cooling achieves 1.02-1.15 (cited range). The gap is driven by the ~4,000x volumetric heat capacity advantage of water over air." },
+            { "@type": "HowToStep", "name": "Calculate PUE payback", "text": "Estimate the CAPEX premium for liquid cooling, then divide by annual OPEX savings from PUE improvement: payback_years = capex_premium / (IT_load_kW x hours_per_year x PUE_delta x energy_rate)." },
+            { "@type": "HowToStep", "name": "Assess water consumption delta", "text": "Air-cooled facilities using evaporative towers can consume 15-30 ML/year per 10 MW IT load. Closed-loop liquid cooling with dry coolers targets WUE below 0.5 L/kWh." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Why does water cool more efficiently than air?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Water has a specific heat capacity of 4.186 kJ/(kg·K) versus air at 1.007 kJ/(kg·K) — about 4.2x higher per unit mass. Combined with water's density (~830x greater than air at standard conditions), the volumetric heat capacity advantage is approximately 3,500-4,000x. This means a small-diameter pipe carrying water at moderate flow removes as much heat as a large air duct with high fan power." }
+            },
+            {
+                "@type": "Question",
+                "name": "What PUE can liquid cooling achieve compared to air cooling?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Air-cooled data centers achieve PUE in the cited range of 1.30-1.60 (Uptime Institute global average ~1.58; hyperscaler best-in-class ~1.20 with free cooling). Direct liquid cooling achieves 1.02-1.15 (ASHRAE cited range for DLC facilities) by eliminating most fan power and enabling higher-temperature heat rejection that avoids mechanical refrigeration in many climates." }
+            },
+            {
+                "@type": "Question",
+                "name": "At what rack density does liquid cooling become necessary?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Air cooling with hot/cold aisle containment is practical up to approximately 15-20 kW/rack (cited industry range). Between 20-40 kW/rack, hybrid approaches such as rear-door heat exchangers can extend air cooling. Above 40 kW/rack — the density of AI GPU racks (NVIDIA DGX H100 ~10 kW per node, 4-node racks reach 45+ kW; GB200 NVL72 racks exceed 120 kW) — direct liquid cooling is the only practical solution." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../compare-air-vs-liquid-cooling.html" class="nav-link">Cooling Comparison</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / Air vs Liquid Cooling
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Cooling Comparison</p>
+            <h1>Air vs Liquid Cooling — Comparison Methodology</h1>
+            <p>The editorial basis, cited numeric ranges, and physics behind the air vs liquid cooling comparison page. This is an <strong>editorial reference</strong> — every number is a cited range from published sources (ASHRAE, Uptime Institute, IEA, NVIDIA), not a dynamic solver. The companion page does not accept user inputs; it presents industry-sourced ranges with an honest uncertainty envelope.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Type <strong>Editorial Comparison</strong></span>
+                <span class="mn-chip">Basis <strong>Cited Ranges</strong></span>
+                <span class="mn-chip">Inputs <strong>N/A — reference page</strong></span>
+                <span class="mn-chip">Metrics <strong>7 comparison rows</strong></span>
+            </div>
+            <a class="mn-toollink" href="../compare-air-vs-liquid-cooling.html">▶ Open the comparison page</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; editorial basis</h2>
+            <p class="mn-lead">The <a class="mn-inline" href="../compare-air-vs-liquid-cooling.html">Air vs Liquid Cooling</a> comparison page is an <strong>editorial reference</strong>, not a dynamic calculator. It does not accept user inputs and does not produce bespoke outputs. Its purpose is to present industry-sourced numeric ranges that describe the performance envelope of each cooling architecture across seven dimensions: rack density, PUE, CAPEX, OPEX, retrofit complexity, acoustic noise, and AI/HPC readiness.</p>
+            <p class="mn-lead">All cited figures are <strong>ranges drawn from published sources</strong> — ASHRAE liquid-cooling guidelines, Uptime Institute annual PUE surveys, NVIDIA DGX product specifications, and IEA water-stress research. No single facility is guaranteed to fall at any specific point within a range; site climate, design choices, utilisation, and workload mix shift the actual outcome. This manual documents which source each range originates from and what physics underlies the gap between the two architectures.</p>
+            <div class="mn-note"><strong>Editorial scope:</strong> this page documents the comparison basis. It is not a cooling-design tool, not a financial model, and not a prescriptive recommendation. Use it to orient a technology decision, then engage a qualified mechanical engineer for facility-specific design.</div>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">This page is a <strong>static editorial reference</strong> — there are no user-facing inputs. The comparison page presents fixed cited ranges, not a parameterised model. The table below documents what each comparison row measures and where its numeric range originates, so readers can evaluate the basis independently.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Row</th><th>What is measured</th><th>Air value (cited range)</th><th>Liquid value (cited range)</th></tr></thead>
+                <tbody>
+                    <tr><td>Rack density</td><td>Peak sustained IT power per rack (kW)</td><td>15–20 kW/rack (with containment)</td><td>40–120+ kW/rack (DLC); 100–200+ kW (immersion)</td></tr>
+                    <tr><td>PUE</td><td>Total facility power ÷ IT power</td><td>1.30–1.60 typical; 1.20 hyperscaler floor</td><td>1.02–1.15 (DLC with dry cooler or free cooling)</td></tr>
+                    <tr><td>CAPEX</td><td>Cooling infrastructure cost per MW IT load</td><td>$2–4 M/MW</td><td>$3–6 M/MW (including CDUs and piping)</td></tr>
+                    <tr><td>OPEX</td><td>Relative cooling energy consumption</td><td>Higher — fan power + overcooling losses</td><td>30–50% energy reduction vs air baseline</td></tr>
+                    <tr><td>Retrofit</td><td>Ease of upgrading an existing facility</td><td>Standard — no special infrastructure</td><td>Moderate (RDHx) to complex (full DLC or immersion)</td></tr>
+                    <tr><td>Acoustic noise</td><td>Typical in-row noise level (dBA)</td><td>70–85 dBA at rack level</td><td>40–55 dBA (server fans reduced or eliminated)</td></tr>
+                    <tr><td>AI/HPC readiness</td><td>Ability to support 40+ kW GPU racks</td><td>No — physical limit ~20 kW/rack with air</td><td>Yes — designed for 40–200+ kW racks</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Methodology — comparison metrics &amp; physics</h2>
+            <p class="mn-lead">Each comparison row rests on a physical or financial argument. This section documents those arguments and their mathematical basis so the cited ranges can be evaluated critically.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Heat-transfer physics: why water beats air</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Cp_water = 4.186 kJ/(kg·K)        (specific heat capacity at 20 °C)</span>
+                <span class="mn-eq">Cp_air   = 1.007 kJ/(kg·K)        (dry air at standard conditions)</span>
+                <span class="mn-eq">ratio_mass = Cp_water / Cp_air ≈ 4.2×        (per unit mass)</span>
+                <span class="mn-eq">ρ_water ≈ 998 kg/m³        ρ_air ≈ 1.20 kg/m³</span>
+                <span class="mn-eq">ratio_vol = (Cp_water × ρ_water) / (Cp_air × ρ_air) ≈ 3 460×</span>
+                <span class="mn-where">Volumetric heat capacity of water vs air: ~3,500× higher. A 25 mm pipe flowing water at 0.5 L/s removes the same heat as a 600 mm duct at 5 m/s. This is the physical root of every PUE and density advantage cited.<span class="mn-src">CITED-RANGE · Engineering thermodynamics</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">PUE range basis</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">PUE = Total_Facility_Power / IT_Equipment_Power        (Uptime/ASHRAE definition)</span>
+                <span class="mn-eq">Air-cooled PUE range: 1.30 – 1.60        [CITED-RANGE — Uptime Institute Global Survey]</span>
+                <span class="mn-eq">DLC PUE range:       1.02 – 1.15        [CITED-RANGE — ASHRAE TC 9.9 DLC guidelines]</span>
+                <span class="mn-eq">PUE_delta_low  = 1.30 − 1.15 = 0.15        (conservative gap)</span>
+                <span class="mn-eq">PUE_delta_high = 1.60 − 1.02 = 0.58        (maximum gap)</span>
+                <span class="mn-where">PUE improvement arises from (a) eliminating CRAH fan power (~5–15% of total facility power in air-cooled facilities), (b) enabling higher chilled-water supply temperatures (40–45 °C vs 12–15 °C), which allows free cooling or dry coolers to work more hours per year, and (c) reducing cold-aisle bypass and hot-aisle recirculation losses. The ranges are medians and percentiles from annual industry surveys — individual facilities vary significantly.<span class="mn-src">CITED-RANGE · Uptime Institute, ASHRAE TC 9.9</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Rack density ceiling — air vs liquid</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Air density ceiling (with containment): 15–20 kW/rack        [CITED-RANGE — ASHRAE A5.1-2021]</span>
+                <span class="mn-eq">RDHx (rear-door HX) ceiling: 30–40 kW/rack        [CITED-RANGE — vendor specifications]</span>
+                <span class="mn-eq">Direct-to-chip (cold plate) ceiling: 40–120+ kW/rack        [CITED-RANGE — NVIDIA DGX, OCP specs]</span>
+                <span class="mn-eq">Immersion (single/two-phase) ceiling: 100–200+ kW/tank        [CITED-RANGE — immersion vendor data]</span>
+                <span class="mn-where">The air ceiling is not a design choice — it is a physical limit set by the maximum airflow a rack can deliver without unacceptable backpressure. NVIDIA DGX H100 (10.2 kW/node × 4 nodes = ~40 kW + networking) and GB200 NVL72 (cited >120 kW) demonstrate that AI GPU racks already exceed the air-cooling ceiling at moderate cluster scale.<span class="mn-src">CITED-RANGE · ASHRAE A5.1-2021, NVIDIA DGX H100/GB200 specs</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">PUE payback methodology</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">annual_opex_savings = IT_kW × 8760 h/yr × PUE_delta × energy_rate_$/kWh</span>
+                <span class="mn-eq">payback_years = capex_premium_$ / annual_opex_savings</span>
+                <span class="mn-where">capex_premium = liquid_capex − air_capex. PUE_delta and capex figures are each cited ranges, so payback is itself a range. The editorial page cites 3–5 years for high-density AI/HPC deployments — this assumes PUE_delta ~0.30, IT load 1 MW, energy rate $0.08/kWh, and a capex premium of ~$2 M: savings = 1000 × 8760 × 0.30 × 0.08 ≈ $210 K/yr → payback ≈ $2 M / $210 K ≈ 9.5 yr at the low end; or $500 K/yr at PUE_delta 0.50 → ~4 yr. The published 3–5 yr figure typically reflects higher density (higher PUE_delta) and lower energy rates.<span class="mn-src">CITED-RANGE · Illustrative range; not a guarantee</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Water consumption delta</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Air-cooled (evaporative tower): WUE ≈ 1.5 – 3.0 L/kWh IT        [CITED-RANGE — IEA / Uptime]</span>
+                <span class="mn-eq">10 MW IT load, 8760 h/yr: water = 10 000 × 8760 × 2.0 L/kWh ≈ 175 ML/yr</span>
+                <span class="mn-eq">DLC with dry cooler (closed loop): WUE ≈ 0.0 – 0.5 L/kWh IT        [CITED-RANGE — ASHRAE TC 9.9]</span>
+                <span class="mn-where">Air cooling with evaporative towers consumes make-up water to replace evaporation losses (typically 1.5–3.0% of circulated volume). DLC with dry coolers (air-blast heat rejection) operates in a closed loop and can achieve near-zero water consumption. In water-stressed regions, WUE is a permit and regulatory constraint — liquid cooling enables compliance that air cooling with towers cannot achieve.<span class="mn-src">CITED-RANGE · IEA Water Stress Index, ASHRAE TC 9.9</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS & SOURCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; sources</h2>
+            <p class="mn-lead">Every cited range in the comparison page maps to one of the following source groups. The numeric range boundaries are the published medians or percentile bands from those sources — they are not derived from a proprietary model.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Metric</th><th>Air (cited range)</th><th>Liquid (cited range)</th><th>Primary source</th></tr></thead>
+                <tbody>
+                    <tr><td>PUE — global average</td><td>~1.58</td><td>—</td><td>Uptime Institute Global Data Center Survey (annual)</td></tr>
+                    <tr><td>PUE — hyperscaler best-in-class (air + free cooling)</td><td>~1.20</td><td>—</td><td>Uptime Institute / Google/Microsoft published PUE</td></tr>
+                    <tr><td>PUE — DLC (direct liquid cooling)</td><td>—</td><td>1.02–1.15</td><td>ASHRAE TC 9.9, Liquid Cooling Guidelines (2021)</td></tr>
+                    <tr><td>Rack density — air (with containment)</td><td>15–20 kW/rack</td><td>—</td><td>ASHRAE A5.1-2021 § Rack Cooling Design</td></tr>
+                    <tr><td>Rack density — cold plate / DLC</td><td>—</td><td>40–120+ kW/rack</td><td>NVIDIA DGX H100 spec (10.2 kW/node); GB200 NVL72 (>120 kW); OCP Liquid Cooling spec</td></tr>
+                    <tr><td>Rack density — immersion</td><td>—</td><td>100–200+ kW/tank</td><td>Submer, GRC, LiquidStack vendor data sheets</td></tr>
+                    <tr><td>CAPEX — air cooling</td><td>$2–4 M/MW</td><td>—</td><td>Turner Construction DC Cost Index; Uptime Institute cost benchmarks</td></tr>
+                    <tr><td>CAPEX — liquid cooling</td><td>—</td><td>$3–6 M/MW</td><td>Turner Construction DC Cost Index (liquid DLC premium cited range)</td></tr>
+                    <tr><td>OPEX reduction — liquid vs air</td><td>baseline</td><td>30–50% cooling energy reduction</td><td>ASHRAE TC 9.9; vendor case studies (Dell, HPE, Vertiv)</td></tr>
+                    <tr><td>WUE — evaporative air cooling</td><td>1.5–3.0 L/kWh</td><td>—</td><td>IEA "Water Consumption of Data Centers" (2022)</td></tr>
+                    <tr><td>WUE — DLC closed-loop</td><td>—</td><td>0.0–0.5 L/kWh</td><td>ASHRAE TC 9.9; Green Grid WUE metric definition</td></tr>
+                    <tr><td>Acoustic noise — air-cooled rack</td><td>70–85 dBA</td><td>—</td><td>ASHRAE equipment noise class ratings</td></tr>
+                    <tr><td>Acoustic noise — liquid-cooled (reduced fans)</td><td>—</td><td>40–55 dBA</td><td>Vendor measured data (Supermicro, HPE DL380 Gen11 with DLC)</td></tr>
+                    <tr><td>Specific heat capacity — water</td><td colspan="2">4.186 kJ/(kg·K) at 20 °C</td><td>NIST Chemistry WebBook; engineering thermodynamics tables</td></tr>
+                    <tr><td>Specific heat capacity — air (dry)</td><td colspan="2">1.007 kJ/(kg·K) at 20 °C, 1 atm</td><td>NIST Chemistry WebBook; ASHRAE Handbook of Fundamentals</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs — comparison table rows</h2>
+            <p class="mn-lead">The comparison page outputs seven rows. The table below maps each row to its comparison basis, the cited range on each side, and the directional verdict (which architecture wins on that metric for high-density AI/HPC deployments).</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Row</th><th>Air cooling</th><th>Liquid cooling</th><th>Directional winner</th><th>Basis</th></tr></thead>
+                <tbody>
+                    <tr><td>Max rack density</td><td>15–20 kW/rack</td><td>40–120+ kW/rack</td><td>Liquid</td><td>Physical heat-removal capacity limit</td></tr>
+                    <tr><td>PUE impact</td><td>1.30–1.60</td><td>1.02–1.15</td><td>Liquid</td><td>Fan power elimination + higher ΔT return water</td></tr>
+                    <tr><td>CAPEX</td><td>$2–4 M/MW</td><td>$3–6 M/MW</td><td>Air (lower first cost)</td><td>Infrastructure procurement benchmarks</td></tr>
+                    <tr><td>OPEX</td><td>Higher baseline</td><td>30–50% reduction</td><td>Liquid</td><td>Fan energy + overcooling elimination</td></tr>
+                    <tr><td>Retrofit ease</td><td>Standard — no special infra</td><td>Moderate–complex (piping, CDUs, floor load)</td><td>Air (simpler)</td><td>Facility modification scope assessment</td></tr>
+                    <tr><td>Acoustic noise</td><td>70–85 dBA</td><td>40–55 dBA</td><td>Liquid</td><td>Server fan reduction / elimination in DLC</td></tr>
+                    <tr><td>AI/HPC readiness</td><td>No (ceiling ~20 kW)</td><td>Yes (40–200+ kW)</td><td>Liquid</td><td>NVIDIA DGX density exceeds air ceiling</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Reading these ranges:</strong> "winner" reflects the dominant outcome for the metric in isolation. A deployment with rack densities below 15 kW may reasonably prefer air cooling on CAPEX and simplicity. The comparison is not a universal verdict — it is a structured summary of the tradeoffs at the density levels relevant to AI/HPC infrastructure (40–120+ kW/rack).</div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example — density-transition &amp; PUE-payback illustration</h2>
+            <p class="mn-lead">A 1 MW IT load data hall contemplating a technology transition from air to direct liquid cooling. All figures use the midpoints of the cited ranges above. This is an <strong>illustrative exercise using cited-range midpoints</strong> — not a site-specific financial model.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Current state (air cooling):</strong> 1 000 kW IT load at PUE midpoint <code>1.45</code> → total facility power = <span class="mn-result">1 450 kW</span>; cooling overhead = <span class="mn-result">450 kW</span>.</li>
+                    <li><strong>Target state (DLC):</strong> same IT load at PUE midpoint <code>1.08</code> → total facility power = <span class="mn-result">1 080 kW</span>; cooling overhead = <span class="mn-result">80 kW</span>.</li>
+                    <li><strong>Annual energy saving:</strong> <code>(1 450 − 1 080) kW × 8 760 h/yr = 3 241 200 kWh/yr</code> → at $0.08/kWh → <span class="mn-result">~$259 K/yr</span> saved.</li>
+                    <li><strong>CAPEX premium (cited range midpoint):</strong> liquid capex midpoint $4.5 M/MW − air capex midpoint $3.0 M/MW = <span class="mn-result">$1.5 M premium</span> for this 1 MW build.</li>
+                    <li><strong>Simple payback:</strong> <code>$1.5 M / $259 K/yr =</code> <span class="mn-result">~5.8 years</span> at cited-range midpoints.</li>
+                    <li><strong>Density unlock:</strong> air ceiling ~18 kW/rack (midpoint) → at 1 MW IT load: <code>1 000 kW / 18 kW =</code> <span class="mn-result">~56 racks</span> needed. DLC at 80 kW/rack: <code>1 000 kW / 80 kW =</code> <span class="mn-result">~13 racks</span> — a <span class="mn-result">4.3× floor-space reduction</span>.</li>
+                    <li><strong>Water consumption comparison:</strong> air (evaporative tower, WUE 2.25 midpoint): <code>1 000 kW × 8 760 h/yr × 2.25 L/kWh =</code> <span class="mn-result">19.7 ML/yr</span>. DLC (closed loop, WUE ~0.1): <span class="mn-result">~0.9 ML/yr</span> → <span class="mn-result">95% reduction</span>.</li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Illustrative note:</strong> all values are midpoints of cited ranges — actual outcomes depend on local energy cost, climate (free-cooling hours per year), utilisation factor, lease vs own, and workload profile. The payback range using the full cited-range boundaries spans approximately 2.5–12 years; a formal financial model with site-specific inputs is required for a capital decision.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>ASHRAE TC 9.9 (2021)</b> — Liquid Cooling Guidelines for Datacom Equipment Centers: PUE ranges for DLC facilities, rack density ceilings for cold-plate and immersion cooling, WUE targets for closed-loop systems.</li>
+                <li><b>ASHRAE A5.1-2021</b> — Thermal Guidelines for Data Processing Environments (5th edition): air-cooling rack density ceiling at 15–20 kW/rack with containment.</li>
+                <li><b>ASHRAE Handbook of Fundamentals</b> — Specific heat capacity and density values for air and water at standard conditions.</li>
+                <li><b>Uptime Institute Global Data Center Survey (annual)</b> — Global average PUE (~1.58), hyperscaler PUE distribution, CAPEX/OPEX benchmark data.</li>
+                <li><b>NVIDIA DGX H100 Product Specification</b> — 10.2 kW per DGX H100 node (8× H100 SXM5 GPUs); rack-level density 45–50 kW for a 4-node configuration with networking.</li>
+                <li><b>NVIDIA GB200 NVL72 System Specification</b> — Rack thermal design power exceeding 120 kW; requires direct liquid cooling.</li>
+                <li><b>IEA "Data Centres and Data Transmission Networks" (2022)</b> — Water consumption of data centers: WUE ranges for evaporative cooling, water-stress context by region.</li>
+                <li><b>Open Compute Project (OCP) Liquid Cooling Specification</b> — Rack density targets and CDU (Coolant Distribution Unit) interface standards for AI/HPC deployments.</li>
+                <li><b>Turner Construction DC Cost Index (2024)</b> — CAPEX ranges for air-cooled and liquid-cooled data center construction per MW IT load.</li>
+                <li><b>The Green Grid</b> — PUE and WUE metric definitions; industry best-practice benchmarks for both metrics.</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS & LIMITS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The comparison page is an editorial summary of industry-sourced ranges. The following boundaries define what it does and does not represent:</p>
+            <ul style="color:var(--mn-muted);font-size:0.88rem;line-height:1.7;padding-left:1.25rem;margin:0 0 0.9rem;">
+                <li><strong style="color:var(--mn-text);">Cited ranges, not prescriptive values.</strong> Every figure is a range from a published source. No single facility is guaranteed to land at any specific point within that range.</li>
+                <li><strong style="color:var(--mn-text);">No user inputs.</strong> The comparison page does not compute site-specific outcomes. It is a reference page, not a calculator.</li>
+                <li><strong style="color:var(--mn-text);">Technology snapshot.</strong> Ranges reflect published data as of 2024–2025. Cooling technology is evolving; specific numbers from next-generation GPU platforms (beyond GB200) may shift the density ceiling upward.</li>
+                <li><strong style="color:var(--mn-text);">Currency of CAPEX estimates.</strong> Cost ranges are USD and reflect Western-market (North America, Western Europe) procurement. APAC and emerging-market costs differ.</li>
+                <li><strong style="color:var(--mn-text);">Energy rate assumption.</strong> The worked example uses $0.08/kWh as an illustrative rate. Indonesian commercial electricity is approximately Rp 1 100–1 500/kWh; adjust the payback accordingly.</li>
+                <li><strong style="color:var(--mn-text);">Not investment or engineering advice.</strong> This page is an educational reference. Facility-specific decisions require a qualified mechanical engineer, thermal analysis, and site-survey data.</li>
+                <li><strong style="color:var(--mn-text);">Hybrid architectures not separately modelled.</strong> Rear-door heat exchangers (RDHx), in-row cooling, and partial DLC retrofits occupy a spectrum between the two poles; their PUE and cost outcomes are not separately enumerated in the comparison rows.</li>
+            </ul>
+            <div class="mn-note"><strong>Data declaration:</strong> all numeric ranges are cited from the external sources listed in Section 07. No proprietary model, survey instrument, or database operated by ResistanceZero was used to generate these ranges. Where sources disagree, the range boundaries reflect the spread across sources.</div>
+        </section>
+
+        <a class="mn-toollink" href="../compare-air-vs-liquid-cooling.html">▶ Open the Air vs Liquid Cooling comparison page</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../compare-air-vs-liquid-cooling.html">Cooling Comparison</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>
