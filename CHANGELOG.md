@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.98.4 — 2026-07-20 (follow-up sweep: theme sync manual/ + llms.txt + hygiene)
+
+### Fixed
+- **Theme manual/ sinkron sitewide**: 41 halaman manual membaca key `theme` sitewide (fallback `rz_theme` legacy) dan menulis keduanya — pilihan dark/light kini konsisten antara manual/ dan seluruh site (pre-existing sejak halaman manual dibuat).
+- 3 straggler biner .html di tools/dc-corpus/raw/ (SEC 10-K pre-hardening) dihapus → audit-version-stamp strict kembali exit 0.
+
+### Changed
+- `llms.txt` regen: +41 entri manual (170 halaman).
+- Allowance ShiftEngine didokumentasikan eksplisit sebagai shift-pattern-based BY DESIGN (bukan gap country-data): benefits per negara sudah di `benefitsOverheadRate`/`socialSecurityRate` — tabel negara di allowance = double-count. Menutup item MEDIUM terakhir inventori DM.
+
+### Verified
+- js-syntax CLEAN (41 manual tersapu) · version-stamp 0 missing · tsc dcmoc.
+
 ## v1.98.3 — 2026-07-20 (manual/ de-orphan 41 halaman + Benchmarks korpus 6× + narasi Cx null-safe)
 
 ### Added

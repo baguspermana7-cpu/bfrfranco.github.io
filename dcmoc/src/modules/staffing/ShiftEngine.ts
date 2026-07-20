@@ -261,6 +261,10 @@ export const calculateStaffing = (
 
     // DM audit: statutory employer social-security rate per country; legacy 2-bucket fallback
     const socialSecurity = totalBase * (country.labor.socialSecurityRate ?? (country.id === 'ID' ? 0.04 : 0.06));
+    /* Shift allowance (meal/transport/site) — SHIFT-PATTERN based by design, NOT
+     * country-based: negara-specific benefits sudah tercakup di labor.benefitsOverheadRate
+     * (site-adapter burden) & socialSecurityRate; menambah tabel negara di sini =
+     * double-count. 12h dapat rate lebih tinggi (hari kerja lebih panjang). Screening. */
     const allowances = totalBase * (patternId === 'continental-8h' ? 0.06 : 0.08) * aqiMult; // AQI multiplier
 
     const weeklyOTCost = overtimeHours * 1.5 * hourlyRate;

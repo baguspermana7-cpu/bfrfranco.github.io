@@ -589,13 +589,13 @@
     <script>
     (function(){
         var toggle = document.getElementById('themeToggle');
-        var theme = localStorage.getItem('rz_theme') || 'dark';
+        var theme = localStorage.getItem('theme') || localStorage.getItem('rz_theme') || 'dark';
         document.documentElement.setAttribute('data-theme', theme);
         if (toggle) toggle.addEventListener('click', function(){
             var current = document.documentElement.getAttribute('data-theme');
             var next = current === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('rz_theme', next);
+            localStorage.setItem('theme', next); localStorage.setItem('rz_theme', next);
         });
         var hamburger = document.querySelector('.hamburger');
         var navMenu = document.querySelector('.nav-menu');
