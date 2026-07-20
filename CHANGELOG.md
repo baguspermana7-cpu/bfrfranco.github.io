@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.97.7 — 2026-07-20 (GATE BARU trace-parity + 3 drift nyata tertangkap & fixed)
+
+### Added
+- **Gate permanen `tools/_dcmoc_trace_parity_probe.mjs`**: klik SETIAP angka ƒx di 14 halaman, assert nilai popover ≡ KPI render (fuzzy mantissa + normalisasi skala rb/jt/K/M + satuan kW/MW/MVA); node basis-lokal terdokumentasi (Investment/Assets) = WARN whitelist. Terdaftar di CLAUDE.md ship suite. **Baseline 116/116 match.**
+
+### Fixed (3 drift mirror tertangkap gate pada run perdana — bukti gate bekerja)
+- `opex.totalAnnual`: node memanggil engine dgn objek padahal signature POSITIONAL (mw, pue, region, headcount, opts) → popover NaN; kini mirror persis call FinancialPage.
+- `ops.energyCostDaily`: basis salah (design penuh ÷365, ~2.1× off) → kini mirror halaman Ops (IT aktif × occupancy S-curve × partial-load PUE × 24h × tarif negara).
+- `staff.fte`: node menjumlah input mentah (14) vs halaman menampilkan headcount efektif engine (13) — kini Σ calculateStaffing per role (satu sumber).
+
+### Changed
+- EA-2 korpus: fetch.mjs diperkeras (curl `--max-filesize` 60MB, **biner PDF/HTML dihapus setelah konversi markitdown** — disk hanya .md); cache raw/ dibersihkan 71MB → 1.4MB.
+
+### Verified
+- parity 116/116 · tsc/build · (walk/synergy/export tetap hijau dari v1.97.6).
+
 ## v1.97.6 — 2026-07-20 (docs sync + adversarial verify 7/8 PASS + trace tail 4 halaman)
 
 ### Added

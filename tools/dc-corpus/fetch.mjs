@@ -37,10 +37,13 @@ for (const src of sources) {
     const mdPath = join(RAW, `${name}.md`);
     if (existsSync(mdPath)) { cached++; continue; }
     try {
-        execFileSync('curl', ['-sL', '--max-time', '45', '-A',
+        /* EA-2 (owner): markitdown-only storage — download size-capped 60MB, binary
+         * DELETED after conversion; only the small .md survives on disk. */
+        execFileSync('curl', ['-sL', '--max-time', '120', '--max-filesize', '62914560', '-A',
             'Mozilla/5.0 (compatible; rz-dc-corpus/1.0; research; +https://resistancezero.com)',
-            '-o', htmlPath, src.url], { timeout: 60000 });
-        execFileSync(MARKITDOWN, [htmlPath, '-o', mdPath], { timeout: 60000 });
+            '-o', htmlPath, src.url], { timeout: 150000 });
+        execFileSync(MARKITDOWN, [htmlPath, '-o', mdPath], { timeout: 180000 });
+        try { unlinkSync(htmlPath); } catch { /* already gone */ }
         const size = readFileSync(mdPath, 'utf8').length;
         if (size < 500) throw new Error(`too small (${size}b — likely blocked/empty)`);
         /* provenance header for the extractor */

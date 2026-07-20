@@ -163,12 +163,9 @@ export const TRACE: Record<string, TraceNode> = {
     /* ── EB batch-3: opex / staffing / availability chains ── */
     'staff.fte': {
         label: 'Total FTE (auto headcount)', page: 'staff', provenance: 'derived',
-        formulaTemplate: 'core shift 24×7 + marginal × (sim.itLoad ÷ 1000 ÷ 10)^0.65 — kalibrasi benchmark Uptime',
+        formulaTemplate: 'Σ headcount efektif per role via ShiftEngine.calculateStaffing (sub-linear sim.itLoad, kalibrasi Uptime) — mirror totalHeadcount halaman (parity-fix 2026-07-20)',
         deps: ['sim.itLoad'],
-        get: () => {
-            const i = sim().inputs;
-            return (i.headcount_ShiftLead ?? 0) + (i.headcount_Engineer ?? 0) + (i.headcount_Technician ?? 0) + (i.headcount_Admin ?? 0) + (i.headcount_Janitor ?? 0);
-        },
+        get: () => { const p = staffCostParts(); return p ? p.headcount : null; },
     },
     'rel.tierTarget': {
         label: 'Tier Availability Target', page: 'reliability', unit: '%', provenance: 'engine', sourceKey: 'reliability',
@@ -184,8 +181,12 @@ export const TRACE: Record<string, TraceNode> = {
         deps: ['sim.itLoad', 'staff.fte'],
         get: () => {
             try {
-                const m = (rzModels() as { opex?: { totalAnnual?: (inp: Record<string, unknown>) => { total?: number } } }).opex;
-                const r = m?.totalAnnual?.({ itLoadKw: sim().inputs.itLoad, countryId: sim().selectedCountry?.id, basisPreset: 'dcContract' });
+                /* parity-fix 2026-07-20: engine signature POSITIONAL (mw, pue, region, headcount, opts) — mirror FinancialPage call persis */
+                const m = (rzModels() as { opex?: { totalAnnual?: (mw: number, pue: number | undefined, region: string, headcount: number, opts?: Record<string, unknown>) => { total?: number } } }).opex;
+                const st = sim(); const i = st.inputs;
+                const hc = (i.headcount_ShiftLead ?? 0) + (i.headcount_Engineer ?? 0) + (i.headcount_Technician ?? 0) + (i.headcount_Admin ?? 0);
+                const r = m?.totalAnnual?.(i.itLoad / 1000, undefined, st.selectedCountry?.id ?? 'US', hc,
+                    { capex: cap().results?.total, extendedOpex: true, basisPreset: 'dcContract' });
                 return r?.total ?? null;
             } catch { return null; }
         },
@@ -222,9 +223,22 @@ export const TRACE: Record<string, TraceNode> = {
     /* ── EB-instrument: page-KPI nodes (append-only) ── */
     'ops.energyCostDaily': {
         label: 'Energy Cost (24h)', page: 'ops', unit: '$', provenance: 'derived',
-        formulaTemplate: 'ops.energyCost ÷ 365',
-        deps: ['ops.energyCost'],
-        get: () => { const a = TRACE['ops.energyCost'].get(); return a == null ? null : +(a / 365).toFixed(0); },
+        formulaTemplate: 'IT aktif (sim.itLoad × occupancy S-curve) × PUE partial-load × 24h × sim.electricityRate — mirror halaman Ops (parity-fix 2026-07-20; basis design penuh ada di ops.energyCost)',
+        deps: ['sim.itLoad', 'engine.pueMatrix', 'sim.electricityRate'],
+        get: () => {
+            try {
+                const m = rzModels() as { capacity?: { occupancyScurve?: (y: number, mk: string) => number }; pue?: { partialLoadPUE?: (p: number, o: number) => number } };
+                const st = sim(); const i = st.inputs;
+                let occ = 0.85;
+                try { if (m?.capacity?.occupancyScurve) occ = Math.max(0.05, Math.min(1, m.capacity.occupancyScurve(1, 'wholesale'))); } catch { /* */ }
+                const designPue = (rzData() as { pueMatrix?: Record<string, Record<string, number>> }).pueMatrix?.[i.coolingType]?.['tier' + i.tierLevel] ?? 1.4;
+                let livePue = designPue;
+                try { if (m?.pue?.partialLoadPUE) livePue = +m.pue.partialLoadPUE(designPue, occ).toFixed(2); } catch { /* */ }
+                const activeItMw = +((i.itLoad / 1000) * occ).toFixed(1);
+                const rate = (st.selectedCountry as { economy?: { electricityRate?: number } } | null)?.economy?.electricityRate ?? 0.1;
+                return Math.round(activeItMw * livePue * 24 * 1000 * rate);
+            } catch { return null; }
+        },
     },
     /* ── SITE INTELLIGENCE — integrated analyses (selected site; 5 sibling engines) ── */
     /* Grid Reliability card (GridReliabilityEngine) */
@@ -1721,7 +1735,7 @@ function phaseDurMo(name: string): number | null {
 
 /** Staffing cost parts (unrounded) — Σ per-role calculateStaffing monthlyCost +
  *  overtime component, mirrors StaffingDashboard results/efficiency memos. */
-function staffCostParts(): { total: number; ot: number } | null {
+function staffCostParts(): { total: number; ot: number; headcount: number } | null {
     try {
         const st = sim();
         const country = st.selectedCountry;
@@ -1736,13 +1750,14 @@ function staffCostParts(): { total: number; ot: number } | null {
             { role: 'janitor', qty: hc[4], is24x7: false },
         ];
         const opModel = i.staffingModel === 'outsourced' ? 'vendor' : i.staffingModel;
-        let total = 0, ot = 0;
+        let total = 0, ot = 0, headcount = 0;
         for (const c of cfg) {
             const r = calculateStaffing(c.role, Math.max(1, c.qty), i.shiftModel, country, c.is24x7, undefined, undefined, opModel, i.hybridRatio ?? 0.5);
             total += r.monthlyCost;
             ot += r.breakdown?.overtime ?? 0;
+            headcount += r.headcount ?? c.qty;
         }
-        return { total, ot };
+        return { total, ot, headcount };
     } catch { return null; }
 }
 

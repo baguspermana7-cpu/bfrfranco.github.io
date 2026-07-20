@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Fire Suppression Calculator — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full engineering methodology for the DC fire-suppression calculator: NFPA 2001 clean-agent mass equations, inputs, output formulas, constants, worked example, and standards references.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="NFPA 2001, clean agent design concentration, Novec 1230, FM-200, IG-541, NOAEL, fire suppression methodology, data center fire calculation">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/fire.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/fire.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/fire.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/fire.html">
+    <meta property="og:title" content="Fire Suppression Calculator — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="NFPA 2001 clean-agent mass equations, inputs, output formulas, constants, and worked example behind the DC fire-suppression calculator.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="Fire Suppression Calculator Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Fire Suppression Calculator — Technical Manual">
+    <meta name="twitter:description" content="NFPA 2001 clean-agent mass equations, inputs, outputs, constants, and worked example.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Fire Suppression Calculator Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "Fire Suppression Calculator" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Fire Suppression Calculator — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "NFPA 2001 clean-agent fire-suppression design methodology for data centers",
+        "articleSection": "Fire Safety",
+        "dependencies": "NFPA 2001, NFPA 72, NFPA 855, UL 9540A",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to size a clean-agent fire-suppression system (NFPA 2001)",
+        "step": [
+            { "@type": "HowToStep", "name": "Define the protected volume", "text": "Enter net room volume (m3), floor area (m2), and ambient temperature (C)." },
+            { "@type": "HowToStep", "name": "Select the clean agent", "text": "Choose Novec 1230, FM-200, or IG-541 and a design concentration (defaults to the Class-A value)." },
+            { "@type": "HowToStep", "name": "Compute agent quantity", "text": "Halocarbon mass W = (V/s)(C/(100-C)) with s = k1 + k2*T; inert volume X = V*ln(100/(100-C))." },
+            { "@type": "HowToStep", "name": "Check occupant safety", "text": "Confirm design concentration stays at or below the agent NOAEL and discharge time meets NFPA 2001." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Which equation sizes the clean-agent quantity?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Halocarbon agents (Novec 1230, FM-200) use the NFPA 2001 mass equation W = (V/s)(C/(100-C)), where s = k1 + k2*T is the specific vapour volume in m3/kg. Inert agents (IG-541) use the volume equation X = V*ln(100/(100-C)) in m3 of agent at NTP." }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the NOAEL check?",
+                "acceptedAnswer": { "@type": "Answer", "text": "For a normally-occupied space the design concentration must stay at or below the agent NOAEL (No Observed Adverse Effect Level): 10% for Novec 1230, 9% for FM-200, 43% for IG-541. The safety margin is NOAEL minus design concentration." }
+            },
+            {
+                "@type": "Question",
+                "name": "Why does the tool model Li-ion battery off-gas?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Clean-agent suppression does not stop a lithium-ion thermal runaway. Per NFPA 855 and UL 9540A the primary mitigation is early H2/CO off-gas detection plus ventilation, so the tool estimates runaway heat, off-gas volume, and the room concentration versus the 25%-LFL alarm threshold." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../fire-calculator.html" class="nav-link">Fire Calculator</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / Fire Suppression Calculator
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Fire Safety</p>
+            <h1>Fire Suppression Calculator — Methodology &amp; Formulas</h1>
+            <p>Every input, equation, constant, output, and reference behind the clean-agent fire-suppression calculator. All math is anchored to NFPA 2001 and executed by the deterministic engine <code class="mn-mono">js/fire-engine.js</code> against the locked basis-of-design in <code class="mn-mono">js/fire-model.js</code> — no back-solved constants, no random values.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>FIRE_ENGINE v1.0.0</strong></span>
+                <span class="mn-chip">Basis <strong>NFPA 2001 (2022)</strong></span>
+                <span class="mn-chip">Inputs <strong>7</strong></span>
+                <span class="mn-chip">Outputs <strong>10</strong></span>
+            </div>
+            <a class="mn-toollink" href="../fire-calculator.html">▶ Open the live calculator</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The calculator sizes a total-flooding clean-agent fire-suppression system for a data-hall or electrical room, and screens the space for occupant safety and lithium-ion battery off-gas hazard. It answers four design questions: <em>how much agent is required</em>, <em>is the space safe to occupy at that concentration</em>, <em>how many detectors and cylinders are needed</em>, and <em>does a Li-ion BBU introduce an off-gas hazard the clean agent cannot cover</em>.</p>
+            <p class="mn-lead">Basis of design is <strong>user-driven</strong>: you supply the room geometry, agent, and (optionally) battery pack; the engine returns a deterministic sizing. The governing authority is <strong>NFPA 2001 (2022) Clean Agent Fire Extinguishing Systems</strong>, with detection from NFPA 72 and Li-ion hazard from NFPA 855 / UL 9540A:2024.</p>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">Seven inputs across three groups — protected space, clean agent, and an optional lithium-ion BBU panel. Ranges are enforced client-side; blank concentration falls back to the agent Class-A design value.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field</th><th>Symbol</th><th>Unit</th><th>Range / default</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td>Room volume <code>inVol</code></td><td><code>V</code></td><td>m³</td><td>≥ 1 · default 500</td><td>Net protected volume (deduct solid obstructions; do not deduct racks).</td></tr>
+                    <tr><td>Floor area <code>inArea</code></td><td><code>A</code></td><td>m²</td><td>≥ 1 · default 170</td><td>Footprint used for spot-detector coverage.</td></tr>
+                    <tr><td>Ambient temp <code>inTemp</code></td><td><code>T</code></td><td>°C</td><td>0–55 · default 20</td><td>Sets specific vapour volume <code>s = k1 + k2·T</code>.</td></tr>
+                    <tr><td>Clean agent <code>inAgent</code></td><td><code>—</code></td><td>enum</td><td>novec1230 / fm200 / ig541</td><td>Selects the agent property block (halocarbon vs inert path).</td></tr>
+                    <tr><td>Design conc. <code>inConc</code></td><td><code>C</code></td><td>%</td><td>1–60 · optional</td><td>Design concentration; blank → agent Class-A default (Novec 4.7, FM-200 7.0, IG-541 37.5).</td></tr>
+                    <tr><td>Battery chemistry <code>inChem</code></td><td><code>—</code></td><td>enum</td><td>'' / nmc / lfp / lco</td><td>Optional Li-ion panel; blank disables the off-gas block.</td></tr>
+                    <tr><td>Pack energy <code>inKwh</code></td><td><code>E</code></td><td>kWh</td><td>≥ 0 · default 333</td><td>Installed BBU energy driving runaway-heat and off-gas estimates.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">Two agent-quantity equations (halocarbon vs inert), plus detection, safety, and Li-ion off-gas models. Function names below map one-to-one to <code class="mn-mono">js/fire-engine.js</code>.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Halocarbon agent mass — Novec 1230, FM-200</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">s = k1 + k2 · T        (specific vapour volume, m³/kg)</span>
+                <span class="mn-eq">W = (V / s) · ( C / (100 − C) )        [kg]</span>
+                <span class="mn-where">In <code>halocarbonAgentKg(V, C, T, k1, k2)</code>. NFPA 2001 total-flooding mass equation. <code>k1,k2</code> per-agent from NFPA 2001 tables.<span class="mn-src">NFPA 2001 · STANDARD</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Inert agent volume — IG-541</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">X = V · ln( 100 / (100 − C) )        [m³ agent at NTP]</span>
+                <span class="mn-where">In <code>inertAgentM3(V, C)</code>. NFPA 2001 inert-gas volume equation.<span class="mn-src">NFPA 2001 · STANDARD</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Cylinders, intensity, GWP, occupant safety</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">cylinders   = ceil( quantity / cylinderFill )</span>
+                <span class="mn-eq">kgPerM3     = W / V</span>
+                <span class="mn-eq">CO₂e_tonnes = W · GWP₁₀₀ / 1000</span>
+                <span class="mn-eq">safetyMargin = NOAEL − C        occupiableOk = (C ≤ NOAEL)</span>
+                <span class="mn-where">In <code>agentForRoom(agent, V, T, C)</code>. Design concentration must stay ≤ agent NOAEL for a normally-occupied space.<span class="mn-src">NFPA 2001 A.1.5 · STANDARD</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Detection &amp; discharge bands</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">spotDetectors = ceil( A / 84 m² )        (NFPA 72, ~9.1 m spacing)</span>
+                <span class="mn-eq">dischargeOk = seconds ≤ 10 (halocarbon)  or ≤ 60 (inert)</span>
+                <span class="mn-eq">holdTimeOk  = minutes ≥ 10</span>
+                <span class="mn-where">In <code>spotDetectorCount()</code>, <code>dischargeTimeOk()</code>, <code>holdTimeOk()</code>.<span class="mn-src">NFPA 72 / 2001 · STANDARD</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Lithium-ion off-gas hazard (optional)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">runawayHeat = E · 3.6 · trHeatFactor        [MJ]   (nmc 2.5 / lfp 1.2 / lco 2.6)</span>
+                <span class="mn-eq">offGas      = E · 1000 · offGasLPerWh / 1000   [m³]  (nmc 4.0 / lfp 2.0 / lco 4.5 L/Wh)</span>
+                <span class="mn-eq">roomConc%   = offGas / (V + offGas) · 100</span>
+                <span class="mn-eq">lflAlarm    = ventGasLFL(6.0%) · 25% = 1.5 vol%     ok if roomConc% ≤ 1.5</span>
+                <span class="mn-where">In <code>liIonRunawayHeatMJ()</code>, <code>liIonOffGasM3()</code>, <code>offGasRoomConcPct()</code>, <code>offGasLflMarginOk()</code>.<span class="mn-src">NFPA 855 / UL 9540A · STANDARD</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">Every constant lives in the deep-frozen <code class="mn-mono">FIRE_MODEL</code> with a <code>// source:</code> tag. Agent property block:</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Agent</th><th>Type</th><th>k1</th><th>k2</th><th>Class-A C</th><th>NOAEL / LOAEL</th><th>GWP₁₀₀</th></tr></thead>
+                <tbody>
+                    <tr><td>Novec 1230 (FK-5-1-12)</td><td>halocarbon</td><td><code>0.0664</code></td><td><code>0.0002741</code></td><td>4.7%</td><td>10.0 / 10.0%</td><td>1</td></tr>
+                    <tr><td>FM-200 (HFC-227ea)</td><td>halocarbon</td><td><code>0.1269</code></td><td><code>0.0005132</code></td><td>7.0%</td><td>9.0 / 10.5%</td><td>3220</td></tr>
+                    <tr><td>IG-541 (Inergen)</td><td>inert</td><td>—</td><td>—</td><td>37.5%</td><td>43 / 52%</td><td>0</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-tablewrap" style="margin-top:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>Li-ion chemistry</th><th>Runaway onset</th><th>Off-gas</th><th>TR heat factor</th></tr></thead>
+                <tbody>
+                    <tr><td>NMC</td><td>150 °C</td><td>4.0 L/Wh</td><td>2.5</td></tr>
+                    <tr><td>LFP</td><td>166.8 °C</td><td>2.0 L/Wh</td><td>1.2</td></tr>
+                    <tr><td>LCO</td><td>150 °C</td><td>4.5 L/Wh</td><td>2.6</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <p class="mn-lead" style="margin-top:0.9rem;">Bands: discharge ≤ 10 s (halocarbon), hold ≥ 10 min, spot-detector coverage 84 m², gas-detect alarm at 25% LFL, vent-gas governing LFL 6.0% (H₂ 4.0%). Li-ion onset temperatures from Nature Sci. Reports 2024 via the repo FMECA research doc.</p>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Formula</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>Agent quantity</td><td><code>W</code> or <code>X</code></td><td>kg / m³ NTP</td><td>Total-flooding charge for the space.</td></tr>
+                    <tr><td>Design concentration</td><td><code>C</code></td><td>%</td><td>Must exceed the agent minimum-extinguish value.</td></tr>
+                    <tr><td>Safety margin</td><td><code>NOAEL − C</code></td><td>pts</td><td>Green if ≥ 0 (occupiable); negative = re-design.</td></tr>
+                    <tr><td>Intensity</td><td><code>W / V</code></td><td>kg/m³</td><td>Charge density, sanity-check vs vendor data.</td></tr>
+                    <tr><td>GWP footprint</td><td><code>W · GWP / 1000</code></td><td>t CO₂e</td><td>Halocarbon only; Novec ≈ 0, FM-200 material.</td></tr>
+                    <tr><td>Cylinders</td><td><code>ceil(qty / fill)</code></td><td>count</td><td>Storage footprint.</td></tr>
+                    <tr><td>Spot detectors</td><td><code>ceil(A / 84)</code></td><td>count</td><td>NFPA 72 minimum coverage.</td></tr>
+                    <tr><td>Discharge time</td><td>band</td><td>s</td><td>≤ 10 s halocarbon / ≤ 60 s inert.</td></tr>
+                    <tr><td>Li-ion runaway heat</td><td><code>E·3.6·f</code></td><td>MJ</td><td>Thermal load a clean agent will not absorb.</td></tr>
+                    <tr><td>Off-gas vs LFL</td><td><code>offGas/(V+offGas)</code></td><td>vol%</td><td>Alarm if &gt; 1.5% (25% of 6% LFL).</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example</h2>
+            <p class="mn-lead">500 m³ hall, 170 m² floor, 20 °C, Novec 1230 at the 4.7% Class-A default, with a 333 kWh NMC BBU. Numbers reproduce the live engine output exactly.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li>Specific vapour volume: <code>s = 0.0664 + 0.0002741·20 =</code> <span class="mn-result">0.071882 m³/kg</span></li>
+                    <li>Agent mass: <code>W = (500 / 0.071882) · (4.7 / 95.3) =</code> <span class="mn-result">343.0 kg</span></li>
+                    <li>Intensity: <code>343.0 / 500 =</code> <span class="mn-result">0.686 kg/m³</span> · GWP footprint <code>343.0·1/1000 =</code> <span class="mn-result">0.34 t CO₂e</span></li>
+                    <li>Cylinders: <code>ceil(343.0 / 100) =</code> <span class="mn-result">4</span></li>
+                    <li>Safety margin: <code>10.0 − 4.7 =</code> <span class="mn-result">5.3 pts</span> → occupiable (C ≤ NOAEL) ✓</li>
+                    <li>Spot detectors: <code>ceil(170 / 84) =</code> <span class="mn-result">3</span> · discharge ≤ 10 s ✓</li>
+                    <li>Li-ion NMC runaway heat: <code>333·3.6·2.5 =</code> <span class="mn-result">2 997 MJ</span></li>
+                    <li>Off-gas: <code>333·4.0 =</code> <span class="mn-result">1 332 m³</span> → room conc <code>1332/(500+1332)·100 =</code> <span class="mn-result">72.7 vol%</span> → far above 1.5% alarm ⇒ early H₂/CO detection + ventilation mandatory.</li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Engineering reading:</strong> the clean agent extinguishes the Class-A fire, but a 333 kWh NMC pack in this room floods it with vent gas orders of magnitude past the flammable limit. Per NFPA 855 / UL 9540A the controlling mitigation is <em>early off-gas detection and forced ventilation</em>, not the suppression charge.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>NFPA 2001 (2022)</b> — Clean Agent Fire Extinguishing Systems: agent mass/volume equations, design concentrations, NOAEL/LOAEL, discharge &amp; hold times, k1/k2 coefficients.</li>
+                <li><b>NFPA 72</b> — National Fire Alarm &amp; Signaling Code: spot-detector coverage (~84 m²).</li>
+                <li><b>NFPA 855</b> — Stationary Energy Storage Systems: Li-ion off-gas detection, 25%-LFL alarm.</li>
+                <li><b>UL 9540A:2024</b> — ESS thermal-runaway fire-propagation test: off-gas basis.</li>
+                <li><b>IEC 62619</b> — Secondary Li cells for industrial use.</li>
+                <li><b>ISO 14520 / FM Global DS 5-32</b> — gaseous suppression &amp; data-center protection.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">js/fire-engine.js</code> (FIRE_ENGINE v1.0.0) + <code class="mn-mono">js/fire-model.js</code> (FIRE_MODEL, deep-frozen).</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">Total-flooding, well-mixed enclosure at the stated temperature; cylinder-fill figures are illustrative sizing defaults (tagged <code>ILLUSTRATIVE</code> in the model) and must be confirmed against the chosen vendor's cylinder data. Off-gas volume uses a representative L/Wh per chemistry — a screening estimate, not a substitute for a UL 9540A test report. This manual and the calculator are an <strong>engineering education and pre-design aid</strong>; final suppression design must be sealed by a qualified fire-protection engineer to the authority having jurisdiction.</p>
+        </section>
+
+        <a class="mn-toollink" href="../fire-calculator.html">▶ Open the live Fire Suppression Calculator</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../fire-calculator.html">Fire Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>
