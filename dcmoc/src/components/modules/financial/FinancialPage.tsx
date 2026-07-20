@@ -37,6 +37,9 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
     const fin = useFinancialTracking();
     const ct = useConstructionTracking();
     const [tab, setTab] = React.useState<'overview' | 'ledger' | 'proforma' | 'montecarlo'>(initialTab ?? 'overview');
+    /* deep-link fix: 'montecarlo' router case re-renders an already-mounted page —
+     * useState won't re-read the prop, so sync tab when initialTab changes */
+    React.useEffect(() => { if (initialTab) setTab(initialTab); }, [initialTab]);
     const [busy, setBusy] = React.useState(false);
 
     React.useEffect(() => { if (!results) runCalculation(); }, [results, runCalculation]);

@@ -588,7 +588,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                                 <span className="hidden sm:inline max-w-[160px] truncate align-bottom text-violet-500 font-medium">{activeProject.name}</span>
                                 <span className="hidden sm:inline"> / </span>
                             </>)}
-                            <span className="text-slate-800 dark:text-slate-200 font-medium">{activeTab === 'dashboard' ? 'Executive Overview' : navItems.find(n => n.id === activeTab)?.label || SUPPORT.find(s => s.id === activeTab)?.label || PLATFORM.find(p => p.id === activeTab)?.label || 'Overview'}</span>
+                            <span className="text-slate-800 dark:text-slate-200 font-medium">{activeTab === 'dashboard' ? 'Executive Overview' : navItems.find(n => n.id === activeTab)?.label || SUPPORT.find(s => s.id === activeTab)?.label || PLATFORM.find(p => p.id === activeTab)?.label || ({ faq: 'FAQ', montecarlo: 'Monte Carlo', tier: 'Tier Classification' } as Record<string, string>)[activeTab] || 'Overview'}</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">

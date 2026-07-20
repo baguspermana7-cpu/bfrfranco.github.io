@@ -12,6 +12,8 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useSimulationStore } from '@/store/simulation';
+import { useRequirementsStore } from '@/store/requirements';
+import { densityToEngineBucket } from '@/lib/requirementsMappings';
 import { useCxTracking, cxPlanMode, checklistDerivedCompletion, type CxCheckValue } from '@/store/cxTracking';
 import { rzModels, rzData } from '@/lib/rz-engine';
 import { CX_CHECKLIST, resolveProc, type ReadinessKey, type ChecklistItem } from '@/lib/cx-procedures';
@@ -57,6 +59,10 @@ export function CommissioningEnginePage() {
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
     const inputs = useSimulationStore((s) => s.inputs);
     const country = useSimulationStore((s) => s.selectedCountry);
+    /* HIGH-2 (visual audit) — rack density MUST reach the engine. Without it,
+     * equipScale defaulted to the 'standard' 6 kW bucket → RACKS = ceil(2500/6)
+     * = 417 while the whole app (Requirements 60 kW/rack) shows 42. */
+    const rackKw = useRequirementsStore((s) => s.workload.avgRackDensityKw);
     const t = useCxTracking();
     const [tab, setTab] = React.useState<'overview' | 'checklist' | 'cost'>('overview');
     const [openLevel, setOpenLevel] = React.useState<ReadinessKey | null>('L3');
@@ -66,7 +72,7 @@ export function CommissioningEnginePage() {
     const model = React.useMemo(() => {
         const m = rzModels()?.commissioning;
         if (!m?.programRich) return null;
-        const rich = m.programRich({ itLoadKw: inputs.itLoad, coolingType: inputs.coolingType, powerRedundancy: inputs.powerRedundancy, countryId: country?.id });
+        const rich = m.programRich({ itLoadKw: inputs.itLoad, coolingType: inputs.coolingType, powerRedundancy: inputs.powerRedundancy, countryId: country?.id, rackDensity: densityToEngineBucket(rackKw) });
         const eq = rich.equip as Record<string, number>;
         /* Per-readiness-key checklist stats — items filtered to systems that
          * actually EXIST at the current config (live equipScale counts). */
@@ -102,7 +108,7 @@ export function CommissioningEnginePage() {
         const passTotal = anyTicks ? KEYS.reduce((s, k) => s + checklistStats[k].pass, 0) : t.testsPassed;
         const failTotal = anyTicks ? KEYS.reduce((s, k) => s + checklistStats[k].fail, 0) : t.testsFailed;
         return { rich, readiness, systems, testsTotal, checklistStats, anyTicks, passTotal, failTotal };
-    }, [inputs, country, t]);
+    }, [inputs, country, rackKw, t]);
 
     if (!model) return <div className="p-8 text-center text-sm text-slate-500">Engine loading…</div>;
     const { rich, readiness, systems, testsTotal, checklistStats, anyTicks, passTotal, failTotal } = model;
@@ -372,7 +378,10 @@ export function CommissioningEnginePage() {
                             { label: 'Systems in Scope', value: String(systems.length), sub: 'from equipment scaling' },
                             { label: 'Tests (screening)', value: testsTotal.toLocaleString(), sub: t.testsPassed != null ? `${t.testsPassed} passed · ${t.testsFailed ?? 0} failed` : 'counts × tests-per-unit', trace: 'cx.testsTotal' },
                             { label: 'Open Issues', value: String(openIssues.length), sub: `${punch.length} punch items` },
-                            { label: 'IST Scenarios', value: String(rich.tierInfo.scenarios), sub: `${rich.tierInfo.tier} · ${rich.tierInfo.istHrs}h IST` },
+                            /* #7 audit — scenarios derive from the REDUNDANCY config, not the project
+                             * tier; labeling them with tierInfo.tier ("Tier IV" at 2N) contradicted the
+                             * project's Tier 3 target. Attribute to redundancy; project tier = sim.tierLevel. */
+                            { label: 'IST Scenarios', value: String(rich.tierInfo.scenarios), sub: `${inputs.powerRedundancy} config · ${rich.tierInfo.istHrs}h IST` },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>

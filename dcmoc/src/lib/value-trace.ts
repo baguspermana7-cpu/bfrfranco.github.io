@@ -7,6 +7,7 @@
  * ──────────────────────────────────────────────────────────────────────── */
 
 import { useSimulationStore } from '@/store/simulation';
+import { ccOverall } from '@/components/modules/reliability/availabilityChain';
 import { useCapexStore } from '@/store/capex';
 import { useRequirementsStore } from '@/store/requirements';
 import { useSitesStore } from '@/store/sites';
@@ -609,13 +610,16 @@ export const TRACE: Record<string, TraceNode> = {
 
     /* dashboard chains */
     'rel.systemAvailability': {
-        label: 'System Availability (RBD seri)', page: 'reliability', unit: '%', provenance: 'engine',
-        formulaTemplate: 'models.reliability.systemAvailability(UPS · CRAC · genset · switchgear seri, redundansi power terpilih) × 100',
+        label: 'System Availability (β common-cause)', page: 'reliability', unit: '%', provenance: 'engine',
+        formulaTemplate: 'availabilityChain.ccOverall — chain RBD + β=5% common-cause (sama dgn halaman Reliability; fake-100% fix 2026-07-20) × 100',
         get: () => {
             try {
-                const m = (rzModels() as { reliability?: { systemAvailability?: (c: string[], r: string) => number } }).reliability;
-                const av = m?.systemAvailability?.(['ups', 'crac', 'generator', 'switchgear'], redKeyLive());
-                return av != null ? +(av * 100).toFixed(3) : null;
+                const m = (rzModels() as { reliability?: unknown }).reliability;
+                const rd = (rzData() as { reliability?: { components?: Record<string, { mtbf: number; mttr: number; label: string }>; redundancyPaths?: Record<string, number> } }).reliability;
+                if (!m || !rd?.components) return null;
+                const paths = rd.redundancyPaths?.[redKeyLive()] ?? 2;
+                const av = ccOverall(m as never, rd.components, 1, paths);
+                return +(av * 100).toFixed(5);
             } catch { return null; }
         },
     },
@@ -1283,7 +1287,7 @@ function cxTestsTotal(): number | null {
         if (t.testsTotalOverride != null) return t.testsTotalOverride;
         const i = sim().inputs;
         const m = (rzModels() as { commissioning?: { programRich?: (inp: Record<string, unknown>) => { equip: Record<string, number> } | null } }).commissioning;
-        const rich = m?.programRich?.({ itLoadKw: i.itLoad, coolingType: i.coolingType, powerRedundancy: i.powerRedundancy, countryId: sim().selectedCountry?.id });
+        const rich = m?.programRich?.({ itLoadKw: i.itLoad, coolingType: i.coolingType, powerRedundancy: i.powerRedundancy, countryId: sim().selectedCountry?.id, rackDensity: densityBucketLive() });
         if (!rich?.equip) return null;
         return Object.entries(CX_TESTS_PER).reduce((s, [k, per]) => s + (rich.equip[k] ?? 0) * per, 0);
     } catch { return null; }
@@ -1735,6 +1739,15 @@ function phaseDurMo(name: string): number | null {
 
 /** Staffing cost parts (unrounded) — Σ per-role calculateStaffing monthlyCost +
  *  overtime component, mirrors StaffingDashboard results/efficiency memos. */
+
+/** Density bucket for engine equipScale/programRich — mirrors capacity-adapter densityToEngineBucket. */
+function densityBucketLive(): string {
+    try {
+        const kw = (useRequirementsStore.getState() as { workload?: { avgRackDensityKw?: number } }).workload?.avgRackDensityKw ?? 60;
+        return kw < 9 ? 'standard' : kw < 18 ? 'medium' : kw < 45 ? 'high' : 'ai_hpc';
+    } catch { return 'ai_hpc'; }
+}
+
 function staffCostParts(): { total: number; ot: number; headcount: number } | null {
     try {
         const st = sim();

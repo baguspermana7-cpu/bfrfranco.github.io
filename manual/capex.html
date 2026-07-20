@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>CAPEX Calculator — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full engineering methodology for the data-center CAPEX calculator: category cost factors, multiplier chains, space model, timeline, worked example, and data-source provenance anchored to Turner &amp; Townsend DCCI 2025.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="data center CAPEX calculator methodology, data center construction cost, Turner Townsend DCCI, AACE Class 4 estimate, $/kW IT build cost, redundancy multiplier, PUE cooling cost, rack density space model">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/capex.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/capex.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/capex.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/capex.html">
+    <meta property="og:title" content="CAPEX Calculator — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="Category cost factors, multiplier chains, space model, timeline phasing, and worked example behind the data-center CAPEX calculator. Anchored to Turner &amp; Townsend DCCI 2025.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="CAPEX Calculator Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="CAPEX Calculator — Technical Manual">
+    <meta name="twitter:description" content="Category cost factors, multiplier chains, space model, and worked example behind the data-center CAPEX calculator.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="CAPEX Calculator Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "CAPEX Calculator" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "CAPEX Calculator — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Parametric CAPEX estimation methodology for data-center greenfield and brownfield builds",
+        "articleSection": "Capital Cost",
+        "dependencies": "Turner & Townsend DCCI 2025, AACE 18R-97, Uptime Institute Tier Standard, ASHRAE TC9.9",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to estimate data-center construction CAPEX (parametric Class 4)",
+        "step": [
+            { "@type": "HowToStep", "name": "Define IT load and rack density", "text": "Enter IT load in kW and select rack-density tier (standard 6 kW, medium 12.5 kW, high 25 kW, AI 75 kW). The engine derives rack count and floor footprint." },
+            { "@type": "HowToStep", "name": "Select cooling architecture and redundancy", "text": "Choose from air, in-row, RDHX, or liquid cooling. Select redundancy tier (N, N+1, 2N, 2N+1). Both drive per-category multipliers and the design PUE." },
+            { "@type": "HowToStep", "name": "Set location and building type", "text": "Select a region group (Americas, EMEA, APAC, Middle East) or a specific city market. Building type (warehouse, modular, purpose-built, high-rise) adjusts the civil and seismic line items." },
+            { "@type": "HowToStep", "name": "Read the cost breakdown and space program", "text": "The engine returns a 14-category cost breakdown, $/kW IT summary, design PUE, rack count, floor area program, and a parallel-phase construction timeline." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What AACE estimate class is this CAPEX model?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The engine produces a Class 4 (Study / Feasibility) estimate per AACE International Recommended Practice 18R-97. Typical accuracy range is −30% / +50%. It is NOT a Class 2 or Class 1 detailed estimate and must not be used for contract procurement without further engineering definition." }
+            },
+            {
+                "@type": "Question",
+                "name": "How does the city $/W override work?",
+                "acceptedAnswer": { "@type": "Answer", "text": "When a city is selected, the engine sets locMult = city.perW / 4.65 (the cityAnchorPerW). The 4.65 $/W anchor is the Americas baseline; Tokyo at 15.20 $/W gives locMult = 3.27×. Category costs are then multiplied by this city locMult instead of the region-group multiplier." }
+            },
+            {
+                "@type": "Question",
+                "name": "What drives the PUE output?",
+                "acceptedAnswer": { "@type": "Answer", "text": "PUE comes from the DATA.capexDetail.pueByCoolingRack matrix (sourced from Uptime Institute 2026 survey cohorts). It is indexed by both cooling type and rack-density tier. Air cooling with standard-density racks gives PUE 1.8; liquid cooling with AI-density racks gives PUE 1.15. PUE feeds the annual energy cost estimate." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../capex-calculator.html" class="nav-link">CAPEX Calculator</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / CAPEX Calculator
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Capital Cost</p>
+            <h1>CAPEX Calculator — Methodology &amp; Formulas</h1>
+            <p>Every input, multiplier chain, formula, constant, output, and data-source provenance behind the data-center CAPEX calculator. All math is executed by the deterministic engine <code class="mn-mono">RZEngine.models.capex.detailed()</code> — constants live in the deep-frozen <code class="mn-mono">DATA.capexDetail</code> block with a <code class="mn-mono">DATA.sources</code> provenance sidecar. No back-solved constants, no random values.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>RZEngine v2.5.1</strong></span>
+                <span class="mn-chip">Estimate class <strong>AACE Class 4</strong></span>
+                <span class="mn-chip">Source <strong>T&amp;T DCCI 2025</strong></span>
+                <span class="mn-chip">Inputs <strong>17 core + 18 advanced</strong></span>
+                <span class="mn-chip">Outputs <strong>14-category breakdown + space + timeline</strong></span>
+            </div>
+            <a class="mn-toollink" href="../capex-calculator.html">&#9654; Open the live calculator</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The CAPEX calculator produces a parametric, Class 4 (Study / Feasibility) budgetary estimate of data-center construction cost. It answers five pre-design questions: <em>what is the total build cost</em>, <em>how does cost break down across engineering disciplines</em>, <em>what floor area and rack count does the design imply</em>, <em>what construction schedule should the project plan against</em>, and <em>what annual energy cost will the facility carry</em>.</p>
+            <p class="mn-lead">The governing cost basis is the <strong>Turner &amp; Townsend Data Center Cost Index (DCCI) 2025</strong>, supplemented by the Cushman &amp; Wakefield Data Center Cost Guide 2025 for city-level $/W anchors and JLL 2026 escalation indices. Category cost factors are calibrated so that the Americas baseline (locMult 1.00) at 4.65 $/W matches the sourced composite anchor. The model is AACE Class 4: project definition maturity 1–15%, typical accuracy −30% / +50%. It is an engineering pre-design screening tool, not a contractor bid.</p>
+            <p class="mn-lead">The complete model body lives in <code class="mn-mono">rz-engine.js</code> under <code class="mn-mono">RZEngine.models.capex.detailed()</code> (approximately line 8399). The constant block is <code class="mn-mono">DATA.capexDetail</code> (approximately line 5266). The provenance sidecar is <code class="mn-mono">DATA.sources['capexDetail']</code>. The calculator page (<code class="mn-mono">capex-calculator.html</code>) is a pure presentation layer that reads DOM inputs and calls the engine — no cost arithmetic lives on the page.</p>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">Seventeen core inputs across five groups — IT infrastructure, cooling &amp; density, fire/life-safety, power, and location. Eighteen additional advanced parameters unlock in Advanced mode. All defaults below reproduce the page's <code class="mn-mono">value=""</code> / <code class="mn-mono">selected</code> attributes exactly.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field / DOM id</th><th>Symbol</th><th>Unit</th><th>Range / default</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td><code>itLoad</code></td><td><code>itLoadKw</code></td><td>kW</td><td>100 – 100 000 · default 1 000</td><td>Total IT load (IT power budget). Drives every per-kW cost line and rack count.</td></tr>
+                    <tr><td><code>rackType</code> (radio)</td><td><code>rackType</code></td><td>enum</td><td>standard* / medium / high / ai</td><td>Rack-density tier. Sets <code>rackKw</code> (6 / 12.5 / 25 / 75 kW/rack) for rack count and <code>rackMult</code> for building, electrical, and cooling cost lines.</td></tr>
+                    <tr><td><code>coolingType</code> (radio)</td><td><code>coolingType</code></td><td>enum</td><td>air* / inrow / rdhx / liquid</td><td>Cooling architecture. Drives <code>coolingMult</code>, design PUE from <code>pueByCoolingRack</code>, WUE, and construction timeline cooling multiplier.</td></tr>
+                    <tr><td><code>redundancy</code> (radio)</td><td><code>redundancy</code></td><td>enum</td><td>n / n1* / 2n / 2n1</td><td>Uptime Institute redundancy tier. Drives <code>redMult</code> applied to electrical, UPS, generator, and commissioning lines. Also scales testing and space support ratios.</td></tr>
+                    <tr><td><code>fuelHours</code></td><td><code>fuelHours</code></td><td>hours</td><td>8 – 168 · default 48</td><td>Generator fuel-tank autonomy. Fuel multiplier = 1 + (fuelHours − 24) × 0.008. Only hours above 24 accrue additional cost.</td></tr>
+                    <tr><td><code>buildingType</code></td><td><code>buildingType</code></td><td>enum</td><td>warehouse / modular / purpose* / highrise</td><td>Building construction type. Applies <code>buildingMult</code> (0.70 / 0.85 / 1.00 / 1.40×) to the building and seismic lines. Also scales construction schedule civil phase.</td></tr>
+                    <tr><td><code>seismicZone</code></td><td><code>seismicZone</code></td><td>enum</td><td>zone0 / zone1 / zone2* / zone3 / zone4</td><td>Seismic design zone. Multiplies the seismic line item by <code>seismicMult</code> (0.2 / 1.0 / 2.5 / 5.0 / 8.0×).</td></tr>
+                    <tr><td><code>fireType</code></td><td><code>fireType</code></td><td>enum</td><td>fm200 / novec* / inergen / n2 / water</td><td>Fire-suppression agent. Applies <code>fireSuppressionMult</code> (1.0 / 1.3 / 1.2 / 1.8 / 0.6×) to the fire-suppression line.</td></tr>
+                    <tr><td><code>alarmType</code></td><td><code>alarmType</code></td><td>enum</td><td>conventional / addressable* / vesda / hybrid</td><td>Fire-detection system. Applies <code>fireAlarmMult</code> (0.6 / 1.0 / 1.8 / 2.2×) to the fire-alarm line.</td></tr>
+                    <tr><td><code>upsType</code></td><td><code>upsType</code></td><td>enum</td><td>standalone / modular* / distributed / rotary</td><td>UPS topology. Applies <code>upsMult</code> (0.9 / 1.0 / 1.2 / 1.5×) to the UPS line item.</td></tr>
+                    <tr><td><code>genType</code></td><td><code>genType</code></td><td>enum</td><td>diesel* / gas / dualfuel / hvo</td><td>Generator fuel type. Applies <code>genMult</code> (1.0 / 1.15 / 1.3 / 1.2×) to the generator line.</td></tr>
+                    <tr><td><code>locationFactor</code></td><td><code>location</code></td><td>enum</td><td>americas* / emea / middle_east / apac</td><td>Region group. Resolved via <code>regionGroupDefaults</code> to an internalRegion and a base <code>locMult</code> (1.00 / 1.15 / 0.90 / 0.85×). Overridden when a city is selected.</td></tr>
+                    <tr><td><code>cityMarket</code></td><td><code>city</code></td><td>enum</td><td>none* or any of 58 cities</td><td>Optional city-specific override. Sets <code>locMult = city.perW / 4.65</code> and overrides <code>effectiveRegion</code>. City $/W values come from T&amp;T DCCI 2025 + C&amp;W 2025 anchor table.</td></tr>
+                    <tr><td><code>deepSeaEnable</code> (checkbox)</td><td><code>deepSea</code></td><td>bool</td><td>off*</td><td>Enables deep-sea water cooling physics path. Adds a <code>deepSeaCooling</code> capex line from <code>RZEngine.models.cooling.deepSea()</code> and overrides PUE with the physics-derived value.</td></tr>
+                    <tr><td><code>dsDepth</code></td><td><code>depthM</code></td><td>m</td><td>300 – 1 200 · default 900</td><td>Seawater intake depth (active only when deep-sea is enabled). Drives pipeline head pressure and pump energy in the cooling physics model.</td></tr>
+                    <tr><td><code>dsPipeline</code></td><td><code>pipelineKm</code></td><td>km</td><td>0.5 – 15 · default 3</td><td>Subsea pipeline length. Scales pipeline capital cost in the deep-sea cooling capex model.</td></tr>
+                    <tr><td><code>refrigerantType</code></td><td><code>refrigerant</code></td><td>enum</td><td>auto* or R-410A / R-134a / R-513A / R-32 / R-454B / R-1234ze / R-1233zd / R-717 / R-290</td><td>Chiller refrigerant selection. When not "auto", <code>RZEngine.models.cooling.refrigerant()</code> applies a <code>capexMult</code> premium to the cooling line item based on refrigerant equipment cost and safety-class installation requirements.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Advanced mode</strong> adds 18 further parameters: projection year (2025–2030 escalation), market condition, delivery method, contractor availability, design fee %, PM fee %, contingency %, FOM (substation/grid-connection/switchgear), power distribution type, transformer type, PDU type and cabling type (per-rack costs), floor type, site condition, security level, fiber entry count, green certification, and renewable generation option. Each maps to a multiplier or additive cost in <code class="mn-mono">DATA.capexDetail</code>.</div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">All arithmetic is in <code class="mn-mono">RZEngine.models.capex.detailed(inp)</code>. The model has five sequential stages: resolve multipliers → compute 14 base cost lines → add advanced per-rack and fiber costs → apply soft costs and contingency → derive PUE, space, and timeline. Function location: <code class="mn-mono">rz-engine.js</code> approximately line 8399.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Stage 1 — Multiplier resolution</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">redMult   = CD.redundancyMult[redundancy]      { n:1.00, n1:1.25, 2n:1.85, 2n1:2.10 }</span>
+                <span class="mn-eq">coolMult  = CD.coolingMult[coolingType]        { air:1.00, inrow:1.20, rdhx:1.35, liquid:1.60 }</span>
+                <span class="mn-eq">rackMult  = CD.rackMult[rackType]             { standard:1.00, medium:1.10, high:1.30, ai:1.90 }</span>
+                <span class="mn-eq">buildMult = CD.buildingMult[buildingType]      { warehouse:0.70, modular:0.85, purpose:1.00, highrise:1.40 }</span>
+                <span class="mn-eq">seismicMult = CD.seismicMult[seismicZone]     { zone0:0.20, zone1:1.00, zone2:2.50, zone3:5.00, zone4:8.00 }</span>
+                <span class="mn-eq">fireSupMult = CD.fireSuppressionMult[fireType]{ fm200:1.00, novec:1.30, inergen:1.20, n2:1.80, water:0.60 }</span>
+                <span class="mn-eq">alarmMult = CD.fireAlarmMult[alarmType]       { conventional:0.60, addressable:1.00, vesda:1.80, hybrid:2.20 }</span>
+                <span class="mn-eq">upsM  = CD.upsMult[upsType]                   { standalone:0.90, modular:1.00, distributed:1.20, rotary:1.50 }</span>
+                <span class="mn-eq">genM  = CD.genMult[genType]                   { diesel:1.00, gas:1.15, dualfuel:1.30, hvo:1.20 }</span>
+                <span class="mn-eq">locMult   = regionGroupDefaults[location].multiplier  (or city.perW / 4.65 if city selected)</span>
+                <span class="mn-eq">fuelMult  = 1 + (fuelHours − 24) × 0.008</span>
+                <span class="mn-eq">advGlobalMult = yearMult × marketMult × deliveryMult × contractorMult   (1.0 in simple mode)</span>
+                <span class="mn-where">Constants from <code>DATA.capexDetail</code>. <code>locMult</code> for city override: Dallas 14.30/4.65 = 3.075×; Tokyo 15.20/4.65 = 3.269×; Jakarta 11.21/4.65 = 2.411×.<span class="mn-src">T&amp;T DCCI 2025 · C&amp;W 2025</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Stage 2 — 14 base cost lines</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">costs[key] = CD.costFactors[key] × itLoadKw × multiplier × advGlobalMult</span>
+                <span class="mn-eq"></span>
+                <span class="mn-eq">Per-line multiplier breakdown (each × locMult as base):</span>
+                <span class="mn-eq">  building       × buildMult × rackMult × floorM × siteM</span>
+                <span class="mn-eq">  seismic        × seismicMult × buildMult</span>
+                <span class="mn-eq">  electrical     × redMult × rackMult × powerDistM × transformerM</span>
+                <span class="mn-eq">  ups            × redMult × rackMult × upsM</span>
+                <span class="mn-eq">  generator      × redMult × fuelMult × genM</span>
+                <span class="mn-eq">  cooling        × coolMult × rackMult</span>
+                <span class="mn-eq">  fireSuppression× fireSupMult</span>
+                <span class="mn-eq">  fireAlarm      × alarmMult</span>
+                <span class="mn-eq">  security       × securityM</span>
+                <span class="mn-eq">  commissioning  × redMult</span>
+                <span class="mn-eq">  testing        × pr.testing × testingRedundancyMult[redundancy]</span>
+                <span class="mn-eq">  permits        × pr.permits</span>
+                <span class="mn-eq">  bms, network   × locMult only (no secondary multiplier)</span>
+                <span class="mn-where">In the simple-mode loop: <code>Object.keys(CD.costFactors).forEach(…)</code> iterating 14 keys. <code>pr</code> = <code>CD.permitRegionMult[effectiveRegion]</code>.<span class="mn-src">rz-engine.js ~line 8481</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Stage 3 — Advanced per-rack costs (advanced mode only)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">racks        = ceil( itLoadKw / CD.rackKw[rackType] )</span>
+                <span class="mn-eq">pduTotal     = racks × pduPerRack × advGlobalMult × locMult   → added to costs.electrical</span>
+                <span class="mn-eq">cablingTotal = racks × cablingPerRack × advGlobalMult × locMult → added to costs.network</span>
+                <span class="mn-eq">fiberCost    = CD.fiberEntryCost[fiberEntry] × advGlobalMult   → added to costs.network</span>
+                <span class="mn-where"><code>pduPerRack</code>: basic $800, intelligent $1 500, switched $2 500. <code>cablingPerRack</code>: copper $600, hybrid $1 200, fiber $2 000. <code>fiberEntryCost</code>: single $150 k, dual $350 k, multi $600 k.<span class="mn-src">DATA.capexDetail · rz-engine.js ~line 8499</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Stage 4 — Soft costs, contingency, and FOM</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">softCosts.design = total × (designPct / 100)     (if designPct > 0)</span>
+                <span class="mn-eq">softCosts.pm     = total × (pmPct / 100)          (if pmPct > 0)</span>
+                <span class="mn-eq">greenPremium     = total × (greenM − 1.0)         (if greenM > 1.0)</span>
+                <span class="mn-eq">contingency      = total × (contingencyPct / 100)</span>
+                <span class="mn-eq">  simple mode: contingencyPct = 5% (CD.softCostDefaults.simpleContingencyPct)</span>
+                <span class="mn-eq">  advanced mode: contingencyPct = user input (default 10%)</span>
+                <span class="mn-eq">fomTotal (if includeFOM):</span>
+                <span class="mn-eq">  subCost        = CD.substationCosts[substationType] × transformerLeadMult</span>
+                <span class="mn-eq">  gridConnection = itLoadKw × 0.001 × CD.fom.gridConnectionPerMw   ($500 k/MW)</span>
+                <span class="mn-eq">  switchgear     = itLoadKw × 0.001 × CD.fom.switchgearPerMw        ($300 k/MW)</span>
+                <span class="mn-eq">  fomTotal       = (subCost + gridConnection + switchgear) × (1 + utilityRate/100) × yearMult</span>
+                <span class="mn-eq">renewableCost    = CD.renewableCostPerMw[renewableOption] × (itLoadKw / 1000) × advGlobalMult</span>
+                <span class="mn-eq">total = sum(costs) + softTotal + greenPremium + contingency + fomTotal + renewableCost</span>
+                <span class="mn-where">FOM = Facility Off-site MEP (substation, grid connection, switchgear). Substations: shared $1 M, dedicated 33 kV $4 M, dedicated 132 kV $7.5 M. Renewable: none $0, solar $1.2 M/MW, solar+BESS $2.5 M/MW.<span class="mn-src">DATA.capexDetail · rz-engine.js ~line 8508</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Stage 5 — PUE, energy cost, space model, and timeline</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">pue = CD.pueByCoolingRack[coolingType][rackType]</span>
+                <span class="mn-eq">wue = CD.wueByCooling[coolingType]       { air:0.0, inrow:1.8, rdhx:0.3, liquid:0.1 }</span>
+                <span class="mn-eq">energyRate = CD.energyRateByLocation.other = $0.12/kWh   (legacy quirk: location key never matches)</span>
+                <span class="mn-eq">annualEnergy = itLoadKw × pue × 8 760 × energyRate</span>
+                <span class="mn-eq"></span>
+                <span class="mn-eq">racks            = ceil( itLoadKw / CD.rackKw[rackType] )</span>
+                <span class="mn-eq">rackFootprint    = CD.space.rackFootprintM2[rackType] × liquidRowFactor</span>
+                <span class="mn-eq">  liquidRowFactor = 1.08 if coolingType in {liquid, rdhx, deepSea}, else 1.0</span>
+                <span class="mn-eq">whiteSpaceM2     = ceil( racks × rackFootprint )</span>
+                <span class="mn-eq">supportM2        = ceil( whiteSpaceM2 × CD.space.supportRatioByRedundancy[redundancy] )</span>
+                <span class="mn-eq">adminM2          = ceil( 300 + racks × 0.15 )</span>
+                <span class="mn-eq">grossM2          = whiteSpaceM2 + supportM2 + adminM2</span>
+                <span class="mn-eq"></span>
+                <span class="mn-eq">Timeline (parallel-phase model — timelineDetailed()):</span>
+                <span class="mn-eq">  design   = max(2, ceil(base.design × lMult))</span>
+                <span class="mn-eq">  permit   = max(2, ceil(base.permit × pMult))</span>
+                <span class="mn-eq">  civil    = max(2, ceil(base.civil × bMult × lMult))</span>
+                <span class="mn-eq">  mep      = max(2, ceil(base.mep × cMult × lMult))</span>
+                <span class="mn-eq">  commission = max(1, ceil(base.commission × cMult × max(0.7, lMult)))</span>
+                <span class="mn-eq">  totalMonths = commStart + commission   (phases partially overlap)</span>
+                <span class="mn-where">lMult scales with IT load: ≤1 MW = 0.55, ≤2 MW = 0.65, ≤5 MW = 0.80, ≤10 MW = 1.00, ≤25 MW = 1.15, ≤50 MW = 1.30, >50 MW = 1.50. PUE source: Uptime Institute Global Survey 2026 cohorts.<span class="mn-src">DATA.capexDetail · rz-engine.js ~line 8524</span></span>
+            </div>
+
+            <div class="mn-note"><strong>Refrigerant premium (optional):</strong> when a specific refrigerant is selected (or auto-mapped), <code>RZEngine.models.cooling.refrigerant(refKey, opts)</code> computes a <code>capexMult</code> based on GWP and safety class. If <code>capexMult &gt; 1</code>, the premium <code>= costs.cooling × (capexMult − 1)</code> is added to <code>costs.cooling</code> and the total. Deep-sea cooling adds a physics-derived <code>costs.deepSeaCooling</code> from <code>RZEngine.models.cooling.deepSea()</code> and replaces the PUE lookup with the physics-derived value.</div>
+        </section>
+
+        <!-- 4. CONSTANTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">Every constant lives in <code class="mn-mono">DATA.capexDetail</code> (rz-engine.js ~line 5266) with provenance registered in <code class="mn-mono">DATA.sources['capexDetail']</code>. The 14 base cost factors in $/kW IT:</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Category key</th><th>$/kW IT</th><th>Primary multipliers</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td><code>building</code></td><td>$800</td><td>locMult · buildMult · rackMult · floorM · siteM</td><td>Civil, structural shell, raised floor, fit-out.</td></tr>
+                    <tr><td><code>seismic</code></td><td>$100</td><td>locMult · seismicMult · buildMult</td><td>Seismic bracing, isolation pads. Zone 4 = 8× base.</td></tr>
+                    <tr><td><code>electrical</code></td><td>$1 200</td><td>locMult · redMult · rackMult · powerDistM · transformerM</td><td>Switchgear, MV/LV distribution, busway, PDU (+ per-rack in adv. mode).</td></tr>
+                    <tr><td><code>ups</code></td><td>$600</td><td>locMult · redMult · rackMult · upsM</td><td>UPS systems and battery strings.</td></tr>
+                    <tr><td><code>generator</code></td><td>$400</td><td>locMult · redMult · fuelMult · genM</td><td>Gensets and day-tank. fuelMult &gt; 1 above 24 h autonomy.</td></tr>
+                    <tr><td><code>cooling</code></td><td>$700</td><td>locMult · coolMult · rackMult</td><td>Chillers, cooling towers, CRAC/CRAH, CDU, pipe work.</td></tr>
+                    <tr><td><code>fireSuppression</code></td><td>$150</td><td>locMult · fireSupMult</td><td>Agent cylinders, distribution pipe, nozzles.</td></tr>
+                    <tr><td><code>fireAlarm</code></td><td>$80</td><td>locMult · alarmMult</td><td>Detector field devices and fire control panel.</td></tr>
+                    <tr><td><code>bms</code></td><td>$120</td><td>locMult</td><td>BMS / DCIM controllers, sensors, integration.</td></tr>
+                    <tr><td><code>network</code></td><td>$250</td><td>locMult (+ per-rack cabling + fiber in adv. mode)</td><td>Structured cabling, patch panels, ODF.</td></tr>
+                    <tr><td><code>security</code></td><td>$80</td><td>locMult · securityM</td><td>Access control, CCTV, man-trap. Security-level mult 1.0 / 1.5 / 2.2×.</td></tr>
+                    <tr><td><code>commissioning</code></td><td>$120</td><td>locMult · redMult</td><td>IST, integrated systems testing, 3rd-party witness.</td></tr>
+                    <tr><td><code>testing</code></td><td>$90</td><td>locMult · pr.testing · testingRedundancyMult</td><td>Factory acceptance, site acceptance, compliance testing.</td></tr>
+                    <tr><td><code>permits</code></td><td>$60</td><td>locMult · pr.permits</td><td>Building permits, environmental approvals, utility interconnect.</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <div class="mn-tablewrap" style="margin-top:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>Parameter</th><th>Values / range</th><th>Source</th><th>asOf</th></tr></thead>
+                <tbody>
+                    <tr><td>City $/W anchor table (58 cities)</td><td>$6.20 (Chennai) – $15.20/W (Tokyo)</td><td>Turner &amp; Townsend DCCI 2025 + Cushman &amp; Wakefield DC Cost Guide 2025</td><td>2025</td></tr>
+                    <tr><td>cityAnchorPerW</td><td>$4.65/W</td><td>Americas composite baseline (locMult normalisation anchor)</td><td>2025</td></tr>
+                    <tr><td>Year escalation multipliers</td><td>2025: 1.000 / 2026: 1.060 / 2027: 1.115 / 2028: 1.165 / 2029: 1.210 / 2030: 1.250</td><td>JLL Data Center Outlook 2026</td><td>2026</td></tr>
+                    <tr><td>PUE matrix (air / inrow / rdhx / liquid × density tier)</td><td>1.15 – 1.80</td><td>Uptime Institute Global Survey 2026 (cooling-type cohorts)</td><td>2026</td></tr>
+                    <tr><td>Space: rackFootprintM2</td><td>standard 2.5 / medium 2.8 / high 3.2 / ai 4.2 m²/rack</td><td>Uptime/ASHRAE TC9.9 layout guidance; DLC rows +8% CDU clearance</td><td>2026</td></tr>
+                    <tr><td>Space: supportRatioByRedundancy</td><td>N: 0.55 / N+1: 0.75 / 2N: 1.05 / 2N+1: 1.20</td><td>Published DC space programs; white space typically 40–50% of gross</td><td>2026</td></tr>
+                    <tr><td>fuelMultPerHourOver24</td><td>0.008 per hour</td><td>Engine lineage (capex-calculator inline model v2.3.0)</td><td>2025</td></tr>
+                    <tr><td>energyRateByLocation.other</td><td>$0.12/kWh</td><td>Blended rate for regions other than SEA/India/USA</td><td>2025</td></tr>
+                    <tr><td>AACE estimate class</td><td>Class 4; accuracy −30% / +50%</td><td>AACE International Recommended Practice 18R-97</td><td>2020</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <p class="mn-lead">The engine returns a single object <code class="mn-mono">R</code>. The calculator page reads these fields to populate the KPI summary, cost breakdown chart, space program table, and timeline strip.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output field</th><th>Formula / source</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td><code>R.total</code></td><td>sum(costs) + softCosts + contingency + FOM + renewable</td><td>USD</td><td>Total project capital estimate (Class 4, −30/+50%). Displayed as headline KPI.</td></tr>
+                    <tr><td><code>R.perKw</code></td><td><code>R.total / itLoadKw</code></td><td>$/kW IT</td><td>Build cost intensity. Compare against AACE Class 4 band: ~$5–15 k/kW for Tier 2–4.</td></tr>
+                    <tr><td><code>R.costs</code></td><td>Object of 14 category costs (+ deepSeaCooling if enabled)</td><td>USD ea.</td><td>Line-item breakdown for the cost pie / waterfall chart.</td></tr>
+                    <tr><td><code>R.contingency</code></td><td><code>pre-contingency total × contingencyPct/100</code></td><td>USD</td><td>Risk reserve. 5% simple mode, user-set in advanced mode.</td></tr>
+                    <tr><td><code>R.softCosts</code></td><td>design fee + PM fee (% of hard costs)</td><td>USD obj.</td><td>Professional fees. Zero in simple mode.</td></tr>
+                    <tr><td><code>R.fomTotal</code></td><td>substation + grid-connection + switchgear costs</td><td>USD</td><td>Off-site infrastructure. Zero unless FOM checkbox is enabled.</td></tr>
+                    <tr><td><code>R.racks</code></td><td><code>ceil(itLoadKw / CD.rackKw[rackType])</code></td><td>count</td><td>Rack count driving space program and per-rack advanced costs.</td></tr>
+                    <tr><td><code>R.pue</code></td><td><code>CD.pueByCoolingRack[coolingType][rackType]</code></td><td>ratio</td><td>Design PUE used for annual energy estimate. Replaced by physics PUE in deep-sea mode.</td></tr>
+                    <tr><td><code>R.wue</code></td><td><code>CD.wueByCooling[coolingType]</code></td><td>L/kWh</td><td>Water usage effectiveness. 0 for air and liquid; 1.8 for in-row evaporative; 0.3 for RDHX.</td></tr>
+                    <tr><td><code>R.annualEnergy</code></td><td><code>itLoadKw × pue × 8 760 × energyRate</code></td><td>USD/yr</td><td>Annual electricity cost at the blended energy rate. Screening-grade opex proxy.</td></tr>
+                    <tr><td><code>R.space</code></td><td>racks, footprint, whiteSpaceM2, supportM2, grossM2, grossSqft, halls, kwPerM2</td><td>various</td><td>Space program output. grossM2 = white + support + admin. Screens land-take and floor loading.</td></tr>
+                    <tr><td><code>R.timeline</code></td><td>design, permit, procurement, civil, mep, commission, totalMonths</td><td>months</td><td>Parallel-phase construction schedule. Phases overlap per fast-track logic.</td></tr>
+                    <tr><td><code>R.deepSea</code></td><td>physics model output (null if not enabled)</td><td>object</td><td>Deep-sea cooling capex, PUE, pump power, flow rates.</td></tr>
+                    <tr><td><code>R.refrigerant</code></td><td>refrigerant model output (null if auto resolves to none)</td><td>object</td><td>Refrigerant identity, GWP, capexMult, and capexPremium applied to cooling line.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example</h2>
+            <p class="mn-lead">1 000 kW IT, standard rack (6 kW/rack), air cooling, N+1 redundancy, 48 h fuel autonomy, purpose-built building, seismic zone 2 (moderate), Novec 1230 fire suppression, addressable fire alarm, modular UPS, diesel generator, Americas region (locMult 1.00), no city override, simple mode (no advanced options). All numbers below are the literal output of <code class="mn-mono">RZEngine.models.capex.detailed()</code> run against <code class="mn-mono">rz-engine.js</code> via Node.js <code class="mn-mono">vm.runInContext</code> — engine run verified.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Multiplier resolution:</strong> redMult (N+1) = <span class="mn-result">1.25</span> · coolMult (air) = <span class="mn-result">1.00</span> · rackMult (standard) = <span class="mn-result">1.00</span> · buildMult (purpose) = <span class="mn-result">1.00</span> · seismicMult (zone2) = <span class="mn-result">2.50</span> · fireSupMult (novec) = <span class="mn-result">1.30</span> · alarmMult (addressable) = <span class="mn-result">1.00</span> · upsM (modular) = <span class="mn-result">1.00</span> · genM (diesel) = <span class="mn-result">1.00</span> · locMult (americas) = <span class="mn-result">1.00</span> · fuelMult = 1 + (48−24) × 0.008 = <span class="mn-result">1.192</span> · advGlobalMult = <span class="mn-result">1.00</span></li>
+                    <li><strong>Category costs</strong> (= costFactor × 1000 kW × multiplier):
+                        <br>building: 800 × 1.00 × 1.00 × 1.00 = <span class="mn-result">$800 000</span>
+                        <br>seismic: 100 × 1.00 × 2.50 × 1.00 = <span class="mn-result">$250 000</span>
+                        <br>electrical: 1200 × 1.00 × 1.25 × 1.00 = <span class="mn-result">$1 500 000</span>
+                        <br>ups: 600 × 1.00 × 1.25 × 1.00 = <span class="mn-result">$750 000</span>
+                        <br>generator: 400 × 1.00 × 1.25 × 1.192 = <span class="mn-result">$596 000</span>
+                        <br>cooling: 700 × 1.00 × 1.00 = <span class="mn-result">$700 000</span>
+                        <br>fireSuppression: 150 × 1.00 × 1.30 = <span class="mn-result">$195 000</span>
+                        <br>fireAlarm: 80 × 1.00 × 1.00 = <span class="mn-result">$80 000</span>
+                        <br>bms: 120 × 1.00 = <span class="mn-result">$120 000</span>
+                        <br>network: 250 × 1.00 = <span class="mn-result">$250 000</span>
+                        <br>security: 80 × 1.00 = <span class="mn-result">$80 000</span>
+                        <br>commissioning: 120 × 1.00 × 1.25 = <span class="mn-result">$150 000</span>
+                        <br>testing: 90 × 1.00 × 1.00 × 1.00 = <span class="mn-result">$90 000</span>
+                        <br>permits: 60 × 1.00 × 1.00 = <span class="mn-result">$60 000</span>
+                    </li>
+                    <li><strong>Pre-contingency sum:</strong> <span class="mn-result">$5 621 000</span></li>
+                    <li><strong>Contingency</strong> (5% simple mode): 5 621 000 × 0.05 = <span class="mn-result">$281 050</span></li>
+                    <li><strong>Total CAPEX:</strong> 5 621 000 + 281 050 = <span class="mn-result">$5 902 050</span></li>
+                    <li><strong>Cost per kW IT:</strong> 5 902 050 / 1 000 = <span class="mn-result">$5 902/kW</span></li>
+                    <li><strong>Rack count:</strong> ceil(1000 / 6) = <span class="mn-result">167 racks</span></li>
+                    <li><strong>Design PUE</strong> (air, standard): pueByCoolingRack.air.standard = <span class="mn-result">1.80</span> · WUE = <span class="mn-result">0.0 L/kWh</span></li>
+                    <li><strong>Annual energy cost:</strong> 1000 × 1.80 × 8760 × $0.12 = <span class="mn-result">$1 892 160/yr</span></li>
+                    <li><strong>Space program:</strong> whiteSpaceM2 = ceil(167 × 2.5) = <span class="mn-result">418 m²</span> · supportM2 = ceil(418 × 0.75) = <span class="mn-result">314 m²</span> · adminM2 = ceil(300 + 167×0.15) = <span class="mn-result">326 m²</span> · grossM2 = <span class="mn-result">1 058 m²</span> (11 388 ft²) · kwPerM2 = <span class="mn-result">2.4 kW/m²</span> · 1 data hall suggested</li>
+                    <li><strong>Construction timeline</strong> (N+1, purpose-built, air, USA, 1 MW IT → lMult = 0.55): design <span class="mn-result">3 mo</span> · permit <span class="mn-result">3 mo</span> · procurement <span class="mn-result">2 mo</span> · civil <span class="mn-result">6 mo</span> · MEP <span class="mn-result">5 mo</span> · commissioning <span class="mn-result">3 mo</span> · <strong>total <span class="mn-result">15 months</span></strong></li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Verification method:</strong> all numbers above are the literal return value of <code>RZEngine.models.capex.detailed({itLoadKw:1000, rackType:'standard', coolingType:'air', redundancy:'n1', fuelHours:48, buildingType:'purpose', seismicZone:'zone2', fireType:'novec', alarmType:'addressable', upsType:'modular', genType:'diesel', location:'americas'})</code> executed via <code>node -e</code> with <code>vm.runInContext</code> against the live <code>rz-engine.js</code> file. Not hand-computed — engine run verified.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>T&amp;T DCCI 2025</b> — Turner &amp; Townsend Data Center Cost Index 2025: primary source for regional build-cost benchmarks, cost-category composition, and the city $/W anchor table (58 markets).</li>
+                <li><b>C&amp;W 2025</b> — Cushman &amp; Wakefield Data Center Cost Guide 2025: supplementary city $/W values (Americas and APAC markets) cross-checked against T&amp;T.</li>
+                <li><b>JLL 2026</b> — JLL Data Center Outlook 2026: year-on-year construction cost escalation indices (2025 baseline → 2030 at +25%).</li>
+                <li><b>AACE 18R-97</b> — AACE International Recommended Practice "Cost Estimate Classification System": Class 1–5 estimate definitions, project definition maturity %, and accuracy ranges. Engine is Class 4 (−30% / +50%).</li>
+                <li><b>Uptime Institute 2026</b> — Global Data Center Survey 2026: PUE distribution by cooling-architecture cohort (air, in-row, RDHX, liquid); staffing benchmarks; Tier availability definitions (T2 99.741% / T3 99.982% / T4 99.995%).</li>
+                <li><b>ASHRAE TC9.9 (5th ed. 2021)</b> — Thermal Guidelines for Data Processing Environments: supply-temperature envelopes (A1–A4, H1), maximum rack density by cooling type, floor-loading guidance. Referenced in space model and cooling architecture selection.</li>
+                <li><b>TIA-942-C</b> — Telecommunications Infrastructure Standard for Data Centers: Rated-1 through Rated-4 topology descriptions corresponding to Uptime Tier 1–4.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">rz-engine.js</code> (RZEngine v2.5.1): <code>models.capex.detailed()</code> ~line 8399; <code>DATA.capexDetail</code> ~line 5266; <code>DATA.sources['capexDetail']</code> ~line 6589. Minified twin: <code class="mn-mono">rz-engine.min.js</code> (loaded by 52 pages including <code>capex-calculator.html</code>).</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The model is a <strong>Class 4 parametric estimate</strong> (AACE 18R-97). Its accuracy is inherently −30% / +50% with 1–15% project definition completeness. Specific limitations and assumptions:</p>
+            <p class="mn-lead"><strong>Cost basis:</strong> category $/kW factors are anchored to the T&amp;T DCCI 2025 composite benchmark, calibrated so that <code>Americas locMult 1.00 × all-defaults ≈ 4.65 $/W</code>. They represent a market-median build; owner-specific procurement, site conditions, and design choices can shift individual lines by ±50%+.</p>
+            <p class="mn-lead"><strong>Energy rate:</strong> the annual energy cost uses a fixed $0.12/kWh fallback for all regions except SEA ($0.08), India ($0.07), and USA ($0.10). The USA condition is a legacy key-mismatch quirk documented in the engine JSDoc — the <code>location</code> input never equals the string <code>'usa'</code> (it maps to <code>'americas'</code>), so the $0.12 fallback applies globally in simple mode. This is a documented non-defect preserved for calculation continuity; future reconciliation requires a deliberate data-model change.</p>
+            <p class="mn-lead"><strong>Space model:</strong> rack footprint and support-to-white-space ratios are planning rules of thumb from Uptime/ASHRAE TC9.9 layout guidance. They produce a reasonable gross building footprint for programming purposes but are not a substitute for a detailed space plan or architectural layout study.</p>
+            <p class="mn-lead"><strong>Timeline:</strong> the parallel-phase schedule model uses base durations calibrated from industry benchmarks (T&amp;T + JLL project delivery data). Critical long-lead equipment (transformers 60–120 weeks, switchgear 50–80 weeks in the 2024–26 market) can be the dominant schedule driver and is not fully reflected in the model's phase durations — the engine's <code>DATA.construction.longLeadWeeks</code> table documents these but they are advisory, not input to the timeline formula.</p>
+            <p class="mn-lead"><strong>Scope exclusions:</strong> the estimate does not include land acquisition, IT equipment, furniture and fixtures, moving/relocation, tenant improvement works above the base shell, or ongoing operating costs beyond the energy screening estimate. FOM (substation, grid connection, switchgear) is modelled only when the Advanced mode FOM checkbox is enabled.</p>
+            <p class="mn-lead">This calculator and manual are an <strong>engineering education and pre-design screening tool</strong>. They do not constitute a professional engineering estimate, a quantity surveyor's report, or investment or procurement advice. Final capital budgets must be validated by a qualified cost engineer or quantity surveyor against site-specific project definition documents.</p>
+        </section>
+
+        <a class="mn-toollink" href="../capex-calculator.html">&#9654; Open the live CAPEX Calculator</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../capex-calculator.html">CAPEX Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Liquid-to-Chip System Modelling Lab — Methodology &amp; Formulas | ResistanceZero</title>
+    <meta name="description" content="Full engineering methodology for the LTC system modelling lab: steady-state energy balance, mass-flow equation, hydraulic pump power, HX effectiveness, fan affinity law, PUE impact, and all inputs and outputs documented.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="liquid-to-chip cooling, LTC modelling, CDU thermal, pump affinity law, HX effectiveness, PUE liquid cooling, data center thermal model, steady-state solver, ASHRAE liquid cooling">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/ltc-system-modelling-lab.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/ltc-system-modelling-lab.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/ltc-system-modelling-lab.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/ltc-system-modelling-lab.html">
+    <meta property="og:title" content="Liquid-to-Chip System Modelling Lab — Methodology &amp; Formulas">
+    <meta property="og:description" content="Steady-state energy balance, mass-flow, hydraulic pump power, HX effectiveness, fan affinity law, PUE impact, and all inputs and outputs for the LTC modelling lab.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="LTC System Modelling Lab Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Liquid-to-Chip System Modelling Lab — Technical Manual">
+    <meta name="twitter:description" content="Steady-state energy balance, mass-flow, pump power, HX effectiveness, fan affinity, and PUE methodology for the LTC lab.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="LTC System Modelling Lab Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "LTC Modelling Lab" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Liquid-to-Chip System Modelling Lab — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Steady-state liquid-to-chip cooling solver methodology for AI/HPC data centers",
+        "articleSection": "Thermal Lab",
+        "dependencies": "ASHRAE Liquid Cooling Design Guide, HX Institute, ISO 14644, pump affinity laws",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to run the LTC steady-state solver",
+        "step": [
+            { "@type": "HowToStep", "name": "Set IT load and architecture", "text": "Enter IT load (MW), rack type, liquid-capture fraction (%), and choose a cooling architecture preset (direct-liquid, hybrid, or air)." },
+            { "@type": "HowToStep", "name": "Configure thermal loop", "text": "Set liquid supply and return temperatures. The solver derives delta-T and mass flow from Q = m * Cp * deltaT." },
+            { "@type": "HowToStep", "name": "Configure hydraulics", "text": "Set pump head (m), pump efficiency (%), hydraulic margin, and pipe-loss multiplier. Solver computes hydraulic power and corrects for density stress." },
+            { "@type": "HowToStep", "name": "Read outputs", "text": "Solver returns flow (LPM), pump power (kW), PUE, system COP, WUE, annual energy, OPEX, carbon, and compliance scores." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "How does the solver compute coolant mass flow?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Mass flow is derived from the thermal energy balance Q = m * Cp * deltaT, where Q is the liquid-side heat load (IT load × liquid capture fraction), Cp is the coolant specific heat (kJ/kg·K), and deltaT is the return-minus-supply temperature difference. The solver clamps deltaT to [3, 20] C and adjusts for rack density stress before computing flow in LPM." }
+            },
+            {
+                "@type": "Question",
+                "name": "How is pump power calculated?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Hydraulic power P_hyd = rho * g * H_eff * Q_m3s / 1000 (kW), where H_eff is the effective head after pipe-loss and density-stress corrections. Electrical pump power = P_hyd / pumpEff. The design flow adds redundancy factor, hydraulic margin, and pipe-loss multiplier before entering the hydraulic equation." }
+            },
+            {
+                "@type": "Question",
+                "name": "How is PUE computed?",
+                "acceptedAnswer": { "@type": "Answer", "text": "PUE = totalFacilityKw / itKw, where totalFacilityKw = IT + totalCooling (liquid + air + fan) + UPS loss + distribution loss + auxiliary (3% IT). UPS loss = itKw / upsEff - itKw; distLossKw = upsInputKw * distLoss%." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../ltc-system-modelling-lab.html" class="nav-link">LTC Modelling Lab</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / LTC Modelling Lab
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Thermal Lab</p>
+            <h1>Liquid-to-Chip System Modelling Lab — Methodology &amp; Formulas</h1>
+            <p>Every input, equation, constant, output, and reference behind the LTC steady-state solver. All math is executed by the deterministic engine <code class="mn-mono">js/ltc-system-modelling-lab.js</code> (function <code class="mn-mono">computeModel</code>) — no back-solved constants, no random values. This is a <strong>SIMULATED / educational</strong> model; it is not a substitute for site-specific hydraulic or thermal commissioning data.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Solver <strong>computeModel (inline)</strong></span>
+                <span class="mn-chip">Basis <strong>ASHRAE / HX Institute / ISO 14644</strong></span>
+                <span class="mn-chip">Sliders <strong>5 primary</strong></span>
+                <span class="mn-chip">Outputs <strong>12+</strong></span>
+                <span class="mn-chip">Status <strong>SIMULATED — educational</strong></span>
+            </div>
+            <a class="mn-toollink" href="../ltc-system-modelling-lab.html">&#9654; Open the live LTC Modelling Lab</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The LTC System Modelling Lab answers five design questions for a liquid-to-chip cooled AI/HPC data center: <em>what coolant flow is needed</em>, <em>what pump power does that cost</em>, <em>what PUE and system COP result</em>, <em>how does the design score against ASHRAE / ANSI / ISO / NFPA / Uptime Institute criteria</em>, and <em>how sensitive are those results to each input parameter</em>.</p>
+            <p class="mn-lead">The solver is a <strong>steady-state energy balance</strong> with no transient dynamics: at each solver call, Q_in = Q_cooling + Q_aux (losses), and the model reports the steady-state operating point for the given inputs. This is an engineering <strong>pre-design and education aid</strong>. Final system design must be validated by site-specific thermal and hydraulic modelling and commissioned against real telemetry. All outputs are labelled SIMULATED.</p>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">The lab exposes a wide set of parameters. The five primary interactive sliders (flow-driving tier) are highlighted below; the remaining parameters are set via the architecture preset or manually. Ranges are enforced by <code class="mn-mono">clamp()</code> in <code class="mn-mono">gatherInputs()</code>.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field</th><th>Symbol</th><th>Unit</th><th>Range / default</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>IT Load</strong> <code>inItLoad</code></td><td><code>itLoadMw</code></td><td>MW</td><td>0.5–80 · default 12</td><td>Total IT electrical load driving the thermal calculation. <code>itKw = itLoadMw × 1000</code>.</td></tr>
+                    <tr><td><strong>Liquid Capture %</strong> <code>inLiquidCapture</code></td><td><code>liquidCapture</code></td><td>%</td><td>0–100 · default 85</td><td>Share of IT heat removed by the liquid loop. Drives <code>liquidKw</code> and thereby mass flow.</td></tr>
+                    <tr><td><strong>Supply Temperature</strong> <code>inSupplyTemp</code></td><td><code>supplyTemp</code></td><td>°C</td><td>16–42 · default 32.5</td><td>Entering liquid coolant temperature (liquid, not supply-air). Warm-water LTC designs typically run high-20s to low-30s °C.</td></tr>
+                    <tr><td><strong>Return Temperature</strong> <code>inReturnTemp</code></td><td><code>returnTemp</code></td><td>°C</td><td>supplyTemp+3 min · default 40.5</td><td>Leaving liquid coolant temperature. Together with supply temp, sets <code>baseDeltaT</code>.</td></tr>
+                    <tr><td><strong>Pump Head</strong> <code>inPumpHead</code></td><td><code>pumpHead</code></td><td>m</td><td>5–90 · default 28</td><td>Nominal hydraulic head for the loop. Corrected for pipe-loss multiplier and density stress.</td></tr>
+                    <tr><td>Pump Efficiency <code>inPumpEff</code></td><td><code>pumpEff</code></td><td>%</td><td>35–95 · default 78</td><td>Net pump efficiency converting hydraulic to electrical power.</td></tr>
+                    <tr><td>Architecture preset <code>inCoolingArchitecture</code></td><td>—</td><td>enum</td><td>direct_liquid / hybrid / air_inrow_dahu</td><td>Auto-loads supply/return temps, capture %, airCOP, fan power, and pipe-loss for a representative profile.</td></tr>
+                    <tr><td>HX type / Coolant <code>inCoolant</code></td><td><code>coolantKey</code></td><td>enum</td><td>water / pg20 / pg30</td><td>Selects Cp and density (ρ) for the coolant. Water: Cp=4.186 kJ/kg·K, ρ=997 kg/m³; PG-20: Cp=3.92, ρ=1025; PG-30: Cp=3.75, ρ=1038.</td></tr>
+                    <tr><td>Economizer availability <code>inEconomizerHours</code></td><td><code>economizerHours</code></td><td>% of year</td><td>0–95 · default 34</td><td>Share of annual hours under economizer conditions. Scales air-side COP and WUE.</td></tr>
+                    <tr><td>Facility fan power <code>inFanPower</code></td><td><code>fanPower</code></td><td>% of IT</td><td>0.5–12 · default 2.8</td><td>Residual CRAH/DAHU fan overhead before liquid-capture and control reductions.</td></tr>
+                    <tr><td>UPS efficiency <code>inUpsEff</code></td><td><code>upsEff</code></td><td>%</td><td>90–99.5 · default 96.5</td><td>UPS conversion efficiency. Loss = <code>itKw / upsEff − itKw</code>.</td></tr>
+                    <tr><td>Target PUE <code>inTargetPue</code></td><td><code>targetPue</code></td><td>—</td><td>≥1.05 · default 1.20</td><td>Design target used by gap analysis and optimizer. Does not affect the solver result.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Architecture presets:</strong> <em>Direct Liquid (Warm-Water LTC)</em> loads capture 85 %, supply 32.5 °C, return 40.5 °C, airCOP 4.6, fan 2.8 % IT. <em>Hybrid</em> loads capture 55 %, supply 24 °C, return 32 °C. <em>Air In-Row/DAHU</em> loads capture 12 %, supply 18 °C, return 24 °C. <em>Manual</em> bypasses auto-load.</div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">The solver runs in one deterministic pass with no iteration loops. Function names map one-to-one to <code class="mn-mono">js/ltc-system-modelling-lab.js</code> (<code>computeModel</code>).</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Steady-state energy balance (conceptual)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Q_in = IT_kW   (heat dissipated by servers)</span>
+                <span class="mn-eq">Q_cooling = liquidCoolingKw + airCoolingKw + fanKw</span>
+                <span class="mn-eq">Q_loss = upsLossKw + distLossKw + auxKw   (3% IT)</span>
+                <span class="mn-eq">totalFacilityKw = IT_kW + Q_cooling + Q_loss   (power draw)</span>
+                <span class="mn-where">The solver does not iterate; it computes Q_cooling from the input parameters directly. Steady-state means the system is assumed to be in thermal equilibrium at the stated inputs.<span class="mn-src">SIMULATED · inline computeModel</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Supply temperature rise &amp; mass flow</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">baseDeltaT = returnTemp − supplyTemp</span>
+                <span class="mn-eq">deltaT = clamp( baseDeltaT × (0.9 + densityStress × 0.08),  3,  20 )   [°C]</span>
+                <span class="mn-eq">liquidKw = itKw × (effectiveCapture / 100)</span>
+                <span class="mn-eq">massFlow_kg/s = liquidKw / ( Cp × deltaT )</span>
+                <span class="mn-eq">baseFlow_m³/s = massFlow_kg/s / ρ</span>
+                <span class="mn-eq">designFlow_m³/s = baseFlow × redundancyFactor × (1 + hydraulicMargin%) × pipeFactor</span>
+                <span class="mn-eq">flowLPM = designFlow_m³/s × 60 000</span>
+                <span class="mn-where">Cp and ρ from coolant table (water: 4.186 kJ/kg·K, 997 kg/m³). redundancyFactor = 2 for 2N, 1.15 for N+1, 1 for N. densityStress = clamp(designDensity / 70, 0.5, 2.8).<span class="mn-src">ASHRAE Liquid Cooling Guide · inline computeModel</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Hydraulic pump power (affinity-law corrected)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">pumpHeadEff = pumpHead × pipeFactor × (1 + (densityStress − 1) × 0.22)   [m]</span>
+                <span class="mn-eq">P_hyd = ρ × g × pumpHeadEff × designFlow_m³/s / 1000   [kW]</span>
+                <span class="mn-eq">pumpPowerKw = P_hyd / pumpEff_fraction</span>
+                <span class="mn-where">g = 9.81 m/s². pumpEff_fraction clamped to [0.35, 1]. Fan power (fan affinity law scaling): <code>fanKw = itKw × (fanPower%) × (1 − effectiveCapture/100 × 0.55) × (1 − controlBonus × 0.18)</code> — residual fan demand after liquid-capture and control reductions.<span class="mn-src">HX Institute · pump affinity laws · inline computeModel</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">HX effectiveness &amp; liquid cooling COP</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">supplyBonus = clamp( (supplyTemp − 28) × 0.11,  −0.45,  1.5 )</span>
+                <span class="mn-eq">economizerFraction = economizerHours / 100</span>
+                <span class="mn-eq">liquidCOP = clamp( (6.1 + climateBias + supplyBonus + economizerFraction × 1.05 + controlBonus) × futureFactor,  3.0,  19 )</span>
+                <span class="mn-eq">airCopEff = clamp( airCOP × (1 + economizerFraction × 0.58 + controlBonus × 0.32) × factor,  1.7,  16 )</span>
+                <span class="mn-eq">liquidCoolingKw = (liquidKw + cduLossKw) / liquidCOP + pumpPowerKw</span>
+                <span class="mn-eq">airCoolingKw = airKw / airCopEff</span>
+                <span class="mn-where">Higher liquid supply temperature → higher liquidCOP (warm-water rejection to cooling tower or dry cooler). Economizer availability boosts both liquid and air path effectiveness. HX effectiveness is captured through the liquidCOP / supplyBonus relationship: warmer supply allows higher approach temperature to the rejection side.<span class="mn-src">HX Institute · ASHRAE · inline computeModel</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">PUE impact (facility + CDU pump)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">upsInputKw = itKw / upsEff_fraction</span>
+                <span class="mn-eq">upsLossKw = upsInputKw − itKw</span>
+                <span class="mn-eq">distLossKw = upsInputKw × (distLoss% / 100)</span>
+                <span class="mn-eq">auxKw = itKw × 0.03</span>
+                <span class="mn-eq">totalCoolingKw = liquidCoolingKw + airCoolingKw + fanKw</span>
+                <span class="mn-eq">totalFacilityKw = itKw + totalCoolingKw + upsLossKw + distLossKw + auxKw</span>
+                <span class="mn-eq">PUE = totalFacilityKw / itKw</span>
+                <span class="mn-where">CDU pump power (pumpPowerKw) is already embedded in liquidCoolingKw. PUE includes UPS and distribution losses, fan load, liquid cooling overhead, and a 3% IT auxiliary allowance.<span class="mn-src">ISO 30134-2 / Green Grid · inline computeModel</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">System COP</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">systemCOP = itKw / totalCoolingKw</span>
+                <span class="mn-where">Cooling-side COP only (IT load divided by total cooling power including pump and fans).<span class="mn-src">ASHRAE 90.4 · inline computeModel</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">WUE and annual energy</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">WUE = baseWUE × (1 − economizerFraction × 0.43) × (1 − effectiveCapture/100 × 0.32) × (1 − (futureFactor−1) × 0.18)</span>
+                <span class="mn-eq">annualKWh = totalFacilityKw × 8 760</span>
+                <span class="mn-eq">annualGWh = annualKWh / 1 000 000</span>
+                <span class="mn-where">baseWUE is climate-specific. Economizer use and high liquid-capture reduce water consumption. WUE clamped to ≥ 0.04 L/kWh.<span class="mn-src">ISO 14644 / Green Grid · inline computeModel</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">All constants are declared in the top of <code class="mn-mono">initCalculator()</code> in <code class="mn-mono">js/ltc-system-modelling-lab.js</code>. Coolant property block:</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Coolant</th><th>Cp (kJ/kg·K)</th><th>ρ (kg/m³)</th><th>Typical use</th></tr></thead>
+                <tbody>
+                    <tr><td>Water (<code>water</code>)</td><td><code>4.186</code></td><td><code>997</code></td><td>Standard warm-water DLC loops.</td></tr>
+                    <tr><td>Propylene glycol 20% (<code>pg20</code>)</td><td><code>3.92</code></td><td><code>1025</code></td><td>Light freeze protection; moderate Cp penalty.</td></tr>
+                    <tr><td>Propylene glycol 30% (<code>pg30</code>)</td><td><code>3.75</code></td><td><code>1038</code></td><td>Full freeze protection; higher density, lower Cp.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-tablewrap" style="margin-top:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>Rack profile</th><th>Typical density</th><th>LiquidBias</th><th>AirResidual</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td>AI/HPC direct liquid</td><td>50–100 kW/rack</td><td>1.15</td><td>0.12</td><td>GPU/TPU clusters; dominant liquid capture.</td></tr>
+                    <tr><td>Enterprise mixed</td><td>15–30 kW/rack</td><td>0.82</td><td>0.45</td><td>Mixed workloads; hybrid liquid + air.</td></tr>
+                    <tr><td>Immersion (single-phase)</td><td>80–120 kW/rack</td><td>1.28</td><td>0.05</td><td>Full immersion; near-total liquid capture.</td></tr>
+                    <tr><td>Immersion (two-phase)</td><td>80–120 kW/rack</td><td>1.36</td><td>0.08</td><td>Two-phase; highest capture bias.</td></tr>
+                    <tr><td>Legacy air + RDHx</td><td>10–25 kW/rack</td><td>0.62</td><td>0.72</td><td>Rear-door HX hybrid; mostly air-side.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <p class="mn-lead" style="margin-top:0.9rem;">Hard guardrails: deltaT must be ≥3 °C (hard-stop below 3 °C); deltaT &lt;6 °C triggers a design warning (typical target is ≥6–10 °C). Pump efficiency below 45% is a hard-stop; below 65% is a warning. Risk index is clamped to [5, 95] and blocked above 70 for optimizer/stochastic runs.</p>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Formula / derivation</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>Design flow</td><td><code>flowLPM</code></td><td>L/min</td><td>Pump sizing flow including redundancy, margin, and pipe factor.</td></tr>
+                    <tr><td>Pump power</td><td><code>pumpPowerKw</code></td><td>kW</td><td>Electrical power to CDU pump; contributes directly to PUE.</td></tr>
+                    <tr><td>PUE</td><td><code>totalFacilityKw / itKw</code></td><td>—</td><td>Overall facility efficiency. Typical hyperscale target 1.10–1.25.</td></tr>
+                    <tr><td>System COP</td><td><code>itKw / totalCoolingKw</code></td><td>—</td><td>Cooling-side performance; higher = better.</td></tr>
+                    <tr><td>WUE</td><td>climate-adjusted</td><td>L/kWh</td><td>Water consumption per IT energy unit.</td></tr>
+                    <tr><td>Annual energy</td><td><code>totalFacilityKw × 8760</code></td><td>GWh/year</td><td>Full-facility energy footprint at stated load.</td></tr>
+                    <tr><td>Net OPEX</td><td>energy cost + water − heat-reuse credit</td><td>USD/year</td><td>Annual operating cost after any waste-heat recovery credit.</td></tr>
+                    <tr><td>Net carbon</td><td><code>annualKWh × CI − avoidedCarbon</code></td><td>t CO₂e/year</td><td>Gross minus heat-reuse displacement; carbon intensity is site-specific.</td></tr>
+                    <tr><td>Thermal delta-T</td><td><code>deltaT</code></td><td>°C</td><td>Effective liquid loop temperature rise after density-stress correction.</td></tr>
+                    <tr><td>Compliance scores</td><td>ASHRAE / ANSI / ISO / NFPA / Uptime</td><td>0–100</td><td>Weighted standards-alignment index per protocol.</td></tr>
+                    <tr><td>Risk index</td><td>additive penalty model</td><td>0–100</td><td>Composite resilience risk; &lt;35 = low, 35–60 = moderate, &gt;60 = high.</td></tr>
+                    <tr><td>CDU count</td><td><code>ceil(liquidKw / cduUnit)</code></td><td>count</td><td>Number of CDU units at stated kW capacity.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example</h2>
+            <p class="mn-lead">Default scenario: 12 MW IT load, direct-liquid architecture (85% capture), water coolant, supply 32.5 °C, return 40.5 °C, pump head 28 m, pump efficiency 78%, hydraulic margin 12%, pipe-loss ×1.0, N+1 redundancy. Numbers reproduce the live solver output at default settings.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li>IT load: <code>itKw = 12 × 1000 =</code> <span class="mn-result">12 000 kW</span></li>
+                    <li>Liquid-side load: <code>liquidKw = 12 000 × 0.85 =</code> <span class="mn-result">10 200 kW</span></li>
+                    <li>baseDeltaT: <code>40.5 − 32.5 =</code> <span class="mn-result">8.0 °C</span> (within [3, 20] — valid design range)</li>
+                    <li>Mass flow: <code>m = 10 200 / (4.186 × 8.0) =</code> <span class="mn-result">304.7 kg/s</span></li>
+                    <li>Base volume flow: <code>304.7 / 997 =</code> <span class="mn-result">0.3056 m³/s</span></li>
+                    <li>Design flow (N+1, 12% margin, ×1.0 pipe): <code>0.3056 × 1.15 × 1.12 × 1.0 =</code> <span class="mn-result">0.3936 m³/s → 23 616 LPM</span></li>
+                    <li>Effective head: <code>28 × 1.0 × (1 + (densityStress−1) × 0.22) ≈</code> <span class="mn-result">~28.8 m</span> (density stress ≈ 1.14 for 35 kW/rack default)</li>
+                    <li>Hydraulic power: <code>P_hyd = 997 × 9.81 × 28.8 × 0.3936 / 1000 =</code> <span class="mn-result">~111 kW</span></li>
+                    <li>Pump electrical power: <code>111 / 0.78 =</code> <span class="mn-result">~142 kW</span></li>
+                    <li>PUE (simplified): liquid cooling + pump + air fan + UPS loss + dist loss + aux ÷ IT → <span class="mn-result">~1.27 (varies with climate / control settings)</span></li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>SIMULATED result:</strong> all numbers above are educational estimates produced by the deterministic solver with default parameters. They are not site-validated measurements. Real CDU selection, pipe sizing, and pump curves must be confirmed against vendor data and hydraulic commissioning.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>ASHRAE TC9.9 Liquid Cooling Design Guide</b> — Liquid cooling system design, coolant selection, temperature ranges, flow sizing methodology for data centers.</li>
+                <li><b>HX Institute Standards</b> — Heat exchanger thermal performance, approach temperature, effectiveness-NTU method, and hydraulic sizing.</li>
+                <li><b>Pump affinity laws (centrifugal)</b> — Flow ∝ speed; head ∝ speed²; power ∝ speed³. Used in fan-power modelling (fanKw ∝ flow³ scaling with control reduction).</li>
+                <li><b>ISO 14644 / ISO 30134-2</b> — Cleanroom and data center classification; WUE metric definition; energy efficiency governance.</li>
+                <li><b>ANSI/BICSI 002</b> — Data center design and implementation best practices; redundancy configurations.</li>
+                <li><b>Uptime Institute Tier Standard</b> — Availability tiers (N, N+1, 2N) and their concurrently-maintainable requirements.</li>
+                <li><b>ASHRAE 90.4 / Green Grid</b> — PUE and system COP definitions and reporting methodology.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">js/ltc-system-modelling-lab.js</code> function <code>computeModel(input)</code>. All formula line-numbers are verifiable in that file.</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The model assumes a well-mixed, single-pass steady-state loop at the stated supply and return temperatures. Pipe-loss multiplier (<code>coefPipeLoss</code>) is a network-complexity factor applied uniformly — it is not a pressure-drop simulation. CDU loss is a fixed percentage of liquid heat load (default 1.8%). Coolant properties are constant (no temperature-dependent Cp or ρ). Future-tech coefficient (<code>coefFutureTech</code>) is a linear efficiency multiplier without underlying technology model. Heat-reuse credit is illustrative and varies heavily by site.</p>
+            <p class="mn-lead">This manual and the LTC lab are <strong>engineering education and pre-design aids only</strong>. Outputs are clearly labelled SIMULATED. No cross-page Rule-1 consistency is asserted (this tool is self-contained). Detailed system design must be performed by qualified mechanical and electrical engineers using site-specific data and vendor curves.</p>
+        </section>
+
+        <a class="mn-toollink" href="../ltc-system-modelling-lab.html">&#9654; Open the live LTC System Modelling Lab</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../ltc-system-modelling-lab.html">LTC Modelling Lab</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

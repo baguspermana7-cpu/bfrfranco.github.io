@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Cx Calculator — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full engineering methodology for the DC commissioning (Cx) calculator: L0–L6 lifecycle cost model, Gantt schedule, Monte Carlo band, 8 archetypes, and ASHRAE Guideline 0 basis.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="data center commissioning, L0-L6, IST, integrated systems testing, Cx cost model, ASHRAE Guideline 0, BCxA, NETA ECS, Monte Carlo, Cx schedule, commissioning methodology">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/cx.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/cx.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/cx.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/cx.html">
+    <meta property="og:title" content="Cx Calculator — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="L0–L6 commissioning lifecycle cost model, Gantt schedule, Monte Carlo band, sensitivity tornado, and 8 archetypal scenarios.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="Commissioning Calculator Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Cx Calculator — Technical Manual">
+    <meta name="twitter:description" content="L0–L6 DC commissioning cost model, Monte Carlo, sensitivity tornado, 8 archetypes.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Commissioning Calculator Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "Cx Calculator" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Cx Calculator — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Data center commissioning cost and schedule methodology — L0 through L6 lifecycle phases with Monte Carlo simulation",
+        "articleSection": "Commissioning",
+        "dependencies": "ASHRAE Guideline 0-2019, BCxA, NETA ECS/ATS-2025, Uptime Institute Tier Standard, TIA-942-B",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to estimate a data center commissioning program (L0–L6)",
+        "step": [
+            { "@type": "HowToStep", "name": "Define the project parameters", "text": "Enter IT load (kW), cooling type, redundancy level, building type, and BMS complexity." },
+            { "@type": "HowToStep", "name": "Scale equipment quantities", "text": "Engine scales switchgear, transformers, generators, UPS modules, chillers, PDUs, and other equipment counts from IT load and rack density." },
+            { "@type": "HowToStep", "name": "Compute per-level working-day durations (L0–L6)", "text": "Each level duration is driven by equipment counts, cooling, redundancy, and scope multipliers." },
+            { "@type": "HowToStep", "name": "Apply regional day-rate pricing", "text": "Multiply staffed durations by the regional day-rate card (30 markets) to obtain per-level cost estimates." },
+            { "@type": "HowToStep", "name": "Run Monte Carlo and sensitivity analysis", "text": "N=10 000 simulations with ±7.5% IT-load noise yield P5–P95 band; 7-parameter tornado shows top cost drivers." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What are L0–L6 in DC commissioning?",
+                "acceptedAnswer": { "@type": "Answer", "text": "L0 = Design & Cx Planning (OPR/BOD review, Cx plan, points list). L1 = Factory Witness Testing (FAT at manufacturer). L2 = Installation Verification (static testing, insulation resistance, piping pressure). L3 = Component Startup (first energization, OEM startup, BMS point-to-point). L4 = Functional Performance Testing (full-load systems, control sequences). L5 = Integrated Systems Testing (IST — failure scenarios across all systems). L6 = Turnover & Closeout (punchlist, training, final report). These are project-delivery levels, not ASHRAE-defined terms." }
+            },
+            {
+                "@type": "Question",
+                "name": "How does the engine compute Cx program cost?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The RICH engine (RZEngine.models.commissioning.programRich) scales equipment counts from IT load and rack density, computes per-level staffed durations (L0–L6) using 11 multiplier tables (cooling, redundancy, building, seismic, substation, BMS, delivery, scope, fire, UPS, generator), prices each level by the regional day-rate card (30 markets), and blends the level sum against a $/kW base using a geometric-mean normalization (^0.45). Contingency of 15% is added. The result is a budgetary estimate; the method and data are documented in DATA.commissioning.cx.rich (rz-engine.js)." }
+            },
+            {
+                "@type": "Question",
+                "name": "What does the Monte Carlo band represent?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The Monte Carlo runs N=10 000 trials: each trial samples IT load from a Normal(μ=base, σ=7.5%) distribution and applies independent cost noise Normal(0, 5%) clamped to ±15%. Results are sorted and percentile statistics (P5, P25, P50, P75, P95, CVaR-95) are returned. This represents budget uncertainty from scope variability, not schedule risk — contractor availability or regulatory delays are not modelled." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../cx-calculator.html" class="nav-link">Cx Calculator</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / Cx Calculator
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Commissioning</p>
+            <h1>Cx Calculator — Methodology &amp; Formulas</h1>
+            <p>Every input, equation, constant, output, and reference behind the commissioning (Cx) calculator. All math is anchored to the RICH engine in <code class="mn-mono">RZEngine.models.commissioning</code> (rz-engine.js §v2.5.0) against deep-frozen constants in <code class="mn-mono">DATA.commissioning.cx.rich</code> — no back-solved coefficients, no random schedule values.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>RZEngine v2.5.0</strong></span>
+                <span class="mn-chip">Basis <strong>ASHRAE Guideline 0-2019</strong></span>
+                <span class="mn-chip">Inputs <strong>14</strong></span>
+                <span class="mn-chip">Outputs <strong>cost · schedule · MC · tornado</strong></span>
+                <span class="mn-chip">Archetypes <strong>8</strong></span>
+                <span class="mn-chip">Regions <strong>30</strong></span>
+            </div>
+            <a class="mn-toollink" href="../cx-calculator.html">▶ Open the live Cx Calculator</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The calculator estimates the total cost and working-day schedule of a data center commissioning (Cx) program across the full project-delivery lifecycle — L0 Design &amp; Planning through L5 Integrated Systems Testing (IST) to L6 Turnover &amp; Closeout. It answers four questions: <em>how much will the Cx program cost</em>, <em>how long will each phase take</em>, <em>what is the cost uncertainty band (P5–P95)</em>, and <em>which inputs drive the most budget swing</em>.</p>
+            <p class="mn-lead">Basis of design is <strong>user-driven</strong>: supply IT load, cooling type, redundancy, building configuration, and region; the engine returns a deterministic staffed-duration and cost estimate per level. The governing process framework is <strong>ASHRAE Guideline 0-2019 (Commissioning Process)</strong>, with test-procedure scope from <strong>NETA ECS/ATS-2025</strong>, IST scenario counts from <strong>Uptime Institute Tier Standard 2024</strong>, and structured-cabling tests from <strong>BICSI 002</strong>. Day-rate calibration reflects industry practice (n = 50+ DC Cx programs, 2021–2026).</p>
+            <div class="mn-note"><strong>L0–L6 are project-delivery levels</strong>, not an ASHRAE-defined numbering hierarchy. They are used here as a practical label for the seven sequential phases of a DC commissioning program. ASHRAE Guideline 0 defines the lifecycle process backbone; the level labels are a practitioner convention.</div>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">Fourteen inputs across five groups — facility sizing, cooling &amp; redundancy, electrical infrastructure, project delivery, and region. All are mapped through <code class="mn-mono">models.commissioning.mapInput()</code> which fills any missing field with the budgetary defaults in <code class="mn-mono">DATA.commissioning.cx.rich.defaults</code>.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field (UI / key)</th><th>Type</th><th>Default</th><th>Values / range</th><th>Effect</th></tr></thead>
+                <tbody>
+                    <tr><td>IT Load <code>itLoad</code></td><td>number kW</td><td>2 000</td><td>≥ 100</td><td>Drives all equipment-count scales; appears in every level cost formula.</td></tr>
+                    <tr><td>Cooling Type <code>coolingType</code></td><td>enum</td><td>air</td><td>air / inrow / rdhx / dlc / immersion</td><td>Cost mult (1.00–1.55) and duration mult (1.00–1.40); liquid cooling adds CDU scope to L2–L5.</td></tr>
+                    <tr><td>Redundancy <code>redundancy</code></td><td>enum</td><td>N+1</td><td>N / N+1 / 2N / 2N+1</td><td>Cost mult (1.00–2.25), duration mult (1.00–1.90), IST scenario count (3–10), IST hours (14–120).</td></tr>
+                    <tr><td>Rack Density <code>rackDensity</code></td><td>enum</td><td>standard</td><td>standard (6 kW) / medium (12 kW) / high (25 kW) / ai_hpc (75 kW)</td><td>Sets rack count for equipment scale; density.cool multiplier (1.00–1.60) enters global cost.</td></tr>
+                    <tr><td>Building Type <code>buildingType</code></td><td>enum</td><td>purpose</td><td>warehouse / modular / purpose / highrise</td><td>Cost mult (0.75–1.30) and duration mult (0.70–1.25).</td></tr>
+                    <tr><td>Fire Suppression <code>fireSuppression</code></td><td>enum</td><td>novec</td><td>fm200 / novec / inergen / n2 / water / water_mist</td><td>Scalar multiplier on global cost (0.85–1.15).</td></tr>
+                    <tr><td>UPS Type <code>upsType</code></td><td>enum</td><td>modular</td><td>standalone / modular / distributed / rotary</td><td>Scalar multiplier (1.00–1.40) on global cost.</td></tr>
+                    <tr><td>Generator <code>generatorType</code></td><td>enum</td><td>diesel</td><td>diesel / gas / dualfuel / hvo</td><td>Scalar multiplier (1.00–1.25); load-bank diesel cost in L5 uses the regional diesel $/L rate.</td></tr>
+                    <tr><td>Seismic Zone <code>seismicZone</code></td><td>enum</td><td>1</td><td>0 / 1 / 2 / 3 / 4</td><td>Cost mult (1.00–1.35) and duration mult (1.00–1.25).</td></tr>
+                    <tr><td>Cx Scope <code>cxScope</code></td><td>enum</td><td>new_build</td><td>new_build / retrofit / recommission / continuous</td><td>Duration mult (0.25–1.00) and cost mult (0.30–1.00) applied to all levels uniformly.</td></tr>
+                    <tr><td>Substation Config <code>substationConfig</code></td><td>enum</td><td>single_sub</td><td>utility_fed / single_sub / dual_sub / ring_bus</td><td>Cost mult (0.70–2.10) and duration mult (0.75–1.80); adds days to L0 for complex configs.</td></tr>
+                    <tr><td>BMS Complexity <code>bmsComplexity</code></td><td>enum</td><td>standard</td><td>basic (200 pts) / standard (500 pts) / advanced (1 200 pts) / ai_driven (2 000 pts)</td><td>Cost mult (0.60–2.00) and duration mult (0.50–1.70); BMS point count directly scales L3 BMS verification days.</td></tr>
+                    <tr><td>Delivery Method <code>deliveryMethod</code></td><td>enum</td><td>traditional</td><td>traditional / design_build / epc / modular_pod</td><td>Cost mult (0.70–1.00) and duration mult (0.60–1.00); modular_pod increases L1 by ×1.5.</td></tr>
+                    <tr><td>Region <code>region</code></td><td>enum</td><td>us_virginia</td><td>30 market keys (or ISO-2 country code via iso2Region map)</td><td>Selects day-rate card: cxDay / fieldDay / oemDay / witnessDay / perDiem / diesel $/L / mult (0.29–1.00 vs US).</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">The RICH engine executes six sequential steps. All function names map one-to-one to <code class="mn-mono">RZEngine.models.commissioning.*</code> in <code class="mn-mono">rz-engine.js</code> (v2.5.0).</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 1 — Equipment-quantity scaling</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">switchgear    = ⌈kW / 5 000⌉ + 1</span>
+                <span class="mn-eq">transformers  = ⌈kW / 2 500⌉</span>
+                <span class="mn-eq">generators    = ⌈kW / 2 000⌉</span>
+                <span class="mn-eq">ups_modules   = ⌈kW / 500⌉</span>
+                <span class="mn-eq">cooling_units = ⌈kW / 200⌉</span>
+                <span class="mn-eq">pdus          = ⌈kW / 100⌉</span>
+                <span class="mn-eq">chillers      = ⌈kW / 500⌉ · pumps = ⌈kW / 300⌉</span>
+                <span class="mn-eq">racks         = ⌈kW / density.kw⌉     (6 / 12 / 25 / 75 kW/rack)</span>
+                <span class="mn-eq">fireZones     = ⌈kW / 200⌉ · sts = ⌈kW / 1 000⌉ · ats = ⌈kW / 2 000⌉</span>
+                <span class="mn-eq">+12 more counts (lvsb, db, mcc, vfd, busway, firePumps, ahu, accessDoors, cameras, lightZones, emergLights, sumpPumps, rpp)</span>
+                <span class="mn-where">In <code>models.commissioning.equipScale(inp)</code>.<span class="mn-src">inline · rz-engine.js §9505</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 2 — Per-level working-day durations (L0–L6)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">L0 = max(5, ⌈(15 + sizeAdder + liquidAdder + substAdder + bmsAdder) × scopeDur⌉)</span>
+                <span class="mn-eq">    sizeAdder: +5 if kW&gt;5 000 · +10 if kW&gt;20 000 · +15 if kW&gt;50 000</span>
+                <span class="mn-eq">L1 = ⌈(eq.switchgear×2 + eq.transformers×3 + eq.generators×2 + 2 + eq.chillers×0.5 + 1</span>
+                <span class="mn-eq">       + eq.lvsb×0.5 + eq.mcc×0.5 + eq.pdus×0.3 + eq.busway×0.3 + eq.ats×0.3</span>
+                <span class="mn-eq">       [+ 2 if liquid] [×1.5 if modular_pod]) × scopeDur⌉</span>
+                <span class="mn-eq">L2 = max(1, ⌈(max(l2elec, l2mech) + fireZones×0.75 + fireZones×0.25 + ⌈kW/1000⌉×2 + 1)</span>
+                <span class="mn-eq">          × redDur × bldDur × scopeDur⌉)</span>
+                <span class="mn-eq">L3 = max(1, ⌈(l3elec + max(l3mech, l3fire) + l3bms) × coolDur × redDur × scopeDur⌉)</span>
+                <span class="mn-eq">    l3bms = ⌈bms.pts × (kW/1000) / 100⌉   (BMS point-to-point days)</span>
+                <span class="mn-eq">L4 = max(1, ⌈(l4elec + max(l4mech, 3)) × scaleFactor × redDur × scopeDur⌉)</span>
+                <span class="mn-eq">    scaleFactor: 1.0→1.15→1.30→1.50→1.75 at kW 5k/10k/25k/50k</span>
+                <span class="mn-eq">L5 = max(1, ⌈⌈(rd.istHrs + rd.scenarios×3) / 10⌉ × sf5 × coolDur × scopeDur⌉)</span>
+                <span class="mn-eq">    rd.istHrs: N→14 · N+1→16 · 2N→110 · 2N+1→120  rd.scenarios: 3/6/10/10</span>
+                <span class="mn-eq">L6 = max(3, ⌈(10 + sizeAdder + redAdder + liquidAdder + bmsAdder) × scopeDur⌉)</span>
+                <span class="mn-where">In <code>models.commissioning.levelDurations(inp, eq)</code>.<span class="mn-src">inline · rz-engine.js §9522</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 3 — Per-level costs (regional day-rate pricing)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">L0_cost = (L0 × r.cxDay × 2.5 + kW × 2) × r.mult</span>
+                <span class="mn-eq">L1_cost = L1 × r.cxDay × 2 + L1 × r.perDiem</span>
+                <span class="mn-eq">L2_cost = L2 × r.cxDay × 3 + L2 × 350 + kW × 0.5</span>
+                <span class="mn-eq">L3_cost = L3 × r.cxDay × 4 + (gens×12+8)×350 + L3×500 + (gens×2+chillers×2)×r.oemDay</span>
+                <span class="mn-eq">L4_cost = L4 × r.cxDay × 5 + lbHrs×350 + L4×200×4 + L4×600</span>
+                <span class="mn-eq">    lbHrs: 24 (N/N+1) · 48 (2N/2N+1)</span>
+                <span class="mn-eq">L5_cost = L5×r.cxDay×8 + mw×8000×lbDays + 20×kW×0.3×r.diesel + L5×r.witnessDay</span>
+                <span class="mn-eq">    lbDays: N→1 · N+1→2 · 2N/2N+1→5</span>
+                <span class="mn-eq">L6_cost = (L6×r.cxDay×3 + ⌈kW/2000⌉×r.cxDay×2 + kW×3 + kW×1.5) × r.mult</span>
+                <span class="mn-where">In <code>models.commissioning.levelCosts(inp, dur, eq)</code>. r = regional rate card.<span class="mn-src">inline · rz-engine.js §9573</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 4 — Grand total (GM-normalized blend with global multiplier)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">gm          = cool.cost × red.cost × bld.cost × seismic.cost × sub.cost</span>
+                <span class="mn-eq">            × bms.cost × delivery.cost × fire.cost × ups.cost × gen.cost × density.cool</span>
+                <span class="mn-eq">normFactor  = gm ^ 0.45           (geometric-mean damping; prevents multiplicative explosion)</span>
+                <span class="mn-eq">totalBase   = (baseKw.electrical + baseCostKw + baseKw.fire + baseKw.security</span>
+                <span class="mn-eq">             + baseKw.it + baseKw.controls + baseKw.building) × kW × normFactor</span>
+                <span class="mn-eq">    baseKw ($/kW): elec 72 · mech-air 35 / mech-dlc 50 · fire 12 · security 6 · it 11 · controls 14 · building 5</span>
+                <span class="mn-eq">levelTotal  = L0_cost + (L1+L2+L3+L4+L5)×r.mult + L6_cost</span>
+                <span class="mn-eq">subtotal    = max(totalBase, levelTotal) + kW×5 (doc) + totalDays×r.perDiem×3 (travel)</span>
+                <span class="mn-eq">subtotal   × r.mult   [× 1.08 if kW≥50 000]   [× 1.05 if kW≥100 000]</span>
+                <span class="mn-eq">contingency = subtotal × 0.15</span>
+                <span class="mn-eq">grand       = subtotal + contingency</span>
+                <span class="mn-where">In <code>models.commissioning.programRich(input)</code>.<span class="mn-src">inline · rz-engine.js §9595</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 5 — Monte Carlo cost band</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">For i = 1 … N (default 10 000):</span>
+                <span class="mn-eq">  itLoad_i = max(100, round(base.itLoad × (1 + Normal(0, 0.075))))</span>
+                <span class="mn-eq">  cost_i   = programRich(with itLoad_i).grand × clamp(1 + Normal(0, 0.05), 0.85, 1.15)</span>
+                <span class="mn-eq">Sort, report P5 / P25 / P50 / P75 / P95 / mean / σ / CVaR-95</span>
+                <span class="mn-eq">Normal(0, σ) drawn via Box-Muller: z = √(−2 ln u₁) · cos(2π u₂), u₁,u₂ ~ Uniform(0,1)</span>
+                <span class="mn-where">In <code>models.commissioning.monteCarlo(input, opts)</code>. opts.rng can override Math.random for deterministic testing.<span class="mn-src">inline · rz-engine.js §9656</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 6 — Sensitivity tornado (7-parameter OAT)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">For each of 7 params (IT Load, Cooling Type, Redundancy, Building Type, Seismic, Substation, BMS):</span>
+                <span class="mn-eq">  lo_cost = programRich(param → low_value).grand</span>
+                <span class="mn-eq">  hi_cost = programRich(param → high_value).grand</span>
+                <span class="mn-eq">  range   = |hi_cost − lo_cost|</span>
+                <span class="mn-eq">Sort by range desc → tornado chart (widest bar = top driver)</span>
+                <span class="mn-eq">IT Load: ±20% of base.  Categorical params: low/high = enum extremes.</span>
+                <span class="mn-where">In <code>models.commissioning.sensitivity(input, baseCost)</code>.<span class="mn-src">inline · rz-engine.js §9681</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Compact schedule model (programSchedule)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">raw          = 4.5 + 0.45 × log₂(1 + mw) × 4   (log-damped growth, mw = kW/1000)</span>
+                <span class="mn-eq">totalMonths  = min(20, raw × coolMult × redMult)</span>
+                <span class="mn-eq">level months = totalMonths × level.schedWeight   (L0 6% … L5 27%)</span>
+                <span class="mn-where">In <code>models.commissioning.programSchedule(input)</code>. Used by the Gantt chart. Phase weights: L0 6% · L1 8% · L2 12% · L3 20% · L4 18% · L5 27% · L6 9%.<span class="mn-src">DATA.commissioning.cx.levels · rz-engine.js §5572</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">All constants live in deep-frozen <code class="mn-mono">DATA.commissioning.cx.rich</code> (rz-engine.js §5591). Source tag on each block: <code class="mn-mono">DATA.sources['commissioning.cx']</code> cites "DC Cx budgetary practice (ASHRAE Guideline 0 / BCxA / NETA ECS scope, Uptime IST scenario counts), rates calibrated to industry n=50+ programs 2021–2026, asOf 2026."</p>
+
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Multiplier table</th><th>Keys</th><th>Cost range</th><th>Duration range</th></tr></thead>
+                <tbody>
+                    <tr><td>Cooling <code>rich.cooling</code></td><td>air / inrow / rdhx / dlc / immersion</td><td>1.00 – 1.55×</td><td>1.00 – 1.40×</td></tr>
+                    <tr><td>Redundancy <code>rich.redundancy</code></td><td>N / N+1 / 2N / 2N+1</td><td>1.00 – 2.25×</td><td>1.00 – 1.90×</td></tr>
+                    <tr><td>Building <code>rich.building</code></td><td>warehouse / modular / purpose / highrise</td><td>0.75 – 1.30×</td><td>0.70 – 1.25×</td></tr>
+                    <tr><td>Seismic <code>rich.seismic</code></td><td>zones 0–4</td><td>1.00 – 1.35×</td><td>1.00 – 1.25×</td></tr>
+                    <tr><td>Substation <code>rich.substation</code></td><td>utility_fed / single_sub / dual_sub / ring_bus</td><td>0.70 – 2.10×</td><td>0.75 – 1.80×</td></tr>
+                    <tr><td>BMS/DCIM <code>rich.bms</code></td><td>basic (200 pts) – ai_driven (2 000 pts)</td><td>0.60 – 2.00×</td><td>0.50 – 1.70×</td></tr>
+                    <tr><td>Delivery <code>rich.delivery</code></td><td>traditional / design_build / epc / modular_pod</td><td>0.70 – 1.00×</td><td>0.60 – 1.00×</td></tr>
+                    <tr><td>Scope <code>rich.scope</code></td><td>continuous / recommission / retrofit / new_build</td><td>0.30 – 1.00×</td><td>0.25 – 1.00×</td></tr>
+                    <tr><td>Fire <code>rich.fire</code></td><td>water / fm200 / novec / inergen / n2 / water_mist</td><td>0.85 – 1.15×</td><td>—</td></tr>
+                    <tr><td>UPS <code>rich.ups</code></td><td>standalone / distributed / modular / rotary</td><td>1.00 – 1.40×</td><td>—</td></tr>
+                    <tr><td>Generator <code>rich.gen</code></td><td>diesel / hvo / gas / dualfuel</td><td>1.00 – 1.25×</td><td>—</td></tr>
+                    <tr><td>Rack density <code>rich.density</code></td><td>standard / medium / high / ai_hpc</td><td>cool 1.00 – 1.60×</td><td>—</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <div class="mn-tablewrap" style="margin-top:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>Regional day-rate card (sample)</th><th>CxDay $/d</th><th>FieldDay $/d</th><th>OEMDay $/d</th><th>WitnessDay $/d</th><th>Diesel $/L</th><th>Mult vs US</th></tr></thead>
+                <tbody>
+                    <tr><td>Northern Virginia (us_virginia)</td><td>1 200</td><td>850</td><td>2 000</td><td>3 500</td><td>1.10</td><td>1.00</td></tr>
+                    <tr><td>London (uk_london)</td><td>875</td><td>650</td><td>1 500</td><td>3 000</td><td>1.75</td><td>0.73</td></tr>
+                    <tr><td>Singapore</td><td>850</td><td>620</td><td>1 500</td><td>3 000</td><td>1.60</td><td>0.71</td></tr>
+                    <tr><td>Jakarta (indonesia_jakarta)</td><td>350</td><td>200</td><td>700</td><td>1 800</td><td>1.05</td><td>0.29</td></tr>
+                    <tr><td>São Paulo (brazil_saopaulo)</td><td>500</td><td>350</td><td>900</td><td>2 200</td><td>1.25</td><td>0.42</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <p class="mn-lead" style="margin-top:0.9rem;">30 markets are covered. ISO-2 country codes not in the exact rate table are mapped to the nearest labor/cost peer via <code class="mn-mono">rich.iso2Region</code>. Contingency is a flat 15% on subtotal. GM-normalization exponent <code>normExp = 0.45</code> — chosen to dampen multiplicative extremes while preserving relative cost ordering across the 11 multiplier tables.</p>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Field</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>Grand total cost</td><td><code>grand</code></td><td>USD</td><td>Subtotal + 15% contingency. Budgetary estimate ±30–50% at this stage.</td></tr>
+                    <tr><td>Cost per kW IT</td><td><code>perKw</code></td><td>$/kW</td><td>Sanity check: typical range $150–$800/kW depending on redundancy and region.</td></tr>
+                    <tr><td>Cx cost as % of capex</td><td><code>pctCapex</code></td><td>%</td><td>Industry benchmark 3–8% for standard builds; 8–15% for 2N+ hyperscale.</td></tr>
+                    <tr><td>Total duration</td><td><code>durationDays / durationWeeks / durationMonths</code></td><td>days / weeks / months</td><td>Working days (5-day week, 22-day month). Excludes procurement lead times.</td></tr>
+                    <tr><td>L0–L6 cost breakdown</td><td><code>levels[].cost</code></td><td>USD</td><td>Fixed proportions of grand total per level: L0 3% · L1 4% · L2 10% · L3 22% · L4 20% · L5 32% · L6 9%.</td></tr>
+                    <tr><td>Discipline breakdown</td><td><code>disciplines[].cost</code></td><td>USD</td><td>Electrical 40% · Mechanical 24% · Fire 9% · Controls 8% · IT 7% · Security 4% · Building 4% · Management 4%.</td></tr>
+                    <tr><td>Equipment counts</td><td><code>equip</code></td><td>count</td><td>25+ equipment types driving duration calculations.</td></tr>
+                    <tr><td>Tier &amp; IST info</td><td><code>tierInfo</code></td><td>—</td><td>Uptime tier label, availability string, IST scenario count, and IST staffed-hours for the selected redundancy.</td></tr>
+                    <tr><td>Monte Carlo band</td><td><code>P5 / P25 / P50 / P75 / P95 / CVaR-95</code></td><td>USD</td><td>P5–P95 = 90% budget confidence interval. CVaR-95 = average of worst-5% outcomes.</td></tr>
+                    <tr><td>Sensitivity tornado</td><td><code>sensitivity[].{name, low, high, range}</code></td><td>USD swing</td><td>7 parameters ranked by range; widest bar is the top cost driver for this configuration.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example — Enterprise 2 MW, N+1, air cooling, Northern Virginia</h2>
+            <p class="mn-lead">Input: <code>itLoad = 2 000 kW, coolingType = air, redundancy = N+1, rackDensity = standard, buildingType = purpose, fireSuppression = novec, upsType = modular, region = us_virginia, generatorType = diesel, seismicZone = 1, cxScope = new_build, substationConfig = single_sub, bmsComplexity = standard, deliveryMethod = traditional</code>. Numbers verified by executing the engine logic in Node.js against rz-engine.js constants.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Equipment scale:</strong> switchgear 2 · transformers 1 · generators 1 · ups_modules 4 · cooling_units 10 · pdus 20 · sts 2 · chillers 4 · pumps 7 · racks 334 · fireZones 10 · ats 1 (+ 12 others)</li>
+                    <li><strong>L0 duration:</strong> base 15 d (2 000 kW &lt; 5 000 threshold) × 1.00 scope = <span class="mn-result">15 working days</span></li>
+                    <li><strong>L1 duration:</strong> 2×2 + 1×3 + 1×2 + 2 + 4×0.5 + 1 + 2×0.5 + 2×0.5 + 20×0.3 + 2×0.3 + 1×0.3 = 22.9 → ⌈22.9×1.00⌉ = <span class="mn-result">23 working days</span></li>
+                    <li><strong>L2 duration:</strong> max(13.5, 13.5) + 10×0.75 + (10×0.25 + 2×2 + 1) = 28.5 → ⌈28.5×1.30 red×1.00 bld×1.00 scope⌉ = <span class="mn-result">38 working days</span></li>
+                    <li><strong>L3 duration:</strong> l3elec=10 + max(l3mech=17.5, l3fire=15) + l3bms=⌈500×2/100⌉=10 = 37.5 → ⌈37.5×1.00 cool×1.30 red⌉ = <span class="mn-result">49 working days</span></li>
+                    <li><strong>L4 duration:</strong> (3+2)+max(7,3)=12 → ⌈12×1.0 sf×1.30 red⌉ = <span class="mn-result">16 working days</span></li>
+                    <li><strong>L5 duration:</strong> N+1 → istHrs=16, scenarios=6; hrs=16+6×3=34; ⌈34/10⌉=4 → ⌈4×1.0 sf5⌉ = <span class="mn-result">4 working days</span></li>
+                    <li><strong>L6 duration:</strong> base 10 d (no 2N/liquid/advanced-BMS adder) → <span class="mn-result">10 working days</span></li>
+                    <li><strong>Total duration:</strong> 15+23+38+49+16+4+10 = <span class="mn-result">155 working days (≈ 31 weeks / 8 months)</span></li>
+                    <li><strong>Level costs (us_virginia rates):</strong><br>
+                        L0 = (15×1200×2.5 + 2000×2)×1.00 = <span class="mn-result">$49 000</span><br>
+                        L1 = 23×1200×2 + 23×300 = <span class="mn-result">$62 100</span><br>
+                        L2 = 38×1200×3 + 38×350 + 2000×0.5 = <span class="mn-result">$151 100</span><br>
+                        L3 = 49×1200×4 + (1×12+8)×350 + 49×500 + (1×2+4×2)×2000 = <span class="mn-result">$286 700</span><br>
+                        L4 = 16×1200×5 + 24×350 + 16×800 + 16×600 = <span class="mn-result">$126 800</span><br>
+                        L5 = 4×1200×8 + 2×8000×2 + 20×2000×0.3×1.10 + 4×3500 = <span class="mn-result">$97 600</span><br>
+                        L6 = (10×1200×3 + 1×1200×2 + 2000×3 + 2000×1.5)×1.00 = <span class="mn-result">$47 400</span><br>
+                        levelTotal = <span class="mn-result">$820 700</span>
+                    </li>
+                    <li><strong>Global multiplier:</strong> gm = 1.00×1.35×1.00×1.05×1.00×1.00×1.00×1.05×1.25×1.00×1.00 = 1.8605 → normFactor = 1.8605^0.45 = <span class="mn-result">1.3223</span></li>
+                    <li><strong>totalBase:</strong> (72+35+12+6+11+14+5)×2000×1.3223 = 155×2000×1.3223 = <span class="mn-result">$409 913</span></li>
+                    <li><strong>Blend:</strong> max(409 913, 820 700) = 820 700 + doc 2000×5=10 000 + travel 155×300×3=139 500 → subtotal×1.00 = <span class="mn-result">$970 200</span></li>
+                    <li><strong>Grand total:</strong> subtotal + 15% contingency = 970 200 × 1.15 = <span class="mn-result">$1 115 730</span> ($557.9/kW · 5.31% of capex at $10 500/kW)</li>
+                    <li><strong>Level split (fixed proportions of grand):</strong><br>
+                        L0 3% = $33 k · L1 4% = $45 k · L2 10% = $112 k · L3 22% = $245 k · L4 20% = $223 k · L5 32% = $357 k · L6 9% = $100 k
+                    </li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Verification method:</strong> the worked-example numbers were computed by executing the exact engine formulas step-by-step in Node.js against the constants extracted from <code class="mn-mono">rz-engine.js</code> (v2.5.0). Results match the live calculator output for the <em>Enterprise 2 MW</em> archetype preset. The level-split values are display-only proportions applied to grand total — they do not add up to levelTotal exactly because the blended grand may exceed the pure level-cost sum.</div>
+        </section>
+
+        <!-- 7. 8 ARCHETYPES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> Eight preset archetypes</h2>
+            <p class="mn-lead">The calculator ships eight archetype presets in <code class="mn-mono">DATA.commissioning.cx.rich.scenarios</code>. Each preset is a full 14-parameter input vector.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Archetype</th><th>IT Load</th><th>Cooling</th><th>Redundancy</th><th>Region</th><th>Rack density</th><th>Delivery</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Enterprise 2 MW</strong></td><td>2 000 kW</td><td>air</td><td>N+1</td><td>us_virginia</td><td>standard</td><td>traditional</td></tr>
+                    <tr><td><strong>Colo 10 MW</strong></td><td>10 000 kW</td><td>in-row</td><td>2N</td><td>us_virginia</td><td>medium</td><td>design-build</td></tr>
+                    <tr><td><strong>Hyperscale 50 MW</strong></td><td>50 000 kW</td><td>DLC</td><td>2N+1</td><td>us_virginia</td><td>ai_hpc</td><td>EPC</td></tr>
+                    <tr><td><strong>Edge 500 kW</strong></td><td>500 kW</td><td>air</td><td>N+1</td><td>us_texas</td><td>standard</td><td>traditional</td></tr>
+                    <tr><td><strong>Modular 5 MW</strong></td><td>5 000 kW</td><td>RDHX</td><td>N+1</td><td>nordics_stockholm</td><td>high</td><td>modular_pod</td></tr>
+                    <tr><td><strong>Recommission 3 MW</strong></td><td>3 000 kW</td><td>air</td><td>N+1</td><td>uk_london</td><td>standard</td><td>traditional</td></tr>
+                    <tr><td><strong>AI Factory 100 MW</strong></td><td>100 000 kW</td><td>DLC</td><td>2N+1</td><td>us_texas</td><td>ai_hpc</td><td>EPC</td></tr>
+                    <tr><td><strong>Fast-track 10 MW</strong></td><td>10 000 kW</td><td>in-row</td><td>N+1</td><td>us_virginia</td><td>medium</td><td>design-build</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <p class="mn-lead" style="margin-top:0.9rem;">The AI Factory archetype (100 MW, DLC, 2N+1, ai_hpc density, EPC) applies the ×1.08 hyperscale surcharge (kW ≥ 50 000) and ×1.05 (kW ≥ 100 000), plus the highest redundancy IST hours (120 h) and scenario count (10 failure scenarios). It represents the most complex and costly Cx program the engine models.</p>
+        </section>
+
+        <!-- 8. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>ASHRAE Guideline 0-2019</b> — The Commissioning Process: lifecycle process backbone (pre-design through occupancy &amp; operations). L0–L6 labels follow this general phase structure. BMS point-to-point verification (§5.4), IST (§5.5), and test documentation requirements.</li>
+                <li><b>ASHRAE Guideline 1.1-2018</b> — HVAC&amp;R Technical Requirements for the Commissioning Process: HVAC functional performance test (FPT) scope and chiller acceptance criteria.</li>
+                <li><b>NETA ECS/ATS-2025</b> — Electrical Commissioning Specification / Acceptance Testing Specification: insulation resistance test tables (§7.2), circuit breaker timing (§7.5), transformer DGA (§7.6), UPS testing (§7.11), visual &amp; mechanical inspection (§7.1).</li>
+                <li><b>Uptime Institute Tier Standard (2024)</b> — IST scenario counts and required hours per tier: N (Tier I, ~14 h / 3 scenarios) → 2N+1 (Tier IV+, ~120 h / 10 scenarios).</li>
+                <li><b>BCxA (Building Commissioning Association)</b> — Commissioning process scope definition and Cx agent (CxA) role standards; industry cost benchmarks.</li>
+                <li><b>BICSI 002 (2019)</b> — Data Center Design and Implementation Best Practices: IST acceptance criteria, structured-cabling OTDR limits, and overall test scope reference.</li>
+                <li><b>TIA-942-B</b> — Telecommunications Infrastructure Standard for Data Centers: cable test acceptance (attenuation, continuity) and structured-cabling test scope for L2.</li>
+                <li><b>IEEE 519-2022</b> — Harmonic voltage/current limits — referenced in UPS and PDU performance testing acceptance criteria (THDv).</li>
+                <li><b>IEC 62040-3</b> — UPS transfer time Class 1 (≤ 10 ms); output THDv and autonomy acceptance criteria in the L4 UPS section.</li>
+                <li><b>NFPA 72 / 75 / 76 / 2001</b> — Fire alarm, data-center fire protection, and clean-agent system: fire-zone scope and suppression acceptance tests in L3/L4.</li>
+                <li><b>ISO 10816</b> — Vibration severity for rotating machinery: chiller vibration limit in OEM startup (L3).</li>
+                <li><b>RSMeans 2025</b> — Day-rate cost calibration reference for US markets.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">rz-engine.js</code> (RZEngine v2.5.0): <code>DATA.commissioning.cx.rich</code> (§5591) · <code>models.commissioning.*</code> (§9418–9751).</li>
+            </ul>
+        </section>
+
+        <a class="mn-toollink" href="../cx-calculator.html">▶ Open the live Cx Calculator</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../cx-calculator.html">Cx Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

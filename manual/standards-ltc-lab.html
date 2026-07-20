@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Standards + Liquid-to-Chip Lab — Methodology &amp; Compliance Scoring | ResistanceZero</title>
+    <meta name="description" content="Methodology for the Standards LTC Lab: 5 standards engines (ASHRAE, ANSI/TIA, ISO, NFPA, Uptime), compliance scoring formula, acceptance criteria tables, evidence checkpoints, and worked example.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="ASHRAE TC 9.9, ANSI TIA-942, ISO 50001, ISO 14644, NFPA data center, Uptime Institute Tier, compliance scoring, liquid-to-chip standards methodology">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/standards-ltc-lab.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/standards-ltc-lab.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/standards-ltc-lab.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/standards-ltc-lab.html">
+    <meta property="og:title" content="Standards + Liquid-to-Chip Lab — Methodology &amp; Compliance Scoring">
+    <meta property="og:description" content="5 standards engines, compliance scoring formula, acceptance criteria tables, evidence checkpoints, and worked example for the Standards LTC Lab.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="Standards LTC Lab Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Standards + Liquid-to-Chip Lab — Methodology">
+    <meta name="twitter:description" content="5 standards engines, compliance scoring formula, acceptance criteria tables, evidence checkpoints.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Standards LTC Lab Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "Standards LTC Lab" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Standards + Liquid-to-Chip Lab — Methodology & Compliance Scoring",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Compliance scoring methodology for 5 standards engines in a data center standards and liquid-to-chip sizing workbench",
+        "articleSection": "Standards Engineering",
+        "dependencies": "ASHRAE TC 9.9, ANSI/TIA-942, ISO 50001, ISO 14644, NFPA 75/76, Uptime Institute Tier Standard",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to score compliance against data-center standards (5-engine workbench)",
+        "step": [
+            { "@type": "HowToStep", "name": "Select standards scope", "text": "Choose which of the 5 engines apply: ASHRAE, ANSI/TIA, ISO, NFPA, Uptime. Each engine has a fixed checklist of pass/fail items derived from the governing standard." },
+            { "@type": "HowToStep", "name": "Record evidence checkpoints", "text": "For each item in the engine checklist, mark Pass or Fail based on available design documents, measurements, or configuration records." },
+            { "@type": "HowToStep", "name": "Compute compliance score", "text": "Score (%) = items_passed / total_items x 100. Evaluate against the two bands: Basic >= 70% = PASS, Advanced >= 90% = CERTIFIED." },
+            { "@type": "HowToStep", "name": "Identify gaps and remediation", "text": "Failed items become a gap list. Address critical items (safety, fire, tier redundancy) before attempting a formal audit submission." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is the compliance scoring formula?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Score (%) = items_passed / total_items x 100. Two achievement bands: Basic >= 70% = PASS; Advanced >= 90% = CERTIFIED. Each standards engine has its own checklist of pass/fail evidence items derived from the governing standard." }
+            },
+            {
+                "@type": "Question",
+                "name": "Is this tool a substitute for a formal standards audit?",
+                "acceptedAnswer": { "@type": "Answer", "text": "No. The workbench is a reference and pre-audit checklist tool only, not a substitute for a certified third-party audit or a compliance declaration. It contains no physics simulation gates. Final compliance determinations must be made by accredited auditors against the published standard." }
+            },
+            {
+                "@type": "Question",
+                "name": "Which 5 standards engines are covered?",
+                "acceptedAnswer": { "@type": "Answer", "text": "ASHRAE TC 9.9 (thermal envelopes and air/liquid cooling), ANSI/TIA-942 (topology readiness and redundancy), ISO 50001/14644 (energy management and cleanroom governance), NFPA 75/76 (fire risk for data centers), and Uptime Institute Tier Standard (redundancy and concurrent maintainability)." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../standards-ltc-lab.html" class="nav-link">Standards LTC Lab</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / Standards LTC Lab
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Standards Engines</p>
+            <h1>Standards + Liquid-to-Chip Lab — Methodology &amp; Compliance Scoring</h1>
+            <p>Compliance scoring formula, 5-engine acceptance-criteria structure, evidence checkpoints, and worked example behind the Standards LTC Lab — a reference and pre-audit checklist workbench covering ASHRAE, ANSI/TIA, ISO, NFPA, and Uptime Institute frameworks.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Standards Engines <strong>5</strong></span>
+                <span class="mn-chip">Scoring <strong>items_passed / total × 100</strong></span>
+                <span class="mn-chip">Band Basic <strong>≥ 70% PASS</strong></span>
+                <span class="mn-chip">Band Advanced <strong>≥ 90% CERTIFIED</strong></span>
+            </div>
+            <a class="mn-toollink" href="../standards-ltc-lab.html">▶ Open the live Standards LTC Lab</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; scope</h2>
+            <p class="mn-lead">The Standards LTC Lab is a <strong>reference and compliance-scoring workbench</strong>, not a physics simulator. It answers one governing question: <em>how many evidence checkpoints does a design or installation pass against each standard, and what band does the total score achieve?</em> There are no thermal or hydraulic equations executed at runtime — acceptance criteria are derived from the published standards text and evaluated against user-supplied checkbox evidence.</p>
+            <p class="mn-lead">The workbench covers five standards domains that routinely govern data-center and liquid-to-chip cooling infrastructure: ASHRAE TC 9.9 thermal envelopes, ANSI/TIA-942 topology readiness, ISO 50001/14644 energy governance, NFPA 75/76 fire risk, and Uptime Institute Tier alignment. Each domain is a separate deep-dive module page; this landing hub is the index and the methodology reference.</p>
+            <div class="mn-note"><strong>Disclaimer:</strong> Outputs are for educational planning and pre-audit preparation only — not a substitute for a certified third-party audit, a professional engineering stamp, or a compliance declaration under any regulatory regime. Always validate final decisions with licensed professionals and the authority having jurisdiction.</div>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs — evidence checkboxes per standard</h2>
+            <p class="mn-lead">Each standards engine presents a fixed checklist of pass/fail evidence items. The user marks each item based on available design documentation, measurements, or configuration records. There are no numeric fields in the compliance scoring path — only checkbox status (pass / fail / not applicable).</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Engine</th><th>Evidence category</th><th>Example checkpoint items</th><th>Typical checklist depth</th></tr></thead>
+                <tbody>
+                    <tr><td>ASHRAE TC 9.9</td><td>Thermal environment</td><td>Inlet temperature in recommended/allowable band; supply delta-T documented; mixed cooling ratio declared</td><td>10–18 items</td></tr>
+                    <tr><td>ANSI/TIA-942</td><td>Topology &amp; redundancy</td><td>Tier classification declared; concurrently maintainable path verified; single-point-of-failure list produced</td><td>12–20 items</td></tr>
+                    <tr><td>ISO 50001 / 14644</td><td>Energy &amp; governance</td><td>EnMS scope documented; PUE measurement in place; improvement objectives set; cleanroom classification (if applicable)</td><td>10–16 items</td></tr>
+                    <tr><td>NFPA 75 / 76</td><td>Fire risk</td><td>Suppression strategy selected; detection coverage meets NFPA 72; response posture documented; Li-ion off-gas risk assessed</td><td>8–14 items</td></tr>
+                    <tr><td>Uptime Institute Tier</td><td>Tier alignment</td><td>Target Tier declared; redundancy level verified per subsystem; fault-containment analysis on record</td><td>10–16 items</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <p class="mn-lead" style="margin-top:0.9rem;">Items marked <em>not applicable</em> are excluded from the denominator. Only pass and fail items count toward the score. This prevents a narrow-scope assessment from being penalised for standards clauses that do not apply to the installation type.</p>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Compliance scoring methodology</h2>
+            <p class="mn-lead">One formula governs all five engines. The score is a simple pass-rate percentage; the two achievement bands derive from the industry-consensus pre-audit thresholds commonly applied in data-center certification programmes.</p>
+
+            <div class="mn-formula">
+                <span class="mn-eq">Score (%) = items_passed / total_applicable × 100</span>
+                <span class="mn-eq">Band  BASIC    : Score ≥ 70%  →  PASS</span>
+                <span class="mn-eq">Band  ADVANCED : Score ≥ 90%  →  CERTIFIED</span>
+                <span class="mn-where">total_applicable = items_passed + items_failed  (not-applicable items excluded from denominator).<span class="mn-src">WORKBENCH · SCORING</span></span>
+            </div>
+
+            <p class="mn-lead">Each standards engine also tracks a <strong>critical-item flag</strong>: certain checklist items are tagged critical (e.g., fire detection coverage, Tier redundancy path, ISO EnMS scope declaration). If any critical item is failed the engine reports <code>CRITICAL GAP</code> regardless of overall score band, because a failed critical item typically blocks a formal audit submission even at high overall scores.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Per-engine acceptance criteria structure</h3>
+            <p class="mn-lead">Each engine's checklist is structured in three columns: item, acceptance criterion, and evidence requirement. The evidence requirement states what documentation or measurement satisfies the criterion.</p>
+
+            <div class="mn-tablewrap" style="margin-top:0.75rem;">
+            <table class="mn-table">
+                <thead><tr><th>Engine</th><th>Governing standard(s)</th><th>Score computation scope</th><th>Critical-item category</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>ASHRAE TC 9.9</td>
+                        <td>ASHRAE TC 9.9 2021 Thermal Guidelines for Data Processing Environments</td>
+                        <td>Thermal environment, air/liquid separation, delta-T validation</td>
+                        <td>Inlet temperature outside allowable envelope</td>
+                    </tr>
+                    <tr>
+                        <td>ANSI/TIA-942</td>
+                        <td>ANSI/TIA-942-C (2021) Telecommunications Infrastructure Standard for Data Centers</td>
+                        <td>Topology, redundancy N+1/2N, structured wiring readiness</td>
+                        <td>Unresolved single point of failure at the declared Tier</td>
+                    </tr>
+                    <tr>
+                        <td>ISO 50001 / 14644</td>
+                        <td>ISO 50001:2018 Energy Management Systems; ISO 14644-1 Cleanrooms (where applicable)</td>
+                        <td>EnMS scope, PUE/WUE measurement, continual improvement, classification evidence</td>
+                        <td>Absent EnMS scope or missing PUE measurement baseline</td>
+                    </tr>
+                    <tr>
+                        <td>NFPA 75 / 76</td>
+                        <td>NFPA 75 (2023) Standard for the Protection of IT Equipment; NFPA 76 (2020) Telecom Facilities</td>
+                        <td>Detection strategy, suppression selection, response posture, battery risk screening</td>
+                        <td>No fire detection coverage; no suppression strategy declared</td>
+                    </tr>
+                    <tr>
+                        <td>Uptime Tier</td>
+                        <td>Uptime Institute Tier Standard: Topology (2022); Operational Sustainability (2022)</td>
+                        <td>Tier topology criteria, concurrent maintainability, fault containment</td>
+                        <td>Fault propagation path crosses Tier boundary without mitigation</td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 4. ENGINE ACCEPTANCE CRITERIA DETAIL -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Engine acceptance criteria — detail tables</h2>
+            <p class="mn-lead">Each table below lists the acceptance criteria and evidence requirements for one engine. Items marked <strong>CRITICAL</strong> trigger the critical-gap flag if failed.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.4rem;">Engine 1 — ASHRAE TC 9.9 (Thermal)</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Item</th><th>Acceptance criterion</th><th>Evidence requirement</th><th>Flag</th></tr></thead>
+                <tbody>
+                    <tr><td>A1 — Inlet temperature</td><td>IT inlet within A1 recommended (18–27 °C) or at minimum within A2 allowable (10–35 °C)</td><td>Measured or designed supply-air temperature at IT equipment inlet</td><td>CRITICAL</td></tr>
+                    <tr><td>A2 — Inlet humidity</td><td>Relative humidity within allowable envelope (8–80% RH, no condensation)</td><td>Humidity measurement or design specification at IT inlet</td><td></td></tr>
+                    <tr><td>A3 — Liquid supply temperature</td><td>Coolant supply temp ≥ minimum allowable for the deployed CDU/manifold</td><td>CDU supply temperature setpoint in design or operations record</td><td></td></tr>
+                    <tr><td>A4 — Delta-T documented</td><td>Supply-to-return delta-T documented for liquid loop</td><td>Measured or design delta-T with units</td><td></td></tr>
+                    <tr><td>A5 — Air-liquid interaction</td><td>Mixed cooling ratio (liquid fraction of total IT heat removal) declared</td><td>Design calculation or measured split</td><td></td></tr>
+                    <tr><td>A6 — Containment strategy</td><td>Hot-aisle or cold-aisle containment strategy defined (or in-row / rear-door declared)</td><td>Airflow management design document or installation photo</td><td></td></tr>
+                    <tr><td>A7 — Re-circulation risk</td><td>No known hot-air recirculation path unmitigated</td><td>CFD study or blanking-panel survey</td><td></td></tr>
+                    <tr><td>A8 — ASHRAE class alignment</td><td>IT equipment ASHRAE class matches the operating envelope</td><td>Equipment datasheets referencing ASHRAE class</td><td></td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.5rem 0 0.4rem;">Engine 2 — ANSI/TIA-942 (Topology)</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Item</th><th>Acceptance criterion</th><th>Evidence requirement</th><th>Flag</th></tr></thead>
+                <tbody>
+                    <tr><td>T1 — Tier declaration</td><td>Target Tier (I–IV) declared in design basis</td><td>Design basis of design (BOD) document</td><td>CRITICAL</td></tr>
+                    <tr><td>T2 — Power redundancy</td><td>UPS and generator topology meets declared Tier redundancy level</td><td>Single-line diagram (SLD) with redundancy annotation</td><td>CRITICAL</td></tr>
+                    <tr><td>T3 — Cooling redundancy</td><td>Cooling loop redundancy meets declared Tier (N, N+1, 2N)</td><td>P&amp;ID or cooling SLD with redundancy annotation</td><td>CRITICAL</td></tr>
+                    <tr><td>T4 — Concurrent maintainability</td><td>For Tier III+: maintenance path exists without IT service impact</td><td>Maintenance scenarios analysis document</td><td></td></tr>
+                    <tr><td>T5 — Single-point-of-failure register</td><td>SPOF register produced and mitigations documented</td><td>SPOF analysis report or design review checklist</td><td></td></tr>
+                    <tr><td>T6 — Structured cabling compliance</td><td>TIA-942 cabling topology followed (MDA, HDA, EDA zones)</td><td>Floor plan with zone delineation</td><td></td></tr>
+                    <tr><td>T7 — Physical security zones</td><td>Security zones defined per TIA-942 Annex B</td><td>Security zone layout drawing</td><td></td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.5rem 0 0.4rem;">Engine 3 — ISO 50001 / 14644 (Energy &amp; Governance)</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Item</th><th>Acceptance criterion</th><th>Evidence requirement</th><th>Flag</th></tr></thead>
+                <tbody>
+                    <tr><td>E1 — EnMS scope</td><td>Energy management system scope documented covering the data hall</td><td>ISO 50001 scope statement</td><td>CRITICAL</td></tr>
+                    <tr><td>E2 — PUE baseline</td><td>PUE measurement methodology and baseline value on record</td><td>PUE calculation sheet with measurement points</td><td>CRITICAL</td></tr>
+                    <tr><td>E3 — WUE measured</td><td>Water Usage Effectiveness measured or declared not applicable</td><td>WUE calculation or N/A declaration</td><td></td></tr>
+                    <tr><td>E4 — Energy objectives</td><td>Quantified energy improvement objectives set with target dates</td><td>Energy objectives register</td><td></td></tr>
+                    <tr><td>E5 — Metering coverage</td><td>Sub-metering covers IT load, cooling, and lighting as minimum</td><td>Metering diagram or BMS point list</td><td></td></tr>
+                    <tr><td>E6 — Management review</td><td>Energy performance reviewed at planned intervals by management</td><td>Meeting minutes or management review record</td><td></td></tr>
+                    <tr><td>E7 — Cleanroom classification (if applicable)</td><td>ISO 14644-1 classification number declared with particle count evidence</td><td>Particle count test report</td><td></td></tr>
+                    <tr><td>E8 — Continual improvement</td><td>At least one completed improvement action documented in the review period</td><td>Action tracking log</td><td></td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.5rem 0 0.4rem;">Engine 4 — NFPA 75 / 76 (Fire Risk)</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Item</th><th>Acceptance criterion</th><th>Evidence requirement</th><th>Flag</th></tr></thead>
+                <tbody>
+                    <tr><td>F1 — Suppression strategy</td><td>Suppression strategy selected and documented (clean agent, sprinkler, or combination)</td><td>Fire protection narrative or system design summary</td><td>CRITICAL</td></tr>
+                    <tr><td>F2 — Detection coverage</td><td>Smoke detection meets NFPA 72 coverage requirements for the protected area</td><td>Detector layout drawing with coverage annotation</td><td>CRITICAL</td></tr>
+                    <tr><td>F3 — Early warning detection</td><td>VESDA or equivalent aspirating smoke detection (ASD) present for early warning</td><td>ASD system specification or installed equipment record</td><td></td></tr>
+                    <tr><td>F4 — Discharge time</td><td>For clean-agent systems: halocarbon discharge ≤ 10 s; inert ≤ 60 s</td><td>System design certificate or discharge time test record</td><td></td></tr>
+                    <tr><td>F5 — Hold time</td><td>Agent hold time ≥ 10 minutes post-discharge</td><td>Room integrity test report (door fan test)</td><td></td></tr>
+                    <tr><td>F6 — Li-ion battery risk</td><td>Li-ion off-gas hazard screened; mitigation strategy documented if batteries present</td><td>NFPA 855 / UL 9540A risk assessment or N/A declaration</td><td></td></tr>
+                    <tr><td>F7 — Emergency response plan</td><td>Emergency response plan (ERP) covers fire scenarios for the data hall</td><td>ERP document with data-hall-specific section</td><td></td></tr>
+                    <tr><td>F8 — Alarm integration</td><td>Fire alarm integrated with access control and HVAC shutdown per NFPA 72 / 75</td><td>Sequence of operations or system integration drawing</td><td></td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.5rem 0 0.4rem;">Engine 5 — Uptime Institute Tier Alignment</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Item</th><th>Acceptance criterion</th><th>Evidence requirement</th><th>Flag</th></tr></thead>
+                <tbody>
+                    <tr><td>U1 — Tier target declared</td><td>Target Tier (I–IV) formally declared in project charter or BOD</td><td>Project BOD or design basis with Tier statement</td><td>CRITICAL</td></tr>
+                    <tr><td>U2 — Non-redundant path (Tier I)</td><td>For Tier I: single non-redundant path to all IT equipment confirmed</td><td>SLD confirming Tier I topology</td><td></td></tr>
+                    <tr><td>U3 — Redundant components (Tier II)</td><td>For Tier II+: redundant components in power and cooling capacity paths</td><td>Capacity analysis with N+1 or better annotation</td><td></td></tr>
+                    <tr><td>U4 — Concurrently maintainable (Tier III)</td><td>For Tier III+: any component or distribution element can be removed without IT service impact</td><td>Maintenance procedure demonstrating concurrent maintainability</td><td>CRITICAL</td></tr>
+                    <tr><td>U5 — Fault tolerant (Tier IV)</td><td>For Tier IV: any single fault does not interrupt IT service; active-active delivery paths proven</td><td>Fault tolerance analysis or simulation record</td><td>CRITICAL</td></tr>
+                    <tr><td>U6 — Fault containment</td><td>Faults in one system do not propagate to redundant system</td><td>Fault containment analysis document</td><td></td></tr>
+                    <tr><td>U7 — Operational sustainability</td><td>Staffing, preventive maintenance, and training meet Uptime Institute OS criteria</td><td>Operations management review documentation</td><td></td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 5. SCORE BANDS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Score bands &amp; outputs</h2>
+            <p class="mn-lead">The workbench produces one score per engine and one aggregate score across all enabled engines. Band thresholds reflect typical pre-audit acceptance levels; they are not the certification authority's own thresholds (which vary by body and standard edition).</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Formula</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>Per-engine score</td><td><code>items_passed / (items_passed + items_failed) × 100</code></td><td>Percentage of applicable items passed for that standard.</td></tr>
+                    <tr><td>Band BASIC</td><td><code>Score ≥ 70%</code></td><td>PASS — adequate coverage for a preliminary design review.</td></tr>
+                    <tr><td>Band ADVANCED</td><td><code>Score ≥ 90%</code></td><td>CERTIFIED — high-confidence coverage; suitable as pre-audit baseline.</td></tr>
+                    <tr><td>Band BELOW BASIC</td><td><code>Score &lt; 70%</code></td><td>FAIL — significant gaps; not ready for audit submission.</td></tr>
+                    <tr><td>CRITICAL GAP flag</td><td>Any critical item failed</td><td>Reported independently of score band; must be resolved before any audit.</td></tr>
+                    <tr><td>Aggregate score</td><td><code>sum(passed across engines) / sum(applicable across engines) × 100</code></td><td>Cross-engine compliance posture; weighted by checklist depth.</td></tr>
+                    <tr><td>Gap list</td><td>Failed items per engine</td><td>Ordered list of items to address; critical items sort to top.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example</h2>
+            <p class="mn-lead">A design team runs the workbench against a new Tier III data hall with a liquid-cooled high-density zone. They enable all five engines. The following checklist results are recorded:</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>ASHRAE (8 items):</strong> A1–A6 pass, A7 fail (no CFD, blanking panels incomplete), A8 pass. <span class="mn-result">Passed 7 / 8 = 87.5%</span> → Band BASIC PASS. No critical gap.</li>
+                    <li><strong>ANSI/TIA-942 (7 items):</strong> T1–T5 pass, T6 fail (floor plan lacking zone delineation), T7 pass. <span class="mn-result">Passed 6 / 7 = 85.7%</span> → Band BASIC PASS. No critical gap.</li>
+                    <li><strong>ISO 50001 / 14644 (8 items):</strong> E1, E2 pass; E3 N/A (no water cooling); E4 fail (no improvement targets set); E5, E6 pass; E7 N/A (not a cleanroom); E8 fail. Applicable = 6. <span class="mn-result">Passed 4 / 6 = 66.7%</span> → Band BELOW BASIC. No critical gap (E1/E2 pass).</li>
+                    <li><strong>NFPA 75/76 (8 items):</strong> F1–F6 pass; F7 fail (ERP does not cover data hall); F8 pass. <span class="mn-result">Passed 7 / 8 = 87.5%</span> → Band BASIC PASS. No critical gap.</li>
+                    <li><strong>Uptime Tier III (7 items):</strong> U1–U6 pass; U7 fail (staffing records incomplete). <span class="mn-result">Passed 6 / 7 = 85.7%</span> → Band BASIC PASS. No critical gap.</li>
+                    <li>Aggregate: passed <span class="mn-result">30 / 36 = 83.3%</span> → Band BASIC PASS across all engines.</li>
+                    <li>Gap list (4 items): A7 blanking panels, T6 cabling zone drawing, E4 energy targets, E8 improvement action, F7 ERP data-hall section, U7 staffing records. → Address E4 and E8 first to lift ISO above 70%. No CRITICAL GAP flags raised.</li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Engineering reading:</strong> the design is audit-ready on ASHRAE, ANSI/TIA, NFPA, and Uptime, but the ISO energy-management module falls below the Basic band. Closing E4 (set improvement objectives) and E8 (log one completed action) lifts ISO to 6/6 = 100% at the next review cycle, removing the only Below-Basic finding before a formal audit engagement.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>ASHRAE TC 9.9 (2021)</b> — Thermal Guidelines for Data Processing Environments (4th ed.): thermal envelopes A1–A4, allowable ranges, liquid cooling delta-T guidance.</li>
+                <li><b>ANSI/TIA-942-C (2021)</b> — Telecommunications Infrastructure Standard for Data Centers: Tier I–IV topology criteria, structured cabling zones, redundancy classification.</li>
+                <li><b>ISO 50001:2018</b> — Energy Management Systems: scope, baseline, objectives, measurement, continual improvement framework.</li>
+                <li><b>ISO 14644-1:2015</b> — Cleanrooms and associated controlled environments — Classification of air cleanliness by particle concentration (where applicable to ultra-clean liquid-cooled zones).</li>
+                <li><b>NFPA 75 (2023)</b> — Standard for the Protection of Information Technology Equipment.</li>
+                <li><b>NFPA 76 (2020)</b> — Standard for the Fire Protection of Telecommunications Facilities.</li>
+                <li><b>NFPA 72</b> — National Fire Alarm and Signaling Code: detector coverage and alarm integration.</li>
+                <li><b>Uptime Institute Tier Standard: Topology (2022)</b> — Tier I–IV infrastructure criteria, concurrent maintainability, fault containment.</li>
+                <li><b>Uptime Institute Operational Sustainability (2022)</b> — Staffing, preventive maintenance, and training criteria for Tier III–IV.</li>
+                <li><b>NFPA 855 / UL 9540A</b> — Li-ion battery energy storage fire-risk screening (Engine 4 item F6).</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The workbench is a <strong>checklist reference tool</strong>. It does not execute thermal or hydraulic simulations, does not verify measurement data numerically, and does not issue compliance certificates. Checklist item counts and band thresholds are workbench defaults; the published standards may introduce additional requirements in future editions or through interpretive guidance. The ANSI/TIA Tier scale in this workbench follows TIA-942-C Annex H (Rated 1–4) which is broadly aligned with but distinct from the Uptime Institute Tier Standard — users should review both if seeking dual recognition. This manual and the workbench are an engineering education and pre-audit preparation aid; formal compliance determination must be carried out by accredited third-party auditors against the current edition of each standard, under the authority having jurisdiction.</p>
+        </section>
+
+        <a class="mn-toollink" href="../standards-ltc-lab.html">▶ Open the live Standards LTC Lab</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../standards-ltc-lab.html">Standards LTC Lab</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

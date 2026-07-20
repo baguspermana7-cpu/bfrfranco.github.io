@@ -218,7 +218,10 @@ const FinancialDashboard = () => {
             effectiveInputs.headcount_Admin * labor.baseSalary_Admin +
             effectiveInputs.headcount_Janitor * labor.baseSalary_Janitor
         ) * 12;
-        const energyCost = effectiveInputs.itLoad * ((rzData().pueMatrix as Record<string, Record<string, number>> | undefined)?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? 1.4) * 8760 * (selectedCountry?.economy.electricityRate ?? 0.10) / 1000;
+        /* unit fix: itLoad [kW] × PUE × 8760 [h] × electricityRate [$/kWh] = $ —
+         * the old “/ 1000” treated the $/kWh rate as $/MWh and understated
+         * energy 1000× (2.5 MW showed “$3K/yr” energy). */
+        const energyCost = effectiveInputs.itLoad * ((rzData().pueMatrix as Record<string, Record<string, number>> | undefined)?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? 1.4) * 8760 * (selectedCountry?.economy.electricityRate ?? 0.10);
         const maintenanceCost = effectiveInputs.itLoad * MAINT_PER_KW_YR;
         return staffCost + energyCost + maintenanceCost;
     }, [selectedCountry, effectiveInputs]);
@@ -297,7 +300,8 @@ const FinancialDashboard = () => {
             inputs.headcount_Janitor * labor.baseSalary_Janitor
         ) * 12;
         const maintenanceBudget = inputs.itLoad * MAINT_PER_KW_YR;
-        const energyBudget = inputs.itLoad * ((rzData().pueMatrix as Record<string, Record<string, number>> | undefined)?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? 1.4) * 8760 * (selectedCountry?.economy.electricityRate ?? 0.10) / 1000;
+        /* unit fix: kW × PUE × h × $/kWh = $ (no /1000 — see annualOpex) */
+        const energyBudget = inputs.itLoad * ((rzData().pueMatrix as Record<string, Record<string, number>> | undefined)?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? 1.4) * 8760 * (selectedCountry?.economy.electricityRate ?? 0.10);
         const vendorBudget = 50000;
         const esc = 1 + (finInputs.opexEscalation || 0.035);
         return [
@@ -1012,7 +1016,8 @@ const FinancialDashboard = () => {
                         effectiveInputs.headcount_Admin * labor.baseSalary_Admin +
                         effectiveInputs.headcount_Janitor * labor.baseSalary_Janitor
                     ) * 12;
-                    const energyCost = effectiveInputs.itLoad * ((rzData().pueMatrix as Record<string, Record<string, number>> | undefined)?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? 1.4) * 8760 * (selectedCountry?.economy.electricityRate ?? 0.10) / 1000;
+                    /* unit fix: kW × PUE × h × $/kWh = $ (no /1000 — see annualOpex) */
+                    const energyCost = effectiveInputs.itLoad * ((rzData().pueMatrix as Record<string, Record<string, number>> | undefined)?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? 1.4) * 8760 * (selectedCountry?.economy.electricityRate ?? 0.10);
                     const maintenanceCost = effectiveInputs.itLoad * MAINT_PER_KW_YR;
                     const insuranceCost = capexResults.total * 0.003; // 0.3% of CAPEX
                     const overheadCost = annualOpex * 0.05; // 5% overhead

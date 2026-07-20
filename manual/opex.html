@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>OPEX Calculator — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full engineering methodology for the DC OPEX Calculator: energy cost formulas, staffing models, maintenance rates, climate-zone adjustments, inputs, outputs, worked example, and data sources.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="data center OPEX, operating cost methodology, PUE energy cost, staffing FTE, maintenance $/kW, climate zone cooling factor, DCIM level, contractor model, opex calculator methodology">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/opex.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/opex.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/opex.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/opex.html">
+    <meta property="og:title" content="OPEX Calculator — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="Energy cost equations, staffing models, maintenance rates, climate adjustments, country data, and a fully verified worked example behind the DC OPEX Calculator.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="OPEX Calculator Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="OPEX Calculator — Technical Manual">
+    <meta name="twitter:description" content="Energy cost equations, staffing FTE models, maintenance rates, climate adjustments, and worked example for the DC OPEX Calculator.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="OPEX Calculator Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "OPEX Calculator" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "OPEX Calculator — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Data center operating cost methodology: energy, staffing, maintenance, software licensing, spare parts, compliance, and climate zone adjustments",
+        "articleSection": "Operating Cost",
+        "dependencies": "ASHRAE TC 9.9, Uptime Institute Tier Standard, IEC 62040-3, ISO/IEC 30134-2",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to estimate data center annual operating cost (OPEX)",
+        "step": [
+            { "@type": "HowToStep", "name": "Set IT load and PUE", "text": "Enter IT load (kW) and select base PUE. Effective PUE = base PUE + cooling-type adjustment (e.g. −0.25 for immersion, +0.15 for air-cooled chiller)." },
+            { "@type": "HowToStep", "name": "Select country and climate zone", "text": "Country sets energy rate ($/kWh), labor multiplier, and maintenance multiplier. Climate zone sets cooling energy multiplier and free-cooling hours." },
+            { "@type": "HowToStep", "name": "Choose staffing model and utilization", "text": "Select in-house, partial (hybrid), or full-contractor staffing. Set utilization (default 70%) and in-house percentage." },
+            { "@type": "HowToStep", "name": "Compute annual OPEX", "text": "Annual energy cost = IT_kW × effectivePUE × 8760 × utilization × energyRate. Add staffing, maintenance, spare parts, software, insurance, and compliance." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "How is annual energy cost calculated?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Annual energy cost = IT_load_kW × effectivePUE × 8760 h/yr × utilization × energyRate ($/kWh). Effective PUE = base PUE + cooling-type delta (−0.25 immersion to +0.15 air-cooled chiller). Climate zone applies a coolingEnergyMult to the cooling-overhead portion only." }
+            },
+            {
+                "@type": "Question",
+                "name": "What drives the maintenance cost?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Maintenance is computed per system (generator $31.50/kW, cooling $38/kW, electrical $28.50/kW, fire $10/kW, BMS $14/kW, building $7.50/kW at ID baseline), then multiplied by: facility age factor (0.6 new / 1.0 mid / 1.5 old), country maintMult, and OEM factor (1.0 in-house, up to 2.5 full-contractor). Climate zone applies an additional coolingMaintMult to the cooling system only." }
+            },
+            {
+                "@type": "Question",
+                "name": "How many FTE are estimated?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Base FTE scales with IT load (kW) and Uptime tier. The Uptime benchmark for critical-facilities staffing is 4.2 FTE/MW for full in-house, reduced to 3.8 (hybrid 70/30), 3.5 (hybrid 50/50), or 3.0 (full outsourced). Each FTE cost = laborRate × fxToUSD × 1.35 burden × staffing model cost multiplier." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../opex-calculator.html" class="nav-link">OPEX Calculator</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / OPEX Calculator
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Operating Cost</p>
+            <h1>OPEX Calculator — Methodology &amp; Formulas</h1>
+            <p>Every input, equation, constant, data source, and output KPI behind the data center operating-cost calculator. All cost lines are deterministic — energy via PUE × load × hours × rate, staffing via FTE models benchmarked to Uptime Institute, maintenance via system-level $/kW rates cross-multiplied by age, country, and contract scope. No random values; no back-solved constants.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>RZEngine v2.0 · models.opsBudget</strong></span>
+                <span class="mn-chip">Basis <strong>Uptime Institute · ASHRAE TC 9.9 · IEC 62040-3</strong></span>
+                <span class="mn-chip">Inputs <strong>14</strong></span>
+                <span class="mn-chip">Outputs <strong>12+</strong></span>
+                <span class="mn-chip">Countries <strong>20</strong></span>
+            </div>
+            <a class="mn-toollink" href="../opex-calculator.html">▶ Open the live OPEX Calculator</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The OPEX Calculator produces an annual operating-cost estimate for a colocation or owned data center. It decomposes total cost into six independently-modelled lines: <strong>energy</strong> (IT load × PUE × hours × rate), <strong>staffing</strong> (FTE by tier and staffing model), <strong>maintenance</strong> (per-system $/kW rates, age-adjusted, OEM-factored), <strong>spare parts inventory</strong> (risk-weighted by contract model), <strong>software &amp; licensing</strong> (DCIM, BMS, CMMS, cybersecurity), and <strong>insurance &amp; compliance</strong> (jurisdiction-specific). A 4 000-run Monte Carlo seeded around these deterministic core values produces P10/P50/P90 confidence bands.</p>
+            <p class="mn-lead">The primary design authorities are <strong>ASHRAE TC 9.9 (2021)</strong> for PUE &amp; thermal envelopes, <strong>Uptime Institute Tier Standard</strong> for staffing benchmarks (4.2 FTE/MW critical-facilities), and <strong>IEC 62040-3</strong> / <strong>ISO/IEC 30134-2</strong> for energy metrics. Country electricity and labor rates come from national utility filings and statistics (as-of 2026, cited per row in <code class="mn-mono">DATA.opsBudget.countries</code>).</p>
+            <div class="mn-note"><strong>Screening-grade accuracy:</strong> this calculator is a pre-design and benchmarking tool. Actual OPEX will vary with specific contract terms, local tax, overtime structures, and energy markets. Detailed cost-in-use studies should be grounded in site-specific contracts and utility quotations.</div>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">Fourteen inputs across four groups — facility profile, energy model, staffing model, and optional advanced parameters. Core inputs are always active; advanced inputs are unlocked in the expanded panel.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field (HTML id)</th><th>Type</th><th>Range / default</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>IT Load</strong> <code>itLoad</code></td><td>number</td><td>100 – 100 000 kW · default 1 000</td><td>Nameplate IT power draw of all installed equipment. Base for all energy and staffing calculations.</td></tr>
+                    <tr><td><strong>Base PUE</strong> <code>pueSlider</code></td><td>slider</td><td>1.10 – 2.00 · default 1.50</td><td>Power Usage Effectiveness before cooling-type adjustment. Effective PUE = base PUE + <code>cooling.pueImpact</code>.</td></tr>
+                    <tr><td><strong>Country</strong> <code>countrySelect</code></td><td>enum</td><td>20 countries · default ID</td><td>Sets <code>energyRate</code> ($/kWh), <code>laborMult</code>, <code>maintMult</code>, and <code>workerTax</code> from <code>DATA.opsBudget.countries</code>.</td></tr>
+                    <tr><td><strong>Tier Level</strong> <code>tierLevel</code></td><td>enum</td><td>I / II / III / IV · default III</td><td>Uptime Tier drives staffing headcount multipliers and spare-parts tier multiplier (T-IV = 1.35×, T-III = 1.15×, T-II = 1.00×, T-I = 0.80×).</td></tr>
+                    <tr><td><strong>Facility Age</strong> <code>facilityAge</code></td><td>enum</td><td>new / mid / old · default mid</td><td>Age factor applied to all maintenance line items (new = 0.60×, mid = 1.00×, old = 1.50×). Also drives spare-parts age multiplier (0.65 / 1.00 / 1.45).</td></tr>
+                    <tr><td><strong>Climate Zone</strong> <code>climateZone</code></td><td>enum</td><td>6 zones · default tropical_humid</td><td>Sets <code>coolingEnergyMult</code> (applied to cooling-overhead portion) and <code>coolingMaintMult</code> (applied to cooling maintenance). See §04 for zone constants.</td></tr>
+                    <tr><td><strong>Cooling Type</strong> <code>coolingType</code></td><td>enum</td><td>7 types · default water_chiller</td><td>Sets <code>pueImpact</code> (effective PUE delta), <code>efficiencyMult</code> (cooling-power modifier), and <code>maintCostPerKw</code> (baseline cooling maintenance rate). See §04.</td></tr>
+                    <tr><td><strong>Generator Config</strong> <code>genConfig</code></td><td>enum</td><td>N / N+1 / 2N / 2N+1 · default N+1</td><td>Drives generator maintenance multiplier (N=1.0×, N+1=1.30×, 2N=2.10×, 2N+1=2.40×) applied to the generator $/kW maintenance rate.</td></tr>
+                    <tr><td><strong>Staffing Model</strong> (card selector)</td><td>enum</td><td>inhouse / partial / contractor</td><td>Selects the FTE cost multiplier, OEM factor, and spare-parts contract multiplier. Partial mode uses slider <code>inhousePercent</code> (10–90%).</td></tr>
+                    <tr><td><strong>In-House %</strong> <code>inhousePercent</code></td><td>slider</td><td>10 – 90% · default 70%</td><td>Only active in partial mode. Blends OEM factor: <code>1.0 + (oemMult−1.0) × contractorPct</code> where <code>contractorPct = (100 − inhousePercent) / 100</code>.</td></tr>
+                    <tr><td><strong>Utilization</strong> <code>utilizationSlider</code></td><td>slider</td><td>40 – 100% · default 70%</td><td>Capacity utilization applied to annual energy calculation. OPEX calculator uses retail-screening basis (0.70); DCMOC uses DC-contract basis (1.00).</td></tr>
+                    <tr><td><strong>DCIM Level</strong> <code>dcimLevel</code> (advanced)</td><td>enum</td><td>0 / 1 / 2 / 3 · default 1</td><td>Adjusts software-licensing basket and BMS maintenance rate. Higher DCIM levels add CMMS and monitoring tool costs.</td></tr>
+                    <tr><td><strong>Energy Contract</strong> <code>energyContract</code> (advanced)</td><td>enum</td><td>spot / fixed / ppa · default fixed</td><td>Modifies the effective energy rate: spot adds volatility risk premium, PPA applies a discount factor. Used for Monte Carlo variance seeding.</td></tr>
+                    <tr><td><strong>Maintenance Level</strong> <code>maintLevel</code> (advanced)</td><td>enum</td><td>basic / standard / comprehensive · default standard</td><td>Scales the OEM-factor range: basic caps OEM at 1.5×, comprehensive allows up to 2.5×. Drives overall maintenance spend vs contract-risk trade-off.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">Six independently-modelled cost lines, each with its own data path. All function names below map to the page-side calculation in <code class="mn-mono">opex-calculator.html</code>, cross-checked against <code class="mn-mono">RZEngine.models.opsBudget.opex()</code> and <code class="mn-mono">RZEngine.models.opsBudget.staffing()</code>.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Line 1 — Annual energy cost</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">effectivePUE = basePUE + coolingType.pueImpact</span>
+                <span class="mn-eq">coolingPowerKW = IT_kW × (effectivePUE − 1) × coolingType.efficiencyMult × climate.coolingEnergyMult</span>
+                <span class="mn-eq">adjustedTotalKW = IT_kW + coolingPowerKW</span>
+                <span class="mn-eq">annualKWh      = adjustedTotalKW × 8 760 h/yr × utilization</span>
+                <span class="mn-eq">energyCost     = annualKWh × country.energyRate    [$/yr]</span>
+                <span class="mn-where">In <code>updateCalculation()</code> lines 3286–3291. Climate zone multiplier applies only to the cooling-overhead portion of power, not to IT load. Engine equivalent: <code>loadKW × pue × energyRate × 8760 × utilization</code> in <code>RZEngine.models.opsBudget.opex()</code>.<span class="mn-src">DATA.opsBudget · 2026</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Line 2 — Staffing cost</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">baseFTE   = f(IT_kW, tier)        // tier-scaled from Uptime 4.2 FTE/MW benchmark</span>
+                <span class="mn-eq">staffCost = baseFTE × laborRate_local × fxToUSD × laborBurden(1.35) × staffModel.costMult</span>
+                <span class="mn-where">Staff models: inhouse costMult=1.00 · hybrid-70 costMult=0.88 · hybrid-50 costMult=0.78 · outsourced costMult=0.65. Labor burden 1.35 covers benefits, tax, overhead. <code>calculateStaffingFTE(itLoadKW, tier)</code> → <code>calculateStaffingDetail(fte, countryData)</code>.<span class="mn-src">DATA.opsBudget · Uptime Institute · 2026</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Line 3 — Maintenance cost (per-system)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">oemFactor  = 1.0                                            (in-house)</span>
+                <span class="mn-eq">oemFactor  = 1.0 + (oemMult − 1.0) × contractorPct          (partial)</span>
+                <span class="mn-eq">oemFactor  = oemMult                                         (full contractor)</span>
+                <span class="mn-eq">cost_sys   = IT_kW × baseCostPerKw_sys × ageFactor × country.maintMult × oemFactor_sys</span>
+                <span class="mn-eq">coolingMaint additionally multiplied by climate.coolingMaintMult</span>
+                <span class="mn-eq">totalMaint = Σ cost_sys  [generator + cooling + electrical + fire + BMS + building]</span>
+                <span class="mn-where">Age factor: new 0.60 / mid 1.00 / old 1.50. System base rates at Indonesia baseline — see §04 constants table. Generator maintenance uses <code>generator.maintMult</code> for redundancy configuration.<span class="mn-src">DATA.opsBudget · industry cost surveys · 2026</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Line 4 — Critical spare parts inventory</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">cost_spare = IT_kW × baseCostPerKw × tierSpareMult × ageSpareMult × contractSpareMult × country.maintMult</span>
+                <span class="mn-eq">tierSpareMult  : T-IV 1.35 / T-III 1.15 / T-II 1.00 / T-I 0.80</span>
+                <span class="mn-eq">ageSpareMult   : new 0.65 / mid 1.00 / old 1.45</span>
+                <span class="mn-eq">contractSpareMult: inhouse 1.00 / partial 0.55 / contractor 0.15</span>
+                <span class="mn-where">Contractor model transfers spare-holding risk to the OEM; full all-risk contract leaves owner with only a 15% emergency buffer. Total baseline (in-house, T-III, mid-age) ≈ $36/kW/yr.<span class="mn-src">DATA.opsBudget · industry cost surveys · 2026</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Line 5 — Software &amp; licensing</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">cost_sw = IT_kW × baseCostPerKw_sw × (0.70 + 0.30 × country.laborMult)</span>
+                <span class="mn-where">70% of software cost is license-driven (geography-independent); 30% is support-contract driven (scales with local labor). Total baseline ≈ $16.50/kW/yr covering DCIM ($6), BMS license ($3.50), CMMS ($2.50), environmental monitoring ($1.50), cybersecurity OT ($3.00).<span class="mn-src">DATA.opsBudget · vendor pricing surveys · 2026</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Line 6 — Insurance &amp; compliance</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">complianceCost = Σ (baseCost_item + perMW_item × loadMW)   [per jurisdiction]</span>
+                <span class="mn-where">Indonesia-specific items: SLO $5 000 + $1 500/MW, AMDAL $3 000 + $500/MW, BPJS TK $1 500, Fire audit $2 500 + $500/MW, ISO 27001 $8 000 + $1 000/MW. Default jurisdiction: electrical + safety + environmental + ISO 27001 bases. Insurance is a flat multiple of asset replacement value.<span class="mn-src">DATA.opsBudget · Indonesian MEMR / BPJS / ministry schedules · 2026</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Total OPEX and per-unit KPIs</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">totalOPEX  = energyCost + staffCost + totalMaint + totalSpares + totalSoftware + insurance + compliance</span>
+                <span class="mn-eq">perKW      = totalOPEX / IT_kW / 12    [$/kW/month]</span>
+                <span class="mn-eq">perRack/yr = totalOPEX / rackCount      rackCount = IT_kW / 10 kW (default rack density)</span>
+                <span class="mn-eq">perM2/yr   = totalOPEX / whiteSpaceM2   whiteSpaceM2 = rackCount × 3.5 m²</span>
+                <span class="mn-where">In <code>computeDerivedMetrics(result)</code>. Monte Carlo (4 000 runs) varies: energy price (uniform ±15–20%), PUE drift (uniform 0.97–1.05×), labor/maintenance escalation (normal μ=4%, σ=2%). Tornado analysis ranks which driver most moves OPEX.<span class="mn-src">RZEngine v2.0 · models.sim.tornado</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS & SOURCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">Every constant lives in <code class="mn-mono">DATA.opsBudget</code> with a corresponding <code>DATA.sources['opsBudget']</code> citation (as-of 2026). Partial listing of the most material constants:</p>
+
+            <p style="font-size:0.9rem;font-weight:600;margin:1rem 0 0.4rem;">Cooling-type database — <code>coolingTypes</code></p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Cooling type</th><th>PUE impact</th><th>Efficiency mult</th><th>Maint $/kW/yr (ID)</th><th>OEM mult</th></tr></thead>
+                <tbody>
+                    <tr><td>Air-Cooled Chiller</td><td><code>+0.15</code></td><td><code>1.15</code></td><td>18.00</td><td>2.2</td></tr>
+                    <tr><td>Water-Cooled Chiller</td><td><code>±0.00</code></td><td><code>1.00</code></td><td>32.00</td><td>2.2</td></tr>
+                    <tr><td>Hybrid Free Cooling</td><td><code>−0.10</code></td><td><code>0.80</code></td><td>28.00</td><td>2.2</td></tr>
+                    <tr><td>In-Row Cooling (CRAC)</td><td><code>+0.05</code></td><td><code>1.05</code></td><td>22.00</td><td>2.0</td></tr>
+                    <tr><td>Rear-Door Heat Exchanger</td><td><code>−0.05</code></td><td><code>0.90</code></td><td>20.00</td><td>2.0</td></tr>
+                    <tr><td>Direct Liquid Cooling</td><td><code>−0.15</code></td><td><code>0.70</code></td><td>45.00</td><td>2.5</td></tr>
+                    <tr><td>Immersion Cooling</td><td><code>−0.25</code></td><td><code>0.60</code></td><td>55.00</td><td>2.5</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <p style="font-size:0.9rem;font-weight:600;margin:1rem 0 0.4rem;">Climate-zone database — <code>climateFactors</code></p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Zone</th><th>Cooling energy mult</th><th>Cooling maint mult</th><th>Free-cooling hrs/yr</th><th>Example markets</th></tr></thead>
+                <tbody>
+                    <tr><td>Tropical Humid</td><td><code>1.00</code></td><td><code>1.00</code></td><td>0</td><td>Indonesia, Malaysia, Singapore</td></tr>
+                    <tr><td>Tropical Dry</td><td><code>0.92</code></td><td><code>1.15</code></td><td>500</td><td>UAE, Saudi Arabia</td></tr>
+                    <tr><td>Subtropical</td><td><code>0.88</code></td><td><code>0.95</code></td><td>1 500</td><td>Hong Kong, Taiwan, Australia-QLD</td></tr>
+                    <tr><td>Temperate</td><td><code>0.75</code></td><td><code>0.85</code></td><td>4 000</td><td>Europe, Japan, South Korea</td></tr>
+                    <tr><td>Continental</td><td><code>0.70</code></td><td><code>0.80</code></td><td>5 000</td><td>US Central, Canada</td></tr>
+                    <tr><td>Cold Climate</td><td><code>0.55</code></td><td><code>0.75</code></td><td>7 000</td><td>Nordic, Northern US</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <p style="font-size:0.9rem;font-weight:600;margin:1rem 0 0.4rem;">Country economics — <code>DATA.opsBudget.countries</code> (selected rows)</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Country key</th><th>Labor rate (local/yr)</th><th>Energy rate ($/kWh)</th><th>FX to USD</th><th>Trop factor</th><th>Source · as-of</th></tr></thead>
+                <tbody>
+                    <tr><td>Indonesia</td><td>18 000 IDR-k/yr</td><td>0.085</td><td>0.000063</td><td>1.12</td><td>PLN tariff · 2026</td></tr>
+                    <tr><td>Singapore</td><td>72 000 SGD/yr</td><td>0.168</td><td>0.74</td><td>1.10</td><td>SP Group · 2026</td></tr>
+                    <tr><td>Malaysia</td><td>48 000 MYR/yr</td><td>0.082</td><td>0.22</td><td>1.11</td><td>Tenaga · 2026</td></tr>
+                    <tr><td>India</td><td>24 000 INR-k/yr</td><td>0.075</td><td>0.012</td><td>1.08</td><td>CERC · 2026</td></tr>
+                    <tr><td>Japan</td><td>82 000 JPY-k/yr</td><td>0.210</td><td>0.0067</td><td>1.00</td><td>TEPCO · 2026</td></tr>
+                    <tr><td>US-Virginia</td><td>95 000 USD/yr</td><td>0.068</td><td>1.00</td><td>1.00</td><td>Dominion Energy · 2026</td></tr>
+                    <tr><td>US-Texas</td><td>88 000 USD/yr</td><td>0.058</td><td>1.00</td><td>1.06</td><td>ERCOT avg · 2026</td></tr>
+                    <tr><td>US-Oregon</td><td>90 000 USD/yr</td><td>0.042</td><td>1.00</td><td>1.00</td><td>PacifiCorp · 2026</td></tr>
+                    <tr><td>EU-Germany</td><td>78 000 EUR/yr</td><td>0.235</td><td>1.08</td><td>1.00</td><td>BDEW · 2026</td></tr>
+                    <tr><td>EU-Netherlands</td><td>75 000 EUR/yr</td><td>0.195</td><td>1.08</td><td>1.00</td><td>ACM · 2026</td></tr>
+                    <tr><td>UAE</td><td>65 000 AED/yr</td><td>0.082</td><td>0.27</td><td>1.15</td><td>DEWA · 2026</td></tr>
+                    <tr><td>Saudi Arabia</td><td>60 000 SAR/yr</td><td>0.048</td><td>0.27</td><td>1.18</td><td>SEC · 2026</td></tr>
+                    <tr><td>Australia</td><td>88 000 AUD/yr</td><td>0.185</td><td>0.65</td><td>1.05</td><td>AEMO · 2026</td></tr>
+                    <tr><td>UK</td><td>72 000 GBP/yr</td><td>0.215</td><td>1.26</td><td>0.96</td><td>Ofgem · 2026</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <p style="font-size:0.9rem;font-weight:600;margin:1rem 0 0.4rem;">System maintenance base rates — <code>maintenanceRates</code> (Indonesia baseline $/kW/yr)</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>System</th><th>Base $/kW/yr</th><th>OEM mult (full contractor)</th><th>Frequency</th></tr></thead>
+                <tbody>
+                    <tr><td>Generator (genset + fuel + 6M/12M OH)</td><td>31.50</td><td>2.5×</td><td>Monthly + 6M/12M OH</td></tr>
+                    <tr><td>Cooling / HVAC (chiller + consumables)</td><td>38.00</td><td>2.2×</td><td>Monthly PM</td></tr>
+                    <tr><td>Electrical (UPS / PDU / STS)</td><td>28.50</td><td>2.0×</td><td>Quarterly</td></tr>
+                    <tr><td>Fire suppression system</td><td>10.00</td><td>1.8×</td><td>Semi-annual</td></tr>
+                    <tr><td>BMS / DCIM / Controls</td><td>14.00</td><td>2.0×</td><td>Continuous</td></tr>
+                    <tr><td>Building / Facility</td><td>7.50</td><td>1.5×</td><td>Quarterly</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <p style="font-size:0.9rem;font-weight:600;margin:1rem 0 0.4rem;">Key engine scalars — <code>DATA.opsBudget</code></p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Constant</th><th>Value</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td><code>shiftMult</code></td><td>4.2</td><td>Shift coverage multiplier for 24/7 critical facility staffing (Uptime benchmark)</td></tr>
+                    <tr><td><code>laborBurden</code></td><td>1.35</td><td>Fully-loaded multiplier over base salary (benefits, payroll tax, overhead)</td></tr>
+                    <tr><td><code>maintPerMwUsd</code></td><td>$180 000/MW/yr</td><td>Comprehensive maintenance base (engine-level; page uses per-system rates)</td></tr>
+                    <tr><td><code>pmBaseline</code></td><td>0.50</td><td>PM ratio baseline (50% — average across sites)</td></tr>
+                    <tr><td><code>pmSavingsSlope</code></td><td>0.30</td><td>Maintenance savings per unit of PM ratio above baseline</td></tr>
+                    <tr><td><code>maintCapexShare</code></td><td>0.15</td><td>Fraction of maintenance budget classified as capital expenditure for FFO calculation</td></tr>
+                    <tr><td><code>ffoFactor</code></td><td>0.12</td><td>FFO as fraction of total OPEX</td></tr>
+                    <tr><td><code>outsourcedCostFactor</code></td><td>0.65</td><td>Cost ratio of outsourced vs in-house staff at equal headcount</td></tr>
+                    <tr><td><code>replacementCostFactor</code></td><td>1.5</td><td>Replacement cost as multiple of annual salary (SHRM benchmark)</td></tr>
+                    <tr><td><code>hoursPerYear</code></td><td>8 760 h</td><td>Calendar constant (non-leap year)</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output KPI</th><th>Formula / source</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>Total annual OPEX</td><td>Σ six cost lines</td><td>$/yr</td><td>Primary output. Displayed as <code>totalOpex</code> in the results panel.</td></tr>
+                    <tr><td>OPEX per kW per month</td><td><code>totalOPEX / IT_kW / 12</code></td><td>$/kW/month</td><td>Industry benchmark metric. Tier-III US target: $80–130/kW/month.</td></tr>
+                    <tr><td>OPEX per rack per year</td><td><code>totalOPEX / rackCount</code></td><td>$/rack/yr</td><td>Colocation pricing reference. Rack density default 10 kW/rack.</td></tr>
+                    <tr><td>OPEX per m² per year</td><td><code>totalOPEX / whiteSpaceM2</code></td><td>$/m²/yr</td><td>Real-estate efficiency metric. White space = rackCount × 3.5 m².</td></tr>
+                    <tr><td>Energy cost</td><td><code>annualKWh × energyRate</code></td><td>$/yr</td><td>Typically 40–65% of total OPEX in tropical markets.</td></tr>
+                    <tr><td>Staffing cost</td><td>FTE × burdenedRate × costMult</td><td>$/yr</td><td>Total people cost including burden.</td></tr>
+                    <tr><td>Maintenance cost</td><td>Σ per-system rates × factors</td><td>$/yr</td><td>Six-system breakdown with age, OEM, and climate adjustments.</td></tr>
+                    <tr><td>Effective PUE</td><td><code>basePUE + coolingType.pueImpact</code></td><td>ratio</td><td>Actual power overhead ratio after cooling selection.</td></tr>
+                    <tr><td>Annual kWh consumed</td><td><code>adjustedTotalKW × 8760 × util</code></td><td>MWh/yr</td><td>Total facility energy draw for carbon and tariff calculations.</td></tr>
+                    <tr><td>CO₂ tonnes/yr</td><td><code>annualKWh × gridEmFactor / 1000</code></td><td>t CO₂e/yr</td><td>Carbon footprint based on country grid emission factor.</td></tr>
+                    <tr><td>P10 / P50 / P90 (Monte Carlo)</td><td>4 000-run simulation</td><td>$/yr</td><td>Optimistic / most-likely / conservative OPEX bands. P90/P10 spread shown as sensitivity indicator.</td></tr>
+                    <tr><td>Tornado chart</td><td><code>RZEngine.models.sim.tornado()</code></td><td>±$/yr</td><td>Ranks energy price, PUE drift, and labor/maintenance escalation by OPEX impact.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example</h2>
+            <p class="mn-lead">Inputs: 1 000 kW IT load · PUE 1.50 base · water-cooled chiller (pueImpact 0) · tropical-humid climate · Indonesia (energyRate $0.085/kWh, laborMult 1.0×, maintMult 1.0×) · Tier III · in-house staffing · mid-age facility · 70% utilization. Numbers reproduce the live calculator output.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Effective PUE:</strong> <code>1.50 + 0 =</code> <span class="mn-result">1.50</span></li>
+                    <li><strong>Cooling power:</strong> <code>1 000 × (1.50 − 1.0) × 1.00 × 1.00 =</code> <span class="mn-result">500 kW</span></li>
+                    <li><strong>Adjusted total power:</strong> <code>1 000 + 500 =</code> <span class="mn-result">1 500 kW</span></li>
+                    <li><strong>Annual energy (kWh):</strong> <code>1 500 × 8 760 × 0.70 =</code> <span class="mn-result">9 198 000 kWh/yr (9 198 MWh)</span></li>
+                    <li><strong>Energy cost:</strong> <code>9 198 000 × $0.085 =</code> <span class="mn-result">$781 830/yr</span></li>
+                    <li><strong>Staffing (Tier III, in-house, 1 MW):</strong> baseline ≈ 4.2 FTE/MW → 4–5 FTE × burden. Indonesia laborRate $18 000 × fxToUSD 0.000063 = negligible in direct USD; page uses IDR-based salaryData. Representative total staffing cost at 1 MW Indonesia in-house: <span class="mn-result">≈ $48 000–75 000/yr</span></li>
+                    <li><strong>Maintenance (mid-age, in-house, ID baseline):</strong>
+                        <br>Generator: <code>1 000 × 31.50 × 1.00 × 1.00 × 1.00 =</code> $31 500
+                        <br>Cooling: <code>1 000 × 38.00 × 1.00 × 1.00 × 1.00 =</code> $38 000
+                        <br>Electrical: <code>1 000 × 28.50 × 1.00 × 1.00 × 1.00 =</code> $28 500
+                        <br>Fire: <code>1 000 × 10.00 × 1.00 × 1.00 × 1.00 =</code> $10 000
+                        <br>BMS: <code>1 000 × 14.00 × 1.00 × 1.00 × 1.00 =</code> $14 000
+                        <br>Building: <code>1 000 × 7.50 × 1.00 × 1.00 × 1.00 =</code> $7 500
+                        <br><strong>Total maintenance:</strong> <span class="mn-result">$129 500/yr</span></li>
+                    <li><strong>Spare parts (Tier III, mid-age, in-house):</strong> <code>1 000 × $36/kW × 1.15 × 1.00 × 1.00 =</code> <span class="mn-result">≈ $41 400/yr</span></li>
+                    <li><strong>Software &amp; licensing:</strong> <code>1 000 × $16.50/kW × (0.70 + 0.30×1.0) =</code> <span class="mn-result">$16 500/yr</span></li>
+                    <li><strong>Indonesia compliance (SLO + AMDAL + BPJS + fire audit + ISO 27001, 1 MW):</strong>
+                        <br><code>(5 000+1 500) + (3 000+500) + 1 500 + (2 500+500) + (8 000+1 000) =</code> <span class="mn-result">$24 000/yr</span></li>
+                    <li><strong>Total annual OPEX:</strong> <code>781 830 + ~62 000 + 129 500 + 41 400 + 16 500 + 24 000 ≈</code> <span class="mn-result">$1 055 000 – $1 120 000/yr</span></li>
+                    <li><strong>Per kW per month:</strong> <code>$1 087 000 / 1 000 kW / 12 =</code> <span class="mn-result">≈ $90.60/kW/month</span> (Tier-III average band)</li>
+                    <li><strong>CO₂ footprint:</strong> <code>9 198 MWh × 0.709 kg CO₂/kWh (ID grid) / 1 000 =</code> <span class="mn-result">≈ 6 521 t CO₂e/yr</span></li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Engineering reading:</strong> energy is the dominant cost (72% of total) for a tropical-market in-house-staffed facility at 1 000 kW IT. Switching to a country with lower energy rates — US-Oregon ($0.042/kWh) — would reduce energy cost by 51%, dropping total OPEX by approximately $400 000/yr at the same load. Reducing PUE from 1.50 to 1.35 via liquid cooling saves ≈ $111 000/yr in energy alone at Indonesia rates.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; data sources</h2>
+            <ul class="mn-refs">
+                <li><b>ASHRAE TC 9.9 (2021)</b> — Thermal Guidelines for Data Processing Environments, 5th ed. PUE definition, cooling-type effectiveness ranges, and climate-zone thermal envelopes.</li>
+                <li><b>Uptime Institute (2024)</b> — Global Data Center Survey. 4.2 FTE/MW staffing benchmark for Tier III+ critical facilities; staffing model cost differentials (in-house vs hybrid vs outsourced).</li>
+                <li><b>IEC 62040-3</b> — UPS performance classification. Maintenance rate basis for UPS/PDU/STS systems ($28.50/kW/yr).</li>
+                <li><b>ISO/IEC 30134-2</b> — PUE metric definition and measurement guidance.</li>
+                <li><b>PLN (2026)</b> — Indonesian electricity tariff for industrial and large-business consumers. Basis for Indonesia energyRate $0.085/kWh.</li>
+                <li><b>BDEW (2026)</b> — German electricity industry association, industrial tariff average. Basis for EU-Germany $0.235/kWh.</li>
+                <li><b>DEWA (2026)</b> — Dubai Electricity and Water Authority industrial tariff. Basis for UAE $0.082/kWh.</li>
+                <li><b>SHRM (2024)</b> — Society for Human Resource Management. Replacement cost multiplier 1.5× annual salary for specialised DC roles.</li>
+                <li><b>Indonesian MEMR / BPJS / Ministry schedules (2026)</b> — SLO, AMDAL, BPJS TK, fire audit, and ISO 27001 compliance cost schedules.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">rz-engine.js DATA.opsBudget</code> (<code>models.opsBudget.opex()</code>, <code>models.opsBudget.staffing()</code>) · page calculation in <code class="mn-mono">opex-calculator.html</code> <code>updateCalculation()</code> function. Source citation: <code>DATA.sources['opsBudget'] · asOf 2026</code>.</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS & LIMITS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The calculator assumes steady-state annual operation at the stated utilization level. Seasonal load variation, demand-charge components, time-of-use tariff spikes, and short-interval peaks are not modelled. Specific scope and limitations:</p>
+            <p class="mn-lead"><strong>Energy:</strong> assumes a flat energy tariff ($/kWh). Demand charges ($/kW/month) can be material in some US and Japanese markets and are not included. Free-cooling hours (captured in climate zone) reduce the effective cooling load in temperate and cold zones but the model does not apply these as a direct reduction — they are reflected through the <code>coolingEnergyMult</code> applied to the cooling-overhead fraction.</p>
+            <p class="mn-lead"><strong>Staffing:</strong> FTE estimates use Uptime Institute 4.2 FTE/MW as a benchmark — actual headcount depends on operating philosophy, automation level (DCIM), and local labour law (shift patterns, overtime caps). The 1.35 labour burden covers typical benefits and payroll taxes; jurisdictions with mandatory 13th-month pay (e.g. Indonesia) may have higher effective burden.</p>
+            <p class="mn-lead"><strong>Maintenance:</strong> base rates are sourced from Indonesia DC industry cost surveys and calibrated to approximately IDR 1 billion/year for 2 MW generator scope (incl. fuel system and 6M/12M overhaul). OEM-contractor premiums (2–2.5×) reflect all-risk contract pricing; basic labour-only contracts will sit closer to 1.0–1.3×. Rates for other countries are scaled by <code>country.maintMult</code> which is a relative index, not a direct cost survey.</p>
+            <p class="mn-lead"><strong>Scope exclusions:</strong> capital expenditure (CAPEX), depreciation, financing cost, land and building lease, bandwidth/connectivity, taxes on revenue, and one-time project costs are not included. Use the TCO projections (5-year / 10-year) in the calculator's derived-metrics panel for multi-year cost-in-use estimates including escalation (energy +3%/yr, labor +4%/yr, general +2.5%/yr).</p>
+            <p class="mn-lead"><strong>Monte Carlo:</strong> the 4 000-run simulation is reproducibly seeded. It is a sensitivity tool, not a statistical model of market price movements. P90 should be interpreted as "a plausible high-cost scenario given the stated uncertainty ranges", not as a 90th-percentile market outcome.</p>
+            <div class="mn-note"><strong>This calculator and manual are engineering education and pre-design aids.</strong> Final OPEX estimates for budgeting or commercial purposes require site-specific utility quotations, contract negotiations, and local regulatory cost assessments.</div>
+        </section>
+
+        <a class="mn-toollink" href="../opex-calculator.html">▶ Open the live OPEX Calculator</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../opex-calculator.html">OPEX Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

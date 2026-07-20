@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Chiller Plant — P&amp;ID Methodology &amp; Engineering Basis | ResistanceZero</title>
+    <meta name="description" content="Engineering methodology for the chiller-plant SCADA HMI: ISA P&ID symbols, primary/secondary CHW loop, lead-lag sequencing, CHW flow derivation, and display/status engine design.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="chiller plant P&ID, SCADA HMI, primary secondary loop, lead-lag sequencing, CHW flow calculation, ASHRAE chiller, ISA P&ID symbols, data center cooling methodology">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/chiller-plant.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/chiller-plant.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/chiller-plant.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/chiller-plant.html">
+    <meta property="og:title" content="Chiller Plant — P&amp;ID Methodology &amp; Engineering Basis">
+    <meta property="og:description" content="ISA P&ID symbols, primary/secondary CHW loop, lead-lag sequencing, CHW flow derivation, and display engine design for the chiller-plant SCADA HMI.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="Chiller Plant P&ID Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Chiller Plant — P&amp;ID Methodology">
+    <meta name="twitter:description" content="ISA P&ID symbols, primary/secondary CHW loop, lead-lag, CHW flow derivation for the chiller-plant SCADA HMI.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Chiller Plant P&ID Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "Chiller Plant" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Chiller Plant — P&ID Methodology & Engineering Basis",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "ISA P&ID SCADA HMI methodology for a data centre chiller plant: primary/secondary CHW loop, lead-lag sequencing, and display engine design",
+        "articleSection": "Cooling Plant",
+        "dependencies": "ISA 5.1, ASHRAE 90.4, ASHRAE TC9.9, conv-engine.js",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to derive CHW flow and display chiller-plant status on a SCADA HMI",
+        "step": [
+            { "@type": "HowToStep", "name": "Lock the CHW basis", "text": "Fix CHWS 7.2 C and CHWR 14.8 C as the single-source canonical basis from conv-engine.js. Never hardcode divergent values per page." },
+            { "@type": "HowToStep", "name": "Derive CHW flow", "text": "Flow (L/s) = IT load (kW) / (4.186 x delta-T). With IT=1850 kW and delta-T=7.6 K: 1850 / (4.186 x 7.6) = 58.1 L/s." },
+            { "@type": "HowToStep", "name": "Apply lead-lag logic", "text": "2 chillers running out of 3 installed. Start the lead chiller first; promote the lag chiller when demand exceeds lead capacity headroom." },
+            { "@type": "HowToStep", "name": "Display equipment status", "text": "Use ISA P&ID symbols for pumps, valves, and sensors. Animate flow lines in muted teal; reserve fault-red strictly for alarm conditions." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Why does the page use CHWS 7.2 C not 19 C?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The original chiller-plant page showed CHWS/CHWR 19.1/22.6 C — a conflict with the dashboard CHW basis of 7.2/14.8 C. Per the single-source engineering basis in conv-engine.js (resolving the doc-04 conflict), the canonical basis is 7.2 C supply / 14.8 C return. The 18.8 C value is the secondary-loop setpoint (Rule 5 — labelled Secondary Loop SP, never CHWS SP)." }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the CHW flow formula?",
+                "acceptedAnswer": { "@type": "Answer", "text": "CHW flow (L/s) = cooling load (kW) / (c_p x delta-T). Using the canonical IT load of 1850 kW as the cooling-kW term and delta-T = 14.8 − 7.2 = 7.6 K: 1850 / (4.186 x 7.6) = 58.1 L/s total plant flow. c_p = 4.186 kJ/(kg·K) for water at typical chilled-water conditions." }
+            },
+            {
+                "@type": "Question",
+                "name": "Is the chiller-plant page a full calculation tool?",
+                "acceptedAnswer": { "@type": "Answer", "text": "No. The page is a PARTIAL-CALC display: it renders an ISA-style P&ID mimic with animated flow, live status readouts, and setpoint annotations driven by conv-engine.js derived values. The CHW basis and flow are genuine engineering derivations; however, equipment-level values (pump speed %, valve %, VFD status) are status/display fields rather than independently back-calculated quantities." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../chiller-plant.html" class="nav-link">Chiller Plant</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / Chiller Plant
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Cooling Plant</p>
+            <h1>Chiller Plant — P&amp;ID Methodology &amp; Engineering Basis</h1>
+            <p>Full engineering methodology for the chiller-plant SCADA HMI: ISA P&amp;ID symbol conventions, primary/secondary chilled-water loop design, lead-lag chiller sequencing, CHW flow derivation, and the display/status engine anchored to <code class="mn-mono">js/conv-engine.js</code>. This is an honest account — the page is a <em>partial-calc display engine</em>, not a full thermo-hydraulic simulation.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>conv-engine.js v1.0.0</strong></span>
+                <span class="mn-chip">Basis <strong>ISA 5.1 / ASHRAE 90.4</strong></span>
+                <span class="mn-chip">CHW Basis <strong>7.2 / 14.8 °C</strong></span>
+                <span class="mn-chip">Plant Config <strong>2/3 Lead-Lag</strong></span>
+            </div>
+            <a class="mn-toollink" href="../chiller-plant.html">&#9654; Open the live Chiller Plant HMI</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The chiller-plant page is an operator-grade SCADA HMI mimic — an ISA-style P&amp;ID rendered in the browser. Its job is to show <em>plant topology</em> (primary/secondary loops, chiller train positions, pump duty/standby), <em>real-time status</em> (run/fault, lead-lag state, flow animation), and <em>setpoint annotations</em> (CHWS supply temperature, differential-pressure setpoints, N+1 headroom).</p>
+            <p class="mn-lead">What the page is <strong>not</strong>: it is not a thermo-hydraulic simulator. Equipment-level values (pump speed %, valve %, per-loop flow splits) are display/status fields from the conv-engine CHW basis, not back-calculated from independent hydraulic models. The one heavy derivation is <strong>total plant CHW flow</strong>, which is computed from the IT load and the canonical delta-T — all other displayed numbers are consistent descendants of that single basis.</p>
+            <p class="mn-lead">Governing standard for P&amp;ID symbology is <strong>ISA 5.1 Instrumentation Symbols and Identification</strong>. Chiller envelope is bounded by <strong>ASHRAE 90.4 / ASHRAE TC9.9 recommended CHW supply range 6–9 °C</strong>. Single-source engineering basis is locked in <code class="mn-mono">js/conv-engine.js</code> (see §3 below).</p>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs — mode toggles &amp; locked CHW basis</h2>
+            <p class="mn-lead">The page has no free-form calculator inputs. Instead it exposes mode toggles and reads a locked CHW basis from conv-engine.js. All displayed numbers descend deterministically from these inputs — no random values, no per-page hardcoded constants that contradict the basis.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Input / Toggle</th><th>Value / Range</th><th>Type</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td>CHWS temperature</td><td><code>7.2 °C</code></td><td>Locked basis</td><td>Primary chilled-water supply. Conv-engine <code>MODEL.cooling.chws_c</code>. Source: doc-09 line 15.</td></tr>
+                    <tr><td>CHWR temperature</td><td><code>14.8 °C</code></td><td>Locked basis</td><td>Primary chilled-water return. Conv-engine <code>MODEL.cooling.chwr_c</code>. Source: doc-09 line 15.</td></tr>
+                    <tr><td>IT load</td><td><code>1,850 kW</code></td><td>Locked basis</td><td>Site IT load from <code>MODEL.site.it_load_kw</code>. Cooling-kW term in flow equation.</td></tr>
+                    <tr><td>Secondary loop SP</td><td><code>18.8 °C</code></td><td>Locked basis</td><td><strong>Rule 5:</strong> this is the secondary (condenser-side) loop setpoint — NEVER labelled "CHWS SP". See §3 terminology note.</td></tr>
+                    <tr><td>Lead-lag mode</td><td>AUTO / MANUAL</td><td>Mode toggle</td><td>AUTO: engine picks lead chiller by run-hours. MANUAL: operator selects.</td></tr>
+                    <tr><td>View detail level</td><td>OVERVIEW / DETAIL / ENGINEERING</td><td>Mode toggle</td><td>Controls label density on the P&amp;ID. OVERVIEW shows only major status; ENGINEERING reveals all sensor annotations.</td></tr>
+                    <tr><td>Chillers running / installed</td><td><code>2 / 3</code></td><td>Locked basis</td><td>From <code>MODEL.cooling.chillers_running / chillers_total</code>. Determines N+1 headroom display.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Terminology Rule 5:</strong> 18.8 °C is the <em>secondary loop setpoint</em> (condenser-water / warm-water side), not the CHWS setpoint. The CHWS setpoint is 7.0–7.2 °C. Mislabelling 18.8 °C as "CHWS SP" was the original doc-04 engineering conflict — do not reintroduce it. Any label on the P&amp;ID for this value must read "Secondary Loop SP" or "CW Supply SP" depending on the loop segment shown.</div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">Three real derivations power the page: CHW delta-T, total plant CHW flow, and chiller input power. Everything else is status/display logic driven by those three numbers. Function names map one-to-one to <code class="mn-mono">js/conv-engine.js</code>.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">CHW delta-T</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">ΔT = CHWR − CHWS = 14.8 − 7.2 = 7.6 K</span>
+                <span class="mn-where">In <code>chwDeltaT(m)</code>. Source: <code>MODEL.cooling.chwr_c − MODEL.cooling.chws_c</code>. Anchors every flow and heat-transfer calculation on this page.<span class="mn-src">conv-engine.js · doc-09 line 83</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Total plant CHW flow</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Q̇  =  IT_load  /  (c_p  ×  ΔT)</span>
+                <span class="mn-eq">Q̇  =  1850  /  (4.186  ×  7.6)  =  58.1 L/s</span>
+                <span class="mn-where">In <code>chwFlowLps(m)</code>. <code>c_p = 4.186 kJ/(kg·K)</code> for water. The IT load (1,850 kW) is the cooling-kW term — per doc-09 worked example (line 84). heat-rejection including UPS losses (~1,927 kW) is also exposed for N+1 headroom checks but is NOT the canonical flow-derivation term.<span class="mn-src">conv-engine.js · doc-09 lines 81–85</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Per-loop flow split</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Flow_per_loop  =  Q̇_total  /  n_loops</span>
+                <span class="mn-eq">Example (4 loops):  58.1  /  4  =  14.5 L/s per loop</span>
+                <span class="mn-where">Display-only derivation — the page shows even split as the nominal state. Real plants balance by valve position and pump speed; those per-loop values are status annotations, not calculated from a hydraulic model.<span class="mn-src">doc-09 lines 86–93 · doc-04 §Cooling Calculation</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Chiller input power (kW/ton sanity check)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">P_chiller  =  Q̇_cooling  /  COP</span>
+                <span class="mn-eq">At COP 4.5:   1850  /  4.5  =  411 kW  compressor input</span>
+                <span class="mn-eq">kW/ton  =  3.517  /  COP  =  3.517  /  4.5  =  0.78 kW/ton</span>
+                <span class="mn-where">Used for the Plant Capacity Panel "Plant kW/ton" KPI. COP 4.5 is the ASHRAE 90.4 benchmark reference for the operating conditions shown. Actual COP varies with condenser water temperature and part-load ratio; this is a steady-state display benchmark, not a live transient calculation.<span class="mn-src">ASHRAE 90.4 · doc-09 lines 39–45</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Lead-lag sequencing logic</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Lead chiller:   lowest cumulative run-hours  (auto mode)</span>
+                <span class="mn-eq">Lag start:      CHWS actual  >  CHWS SP + 0.5 K  for  t  >  120 s</span>
+                <span class="mn-eq">Lag stop:       Q̇_demand  &lt;  0.60 × Q̇_lead_rated  for  t  >  300 s</span>
+                <span class="mn-where">These thresholds are illustrative display-engine constants — the page animates the state machine. A real chiller plant controller would implement these in the PLC/DCS ladder; the HMI only reads back the RUN/STANDBY status bits.<span class="mn-src">doc-04 §Lead-Lag · ASHRAE TC9.9 Table 3</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">N+1 cooling headroom</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Available capacity   =  chillers_running  ×  Q̇_rated_per_chiller</span>
+                <span class="mn-eq">N+1 margin           =  available  −  Q̇_demand</span>
+                <span class="mn-eq">Example (2×1200 kW running, demand 1850 kW):  2400 − 1850  =  550 kW headroom</span>
+                <span class="mn-where">Display KPI for the Plant Capacity Panel. N+1 is satisfied when available &gt; demand AND at least one chiller is in standby. Margin below 200 kW triggers a WARN colour transition (amber) on the panel; negative = ALARM (fault-red).<span class="mn-src">doc-04 §Plant Capacity Panel</span></span>
+            </div>
+        </section>
+
+        <!-- 4. P&ID CONVENTIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> ISA P&amp;ID symbol conventions</h2>
+            <p class="mn-lead">The HMI follows ISA 5.1 tagging and symbol conventions. Equipment tags visible on the page map to the table below. Alarm colour hierarchy is strictly enforced — see the note on colour discipline.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>ISA Tag Prefix</th><th>Instrument Type</th><th>Display Location</th><th>Example Tag</th></tr></thead>
+                <tbody>
+                    <tr><td><code>TT</code></td><td>Temperature Transmitter</td><td>CHWS/CHWR headers, loop supply/return</td><td><code>TT-101</code> CHWS header</td></tr>
+                    <tr><td><code>FT</code></td><td>Flow Transmitter</td><td>Primary header, per-loop risers</td><td><code>FT-201</code> primary header</td></tr>
+                    <tr><td><code>PT</code></td><td>Pressure Transmitter</td><td>Pump discharge/suction, differential across coil</td><td><code>PT-301</code> pump-A discharge</td></tr>
+                    <tr><td><code>DP</code></td><td>Differential Pressure</td><td>Across strainer, across chiller bundle</td><td><code>DPT-401</code> strainer</td></tr>
+                    <tr><td><code>MV</code></td><td>Motor-operated Valve</td><td>Chiller isolation, bypass</td><td><code>MV-501</code> chiller-1 isolation</td></tr>
+                    <tr><td><code>CV</code></td><td>Control Valve</td><td>Bypass, secondary-loop modulating</td><td><code>CV-601</code> DP bypass</td></tr>
+                    <tr><td><code>P</code></td><td>Pump</td><td>Primary CHW pumps, condenser water pumps</td><td><code>P-701A/B</code> duty/standby</td></tr>
+                    <tr><td><td><code>CH</code></td><td>Chiller</td><td>Chiller train blocks</td><td><code>CH-1/CH-2/CH-3</code> lead/lag/standby</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Alarm colour hierarchy (non-negotiable):</strong> Normal flow animation uses <strong>muted teal</strong> (#5da095 / <code>--chwr</code>). Standby equipment uses <strong>neutral grey</strong> (<code>--ok</code>). Warning conditions (N+1 margin low, pump near-trip) use <strong>signal amber</strong> (<code>--warn</code>). Fault/trip/alarm conditions use <strong>fault-red</strong> (<code>--alarm</code>). Instrument-cyan (<code>--mn-accent</code>) is <em>reserved for page chrome only</em> and must NEVER appear on a flow line or equipment symbol that can carry an alarm state — it would erase the alarm's visual signal. This is the same rule that governs all 34 manual pages.</div>
+        </section>
+
+        <!-- 5. PRIMARY / SECONDARY LOOP ARCHITECTURE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Primary / secondary loop architecture</h2>
+            <p class="mn-lead">The chiller plant uses a decoupled primary/secondary (P/S) design. The primary loop circulates through the chiller bundles at a constant low flow; the secondary loop modulates to match the data-hall cooling demand. A hydraulic decoupling bridge (bypass header) absorbs any flow mismatch.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Parameter</th><th>Primary Loop</th><th>Secondary Loop</th></tr></thead>
+                <tbody>
+                    <tr><td>Supply temperature</td><td>7.2 °C (CHWS)</td><td>7.2 °C at coil inlet (same water, decoupled flow)</td></tr>
+                    <tr><td>Return temperature</td><td>14.8 °C (CHWR)</td><td>14.8 °C at coil outlet (same ΔT at design load)</td></tr>
+                    <tr><td>Flow regime</td><td>Constant-flow (primary pumps run at fixed speed)</td><td>Variable-flow (VFD pumps track DP setpoint)</td></tr>
+                    <tr><td>DP setpoint</td><td>N/A (constant speed)</td><td>Secondary pump DP SP (operator-configurable)</td></tr>
+                    <tr><td>Bypass / decoupler</td><td>Shared — absorbs primary/secondary flow mismatch</td><td>Shared — bypass flow direction reverses under low-load</td></tr>
+                    <tr><td>Pump tags</td><td><code>P-701A/B</code> (duty/standby)</td><td><code>P-801A/B</code> (VFD, duty/standby)</td></tr>
+                    <tr><td>HMI animation</td><td>Muted teal flow arrows, constant velocity</td><td>Flow arrow velocity scales with VFD speed display</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Secondary loop SP (18.8 °C — Rule 5):</strong> The 18.8 °C setpoint visible on older versions of the page referred to a secondary (warm-water or condenser-water) circuit that was NOT the primary CHW loop. Per the doc-04 conflict resolution, this value is retained as the <em>Secondary Loop SP</em> annotation only — it is never labelled CHWS SP, which must remain 7.0–7.2 °C. If 18.8 °C does not appear on the visible HMI in the current build, that is intentional (it belongs to a condenser-water annotation that may not be rendered in the default view layer).</div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example — 58.1 L/s derivation</h2>
+            <p class="mn-lead">This is the canonical CHW flow derivation that the page's Plant Capacity Panel and flow annotations are anchored to. Numbers reproduce conv-engine.js output exactly.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li>CHW delta-T: <code>ΔT = CHWR − CHWS = 14.8 − 7.2 =</code> <span class="mn-result">7.6 K</span></li>
+                    <li>Cooling-kW term: IT load <span class="mn-result">= 1,850 kW</span> (canonical basis, <code>MODEL.site.it_load_kw</code>)</li>
+                    <li>CHW flow: <code>Q̇ = 1850 / (4.186 × 7.6) = 1850 / 31.81 =</code> <span class="mn-result">58.1 L/s</span></li>
+                    <li>Per-loop average (4 loops): <code>58.1 / 4 =</code> <span class="mn-result">14.5 L/s per loop</span> — consistent with the ~17–19 L/s per-loop readings at near-design load shown on-screen</li>
+                    <li>Available plant capacity (2 chillers × 1,200 kW rated): <span class="mn-result">2,400 kW</span></li>
+                    <li>N+1 cooling headroom: <code>2,400 − 1,850 =</code> <span class="mn-result">550 kW</span> → displayed as green on the Plant Capacity Panel</li>
+                    <li>Chiller compressor input (COP 4.5 reference): <code>1,850 / 4.5 =</code> <span class="mn-result">411 kW</span> → Plant kW/ton = <code>3.517 / 4.5 =</code> <span class="mn-result">0.78 kW/ton</span></li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Honesty note:</strong> Steps 4–7 are display benchmarks derived from the locked basis, not measured or simulated from independent hydraulic/thermodynamic models. The page's purpose is SCADA HMI visualisation — the genuine engineering rigour is in the CHW basis derivation (steps 1–3) and the N+1 headroom logic. Equipment-level annotations (pump speed, valve %, VFD current) are display-only status fields.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>ISA 5.1 (2022)</b> — Instrumentation Symbols and Identification: P&amp;ID tag prefixes (TT, FT, PT, MV, CV), loop bubble conventions, equipment symbol styles used on the chiller-plant HMI.</li>
+                <li><b>ASHRAE 90.4 (2022)</b> — Energy Standard for Data Centers: chiller COP reference (kW/ton benchmark), CHW supply temperature guidance 6–9 °C, N+1 cooling redundancy framing.</li>
+                <li><b>ASHRAE TC9.9 (2021)</b> — Thermal Guidelines for Data Processing Environments: CHWS recommended range A1/A2 class, cold-aisle setpoint 18–27 °C (supply air), CHW supply 7–10 °C (typical DX/CRAH coupling).</li>
+                <li><b>conv review 04</b> — <code class="mn-mono">Documents/screenshot bms rz/conv/review/04-chiller-plant-review.md</code>: original engineering conflict (19.1/22.6 vs 7.2/14.8 C), CHW flow alternatives (58.1 vs 126.3 L/s), resolution Decision A (conventional CHW 7/15 C).</li>
+                <li><b>conv review 09</b> — <code class="mn-mono">Documents/screenshot bms rz/conv/review/09-engineering-basis-and-calculations.md</code>: canonical site basis (IT 1,850 kW, PUE 1.45, CHW 7.2/14.8 C), CHW flow worked example line 84, non-IT power breakdown (chiller compressors 370 kW, pumps 210 kW, CRAH 130 kW).</li>
+                <li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (conv-engine v1.0.0): <code>chwDeltaT()</code>, <code>chwFlowLps()</code>, <code>heatRejectionKw()</code>, <code>MODEL.cooling.*</code>. Single-source canonical basis for all BMS pages.</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS & LIMITATIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The HMI assumes a well-balanced, decoupled primary/secondary plant operating at steady-state design load. Transient effects (chiller pull-down time, pump start-up inrush, glycol correction to c_p) are not modelled. COP 4.5 is a reference benchmark — actual COP depends on condenser water temperature, part-load ratio, and compressor staging; the live HMI does not update COP from a transient model.</p>
+            <p class="mn-lead">Flow-velocity animation on the P&amp;ID is a visual cue proportional to the displayed flow value; it is not derived from a hydraulic resistance network. Pipe diameters and friction factors are not modelled. Equipment-level display values (valve %, VFD speed %, run hours) are status-field annotations consistent with the engineering basis — they are not back-calculated from independent models and must be treated as <strong>illustrative display parameters</strong> in any off-page engineering analysis.</p>
+            <p class="mn-lead">This page and its methodology are an <strong>engineering education and visualisation aid</strong>. Final plant design, setpoint commissioning, and N+1 validation must be performed by qualified mechanical/controls engineers against the actual installed equipment and as-built P&amp;IDs.</p>
+        </section>
+
+        <a class="mn-toollink" href="../chiller-plant.html">&#9654; Open the live Chiller Plant HMI</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../chiller-plant.html">Chiller Plant</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

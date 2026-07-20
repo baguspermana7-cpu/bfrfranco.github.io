@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Critical Spares Engine — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full engineering methodology for the Critical Spares Engine: FMECA criticality, newsvendor fill-rate, METRIC/MEIO hub positioning, Poisson demand, Monte Carlo simulation, Kraljic sourcing strategy, and DMSMS last-time-buy economics for data-center M&amp;E equipment.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="critical spares methodology, FMECA criticality, newsvendor model, METRIC VARI-METRIC, MEIO two-echelon, Poisson spares demand, Kraljic matrix, DMSMS last-time-buy, spare parts optimization, data center M&amp;E spares">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/spares.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/spares.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/spares.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/spares.html">
+    <meta property="og:title" content="Critical Spares Engine — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="FMECA criticality, newsvendor fill-rate, METRIC/MEIO hub positioning, Poisson demand, Monte Carlo, Kraljic, and DMSMS last-time-buy methodology behind the Critical Spares Engine.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="Critical Spares Engine Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Critical Spares Engine — Technical Manual">
+    <meta name="twitter:description" content="FMECA criticality, newsvendor stock levels, METRIC/MEIO hub positioning, Poisson demand, Monte Carlo, Kraljic, and DMSMS last-time-buy methodology.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Critical Spares Engine Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "Critical Spares Engine" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Critical Spares Engine — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Critical spare parts optimisation methodology for data-center M&E equipment — FMECA, newsvendor, METRIC/MEIO, Poisson, Monte Carlo, Kraljic, DMSMS",
+        "articleSection": "Spares & Obsolescence",
+        "dependencies": "MIL-STD-1629A FMECA, Sherbrooke METRIC, Axsäter VARI-METRIC, Kraljic (1983), DMSMS SD-22",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to optimise critical spare parts for a data-center facility",
+        "step": [
+            { "@type": "HowToStep", "name": "Score FMECA criticality", "text": "Enter failure rate λ, installed base N, severity S, detectability D, and redundancy level to compute RPN = S_eff × D × (λ×10) and criticality tier (VITAL / ESSENTIAL / DESIRABLE)." },
+            { "@type": "HowToStep", "name": "Set optimal stock level", "text": "Input unit cost, understock cost Cu, carrying rate, lead time and its sigma, and fill-rate target. Engine computes critical ratio CR = Cu/(Cu+Co), then Q* via Φ⁻¹(CR) or Poisson CDF inversion for slow movers (μ_LT < 5)." },
+            { "@type": "HowToStep", "name": "Position stock across echelons", "text": "Apply METRIC/MEIO marginal analysis: iterate hub (s1) and site (s2) stock levels, adding each unit where marginal fill-rate gain per dollar is highest, until the fleet-readiness target is met." },
+            { "@type": "HowToStep", "name": "Run Monte-Carlo stress test", "text": "Simulate 10 000 scenarios with variable lead time, demand, and supplier reliability to produce P(stockout), P5/P50/P95 readiness distribution, and expected downtime cost." },
+            { "@type": "HowToStep", "name": "Compute last-time-buy economics", "text": "For DMSMS-flagged parts at End-of-Life, compare LTB quantity × unit cost against expected stockout exposure over remaining equipment life to determine the economic buy quantity." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is the FMECA criticality number Cm?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Cm = (S_eff/10) × (D/10) × λ × N, where S_eff is severity reduced by redundancy (N+1 → ×0.65, 2N → ×0.40), D is detectability (1–10), λ is annual failure rate, and N is installed base. Tier thresholds: VITAL Cm ≥ 0.5; ESSENTIAL 0.1–0.5; DESIRABLE < 0.1. Source: MIL-STD-1629A." }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the newsvendor critical ratio?",
+                "acceptedAnswer": { "@type": "Answer", "text": "CR = Cu / (Cu + Co), where Cu is the under-stock (stockout) cost per event and Co = carrying_rate × unit_cost × part_life_years is the over-stock cost over the part's service life. Q* is the smallest integer where P(X ≤ Q*) ≥ CR under Poisson(μ_LT) for slow movers (μ_LT < 5) or Normal for fast movers." }
+            },
+            {
+                "@type": "Question",
+                "name": "Why does the engine switch between Poisson and Normal distributions?",
+                "acceptedAnswer": { "@type": "Answer", "text": "M&E spare parts are typically slow movers (mean demand during lead time μ_LT < 5 units). At low μ_LT the Normal approximation distorts the left tail, so the engine uses exact Poisson CDF (partial sum up to k, normal-continuity-corrected only when λ > 200). For fast movers (μ_LT ≥ 5), Normal is a close match and computationally stable. The switchover threshold DATA.spares.poissonThresholdMuLt = 5." }
+            },
+            {
+                "@type": "Question",
+                "name": "What does the METRIC model add over a single-location newsvendor?",
+                "acceptedAnswer": { "@type": "Answer", "text": "METRIC (Sherbrooke 1968) is a two-echelon model that optimises stock across a regional hub and N sites jointly. It accounts for the depot's outstanding-orders queue: effective site lead time = base hub-to-site time + expected backorders at hub ÷ (N × λ). Marginal analysis then allocates each additional unit to the echelon where the fill-rate gain per dollar is greatest — producing a lower total investment than independent site-level stocking." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../spares-readiness-calculator.html" class="nav-link">Spares Calculator</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / Critical Spares Engine
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Spares &amp; Obsolescence</p>
+            <h1>Critical Spares Engine — Methodology &amp; Formulas</h1>
+            <p>Every input, equation, constant, output, and reference behind the Critical Spares Engine. Seven analytical modules — FMECA criticality, readiness gauge, newsvendor optimal stock, METRIC/MEIO two-echelon hub positioning, supplier risk index, DMSMS last-time-buy economics, and Kraljic sourcing strategy — are executed deterministically by <code class="mn-mono">RZEngine.models.spares</code> in <code class="mn-mono">rz-engine.js</code>. No random values except in the explicitly flagged Monte-Carlo block.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>RZEngine v2.5+ models.spares</strong></span>
+                <span class="mn-chip">Basis <strong>MIL-STD-1629A · Sherbrooke METRIC · Acklam Φ⁻¹</strong></span>
+                <span class="mn-chip">Modules <strong>8</strong></span>
+                <span class="mn-chip">Outputs <strong>20+</strong></span>
+            </div>
+            <a class="mn-toollink" href="../spares-readiness-calculator.html">▶ Open the live Critical Spares Engine</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">Data-center M&amp;E equipment failures cost tens of thousands of dollars per hour in downtime. The Critical Spares Engine answers five planning questions: <em>how critical is each spare part</em>, <em>how many should be held on site and at a regional hub</em>, <em>when and how many to buy before a part is discontinued</em>, <em>which supplier relationships carry the most supply risk</em>, and <em>what sourcing strategy is appropriate for each commodity</em>.</p>
+            <p class="mn-lead">The engine is grounded in four interlocking bodies of theory. <strong>FMECA</strong> (MIL-STD-1629A) provides the criticality framework — severity, detectability, and occurrence combine into a Risk Priority Number that tiers parts into VITAL / ESSENTIAL / DESIRABLE. <strong>Newsvendor theory</strong> (the critical-fractile model, Whitin 1955 / Porteus 1990) provides the cost-minimising stock level Q* balancing over-stock and under-stock costs. <strong>METRIC and MEIO</strong> (Sherbrooke 1968; Axsäter VARI-METRIC; Clark-Scarf 1960) extend this to multi-echelon hub-and-spoke networks where marginal analysis allocates stock across hub and sites jointly. <strong>DMSMS</strong> (Diminishing Manufacturing Sources and Material Shortages, SD-22) governs the last-time-buy and requalification decision when a part reaches end-of-life.</p>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">Inputs across the eight modules. The commodity selector auto-fills λ, installed base, severity, lead time, unit cost, and understock cost with realistic DC M&amp;E industry defaults; all fields are editable to actual fleet data.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field</th><th>Symbol</th><th>Unit</th><th>Default</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td>Annual failure rate <code>c1_lambda</code></td><td><code>λ</code></td><td>failures/yr</td><td>0.25</td><td>Expected failures per unit per year = 1 / MTBF_years. Typical DC M&amp;E range: 0.04–0.25.</td></tr>
+                    <tr><td>Installed base <code>c1_installed</code></td><td><code>N</code></td><td>units</td><td>4</td><td>Count of this equipment type at the site. Scales fleet failure rate and fleet demand.</td></tr>
+                    <tr><td>Severity <code>c1_severity</code></td><td><code>S</code></td><td>1–10</td><td>8</td><td>Consequence if failure reaches the operation. 1 = negligible; 9 = full site outage; 10 = safety. Per MIL-STD-1629A scale.</td></tr>
+                    <tr><td>Detectability <code>c1_detectability</code></td><td><code>D</code></td><td>1–10</td><td>6</td><td>Difficulty of detecting failure before outage. 1 = alarm-monitored; 10 = sudden no warning. Higher = harder to catch.</td></tr>
+                    <tr><td>Redundancy <code>c1_redundancy</code></td><td><code>r</code></td><td>enum</td><td>N+1</td><td>System redundancy: N / N+1 / 2N. Reduces effective severity by factors 1.0 / 0.65 / 0.40.</td></tr>
+                    <tr><td>Qualified alternates <code>c1_alternates</code></td><td><code>a</code></td><td>count</td><td>1</td><td>Number of approved substitute suppliers. Alternate factor = 1 / max(1, a); raises supply exposure when sole-sourced.</td></tr>
+                    <tr><td>Unit cost <code>s_unit_cost</code></td><td><code>C<sub>u</sub></code></td><td>USD</td><td>4 500</td><td>Procurement cost per spare unit (list price or contract rate).</td></tr>
+                    <tr><td>Understock cost <code>s_understk_cost</code></td><td><code>C<sub>u</sub></code></td><td>USD/event</td><td>85 000</td><td>Financial exposure per stockout event — downtime cost, emergency freight, expedite premium.</td></tr>
+                    <tr><td>Carrying cost rate <code>s_carry_rate</code></td><td><code>r<sub>c</sub></code></td><td>%/yr</td><td>25</td><td>Annual holding cost as fraction of unit value: capital (~10%), storage (~4%), insurance (~2%), obsolescence (~9%).</td></tr>
+                    <tr><td>Part life <code>s_part_life</code></td><td><code>L<sub>p</sub></code></td><td>yr</td><td>8</td><td>Expected service life of the spare before obsolescence or physical degradation. Sets Co time horizon.</td></tr>
+                    <tr><td>Annual demand mean <code>s_demand_mu</code></td><td><code>μ<sub>A</sub></code></td><td>units/yr</td><td>1.0</td><td>Mean demand per year across the fleet = λ × N. Sigma defaults to μ × 0.6.</td></tr>
+                    <tr><td>Lead time (mean) <code>s_lt_weeks</code></td><td><code>LT</code></td><td>weeks</td><td>16</td><td>Supplier replenishment lead time from PO to delivery.</td></tr>
+                    <tr><td>Lead time sigma <code>s_lt_sigma</code></td><td><code>σ<sub>LT</sub></code></td><td>weeks</td><td>4</td><td>Standard deviation of lead time — captures supplier variability and logistics uncertainty.</td></tr>
+                    <tr><td>Target fill rate <code>s_fill_rate</code></td><td><code>FR</code></td><td>%</td><td>99</td><td>Fraction of demand events fulfilled immediately from stock. Drives safety stock SS = z(FR) × σ_demand_during_LT.</td></tr>
+                    <tr><td>Hub inputs <code>h_*</code></td><td>—</td><td>various</td><td>see tool</td><td>Number of sites (4), part types (6), OEM lead time (20 wk), hub-to-site lead time (0.5 wk), budget ($200 K).</td></tr>
+                    <tr><td>DMSMS inputs <code>ltb_*</code></td><td>—</td><td>various</td><td>see tool</td><td>Years to EOL, annual demand, unit cost, holding rate, criticality, alternate qualification cost, requalification cost.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">Eight modules in sequence. Function anchors map to <code class="mn-mono">RZEngine.models.spares.*</code> in <code class="mn-mono">rz-engine.js</code> and to the matching <code class="mn-mono">calc*()</code> in <code class="mn-mono">spares-readiness-calculator.html</code>.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">M1 — FMECA Criticality &amp; RPN</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">S_eff = S × redFactor      (redFactor: N=1.00, N+1=0.65, 2N=0.40)</span>
+                <span class="mn-eq">Cm    = (S_eff/10) × (D/10) × λ × N</span>
+                <span class="mn-eq">RPN   = S_eff × D × min(10, λ×10)        [capped at 1000]</span>
+                <span class="mn-eq">Fleet failures/yr = λ × N</span>
+                <span class="mn-eq">Alternate factor  = 1 / max(1, a)</span>
+                <span class="mn-eq">Tier: VITAL Cm≥0.5 · ESSENTIAL 0.1≤Cm&lt;0.5 · DESIRABLE Cm&lt;0.1</span>
+                <span class="mn-where">In <code>calcCriticality()</code>. Cm is the MIL-STD-1629A criticality number normalised to an annual annualised basis. RPN is analogous to FMEA = Severity × Occurrence × Detection. <span class="mn-src">MIL-STD-1629A · STANDARD</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">M2 — Spare Readiness Gauge</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">PO confidence = 1.0 if (PO + commit + on-time) else 0.5 (unconfirmed) or 0.3 (late commit)</span>
+                <span class="mn-eq">Confirmed supply = on-hand + PO_qty × PO_confidence</span>
+                <span class="mn-eq">Readiness % = min(100, confirmed_supply / required × 100)</span>
+                <span class="mn-eq">Date slack (days) = need_date − commit_date</span>
+                <span class="mn-eq">Status: GREEN readiness≥100% and slack≥7d · YELLOW ≥80% · RED &lt;80% or commit late</span>
+                <span class="mn-where">In <code>calcReadiness()</code>. No engine kernel call — arithmetic on procurement data. <span class="mn-src">DC O&amp;M PRACTICE · PROPRIETARY</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">M3 — Newsvendor Optimal Stock (critical-fractile)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">L      = LT_weeks / 52                                (lead time in years)</span>
+                <span class="mn-eq">μ_LT   = μ_A × L                                      (mean demand during LT)</span>
+                <span class="mn-eq">σ_LT   = √( L·σ_A² + μ_A²·σ_LT_yr² )                (demand-during-LT sigma)</span>
+                <span class="mn-eq">Co     = r_c × C_unit × L_p                           (over-stock cost)</span>
+                <span class="mn-eq">CR     = C_u / (C_u + Co)                             (critical ratio)</span>
+                <span class="mn-eq">Q*     = min k : P(X≤k; Poisson(μ_LT)) ≥ CR          [if μ_LT &lt; 5]</span>
+                <span class="mn-eq">Q*     = max(0, ⌈μ_LT + Φ⁻¹(CR)·σ_LT⌉)              [if μ_LT ≥ 5]</span>
+                <span class="mn-eq">SS     = max(0, ⌈Φ⁻¹(FR) · σ_LT⌉)                  (safety stock for fill-rate)</span>
+                <span class="mn-eq">ROP    = ⌈μ_LT + SS⌉                                 (reorder point)</span>
+                <span class="mn-eq">Fill%  = P(X≤Q*; Poisson(μ_LT))  or  Φ((Q*−μ_LT)/σ_LT)</span>
+                <span class="mn-eq">Cost   = (Co/L_p)·max(0,Q*−μ_LT) + C_u·μ_A·(1−Fill%)</span>
+                <span class="mn-where">In <code>RZEngine.models.spares.newsvendor(input)</code>. Poisson mode auto-selected when μ_LT &lt; <code>DATA.spares.poissonThresholdMuLt</code> = 5. Φ⁻¹ via Acklam (2003): <code>RZEngine.models.spares.normInv(p)</code>. <span class="mn-src">Whitin 1955 / Porteus 1990 · ACKLAM 2003</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Poisson CDF kernel — slow-mover demand model</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">P(X≤k; λ) = Σ_{i=0}^{k} e^{−λ} · λ^i / i!         (exact partial sum)</span>
+                <span class="mn-eq">           ≈ Φ((k+0.5−λ)/√λ)                        (continuity-corrected Normal, only when λ&gt;200)</span>
+                <span class="mn-eq">P(X≥1 stockout) = 1 − P(X≤Q*; λ_LT)</span>
+                <span class="mn-where">In <code>RZEngine.models.spares.poissonCdf(k, lambda)</code>. Exact partial sum for λ≤200; normal-continuity approximation only beyond. M&amp;E spares are always well below λ=200. <span class="mn-src">ABRAMOWITZ &amp; STEGUN 26.4 · STANDARD</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Inverse Normal CDF (Acklam kernel)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Φ⁻¹(p) — Acklam (2003) rational approximation, three-region piecewise</span>
+                <span class="mn-eq">|relative error| &lt; 1.15×10⁻⁹  (vs Beasley-Springer-Moro 1977 |e|&lt;4.5×10⁻⁴)</span>
+                <span class="mn-eq">Used for: Q* in Normal mode, safety-stock z-score, MEIO fill targets</span>
+                <span class="mn-where">In <code>RZEngine.models.spares.normInv(p)</code>. Coefficients in <code>DATA.spares.acklamA/B/C/D</code>, threshold <code>DATA.spares.acklamPLow = 0.02425</code>. Also underpins alarm-management Poisson model. <span class="mn-src">DATA.sources['spares.acklam'] · ACKLAM 2003</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">M4 — METRIC / MEIO Two-Echelon Hub Positioning</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">λ_regional = N_sites × λ_site × LT_vendor_yr           (Poisson demand at regional hub)</span>
+                <span class="mn-eq">B(s, λ) = λ·(1−CDF(s−1,λ)) − s·(1−CDF(s,λ))          (expected backorders at hub stock s)</span>
+                <span class="mn-eq">eff_LT_site = LT_hub_to_site + B(s1, λ_reg) / (N_sites × λ_site)</span>
+                <span class="mn-eq">λ_site_eff = λ_site × eff_LT_site</span>
+                <span class="mn-eq">Fill_site(s1, s2) = P(X≤s2; Poisson(λ_site_eff))</span>
+                <span class="mn-eq">Marginal gain per $ = ΔFill / (unit_cost × holding_pct)</span>
+                <span class="mn-eq">Allocate next unit to echelon with higher marginal gain/$ until fill-target reached</span>
+                <span class="mn-where">In <code>calcMEIO()</code> and <code>calcHub()</code>. Implements the Sherbrooke (1968) METRIC insight: hub backorders increase effective site lead time, and marginal analysis allocates each unit optimally across echelons. <span class="mn-src">SHERBROOKE 1968 / AXSÄTER VARI-METRIC · ACADEMIC</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">M5 — Supplier Risk Index</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">SRI = Σ w_i × score_i   where scores are: OTIF (18%), single-source (16%), financial health (14%),</span>
+                <span class="mn-eq">      lead-time volatility (14%), geographic concentration (12%), capacity headroom (10%),</span>
+                <span class="mn-eq">      geopolitical risk (10%), contract status (6%)</span>
+                <span class="mn-eq">Tier: CRITICAL SRI≥7.0 · HIGH 5.5–7.0 · MEDIUM 3.5–5.5 · LOW &lt;3.5</span>
+                <span class="mn-where">In <code>calcSupplierRisk()</code>. OTIF (On-Time In-Full %) is inverted: score = (100 − OTIF%) / 10. Weights sum to 1.00. <span class="mn-src">SUPPLY-CHAIN PRACTICE · PROPRIETARY RUBRIC</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">M6 — DMSMS / Last-Time-Buy Economics</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">DMSMS score = f(criticality, years_to_EOL, alternates, requalification_cost)</span>
+                <span class="mn-eq">LTB economic qty = ⌈μ_A × remaining_life_yrs × (1 + buffer_pct)⌉</span>
+                <span class="mn-eq">LTB cost = LTB_qty × unit_cost</span>
+                <span class="mn-eq">Stockout exposure (no LTB) = μ_A × remaining_yrs × Cu × P(stockout per yr)</span>
+                <span class="mn-eq">Decision: BUY if LTB_cost &lt; stockout_exposure + requalification_cost</span>
+                <span class="mn-where">In <code>calcLTB()</code>. Buffer_pct = 15% default for consumption uncertainty. DMSMS tiers follow SD-22 exposure bands: Low / Medium / High / Critical. <span class="mn-src">DMSMS SD-22 · DOD STANDARD</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">M7 — Kraljic Sourcing Matrix</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">x-axis: Supply Risk score (1–10) = f(single_source, geo_conc, OTIF, geopolitical, qualified_suppliers)</span>
+                <span class="mn-eq">y-axis: Spend Impact score (1–10) = f(criticality, unit_cost, annual_spend)</span>
+                <span class="mn-eq">Quadrant: Strategic (high-risk, high-impact) → partnership + dual-source</span>
+                <span class="mn-eq">          Bottleneck (high-risk, low-impact) → secure supply, safety stock</span>
+                <span class="mn-eq">          Leverage (low-risk, high-impact) → competitive bidding</span>
+                <span class="mn-eq">          Non-critical (low-risk, low-impact) → simplify, consolidate</span>
+                <span class="mn-where">In <code>calcKraljic()</code>. Per Kraljic (1983) HBR "Purchasing Must Become Supply Management". <span class="mn-src">KRALJIC 1983 HBR · ACADEMIC</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">M8 — Monte-Carlo Stress Test</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">For each trial t = 1 … N_trials (10 000):</span>
+                <span class="mn-eq">  LT_t ~ Normal(LT_mean, σ_LT)     (or Triangular for asymmetric)</span>
+                <span class="mn-eq">  demand_t ~ Poisson(μ_A × LT_t/52)  for slow movers</span>
+                <span class="mn-eq">  supply_t = stock × supplier_reliability_t</span>
+                <span class="mn-eq">  stockout_t = demand_t &gt; supply_t</span>
+                <span class="mn-eq">P(stockout) = count(stockout_t) / N_trials</span>
+                <span class="mn-eq">P5 / P50 / P95 readiness from sorted readiness_t distribution</span>
+                <span class="mn-where">In <code>calcMonteCarlo()</code>. Uses Math.random() (browser CSPRNG) for trial sampling only — all deterministic modules are unaffected. Tornado chart ranks input variable contribution to P(stockout) variance. <span class="mn-src">MONTE-CARLO METHOD · STANDARD</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">All numerical constants live in the deep-frozen <code class="mn-mono">DATA</code> object with a <code>// source:</code> tag in <code class="mn-mono">rz-engine.js</code>. Key blocks:</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>DATA key</th><th>Value / Range</th><th>Meaning</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td><code>DATA.spares.poissonThresholdMuLt</code></td><td>5</td><td>μ_LT threshold below which Poisson CDF is used instead of Normal for Q*.</td><td>Statistical practice</td></tr>
+                    <tr><td><code>DATA.spares.acklamPLow</code></td><td>0.02425</td><td>Tail-region threshold for Acklam Φ⁻¹ rational approximation.</td><td>Acklam (2003)</td></tr>
+                    <tr><td><code>DATA.spares.acklamA/B/C/D</code></td><td>6+5+6+4 coefficients</td><td>Rational polynomial coefficients for three-region Φ⁻¹ approximation. |relative error| &lt; 1.15×10⁻⁹.</td><td>DATA.sources['spares.acklam']</td></tr>
+                    <tr><td>Redundancy severity factors</td><td>N=1.00, N+1=0.65, 2N=0.40</td><td>Multiplier applied to raw severity S to obtain S_eff. Reflects probability of second-failure exposure given N+1 or 2N architecture.</td><td>DC FMECA engineering practice</td></tr>
+                    <tr><td>VITAL threshold Cm</td><td>≥ 0.50</td><td>Criticality number above which stockout is unacceptable — STOCK + DUAL-SOURCE decision.</td><td>MIL-STD-1629A adapted</td></tr>
+                    <tr><td>ESSENTIAL threshold Cm</td><td>0.10 – 0.50</td><td>Criticality range requiring stock; single-source acceptable.</td><td>MIL-STD-1629A adapted</td></tr>
+                    <tr><td><code>DATA.sparesPricing.classes</code></td><td>8 classes</td><td>Unit list-price bands (low/mid/high, USD) for UPS 50 kW module, VRLA string, genset PM kit, genset top-overhaul, chiller compressor, CRAH EC fan kit, PDU MCCB breaker, air filter set.</td><td>DATA.sources['sparesPricing']</td></tr>
+                    <tr><td>DMSMS LTB buffer</td><td>15%</td><td>Consumption uncertainty buffer added to the deterministic LTB quantity. Conservative; adjust upward for higher demand variance parts.</td><td>SD-22 engineering practice</td></tr>
+                    <tr><td>Normal CDF coefficients</td><td>Abramowitz-Stegun 26.2.17</td><td>5-term rational polynomial for normCdf(x); |error| ≤ 7.5×10⁻⁸. Used for fill-rate achieved calculation in Normal mode.</td><td>Abramowitz &amp; Stegun (1964)</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-tablewrap" style="margin-top:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>Commodity</th><th>Typical λ (failures/yr)</th><th>Typical unit cost</th><th>Typical LT (weeks)</th><th>FMECA severity default</th></tr></thead>
+                <tbody>
+                    <tr><td>UPS 50 kW power module</td><td>0.20 – 0.30</td><td>$25 K – $60 K</td><td>12 – 20</td><td>9 (N config)</td></tr>
+                    <tr><td>UPS VRLA battery string</td><td>0.12 – 0.20</td><td>$8 K – $15 K</td><td>4 – 8</td><td>8</td></tr>
+                    <tr><td>Genset annual PM kit</td><td>1.00</td><td>$5 K – $15 K</td><td>2 – 4</td><td>5</td></tr>
+                    <tr><td>Genset top overhaul</td><td>0.10 – 0.15</td><td>$60 K – $150 K</td><td>16 – 24</td><td>9</td></tr>
+                    <tr><td>Chiller centrifugal compressor</td><td>0.10 – 0.20</td><td>$80 K – $250 K</td><td>20 – 32</td><td>9 (N config)</td></tr>
+                    <tr><td>CRAH EC/VFD fan retrofit kit</td><td>0.15 – 0.25</td><td>$8 K – $20 K</td><td>6 – 12</td><td>6</td></tr>
+                    <tr><td>PDU/MCCB breaker (DC-grade)</td><td>0.05 – 0.10</td><td>$1 K – $5 K</td><td>2 – 6</td><td>7</td></tr>
+                    <tr><td>CRAH G4 filter set</td><td>3.00 (annual change)</td><td>$1.5 K – $4 K</td><td>1 – 3</td><td>3</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <p class="mn-lead" style="margin-top:0.9rem;">Pricing bands sourced from: Schneider/APC Galaxy VS module class (public list), criticalpowerbatterysolutions.com VRLA TCO 2026, OnPoint/Secondwatt genset maintenance guides 2026, and industrial MCCB distributor ranges. All bands are SCREENING level — not quotation or contract prices. See <code>DATA.sources['sparesPricing']</code>.</p>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Symbol / Formula</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>Criticality tier</td><td>Cm threshold</td><td>VITAL / ESSENTIAL / DESIRABLE</td><td>Primary stocking decision: VITAL → STOCK + DUAL-SOURCE; ESSENTIAL → STOCK; DESIRABLE → don't stock.</td></tr>
+                    <tr><td>Risk Priority Number</td><td>RPN = S_eff × D × min(10, λ×10)</td><td>1 – 1000</td><td>FMECA composite risk score. &gt;100 indicates VITAL-tier stocking pressure.</td></tr>
+                    <tr><td>Fleet failures / yr</td><td>λ × N</td><td>events/yr</td><td>Expected annual failure events across the installed fleet — the demand signal for stock sizing.</td></tr>
+                    <tr><td>Readiness %</td><td>confirmed_supply / required × 100</td><td>%</td><td>Current coverage of the stated requirement. GREEN ≥ 100%; YELLOW 80–100%; RED &lt; 80%.</td></tr>
+                    <tr><td>Optimal stock Q*</td><td>Newsvendor critical-fractile</td><td>units</td><td>Cost-minimising stock level balancing Cu and Co over the part life.</td></tr>
+                    <tr><td>Safety stock SS</td><td>⌈Φ⁻¹(FR) × σ_LT⌉</td><td>units</td><td>Buffer above mean LT demand needed to achieve the fill-rate target FR.</td></tr>
+                    <tr><td>Reorder point ROP</td><td>⌈μ_LT + SS⌉</td><td>units</td><td>On-hand inventory level at which a replenishment order should be placed.</td></tr>
+                    <tr><td>Critical ratio CR</td><td>Cu / (Cu + Co)</td><td>0 – 1</td><td>Fractile of the demand distribution to stock against. CR &gt; 0.9 typically signals VITAL classification.</td></tr>
+                    <tr><td>Fill rate achieved</td><td>P(X ≤ Q*; Poisson(μ_LT))</td><td>%</td><td>Fraction of demand events met from stock at Q*. Compare to target FR.</td></tr>
+                    <tr><td>Annual cost at Q*</td><td>(Co/L_p)·excess + Cu·μ_A·(1−Fill%)</td><td>USD/yr</td><td>Total carrying + expected-stockout cost at the optimal stock level.</td></tr>
+                    <tr><td>P5 / P50 / P95 readiness</td><td>Monte-Carlo percentiles</td><td>%</td><td>Stochastic readiness distribution across 10 000 scenarios. P5 = worst-case 5th percentile.</td></tr>
+                    <tr><td>P(stockout)</td><td>MC fraction of trials with stockout</td><td>%</td><td>Target &lt; 5% for VITAL parts. Driven by lead-time jitter, demand variability, supplier reliability.</td></tr>
+                    <tr><td>Expected downtime cost</td><td>P(stockout) × Cu × μ_A × horizon_yrs</td><td>USD</td><td>Expected financial exposure from stockout events over the planning horizon.</td></tr>
+                    <tr><td>Hub s1 / Site s2 stock</td><td>MEIO marginal analysis</td><td>units</td><td>Optimal allocation of units across hub and sites to reach the fleet-readiness target at minimum cost.</td></tr>
+                    <tr><td>Fleet readiness</td><td>P(X ≤ s2; Poisson(λ_site_eff))</td><td>%</td><td>Fraction of fleet assets serviceable within MTTR given the current hub allocation.</td></tr>
+                    <tr><td>Supplier Risk Index (SRI)</td><td>Weighted 8-factor score</td><td>0 – 10</td><td>CRITICAL ≥ 7.0; HIGH 5.5–7.0; MEDIUM 3.5–5.5; LOW &lt; 3.5.</td></tr>
+                    <tr><td>DMSMS / EOL exposure</td><td>Qualitative DMSMS score</td><td>Low / Medium / High / Critical</td><td>Urgency of last-time-buy or requalification action.</td></tr>
+                    <tr><td>LTB economic qty</td><td>⌈μ_A × years_remaining × 1.15⌉</td><td>units</td><td>Economic last-time-buy quantity with 15% consumption uncertainty buffer.</td></tr>
+                    <tr><td>Sourcing quadrant</td><td>Kraljic 2×2</td><td>Strategic / Leverage / Bottleneck / Non-critical</td><td>Drives supplier relationship strategy and contracting approach.</td></tr>
+                    <tr><td>Days of cover</td><td>(Q* / μ_A) × 365</td><td>days</td><td>How long Q* stock lasts at the mean annual demand rate.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example — UPS 50 kW power module</h2>
+            <p class="mn-lead">A 4-unit installed fleet (N = 4), single-string N configuration, λ = 0.25 failures/unit/yr, severity 9/10 (site outage risk), detectability 7/10. Unit cost $40 000, understock cost Cu = $150 000/event, carrying rate 25%/yr, part life 8 yr, lead time 16 weeks ± 4 weeks. Target fill rate 99%. All numbers reproduced exactly by <code class="mn-mono">node -e</code> calling <code class="mn-mono">RZEngine.models.spares.newsvendor()</code> and <code class="mn-mono">poissonCdf()</code>.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Redundancy &amp; effective severity (N config):</strong> redFactor = 1.00 → <span class="mn-result">S_eff = 9.0/10</span></li>
+                    <li><strong>FMECA criticality:</strong> Cm = (9.0/10) × (7/10) × 0.25 × 4 = <span class="mn-result">0.630</span> → tier <span class="mn-result">VITAL</span> (Cm ≥ 0.50) → decision: STOCK + DUAL-SOURCE</li>
+                    <li><strong>RPN:</strong> occurrence_scaled = min(10, 0.25 × 10) = 2.5 → RPN = 9.0 × 7 × 2.5 = <span class="mn-result">158</span></li>
+                    <li><strong>Fleet failures/yr:</strong> 0.25 × 4 = <span class="mn-result">1.00 events/yr</span></li>
+                    <li><strong>Lead-time demand (μ_LT):</strong> μ_A = 1.0 /yr, L = 16/52 = 0.3077 yr → μ_LT = 1.0 × 0.3077 = <span class="mn-result">0.308</span> units → Poisson mode (μ_LT &lt; 5)</li>
+                    <li><strong>σ_LT:</strong> √(0.3077 × 0.6² + 1.0² × (4/52)²) = <span class="mn-result">0.342</span></li>
+                    <li><strong>Costs:</strong> Co = 0.25 × $40 000 × 8 = <span class="mn-result">$80 000</span> (overstock cost over part life)</li>
+                    <li><strong>Critical ratio:</strong> CR = $150 000 / ($150 000 + $80 000) = <span class="mn-result">0.6522</span></li>
+                    <li><strong>Q* via Poisson inversion:</strong> P(X≤0; 0.308) = e⁻⁰·³⁰⁸ = 0.7351 ≥ CR = 0.6522 → <span class="mn-result">Q* = 0 units</span> (current Q* = 0 is sufficient; add N+1 redundancy to push tier to ESSENTIAL)</li>
+                    <li><strong>Safety stock for 99% fill rate:</strong> Φ⁻¹(0.99) = 2.3263 → SS = ⌈2.3263 × 0.342⌉ = ⌈0.796⌉ = <span class="mn-result">1 unit</span></li>
+                    <li><strong>Reorder point:</strong> ROP = ⌈0.308 + 1⌉ = <span class="mn-result">2 units</span></li>
+                    <li><strong>Fill rate achieved at Q*=0:</strong> P(X≤0; 0.308) = <span class="mn-result">73.5%</span> → below 99% target; hold SS=1 to achieve 96.1%</li>
+                    <li><strong>Annual cost at Q*:</strong> (Co/8) × max(0, 0−0.308) + $150 000 × 1.0 × (1−0.735) = $0 + <span class="mn-result">$39 700/yr</span> expected stockout exposure</li>
+                    <li><strong>N+1 scenario check:</strong> With N+1 redundancy, S_eff = 9 × 0.65 = 5.85, Cm = (5.85/10)×(7/10)×0.25×4 = 0.410 → tier <span class="mn-result">ESSENTIAL</span>, RPN drops to 102</li>
+                    <li><strong>LTB economics (EOL in 5 yr):</strong> LTB qty = ⌈1.0 × 5 × 1.15⌉ = <span class="mn-result">6 units</span>, LTB cost = 6 × $40 000 = <span class="mn-result">$240 000</span> vs stockout exposure $39 700 × 5 = <span class="mn-result">$198 500</span> → LTB is marginal; compare against requalification cost to decide</li>
+                    <li><strong>Poisson CDF verification:</strong> poissonCdf(k=2, λ=1.3) = Σ_{i=0}^{2} e⁻¹·³ × 1.3^i/i! = <span class="mn-result">0.857112</span> (engine-verified)</li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Engineering reading:</strong> a single-string (N) UPS module fleet is VITAL by Cm even with one alternate supplier. Adding N+1 redundancy drops the tier to ESSENTIAL and reduces RPN from 158 to 102 — the redundancy investment also buys a materially lower spares program cost. The fill-rate target of 99% requires holding 1 unit of safety stock beyond Q* = 0, with ROP = 2 units as the replenishment trigger.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>MIL-STD-1629A</b> — Failure Mode, Effects and Criticality Analysis (FMECA). US Department of Defense, 1980. Defines severity, occurrence, detection scales and criticality number Cm. Adapted here for M&amp;E DC spares.</li>
+                <li><b>Sherbrooke (1968)</b> — "METRIC: A Multi-Echelon Technique for Recoverable Item Control." Operations Research, 16(1). Originating paper for the two-echelon hub-site Poisson model used in M4 MEIO.</li>
+                <li><b>Axsäter (1990)</b> — "Modelling Emergency Lateral Transshipments in Inventory Systems." Basis for VARI-METRIC and the backorder approximation B(s, λ) used for hub effective lead-time correction.</li>
+                <li><b>Clark &amp; Scarf (1960)</b> — "Optimal Policies for a Multi-Echelon Inventory Problem." Management Science, 6(4). Foundation of nested decomposition in multi-echelon inventory theory.</li>
+                <li><b>Whitin (1955)</b> — "Inventory Control and Price Theory." Management Science. Original critical-fractile newsvendor formulation.</li>
+                <li><b>Porteus (1990)</b> — "Stochastic Inventory Theory." In Handbooks in Operations Research and Management Science. Modern treatment of the newsvendor / critical-ratio model.</li>
+                <li><b>Kraljic (1983)</b> — "Purchasing Must Become Supply Management." Harvard Business Review, September–October. Sourcing matrix 2×2 quadrant framework implemented in M7.</li>
+                <li><b>DMSMS SD-22</b> — Diminishing Manufacturing Sources and Material Shortages: A Guidebook of Best Practices. Office of the Under Secretary of Defense, 2019. Governs the last-time-buy and requalification decision framework in M6.</li>
+                <li><b>Acklam (2003)</b> — "An Approximation to the Percentage Points of the Normal Distribution." Rational polynomial Φ⁻¹ approximation, |relative error| &lt; 1.15×10⁻⁹. Implemented as <code class="mn-mono">RZEngine.models.spares.normInv(p)</code>.</li>
+                <li><b>Abramowitz &amp; Stegun (1964)</b> — Handbook of Mathematical Functions. §26.2.17 rational approximation for Normal CDF used in <code class="mn-mono">RZEngine.models.spares.normCdf(x)</code>.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">rz-engine.js</code> (RZEngine v2.5+, <code>models.spares.*</code>) + <code class="mn-mono">spares-readiness-calculator.html</code> module logic.</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">Failure rates are assumed constant (exponential distribution, constant hazard rate) — the model does not directly represent bathtub-curve infant-mortality or wear-out phases; apply a correction factor for end-of-useful-life assets. Poisson demand assumes failures arrive independently; demand aggregation at the fleet level is appropriate for homogeneous fleets but may over-smooth mixed-age cohorts. Lead time is modelled as Normal — the Normal approximation is adequate for σ_LT / μ_LT &lt; 0.5; highly skewed lead times (e.g., long-tail supply disruptions) require scenario analysis via the Monte-Carlo module.</p>
+            <p class="mn-lead">The METRIC two-echelon model assumes a single hub serves all sites with identical lead times; lateral transshipments between sites are not modelled. Spare parts pricing bands in <code class="mn-mono">DATA.sparesPricing</code> are public SCREENING benchmarks only — they must be validated against your OEM or distributor contract schedule before use in capital-program budgets.</p>
+            <p class="mn-lead">DMSMS last-time-buy economics are deterministic; they do not model inventory carrying costs after the facility's useful life, nor the probability of alternative requalification success. This tool and manual are an <strong>engineering education and pre-design planning aid</strong>; all material procurement decisions must be validated against your facilities management programme, OEM contractual terms, and applicable statutory requirements.</p>
+        </section>
+
+        <a class="mn-toollink" href="../spares-readiness-calculator.html">▶ Open the live Critical Spares Engine</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../spares-readiness-calculator.html">Spares Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

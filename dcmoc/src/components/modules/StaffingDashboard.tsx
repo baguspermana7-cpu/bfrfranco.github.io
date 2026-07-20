@@ -516,7 +516,7 @@ export function StaffingDashboard() {
                                     {results.projections.map((y: any, i: number) => (
                                         <tr key={y.year}>
                                             <td className="py-2 font-mono text-cyan-600 dark:text-cyan-400">{y.year}</td>
-                                            <td className="py-2 text-slate-600 dark:text-slate-400">{y.headcount} FTEs</td>
+                                            <td className="py-2 text-slate-600 dark:text-slate-400">{y.totalHeadcount ?? y.headcount} FTEs</td>
                                             <td className="py-2 text-right font-bold text-slate-900 dark:text-white">{fmtMoney(y.totalAnnualCost)}</td>
                                             <td className="py-2 text-right text-slate-500">
                                                 {i === 0 ? '-' : `+${((y.totalAnnualCost / results.projections[i - 1].totalAnnualCost - 1) * 100).toFixed(1)}%`}

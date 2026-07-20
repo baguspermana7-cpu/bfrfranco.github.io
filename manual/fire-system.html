@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Fire Suppression System — Control Cockpit | Technical Manual | ResistanceZero</title>
+    <meta name="description" content="Technical methodology for the DC fire suppression system control cockpit: ISA-18.2 alarm state machine, VESDA staged cause-effect matrix, FM-200/N2 purge logic, NFPA 2001/72 basis, and protected-volume derivation.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="fire suppression cockpit, VESDA, FM-200, N2 purge, cause-effect matrix, alarm state machine, ISA-18.2, NFPA 2001, NFPA 72, data center fire safety, BMS dashboard methodology">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/fire-system.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/fire-system.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/fire-system.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/fire-system.html">
+    <meta property="og:title" content="Fire Suppression System — Control Cockpit | Technical Manual">
+    <meta property="og:description" content="ISA-18.2 alarm state machine, VESDA staged cause-effect matrix, FM-200/N2 purge discharge logic, and NFPA 2001/72 protected-volume derivation behind the fire-system cockpit.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="Fire Suppression System Control Cockpit Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Fire Suppression System — Control Cockpit | Technical Manual">
+    <meta name="twitter:description" content="ISA-18.2 alarm state machine, VESDA staged cause-effect matrix, FM-200/N2 purge logic and NFPA 2001/72 basis.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Fire Suppression System Control Cockpit Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "Fire System Cockpit" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Fire Suppression System — Control Cockpit | Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "ISA-18.2 alarm state machine and NFPA 2001/72 cause-effect methodology for the data-center fire-suppression control cockpit",
+        "articleSection": "Fire Safety",
+        "dependencies": "NFPA 2001, NFPA 72, ISA-18.2, ASHRAE 62.1",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How the fire-suppression alarm state machine progresses through 6 stages",
+        "step": [
+            { "@type": "HowToStep", "name": "Stage 0 — Normal", "text": "All systems quiescent. Jockey pump holds static pressure. FACP and VESDA under supervision." },
+            { "@type": "HowToStep", "name": "Stage 1 — VESDA Alert", "text": "Aspirating smoke detector raises alert. Operator investigation required; no output action." },
+            { "@type": "HowToStep", "name": "Stage 2 — VESDA Action / Smoke", "text": "Smoke detector confirms pre-alarm. First-stage sounder activated; pre-alarm sent to BMS." },
+            { "@type": "HowToStep", "name": "Stage 3 — Confirmed Fire", "text": "Cross-zone confirmation triggers AHU/CRAH shutdown, fire-damper close, and pre-action valve charge." },
+            { "@type": "HowToStep", "name": "Stage 4 — Suppression Armed", "text": "Release circuit armed. Countdown active. Manual abort station live. Fire pumps set to AUTO-run on pressure drop." },
+            { "@type": "HowToStep", "name": "Stage 5 — Discharge / Lockout", "text": "Pre-action / inert-gas discharge within the 10-second limit. Post-discharge lockout held until manual reset." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is the alarm state machine used in this cockpit?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The cockpit uses the ISA-18.2 seven-state model: Normal, Unacknowledged (UNACK), Acknowledged (ACK), Returned-to-Normal-Unack (RTN), Shelved, Suppressed, and Out-of-Service (OOS). Red (alarm colour) is reserved exclusively for states where alarmActive = true — i.e. UNACK and ACK. All other states use their own colour. This colour discipline is enforced by RZAlarmState.resolveColor()." }
+            },
+            {
+                "@type": "Question",
+                "name": "How is the protected data-hall volume derived in the cockpit?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The cockpit binds to the conventional BMS basis engine (conv-engine.js / CONV_CALC.snapshot). Protected white-space volume is derived deterministically: HALL_VOL_M3 = round(racks × 1.2 m² footprint × 3.0 m clear height). At the 231-rack / 1.85 MW IT basis this evaluates to 831 m³. The 32 × 20 × 4.2 m (2688 m³) figure in the fire-calculator manual refers to the gross enclosure, not the cockpit's rack-footprint volume." }
+            },
+            {
+                "@type": "Question",
+                "name": "Why does the cockpit not use heavy math like the fire-calculator?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The control cockpit is a state-driven operational dashboard, not a sizing calculator. Agent quantity math (NFPA 2001 W = (V/s)·(C/(100-C))) lives in the fire-calculator (fire-calculator.html + js/fire-engine.js). The cockpit documents alarm progression, cause-effect actions, VESDA zone supervision, manual controls, and post-discharge lockout. The NFPA 2001 lookup table for FM-200 design concentration (5.1–5.5 kg/m³ at 7% Class-A) is referenced as an illustrative context, not recomputed." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../fire-system.html" class="nav-link">Fire System</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / Fire System Cockpit
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Fire Control</p>
+            <h1>Fire Suppression System — Control Cockpit</h1>
+            <p>Methodology behind the operational fire-system cockpit: ISA-18.2 alarm state machine, VESDA staged cause-effect matrix, FM-200 pre-action and N2 purge discharge logic, manual controls, and the engineering basis linking protected volume to the conventional BMS engine. This cockpit is state-driven — the dominant logic is a discrete event machine, not a mass-equation calculator.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Alarm engine <strong>RZAlarmState v1.43.4</strong></span>
+                <span class="mn-chip">Basis <strong>ISA-18.2 / NFPA 2001 / NFPA 72</strong></span>
+                <span class="mn-chip">Stages <strong>6 (0–5)</strong></span>
+                <span class="mn-chip">VESDA zones <strong>8 (4 halls × 2)</strong></span>
+            </div>
+            <a class="mn-toollink" href="../fire-system.html">&#9654; Open the live Fire System Cockpit</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; scope</h2>
+            <p class="mn-lead">The fire-system cockpit (<code class="mn-mono">fire-system.html</code>) is an operational BMS dashboard for monitoring and simulating the data-centre fire-suppression system: pre-action sprinkler zones, FM-200 / inert-gas clean-agent cylinders, and the N2 purge system. It documents alarm progression, cause-effect interlocks, and manual override controls — it is <em>not</em> a sizing calculator. Agent-quantity math lives in the separate <a href="../fire-calculator.html" class="mn-inline">fire-calculator.html</a> (documented in <a href="fire.html" class="mn-inline">manual/fire.html</a>).</p>
+            <p class="mn-lead">The cockpit serves four operational questions: <em>what is the current alarm stage</em>, <em>which cause-effect actions have been triggered</em>, <em>are the manual abort / bypass / simulation controls in a safe state</em>, and <em>does the locked protected-volume basis match the rest of the DC suite</em>. All state is deterministic — no <code class="mn-mono">Math.random()</code>, no back-solved constants.</p>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs — controls &amp; locked basis</h2>
+            <p class="mn-lead">The cockpit has three input categories: manual operator controls (abort / bypass / simulation), the locked engineering basis inherited from <code class="mn-mono">conv-engine.js</code>, and the read-only alarm-state inputs driven by the cause-effect rule machine.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Manual operator controls</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Control</th><th>Type</th><th>Effect</th><th>Interlock</th></tr></thead>
+                <tbody>
+                    <tr><td>Manual Abort</td><td>Pushbutton / software</td><td>Halts the countdown timer at Stage 4; returns to Stage 3 (Confirmed, not yet armed). Does NOT reset detection.</td><td>Active only when <code>state.stage === 4</code> (Armed). Disabled at all other stages.</td></tr>
+                    <tr><td>Bypass (zone)</td><td>Toggle per zone</td><td>Inhibits a VESDA or detector zone from advancing the state machine. Zone shows ISA-18.2 <code>suppressed</code> state.</td><td>Requires conscious ARM + confirmation step in simulation mode to prevent accidental zone lockout.</td></tr>
+                    <tr><td>Simulation Arm</td><td>Toggle</td><td>Arms the simulation so staged fire scenarios can advance stages 0→5. Cockpit is in DEMO mode only — not wired to a real FACP.</td><td>Simulation badge is displayed prominently (amber dashed border) per <code>doc-05 §1</code>; advancing stages is blocked unless ARM is active.</td></tr>
+                    <tr><td>Stage advance</td><td>Simulation only</td><td>Manually advances the alarm state machine one stage at a time (used for training/demo). Each stage triggers the full cause-effect output for that stage.</td><td>Blocked unless <code>state.armed === true</code>.</td></tr>
+                    <tr><td>Reset / Lockout release</td><td>Manual</td><td>Resets cockpit to Stage 0 Normal after a post-discharge lockout. In a real system this requires a physical key-reset at the FACP.</td><td>Only available at Stage 5 (Discharged / Lockout).</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Locked engineering basis (read-only)</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Parameter</th><th>Symbol</th><th>Value</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td>IT load</td><td><code>IT_LOAD_KW</code></td><td>1 850 kW (1.85 MW)</td><td><code>CONV_CALC.snapshot.site.it_load_kw</code> — conventional BMS basis engine</td></tr>
+                    <tr><td>Rack count (8 kW/rack)</td><td><code>RACKS</code></td><td>231</td><td><code>CONV_CALC.snapshot.racks.at_8kw</code></td></tr>
+                    <tr><td>Protected hall volume</td><td><code>HALL_VOL_M3</code></td><td>831 m³ (rack-footprint basis)</td><td>Derived: <code>round(231 × 1.2 m² × 3.0 m)</code></td></tr>
+                    <tr><td>Pre-action zones</td><td><code>ZONE_COUNT</code></td><td>5 (PACV-01 .. 05)</td><td>Fixed — data-hall layout</td></tr>
+                    <tr><td>VESDA zones</td><td>—</td><td>8 (4 halls × 2 circuits each)</td><td>Site design — coverage per NFPA 72</td></tr>
+                    <tr><td>Fire reserve tank</td><td><code>TANK_CAP_M3</code></td><td>114 m³</td><td>Civil — fixed capacity</td></tr>
+                    <tr><td>Pump demand</td><td><code>PUMP_DEMAND_LPM</code></td><td>2 500 L/min</td><td>Hydraulic design basis</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Note on protected volume:</strong> the cockpit derives <code>HALL_VOL_M3 = 831 m³</code> from the rack footprint basis (CONV_CALC snapshot). The fire-calculator manual cites <strong>2 688 m³</strong> (32 × 20 × 4.2 m) — that is the gross enclosure volume used for agent-mass sizing. The two figures are used for different purposes and are both correct within their domain. The cockpit does not recompute agent mass; it inherits the pre-action zone count and volume context from the BMS basis.</div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Alarm state machine methodology</h2>
+            <p class="mn-lead">The cockpit's dominant logic is the ISA-18.2 seven-state alarm model, implemented in <code class="mn-mono">js/rz-alarm-state.js</code> (RZAlarmState v1.43.4). The module provides state definitions, severity tiers, a colour-discipline arbiter, and an equipment-state mapper — all without DOM mutation at load time.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">ISA-18.2 alarm states</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">STATES = { normal, unack, ack, rtn_unack, shelved, suppressed, oos }</span>
+                <span class="mn-eq">alarmActive = true  ONLY for: unack, ack</span>
+                <span class="mn-eq">resolveColor(alarmState, domainColor):</span>
+                <span class="mn-eq">  if (alarmActive || state.color &amp;&amp; state !== 'normal') → return state.color</span>
+                <span class="mn-eq">  else → return domainColor  (domain colour only when NORMAL)</span>
+                <span class="mn-where">In <code>RZAlarmState.resolveColor()</code>. Colour discipline: status wins over domain. Red is permitted ONLY when <code>alarmActive === true</code> (unack or ack). All other states use their own non-red colour.<span class="mn-src">ISA-18.2 · STANDARD</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Severity tiers</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Tier</th><th>Rank</th><th>Colour</th><th>Trigger examples</th></tr></thead>
+                <tbody>
+                    <tr><td>Critical</td><td>4</td><td><code>#ef4444</code> (fault-red)</td><td>Active discharge, fire pump trip, pressure below low-low alarm</td></tr>
+                    <tr><td>High</td><td>3</td><td><code>#f97316</code> (orange)</td><td>Pressure below low alarm, VESDA action, confirmed cross-zone fire</td></tr>
+                    <tr><td>Medium</td><td>2</td><td><code>#f59e0b</code> (amber)</td><td>VESDA alert, pre-action armed, jockey pump run</td></tr>
+                    <tr><td>Low</td><td>1</td><td><code>#eab308</code> (yellow)</td><td>Standby / OOS / bypass / suppressed states, tank below 80%</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Equipment-state to alarm-state mapping</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">deriveFromEquipment(equipState):</span>
+                <span class="mn-eq">  fault | tripped  → { alarm: 'unack',     severity: 'critical' }</span>
+                <span class="mn-eq">  isolated        → { alarm: 'oos',       severity: 'low'      }</span>
+                <span class="mn-eq">  maintenance     → { alarm: 'oos',       severity: 'low'      }</span>
+                <span class="mn-eq">  standby         → { alarm: 'normal',    severity: 'low'      }</span>
+                <span class="mn-eq">  de-energized    → { alarm: 'suppressed',severity: 'low'      }</span>
+                <span class="mn-eq">  simulated       → { alarm: 'normal',    severity: 'low'      }</span>
+                <span class="mn-eq">  energized       → { alarm: 'normal',    severity: 'low'      }</span>
+                <span class="mn-where">In <code>RZAlarmState.deriveFromEquipment()</code>. Maps RZLineModel / RZBreakerSymbols <code>data-state</code> into the inspector Alarms tab. Only fault/tripped produces <code>alarmActive = true</code> and thus the red colour channel.<span class="mn-src">ISA-18.2 · STANDARD</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CAUSE-EFFECT MATRIX -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Cause-effect matrix &amp; staged discharge</h2>
+            <p class="mn-lead">The cockpit implements a 6-stage cause-effect rule machine (<code class="mn-mono">var CE[0..5]</code>) that advances linearly on alarm confirmation. Each stage triggers a deterministic set of outputs — no probabilistic branching. Stage 5 discharge must complete within the NFPA 2001 10-second limit for halocarbons (FM-200). The N2 purge for pre-action valve supervision operates as a continuous standby function, not a timed discharge event.</p>
+
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Stage</th><th>Name</th><th>Colour</th><th>Cause-effect outputs</th></tr></thead>
+                <tbody>
+                    <tr><td><code>0</code></td><td>Normal</td><td>Green (is-normal)</td><td>All quiescent. Jockey pump holds 12.5 bar static. FACP and VESDA under continuous supervision. Pre-action valves closed. N2 supply at 2.4 bar standby pressure.</td></tr>
+                    <tr><td><code>1</code></td><td>VESDA Alert</td><td>Amber (is-active)</td><td>Aspirating smoke concentration above alert threshold. Warning only — no output action. Operator notified for physical investigation.</td></tr>
+                    <tr><td><code>2</code></td><td>VESDA Action / Smoke Detector</td><td>Amber (is-active)</td><td>First-stage sounder activated. Pre-alarm sent to BMS and building management. Operator acknowledge required. Still no suppression output.</td></tr>
+                    <tr><td><code>3</code></td><td>Confirmed Fire (cross-zone)</td><td>Red (is-active)</td><td>Two independent detection zones confirmed (cross-zone logic). AHU / CRAH units commanded off. Fire dampers commanded closed. Pre-action valve charge initiated. Smoke-control mode engaged per ASHRAE 62.1.</td></tr>
+                    <tr><td><code>4</code></td><td>Suppression Armed</td><td>Amber (is-armed)</td><td>Release circuit armed. Countdown timer active (configurable delay, typically 30–60 s). Manual abort station live. Fire pumps transition to AUTO-run on pressure drop below 10.5 bar (FP-01) / 9.5 bar (FP-02). This is the last safe window for manual abort.</td></tr>
+                    <tr><td><code>5</code></td><td>Discharge / Post-Discharge Lockout</td><td>Red (is-active)</td><td>Pre-action solenoid valves open. FM-200 cylinders (or inert-gas bank) discharge to protected zone. Discharge must complete within ≤10 s (halocarbon, NFPA 2001). Hold time ≥10 min. Post-discharge lockout is maintained until a qualified technician performs manual key-reset at the FACP.</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">N2 purge — pre-action supervision</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">N2 supply: N2-GEN-01 → distribution header @ 2.4 bar (standby)</span>
+                <span class="mn-eq">N2 zone branches: PV-N2-MANIFOLD → PACV-01..05 (one per pre-action zone)</span>
+                <span class="mn-eq">Purpose: maintain dry-pipe pressure in pre-action piping; supervise pipe integrity</span>
+                <span class="mn-eq">Discharge trigger: Stage 3 confirmed → solenoid PACV-xx opens → N2 charges water column</span>
+                <span class="mn-where">N2-GEN-01 is tagged <code>data-state="standby"</code> (ISA-18.2 normal, not an alarm). Amber pipe colour in the SVG is DOMAIN colour for N2/inert-gas medium — not a status colour.<span class="mn-src">NFPA 13 / ASHRAE 62.1 · STANDARD</span></span>
+            </div>
+
+            <div class="mn-note"><strong>Alarm colour discipline:</strong> in the cockpit, <strong>red (<code>#ef4444</code>) is reserved exclusively for active alarm / trip / fire / active discharge</strong> (stages 3 and 5, and any pipe in flow-fire animation). The N2 supply pipes are rendered in amber (<code>--n2-amber: #fbbf24</code>) because amber is the <em>domain colour</em> for inert-gas medium, not a fault indicator. Confusing domain colour with alarm colour is a known BMS anti-pattern per <code>doc-10 §Color</code> and <code>doc-27 §3.3</code> — this cockpit does not repeat it.</div>
+        </section>
+
+        <!-- 5. PRESSURE THRESHOLDS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Pressure thresholds &amp; pump start logic</h2>
+            <p class="mn-lead">The fire-pump ladder is driven by a set of deterministic pressure setpoints. The jockey pump maintains static pressure; progressive pressure drops trigger each successive pump start. All thresholds are displayed explicitly in the cockpit per <code>doc-05 §Pressure Thresholds</code>.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Setpoint</th><th>Value (bar)</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td><code>P_STATIC</code></td><td>12.5</td><td>Normal static system pressure maintained by jockey pump.</td></tr>
+                    <tr><td><code>P_JOCKEY_ON</code></td><td>11.5</td><td>Jockey pump start (minor leakage / test demand).</td></tr>
+                    <tr><td><code>P_JOCKEY_OFF</code></td><td>12.8</td><td>Jockey pump stop (normal pressure restored).</td></tr>
+                    <tr><td><code>P_FP1_ON</code></td><td>10.5</td><td>Main fire pump FP-01 (electric · 227 m³/h · 75 kW) auto-start.</td></tr>
+                    <tr><td><code>P_FP2_ON</code></td><td>9.5</td><td>Diesel standby pump FP-02 (227 m³/h) auto-start.</td></tr>
+                    <tr><td><code>P_LOW_ALM</code></td><td>8.5</td><td>Low pressure alarm — operator intervention required.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-formula">
+                <span class="mn-eq">Jockey pump state = (stage ≥ 3 AND press ≤ P_JOCKEY_ON) ? 'RUN' : 'AUTO'</span>
+                <span class="mn-eq">FP-01 state      = (stage ≥ 3 AND press ≤ P_FP1_ON)     ? 'RUN' : 'AUTO'</span>
+                <span class="mn-eq">FP-02 state      = (stage ≥ 4 AND press ≤ P_FP2_ON)     ? 'RUN' : 'AUTO'</span>
+                <span class="mn-where">FP-02 diesel only activates from Stage 4 (Armed) — it will not auto-start on a minor leakage demand that could be handled by FP-01.</span>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example — 2 688 m³ gross volume → FM-200 agent mass band</h2>
+            <p class="mn-lead">This example bridges the cockpit context (operational state machine) to the NFPA 2001 agent-quantity lookup. The cockpit does not execute this calculation — it is shown here as illustrative context linking the protected enclosure geometry to the sizing basis. Full calculation is in <a href="fire.html" class="mn-inline">manual/fire.html</a> and <code class="mn-mono">js/fire-engine.js</code>.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li>Gross enclosure: 32 m × 20 m × 4.2 m = <span class="mn-result">2 688 m³</span></li>
+                    <li>Agent: FM-200 (HFC-227ea). NFPA 2001 Class-A design concentration: <span class="mn-result">7.0%</span></li>
+                    <li>Specific vapour volume at 20 °C: <code>s = 0.1269 + 0.0005132·20 =</code> <span class="mn-result">0.13716 m³/kg</span></li>
+                    <li>Agent mass: <code>W = (2688 / 0.13716) · (7.0 / 93.0) =</code> <span class="mn-result">1 478 kg</span></li>
+                    <li>Intensity check: <code>1478 / 2688 =</code> <span class="mn-result">0.550 kg/m³</span> — within the NFPA 2001 design band of 5.1–5.5 kg/m³ per 100 m³ basis.</li>
+                    <li>Occupant safety: NOAEL 9.0% &gt; design 7.0% → <span class="mn-result">margin 2.0 pts ✓</span></li>
+                    <li>Discharge time limit (halocarbon): <span class="mn-result">≤ 10 s</span> — cockpit Stage 5 triggers the discharge sequence; the physical cylinder bank must meet this limit.</li>
+                    <li>Post-discharge hold time: <span class="mn-result">≥ 10 min</span> before ventilation re-entry. Cockpit shows lockout state until manual key-reset.</li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Honesty note:</strong> the cockpit's protected-volume parameter (<code>HALL_VOL_M3 = 831 m³</code> rack-footprint basis) and the gross enclosure sizing volume (2 688 m³) serve different purposes. The cockpit uses the rack-footprint figure to stay consistent with the conventional BMS suite. The gross-enclosure figure is the input to the agent-mass calculation. A real design would reconcile both with the AHJ and the FACP supplier.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>ISA-18.2</b> — Management of Alarm Systems for the Process Industries: seven-state alarm model (Normal, UNACK, ACK, RTN, Shelved, Suppressed, OOS), severity tiers, colour discipline (status wins over domain).</li>
+                <li><b>NFPA 2001 (2022)</b> — Clean Agent Fire Extinguishing Systems: FM-200 / Novec 1230 / IG-541 agent quantity equations, design concentrations, NOAEL, discharge time (≤10 s halocarbon), hold time (≥10 min).</li>
+                <li><b>NFPA 72</b> — National Fire Alarm &amp; Signaling Code: VESDA zone coverage, spot-detector spacing, FACP supervision, alarm notification.</li>
+                <li><b>NFPA 13</b> — Installation of Sprinkler Systems: pre-action system piping, N2 supervisory pressure, wet-pipe / dry-pipe differences.</li>
+                <li><b>ASHRAE 62.1</b> — Ventilation for Acceptable Indoor Air Quality: smoke-control mode on confirmed alarm (AHU/CRAH shutdown + fire-damper close).</li>
+                <li><b>Alarm engine source</b> — <code class="mn-mono">js/rz-alarm-state.js</code> (RZAlarmState v1.43.4): ISA-18.2 state model + resolveColor() + deriveFromEquipment() + audit().</li>
+                <li><b>Cockpit source</b> — <code class="mn-mono">fire-system.html</code> inline script (deterministic state machine, no PRNG) + <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC basis snapshot) + <code class="mn-mono">js/rz-line-model.js</code> (SVG pipe tagging) + <code class="mn-mono">js/rz-inspector.js</code> (click-through inspector).</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The cockpit is a <strong>demonstration and training tool only</strong> — it is not connected to a real FACP, real smoke detectors, or live suppression cylinders. Simulation mode requires explicit ARM before any stage can advance, and all staged scenarios are deterministic (no random alarm generation). Pressure values are simulated based on the stage rules, not measured from real transducers.</p>
+            <p class="mn-lead">Protected-volume derivation uses the rack-footprint approximation (<code>racks × 1.2 m² × 3.0 m</code>). This is appropriate for BMS-suite consistency but will diverge from a detailed room survey that accounts for raised-floor void, ceiling plenum, obstructions, and actual clear height. Final system design and AHJ approval must be performed by a qualified fire-protection engineer. The NFPA 2001 agent-mass worked example in §06 is an illustrative sizing estimate; it does not substitute for a sealed engineering calculation.</p>
+            <p class="mn-lead">The ISA-18.2 alarm-colour rule (red reserved for <code>alarmActive = true</code> states only) is strictly enforced in the cockpit UI. Operators trained on systems that use red for "anything abnormal" must note that amber and grey are the correct colours for shelved, suppressed, and OOS states in this implementation.</p>
+        </section>
+
+        <a class="mn-toollink" href="../fire-system.html">&#9654; Open the live Fire System Cockpit</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../fire-system.html">Fire System Cockpit</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

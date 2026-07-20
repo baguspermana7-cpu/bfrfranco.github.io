@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Water System &amp; WUE — Cockpit — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full engineering methodology for the Water System &amp; WUE cockpit: WUE formula, instant makeup-water flow, annual water consumption, blowdown, filtration ΔP, water-quality inputs, and standards references.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="WUE, water usage effectiveness, makeup water flow, cooling tower blowdown, TDS cycles of concentration, filtration pressure drop, ASHRAE 188, legionella, data center water management">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/water-system.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/water-system.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/water-system.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/water-system.html">
+    <meta property="og:title" content="Water System &amp; WUE — Cockpit — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="WUE formula, instant makeup-water flow, annual water consumption, blowdown, filtration ΔP threshold, and standards references behind the Water System cockpit.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="Water System &amp; WUE Cockpit Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Water System &amp; WUE — Cockpit — Technical Manual">
+    <meta name="twitter:description" content="WUE formula, makeup-water flow, annual water, blowdown, filtration ΔP, and standards behind the Water System cockpit.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Water System &amp; WUE Cockpit Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "Water System Cockpit" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Water System &amp; WUE — Cockpit — Technical Manual &amp; Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "WUE-based water management methodology for data-center cooling-tower and water-treatment systems",
+        "articleSection": "Water Management",
+        "dependencies": "ASHRAE 188, ISO 11731-2, Uptime Institute WUE metric, conv-engine.js",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to derive makeup-water flow and annual consumption from WUE",
+        "step": [
+            { "@type": "HowToStep", "name": "Fix the WUE basis", "text": "Establish the site WUE basis value in L/kWh (Rule 3: denominator is IT-energy, not facility-energy). Basis for this site: 1.20 L/kWh (sensor-read target, doc-09 line 13)." },
+            { "@type": "HowToStep", "name": "Compute instant makeup flow", "text": "Instant makeup flow (L/min) = (WUE × IT load kW) / 60. At 1850 kW: (1.20 × 1850) / 60 = 37.0 L/min." },
+            { "@type": "HowToStep", "name": "Compute annual water consumption", "text": "Annual water (L) = WUE × annual IT kWh = 1.20 × (1850 × 8760) ≈ 19,447,200 L ≈ 19.4 ML." },
+            { "@type": "HowToStep", "name": "Check blowdown and TDS cycles", "text": "Blowdown flow = makeup_flow × (1/cycles_of_concentration). Max cycles ≤ 5 per water-quality target. Monitor TDS; blow down when TDS approaches limit." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is WUE and what is its denominator?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Water Usage Effectiveness (WUE) = annual site water consumption (L) ÷ annual IT energy (kWh). The denominator is IT energy, NOT facility (total) energy — this is Rule 3 of the conv-engine accuracy standard. The basis for this site is 1.20 L/kWh (doc-09 line 13). It is a basis/target value; the live cockpit sensor-reads the flow meter and back-computes WUE in real time." }
+            },
+            {
+                "@type": "Question",
+                "name": "What is makeup water versus circulation water?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Makeup water is the net fresh water added to the cooling tower to replace evaporation, blowdown, and drift losses. It is what the WUE formula quantifies. Circulation water is the total recirculating flow through the tower basin and heat exchangers, which is orders of magnitude larger. The two must not be conflated — confusing them overstates consumption by ~20–50×." }
+            },
+            {
+                "@type": "Question",
+                "name": "Why is the filtration ΔP threshold 2.0 bar?",
+                "acceptedAnswer": { "@type": "Answer", "text": "2.0 bar differential pressure across the multimedia/sand filter is the standard backwash trigger per manufacturer data and site commissioning. Below this the filter is operating normally; at or above 2.0 bar the media is fouled and a backwash cycle must be initiated to restore flow capacity and avoid breakthrough of suspended solids." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../water-system.html" class="nav-link">Water System</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / Water System Cockpit
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Water &amp; WUE</p>
+            <h1>Water System &amp; WUE — Cockpit Methodology &amp; Formulas</h1>
+            <p>Every input, formula, constant, output, and reference behind the Water System &amp; WUE cockpit. All derived values originate from the deterministic engine <code class="mn-mono">js/conv-engine.js</code> (<code class="mn-mono">CONV_CALC.waterFlowLpmForWue</code>, <code class="mn-mono">wueFromFlowLpm</code>) anchored to the single-scenario basis in <code class="mn-mono">CONV_MODEL</code> — no back-solved constants, no random values. Real-time instrument reads (flow meter, conductivity probe, ΔP transducer) override the basis values when the cockpit is live.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>CONV_CALC v1.0.0</strong></span>
+                <span class="mn-chip">WUE Basis <strong>1.20 L/kWh IT</strong></span>
+                <span class="mn-chip">Inputs <strong>water-quality probe + valve controls</strong></span>
+                <span class="mn-chip">Source <strong>conv review 09</strong></span>
+            </div>
+            <a class="mn-toollink" href="../water-system.html">&#9654; Open the live Water System cockpit</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The cockpit monitors three interlocked water subsystems in a conventional data-centre facility: (1) <strong>cooling-tower makeup water</strong> — quantified by WUE; (2) <strong>water treatment</strong> — chemical dosing, TDS control, blowdown scheduling, and ASHRAE 188 / ISO 11731-2 Legionella management; and (3) <strong>filtration</strong> — multimedia pre-treatment with differential-pressure alarming at the 2.0 bar threshold. Its primary KPI, WUE, is derived from a single frozen scenario basis and then continuously refined by live sensor reads.</p>
+            <p class="mn-lead">Engineering basis: <strong>conv review document 09</strong> ("09-engineering-basis-and-calculations.md") lines 99–104 and 189–190, cross-referenced against the Uptime Institute WUE metric definition. The single-scenario IT load is <strong>1,850 kW</strong> (current) against a design capacity of 2,000 kW. Every water-volume number on every page of the Conventional BMS suite is derived from the same <code class="mn-mono">CONV_MODEL</code> object so the suite is internally consistent.</p>
+            <div class="mn-note"><strong>Rule 3 — WUE denominator:</strong> WUE = annual site water consumption (L) ÷ annual IT energy (kWh). The denominator is <em>IT energy only</em>, not facility (total) energy. Using facility energy (PUE × IT) deflates WUE by ~PUE (1.45×) and understates the cooling-system water intensity. This rule is accuracy-gate-enforced in <code class="mn-mono">CONV_CALC</code>.</div>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs — water-quality probe reads &amp; valve controls</h2>
+            <p class="mn-lead">The cockpit receives two classes of input: (a) basis constants from <code class="mn-mono">CONV_MODEL</code> (fixed scenario values) and (b) live sensor reads from water-quality probes and valve position feedback. The table below distinguishes them.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Input</th><th>Symbol</th><th>Unit</th><th>Type</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td>IT load <code>it_load_kw</code></td><td><code>P<sub>IT</sub></code></td><td>kW</td><td>Basis (1,850 kW)</td><td>Current IT power draw — single source of truth from CONV_MODEL. Live cockpit may read the EPMS meter; basis value is the scenario anchor.</td></tr>
+                    <tr><td>WUE basis <code>wue_l_per_kwh</code></td><td><code>WUE</code></td><td>L/kWh</td><td>Basis (1.20 L/kWh)</td><td>Site water-usage effectiveness. <em>Basis value</em> from doc-09 line 13. Live read: back-computed from measured flow meter ÷ IT load.</td></tr>
+                    <tr><td>Makeup flow <code>flow_lpm</code></td><td><code>Q<sub>mu</sub></code></td><td>L/min</td><td>Sensor-read (flow meter)</td><td>Instantaneous makeup water entering the cooling-tower basin. Sensor primary; basis derivation is the fallback.</td></tr>
+                    <tr><td>Conductivity / TDS <code>tds_ppm</code></td><td><code>TDS</code></td><td>ppm (mg/L)</td><td>Sensor-read (conductivity probe)</td><td>Total dissolved solids in tower basin water. Drives blowdown logic and cycles-of-concentration calculation.</td></tr>
+                    <tr><td>Feed-water TDS <code>tds_feed_ppm</code></td><td><code>TDS<sub>feed</sub></code></td><td>ppm</td><td>Sensor-read or lab sample</td><td>Mains / RO permeate TDS. Used in cycles-of-concentration formula.</td></tr>
+                    <tr><td>Filtration ΔP <code>delta_p_bar</code></td><td><code>ΔP</code></td><td>bar</td><td>Sensor-read (ΔP transducer)</td><td>Differential pressure across the multimedia/sand filter. Threshold 2.0 bar triggers backwash alarm.</td></tr>
+                    <tr><td>Valve states <code>valve_*</code></td><td>—</td><td>open / closed / %</td><td>Control feedback</td><td>Blowdown valve, makeup valve, bypass valve positions — logged for audit and interlock checks.</td></tr>
+                    <tr><td>Chemical dosing <code>dose_*</code></td><td>—</td><td>L/hr or kg/day</td><td>Controller feedback</td><td>Biocide, scale inhibitor, and corrosion inhibitor dosing rates — inputs to ASHRAE 188 Water Management Plan compliance log.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">All formulas below are implemented in <code class="mn-mono">js/conv-engine.js</code>. Function names are exact. The engine is ES5-safe, deterministic, and zero-build.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">WUE definition (Rule 3 — IT-energy denominator)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">WUE = Annual_water_L / Annual_IT_kWh        [L/kWh]</span>
+                <span class="mn-eq">WUE = (Q_mu_Lpm × 60) / P_IT_kW            (instant back-compute from live flow)</span>
+                <span class="mn-where">In <code>wueFromFlowLpm(m, flowLpm)</code>. Denominator = IT energy. Basis: 1.20 L/kWh (doc-09 line 13). This is a <em>basis/target</em> value; the sensor-read flow meter back-computes live WUE each scan.<span class="mn-src">conv review 09 · BASIS</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Instant makeup-water flow from WUE</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Q_mu = (WUE × P_IT) / 60        [L/min]</span>
+                <span class="mn-where">In <code>waterFlowLpmForWue(m)</code>. Converts the per-hour WUE rate to a per-minute flow for instrumentation display. Check: (1.20 × 1850) / 60 = <strong>37.0 L/min</strong>.<span class="mn-src">conv review 09 · DERIVED</span></span>
+            </div>
+            <div class="mn-note"><strong>Makeup vs circulation distinction:</strong> <code>Q_mu</code> (37.0 L/min at basis) is the <em>net fresh water added</em> to replace evaporation + blowdown + drift. The <em>circulation flow</em> through the tower deck and heat exchangers is typically 20–50× larger. The two must never be conflated — confusing them overstates WUE consumption by that factor.</div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Annual water consumption</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Annual_water_L = WUE × P_IT × 8760        [L/yr]</span>
+                <span class="mn-where">Assumes full-year operation at the scenario IT load. Check: 1.20 × 1850 × 8760 = <strong>19,447,200 L ≈ 19.4 ML/yr</strong>. Displayed on the cockpit's annual summary panel.<span class="mn-src">conv review 09 · DERIVED</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Cycles of concentration &amp; blowdown</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">CoC = TDS_basin / TDS_feed        (dimensionless, target ≤ 5)</span>
+                <span class="mn-eq">Q_bd = Q_mu / (CoC − 1)           [L/min]  (blowdown flow to maintain CoC)</span>
+                <span class="mn-eq">Q_evap = Q_mu − Q_bd − Q_drift    [L/min]  (evaporation, residual)</span>
+                <span class="mn-where">CoC ≤ 5 limits scale-forming ion concentration while minimising water waste. At CoC = 5 blowdown is 25% of makeup. Conductivity probe monitors TDS<sub>basin</sub>; the controller triggers the blowdown valve when TDS<sub>basin</sub> approaches TDS<sub>feed</sub> × CoC<sub>max</sub>. Drift is typically &lt;0.002% of circulation (eliminated by drift eliminators).<span class="mn-src">Uptime WUE · ASHRAE 188 · DERIVED</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Filtration differential pressure</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">ΔP_clean ≈ 0.3–0.5 bar           (new media, design point)</span>
+                <span class="mn-eq">ΔP_alarm = 2.0 bar                (backwash trigger threshold)</span>
+                <span class="mn-where">Measured by a ΔP transducer across the multimedia filter inlet/outlet. Rising ΔP indicates media fouling or biological growth. At 2.0 bar the head loss exceeds acceptable limits and a backwash cycle is automatically (or manually) initiated. Threshold is from site commissioning data — not a universal standard; confirm against installed filter manufacturer data sheet.<span class="mn-src">Site commissioning · INSTRUMENT</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Legionella / microbiological monitoring (ASHRAE 188)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">HPC ≤ 1×10³ CFU/mL                (operational target, ISO 11731-2)</span>
+                <span class="mn-eq">Legionella spp. &lt; 1 CFU/100 mL   (ASHRAE 188 action level)</span>
+                <span class="mn-where">Cooling towers are a Legionella growth environment (warm water, nutrients, aerosol). ASHRAE 188 Water Management Plan mandates documented control targets, sampling frequency, and corrective actions. Biocide dosing (oxidising + non-oxidising rotation) and blowdown together keep heterotrophic plate count (HPC) and Legionella below action levels.<span class="mn-src">ASHRAE 188 · ISO 11731-2 · STANDARD</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">Every constant lives in the deep-frozen <code class="mn-mono">CONV_MODEL</code> with a <code>// source:</code> comment citing the review document and line number. Water-relevant constants:</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Constant</th><th>Value</th><th>Unit</th><th>Source</th><th>Type</th></tr></thead>
+                <tbody>
+                    <tr><td><code>wue_l_per_kwh</code></td><td>1.20</td><td>L/kWh IT</td><td>doc-09 line 13; doc-01 §3</td><td>Basis (target)</td></tr>
+                    <tr><td><code>it_load_kw</code></td><td>1,850</td><td>kW</td><td>doc-09 line 10</td><td>Basis (current)</td></tr>
+                    <tr><td>Annual hours</td><td>8,760</td><td>hr/yr</td><td>Calendar constant</td><td>Fixed</td></tr>
+                    <tr><td>Max CoC</td><td>5</td><td>—</td><td>Water management practice; ASHRAE 188 guidance</td><td>Operational target</td></tr>
+                    <tr><td>Filtration ΔP alarm</td><td>2.0</td><td>bar</td><td>Site commissioning data sheet</td><td>Instrument threshold</td></tr>
+                    <tr><td>Legionella action level</td><td>&lt;1 CFU/100 mL</td><td>CFU/100 mL</td><td>ASHRAE 188</td><td>Regulatory threshold</td></tr>
+                    <tr><td>HPC operational target</td><td>≤1×10³ CFU/mL</td><td>CFU/mL</td><td>ISO 11731-2</td><td>Operational target</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Basis vs sensor-read:</strong> <code>wue_l_per_kwh = 1.20</code> is a <em>basis target</em> from the engineering review — it is what the system was designed to achieve. In live cockpit operation the flow meter provides actual <code>Q_mu</code>; the system back-computes <em>actual</em> WUE via <code>wueFromFlowLpm()</code>. When the two diverge (actual WUE &gt; 1.20), the delta surfaces as a water-efficiency alert. The basis chip on the KPI panel always labels which value is shown.</div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Formula</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>WUE (basis)</td><td><code>CONV_MODEL.environment.wue_l_per_kwh</code></td><td>L/kWh</td><td>Target value from engineering review. Green chip on cockpit.</td></tr>
+                    <tr><td>WUE (live)</td><td><code>wueFromFlowLpm(lpm)</code></td><td>L/kWh</td><td>Computed from measured flow meter. Alarm if &gt; basis.</td></tr>
+                    <tr><td>Instant makeup flow</td><td><code>waterFlowLpmForWue(m)</code></td><td>L/min</td><td>37.0 L/min at basis. Flow-meter primary.</td></tr>
+                    <tr><td>Annual water consumption</td><td><code>WUE × P_IT × 8760</code></td><td>L/yr (ML/yr)</td><td>≈ 19.4 ML/yr at basis. Summary panel.</td></tr>
+                    <tr><td>Cycles of concentration</td><td><code>TDS_basin / TDS_feed</code></td><td>—</td><td>Target ≤ 5. Amber alert at CoC &gt; 4.5, red at CoC &gt; 5.</td></tr>
+                    <tr><td>Blowdown flow</td><td><code>Q_mu / (CoC − 1)</code></td><td>L/min</td><td>Required blowdown to maintain target CoC.</td></tr>
+                    <tr><td>Filtration ΔP status</td><td>ΔP transducer reading</td><td>bar</td><td>Green &lt;1.5 bar, amber 1.5–2.0, red ≥ 2.0 (backwash required).</td></tr>
+                    <tr><td>Legionella / HPC status</td><td>Lab / online probe result</td><td>CFU/mL or CFU/100 mL</td><td>ASHRAE 188 action-level indicator.</td></tr>
+                    <tr><td>Chemical dosing status</td><td>Dosing controller feedback</td><td>L/hr / kg/day</td><td>On-duty/off indicator per biocide and inhibitor channel.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example</h2>
+            <p class="mn-lead">Scenario: basis IT load 1,850 kW, WUE 1.20 L/kWh, TDS<sub>feed</sub> = 150 ppm, TDS<sub>basin</sub> = 600 ppm (CoC = 4), filtration ΔP = 1.1 bar. All numbers reproduce <code class="mn-mono">CONV_CALC</code> output exactly.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li>Instant makeup flow: <code>Q_mu = (1.20 × 1850) / 60 =</code> <span class="mn-result">37.0 L/min</span> <span style="color:var(--mn-muted);font-size:0.8rem;">(basis; flow meter overrides in live mode)</span></li>
+                    <li>Annual water consumption: <code>1.20 × 1850 × 8760 =</code> <span class="mn-result">19,447,200 L ≈ 19.4 ML/yr</span></li>
+                    <li>Live WUE back-compute (if meter reads 38.5 L/min): <code>(38.5 × 60) / 1850 =</code> <span class="mn-result">1.249 L/kWh</span> → above basis 1.20, water-efficiency alert</li>
+                    <li>Cycles of concentration: <code>600 / 150 =</code> <span class="mn-result">CoC 4.0</span> (within ≤ 5 target ✓)</li>
+                    <li>Required blowdown to hold CoC = 4: <code>37.0 / (4 − 1) =</code> <span class="mn-result">12.3 L/min</span></li>
+                    <li>Filtration ΔP = 1.1 bar → <span class="mn-result">NORMAL</span> (threshold 2.0 bar, no backwash required)</li>
+                    <li>Annual water with blowdown included: evaporation = <code>37.0 − 12.3 − ~0.07 (drift) ≈</code> <span class="mn-result">24.6 L/min evaporated</span>; total input = <span class="mn-result">37.0 L/min makeup</span> (steady state)</li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Engineering reading:</strong> at CoC = 4 the blowdown is 33% of makeup (12.3 of 37.0 L/min). Raising CoC to 5 would drop blowdown to 25% (9.3 L/min), saving ~3 L/min — approximately 1.6 ML/yr in water savings, at the cost of tighter TDS monitoring. The tradeoff is governed by local water cost vs. chemical-treatment cost and scale-fouling risk.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>ASHRAE 188 (2021)</b> — Legionellosis: Risk Management for Building Water Systems. Mandates a Water Management Plan for cooling towers including control targets, sampling schedules, corrective actions, and record retention. The cockpit's biocide dosing and Legionella status indicators are ASHRAE 188 WMP deliverables.</li>
+                <li><b>ISO 11731-2</b> — Water quality — Detection and enumeration of Legionella — Part 2: Direct membrane filtration method for waters with low bacterial counts. HPC ≤ 1×10³ CFU/mL operational target cited from this standard.</li>
+                <li><b>Uptime Institute WUE Metric</b> — Water Usage Effectiveness white paper. Defines WUE = annual site water ÷ annual IT energy. Source of the IT-denominator Rule 3.</li>
+                <li><b>conv review 09</b> — "09-engineering-basis-and-calculations.md" lines 99–104, 189–190. Single-scenario basis for WUE 1.20 L/kWh, IT load 1,850 kW, and the water-flow contract of the Conventional BMS suite.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC v1.0.0) + frozen <code class="mn-mono">CONV_MODEL</code>. Functions: <code>waterFlowLpmForWue()</code>, <code>wueFromFlowLpm()</code>.</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The WUE basis (1.20 L/kWh) is a <strong>site target</strong> from the engineering review — it assumes steady-state operation at 1,850 kW IT load with the cooling tower operating at design cycles of concentration and no abnormal evaporative losses. Actual WUE varies with ambient wet-bulb temperature (higher in summer), partial-load operation, and tower maintenance state; the cockpit surfaces these deviations by continuously back-computing live WUE from the flow meter. The annual 19.4 ML figure assumes 8,760 hr/yr at the stated IT load — seasonality and planned downtime will reduce the actual total. Blowdown volume estimates use the steady-state CoC formula; transient startup, chemical slug dosing, and emergency drain events are metered separately. Filtration ΔP thresholds are from site commissioning data and must be re-validated after any media replacement or hydraulic modification. This manual is an <strong>engineering education and operational reference</strong>; a licensed water-treatment engineer and microbiologist must author the site's formal ASHRAE 188 Water Management Plan.</p>
+        </section>
+
+        <a class="mn-toollink" href="../water-system.html">&#9654; Open the live Water System &amp; WUE Cockpit</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../water-system.html">Water System</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

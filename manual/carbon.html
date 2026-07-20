@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Carbon Footprint Analyzer — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full engineering methodology for the data center Carbon Footprint Analyzer: GHG Protocol Scope 1/2/3 equations, LCA embodied carbon, material emission factors, grid intensity by region, offset strategies, and regulatory compliance (SEC, EU CBAM).">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="GHG Protocol, Scope 1, Scope 2, Scope 3, LCA, embodied carbon, carbon footprint data center, grid emission factor, carbon offset, SEC climate disclosure, EU CBAM, ISO 14064, carbon footprint methodology">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/carbon.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/carbon.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/carbon.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/carbon.html">
+    <meta property="og:title" content="Carbon Footprint Analyzer — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="GHG Protocol Scope 1/2/3 equations, LCA material emission factors, regional grid intensity, offset strategies, and regulatory compliance behind the DC Carbon Footprint Analyzer.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="Carbon Footprint Analyzer Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Carbon Footprint Analyzer — Technical Manual">
+    <meta name="twitter:description" content="GHG Protocol Scope 1/2/3 equations, LCA embodied carbon, grid factors, offsets, and regulatory compliance methodology.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Carbon Footprint Analyzer Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "Carbon Footprint Analyzer" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Carbon Footprint Analyzer — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "GHG Protocol Scope 1/2/3 carbon accounting and LCA methodology for data center facilities",
+        "articleSection": "Carbon & Sustainability",
+        "dependencies": "GHG Protocol Corporate Standard, ISO 14064-1, ISO 14044 (LCA), IEA 2026 grid intensity, EN 15978",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to calculate a data center carbon footprint (GHG Protocol Scope 1/2/3)",
+        "step": [
+            { "@type": "HowToStep", "name": "Enter IT load and PUE", "text": "Input IT power in kW and Power Usage Effectiveness to compute total facility energy consumption." },
+            { "@type": "HowToStep", "name": "Select country and grid intensity", "text": "Choose the host country; the engine loads the IEA/Ember 2026 grid emission factor (kgCO2e/kWh) automatically." },
+            { "@type": "HowToStep", "name": "Configure Scope 1 sources", "text": "Set generator fuel type, annual test hours, cooling refrigerant type, and annual leak rate to compute direct emissions." },
+            { "@type": "HowToStep", "name": "Set renewable energy coverage", "text": "Specify renewable percentage via on-site PV, BESS, or PPA/Green Tariff to derive market-based Scope 2." },
+            { "@type": "HowToStep", "name": "Run LCA embodied carbon", "text": "Switch to the Life-Cycle tab and enter building type, materials, IT equipment, battery chemistry, and end-of-life strategy to compute EN 15978 stages A1–D." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is the difference between Scope 2 location-based and market-based?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Location-based Scope 2 uses the national average grid emission factor regardless of energy procurement. Market-based Scope 2 reduces the factor in proportion to renewable energy certificates (RECs) or PPA coverage: effectiveGrid = gridIntensity × (1 − renewablePct/100). The calculator applies the market-based method when renewable coverage > 0%." }
+            },
+            {
+                "@type": "Question",
+                "name": "What material emission factors does the LCA use?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Concrete C30 = 150 kgCO2e/t, C40 = 250 kgCO2e/t, low-carbon GGBS blend = 100 kgCO2e/t. Structural steel: world-average (30% recycled) = 1850 kgCO2e/t, EAF (90%+ recycled) = 500 kgCO2e/t, BOF virgin = 2200 kgCO2e/t. Copper (primary) = 4100 kgCO2e/t. Aluminium (primary) = 10,000 kgCO2e/t. PVC cable = 2800 kgCO2e/t. Sources: ICE Database v4.1 and RICS/LETI DC embodied-carbon studies." }
+            },
+            {
+                "@type": "Question",
+                "name": "How does the tool apply regulatory compliance (SEC, EU CBAM)?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The compliance tab maps each emission scope to the relevant regulatory regime: US SEC Climate Disclosure Rule (final 2024) requires Scope 1+2 disclosure for large accelerated filers; EU CBAM (Carbon Border Adjustment Mechanism, 2026 full entry) prices embedded emissions at the EU ETS rate (~€85/tCO2e in 2025); Singapore National Carbon Tax (S$45/t from 2026) applies to Scope 1 direct emitters. The tool computes annual financial exposure under each regime using the total tCO2e from the relevant scopes." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../carbon-footprint.html" class="nav-link">Carbon Analyzer</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / Carbon Footprint Analyzer
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Carbon &amp; Sustainability</p>
+            <h1>Carbon Footprint Analyzer — Methodology &amp; Formulas</h1>
+            <p>Every input, equation, constant, output, and reference behind the Carbon Footprint Analyzer. All math covers GHG Protocol Scope 1/2/3 annual emissions and a full life-cycle assessment (EN 15978 stages A1–D), powered by the deterministic engine <code class="mn-mono">RZEngine.models.carbon</code> anchored to locked data in <code class="mn-mono">DATA.carbon</code> — no random values, no back-solved constants.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>RZEngine v2.5.x</strong></span>
+                <span class="mn-chip">Basis <strong>GHG Protocol Corporate Standard</strong></span>
+                <span class="mn-chip">LCA Basis <strong>ISO 14044 / EN 15978</strong></span>
+                <span class="mn-chip">Countries <strong>32</strong></span>
+                <span class="mn-chip">Tabs <strong>3 (Operational · LCA · Carbon Budget)</strong></span>
+            </div>
+            <a class="mn-toollink" href="../carbon-footprint.html">&#9654; Open the live Carbon Footprint Analyzer</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The Carbon Footprint Analyzer quantifies greenhouse-gas emissions from a data center across three boundary layers defined by the <strong>GHG Protocol Corporate Standard</strong>: direct emissions you own (Scope 1), electricity you purchase (Scope 2), and supply-chain and construction emissions you induce (Scope 3). It then extends those annual figures across the full cradle-to-grave facility lifetime via a life-cycle assessment aligned to <strong>EN 15978</strong> (Sustainability of construction works, calculation method for environmental performance of buildings, stages A1–D).</p>
+            <p class="mn-lead">A third tab allocates the resulting annual emissions against the host country's nationally-determined contribution (NDC) under the <strong>Paris Agreement</strong>, mapping the facility's share of the national carbon budget across sectors (AI training, inference, cloud, enterprise, government) and computing the gap to net-zero by the user's target year. This is a screening-grade planning model, not a certified corporate carbon disclosure.</p>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">Inputs span three operational groups (power, location, Scope 1 sources, renewables) plus a lifecycle group for the LCA tab and a budget-allocation group for the Carbon Budget tab.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.4rem;">Tab 1 — Operational</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field / ID</th><th>Symbol</th><th>Unit</th><th>Range / default</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td>IT Load <code>itLoad</code></td><td><code>P<sub>IT</sub></code></td><td>kW</td><td>50–100 000 · default 1 000</td><td>Rack-level IT power draw (servers + storage + network). Does not include cooling or power-distribution overhead.</td></tr>
+                    <tr><td>PUE <code>pueValue</code></td><td><code>PUE</code></td><td>ratio</td><td>1.1–2.5 · default 1.58</td><td>Total facility power ÷ IT power. Multiplies IT load to give facility power. Industry average 1.58 (Uptime 2026).</td></tr>
+                    <tr><td>Country <code>countrySelect</code></td><td>—</td><td>ISO-2 enum</td><td>32 countries</td><td>Selects grid emission factor and electricity rate from <code>COUNTRIES[]</code> (patched at runtime from <code>RZEngine.data.countries</code>).</td></tr>
+                    <tr><td>Grid intensity <code>gridIntensity</code></td><td><code>EF<sub>grid</sub></code></td><td>kgCO₂e/kWh</td><td>read-only · auto-filled</td><td>National average emission factor for purchased electricity. Source: IEA 2026 + Ember. Range 0.02 (SE) to 0.90 (ZA).</td></tr>
+                    <tr><td>Generator fuel <code>genType</code></td><td>—</td><td>enum</td><td>diesel / hvo</td><td>Standard diesel 2.68 kgCO₂/L; HVO (hydrotreated vegetable oil) 0.54 kgCO₂/L (~80% lower).</td></tr>
+                    <tr><td>Generator test hours <code>genHours</code></td><td><code>H<sub>gen</sub></code></td><td>h/yr</td><td>50–500 · default 200</td><td>Annual hours of generator operation including monthly testing, load-bank tests, and unplanned outages.</td></tr>
+                    <tr><td>Cooling type <code>coolingType</code></td><td>—</td><td>enum</td><td>air_crac / inrow / rdhx / dlc</td><td>Selects refrigerant GWP and charge rate. R-410A (GWP 2088), R-134a (GWP 1430), R-1234ze (GWP 7).</td></tr>
+                    <tr><td>Annual leak rate <code>leakRate</code></td><td><code>L<sub>r</sub></code></td><td>%</td><td>1–15 · default 5</td><td>Fraction of total refrigerant charge that escapes annually. Industry average 5–10% for DX; 2–3% for chilled-water plants.</td></tr>
+                    <tr><td>Renewable strategy <code>renewableType</code></td><td>—</td><td>enum</td><td>none / solar / solar_bess / ppa</td><td>Procurement mechanism. Determines co-investment note only; the emission reduction is applied via <code>renewablePct</code>.</td></tr>
+                    <tr><td>Renewable coverage <code>renewablePct</code></td><td><code>R</code></td><td>%</td><td>0–100 · default 0</td><td>Percentage of facility electricity matched by renewable energy or certificates. Applied to derive market-based Scope 2.</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.4rem;">Tab 2 — Life-Cycle Assessment</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field / ID</th><th>Unit</th><th>Default</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td>Facility size <code>facilityMW</code></td><td>MW IT</td><td>linked to itLoad</td><td>Total IT capacity; scales material quantities, floor area, and server counts per MW.</td></tr>
+                    <tr><td>Building type <code>buildingType</code></td><td>enum</td><td>purpose</td><td>Multiplier on material quantities: purpose-built = 1.0, converted warehouse = 0.70, modular = 0.85.</td></tr>
+                    <tr><td>Concrete grade <code>concreteGrade</code></td><td>enum</td><td>c30</td><td>C30 = 150 kgCO₂e/t; C40 = 250 kgCO₂e/t; low-carbon GGBS blend = 100 kgCO₂e/t. ICE Database v4.1.</td></tr>
+                    <tr><td>Steel sourcing <code>steelSource</code></td><td>enum</td><td>world_avg</td><td>World-average (30% recycled) = 1850 kgCO₂e/t; EAF (90%+) = 500 kgCO₂e/t; BOF virgin = 2200 kgCO₂e/t.</td></tr>
+                    <tr><td>Seismic zone <code>seismicZone</code></td><td>0–4</td><td>0</td><td>Structural mass multiplier: Zone 0 = 1.0×, Zone 1 = 1.05×, Zone 2 = 1.12×, Zone 3 = 1.25×, Zone 4 = 1.40×.</td></tr>
+                    <tr><td>Workload type <code>workloadType</code></td><td>enum</td><td>traditional</td><td>Sets server embodied carbon (kgCO₂e) and density (servers/MW): traditional 1200/1250, cloud 1200/1000, H100 4000/140, B200 3500/200.</td></tr>
+                    <tr><td>Server refresh cycle <code>serverRefresh</code></td><td>yr</td><td>4</td><td>Replacement period; drives number of IT refresh cycles over project lifetime.</td></tr>
+                    <tr><td>Network refresh <code>networkRefresh</code></td><td>yr</td><td>5</td><td>Network-switch replacement cycle.</td></tr>
+                    <tr><td>Project lifetime <code>projectLifetime</code></td><td>yr</td><td>20</td><td>Total facility operational life for LCA amortisation and lifetime operational total.</td></tr>
+                    <tr><td>Battery chemistry <code>batteryType</code></td><td>enum</td><td>vrla</td><td>UPS battery: VRLA = 68 kgCO₂e/kWh (5yr life); LFP = 62 kgCO₂e/kWh (10yr); NMC = 74 kgCO₂e/kWh (8yr).</td></tr>
+                    <tr><td>Battery runtime <code>batteryRuntime</code></td><td>min</td><td>10</td><td>UPS hold-time at full IT load; sets total battery kWh = facilityMW × 1000 × (runtime/60) × redundancyMult.</td></tr>
+                    <tr><td>Redundancy <code>redundancyLCA</code></td><td>enum</td><td>n1</td><td>N = 1.0×, N+1 = 1.25×, 2N = 2.0×, 2N+1 = 2.25× on battery and MEP quantities.</td></tr>
+                    <tr><td>Equipment origin <code>equipOrigin</code></td><td>enum</td><td>regional</td><td>Transport multiplier on A4+A5: local (&lt;500 km) = 0.8×, regional = 1.0×, international = 1.5×.</td></tr>
+                    <tr><td>Construction duration <code>constructDuration</code></td><td>months</td><td>18</td><td>Scales A4+A5 construction-activity carbon linearly vs the 18-month reference basis.</td></tr>
+                    <tr><td>Decommission plan <code>decommPlan</code></td><td>enum</td><td>demolition</td><td>End-of-life multiplier on C1–C4: demolition = 1.0×, refurbishment = 0.5×, deconstruction/reuse = 0.2×.</td></tr>
+                    <tr><td>Steel recycle % <code>steelRecycle</code></td><td>%</td><td>92</td><td>Module-D recycling credit on structural steel (92% industry average).</td></tr>
+                    <tr><td>Copper recycle % <code>copperRecycle</code></td><td>%</td><td>85</td><td>Module-D recycling credit on copper cabling and busbars.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">All emission calculations follow <strong>GHG Protocol Corporate Standard (2015 edition)</strong> for Scope 1/2/3 boundaries, and <strong>EN 15978:2011 / ISO 14044:2006</strong> for LCA stages. Function names map one-to-one to <code class="mn-mono">RZEngine.models.carbon</code> in <code>rz-engine.js</code>.</p>
+
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.3rem;">Scope 2 — Purchased grid electricity</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">facilityKWh = P<sub>IT</sub> × PUE × 8 760 h/yr</span>
+                <span class="mn-eq">effectiveEF  = EF<sub>grid</sub> × (1 − R / 100)      [market-based]</span>
+                <span class="mn-eq">Scope 2      = (facilityKWh / 1 000) × effectiveEF   [tCO₂e/yr]</span>
+                <span class="mn-where">In <code>RZEngine.models.carbon.annualTonnes(mw, pue, region)</code>. Market-based method: renewable coverage R% directly reduces the effective emission factor. Location-based = R set to 0. <span class="mn-src">GHG Protocol · IEA 2026</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.3rem;">Scope 1a — Generator diesel / HVO combustion</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">fuelConsumed  = P<sub>IT</sub> [kW] × 0.3 L/kW·h × H<sub>gen</sub> [h/yr]   [L/yr]</span>
+                <span class="mn-eq">genEmissions  = fuelConsumed × EF<sub>fuel</sub> / 1 000             [tCO₂e/yr]</span>
+                <span class="mn-where">EF<sub>fuel</sub>: diesel 2.68 kgCO₂/L (EPA 2024); HVO 0.54 kgCO₂/L (~80% life-cycle reduction). Diesel consumption rate 0.3 L/kW·h is the engine constant <code>DIESEL_CONSUMPTION_RATE</code>. <span class="mn-src">EPA Emission Factors 2024 · GHG Protocol</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.3rem;">Scope 1b — Fugitive refrigerant leakage</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">totalCharge      = P<sub>IT</sub> [kW] × chargeKgPerKw           [kg refrigerant]</span>
+                <span class="mn-eq">refrigEmissions  = totalCharge × (L<sub>r</sub> / 100) × GWP / 1 000  [tCO₂e/yr]</span>
+                <span class="mn-where">chargeKgPerKw and GWP are per-cooling-type constants: air_crac 0.30 kg/kW / GWP 2088; inrow 0.20 / 2088; rdhx 0.15 / 1430; dlc 0.05 / 7. GWP₁₀₀ values: IPCC AR4 (sitewide-consistent). <span class="mn-src">GHG Protocol · IPCC AR4 · EPA GreenChill</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.3rem;">Scope 3 simplified (operational tab)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Scope 3<sub>ops</sub> = P<sub>IT</sub> [kW] × 0.15 tCO₂e/kW    [tCO₂e/yr upstream]</span>
+                <span class="mn-where">A screening upstream-supply-chain factor used on the operational tab only (0.15 tCO₂e/kW IT = ~15 kgCO₂e per MWh IT). The LCA tab provides a full cradle-to-gate Scope 3 breakdown with material-level emission factors. <span class="mn-src">GHG Protocol Scope 3 Standard · RICS/LETI</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.3rem;">LCA — Stage A1–A3: Material production (embodied carbon)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">concreteCarbon   = facilityMW × 1 000 t/MW × EF<sub>concrete</sub> × buildMult × seismicMult / 1 000</span>
+                <span class="mn-eq">steelCarbon      = facilityMW ×   200 t/MW × EF<sub>steel</sub>    × buildMult × seismicMult / 1 000</span>
+                <span class="mn-eq">copperCarbon     = facilityMW ×    20 t/MW × 4 100 kgCO₂e/t / 1 000</span>
+                <span class="mn-eq">aluminumCarbon   = facilityMW ×    10 t/MW × 10 000 kgCO₂e/t / 1 000</span>
+                <span class="mn-eq">pvcCarbon        = facilityMW ×     7 t/MW × 2 800 kgCO₂e/t / 1 000</span>
+                <span class="mn-eq">materialsTotal   = concreteCarbon + steelCarbon + copperCarbon + aluminumCarbon + pvcCarbon  [tCO₂e]</span>
+                <span class="mn-where">All results in tCO₂e. EF<sub>concrete</sub>: C30 150, C40 250, low-carbon 100 kgCO₂e/t. EF<sub>steel</sub>: world-avg 1850, EAF 500, BOF 2200 kgCO₂e/t. Quantities per MW IT: concrete 1 000 t, steel 200 t, copper 20 t, aluminium 10 t, PVC 7 t — from RICS/LETI DC embodied-carbon studies. buildMult: purpose 1.0, converted 0.7, modular 0.85. seismicMult: zone 0–4 = [1.0, 1.05, 1.12, 1.25, 1.40]. <span class="mn-src">ICE Database v4.1 · RICS/LETI · EN 15978</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.3rem;">LCA — IT equipment embodied carbon (Scope 3 upstream)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">totalServers  = facilityMW × serversPerMW</span>
+                <span class="mn-eq">serverCycles  = ceil(projectLife / serverRefresh)</span>
+                <span class="mn-eq">networkCycles = ceil(projectLife / networkRefresh)</span>
+                <span class="mn-eq">itEmbodied    = ( totalServers × EF<sub>server</sub> × serverCycles</span>
+                <span class="mn-eq">                + totalServers × 0.05 × 450 kgCO₂e × networkCycles</span>
+                <span class="mn-eq">                + totalServers × 0.02 × 2 000 kgCO₂e × serverCycles ) / 1 000  [tCO₂e]</span>
+                <span class="mn-where">EF<sub>server</sub> per workload: traditional 1 200 kgCO₂e (1 250 servers/MW), cloud 1 200 (1 000/MW), H100 GPU 4 000 (140/MW), B200+ GPU 3 500 (200/MW). Network switches at 5% of server count × 450 kgCO₂e; storage arrays at 2% × 2 000 kgCO₂e. <span class="mn-src">Dell/HPE/NVIDIA published LCA · GHG Protocol Scope 3</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.3rem;">LCA — UPS battery embodied carbon</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">batteryKWh       = facilityMW × 1 000 × (batteryRuntime / 60) × redundancyMult</span>
+                <span class="mn-eq">batteryCarbon    = batteryKWh × EF<sub>battery</sub> / 1 000                     [tCO₂e/cycle]</span>
+                <span class="mn-eq">batteryReplacements = ceil(projectLife / battChemLife)</span>
+                <span class="mn-eq">totalBatteryCarbon  = batteryCarbon × batteryReplacements             [tCO₂e]</span>
+                <span class="mn-where">EF<sub>battery</sub>: VRLA 68 kgCO₂e/kWh (5yr life); LFP 62 (10yr); NMC 74 (8yr). redundancyMult: N=1.0, N+1=1.25, 2N=2.0, 2N+1=2.25. <span class="mn-src">PEFCR Battery (2020) · IVL Swedish Environment Institute</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.3rem;">LCA — MEP equipment, construction activity, end-of-life (A4–C4)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">mepCarbon         = facilityMW × 150 tCO₂e/MW         (UPS + cooling + gensets + switchgear)</span>
+                <span class="mn-eq">floorArea         = facilityMW × 500 m²/MW</span>
+                <span class="mn-eq">constructCarbon   = floorArea × 40 kgCO₂e/m² × transportMult × (duration / 18) / 1 000</span>
+                <span class="mn-eq">endOfLifeCarbon   = floorArea × 15 kgCO₂e/m² × decommMult / 1 000</span>
+                <span class="mn-where">transportMult: local 0.80, regional 1.00, international 1.50. decommMult: demolition 1.0, refurbishment 0.5, deconstruction 0.2. Construction activity factor 40 kgCO₂e/m² covers plant diesel, formwork, site waste (A5). <span class="mn-src">RICS Embodied Carbon Primer 2020 · EN 15978</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.3rem;">LCA — Module D: End-of-life recycling credits</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">steelCredit   = facilityMW × 200 t × (steelRecycle% / 100) × 1 500 kgCO₂e/t / 1 000</span>
+                <span class="mn-eq">copperCredit  = facilityMW × 20 t  × (copperRecycle% / 100) × 3 000 kgCO₂e/t / 1 000</span>
+                <span class="mn-eq">alCredit      = facilityMW × 10 t  × 0.85 × 9 000 kgCO₂e/t / 1 000</span>
+                <span class="mn-eq">moduleDCredit = −(steelCredit + copperCredit + alCredit)         [tCO₂e, negative]</span>
+                <span class="mn-where">Recycling credit = avoided primary production. Factors: steel 1 500, copper 3 000, aluminium 9 000 kgCO₂e/t saved. Aluminium recycled fraction fixed at 85% (industry average). Module D is reported separately and does not reduce the A1–C4 total. <span class="mn-src">ICE Database v4.1 · EN 15978 Module D</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.3rem;">Carbon budget allocation (Tab 3)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">dcSectorEmissions = nationalTotal × (dcShare% / 100)          [MtCO₂e/yr]</span>
+                <span class="mn-eq">targetDcEmissions = dcSectorEmissions × (1 − ndcReduction)</span>
+                <span class="mn-eq">cumulativeBudget  = (dcSectorEmissions + targetDcEmissions) / 2 × budgetYears  [linear]</span>
+                <span class="mn-eq">annualBudgetPerMW = cumulativeBudget / budgetYears / nationalMW × 1 000     [tCO₂/MW/yr]</span>
+                <span class="mn-where">NDC reduction = |ndcTarget%| / 100. nationalMW estimated as dcSectorEmissions / (0.475 kgCO₂/kWh × 8.76 × 1.58). Three budget methodologies: linear trajectory, front-loaded (×0.85), back-loaded (×1.15). <span class="mn-src">UNFCCC NDC Registry · Paris Agreement Art. 4</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.3rem;">Carbon offset and compliance cost</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">offsetCost    = totalEmissions [tCO₂e] × $35 /tCO₂e   [voluntary market]</span>
+                <span class="mn-eq">taxExposure   = totalEmissions × $65 /tCO₂e           [EU ETS 2025 proxy]</span>
+                <span class="mn-where">In <code>RZEngine.models.carbon.offsetCost(tonnes)</code> and the inline EU ETS exposure. DATA.carbon.offsetPrice = $35 (voluntary market 2026 blend; reconciles DCMOC $45 vs legacy $18). EU ETS proxy $65 = ~€60/tCO₂ (2025 forward). Singapore NCCS S$45/t from 2026 also surfaced. <span class="mn-src">World Bank Carbon Pricing Dashboard · OECD ECR 2025 · DATA.sources['carbon']</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS & SOURCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">All grid factors and carbon prices are locked in <code class="mn-mono">DATA.carbon</code> with provenance tags in <code class="mn-mono">DATA.sources['carbon']</code>. Material emission factors live in the inline <code class="mn-mono">LCA</code> constant in <code>carbon-footprint.html</code>, crossreferencing ICE Database v4.1 and RICS/LETI studies.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.4rem;">Grid emission factors (kgCO₂e/kWh) — <code>DATA.carbon.gridFactor</code></h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Region</th><th>EF (kgCO₂e/kWh)</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td>US</td><td><code>0.37</code></td><td>US EIA national average (coal+gas+nuclear+renewables mix)</td></tr>
+                    <tr><td>EU</td><td><code>0.23</code></td><td>EU27 average (high nuclear FR/SE, coal-heavy PL pulled)</td></tr>
+                    <tr><td>APAC</td><td><code>0.55</code></td><td>Blended Asia-Pacific (China/India dominate)</td></tr>
+                    <tr><td>LATAM</td><td><code>0.20</code></td><td>High hydro share (BR, CO, CL)</td></tr>
+                    <tr><td>ID (Indonesia)</td><td><code>0.68</code></td><td>Coal-heavy PLN grid; per-country COUNTRIES[] = 0.70</td></tr>
+                    <tr><td>SG (Singapore)</td><td><code>0.41</code></td><td>CCGT gas-dominant grid; per-country = 0.40</td></tr>
+                    <tr><td>JP (Japan)</td><td><code>0.47</code></td><td>Post-Fukushima gas/coal, nuclear restart partial</td></tr>
+                    <tr><td>IN (India)</td><td><code>0.63</code></td><td>Coal-heavy; per-country = 0.72</td></tr>
+                    <tr><td>MY (Malaysia)</td><td><code>0.55</code></td><td>Gas+coal Peninsular; per-country = 0.60</td></tr>
+                    <tr><td>FR (France)</td><td><code>0.06</code></td><td>~70% nuclear (per-country table)</td></tr>
+                    <tr><td>SE (Sweden)</td><td><code>0.02</code></td><td>Hydro + wind dominant</td></tr>
+                    <tr><td>ZA (South Africa)</td><td><code>0.90</code></td><td>Coal-dominant Eskom grid</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <p class="mn-lead" style="margin-top:0.8rem;">Source: <code>DATA.sources['carbon'] = 'IEA 2026 + Ember grid intensity + ICAP carbon prices'</code>, asOf 2026.</p>
+            <p class="mn-lead">At runtime, <code>carbon-footprint.html</code> patches per-country values from <code>RZEngine.data.countries[id].environment.gridCarbonIntensity</code> (the single source of truth generated from <code>dcmoc/src/constants/countries.ts</code>). The 32-country per-country table shown in the tool supersedes the 9-region <code>DATA.carbon.gridFactor</code> blends for the calculator.</p>
+
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.4rem;">Carbon prices ($/tCO₂e) — <code>DATA.carbon.carbonPrice</code></h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Region</th><th>Price ($/tCO₂e)</th><th>Regime</th></tr></thead>
+                <tbody>
+                    <tr><td>US</td><td><code>40</code></td><td>Blended state-level compliance + RGGI + voluntary</td></tr>
+                    <tr><td>EU</td><td><code>85</code></td><td>EU ETS 2025 (compliance, ~€80/t converted)</td></tr>
+                    <tr><td>APAC</td><td><code>25</code></td><td>Blended SEA/APAC compliance schemes</td></tr>
+                    <tr><td>LATAM</td><td><code>15</code></td><td>Colombia/Chile voluntary + compliance blend</td></tr>
+                    <tr><td>ID</td><td><code>12</code></td><td>Indonesia ETS pilot + voluntary market</td></tr>
+                    <tr><td>SG</td><td><code>18</code></td><td>NCCS S$25/t 2024 (S$45/t from 2026)</td></tr>
+                    <tr><td>JP</td><td><code>30</code></td><td>Japan GX-ETS + J-Credit scheme</td></tr>
+                    <tr><td>IN</td><td><code>10</code></td><td>India PAT + voluntary carbon market</td></tr>
+                    <tr><td>MY</td><td><code>14</code></td><td>Bursa Carbon Exchange + voluntary blend</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <p class="mn-lead" style="margin-top:0.8rem;">Source: <code>DATA.sources['envCosts'] = 'World Bank Carbon Pricing Dashboard + OECD ECR 2025 + NCCS Singapore'</code>, asOf 2026-07.</p>
+
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.4rem;">Material emission factors — <code>LCA</code> constant</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Material</th><th>kgCO₂e/t</th><th>Quantity/MW IT</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td>Concrete C30</td><td><code>150</code></td><td>1 000 t</td><td>ICE Database v4.1, RICS/LETI DC</td></tr>
+                    <tr><td>Concrete C40</td><td><code>250</code></td><td>1 000 t</td><td>ICE Database v4.1</td></tr>
+                    <tr><td>Concrete low-carbon (GGBS 50%)</td><td><code>100</code></td><td>1 000 t</td><td>RICS/LETI</td></tr>
+                    <tr><td>Steel — world average (30% recycled)</td><td><code>1 850</code></td><td>200 t</td><td>ICE Database v4.1</td></tr>
+                    <tr><td>Steel — EAF (90%+ recycled)</td><td><code>500</code></td><td>200 t</td><td>ICE Database v4.1</td></tr>
+                    <tr><td>Steel — BOF virgin</td><td><code>2 200</code></td><td>200 t</td><td>ICE Database v4.1</td></tr>
+                    <tr><td>Copper (primary)</td><td><code>4 100</code></td><td>20 t</td><td>ICE Database v4.1</td></tr>
+                    <tr><td>Aluminium (primary)</td><td><code>10 000</code></td><td>10 t</td><td>ICE Database v4.1</td></tr>
+                    <tr><td>PVC cable</td><td><code>2 800</code></td><td>7 t</td><td>ICE Database / Ecoinvent 3.9</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.4rem;">Engine model — <code>DATA.carbon</code> anchors</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Constant</th><th>Value</th><th>Unit</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td><code>DATA.carbon.embodiedPerMw</code></td><td>3 200</td><td>tCO₂e/MW</td><td>Bulk embodied carbon for engine's <code>models.carbon.embodiedTonnes(mw)</code>. Covers concrete+steel+MEP screening estimate. RICS/LETI DC studies.</td></tr>
+                    <tr><td><code>DATA.carbon.dieselKgCo2PerL</code></td><td>2.68</td><td>kgCO₂/L</td><td>EPA Emission Factors 2024.</td></tr>
+                    <tr><td><code>DATA.carbon.genTestHoursPerYear</code></td><td>52</td><td>h/yr</td><td>Engine default (1 h/week monthly test). Calculator uses user-provided 50–500 h.</td></tr>
+                    <tr><td><code>DATA.carbon.refrigerantLeakTco2ePerMwYr</code></td><td>8</td><td>tCO₂e/MW·yr</td><td>Engine Scope 1 screening; GHG Protocol + EPA GreenChill typical ranges.</td></tr>
+                    <tr><td><code>DATA.carbon.offsetPrice</code></td><td>35</td><td>$/tCO₂e</td><td>Voluntary market 2026 blend (nature-based + engineered); reconciles DCMOC $45 vs legacy $18. <code>DATA.sources['carbon.offsetPrice']</code>.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Formula / source</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>Annual total emissions</td><td><code>scope1 + scope2 + scope3</code></td><td>tCO₂e/yr</td><td>GHG Protocol total boundary. Primary KPI on the operational tab.</td></tr>
+                    <tr><td>Scope 1</td><td><code>genEmissions + refrigEmissions</code></td><td>tCO₂e/yr</td><td>Direct on-site emissions: generator fuel combustion + fugitive refrigerant leaks.</td></tr>
+                    <tr><td>Scope 2 (market-based)</td><td><code>annualMWh × effectiveEF</code></td><td>tCO₂e/yr</td><td>Purchased electricity adjusted for renewable certificates/PPAs.</td></tr>
+                    <tr><td>Scope 3 (simplified)</td><td><code>P<sub>IT</sub> × 0.15</code></td><td>tCO₂e/yr</td><td>Upstream IT supply chain screening factor (operational tab only).</td></tr>
+                    <tr><td>Carbon intensity</td><td><code>totalEmissions × 1000 / (P<sub>IT</sub> × 8760)</code></td><td>kgCO₂e/kWh IT</td><td>Efficiency grade: A+ &lt;0.1, A &lt;0.2, B &lt;0.4, C &lt;0.6, D &lt;0.8, E &lt;1.0, F ≥1.0.</td></tr>
+                    <tr><td>Offset cost</td><td><code>totalEmissions × $35</code></td><td>$/yr</td><td>Voluntary market neutralisation cost at 2026 blend price.</td></tr>
+                    <tr><td>Tax exposure</td><td><code>totalEmissions × $65</code></td><td>$/yr</td><td>Indicative EU ETS-proxy compliance cost (not the applicable rate outside EU).</td></tr>
+                    <tr><td>LCA embodied (A1–A3)</td><td><code>materialsTotal</code></td><td>tCO₂e</td><td>One-time cradle-to-gate: concrete + steel + copper + aluminium + PVC.</td></tr>
+                    <tr><td>IT embodied (Scope 3)</td><td><code>itEmbodied</code></td><td>tCO₂e</td><td>Lifetime server+network+storage manufacturing emissions across all refresh cycles.</td></tr>
+                    <tr><td>Battery carbon (total)</td><td><code>batteryCarbon × batteryReplacements</code></td><td>tCO₂e</td><td>UPS battery manufacturing over project life (all replacement cycles).</td></tr>
+                    <tr><td>Module D credit</td><td><code>−(steelCredit + copperCredit + alCredit)</code></td><td>tCO₂e</td><td>End-of-life recycling benefit — negative value, reported separately from A1–C4 total per EN 15978.</td></tr>
+                    <tr><td>Lifetime operational</td><td><code>totalEmissions × projectLife</code></td><td>tCO₂e</td><td>Cumulative operational footprint over the facility lifetime.</td></tr>
+                    <tr><td>Lifetime total (LCA + ops)</td><td><code>totalLCA + lifetimeOperational</code></td><td>tCO₂e</td><td>Cradle-to-grave total: all construction, IT, and operational emissions over project life.</td></tr>
+                    <tr><td>Annual budget per MW</td><td>NDC derivation (see § 03)</td><td>tCO₂/MW/yr</td><td>National DC-sector carbon budget allocated per MW of installed capacity.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example</h2>
+            <p class="mn-lead">Default inputs: 1 000 kW IT, PUE 1.58, United States (grid 0.40 kgCO₂e/kWh), diesel generator 200 h/yr, air_crac cooling (R-410A, GWP 2088, 0.30 kg/kW, 5% leak), no renewables, 1 MW facility, purpose-built, concrete C30, steel world-average, traditional workload, VRLA battery 10 min N+1, 20-year life. All numbers verified by <code>node -e</code> against the engine logic.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Facility energy:</strong> <code>1000 kW × 1.58 PUE × 8760 h =</code> <span class="mn-result">13 840.8 MWh/yr</span></li>
+                    <li><strong>Scope 2:</strong> <code>13 840.8 MWh × 0.40 kgCO₂/kWh =</code> <span class="mn-result">5 536 tCO₂e/yr</span></li>
+                    <li><strong>Scope 1a — generator diesel:</strong> <code>1000 kW × 0.30 L/kW·h × 200 h × 2.68 kgCO₂/L / 1000 =</code> <span class="mn-result">160.8 tCO₂e/yr</span></li>
+                    <li><strong>Scope 1b — refrigerant:</strong> total charge <code>1000 × 0.30 = 300 kg</code>; leak <code>300 × 0.05 × 2088 / 1000 =</code> <span class="mn-result">31.3 tCO₂e/yr</span>; Scope 1 total <span class="mn-result">192 tCO₂e/yr</span></li>
+                    <li><strong>Scope 3 (simplified):</strong> <code>1000 kW × 0.15 =</code> <span class="mn-result">150 tCO₂e/yr</span></li>
+                    <li><strong>Annual total:</strong> <code>192 + 5536 + 150 =</code> <span class="mn-result">5 878 tCO₂e/yr</span> → Carbon intensity <code>5878 × 1000 / (1000 × 8760) =</code> <span class="mn-result">0.671 kgCO₂e/kWh IT → Grade D (below average)</span></li>
+                    <li><strong>Offset cost:</strong> <code>5878 × $35 =</code> <span class="mn-result">$205 730/yr</span></li>
+                    <li><strong>LCA A1–A3 materials (1 MW, C30, world-avg steel):</strong> concrete <code>1000 t × 150 =</code> 150 t, steel <code>200 t × 1850 =</code> 370 t, copper <code>20 t × 4100 =</code> 82 t, aluminium <code>10 t × 10 000 =</code> 100 t, PVC <code>7 t × 2800 =</code> 20 t → <span class="mn-result">722 tCO₂e embodied (A1–A3)</span></li>
+                    <li><strong>IT embodied (traditional, 20yr / 4yr refresh = 5 cycles):</strong> 1 250 servers × 1 200 kgCO₂e × 5 cycles + 62.5 switches × 450 × 4 cycles + 25 storage × 2 000 × 5 cycles = <span class="mn-result">7 863 tCO₂e over life</span></li>
+                    <li><strong>Battery carbon (VRLA, 10 min, N+1, 5yr replace → 4 cycles):</strong> <code>1000 kW × (10/60) min × 1.25 × 68 kgCO₂e/kWh / 1000 × 4 cycles =</code> <span class="mn-result">56.7 tCO₂e</span></li>
+                    <li><strong>MEP + construction + EOL:</strong> 150 + 20.0 + 7.5 = <span class="mn-result">177.5 tCO₂e</span></li>
+                    <li><strong>Module D recycling credits (steel 92%, copper 85%, Al 85%):</strong> steel <code>200 × 0.92 × 1500 =</code> 276 t, copper <code>20 × 0.85 × 3000 =</code> 51 t, Al <code>10 × 0.85 × 9000 =</code> 76.5 t → <span class="mn-result">−404 tCO₂e (benefit)</span></li>
+                    <li><strong>Total LCA (excl. ops):</strong> <code>722 + 7863 + 56.7 + 177.5 − 404 =</code> <span class="mn-result">8 415 tCO₂e</span></li>
+                    <li><strong>Lifetime operational (20yr):</strong> <code>5878 × 20 =</code> <span class="mn-result">117 560 tCO₂e</span></li>
+                    <li><strong>Cradle-to-grave total:</strong> <code>8415 + 117 560 =</code> <span class="mn-result">125 975 tCO₂e over 20 years</span></li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Reading:</strong> for this typical 1 MW colo in the US, Scope 2 electricity dominates at ~94% of annual emissions. Switching to 100% renewable PPA reduces Scope 2 to near zero, cutting the annual total to ~342 tCO₂e and flipping the grade from D to A+. On a lifetime basis, IT equipment manufacturing (7 863 t) exceeds the entire building structure (722 t) by ~11×, reflecting the embodied-carbon intensity of AI/GPU hardware. Low-carbon steel (EAF) would reduce the steel line from 370 t to 100 t — a 73% saving on structural steel alone.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>GHG Protocol (2015)</b> — Corporate Accounting and Reporting Standard (Revised): Scope 1/2/3 boundary definitions, market-based vs location-based Scope 2, REC treatment. <a class="mn-inline" href="https://ghgprotocol.org" target="_blank" rel="noopener noreferrer">ghgprotocol.org</a></li>
+                <li><b>ISO 14064-1:2018</b> — Specification with guidance at the organisation level for quantification and reporting of GHG emissions and removals.</li>
+                <li><b>ISO 14044:2006 + AMD 1:2017</b> — Environmental management — Life cycle assessment — Requirements and guidelines.</li>
+                <li><b>EN 15978:2011</b> — Sustainability of construction works: calculation method for the environmental performance of buildings; defines stages A1–A5 (product + construction), B (operational), C (end-of-life), D (beyond system boundary).</li>
+                <li><b>IEA World Energy Statistics 2026</b> — National electricity emission intensity factors (kgCO₂e/kWh). Source for <code>DATA.carbon.gridFactor</code> and <code>COUNTRIES[].grid</code>.</li>
+                <li><b>Ember Climate Grid Intensity 2026</b> — Real-time country grid emission factors used to cross-check IEA values. <code>DATA.sources['carbon']</code>.</li>
+                <li><b>ICAP Emissions Trading Worldwide 2026</b> — Carbon prices by jurisdiction. Source for <code>DATA.carbon.carbonPrice</code>.</li>
+                <li><b>ICE Database v4.1 (RICS/Circular Ecology)</b> — Embodied carbon factors for construction materials: concrete, steel, copper, aluminium, PVC.</li>
+                <li><b>RICS Professional Statement: Whole Life Carbon Assessment (2023)</b> — DC embodied carbon benchmarks; quantities per MW IT.</li>
+                <li><b>LETI Embodied Carbon Primer (2020)</b> — Low-carbon material specification (GGBS concrete, EAF steel targets).</li>
+                <li><b>EPA Emission Factors for Greenhouse Gas Inventories (2024)</b> — Stationary combustion: diesel 2.68 kgCO₂/L. Source for <code>DATA.carbon.dieselKgCo2PerL</code>.</li>
+                <li><b>IPCC AR4 (2007)</b> — GWP₁₀₀ values: R-410A 2088, R-134a 1430, R-1234ze 7. Sitewide-consistent (matches published values in <code>DATA.refrigerants</code>).</li>
+                <li><b>IVL Swedish Environment Institute (2023)</b> — Battery LCA emission factors: VRLA 68, LFP 62, NMC 74 kgCO₂e/kWh. Basis for <code>LCA.BATTERY_*</code> constants.</li>
+                <li><b>UNFCCC NDC Registry (2024)</b> — Nationally Determined Contributions: national emission totals, reduction targets, and target years. Source for <code>NDC_DATA</code> (32 countries).</li>
+                <li><b>Paris Agreement Art. 4 (2015)</b> — Net-zero trajectory and budget methodology basis for the Carbon Budget tab.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">rz-engine.js</code> <code>DATA.carbon</code> + <code>RZEngine.models.carbon</code> (gridFactor / annualTonnes / embodiedTonnes / annualCost / offsetCost / scopes).</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS & LIMITS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead"><strong>Scope boundaries:</strong> Scope 2 is calculated on the market-based method only (location-based = renewable coverage set to 0%). Scope 3 upstream on the operational tab is a screening factor (0.15 tCO₂e/kW IT); the LCA tab provides a more granular Scope 3 upstream via per-material emission factors and IT-equipment LCAs, but does not include purchased goods and services beyond IT hardware, business travel, waste, or water.</p>
+            <p class="mn-lead"><strong>Grid factors:</strong> National average emission factors from IEA/Ember do not represent the marginal emission rate of an additional data-center load on any specific grid or hour. Time-of-use or hourly matching (24/7 CFE methodology) is not modelled. For high-renewable grids (France, Sweden), the national average already reflects near-zero grid intensity.</p>
+            <p class="mn-lead"><strong>Material quantities per MW:</strong> Concrete 1 000 t/MW, steel 200 t/MW, copper 20 t/MW, aluminium 10 t/MW, PVC 7 t/MW are industry planning estimates from RICS/LETI DC embodied-carbon studies. They are screening-grade benchmarks; actual quantities depend on structural design, site conditions, and equipment specification.</p>
+            <p class="mn-lead"><strong>IT embodied carbon:</strong> Server-embodied values (1 200–4 000 kgCO₂e/unit) are from published manufacturer LCA declarations or peer-reviewed studies. AI GPU server values (H100 4 000, B200 3 500 kgCO₂e) are estimates based on the Dell/NVIDIA hardware and will improve as manufacturers publish more detailed LCA reports.</p>
+            <p class="mn-lead"><strong>Regulatory compliance:</strong> Carbon tax exposure is computed using the EU ETS proxy ($65/tCO₂e) as an indicative figure only. Actual compliance obligations depend on the jurisdiction, emission category, facility classification, and applicable scheme thresholds. SEC Climate Disclosure, EU CBAM, and Singapore NCCS exposures cited in the tool are informational only and do not constitute legal or compliance advice.</p>
+            <p class="mn-lead"><strong>Carbon budget allocation:</strong> The NDC-derived per-MW budget is a macro screening estimate derived from national total emission budgets and a static DC-sector share percentage. It does not account for electricity generation emissions already included in Scope 2, temporal emission pathways within each country's sector, or sub-national policy variations.</p>
+            <p class="mn-lead">This calculator is an <strong>engineering education and pre-design planning aid</strong>. Carbon footprints for corporate GHG reporting under GHG Protocol, ISO 14064, SEC Rule, or EU taxonomy must be prepared or validated by a qualified sustainability professional with access to site-specific metered data and certified grid factors.</p>
+        </section>
+
+        <a class="mn-toollink" href="../carbon-footprint.html">&#9654; Open the live Carbon Footprint Analyzer</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../carbon-footprint.html">Carbon Analyzer</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

@@ -5822,6 +5822,27 @@
  * quote, gate-enforced). Do NOT hand-edit — rerun the corpus pipeline. */
         benchmarksCorpus: {
                 "capacity_mw": {
+                        "finance": {
+                                "n": 103,
+                                "unit": "MW",
+                                "p10": 23,
+                                "p25": 68,
+                                "p50": 150,
+                                "p75": 450,
+                                "p90": 650,
+                                "companies": [
+                                        "DLR 10-K FY25",
+                                        "DLR 1Q26 Release",
+                                        "DigitalCore REIT Dec25",
+                                        "Equinix 10-K FY25",
+                                        "Equinix Q2-25 Deck",
+                                        "IronMountain 10-K FY25",
+                                        "IronMountain Q2-25 Deck",
+                                        "KeppelDC AR2024",
+                                        "NTT IR Nov25"
+                                ],
+                                "sources": 9
+                        },
                         "hyperscale": {
                                 "n": 29,
                                 "unit": "MW",
@@ -5837,9 +5858,91 @@
                                         "Microsoft"
                                 ],
                                 "sources": 4
+                        },
+                        "pm": {
+                                "n": 51,
+                                "unit": "MW",
+                                "p10": 30,
+                                "p25": 100,
+                                "p50": 350,
+                                "p75": 636,
+                                "p90": 835,
+                                "companies": [
+                                        "Dominion 2024 IRP",
+                                        "EIAR CyrusOne Grid",
+                                        "EIAR Google Dublin DC3",
+                                        "EIAR Vantage DUB11"
+                                ],
+                                "sources": 4
+                        },
+                        "research": {
+                                "n": 66,
+                                "unit": "MW",
+                                "p10": 42,
+                                "p25": 115,
+                                "p50": 330,
+                                "p75": 600,
+                                "p90": 800,
+                                "companies": [
+                                        "DOE Powering AI",
+                                        "IEA Electricity 2025",
+                                        "IEA Energy AI 2025",
+                                        "LBNL DC 2016",
+                                        "LBNL DC Water 2021"
+                                ],
+                                "sources": 5
+                        }
+                },
+                "energy_gwh": {
+                        "pm": {
+                                "n": 3,
+                                "unit": "GWh",
+                                "p10": 1306,
+                                "p25": 1306,
+                                "p50": 2500,
+                                "p75": 3000,
+                                "p90": 3000,
+                                "companies": [
+                                        "Dominion 2024 IRP"
+                                ],
+                                "sources": 1
+                        },
+                        "research": {
+                                "n": 17,
+                                "unit": "GWh",
+                                "p10": 20,
+                                "p25": 140,
+                                "p50": 250,
+                                "p75": 440,
+                                "p90": 750,
+                                "companies": [
+                                        "IEA Electricity 2025",
+                                        "IEA Energy AI 2025"
+                                ],
+                                "sources": 2
                         }
                 },
                 "investment_busd": {
+                        "finance": {
+                                "n": 121,
+                                "unit": "$B",
+                                "p10": 1.1,
+                                "p25": 1.6,
+                                "p50": 3.1,
+                                "p75": 6.9,
+                                "p90": 23.6,
+                                "companies": [
+                                        "DLR 10-K FY25",
+                                        "DLR 1Q26 Release",
+                                        "DigitalCore REIT Dec25",
+                                        "Equinix 10-K FY25",
+                                        "Equinix Q2-25 Deck",
+                                        "IronMountain 10-K FY25",
+                                        "IronMountain Q2-25 Deck",
+                                        "KeppelDC AR2024"
+                                ],
+                                "sources": 8
+                        },
                         "hyperscale": {
                                 "n": 3,
                                 "unit": "$B",
@@ -5851,6 +5954,34 @@
                                 "companies": [
                                         "Google Report 2024",
                                         "Google Report 2025"
+                                ],
+                                "sources": 2
+                        },
+                        "pm": {
+                                "n": 6,
+                                "unit": "$B",
+                                "p10": 1.5,
+                                "p25": 2.5,
+                                "p50": 5,
+                                "p75": 6.5,
+                                "p90": 7,
+                                "companies": [
+                                        "Dominion 2024 IRP",
+                                        "WHEDA Colo RFP"
+                                ],
+                                "sources": 2
+                        },
+                        "research": {
+                                "n": 3,
+                                "unit": "$B",
+                                "p10": 2,
+                                "p25": 2,
+                                "p50": 4.5,
+                                "p75": 16,
+                                "p90": 16,
+                                "companies": [
+                                        "IEA Energy AI 2025",
+                                        "LBNL DC 2024"
                                 ],
                                 "sources": 2
                         }
@@ -5869,9 +6000,57 @@
                                         "Google Report 2025"
                                 ],
                                 "sources": 2
+                        },
+                        "research": {
+                                "n": 15,
+                                "unit": "ratio",
+                                "p10": 1.034,
+                                "p25": 1.07,
+                                "p50": 1.13,
+                                "p75": 1.5,
+                                "p90": 1.56,
+                                "companies": [
+                                        "IEA Electricity 2025",
+                                        "IEA Energy AI 2025",
+                                        "LBNL DC 2024",
+                                        "LBNL DC Water 2021",
+                                        "NREL Thermosyphon",
+                                        "Uptime Survey 2024"
+                                ],
+                                "sources": 6
+                        },
+                        "spec": {
+                                "n": 22,
+                                "unit": "ratio",
+                                "p10": 1.05,
+                                "p25": 1.13,
+                                "p50": 1.95,
+                                "p75": 2.25,
+                                "p90": 2.43,
+                                "companies": [
+                                        "ASHRAE Liquid 2021",
+                                        "GreenGrid PUE WP49",
+                                        "GreenGrid WUE WP35"
+                                ],
+                                "sources": 3
                         }
                 },
                 "renewable_share": {
+                        "finance": {
+                                "n": 4,
+                                "unit": "%",
+                                "p10": 91,
+                                "p25": 100,
+                                "p50": 100,
+                                "p75": 100,
+                                "p90": 100,
+                                "companies": [
+                                        "DigitalCore REIT Dec25",
+                                        "Equinix 10-K FY25",
+                                        "IronMountain 10-K FY25"
+                                ],
+                                "sources": 3
+                        },
                         "hyperscale": {
                                 "n": 19,
                                 "unit": "%",
@@ -5888,6 +6067,35 @@
                                         "Microsoft"
                                 ],
                                 "sources": 5
+                        },
+                        "pm": {
+                                "n": 6,
+                                "unit": "%",
+                                "p10": 15,
+                                "p25": 27,
+                                "p50": 70,
+                                "p75": 80,
+                                "p90": 100,
+                                "companies": [
+                                        "EIAR CyrusOne Grid",
+                                        "EIAR Google Dublin DC3"
+                                ],
+                                "sources": 2
+                        },
+                        "research": {
+                                "n": 73,
+                                "unit": "%",
+                                "p10": 6,
+                                "p25": 14,
+                                "p50": 36,
+                                "p75": 60,
+                                "p90": 96,
+                                "companies": [
+                                        "IEA Electricity 2025",
+                                        "IEA Energy AI 2025",
+                                        "Uptime Institute"
+                                ],
+                                "sources": 3
                         }
                 },
                 "water_million_gal": {
@@ -5904,6 +6112,23 @@
                                         "Google Report 2025"
                                 ],
                                 "sources": 2
+                        }
+                },
+                "wue": {
+                        "research": {
+                                "n": 11,
+                                "unit": "L/kWh",
+                                "p10": 0.2,
+                                "p25": 0.36,
+                                "p50": 0.45,
+                                "p75": 4.4,
+                                "p90": 4.5,
+                                "companies": [
+                                        "IEA Energy AI 2025",
+                                        "LBNL DC 2024",
+                                        "NREL Thermosyphon"
+                                ],
+                                "sources": 3
                         }
                 }
         },

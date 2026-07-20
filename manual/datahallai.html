@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>AI/HPC Data Hall — NVL72 Cockpit — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full engineering methodology for the AI/HPC Data Hall NVL72 Cockpit: GB200 NVL72 basis-of-design, direct liquid cooling formulas, PUE derivation, hydronic flow, CDU sizing, and worked examples from the locked Scenario A baseline.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="GB200 NVL72, AI data hall, direct liquid cooling, PUE methodology, hydronic flow, CDU sizing, ASHRAE, ISO IEC 30134, data hall cockpit, NVIDIA Blackwell">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/datahallai.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/datahallai.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/datahallai.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/datahallai.html">
+    <meta property="og:title" content="AI/HPC Data Hall — NVL72 Cockpit — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="GB200 NVL72 basis-of-design, direct liquid cooling formulas, PUE derivation, hydronic flow, CDU sizing, and 10 worked examples behind the AI Data Hall Cockpit.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="AI Data Hall NVL72 Cockpit Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="AI/HPC Data Hall — NVL72 Cockpit — Technical Manual">
+    <meta name="twitter:description" content="GB200 NVL72 basis-of-design, direct liquid cooling, PUE derivation, hydronic flow, CDU sizing, and worked examples.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="AI Data Hall NVL72 Cockpit Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "AI Data Hall Cockpit" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "AI/HPC Data Hall — NVL72 Cockpit — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "GB200 NVL72 AI data hall engineering methodology: direct liquid cooling, PUE derivation, hydronic flow, and CDU sizing for mission-critical HPC infrastructure",
+        "articleSection": "Data Center Engineering",
+        "dependencies": "NVIDIA GB200 NVL72 spec, ASHRAE A1/A2, ISO/IEC 30134-2, ISO/IEC 30134-8, BASELINE-DECISION.md",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to derive AI data hall power and cooling from GB200 NVL72 basis",
+        "step": [
+            { "@type": "HowToStep", "name": "Establish the locked basis", "text": "Start from the BASELINE-DECISION.md: 4 halls, 27 NVL72 domains/hall, 132 kW per NVL72 (not per rack), 85% liquid capture, TCS 35/45 C, ΔT 10 K." },
+            { "@type": "HowToStep", "name": "Derive IT load", "text": "IT_load = Σ rack_kW + network_kW + storage_kW. For Scenario A: 27 × 132 = 3,564 kW per hall." },
+            { "@type": "HowToStep", "name": "Split cooling to liquid and air", "text": "Liquid heat = IT × 0.85; Air heat = IT × 0.15. For Scenario A: 3,029 kW liquid, 535 kW air." },
+            { "@type": "HowToStep", "name": "Size hydronic flow and CDU count", "text": "Flow_LPM = Q_kW × 60 / (ρ × Cp × ΔT). CDU_count = ceil(liquid_kW / 350). For Scenario A: 4,342 LPM total, 9 CDUs running." },
+            { "@type": "HowToStep", "name": "Derive PUE bottom-up", "text": "Chiller input = cooling_heat / COP (nameplate 6.8). Add ancillaries. PUE = Facility_kW / IT_kW. The nameplate COP is never back-solved." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is the locked Scenario A IT load per hall?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Scenario A (locked): 27 NVL72 domains × 132 kW per NVL72 = 3,564 kW per hall. The 132 kW is per NVL72 pair (2 physical rack positions at 66 kW each), NOT per individual rack. Scenario B (variant) treats 132 kW as per physical rack → 7,128 kW per hall, which makes the 4,500 kW UPS impossible." }
+            },
+            {
+                "@type": "Question",
+                "name": "Why is the PUE 1.30 and not 1.08?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The PUE is derived bottom-up from the nameplate COP 6.8 of the Carrier 19DV chiller plus real ancillary loads (pumps, fans, CDU pumps, CRAH fans, UPS/distribution loss, aux). For Scenario B IT 7,128 kW: chiller input 1,048 + ancillaries 1,100 = non-IT 2,148 kW → PUE = (7,128 + 2,148)/7,128 = 1.30. A target PUE ≤ 1.12 is a design aspiration, not a derived operational value." }
+            },
+            {
+                "@type": "Question",
+                "name": "How is hydronic TCS flow calculated?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Flow_LPM = Q_kW × 60 / (ρ × Cp × ΔT) where ρ = 1.0 kg/L, Cp = 4.186 kJ/kg·K, ΔT = 10 K. For Scenario A liquid heat 3,029 kW: 3,029 × 60 / (1.0 × 4.186 × 10) = 4,342 LPM total; 4,342 / 54 racks = 80.4 LPM per rack position." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../datahallAI.html" class="nav-link">AI Data Hall</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / AI Data Hall Cockpit
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Cockpit Basis</p>
+            <h1>AI/HPC Data Hall — NVL72 Cockpit — Methodology &amp; Formulas</h1>
+            <p>Every input, equation, constant, output, and reference behind the GB200 NVL72 AI Data Hall Cockpit. All math is anchored to the locked Scenario A basis-of-design and executed by the deterministic engine <code class="mn-mono">js/datahall-calculations.js</code> (<code class="mn-mono">DATAHALL_CALC</code>) against the deep-frozen model in <code class="mn-mono">js/datahall-model.js</code> (<code class="mn-mono">DATAHALL_MODEL</code>) — no <code class="mn-mono">Math.random()</code> on basis KPIs, no back-solved constants, no per-tab divergence.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>DATAHALL_CALC v1.0</strong></span>
+                <span class="mn-chip">Basis <strong>BASELINE-DECISION.md (locked 2026-05-17)</strong></span>
+                <span class="mn-chip">Scenario <strong>A (132 kW / NVL72)</strong></span>
+                <span class="mn-chip">Inputs <strong>LOCKED + tab selection</strong></span>
+                <span class="mn-chip">Worked examples <strong>10 (doc-21)</strong></span>
+            </div>
+            <a class="mn-toollink" href="../datahallAI.html">&#9654; Open the AI Data Hall Cockpit</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The AI Data Hall Cockpit is a deterministic digital-twin dashboard for a GB200 NVL72 HPC facility operating direct liquid cooling. It answers five engineering questions: <em>what is the IT load per hall and per facility</em>, <em>how is heat split between liquid and air paths</em>, <em>what hydronic flow and how many CDUs are required</em>, <em>what is the honest bottom-up PUE</em>, and <em>what does the electrical distribution look like under the locked load</em>.</p>
+            <p class="mn-lead">Basis of design is <strong>locked</strong>: the <code class="mn-mono">DATAHALL_MODEL</code> object is deep-frozen at page load. No tab can mutate it. Every KPI on every tab reads from the same <code class="mn-mono">DATAHALL_CALC.lockedState()</code> and <code class="mn-mono">DATAHALL_CALC.pueBasis()</code> call — Rule 1 (one source of truth) of <code class="mn-mono">standarization/ACCURACY_VALIDATION.md</code>. The governing hardware reference is the <strong>NVIDIA GB200 NVL72</strong> specification; thermal and facility methodology follows <strong>ASHRAE A2</strong> and <strong>ISO/IEC 30134-2</strong> (PUE) and <strong>ISO/IEC 30134-8</strong> (CUE<sub>IT</sub>).</p>
+        </section>
+
+        <!-- 2. INPUTS / LOCKED BASIS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs — LOCKED basis + tab selection</h2>
+            <p class="mn-lead">The primary input block is the immutable <code class="mn-mono">DATAHALL_MODEL</code> (Scenario A, locked 2026-05-17). Tab-selection controls (scenario toggle, view mode) change which derived quantities are <em>displayed</em> but do not alter the underlying constants. All values below are from <code class="mn-mono">BASELINE-DECISION.md</code> and verified in doc-21 worked examples.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Parameter</th><th>Symbol</th><th>Value (Scenario A)</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td>Facility data halls</td><td><code>halls</code></td><td>4</td><td>BASELINE-DECISION.md</td></tr>
+                    <tr><td>NVL72 domains per hall</td><td><code>nvl72PerHall</code></td><td>27</td><td>BASELINE-DECISION.md</td></tr>
+                    <tr><td>Physical rack positions per NVL72</td><td><code>racksPerNVL72</code></td><td>2</td><td>doc-21 Ex1 "1 NVL72 = 2 rack concept"</td></tr>
+                    <tr><td>Physical rack positions per hall</td><td><code>racksPerHall</code></td><td>54</td><td>27 × 2</td></tr>
+                    <tr><td>GPU per NVL72 / CPU per NVL72</td><td><code>gpuPerNVL72 / cpuPerNVL72</code></td><td>72 / 36</td><td>NVIDIA GB200 NVL72 spec</td></tr>
+                    <tr><td>IT load per NVL72 pair (LOCKED)</td><td><code>kwPerNVL72</code></td><td><strong>132 kW</strong></td><td>BASELINE-DECISION.md "Adopted load — 132 kW per NVL72 (NOT per rack)"</td></tr>
+                    <tr><td>IT load per physical rack position</td><td><code>kwPerRack</code></td><td>66 kW</td><td>132 / 2 — doc-21 Ex1</td></tr>
+                    <tr><td>IT load per hall (Scenario A)</td><td><code>itPerHall_kW</code></td><td>3,564 kW</td><td>27 × 132 — doc-21 Ex1</td></tr>
+                    <tr><td>IT load per facility (Scenario A)</td><td><code>itPerFacility_kW</code></td><td>14,256 kW</td><td>3,564 × 4</td></tr>
+                    <tr><td>Liquid capture ratio</td><td><code>liquidCaptureRatio</code></td><td>0.85</td><td>BASELINE-DECISION.md "Liquid capture 85%"</td></tr>
+                    <tr><td>TCS supply / return</td><td><code>tcsSupplyC / tcsReturnC</code></td><td>35 / 45 °C</td><td>BASELINE-DECISION.md "35 / 45 °C (ΔT 10 K)"</td></tr>
+                    <tr><td>TCS delta-T</td><td><code>tcsDeltaT_K</code></td><td>10 K</td><td>BASELINE-DECISION.md</td></tr>
+                    <tr><td>Water density</td><td><code>rhoKgPerL</code></td><td>1.0 kg/L</td><td>doc-21 Ex6</td></tr>
+                    <tr><td>Water specific heat</td><td><code>cpKjPerKgK</code></td><td>4.186 kJ/kg·K</td><td>doc-21 Ex6</td></tr>
+                    <tr><td>LV voltage (line-line)</td><td><code>voltageLL</code></td><td>400 V</td><td>doc-21 Ex3</td></tr>
+                    <tr><td>Power factor</td><td><code>powerFactor</code></td><td>0.96</td><td>doc-21 Ex3</td></tr>
+                    <tr><td>CDU rating</td><td><code>cdu.ratingKW</code></td><td>350 kW (EoR)</td><td>doc-21 Ex7</td></tr>
+                    <tr><td>Chiller nameplate COP</td><td><code>chiller.nameplateCOP</code></td><td>6.8</td><td>doc-21 Ex9; Carrier 19DV</td></tr>
+                    <tr><td>UPS rating per feed</td><td><code>ups.ratingKW</code></td><td>4,500 kW (2N)</td><td>doc-21 Ex2</td></tr>
+                    <tr><td>Transformer rating</td><td><code>transformer.ratingMVA</code></td><td>5 MVA</td><td>doc-21 Ex4</td></tr>
+                    <tr><td>Active CRAH units</td><td><code>crah.activeUnits</code></td><td>5</td><td>doc-21 Ex8</td></tr>
+                    <tr><td>CRAH chilled-water ΔT</td><td><code>crah.chwDeltaT_K</code></td><td>5 K</td><td>doc-21 Ex8</td></tr>
+                    <tr><td>PUE design band (target)</td><td><code>pueDesignBand</code></td><td>1.12 – 1.25</td><td>BASELINE-DECISION.md</td></tr>
+                    <tr><td>Data hall geometry (L × W × H)</td><td><code>geometry</code></td><td>32 × 20 × 4.2 m</td><td>doc-21 Ex10</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Scenario A vs B:</strong> Scenario A (LOCKED) treats 132 kW as per NVL72 pair → 3,564 kW/hall. Scenario B (variant, NOT adopted) treats 132 kW as per physical rack → 7,128 kW/hall, which overloads the 4,500 kW 2N UPS (158% loading — impossible per doc-21 Ex2) and requires 12,000 A busway. The cockpit labels every KPI with its basis scenario and locks the derived panel to Scenario A.</div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section" id="DATAHALL_CALC">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">All formulas below are implemented verbatim in <code class="mn-mono">js/datahall-calculations.js</code>. Function names are in parentheses. Source lines cite <code class="mn-mono">00-overview-audit.md</code> "Core Calculation Engine" (lines 104-125) and doc-21 worked examples.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">IT load — <code>itLoad()</code></h3>
+            <div class="mn-formula">
+                <span class="mn-eq">IT_kW = Σ rack_kW  +  network_kW  +  storage_kW</span>
+                <span class="mn-where">In <code>itLoad(rackPowerKWArray, networkKW, storageKW)</code>. For Scenario A: Σ rack_kW = 27 NVL72 × 132 kW = 3,564 kW. Network and storage additive.<span class="mn-src">doc-00 line 107 · doc-21 Ex1</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">NVL72 power — <code>nvl72Power()</code></h3>
+            <div class="mn-formula">
+                <span class="mn-eq">NVL72_kW = racksPerNVL72 × rack_kW</span>
+                <span class="mn-where">In <code>nvl72Power(nvl36RackPowerKW, racksPerNVL72)</code>. 2 × 66 kW = 132 kW per NVL72 pair.<span class="mn-src">doc-00 line 108 · doc-21 Ex1</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Facility load — <code>facilityKW()</code></h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Facility_kW = IT_kW  +  coolingElec_kW  +  upsLoss_kW  +  distLoss_kW  +  aux_kW</span>
+                <span class="mn-where">In <code>facilityKW(itKW, coolingElecKW, upsLossKW, distLossKW, auxKW)</code>. The denominator for PUE and CUE.<span class="mn-src">doc-00 line 109</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">PUE — <code>pue()</code></h3>
+            <div class="mn-formula">
+                <span class="mn-eq">PUE = Facility_kW / IT_kW</span>
+                <span class="mn-where">In <code>pue(facilityKW, itKW)</code>. ISO/IEC 30134-2 definition. The result is DERIVED (cyan chip), not the TARGET (1.12–1.25 band from BASELINE). Rule 4: marketing target ≠ derived value.<span class="mn-src">doc-00 line 110 · doc-21 Ex9 · ISO/IEC 30134-2</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Liquid heat / air heat — <code>liquidHeat()</code>, <code>airHeat()</code></h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Liquid_heat_kW = IT_kW × liquid_capture_ratio       (0.85 for NVL72 direct liquid)</span>
+                <span class="mn-eq">Air_heat_kW    = IT_kW × (1 − liquid_capture_ratio)</span>
+                <span class="mn-where">In <code>liquidHeat(itKW, captureRatio)</code> and <code>airHeat(itKW, captureRatio)</code>. Scenario A: 3,564 × 0.85 = 3,029 kW liquid; 3,564 × 0.15 = 535 kW residual air.<span class="mn-src">doc-00 lines 114-115 · doc-21 Ex5</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Hydronic TCS flow — <code>hydronicFlowLPM()</code></h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Flow_LPM = Q_kW × 60  /  (ρ_kg/L × Cp_kJ/kg·K × ΔT_K)</span>
+                <span class="mn-where">In <code>hydronicFlowLPM(qKW, rhoKgL, cpKjKgK, deltaTK)</code>. Q is the LIQUID CAPTURED heat (85% of IT), not full IT load. The UI must state this basis explicitly per doc-21 Ex6 "UI requirement: show whether flow is based on liquid captured heat or full rack heat."<span class="mn-src">doc-00 line 117 · doc-21 Ex6 · BASELINE-DECISION.md</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">CDU count — <code>cduRunningCount()</code></h3>
+            <div class="mn-formula">
+                <span class="mn-eq">CDU_running = ceil( Liquid_heat_kW / CDU_rating_kW )</span>
+                <span class="mn-where">In <code>cduRunningCount(liquidHeatKW, cduRatingKW)</code>. CDU_rating = 350 kW (end-of-row, doc-21 Ex7). Recommended installed count is N+1 or N+2 above running minimum.<span class="mn-src">doc-21 Ex7</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">CRAH residual cooling — <code>fwsFlowM3h()</code></h3>
+            <div class="mn-formula">
+                <span class="mn-eq">perCRAH_kW = Air_heat_kW / activeUnits</span>
+                <span class="mn-eq">Flow_m3/h  = Q_kW × 3600 / (ρ_kg/m³ × Cp_kJ/kg·K × ΔT_K)</span>
+                <span class="mn-where">In <code>fwsFlowM3h(qKW, rhoKgM3, cpKjKgK, deltaTK)</code>. ρ = 1000 kg/m³, ΔT = 5 K (CRAH chilled-water loop). Residual air carries the remaining 15% of IT heat. Doc-21 Ex8 demonstrates: Scenario B 214 kW/CRAH → 36.8 m³/h per unit.<span class="mn-src">doc-00 line 118 · doc-21 Ex8</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Chiller input — <code>chillerInput()</code></h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Chiller_input_kW = cooling_heat_kW / COP_nameplate</span>
+                <span class="mn-where">In <code>chillerInput(coolingKW, cop)</code>. COP_nameplate = 6.8 (Carrier 19DV, doc-21 Ex9). This COP is NEVER calibrated or back-solved to hit a target PUE. "cooling_heat" in the PUE path equals full IT load (doc-21 Ex9: "cooling heat = 7,128 kW = IT").<span class="mn-src">doc-00 line 119 · doc-21 Ex9</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Bottom-up PUE with 5-part basis — <code>pueBasis()</code></h3>
+            <div class="mn-formula">
+                <span class="mn-eq">chillerInput_kW  = IT_kW / COP                         (COP = 6.8 nameplate)</span>
+                <span class="mn-eq">pumps_kW         = 200 × (IT / 7128)                   (scale from Ex9 ref)</span>
+                <span class="mn-eq">fans_kW          = 250 × (IT / 7128)</span>
+                <span class="mn-eq">cduPumps_kW      = 120 × (IT / 7128)</span>
+                <span class="mn-eq">crahFans_kW      =  80 × (IT / 7128)</span>
+                <span class="mn-eq">upsDistLoss_kW   = 300 × (IT / 7128)</span>
+                <span class="mn-eq">aux_kW           = 150 × (IT / 7128)</span>
+                <span class="mn-eq">nonIT_kW         = chillerInput + pumps + fans + cduPumps + crahFans + upsDistLoss + aux</span>
+                <span class="mn-eq">Facility_kW      = IT_kW + nonIT_kW</span>
+                <span class="mn-eq">PUE              = Facility_kW / IT_kW</span>
+                <span class="mn-where">In <code>pueBasis(itKW, model)</code>. The 6 ancillary reference values (200/250/120/80/300/150 kW) are the Scenario B reference point from doc-21 Ex9, scaled linearly for any IT load. The 5-part basis breakdown (IT / cooling / UPS-loss / dist-loss / aux) is returned for display per doc-00 lines 301-308. Nothing is back-solved.<span class="mn-src">doc-21 Ex9 · doc-00 lines 301-308 · BASELINE-DECISION.md</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Electrical — current, kVA, 3-phase kW</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">I_A   = kW × 1000 / (√3 × V_LL × PF)    [required current]</span>
+                <span class="mn-eq">kVA   = kW / PF                           [apparent power]</span>
+                <span class="mn-eq">kW    = √3 × V_LL × I × PF / 1000        [3-phase real power check]</span>
+                <span class="mn-where">In <code>requiredCurrentA()</code>, <code>kva()</code>, <code>threePhaseKW()</code>. Spec uses 1.732 (not full √3 = 1.7320508) to match doc-21 Ex3 exactly. V = 400 V, PF = 0.96.<span class="mn-src">doc-00 lines 122-123 · doc-21 Ex3 · doc-21 Ex4</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Room volume — <code>roomVolumeM3()</code></h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Volume_m³ = length_m × width_m × height_m</span>
+                <span class="mn-where">In <code>roomVolumeM3(lengthM, widthM, heightM)</code>. Geometry: 32 × 20 × 4.2 = 2,688 m³ per doc-21 Ex10. Fire-agent sizing (if implemented) requires further inputs per NFPA 2001 — room volume alone is insufficient.<span class="mn-src">doc-21 Ex10</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">Every constant lives in the deep-frozen <code class="mn-mono">DATAHALL_MODEL</code> with a <code>// source:</code> comment. No economically-material literal lives inside a function body. Key hardware constants:</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Equipment</th><th>Model / Reference</th><th>Rating / Value</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td>UPS</td><td>Modular UPS, 2N A/B topology</td><td>4,500 kW per feed</td><td>doc-21 Ex2; BASELINE-DECISION.md</td></tr>
+                    <tr><td>Transformer</td><td>Cast-resin distribution transformer</td><td>5 MVA (10 MVA conservative)</td><td>doc-21 Ex4; BASELINE-DECISION.md</td></tr>
+                    <tr><td>Busway</td><td>Undersized: 4,000 A → Selected: 6,300 A</td><td>~5,357 A required (Scenario A)</td><td>doc-21 Ex3</td></tr>
+                    <tr><td>Generator</td><td>Caterpillar 3516E</td><td>2,500–2,750 kW</td><td>NVIDIA GB200 NVL72 spec context; BASELINE "NOT 8 MW"</td></tr>
+                    <tr><td>CDU</td><td>350 kW end-of-row CDU</td><td>350 kW thermal</td><td>doc-21 Ex7</td></tr>
+                    <tr><td>Chiller</td><td>Carrier 19DV water-cooled centrifugal</td><td>1,231–4,044 kW; COP 6.8</td><td>doc-21 Ex9; Carrier 19DV nameplate</td></tr>
+                    <tr><td>CRAH</td><td>Active units per hall</td><td>5 active; ΔT 5 K</td><td>doc-21 Ex8</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-tablewrap" style="margin-top:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>PUE ancillary (Ex9 Scenario B reference)</th><th>kW (at IT = 7,128 kW)</th><th>Scales by</th></tr></thead>
+                <tbody>
+                    <tr><td>Chiller input (COP 6.8 nameplate)</td><td>1,048</td><td>IT / COP (not scaled)</td></tr>
+                    <tr><td>Primary pumps</td><td>200</td><td>IT / 7,128</td></tr>
+                    <tr><td>Drycooler / cooling tower fans</td><td>250</td><td>IT / 7,128</td></tr>
+                    <tr><td>CDU pumps</td><td>120</td><td>IT / 7,128</td></tr>
+                    <tr><td>CRAH fans</td><td>80</td><td>IT / 7,128</td></tr>
+                    <tr><td>UPS + distribution loss</td><td>300</td><td>IT / 7,128</td></tr>
+                    <tr><td>Auxiliary (lighting, controls, security)</td><td>150</td><td>IT / 7,128</td></tr>
+                    <tr><td><strong>Total non-IT (Scenario B reference)</strong></td><td><strong>2,148</strong></td><td></td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Engine function</th><th>Unit</th><th>Basis chip</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>IT load per hall / facility</td><td><code>lockedState().itPerHall_kW</code></td><td>kW</td><td>BOD LOCKED</td><td>27 × 132 kW (Scenario A). Never randomised.</td></tr>
+                    <tr><td>Liquid heat</td><td><code>lockedState().liquidHeat_kW</code></td><td>kW</td><td>DERIVED</td><td>IT × 0.85; drives CDU count and TCS flow.</td></tr>
+                    <tr><td>Residual air heat</td><td><code>lockedState().airHeat_kW</code></td><td>kW</td><td>DERIVED</td><td>IT × 0.15; drives CRAH sizing.</td></tr>
+                    <tr><td>TCS total flow</td><td><code>lockedState().tcsFlowTotal_LPM</code></td><td>LPM</td><td>DERIVED</td><td>Based on liquid captured heat (85%), not full rack heat — label required.</td></tr>
+                    <tr><td>TCS flow per rack position</td><td><code>lockedState().tcsFlowPerRack_LPM</code></td><td>LPM</td><td>DERIVED</td><td>Total / 54 rack positions. Shows 80.4 LPM for Scenario A.</td></tr>
+                    <tr><td>CDU running count</td><td><code>lockedState().cduRunningCount</code></td><td>count</td><td>DERIVED</td><td>ceil(liquid_kW / 350). Recommended installed = N+1 or N+2 above running.</td></tr>
+                    <tr><td>CRAH flow per unit</td><td><code>lockedState().crahFlowPerUnit_m3h</code></td><td>m³/h</td><td>DERIVED</td><td>Per active CRAH at 5 K CHW delta-T.</td></tr>
+                    <tr><td>Required busway current</td><td><code>lockedState().requiredCurrent_A</code></td><td>A</td><td>DERIVED</td><td>Must not exceed busway rating. 5,357 A Scenario A → 6,300 A selected.</td></tr>
+                    <tr><td>Transformer apparent power</td><td><code>lockedState().transformer_kVA</code></td><td>kVA</td><td>DERIVED</td><td>IT_kW / PF. 3,713 kVA → 74.3% of 5 MVA (Scenario A, plausible).</td></tr>
+                    <tr><td>UPS loading %</td><td><code>lockedState().upsLoadingPct</code></td><td>%</td><td>DERIVED</td><td>IT_kW / UPS_rated. 79.2% Scenario A — plausible with margin.</td></tr>
+                    <tr><td>PUE (bottom-up)</td><td><code>pueBasis().pue</code></td><td>—</td><td>DERIVED</td><td>Facility / IT. Shows the honest derived value, never the target.</td></tr>
+                    <tr><td>PUE 5-part basis</td><td><code>pueBasis().basis</code></td><td>kW</td><td>DERIVED</td><td>IT / cooling / UPS-loss / dist-loss / aux — human-auditable breakdown.</td></tr>
+                    <tr><td>Data hall volume</td><td><code>dataHallVolume()</code></td><td>m³</td><td>BOD LOCKED</td><td>32 × 20 × 4.2 = 2,688 m³ per hall.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example — Scenario A (LOCKED basis)</h2>
+            <p class="mn-lead">Numbers reproduce the engine output exactly for Scenario A (132 kW / NVL72). Examples 1–10 are the acceptance tests in <code class="mn-mono">tools/test-datahall-calc.mjs</code> (57/57 assertions). Below is a compressed trace of the ten examples.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Ex1 — IT load &amp; rack count:</strong> 27 NVL72 × 2 racks = <span class="mn-result">54 rack positions/hall</span>. 27 × 132 kW = <span class="mn-result">IT = 3,564 kW/hall</span>; 66 kW/rack position.</li>
+                    <li><strong>Ex2 — UPS sizing:</strong> IT 3,564 kW ÷ UPS 4,500 kW = <span class="mn-result">79.2% load</span> — plausible (2N, some margin). Scenario B 7,128 ÷ 4,500 = 158.4% — impossible.</li>
+                    <li><strong>Ex3 — Busway current:</strong> I = 3,564 × 1000 / (1.732 × 400 × 0.96) = <span class="mn-result">5,357 A</span> → 4,000 A busway undersized; <span class="mn-result">6,300 A selected</span>.</li>
+                    <li><strong>Ex4 — Transformer loading:</strong> kVA = 3,564 / 0.96 = <span class="mn-result">3,713 kVA</span>; 5 MVA load = <span class="mn-result">74.3%</span> — plausible.</li>
+                    <li><strong>Ex5 — Cooling split:</strong> Liquid = 3,564 × 0.85 = <span class="mn-result">3,029 kW</span>; Air = 3,564 × 0.15 = <span class="mn-result">535 kW</span>.</li>
+                    <li><strong>Ex6 — TCS flow (Scenario A):</strong> Flow = 3,029 × 60 / (1.0 × 4.186 × 10) = <span class="mn-result">4,342 LPM total</span>; 4,342 / 54 = <span class="mn-result">80.4 LPM/rack</span>. Flow basis = liquid captured heat (85%), not full rack heat.</li>
+                    <li><strong>Ex7 — CDU count:</strong> ceil(3,029 / 350) = ceil(8.65) = <span class="mn-result">9 CDUs running</span>; recommended installed 10–12.</li>
+                    <li><strong>Ex8 — CRAH residual:</strong> 535 kW / 5 CRAH = 107 kW/unit; m³/h = 107 × 3600 / (1000 × 4.186 × 5) = <span class="mn-result">18.4 m³/h/CRAH</span>.</li>
+                    <li><strong>Ex9 — Chiller input &amp; PUE (Scenario B reference point):</strong> Chiller = 7,128 / 6.8 = <span class="mn-result">1,048 kW</span>. Non-IT = 1,048 + 200 + 250 + 120 + 80 + 300 + 150 = <span class="mn-result">2,148 kW</span>. PUE = (7,128 + 2,148) / 7,128 = <span class="mn-result">1.30</span>. For Scenario A (IT 3,564 kW scaled): PUE ~1.30 by same methodology.</li>
+                    <li><strong>Ex10 — Data hall volume:</strong> 32 × 20 × 4.2 = <span class="mn-result">2,688 m³/hall</span>. Fire-agent design requires additional NFPA 2001 inputs; room volume alone is insufficient.</li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>PUE reading:</strong> The derived PUE (~1.30 at full load, Scenario B reference) reflects chiller-based direct liquid cooling without free-cooling bypass. The target band 1.12–1.25 (BASELINE-DECISION.md) is achievable with partial free cooling or heat rejection improvements but is a <em>design target</em>, not the operational result from this engine. Rule 4 (ACCURACY_VALIDATION.md): <strong>target ≠ derived value</strong> — the cockpit shows them in different colours and chips.</div>
+        </section>
+
+        <!-- 7. ACCURACY VALIDATION -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> Accuracy validation — 6 rules</h2>
+            <p class="mn-lead">Codified in <code class="mn-mono">standarization/ACCURACY_VALIDATION.md</code> and enforced by <code class="mn-mono">tools/probe-accuracy-validation.mjs</code> (40/40 acceptance tests). Gate any change that touches the cockpit pages.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Rule</th><th>Requirement</th><th>Failure example</th></tr></thead>
+                <tbody>
+                    <tr><td><code>Rule 1</code> — One source of truth</td><td>Every KPI on every tab reads from <code>DATAHALL_CALC.lockedState()</code> or <code>pueBasis()</code> — never from a separate variable or inline literal.</td><td>Dashboard showing 66 kW/rack while the electrical tab shows 132 kW/rack simultaneously.</td></tr>
+                    <tr><td><code>Rule 2</code> — No Math.random on basis KPIs</td><td>IT load, PUE, Facility load, GPU count, CDU count, UPS/transformer ratings: deterministic. Reload 20× — must be identical every time.</td><td>Random jitter on TCS flow or dashboard rack-load causing different values each load.</td></tr>
+                    <tr><td><code>Rule 3</code> — Every metric carries a denominator</td><td>PUE = Facility ÷ IT; UPS loading = load ÷ rated; transformer = kVA_load ÷ kVA_rating. Denominator shown in tooltip or inline.</td><td>PUE shown without stating the IT kW basis.</td></tr>
+                    <tr><td><code>Rule 4</code> — Target ≠ derived value</td><td>Target PUE ≤ 1.12 (design band, blue chip) and derived PUE 1.30 (engine output, cyan chip) are two different numbers with different colour meanings.</td><td>Showing "PUE 1.12" (target) in green as if it were the operating result.</td></tr>
+                    <tr><td><code>Rule 5</code> — Terminology matches engineering basis</td><td>Use "NVL72 domain" (132 kW logical pair) and "physical rack position" (66 kW per slot). Never call a 66 kW rack an "NVL72 rack" — NVIDIA spec says ~120 kW per NVL72 rack-scale system.</td><td>Labelling the 66 kW slot as an "NVL72 rack" when it is one of two physical positions in an NVL72 footprint.</td></tr>
+                    <tr><td><code>Rule 6</code> — Basis chip on every critical KPI</td><td>Each KPI carries: MEASURED / DERIVED / TARGET / SIMULATED / BOD LOCKED / MANUAL. Click opens a drawer with formula, inputs, output, scope, denominator, source.</td><td>A PUE tile with no chip — operator cannot determine if the value is a target or a derived result.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 8. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>NVIDIA GB200 NVL72</b> — Blackwell GPU rack-scale specification: 72 GPU + 36 Grace CPU per NVL72, direct liquid cooling, ~120–140 kW per NVL72 domain (adopted design value 132 kW).</li>
+                <li><b>BASELINE-DECISION.md (locked 2026-05-17)</b> — Single immutable source of truth for the whole cockpit: 4 halls, 27 NVL72/hall, 132 kW/NVL72 (Scenario A), 85% liquid capture, TCS 35/45 °C, PUE design band 1.12–1.25.</li>
+                <li><b>21-calculation-worked-examples.md (doc-21)</b> — 10 fully-traced examples (Ex1–Ex10) that are the acceptance test cases for <code class="mn-mono">tools/test-datahall-calc.mjs</code> (57/57 assertions).</li>
+                <li><b>00-overview-audit.md (doc-00)</b> — Core Calculation Engine definition (lines 104-125), Source Sanity References, equipment corrections (Cat 3516E ≈ 2.5–2.75 MW).</li>
+                <li><b>ASHRAE A2 / ASHRAE 90.4</b> — Inlet temperature envelope for HPC cooling; energy efficiency for data centres.</li>
+                <li><b>ISO/IEC 30134-2</b> — Data centre key performance indicators: Power Usage Effectiveness (PUE) — definition, measurement scope, and boundary.</li>
+                <li><b>ISO/IEC 30134-8</b> — Carbon Usage Effectiveness relative to IT equipment energy (CUE<sub>IT</sub>).</li>
+                <li><b>Carrier 19DV centrifugal chiller</b> — Nameplate COP 6.8 used in doc-21 Ex9 (not calibrated to hit a target PUE).</li>
+                <li><b>Engine sources</b> — <code class="mn-mono">js/datahall-calculations.js</code> (DATAHALL_CALC, pure derivation engine) + <code class="mn-mono">js/datahall-model.js</code> (DATAHALL_MODEL, deep-frozen basis).</li>
+                <li><b>standarization/ACCURACY_VALIDATION.md</b> — 6 accuracy rules + 40 acceptance tests enforced by <code class="mn-mono">tools/probe-accuracy-validation.mjs</code>.</li>
+            </ul>
+        </section>
+
+        <a class="mn-toollink" href="../datahallAI.html">&#9654; Open the AI Data Hall Cockpit</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../datahallAI.html">AI Data Hall Cockpit</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

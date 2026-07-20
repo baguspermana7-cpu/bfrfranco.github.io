@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>PUE Calculator — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full engineering methodology for the data center PUE calculator: facility power decomposition, cooling COP equations, UPS efficiency curves, inputs, output formulas, constants, worked example, and standards references.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="PUE methodology, Power Usage Effectiveness, DCiE, Green Grid ISO 30134-2, ASHRAE TC 9.9, cooling COP, UPS efficiency, data center energy, PUE calculator">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/pue.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/pue.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/pue.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/pue.html">
+    <meta property="og:title" content="PUE Calculator — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="Facility power decomposition, cooling COP equations, UPS efficiency curves, constants, and worked example behind the data center PUE calculator.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="PUE Calculator Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="PUE Calculator — Technical Manual">
+    <meta name="twitter:description" content="Facility power decomposition, cooling COP, UPS efficiency curves, constants, and worked example for the PUE calculator.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="PUE Calculator Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "PUE Calculator" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "PUE Calculator — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Power Usage Effectiveness calculation methodology for data centers: facility power decomposition, cooling COP, UPS efficiency, and carbon impact",
+        "articleSection": "Energy Efficiency",
+        "dependencies": "ISO/IEC 30134-2, ASHRAE TC 9.9, Green Grid PUE White Paper, Uptime Institute Global Survey",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to calculate data center PUE from first principles",
+        "step": [
+            { "@type": "HowToStep", "name": "Quantify IT load", "text": "Enter the total IT equipment power in kW — the denominator of PUE." },
+            { "@type": "HowToStep", "name": "Model cooling power", "text": "Cooling kW = IT load × cooling overhead fraction × climate multiplier, reduced by containment efficiency and economizer savings. Cooling overhead is derived from the cooling type COP." },
+            { "@type": "HowToStep", "name": "Add power-chain losses", "text": "UPS loss = IT load × (1/UPS_eff − 1) × redundancy multiplier. Transformer loss = IT load × tx%. PDU loss = IT load × (1 − PDU_eff)." },
+            { "@type": "HowToStep", "name": "Sum facility loads and compute PUE", "text": "Total = IT + Cooling + UPS_loss + Tx_loss + PDU_loss + Lighting + Security + Fire. PUE = Total / IT. DCiE = 1 / PUE." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is the PUE formula?",
+                "acceptedAnswer": { "@type": "Answer", "text": "PUE = Total Facility Power / IT Equipment Power (ISO/IEC 30134-2). Total facility power includes IT load plus cooling, UPS losses, transformer losses, PDU losses, lighting, security, and fire suppression. DCiE = 1/PUE." }
+            },
+            {
+                "@type": "Question",
+                "name": "How does cooling type affect PUE?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Cooling overhead in the PUE model equals IT load × a type-specific fraction representing the inverse of COP: CRAC ~0.45 (COP 2.8), CRAH ~0.38 (COP 4.0), in-row ~0.32 (COP 5.0), rear-door ~0.22 (COP 8.0), direct liquid ~0.12 (COP 15), immersion ~0.08 (COP 25). Lower COP = higher cooling overhead = higher PUE." }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the global average PUE benchmark?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The Uptime Institute 2024 Global Survey reports the worldwide average at 1.58. Best-in-class hyperscale facilities (Google, Meta, AWS) achieve 1.10–1.20. Enterprise colocations typically fall in the 1.40–1.60 range. Legacy facilities often exceed 2.0." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../pue-calculator.html" class="nav-link">PUE Calculator</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / PUE Calculator
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Energy Efficiency</p>
+            <h1>PUE Calculator — Methodology &amp; Formulas</h1>
+            <p>Every input, equation, constant, output, and reference behind the data center PUE calculator. All math is executed in the browser as a deterministic facility-power decomposition anchored to ISO/IEC 30134-2 and ASHRAE TC 9.9 — no random values, no back-solved constants. Engine functions cross-reference <code class="mn-mono">RZEngine.models.pue.*</code> in <code class="mn-mono">rz-engine.js</code> where applicable.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>RZEngine v2.0</strong></span>
+                <span class="mn-chip">Basis <strong>ISO/IEC 30134-2 · Green Grid</strong></span>
+                <span class="mn-chip">Free inputs <strong>9</strong></span>
+                <span class="mn-chip">Pro inputs <strong>5</strong></span>
+                <span class="mn-chip">Outputs <strong>8+</strong></span>
+            </div>
+            <a class="mn-toollink" href="../pue-calculator.html">&#9654; Open the live PUE Calculator</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The calculator quantifies the Power Usage Effectiveness (PUE) of a data center from a bottom-up facility power decomposition. It answers three design questions: <em>what fraction of drawn power reaches IT equipment</em>, <em>how does cooling architecture drive overhead</em>, and <em>what is the annual energy cost and carbon footprint</em>.</p>
+            <p class="mn-lead">PUE is defined in <strong>ISO/IEC 30134-2:2016</strong> (adopted by The Green Grid as the industry standard) and measured per ASHRAE TC 9.9 operating envelope guidance. The tool models PUE from first principles rather than from a lookup table, so it can predict the impact of architecture changes before they are built. The global benchmark is <strong>1.58 (Uptime Institute Global Survey 2024)</strong>; hyperscale leaders achieve 1.10–1.20.</p>
+            <p class="mn-lead">The governing identity is:</p>
+            <div class="mn-formula">
+                <span class="mn-eq">PUE = P_total / P_IT</span>
+                <span class="mn-eq">DCiE = 1 / PUE    (Data Center Infrastructure Efficiency)</span>
+                <span class="mn-where">ISO/IEC 30134-2 §5. P_IT is the IT equipment load (denominator). P_total is the sum of all loads (numerator).<span class="mn-src">ISO/IEC 30134-2 · STANDARD</span></span>
+            </div>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">Fourteen inputs across five groups — IT infrastructure, cooling system, power distribution, facility loads, and PRO advanced parameters. Ranges are enforced client-side; defaults reflect a typical Tier III colocation at 1 MW IT load.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field</th><th>ID</th><th>Unit</th><th>Default</th><th>Tier</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td>IT Load</td><td><code>itLoad</code></td><td>kW</td><td>1 000</td><td>Free</td><td>Total IT equipment power — the PUE denominator. Range 50–100 000 kW.</td></tr>
+                    <tr><td>Rack Density</td><td><code>rackDensity</code></td><td>kW/rack</td><td>8</td><td>Free</td><td>Used to auto-calculate rack count = ceil(IT load / density). Options: 5, 8, 15, 30.</td></tr>
+                    <tr><td>Cooling Type</td><td><code>coolingType</code></td><td>enum</td><td>crah</td><td>Free</td><td>Sets the cooling overhead fraction (proxy for inverse COP). See §3.</td></tr>
+                    <tr><td>Containment</td><td><code>containment</code></td><td>enum</td><td>cold</td><td>Free</td><td>Airflow containment strategy reduces cooling overhead by a fixed fraction. See §3.</td></tr>
+                    <tr><td>Climate Zone</td><td><code>climateZone</code></td><td>enum</td><td>subtropical</td><td>Free</td><td>Multiplies the cooling overhead (tropical-humid = 1.15, cold = 0.78). See constants §4.</td></tr>
+                    <tr><td>UPS Type</td><td><code>upsType</code></td><td>enum</td><td>double</td><td>Free</td><td>Determines the load-dependent UPS efficiency curve. See §3.</td></tr>
+                    <tr><td>UPS Load Factor</td><td><code>upsLoadFactor</code></td><td>%</td><td>50</td><td>Free</td><td>% of rated UPS capacity utilised. Governs which point on the efficiency curve is used.</td></tr>
+                    <tr><td>Redundancy</td><td><code>redundancy</code></td><td>enum</td><td>n1</td><td>Free</td><td>Scales UPS losses by redundancy overhead multiplier (N=1.00, N+1=1.10, 2N=1.25, 2N+1=1.35).</td></tr>
+                    <tr><td>Lighting</td><td><code>lighting</code></td><td>W/m²</td><td>8</td><td>Free</td><td>Lighting power density. Floor area = rack count × 3 m²/rack. Lighting kW = W/m² × area / 1000.</td></tr>
+                    <tr><td>Security</td><td><code>security</code></td><td>kW/rack</td><td>0.5</td><td>Free</td><td>Physical security load (CCTV, access control, NVR). Security kW = rate × rack count.</td></tr>
+                    <tr><td>Fire Suppression</td><td><code>fire</code></td><td>kW/rack</td><td>0.1</td><td>Free</td><td>Detection + suppression standby power. Fire kW = rate × rack count.</td></tr>
+                    <tr><td>Economizer Mode</td><td><code>economizer</code></td><td>enum</td><td>none</td><td>PRO</td><td>Reduces cooling kW by 15% (air-side) or 25% (water-side). Driven by free-cooling hours in climate data.</td></tr>
+                    <tr><td>Supply Air Temp</td><td><code>supplyTemp</code></td><td>°C</td><td>20</td><td>PRO</td><td>Each °C above 20 saves 3% cooling energy (ASHRAE TC 9.9 range 18–27°C).</td></tr>
+                    <tr><td>Transformer Loss</td><td><code>transformerLoss</code></td><td>%</td><td>1.5</td><td>PRO</td><td>Voltage-transformation losses. Transformer kW = IT load × tx%.</td></tr>
+                    <tr><td>PDU Type</td><td><code>pduType</code></td><td>enum</td><td>metered</td><td>PRO</td><td>PDU efficiency: basic 98%, metered 98.5%, monitored/switched 99%. PDU loss = IT × (1 − eff).</td></tr>
+                    <tr><td>Energy Cost</td><td><code>energyCost</code></td><td>$/kWh</td><td>0.10</td><td>PRO</td><td>Blended electricity rate for annual cost calculation. Compare with <code>DATA.regions[*].powerKwh</code>.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">The calculator decomposes total facility power into six additive components, then applies PUE = P_total / P_IT. All intermediate values are deterministic given the inputs.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 1 — Rack count (derived)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">rackCount = ceil( itLoad / rackDensity )</span>
+                <span class="mn-where">Used to scale facility loads (lighting area, security kW, fire kW). Auto-shown in the UI; can be overridden.</span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 2 — Cooling power</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">P_cool = itLoad × ( coolingOverhead[type] × climateMult[zone] − containmentReduction[containment] )</span>
+                <span class="mn-eq">if econMode === 'airside':   P_cool × 0.85</span>
+                <span class="mn-eq">if econMode === 'waterside': P_cool × 0.75</span>
+                <span class="mn-eq">if PRO supplyTemp ≠ 20°C:   P_cool × ( 1 − (supplyTemp − 20) × 0.03 )</span>
+                <span class="mn-eq">P_cool = max( P_cool, itLoad × 0.02 )    (floor: 2% of IT)</span>
+                <span class="mn-where"><code>coolingOverhead</code> is a type-keyed fraction approximating 1/COP × overhead share (see constants §4). <code>climateMult</code> adjusts for ambient cooling penalty. Containment reduces mixing losses. Economizer applies free cooling. Each °C above 20°C cuts cooling 3% via higher chiller efficiency and extended economizer hours (ASHRAE TC 9.9).<span class="mn-src">ASHRAE TC 9.9 · STANDARD</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 3 — UPS losses</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">upsEff = interpolate( upsEfficiency[type], upsLoadFactor )    (linear between 25/50/75/100%)</span>
+                <span class="mn-eq">P_ups = itLoad × ( 1/upsEff − 1 ) × redundancyMult[redund]</span>
+                <span class="mn-where">Efficiency is load-dependent (curves per type, §4). Double-conversion at 50% load = 92% → loss = 8.7%. Redundancy overhead multiplier scales losses for standby capacity.<span class="mn-src">IEEE 1100 / UPS vendor data</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 4 — Transformer &amp; PDU losses (PRO)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">P_tx  = itLoad × txLoss                (default 1.5%)</span>
+                <span class="mn-eq">P_pdu = itLoad × ( 1 − pduEfficiency[type] )    (metered: 0.5%)</span>
+                <span class="mn-where">Transformer losses are load-proportional in this model (conservative; actual no-load losses are constant). DOE 2016-compliant dry-type transformers achieve 0.5–1.5% loss vs legacy 1.5–2.5%.<span class="mn-src">DOE 10 CFR Part 431 / IEEE C57.12</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 5 — Facility loads</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">floorArea   = rackCount × 3          (m², 3 m²/rack rule-of-thumb)</span>
+                <span class="mn-eq">P_lighting  = lightingWm2 × floorArea / 1000</span>
+                <span class="mn-eq">P_security  = secKwRack × rackCount</span>
+                <span class="mn-eq">P_fire      = fireKwRack × rackCount</span>
+                <span class="mn-eq">P_facility  = P_lighting + P_security + P_fire</span>
+                <span class="mn-where">Lighting, security, and fire suppression are minor but measurable components of facility overhead. Lighting typically 1–3% of total; security and fire together &lt;1%.</span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 6 — PUE, DCiE, energy, carbon</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">P_total      = P_IT + P_cool + P_ups + P_tx + P_pdu + P_facility</span>
+                <span class="mn-eq">PUE          = P_total / P_IT        ← RZEngine.models.pue.pueFromInputs(itLoad, P_total)</span>
+                <span class="mn-eq">DCiE         = 1 / PUE              ← RZEngine.models.pue.dcie(PUE)</span>
+                <span class="mn-eq">annualEnergy = P_total × 8 760       [kWh/yr]</span>
+                <span class="mn-eq">annualCost   = annualEnergy × energyCostPerKWh</span>
+                <span class="mn-eq">CO2_tyr      = annualEnergy × gridFactor / 1 000    [t CO₂e/yr]  (PRO; default 0.5 kg/kWh)</span>
+                <span class="mn-where">Engine functions <code>pueFromInputs</code> and <code>dcie</code> are in <code>RZEngine.models.pue</code> (rz-engine.js §S4). Grid carbon factor defaults to 0.5 kg CO₂/kWh blended; pro mode uses <code>DATA.carbon.gridFactor[region]</code> per climate/region.<span class="mn-src">ISO/IEC 30134-2 · STANDARD; DATA.carbon.gridFactor · rz-engine.js</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Partial-load PUE curve (free panel)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">PUE(l) = 1 + overhead × ( 0.55/l + 0.45 )</span>
+                <span class="mn-eq">where  overhead = designPUE − 1,   l = IT utilisation fraction ∈ [0.05, 1.00]</span>
+                <span class="mn-where">Fixed-share 0.55 means 55% of facility overhead is invariant to IT load (cooling base load, transformer no-load, lighting, security) — it doesn't scale down with IT, so PUE rises at low utilisation. Powered by <code>RZEngine.models.pue.partialLoadPUE(designPUE, loadFraction)</code>.<span class="mn-src">Green Grid partial-load PUE guidance; DATA.sources['pue.partialLoad']</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">Every constant is authored in the calculator JS or in the deep-frozen <code class="mn-mono">DATA</code> block of <code class="mn-mono">rz-engine.js</code> (v2.0), with a <code>DATA.sources</code> citation. Key tables:</p>
+
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Cooling Type</th><th>COP (nominal)</th><th>Overhead fraction</th><th>Containment reductions</th></tr></thead>
+                <tbody>
+                    <tr><td>CRAC (Computer Room AC)</td><td>~2.8</td><td><code>0.45</code></td><td rowspan="6" style="vertical-align:middle;">None: 0.00 · Hot-aisle: 0.10 · Cold-aisle: 0.12 · Chimney: 0.15</td></tr>
+                    <tr><td>CRAH (Computer Room Air Handler)</td><td>~4.0</td><td><code>0.38</code></td></tr>
+                    <tr><td>In-Row Cooling</td><td>~5.0</td><td><code>0.32</code></td></tr>
+                    <tr><td>Rear-Door Heat Exchanger</td><td>~8.0</td><td><code>0.22</code></td></tr>
+                    <tr><td>Direct Liquid Cooling (DLC)</td><td>~15</td><td><code>0.12</code></td></tr>
+                    <tr><td>Immersion Cooling</td><td>~25</td><td><code>0.08</code></td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <div class="mn-tablewrap" style="margin-top:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>Climate Zone</th><th>Climate Multiplier</th><th>Free-Cooling Hrs/yr</th><th>Example cities</th></tr></thead>
+                <tbody>
+                    <tr><td>Tropical Humid</td><td><code>1.15</code></td><td>0</td><td>Jakarta, Singapore</td></tr>
+                    <tr><td>Tropical Dry</td><td><code>1.08</code></td><td>500</td><td>Dubai, Phoenix</td></tr>
+                    <tr><td>Subtropical</td><td><code>1.00</code></td><td>1 500</td><td>Hong Kong, Sydney</td></tr>
+                    <tr><td>Temperate</td><td><code>0.92</code></td><td>3 000</td><td>London, San Francisco</td></tr>
+                    <tr><td>Continental</td><td><code>0.85</code></td><td>4 500</td><td>Chicago, Frankfurt</td></tr>
+                    <tr><td>Cold</td><td><code>0.78</code></td><td>6 000</td><td>Stockholm, Helsinki</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <div class="mn-tablewrap" style="margin-top:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>UPS Type</th><th>Eff @ 25%</th><th>Eff @ 50%</th><th>Eff @ 75%</th><th>Eff @ 100%</th></tr></thead>
+                <tbody>
+                    <tr><td>Double-Conversion (Online)</td><td>88%</td><td>92%</td><td>94%</td><td>95%</td></tr>
+                    <tr><td>Line-Interactive</td><td>93%</td><td>96%</td><td>97%</td><td>97.5%</td></tr>
+                    <tr><td>Rotary / DRUPS</td><td>90%</td><td>94%</td><td>96%</td><td>97%</td></tr>
+                    <tr><td>Flywheel Hybrid</td><td>95%</td><td>97%</td><td>98%</td><td>98.5%</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <div class="mn-tablewrap" style="margin-top:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>Region</th><th>Power cost ($/kWh)</th><th>Grid factor (kg CO₂/kWh)</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td>United States</td><td><code>0.090</code></td><td><code>0.37</code></td><td>EIA industrial + DC PPA blend</td></tr>
+                    <tr><td>Europe (blended)</td><td><code>0.235</code></td><td><code>0.23</code></td><td>Eurostat non-household electricity</td></tr>
+                    <tr><td>Asia-Pacific (blended)</td><td><code>0.110</code></td><td><code>0.55</code></td><td>IEA / regional utility filings</td></tr>
+                    <tr><td>Indonesia (ID)</td><td><code>0.075</code></td><td><code>0.68</code></td><td>PLN tariff / IEA 2025</td></tr>
+                    <tr><td>Singapore (SG)</td><td><code>0.180</code></td><td><code>0.41</code></td><td>EMA Singapore 2025</td></tr>
+                    <tr><td>Malaysia (MY)</td><td><code>0.070</code></td><td><code>0.55</code></td><td>TNB / IEA 2025</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <div class="mn-tablewrap" style="margin-top:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>PUE Benchmark</th><th>Cooling</th><th>Tier II</th><th>Tier III</th><th>Tier IV</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td>Air-cooled</td><td>CRAH / CRAC</td><td><code>1.62</code></td><td><code>1.50</code></td><td><code>1.44</code></td><td>Uptime Institute Global Survey 2026</td></tr>
+                    <tr><td>In-row</td><td>close-coupled</td><td><code>1.34</code></td><td><code>1.27</code></td><td><code>1.22</code></td><td>Uptime Institute 2026 close-coupled cohort</td></tr>
+                    <tr><td>Rear-door HX</td><td>RDHX</td><td><code>1.24</code></td><td><code>1.18</code></td><td><code>1.14</code></td><td>Uptime Institute 2026 rear-door cohort</td></tr>
+                    <tr><td>Liquid / DLC</td><td>direct-to-chip</td><td><code>1.22</code></td><td><code>1.15</code></td><td><code>1.10</code></td><td>Uptime Institute 2026 / ASHRAE TC9.9</td></tr>
+                    <tr><td>Immersion</td><td>single/two-phase</td><td><code>1.07</code></td><td><code>1.04</code></td><td><code>1.03</code></td><td>Uptime Institute 2026</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <div class="mn-note"><strong>Benchmark PUE 1.58:</strong> Uptime Institute 2024 Global Survey global average. <code>DATA.sources['pueDefaults']</code> and <code>DATA.sources['pueMatrix']</code> in <code>rz-engine.js</code> cite Uptime Global PUE Survey 2026 as of the last engine refresh.</div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Formula</th><th>Unit</th><th>Tier</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>PUE</td><td><code>P_total / P_IT</code></td><td>ratio</td><td>Free</td><td>≤1.20 = Excellent; 1.20–1.40 = Very Good; 1.40–1.60 = Good; 1.60–1.80 = Average; &gt;2.0 = Poor.</td></tr>
+                    <tr><td>DCiE</td><td><code>1 / PUE × 100%</code></td><td>%</td><td>Free</td><td>Percentage of total power that reaches IT. DCiE 64.5% means 35.5% is non-IT overhead.</td></tr>
+                    <tr><td>Total Facility Power</td><td><code>sum of all components</code></td><td>kW</td><td>Free</td><td>Numerator of PUE. Capacity planning input (utility connection sizing).</td></tr>
+                    <tr><td>Cooling Load</td><td><code>P_cool</code></td><td>kW</td><td>Free</td><td>Largest non-IT load. Use to size chiller plant and cooling-tower capacity.</td></tr>
+                    <tr><td>UPS Loss</td><td><code>P_ups</code></td><td>kW</td><td>Free</td><td>AC-DC-AC conversion loss. Shrinks with higher-efficiency topology or higher load factor.</td></tr>
+                    <tr><td>Annual Energy</td><td><code>P_total × 8 760</code></td><td>MWh / GWh</td><td>Free</td><td>Total facility electricity consumption per year (8 760 h/yr = <code>DATA.hoursPerYear</code>).</td></tr>
+                    <tr><td>Annual Cost</td><td><code>annualEnergy × $/kWh</code></td><td>USD</td><td>PRO</td><td>Estimated annual electricity spend (excludes demand charges and ToU variations).</td></tr>
+                    <tr><td>CO2/Year</td><td><code>annualEnergy × gridFactor / 1 000</code></td><td>t CO₂e</td><td>PRO</td><td>Scope 2 emissions. Uses 0.5 kg/kWh default blended or <code>DATA.carbon.gridFactor[region]</code>.</td></tr>
+                    <tr><td>Free Cooling Hours</td><td>climate lookup</td><td>hrs/yr</td><td>PRO</td><td>Estimated annual hours when ambient enables economizer operation. From <code>climateData[zone].freeCoolingHrs</code>.</td></tr>
+                    <tr><td>Partial-load PUE</td><td><code>RZEngine.models.pue.partialLoadPUE(PUE, 0.50)</code></td><td>ratio</td><td>Free panel</td><td>PUE at 50% IT utilisation — shows efficiency degradation at partial load.</td></tr>
+                    <tr><td>WUE</td><td><code>DATA.water.wueByType[cooling]</code></td><td>L/kWh</td><td>Free panel</td><td>Water Use Effectiveness companion: air 1.80, rear-door 1.10, DLC 0.50, immersion 0.10 L/kWh.</td></tr>
+                    <tr><td>Annual Water</td><td><code>WUE × IT_kWh / 1 000</code></td><td>m³/yr</td><td>Free panel</td><td>Total water consumption for cooling per year.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example</h2>
+            <p class="mn-lead">1 000 kW IT load (default preset), CRAH cooling, cold-aisle containment, subtropical climate, double-conversion UPS at 50% load factor, N+1 redundancy, standard lighting (8 W/m²), standard security (0.5 kW/rack), FM-200 fire (0.1 kW/rack). PRO defaults: no economizer, supply temp 20°C, transformer 1.5%, metered PDU, energy cost $0.10/kWh. All values computed from the documented constants — no lookup-only numbers.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Rack count:</strong> <code>ceil(1 000 / 8) =</code> <span class="mn-result">125 racks</span></li>
+                    <li><strong>Cooling (CRAH, cold-aisle, subtropical):</strong><br>
+                        <code>1 000 × (0.38 × 1.00 − 0.12) = 1 000 × 0.26 =</code> <span class="mn-result">260 kW</span></li>
+                    <li><strong>UPS efficiency (double-conversion, 50% load):</strong> interpolate curve → <span class="mn-result">92%</span><br>
+                        <code>P_ups = 1 000 × (1/0.92 − 1) × 1.10 = 1 000 × 0.0870 × 1.10 =</code> <span class="mn-result">95.7 kW</span></li>
+                    <li><strong>Transformer losses (PRO default 1.5%):</strong> <code>1 000 × 0.015 =</code> <span class="mn-result">15 kW</span></li>
+                    <li><strong>PDU losses (metered, 98.5% eff):</strong> <code>1 000 × (1 − 0.985) =</code> <span class="mn-result">15 kW</span></li>
+                    <li><strong>Floor area:</strong> <code>125 × 3 =</code> <span class="mn-result">375 m²</span><br>
+                        Lighting: <code>8 × 375 / 1 000 =</code> <span class="mn-result">3.0 kW</span><br>
+                        Security: <code>0.5 × 125 =</code> <span class="mn-result">62.5 kW</span><br>
+                        Fire: <code>0.1 × 125 =</code> <span class="mn-result">12.5 kW</span><br>
+                        P_facility = <span class="mn-result">78.0 kW</span></li>
+                    <li><strong>Total facility power:</strong><br>
+                        <code>1 000 + 260 + 95.7 + 15 + 15 + 78 =</code> <span class="mn-result">1 463.7 kW</span></li>
+                    <li><strong>PUE:</strong> <code>1 463.7 / 1 000 =</code> <span class="mn-result">1.464</span> → rating: A — Very Good</li>
+                    <li><strong>DCiE:</strong> <code>1 / 1.464 × 100 =</code> <span class="mn-result">68.3%</span></li>
+                    <li><strong>Annual energy:</strong> <code>1 463.7 × 8 760 =</code> <span class="mn-result">12 822 MWh/yr (12.8 GWh)</span></li>
+                    <li><strong>Annual cost (PRO, $0.10/kWh):</strong> <code>12 822 000 × 0.10 =</code> <span class="mn-result">$1.28M/yr</span></li>
+                    <li><strong>CO2 (PRO, blended 0.5 kg/kWh):</strong> <code>12 822 000 × 0.5 / 1 000 =</code> <span class="mn-result">6 411 t CO₂e/yr</span></li>
+                    <li><strong>Partial-load PUE at 50% IT:</strong><br>
+                        overhead = 1.464 − 1 = 0.464 · PUE(0.50) = 1 + 0.464 × (0.55/0.50 + 0.45) = 1 + 0.464 × 1.55 =<span class="mn-result"> 1.719</span></li>
+                    <li><strong>WUE (CRAH → air key):</strong> <code>DATA.water.wueByType.air =</code> <span class="mn-result">1.80 L/kWh</span><br>
+                        Annual water: <code>1.80 × 1 000 × 8 760 / 1 000 =</code> <span class="mn-result">15 768 m³/yr</span></li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Engineering reading:</strong> at this configuration the 260 kW cooling load is the dominant overhead (17.8% of total), followed by security (4.3%), UPS losses (6.5%), and PDU/transformer (2% each). Upgrading from CRAH to in-row cooling reduces the overhead fraction from 0.38 to 0.32 and would drop PUE by roughly 0.06. Adding a water-side economizer in subtropical conditions (1 500 hrs/yr) saves an additional 25% of cooling or ~65 kW on this load, translating to ~0.065 PUE reduction.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>ISO/IEC 30134-2:2016</b> — Information technology — Data centres key performance indicators — Part 2: Power usage effectiveness (PUE). Definitive normative basis for the PUE formula and measurement boundary.</li>
+                <li><b>Green Grid PUE White Papers</b> — WP#6 (PUE: A comprehensive examination of the metric), WP#49 (Measuring &amp; managing data center energy use), WP#66 (PUE measurement granularity L1–L3). Source of the L1/L2/L3 measurement levels implemented in the PRO Seasonal panel.</li>
+                <li><b>ASHRAE TC 9.9 (2021 ed.)</b> — Thermal Guidelines for Data Processing Environments. Basis for supply air temperature range (18–27°C, A1 class), each-degree-Celsius cooling savings, and ASHRAE class definitions A1–A4.</li>
+                <li><b>Uptime Institute Global Survey 2024 / 2026</b> — Primary benchmark for global average PUE 1.58, tier x cooling PUE matrix, and the Tier I–IV availability / redundancy standard. Cited in <code class="mn-mono">DATA.sources['pueDefaults']</code> and <code class="mn-mono">DATA.sources['pueMatrix']</code> in <code class="mn-mono">rz-engine.js</code>.</li>
+                <li><b>IEEE 1100 (Emerald Book)</b> — Recommended practice for powering and grounding electronic equipment. Basis for UPS efficiency topology descriptions and load-curve behavior.</li>
+                <li><b>DOE 10 CFR Part 431</b> — Energy Conservation Standards for Distribution Transformers (DOE 2016 rule). Basis for transformer loss ranges (0.5–2.5%).</li>
+                <li><b>GHG Protocol Corporate Standard</b> — Scope 2 grid emission factors methodology. <code>DATA.carbon.gridFactor</code> values and source citations in <code class="mn-mono">rz-engine.js</code> §DATA.sources.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">rz-engine.js</code> (RZEngine v2.0): <code>DATA.pueDefaults</code>, <code>DATA.pueMatrix</code>, <code>DATA.coolingTypes</code>, <code>DATA.water.wueByType</code>, <code>DATA.carbon.gridFactor</code>, <code>models.pue.*</code>. Calculator: <code class="mn-mono">pue-calculator.html</code>.</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The calculation assumes a single thermodynamic zone at steady-state load; seasonal variation is modelled only in the PRO monthly chart (not in the base PUE output). Cooling overhead fractions are calibrated to typical-installation COP for each technology type; site-specific COP varies with supply water temperature, ambient wet-bulb, and part-load conditions. The 3 m²/rack floor area used for lighting calculations is a rule-of-thumb; dense hot-aisle configurations may pack more tightly. Redundancy multipliers scale UPS loss proportionally — this is conservative for 2N systems where one UPS string is entirely bypassed at low load.</p>
+            <p class="mn-lead">Transformer losses are modelled as load-proportional (a slight overstatement for DOE 2016-compliant units that have low constant core losses). Annual hours of 8 760 is the <code>DATA.hoursPerYear</code> constant; leap-year and planned-downtime corrections are not applied. Energy cost uses a flat $/kWh blended rate; demand charges (typically 20–30% of actual bills) are not included.</p>
+            <p class="mn-lead">This manual and the calculator are an <strong>engineering education and pre-design aid</strong>. PUE results are screening estimates; final energy and carbon reporting requires metered measurements per Green Grid L2/L3 methodology and validation by a qualified data center energy engineer.</p>
+        </section>
+
+        <a class="mn-toollink" href="../pue-calculator.html">&#9654; Open the live PUE Calculator</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../pue-calculator.html">PUE Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

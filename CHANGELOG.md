@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.98.0 — 2026-07-20 (EA-2 KORPUS BESAR 47 dokumen + audit visual 2 ronde: 4 bug kalkulasi HIGH fixed)
+
+### Added — EA-2 Big-Project Corpus (owner: "crawl semua — PM, tech spec, tender, research, calculation")
+- **47/48 dokumen publik baru ter-ingest** (markitdown-only, biner dihapus, 60MB cap): **spec 15** (OCP ORv3/immersion/manifold, ASHRAE TC9.9 liquid/water-cooled, NVIDIA DGX H100/GB200/GB300 RA, Green Grid PUE/WUE, Schneider WP110 AI) · **pm/tender 10** (EIAR Google Dublin/Vantage/CyrusOne, Loudoun 5.33GW brief, ADB IFB, PJM/Dominion DC load, RFP colo) · **finance 9** (10-K Equinix/DLR SEC EDGAR, deck Equinix/IronMountain/NTT ¥1.5T, Keppel DC REIT, Digital Core) · **research 14** (LBNL 2024 176→580 TWh, IEA Energy&AI 415→945 TWh, arXiv AI-thirsty/POLCA/cooling-RL, EPRI, DOE, Uptime Survey 2024 PUE 1.56).
+- **Korpus: gate 389 → 2.451 assert hijau** — fakta PUE 69 · investment $B 134 · renewable 104 · WUE 12 · kapasitas MW lintas segment finance/hyperscale/pm/research/spec; **Research Library 9 → 35 dokumen** (KB) + Data Library DC Corpus persentil baru. Provenance (source_url + kutipan) wajib per fakta.
+
+### Fixed — audit visual 2 ronde (4 HIGH + 2 M + 3 kecil)
+- **H1 CAPEX basis salah 1.0 MW/USA di sesi baru** (menular Dashboard/Results/Financial): default capex store tidak pernah direkonsiliasi dgn simulation (2.5 MW/ID) sampai user mengedit requirement → **$9.07M @1MW USA → $14.75M @2.5MW Indonesia** (constructionIndex 0.65 kini aktif); rekonsiliasi on-rehydrate tanpa loop; $/kW dibulatkan.
+- **H2 "fake 100%" Dashboard + RAM Detail**: komposisi parallel murni tersaturasi → modul shared `availabilityChain` (β=5% common-cause, format nines, round-at-render) dipakai RAM tab + Dashboard KPI + trace node → **100.000%/0 min → 99.99802% — 4+ nines / 10.4 min-yr**, identik antar-tab.
+- **H3 Pro-Forma Energy ~1000× off**: pembagi `/1000` salah unit ($/kWh diperlakukan $/MWh) di 3 lokasi FinancialDashboard → Energy $3K → **$2.96M** (NPV/IRR/sensitivity pro-forma kini sebasis).
+- **H4 Commissioning racks 417 & "Tier IV"**: programRich tanpa rackDensity (fallback 6kW) → bucket ai_hpc (racks 34, konsisten fleet); label tier kini bind sim.tierLevel (Tier III), IST diatribusikan ke config 2N. Trace programRich ikut dibetulkan.
+- **M**: kolom HEADCOUNT proyeksi 5-thn kosong (field `headcount` vs `totalHeadcount`) · deep-link Monte Carlo tidak pindah tab (initialTab useState stale → effect sync) · breadcrumb FAQ.
+
+### Verified
+- Engine 599/0 · parity 155/0 · bindings 73/0 · accuracy 40/0 · **dc-corpus 2451/0** · tsc/build · walk 24/0 · synergy 6/0 · **trace-parity 116/116** · export 44/0 · ?v `2026-07-20-e`.
+
 ## v1.97.7 — 2026-07-20 (GATE BARU trace-parity + 3 drift nyata tertangkap & fixed)
 
 ### Added

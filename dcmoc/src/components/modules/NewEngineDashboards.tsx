@@ -8,8 +8,10 @@
 
 import React from 'react';
 import { useSimulationStore } from '@/store/simulation';
+import { useRequirementsStore } from '@/store/requirements';
 import { useCapexStore } from '@/store/capex';
-import { rzModels } from '@/lib/rz-engine';
+import { densityToEngineBucket } from '@/lib/requirementsMappings';
+import { rzModels, rzData } from '@/lib/rz-engine';
 import { generatePillarPDF, type PillarReport } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import { MapPin, Boxes, HardHat, CheckCircle2, Activity, FileDown } from 'lucide-react';
@@ -124,8 +126,16 @@ export function CommissioningDashboard() {
     // All values move with itLoad / cooling / redundancy / country. No hardcoded
     // completion vector: readiness reflects the true design-phase state until a
     // live Cx checklist feeds it.
-    const store = { itLoadKw: inputs.itLoad, coolingType: inputs.coolingType, powerRedundancy: inputs.powerRedundancy, countryId: country?.id };
+    /* HIGH-2 (visual audit) — rackDensity from the project requirement (60 kW →
+     * ai_hpc bucket). Omitting it made equipScale default to 'standard' (6 kW):
+     * RACKS showed 417 on a project the whole app counts as 42 racks. */
+    const rackKw = useRequirementsStore((s) => s.workload.avgRackDensityKw);
+    const store = { itLoadKw: inputs.itLoad, coolingType: inputs.coolingType, powerRedundancy: inputs.powerRedundancy, countryId: country?.id, rackDensity: densityToEngineBucket(rackKw) };
     const key = JSON.stringify(store);
+    /* #7 audit — the project tier is sim.tierLevel; rich.tierInfo.tier is the
+     * tier IMPLIED by the redundancy config (2N → "Tier IV") and contradicted
+     * the Tier 3 project on the Scope card. Label anchors to engine DATA.tiers. */
+    const tierLabel: string = rzData()?.tiers?.[inputs.tierLevel]?.label ?? `Tier ${inputs.tierLevel}`;
     const rich = React.useMemo<CxRich | null>(() => (m && m.programRich ? m.programRich(store) : null), [m, key]);
     const mc = React.useMemo<CxMC | null>(() => (m && m.monteCarlo && rich ? m.monteCarlo(store, { n: 4000 }) : null), [m, key, rich]);
     const sens = React.useMemo<CxSens[] | null>(() => (m && m.sensitivity && rich ? m.sensitivity(store, rich.grand) : null), [m, key, rich]);
@@ -156,7 +166,7 @@ export function CommissioningDashboard() {
                     kpis: [
                         { label: 'Cx Program Cost', value: cxMoney(rich.grand), sub: `${cxMoney(rich.perKw)}/kW · ${rich.pctCapex.toFixed(1)}% of capex` },
                         { label: 'Program Duration', value: `${rich.durationDays} d`, sub: `~${rich.durationMonths} mo` },
-                        { label: 'IT Load', value: `${(inputs.itLoad / 1000).toFixed(1)} MW`, sub: `${rich.tierInfo.tier} · ${rich.tierInfo.avail}` },
+                        { label: 'IT Load', value: `${(inputs.itLoad / 1000).toFixed(1)} MW`, sub: `${tierLabel} · ${inputs.powerRedundancy}` },
                         ...(mc ? [{ label: 'Cost Range P5–P95', value: `${cxMoney(mc.p5)}–${cxMoney(mc.p95)}`, sub: `P50 ${cxMoney(mc.p50)} · CVaR95 ${cxMoney(mc.cvar95)}` }] : []),
                     ],
                     sections: [
@@ -172,7 +182,7 @@ export function CommissioningDashboard() {
                 <Metric label="Cx Program Cost" value={cxMoney(rich.grand)} sub={`${cxMoney(rich.perKw)}/kW · ${rich.pctCapex.toFixed(1)}% of capex`} />
                 <Metric label="Program Duration" value={`${rich.durationDays} d`} sub={`~${rich.durationMonths} mo · L0→L6`} />
                 <Metric label="Contingency (15%)" value={cxMoney(rich.contingency)} sub={`subtotal ${cxMoney(rich.subtotal)}`} />
-                <Metric label="Scope" value={`${(inputs.itLoad / 1000).toFixed(1)} MW`} sub={`${inputs.coolingType} · ${inputs.powerRedundancy} · ${rich.tierInfo.tier}`} />
+                <Metric label="Scope" value={`${(inputs.itLoad / 1000).toFixed(1)} MW`} sub={`${inputs.coolingType} · ${inputs.powerRedundancy} · ${tierLabel}`} />
             </div>
 
             {mc && (

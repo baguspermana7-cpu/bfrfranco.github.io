@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Tier Advisor — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full methodology for the Tier Advisor: Uptime Institute Tier I-IV classification rules, TIA-942-B, EN 50600, BICSI 002, subsystem scoring logic, floor constraints, gap analysis, and 12+ regional compliance overlays.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="Uptime Institute Tier, TIA-942-B, EN 50600, BICSI 002, data center tier classification, tier advisor methodology, N+1 redundancy, 2N redundancy, concurrently maintainable, fault tolerant, data center reliability">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/tier.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/tier.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/tier.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/tier.html">
+    <meta property="og:title" content="Tier Advisor — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="Uptime Institute Tier I-IV classification rules, TIA-942-B, EN 50600, subsystem scoring, floor constraints, gap analysis, and 12+ regional compliance overlays behind the Tier Advisor.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="Tier Advisor Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Tier Advisor — Technical Manual">
+    <meta name="twitter:description" content="Uptime Institute Tier I-IV rules, TIA-942-B, EN 50600, subsystem scoring, floor constraints, and regional compliance overlays.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Tier Advisor Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "Tier Advisor" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Tier Advisor — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Uptime Institute Tier I-IV and TIA-942-B data center classification methodology",
+        "articleSection": "Reliability Tiering",
+        "dependencies": "ANSI/TIA-942-B, Uptime Institute Tier Standard, EN 50600-2-1, BICSI 002",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to classify a data center under Uptime Institute Tier Standard",
+        "step": [
+            { "@type": "HowToStep", "name": "Enter facility profile", "text": "Select facility type, IT load, number of floors, and building age." },
+            { "@type": "HowToStep", "name": "Configure power infrastructure", "text": "Specify utility feeds, generator configuration (N, N+1, 2N, 2N+1), UPS topology, ATS type, PDU redundancy, and fuel autonomy." },
+            { "@type": "HowToStep", "name": "Define cooling and network", "text": "Set cooling redundancy level, distribution type, cooling technology, network entry diversity, carrier count, and meet-me room configuration." },
+            { "@type": "HowToStep", "name": "Assess physical security and monitoring", "text": "Choose fire suppression type, physical access control level, and BMS/DCIM monitoring capability." },
+            { "@type": "HowToStep", "name": "Review tier result and gap analysis", "text": "The engine scores each subsystem 0-100, computes a weighted composite, applies floor constraints, maps to Uptime Institute Tier I-IV, and generates a specific gap list and upgrade cost estimate." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What determines Uptime Institute Tier classification?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Tier classification is a prescriptive topology check, not a calculation. The weakest subsystem defines the tier. Tier I = single non-redundant path. Tier II = redundant capacity components but single distribution path. Tier III = multiple independent distribution paths (concurrently maintainable; only one path active at a time). Tier IV = active/active redundant paths — a single fault anywhere cannot cause downtime (fault tolerant)." }
+            },
+            {
+                "@type": "Question",
+                "name": "How does the Tier Advisor score power infrastructure?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The power subsystem score is a weighted sum: utilityFeeds (20%), genConfig (25%), upsConfig (20%), upsTopo (10%), atsConfig (10%), pduRedundancy (10%), fuelAutonomy (5%). Each input maps to a 0-100 raw score via a lookup table. For example, 2N UPS = 80, 2(N+1) = 100, N+1 = 50. Fuel autonomy uses a continuous ramp: 0-8 hrs maps 0-30, 8-24 hrs maps 30-60, 24-72 hrs maps 60-85, above 72 hrs asymptotes to 100." }
+            },
+            {
+                "@type": "Question",
+                "name": "What are the floor constraints that prevent over-classification?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Even if the composite score reaches 75+, Tier III requires: utility feeds must be dual (dual_same, dual_diverse, or on-site generation), generator N+1 or better, UPS N+1 or better, and cooling distribution must not be single loop. Tier IV additionally requires: dual diverse utility feeds from separate substations, 2N/2(N+1) generators, 2N/2(N+1) UPS, dual or triple PDU cords, 2N/2(N+1) cooling redundancy, and dual diverse or 3+ network entry paths. A composite score is capped at 74 if Tier III prerequisites are unmet, and capped at 89 if Tier IV prerequisites are unmet." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../tier-advisor.html" class="nav-link">Tier Advisor</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / Tier Advisor
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Reliability Tiering</p>
+            <h1>Tier Advisor — Methodology &amp; Classification Rules</h1>
+            <p>Every input, scoring rule, floor constraint, output, and reference behind the Tier Advisor. Classification is <strong>prescriptive topology mapping</strong>, not a physics formula — the engine scores each subsystem, enforces hard structural requirements, and maps the result to Uptime Institute Tier I–IV, TIA-942-B Rated 1–4, EN 50600 Class 1–4, and BICSI 002 Class F1–F4 simultaneously across 12+ jurisdictions.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>TIER ADVISOR v1.0</strong></span>
+                <span class="mn-chip">Basis <strong>Uptime Institute / TIA-942-B / EN 50600</strong></span>
+                <span class="mn-chip">Inputs <strong>20</strong></span>
+                <span class="mn-chip">Outputs <strong>9 + gap analysis</strong></span>
+                <span class="mn-chip">Jurisdictions <strong>12+</strong></span>
+            </div>
+            <a class="mn-toollink" href="../tier-advisor.html">▶ Open the live Tier Advisor</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The Tier Advisor maps a data center's actual infrastructure topology against four concurrent classification frameworks: <strong>Uptime Institute Tier Standard</strong> (Tier I–IV), <strong>ANSI/TIA-942-B</strong> (Rated 1–4), <strong>EN 50600-2-1</strong> (Availability Class VK1–VK4), and <strong>BICSI 002</strong> (Class F1–F4). It answers three operational questions: <em>what tier does the current infrastructure support</em>, <em>which subsystem is the limiting factor</em>, and <em>what specific changes are required to reach the next tier</em>.</p>
+            <p class="mn-lead">Classification is <strong>user-driven and prescriptive</strong>: you supply the infrastructure topology; the engine applies the published requirement tables. There are no back-solved coefficients and no probabilistic sampling in the classification path — the tier result is deterministic from inputs. The governing authority for topology requirements is the <strong>Uptime Institute Tier Standard (2022)</strong>, cross-referenced to <strong>ANSI/TIA-942-B (2017)</strong> and <strong>EN 50600-2-1:2021</strong>. Regional compliance overlays reference jurisdiction-specific frameworks (MAS TRM, EU DORA, FISC, APRA CPS 234, OJK/ESDM, BNM RMiT, and others) for the 12 supported regions.</p>
+            <div class="mn-note">
+                <strong>Prescriptive, not probabilistic:</strong> Uptime Institute Tier is a binary topology check — a facility either satisfies the structural requirements for a given tier or it does not. The scoring model (0–100) is a <em>continuous proxy</em> that measures how completely inputs satisfy those requirements, providing nuanced guidance for partial compliance. The hard floor constraints enforce the binary pass/fail logic of the published standards on top of the continuous score.
+            </div>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">Twenty inputs across six groups — facility profile, power, cooling, network, physical security, and optional regional compliance (PRO). All inputs are enumerated categorical or continuous numeric values; ranges are enforced client-side.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field (DOM id)</th><th>Type</th><th>Options / range</th><th>Group</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td><code>facilityType</code></td><td>enum</td><td>enterprise / colocation / hyperscale / edge / telecom / financial</td><td>Facility</td><td>Facility class — used in narrative generation and PDF export; does not affect the tier score directly.</td></tr>
+                    <tr><td><code>itLoad</code></td><td>number</td><td>50–500 000 kW</td><td>Facility</td><td>Total IT load in kW — used in cost estimate scaling and narrative only.</td></tr>
+                    <tr><td><code>numFloors</code></td><td>enum</td><td>1 / 2 / 3 / 4+</td><td>Facility</td><td>Building floor count — narrative context only.</td></tr>
+                    <tr><td><code>buildingAge</code></td><td>number</td><td>0–50 years</td><td>Facility</td><td>Age in years — narrative context only; no score impact.</td></tr>
+                    <tr><td><code>utilityFeeds</code></td><td>enum</td><td>single / dual_same / dual_diverse / onsite</td><td>Power</td><td>Number and diversity of utility supply paths. Tier III floor requires dual; Tier IV floor requires dual_diverse.</td></tr>
+                    <tr><td><code>genConfig</code></td><td>enum</td><td>none / n / n1 / 2n / 2n1</td><td>Power</td><td>Generator redundancy topology. Tier III floor: N+1 minimum; Tier IV floor: 2N or 2(N+1).</td></tr>
+                    <tr><td><code>upsConfig</code></td><td>enum</td><td>none / n / n1 / 2n / 2n1 / distributed</td><td>Power</td><td>UPS redundancy topology. Same floor thresholds as generators. Distributed = scored at 90.</td></tr>
+                    <tr><td><code>upsTopo</code></td><td>enum</td><td>standby / line_interactive / double_conversion / rotary</td><td>Power</td><td>UPS conversion topology. Double-conversion (online) required for mission-critical; scores 90.</td></tr>
+                    <tr><td><code>atsConfig</code></td><td>enum</td><td>none / single / dual / sts</td><td>Power</td><td>Transfer switch type. STS (static transfer switch) provides sub-cycle switching for IT loads.</td></tr>
+                    <tr><td><code>pduRedundancy</code></td><td>enum</td><td>single / dual / triple</td><td>Power</td><td>PDU cord configuration at rack level. Tier IV floor requires dual or triple.</td></tr>
+                    <tr><td><code>fuelAutonomy</code></td><td>number</td><td>0–720 hours</td><td>Power</td><td>Generator fuel storage in hours at rated load. Continuous ramp function (see §03).</td></tr>
+                    <tr><td><code>coolRedundancy</code></td><td>enum</td><td>n / n1 / n2 / 2n / 2n1</td><td>Cooling</td><td>Cooling plant redundancy. Tier III floor: N+1 minimum implied; Tier IV floor: 2N or 2(N+1).</td></tr>
+                    <tr><td><code>coolDistribution</code></td><td>enum</td><td>single / dual / n1_piping</td><td>Cooling</td><td>Cooling distribution loop count. Tier III floor: not single. N+1 piping scores highest.</td></tr>
+                    <tr><td><code>coolType</code></td><td>enum</td><td>dx / chilled_water / free_cooling / rdhx / dlc / immersion</td><td>Cooling</td><td>Cooling technology. Higher sophistication (DLC, immersion) scores higher — reflects operational resilience.</td></tr>
+                    <tr><td><code>netEntry</code></td><td>enum</td><td>single / dual_same / dual_diverse / three_plus</td><td>Network</td><td>Network entry path count and conduit diversity. Tier IV floor: dual_diverse or three_plus.</td></tr>
+                    <tr><td><code>carrierDiv</code></td><td>enum</td><td>single / two / three_plus</td><td>Network</td><td>Number of distinct telecommunications carriers.</td></tr>
+                    <tr><td><code>meetMeRoom</code></td><td>enum</td><td>none / single / redundant</td><td>Network</td><td>Meet-me room (MMR) presence and redundancy.</td></tr>
+                    <tr><td><code>fireSuppression</code></td><td>enum</td><td>none / wet / preaction / clean / vesda_clean</td><td>Physical</td><td>Fire suppression type. VESDA + clean agent = highest detection latency + suppression effectiveness.</td></tr>
+                    <tr><td><code>accessControl</code></td><td>enum</td><td>key / card / biometric / mfa_mantrap</td><td>Physical</td><td>Physical access control layer. MFA + mantrap = maximum depth of authentication.</td></tr>
+                    <tr><td><code>monitoring</code></td><td>enum</td><td>none / basic / bms / full_dcim</td><td>Physical</td><td>Monitoring capability. Full DCIM + BMS = comprehensive telemetry, alarming, and capacity planning.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Regional compliance inputs (PRO):</strong> <code>regionSelect</code> (12 jurisdictions) and <code>verticalSelect</code> (5 industry verticals) are evaluated only in PRO mode and contribute to the regional score (weight 15%) via the <code>calcRegional()</code> function documented in §03.</div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">The engine runs five sequential steps: (1) raw subsystem score computation, (2) weighted composite aggregation, (3) floor constraint enforcement, (4) tier and grade assignment, and (5) confidence computation. All function names map one-to-one to inline JS in <code class="mn-mono">tier-advisor.html</code>.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 1 — Subsystem scores (in <code>calculate()</code>)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">powerScore    = gs('utilityFeeds')·0.20 + gs('genConfig')·0.25 + gs('upsConfig')·0.20</span>
+                <span class="mn-eq">              + gs('upsTopo')·0.10 + gs('atsConfig')·0.10 + gs('pduRedundancy')·0.10</span>
+                <span class="mn-eq">              + fuelScore(fuelAutonomy)·0.05</span>
+                <span class="mn-eq"></span>
+                <span class="mn-eq">coolingScore  = gs('coolRedundancy')·0.50 + gs('coolDistribution')·0.30 + gs('coolType')·0.20</span>
+                <span class="mn-eq">networkScore  = gs('netEntry')·0.45 + gs('carrierDiv')·0.30 + gs('meetMeRoom')·0.25</span>
+                <span class="mn-eq">physicalScore = gs('fireSuppression')·0.35 + gs('accessControl')·0.35 + gs('monitoring')·0.30</span>
+                <span class="mn-eq">monitorScore  = SCORE_MAPS.monitoring[monitoring]</span>
+                <span class="mn-where"><code>gs(id)</code> looks up the enum value of input <code>id</code> in <code>SCORE_MAPS</code> (see §04 constants table). <code>fuelScore(h)</code> is a piecewise ramp (see below). Monitoring is double-counted: as a component inside physicalScore and as a standalone subsystem — this emphasises its importance to overall operations confidence. <span class="mn-src">TIER ADVISOR · ENGINE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Fuel autonomy ramp — <code>fuelScore(h)</code></h3>
+            <div class="mn-formula">
+                <span class="mn-eq">h ≤ 8   → score = h / 8 · 30                          (0–30, fast initial ramp)</span>
+                <span class="mn-eq">h ≤ 24  → score = 30 + (h − 8) / 16 · 30             (30–60, moderate ramp)</span>
+                <span class="mn-eq">h ≤ 72  → score = 60 + (h − 24) / 48 · 25            (60–85, slow ramp)</span>
+                <span class="mn-eq">h > 72  → score = min(100, 85 + (h − 72) / 648 · 15) (85–100, asymptote)</span>
+                <span class="mn-where">Reflects diminishing returns beyond 72 hours. The Uptime Institute does not specify a minimum autonomy for Tier III/IV; FISC (Japan) requires 72 hours; EU DORA guidance references 72 hours. The ramp captures this industry consensus. In <code>fuelScore()</code>. <span class="mn-src">UPTIME · FISC · ENGINE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 2 — Weighted composite (in <code>calculate()</code>)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">WEIGHTS = { power:0.35, cooling:0.20, network:0.15, physical:0.10, monitoring:0.05, regional:0.15 }</span>
+                <span class="mn-eq">compositeRaw = powerScore·0.35 + coolingScore·0.20 + networkScore·0.15</span>
+                <span class="mn-eq">             + physicalScore·0.10 + monitorScore·0.05 + regionalScore·0.15</span>
+                <span class="mn-where">Power carries the largest weight (35%) reflecting that electrical failure is the leading cause of data center outages (Uptime Institute Annual Outage Analysis). <code>regionalScore</code> defaults to 50 (neutral baseline) in free mode; in PRO mode it is computed by <code>calcRegional()</code>. <span class="mn-src">UPTIME OUTAGE ANALYSIS · ENGINE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 3 — Floor constraints (prescriptive topology checks)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">canT3 = (utilityFeeds ∈ {dual_same, dual_diverse, onsite})</span>
+                <span class="mn-eq">      AND (genConfig ∈ {n1, 2n, 2n1})</span>
+                <span class="mn-eq">      AND (upsConfig ∈ {n1, 2n, 2n1, distributed})</span>
+                <span class="mn-eq">      AND (coolDistribution ≠ single)</span>
+                <span class="mn-eq"></span>
+                <span class="mn-eq">canT4 = (utilityFeeds = dual_diverse)</span>
+                <span class="mn-eq">      AND (genConfig ∈ {2n, 2n1})</span>
+                <span class="mn-eq">      AND (upsConfig ∈ {2n, 2n1})</span>
+                <span class="mn-eq">      AND (pduRedundancy ∈ {dual, triple})</span>
+                <span class="mn-eq">      AND (coolRedundancy ∈ {2n, 2n1})</span>
+                <span class="mn-eq">      AND (netEntry ∈ {dual_diverse, three_plus})</span>
+                <span class="mn-eq"></span>
+                <span class="mn-eq">if compositeRaw ≥ 75 AND NOT canT3  → compositeRaw = min(compositeRaw, 74)</span>
+                <span class="mn-eq">if compositeRaw ≥ 90 AND NOT canT4  → compositeRaw = min(compositeRaw, 89)</span>
+                <span class="mn-eq">composite = round(compositeRaw)</span>
+                <span class="mn-where">The floor constraints implement the binary "must have" topology requirements from TIA-942-B §6 and the Uptime Institute Tier Standard §4. No amount of high scores in monitoring or fire suppression can substitute for missing power or cooling path redundancy. In <code>calculate()</code>. <span class="mn-src">TIA-942-B §6 · UPTIME TIER STD §4 · ENGINE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 4 — Tier and grade assignment</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">composite ≥ 90  → Tier IV  · grade A+ · color #10b981 · "Fault Tolerant"</span>
+                <span class="mn-eq">composite ≥ 75  → Tier III · grade A  · color #3b82f6 · "Concurrently Maintainable"</span>
+                <span class="mn-eq">composite ≥ 60  → Tier II+ · grade B  · color #f59e0b · "Redundant Components+"</span>
+                <span class="mn-eq">composite ≥ 45  → Tier II  · grade C  · color #f59e0b · "Redundant Components"</span>
+                <span class="mn-eq">composite ≥ 25  → Tier I+  · grade D  · color #ef4444 · "Basic Capacity+"</span>
+                <span class="mn-eq">composite &lt; 25  → Tier I   · grade F  · color #ef4444 · "Basic Capacity"</span>
+                <span class="mn-eq"></span>
+                <span class="mn-eq">Framework mappings:  uptimeTier = tier  (strip "+")  |  tia942 = "Rated " + tierNum</span>
+                <span class="mn-eq">                     en50600 = "Class " + tierNum     |  bicsi = "Class F" + tierNum</span>
+                <span class="mn-where">Tier II+ and Tier I+ are non-standard sub-classifications used by the tool to represent facilities that exceed the named tier's minimum but fall short of the next full tier's requirements. The official framework output strips the "+" suffix when reporting to Uptime Institute / TIA-942 / EN 50600 / BICSI. <span class="mn-src">UPTIME TIER STD · TIA-942-B · EN 50600 · BICSI 002 · ENGINE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 5 — Confidence score</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">avg      = mean([powerScore, coolingScore, networkScore, physicalScore, monitorScore])</span>
+                <span class="mn-eq">variance = mean([(s − avg)² for each subsystem score s])</span>
+                <span class="mn-eq">confidence = max(60, min(98, round(95 − sqrt(variance) · 0.5)))  [%]</span>
+                <span class="mn-where">Confidence measures internal consistency: a facility where all subsystems score similarly to the composite carries high confidence; one with extreme outliers (e.g. excellent power but critically deficient network) carries lower confidence. In <code>calculate()</code>. <span class="mn-src">ENGINE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Regional compliance overlay — <code>calcRegional()</code> [PRO]</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">regionalScore starts at 50 (neutral baseline)</span>
+                <span class="mn-eq">Each satisfied jurisdiction-specific requirement adds a bonus (typically +8 to +15 pts)</span>
+                <span class="mn-eq">regionalScore = min(100, 50 + sum of passed-check bonuses)</span>
+                <span class="mn-where">Jurisdiction-specific checks per region (example — Singapore MAS TRM): 2N UPS (+15), diverse fiber paths (+10), ≥48 hr fuel (+10), MFA access (+5), full DCIM (+10). Each jurisdiction has 4–5 checks drawn from the published regulatory guidance. See §04 regional table for the full check matrix. <span class="mn-src">MAS TRM · DORA · FISC · APRA CPS 234 · OJK/ESDM · ENGINE</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Gap analysis — <code>buildGapAnalysis()</code></h3>
+            <p class="mn-lead">Gap analysis generates a specific action list by inspecting current input values against the next tier's floor requirements. For Tier I/II → Tier III gaps it checks: utilityFeeds, genConfig, upsConfig, coolRedundancy, coolDistribution, netEntry, atsConfig. For Tier III → Tier IV gaps it checks the stricter 2N constraints on all the same dimensions plus pduRedundancy and atsConfig type (STS or dual).</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Recommendations — <code>buildRecommendations()</code></h3>
+            <p class="mn-lead">All five subsystem scores are sorted ascending. The three lowest-scoring subsystems with scores below 85 are flagged. Priority is set by score bracket: &lt;40 = P1-Critical, 40–60 = P2-High, 60–85 = P3-Medium. Each recommendation card includes a subsystem-specific upgrade action description and priority badge.</p>
+        </section>
+
+        <!-- 4. CONSTANTS & SOURCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Score maps, constants &amp; sources</h2>
+            <p class="mn-lead">Every raw score lives in the deep-frozen <code class="mn-mono">SCORE_MAPS</code> object. The table below is the complete lookup — no hidden values exist outside this object.</p>
+
+            <div class="mn-tablewrap" style="margin-bottom:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>Input field</th><th>Value</th><th>Raw score (0–100)</th><th>Rationale</th></tr></thead>
+                <tbody>
+                    <tr><td rowspan="4"><code>utilityFeeds</code></td><td><code>single</code></td><td>10</td><td>Single point of failure at utility level — Tier I topology.</td></tr>
+                    <tr><td><code>dual_same</code></td><td>40</td><td>Two feeds from same substation: protects against cable fault, not substation failure.</td></tr>
+                    <tr><td><code>dual_diverse</code></td><td>80</td><td>Feeds from separate substations: single-source grid fault is isolated. Required for Tier IV.</td></tr>
+                    <tr><td><code>onsite</code></td><td>60</td><td>Self-generation eliminates utility dependency but adds fuel-chain risk.</td></tr>
+                    <tr><td rowspan="5"><code>genConfig</code></td><td><code>none</code></td><td>0</td><td>No backup generation — Tier I (no redundancy).</td></tr>
+                    <tr><td><code>n</code></td><td>30</td><td>Exactly enough capacity — zero margin for maintenance or fault.</td></tr>
+                    <tr><td><code>n1</code></td><td>60</td><td>One redundant unit — concurrent maintenance possible. Tier III floor minimum.</td></tr>
+                    <tr><td><code>2n</code></td><td>85</td><td>Full dual bus — single generator fault does not interrupt IT load. Tier IV floor.</td></tr>
+                    <tr><td><code>2n1</code></td><td>100</td><td>Dual bus plus spare — highest resilience; tolerates simultaneous maintenance and fault.</td></tr>
+                    <tr><td rowspan="6"><code>upsConfig</code></td><td><code>none</code></td><td>0</td><td>No UPS — no ride-through during utility-to-generator transfer.</td></tr>
+                    <tr><td><code>n</code></td><td>20</td><td>Exact capacity — maintenance requires outage.</td></tr>
+                    <tr><td><code>n1</code></td><td>50</td><td>One redundant module — concurrent maintenance; Tier III floor minimum.</td></tr>
+                    <tr><td><code>2n</code></td><td>80</td><td>Dual independent UPS systems — active/standby redundancy; Tier IV floor.</td></tr>
+                    <tr><td><code>2n1</code></td><td>100</td><td>Dual systems plus spare module — maximum tolerance.</td></tr>
+                    <tr><td><code>distributed</code></td><td>90</td><td>Distributed redundant UPS (e.g. modular delta conversion) — equivalent to 2N in reliability.</td></tr>
+                    <tr><td rowspan="4"><code>upsTopo</code></td><td><code>standby</code></td><td>20</td><td>Off-line UPS — brief transfer gap on utility failure; not suitable for Tier III+.</td></tr>
+                    <tr><td><code>line_interactive</code></td><td>40</td><td>Minimal conditioning; transfer time still measurable.</td></tr>
+                    <tr><td><code>double_conversion</code></td><td>90</td><td>Online double-conversion — continuous power conditioning, zero transfer time. Industry standard for DC.</td></tr>
+                    <tr><td><code>rotary</code></td><td>80</td><td>Rotary UPS/DRUPS — flywheel ride-through, no chemical batteries, good resilience.</td></tr>
+                    <tr><td rowspan="4"><code>atsConfig</code></td><td><code>none</code></td><td>0</td><td>Manual switchover — extended outage during source change.</td></tr>
+                    <tr><td><code>single</code></td><td>40</td><td>Single ATS — automatic but single point of failure in transfer path.</td></tr>
+                    <tr><td><code>dual</code></td><td>75</td><td>Dual ATS — each bus has its own transfer switch; ATS failure does not collapse both buses.</td></tr>
+                    <tr><td><code>sts</code></td><td>100</td><td>Static Transfer Switch — sub-cycle (&lt;4 ms) switching; no IT load interruption during source fault.</td></tr>
+                    <tr><td rowspan="3"><code>pduRedundancy</code></td><td><code>single</code></td><td>20</td><td>Single-cord feed to rack — PDU failure = rack outage. Not acceptable at Tier IV.</td></tr>
+                    <tr><td><code>dual</code></td><td>70</td><td>A+B dual-cord — PDU or path failure does not interrupt dual-corded servers. Tier IV floor minimum.</td></tr>
+                    <tr><td><code>triple</code></td><td>100</td><td>Triple-corded distribution — supports highest-criticality loads with three independent paths.</td></tr>
+                    <tr><td rowspan="5"><code>coolRedundancy</code></td><td><code>n</code></td><td>15</td><td>No cooling redundancy — any CRAC/CRAH failure causes thermal runaway. Tier I.</td></tr>
+                    <tr><td><code>n1</code></td><td>50</td><td>One redundant cooling unit — concurrent maintenance possible. Tier III floor implied.</td></tr>
+                    <tr><td><code>n2</code></td><td>70</td><td>Two redundant units — higher resilience margin but not fully concurrent on all paths.</td></tr>
+                    <tr><td><code>2n</code></td><td>90</td><td>Dual cooling systems — full active/standby; Tier IV floor minimum.</td></tr>
+                    <tr><td><code>2n1</code></td><td>100</td><td>Dual systems plus spare — maximum cooling resilience.</td></tr>
+                    <tr><td rowspan="3"><code>coolDistribution</code></td><td><code>single</code></td><td>20</td><td>Single pipe loop — distribution fault is single point of failure. Tier III floor: must not be single.</td></tr>
+                    <tr><td><code>dual</code></td><td>70</td><td>Dual cooling loops — loop maintenance or fault isolates to one bus.</td></tr>
+                    <tr><td><code>n1_piping</code></td><td>100</td><td>N+1 pipe segments with isolation valves — highest distribution resilience.</td></tr>
+                    <tr><td rowspan="6"><code>coolType</code></td><td><code>dx</code></td><td>55</td><td>Direct expansion — simple but limited scalability and efficiency.</td></tr>
+                    <tr><td><code>chilled_water</code></td><td>65</td><td>Central chilled water plant — industry standard for medium–large DC.</td></tr>
+                    <tr><td><code>free_cooling</code></td><td>75</td><td>Economiser / adiabatic — reduced mechanical complexity in partial load conditions.</td></tr>
+                    <tr><td><code>rdhx</code></td><td>80</td><td>Rear-door heat exchanger — close-coupled; removes heat at source.</td></tr>
+                    <tr><td><code>dlc</code></td><td>90</td><td>Direct liquid cooling — very high density; eliminates raised-floor airflow dependency.</td></tr>
+                    <tr><td><code>immersion</code></td><td>100</td><td>Immersion cooling — no airside cooling path; maximum heat transfer efficiency.</td></tr>
+                    <tr><td rowspan="4"><code>netEntry</code></td><td><code>single</code></td><td>15</td><td>Single conduit — physical cable cut = total network loss.</td></tr>
+                    <tr><td><code>dual_same</code></td><td>40</td><td>Two cables entering same conduit or manhole — simultaneous backhoe vulnerability remains.</td></tr>
+                    <tr><td><code>dual_diverse</code></td><td>80</td><td>Separate conduit routes entering at separate physical locations. Tier IV floor minimum.</td></tr>
+                    <tr><td><code>three_plus</code></td><td>100</td><td>Three or more diverse entry paths — maximum network resiliency; common in carrier-neutral facilities.</td></tr>
+                    <tr><td rowspan="3"><code>carrierDiv</code></td><td><code>single</code></td><td>20</td><td>Single carrier — carrier peering or backbone issue affects entire facility.</td></tr>
+                    <tr><td><code>two</code></td><td>60</td><td>Two carriers — commercial standard for Tier III; protects against single-carrier outage.</td></tr>
+                    <tr><td><code>three_plus</code></td><td>100</td><td>Three or more carriers — highest provider diversity; carrier failure is isolated.</td></tr>
+                    <tr><td rowspan="3"><code>meetMeRoom</code></td><td><code>none</code></td><td>0</td><td>No dedicated MMR — cross-connects routed through data hall.</td></tr>
+                    <tr><td><code>single</code></td><td>50</td><td>Dedicated meet-me room — carrier cross-connects isolated from data hall.</td></tr>
+                    <tr><td><code>redundant</code></td><td>100</td><td>Redundant MMRs at separate locations — MMR fire or flood does not affect all carriers.</td></tr>
+                    <tr><td rowspan="5"><code>fireSuppression</code></td><td><code>none</code></td><td>0</td><td>No suppression — regulatory non-compliance in most jurisdictions.</td></tr>
+                    <tr><td><code>wet</code></td><td>50</td><td>Wet pipe — fast response but water damage risk to IT equipment.</td></tr>
+                    <tr><td><code>preaction</code></td><td>65</td><td>Pre-action (double interlock) — requires fire + flow signal before water release; reduces false activation.</td></tr>
+                    <tr><td><code>clean</code></td><td>85</td><td>Clean agent (FM-200 / Novec 1230) — no residue, no water damage, occupant-safe at design concentration.</td></tr>
+                    <tr><td><code>vesda_clean</code></td><td>100</td><td>VESDA (Very Early Smoke Detection) + clean agent — earliest possible detection + safest suppression.</td></tr>
+                    <tr><td rowspan="4"><code>accessControl</code></td><td><code>key</code></td><td>15</td><td>Physical key — no audit trail, no remote revocation.</td></tr>
+                    <tr><td><code>card</code></td><td>40</td><td>Card access — audit trail present but single factor (lost/stolen card = breach).</td></tr>
+                    <tr><td><code>biometric</code></td><td>75</td><td>Biometric (fingerprint/iris) — cannot be shared or stolen, but single layer.</td></tr>
+                    <tr><td><code>mfa_mantrap</code></td><td>100</td><td>Multi-factor (card + bio) with mantrap — maximum depth; TIA-942-B Rated 4 expectation.</td></tr>
+                    <tr><td rowspan="4"><code>monitoring</code></td><td><code>none</code></td><td>0</td><td>No monitoring — no visibility into thermal or power events.</td></tr>
+                    <tr><td><code>basic</code></td><td>30</td><td>Basic temperature/humidity sensors — minimal instrumentation.</td></tr>
+                    <tr><td><code>bms</code></td><td>65</td><td>Building Management System — plant-level monitoring and alarming; industry standard for Tier III.</td></tr>
+                    <tr><td><code>full_dcim</code></td><td>100</td><td>Full DCIM + BMS — capacity management, predictive analytics, asset tracking; Tier IV expectation.</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <p class="mn-lead" style="margin-top:0.9rem;">Per-tier requirements summary (Uptime Institute Tier Standard + TIA-942-B convergence):</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Tier</th><th>Availability target</th><th>Annual downtime allowance</th><th>Power redundancy</th><th>Cooling redundancy</th><th>Network</th><th>Maintainability</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Tier I</strong></td><td>≥ 99.671%</td><td>28.8 hrs/yr</td><td>N (non-redundant)</td><td>N</td><td>Single path</td><td>Outage required for maintenance</td></tr>
+                    <tr><td><strong>Tier II</strong></td><td>≥ 99.741%</td><td>22.0 hrs/yr</td><td>N+1 components, single distribution path</td><td>N+1 components</td><td>Single path</td><td>Planned maintenance requires outage</td></tr>
+                    <tr><td><strong>Tier III</strong></td><td>≥ 99.982%</td><td>1.6 hrs/yr</td><td>N+1 generators + UPS, dual distribution paths</td><td>N+1 with dual distribution</td><td>Multiple diverse paths (one active)</td><td>Concurrently maintainable — no outage for planned maintenance</td></tr>
+                    <tr><td><strong>Tier IV</strong></td><td>≥ 99.995%</td><td>0.4 hrs/yr</td><td>2N generators + UPS, active/active dual systems</td><td>2N with independent loops</td><td>Dual diverse independent paths (both active)</td><td>Fault tolerant — single fault anywhere does not cause downtime</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <p class="mn-lead" style="margin-top:0.9rem;">Regional compliance bonus matrix (PRO mode — partial excerpt; each region has 4–5 checks, starting baseline 50):</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Region / Framework</th><th>Key requirement checks</th><th>Bonus per check</th><th>Governing document</th></tr></thead>
+                <tbody>
+                    <tr><td>Singapore — MAS TRM</td><td>2N UPS; dual diverse fiber; ≥ 48 hr fuel; MFA mantrap; full DCIM</td><td>+5 to +15</td><td>MAS Technology Risk Management Guidelines §7</td></tr>
+                    <tr><td>Indonesia — OJK/ESDM</td><td>2N UPS; full DCIM; ≥ 48 hr fuel; biometric/MFA; 2N generators</td><td>+10 each</td><td>OJK Circular SEOJK No. 29/SEOJK.01/2022</td></tr>
+                    <tr><td>Malaysia — BNM RMiT</td><td>2N UPS; diverse network; full DCIM; ≥ 24 hr fuel; biometric/MFA</td><td>+8 to +12</td><td>BNM Risk Management in Technology (RMiT) 2020</td></tr>
+                    <tr><td>Thailand — BOT IT Risk</td><td>N+1/2N UPS; BMS/full DCIM; ≥ 24 hr fuel; biometric/MFA; diverse network</td><td>+10 each</td><td>BOT IT Risk Management Circular 2021</td></tr>
+                    <tr><td>Japan — FISC</td><td>≥ 72 hr fuel; 2N UPS; biometric/MFA; full DCIM; seismic 2N cooling</td><td>+10 to +20</td><td>FISC Security Guidelines for Computer Systems §3.2</td></tr>
+                    <tr><td>South Korea — FSS</td><td>2N UPS; diverse network; full DCIM; ≥ 48 hr fuel; biometric/MFA</td><td>+8 to +12</td><td>FSS Electronic Financial Infrastructure Standards</td></tr>
+                    <tr><td>Australia — APRA CPS 234</td><td>biometric/MFA; full DCIM; 2N UPS; diverse network; ≥ 48 hr fuel</td><td>+8 to +12</td><td>APRA Prudential Standard CPS 234 §28–33</td></tr>
+                    <tr><td>EU — DORA</td><td>Diverse network paths (Art. 11); full DCIM (Art. 12); 2N UPS; biometric/MFA; ≥ 72 hr fuel</td><td>+5 to +15</td><td>EU Regulation 2022/2554 (DORA) Art. 11–12</td></tr>
+                    <tr><td>UK — FCA/PRA</td><td>Diverse network; full DCIM; 2N UPS; biometric/MFA; ≥ 48 hr fuel</td><td>+8 to +12</td><td>FCA PS21/3 Operational Resilience; PRA SS6/21</td></tr>
+                    <tr><td>USA — SOC 2/HIPAA/PCI</td><td>biometric/MFA; full DCIM; 2N UPS; diverse network; ≥ 48 hr fuel</td><td>+8 to +12</td><td>AICPA TSC 2017 / HIPAA §164.310 / PCI DSS v4.0</td></tr>
+                    <tr><td>India — RBI/SEBI</td><td>2N UPS; diverse network; full DCIM; ≥ 48 hr fuel; biometric/MFA</td><td>+7 to +15</td><td>RBI Master Direction IT 2021; SEBI Circular CIR/MRD/2012</td></tr>
+                    <tr><td>Global (default)</td><td>No overlay — regional score fixed at 50 (neutral)</td><td>—</td><td>—</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>DOM id</th><th>Computation</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>Tier classification</td><td><code>tierDisplay</code></td><td>Composite score threshold + floor constraints → Tier I/I+/II/II+/III/IV</td><td>Primary result. Uptime Institute tier designation.</td></tr>
+                    <tr><td>Composite score</td><td><code>scoreValue</code></td><td>Weighted sum of 6 subsystem scores (0–100)</td><td>Continuous measure of infrastructure completeness.</td></tr>
+                    <tr><td>Grade</td><td><code>gradeValue</code></td><td>A+/A/B/C/D/F mapped from tier</td><td>Letter-grade proxy for tier level.</td></tr>
+                    <tr><td>Confidence</td><td><code>confidenceValue</code></td><td><code>max(60, min(98, 95 − √variance · 0.5))</code></td><td>Subsystem score consistency; low confidence = one subsystem is far below the composite.</td></tr>
+                    <tr><td>Uptime Institute tier</td><td><code>uptimeTier</code></td><td>Tier N (stripping "+")</td><td>Official Uptime Institute classification.</td></tr>
+                    <tr><td>TIA-942-B rating</td><td><code>tia942Rating</code></td><td>"Rated " + tierNum</td><td>TIA-942-B equivalent rated level.</td></tr>
+                    <tr><td>EN 50600 class</td><td><code>en50600Class</code></td><td>"Class " + tierNum</td><td>EN 50600-2-1 availability class.</td></tr>
+                    <tr><td>BICSI 002 class</td><td><code>bicsiClass</code></td><td>"Class F" + tierNum</td><td>BICSI 002 data center design and implementation classification.</td></tr>
+                    <tr><td>Subsystem scores (×5)</td><td><code>powerVal</code> …</td><td>Per-subsystem weighted scores (0–100)</td><td>Bar chart + radar chart source. Identifies the limiting subsystem.</td></tr>
+                    <tr><td>Gap analysis</td><td><code>gapContent</code></td><td>Conditional inspection of input values vs next-tier floor requirements</td><td>Specific action list: what must change to reach the next tier.</td></tr>
+                    <tr><td>Upgrade cost estimate [PRO]</td><td><code>upgradeCostVal</code></td><td>Per-upgrade cost bands summed, ×0.8–1.5 range</td><td>Indicative CapEx range in USD thousands to reach next tier.</td></tr>
+                    <tr><td>Regional compliance score [PRO]</td><td><code>regionalScoreVal</code></td><td><code>calcRegional()</code> — 50 + jurisdiction bonuses</td><td>How well the facility meets the selected jurisdiction's specific requirements.</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <p class="mn-lead" style="margin-top:0.9rem;">Upgrade cost bands (PRO cost estimator):</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Upgrade action</th><th>Trigger condition</th><th>Cost band (USD)</th><th>Score impact</th></tr></thead>
+                <tbody>
+                    <tr><td>Upgrade UPS to 2N</td><td>upsConfig = n or n1</td><td>$200K – $800K</td><td>+15 pts</td></tr>
+                    <tr><td>Upgrade generators to 2N</td><td>genConfig = n or n1</td><td>$300K – $1 200K</td><td>+12 pts</td></tr>
+                    <tr><td>Add diverse utility feed</td><td>utilityFeeds ≠ dual_diverse</td><td>$150K – $600K</td><td>+10 pts</td></tr>
+                    <tr><td>Upgrade cooling to 2N</td><td>coolRedundancy ≠ 2n or 2n1</td><td>$250K – $900K</td><td>+10 pts</td></tr>
+                    <tr><td>Add dual-cord PDU (A+B)</td><td>pduRedundancy = single</td><td>$50K – $200K</td><td>+8 pts</td></tr>
+                    <tr><td>Install STS / dual ATS</td><td>atsConfig ≠ sts and ≠ dual</td><td>$80K – $300K</td><td>+6 pts</td></tr>
+                    <tr><td>Deploy full DCIM + BMS</td><td>monitoring ≠ full_dcim</td><td>$100K – $400K</td><td>+5 pts</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example</h2>
+            <p class="mn-lead">Profile: <strong>Colocation, 2 000 kW, dual feeds (same substation), N+1 generators, N+1 double-conversion UPS, single ATS, dual PDU, 48 hr fuel, N+1 cooling with dual loop + chilled water, dual diverse network entry, 2 carriers, single MMR, pre-action suppression, card access, BMS, global region.</strong> This is the tool's default state. Trace every number against the score maps in §04.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Power subsystem score:</strong>
+                        <br>utilityFeeds(dual_same)=40·0.20=8.0
+                        + genConfig(n1)=60·0.25=15.0
+                        + upsConfig(n1)=50·0.20=10.0
+                        + upsTopo(double_conversion)=90·0.10=9.0
+                        + atsConfig(single)=40·0.10=4.0
+                        + pduRedundancy(dual)=70·0.10=7.0
+                        + fuelScore(48)·0.05
+                        <br>fuelScore(48): h=48 → 60 + (48−24)/48·25 = 60 + 12.5 = 72.5 → ×0.05 = 3.625
+                        <br>powerScore = 8+15+10+9+4+7+3.625 = <span class="mn-result">56.6</span>
+                    </li>
+                    <li><strong>Cooling subsystem score:</strong>
+                        <br>coolRedundancy(n1)=50·0.50=25.0 + coolDistribution(dual)=70·0.30=21.0 + coolType(chilled_water)=65·0.20=13.0
+                        <br>coolingScore = <span class="mn-result">59.0</span>
+                    </li>
+                    <li><strong>Network subsystem score:</strong>
+                        <br>netEntry(dual_diverse)=80·0.45=36.0 + carrierDiv(two)=60·0.30=18.0 + meetMeRoom(single)=50·0.25=12.5
+                        <br>networkScore = <span class="mn-result">66.5</span>
+                    </li>
+                    <li><strong>Physical subsystem score:</strong>
+                        <br>fireSuppression(preaction)=65·0.35=22.75 + accessControl(card)=40·0.35=14.0 + monitoring(bms)=65·0.30=19.5
+                        <br>physicalScore = <span class="mn-result">56.25</span>
+                    </li>
+                    <li><strong>Monitoring standalone score:</strong>
+                        <br>monitoring(bms) = <span class="mn-result">65</span>
+                    </li>
+                    <li><strong>Regional score (global, free mode):</strong>
+                        <br>regionalScore = <span class="mn-result">50</span> (neutral baseline)
+                    </li>
+                    <li><strong>Composite (raw):</strong>
+                        <br>56.6·0.35 + 59.0·0.20 + 66.5·0.15 + 56.25·0.10 + 65·0.05 + 50·0.15
+                        <br>= 19.81 + 11.80 + 9.975 + 5.625 + 3.25 + 7.50 = <span class="mn-result">57.96 → 58</span>
+                    </li>
+                    <li><strong>Floor constraints:</strong>
+                        <br>canT3 check: utilityFeeds=dual_same ✓ · genConfig=n1 ✓ · upsConfig=n1 ✓ · coolDistribution=dual ✓ → <span class="mn-result">canT3 = true</span>
+                        <br>canT4 check: utilityFeeds ≠ dual_diverse → <span class="mn-result">canT4 = false</span>
+                        <br>composite=58 &lt; 75 so neither cap applies. Composite remains <span class="mn-result">58</span>.
+                    </li>
+                    <li><strong>Tier assignment:</strong>
+                        <br>composite=58 falls in [45, 60) → <span class="mn-result">Tier II · grade C · "Redundant Components"</span>
+                        <br>Framework map: Uptime Tier II · TIA-942 Rated 2 · EN 50600 Class 2 · BICSI 002 Class F2
+                    </li>
+                    <li><strong>Confidence:</strong>
+                        <br>scores = [56.6, 59.0, 66.5, 56.25, 65] · avg = 60.67
+                        <br>variance = [(56.6-60.67)²+(59-60.67)²+(66.5-60.67)²+(56.25-60.67)²+(65-60.67)²] / 5
+                        <br>= [16.56 + 2.79 + 33.98 + 19.53 + 18.75] / 5 = 91.61 / 5 = 18.32
+                        <br>confidence = max(60, min(98, round(95 − √18.32 · 0.5))) = max(60, min(98, round(95 − 2.14))) = <span class="mn-result">93%</span>
+                    </li>
+                    <li><strong>Gap to Tier III (canT3 = true, so score-based gap applies):</strong>
+                        <br>composite=58 &lt; 75 → gaps checked: single ATS (not none/single → gap flagged), coolRedundancy=n1 (gap: add N+2 or 2N), power score limited by N+1 UPS and same-substation feeds.
+                        <br><em>Primary gap: upgrade utilityFeeds to dual_diverse, UPS to 2N, and cooling to 2N — these collectively add ~30 pts and push composite above 75.</em>
+                    </li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Engineering reading:</strong> The default 2 MW colocation profile with N+1 power and cooling is Tier II by score (58). It passes the Tier III structural prerequisites (canT3 = true) but falls short on score because dual-same utility feeds, single ATS, and N+1 UPS/cooling keep the weighted composite below 75. Upgrading to dual_diverse feeds (+24 pts on utilityFeeds), 2N UPS (+30 pts on upsConfig), and 2N cooling (+40 pts on coolRedundancy) would push the composite to approximately 76 — just over the Tier III threshold. The floor constraint check would also need dual cooling distribution (already met) and N+1 generators (already met).</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>ANSI/TIA-942-B (2017)</b> — Telecommunications Infrastructure Standard for Data Centers: topology requirements for Rated 1–4, redundancy definitions, telecom room requirements, physical security.</li>
+                <li><b>Uptime Institute Tier Standard: Topology (2022)</b> — Definitive Tier I–IV topology requirements: concurrently maintainable (Tier III) and fault tolerant (Tier IV) definitions, single points of failure analysis, availability targets (99.671% / 99.741% / 99.982% / 99.995%).</li>
+                <li><b>EN 50600-2-1:2021</b> — Information technology — Data centre facilities and infrastructures — Part 2-1: Building construction; defines Availability Classes (VK1–VK4) aligned with the Uptime Institute tier concepts under the European framework.</li>
+                <li><b>BICSI 002 (2019)</b> — Data Center Design and Implementation Best Practices: Class F1–F4 classification; telecom and network redundancy guidance.</li>
+                <li><b>IEC 62040-3</b> — UPS performance requirements: classification of standby, line-interactive, and double-conversion topologies.</li>
+                <li><b>IEEE 493 (Gold Book)</b> — IEEE Recommended Practice for the Design of Reliable Industrial and Commercial Power Systems: MTBF/MTTR basis for component-level reliability data.</li>
+                <li><b>NFPA 70 (NEC) / IEC 60364</b> — Electrical installation standards referenced by TIA-942-B for wiring methods and distribution.</li>
+                <li><b>MAS TRM (2021)</b> — Monetary Authority of Singapore Technology Risk Management Guidelines §7: data centre and recovery site requirements.</li>
+                <li><b>EU DORA (Regulation 2022/2554)</b> — Digital Operational Resilience Act, Art. 11 (ICT continuity) and Art. 12 (response and recovery): network diversity and monitoring requirements.</li>
+                <li><b>FISC Security Guidelines (2022)</b> — Center for Financial Industry Information Systems (Japan): §3.2 backup power 72-hour requirement, seismic considerations.</li>
+                <li><b>APRA CPS 234 (2019)</b> — Prudential Standard on Information Security §28–33: physical security and monitoring expectations for APRA-regulated entities (Australia).</li>
+                <li><b>Uptime Institute Annual Outage Analysis (2023)</b> — Source for power-subsystem weight (35%): electrical infrastructure failure cited as leading cause of major outages.</li>
+                <li><b>Engine source</b> — Inline JS in <code class="mn-mono">tier-advisor.html</code>: <code>SCORE_MAPS</code>, <code>WEIGHTS</code>, <code>calculate()</code>, <code>fuelScore()</code>, <code>calcRegional()</code>, <code>buildGapAnalysis()</code>.</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS & LIMITS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The Tier Advisor classifies <em>infrastructure topology</em> only — it does not assess the quality of installed equipment, commissioning state, operational procedures, or maintenance history. A data center can be architected as Tier IV on paper but operate at Tier I reliability if maintenance procedures are poor. The Uptime Institute Tier Standard explicitly states that topology defines the <em>design intent</em>; actual performance certification requires on-site audit by Uptime Institute-accredited personnel.</p>
+            <p class="mn-lead">Regional compliance overlays are derived from publicly available regulatory guidance and represent a summarised assessment of key IT infrastructure requirements within each framework. They are not exhaustive compliance audits; full compliance with MAS TRM, DORA, FISC, APRA CPS 234, or any other jurisdiction requires formal assessment against the complete regulatory text by qualified professionals.</p>
+            <p class="mn-lead">Cost estimates in the PRO cost-to-upgrade panel are indicative ranges based on industry benchmark data and are expressed in USD. Actual costs depend on facility size, geographic location, existing infrastructure state, contractor pricing, and scope definition. The range provided (±30% around the midpoint) reflects typical estimation-phase uncertainty (Class 5 estimate per AACE International). This tool and manual are an <strong>engineering education and pre-design aid</strong>; final infrastructure design and tier classification must be performed by qualified data center engineers and verified by the relevant accreditation body.</p>
+        </section>
+
+        <a class="mn-toollink" href="../tier-advisor.html">▶ Open the live Tier Advisor</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../tier-advisor.html">Tier Advisor</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

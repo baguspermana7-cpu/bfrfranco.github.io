@@ -32,7 +32,7 @@ let ok = 0, fail = 0, cached = 0;
 for (const src of sources) {
     const name = slug(src.company);
     if (only && name !== only) continue;
-    const ext = src.url.split('?')[0].toLowerCase().endsWith('.pdf') ? 'pdf' : 'html';
+    const ext = src.ext ?? (src.url.split('?')[0].toLowerCase().endsWith('.pdf') ? 'pdf' : 'html');
     const htmlPath = join(RAW, `${name}.${ext}`);
     const mdPath = join(RAW, `${name}.md`);
     if (existsSync(mdPath)) { cached++; continue; }
@@ -40,7 +40,7 @@ for (const src of sources) {
         /* EA-2 (owner): markitdown-only storage — download size-capped 60MB, binary
          * DELETED after conversion; only the small .md survives on disk. */
         execFileSync('curl', ['-sL', '--max-time', '120', '--max-filesize', '62914560', '-A',
-            'Mozilla/5.0 (compatible; rz-dc-corpus/1.0; research; +https://resistancezero.com)',
+            'Mozilla/5.0 (compatible; rz-dc-corpus/1.0; research; +https://resistancezero.com; contact: resistancezero.com)',
             '-o', htmlPath, src.url], { timeout: 150000 });
         execFileSync(MARKITDOWN, [htmlPath, '-o', mdPath], { timeout: 180000 });
         try { unlinkSync(htmlPath); } catch { /* already gone */ }

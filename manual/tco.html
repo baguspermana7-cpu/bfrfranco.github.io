@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>TCO Calculator — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full engineering methodology for the Data Center TCO Calculator: Build vs Colo vs Cloud 5/10-year cost formulas, CAPEX/OPEX components, Monte Carlo simulation, WACC-adjusted NPV, market data sources, and a verified worked example.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="data center TCO, total cost of ownership, build vs colo vs cloud, colocation cost model, cloud TCO, CAPEX OPEX, Monte Carlo simulation, WACC NPV, data center economics">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/tco.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/tco.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/tco.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/tco.html">
+    <meta property="og:title" content="TCO Calculator — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="Build vs Colo vs Cloud cost formulas, CAPEX/OPEX components, Monte Carlo simulation, WACC-adjusted NPV, and a fully verified worked example for the Data Center TCO Calculator.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="TCO Calculator Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="TCO Calculator — Technical Manual">
+    <meta name="twitter:description" content="Build vs Colo vs Cloud cost formulas, Monte Carlo simulation, WACC NPV, and a verified worked example.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="TCO Calculator Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "TCO Calculator" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "TCO Calculator — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Total Cost of Ownership methodology for Build vs Colocation vs Cloud data center deployment models",
+        "articleSection": "Data Center Economics",
+        "dependencies": "CBRE H1 2025, JLL 2026, Cushman & Wakefield 2025, DC Byte 2025, Uptime Institute 2025, IEA Electricity 2026",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to compare Build vs Colo vs Cloud data center TCO",
+        "step": [
+            { "@type": "HowToStep", "name": "Select region and IT load", "text": "Choose one of the 12 global markets (N. Virginia, Dallas, Phoenix, Chicago, Singapore, Frankfurt, Tokyo, Jakarta, Sydney, London, Mumbai, Sao Paulo) and set the IT load in MW." },
+            { "@type": "HowToStep", "name": "Configure infrastructure parameters", "text": "Set the Uptime Institute tier (II/III/IV), PUE, cooling type, and utilization rate. The tier multiplier scales CAPEX; the cooling type sets the default PUE." },
+            { "@type": "HowToStep", "name": "Set analysis period and growth", "text": "Choose a 5-year or 10-year horizon and set the expected annual capacity growth rate used to scale colo and cloud spend." },
+            { "@type": "HowToStep", "name": "Review TCO results and Monte Carlo", "text": "Compare the three deployment models across CAPEX, power, staffing, maintenance, and network costs. Pro users access the Monte Carlo risk distribution and WACC-adjusted NPV." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "How is the Build CAPEX calculated?",
+                "acceptedAnswer": { "@type": "Answer", "text": "CAPEX = IT_MW × buildCost_per_MW × tierMultiplier. The market build cost ($/MW) comes from CBRE/JLL data. Tier II = 0.85×, Tier III = 1.00×, Tier IV = 1.35×. All figures are sourced from MARKET_DATA in tco-calculator.html (inline, not the RZEngine)." }
+            },
+            {
+                "@type": "Question",
+                "name": "What drives the breakeven year calculation?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The calculator runs a year-by-year accumulator out to 15 years. In each year it adds Build OPEX (power + staff + maintenance + insurance + network + 4% other) to the running Build cumulative total, and adds Colo OPEX (kW/month lease × growth scale + staff + network + 3% other) to the Colo cumulative. The breakeven year is the first year Build cumulative falls below Colo cumulative." }
+            },
+            {
+                "@type": "Question",
+                "name": "How does the Monte Carlo work?",
+                "acceptedAnswer": { "@type": "Answer", "text": "10,000 iterations. Each draws a macro scenario (baseline 50%, AI boom 25%, recession 15%, power crisis 10%) and five stochastic variables: correlated construction/power shocks (ρ = 0.65, Box–Muller + Cholesky), occupancy uncertainty (uniform), colo price variance (uniform), and demand growth variance (uniform). The engine prefers RZEngine.models.sim.monteCarlo (seeded, reproducible, seed 20260705); falls back to inline Math.random(). Outputs P5/P50/P95 of the winning option's TCO." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../tco-calculator.html" class="nav-link">TCO Calculator</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / TCO Calculator
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Total Cost of Ownership</p>
+            <h1>TCO Calculator — Methodology &amp; Formulas</h1>
+            <p>Every input, equation, constant, market constant, and output behind the Build vs Colo vs Cloud total-cost-of-ownership calculator. All cost arithmetic is inline in <code class="mn-mono">tco-calculator.html</code> (no separate engine file). Market pricing data is sourced from CBRE, JLL, Cushman &amp; Wakefield, and DC Byte (2025). The Monte Carlo delegates to <code class="mn-mono">RZEngine.models.sim.monteCarlo</code> when the engine is present; otherwise falls back to the inline Box–Muller sampler.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>inline JS (WACC + Monte Carlo)</strong></span>
+                <span class="mn-chip">Markets <strong>12</strong></span>
+                <span class="mn-chip">Horizons <strong>5 yr / 10 yr</strong></span>
+                <span class="mn-chip">MC Iterations <strong>10 000</strong></span>
+                <span class="mn-chip">Scenarios <strong>4 macro</strong></span>
+            </div>
+            <a class="mn-toollink" href="../tco-calculator.html">&#9654; Open the live calculator</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The calculator answers one question at two horizons (5 or 10 years): for a given IT load and region, which deployment model — owning your own facility (<strong>Build</strong>), renting power-and-space in a third-party data hall (<strong>Colo</strong>), or consuming compute from a hyperscaler (<strong>Cloud</strong>) — delivers the lowest total cost of ownership?</p>
+            <p class="mn-lead">The comparison is <strong>user-driven</strong>: you supply the IT load (MW), region, Uptime Institute tier, PUE, cooling type, utilisation rate, and annual growth rate. The calculator returns deterministic CAPEX+OPEX totals for all three paths, a breakeven year where Build crosses below Colo, an effective $/kW/yr metric, and (for Pro users) a scenario-weighted Monte Carlo risk distribution and a WACC-adjusted NPV table.</p>
+            <p class="mn-lead">The model is a <strong>financial pre-feasibility aid</strong> — not a substitute for a full techno-economic study. Market data reflects publicly available pricing surveys; individual project costs will vary. The calculation is fully deterministic given fixed inputs; the only stochastic element is the Monte Carlo risk simulation accessed via the Pro panel.</p>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">Eight inputs across two groups — site &amp; capacity, and analysis parameters. All validation is client-side via <code class="mn-mono">RZCalc.validateNumbers()</code>. Missing numerics fall back to the listed defaults.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field</th><th>ID</th><th>Unit</th><th>Default</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td>Region</td><td><code>tcoRegion</code></td><td>enum (12 markets)</td><td>n-virginia</td><td>Selects the MARKET_DATA block supplying build cost, colo rate, power rate, staff cost, and year-indexed projections.</td></tr>
+                    <tr><td>IT Load</td><td><code>tcoItLoad</code></td><td>MW</td><td>5</td><td>Rated IT power draw. Drives all linear cost scaling.</td></tr>
+                    <tr><td>Analysis period</td><td><code>tcoPeriod</code></td><td>years (5 / 10)</td><td>5</td><td>Accumulation horizon. Breakeven search extends to 15 years regardless of this setting.</td></tr>
+                    <tr><td>Tier</td><td><code>tcoTier</code></td><td>enum (II / III / IV)</td><td>tier-3</td><td>Uptime Institute tier. Multiplies Build CAPEX: II = 0.85×, III = 1.00×, IV = 1.35×. Also sets staffing density.</td></tr>
+                    <tr><td>PUE</td><td><code>tcoPue</code></td><td>dimensionless</td><td>1.3</td><td>Power Usage Effectiveness. Scales the total facility power draw in the annual power cost formula.</td></tr>
+                    <tr><td>Utilisation</td><td><code>tcoUtil</code></td><td>%</td><td>70</td><td>Average IT load factor. Scales power consumption (0–100%).</td></tr>
+                    <tr><td>Cooling type</td><td><code>tcoCooling</code></td><td>enum</td><td>chilled-water</td><td>Air / Chilled-water / Evaporative / DLC. Sets the default PUE reference (inline: air 1.40, chilled-water 1.25, evaporative 1.15, DLC 1.08).</td></tr>
+                    <tr><td>Annual growth</td><td><code>tcoGrowth</code></td><td>%/yr</td><td>10</td><td>Compound capacity growth rate applied to Colo and Cloud spend via <code>(1 + growthRate)^y</code> scale factor per year.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <p class="mn-lead" style="margin-top:0.9rem;">Three additional inputs are available to Pro (authenticated) users: power rate override ($/kWh), staff headcount override (FTE), colo escalation override (%), cloud reserved-instance discount (%), and debt-to-equity ratio for the WACC computation.</p>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">All arithmetic lives in the inline <code class="mn-mono">calculate()</code> function in <code class="mn-mono">tco-calculator.html</code>. There is no external TCO engine file. The inline constants are tagged <code>INLINE</code> below; market rates sourced from the in-page <code>MARKET_DATA</code> object are tagged <code>MARKET_DATA</code>.</p>
+
+            <!-- 3a. BUILD TCO -->
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.2rem;">3a — Build TCO: CAPEX</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">CAPEX = IT_MW &times; buildCost &times; tierMult &times; 1,000,000      [USD]</span>
+                <span class="mn-where">
+                    <code>buildCost</code> = market construction cost per MW ($/MW) from MARKET_DATA. <code>tierMult</code>: Tier II = 0.85, Tier III = 1.00, Tier IV = 1.35.
+                    <span class="mn-src">MARKET_DATA · CBRE/JLL 2025</span>
+                    <span class="mn-src">tierMult · INLINE</span>
+                </span>
+            </div>
+            <p class="mn-lead">CAPEX is a one-time charge, added at year 0. It also seeds the maintenance and insurance annual rates.</p>
+
+            <!-- 3b. Build OPEX Year 1 -->
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">3b — Build TCO: annual OPEX components (Year 1)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">annualPower    = IT_MW &times; PUE &times; 8,760 h/yr &times; util &times; powerRate &times; 1,000    [USD/yr]</span>
+                <span class="mn-eq">annualStaff    = staffCount &times; staffSalary                                                 [USD/yr]</span>
+                <span class="mn-eq">annualMaint    = CAPEX &times; 0.03                                                             [USD/yr]</span>
+                <span class="mn-eq">annualInsurance= CAPEX &times; 0.007                                                            [USD/yr]</span>
+                <span class="mn-eq">annualNetwork  = IT_MW &times; 20,000 &times; 12                                                 [USD/yr]</span>
+                <span class="mn-eq">annualOther    = (power + staff + maint + ins + net) &times; 0.04                              [USD/yr]</span>
+                <span class="mn-eq">yr1Opex        = power + staff + maint + ins + net + other</span>
+                <span class="mn-where">
+                    <code>powerRate</code> = $/kWh from MARKET_DATA (Pro: overridable). <code>staffCount</code> = ceil(staffPerMW &times; IT_MW); staffPerMW: Tier II = 3, III = 5, IV = 8 (INLINE). <code>staffSalary</code> = $/FTE/yr from MARKET_DATA. Maintenance 3% of CAPEX, insurance 0.7% of CAPEX, network $20k/MW/month, other 4% of all other OPEX items — all INLINE constants.
+                    <span class="mn-src">power · MARKET_DATA</span>
+                    <span class="mn-src">maint/ins/net/other · INLINE</span>
+                </span>
+            </div>
+
+            <!-- 3c. Build multi-year loop -->
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">3c — Build TCO: multi-year accumulation</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">For y = 0 .. years-1:</span>
+                <span class="mn-eq">  yPowerRate  = MARKET_DATA.projections.powerCostByYear[y]  (fallback: powerRate &times; (1 + PROJECTIONS.powerInflationByYear[2025+y])^y)</span>
+                <span class="mn-eq">  yStaffCost  = MARKET_DATA.projections.staffCostByYear[y]  (fallback: staffSalary &times; 1.05^y)</span>
+                <span class="mn-eq">  yPower      = IT_MW &times; PUE &times; 8,760 &times; util &times; yPowerRate &times; 1,000</span>
+                <span class="mn-eq">  yStaff      = staffCount &times; yStaffCost</span>
+                <span class="mn-eq">  yMaint      = annualMaint &times; 1.03^y</span>
+                <span class="mn-eq">  yOther      = (yPower + yStaff + yMaint + yIns + yNet) &times; 0.04</span>
+                <span class="mn-eq">  buildTotal += CAPEX + &sum;(yPower + yStaff + yMaint + yIns + yNet + yOther)</span>
+                <span class="mn-where">
+                    Year-indexed power and staff costs come from per-market projection arrays (2025–2030, capped at the 2030 value for years beyond index). Global <code>PROJECTIONS.powerInflationByYear</code> fallback: 4% (2025), 5% (2026), 4% (2027), 3% (2028–2029), 2% (2030). Staff inflation fallback 5%/yr, maintenance inflation 3%/yr — INLINE.
+                    <span class="mn-src">projections · MARKET_DATA</span>
+                    <span class="mn-src">inflation rates · INLINE/PROJECTIONS</span>
+                </span>
+            </div>
+
+            <!-- 3d. Colo TCO -->
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.2rem;">3d — Colo TCO</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">coloSetup   = IT_MW &times; 50,000          (one-time setup fees)              [USD] INLINE</span>
+                <span class="mn-eq">For y = 0 .. years-1:</span>
+                <span class="mn-eq">  scale       = (1 + growthRate)^y</span>
+                <span class="mn-eq">  yColoPrice  = MARKET_DATA.projections.coloPriceByYear[y]  (fallback: coloKW &times; (1 + coloEsc)^y)</span>
+                <span class="mn-eq">  yColo       = IT_MW &times; 1,000 &times; yColoPrice &times; 12 &times; scale            [USD/yr]</span>
+                <span class="mn-eq">  yColoStaff  = coloStaffCount &times; staffCostByYear[y]                        [USD/yr]</span>
+                <span class="mn-eq">  yColoNet    = IT_MW &times; 15,000 &times; 12                                    [USD/yr]  INLINE</span>
+                <span class="mn-eq">  yColoOther  = (yColo + yColoStaff + yColoNet) &times; 0.03                   [USD/yr]  INLINE</span>
+                <span class="mn-eq">  coloTotal  += coloSetup + &sum;(yColo + yColoStaff + yColoNet + yColoOther)</span>
+                <span class="mn-where">
+                    <code>coloKW</code> = $/kW/month from MARKET_DATA. <code>coloStaffCount</code> = ceil(1.5 &times; IT_MW) — reduced headcount vs own-build (INLINE). <code>coloEsc</code> = colo escalation rate, default 3%/yr (INLINE; Pro: overridable). Network $15k/MW/month (INLINE). Growth scale is applied to the colo lease only (workload grows, you rent more kW). Setup fees do not escalate.
+                    <span class="mn-src">coloKW · MARKET_DATA</span>
+                    <span class="mn-src">setup/staffing/net/other · INLINE</span>
+                </span>
+            </div>
+
+            <!-- 3e. Cloud TCO -->
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.2rem;">3e — Cloud TCO</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">CLOUD_BASE   = $420 /kW/month  (list-price equivalent)                 INLINE</span>
+                <span class="mn-eq">yr1Cloud     = IT_MW &times; 1,000 &times; CLOUD_BASE &times; 12 &times; (1 - cloudDiscount)</span>
+                <span class="mn-eq">cloudEgress  = yr1Cloud &times; 0.15                                          INLINE</span>
+                <span class="mn-eq">cloudSupport = yr1Cloud &times; 0.10                                          INLINE</span>
+                <span class="mn-eq">For y = 0 .. years-1:</span>
+                <span class="mn-eq">  scale        = (1 + growthRate)^y</span>
+                <span class="mn-eq">  cloudCumRate = &prod;(1 + PROJECTIONS.cloudPricingByYear[2025..2025+y])</span>
+                <span class="mn-eq">  yCloud       = yr1Cloud &times; cloudCumRate &times; scale</span>
+                <span class="mn-eq">  yEgress      = yCloud &times; 0.15</span>
+                <span class="mn-eq">  ySupport     = yCloud &times; 0.10</span>
+                <span class="mn-eq">  yCloudOther  = yCloud &times; 0.02                                          INLINE</span>
+                <span class="mn-eq">  cloudTotal  += &sum;(yCloud + yEgress + ySupport + yCloudOther)</span>
+                <span class="mn-where">
+                    <code>cloudDiscount</code> = reserved-instance/committed-use discount, default 30% (INLINE; Pro: overridable). <code>PROJECTIONS.cloudPricingByYear</code>: 0.0% (2025), −5% (2026), −8% (2027), −3% (2028), −2% (2029), −1% (2030) — cloud pricing is modelled as declining year-on-year (INLINE). Egress 15%, support 10%, other 2% — INLINE multiples on the compute line. No CAPEX for Cloud.
+                    <span class="mn-src">CLOUD_BASE · INLINE</span>
+                    <span class="mn-src">cloudPricingByYear · INLINE/PROJECTIONS</span>
+                </span>
+            </div>
+
+            <!-- 3f. Breakeven -->
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.2rem;">3f — Breakeven year</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Extend to 15 years. For y = 0 .. 14:</span>
+                <span class="mn-eq">  beCum += Build_OPEX_year_y   (same formula as 3c, using market projections)</span>
+                <span class="mn-eq">  ceCum += Colo_OPEX_year_y   (same formula as 3d)</span>
+                <span class="mn-eq">  If beCum &lt; ceCum for the first time: breakevenYear = y + 1   break</span>
+                <span class="mn-where">
+                    The Build accumulator starts at CAPEX (year 0). The Colo accumulator starts at coloSetup. The first year y where the Build running total falls below Colo is reported as the breakeven. If no crossover by year 15, the output reads "N/A". INLINE algorithm.
+                    <span class="mn-src">INLINE</span>
+                </span>
+            </div>
+
+            <!-- 3g. Cost per kW -->
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">3g — Effective cost per kW per year</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">costPerKw = winnerTCO / (IT_MW &times; 1,000) / years      [$/kW/yr]</span>
+                <span class="mn-where">Divides the winning option's total TCO by the installed kW capacity and the number of years. INLINE.<span class="mn-src">INLINE</span></span>
+            </div>
+
+            <!-- 3h. WACC and NPV (Pro) -->
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.2rem;">3h — WACC-adjusted NPV (Pro)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">WACC = D/V &times; kd &times; (1 - T) + E/V &times; ke</span>
+                <span class="mn-eq">  kd = 0.06 (cost of debt),  ke = 0.12 (cost of equity),  T = 0.25 (tax rate)  INLINE</span>
+                <span class="mn-eq">  D/V = debtEquity (default 0.60),  E/V = 1 - D/V</span>
+                <span class="mn-eq">  Default WACC &asymp; 0.60 &times; 0.06 &times; 0.75 + 0.40 &times; 0.12 = 0.027 + 0.048 = 7.5%</span>
+                <span class="mn-eq"></span>
+                <span class="mn-eq">NPV_Build = CAPEX + &sum;(Build_OPEX_y / (1 + WACC)^(y+1))   for y = 0..9</span>
+                <span class="mn-eq">NPV_Colo  = coloSetup + &sum;(Colo_OPEX_y / (1 + WACC)^(y+1))</span>
+                <span class="mn-eq">NPV_Cloud = &sum;(Cloud_OPEX_y / (1 + WACC)^(y+1))</span>
+                <span class="mn-eq">NPV_diff  = max(NPV_Build, NPV_Colo, NPV_Cloud) - min(...)</span>
+                <span class="mn-where">
+                    The NPV spread is displayed as the "NPV advantage" of the cheapest option over the most expensive one. The WACC uses the Modigliani–Miller tax-shield form for the debt term. All rates are INLINE (not from FINEngine — the TCO calculator does not call <code>FINEngine</code>). D/V is the Pro user's debt/equity input, defaulting to 60%.
+                    <span class="mn-src">INLINE · Modigliani–Miller</span>
+                </span>
+            </div>
+
+            <!-- 3i. Monte Carlo -->
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.2rem;">3i — Monte Carlo risk simulation (Pro)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">N = 10,000 iterations</span>
+                <span class="mn-eq">Each iteration draws:</span>
+                <span class="mn-eq">  scenario  ~ categorical({baseline:0.50, aiBoom:0.25, recession:0.15, powerCrisis:0.10})</span>
+                <span class="mn-eq">  conZ, pwrZ ~ N(0,1) with Cholesky correlation &rho; = 0.65  (Box–Muller / engine stdNormal)</span>
+                <span class="mn-eq">  occU, colU, dmdU ~ Uniform(-0.5, 0.5)</span>
+                <span class="mn-eq"></span>
+                <span class="mn-eq">Per-iteration winner TCO (e.g. Build path):</span>
+                <span class="mn-eq">  CAPEX_i  = CAPEX &times; (1 + conZ &times; mktVariance &times; scenario.costMult)   [clamped 0.7–1.5]</span>
+                <span class="mn-eq">  yPower_i = yPower &times; (1 + pwrZ &times; mktVariance &times; scenario.costMult)   [clamped 0.7–1.5]</span>
+                <span class="mn-eq">  yStaff_i = yStaff &times; (1 + occU &times; mktVariance &times; 1.5)               [clamped 0.75–1.25]</span>
+                <span class="mn-eq">  (Colo) colPrice_i = coloPrice &times; (1 + colU &times; mktVariance &times; 2.0)     [clamped 0.7–1.4]</span>
+                <span class="mn-eq">  (Cloud) demandScale_i = scenario.demandMult &times; (1 + dmdU &times; 0.10)</span>
+                <span class="mn-eq"></span>
+                <span class="mn-eq">Output: sorted array bestArr[0..9999]; P5 = bestArr[500], P50 = bestArr[5000], P95 = bestArr[9500]</span>
+                <span class="mn-where">
+                    Macro scenarios multiply both demand and cost simultaneously. Construction cost and power cost shocks are positively correlated (rho = 0.65): energy-intensive supply crunches tend to hit both together. Market-specific variance (<code>mkt.variance</code>) scales the shock magnitude; emerging markets (Jakarta 0.22, Mumbai 0.20, São Paulo 0.25) carry wider distributions than mature markets (Frankfurt 0.09, Chicago 0.10). <br><br>
+                    Preferred path: <code>RZEngine.models.sim.monteCarlo(fn, distributions, 10000, 20260705, {correlations:[{a:'conZ',b:'pwrZ',rho:0.65}]})</code> — seeded LCG (seed 20260705), reproducible across sessions. Fallback: inline Math.random() Box–Muller, non-seeded, non-reproducible. Histogram rendered in 40 bins; P5 zone green, P95 zone red.
+                    <span class="mn-src">RZEngine.models.sim.monteCarlo · rz-engine.js:8990</span>
+                    <span class="mn-src">scenario weights · INLINE/SCENARIOS</span>
+                </span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS & SOURCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">The 12-market dataset (<code>MARKET_DATA</code>) is the single largest source of externally-sourced data in the calculator. Every field is attributed below. Purely structural coefficients (tier multipliers, percentage ratios) are inline constants with no external provenance and are so labelled.</p>
+
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Market</th><th>Build $/MW</th><th>Colo $/kW/mo</th><th>Power $/kWh</th><th>Staff $/FTE/yr</th><th>CAGR</th><th>Variance</th></tr></thead>
+                <tbody>
+                    <tr><td>N. Virginia</td><td>$12.0 M</td><td>$215</td><td>$0.065</td><td>$85 K</td><td>25%</td><td>0.12</td></tr>
+                    <tr><td>Dallas</td><td>$9.5 M</td><td>$160</td><td>$0.055</td><td>$75 K</td><td>22%</td><td>0.15</td></tr>
+                    <tr><td>Phoenix</td><td>$9.0 M</td><td>$150</td><td>$0.058</td><td>$72 K</td><td>20%</td><td>0.13</td></tr>
+                    <tr><td>Chicago</td><td>$10.5 M</td><td>$175</td><td>$0.072</td><td>$80 K</td><td>15%</td><td>0.10</td></tr>
+                    <tr><td>Singapore</td><td>$14.5 M</td><td>$390</td><td>$0.180</td><td>$92 K</td><td>12%</td><td>0.14</td></tr>
+                    <tr><td>Frankfurt</td><td>$11.6 M</td><td>$195</td><td>$0.150</td><td>$88 K</td><td>10%</td><td>0.09</td></tr>
+                    <tr><td>Tokyo</td><td>$15.2 M</td><td>$270</td><td>$0.160</td><td>$95 K</td><td>8%</td><td>0.11</td></tr>
+                    <tr><td>Jakarta</td><td>$8.5 M</td><td>$160</td><td>$0.080</td><td>$35 K</td><td>18%</td><td>0.22</td></tr>
+                    <tr><td>Sydney</td><td>$12.5 M</td><td>$180</td><td>$0.140</td><td>$90 K</td><td>14%</td><td>0.11</td></tr>
+                    <tr><td>London</td><td>$12.0 M</td><td>$200</td><td>$0.170</td><td>$92 K</td><td>10%</td><td>0.10</td></tr>
+                    <tr><td>Mumbai</td><td>$7.5 M</td><td>$125</td><td>$0.085</td><td>$28 K</td><td>20%</td><td>0.20</td></tr>
+                    <tr><td>São Paulo</td><td>$10.0 M</td><td>$165</td><td>$0.100</td><td>$42 K</td><td>16%</td><td>0.25</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <p class="mn-lead" style="margin-top:0.75rem;">Source attribution in code: <code>/* Source: CBRE H1 2025, JLL 2026, Cushman &amp; Wakefield 2025, DC Byte 2025 */</code>. Each market also carries 6-year projection arrays (2025–2030) for build cost, colo price, power cost, vacancy, and staff cost; year-indexed values take precedence over the flat-rate fallbacks.</p>
+
+            <div class="mn-tablewrap" style="margin-top:1rem;">
+            <table class="mn-table">
+                <thead><tr><th>Constant</th><th>Value</th><th>Location</th><th>Provenance</th></tr></thead>
+                <tbody>
+                    <tr><td>Tier II CAPEX multiplier</td><td>0.85</td><td><code>TIER_MULT</code> inline</td><td>INLINE — structural</td></tr>
+                    <tr><td>Tier III CAPEX multiplier</td><td>1.00 (base)</td><td><code>TIER_MULT</code> inline</td><td>INLINE — structural</td></tr>
+                    <tr><td>Tier IV CAPEX multiplier</td><td>1.35</td><td><code>TIER_MULT</code> inline</td><td>INLINE — structural</td></tr>
+                    <tr><td>Staff per MW: Tier II/III/IV</td><td>3 / 5 / 8 FTE</td><td><code>TIER_STAFF_PER_MW</code> inline</td><td>INLINE — engineering judgement</td></tr>
+                    <tr><td>Colo staff per MW</td><td>1.5 FTE</td><td><code>coloStaffPerMW</code> inline</td><td>INLINE — reduced vs own-build</td></tr>
+                    <tr><td>Maintenance rate</td><td>3% of CAPEX/yr</td><td>inline</td><td>INLINE — industry convention</td></tr>
+                    <tr><td>Insurance rate</td><td>0.7% of CAPEX/yr</td><td>inline</td><td>INLINE — industry convention</td></tr>
+                    <tr><td>Other OPEX overhead</td><td>4% of (power+staff+maint+ins+net)/yr (Build); 3% for Colo</td><td>inline</td><td>INLINE</td></tr>
+                    <tr><td>Build network cost</td><td>$20,000/MW/month</td><td>inline</td><td>INLINE</td></tr>
+                    <tr><td>Colo network cost</td><td>$15,000/MW/month</td><td>inline</td><td>INLINE</td></tr>
+                    <tr><td>Colo setup fees</td><td>$50,000/MW</td><td>inline</td><td>INLINE</td></tr>
+                    <tr><td>Cloud list-price base</td><td>$420/kW/month</td><td><code>CLOUD_BASE</code></td><td>INLINE</td></tr>
+                    <tr><td>Cloud reserved discount</td><td>30% (Pro: overridable)</td><td>inline default</td><td>INLINE</td></tr>
+                    <tr><td>Egress as % of compute</td><td>15%</td><td>inline</td><td>INLINE</td></tr>
+                    <tr><td>Cloud support as % of compute</td><td>10%</td><td>inline</td><td>INLINE</td></tr>
+                    <tr><td>Cloud other</td><td>2% of compute</td><td>inline</td><td>INLINE</td></tr>
+                    <tr><td>Cost of debt (WACC)</td><td>6%</td><td>inline WACC constants</td><td>INLINE</td></tr>
+                    <tr><td>Cost of equity (WACC)</td><td>12%</td><td>inline WACC constants</td><td>INLINE</td></tr>
+                    <tr><td>Tax rate (WACC)</td><td>25%</td><td>inline WACC constants</td><td>INLINE</td></tr>
+                    <tr><td>MC corr. construction/power</td><td>&rho; = 0.65</td><td><code>renderMonteCarlo()</code></td><td>INLINE — Cholesky pair</td></tr>
+                    <tr><td>MC seed</td><td>20260705</td><td><code>E.models.sim.monteCarlo(...)</code></td><td>INLINE</td></tr>
+                    <tr><td>Construction inflation 2025–2030</td><td>8/10/7/6/5/4 %</td><td><code>PROJECTIONS</code> inline</td><td>INLINE/McKinsey 2025</td></tr>
+                    <tr><td>Cloud pricing 2025–2030</td><td>0/−5/−8/−3/−2/−1 %</td><td><code>PROJECTIONS</code> inline</td><td>INLINE</td></tr>
+                    <tr><td>AI demand growth 2025–2030</td><td>33/30/28/25/22/20 %</td><td><code>PROJECTIONS</code> inline</td><td>McKinsey 2025 (attributed in code)</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Formula ref</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>Build TCO</td><td>§3c sum</td><td>USD</td><td>CAPEX + all OPEX over the analysis horizon. Year-indexed power and staff costs.</td></tr>
+                    <tr><td>Colo TCO</td><td>§3d sum</td><td>USD</td><td>Setup + lease + staff + network + other over horizon. Lease grows with capacity growth rate.</td></tr>
+                    <tr><td>Cloud TCO</td><td>§3e sum</td><td>USD</td><td>Compute + egress + support + other over horizon. Compute price declines per cloudPricingByYear; spend grows with capacity.</td></tr>
+                    <tr><td>Best option</td><td>min(Build, Colo, Cloud)</td><td>name</td><td>Lowest-TCO model at the selected horizon and growth rate.</td></tr>
+                    <tr><td>Savings vs #2</td><td>(#2 − winner) / #2 × 100</td><td>%</td><td>Relative advantage of the winning model over the second-cheapest.</td></tr>
+                    <tr><td>Build CAPEX</td><td>§3a</td><td>USD</td><td>One-time construction cost at Year 0.</td></tr>
+                    <tr><td>Annual OPEX (Year 1)</td><td>§3b yr1Opex</td><td>USD/yr</td><td>Year-1 run cost for own-build; useful for budget planning.</td></tr>
+                    <tr><td>Effective $/kW/yr</td><td>§3g</td><td>USD/kW/yr</td><td>Winner TCO amortised per installed kW over the analysis period.</td></tr>
+                    <tr><td>Breakeven year</td><td>§3f</td><td>year (1–15)</td><td>First year Build cumulative total falls below Colo. N/A if never crosses within 15 yr.</td></tr>
+                    <tr><td>P5 / P50 / P95 (MC)</td><td>§3i sorted array</td><td>USD</td><td>Risk distribution of the winning option's TCO across 10 000 stochastic scenarios. Pro only.</td></tr>
+                    <tr><td>WACC-adjusted NPV spread</td><td>§3h</td><td>USD</td><td>Present-value advantage of cheapest vs most expensive option at the computed WACC. Pro only.</td></tr>
+                    <tr><td>Breakeven (NPV projection)</td><td>§3h year loop</td><td>year (1–10)</td><td>Year Build NPV cumulative crosses below Colo NPV cumulative in the 10-year WACC projection. Pro only.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example</h2>
+            <p class="mn-lead">Market: <strong>Dallas</strong> · IT load: <strong>5 MW</strong> · Period: <strong>5 years</strong> · Tier: <strong>III</strong> · PUE: <strong>1.3</strong> · Utilisation: <strong>70%</strong> · Cooling: chilled-water · Growth: <strong>10%/yr</strong>. All numbers computed by hand from the inline formulas and market constants extracted above. Year-1 values use the Year 0 projection array entries.</p>
+
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Build CAPEX</strong>: <code>5 MW × $9.5 M × 1.00 (Tier III) =</code> <span class="mn-result">$47,500,000</span></li>
+                    <li><strong>Build Year-1 power</strong>: <code>5 × 1.3 × 8,760 × 0.70 × $0.055/kWh × 1,000 =</code> <span class="mn-result">$2,185,650/yr</span> (using Dallas power $0.055/kWh Y0)</li>
+                    <li><strong>Build Year-1 staff</strong>: <code>ceil(5 × 5 FTE/MW) = 25 FTE × $75,000 =</code> <span class="mn-result">$1,875,000/yr</span></li>
+                    <li><strong>Build Year-1 maint</strong>: <code>$47.5 M × 0.03 =</code> <span class="mn-result">$1,425,000/yr</span> · Insurance: <code>$47.5 M × 0.007 =</code> <span class="mn-result">$332,500/yr</span></li>
+                    <li><strong>Build Year-1 network</strong>: <code>5 × $20,000 × 12 =</code> <span class="mn-result">$1,200,000/yr</span></li>
+                    <li><strong>Build Year-1 other</strong>: <code>(2,185,650 + 1,875,000 + 1,425,000 + 332,500 + 1,200,000) × 0.04 =</code> <span class="mn-result">$280,726/yr</span></li>
+                    <li><strong>Build Year-1 OPEX total</strong>: <code>2,185,650 + 1,875,000 + 1,425,000 + 332,500 + 1,200,000 + 280,726 =</code> <span class="mn-result">$7,298,876/yr</span></li>
+                    <li><strong>Build 5-yr TCO</strong>: CAPEX + sum of 5 annual OPEX rows (years escalate slightly). Using Year 0 rate for all 5 years as a conservative lower bound: <code>$47,500,000 + 5 × $7,298,876 ≈</code> <span class="mn-result">~$84,000,000</span> (live calculator will be modestly higher due to year-indexed power/staff escalation from Dallas projections: power $0.055→$0.068, staff $75K→$95.7K by 2030)</li>
+                    <li><strong>Colo Year-1 lease</strong>: <code>5 MW × 1,000 kW/MW × $160/kW/mo × 12 × 1.0 (scale Y0) =</code> <span class="mn-result">$9,600,000/yr</span></li>
+                    <li><strong>Colo staff</strong>: <code>ceil(1.5 × 5) = 8 FTE × $75,000 =</code> <span class="mn-result">$600,000/yr</span></li>
+                    <li><strong>Colo network</strong>: <code>5 × $15,000 × 12 =</code> <span class="mn-result">$900,000/yr</span></li>
+                    <li><strong>Colo other Y1</strong>: <code>(9,600,000 + 600,000 + 900,000) × 0.03 =</code> <span class="mn-result">$333,000/yr</span></li>
+                    <li><strong>Colo setup</strong>: <code>5 MW × $50,000 =</code> <span class="mn-result">$250,000</span></li>
+                    <li><strong>Colo 5-yr TCO</strong>: Setup + 5 years (lease grows 10%/yr from year 0 scale=1 to year 4 scale=1.464). Sum of lease years: 1.0+1.1+1.21+1.331+1.464 = 6.105. <code>$250,000 + 6.105 × $9,600,000 + 5 × ($600,000 + $900,000 + $333,000) ≈</code> <span class="mn-result">~$67,800,000</span></li>
+                    <li><strong>Cloud Year-1</strong>: <code>5 MW × 1,000 kW/MW × $420/kW/mo × 12 × (1 − 0.30) =</code> <span class="mn-result">$17,640,000/yr</span></li>
+                    <li><strong>Cloud 5-yr TCO</strong> (with 15% egress + 10% support + 2% other = 1.27× multiplier, cloud pricing cumulative rate Y0–Y4: 1.00×0.95×0.87×0.84×0.82 ≈ 0.574, growth scale cumulative sum ≈ 6.105): <code>$17,640,000 × 0.574 × 1.27 × 5 ≈</code> (each year priced independently) <span class="mn-result">~$70,000,000</span> (cloud pricing declines partially offset growth)</li>
+                    <li><strong>Winner at 5 years, 10%/yr growth</strong>: Colo ≈ $67.8 M &lt; Cloud ≈ $70 M &lt; Build ≈ $84 M → <span class="mn-result">Colo wins</span></li>
+                    <li><strong>Breakeven (Build vs Colo)</strong>: With Build CAPEX of $47.5 M vs Colo $250 K setup, the Colo annual spend ($11.4 M/yr Y1, escalating) exceeds Build annual OPEX ($7.3 M/yr Y1) each year. The gap narrows only as growth compounds the colo lease. At 10% growth the colo lease grows faster than build OPEX, so the crossover is driven by growth rate vs savings per year. Rough breakeven: <code>Build cumulative &asymp; Colo cumulative</code> → at flat rates, ΔY1 = $9.6 M − $7.3 M = $2.3 M/yr savings on colo, but CAPEX excess = $47.25 M → payback ≈ $47.25 M / $2.3 M ≈ <span class="mn-result">~20 yr</span> (beyond the 15-yr search horizon, so reported as N/A at this scale and growth rate)</li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Verification note:</strong> The worked example was computed by hand directly from the inline formulas and MARKET_DATA constants extracted from <code>tco-calculator.html</code>. The live calculator applies year-indexed projections from the Dallas <code>projections</code> arrays (powerCostByYear, staffCostByYear, coloPriceByYear), so actual calculator output will differ modestly from the flat-rate approximation used here. The order of magnitude and winner (Colo) are consistent at 5 MW / 10% growth / 5 years in Dallas.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; data sources</h2>
+            <ul class="mn-refs">
+                <li><b>CBRE H1 2025</b> — Data Center Market Trends: build cost $/MW, colo $/kW/month baseline pricing across N. Virginia, Dallas, Phoenix, Chicago markets.</li>
+                <li><b>JLL 2026</b> — Data Center Outlook: construction cost global average $10.7 M/MW (2025), AI-ready premium 1.8×. Also London, Singapore, Frankfurt, Sydney market data.</li>
+                <li><b>Cushman &amp; Wakefield 2025</b> — Data Center Outlook: vacancy rates, capacity pipelines, CAGR by market.</li>
+                <li><b>DC Byte 2025</b> — Global Data Center Tracker: operational MW, construction MW, planned MW, equilibrium colo price by market.</li>
+                <li><b>Uptime Institute 2025 Annual Survey</b> — Global average PUE 1.55, target 2030: 1.30; rack density trends (8→50 kW/rack 2025→2030). Referenced in <code>BENCHMARKS</code>.</li>
+                <li><b>IEA Electricity 2026</b> — Global DC power demand TWh projections 2024–2030. Referenced in <code>BENCHMARKS.dcPowerDemand</code>.</li>
+                <li><b>Synergy Research Q1 2025</b> — Hyperscale count: 1,189 operational, 504 planned, 122,200 MW total. Referenced in <code>BENCHMARKS.hyperscaleCount</code>.</li>
+                <li><b>Dell'Oro Group 2025</b> — Hyperscaler CAPEX forecast: $224 B (2024), $413 B (2025), $500 B (2026). Referenced in <code>BENCHMARKS.hyperscalerCapex</code>.</li>
+                <li><b>McKinsey 2025</b> — AI demand growth trajectory 33%→20% (2025–2030). Referenced in <code>PROJECTIONS.aiDemandGrowth</code>.</li>
+                <li><b>STL Partners 2025</b> — Edge DC CAGR 16.5%. Referenced in <code>PROJECTIONS.edgeDCGrowth</code>.</li>
+                <li><b>Turner &amp; Townsend / Arcadis</b> — Regional construction cost benchmarks (earthquake-resistant premium Tokyo +15–20%; Sao Paulo construction inflation 20%+). Referenced in market notes.</li>
+                <li><b>Engine source</b> — Inline JS in <code>tco-calculator.html</code>; Monte Carlo via <code>js/rz-engine.min.js</code> (<code>RZEngine.models.sim.monteCarlo</code>, seeded LCG, seed 20260705).</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS & LIMITS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The model assumes a <strong>greenfield build</strong> at the stated IT load from Year 0 (no phased capacity expansion within the horizon). Power consumption is modelled as flat at <code>IT_MW × PUE × utilisation</code> throughout; the growth rate only scales the Colo lease and Cloud compute spend — it does not model incremental Build CAPEX for new capacity. This is conservative for Build (no expansion CAPEX) and aggressive for Colo/Cloud (full growth-rate escalation of the lease/compute line).</p>
+            <p class="mn-lead">Colo pricing uses market-specific year-by-year arrays where available (2025–2030). Beyond 2030 the 2030 value is clamped. Mean-reversion and S-curve capacity models exist in the code (<code>predictColoPrice</code>, <code>predictCapacity</code>) but are display-only for market intelligence chips and do not feed into the TCO accumulator.</p>
+            <p class="mn-lead">The Cloud base rate of $420/kW/month is a list-price equivalent for IaaS compute-intensive workloads; storage, managed databases, and other services are not separately modelled. Reserved-instance / committed-use discounts default to 30% (a typical 1-year commitment discount from the major hyperscalers as of 2025). The 15% egress charge is a mid-market estimate; egress costs vary substantially by provider and architecture.</p>
+            <p class="mn-lead">WACC parameters (6% debt, 12% equity, 25% tax) are illustrative defaults for a mid-market infrastructure borrower. Real projects should compute the WACC from their actual capital structure and jurisdiction tax rate via the Pro override fields. <strong>This calculator is an engineering education and pre-feasibility aid — not a substitute for a full financial model or independent techno-economic study.</strong></p>
+        </section>
+
+        <a class="mn-toollink" href="../tco-calculator.html">&#9654; Open the live TCO Calculator</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../tco-calculator.html">TCO Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

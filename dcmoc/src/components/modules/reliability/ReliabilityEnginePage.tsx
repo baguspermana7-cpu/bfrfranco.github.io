@@ -29,30 +29,21 @@ import { ShieldCheck, ChevronRight, FileDown, ArrowUpRight } from 'lucide-react'
 import { Explain } from '@/components/ui/Explain';
 import { TraceValue } from '@/components/ui/TraceValue';
 import { explainThresholdMetric, DecisionLever } from '@/lib/decision-explain';
+/* single source of truth for the β-adjusted chain + nines formatters —
+ * shared with the RAM Detail tab so both tabs show the SAME headline */
+import {
+    MIN_PER_YEAR, ninesOf, fmtAvail, fmtDowntime,
+    buildSystems as buildSystemsShared, ccOverall as ccOverallShared,
+    type SystemRow, type RelComponent,
+} from '@/components/modules/reliability/availabilityChain';
 
-interface SystemRow { label: string; availability: number; chain: string; redundant: boolean }
 interface ComponentRow { key: string; label: string; mtbf: number; mttr: number; lambdaMyr: number; count: number | null; availability: number; contribPct: number }
-
-/* β-factor common-cause screening share (assumption, IEC 61508-style screening) */
-const CC_BETA = 0.05;
-const MIN_PER_YEAR = 525960;
 
 /* engine component class → equipScale fleet-count key */
 const EQ_KEY: Record<string, string> = {
     ups: 'ups_modules', generator: 'generators', crac: 'cooling_units',
     pdu: 'pdus', switchgear: 'switchgear', chiller: 'chillers',
 };
-
-/* nines-aware availability formatter — never rounds up to a fake 100% */
-const ninesOf = (a: number): number => a >= 1 - 1e-9 ? 9 : Math.min(9, Math.floor(-Math.log10(1 - a)));
-const fmtAvail = (a: number): string => {
-    if (a >= 1 - 1e-9) return '>99.9999999%';
-    const nines = ninesOf(a);
-    const s = (a * 100).toFixed(Math.max(4, nines + 1));
-    if (s.startsWith('100')) return '>99.9999999%';
-    return `${s}%`;
-};
-const fmtDowntime = (min: number): string => min < 1 ? `~${Math.round(min * 60)} s/yr` : `${min.toFixed(1)} min/yr`;
 
 export function ReliabilityEnginePage() {
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
@@ -68,32 +59,14 @@ export function ReliabilityEnginePage() {
         const m = eng?.reliability;
         const d = rzData()?.reliability;
         if (!m?.availability || !d?.components) return null;
-        const comps = d.components as Record<string, { mtbf: number; mttr: number; label: string }>;
+        const comps = d.components as Record<string, RelComponent>;
         const redKey = REDUNDANCY_KEY[inputs.powerRedundancy] ?? 'n1';
         const paths: number = d.redundancyPaths?.[redKey] ?? 2;
-        const par = (av: number, n: number) => m.parallelAvailability ? m.parallelAvailability(av, n) : 1 - Math.pow(1 - av, n);
-        const ser = (arr: number[]) => m.seriesAvailability ? m.seriesAvailability(arr) : arr.reduce((s, x) => s * x, 1);
 
-        /* documented per-system chains, parameterized for sensitivity re-runs */
-        const buildSystems = (mttrFactor: number, p: number): SystemRow[] => {
-            const a = (cls: string) => comps[cls] ? m.availability(comps[cls].mtbf, comps[cls].mttr * mttrFactor) : 0.999;
-            return [
-                { label: 'Power Distribution', availability: par(ser([a('switchgear'), a('pdu')]), p), chain: `(swgr·pdu) × ${p} paths`, redundant: p > 1 },
-                { label: 'UPS & Battery', availability: par(a('ups'), p), chain: `UPS × ${p} paths`, redundant: p > 1 },
-                { label: 'Generators', availability: par(a('generator'), Math.max(2, p)), chain: `gen × ${Math.max(2, p)} (N+1 floor)`, redundant: true },
-                { label: 'Cooling (Chillers)', availability: par(a('chiller'), 2), chain: 'chiller N+1 (2 paths)', redundant: true },
-                { label: 'CRAC / AHU', availability: par(a('crac'), 2), chain: 'CRAC N+1', redundant: true },
-            ];
-        };
-        /* β=5% common-cause screening: blend the parallel-composed overall with
-         * the single-path series overall (a common-cause event defeats redundancy) */
-        const ccOverall = (mttrFactor: number, p: number): number => {
-            const a = (cls: string) => comps[cls] ? m.availability(comps[cls].mtbf, comps[cls].mttr * mttrFactor) : 0.999;
-            const sys = buildSystems(mttrFactor, p);
-            const overallPar = ser(sys.map((s) => s.availability));
-            const overallSingle = ser([ser([a('switchgear'), a('pdu')]), a('ups'), a('generator'), a('chiller'), a('crac')]);
-            return overallPar * (1 - CC_BETA) + overallSingle * CC_BETA;
-        };
+        /* shared β-adjusted chain (availabilityChain.ts) — same composition the
+         * RAM Detail tab uses, parameterized for sensitivity re-runs */
+        const buildSystems = (mttrFactor: number, p: number): SystemRow[] => buildSystemsShared(m, comps, mttrFactor, p);
+        const ccOverall = (mttrFactor: number, p: number): number => ccOverallShared(m, comps, mttrFactor, p);
 
         const systems = buildSystems(1, paths);
         const overall = ccOverall(1, paths); // headline: common-cause-adjusted

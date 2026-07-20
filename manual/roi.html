@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>ROI Calculator — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full financial methodology for the DC ROI calculator: NPV discounted cashflow, IRR via Newton-Raphson, payback period, profitability index, occupancy ramp interpolation, and Monte Carlo risk simulation.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="NPV methodology, IRR Newton-Raphson, data center ROI, payback period, profitability index, Monte Carlo simulation, WACC, occupancy ramp, DCF analysis, data center investment">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/roi.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/roi.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/roi.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/roi.html">
+    <meta property="og:title" content="ROI Calculator — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="NPV discounted cashflow, IRR Newton-Raphson, payback, PI, occupancy ramp, and Monte Carlo risk — every formula behind the DC ROI calculator.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="ROI Calculator Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="ROI Calculator — Technical Manual">
+    <meta name="twitter:description" content="NPV discounted cashflow, IRR Newton-Raphson, payback, PI, occupancy ramp, and Monte Carlo simulation.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="ROI Calculator Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "ROI Calculator" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "ROI Calculator — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Discounted cashflow methodology for data center investment return analysis",
+        "articleSection": "Investment Return",
+        "dependencies": "NPV, IRR, Payback, Profitability Index, Monte Carlo, DCF",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to calculate data center investment ROI (NPV, IRR, payback)",
+        "step": [
+            { "@type": "HowToStep", "name": "Define investment parameters", "text": "Enter total CAPEX ($M), IT capacity (MW), project lifetime (years), and construction period (months)." },
+            { "@type": "HowToStep", "name": "Configure revenue and occupancy", "text": "Set colocation price ($/kW/month), price escalation, ancillary revenue percentage, and the three-point occupancy ramp (Year 1 / Year 3 / Year 5 / steady-state)." },
+            { "@type": "HowToStep", "name": "Define operating costs", "text": "Enter electricity rate and PUE (which determine energy OPEX), staffing, maintenance, and insurance costs with their annual escalation rate." },
+            { "@type": "HowToStep", "name": "Set financing and tax parameters", "text": "Specify WACC / discount rate, debt/equity split, interest rate, loan term, corporate tax rate, depreciation method, and exit cap rate for terminal value." },
+            { "@type": "HowToStep", "name": "Review NPV, IRR, payback, and PI", "text": "Analyse the year-by-year cashflow table, NPV at your WACC, IRR versus cost of capital, simple payback year, and profitability index." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "How is IRR calculated in the ROI calculator?",
+                "acceptedAnswer": { "@type": "Answer", "text": "IRR is solved by Newton-Raphson iteration on the cashflow series. Starting from an initial guess (12%), each iteration updates the rate: r_{n+1} = r_n − NPV(r_n) / NPV'(r_n), where NPV'(r) = −∑ j·CF_j / (1+r)^{j+1}. The loop runs up to 200 iterations with a tolerance of 1e-7; the result is the rate at which NPV equals zero." }
+            },
+            {
+                "@type": "Question",
+                "name": "What discount rate should I use for NPV?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Use your Weighted Average Cost of Capital (WACC). For data center projects this typically ranges from 7–12%. WACC = (E/V)·r_e + (D/V)·r_d·(1−T), where E is equity, D is debt, V is total capital, r_e is cost of equity, r_d is cost of debt, and T is the tax rate. The default in the calculator is 8%." }
+            },
+            {
+                "@type": "Question",
+                "name": "What does the Monte Carlo simulation model?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The simulation runs 10,000 iterations, varying revenue (±20%), occupancy (±15%), and OPEX (±15%) independently using a uniform distribution. Each iteration recalculates NPV and the results are sorted to extract P5 (optimistic), P50 (median), and P95 (pessimistic) outcomes, plus the probability that NPV exceeds zero." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../roi-calculator.html" class="nav-link">ROI Calculator</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / ROI Calculator
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Investment Return</p>
+            <h1>ROI Calculator — Methodology &amp; Formulas</h1>
+            <p>Every input, equation, constant, and reference behind the data center ROI calculator. All arithmetic is executed inline in the browser: year-by-year cashflow construction, NPV discounted cashflow, IRR via Newton-Raphson iteration, payback accumulation, profitability index, and a 10,000-iteration Monte Carlo risk simulation — no back-solved constants, no random final values.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Model <strong>v1.0 (Feb 2026)</strong></span>
+                <span class="mn-chip">Inputs <strong>26 (free + pro)</strong></span>
+                <span class="mn-chip">Outputs <strong>8 primary + MC</strong></span>
+                <span class="mn-chip">IRR solver <strong>Newton-Raphson</strong></span>
+            </div>
+            <a class="mn-toollink" href="../roi-calculator.html">▶ Open the live ROI Calculator</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The calculator answers one investment question: <em>given a set of assumptions about CAPEX, revenue, operating costs, occupancy ramp, and financing, does this data center project create value above the cost of capital?</em> It does this by projecting a year-by-year cashflow model and applying three complementary lenses:</p>
+            <ul style="color:var(--mn-muted);line-height:1.8;padding-left:1.3rem;font-size:0.9rem;margin:0 0 0.9rem;">
+                <li><strong style="color:var(--mn-text);">Net Present Value (NPV)</strong> — the total surplus in today's dollars after discounting all future cashflows at the WACC. Positive NPV means the project earns more than the cost of capital.</li>
+                <li><strong style="color:var(--mn-text);">Internal Rate of Return (IRR)</strong> — the discount rate that makes NPV exactly zero. Compare to the WACC: if IRR &gt; WACC, the project creates value.</li>
+                <li><strong style="color:var(--mn-text);">Payback &amp; Profitability Index</strong> — complementary liquidity and ranking metrics that do not require a single discount-rate judgment.</li>
+            </ul>
+            <p class="mn-lead">The model operates in two modes. <strong>Free Analysis</strong> runs the deterministic DCF and displays NPV, IRR, payback, PI, yield on cost, and ROIC. <strong>Pro Analysis</strong> additionally runs Monte Carlo simulation (10,000 iterations), sensitivity tornado, five-scenario comparison, and a full year-by-year cashflow table with debt service and tax lines.</p>
+            <div class="mn-note"><strong>Industry calibration:</strong> revenue benchmarks, WACC ranges, and occupancy ramp profiles are drawn from Uptime Institute Benchmarking Reports, JLL Data Center Outlook, and CBRE market analytics. Construction period and staffing ratios follow conventional industry practice. All defaults are configurable.</div>
+        </section>
+
+        <!-- 2. INPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs</h2>
+            <p class="mn-lead">Twenty-six inputs across six groups. Free-mode inputs drive the deterministic model; Pro-mode adds financing and tax/depreciation parameters. All inputs are validated client-side with out-of-range warnings via <code class="mn-mono">RZCalc.validateNumbers()</code> in <code class="mn-mono">js/rz-calc-utils.js</code>.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.3rem;color:var(--mn-text);">Group 1 — Investment Parameters</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field / ID</th><th>Unit</th><th>Default</th><th>Range</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td><code>totalCapex</code></td><td>$M</td><td>100</td><td>1 – 5 000</td><td>Total upfront capital: land, building, MEP, IT infrastructure, soft costs. Deployed as Year-0 outflow.</td></tr>
+                    <tr><td><code>itCapacity</code></td><td>MW</td><td>10</td><td>0.5 – 500</td><td>IT power capacity available for lease. Drives the revenue ceiling. Converted to kW internally: <code>itCapacityKW = itCapacityMW × 1 000</code>.</td></tr>
+                    <tr><td><code>projectLife</code></td><td>years</td><td>20</td><td>10 / 15 / 20 / 25</td><td>Analysis horizon. Cashflows are projected for this many years after Year 0.</td></tr>
+                    <tr><td><code>constructionMonths</code></td><td>months</td><td>18</td><td>12 / 18 / 24 / 30</td><td>Build period before first revenue. Stored as <code>constructionYears = months / 12</code> (may be fractional).</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.3rem;color:var(--mn-text);">Group 2 — Revenue Projections</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field / ID</th><th>Unit</th><th>Default</th><th>Range / Options</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td><code>revenueModel</code></td><td>enum</td><td>retail</td><td>wholesale / retail / hyperscale</td><td>Sets the suggested <code>revenuePerKw</code> preset (120 / 170 / 280 $/kW/mo).</td></tr>
+                    <tr><td><code>revenuePerKw</code></td><td>$/kW/mo</td><td>185</td><td>50 – 500</td><td>Monthly colocation price per kW of IT capacity. Primary revenue driver.</td></tr>
+                    <tr><td><code>escalation</code></td><td>%/yr</td><td>3</td><td>−2 – 8</td><td>Annual price growth applied to <code>revenuePerKw</code> via compound factor each year.</td></tr>
+                    <tr><td><code>ancillaryPct</code></td><td>%</td><td>15</td><td>5 / 10 / 15 / 25</td><td>Cross-connects, remote hands, managed services — as a fraction of base power revenue.</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.3rem;color:var(--mn-text);">Group 3 — Operating Costs</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field / ID</th><th>Unit</th><th>Default</th><th>Range</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td><code>electricityRate</code></td><td>$/kWh</td><td>0.08</td><td>0.02 – 0.40</td><td>Industrial all-in electricity tariff. Typically 40–60 % of total OPEX.</td></tr>
+                    <tr><td><code>pueValue</code></td><td>ratio</td><td>1.4</td><td>1.05 – 2.5</td><td>Power Usage Effectiveness. Multiplies IT load to give total facility power draw.</td></tr>
+                    <tr><td><code>staffingCost</code></td><td>$M/yr</td><td>3</td><td>0.5 – 20</td><td>Total annual personnel cost (engineers, technicians, security, management). Treated as <em>fixed</em> OPEX.</td></tr>
+                    <tr><td><code>maintenanceCost</code></td><td>$M/yr</td><td>1.5</td><td>0.1 – 15</td><td>Preventive and corrective maintenance of MEP, UPS, cooling, generators. Treated as <em>variable</em> OPEX (scales with occupancy, floored at 50%).</td></tr>
+                    <tr><td><code>insuranceCost</code></td><td>$M/yr</td><td>0.8</td><td>0.1 – 10</td><td>Property, liability, and business-interruption insurance plus property taxes. Treated as <em>fixed</em> OPEX.</td></tr>
+                    <tr><td><code>opexEscalation</code></td><td>%/yr</td><td>2.5</td><td>0 – 6</td><td>Annual inflation applied to non-electricity OPEX (staffing, maintenance, insurance).</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.3rem;color:var(--mn-text);">Group 4 — Occupancy Ramp</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field / ID</th><th>Unit</th><th>Conservative</th><th>Moderate (default)</th><th>Aggressive</th></tr></thead>
+                <tbody>
+                    <tr><td><code>occYear1</code></td><td>%</td><td>15</td><td>25</td><td>45</td></tr>
+                    <tr><td><code>occYear3</code></td><td>%</td><td>45</td><td>60</td><td>80</td></tr>
+                    <tr><td><code>occYear5</code></td><td>%</td><td>70</td><td>85</td><td>95</td></tr>
+                    <tr><td><code>occMax</code></td><td>%</td><td>85</td><td>92</td><td>98</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.3rem;color:var(--mn-text);">Group 5 — Financing (Pro)</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field / ID</th><th>Unit</th><th>Default</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td><code>debtRatio</code></td><td>%</td><td>70</td><td>Debt as % of total CAPEX. Equity = (100 − debtRatio) × CAPEX.</td></tr>
+                    <tr><td><code>interestRate</code></td><td>%</td><td>6</td><td>Annual interest rate on project finance debt.</td></tr>
+                    <tr><td><code>loanTerm</code></td><td>years</td><td>10</td><td>Loan amortisation period. Debt service is zero after this year.</td></tr>
+                    <tr><td><code>discountRate</code></td><td>%</td><td>8</td><td>WACC used to discount future cashflows for NPV. Separate from the interest rate on debt.</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.3rem;color:var(--mn-text);">Group 6 — Tax &amp; Depreciation (Pro)</h3>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Field / ID</th><th>Unit</th><th>Default</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td><code>taxRate</code></td><td>%</td><td>25</td><td>Effective corporate income tax rate applied to taxable income each year.</td></tr>
+                    <tr><td><code>depreciationMethod</code></td><td>enum</td><td>straight</td><td>Straight-line (÷20 yr), MACRS 15-year (16-band schedule), or 100% Bonus Year-1.</td></tr>
+                    <tr><td><code>terminalMethod</code></td><td>enum</td><td>caprate</td><td>Exit valuation at end of hold: cap-rate (NOI / cap rate), book value, or none.</td></tr>
+                    <tr><td><code>exitCapRate</code></td><td>%</td><td>5.5</td><td>Capitalisation rate applied to peak NOI to estimate terminal sale value.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">The engine builds a year-by-year cashflow vector then applies five successive calculations: occupancy interpolation, revenue and OPEX construction, NPV, IRR, and payback. All arithmetic runs inline in <code class="mn-mono">roi-calculator.html</code>; IRR falls back to <code class="mn-mono">RZEngine.models.roi.irr()</code> if the shared engine is loaded.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">A · Occupancy ramp interpolation</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">occ(y) = f(opYear)  where  opYear = calendarYear − constructionYears</span>
+                <span class="mn-eq"></span>
+                <span class="mn-eq">if opYear ≤ 0 :  occ = 0</span>
+                <span class="mn-eq">if opYear ≤ 1 :  occ = y1 × opYear</span>
+                <span class="mn-eq">if opYear ≤ 3 :  occ = y1 + (y3 − y1) × (opYear − 1) / 2</span>
+                <span class="mn-eq">if opYear ≤ 5 :  occ = y3 + (y5 − y3) × (opYear − 3) / 2</span>
+                <span class="mn-eq">if opYear ≤ 7 :  occ = y5 + (yMax − y5) × (opYear − 5) / 2</span>
+                <span class="mn-eq">else          :  occ = yMax</span>
+                <span class="mn-where">Defined in <code>getOccupancy(year)</code>. Piecewise-linear interpolation across the four user-supplied control points. <code>constructionYears</code> shifts the occupancy clock: a facility with 18-month construction begins leasing in calendar Year 2 (opYear = 0.5). The result is clamped to [0, 1] before multiplication. <span class="mn-src">inline · roi-calculator.html</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">B · Annual revenue</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">priceEsc      = (1 + escalation/100)^(yr−1)</span>
+                <span class="mn-eq">baseRevenue   = itCapacityKW × revenuePerKw × 12 × occ(yr) × priceEsc    [$]</span>
+                <span class="mn-eq">ancRevenue    = baseRevenue × (ancillaryPct / 100)                        [$]</span>
+                <span class="mn-eq">totalRevenue  = baseRevenue + ancRevenue                                  [$]</span>
+                <span class="mn-where">Revenue is zero during the construction period (occ = 0). Price escalation compounds from Year 1 (yr = 1 → factor = 1.0). Ancillary revenue is a flat percentage of power/space base revenue. <span class="mn-src">inline · calculate()</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">C · Annual OPEX</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">occupiedKW      = itCapacityKW × occ(yr)</span>
+                <span class="mn-eq">totalPowerKW    = occupiedKW × PUE</span>
+                <span class="mn-eq">elecEscFactor   = (1.035)^(yr−1)         [hard-coded 3.5 %/yr electricity inflation]</span>
+                <span class="mn-eq">annualElec      = totalPowerKW × 8 760 × electricityRate × elecEscFactor     [$]</span>
+                <span class="mn-eq">opexEscFactor   = (1 + opexEsc/100)^(yr−1)</span>
+                <span class="mn-eq">fixedOpex       = (staffingCost + insuranceCost) × 1e6 × opexEscFactor      [$]</span>
+                <span class="mn-eq">variableOpex    = maintenanceCost × 1e6 × opexEscFactor × max(0.50, occ)    [$]</span>
+                <span class="mn-eq">totalOpex       = annualElec + fixedOpex + variableOpex                      [$]</span>
+                <span class="mn-where">Electricity scales with occupied IT load and PUE. Staffing and insurance are treated as fixed overhead (do not scale below 100% occupancy). Maintenance is semi-variable, floored at 50% of stabilised cost at zero occupancy. The electricity escalator (3.5 %/yr) is fixed in the model and separate from the user-controlled <code>opexEscalation</code> slider, which applies only to non-energy OPEX. Electricity OPEX is zero during construction (occ = 0). <span class="mn-src">inline · calculate()</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">D · Net Operating Income and debt service</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">NOI           = totalRevenue − totalOpex                                    [$]</span>
+                <span class="mn-eq">debtAmount    = totalCapexDollars × debtRatio / 100                        [$]</span>
+                <span class="mn-eq">r_d           = interestRate / 100</span>
+                <span class="mn-eq">annualDS      = debtAmount × r_d × (1 + r_d)^loanTerm                      [$]  (level PMT)</span>
+                <span class="mn-eq">              ─────────────────────────────────────────</span>
+                <span class="mn-eq">              (1 + r_d)^loanTerm − 1</span>
+                <span class="mn-eq">ds(yr)        = annualDS  if yr ≤ loanTerm  else  0                        [$]</span>
+                <span class="mn-where">Standard level-payment mortgage formula. Debt service falls to zero after the loan term regardless of the project analysis period. <span class="mn-src">inline · calculate()</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">E · Tax and depreciation</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">dep(yr)  =  totalCapex / min(projectLife, 20)              [straight-line]</span>
+                <span class="mn-eq">         OR totalCapex × MACRS_rate[yr]                    [MACRS 15-yr: rates 5.0,9.5,8.55,7.70,6.93,6.23,5.9,5.9,5.91,5.9,5.91,5.9,5.91,5.9,5.91,2.95 %]</span>
+                <span class="mn-eq">         OR totalCapex  (yr=1 only)                        [bonus 100 % Year-1]</span>
+                <span class="mn-eq">interestPortion  ≈ ds(yr) × r_d / (r_d + 1)               [simplified interest fraction]</span>
+                <span class="mn-eq">taxableIncome    = max( 0,  NOI − interestPortion − dep )  [loss carryforward simplified]</span>
+                <span class="mn-eq">taxAmount        = taxableIncome × taxRate / 100</span>
+                <span class="mn-eq">netCF(yr)        = NOI − ds(yr) − taxAmount</span>
+                <span class="mn-where">Taxable income deducts the estimated interest component of debt service and the period's depreciation allowance. Loss carryforward is simplified (floored at zero rather than accumulated). This is a screening model — final tax calculations must be confirmed with a qualified tax advisor. <span class="mn-src">inline · calculate()</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">F · Terminal value</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">TV  =  peakNOI / (exitCapRate / 100)          [cap-rate method]</span>
+                <span class="mn-eq">TV  =  max(0, totalCapex − ΣdepSchedule)      [book value method]</span>
+                <span class="mn-eq">TV  =  0                                       [none — conservative]</span>
+                <span class="mn-where">Terminal value is added to the last cashflow in the series before NPV and IRR are computed. Using the cap-rate method with a 5.5% exit cap and the last-year stabilised NOI approximates what a buyer would pay for the income stream at exit. Institutional data center assets currently trade at 5–7% cap rates. <span class="mn-src">inline · calculate()</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">G · Net Present Value (NPV)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">NPV  =  Σ  CF_j / (1 + r)^j     for  j = 0 … N</span>
+                <span class="mn-where">where <code>CF_0 = −totalCapexDollars</code> (Year-0 outflow), <code>CF_j = netCF(j)</code> for years 1…N, and <code>CF_N</code> includes the terminal value. <code>r = discountRate / 100</code>. Defined in <code>calcNPV(rate, cashflows)</code>; the shared engine path is <code>RZEngine.models.roi.npv(cashflows, rate)</code> when available. <span class="mn-src">inline · calcNPV() / RZEngine.models.roi.npv</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">H · Internal Rate of Return — Newton-Raphson</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">find r* such that  NPV(r*) = 0</span>
+                <span class="mn-eq"></span>
+                <span class="mn-eq">Algorithm (Newton-Raphson, up to 200 iterations, tol = 1e-7):</span>
+                <span class="mn-eq">  NPV(r)   = Σ  CF_j / (1+r)^j</span>
+                <span class="mn-eq">  NPV'(r)  = −Σ  j · CF_j / (1+r)^(j+1)      [analytical first derivative]</span>
+                <span class="mn-eq">  r_{n+1}  = r_n − NPV(r_n) / NPV'(r_n)      [Newton-Raphson update]</span>
+                <span class="mn-eq">  converged when  |r_{n+1} − r_n| &lt; 1e-7</span>
+                <span class="mn-eq">  guard rails: clamp r to [−0.99, 10] each iteration</span>
+                <span class="mn-where">Initial guess = 0.12 (12%). Guard rails prevent the solver from diverging to extreme values when early cashflows are all negative. If the shared engine is loaded (<code>RZEngine.models.roi.irr</code>), that implementation (bisection) is tried first; the Newton-Raphson fallback runs only if the engine result is null/infinite. <span class="mn-src">inline · calcIRR() / RZEngine.models.roi.irr</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">I · Payback period</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">cumulative(0)   = −totalCapex</span>
+                <span class="mn-eq">cumulative(yr)  = cumulative(yr−1) + netCF(yr)</span>
+                <span class="mn-eq">payback year    = first yr where  cumulative(yr) ≥ 0</span>
+                <span class="mn-where">Simple (undiscounted) payback. The cumulative begins at −CAPEX (Year-0 outflow). Payback year is the first calendar year in which the running total crosses zero. If it never crosses within the analysis horizon, the display shows "&gt;20". <span class="mn-src">inline · calculate()</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">J · Profitability Index (PI)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">PV_inflows  =  NPV + totalCapexDollars        [PV of all inflows = NPV surplus + cost recovered]</span>
+                <span class="mn-eq">PI          =  PV_inflows / totalCapexDollars  =  1 + NPV / CAPEX</span>
+                <span class="mn-where">PI &gt; 1 signals value creation. Used to rank mutually exclusive projects when capital is constrained. A PI of 1.25 means every $1 of CAPEX returns $1.25 in present-value terms. <span class="mn-src">inline · calculate()</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">K · Ancillary metrics</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Yield on Cost  =  peakNOI / totalCapexDollars × 100          [%]</span>
+                <span class="mn-eq">ROIC           =  (ΣnetCF / projectLife) / totalCapexDollars × 100  [%]  (simple average)</span>
+                <span class="mn-eq">TerminalValue  =  peakNOI / (exitCapRate / 100)               [$]  (cap-rate path)</span>
+                <span class="mn-where">Yield on cost is the unleveraged stabilised NOI yield on development cost — a 150–300 bps spread above the prevailing cap rate indicates a value-creation development margin. ROIC uses a simple (undiscounted) annual average net cashflow divided by total invested capital. <span class="mn-src">inline · calculate()</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">L · Monte Carlo simulation (Pro)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">N  =  10 000 iterations</span>
+                <span class="mn-eq"></span>
+                <span class="mn-eq">For each iteration i:</span>
+                <span class="mn-eq">  revenue_i  ~  Uniform(0.80, 1.20)   [±20 % revenue variance]</span>
+                <span class="mn-eq">  occ_i      ~  Uniform(0.85, 1.15)   [±15 % occupancy variance]</span>
+                <span class="mn-eq">  opex_i     ~  Uniform(0.85, 1.15)   [±15 % OPEX variance]</span>
+                <span class="mn-eq">  CF_j^(i)   =  CF_j × ((revenue_i + occ_i) / 2) × (2 − opex_i)   for j &gt; 0</span>
+                <span class="mn-eq">  CF_0^(i)   =  −totalCapex                                          [CAPEX fixed]</span>
+                <span class="mn-eq">  NPV^(i)    =  Σ CF_j^(i) / (1 + r)^j</span>
+                <span class="mn-eq"></span>
+                <span class="mn-eq">Sort results ascending, then extract:</span>
+                <span class="mn-eq">  P5   =  results[N × 0.05]      [optimistic tail]</span>
+                <span class="mn-eq">  P50  =  results[N × 0.50]      [median]</span>
+                <span class="mn-eq">  P95  =  results[N × 0.95]      [pessimistic tail]</span>
+                <span class="mn-eq">  P(NPV&gt;0) =  count(results &gt; 0) / N</span>
+                <span class="mn-where">If <code>RZEngine.models.sim.monteCarlo()</code> is available (seeded PRNG, seed 20260705), the engine path is used so results are reproducible across recalculations. The fallback uses <code>Math.random()</code> (results jitter each run). Revenue and occupancy factors enter as a blended average; OPEX enters as a multiplicative inverse (higher OPEX factor → lower cashflow). CAPEX is deterministic — only operating-period cashflows are varied. <span class="mn-src">inline · runMonteCarlo() / RZEngine.models.sim.monteCarlo</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">Fixed values embedded in the model with their provenance. User-overridable inputs are listed in Section 02; these are not user-adjustable.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Constant</th><th>Value</th><th>Source / Rationale</th></tr></thead>
+                <tbody>
+                    <tr><td>Electricity inflation rate</td><td><code>3.5 %/yr</code></td><td>Hard-coded in <code>calculate()</code>. Approximates US EIA 10-year average commercial electricity price escalation (2014–2024). Separate from the user OPEX-escalation slider.</td></tr>
+                    <tr><td>MACRS 15-year rate schedule</td><td><code>[5.0, 9.5, 8.55, 7.70, 6.93, 6.23, 5.9, 5.9, 5.91, 5.9, 5.91, 5.9, 5.91, 5.9, 5.91, 2.95]</code></td><td>IRS GDS 15-year property (MACRS, 200% DB). Data center building systems qualify as 15-year property under IRS Revenue Procedure 87-56, Asset Class 00.3.</td></tr>
+                    <tr><td>Straight-line depreciation life cap</td><td><code>min(projectLife, 20) years</code></td><td>IRS SL life for commercial real property plus MEP infrastructure typically 20–39 years. Capped at 20 for the calculator to avoid division by very long lives in short analysis periods.</td></tr>
+                    <tr><td>IRR Newton-Raphson initial guess</td><td><code>12 % (0.12)</code></td><td>Mid-range of typical DC project returns (12–20 %). Produces reliable convergence for the sector-relevant cashflow shapes.</td></tr>
+                    <tr><td>IRR max iterations</td><td><code>200</code></td><td>Guarantees termination. Convergence tolerance is 1e-7 (rate change), sufficient for financial precision.</td></tr>
+                    <tr><td>IRR rate clamp</td><td><code>[−0.99, 10]</code></td><td>Prevents runaway to ±infinity during early iterations when all cashflows are negative. Applied each Newton-Raphson step.</td></tr>
+                    <tr><td>Monte Carlo iterations</td><td><code>N = 10 000</code></td><td>Sufficient for stable P5/P95 tails at 3 S.D. accuracy without browser lag. Seeded variant uses seed <code>20260705</code>.</td></tr>
+                    <tr><td>Revenue variance (MC)</td><td><code>Uniform [0.80, 1.20]</code></td><td>±20% revenue corridor represents realistic market uncertainty over a 10–20 year DC hold (pricing power, demand shifts, contract churn).</td></tr>
+                    <tr><td>Occupancy variance (MC)</td><td><code>Uniform [0.85, 1.15]</code></td><td>±15% occupancy corridor accounts for lease-up velocity uncertainty.</td></tr>
+                    <tr><td>OPEX variance (MC)</td><td><code>Uniform [0.85, 1.15]</code></td><td>±15% OPEX corridor accounts for energy cost spikes, staffing inflation surprises, and maintenance schedule deviations.</td></tr>
+                    <tr><td>Sensitivity tornado weights</td><td>Revenue 35 %, Occupancy 25 %, Electricity 15 %, PUE 12 %, CAPEX 10 %, Interest 8 %</td><td>Illustrative relative importance weights derived from industry sensitivity studies (JLL, Cushman &amp; Wakefield DC economics research). The bar magnitude is scaled as <code>|baseNPV| × weight × 0.4</code>.</td></tr>
+                    <tr><td>Histogram bins</td><td><code>30</code></td><td>Monte Carlo histogram resolution. Sorted results array is divided into 30 equal-width bins for display.</td></tr>
+                    <tr><td>Maintenance variable floor</td><td><code>50 % of stabilised cost</code></td><td><code>Math.max(0.50, occ)</code> ensures maintenance OPEX does not drop below 50% of stabilised rate even at zero occupancy (fixed preventive maintenance contracts, minimum labour).</td></tr>
+                    <tr><td>Annual hours</td><td><code>8 760 h/yr</code></td><td>365 × 24. Applied in the electricity OPEX formula. No derating for planned outages (assume continuous 100% uptime basis for OPEX sizing).</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-tablewrap" style="margin-top:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>Occupancy ramp preset</th><th>Y1 %</th><th>Y3 %</th><th>Y5 %</th><th>Steady-state %</th><th>Typical scenario</th></tr></thead>
+                <tbody>
+                    <tr><td>Conservative</td><td>15</td><td>45</td><td>70</td><td>85</td><td>Speculative build, single market, no anchor tenant</td></tr>
+                    <tr><td>Moderate (default)</td><td>25</td><td>60</td><td>85</td><td>92</td><td>Established market, partial pre-leasing, solid pipeline</td></tr>
+                    <tr><td>Aggressive</td><td>45</td><td>80</td><td>95</td><td>98</td><td>Pre-leased anchor &gt;50% of capacity, strong demand corridor</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs</h2>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Output</th><th>Element ID</th><th>Formula</th><th>Unit</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>NPV</td><td><code>primaryValue</code></td><td><code>Σ CF_j / (1+r)^j</code></td><td>$M</td><td>Present-value surplus. Positive = project earns above WACC. Primary investment decision metric.</td></tr>
+                    <tr><td>IRR</td><td><code>metIRR</code></td><td>Newton-Raphson root of NPV=0</td><td>%</td><td>Compare to WACC. IRR &gt; WACC → value created. Graded: &gt;25% Exceptional, &gt;18% Strong, &gt;12% Good, &gt;8% Moderate, &gt;4% Marginal, ≤4% Below Threshold.</td></tr>
+                    <tr><td>Simple payback</td><td><code>metPayback</code></td><td>First year cumulative CF ≥ 0</td><td>years</td><td>Undiscounted payback. Typical DC: 6–12 years. Shorter payback reduces technology-obsolescence risk.</td></tr>
+                    <tr><td>Profitability Index</td><td><code>metPI</code></td><td><code>1 + NPV / CAPEX</code></td><td>× (ratio)</td><td>PI &gt; 1.0 = value creation. Used to rank competing projects when capital is constrained.</td></tr>
+                    <tr><td>ROIC</td><td><code>metROIC</code></td><td><code>avg(netCF) / CAPEX × 100</code></td><td>%</td><td>Simple average annual return on invested capital. Comparable to WACC as an efficiency check.</td></tr>
+                    <tr><td>Peak Revenue</td><td><code>metRevenue</code></td><td><code>max(totalRevenue)</code></td><td>$M/yr</td><td>Stabilised annual gross revenue at full occupancy. Revenue ceiling for the asset.</td></tr>
+                    <tr><td>Peak NOI</td><td><code>metNOI</code></td><td><code>max(totalRevenue − totalOpex)</code></td><td>$M/yr</td><td>Stabilised Net Operating Income. Primary input for terminal value and yield-on-cost calculations.</td></tr>
+                    <tr><td>Yield on Cost</td><td><code>metYield</code></td><td><code>peakNOI / CAPEX × 100</code></td><td>%</td><td>Unleveraged stabilised NOI yield on development cost. A spread of 150–300 bps above market cap rate indicates value-creation margin.</td></tr>
+                    <tr><td>Terminal Value</td><td><code>metTerminal</code></td><td><code>peakNOI / capRate</code> or book or 0</td><td>$M</td><td>Estimated exit value added to last-year cashflow. Represents 40–70% of total project return in long-hold DC investments.</td></tr>
+                    <tr><td>MC P5 / P50 / P95</td><td><code>mcP5/50/95</code></td><td>Sorted NPV distribution percentiles</td><td>$M</td><td>Optimistic / median / pessimistic NPV under the MC uncertainty model. P(NPV&gt;0) shows probability of positive return.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example — verified by <code>node -e</code></h2>
+            <p class="mn-lead">Default inputs: $100M CAPEX, 10 MW IT, 20-year life, 18-month construction, retail colo at $185/kW/mo, 3% escalation, 15% ancillary, $0.08/kWh electricity, PUE 1.4, $3M staffing, $1.5M maintenance, $0.8M insurance, 2.5% OPEX escalation, moderate occupancy ramp (y1=25, y3=60, y5=85, max=92%), 70/30 debt, 6% interest, 10-year loan, 8% WACC, 25% tax, straight-line depreciation, cap-rate terminal at 5.5%. Results verified by running the inline JavaScript via <code>node -e</code>.</p>
+
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Construction offset:</strong> <code>constructionYears = 18/12 = 1.5</code> — facility begins commercial operations mid-Year 2. Operating Year 1 occupancy in calendar Year 2 = <code>getOccupancy(0.5) = 25 × 0.5 =</code> <span class="mn-result">12.5 %</span></li>
+                    <li><strong>Calendar Y1 revenue:</strong> occ = 0 (still under construction in opYear &lt; 0) → <span class="mn-result">$0</span>. Fixed OPEX still runs: staffing + insurance = <code>3 + 0.8 = $3.8M</code>, variable maintenance at <code>max(0.5, 0) = 0.5</code> floor = <code>0.75M</code>. NOI Y1 = <span class="mn-result">−$4.55M</span></li>
+                    <li><strong>Calendar Y5 occupancy:</strong> opYear = 5 − 1.5 = 3.5 → interpolated: <code>y3 + (y5 − y3) × (3.5 − 3) / 2 = 60 + 25 × 0.25 =</code> <span class="mn-result">66.3 %</span></li>
+                    <li><strong>Calendar Y10 revenue (first full operating year at 92%):</strong> opYear = 8.5 &gt; 7 → occ = 92%. priceEsc = (1.03)^9 = 1.305. baseRevenue = <code>10 000 × 185 × 12 × 0.92 × 1.305 =</code> <span class="mn-result">$26.57M</span>. +15% ancillary → <span class="mn-result">$30.65M total</span></li>
+                    <li><strong>Peak NOI (Y20, price escalated):</strong> baseRevenue Y20 = <code>10 000 × 185 × 12 × 0.92 × (1.03)^19 =</code> <span class="mn-result">$41.19M total revenue (incl ancillary)</span>. Electricity Y20 = <code>9 200 × 1.4 × 8 760 × 0.08 × (1.035)^19 =</code> approx $21.3M. Total OPEX ≈ $25.6M. Peak NOI ≈ <span class="mn-result">$15.55M/yr</span></li>
+                    <li><strong>Debt service:</strong> debtAmount = <code>$100M × 70% = $70M</code>. r_d = 6%. annualDS = <code>70e6 × 0.06 × (1.06)^10 / ((1.06)^10 − 1) =</code> <span class="mn-result">$9.51M/yr</span> (years 1–10)</li>
+                    <li><strong>Straight-line dep:</strong> <code>100e6 / 20 = $5.0M/yr</code> each year. Taxable income Y10 approx = <code>NOI − interestPortion − dep</code>. Tax drag reduces net cashflow by roughly $0.4–1.2M/yr in profitable years.</li>
+                    <li><strong>Terminal value:</strong> <code>peakNOI / 0.055 = 15.55 / 0.055 =</code> <span class="mn-result">$282.8M</span> added to Y20 cashflow.</li>
+                    <li><strong>NPV at 8% WACC:</strong> <span class="mn-result">−$41.4M</span> <em>(project does not recover cost of capital at these inputs — the 8% WACC exceeds the project IRR)</em></li>
+                    <li><strong>IRR (Newton-Raphson):</strong> <span class="mn-result">5.83 %</span> — below the 8% WACC, confirming negative NPV</li>
+                    <li><strong>Simple payback:</strong> cumulative never crosses zero within 20 years at these default inputs → <span class="mn-result">&gt;20 yrs</span></li>
+                    <li><strong>Profitability Index:</strong> <code>PI = 1 + (−41.4) / 100 =</code> <span class="mn-result">0.586×</span> — below 1.0 (consistent with negative NPV)</li>
+                    <li><strong>Yield on Cost:</strong> <code>15.55 / 100 =</code> <span class="mn-result">15.6 %</span> unleveraged NOI yield on cost</li>
+                </ol>
+            </div>
+
+            <div class="mn-note"><strong>Reading the worked example:</strong> at default inputs the project's IRR (5.83%) falls below the WACC (8%), producing a negative NPV (−$41.4M). This reflects the default WACC being set conservatively high relative to a 10MW mid-market colo build. Reducing the WACC to 5–6%, increasing revenue per kW, or using an aggressive occupancy ramp flips the NPV positive and demonstrates how sensitive DC investments are to these three parameters — exactly what the sensitivity tornado quantifies. The terminal value ($282.8M at a 5.5% exit cap) represents the dominant value event in any scenario where the project is held to stabilisation.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>JLL Data Center Outlook</b> — Annual global market report: vacancy rates, absorption, pricing benchmarks ($100–400/kW/mo), cap rate data. Primary calibration source for revenue defaults and occupancy presets.</li>
+                <li><b>CBRE Global Data Center Trends</b> — Wholesale and retail pricing, construction cost ($/MW), yield-on-cost benchmarks, and cap-rate compression data.</li>
+                <li><b>Uptime Institute Annual Global Data Center Survey</b> — PUE distribution (global mean 1.58), staffing ratios (FTE/MW), maintenance cost ranges (1.5–3% of MEP CAPEX/yr).</li>
+                <li><b>IRS Revenue Procedure 87-56 / MACRS GDS</b> — 15-year property MACRS rates for data center MEP and building systems. Asset Class 00.3.</li>
+                <li><b>US EIA Electric Power Monthly</b> — Commercial electricity price escalation basis (3.5%/yr assumption derived from 2014–2024 10-year average).</li>
+                <li><b>Brealey, Myers &amp; Allen — Principles of Corporate Finance</b> — NPV, IRR, payback, and PI methodology. Newton-Raphson IRR solver is a standard numerical implementation of the textbook definition.</li>
+                <li><b>Damodaran — Valuation: Measuring and Managing the Value of Companies</b> — WACC methodology, terminal value (cap rate = Gordon Growth in perpetuity equivalent), and PI for capital rationing.</li>
+                <li><b>CBRE / Cushman &amp; Wakefield DC economics research</b> — Sensitivity factor weights used in the tornado chart (Revenue 35%, Occupancy 25%, Electricity 15%, PUE 12%, CAPEX 10%, Interest 8%).</li>
+                <li><b>Engine source</b> — Inline in <code class="mn-mono">roi-calculator.html</code> functions <code>calcNPV()</code>, <code>calcIRR()</code>, <code>getOccupancy()</code>, <code>calculate()</code>, <code>runMonteCarlo()</code>. Optional shared engine path: <code class="mn-mono">RZEngine.models.roi.npv/irr</code>, <code class="mn-mono">RZEngine.models.sim.monteCarlo</code>.</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS AND DISCLAIMER -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions, limitations &amp; disclaimer</h2>
+            <p class="mn-lead"><strong>Model assumptions:</strong> The cashflow model assumes a single-tranche equity-plus-debt capital structure, level-payment amortisation, no refinancing during the hold period, no revenue from power resale or renewable energy credits, and no construction-phase interest capitalisation (CAPEX is deployed as a single Year-0 outflow). Loss carryforward is simplified to zero-floor taxable income (not accumulated). Tax treatment ignores alternative minimum tax, state and local tax overlays, and transfer-pricing considerations. Terminal-value cap-rate method ignores transaction costs and capital gains tax at exit.</p>
+            <p class="mn-lead"><strong>Electricity OPEX:</strong> The model assumes electricity cost escalates at a fixed 3.5%/yr regardless of the user's OPEX escalation slider. This approximates a power-pass-through contract structure; fully hedged fixed-rate power would reduce this to near zero escalation.</p>
+            <p class="mn-lead"><strong>Sensitivity tornado:</strong> Factor weights are illustrative, derived from published industry sensitivity studies. For a project-specific sensitivity analysis, vary each input independently using the calculator's inputs and compare NPV outcomes.</p>
+            <p class="mn-lead"><strong>Monte Carlo:</strong> The simulation uses uniform distributions for all three uncertainty parameters. Real-world distributions are skewed (occupancy is bounded above at 100%, revenue has fat downside tails in market downturns). The uniform approximation understates tail risk on the downside. The seeded variant (RZEngine path) ensures the same seed produces the same P5/P50/P95 across recalculations, removing random jitter from the display.</p>
+
+            <div class="mn-note">
+                <strong>Educational analysis only — not investment advice / not a licensed advisor.</strong> This calculator and manual are provided for educational and pre-feasibility estimation purposes only. Results are approximations based on generalised industry benchmarks and should not be used as the sole basis for any investment, financing, procurement, or strategic decision. Data center investments involve jurisdiction-specific tax treatment, financing conditions, market dynamics, and technical risks that are not captured in this model. Always engage qualified financial professionals, tax advisors, and independent feasibility consultants before committing capital. No representation is made as to the accuracy, completeness, or fitness for purpose of any result produced by this tool. By using this calculator you agree to the ResistanceZero <a class="mn-inline" href="../terms.html">Terms of Service</a>. This site is independent personal research and does not represent any current or former employer.
+            </div>
+        </section>
+
+        <a class="mn-toollink" href="../roi-calculator.html">▶ Open the live ROI Calculator</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../roi-calculator.html">ROI Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

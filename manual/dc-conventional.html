@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+    setTimeout(loadGtag,4000);
+  })();
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- SEO Meta Tags -->
+    <title>Conventional DC — EPMS &amp; BMS Cockpit — Technical Manual &amp; Methodology | ResistanceZero</title>
+    <meta name="description" content="Full engineering methodology for the Conventional DC EPMS/BMS cockpit: locked basis-of-design, CONV_CALC derivations, PUE/WUE/CUE formulas, CHW loop, UPS 2N sizing, fuel autonomy, and worked example.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="conventional data center, EPMS, BMS, PUE, WUE, CUE, chilled water, UPS 2N, fuel autonomy, ASHRAE 90.1, Uptime Institute, ISO/IEC 30134-8, dc-conventional methodology">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#0b0f14">
+    <link rel="canonical" href="https://resistancezero.com/manual/dc-conventional.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/manual/dc-conventional.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/manual/dc-conventional.html">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/manual/dc-conventional.html">
+    <meta property="og:title" content="Conventional DC — EPMS &amp; BMS Cockpit — Technical Manual &amp; Methodology">
+    <meta property="og:description" content="Locked basis-of-design, CONV_CALC derivations, PUE/WUE/CUE formulas, CHW loop, UPS 2N sizing, fuel autonomy, and worked example for the Conventional DC EPMS/BMS cockpit.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:image:alt" content="Conventional DC EPMS BMS Cockpit Methodology">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Conventional DC — EPMS &amp; BMS Cockpit — Technical Manual">
+    <meta name="twitter:description" content="Locked basis-of-design, CONV_CALC derivations, PUE/WUE/CUE formulas, CHW loop, UPS 2N, fuel autonomy, worked example.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta name="twitter:image:alt" content="Conventional DC EPMS BMS Cockpit Methodology">
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Technical Manuals", "item": "https://resistancezero.com/manual/" },
+            { "@type": "ListItem", "position": 4, "name": "Conventional DC Cockpit" }
+        ]
+    }
+    </script>
+
+    <!-- TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Conventional DC — EPMS & BMS Cockpit — Technical Manual & Methodology",
+        "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
+        "publisher": { "@type": "Organization", "name": "ResistanceZero" },
+        "about": "Engineering methodology and locked basis-of-design for the Conventional DC EPMS/BMS cockpit",
+        "articleSection": "Data Centre Engineering",
+        "dependencies": "ASHRAE 90.1, Uptime Institute Tier Standard, ISO/IEC 30134-8, conv review doc 09",
+        "proficiencyLevel": "Expert"
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How the Conventional DC EPMS/BMS Cockpit derives its KPIs",
+        "step": [
+            { "@type": "HowToStep", "name": "Lock the basis-of-design", "text": "Fix IT load (1,850 kW), PUE (1.45), and all primary constants in CONV_MODEL — no user inputs, fully deterministic." },
+            { "@type": "HowToStep", "name": "Derive facility and non-IT loads", "text": "Facility = IT × PUE = 1,850 × 1.45 = 2,682.5 kW. Non-IT = Facility − IT = 832.5 kW." },
+            { "@type": "HowToStep", "name": "Compute cooling and water metrics", "text": "CHW flow = IT load / (4.186 × ΔT) = 1,850 / (4.186 × 7.6) = 58.1 L/s. WUE = 1.20 L/kWh; water flow = (1.20 × 1,850) / 60 = 37.0 L/min." },
+            { "@type": "HowToStep", "name": "Verify fuel autonomy", "text": "Usable fuel = 60,000 × 0.90 × 0.85 = 45,900 L; autonomy = 45,900 / 956 = 48.0 hr." }
+        ]
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Why is the cockpit locked — no user inputs?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The EPMS/BMS cockpit is a real-time monitoring and anomaly-detection aid, not a design calculator. Its numbers represent a single authenticated engineering scenario (IT load 1,850 kW, PUE 1.45) anchored in conv review doc 09. Allowing arbitrary inputs would break the ACCURACY_VALIDATION 6-rule contract and produce engineering-indefensible output. All KPIs are derived deterministically from CONV_CALC." }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the canonical chilled-water loop basis?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The primary (secondary) CHW loop runs at 7.2 °C supply / 14.8 °C return (ΔT = 7.6 K). This resolves the 7.2/14.8 vs 19.1/22.6 conflict documented in conv-engine.js: the ~19/23 °C readings are the condenser-side loop and are never labelled CHWS/CHWR in the cockpit. Source: conv review doc 09 lines 15, 81–84." }
+            },
+            {
+                "@type": "Question",
+                "name": "How is WUE derived and what does 37 L/min mean?",
+                "acceptedAnswer": { "@type": "Answer", "text": "WUE = 1.20 L/kWh is the site water-usage effectiveness target (ISO/IEC 30134-2 definition: annual cooling-makeup water / annual IT energy). The cockpit converts it to an instant equivalent makeup flow: 1.20 × 1,850 / 60 = 37.0 L/min, which is the steady-state evaporative loss rate a cooling tower operator would monitor." }
+            }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="../assets/Favicon.png">
+    <link rel="apple-touch-icon" href="../assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+
+    <style>
+        /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
+           CLONE CONVENTION (all 34 manuals share this): chrome accent = instrument-cyan
+           (--mn-accent), CTA = signal-amber (--mn-cta). Status channels (fault-red,
+           alarm-amber) are RESERVED — never use them for page chrome. Differentiate
+           manuals by content/eyebrow label, NOT by pulling from the alarm palette. */
+        :root {
+            --mn-accent: #00DDFF;       /* instrument-cyan — page chrome only */
+            --mn-accent-rgb: 0,221,255;
+            --mn-cta: #FFAA00;          /* signal-amber — CTA + primary interactive, sitewide */
+            --mn-bg: #0b0f14;
+            --mn-surface: #121820;
+            --mn-surface-2: #0e141b;
+            --mn-border: rgba(255,255,255,0.09);
+            --mn-text: #e7edf3;
+            --mn-muted: #93a1b0;
+            --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            --mn-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+            --mn-cyan: #00DDFF;
+            --mn-amber: #FFAA00;
+            --mn-green: #00FF88;
+        }
+        :root:not([data-theme="dark"]) {
+            --mn-accent: #0891b2;
+            --mn-accent-rgb: 8,145,178;
+            --mn-cta: #b45309;
+            --mn-bg: #f5f7fa;
+            --mn-surface: #ffffff;
+            --mn-surface-2: #eef2f6;
+            --mn-border: rgba(15,23,42,0.12);
+            --mn-text: #10161d;
+            --mn-muted: #4a5763;
+            --mn-cyan: #0891b2;
+            --mn-green: #059669;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+        }
+        body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+        /* Hero */
+        .mn-hero {
+            border: 1px solid var(--mn-border);
+            border-left: 3px solid var(--mn-accent);
+            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
+        }
+        .mn-hero .mn-eyebrow {
+            font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem;
+        }
+        .mn-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.15; margin: 0 0 0.75rem; font-weight: 700; }
+        .mn-hero p { color: var(--mn-muted); max-width: 60ch; margin: 0; line-height: 1.6; }
+        .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .mn-chip {
+            font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
+            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            background: rgba(var(--mn-accent-rgb),0.05);
+        }
+        .mn-chip strong { color: var(--mn-text); font-weight: 600; }
+
+        /* Breadcrumb + tool link */
+        .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a:hover { text-decoration: underline; }
+        .mn-toollink {
+            display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
+            font-family: var(--mn-mono); font-size: 0.8rem; font-weight: 600;
+            color: #0b0f14; background: var(--mn-cta); padding: 0.55rem 0.95rem;
+            border-radius: 7px; text-decoration: none; min-height: 44px; box-sizing: border-box;
+        }
+        .mn-toollink:hover { filter: brightness(1.08); }
+
+        /* Section blocks */
+        .mn-section { margin: 2.25rem 0; }
+        .mn-section > h2 {
+            font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
+            display: flex; align-items: baseline; gap: 0.6rem;
+        }
+        .mn-section > h2 .mn-num {
+            font-family: var(--mn-mono); font-size: 0.85rem; color: var(--mn-accent);
+            border: 1px solid var(--mn-border); border-radius: 5px; padding: 0.05rem 0.4rem;
+        }
+        .mn-section > p.mn-lead { color: var(--mn-muted); margin: 0 0 1.1rem; line-height: 1.6; max-width: 68ch; }
+
+        /* Tables */
+        .mn-tablewrap { overflow-x: auto; border: 1px solid var(--mn-border); border-radius: 9px; }
+        table.mn-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 520px; }
+        table.mn-table th, table.mn-table td { text-align: left; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--mn-border); vertical-align: top; }
+        table.mn-table td, .mn-result, .mn-formula { font-variant-numeric: tabular-nums; font-feature-settings: "zero" 1, "tnum" 1; }
+        table.mn-table thead th {
+            font-family: var(--mn-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--mn-muted); background: var(--mn-surface-2); position: sticky; top: 0;
+        }
+        table.mn-table tbody tr:last-child td { border-bottom: none; }
+        table.mn-table code, .mn-mono { font-family: var(--mn-mono); }
+        table.mn-table td code { color: var(--mn-cyan); font-size: 0.82rem; }
+
+        /* Formula card */
+        .mn-formula {
+            font-family: var(--mn-mono); background: var(--mn-surface-2);
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
+            font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
+        }
+        .mn-formula .mn-eq { display: block; margin: 0.15rem 0; white-space: nowrap; }
+        .mn-formula .mn-where { color: var(--mn-muted); font-size: 0.78rem; white-space: normal; margin-top: 0.5rem; display: block; }
+        .mn-src {
+            display: inline-block; font-family: var(--mn-mono); font-size: 0.68rem;
+            color: var(--mn-green); border: 1px solid var(--mn-border); border-radius: 4px;
+            padding: 0.05rem 0.35rem; margin-left: 0.35rem;
+        }
+
+        /* Callout */
+        .mn-note {
+            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
+            color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
+        }
+        .mn-note strong { color: var(--mn-text); }
+
+        /* Worked example */
+        .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
+        .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
+
+        /* References */
+        .mn-refs { list-style: none; margin: 0; padding: 0; }
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        .mn-refs li:last-child { border-bottom: none; }
+        .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
+
+        a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
+        a.mn-inline:hover { text-decoration: underline; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
+            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-hero { padding: 1.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../dc-conventional.html" class="nav-link">Conventional DC</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap">
+        <div class="mn-crumb">
+            <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / Conventional DC Cockpit
+        </div>
+
+        <header class="mn-hero">
+            <p class="mn-eyebrow">Technical Manual · Cockpit Basis</p>
+            <h1>Conventional DC — EPMS &amp; BMS Cockpit — Methodology &amp; Formulas</h1>
+            <p>Every KPI, formula, constant, and cross-page binding behind the Conventional DC EPMS/BMS cockpit. All values are derived deterministically from the locked basis-of-design in <code class="mn-mono">js/conv-engine.js</code> (<code class="mn-mono">CONV_CALC</code>) — no user inputs, no random seeding, no back-solved constants. The cockpit reflects a single authenticated engineering scenario anchored in conv review doc 09.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Engine <strong>CONV_CALC v1.0.0</strong></span>
+                <span class="mn-chip">Basis <strong>conv review doc 09</strong></span>
+                <span class="mn-chip">Inputs <strong>LOCKED</strong></span>
+                <span class="mn-chip">Outputs <strong>20+</strong></span>
+                <span class="mn-chip">Accuracy rules <strong>6</strong></span>
+            </div>
+            <a class="mn-toollink" href="../dc-conventional.html">&#9654; Open the live Conventional DC Cockpit</a>
+        </header>
+
+        <!-- 1. PURPOSE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The Conventional DC cockpit is an EPMS/BMS monitoring and anomaly-detection aid for a chilled-water, UPS-backed, generator-protected data centre. It answers five operational questions in real time: <em>what is the current energy balance</em>, <em>is cooling performing within design</em>, <em>how are the UPS modules loaded</em>, <em>how much fuel autonomy remains</em>, and <em>how do site sustainability metrics (PUE/WUE/CUE) compare to design targets</em>.</p>
+            <p class="mn-lead">This page is a <strong>cockpit</strong>, not a calculator. Its basis of design is <strong>fixed</strong>: the scenario constants in <code class="mn-mono">CONV_MODEL</code> (locked, deep-frozen) drive every displayed number. The governing accuracy contract is the <strong>ACCURACY_VALIDATION 6 rules</strong> (one source of truth · no <code>Math.random</code> on basis KPIs · explicit denominator on every metric · marketing target ≠ derived value · terminology must match engineering basis · basis chip on every critical KPI), plus the 23 acceptance tests in <code class="mn-mono">tools/probe-accuracy-validation.mjs</code>. Basis document: <strong>conv/review/09-engineering-basis-and-calculations.md</strong>.</p>
+        </section>
+
+        <!-- 2. INPUTS (LOCKED BASIS) -->
+        <section class="mn-section">
+            <h2><span class="mn-num">02</span> Inputs — locked basis-of-design</h2>
+            <p class="mn-lead">There are no user inputs. The table below is the complete set of authored constants in <code class="mn-mono">CONV_MODEL</code>. Every other number on every cockpit page is derived from these. Source citations map to conv review doc 09 line numbers.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Parameter</th><th>Symbol / key</th><th>Value</th><th>Unit</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td>IT design capacity</td><td><code>it_design_kw</code></td><td>2 000</td><td>kW</td><td>doc-09 line 9</td></tr>
+                    <tr><td>IT load (current)</td><td><code>it_load_kw</code></td><td>1 850</td><td>kW</td><td>doc-09 line 10</td></tr>
+                    <tr><td>Power usage effectiveness</td><td><code>pue</code></td><td>1.45</td><td>—</td><td>doc-09 line 11</td></tr>
+                    <tr><td>Water usage effectiveness</td><td><code>wue_l_per_kwh</code></td><td>1.20</td><td>L/kWh</td><td>doc-09 line 13</td></tr>
+                    <tr><td>Grid carbon intensity</td><td><code>carbon_kg_per_facility_kwh</code></td><td>0.42</td><td>kgCO₂/kWh</td><td>doc-09 line 14, denominator = facility kWh</td></tr>
+                    <tr><td>Cold-aisle average temperature</td><td><code>avg_temp_c</code></td><td>22.4</td><td>°C</td><td>doc-01 §Right-Side Stats Panel; ASHRAE TC9.9 recommended band</td></tr>
+                    <tr><td>Average relative humidity</td><td><code>avg_rh_pct</code></td><td>48</td><td>%</td><td>doc-01/09 environment row; ASHRAE 40–60% band midpoint</td></tr>
+                    <tr><td>CHW supply temperature</td><td><code>chws_c</code></td><td>7.2</td><td>°C</td><td>doc-09 line 15, 81–84 — canonical primary loop</td></tr>
+                    <tr><td>CHW return temperature</td><td><code>chwr_c</code></td><td>14.8</td><td>°C</td><td>doc-09 line 15, 81–84 — canonical primary loop</td></tr>
+                    <tr><td>Chillers running / total</td><td><code>chillers_running / _total</code></td><td>2 / 3</td><td>—</td><td>doc-01 §2 dashboard KPI "Chillers 2/3"</td></tr>
+                    <tr><td>UPS efficiency</td><td><code>ups_efficiency</code></td><td>0.96</td><td>—</td><td>doc-09 line 39 ("UPS losses @ 96% efficiency 77 kW")</td></tr>
+                    <tr><td>UPS module count (2N)</td><td><code>ups_module_count</code></td><td>2</td><td>—</td><td>doc-01 §Right-Side Stats Panel (UPS A / UPS B)</td></tr>
+                    <tr><td>EPMS metering tolerance</td><td><code>metering_tolerance_pct</code></td><td>2</td><td>%</td><td>doc-12 line 9 "within 2%"</td></tr>
+                    <tr><td>Fuel tank capacity</td><td><code>tank_capacity_l</code></td><td>60 000</td><td>L</td><td>doc-09 line 140</td></tr>
+                    <tr><td>Tank usable fraction</td><td><code>usable_fraction</code></td><td>0.90</td><td>—</td><td>doc-09 line 141</td></tr>
+                    <tr><td>Fuel level</td><td><code>level_pct</code></td><td>85</td><td>%</td><td>doc-09 lines 16, 126</td></tr>
+                    <tr><td>Generator fuel consumption</td><td><code>generator_consumption_lph</code></td><td>956</td><td>L/hr</td><td>doc-09 lines 144–147</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Accuracy rule 4:</strong> None of these values is a marketing target presented as a measured outcome. PUE 1.45 is the engineering basis from doc-09, not a best-in-class aspirational figure. The cockpit displays these as <em>design basis</em> chips, not live telemetry.</div>
+        </section>
+
+        <!-- 3. METHODOLOGY -->
+        <section class="mn-section">
+            <h2><span class="mn-num">03</span> Calculation methodology</h2>
+            <p class="mn-lead">All derivations are pure functions inside <code class="mn-mono">CONV_CALC</code>. Function names below map one-to-one to <code class="mn-mono">js/conv-engine.js</code>. No formula exists outside the engine.</p>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Facility and non-IT load</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Facility = IT × PUE                  → 1 850 × 1.45 = 2 682.5 kW</span>
+                <span class="mn-eq">Non-IT   = Facility − IT             → 2 682.5 − 1 850 = 832.5 kW</span>
+                <span class="mn-where">In <code>facilityLoadKw(m)</code>, <code>nonItLoadKw(m)</code>. Facility is the total metered input to the site; Non-IT covers cooling, lighting, UPS losses, and all ancillaries. Both are rendered on the dashboard energy panel.<span class="mn-src">doc-09 lines 25–28, 32–34</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">PUE reconciliation</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">PUE = Facility / IT = 2 682.5 / 1 850 = 1.45   (identity check)</span>
+                <span class="mn-where">The cockpit renders PUE as the ratio Facility÷IT. The locked value must always reconcile to exactly 1.45 — any other display would violate accuracy rule 1 (one source of truth). Denominator is IT load (not design capacity).<span class="mn-src">doc-09 line 11; ACCURACY_VALIDATION rule 3</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">UPS losses</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">UPS loss = IT × (1/η − 1)            → 1 850 × (1/0.96 − 1) = 77.1 kW</span>
+                <span class="mn-eq">Per module (2N) = UPS output / count  → 1 850 / 2 = 925 kW per module</span>
+                <span class="mn-where">In <code>upsLossKw(m)</code>, <code>upsModuleKw(m)</code>. In the 2N topology each module carries the full protected IT load at 100% redundancy. At 50% shared-load operating mode each module runs at 925 kW. UPS output is taken as IT load (mechanical on gen-backed switchboard, not UPS).<span class="mn-src">doc-09 line 39; doc-01 §UPS A / UPS B</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Chilled-water loop</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">ΔT      = CHWR − CHWS = 14.8 − 7.2 = 7.6 K</span>
+                <span class="mn-eq">CHW flow = IT load / (Cp × ΔT)       → 1 850 / (4.186 × 7.6) = 58.1 L/s</span>
+                <span class="mn-eq">Heat rejection = IT + UPS loss        → 1 850 + 77.1 = 1 927.1 kW  (sanity band 1 850–1 950)</span>
+                <span class="mn-where">In <code>chwDeltaT(m)</code>, <code>chwFlowLps(m)</code>, <code>heatRejectionKw(m)</code>. Cp = 4.186 kJ/(kg·K) for water. CHW flow is sized on IT load per doc-09 worked example; heat rejection (IT + UPS loss) is the cooling-band sanity check per doc-09 line 77. <strong>The secondary condenser loop (~19/22 °C) is NEVER labelled CHWS/CHWR in the cockpit</strong> — it is a distinct loop relabelled per conv-engine.js CHW basis decision.<span class="mn-src">doc-09 lines 81–85; doc-00 line 83</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Water usage effectiveness (WUE)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">WUE = annual cooling makeup water [L] / annual IT energy [kWh]   = 1.20 L/kWh</span>
+                <span class="mn-eq">Instant equivalent flow = (WUE × IT) / 60  → (1.20 × 1 850) / 60 = 37.0 L/min</span>
+                <span class="mn-where">In <code>waterFlowLpmForWue(m)</code>. WUE definition per ISO/IEC 30134-2. The cockpit shows the steady-state equivalent makeup-water flow rate a cooling-tower operator monitors. The display value is 37 L/min — not "37 × 60 = 2 220 L/hr" on the raw basis chip; the fraction /60 converts kWh×L/kWh to L/min.<span class="mn-src">doc-09 lines 99–104; ISO/IEC 30134-2</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Carbon usage effectiveness (CUE)</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">CUE = carbon emission rate [kgCO₂/hr] / IT power [kW]</span>
+                <span class="mn-eq">Carbon rate = Facility × grid factor   → 2 682.5 × 0.42 = 1 126.7 kgCO₂/hr</span>
+                <span class="mn-eq">CUE (IT-basis) = grid factor × PUE    → 0.42 × 1.45 = 0.609 kgCO₂/kWh-IT</span>
+                <span class="mn-where">In <code>carbonKgPerHr(m)</code>. CUE per ISO/IEC 30134-8 uses the facility-energy denominator for the grid carbon factor (0.42 kgCO₂/kWh is stated as a facility-energy intensity in doc-09 line 14). The IT-basis form CUE = grid factor × PUE is a derived identity. <strong>Denominator must be explicit on every CUE display</strong> (accuracy rule 3).<span class="mn-src">doc-09 lines 155–158, 167; ISO/IEC 30134-8</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Fuel autonomy</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Usable fuel = capacity × usable fraction × fill level</span>
+                <span class="mn-eq">             = 60 000 × 0.90 × 0.85 = 45 900 L</span>
+                <span class="mn-eq">Autonomy     = usable fuel / generator consumption rate</span>
+                <span class="mn-eq">             = 45 900 / 956 = 48.0 hr</span>
+                <span class="mn-where">In <code>fuelUsableL(m)</code>, <code>fuelAutonomyHr(m)</code>. The 48 hr design target is a Uptime Institute requirement for Tier III/IV continuous operations — validated against doc-09 lines 132–147.<span class="mn-src">doc-09 lines 132–147; Uptime Institute Tier Standard</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Active-rack estimates</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Active racks = IT load / rack density   (illustrative cross-sections)</span>
+                <span class="mn-eq">  At 6 kW/rack: 1 850 / 6  = 308 racks</span>
+                <span class="mn-eq">  At 8 kW/rack: 1 850 / 8  = 231 racks</span>
+                <span class="mn-eq">  At 10 kW/rack: 1 850 / 10 = 185 racks</span>
+                <span class="mn-where">In <code>activeRacks(m, kwPerRack)</code>. Three density cross-sections per doc-09 lines 51–63. Shown as informational context on the IT panel, not as primary KPIs.<span class="mn-src">doc-09 lines 51–63</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">EPMS power metering</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">EPMS total = Facility load = 2 682.5 kW  (nominal; tolerance band ±2%)</span>
+                <span class="mn-eq">EPMS UPS output = IT load = 1 850 kW     (mechanical on gen-backed board)</span>
+                <span class="mn-where">In <code>epmsTotalKw(m)</code>, <code>epmsUpsOutputKw(m)</code>. Metering tolerance ±2% is a quality flag, not an applied offset — the cockpit shows nominal values. EPMS = Electrical Power Monitoring System.<span class="mn-src">doc-00 line 77; doc-12 line 9</span></span>
+            </div>
+        </section>
+
+        <!-- 4. CONSTANTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
+            <p class="mn-lead">Every constant lives in the deep-frozen <code class="mn-mono">CONV_MODEL</code> object with a <code>// source:</code> tag pointing to conv review doc line numbers. The snapshot table confirms all computed intermediates at the locked basis point.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Computed quantity</th><th>Function</th><th>Result</th><th>Unit</th></tr></thead>
+                <tbody>
+                    <tr><td>Facility load</td><td><code>facilityLoadKw()</code></td><td>2 682.5</td><td>kW</td></tr>
+                    <tr><td>Non-IT load</td><td><code>nonItLoadKw()</code></td><td>832.5</td><td>kW</td></tr>
+                    <tr><td>UPS loss</td><td><code>upsLossKw()</code></td><td>77.1</td><td>kW</td></tr>
+                    <tr><td>CHW ΔT</td><td><code>chwDeltaT()</code></td><td>7.6</td><td>K</td></tr>
+                    <tr><td>CHW flow</td><td><code>chwFlowLps()</code></td><td>58.1</td><td>L/s</td></tr>
+                    <tr><td>Heat rejection</td><td><code>heatRejectionKw()</code></td><td>1 927.1</td><td>kW</td></tr>
+                    <tr><td>UPS per-module load</td><td><code>upsModuleKw()</code></td><td>925.0</td><td>kW</td></tr>
+                    <tr><td>Water makeup flow</td><td><code>waterFlowLpmForWue()</code></td><td>37.0</td><td>L/min</td></tr>
+                    <tr><td>Carbon emission rate</td><td><code>carbonKgPerHr()</code></td><td>1 126.7</td><td>kgCO₂/hr</td></tr>
+                    <tr><td>Usable fuel</td><td><code>fuelUsableL()</code></td><td>45 900</td><td>L</td></tr>
+                    <tr><td>Fuel autonomy</td><td><code>fuelAutonomyHr()</code></td><td>48.0</td><td>hr</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Accuracy rule 2:</strong> None of these values involves <code>Math.random()</code>. Every number is stable on reload, reproducible in Node, and verifiable against <code>tools/test-conv-calc.mjs</code> (22/22 DoD identities).</div>
+        </section>
+
+        <!-- 5. OUTPUTS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">05</span> Outputs &amp; cockpit panels</h2>
+            <p class="mn-lead">The cockpit surfaces these derived quantities across its dashboard, EPMS, cooling, water, fuel, and sustainability panels. Each KPI carries a basis chip citing its source.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>KPI</th><th>CONV_CALC function</th><th>Unit</th><th>Panel</th></tr></thead>
+                <tbody>
+                    <tr><td>IT load</td><td><code>model.site.it_load_kw</code></td><td>kW</td><td>Energy dashboard</td></tr>
+                    <tr><td>Facility load</td><td><code>facilityLoadKw()</code></td><td>kW</td><td>Energy dashboard / EPMS total</td></tr>
+                    <tr><td>Non-IT load</td><td><code>nonItLoadKw()</code></td><td>kW</td><td>Energy breakdown</td></tr>
+                    <tr><td>PUE</td><td>Facility / IT (identity)</td><td>—</td><td>Sustainability header</td></tr>
+                    <tr><td>WUE</td><td><code>model.environment.wue_l_per_kwh</code></td><td>L/kWh</td><td>Sustainability / water panel</td></tr>
+                    <tr><td>CUE (IT-basis)</td><td>grid factor × PUE</td><td>kgCO₂/kWh-IT</td><td>Sustainability panel</td></tr>
+                    <tr><td>Carbon rate</td><td><code>carbonKgPerHr()</code></td><td>kgCO₂/hr</td><td>Sustainability panel</td></tr>
+                    <tr><td>UPS loss</td><td><code>upsLossKw()</code></td><td>kW</td><td>EPMS electrical panel</td></tr>
+                    <tr><td>UPS per-module kW</td><td><code>upsModuleKw()</code></td><td>kW</td><td>EPMS UPS A / UPS B gauges</td></tr>
+                    <tr><td>CHW supply / return</td><td><code>model.cooling.chws_c / chwr_c</code></td><td>°C</td><td>Cooling panel — primary loop only</td></tr>
+                    <tr><td>CHW ΔT</td><td><code>chwDeltaT()</code></td><td>K</td><td>Cooling panel</td></tr>
+                    <tr><td>CHW flow</td><td><code>chwFlowLps()</code></td><td>L/s</td><td>Cooling panel</td></tr>
+                    <tr><td>Heat rejection</td><td><code>heatRejectionKw()</code></td><td>kW</td><td>Cooling sanity band</td></tr>
+                    <tr><td>Chillers running / total</td><td><code>model.cooling.chillers_*</code></td><td>—</td><td>Cooling panel status</td></tr>
+                    <tr><td>Water makeup flow</td><td><code>waterFlowLpmForWue()</code></td><td>L/min</td><td>Water panel</td></tr>
+                    <tr><td>Fuel level / usable</td><td><code>model.fuel.level_pct / fuelUsableL()</code></td><td>% / L</td><td>Fuel panel gauge</td></tr>
+                    <tr><td>Fuel autonomy</td><td><code>fuelAutonomyHr()</code></td><td>hr</td><td>Fuel panel — 48 hr design target</td></tr>
+                    <tr><td>Active racks (3 densities)</td><td><code>activeRacks(m, kW)</code></td><td>count</td><td>IT capacity panel</td></tr>
+                    <tr><td>Avg temperature / RH</td><td><code>model.environment.avg_temp_c / avg_rh_pct</code></td><td>°C / %</td><td>Environment panel</td></tr>
+                    <tr><td>EPMS metering tolerance</td><td><code>model.electrical.metering_tolerance_pct</code></td><td>%</td><td>EPMS quality chip</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 6. WORKED EXAMPLE -->
+        <section class="mn-section">
+            <h2><span class="mn-num">06</span> Worked example — 1 850 kW scenario</h2>
+            <p class="mn-lead">Full derivation chain reproducing every primary KPI on the live cockpit exactly. All figures match <code class="mn-mono">CONV_CALC.snapshot</code>.</p>
+            <div class="mn-worked">
+                <ol>
+                    <li><strong>Facility load:</strong> <code>1 850 × 1.45 =</code> <span class="mn-result">2 682.5 kW</span></li>
+                    <li><strong>Non-IT load:</strong> <code>2 682.5 − 1 850 =</code> <span class="mn-result">832.5 kW</span></li>
+                    <li><strong>PUE reconciliation:</strong> <code>2 682.5 / 1 850 =</code> <span class="mn-result">1.45</span> ✓ (identity holds)</li>
+                    <li><strong>UPS loss:</strong> <code>1 850 × (1/0.96 − 1) =</code> <span class="mn-result">77.1 kW</span> · per module (2N): <code>1 850 / 2 =</code> <span class="mn-result">925.0 kW</span></li>
+                    <li><strong>CHW ΔT:</strong> <code>14.8 − 7.2 =</code> <span class="mn-result">7.6 K</span> · CHW flow: <code>1 850 / (4.186 × 7.6) =</code> <span class="mn-result">58.1 L/s</span></li>
+                    <li><strong>Heat rejection:</strong> <code>1 850 + 77.1 =</code> <span class="mn-result">1 927.1 kW</span> — within design band 1 850–1 950 kW ✓</li>
+                    <li><strong>WUE check:</strong> 1.20 L/kWh (basis) · instant makeup flow: <code>(1.20 × 1 850) / 60 =</code> <span class="mn-result">37.0 L/min</span></li>
+                    <li><strong>Carbon rate:</strong> <code>2 682.5 × 0.42 =</code> <span class="mn-result">1 126.7 kgCO₂/hr</span> · CUE (IT-basis): <code>0.42 × 1.45 =</code> <span class="mn-result">0.609 kgCO₂/kWh-IT</span></li>
+                    <li><strong>Usable fuel:</strong> <code>60 000 × 0.90 × 0.85 =</code> <span class="mn-result">45 900 L</span> · Autonomy: <code>45 900 / 956 =</code> <span class="mn-result">48.0 hr</span> ✓ (Uptime Tier III/IV target)</li>
+                    <li><strong>Active racks at 8 kW/rack:</strong> <code>1 850 / 8 =</code> <span class="mn-result">231 racks</span></li>
+                </ol>
+            </div>
+            <div class="mn-note"><strong>Engineering reading:</strong> the cockpit operates at 92.5% of design IT capacity (1 850/2 000 kW). PUE 1.45 is consistent with a mid-efficiency conventional chilled-water site (ASHRAE 90.1 baseline for the climate zone). The 48 hr fuel autonomy is the Uptime Institute minimum for uninterrupted Tier III/IV operations without refuelling.</div>
+        </section>
+
+        <!-- 7. REFERENCES -->
+        <section class="mn-section">
+            <h2><span class="mn-num">07</span> References &amp; standards</h2>
+            <ul class="mn-refs">
+                <li><b>conv review doc 09</b> — 09-engineering-basis-and-calculations.md: primary source for all scenario constants (IT load, PUE, WUE, CHW loop, UPS efficiency, fuel system). Line numbers cited throughout.</li>
+                <li><b>ASHRAE 90.1</b> — Energy Standard for Buildings: PUE benchmarks and baseline cooling-system design parameters for conventional chilled-water data centres.</li>
+                <li><b>ASHRAE TC9.9</b> — Thermal Guidelines for Data Processing Environments: cold-aisle temperature and RH recommended bands (A1/A2 class).</li>
+                <li><b>Uptime Institute Tier Standard</b> — Operational Sustainability (2021): 48 hr fuel autonomy requirement for Tier III/IV maintained availability.</li>
+                <li><b>ISO/IEC 30134-2</b> — Key Performance Indicators for Data Centres — Part 2: Power Usage Effectiveness (PUE) and Water Usage Effectiveness (WUE) definitions.</li>
+                <li><b>ISO/IEC 30134-8</b> — Key Performance Indicators for Data Centres — Part 8: Carbon Usage Effectiveness (CUE). Denominator = IT energy; grid carbon factor applied at facility-energy basis per doc-09 line 14.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC v1.0.0 + CONV_MODEL, deep-frozen). Gate: <code class="mn-mono">tools/test-conv-calc.mjs</code> (22/22 DoD identities).</li>
+                <li><b>Accuracy gate</b> — <code class="mn-mono">tools/probe-accuracy-validation.mjs</code> (40/40 acceptance tests, 6 accuracy rules). Must pass before any cockpit change ships.</li>
+            </ul>
+        </section>
+
+        <!-- 8. ASSUMPTIONS & LIMITATIONS -->
+        <section class="mn-section">
+            <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
+            <p class="mn-lead">The cockpit models a <strong>single fixed engineering scenario</strong>. It is not a design calculator and cannot be parameterised. Key assumptions and scope boundaries:</p>
+            <p class="mn-lead"><strong>CHW loop:</strong> Only the primary (secondary) chilled-water loop at 7.2/14.8 °C is surfaced. The condenser-side loop operating at ~19–23 °C is out of scope for this cockpit and is never labelled CHWS/CHWR (conv-engine.js CHW basis decision). Secondary pump losses and free-cooling economiser modes are not modelled.</p>
+            <p class="mn-lead"><strong>UPS topology:</strong> The 2N model assumes equal load sharing across both modules at 925 kW each. Single-module fault scenarios and static bypass paths are not modelled.</p>
+            <p class="mn-lead"><strong>Fuel consumption:</strong> 956 L/hr is the generator consumption at approximately 2.7 MW facility load (generator output ≈ non-IT + IT generation, accounting for prime-move fuel burn curve). It is an engineering estimate for sizing, not a live meter reading.</p>
+            <p class="mn-lead"><strong>WUE and water flow:</strong> The 37 L/min figure is the steady-state equivalent evaporative makeup rate derived from the annual WUE target. Actual instantaneous cooling-tower blowdown, drift loss, and basin makeup vary with ambient wet-bulb temperature. This cockpit displays the design-point equivalent only.</p>
+            <p class="mn-lead"><strong>Carbon intensity:</strong> 0.42 kgCO₂/kWh is a fixed grid-average factor from the engineering basis. Real-time grid decarbonisation, marginal emissions, and Scope 2 market-based accounting are out of scope.</p>
+            <p class="mn-lead">This manual and the cockpit are an <strong>engineering education and operational reference aid</strong>. They do not substitute for a live DCIM/EPMS/BMS with calibrated sensors, metered telemetry, and alarm setpoints set by a qualified controls engineer to the site authority having jurisdiction.</p>
+        </section>
+
+        <a class="mn-toollink" href="../dc-conventional.html">&#9654; Open the live Conventional DC EPMS/BMS Cockpit</a>
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
+                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home Dashboard</a></li>
+                        <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
+                        <li><a href="index.html">Technical Manuals</a></li>
+                        <li><a href="../dc-conventional.html">Conventional DC Cockpit</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4 class="footer-heading">CONNECT</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
+                        <li><a href="../articles.html">Technical Journal</a></li>
+                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle = document.getElementById('themeToggle');
+        var theme = localStorage.getItem('rz_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (toggle) toggle.addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('rz_theme', next);
+        });
+        var hamburger = document.querySelector('.hamburger');
+        var navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) hamburger.addEventListener('click', function(){
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../auth.js?v=2026-07-14a" defer></script>
+</body>
+</html>

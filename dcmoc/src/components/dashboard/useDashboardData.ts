@@ -12,7 +12,8 @@ import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { getPUE } from '@/constants/pue';
 import { calculateFinancials, defaultOccupancyRamp, type FinancialResult } from '@/modules/analytics/FinancialEngine';
-import { rzModels } from '@/lib/rz-engine';
+import { rzModels, rzData } from '@/lib/rz-engine';
+import { ccOverall } from '@/components/modules/reliability/availabilityChain';
 import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 
 const REDUNDANCY_KEY: Record<string, string> = { 'N+1': 'n1', '2N': '2n', '2N+1': '2n1' };
@@ -68,7 +69,17 @@ export function useDashboardData(): DashboardData {
         // ── reliability / architecture / construction / site ──
         let availabilityPct: number | null = null, availabilityTarget: number | null = null, downtimeMin: number | null = null;
         try {
-            if (m.reliability?.systemAvailability) {
+            /* fake-100% fix (audit 2026-07-20): pure parallel composition saturates to
+             * 1.0 at display precision — use the SAME β=5% common-cause chain as the
+             * Reliability page (availabilityChain.ccOverall); round only at render. */
+            const rd = (rzData() as { reliability?: { components?: Record<string, { mtbf: number; mttr: number; label: string }>; redundancyPaths?: Record<string, number> } }).reliability;
+            if (m.reliability && rd?.components) {
+                const paths = rd.redundancyPaths?.[redKey] ?? 2;
+                const av = ccOverall(m.reliability as never, rd.components, 1, paths);
+                availabilityPct = +(av * 100).toFixed(5);
+                availabilityTarget = +(m.reliability.tierTarget(inputs.tierLevel) * 100).toFixed(3);
+                downtimeMin = m.reliability.annualDowntimeMinutes(av);
+            } else if (m.reliability?.systemAvailability) {
                 const av = m.reliability.systemAvailability(['ups', 'crac', 'generator', 'switchgear'], redKey);
                 availabilityPct = +(av * 100).toFixed(3);
                 availabilityTarget = +(m.reliability.tierTarget(inputs.tierLevel) * 100).toFixed(3);
