@@ -5893,6 +5893,22 @@
                                 "sources": 5
                         }
                 },
+                "construction_months": {
+                        "pm": {
+                                "n": 3,
+                                "unit": "months",
+                                "p10": 27,
+                                "p25": 27,
+                                "p50": 30,
+                                "p75": 60,
+                                "p90": 60,
+                                "companies": [
+                                        "EIAR Google Dublin DC3",
+                                        "EIAR Vantage DUB11"
+                                ],
+                                "sources": 2
+                        }
+                },
                 "energy_gwh": {
                         "pm": {
                                 "n": 3,
@@ -6033,6 +6049,21 @@
                                         "GreenGrid WUE WP35"
                                 ],
                                 "sources": 3
+                        }
+                },
+                "rack_density_kw": {
+                        "research": {
+                                "n": 3,
+                                "unit": "kW/rack",
+                                "p10": 7,
+                                "p25": 7,
+                                "p50": 9,
+                                "p75": 50,
+                                "p90": 50,
+                                "companies": [
+                                        "Uptime Survey 2024"
+                                ],
+                                "sources": 1
                         }
                 },
                 "renewable_share": {

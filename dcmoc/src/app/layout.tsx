@@ -36,7 +36,7 @@ export default function RootLayout({
             Consumed via src/lib/rz-engine.ts (with local fallbacks). v2.4.0 adds
             the DC-OS Layer engines: reliability/site/commissioning/asset/
             construction/requirements/architecture. */}
-        <script src="/rz-engine.min.js?v=2026-07-20-f" defer></script>
+        <script src="/rz-engine.min.js?v=2026-07-20-g" defer></script>
         {/* Shared RZExplain knowledge DB (window.RZ_EXPLAIN_DB, 802 entries) —
             consumed via src/lib/explain.ts + <Explain k="..."/> (SSR-guarded,
             renders nothing when absent). */}

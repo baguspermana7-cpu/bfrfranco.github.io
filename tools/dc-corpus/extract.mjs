@@ -24,6 +24,13 @@ const PATTERNS = [
     { metric: 'investment_busd', unit: '$B', re: /\$\s?(\d{1,3}(?:\.\d)?)\s?billion/gi, min: 0.5, max: 200 },
     { metric: 'energy_gwh', unit: 'GWh', re: /(\d{1,5}(?:,\d{3})?)\s?GWh/gi, min: 10, max: 100000 },
     { metric: 'wue', unit: 'L/kWh', re: /(?:WUE|water usage effectiveness)[^.\n]{0,80}?(\d\.\d{1,2})/gi, min: 0.01, max: 9 },
+    /* Arc-2 patterns (2026-07-20) — schedule / $-per-kW / rack density from EIAR-tender-spec docs */
+    { metric: 'construction_months', unit: 'months', re: /(\d{1,2})[\s-]*months?[^.\n]{0,40}?(?:construction|programme|build(?:ing)? (?:period|schedule)|schedule)/gi, min: 4, max: 72 },
+    { metric: 'construction_months', unit: 'months', re: /(?:construction|programme|build(?:ing)?)\s+(?:period|duration|schedule)[^.\n]{0,40}?(\d{1,2})[\s-]*months?/gi, min: 4, max: 72 },
+    /* $/kW — negative guard: MUST NOT match "$X per kWh" (energy price) */
+    { metric: 'capex_usd_per_kw', unit: '$/kW', re: /\$\s?(\d{1,3}(?:,\d{3})*)\s?(?:per|\/)\s?k(?:ilo)?[wW](?:att)?\b(?!h)(?!\s?h)/g, min: 1000, max: 40000 },
+    { metric: 'rack_density_kw', unit: 'kW/rack', re: /(\d{1,3}(?:\.\d)?)\s?kW\s?(?:per|\/)\s?rack/gi, min: 2, max: 400 },
+    { metric: 'rack_density_kw', unit: 'kW/rack', re: /rack\s+densit(?:y|ies)[^.\n]{0,40}?(\d{1,3}(?:\.\d)?)\s?kW/gi, min: 2, max: 400 },
 ];
 
 const yearRe = /\b(20[12]\d)\b/;

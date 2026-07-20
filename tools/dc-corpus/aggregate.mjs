@@ -65,4 +65,16 @@ const research = Object.values(docs).map((d) => ({ ...d, metrics: [...d.metrics]
     .sort((a, b) => b.factCount - a.factCount);
 writeFileSync(join(DIR, '..', '..', 'dcmoc', 'src', 'lib', 'research-library.json'),
     JSON.stringify({ generated: '2026-07-19', note: 'AUTO-GENERATED doc index of the DC public-data corpus — regenerate via the corpus pipeline.', docs: research }, null, 1) + '\n');
-console.log('AGGREGATE →', Object.keys(out).map((m) => `${m}(${Object.keys(out[m]).join(',')})`).join(' · '), `· research docs: ${research.length}`);
+/* Arc-2 (2026-07-20): corpus-facts.json — slim per-fact mirror for the Data Library
+ * drill-down (was a manual agent step; now deterministic pipeline output).
+ * Sort stabil (metric → segment → company → value) + quote dipotong 240 char. */
+const slim = facts.map((f) => ({
+    metric: f.metric, value: f.value, unit: f.unit, company: f.company,
+    segment: f.segment, year: f.year ?? null, source_url: f.source_url,
+    quote: String(f.quote ?? '').slice(0, 240),
+})).sort((a, b) =>
+    a.metric.localeCompare(b.metric) || a.segment.localeCompare(b.segment)
+    || a.company.localeCompare(b.company) || a.value - b.value);
+writeFileSync(join(DIR, '..', '..', 'dcmoc', 'src', 'lib', 'corpus-facts.json'),
+    JSON.stringify({ note: 'AUTO-GENERATED slim fact mirror of dc-facts.json — regenerate via the corpus pipeline.', facts: slim }, null, 1) + '\n');
+console.log('AGGREGATE →', Object.keys(out).map((m) => `${m}(${Object.keys(out[m]).join(',')})`).join(' · '), `· research docs: ${research.length} · slim facts: ${slim.length}`);
