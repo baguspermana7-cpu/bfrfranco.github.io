@@ -189,6 +189,12 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
     for (const [key, factor] of Object.entries(costFactors)) {
         let multiplier = locMult;
 
+        // Ship-C: per-category landed cost (import duty × equipment share). Engine
+        // returns 1.0 for labor-heavy categories and FTA/no-country → no-op unless
+        // the country carries a duty band. Supersedes the dormant importDifficultyFactor.
+        const landedFactor = (rzModels() as any)?.supplyChain?.landedFactor ? (rzModels() as any).supplyChain.landedFactor(country ?? null, key) : 1.0;
+        multiplier *= landedFactor;
+
         if (key === 'building') multiplier *= buildMult * rackMult;
         else if (key === 'seismic') multiplier *= seismicMult * buildMult;
         else if (key === 'electrical') multiplier *= redMult * rackMult * upsMult * powerUplift;

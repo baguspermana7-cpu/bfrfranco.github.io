@@ -86,6 +86,9 @@ export interface CountryProfile {
     };
     supplyChain: {
         importDifficultyFactor: number;
+        importDutyBand: 'fta' | 'low' | 'med' | 'high' | 'punitive';
+        gpuExportTier: 1 | 2 | 3;
+        customsLeadBand: 'fast' | 'normal' | 'slow';
     };
     taxIncentives?: {
         freeTradeZones: string[];
@@ -185,6 +188,9 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         },
         supplyChain: {
             importDifficultyFactor: 1.35,
+            importDutyBand: 'med',
+            gpuExportTier: 2,
+            customsLeadBand: 'normal',
         },
         taxIncentives: {
             freeTradeZones: ['Batam FTZ', 'Nusantara Capital (IKN)', 'Cikarang SEZ'],
@@ -279,7 +285,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         risk: {
             downtimeCostPerMin: 4500,
         },
-        supplyChain: { importDifficultyFactor: 1.0 },
+        supplyChain: {
+            importDifficultyFactor: 1.0,
+            importDutyBand: 'fta',
+            gpuExportTier: 2,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Jurong Island', 'Changi Business Park'],
             taxHolidayYears: 5,
@@ -373,7 +384,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         risk: {
             downtimeCostPerMin: 1200,
         },
-        supplyChain: { importDifficultyFactor: 1.1 },
+        supplyChain: {
+            importDifficultyFactor: 1.1,
+            importDutyBand: 'med',
+            gpuExportTier: 2,
+            customsLeadBand: 'normal',
+        },
         taxIncentives: {
             freeTradeZones: ['Iskandar Malaysia', 'Cyberjaya', 'Kulim Hi-Tech Park'],
             taxHolidayYears: 10,
@@ -467,7 +483,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         risk: {
             downtimeCostPerMin: 5000,
         },
-        supplyChain: { importDifficultyFactor: 1.0 },
+        supplyChain: {
+            importDifficultyFactor: 1.0,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Foreign Trade Zones (250+)'],
             taxHolidayYears: 0,
@@ -560,7 +581,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         risk: {
             downtimeCostPerMin: 4000,
         },
-        supplyChain: { importDifficultyFactor: 1.05 },
+        supplyChain: {
+            importDifficultyFactor: 1.05,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Okinawa FTZ', 'Narita FTZ'],
             taxHolidayYears: 0,
@@ -653,7 +679,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         risk: {
             downtimeCostPerMin: 4500,
         },
-        supplyChain: { importDifficultyFactor: 1.2 },
+        supplyChain: {
+            importDifficultyFactor: 1.2,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Sydney Olympic Park'],
             taxHolidayYears: 0,
@@ -724,7 +755,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['DCDA', 'Estidama', 'Civil Defence'], annualComplianceCost: 15000, environmentalPermitCostPerYear: 3000 },
         environment: { baselineAQI: 100, gridCarbonIntensity: 0.45 },
         risk: { downtimeCostPerMin: 3500 },
-        supplyChain: { importDifficultyFactor: 1.0 },
+        supplyChain: {
+            importDifficultyFactor: 1.0,
+            importDutyBand: 'fta',
+            gpuExportTier: 2,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['JAFZA', 'DAFZA', 'Masdar City', 'ADGM'],
             taxHolidayYears: 50,
@@ -792,7 +828,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['Saudi CDC', 'SASO', 'NEOM Standards'], annualComplianceCost: 12000, environmentalPermitCostPerYear: 2500 },
         environment: { baselineAQI: 110, gridCarbonIntensity: 0.55 },
         risk: { downtimeCostPerMin: 3000 },
-        supplyChain: { importDifficultyFactor: 1.05 },
+        supplyChain: {
+            importDifficultyFactor: 1.05,
+            importDutyBand: 'med',
+            gpuExportTier: 2,
+            customsLeadBand: 'normal',
+        },
         taxIncentives: {
             freeTradeZones: ['KAEC', 'NEOM', 'Jazan Economic City'],
             taxHolidayYears: 10,
@@ -860,7 +901,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['Kahramaa', 'QCS 2014'], annualComplianceCost: 14000, environmentalPermitCostPerYear: 3000 },
         environment: { baselineAQI: 95, gridCarbonIntensity: 0.48 },
         risk: { downtimeCostPerMin: 3500 },
-        supplyChain: { importDifficultyFactor: 1.05 },
+        supplyChain: {
+            importDifficultyFactor: 1.05,
+            importDutyBand: 'low',
+            gpuExportTier: 2,
+            customsLeadBand: 'normal',
+        },
         taxIncentives: {
             freeTradeZones: ['Qatar Free Zones (QFZ)', 'Manateq Logistics Park'],
             taxHolidayYears: 20,
@@ -929,7 +975,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['SABS', 'ECSA', 'OHS Act'], annualComplianceCost: 5000, environmentalPermitCostPerYear: 3000 },
         environment: { baselineAQI: 50, gridCarbonIntensity: 0.9 },
         risk: { downtimeCostPerMin: 1500 },
-        supplyChain: { importDifficultyFactor: 1.3 },
+        supplyChain: {
+            importDifficultyFactor: 1.3,
+            importDutyBand: 'med',
+            gpuExportTier: 2,
+            customsLeadBand: 'slow',
+        },
         taxIncentives: {
             freeTradeZones: ['Coega IDZ', 'Dube TradePort', 'Richards Bay IDZ'],
             taxHolidayYears: 0,
@@ -997,7 +1048,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['NCC', 'SON', 'NESREA'], annualComplianceCost: 3000, environmentalPermitCostPerYear: 2000 },
         environment: { baselineAQI: 140, gridCarbonIntensity: 0.45 },
         risk: { downtimeCostPerMin: 800 },
-        supplyChain: { importDifficultyFactor: 1.6 },
+        supplyChain: {
+            importDifficultyFactor: 1.6,
+            importDutyBand: 'high',
+            gpuExportTier: 2,
+            customsLeadBand: 'slow',
+        },
         taxIncentives: {
             freeTradeZones: ['Lekki Free Zone', 'Calabar FTZ', 'Kano FTZ'],
             taxHolidayYears: 5,
@@ -1065,7 +1121,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['KEBS', 'ERC License'], annualComplianceCost: 3500, environmentalPermitCostPerYear: 2000 },
         environment: { baselineAQI: 60, gridCarbonIntensity: 0.3 },
         risk: { downtimeCostPerMin: 700 },
-        supplyChain: { importDifficultyFactor: 1.5 },
+        supplyChain: {
+            importDifficultyFactor: 1.5,
+            importDutyBand: 'high',
+            gpuExportTier: 2,
+            customsLeadBand: 'slow',
+        },
         taxIncentives: {
             freeTradeZones: ['Nairobi SEZ', 'Konza Technopolis'],
             taxHolidayYears: 10,
@@ -1134,7 +1195,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['INMETRO', 'NR-10', 'ANATEL'], annualComplianceCost: 6000, environmentalPermitCostPerYear: 3500 },
         environment: { baselineAQI: 50, gridCarbonIntensity: 0.15 },
         risk: { downtimeCostPerMin: 1800 },
-        supplyChain: { importDifficultyFactor: 1.4 },
+        supplyChain: {
+            importDifficultyFactor: 1.4,
+            importDutyBand: 'high',
+            gpuExportTier: 2,
+            customsLeadBand: 'slow',
+        },
         taxIncentives: {
             freeTradeZones: ['Manaus Free Zone', 'ZPE Export Processing Zones'],
             taxHolidayYears: 0,
@@ -1202,7 +1268,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['SEC', 'INN Chile'], annualComplianceCost: 5000, environmentalPermitCostPerYear: 3000 },
         environment: { baselineAQI: 40, gridCarbonIntensity: 0.35 },
         risk: { downtimeCostPerMin: 1500 },
-        supplyChain: { importDifficultyFactor: 1.3 },
+        supplyChain: {
+            importDifficultyFactor: 1.3,
+            importDutyBand: 'fta',
+            gpuExportTier: 2,
+            customsLeadBand: 'normal',
+        },
         taxIncentives: {
             freeTradeZones: ['Iquique FTZ', 'Arica FTZ'],
             taxHolidayYears: 0,
@@ -1270,7 +1341,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['NOM', 'SENER'], annualComplianceCost: 5000, environmentalPermitCostPerYear: 3000 },
         environment: { baselineAQI: 80, gridCarbonIntensity: 0.45 },
         risk: { downtimeCostPerMin: 1200 },
-        supplyChain: { importDifficultyFactor: 1.15 },
+        supplyChain: {
+            importDifficultyFactor: 1.15,
+            importDutyBand: 'low',
+            gpuExportTier: 2,
+            customsLeadBand: 'normal',
+        },
         taxIncentives: {
             freeTradeZones: ['Queretaro SEZ', 'Bajio Industrial Corridor'],
             taxHolidayYears: 0,
@@ -1339,7 +1415,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['RETIE', 'SIC'], annualComplianceCost: 4000, environmentalPermitCostPerYear: 2500 },
         environment: { baselineAQI: 55, gridCarbonIntensity: 0.2 },
         risk: { downtimeCostPerMin: 1000 },
-        supplyChain: { importDifficultyFactor: 1.35 },
+        supplyChain: {
+            importDifficultyFactor: 1.35,
+            importDutyBand: 'med',
+            gpuExportTier: 2,
+            customsLeadBand: 'normal',
+        },
         taxIncentives: {
             freeTradeZones: ['Zona Franca Bogota', 'Zona Franca del Pacifico'],
             taxHolidayYears: 5,
@@ -1408,7 +1489,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['BIS', 'CEA Regulations', 'LEED India'], annualComplianceCost: 4000, environmentalPermitCostPerYear: 2500 },
         environment: { baselineAQI: 150, gridCarbonIntensity: 0.72 },
         risk: { downtimeCostPerMin: 1200 },
-        supplyChain: { importDifficultyFactor: 1.2 },
+        supplyChain: {
+            importDifficultyFactor: 1.2,
+            importDutyBand: 'high',
+            gpuExportTier: 2,
+            customsLeadBand: 'slow',
+        },
         taxIncentives: {
             freeTradeZones: ['SEEPZ Mumbai', 'Mahindra World City', 'GIFT City Gujarat'],
             taxHolidayYears: 10,
@@ -1476,7 +1562,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['GB Standards', 'MIIT License', 'Green DC Rating'], annualComplianceCost: 8000, environmentalPermitCostPerYear: 4000 },
         environment: { baselineAQI: 130, gridCarbonIntensity: 0.58 },
         risk: { downtimeCostPerMin: 2500 },
-        supplyChain: { importDifficultyFactor: 1.1 },
+        supplyChain: {
+            importDifficultyFactor: 1.1,
+            importDutyBand: 'high',
+            gpuExportTier: 3,
+            customsLeadBand: 'slow',
+        },
         taxIncentives: {
             freeTradeZones: ['Shanghai FTZ', 'Hainan FTP', 'Shenzhen Qianhai'],
             taxHolidayYears: 5,
@@ -1545,7 +1636,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['KS Standards', 'KISA DC Cert'], annualComplianceCost: 9000, environmentalPermitCostPerYear: 7000 },
         environment: { baselineAQI: 55, gridCarbonIntensity: 0.42 },
         risk: { downtimeCostPerMin: 3500 },
-        supplyChain: { importDifficultyFactor: 1.0 },
+        supplyChain: {
+            importDifficultyFactor: 1.0,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'normal',
+        },
         taxIncentives: {
             freeTradeZones: ['Incheon FEZ', 'Busan-Jinhae FEZ', 'Sejong Smart City'],
             taxHolidayYears: 5,
@@ -1614,7 +1710,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['TIS Standards', 'PEA License'], annualComplianceCost: 4500, environmentalPermitCostPerYear: 2500 },
         environment: { baselineAQI: 80, gridCarbonIntensity: 0.5 },
         risk: { downtimeCostPerMin: 1000 },
-        supplyChain: { importDifficultyFactor: 1.15 },
+        supplyChain: {
+            importDifficultyFactor: 1.15,
+            importDutyBand: 'med',
+            gpuExportTier: 2,
+            customsLeadBand: 'normal',
+        },
         taxIncentives: {
             freeTradeZones: ['Eastern Seaboard (EEC)', 'Amata City', 'Hemaraj Industrial'],
             taxHolidayYears: 8,
@@ -1683,7 +1784,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['TCVN', 'MOIT License'], annualComplianceCost: 3500, environmentalPermitCostPerYear: 2000 },
         environment: { baselineAQI: 100, gridCarbonIntensity: 0.55 },
         risk: { downtimeCostPerMin: 800 },
-        supplyChain: { importDifficultyFactor: 1.3 },
+        supplyChain: {
+            importDifficultyFactor: 1.3,
+            importDutyBand: 'med',
+            gpuExportTier: 2,
+            customsLeadBand: 'normal',
+        },
         taxIncentives: {
             freeTradeZones: ['Saigon Hi-Tech Park', 'Da Nang IT Park', 'VSIP Binh Duong'],
             taxHolidayYears: 4,
@@ -1752,7 +1858,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['PNS Standards', 'DOE License'], annualComplianceCost: 3500, environmentalPermitCostPerYear: 2500 },
         environment: { baselineAQI: 70, gridCarbonIntensity: 0.6 },
         risk: { downtimeCostPerMin: 900 },
-        supplyChain: { importDifficultyFactor: 1.35 },
+        supplyChain: {
+            importDifficultyFactor: 1.35,
+            importDutyBand: 'high',
+            gpuExportTier: 2,
+            customsLeadBand: 'slow',
+        },
         taxIncentives: {
             freeTradeZones: ['PEZA Zones (400+)', 'Clark Freeport', 'Subic Bay Freeport'],
             taxHolidayYears: 7,
@@ -1821,7 +1932,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['CNS Standards', 'Taipower License'], annualComplianceCost: 7000, environmentalPermitCostPerYear: 5000 },
         environment: { baselineAQI: 60, gridCarbonIntensity: 0.5 },
         risk: { downtimeCostPerMin: 3000 },
-        supplyChain: { importDifficultyFactor: 1.05 },
+        supplyChain: {
+            importDifficultyFactor: 1.05,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Hsinchu Science Park', 'Kaohsiung Software Park'],
             taxHolidayYears: 5,
@@ -1889,7 +2005,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['AS/NZS Standards', 'WorkSafe'], annualComplianceCost: 8000, environmentalPermitCostPerYear: 6000 },
         environment: { baselineAQI: 15, gridCarbonIntensity: 0.1 },
         risk: { downtimeCostPerMin: 4000 },
-        supplyChain: { importDifficultyFactor: 1.25 },
+        supplyChain: {
+            importDifficultyFactor: 1.25,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: [],
             taxHolidayYears: 0,
@@ -1959,7 +2080,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['BS EN Standards', 'IET Wiring Regs', 'BREEAM'], annualComplianceCost: 14000, environmentalPermitCostPerYear: 6500 },
         environment: { baselineAQI: 25, gridCarbonIntensity: 0.23 },
         risk: { downtimeCostPerMin: 4500 },
-        supplyChain: { importDifficultyFactor: 1.0 },
+        supplyChain: {
+            importDifficultyFactor: 1.0,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['London Docklands Enterprise Zone'],
             taxHolidayYears: 0,
@@ -2028,7 +2154,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['VDE', 'TÜV', 'EnEfG'], annualComplianceCost: 16000, environmentalPermitCostPerYear: 6000 },
         environment: { baselineAQI: 20, gridCarbonIntensity: 0.35 },
         risk: { downtimeCostPerMin: 5000 },
-        supplyChain: { importDifficultyFactor: 1.0 },
+        supplyChain: {
+            importDifficultyFactor: 1.0,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: [],
             taxHolidayYears: 0,
@@ -2097,7 +2228,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['NEN Standards', 'BREEAM-NL'], annualComplianceCost: 13000, environmentalPermitCostPerYear: 6000 },
         environment: { baselineAQI: 20, gridCarbonIntensity: 0.33 },
         risk: { downtimeCostPerMin: 4500 },
-        supplyChain: { importDifficultyFactor: 1.0 },
+        supplyChain: {
+            importDifficultyFactor: 1.0,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Amsterdam Schiphol Logistics Park'],
             taxHolidayYears: 0,
@@ -2166,7 +2302,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['IS EN Standards', 'SEAI BER'], annualComplianceCost: 14000, environmentalPermitCostPerYear: 6000 },
         environment: { baselineAQI: 15, gridCarbonIntensity: 0.3 },
         risk: { downtimeCostPerMin: 4500 },
-        supplyChain: { importDifficultyFactor: 1.05 },
+        supplyChain: {
+            importDifficultyFactor: 1.05,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Shannon Free Zone', 'IDA Technology Parks'],
             taxHolidayYears: 0,
@@ -2235,7 +2376,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['NF C 15-100', 'AFNOR'], annualComplianceCost: 15000, environmentalPermitCostPerYear: 6000 },
         environment: { baselineAQI: 25, gridCarbonIntensity: 0.06 },
         risk: { downtimeCostPerMin: 4000 },
-        supplyChain: { importDifficultyFactor: 1.0 },
+        supplyChain: {
+            importDifficultyFactor: 1.0,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: [],
             taxHolidayYears: 0,
@@ -2303,7 +2449,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['SS Standards', 'Energimyndigheten'], annualComplianceCost: 12000, environmentalPermitCostPerYear: 6000 },
         environment: { baselineAQI: 10, gridCarbonIntensity: 0.04 },
         risk: { downtimeCostPerMin: 4000 },
-        supplyChain: { importDifficultyFactor: 1.0 },
+        supplyChain: {
+            importDifficultyFactor: 1.0,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Lulea Data Center Hub'],
             taxHolidayYears: 0,
@@ -2371,7 +2522,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['PN-EN Standards', 'URE License'], annualComplianceCost: 7000, environmentalPermitCostPerYear: 4500 },
         environment: { baselineAQI: 40, gridCarbonIntensity: 0.65 },
         risk: { downtimeCostPerMin: 2000 },
-        supplyChain: { importDifficultyFactor: 1.05 },
+        supplyChain: {
+            importDifficultyFactor: 1.05,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'normal',
+        },
         taxIncentives: {
             freeTradeZones: ['Polish SEZ (14 zones)', 'Lodz SEZ', 'Katowice SEZ'],
             taxHolidayYears: 15,
@@ -2440,7 +2596,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['ITED', 'ITUR', 'RGSPIE', 'DL 95/91'], annualComplianceCost: 14000, environmentalPermitCostPerYear: 5000 },
         environment: { baselineAQI: 20, gridCarbonIntensity: 0.08 },
         risk: { downtimeCostPerMin: 3500 },
-        supplyChain: { importDifficultyFactor: 1.05 },
+        supplyChain: {
+            importDifficultyFactor: 1.05,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Madeira Free Trade Zone', 'Sines Industrial Zone'],
             taxHolidayYears: 10,
@@ -2512,7 +2673,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['Oman Civil Defence', 'MTCIT License', 'OPWP Grid Code'], annualComplianceCost: 10000, environmentalPermitCostPerYear: 2500 }, // screening est. 2026
         environment: { baselineAQI: 90, gridCarbonIntensity: 0.48 }, // gas-dominated grid // screening est. 2026
         risk: { downtimeCostPerMin: 2000 }, // screening est. 2026
-        supplyChain: { importDifficultyFactor: 1.05 },
+        supplyChain: {
+            importDifficultyFactor: 1.05,
+            importDutyBand: 'low',
+            gpuExportTier: 2,
+            customsLeadBand: 'normal',
+        },
         taxIncentives: {
             freeTradeZones: ['Duqm SEZ', 'Salalah Free Zone', 'Sohar Free Zone'],
             taxHolidayYears: 30, // Duqm SEZ up to 30yr // screening est. 2026
@@ -2584,7 +2750,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['SFS Standards', 'Tukes', 'Energiavirasto'], annualComplianceCost: 12000, environmentalPermitCostPerYear: 6000 }, // screening est. 2026
         environment: { baselineAQI: 8, gridCarbonIntensity: 0.08 }, // screening est. 2026
         risk: { downtimeCostPerMin: 4000 }, // screening est. 2026
-        supplyChain: { importDifficultyFactor: 1.0 },
+        supplyChain: {
+            importDifficultyFactor: 1.0,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Hamina DC Hub'],
             taxHolidayYears: 0,
@@ -2656,7 +2827,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['UNE Standards', 'REBT', 'CNMC Grid Access'], annualComplianceCost: 12000, environmentalPermitCostPerYear: 5500 }, // screening est. 2026
         environment: { baselineAQI: 25, gridCarbonIntensity: 0.15 }, // screening est. 2026
         risk: { downtimeCostPerMin: 3500 }, // screening est. 2026
-        supplyChain: { importDifficultyFactor: 1.05 },
+        supplyChain: {
+            importDifficultyFactor: 1.05,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Zona Franca Barcelona', 'Aragón DC corridor', 'Canary Islands ZEC'],
             taxHolidayYears: 0,
@@ -2729,7 +2905,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['CSA Standards', 'ESA/RBQ Electrical', 'Provincial Permits'], annualComplianceCost: 13000, environmentalPermitCostPerYear: 7000 }, // screening est. 2026
         environment: { baselineAQI: 15, gridCarbonIntensity: 0.13 }, // Québec hydro ~0.03 // screening est. 2026
         risk: { downtimeCostPerMin: 4500 }, // screening est. 2026
-        supplyChain: { importDifficultyFactor: 1.0 },
+        supplyChain: {
+            importDifficultyFactor: 1.0,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Montréal hydro corridor', 'Alberta DC zone'],
             taxHolidayYears: 0,
@@ -2801,7 +2982,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['CEI Standards', 'VVF Fire Cert', 'ARERA Grid Access'], annualComplianceCost: 14000, environmentalPermitCostPerYear: 5500 }, // screening est. 2026
         environment: { baselineAQI: 35, gridCarbonIntensity: 0.25 }, // Po valley air // screening est. 2026
         risk: { downtimeCostPerMin: 3500 }, // screening est. 2026
-        supplyChain: { importDifficultyFactor: 1.05 },
+        supplyChain: {
+            importDifficultyFactor: 1.05,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Trieste Free Port', 'ZES Unica (South)'],
             taxHolidayYears: 0,
@@ -2873,7 +3059,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['NEK Standards', 'DSB', 'NVE Grid License'], annualComplianceCost: 12000, environmentalPermitCostPerYear: 6500 }, // screening est. 2026
         environment: { baselineAQI: 8, gridCarbonIntensity: 0.03 }, // hydro // screening est. 2026
         risk: { downtimeCostPerMin: 4000 }, // screening est. 2026
-        supplyChain: { importDifficultyFactor: 1.0 },
+        supplyChain: {
+            importDifficultyFactor: 1.0,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Norwegian DC power regions (Rjukan, Stavanger)'],
             taxHolidayYears: 0,
@@ -2945,7 +3136,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['DS Standards', 'Sikkerhedsstyrelsen', 'Energinet Grid Code'], annualComplianceCost: 12000, environmentalPermitCostPerYear: 6000 }, // screening est. 2026
         environment: { baselineAQI: 10, gridCarbonIntensity: 0.12 }, // wind-heavy // screening est. 2026
         risk: { downtimeCostPerMin: 4000 }, // screening est. 2026
-        supplyChain: { importDifficultyFactor: 1.0 },
+        supplyChain: {
+            importDifficultyFactor: 1.0,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Copenhagen/Odense DC corridor'],
             taxHolidayYears: 0,
@@ -3017,7 +3213,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         compliance: { certifications: ['SEV/Electrosuisse', 'ESTI', 'Cantonal Fire Police'], annualComplianceCost: 16000, environmentalPermitCostPerYear: 7500 }, // screening est. 2026
         environment: { baselineAQI: 10, gridCarbonIntensity: 0.04 }, // hydro+nuclear // screening est. 2026
         risk: { downtimeCostPerMin: 5000 }, // finance-sector density // screening est. 2026
-        supplyChain: { importDifficultyFactor: 1.0 },
+        supplyChain: {
+            importDifficultyFactor: 1.0,
+            importDutyBand: 'low',
+            gpuExportTier: 1,
+            customsLeadBand: 'fast',
+        },
         taxIncentives: {
             freeTradeZones: ['Zug/Lucerne cantonal low-tax'],
             taxHolidayYears: 0,

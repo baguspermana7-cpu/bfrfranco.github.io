@@ -222,7 +222,7 @@ function CountryCoverageSection() {
 /* ── Data Library — browse the canonical engine DATA (single source) ── */
 export function DataLibraryDashboard() {
     const d = rzData();
-    const [tab, setTab] = React.useState<'countries' | 'coverage' | 'markets' | 'pue' | 'refrigerants' | 'coolingtech' | 'omcontracts' | 'sparespricing' | 'envcosts' | 'sources' | 'corpus'>('countries');
+    const [tab, setTab] = React.useState<'countries' | 'coverage' | 'markets' | 'pue' | 'refrigerants' | 'coolingtech' | 'supplychain' | 'omcontracts' | 'sparespricing' | 'envcosts' | 'sources' | 'corpus'>('countries');
     const [srcQuery, setSrcQuery] = React.useState('');
     // Carbon-price table sort (Environmental Costs)
     const [envSort, setEnvSort] = React.useState<'country' | 'price'>('price');
@@ -233,6 +233,13 @@ export function DataLibraryDashboard() {
     const refr = d.refrigerants || {};
     /* Ship-B — advanced/emerging cooling ladder (DATA.coolingTech), live from engine */
     const coolingTech = (d.coolingTech || {}) as Record<string, CoolingTechRow>;
+    /* Ship-C — per-country supply-chain / import screening (DATA.supplyChain) */
+    const supplyChainData = (d.supplyChain || {}) as {
+        importDutyBands?: Record<string, number>;
+        customsLeadWk?: Record<string, number>;
+    };
+    const importDutyBands = supplyChainData.importDutyBands || {};
+    const customsLeadWk = supplyChainData.customsLeadWk || {};
     /* v2.5.2 sourced screening bands — rendered LIVE from rzData(), no local copy */
     const omContracts = (d.omContracts || {}) as {
         tiers?: Record<string, { low?: number; mid?: number; high?: number; scope?: string }>;
@@ -264,6 +271,7 @@ export function DataLibraryDashboard() {
         ['pue', 'PUE Matrix', Object.keys(pue).length],
         ['refrigerants', 'Refrigerants', Object.keys(refr).length],
         ['coolingtech', 'Cooling Tech', Object.keys(coolingTech).length],
+        ['supplychain', 'Supply Chain', Object.keys(COUNTRIES).length],
         ['omcontracts', 'O&M Contracts', Object.keys(omContracts.tiers || {}).length],
         ['sparespricing', 'Spares Pricing', Object.keys(sparesPricing).length],
         ['envcosts', 'Env Costs', carbonRows.length],
@@ -372,6 +380,35 @@ export function DataLibraryDashboard() {
                                 </table>
                                 <p className="text-[9px] text-slate-400">COMMERCIAL = TRL 8-9 shipping; EMERGING = TRL 5-7 pilot/riset. Microfluidic in-chip belum punya harga per-rak publik &amp; BUKAN fakta arsitektur NVIDIA.</p>
                             </>)}
+                    </div>
+                )}
+                {tab === 'supplychain' && (
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Supply Chain &amp; Import — per-country landed cost / export tier / customs lead</h2>
+                            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">engine · proxy screen</span>
+                        </div>
+                        <table className="w-full text-xs min-w-[680px]">
+                            <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Country</th><th className="pr-3">Region</th><th className="pr-3">Import-Duty Band</th><th className="pr-3 text-right">Duty %</th><th className="pr-3 text-right">Export Tier</th><th className="pr-3 text-right">Customs Lead (wk)</th><th className="text-center">FTA?</th></tr></thead>
+                            <tbody>{Object.values(COUNTRIES).map((c) => {
+                                const band = c.supplyChain.importDutyBand;
+                                const dutyPct = ((importDutyBands[band] ?? 0) * 100);
+                                const leadWk = customsLeadWk[c.supplyChain.customsLeadBand];
+                                const isFta = band === 'fta';
+                                return (
+                                    <tr key={c.id} className="border-t border-slate-100 dark:border-white/5">
+                                        <td className="py-1.5 pr-3 font-medium text-slate-700 dark:text-slate-200">{c.name} <span className="text-[9px] text-slate-400 font-mono">{c.id}</span></td>
+                                        <td className="pr-3 text-slate-500">{c.region}</td>
+                                        <td className="pr-3 text-slate-600 dark:text-slate-300 capitalize">{band}</td>
+                                        <td className="pr-3 text-right tabular-nums"><span className={dutyPct > 0 ? 'text-amber-500 font-medium' : 'text-slate-400'}>{dutyPct.toLocaleString(undefined, { maximumFractionDigits: 1 })}%</span></td>
+                                        <td className="pr-3 text-right tabular-nums text-slate-500">{c.supplyChain.gpuExportTier}</td>
+                                        <td className="pr-3 text-right tabular-nums text-slate-500">{leadWk != null ? `+${leadWk}` : '—'}</td>
+                                        <td className="text-center">{isFta ? <span className="text-emerald-500">✓</span> : <span className="text-slate-400">—</span>}</td>
+                                    </tr>
+                                );
+                            })}</tbody>
+                        </table>
+                        <p className="text-[9px] text-slate-400">Duty on imported-equipment fraction only (screening); export tiers = US BIS proxy — AI Diffusion Rule RESCINDED, advisory not statutory. Per-country bands from <code>constants/countries.ts</code> · rates from <code>DATA.supplyChain</code>.</p>
                     </div>
                 )}
                 {tab === 'omcontracts' && (

@@ -252,7 +252,10 @@
                     "downtimeCostPerMin": 1500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.35
+                    "importDifficultyFactor": 1.35,
+                    "importDutyBand": "med",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "normal"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -376,7 +379,10 @@
                     "downtimeCostPerMin": 4500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1
+                    "importDifficultyFactor": 1,
+                    "importDutyBand": "fta",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -499,7 +505,10 @@
                     "downtimeCostPerMin": 1200
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.1
+                    "importDifficultyFactor": 1.1,
+                    "importDutyBand": "med",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "normal"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -623,7 +632,10 @@
                     "downtimeCostPerMin": 5000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1
+                    "importDifficultyFactor": 1,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -745,7 +757,10 @@
                     "downtimeCostPerMin": 4000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.05
+                    "importDifficultyFactor": 1.05,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -868,7 +883,10 @@
                     "downtimeCostPerMin": 4500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.2
+                    "importDifficultyFactor": 1.2,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -991,7 +1009,10 @@
                     "downtimeCostPerMin": 3500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1
+                    "importDifficultyFactor": 1,
+                    "importDutyBand": "fta",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -1117,7 +1138,10 @@
                     "downtimeCostPerMin": 3000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.05
+                    "importDifficultyFactor": 1.05,
+                    "importDutyBand": "med",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "normal"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -1241,7 +1265,10 @@
                     "downtimeCostPerMin": 3500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.05
+                    "importDifficultyFactor": 1.05,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "normal"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -1365,7 +1392,10 @@
                     "downtimeCostPerMin": 1500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.3
+                    "importDifficultyFactor": 1.3,
+                    "importDutyBand": "med",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "slow"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -1490,7 +1520,10 @@
                     "downtimeCostPerMin": 800
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.6
+                    "importDifficultyFactor": 1.6,
+                    "importDutyBand": "high",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "slow"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -1614,7 +1647,10 @@
                     "downtimeCostPerMin": 700
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.5
+                    "importDifficultyFactor": 1.5,
+                    "importDutyBand": "high",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "slow"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -1738,7 +1774,10 @@
                     "downtimeCostPerMin": 1800
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.4
+                    "importDifficultyFactor": 1.4,
+                    "importDutyBand": "high",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "slow"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -1861,7 +1900,10 @@
                     "downtimeCostPerMin": 1500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.3
+                    "importDifficultyFactor": 1.3,
+                    "importDutyBand": "fta",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "normal"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -1984,7 +2026,10 @@
                     "downtimeCostPerMin": 1200
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.15
+                    "importDifficultyFactor": 1.15,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "normal"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -2107,7 +2152,10 @@
                     "downtimeCostPerMin": 1000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.35
+                    "importDifficultyFactor": 1.35,
+                    "importDutyBand": "med",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "normal"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -2231,7 +2279,10 @@
                     "downtimeCostPerMin": 1200
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.2
+                    "importDifficultyFactor": 1.2,
+                    "importDutyBand": "high",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "slow"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -2356,7 +2407,10 @@
                     "downtimeCostPerMin": 2500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.1
+                    "importDifficultyFactor": 1.1,
+                    "importDutyBand": "high",
+                    "gpuExportTier": 3,
+                    "customsLeadBand": "slow"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -2480,7 +2534,10 @@
                     "downtimeCostPerMin": 3500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1
+                    "importDifficultyFactor": 1,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "normal"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -2604,7 +2661,10 @@
                     "downtimeCostPerMin": 1000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.15
+                    "importDifficultyFactor": 1.15,
+                    "importDutyBand": "med",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "normal"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -2728,7 +2788,10 @@
                     "downtimeCostPerMin": 800
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.3
+                    "importDifficultyFactor": 1.3,
+                    "importDutyBand": "med",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "normal"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -2852,7 +2915,10 @@
                     "downtimeCostPerMin": 900
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.35
+                    "importDifficultyFactor": 1.35,
+                    "importDutyBand": "high",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "slow"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -2976,7 +3042,10 @@
                     "downtimeCostPerMin": 3000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.05
+                    "importDifficultyFactor": 1.05,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -3099,7 +3168,10 @@
                     "downtimeCostPerMin": 4000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.25
+                    "importDifficultyFactor": 1.25,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [],
@@ -3219,7 +3291,10 @@
                     "downtimeCostPerMin": 4500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1
+                    "importDifficultyFactor": 1,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -3342,7 +3417,10 @@
                     "downtimeCostPerMin": 5000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1
+                    "importDifficultyFactor": 1,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [],
@@ -3462,7 +3540,10 @@
                     "downtimeCostPerMin": 4500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1
+                    "importDifficultyFactor": 1,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -3584,7 +3665,10 @@
                     "downtimeCostPerMin": 4500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.05
+                    "importDifficultyFactor": 1.05,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -3708,7 +3792,10 @@
                     "downtimeCostPerMin": 4000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1
+                    "importDifficultyFactor": 1,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [],
@@ -3828,7 +3915,10 @@
                     "downtimeCostPerMin": 4000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1
+                    "importDifficultyFactor": 1,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -3950,7 +4040,10 @@
                     "downtimeCostPerMin": 2000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.05
+                    "importDifficultyFactor": 1.05,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "normal"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -4076,7 +4169,10 @@
                     "downtimeCostPerMin": 3500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.05
+                    "importDifficultyFactor": 1.05,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -4200,7 +4296,10 @@
                     "downtimeCostPerMin": 2000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.05
+                    "importDifficultyFactor": 1.05,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 2,
+                    "customsLeadBand": "normal"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -4325,7 +4424,10 @@
                     "downtimeCostPerMin": 4000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1
+                    "importDifficultyFactor": 1,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -4448,7 +4550,10 @@
                     "downtimeCostPerMin": 3500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.05
+                    "importDifficultyFactor": 1.05,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -4573,7 +4678,10 @@
                     "downtimeCostPerMin": 4500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1
+                    "importDifficultyFactor": 1,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -4697,7 +4805,10 @@
                     "downtimeCostPerMin": 3500
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1.05
+                    "importDifficultyFactor": 1.05,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -4821,7 +4932,10 @@
                     "downtimeCostPerMin": 4000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1
+                    "importDifficultyFactor": 1,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -4944,7 +5058,10 @@
                     "downtimeCostPerMin": 4000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1
+                    "importDifficultyFactor": 1,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -5067,7 +5184,10 @@
                     "downtimeCostPerMin": 5000
                 },
                 "supplyChain": {
-                    "importDifficultyFactor": 1
+                    "importDifficultyFactor": 1,
+                    "importDutyBand": "low",
+                    "gpuExportTier": 1,
+                    "customsLeadBand": "fast"
                 },
                 "taxIncentives": {
                     "freeTradeZones": [
@@ -5617,6 +5737,31 @@
                 { calc: 'Fire water / clean-agent demand', engineRef: 'models.fire + DATA.boq.takeoff.fire', standard: 'NFPA 2001/750' },
                 { calc: 'Water consumption / WUE', engineRef: 'DATA.waterFootprint', standard: 'ASHRAE / Uptime WUE' }
             ]
+        },
+
+        /* ══ v2.5.5 (Ship-C) — DATA.supplyChain: per-country landed-cost + export-control
+         * + customs lead-time SHARED logic. Duty applies to the IMPORTED-EQUIPMENT
+         * fraction of each cost category ONLY (labor/civil discount is already in the
+         * country constructionIndex — split-rule; imported equipment stays ~1.0 USD +
+         * duty). Export-control tiers are a Fed-Register PROXY — the AI Diffusion Rule
+         * was RESCINDED, so this is advisory, NOT statutory/legal advice. Per-country
+         * band assignment lives in CountryProfile.supplyChain (countries.ts). ══ */
+        supplyChain: {
+            /* import-exposed (equipment) fraction per CapexResult cost category — duty
+             * only bites this portion (BOM split, screening). Labor-heavy ≈ 0. */
+            equipmentShareByCategory: { electrical: 0.40, ups: 0.70, generator: 0.75, cooling: 0.55, network: 0.80, bms: 0.60, security: 0.60, fireSuppression: 0.50, fireAlarm: 0.50, building: 0.05, seismic: 0.05, commissioning: 0.0, testing: 0.0, permits: 0.0 },
+            /* effective duty rate on imported equipment by band (band midpoints). */
+            importDutyBands: { fta: 0.0, low: 0.03, med: 0.075, high: 0.17, punitive: 0.30 },
+            /* GPU export-control tiers — PROXY (AI Diffusion Rule RESCINDED). */
+            exportTiers: {
+                1: { label: 'Tier 1 (allied)',        note: 'no frontier-GPU restriction (US + close allies) — Fed-Register proxy, AI Diffusion Rule RESCINDED, not statutory' },
+                2: { label: 'Tier 2 (intermediate)',  note: 'no hard cap in force (AI Diffusion Rule RESCINDED); case-by-case licensing possible — proxy, not statutory' },
+                3: { label: 'Tier 3 (restricted)',    note: 'frontier GPU export-restricted (China graded / arms-embargo) — PROXY assessment; AI Diffusion Rule RESCINDED so the specific tier caps are not in force, but China/embargo controls persist under separate rules. Policy fluid, NOT legal advice' }
+            },
+            /* archProfiles that are frontier GPUs (trigger the export-control advisory). */
+            frontierArchKeys: ['gb200_nvl72', 'gb300_nvl72', 'rubin_vr200'],
+            /* customs clearance + inland logistics adder (weeks) on imported long-lead. */
+            customsLeadWk: { fast: 2, normal: 6, slow: 12 }
         },
 
         /* ══ v2.3.0 — DATA.deepSeaCooling: chiller-less deep-sea water cooling physics.
@@ -7188,6 +7333,7 @@
             'boq.gfaM2PerMw':    { source: 'Turner & Townsend DC Cost Index 2025-26 (~10-11.4k sqft/MW gross) + Silverback WPSF series — screening; 900 m²/MW mid-band', asOf: '2025', unit: 'm² GFA per MW IT', method: 'SCREENING rule-of-thumb' },
             'boq.takeoff':       { source: 'SCREENING quantity-takeoff ratios: rebar ~130 kg/m³ (One Click LCA), structural steel ~40 kg/m² (CalcTree), raised floor ~4.6 m²/rack (dgtlinfra), clean-agent Novec 1230 ~0.55 kg/m³ per NFPA 2001/3M TDS (HIGH), CW coolant ~8 L/kW (B&V Water). Per-kW cable/tray/conduit/pipe-per-MW ratios = rule-of-thumb LOW confidence (Spon’s/RSMeans price installed length not per-kW) — folded into AACE −30/+50 band; each line carries its own confidence tag. Reconciled to CAPEX category totals so absolute ratio error does not move the total.', asOf: '2026', unit: 'material/labor qty per driver', method: 'AACE Class-4 screening; reconciled to parametric CAPEX' },
             'boq.unitRates':     { source: 'US-2025 material+install $/unit: concrete ~$320/m³ + rebar ~$2100/t (Gordian/HomeGuide), structural steel ~$3300/t (SteelFlo 2026), raised floor ~$270/m² (datacenterfloortiles), LV/MV cable + tray + CW pipe (1xTechnologies/DistributorWire/RSMeans/MEP Academy — LOW), bare BLS trade wages (electrician/pipefitter/ironworker/laborer). Regionalized via locMult; +5.5%/yr escalation (T&T). Aggregate line rates (ict/bms/security/cx/permits) are anchors scaled by reconcileFactor to the category $.', asOf: '2025', unit: 'USD per material/labor unit', method: 'SCREENING; add ~35-60% labor burden for a bid' },
+            'supplyChain': { source: 'PROXY/SCREENING per-country landed-cost + export-control. Import-duty bands (equipment): FTA 0 / low ~3% / med ~7.5% / high ~17% (IN ~15, BR ~16) / punitive ~30% (China↔US), applied to the imported-EQUIPMENT fraction per category (BOM split: ups ~70/gen ~75/network ~80/cooling ~55/electrical ~40%, labor-heavy ~0) — WTO/national tariff schedules, screening. Export-control tiers = US BIS Fed-Register PROXY; AI Diffusion Rule RESCINDED 2025 so caps are NOT in force — advisory only, NOT statutory/legal advice. Customs lead +2-12 wk by jurisdiction. Per-country band assignment in CountryProfile.supplyChain.', asOf: '2026', unit: 'duty rate + export tier + customs weeks', method: 'PROXY/SCREENING — duty on equipment fraction only; export-control advisory, policy fluid' },
             'dossier': { source: 'STANDARD-PRACTICE EPC Technical Dossier scaffold — permitting matrix (typical AHJ permits + indicative durations), design basis (IEC/NEC/ASHRAE TC9.9/ASCE 7/NFPA/Uptime references), risk register (typical mission-critical DC risks), document register, ops-readiness gates. Reference convention (Uptime/TIA-942/BICSI/NFPA), NOT a project-specific submission; durations/risks indicative. models.dossier.sections composes these with live engine outputs.', asOf: '2026', unit: 'permit/risk/document/readiness scaffold + calc→model references', method: 'STANDARD-PRACTICE reference — validate against the AHJ + full design' },
             'boq.equipmentSizing': { source: 'SCREENING nominal unit ratings for equipment-count sizing (UPS 500kW module, genset 2.5MW, transformer 2.5MVA, CRAH 150kW, CDU 700kW, chiller 1.4MW) + redundancy addend by topology. Lead times reflect the 2026 long-lead reality — MV transformer/switchgear ~120 wk dominant (industry supply-chain reporting); UPS ~26, genset ~40, chiller ~32 wk.', asOf: '2026', unit: 'kW/MVA per unit + weeks lead time', method: 'SCREENING — real selection depends on the design' },
             'boq.procurement':      { source: 'Standard mission-critical DC EPC procurement packaging (12 packages P01-P12) with tender method, lead time, FAT/SAT, warranty — industry norm (Uptime/BICSI procurement practice). Package value = Σ mapped CapexResult category $.', asOf: '2026', unit: 'package scope + lead-time + FAT/SAT + warranty', method: 'SCREENING packaging convention' },
@@ -11412,10 +11558,49 @@
                         { key: 'equipment',   title: 'Equipment Schedule',           data: 'models.boq.equipmentSchedule' },
                         { key: 'boq',         title: 'Bill of Quantities',           data: 'models.boq.generate' },
                         { key: 'procurement', title: 'Procurement Packages',         data: 'models.boq.procurementPackages' },
+                        { key: 'supplyChain', title: 'Supply Chain & Import',         data: 'models.supplyChain + DATA.supplyChain' },
                         { key: 'risk',        title: 'Risk Register',                data: 'DATA.dossier.riskRegister' },
                         { key: 'opsReady',    title: 'Operations Readiness',         data: 'DATA.dossier.opsReadiness' },
                         { key: 'docRegister', title: 'Document Register',            data: 'DATA.dossier.documentRegister' }
                     ];
+                }
+            },
+
+            /* ── Ship-C: per-country supply-chain (landed cost / export-control / lead-time) ──
+             * All fns tolerate a null country (return the no-op identity). country =
+             * a CountryProfile with .supplyChain.{importDutyBand, gpuExportTier,
+             * customsLeadBand}. Duty on equipment fraction only; export-control PROXY. */
+            supplyChain: {
+                dutyRate: function (country) {
+                    var band = country && country.supplyChain && country.supplyChain.importDutyBand;
+                    var r = DATA.supplyChain.importDutyBands[band];
+                    return r != null ? r : 0.0;
+                },
+                /* landed-cost multiplier for a cost category: 1 + duty × equipment-share.
+                 * Floored at 1.0 (an uplift on imports, never a discount). */
+                landedFactor: function (country, category) {
+                    var share = DATA.supplyChain.equipmentShareByCategory[category];
+                    if (share == null || !(share > 0)) return 1.0;
+                    var duty = RZEngine.models.supplyChain.dutyRate(country);
+                    var f = 1 + duty * share;
+                    return f > 1.0 ? f : 1.0;
+                },
+                exportTier: function (country) {
+                    var t = country && country.supplyChain && country.supplyChain.gpuExportTier;
+                    return t || 1;
+                },
+                /* export-control advisory: frontier GPU + Tier-3 → restricted. PROXY. */
+                exportControl: function (country, archKey) {
+                    var tier = RZEngine.models.supplyChain.exportTier(country);
+                    var info = DATA.supplyChain.exportTiers[tier] || DATA.supplyChain.exportTiers[1];
+                    var frontier = DATA.supplyChain.frontierArchKeys.indexOf((archKey || '').toLowerCase()) >= 0;
+                    return { tier: tier, label: info.label, note: info.note, frontier: frontier, restricted: frontier && tier === 3 };
+                },
+                /* customs + inland logistics weeks added to imported long-lead equipment. */
+                leadTimeCustomsWk: function (country) {
+                    var band = (country && country.supplyChain && country.supplyChain.customsLeadBand) || 'normal';
+                    var w = DATA.supplyChain.customsLeadWk[band];
+                    return w != null ? w : DATA.supplyChain.customsLeadWk.normal;
                 }
             }
         },

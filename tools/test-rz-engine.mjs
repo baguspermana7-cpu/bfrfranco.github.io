@@ -1373,7 +1373,23 @@ if (M.opex && M.opex.totalAnnual) {
     ok('executiveSummary timelineMonths falls back to result.timeline.totalMonths (native path)', M.dossier.executiveSummary({ itLoad: 20000 }, { total: 340e6, timeline: { totalMonths: 33 } }).timelineMonths === 33);
     ok('dossier engineRefs resolve (floorLoadingKnM2 in architecture not requirements)', D.architecture.floorLoadingKnM2 != null && (D.requirements.floorLoadingKnM2 == null));
     const secs = M.dossier.sections();
-    ok('dossier.sections manifest (10, ordered, boq+permitting+risk)', secs.length === 10 && secs.every(s => s.key && s.title && s.data) && secs.some(s => s.key === 'boq') && secs.some(s => s.key === 'permitting') && secs.some(s => s.key === 'risk'));
+    ok('dossier.sections manifest (11, ordered, boq+permitting+risk+supplyChain)', secs.length === 11 && secs.every(s => s.key && s.title && s.data) && secs.some(s => s.key === 'boq') && secs.some(s => s.key === 'permitting') && secs.some(s => s.key === 'risk') && secs.some(s => s.key === 'supplyChain'));
+    /* ── Ship-C: per-country supply-chain (landed cost / export-control / lead-time) ── */
+    const sc = D.supplyChain;
+    ok('DATA.supplyChain present + sourced', !!sc && !!D.sources['supplyChain']);
+    ok('equipmentShareByCategory covers 14 categories, labor≈0', sc.equipmentShareByCategory.ups === 0.70 && sc.equipmentShareByCategory.permits === 0 && sc.equipmentShareByCategory.building < 0.1);
+    ok('importDutyBands fta=0 < low < med < high < punitive', sc.importDutyBands.fta === 0 && sc.importDutyBands.low < sc.importDutyBands.med && sc.importDutyBands.med < sc.importDutyBands.high && sc.importDutyBands.high < sc.importDutyBands.punitive);
+    const cHigh = { supplyChain: { importDutyBand: 'high', gpuExportTier: 3, customsLeadBand: 'slow' } };
+    const cFta = { supplyChain: { importDutyBand: 'fta', gpuExportTier: 2, customsLeadBand: 'fast' } };
+    ok('landedFactor: duty country uplifts equipment category', Math.abs(M.supplyChain.landedFactor(cHigh, 'ups') - (1 + 0.17 * 0.70)) < 1e-9);
+    ok('landedFactor: FTA country = 1.0 (no uplift)', M.supplyChain.landedFactor(cFta, 'ups') === 1.0);
+    ok('landedFactor: labor category = 1.0 even with duty', M.supplyChain.landedFactor(cHigh, 'permits') === 1.0 && M.supplyChain.landedFactor(cHigh, 'commissioning') === 1.0);
+    ok('landedFactor: null country = 1.0 no-op', M.supplyChain.landedFactor(null, 'ups') === 1.0);
+    ok('landedFactor never discounts (floor 1.0)', M.supplyChain.landedFactor(cHigh, 'electrical') >= 1.0 && M.supplyChain.landedFactor(cFta, 'electrical') >= 1.0);
+    const ecFrontier = M.supplyChain.exportControl(cHigh, 'gb200_nvl72');
+    ok('exportControl: frontier GPU + Tier-3 restricted + note RESCINDED', ecFrontier.restricted === true && /RESCINDED/i.test(ecFrontier.note));
+    ok('exportControl: non-frontier or Tier<3 not restricted', M.supplyChain.exportControl(cHigh, 'h100_pod').restricted === false && M.supplyChain.exportControl(cFta, 'gb200_nvl72').restricted === false);
+    ok('leadTimeCustomsWk: slow > fast, null→normal', M.supplyChain.leadTimeCustomsWk(cHigh) === 12 && M.supplyChain.leadTimeCustomsWk(cFta) === 2 && M.supplyChain.leadTimeCustomsWk(null) === 6);
 }
 
 /* ── Arc-1 calibrationSpec structural ── */

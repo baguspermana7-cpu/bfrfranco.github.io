@@ -126,6 +126,41 @@ export interface BoqProjectMeta {
     version: string;
 }
 
+/* ── Ship-C supply-chain types (mirror rzModels().supplyChain + DATA.supplyChain) ── */
+
+/** Export-control advisory — rzModels().supplyChain.exportControl(country, archKey).
+ *  PROXY/screening only (US BIS Fed-Register proxy; AI Diffusion Rule rescinded). */
+export interface BoqExportControl {
+    tier: number;
+    label: string;
+    note: string;
+    frontier: boolean;
+    restricted: boolean;
+}
+
+/** Per-category landed-cost uplift row (duty applies to the imported-equipment
+ *  fraction of the category only — labor/civil already in the construction index). */
+export interface BoqLandedCategory {
+    category: string;
+    share: number;
+    landedFactor: number;
+}
+
+/** Supply-chain & import screening block — computed from input.country + input.archKey.
+ *  Null when no country is selected (the section renders a "no country" note). */
+export interface BoqSupplyChain {
+    country: string;
+    dutyBand: string;
+    dutyRatePct: number;
+    exportTier: number;
+    exportLabel: string;
+    exportNote: string;
+    exportControl: BoqExportControl;
+    archKey: string | null;
+    customsLeadWk: number;
+    perCategoryLanded: BoqLandedCategory[];
+}
+
 /* ── dossier types (mirror rzData().dossier + rzModels().dossier) ── */
 
 /** Executive summary — rzModels().dossier.executiveSummary(input, result). */
@@ -208,6 +243,10 @@ export interface BoqModel {
     /** Static EPC dossier scaffold (permitting / design basis / risk / …).
      *  Null when the engine does not expose DATA.dossier. */
     dossier: DossierData | null;
+    /** Ship-C per-country supply-chain & import screening (landed cost /
+     *  export-control / customs lead). Null when no country is selected or the
+     *  engine does not expose models.supplyChain. */
+    supplyChain: BoqSupplyChain | null;
 }
 
 export interface BuildBoqOpts {
@@ -216,6 +255,24 @@ export interface BuildBoqOpts {
 }
 
 /* ── build ─────────────────────────────────────────────────────────────── */
+
+/** Structural view of a CountryProfile as consumed by the engine supply-chain
+ *  models (they read `.name` + `.supplyChain.{importDutyBand,…}`). */
+interface CountryProfileLike {
+    name?: string;
+    supplyChain?: { importDutyBand?: string };
+}
+
+/** Equipment categories surfaced in the per-category landed-cost table (the
+ *  import-exposed disciplines — labor-heavy categories are omitted). Order is
+ *  the reporting order. */
+const SUPPLY_CHAIN_CATEGORIES: readonly string[] = [
+    'electrical',
+    'ups',
+    'generator',
+    'cooling',
+    'network',
+] as const;
 
 /** Location multiplier for the bottom-up take-off: country constructionIndex
  *  (the same primary driver CapexEngine uses) or 1.0 when unavailable. */
@@ -258,6 +315,13 @@ export function buildBoqModel(
         dossier?: {
             executiveSummary?: (input: CapexInput, result: CapexResult) => DossierExecSummary;
         };
+        supplyChain?: {
+            dutyRate?: (country: CountryProfileLike | null) => number;
+            landedFactor?: (country: CountryProfileLike | null, category: string) => number;
+            exportTier?: (country: CountryProfileLike | null) => number;
+            exportControl?: (country: CountryProfileLike | null, archKey?: string) => BoqExportControl;
+            leadTimeCustomsWk?: (country: CountryProfileLike | null) => number;
+        };
     };
     const boq = models.boq;
     if (!boq?.generate || !boq?.summary) return null;
@@ -291,8 +355,16 @@ export function buildBoqModel(
         ? models.dossier.executiveSummary(input, result)
         : null;
 
-    const data = rzData() as { version?: string; dossier?: DossierData };
+    const data = rzData() as {
+        version?: string;
+        dossier?: DossierData;
+        supplyChain?: { equipmentShareByCategory?: Record<string, number> };
+    };
     const dossier: DossierData | null = data.dossier ?? null;
+
+    // Ship-C supply-chain surface — null when no country is selected (the
+    // section then renders a "no country" note) or the engine omits the models.
+    const supplyChain: BoqSupplyChain | null = buildSupplyChain(input, models.supplyChain, data.supplyChain);
 
     const projectMeta: BoqProjectMeta = {
         projectName: '',       // filled by the caller (requirements store)
@@ -302,7 +374,53 @@ export function buildBoqModel(
         version: data.version ?? '—',
     };
 
-    return { generated, summary, projectMeta, equipment, procurement, executiveSummary, dossier };
+    return { generated, summary, projectMeta, equipment, procurement, executiveSummary, dossier, supplyChain };
+}
+
+/** Engine supply-chain model surface (subset consumed here). */
+interface SupplyChainModels {
+    dutyRate?: (country: CountryProfileLike | null) => number;
+    landedFactor?: (country: CountryProfileLike | null, category: string) => number;
+    exportTier?: (country: CountryProfileLike | null) => number;
+    exportControl?: (country: CountryProfileLike | null, archKey?: string) => BoqExportControl;
+    leadTimeCustomsWk?: (country: CountryProfileLike | null) => number;
+}
+
+/** Compute the supply-chain screening block from the CAPEX input + the shared
+ *  engine models. Returns null when no country is selected or the engine does
+ *  not expose models.supplyChain (both degrade to a "no country" note). */
+function buildSupplyChain(
+    input: CapexInput,
+    models: SupplyChainModels | undefined,
+    scData: { equipmentShareByCategory?: Record<string, number> } | undefined,
+): BoqSupplyChain | null {
+    const country = input.country;
+    if (!country || !models?.exportControl || !models?.landedFactor) return null;
+
+    const c = country as CountryProfileLike;
+    const archKey: string | null = input.archKey ?? null;
+    const shares = scData?.equipmentShareByCategory ?? {};
+
+    const dutyRatePct = (models.dutyRate ? models.dutyRate(c) : 0) * 100;
+    const exportControl = models.exportControl(c, input.archKey);
+    const perCategoryLanded: BoqLandedCategory[] = SUPPLY_CHAIN_CATEGORIES.map((category) => ({
+        category,
+        share: shares[category] ?? 0,
+        landedFactor: models.landedFactor!(c, category),
+    }));
+
+    return {
+        country: country.name ?? '—',
+        dutyBand: country.supplyChain?.importDutyBand ?? 'n/a',
+        dutyRatePct,
+        exportTier: exportControl.tier,
+        exportLabel: exportControl.label,
+        exportNote: exportControl.note,
+        exportControl,
+        archKey,
+        customsLeadWk: models.leadTimeCustomsWk ? models.leadTimeCustomsWk(c) : 0,
+        perCategoryLanded,
+    };
 }
 
 /** Return a copy of the model with projectName / tierLevel filled from the
@@ -546,7 +664,7 @@ function disciplineSection(d: BoqDiscipline): string {
  *  (schedule-driving) and highlighted in amber. */
 const LONG_LEAD_WK = 52;
 
-function equipmentScheduleSection(items: BoqEquipmentItem[]): string {
+function equipmentScheduleSection(items: BoqEquipmentItem[], customsLeadWk?: number): string {
     if (!items.length) return '';
     const rows = items.map((e, i) => {
         const longLead = Number.isFinite(e.leadTimeWk) && e.leadTimeWk >= LONG_LEAD_WK;
@@ -584,7 +702,9 @@ function equipmentScheduleSection(items: BoqEquipmentItem[]): string {
         </table>
         <p style="font-size:9.5px;line-height:1.6;color:${T.muted};margin:6px 0 0;">
             <span style="color:${T.amber};">Amber rows</span> are long-lead (≥ ${LONG_LEAD_WK} wk) — they drive the delivery programme, order early.
-            Indicative equipment counts — screening, N+redundancy sizing; real selection per detailed design.
+            Indicative equipment counts — screening, N+redundancy sizing; real selection per detailed design.${Number.isFinite(customsLeadWk) && (customsLeadWk ?? 0) > 0
+            ? ` Add <b style="color:${T.text};">+${qtyFmt(customsLeadWk!)} wk</b> customs / inland-logistics lead on imported items (see Supply Chain &amp; Import).`
+            : ''}
         </p>
     </section>`;
 }
@@ -630,6 +750,70 @@ function procurementPackagesSection(pkgs: BoqPackage[]): string {
     </section>`;
 }
 
+/* ── supply-chain & import section (Ship-C) ────────────────────────────── */
+
+function supplyChainSection(no: number, sc: BoqSupplyChain | null): string {
+    if (!sc) {
+        return `<section class="block">
+            ${secHead(no, SECTION_TITLES[no - 1], 'screening / proxy — not statutory')}
+            <p style="font-size:10.5px;line-height:1.65;color:${T.muted};margin:0;">
+                No country selected — pick a country in Requirements to compute the per-country
+                landed-cost uplift, import-duty band and export-control screening.
+            </p>
+        </section>`;
+    }
+    const dutyPct = Number.isFinite(sc.dutyRatePct)
+        ? sc.dutyRatePct.toLocaleString(undefined, { maximumFractionDigits: 1 })
+        : '—';
+    const kpi = (label: string, value: string) =>
+        `<div class="mini-stat"><div class="mini-k">${esc(label)}</div><div class="mini-v">${esc(value)}</div></div>`;
+    const rows = sc.perCategoryLanded.map((r, i) => {
+        const upliftPct = Number.isFinite(r.landedFactor) ? (r.landedFactor - 1) * 100 : 0;
+        return `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:5px 8px;font-size:10px;color:${T.text};text-transform:capitalize;">${esc(r.category)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.muted};">${(r.share * 100).toLocaleString(undefined, { maximumFractionDigits: 0 })}%</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};">×${r.landedFactor.toLocaleString(undefined, { maximumFractionDigits: 3 })}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${upliftPct > 0 ? T.amber : T.muted};font-weight:${upliftPct > 0 ? 700 : 400};">${upliftPct > 0 ? '+' : ''}${upliftPct.toLocaleString(undefined, { maximumFractionDigits: 1 })}%</td>
+        </tr>`;
+    }).join('');
+    const banner = sc.exportControl.restricted
+        ? `<div style="border:1.5px solid ${T.fault};background:rgba(248,113,113,0.12);border-radius:10px;padding:12px 14px;margin-bottom:12px;">
+            <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:${T.fault};">⚠ Export-control advisory</div>
+            <p style="font-size:10.5px;line-height:1.6;color:${T.text};margin:5px 0 0;">
+                Frontier GPU (<b style="font-family:'JetBrains Mono',monospace;">${esc(sc.archKey ?? '—')}</b>) to a Tier-3 jurisdiction —
+                PROXY assessment, AI Diffusion Rule rescinded, policy fluid, NOT legal advice.
+            </p>
+        </div>`
+        : '';
+    return `<section class="block">
+        ${secHead(no, SECTION_TITLES[no - 1], 'screening / proxy — not statutory')}
+        ${banner}
+        <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px;">
+            ${kpi('Country', sc.country)}
+            ${kpi('Export tier', `${sc.exportTier} · ${sc.exportLabel.replace(/^Tier \d+ /, '').replace(/[()]/g, '')}`)}
+            ${kpi('Import-duty band', `${sc.dutyBand} · ${dutyPct}%`)}
+            ${kpi('Customs lead', `+${qtyFmt(sc.customsLeadWk)} wk`)}
+        </div>
+        <table class="tbl">
+            <thead><tr>
+                <th style="text-align:left;">Category</th>
+                <th style="text-align:right;">Equipment Share</th>
+                <th style="text-align:right;">Landed Factor</th>
+                <th style="text-align:right;">Uplift</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+        </table>
+        <p style="font-size:9.5px;line-height:1.6;color:${T.muted};margin:6px 0 0;">
+            Duty applies to the <b style="color:${T.text};">imported-equipment fraction only</b> — local labor / civil is already
+            captured in the construction index, so the landed factor lifts just the equipment share of each category.
+        </p>
+        <p style="font-size:9px;line-height:1.55;color:${T.slate};margin:4px 0 0;">
+            ${esc(sc.exportNote)} Import-duty band + export tier are SCREENING / PROXY (US BIS Fed-Register proxy;
+            AI Diffusion Rule rescinded — advisory, not statutory / not legal advice).
+        </p>
+    </section>`;
+}
+
 /* ── dossier sections (Ship-3) ─────────────────────────────────────────── */
 
 /** Ordered section titles — single source for both the ToC and the numbered
@@ -642,6 +826,7 @@ const SECTION_TITLES: readonly string[] = [
     'Equipment Schedule',
     'Bill of Quantities',
     'Procurement Packages',
+    'Supply Chain & Import',
     'Risk Register',
     'Operations Readiness',
     'Document Register',
@@ -853,7 +1038,7 @@ function docRegisterSection(no: number, docs: string[]): string {
 export function renderBoqDossierHTML(model: BoqModel, projectMeta?: BoqProjectMeta): string {
     const merged: BoqModel = projectMeta ? { ...model, projectMeta } : model;
     const disciplinesHtml = merged.generated.disciplines.map(disciplineSection).join('');
-    const equipmentHtml = equipmentScheduleSection(merged.equipment ?? []);
+    const equipmentHtml = equipmentScheduleSection(merged.equipment ?? [], merged.supplyChain?.customsLeadWk);
     const procurementHtml = procurementPackagesSection(merged.procurement ?? []);
     const v = esc(merged.projectMeta.version);
 
@@ -863,9 +1048,10 @@ export function renderBoqDossierHTML(model: BoqModel, projectMeta?: BoqProjectMe
     const permittingHtml = d ? permittingSection(2, d.permittingMatrix) : '';
     const designBasisHtml = d ? designBasisSection(3, d.designBasis) : '';
     const engCalcsHtml = d ? engCalcsSection(4, d.engineeringCalcs) : '';
-    const riskHtml = d ? riskRegisterSection(8, d.riskRegister) : '';
-    const opsReadyHtml = d ? opsReadySection(9, d.opsReadiness) : '';
-    const docRegisterHtml = d ? docRegisterSection(10, d.documentRegister) : '';
+    const supplyChainHtml = supplyChainSection(8, merged.supplyChain);
+    const riskHtml = d ? riskRegisterSection(9, d.riskRegister) : '';
+    const opsReadyHtml = d ? opsReadySection(10, d.opsReadiness) : '';
+    const docRegisterHtml = d ? docRegisterSection(11, d.documentRegister) : '';
 
     return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -921,6 +1107,7 @@ export function renderBoqDossierHTML(model: BoqModel, projectMeta?: BoqProjectMe
     ${commercialSummarySection(merged)}
     ${disciplinesHtml}
     ${procurementHtml}
+    ${supplyChainHtml}
     ${riskHtml}
     ${opsReadyHtml}
     ${docRegisterHtml}

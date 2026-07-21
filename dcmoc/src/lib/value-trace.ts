@@ -161,6 +161,11 @@ export const TRACE: Record<string, TraceNode> = {
         deps: ['capex.total', 'sim.itLoad'],
         get: () => { const t = cap().results?.total; return t ? +(t / Math.max(1, cap().inputs.itLoad)).toFixed(0) : null; },
     },
+    'capex.landedFactor': {
+        label: 'Landed-Cost Factor (UPS, import duty × equipment share)', page: 'capex', unit: '×', provenance: 'engine', sourceKey: 'supplyChain',
+        formulaTemplate: 'models.supplyChain.landedFactor(country, "ups") = 1 + importDutyBand × equipmentShare — Ship-C per-category duty uplift',
+        get: () => { const c = sim().selectedCountry; return c ? ((rzModels() as any)?.supplyChain?.landedFactor?.(c, 'ups') ?? null) : null; },
+    },
     /* ── EB batch-3: opex / staffing / availability chains ── */
     'staff.fte': {
         label: 'Total FTE (auto headcount)', page: 'staff', provenance: 'derived',

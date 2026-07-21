@@ -11,6 +11,17 @@ release sections rather than semver.
 
 ---
 
+## v1.105.0 — 2026-07-21 (Supply-Chain per Country: landed cost + export-control + customs lead-time)
+
+### Added
+- **RZEngine `DATA.supplyChain` + `models.supplyChain`** — per-country landed-cost / export-control / customs lead-time (the pending original CAPEX ask "supply chain per selected country"). `equipmentShareByCategory` (import-exposed fraction per cost category: ups 0.70, generator 0.75, network 0.80, cooling 0.55, electrical 0.40; labor-heavy ≈ 0), `importDutyBands` (fta 0 / low 3% / med 7.5% / high 17% / punitive 30%), `exportTiers` (1/2/3 PROXY), `frontierArchKeys`, `customsLeadWk`. `models.supplyChain.landedFactor(country, category) = 1 + duty×equipmentShare` (floored 1.0 — **split-rule**: duty on imported-equipment fraction ONLY; local labor/civil already in constructionIndex, never double-discounted), `exportControl(country, archKey)`, `leadTimeCustomsWk`, `dutyRate`, `exportTier`. Standard: `standarization/SUPPLY_CHAIN_STANDARD.md`.
+- **CountryProfile.supplyChain extended** (all 40 countries) — `importDutyBand` / `gpuExportTier` / `customsLeadBand` per sourced tiers (SG/AE/CL fta, US/EU/JP/KR/TW/AU low+T1, ID/MY/TH/VN med+T2, IN/BR/NG/KE/PH high, CN high+T3). `build-countries-data.mjs` regen + **parity 155/0**.
+- **CapexEngine landed cost** — cost loop applies `landedFactor(country, key)` per category (SG/FTA flat, ID med → electrical +3%/ups +5.3%/gen +5.6%/cooling +4.1%, CN high larger). Value-trace node `capex.landedFactor`.
+- **BOQ dossier "Supply Chain & Import" section** (now 11 sections, slot 8) — export tier + duty band + per-category landed-uplift table + customs lead + split-rule note + **RED export-control banner** when a frontier GPU (GB200/GB300/Rubin) ships to a Tier-3 jurisdiction (PROXY, AI Diffusion Rule RESCINDED, NOT legal advice). Data Library "Supply Chain" tab (per-country duty/tier/lead table + proxy caption).
+
+### Verified
+- engine 708/0 · **parity 155/0 (after country regen)** · calibration 19/0 · bindings 85/0 (catalog 216fn/118src) · dc-corpus 2678/0 · trace-parity 117/117 · walk 24/0 · synergy 6/0 · export 44/0 · tsc 0 + next build · js-syntax/script-tags/dark CLEAN. Split-rule (duty on equipment fraction only, floored 1.0) + export-control PROXY (rescinded, not statutory) asserted. Deliberate CAPEX re-baseline for non-US duty countries. Engine ?v `-g`→`-h`. Ship-C COMPLETE.
+
 ## v1.104.1 — 2026-07-21 (dossier correctness fixes — adversarial review)
 
 ### Fixed

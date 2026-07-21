@@ -2,9 +2,9 @@
  "generator": "tools/build-engine-catalog.mjs",
  "note": "AUTO-GENERATED from rz-engine.js — do not hand-edit. Consumers are grep-derived from real usage.",
  "dataVersion": "2.5.1",
- "modelCount": 51,
- "functionCount": 211,
- "sourceCount": 117,
+ "modelCount": 52,
+ "functionCount": 216,
+ "sourceCount": 118,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -1617,6 +1617,46 @@
    ]
   },
   {
+   "name": "supplyChain",
+   "functions": [
+    {
+     "name": "dutyRate",
+     "params": [
+      "country"
+     ]
+    },
+    {
+     "name": "exportControl",
+     "params": [
+      "country",
+      "archKey"
+     ]
+    },
+    {
+     "name": "exportTier",
+     "params": [
+      "country"
+     ]
+    },
+    {
+     "name": "landedFactor",
+     "params": [
+      "country",
+      "category"
+     ]
+    },
+    {
+     "name": "leadTimeCustomsWk",
+     "params": [
+      "country"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/lib/value-trace.ts"
+   ]
+  },
+  {
    "name": "tax",
    "functions": [
     {
@@ -2512,6 +2552,12 @@
    "key": "staffingLoadFactor",
    "source": "Industry fully-loaded cost convention",
    "asOf": "2026"
+  },
+  {
+   "key": "supplyChain",
+   "source": "PROXY/SCREENING per-country landed-cost + export-control. Import-duty bands (equipment): FTA 0 / low ~3% / med ~7.5% / high ~17% (IN ~15, BR ~16) / punitive ~30% (China↔US), applied to the imported-EQUIPMENT fraction per category (BOM split: ups ~70/gen ~75/network ~80/cooling ~55/electrical ~40%, labor-heavy ~0) — WTO/national tariff schedules, screening. Export-control tiers = US BIS Fed-Register PROXY; AI Diffusion Rule RESCINDED 2025 so caps are NOT in force — advisory only, NOT statutory/legal advice. Customs lead +2-12 wk by jurisdiction. Per-country band assignment in CountryProfile.supplyChain.",
+   "asOf": "2026",
+   "method": "PROXY/SCREENING — duty on equipment fraction only; export-control advisory, policy fluid"
   },
   {
    "key": "tax",
