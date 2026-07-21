@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.109.0 — 2026-07-21 (SecondBrain overhaul — pro-grade Vector Index dashboard + graph toolbar fix)
+
+### Vector Index dashboard (`Apps/second brain/vector-index.html`)
+- **Smooth cluster density** replaces the ugly overlapping convex-hull polygons — `d3.contourDensity()` soft isobands per client-cluster, cached in world space so zoom/pan stay smooth.
+- **Constant-size category labels** (screen space, fade out on zoom-in) instead of labels that ballooned when zoomed.
+- **Live left-panel controls**: Namespace (collection filter), Time Range (mtime filter), and Cluster Algorithm (client re-cluster on the 2D projection — KMeans / DBSCAN / agglomerative) now actually drive the canvas. Similarity-threshold fade + smooth animated zoom buttons.
+- **3D enhanced + interactive**: raycaster hover-tooltip + click-to-select fills the right panel (was inert); round sprite points, additive glow, depth fog, auto-orbit (pauses on interaction), fit-to-bounds.
+- **Detail + scalable + robust tabs**: shared sortable / filterable / paginated table (Documents · Chunks · Embeddings) with row-click → locate the point in the visualization; richer Overview (cluster mini-table · recency · token stats) with distribution bars whose width equals the % shown; Analytics gains a similarity-to-centroid histogram (oversized SVG charts replaced with bounded bars); full Settings health (index · projection · per-collection · cluster-size tables + copy `rzmem viz`). Right panel adds a vector sparkline + nearest-neighbors. Tab reveal animation, `Esc` clears selection, tabular-nums, solid gate scrim (no glassmorphism).
+
+### SecondBrain graph page (`Apps/second brain/index.html`)
+- **Fixed the toolbar "aneh behaviour"** root cause: the empty-state `#emp` lived inside the vis-network container, which wipes its children on first render — so every later rebuild (Force / filter / search / focus / orphan) threw `Cannot read properties of null (reading 'style')`. Moved `#emp` out of the container + defensive guards → all controls work without crashing. Hierarchical layout now auto-fits (no more off-screen "explosion").
+- **Prominent "Vector Index" entry CTA**: filled cyan→violet gradient pill with glow + shine (replaces the tiny buried icon), clearly signalling a major feature.
+
+### Verified
+- Headless (puppeteer, root + non-root contexts): dashboard 8 tabs render · sort/filter/paginate + row-click cross-nav · Namespace/Time/Cluster/threshold/toggles drive the canvas · **0 console errors**. Graph page: CTA navigates · Force/Hierarchical/Fit/Orphan/filter all crash-free. Ship gates green; `vector-index.json` stays local/gitignored (0 PureDC in committed files).
+
 ## v1.108.0 — 2026-07-21 (Supply-Chain correctness fixes — adversarial review)
 
 ### Fixed

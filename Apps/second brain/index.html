@@ -107,6 +107,21 @@ nav::after{
 .nbk:hover{color:var(--neon)}
 .nbk svg{color:var(--neon-d)}
 
+/* Vector Index — prominent filled-glow CTA (portal to a big feature) */
+.nbk-cta{position:relative;overflow:hidden;margin:0 6px;padding:0 15px;height:30px;border-left:none;border-radius:8px;
+  color:#04121a;font-weight:700;letter-spacing:.09em;
+  background:linear-gradient(120deg,#22d3ee 0%,#38bdf8 42%,#a78bfa 100%);
+  box-shadow:0 0 0 1px rgba(34,211,238,.5),0 6px 20px -4px rgba(34,211,238,.55),0 2px 10px -2px rgba(167,139,250,.5);
+  transition:transform .18s cubic-bezier(.2,0,0,1),box-shadow .18s,filter .18s}
+.nbk-cta svg{color:#04121a!important}
+.nbk-cta:hover{color:#04121a;transform:translateY(-1px);filter:brightness(1.06);
+  box-shadow:0 0 0 1px rgba(34,211,238,.7),0 10px 26px -4px rgba(34,211,238,.7),0 3px 14px -2px rgba(167,139,250,.6)}
+.nbk-cta::after{content:'';position:absolute;top:0;left:-60%;width:45%;height:100%;
+  background:linear-gradient(105deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);
+  animation:ctaShine 4.5s ease-in-out infinite}
+@keyframes ctaShine{0%,72%{left:-60%}86%{left:120%}100%{left:120%}}
+@media(prefers-reduced-motion:reduce){.nbk-cta::after{animation:none;opacity:0}}
+
 /* ── TOOLBAR ── */
 .tbr{
   position:fixed;top:var(--nav-h);left:0;right:0;z-index:190;height:var(--tool-h);
@@ -150,8 +165,8 @@ nav::after{
 #gw{position:fixed;top:calc(var(--nav-h) + var(--tool-h));left:0;right:0;bottom:0;
   transition:right .3s cubic-bezier(.4,0,.2,1)}
 #gw.sbo{right:var(--sb-w)}
-#emp{display:none;position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+#emp{display:none;position:fixed;top:calc(var(--nav-h) + var(--tool-h) + (100vh - var(--nav-h) - var(--tool-h))/2);
+  left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;z-index:5}
 .ei{width:48px;height:48px;border-radius:50%;border:1px solid var(--rim);
   display:flex;align-items:center;justify-content:center;color:var(--t3);margin:0 auto 10px}
 #emp p{font-family:var(--mono);font-size:.68rem;color:var(--t3);letter-spacing:.08em}
@@ -443,10 +458,10 @@ html.light #stars{opacity:.06}
     <span style="font-size:12px;margin-left:4px;">Wiki</span>
   </a>
 
-  <a href="vector-index.html" class="nbk" id="bVec" title="Vector Index — AI embedding visualization (root only)" style="text-decoration:none;">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="6" r="1.7"/><circle cx="12" cy="4" r="1.7"/><circle cx="19" cy="7" r="1.7"/><circle cx="7" cy="13" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="10" cy="19" r="1.7"/><circle cx="19" cy="17" r="1.7"/></svg>
-    <span style="font-size:12px;margin-left:4px;">Vector Index</span>
-    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:4px;opacity:.7"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+  <a href="vector-index.html" class="nbk nbk-cta" id="bVec" title="Vector Index — AI embedding visualization (root only)" style="text-decoration:none;">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="6" r="1.9"/><circle cx="12" cy="4" r="1.9"/><circle cx="19" cy="7" r="1.9"/><circle cx="7" cy="13" r="1.9"/><circle cx="15" cy="12" r="1.9"/><circle cx="10" cy="19" r="1.9"/><circle cx="19" cy="17" r="1.9"/></svg>
+    <span style="font-size:12px;margin-left:5px;">Vector Index</span>
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-left:5px"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
   </a>
 
   <a href="../../index.html" class="nbk">
@@ -528,11 +543,12 @@ html.light #stars{opacity:.06}
 <div id="toast"></div>
 
 <!-- GRAPH -->
-<div id="gw">
-  <div id="emp">
-    <div class="ei"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
-    <p>no nodes match</p>
-  </div>
+<div id="gw"></div>
+<!-- empty-state lives OUTSIDE #gw: vis-network wipes its container's children on
+     first render, which used to destroy #emp and crash every later rebuild -->
+<div id="emp">
+  <div class="ei"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+  <p>no nodes match</p>
 </div>
 
 <!-- SIDEBAR -->
@@ -1002,10 +1018,10 @@ function build(){
   });
 
   const density=fil.length>1?(2*edges.length/(fil.length*(fil.length-1))).toFixed(3):'0';
-  document.getElementById('emp').style.display=fil.length?'none':'block';
-  document.getElementById('sN').textContent=fil.length;
-  document.getElementById('sE').textContent=edges.length;
-  document.getElementById('sG').textContent=density;
+  var _emp=document.getElementById('emp'); if(_emp) _emp.style.display=fil.length?'none':'block';
+  var _sN=document.getElementById('sN'); if(_sN) _sN.textContent=fil.length;
+  var _sE=document.getElementById('sE'); if(_sE) _sE.textContent=edges.length;
+  var _sG=document.getElementById('sG'); if(_sG) _sG.textContent=density;
 
   const ct=document.getElementById('gw');
   vN=new vis.DataSet(vNodes); vE=new vis.DataSet(vEdges);
@@ -1633,21 +1649,28 @@ document.getElementById('bH').addEventListener('click',()=>{
      'hubsize' uses node degree as the root-selection heuristic — high-degree
      hubs (Engineering Journal, MEMORY.md, RZEngine v1.2.0) become natural
      roots, other nodes fan out beneath them. */
-  if(net)net.setOptions({
-    layout:{
-      hierarchical:{
-        direction:'UD',
-        sortMethod:'hubsize',
-        levelSeparation:180,
-        nodeSpacing:200,
-        treeSpacing:250,
-        parentCentralization:true,
-        blockShifting:true,
-        edgeMinimization:true
-      }
-    },
-    physics:{enabled:false}
-  });
+  if(net){
+    net.setOptions({
+      layout:{
+        hierarchical:{
+          enabled:true,
+          direction:'UD',
+          sortMethod:'hubsize',
+          shakeTowards:'roots',
+          levelSeparation:130,
+          nodeSpacing:120,
+          treeSpacing:160,
+          parentCentralization:true,
+          blockShifting:true,
+          edgeMinimization:true
+        }
+      },
+      physics:{enabled:false}
+    });
+    /* hierarchical bakes positions synchronously but the canvas needs a tick to
+     * lay out — frame the whole tree so it never renders as an off-screen "explosion" */
+    setTimeout(function(){ if(net) net.fit({animation:{duration:600,easingFunction:'easeInOutQuad'}}); }, 120);
+  }
   document.querySelectorAll('.lb').forEach(b=>b.classList.remove('on'));
   document.getElementById('bH').classList.add('on');
 });
