@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.107.0 — 2026-07-21 (Vector Index dashboard revision + SecondBrain gate/lock/modal fixes)
+
+### Added
+- **Vector Index dashboard — 8 functional tabs** (`Apps/second brain/vector-index.html`): Overview (stat cards + category/collection distribution + top documents), Documents, Chunks, Embeddings (filterable + paginated tables), Vector Visualization (the canvas), Search (semantic/text), Analytics (SVG bar charts — category, cluster sizes, collection split, token histogram), Settings. All driven from the local `vector-index.json` (no backend).
+- **Prominent, labeled entry point** — the SecondBrain toolbar's tiny 7-dot icon is promoted to a labeled **"Vector Index"** nav pill (with a padlock cue) next to Wiki.
+- **Padlock on the "Second Brain" nav item** across 61 pages (Insights dropdown) — signals root-only.
+
+### Fixed
+- **Login modal on SecondBrain rendered with no visible fields** — the gate `z-index:100000` covered the auth modal (`99999`) and the page-blur rule blurred the modal into mush. Gate lowered to `z-index:9000` and the blur now excludes `#rzModalOverlay`, so the standard Email+Password Sign-In modal renders cleanly on top.
+- **Similarity Threshold slider had no visible effect** — it now fades every point less similar than the threshold to the selected point / query, with a live "N / total ≥ threshold" caption.
+- **Vector Visualization looked bare** — cluster hulls + category labels now default ON, larger points with halos, a faint reference grid, brighter selected/neighbor states.
+- **Dead controls wired** — topbar bell/cog/avatar; added a "← SecondBrain" back button.
+- three.js pinned to a single version (0.128) for the 2D/3D toggle.
+
+### Verified
+- Headless (puppeteer): root unlocks both pages; all 8 tabs render real content; slider + back + tabs + zoom work; **0 console errors**. Non-root context → `index.html` locks and the Sign-In modal shows **visible Email + Password fields** (z 99999, unblurred). Padlock present on 61 pages. Viz data (`vector-index.json`) stays local/gitignored — 0 PureDC in committed files.
+
 ## v1.106.0 — 2026-07-21 (Ship-D: DC Corpus / KB dive-deep — new-domain sources + rack-power metric)
 
 ### Added

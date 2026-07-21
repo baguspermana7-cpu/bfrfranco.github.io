@@ -120,6 +120,8 @@ body:not(.locked) .root-gate{display:none!important}
 .lp-slider-row{display:flex;align-items:center;gap:8px}
 .lp-slider{flex:1;accent-color:var(--cyan);height:3px;cursor:pointer}
 .lp-slider-val{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--cyan);min-width:32px;text-align:right}
+.lp-hint{font-size:10px;color:var(--text-muted);line-height:1.45;margin-top:6px}
+.lp-hint b{color:var(--cyan);font-family:'JetBrains Mono',monospace;font-weight:500}
 .proj-seg{display:flex;background:var(--panel2);border:1px solid var(--border);border-radius:6px;overflow:hidden}
 .proj-btn{flex:1;padding:5px 0;text-align:center;font-size:11px;color:var(--text-muted);cursor:pointer;border:none;background:none;font-family:inherit;transition:background 0.15s,color 0.15s}
 .proj-btn.active{background:var(--cyan);color:#0b0f14;font-weight:600}
@@ -221,6 +223,75 @@ table.results-table tr:hover td{background:rgba(255,255,255,0.02)}
 .empty-state-card h3{font-size:16px;margin-bottom:8px}
 .empty-state-card p{color:var(--text-muted);line-height:1.6;margin-bottom:16px}
 .empty-state-card code{background:var(--panel2);border:1px solid var(--border);border-radius:4px;padding:6px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);display:inline-block}
+
+/* BACK BUTTON */
+.topbar-back{display:flex;align-items:center;gap:6px;flex-shrink:0;color:var(--text-dim);text-decoration:none;font-size:12px;padding:5px 10px;border:1px solid var(--border);border-radius:7px;background:var(--panel2);transition:border-color .15s,color .15s,background .15s;white-space:nowrap}
+.topbar-back:hover{color:var(--cyan);border-color:var(--border-active);background:rgba(34,211,238,0.06)}
+.topbar-back i{font-size:11px}
+
+/* VIEWS */
+.views{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.view{display:none;flex:1;min-height:0;flex-direction:column;overflow:hidden}
+.view.active{display:flex}
+.view-scroll{flex:1;overflow-y:auto;padding:20px 24px}
+.vh{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.vh h2{font-size:17px;font-weight:600;color:var(--text)}
+.vsearch{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-family:inherit;font-size:12px;outline:none;min-width:240px;transition:border-color .15s}
+.vsearch:focus{border-color:var(--border-active);box-shadow:0 0 0 3px var(--cyan-glow)}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:16px}
+.stat-card .k{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px}
+.stat-card .v{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:500;color:var(--text)}
+.stat-card .v.cyan{color:var(--cyan)}
+.card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px}
+.card h3{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text)}
+.card h3 .fa,.card h3 i{color:var(--cyan);margin-right:6px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.two-col{grid-template-columns:1fr}}
+
+/* DISTRIBUTION BARS */
+.dist-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.dist-label{width:120px;flex-shrink:0;font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:6px}
+.dist-label .sw{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.dist-track{flex:1;height:14px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden}
+.dist-fill{height:100%;border-radius:4px;transition:width .4s}
+.dist-val{width:64px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted)}
+
+/* GENERIC TABLE */
+.vtable-wrap{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+table.vtable{width:100%;border-collapse:collapse;font-size:12px}
+table.vtable th{background:var(--panel2);color:var(--text-muted);font-weight:500;padding:8px 12px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--border);position:sticky;top:0;cursor:pointer;user-select:none}
+table.vtable th:hover{color:var(--text-dim)}
+table.vtable td{padding:7px 12px;color:var(--text-dim);border-bottom:1px solid rgba(255,255,255,0.04);max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+table.vtable tr:hover td{background:rgba(255,255,255,0.02)}
+table.vtable td.mono{font-family:'JetBrains Mono',monospace;color:var(--text-muted)}
+.cat-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:1px 7px;border-radius:10px;background:var(--panel);border:1px solid var(--border)}
+.cat-chip .sw{width:7px;height:7px;border-radius:50%}
+.vpager{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;font-size:12px;color:var(--text-muted)}
+.vpager button{background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--text-dim);padding:5px 12px;cursor:pointer;font-family:inherit;font-size:12px}
+.vpager button:hover:not(:disabled){border-color:var(--border-active);color:var(--cyan)}
+.vpager button:disabled{opacity:.4;cursor:default}
+
+/* SEARCH VIEW */
+.search-big{display:flex;align-items:center;gap:0;background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:4px 4px 4px 16px;margin-bottom:8px}
+.search-big i{color:var(--text-muted);font-size:14px}
+.search-big input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:inherit;font-size:14px;padding:12px}
+.search-big button{background:var(--cyan);color:#0b0f14;border:none;border-radius:9px;padding:10px 22px;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer}
+.search-big button:hover{opacity:.88}
+.search-note{font-size:11px;color:var(--text-muted);margin-bottom:18px}
+
+/* ANALYTICS BARS (svg) */
+.bars svg{width:100%;height:auto;display:block}
+.bar-cap{font-size:11px;color:var(--text-muted);margin-top:6px}
+
+/* SETTINGS */
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-dim)}
+.set-row:last-child{border-bottom:none}
+.set-row .sk{color:var(--text-muted)}
+.set-row .sv{font-family:'JetBrains Mono',monospace;color:var(--text)}
+.set-code{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);display:inline-block;margin-top:4px}
 </style>
 </head>
 <body class="locked">
@@ -305,6 +376,7 @@ table.results-table tr:hover td{background:rgba(255,255,255,0.02)}
           <input type="range" class="lp-slider" id="simSlider" min="0" max="100" value="70">
           <span class="lp-slider-val" id="simSliderVal">70%</span>
         </div>
+        <div class="lp-hint" id="simHint">Select a point (or search) — then this fades everything less similar than the threshold.</div>
       </div>
       <div class="lp-section">
         <div class="lp-title">Cluster Algorithm</div>
@@ -507,7 +579,12 @@ var G = {
   compareFirst: null,
   simLinks: [],
   simThreshold: 0.70,
-  toggles: {labels:false, clusters:false, heatmap:false, links:false, mode3d:false},
+  simAnchor: null,        // point (or query) that the similarity threshold fades against
+  anchorSims: null,       // Map i->cosine to anchor
+  aboveCount: 0,
+  currentView: 'viz',
+  viewsBuilt: {},
+  toggles: {labels:true, clusters:true, heatmap:false, links:false, mode3d:false},
   enabledCats: {},
   dirty: true,
   hoveredPoint: null,
@@ -539,6 +616,7 @@ document.addEventListener('DOMContentLoaded', function(){
     .catch(function(){ showEmptyState(); });
 
   bindUI();
+  bindViews();
   setupSearch();
   setupD3Zoom();
   setupCanvasEvents();
@@ -783,6 +861,15 @@ function render2D(){
   ctx.fillStyle='#0b0f14';
   ctx.fillRect(0,0,W,H);
 
+  // faint reference grid (screen space)
+  var gs=64;
+  ctx.strokeStyle='rgba(255,255,255,0.025)';
+  ctx.lineWidth=1;
+  ctx.beginPath();
+  for(var gx=(G.transform.x%gs);gx<W;gx+=gs){ ctx.moveTo(gx,0); ctx.lineTo(gx,H); }
+  for(var gy=(G.transform.y%gs);gy<H;gy+=gs){ ctx.moveTo(0,gy); ctx.lineTo(W,gy); }
+  ctx.stroke();
+
   if(!G.filtered.length) return;
 
   ctx.save();
@@ -797,16 +884,30 @@ function render2D(){
   // similarity links
   if(G.toggles.links) drawSimLinks();
 
-  // points
-  var r=2.5/G.transform.scale;
+  // points — fade by similarity to the anchor (selected/query) when threshold active
+  var r=3.2/G.transform.scale;
+  var anchor=G.simAnchor, sims=G.anchorSims, thr=G.simThreshold;
   for(var i=0;i<G.filtered.length;i++){
     var p=G.filtered[i];
     var c=getCoord(p);
     var col=catColor(p.cat);
+    var faded=false;
+    if(anchor && sims){
+      var sm=sims[p.i];
+      if(sm===undefined) sm=-1;
+      if(p.i!==anchor.i && sm<thr) faded=true;
+    }
     ctx.beginPath();
-    ctx.arc(c.x, c.y, r, 0, Math.PI*2);
-    ctx.fillStyle=col+'cc';
+    ctx.arc(c.x, c.y, faded?r*0.7:r, 0, Math.PI*2);
+    ctx.fillStyle=col+(faded?'18':'e0');
     ctx.fill();
+    if(!faded && anchor && sims){ // subtle halo on the survivors
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, r*1.7, 0, Math.PI*2);
+      ctx.strokeStyle=col+'40';
+      ctx.lineWidth=0.8/G.transform.scale;
+      ctx.stroke();
+    }
   }
 
   // neighbor rings
@@ -1008,6 +1109,7 @@ function onCanvasClick(e){
 
   G.selected=p;
   G.neighbors=[];
+  setSimAnchor(p);
   G.dirty=true;
   showRightPanel(p);
 }
@@ -1100,6 +1202,39 @@ function highlightNeighbors(p){
   showToast('Highlighting 5 nearest neighbors');
 }
 
+// ── SIMILARITY THRESHOLD ANCHOR ────────────────────────────────────────────
+function setSimAnchor(anchor){
+  G.simAnchor=anchor;
+  if(!anchor || !anchor.vec || !anchor.vec.length){ G.anchorSims=null; updateSimHint(); return; }
+  var sims={};
+  for(var i=0;i<G.points.length;i++){
+    var q=G.points[i];
+    if(!q.vec||!q.vec.length){ sims[q.i]=-1; continue; }
+    sims[q.i]=dotProduct(anchor.vec, q.vec);
+  }
+  G.anchorSims=sims;
+  updateSimHint();
+}
+function updateSimHint(){
+  var el=document.getElementById('simHint');
+  if(!el) return;
+  if(!G.simAnchor || !G.anchorSims){
+    el.innerHTML='Select a point (or search) — then this fades everything less similar than the threshold.';
+    G.aboveCount=0;
+    return;
+  }
+  var thr=G.simThreshold, n=0, tot=0;
+  for(var i=0;i<G.filtered.length;i++){
+    var s=G.anchorSims[G.filtered[i].i];
+    if(s===undefined) continue;
+    tot++;
+    if(G.filtered[i].i===G.simAnchor.i || s>=thr) n++;
+  }
+  G.aboveCount=n;
+  var name=G.simAnchor.file ? (G.simAnchor.file.length>18?G.simAnchor.file.slice(0,16)+'…':G.simAnchor.file) : 'anchor';
+  el.innerHTML='<b>'+n+'</b> / '+tot+' points ≥ '+Math.round(thr*100)+'% similar to <b>'+escapeHtml(name)+'</b>';
+}
+
 // ── 3D MODE ────────────────────────────────────────────────────────────────
 function enter3D(){
   canvas.style.display='none';
@@ -1176,7 +1311,7 @@ function destroyThree(){
 // ── SEARCH ─────────────────────────────────────────────────────────────────
 function setupSearch(){
   var inp=document.getElementById('searchInput');
-  inp.addEventListener('keydown', function(e){ if(e.key==='Enter') runSearch(inp.value.trim()); });
+  inp.addEventListener('keydown', function(e){ if(e.key==='Enter') runSearchInto(inp.value.trim(),'resultsBody'); });
   document.addEventListener('keydown', function(e){
     if((e.metaKey||e.ctrlKey)&&e.key==='k'){ e.preventDefault(); inp.focus(); inp.select(); }
   });
@@ -1203,6 +1338,7 @@ function runSearch(query){
       if(!emb||!emb.length) throw new Error('no embedding');
       var vec=normalize(emb);
       G.queryVec=vec;
+      setSimAnchor({i:-2, vec:vec, file:query});
       var scored=[];
       for(var i=0;i<G.points.length;i++){
         var p=G.points[i];
@@ -1232,17 +1368,13 @@ function textSearch(query, elapsed){
 }
 
 function fillResults(scored, latency, vectorMode){
-  resultsSection.classList.add('visible');
-  if(!scored.length){
-    resultsBody.innerHTML='<tr><td colspan="8" class="results-empty">No results found</td></tr>';
-    return;
-  }
-  var html='';
+  var target=_resultsTarget||'resultsBody';
+  var rowsHtml='';
   for(var i=0;i<scored.length;i++){
     var p=scored[i].p, sim=scored[i].sim;
     var pct=Math.round(sim*100);
     var fileShort=p.file ? (p.file.length>24 ? p.file.slice(0,22)+'…' : p.file) : '—';
-    html+='<tr>'
+    rowsHtml+='<tr>'
       +'<td>'+(i+1)+'</td>'
       +'<td><div class="sim-cell"><div class="mini-bar"><div class="mini-bar-fill" style="width:'+pct+'%"></div></div>'+pct+'%</div></td>'
       +'<td title="'+escapeHtml(p.file||'')+'">'+escapeHtml(fileShort)+'</td>'
@@ -1253,10 +1385,22 @@ function fillResults(scored, latency, vectorMode){
       +'<td><span class="status-badge">● match</span></td>'
       +'</tr>';
   }
-  resultsBody.innerHTML=html;
 
-  // zoom to top result on canvas
-  if(scored.length && !G.toggles.mode3d){
+  if(target==='resultsBody'){
+    resultsSection.classList.add('visible');
+    resultsBody.innerHTML = scored.length ? rowsHtml : '<tr><td colspan="8" class="results-empty">No results found</td></tr>';
+  } else {
+    var el=document.getElementById(target);
+    if(el){
+      el.innerHTML = scored.length
+        ? '<div class="results-title" style="margin:6px 0 8px">'+scored.length+' results · '+(vectorMode?'vector (ollama)':'text match')+' · '+(latency||0)+'ms</div>'
+          +'<div class="vtable-wrap"><table class="vtable"><thead><tr><th>Rank</th><th>Similarity</th><th>Document</th><th>Chunk</th><th>Collection</th><th>Tokens</th><th>Latency</th><th>Status</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'
+        : '<div class="results-empty">No results found</div>';
+    }
+  }
+
+  // zoom to top result on canvas (only for the viz bottom table)
+  if(target==='resultsBody' && scored.length && !G.toggles.mode3d){
     var top=scored[0].p;
     G.selected=top;
     showRightPanel(top);
@@ -1282,6 +1426,7 @@ function bindUI(){
   slider.addEventListener('input',function(){
     G.simThreshold=parseInt(slider.value)/100;
     sliderVal.textContent=slider.value+'%';
+    updateSimHint();
     G.dirty=true;
   });
 
@@ -1341,14 +1486,238 @@ function bindUI(){
     if(!G.toggles.mode3d){ document.getElementById('tog3D').checked=true; G.toggles.mode3d=true; enter3D(); }
   });
 
+  // default overlays on (clusters + labels) — reflect in checkboxes
+  var tl=document.getElementById('togLabels'); if(tl) tl.checked=true;
+  var tc=document.getElementById('togClusters'); if(tc) tc.checked=true;
+
   // resize
   window.addEventListener('resize',function(){ G.dirty=true; if(G.threeRenderer&&G.toggles.mode3d){ var w=threeDiv.clientWidth,h=threeDiv.clientHeight; G.threeRenderer.setSize(w,h); if(G.threeCamera){G.threeCamera.aspect=w/h; G.threeCamera.updateProjectionMatrix();} } });
+}
+
+// ── VIEWS / TABS ───────────────────────────────────────────────────────────
+function bindViews(){
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.addEventListener('click',function(){ switchView(t.getAttribute('data-view')); });
+  });
+  var bell=document.getElementById('tbBell'); if(bell) bell.addEventListener('click',function(){ showToast('No new notifications'); });
+  var cog=document.getElementById('tbCog'); if(cog) cog.addEventListener('click',function(){ switchView('settings'); });
+  var av=document.getElementById('tbAvatar'); if(av) av.addEventListener('click',function(){ showToast('Signed in as '+sessionEmail()); });
+  var sb=document.getElementById('searchBig'), sbb=document.getElementById('searchBigBtn');
+  function goBig(){ var q=(sb.value||'').trim(); if(q) runSearchInto(q, 'searchBigBody'); }
+  if(sbb) sbb.addEventListener('click', goBig);
+  if(sb) sb.addEventListener('keydown', function(e){ if(e.key==='Enter') goBig(); });
+  var ds=document.getElementById('docSearch'); if(ds) ds.addEventListener('input', function(){ renderDocuments(ds.value.trim().toLowerCase()); });
+  var cs=document.getElementById('chunkSearch'); if(cs) cs.addEventListener('input', function(){ G.chunkPage=0; renderChunks(cs.value.trim().toLowerCase()); });
+  var es=document.getElementById('embSearch'); if(es) es.addEventListener('input', function(){ G.embPage=0; renderEmbeddings(es.value.trim().toLowerCase()); });
+}
+
+function sessionEmail(){
+  try{ var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null'); return (s&&s.email)||'root'; }catch(e){ return 'root'; }
+}
+
+function switchView(name){
+  if(!name) return;
+  G.currentView=name;
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.getAttribute('data-view')===name); });
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.toggle('active', v.id==='view-'+name); });
+  if(name!=='viz' && !G.viewsBuilt[name]){ if(buildView(name)) G.viewsBuilt[name]=true; }
+  if(name==='viz'){ G.dirty=true; }
+}
+
+function buildView(name){
+  if(!G.data) return false;
+  if(name==='overview') buildOverview();
+  else if(name==='documents') buildDocuments();
+  else if(name==='chunks') buildChunks();
+  else if(name==='embeddings') buildEmbeddings();
+  else if(name==='analytics') buildAnalytics();
+  else if(name==='settings') buildSettings();
+  return true;
+}
+
+function fmtN(n){ return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':String(n); }
+function catChipHtml(cat){
+  var c=G.catMap[cat]||{}; var col=c.color||'#888'; var lbl=c.label||cat||'—';
+  return '<span class="cat-chip"><span class="sw" style="background:'+col+'"></span>'+escapeHtml(lbl)+'</span>';
+}
+function distBars(pairs, total){ // pairs: [{label,color,val}]
+  var max=0; pairs.forEach(function(p){ if(p.val>max)max=p.val; });
+  max=max||1;
+  return pairs.map(function(p){
+    var pct=Math.round(p.val/max*100);
+    var share=total?((p.val/total*100).toFixed(1)+'%'):'';
+    return '<div class="dist-row"><div class="dist-label"><span class="sw" style="background:'+(p.color||'#888')+'"></span>'+escapeHtml(p.label)+'</div>'
+      +'<div class="dist-track"><div class="dist-fill" style="width:'+pct+'%;background:'+(p.color||'#888')+'"></div></div>'
+      +'<div class="dist-val">'+fmtN(p.val)+(share?' · '+share:'')+'</div></div>';
+  }).join('');
+}
+
+// ── DOC AGGREGATION (shared) ───────────────────────────────────────────────
+function docList(){
+  if(G.docCache) return G.docCache;
+  var map={};
+  G.points.forEach(function(p){
+    var d=map[p.file]; if(!d){ d=map[p.file]={file:p.file, cat:p.cat, coll:p.coll, chunks:0, tokens:0}; }
+    d.chunks++; d.tokens+=p.tokens;
+  });
+  var arr=Object.keys(map).map(function(k){ return map[k]; });
+  arr.sort(function(a,b){ return b.chunks-a.chunks; });
+  G.docCache=arr; return arr;
+}
+
+// ── OVERVIEW ───────────────────────────────────────────────────────────────
+function buildOverview(){
+  var s=G.data.stats||{}, cats=G.data.categories||[];
+  var docs=docList();
+  var byColl={}; G.points.forEach(function(p){ byColl[p.coll]=(byColl[p.coll]||0)+1; });
+  var el=document.getElementById('ovBody');
+  var html='<div class="vh"><h2>Overview</h2></div>';
+  html+='<div class="stat-grid">'
+    +'<div class="stat-card"><div class="k">Documents</div><div class="v cyan">'+fmtN(s.documents||docs.length)+'</div></div>'
+    +'<div class="stat-card"><div class="k">Chunks</div><div class="v">'+fmtN(s.chunks||G.points.length)+'</div></div>'
+    +'<div class="stat-card"><div class="k">Embeddings</div><div class="v">'+fmtN(s.embeddings||G.points.length)+'</div></div>'
+    +'<div class="stat-card"><div class="k">Avg Similarity</div><div class="v cyan">'+(s.avgSimilarity||0).toFixed(1)+'%</div></div>'
+    +'<div class="stat-card"><div class="k">Dimensions</div><div class="v">'+(s.dim||768)+'</div></div>'
+    +'<div class="stat-card"><div class="k">Clusters</div><div class="v">'+((G.data.clusters||[]).length||'—')+'</div></div>'
+    +'</div>';
+  html+='<div class="two-col">';
+  html+='<div class="card"><h3><i class="fas fa-layer-group"></i>Category Distribution</h3>'
+    +distBars(cats.map(function(c){return {label:c.label,color:c.color,val:c.count};}), G.points.length)+'</div>';
+  html+='<div class="card"><h3><i class="fas fa-database"></i>Collection Split</h3>'
+    +distBars(Object.keys(byColl).map(function(k){return {label:k,color:k==='mem'?'#f472b6':'#22d3ee',val:byColl[k]};}), G.points.length)+'</div>';
+  html+='</div>';
+  html+='<div class="card"><h3><i class="fas fa-file-alt"></i>Top Documents by Chunks</h3><div class="vtable-wrap"><table class="vtable"><thead><tr><th>Document</th><th>Category</th><th>Chunks</th><th>Tokens</th></tr></thead><tbody>';
+  docs.slice(0,15).forEach(function(d){
+    html+='<tr><td title="'+escapeHtml(d.file)+'">'+escapeHtml(d.file)+'</td><td>'+catChipHtml(d.cat)+'</td><td class="mono">'+d.chunks+'</td><td class="mono">'+fmtN(d.tokens)+'</td></tr>';
+  });
+  html+='</tbody></table></div></div>';
+  el.innerHTML=html;
+}
+
+// ── DOCUMENTS ──────────────────────────────────────────────────────────────
+function buildDocuments(){ renderDocuments(''); }
+function renderDocuments(filter){
+  var docs=docList().filter(function(d){ return !filter || d.file.toLowerCase().indexOf(filter)>=0; });
+  var html='<div class="vtable-wrap"><table class="vtable"><thead><tr><th>Document</th><th>Category</th><th>Collection</th><th>Chunks</th><th>Tokens</th></tr></thead><tbody>';
+  docs.slice(0,500).forEach(function(d){
+    html+='<tr><td title="'+escapeHtml(d.file)+'">'+escapeHtml(d.file)+'</td><td>'+catChipHtml(d.cat)+'</td><td class="mono">'+escapeHtml(d.coll)+'</td><td class="mono">'+d.chunks+'</td><td class="mono">'+fmtN(d.tokens)+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+  if(docs.length>500) html+='<div class="vpager">Showing first 500 of '+docs.length+' documents</div>';
+  document.getElementById('docBody').innerHTML=html;
+}
+
+// ── CHUNKS ─────────────────────────────────────────────────────────────────
+function buildChunks(){ G.chunkPage=0; renderChunks(''); }
+function renderChunks(filter){
+  var rows=G.points.filter(function(p){ return !filter || ((p.file||'')+' '+(p.preview||'')).toLowerCase().indexOf(filter)>=0; });
+  var per=100, page=G.chunkPage||0, pages=Math.max(1,Math.ceil(rows.length/per));
+  if(page>=pages) page=pages-1; G.chunkPage=page;
+  var slice=rows.slice(page*per,(page+1)*per);
+  var html='<div class="vtable-wrap"><table class="vtable"><thead><tr><th>Document</th><th>Chunk</th><th>Category</th><th>Tokens</th><th>Preview</th></tr></thead><tbody>';
+  slice.forEach(function(p){
+    html+='<tr><td title="'+escapeHtml(p.file)+'">'+escapeHtml(p.file)+'</td><td class="mono">#'+p.chunk+'</td><td>'+catChipHtml(p.cat)+'</td><td class="mono">'+p.tokens+'</td><td title="'+escapeHtml(p.preview||'')+'">'+escapeHtml(p.preview||'')+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+  document.getElementById('chunkBody').innerHTML=html;
+  renderPager('chunkPager', page, pages, rows.length, function(np){ G.chunkPage=np; renderChunks(filter); });
+}
+
+// ── EMBEDDINGS ─────────────────────────────────────────────────────────────
+function buildEmbeddings(){ G.embPage=0; renderEmbeddings(''); }
+function renderEmbeddings(filter){
+  var dim=(G.data.stats||{}).dim||768;
+  var rows=G.points.filter(function(p){ return !filter || (('emb-'+p.i+' '+(p.file||'')+' '+p.coll).toLowerCase().indexOf(filter)>=0); });
+  var per=100, page=G.embPage||0, pages=Math.max(1,Math.ceil(rows.length/per));
+  if(page>=pages) page=pages-1; G.embPage=page;
+  var slice=rows.slice(page*per,(page+1)*per);
+  var html='<div class="vtable-wrap"><table class="vtable"><thead><tr><th>Embedding ID</th><th>Collection</th><th>Category</th><th>Cluster</th><th>Dim</th><th>Tokens</th></tr></thead><tbody>';
+  slice.forEach(function(p){
+    html+='<tr><td class="mono">EMB-'+String(p.i).padStart(4,'0')+'</td><td class="mono">'+escapeHtml(p.coll)+'</td><td>'+catChipHtml(p.cat)+'</td><td class="mono">'+p.cluster+'</td><td class="mono">'+dim+'d</td><td class="mono">'+p.tokens+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+  document.getElementById('embBody').innerHTML=html;
+  renderPager('embPager', page, pages, rows.length, function(np){ G.embPage=np; renderEmbeddings(filter); });
+}
+
+function renderPager(id, page, pages, total, go){
+  var el=document.getElementById(id); if(!el) return;
+  el.innerHTML='';
+  var prev=document.createElement('button'); prev.textContent='‹ Prev'; prev.disabled=page<=0;
+  prev.addEventListener('click',function(){ if(page>0) go(page-1); });
+  var next=document.createElement('button'); next.textContent='Next ›'; next.disabled=page>=pages-1;
+  next.addEventListener('click',function(){ if(page<pages-1) go(page+1); });
+  var lbl=document.createElement('span'); lbl.textContent='Page '+(page+1)+' / '+pages+' · '+fmtN(total)+' rows';
+  el.appendChild(prev); el.appendChild(lbl); el.appendChild(next);
+}
+
+// ── SEARCH VIEW (routes results into a chosen container) ────────────────────
+var _resultsTarget='resultsBody';
+function runSearchInto(query, targetId){
+  _resultsTarget=targetId||'resultsBody';
+  runSearch(query);
+}
+
+// ── ANALYTICS ──────────────────────────────────────────────────────────────
+function svgBars(title, pairs){ // pairs:[{label,color,val}]
+  var max=0; pairs.forEach(function(p){ if(p.val>max)max=p.val; }); max=max||1;
+  var bw=Math.max(18, Math.min(60, Math.floor(560/pairs.length))), gap=14, pad=30;
+  var w=pairs.length*(bw+gap)+pad*2, h=220;
+  var s='<div class="card"><h3>'+escapeHtml(title)+'</h3><div class="bars"><svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet">';
+  pairs.forEach(function(p,i){
+    var bh=Math.round((h-50)*(p.val/max));
+    var x=pad+i*(bw+gap), y=h-30-bh;
+    s+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" rx="3" fill="'+(p.color||'#22d3ee')+'"><title>'+escapeHtml(p.label)+': '+p.val+'</title></rect>';
+    s+='<text x="'+(x+bw/2)+'" y="'+(y-6)+'" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="JetBrains Mono">'+fmtN(p.val)+'</text>';
+    s+='<text x="'+(x+bw/2)+'" y="'+(h-12)+'" fill="#64748b" font-size="9" text-anchor="middle">'+escapeHtml(p.label.length>10?p.label.slice(0,9)+'…':p.label)+'</text>';
+  });
+  s+='</svg></div></div>';
+  return s;
+}
+function buildAnalytics(){
+  var cats=G.data.categories||[];
+  var byCluster={}; G.points.forEach(function(p){ byCluster[p.cluster]=(byCluster[p.cluster]||0)+1; });
+  var byColl={}; G.points.forEach(function(p){ byColl[p.coll]=(byColl[p.coll]||0)+1; });
+  // token histogram buckets
+  var buckets=[0,0,0,0,0,0], edges=['<50','50-100','100-200','200-400','400-800','800+'];
+  G.points.forEach(function(p){ var t=p.tokens; buckets[t<50?0:t<100?1:t<200?2:t<400?3:t<800?4:5]++; });
+  var el=document.getElementById('anBody');
+  var html='<div class="vh"><h2>Analytics</h2></div>';
+  html+=svgBars('Embeddings per Category', cats.map(function(c){return {label:c.label,color:c.color,val:c.count};}));
+  html+='<div class="two-col">';
+  html+=svgBars('Cluster Sizes', Object.keys(byCluster).sort(function(a,b){return a-b;}).map(function(k){return {label:'C'+k,color:'#a78bfa',val:byCluster[k]};}));
+  html+=svgBars('Collection Split', Object.keys(byColl).map(function(k){return {label:k,color:k==='mem'?'#f472b6':'#22d3ee',val:byColl[k]};}));
+  html+='</div>';
+  html+=svgBars('Chunk Token Histogram', edges.map(function(e,i){return {label:e,color:'#34d399',val:buckets[i]};}));
+  el.innerHTML=html;
+}
+
+// ── SETTINGS ───────────────────────────────────────────────────────────────
+function buildSettings(){
+  var s=G.data.stats||{}, cats=G.data.categories||[];
+  var el=document.getElementById('setBody');
+  var html='<div class="vh"><h2>Settings</h2></div>';
+  html+='<div class="card"><h3><i class="fas fa-microchip"></i>Index</h3>'
+    +'<div class="set-row"><span class="sk">Embedding model</span><span class="sv">'+escapeHtml(s.model||'nomic-embed-text')+'</span></div>'
+    +'<div class="set-row"><span class="sk">Dimensions</span><span class="sv">'+(s.dim||768)+'</span></div>'
+    +'<div class="set-row"><span class="sk">Vector database</span><span class="sv">'+escapeHtml(s.indexType||'Milvus Lite')+'</span></div>'
+    +'<div class="set-row"><span class="sk">Metric</span><span class="sv">COSINE</span></div>'
+    +'<div class="set-row"><span class="sk">Embeddings</span><span class="sv">'+fmtN(s.embeddings||G.points.length)+'</span></div>'
+    +'<div class="set-row"><span class="sk">Generated</span><span class="sv">'+escapeHtml(G.data.generated||'—')+'</span></div>'
+    +'</div>';
+  html+='<div class="card"><h3><i class="fas fa-tags"></i>Categories</h3>'
+    +distBars(cats.map(function(c){return {label:c.label,color:c.color,val:c.count};}), G.points.length)+'</div>';
+  html+='<div class="card"><h3><i class="fas fa-sync"></i>Refresh</h3>'
+    +'<p style="font-size:12px;color:var(--text-muted);line-height:1.6;margin-bottom:8px">Projection is precomputed offline (t-SNE + PCA + KMeans) and stored in a local, gitignored JSON — never published (NDA + localhost lock). Regenerate on localhost:</p>'
+    +'<span class="set-code">rzmem viz</span>'
+    +'<p style="font-size:11px;color:var(--text-muted);margin-top:10px">Default overlays: Clusters + Labels ON · Projection: t-SNE · Similarity threshold: 70%</p></div>';
+  el.innerHTML=html;
 }
 
 })();
 </script>
 
-<script src="../../auth.js?v=2026-07-21" defer></script>
 <script src="../../js/rz-feature-flags.js?v=2026-07-21" defer></script>
+<script src="../../auth.js?v=2026-07-21" defer></script>
 </body>
 </html>
