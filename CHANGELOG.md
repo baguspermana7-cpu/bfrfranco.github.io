@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.104.0 — 2026-07-21 (BOQ Phase 3: full EPC Technical Project Dossier)
+
+### Added
+- **RZEngine `DATA.dossier` + `models.dossier`** — EPC Technical Dossier scaffold wrapping the BOQ (STANDARD-PRACTICE, sourced): `permittingMatrix` (10 typical AHJ permits + authority/duration/dependency/risk/standard), `designBasis` (per-discipline basis + IEC/NEC/ASHRAE TC9.9/ASCE 7/NFPA/Uptime standard + engine ref), `riskRegister` (8 mission-critical DC risks w/ probability/impact/mitigation/owner), `documentRegister` (16 deliverables), `opsReadiness` (gates + engine refs), `engineeringCalcs` (each calc → the engine model that computes it). `models.dossier.executiveSummary(input, result)` (live capacity/redundancy/PUE/CAPEX/$per-kW/timeline/racks) + `models.dossier.sections()` (10-section ordered manifest).
+- **DCMOC full dossier** (`BoqDossier.ts`) — the BOQ is now section 6 of a numbered 10-section **"Technical Project Dossier — Bill of Quantities & EPC Reference"** with a Table of Contents (shared `SECTION_TITLES` single-source so numbers/titles can't drift): 1 Executive Summary (KPI grid, live CAPEX) · 2 Regulatory & Permitting Matrix (risk chips) · 3 Design Basis · 4 Engineering Calculations · 5 Equipment Schedule · 6 Bill of Quantities (reconciled + disclaimer/margin/safety-factor) · 7 Procurement Packages · 8 Risk Register · 9 Operations Readiness · 10 Document Register. Dossier-level STANDARD-PRACTICE banner ("permitting durations/risks indicative; validate against AHJ + full design; not a quotation/tender").
+
+### Verified
+- engine 695/0 · parity 155/0 · calibration 19/0 · bindings 85/0 (catalog 211fn/117src) · dc-corpus 2678/0 · trace-parity 117/117 · walk 24/0 · synergy 6/0 · export 44/0 · tsc 0 + next build · js-syntax/script-tags/dark CLEAN. Exec summary pulls live CAPEX; 6 static datasets resolve; no `</script>` hazard. Engine ?v `-e`→`-f`. Grand plan COMPLETE: BOQ P1 (reconciled line items + margin/safety) + P2 (equipment + procurement) + P3 (full EPC dossier) all shipped.
+
 ## v1.103.1 — 2026-07-21 (BOQ correctness fixes — adversarial review)
 
 ### Fixed

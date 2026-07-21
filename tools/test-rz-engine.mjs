@@ -1359,6 +1359,19 @@ if (M.opex && M.opex.totalAnnual) {
     const pk = M.boq.procurementPackages(costs);
     ok('procurementPackages 12 with value + FAT/SAT + warranty', Array.isArray(pk) && pk.length === 12 && pk.every(p => p.pkgNo && Number.isFinite(p.estValue) && p.fatSat != null && p.warrantyYr != null && p.source));
     ok('procurement value non-additive (electrical spans multiple pkgs)', pk.reduce((s, p) => s + p.estValue, 0) > Object.values(costs).reduce((s, v) => s + v, 0));
+    /* ── BOQ Ship-3: EPC Technical Dossier scaffold ── */
+    const dos = D.dossier;
+    ok('DATA.dossier present + sourced', !!dos && !!D.sources['dossier']);
+    ok('permittingMatrix complete', Array.isArray(dos.permittingMatrix) && dos.permittingMatrix.length >= 8 && dos.permittingMatrix.every(p => p.permit && p.authority && Number.isFinite(p.durationWk) && p.risk));
+    ok('designBasis per-discipline w/ standard + engineRef', dos.designBasis.length >= 4 && dos.designBasis.every(d => d.discipline && d.basis && d.standard && d.engineRef));
+    ok('riskRegister w/ prob/impact/mitigation/owner', dos.riskRegister.length >= 6 && dos.riskRegister.every(r => r.id && r.probability && r.impact && r.mitigation && r.owner));
+    ok('documentRegister non-empty list', Array.isArray(dos.documentRegister) && dos.documentRegister.length >= 10);
+    ok('opsReadiness w/ owner + gate', dos.opsReadiness.every(o => o.item && o.owner && o.gate));
+    ok('engineeringCalcs reference engine models', dos.engineeringCalcs.every(c => c.calc && c.engineRef && c.standard));
+    const es = M.dossier.executiveSummary({ itLoad: 20000, redundancy: '2n', coolingType: 'liquid' }, { total: 340e6, pue: 1.2, metrics: { perKw: 17000, timelineMonths: 28, racks: 334 } });
+    ok('dossier.executiveSummary derives capacity + capex + redundancy', es.capacityMw === 20 && es.totalCapex === 340e6 && /2N/i.test(es.redundancy) && es.timelineMonths === 28);
+    const secs = M.dossier.sections();
+    ok('dossier.sections manifest (10, ordered, boq+permitting+risk)', secs.length === 10 && secs.every(s => s.key && s.title && s.data) && secs.some(s => s.key === 'boq') && secs.some(s => s.key === 'permitting') && secs.some(s => s.key === 'risk'));
 }
 
 /* ── Arc-1 calibrationSpec structural ── */

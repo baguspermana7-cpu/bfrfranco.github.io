@@ -126,6 +126,72 @@ export interface BoqProjectMeta {
     version: string;
 }
 
+/* ── dossier types (mirror rzData().dossier + rzModels().dossier) ── */
+
+/** Executive summary — rzModels().dossier.executiveSummary(input, result). */
+export interface DossierExecSummary {
+    capacityMw: number;
+    redundancy: string;
+    cooling: string;
+    pue: number;
+    totalCapex: number;
+    perKw: number;
+    timelineMonths: number;
+    racks: number;
+}
+
+/** Coarse risk band used by the permitting matrix + risk register chips. */
+export type DossierRisk = 'high' | 'med' | 'low';
+
+export interface PermitRow {
+    permit: string;
+    authority: string;
+    durationWk: number;
+    dependency: string;
+    risk: DossierRisk;
+    standard: string;
+}
+
+export interface DesignBasisRow {
+    discipline: string;
+    basis: string;
+    standard: string;
+    engineRef: string;
+}
+
+export interface RiskRow {
+    id: string;
+    category: string;
+    risk: string;
+    probability: DossierRisk;
+    impact: DossierRisk;
+    mitigation: string;
+    owner: string;
+}
+
+export interface OpsReadyRow {
+    item: string;
+    owner: string;
+    gate: string;
+    engineRef?: string;
+}
+
+export interface EngCalcRow {
+    calc: string;
+    engineRef: string;
+    standard: string;
+}
+
+/** Static dossier scaffold — rzData().dossier. */
+export interface DossierData {
+    permittingMatrix: PermitRow[];
+    designBasis: DesignBasisRow[];
+    riskRegister: RiskRow[];
+    documentRegister: string[];
+    opsReadiness: OpsReadyRow[];
+    engineeringCalcs: EngCalcRow[];
+}
+
 export interface BoqModel {
     generated: BoqGenerated;
     summary: BoqSummary;
@@ -136,6 +202,12 @@ export interface BoqModel {
     /** INDICATIVE procurement scope envelopes — values OVERLAP across packages
      *  and are NOT additive to the CAPEX total. Empty when unavailable. */
     procurement: BoqPackage[];
+    /** Live executive summary (capacity/CAPEX/PUE/timeline). Null when the
+     *  engine dossier model is unavailable. */
+    executiveSummary: DossierExecSummary | null;
+    /** Static EPC dossier scaffold (permitting / design basis / risk / …).
+     *  Null when the engine does not expose DATA.dossier. */
+    dossier: DossierData | null;
 }
 
 export interface BuildBoqOpts {
@@ -183,6 +255,9 @@ export function buildBoqModel(
             ) => BoqEquipmentItem[];
             procurementPackages?: (costs: Record<string, number>) => BoqPackage[];
         };
+        dossier?: {
+            executiveSummary?: (input: CapexInput, result: CapexResult) => DossierExecSummary;
+        };
     };
     const boq = models.boq;
     if (!boq?.generate || !boq?.summary) return null;
@@ -211,7 +286,14 @@ export function buildBoqModel(
         ? boq.procurementPackages(result.costs)
         : [];
 
-    const data = rzData() as { version?: string };
+    // Ship-3 dossier surfaces — null-guarded (older engines omit them).
+    const executiveSummary: DossierExecSummary | null = models.dossier?.executiveSummary
+        ? models.dossier.executiveSummary(input, result)
+        : null;
+
+    const data = rzData() as { version?: string; dossier?: DossierData };
+    const dossier: DossierData | null = data.dossier ?? null;
+
     const projectMeta: BoqProjectMeta = {
         projectName: '',       // filled by the caller (requirements store)
         location: input.country?.name ?? input.location,
@@ -220,7 +302,7 @@ export function buildBoqModel(
         version: data.version ?? '—',
     };
 
-    return { generated, summary, projectMeta, equipment, procurement };
+    return { generated, summary, projectMeta, equipment, procurement, executiveSummary, dossier };
 }
 
 /** Return a copy of the model with projectName / tierLevel filled from the
@@ -295,6 +377,23 @@ function confChip(c: BoqConfidence): string {
     return `<span style="display:inline-block;padding:1px 7px;border-radius:999px;background:${s.bg};color:${s.fg};font-size:9px;font-weight:700;letter-spacing:.3px;">${esc(s.label)}</span>`;
 }
 
+/* Risk band chip (high=fault-red, med=signal-amber, low=slate). */
+const RISK_CHIP: Record<DossierRisk, { bg: string; fg: string }> = {
+    high: { bg: 'rgba(248,113,113,0.16)', fg: T.fault },
+    med: { bg: 'rgba(251,191,36,0.16)', fg: T.amber },
+    low: { bg: 'rgba(148,163,184,0.16)', fg: T.slate },
+};
+
+function riskChip(r: DossierRisk): string {
+    const s = RISK_CHIP[r] ?? RISK_CHIP.low;
+    return `<span style="display:inline-block;padding:1px 7px;border-radius:999px;background:${s.bg};color:${s.fg};font-size:9px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;">${esc(r)}</span>`;
+}
+
+/* Section header — numbered, matches the ToC. */
+function secHead(no: number, title: string, note?: string): string {
+    return `<h2 class="sec-title" style="margin-top:28px;">${no}. ${esc(title)}${note ? ` <span style="font-size:8.5px;color:${T.slate};letter-spacing:.5px;text-transform:none;">— ${esc(note)}</span>` : ''}</h2>`;
+}
+
 /* ── document sections ─────────────────────────────────────────────────── */
 
 function coverSection(model: BoqModel): string {
@@ -306,8 +405,8 @@ function coverSection(model: BoqModel): string {
             <div style="font-size:13px;font-weight:700;color:${T.text};margin-top:2px;font-family:'JetBrains Mono',monospace;">${esc(value)}</div>
         </div>`;
     return `<section class="cover">
-        <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${T.cyan};">DC-OS · Technical Dossier</div>
-        <h1 style="font-size:30px;font-weight:800;color:${T.text};margin:8px 0 4px;line-height:1.15;">Bill of Quantities<br><span style="font-size:16px;font-weight:600;color:${T.muted};">Technical Dossier</span></h1>
+        <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${T.cyan};">DC-OS · Technical Project Dossier</div>
+        <h1 style="font-size:28px;font-weight:800;color:${T.text};margin:8px 0 4px;line-height:1.15;">Technical Project Dossier<br><span style="font-size:15px;font-weight:600;color:${T.muted};">Bill of Quantities &amp; EPC Reference</span></h1>
         <div style="display:flex;flex-wrap:wrap;gap:16px;margin:20px 0 14px;padding:14px 16px;border:1px solid ${T.line};border-radius:12px;background:${T.surface};">
             ${cell('Project', p.projectName || 'Untitled Project')}
             ${cell('Location', p.location)}
@@ -469,7 +568,7 @@ function equipmentScheduleSection(items: BoqEquipmentItem[]): string {
         </tr>`;
     }).join('');
     return `<section class="block">
-        <h2 class="sec-title" style="margin-top:28px;">Equipment Schedule <span style="font-size:8.5px;color:${T.slate};letter-spacing:.5px;">— informational, not reconciled to $</span></h2>
+        ${secHead(5, 'Equipment Schedule', 'informational, not reconciled to $')}
         <table class="tbl">
             <thead><tr>
                 <th style="text-align:left;">Equipment</th>
@@ -506,7 +605,7 @@ function procurementPackagesSection(pkgs: BoqPackage[]): string {
         </tr>`,
     ).join('');
     return `<section class="block">
-        <h2 class="sec-title" style="margin-top:28px;">Procurement Packages</h2>
+        ${secHead(7, 'Procurement Packages')}
         <div style="border-left:3px solid ${T.amber};background:rgba(251,191,36,0.08);border-radius:0 10px 10px 0;padding:10px 13px;margin-bottom:10px;">
             <p style="font-size:10px;line-height:1.6;color:${T.text};margin:0;">
                 <b style="color:${T.amber};">Indicative scope envelopes</b> — package values <b>OVERLAP</b> (the electrical / mechanical
@@ -531,6 +630,223 @@ function procurementPackagesSection(pkgs: BoqPackage[]): string {
     </section>`;
 }
 
+/* ── dossier sections (Ship-3) ─────────────────────────────────────────── */
+
+/** Ordered section titles — single source for both the ToC and the numbered
+ *  headers, so they can never drift. */
+const SECTION_TITLES: readonly string[] = [
+    'Executive Summary',
+    'Regulatory & Permitting Matrix',
+    'Design Basis',
+    'Engineering Calculations',
+    'Equipment Schedule',
+    'Bill of Quantities',
+    'Procurement Packages',
+    'Risk Register',
+    'Operations Readiness',
+    'Document Register',
+] as const;
+
+function dossierBannerSection(): string {
+    return `<section class="block" style="margin-top:16px;">
+        <div style="border-left:3px solid ${T.amber};background:rgba(251,191,36,0.08);border-radius:0 10px 10px 0;padding:10px 13px;">
+            <p style="font-size:10px;line-height:1.6;color:${T.text};margin:0;">
+                <b style="color:${T.amber};">STANDARD-PRACTICE EPC reference</b> — permitting durations + risks indicative;
+                validate against the AHJ and a full engineering design. Not a quotation or tender.
+            </p>
+        </div>
+    </section>`;
+}
+
+function tocSection(): string {
+    const items = SECTION_TITLES.map((t, i) =>
+        `<li style="display:flex;align-items:baseline;gap:8px;padding:3px 0;border-bottom:1px solid ${T.line};">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${T.cyan};font-weight:700;min-width:22px;">${i + 1}.</span>
+            <span style="font-size:11px;color:${T.text};">${esc(t)}</span>
+        </li>`,
+    ).join('');
+    return `<section class="block">
+        <h2 class="sec-title">Contents</h2>
+        <ol style="list-style:none;margin:0;padding:0;">${items}</ol>
+    </section>`;
+}
+
+function execSummarySection(no: number, s: DossierExecSummary): string {
+    const kpi = (label: string, value: string) =>
+        `<div class="mini-stat"><div class="mini-k">${esc(label)}</div><div class="mini-v">${esc(value)}</div></div>`;
+    const pueStr = Number.isFinite(s.pue) && s.pue > 0 ? s.pue.toLocaleString(undefined, { maximumFractionDigits: 2 }) : '—';
+    const perKwStr = Number.isFinite(s.perKw) && s.perKw > 0 ? `$${Math.round(s.perKw).toLocaleString()}` : '—';
+    const monthsStr = Number.isFinite(s.timelineMonths) && s.timelineMonths > 0 ? `${qtyFmt(s.timelineMonths)} mo` : '—';
+    return `<section class="block">
+        ${secHead(no, SECTION_TITLES[no - 1])}
+        <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px;">
+            ${kpi('IT Capacity', `${s.capacityMw.toLocaleString()} MW`)}
+            ${kpi('Redundancy', s.redundancy)}
+            ${kpi('Cooling', s.cooling)}
+            ${kpi('PUE (design)', pueStr)}
+            ${kpi('Total CAPEX', money(s.totalCapex))}
+            ${kpi('$/kW IT', perKwStr)}
+            ${kpi('Timeline', monthsStr)}
+            ${kpi('Racks', qtyFmt(s.racks))}
+        </div>
+        <p style="font-size:10.5px;line-height:1.65;color:${T.muted};margin:0;">
+            A <b style="color:${T.text};">${esc(`${s.capacityMw.toLocaleString()} MW`)}</b> IT facility on a
+            <b style="color:${T.text};">${esc(s.redundancy)}</b> topology with
+            <b style="color:${T.text};">${esc(s.cooling)}</b> cooling (design PUE
+            <b style="color:${T.text};">${esc(pueStr)}</b>). The screening-grade parametric CAPEX is
+            <b style="color:${T.amber};">${money(s.totalCapex)}</b> (${esc(perKwStr)}/kW IT) across
+            <b style="color:${T.text};">${qtyFmt(s.racks)}</b> racks, on an indicative
+            <b style="color:${T.text};">${esc(monthsStr)}</b> delivery programme. Figures are computed live by the
+            shared engine from the current requirement + CAPEX inputs.
+        </p>
+    </section>`;
+}
+
+function permittingSection(no: number, rows: PermitRow[]): string {
+    if (!rows.length) return '';
+    const body = rows.map((r, i) =>
+        `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:5px 8px;font-size:10px;color:${T.text};">${esc(r.permit)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(r.authority)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};">${qtyFmt(r.durationWk)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(r.dependency)}</td>
+            <td style="padding:5px 8px;text-align:center;">${riskChip(r.risk)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(r.standard)}</td>
+        </tr>`,
+    ).join('');
+    return `<section class="block">
+        ${secHead(no, SECTION_TITLES[no - 1])}
+        <table class="tbl">
+            <thead><tr>
+                <th style="text-align:left;">Permit</th>
+                <th style="text-align:left;">Authority</th>
+                <th style="text-align:right;">Duration (wk)</th>
+                <th style="text-align:left;">Dependency</th>
+                <th style="text-align:center;">Risk</th>
+                <th style="text-align:left;">Standard</th>
+            </tr></thead>
+            <tbody>${body}</tbody>
+        </table>
+    </section>`;
+}
+
+function designBasisSection(no: number, rows: DesignBasisRow[]): string {
+    if (!rows.length) return '';
+    const body = rows.map((r, i) =>
+        `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:5px 8px;font-size:10px;color:${T.text};font-weight:700;">${esc(r.discipline)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(r.basis)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(r.standard)}</td>
+            <td style="padding:5px 8px;font-size:9px;font-family:'JetBrains Mono',monospace;color:${T.cyan};">${esc(r.engineRef)}</td>
+        </tr>`,
+    ).join('');
+    return `<section class="block">
+        ${secHead(no, SECTION_TITLES[no - 1])}
+        <table class="tbl">
+            <thead><tr>
+                <th style="text-align:left;">Discipline</th>
+                <th style="text-align:left;">Basis</th>
+                <th style="text-align:left;">Standard</th>
+                <th style="text-align:left;">Engine Reference</th>
+            </tr></thead>
+            <tbody>${body}</tbody>
+        </table>
+    </section>`;
+}
+
+function engCalcsSection(no: number, rows: EngCalcRow[]): string {
+    if (!rows.length) return '';
+    const body = rows.map((r, i) =>
+        `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:5px 8px;font-size:10px;color:${T.text};">${esc(r.calc)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(r.standard)}</td>
+            <td style="padding:5px 8px;font-size:9px;font-family:'JetBrains Mono',monospace;color:${T.cyan};">${esc(r.engineRef)}</td>
+        </tr>`,
+    ).join('');
+    return `<section class="block">
+        ${secHead(no, SECTION_TITLES[no - 1])}
+        <table class="tbl">
+            <thead><tr>
+                <th style="text-align:left;">Calculation</th>
+                <th style="text-align:left;">Standard</th>
+                <th style="text-align:left;">Engine Reference</th>
+            </tr></thead>
+            <tbody>${body}</tbody>
+        </table>
+        <p style="font-size:9.5px;line-height:1.6;color:${T.muted};margin:6px 0 0;">
+            Computed live by the referenced engine model — see the linked calculators; screening basis.
+        </p>
+    </section>`;
+}
+
+function riskRegisterSection(no: number, rows: RiskRow[]): string {
+    if (!rows.length) return '';
+    const body = rows.map((r, i) =>
+        `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:5px 8px;font-size:10px;font-family:'JetBrains Mono',monospace;color:${T.cyan};font-weight:700;">${esc(r.id)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};text-transform:uppercase;letter-spacing:.4px;">${esc(r.category)}</td>
+            <td style="padding:5px 8px;font-size:10px;color:${T.text};">${esc(r.risk)}</td>
+            <td style="padding:5px 8px;text-align:center;">${riskChip(r.probability)}</td>
+            <td style="padding:5px 8px;text-align:center;">${riskChip(r.impact)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(r.mitigation)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};text-align:center;">${esc(r.owner)}</td>
+        </tr>`,
+    ).join('');
+    return `<section class="block">
+        ${secHead(no, SECTION_TITLES[no - 1])}
+        <table class="tbl">
+            <thead><tr>
+                <th style="text-align:left;">ID</th>
+                <th style="text-align:left;">Category</th>
+                <th style="text-align:left;">Risk</th>
+                <th style="text-align:center;">Probability</th>
+                <th style="text-align:center;">Impact</th>
+                <th style="text-align:left;">Mitigation</th>
+                <th style="text-align:center;">Owner</th>
+            </tr></thead>
+            <tbody>${body}</tbody>
+        </table>
+    </section>`;
+}
+
+function opsReadySection(no: number, rows: OpsReadyRow[]): string {
+    if (!rows.length) return '';
+    const body = rows.map((r, i) =>
+        `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:5px 8px;font-size:10px;color:${T.text};">${esc(r.item)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};text-align:center;">${esc(r.owner)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};text-align:center;text-transform:uppercase;letter-spacing:.4px;">${esc(r.gate)}</td>
+            <td style="padding:5px 8px;font-size:9px;font-family:'JetBrains Mono',monospace;color:${r.engineRef ? T.cyan : T.muted};">${esc(r.engineRef ?? '—')}</td>
+        </tr>`,
+    ).join('');
+    return `<section class="block">
+        ${secHead(no, SECTION_TITLES[no - 1])}
+        <table class="tbl">
+            <thead><tr>
+                <th style="text-align:left;">Item</th>
+                <th style="text-align:center;">Owner</th>
+                <th style="text-align:center;">Gate</th>
+                <th style="text-align:left;">Engine Ref</th>
+            </tr></thead>
+            <tbody>${body}</tbody>
+        </table>
+    </section>`;
+}
+
+function docRegisterSection(no: number, docs: string[]): string {
+    if (!docs.length) return '';
+    const items = docs.map((d) =>
+        `<div style="display:flex;align-items:baseline;gap:8px;padding:4px 0;border-bottom:1px solid ${T.line};">
+            <span style="color:${T.cyan};font-size:11px;line-height:1;">▪</span>
+            <span style="font-size:10.5px;color:${T.text};">${esc(d)}</span>
+        </div>`,
+    ).join('');
+    return `<section class="block">
+        ${secHead(no, SECTION_TITLES[no - 1])}
+        <div style="columns:2;column-gap:26px;">${items}</div>
+    </section>`;
+}
+
 /* ── document assembly ─────────────────────────────────────────────────── */
 
 /** Render the full BOQ dossier as a complete, standalone HTML5 document. */
@@ -541,9 +857,19 @@ export function renderBoqDossierHTML(model: BoqModel, projectMeta?: BoqProjectMe
     const procurementHtml = procurementPackagesSection(merged.procurement ?? []);
     const v = esc(merged.projectMeta.version);
 
+    // Ship-3 dossier surfaces (null-guarded — degrade to the BOQ-only document).
+    const execHtml = merged.executiveSummary ? execSummarySection(1, merged.executiveSummary) : '';
+    const d = merged.dossier;
+    const permittingHtml = d ? permittingSection(2, d.permittingMatrix) : '';
+    const designBasisHtml = d ? designBasisSection(3, d.designBasis) : '';
+    const engCalcsHtml = d ? engCalcsSection(4, d.engineeringCalcs) : '';
+    const riskHtml = d ? riskRegisterSection(8, d.riskRegister) : '';
+    const opsReadyHtml = d ? opsReadySection(9, d.opsReadiness) : '';
+    const docRegisterHtml = d ? docRegisterSection(10, d.documentRegister) : '';
+
     return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bill of Quantities — ${esc(merged.projectMeta.projectName || 'DC-OS')}</title>
+    <title>Technical Project Dossier — ${esc(merged.projectMeta.projectName || 'DC-OS')}</title>
     <style>
         @media print {
             body { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
@@ -583,15 +909,24 @@ export function renderBoqDossierHTML(model: BoqModel, projectMeta?: BoqProjectMe
     </style></head><body>
     <div class="print-bar no-print"><button class="print-btn" onclick="window.print()">⬇ Save as PDF / Print</button></div>
     ${coverSection(merged)}
+    ${dossierBannerSection()}
+    ${tocSection()}
+    ${execHtml}
+    ${permittingHtml}
+    ${designBasisHtml}
+    ${engCalcsHtml}
+    ${equipmentHtml}
+    ${secHead(6, 'Bill of Quantities', 'by discipline')}
     ${disclaimerSection(merged)}
     ${commercialSummarySection(merged)}
-    <h2 class="sec-title" style="margin-top:28px;">Bill of Quantities — by Discipline</h2>
     ${disciplinesHtml}
-    ${equipmentHtml}
     ${procurementHtml}
+    ${riskHtml}
+    ${opsReadyHtml}
+    ${docRegisterHtml}
     <footer>
         <span>SCREENING-GRADE · not a quotation · resistancezero.com · v${v}</span>
-        <span>DC-OS · Bill of Quantities · Technical Dossier</span>
+        <span>DC-OS · Technical Project Dossier · Bill of Quantities &amp; EPC Reference</span>
     </footer>
     </body></html>`;
 }

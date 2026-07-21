@@ -30,5 +30,10 @@ civil_structural→[building,seismic] · electrical→[electrical,ups,generator]
 ## Gates
 `test-rz-engine.mjs` BOQ block: DATA.boq + all boq.* sources present; 8 disciplines; every takeoff line sourced+confidence+rateKey-resolves; every unitRate has usd+confidence+source; **reconciliation invariant `Σ lines === categoryTotal` all disciplines**; categoryTotal === Σ mapped costs; hardTotal === Σ 14 costs; summary.grandTotal === capexTotal; embeddedMargin = hard×m/(1+m) (not added); markup ≈ 11.1%; safety factors present; disclaimer = screening/not-a-quotation. Value-trace nodes `boq.grandTotal`+`boq.marginPct` gated by trace-parity.
 
-## Roadmap (Phase 2/3)
-P2: equipment schedule (qty/model/N+1) + procurement packages + labor takeoff + regional labor rates. P3: full 20-section EPC dossier (permitting matrix, design basis, engineering calcs, risk register, commissioning, ops readiness, document register) around the BOQ core. See [AI_ARCH_STANDARD.md](AI_ARCH_STANDARD.md), [COOLING_LADDER_STANDARD.md](COOLING_LADDER_STANDARD.md).
+## Phase 2 (SHIPPED v1.103.0)
+`models.boq.equipmentSchedule` (UPS/genset/MV-transformer/PDU/CRAH/CDU, N+redundancy counts, lead times — MV transformer 120 wk long-lead) + `DATA.boq.procurement` 12 EPC packages + `models.boq.procurementPackages` (estValue NON-ADDITIVE — categories span packages). Dossier +2 sections. Cooling duty = IT heat load (not IT×PUE) per v1.103.1 fix.
+
+## Phase 3 — EPC Technical Dossier (SHIPPED v1.104.0)
+`DATA.dossier` (STANDARD-PRACTICE, sourced): permittingMatrix, designBasis (IEC/NEC/ASHRAE/ASCE/NFPA/Uptime refs), riskRegister (prob/impact/mitigation/owner), documentRegister, opsReadiness, engineeringCalcs (each → the engine model that computes it). `models.dossier.executiveSummary(input,result)` + `models.dossier.sections()` (10-section ordered manifest). The BOQ becomes one section of a full "Technical Project Dossier" (ToC + Executive Summary + Permitting Matrix + Design Basis + Engineering Calcs + Equipment + BOQ + Procurement + Risk Register + Ops Readiness + Document Register). STANDARD-PRACTICE reference — durations/risks indicative, validate against AHJ + full design; NOT a quotation/tender.
+
+See [AI_ARCH_STANDARD.md](AI_ARCH_STANDARD.md), [COOLING_LADDER_STANDARD.md](COOLING_LADDER_STANDARD.md).

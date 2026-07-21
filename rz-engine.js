@@ -5559,6 +5559,66 @@
             ]
         },
 
+        /* ══ v2.5.4 (BOQ Ship-3) — DATA.dossier: the EPC Technical Project Dossier
+         * scaffold that wraps the BOQ. Standard mission-critical DC content (permitting
+         * matrix, design basis, risk register, document register, ops-readiness) —
+         * STANDARD-PRACTICE tags (Uptime/TIA-942/BICSI/NFPA convention), NOT a
+         * project-specific submission. models.dossier.sections() composes these with
+         * live engine outputs (electrical/reliability/commissioning/spares/tier) into a
+         * section list. Screening/reference — validate against the AHJ + a full design. ══ */
+        dossier: {
+            permittingMatrix: [
+                { permit: 'Building / Construction Permit', authority: 'Local building authority / AHJ', durationWk: 12, dependency: 'Approved design + zoning', risk: 'high', standard: 'local building code' },
+                { permit: 'Environmental Permit / EIA', authority: 'Environmental agency', durationWk: 20, dependency: 'Environmental impact study', risk: 'high', standard: 'local EIA regulation' },
+                { permit: 'Fire Department Approval', authority: 'Fire authority', durationWk: 8, dependency: 'Fire strategy + C&E matrix', risk: 'med', standard: 'NFPA 75/76 / local' },
+                { permit: 'Grid Interconnection / Utility Approval', authority: 'Electric utility / TSO', durationWk: 52, dependency: 'Load study + connection agreement', risk: 'high', standard: 'utility connection code' },
+                { permit: 'MV/HV Energization Approval', authority: 'Utility / electrical inspectorate', durationWk: 16, dependency: 'SLD + protection settings', risk: 'high', standard: 'IEC/IEEE + local' },
+                { permit: 'Water Supply & Wastewater', authority: 'Water utility / municipality', durationWk: 12, dependency: 'Water balance + discharge plan', risk: 'med', standard: 'local utility' },
+                { permit: 'Fuel Storage Permit', authority: 'Fire authority / environmental', durationWk: 10, dependency: 'Tank design + secondary containment', risk: 'med', standard: 'NFPA 30 / local' },
+                { permit: 'Telecommunications / Carrier Entry', authority: 'Telecom regulator / carriers', durationWk: 12, dependency: 'Route survey + carrier agreements', risk: 'low', standard: 'local telecom' },
+                { permit: 'Occupancy Permit', authority: 'Building authority', durationWk: 6, dependency: 'Final inspection + as-builts', risk: 'med', standard: 'local building code' },
+                { permit: 'Operational License', authority: 'Business/data authority', durationWk: 8, dependency: 'Occupancy + compliance certs', risk: 'med', standard: 'local jurisdiction' }
+            ],
+            designBasis: [
+                { discipline: 'Electrical', basis: 'Utility supply, MV/LV topology, UPS + genset backup, redundancy per tier', standard: 'IEC 60364 / NEC / IEEE 3006', engineRef: 'models.requirements + capexDetail' },
+                { discipline: 'Mechanical / Cooling', basis: 'Cooling architecture, ASHRAE thermal envelope, redundancy, PUE target', standard: 'ASHRAE TC9.9 / TIA-942', engineRef: 'DATA.pueMatrix, DATA.architecture.ashraeClasses' },
+                { discipline: 'Structural', basis: 'Floor loading, seismic zone, wind, equipment foundations', standard: 'ASCE 7 / IBC', engineRef: 'DATA.requirements.floorLoadingKnM2' },
+                { discipline: 'Fire & Life Safety', basis: 'Detection (VESDA), clean-agent suppression, compartmentation, egress', standard: 'NFPA 75/76/2001', engineRef: 'models.fire' },
+                { discipline: 'Availability / Tier', basis: 'Uptime tier topology + availability target', standard: 'Uptime Tier / TIA-942', engineRef: 'models.tier, models.reliability' }
+            ],
+            riskRegister: [
+                { id: 'R01', category: 'Procurement', risk: 'Long-lead equipment (MV transformer ~120 wk) slips schedule', probability: 'high', impact: 'high', mitigation: 'Early procurement, pre-order, buffer float, alt vendors', owner: 'PMC' },
+                { id: 'R02', category: 'Authority', risk: 'Permit / grid-connection delay', probability: 'med', impact: 'high', mitigation: 'Early submission, utility engagement, parallel tracks', owner: 'Owner Eng' },
+                { id: 'R03', category: 'Technical', risk: 'Cooling under-performance at high density', probability: 'med', impact: 'high', mitigation: 'CFD, IST/load-bank, N+1 margin', owner: 'CxA' },
+                { id: 'R04', category: 'Cost', risk: 'Escalation / FX on imported equipment', probability: 'high', impact: 'med', mitigation: 'Fixed-price packages, hedging, contingency', owner: 'QS' },
+                { id: 'R05', category: 'Construction', risk: 'Interface / integration gaps between packages', probability: 'med', impact: 'med', mitigation: 'Integration matrix, single Cx authority', owner: 'EPC' },
+                { id: 'R06', category: 'Safety', risk: 'Working-at-height / confined-space / hot-work incidents', probability: 'med', impact: 'high', mitigation: 'Permit-to-work, method statements, HSE plan', owner: 'EPC HSE' },
+                { id: 'R07', category: 'Supply Chain', risk: 'Single-source dependency (GPU/UPS/genset)', probability: 'med', impact: 'high', mitigation: 'Dual-source, framework agreements', owner: 'Procurement' },
+                { id: 'R08', category: 'Commissioning', risk: 'Failure at integrated systems / black-building test', probability: 'low', impact: 'high', mitigation: 'Level 1-5 Cx, scripted scenarios, witness tests', owner: 'CxA' }
+            ],
+            documentRegister: [
+                'Design Drawings & Specifications', 'Engineering Calculations', 'Single-Line Diagrams', 'Method Statements', 'Inspection & Test Plans (ITP)', 'Factory Acceptance Test Reports', 'Site Acceptance Test Reports', 'Cable/Panel/Equipment Schedules', 'Shop & As-Built Drawings', 'Commissioning Report (L1-L5)', 'Asset Register / CMMS Data', 'O&M Manuals', 'Training Records', 'Warranty Documents', 'Closeout / Handover Package', 'BIM Model / Digital Twin'
+            ],
+            opsReadiness: [
+                { item: 'Asset register + CMMS load', owner: 'FM', gate: 'pre-handover' },
+                { item: 'Critical spares stocked (newsvendor)', owner: 'Ops', gate: 'pre-go-live', engineRef: 'models.spares' },
+                { item: 'PM schedule + MOP/SOP/EOP', owner: 'FM', gate: 'pre-go-live', engineRef: 'models.maintenance' },
+                { item: 'O&M contracts in place', owner: 'Procurement', gate: 'handover', engineRef: 'DATA.omContracts' },
+                { item: 'Staff trained + emergency drills', owner: 'Ops', gate: 'pre-go-live' },
+                { item: 'Warranty matrix + vendor contacts', owner: 'FM', gate: 'handover' }
+            ],
+            /* engineering calcs surfaced from existing engine models — each references
+             * the model/data that computes it (traceability, not re-derivation). */
+            engineeringCalcs: [
+                { calc: 'Electrical load & UPS/genset sizing', engineRef: 'models.boq.equipmentSchedule + capexDetail', standard: 'NEC 220 / IEEE 3006' },
+                { calc: 'Cooling / heat load', engineRef: 'models.boq.drivers.coolingKw + DATA.pueMatrix', standard: 'ASHRAE TC9.9' },
+                { calc: 'Reliability / availability (tier)', engineRef: 'models.reliability + models.tier', standard: 'Uptime / IEEE 493' },
+                { calc: 'Structural floor loading', engineRef: 'DATA.requirements.floorLoadingKnM2', standard: 'ASCE 7' },
+                { calc: 'Fire water / clean-agent demand', engineRef: 'models.fire + DATA.boq.takeoff.fire', standard: 'NFPA 2001/750' },
+                { calc: 'Water consumption / WUE', engineRef: 'DATA.waterFootprint', standard: 'ASHRAE / Uptime WUE' }
+            ]
+        },
+
         /* ══ v2.3.0 — DATA.deepSeaCooling: chiller-less deep-sea water cooling physics.
          * Design basis: the 150 MW AI DC reference architecture (owner poster, 2026) —
          * 3 separated loops (TCS rack CDU → FWS closed → seawater open), titanium Gr2 PHE,
@@ -7128,6 +7188,7 @@
             'boq.gfaM2PerMw':    { source: 'Turner & Townsend DC Cost Index 2025-26 (~10-11.4k sqft/MW gross) + Silverback WPSF series — screening; 900 m²/MW mid-band', asOf: '2025', unit: 'm² GFA per MW IT', method: 'SCREENING rule-of-thumb' },
             'boq.takeoff':       { source: 'SCREENING quantity-takeoff ratios: rebar ~130 kg/m³ (One Click LCA), structural steel ~40 kg/m² (CalcTree), raised floor ~4.6 m²/rack (dgtlinfra), clean-agent Novec 1230 ~0.55 kg/m³ per NFPA 2001/3M TDS (HIGH), CW coolant ~8 L/kW (B&V Water). Per-kW cable/tray/conduit/pipe-per-MW ratios = rule-of-thumb LOW confidence (Spon’s/RSMeans price installed length not per-kW) — folded into AACE −30/+50 band; each line carries its own confidence tag. Reconciled to CAPEX category totals so absolute ratio error does not move the total.', asOf: '2026', unit: 'material/labor qty per driver', method: 'AACE Class-4 screening; reconciled to parametric CAPEX' },
             'boq.unitRates':     { source: 'US-2025 material+install $/unit: concrete ~$320/m³ + rebar ~$2100/t (Gordian/HomeGuide), structural steel ~$3300/t (SteelFlo 2026), raised floor ~$270/m² (datacenterfloortiles), LV/MV cable + tray + CW pipe (1xTechnologies/DistributorWire/RSMeans/MEP Academy — LOW), bare BLS trade wages (electrician/pipefitter/ironworker/laborer). Regionalized via locMult; +5.5%/yr escalation (T&T). Aggregate line rates (ict/bms/security/cx/permits) are anchors scaled by reconcileFactor to the category $.', asOf: '2025', unit: 'USD per material/labor unit', method: 'SCREENING; add ~35-60% labor burden for a bid' },
+            'dossier': { source: 'STANDARD-PRACTICE EPC Technical Dossier scaffold — permitting matrix (typical AHJ permits + indicative durations), design basis (IEC/NEC/ASHRAE TC9.9/ASCE 7/NFPA/Uptime references), risk register (typical mission-critical DC risks), document register, ops-readiness gates. Reference convention (Uptime/TIA-942/BICSI/NFPA), NOT a project-specific submission; durations/risks indicative. models.dossier.sections composes these with live engine outputs.', asOf: '2026', unit: 'permit/risk/document/readiness scaffold + calc→model references', method: 'STANDARD-PRACTICE reference — validate against the AHJ + full design' },
             'boq.equipmentSizing': { source: 'SCREENING nominal unit ratings for equipment-count sizing (UPS 500kW module, genset 2.5MW, transformer 2.5MVA, CRAH 150kW, CDU 700kW, chiller 1.4MW) + redundancy addend by topology. Lead times reflect the 2026 long-lead reality — MV transformer/switchgear ~120 wk dominant (industry supply-chain reporting); UPS ~26, genset ~40, chiller ~32 wk.', asOf: '2026', unit: 'kW/MVA per unit + weeks lead time', method: 'SCREENING — real selection depends on the design' },
             'boq.procurement':      { source: 'Standard mission-critical DC EPC procurement packaging (12 packages P01-P12) with tender method, lead time, FAT/SAT, warranty — industry norm (Uptime/BICSI procurement practice). Package value = Σ mapped CapexResult category $.', asOf: '2026', unit: 'package scope + lead-time + FAT/SAT + warranty', method: 'SCREENING packaging convention' },
             'boq.commercialBasis': { source: 'EPC margin 8-12% gross / 2-6% net realized on LSTK mission-critical (XYZ Reality) — DISCLOSED, embedded in benchmark not added. Safety factors: NEC 210.20/215.3 continuous 1.25 (HIGH), ASCE 7-22 LRFD 1.2D+1.6L (HIGH), NEC 310.15 ampacity derate ~0.75 (HIGH), Uptime Tier-3 N+1 (HIGH). AACE 18R-97/17R-97 Class-4 −30%/+50% (HIGH); contingency set by risk, screening rule-of-thumb 20-30%.', asOf: '2026', unit: 'margin % + design safety factors', method: 'code-mandated factors HIGH; margin band screening' },
@@ -11309,6 +11370,52 @@
                         }, 0);
                         return { pkgNo: p.pkgNo, name: p.name, scope: p.scope, disciplines: p.disciplines, tenderMethod: p.tenderMethod, leadTimeWk: p.leadTimeWk, fatSat: p.fatSat, warrantyYr: p.warrantyYr, estValue: est, confidence: p.confidence, source: p.source };
                     });
+                }
+            },
+
+            /* ── BOQ Ship-3: EPC Technical Dossier assembler ──
+             * Composes the full multi-section dossier manifest + an executive summary
+             * from live inputs. Static content lives in DATA.dossier; per-section live
+             * data is pulled by the renderer from the existing models. STANDARD-PRACTICE
+             * reference — screening, validate against the AHJ + a full design. */
+            dossier: {
+                /* executive summary derived from the requirement inputs + CAPEX result. */
+                executiveSummary: function (input, result) {
+                    var itKw = (input && input.itLoad) || 0;
+                    var mw = itKw / 1000;
+                    var red = (input && input.redundancy) || 'n1';
+                    var redLabel = (DATA.redundancyLevels && DATA.redundancyLevels[red]) || red;
+                    var cooling = (input && input.coolingType) || 'liquid';
+                    var total = (result && result.total) || 0;
+                    var perKw = (result && result.metrics && result.metrics.perKw) || (itKw ? total / itKw : 0);
+                    var months = (result && result.metrics && result.metrics.timelineMonths) || 0;
+                    var pue = (result && result.pue) || (result && result.metrics && result.metrics.pue) || 0;
+                    return {
+                        capacityMw: +mw.toFixed(2),
+                        redundancy: redLabel,
+                        cooling: cooling,
+                        pue: pue,
+                        totalCapex: total,
+                        perKw: perKw,
+                        timelineMonths: months,
+                        racks: (result && result.metrics && result.metrics.racks) || 0
+                    };
+                },
+                /* ordered section manifest for the dossier table-of-contents; `data`
+                 * names the engine source the renderer pulls each section from. */
+                sections: function () {
+                    return [
+                        { key: 'exec',        title: 'Executive Summary',            data: 'models.dossier.executiveSummary' },
+                        { key: 'permitting',  title: 'Regulatory & Permitting Matrix', data: 'DATA.dossier.permittingMatrix' },
+                        { key: 'designBasis', title: 'Design Basis',                 data: 'DATA.dossier.designBasis' },
+                        { key: 'engCalcs',    title: 'Engineering Calculations',     data: 'DATA.dossier.engineeringCalcs' },
+                        { key: 'equipment',   title: 'Equipment Schedule',           data: 'models.boq.equipmentSchedule' },
+                        { key: 'boq',         title: 'Bill of Quantities',           data: 'models.boq.generate' },
+                        { key: 'procurement', title: 'Procurement Packages',         data: 'models.boq.procurementPackages' },
+                        { key: 'risk',        title: 'Risk Register',                data: 'DATA.dossier.riskRegister' },
+                        { key: 'opsReady',    title: 'Operations Readiness',         data: 'DATA.dossier.opsReadiness' },
+                        { key: 'docRegister', title: 'Document Register',            data: 'DATA.dossier.documentRegister' }
+                    ];
                 }
             }
         },
