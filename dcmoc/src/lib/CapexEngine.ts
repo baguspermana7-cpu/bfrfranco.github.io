@@ -143,7 +143,7 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
     const coolMult = (cd.coolingMult ?? coolingMultipliers)[coolingType] || 1.0;
     const rackMult = (cd.rackMult ?? rackMultipliers)[rackType] || 1.0;
     const buildMult = (cd.buildingMult ?? buildingMultipliers)[buildingType] || 1.0;
-    const seismicMult = (cd.seismicMult ?? seismicMultipliers)['zone2'] || 1.0; // Defaulting to Zone 2 for now
+    const seismicMult = (cd.seismicMult ?? seismicMultipliers)[input.seismicZone ?? 'zone2'] || 1.0; // wired to input.seismicZone (zone2 default) — now consistent with the BOQ take-off basis
     const fireSupMult = (cd.fireSuppressionMult ?? fireSuppressionMultipliers)[fireType] || 1.0;
     const alarmMult = (cd.fireAlarmMult ?? fireAlarmMultipliers)[alarmType] || 1.0;
     const upsMult = (cd.upsMult ?? upsMultipliers)[upsType] || 1.0;

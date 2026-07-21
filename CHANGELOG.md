@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.110.1 — 2026-07-22 (deep-BOQ correctness fixes — adversarial review)
+
+### Fixed
+- **Seismic zone now consistent + functional (HIGH)** — the Seismic Zone dropdown never affected CAPEX cost (CapexEngine hardcoded `zone2`), while the BOQ take-off read `input.seismicZone` (default `zone1`) — so civil rebar/bracing quantities were calibrated to a different zone than the cost basis. Now `CapexEngine` reads `input.seismicZone` (the dropdown works: zone0 0.2× → zone4 8× on the seismic category), BOQ driver + store `defaultInputs` both default `zone2` — all three agree. (Deliberate CAPEX re-baseline for non-zone2 selections — the control now does something.)
+- **Lump-fallback line coherence (MED)** — the zero-load reconciliation fallback hijacked the first real component row (qty 0 / rate 0 / full total); now pushes a dedicated `Lump sum` line (qty 1) so the discipline tree reads coherently.
+- **Removed 3 dead `unitRates` keys (MED)** — `securityPerRack`/`cxPerMw`/`permitPerMw` were pre-deepening anchors referenced by no leaf (a future author using `securityPerRack` would get a wrong $1,500/rack vs the real acs+cctv+intrusion path).
+
+### Verified
+- engine 722/0 · parity 155/0 · calibration 19/0 · bindings 85/0 (catalog 216fn/119src) · export 44/0 · tsc 0 + build. Reconciliation invariant + param wiring + dossier null-safety confirmed by the review (0 CRITICAL). Engine ?v `-k`→`-l`.
+
 ## v1.110.0 — 2026-07-22 (DCMOC quality program: deep BOQ dossier + design de-slop + KPI cards)
 
 Four-phase DCMOC overhaul (owner: dossier too shallow "3 levels deeper" + "design warna terlalu AI slop, harus intuitive" + KPI cards uneven/overflowing).

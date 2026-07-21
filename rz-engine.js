@@ -5873,7 +5873,6 @@
                 intrusion_m2:   { usd: 14,   confidence: 'low',  source: 'boq.unitRates' },
                 perimeterSec_m: { usd: 480,  confidence: 'low',  source: 'boq.unitRates' },
                 soc_perMw:      { usd: 45000, confidence: 'low', source: 'boq.unitRates' },
-                securityPerRack:{ usd: 1500, confidence: 'low',  source: 'boq.unitRates' },
                 /* ── testing_cx (per-MW anchors, scaled to category $) ── */
                 cxL1_perMw:     { usd: 40000, confidence: 'low', source: 'boq.unitRates' },
                 cxL2_perMw:     { usd: 45000, confidence: 'low', source: 'boq.unitRates' },
@@ -5881,14 +5880,12 @@
                 cxL4_perMw:     { usd: 60000, confidence: 'low', source: 'boq.unitRates' },
                 cxL5_perMw:     { usd: 45000, confidence: 'low', source: 'boq.unitRates' },
                 cxa_perMw:      { usd: 65000, confidence: 'low', source: 'boq.unitRates' },
-                cxPerMw:        { usd: 270000,confidence: 'low', source: 'boq.unitRates' },
                 /* ── permits / soft (per-MW anchors) ── */
                 designFee_perMw:{ usd: 180000,confidence: 'low', source: 'boq.unitRates' },
                 pm_perMw:       { usd: 140000,confidence: 'low', source: 'boq.unitRates' },
                 prelims_perMw:  { usd: 120000,confidence: 'low', source: 'boq.unitRates' },
                 insurance_perMw:{ usd: 60000, confidence: 'low', source: 'boq.unitRates' },
-                permitFee_perMw:{ usd: 80000, confidence: 'low', source: 'boq.unitRates' },
-                permitPerMw:    { usd: 80000, confidence: 'low', source: 'boq.unitRates' }
+                permitFee_perMw:{ usd: 80000, confidence: 'low', source: 'boq.unitRates' }
             },
             /* bare BLS national-mean trade wages ($/hr) — informational (labor is folded as
              * laborPct of material in screening mode; burden +35-60% for a real bid). */
@@ -11703,7 +11700,7 @@
                     var protectedM3 = mw * 1500;                           /* ~1500 m³/MW protected (2kW/m² × ~5m) */
 
                     /* ── param-conditional inputs (with page-DOM defaults) ── */
-                    var seismicZone = input.seismicZone || 'zone1';
+                    var seismicZone = input.seismicZone || 'zone2';   /* zone2 default — matches CapexEngine cost basis (consistency) */
                     var fireType    = input.fireType || 'novec';
                     var upsType     = input.upsType || 'modular';
                     var genType     = input.genType || 'diesel';   /* informational — fuel volume is diesel-store screening */
@@ -11793,10 +11790,12 @@
                         var reconcileFactor = bottomUp > 0 ? catTotal / bottomUp : 1;
                         if (bottomUp > 0) {
                             flat.forEach(function (l) { l.matCost *= reconcileFactor; l.laborCost *= reconcileFactor; l.total *= reconcileFactor; l.unitRate = l.qty > 0 ? l.total / l.qty : l.unitRate; });
-                        } else if (flat.length) {
-                            /* zero bottom-up but nonzero category $ (all drivers 0) — carry the
-                             * whole category $ on the first line so Σ lines === categoryTotal. */
-                            flat[0].total = catTotal; flat[0].matCost = catTotal; flat[0].laborCost = 0; flat[0].unitRate = 0; flat[0].spec = (flat[0].spec || '') + ' (lump — quantity not derivable at zero load)';
+                        } else if (subsystems.length) {
+                            /* zero bottom-up but nonzero category $ (all drivers 0) — add a
+                             * dedicated, coherent lump line (qty 1) rather than hijacking a real
+                             * component row, so Σ lines === categoryTotal and the tree reads cleanly. */
+                            var lump = { desc: 'Lump sum — quantity not derivable at zero load', spec: 'discipline allowance', unit: 'ls', qty: 1, unitRate: catTotal, matCost: catTotal, laborCost: 0, total: catTotal, confidence: 'low', source: 'boq.takeoff' };
+                            subsystems[0].lines.push(lump); flat.push(lump);
                         }
                         /* subsystem subtotals (post-reconcile; lines are shared references) */
                         subsystems.forEach(function (s) { s.subtotal = s.lines.reduce(function (a, l) { return a + l.total; }, 0); });

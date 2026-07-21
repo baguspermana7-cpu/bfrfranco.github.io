@@ -52,6 +52,8 @@ const defaultInputs: CapexInput = {
     fuelHours: 48,
     fireType: 'novec',
     alarmType: 'addressable',
+    seismicZone: 'zone2',   // explicit default so CapexEngine cost + BOQ take-off agree on first load
+
     projYear: '2025',
     designFee: 8,
     pmFee: 5,
