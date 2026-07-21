@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.99.10 — 2026-07-21 (pin Chart.js CDN versi sitewide — stabilitas)
+
+### Changed
+- **13 halaman dgn `chart.js` CDN tak dipin → `@4.4.1/dist/chart.umd.min.js`** (article-17/18/24/25, FF-1/2/3, roi/pue/tia-942/carbon/geopolitics-3/water-system): `cdn.jsdelivr.net/npm/chart.js` tanpa @versi menarik "latest" v4 = drift diam-diam (breaking change upstream bisa merusak chart kapan saja). Kini terkunci ke versi terverifikasi (sama dgn tco/tier-advisor). article-2 sudah @4.4.0 (dibiarkan, aman). Verifikasi headless: 4 halaman pinned render 0 error.
+
+### Verified
+- js-syntax audit CLEAN · headless render bersih · residual bare chart.js = 0 di halaman user-facing.
+
 ## v1.99.9 — 2026-07-21 (tier-advisor plugin errors fixed)
 
 ### Fixed
