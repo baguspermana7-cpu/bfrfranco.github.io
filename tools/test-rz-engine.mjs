@@ -1370,6 +1370,8 @@ if (M.opex && M.opex.totalAnnual) {
     ok('engineeringCalcs reference engine models', dos.engineeringCalcs.every(c => c.calc && c.engineRef && c.standard));
     const es = M.dossier.executiveSummary({ itLoad: 20000, redundancy: '2n', coolingType: 'liquid' }, { total: 340e6, pue: 1.2, metrics: { perKw: 17000, timelineMonths: 28, racks: 334 } });
     ok('dossier.executiveSummary derives capacity + capex + redundancy', es.capacityMw === 20 && es.totalCapex === 340e6 && /2N/i.test(es.redundancy) && es.timelineMonths === 28);
+    ok('executiveSummary timelineMonths falls back to result.timeline.totalMonths (native path)', M.dossier.executiveSummary({ itLoad: 20000 }, { total: 340e6, timeline: { totalMonths: 33 } }).timelineMonths === 33);
+    ok('dossier engineRefs resolve (floorLoadingKnM2 in architecture not requirements)', D.architecture.floorLoadingKnM2 != null && (D.requirements.floorLoadingKnM2 == null));
     const secs = M.dossier.sections();
     ok('dossier.sections manifest (10, ordered, boq+permitting+risk)', secs.length === 10 && secs.every(s => s.key && s.title && s.data) && secs.some(s => s.key === 'boq') && secs.some(s => s.key === 'permitting') && secs.some(s => s.key === 'risk'));
 }

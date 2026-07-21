@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.104.1 — 2026-07-21 (dossier correctness fixes — adversarial review)
+
+### Fixed
+- **Dangling engine references (HIGH)** — `DATA.dossier` Design Basis + Engineering Calculations pointed structural floor-loading at `DATA.requirements.floorLoadingKnM2`, which doesn't exist; the key lives in `DATA.architecture.floorLoadingKnM2`. Corrected both (the "Engine Reference" column an engineer follows to validate the calc now resolves).
+- **Executive-summary timeline via native engine path (HIGH)** — `models.dossier.executiveSummary` read only `result.metrics.timelineMonths`; a native `models.capex` result (no `.metrics`) silently rendered "— mo". Added `|| result.timeline.totalMonths` fallback.
+- **Section-title single-source drift (HIGH)** — dossier sections 5/6/7 hardcoded their titles instead of reading `SECTION_TITLES`, defeating the single-source ToC/header design. Now all sections read `SECTION_TITLES[n-1]`.
+
+### Verified
+- engine 697/0 (new: timeline fallback + floorLoading-path guards) · parity 155/0 · calibration 19/0 · bindings 85/0 · trace-parity 117/117 · export 44/0 · tsc 0 + build · script-tags CLEAN. Engine ?v `-f`→`-g`. Found by an adversarial review of the P3 dossier (0 CRITICAL, 3 HIGH resolved; MED/LOW were non-issues or false positives — `models.maintenance` does exist).
+
 ## v1.104.0 — 2026-07-21 (BOQ Phase 3: full EPC Technical Project Dossier)
 
 ### Added

@@ -5582,7 +5582,7 @@
             designBasis: [
                 { discipline: 'Electrical', basis: 'Utility supply, MV/LV topology, UPS + genset backup, redundancy per tier', standard: 'IEC 60364 / NEC / IEEE 3006', engineRef: 'models.requirements + capexDetail' },
                 { discipline: 'Mechanical / Cooling', basis: 'Cooling architecture, ASHRAE thermal envelope, redundancy, PUE target', standard: 'ASHRAE TC9.9 / TIA-942', engineRef: 'DATA.pueMatrix, DATA.architecture.ashraeClasses' },
-                { discipline: 'Structural', basis: 'Floor loading, seismic zone, wind, equipment foundations', standard: 'ASCE 7 / IBC', engineRef: 'DATA.requirements.floorLoadingKnM2' },
+                { discipline: 'Structural', basis: 'Floor loading, seismic zone, wind, equipment foundations', standard: 'ASCE 7 / IBC', engineRef: 'DATA.architecture.floorLoadingKnM2' },
                 { discipline: 'Fire & Life Safety', basis: 'Detection (VESDA), clean-agent suppression, compartmentation, egress', standard: 'NFPA 75/76/2001', engineRef: 'models.fire' },
                 { discipline: 'Availability / Tier', basis: 'Uptime tier topology + availability target', standard: 'Uptime Tier / TIA-942', engineRef: 'models.tier, models.reliability' }
             ],
@@ -5613,7 +5613,7 @@
                 { calc: 'Electrical load & UPS/genset sizing', engineRef: 'models.boq.equipmentSchedule + capexDetail', standard: 'NEC 220 / IEEE 3006' },
                 { calc: 'Cooling / heat load', engineRef: 'models.boq.drivers.coolingKw + DATA.pueMatrix', standard: 'ASHRAE TC9.9' },
                 { calc: 'Reliability / availability (tier)', engineRef: 'models.reliability + models.tier', standard: 'Uptime / IEEE 493' },
-                { calc: 'Structural floor loading', engineRef: 'DATA.requirements.floorLoadingKnM2', standard: 'ASCE 7' },
+                { calc: 'Structural floor loading', engineRef: 'DATA.architecture.floorLoadingKnM2', standard: 'ASCE 7' },
                 { calc: 'Fire water / clean-agent demand', engineRef: 'models.fire + DATA.boq.takeoff.fire', standard: 'NFPA 2001/750' },
                 { calc: 'Water consumption / WUE', engineRef: 'DATA.waterFootprint', standard: 'ASHRAE / Uptime WUE' }
             ]
@@ -11388,7 +11388,7 @@
                     var cooling = (input && input.coolingType) || 'liquid';
                     var total = (result && result.total) || 0;
                     var perKw = (result && result.metrics && result.metrics.perKw) || (itKw ? total / itKw : 0);
-                    var months = (result && result.metrics && result.metrics.timelineMonths) || 0;
+                    var months = (result && result.metrics && result.metrics.timelineMonths) || (result && result.timeline && result.timeline.totalMonths) || 0;
                     var pue = (result && result.pue) || (result && result.metrics && result.metrics.pue) || 0;
                     return {
                         capacityMw: +mw.toFixed(2),

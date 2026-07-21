@@ -568,7 +568,7 @@ function equipmentScheduleSection(items: BoqEquipmentItem[]): string {
         </tr>`;
     }).join('');
     return `<section class="block">
-        ${secHead(5, 'Equipment Schedule', 'informational, not reconciled to $')}
+        ${secHead(5, SECTION_TITLES[4], 'informational, not reconciled to $')}
         <table class="tbl">
             <thead><tr>
                 <th style="text-align:left;">Equipment</th>
@@ -605,7 +605,7 @@ function procurementPackagesSection(pkgs: BoqPackage[]): string {
         </tr>`,
     ).join('');
     return `<section class="block">
-        ${secHead(7, 'Procurement Packages')}
+        ${secHead(7, SECTION_TITLES[6])}
         <div style="border-left:3px solid ${T.amber};background:rgba(251,191,36,0.08);border-radius:0 10px 10px 0;padding:10px 13px;margin-bottom:10px;">
             <p style="font-size:10px;line-height:1.6;color:${T.text};margin:0;">
                 <b style="color:${T.amber};">Indicative scope envelopes</b> — package values <b>OVERLAP</b> (the electrical / mechanical
@@ -916,7 +916,7 @@ export function renderBoqDossierHTML(model: BoqModel, projectMeta?: BoqProjectMe
     ${designBasisHtml}
     ${engCalcsHtml}
     ${equipmentHtml}
-    ${secHead(6, 'Bill of Quantities', 'by discipline')}
+    ${secHead(6, SECTION_TITLES[5], 'by discipline')}
     ${disclaimerSection(merged)}
     ${commercialSummarySection(merged)}
     ${disciplinesHtml}
