@@ -2,9 +2,9 @@
  "generator": "tools/build-engine-catalog.mjs",
  "note": "AUTO-GENERATED from rz-engine.js — do not hand-edit. Consumers are grep-derived from real usage.",
  "dataVersion": "2.5.1",
- "modelCount": 49,
- "functionCount": 204,
- "sourceCount": 110,
+ "modelCount": 50,
+ "functionCount": 207,
+ "sourceCount": 114,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -177,6 +177,40 @@
     "dcmoc/src/lib/value-bindings.ts",
     "dcmoc/src/lib/value-trace.ts"
    ]
+  },
+  {
+   "name": "boq",
+   "functions": [
+    {
+     "name": "drivers",
+     "params": [
+      "costs",
+      "metrics",
+      "input"
+     ]
+    },
+    {
+     "name": "generate",
+     "params": [
+      "costs",
+      "metrics",
+      "input",
+      "opts"
+     ]
+    },
+    {
+     "name": "summary",
+     "params": [
+      "costs",
+      "softCosts",
+      "contingency",
+      "fomTotal",
+      "capexTotal",
+      "opts"
+     ]
+    }
+   ],
+   "consumers": []
   },
   {
    "name": "capacity",
@@ -1914,6 +1948,30 @@
    "source": "DC public-data corpus (tools/dc-corpus): operator/hyperscaler sustainability & annual reports + research bodies — every fact carries source_url + verbatim quote; distributions p10-p90 per metric x segment",
    "asOf": "2026-07-19",
    "method": "markitdown ingestion + heuristic extraction + percentile aggregation; regenerate via the corpus pipeline (append-only)"
+  },
+  {
+   "key": "boq.commercialBasis",
+   "source": "EPC margin 8-12% gross / 2-6% net realized on LSTK mission-critical (XYZ Reality) — DISCLOSED, embedded in benchmark not added. Safety factors: NEC 210.20/215.3 continuous 1.25 (HIGH), ASCE 7-22 LRFD 1.2D+1.6L (HIGH), NEC 310.15 ampacity derate ~0.75 (HIGH), Uptime Tier-3 N+1 (HIGH). AACE 18R-97/17R-97 Class-4 −30%/+50% (HIGH); contingency set by risk, screening rule-of-thumb 20-30%.",
+   "asOf": "2026",
+   "method": "code-mandated factors HIGH; margin band screening"
+  },
+  {
+   "key": "boq.gfaM2PerMw",
+   "source": "Turner & Townsend DC Cost Index 2025-26 (~10-11.4k sqft/MW gross) + Silverback WPSF series — screening; 900 m²/MW mid-band",
+   "asOf": "2025",
+   "method": "SCREENING rule-of-thumb"
+  },
+  {
+   "key": "boq.takeoff",
+   "source": "SCREENING quantity-takeoff ratios: rebar ~130 kg/m³ (One Click LCA), structural steel ~40 kg/m² (CalcTree), raised floor ~4.6 m²/rack (dgtlinfra), clean-agent Novec 1230 ~0.55 kg/m³ per NFPA 2001/3M TDS (HIGH), CW coolant ~8 L/kW (B&V Water). Per-kW cable/tray/conduit/pipe-per-MW ratios = rule-of-thumb LOW confidence (Spon’s/RSMeans price installed length not per-kW) — folded into AACE −30/+50 band; each line carries its own confidence tag. Reconciled to CAPEX category totals so absolute ratio error does not move the total.",
+   "asOf": "2026",
+   "method": "AACE Class-4 screening; reconciled to parametric CAPEX"
+  },
+  {
+   "key": "boq.unitRates",
+   "source": "US-2025 material+install $/unit: concrete ~$320/m³ + rebar ~$2100/t (Gordian/HomeGuide), structural steel ~$3300/t (SteelFlo 2026), raised floor ~$270/m² (datacenterfloortiles), LV/MV cable + tray + CW pipe (1xTechnologies/DistributorWire/RSMeans/MEP Academy — LOW), bare BLS trade wages (electrician/pipefitter/ironworker/laborer). Regionalized via locMult; +5.5%/yr escalation (T&T). Aggregate line rates (ict/bms/security/cx/permits) are anchors scaled by reconcileFactor to the category $.",
+   "asOf": "2025",
+   "method": "SCREENING; add ~35-60% labor burden for a bid"
   },
   {
    "key": "calibrationSpec",

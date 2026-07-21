@@ -18,11 +18,13 @@ import {
     escalationTable, PAYMENT_TERMS, boqRows, capexInsights,
 } from '@/state/adapters/capex-adapter';
 import { fmtMoney } from '@/lib/format';
-import { Building, ChevronRight, FileDown } from 'lucide-react';
+import { Building, ChevronRight, FileDown, ClipboardList } from 'lucide-react';
 import { rzData } from '@/lib/rz-engine';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
+import { buildBoqModel, openBoqDossier, withProjectMeta } from '@/modules/reporting/boq/BoqDossier';
+import { useRequirementsStore } from '@/store/requirements';
 
 export function CapexEnginePage() {
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
@@ -100,6 +102,17 @@ export function CapexEnginePage() {
         } finally { setBusy(false); }
     };
 
+    const openBoq = () => {
+        if (!results) return;
+        const m = buildBoqModel(inputs, results);
+        if (!m) return;
+        const meta = withProjectMeta(m, {
+            projectName: useRequirementsStore.getState().overview.projectName,
+            tierLevel: useSimulationStore.getState().inputs.tierLevel,
+        }).projectMeta;
+        openBoqDossier(m, meta);
+    };
+
     return (
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -119,6 +132,7 @@ export function CapexEnginePage() {
                         ))}
                     </div>
                     <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
+                    <button onClick={openBoq} title="Bill of Quantities — line items by discipline, disclosed margin, safety factors (save as PDF)" className="inline-flex items-center gap-1 rounded-lg border border-cyan-500/60 px-2.5 py-1.5 text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10"><ClipboardList className="h-3.5 w-3.5" />BOQ</button>
                     <button onClick={() => setActiveTab('construction')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: Construction <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>

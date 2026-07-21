@@ -5421,6 +5421,118 @@
             permitTimeMult: { sea: 1.2, india: 1.4, china: 1.3, japan: 1.5, australia: 1.3, europe: 1.4, usa: 1.0, mena: 1.1 }
         },
 
+        /* ══ v2.5.3 (BOQ Ship-1) — DATA.boq: screening-grade Bill-of-Quantities takeoff
+         * ratios + unit rates + commercial basis. Feeds models.boq, which DECOMPOSES a
+         * computed CapexResult.costs map into a hierarchical BOQ and RECONCILES each
+         * discipline's bottom-up sum to the parametric category $ (single source of truth
+         * = the CAPEX total; BOQ is never a divergent second number). AACE Class-4
+         * (−30%/+50%). Confidence per line: 'high' carry near face value, 'med' usable
+         * with range, 'low' rule-of-thumb (fold into the AACE band, footnote unsourced).
+         * The T&T/C&W benchmark $/kW that build the CAPEX total are OWNER-DELIVERED costs
+         * that already EMBED contractor margin — so margin here is DISCLOSED (backed out of
+         * the subtotal), never added on top. Sourced in DATA.sources['boq.*']. ══ */
+        boq: {
+            gfaM2PerMw: 900,   /* gross floor area m² per MW IT (T&T ~10-11.4k sqft/MW; Silverback WPSF) — med */
+            /* discipline → which CapexResult.costs categories it decomposes (reconcile target) */
+            disciplines: [
+                { key: 'civil_structural', label: 'Civil & Structural', categories: ['building', 'seismic'] },
+                { key: 'electrical',        label: 'Electrical (MV/LV, UPS, Genset)', categories: ['electrical', 'ups', 'generator'] },
+                { key: 'mechanical_cooling',label: 'Mechanical & Cooling',  categories: ['cooling'] },
+                { key: 'fire',              label: 'Fire Protection & Detection', categories: ['fireSuppression', 'fireAlarm'] },
+                { key: 'elv_ict',           label: 'ELV / ICT / BMS-DCIM', categories: ['network', 'bms'] },
+                { key: 'security',          label: 'Security Systems',     categories: ['security'] },
+                { key: 'testing_cx',        label: 'Testing & Commissioning', categories: ['commissioning', 'testing'] },
+                { key: 'permits',           label: 'Permits & Approvals',  categories: ['permits'] }
+            ],
+            /* per-discipline line items. driver ∈ gfaM2|itKw|racks|mw|protectedM3|coolingKw|lump.
+             * ratio × driver = qty; qty × unitRates[rateKey] = material; +laborPct labor. */
+            takeoff: {
+                civil_structural: [
+                    { desc: 'Structural concrete (foundations, slabs, cores)', spec: 'C32/40 in-place', unit: 'm³', driver: 'gfaM2', ratio: 0.30, rateKey: 'concrete_m3', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' },
+                    { desc: 'Reinforcement steel', spec: 'rebar ~130 kg/m³ concrete', unit: 't', driver: 'gfaM2', ratio: 0.30 * 0.130, rateKey: 'rebar_t', laborPct: 0.30, confidence: 'med', source: 'boq.takeoff' },
+                    { desc: 'Structural steel (frame, platforms)', spec: 'fabricated + erected', unit: 't', driver: 'gfaM2', ratio: 0.040, rateKey: 'steel_t', laborPct: 0.35, confidence: 'med', source: 'boq.takeoff' },
+                    { desc: 'Raised access floor', spec: 'heavy-duty, ~50 sqft/rack', unit: 'm²', driver: 'racks', ratio: 4.6, rateKey: 'raisedFloor_m2', laborPct: 0.25, confidence: 'med', source: 'boq.takeoff' }
+                ],
+                electrical: [
+                    { desc: 'LV power cable', spec: 'Cu XLPE ~500 kcmil equiv', unit: 'm', driver: 'itKw', ratio: 8, rateKey: 'lvCable_m', laborPct: 0.40, confidence: 'low', source: 'boq.takeoff' },
+                    { desc: 'MV cable', spec: '15 kV Cu 500 kcmil', unit: 'm', driver: 'mw', ratio: 600, rateKey: 'mvCable_m', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' },
+                    { desc: 'Cable tray / ladder', spec: 'GI, ≤40% fill', unit: 'm', driver: 'itKw', ratio: 0.15, rateKey: 'cableTray_m', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' },
+                    { desc: 'Earthing / grounding conductor', spec: 'Cu, IEEE 80/142 ring', unit: 't', driver: 'mw', ratio: 0.35, rateKey: 'groundingCu_t', laborPct: 0.30, confidence: 'low', source: 'boq.takeoff' }
+                ],
+                mechanical_cooling: [
+                    { desc: 'Chilled / condenser-water pipe', spec: 'welded steel, insulated', unit: 'm', driver: 'mw', ratio: 40, rateKey: 'cwPipe_m', laborPct: 0.45, confidence: 'low', source: 'boq.takeoff' },
+                    { desc: 'Coolant / glycol charge', spec: 'closed-loop CW (~8 L/kW cooling)', unit: 'L', driver: 'coolingKw', ratio: 8, rateKey: 'glycol_L', laborPct: 0.05, confidence: 'med', source: 'boq.takeoff' },
+                    { desc: 'Ductwork (sheet metal)', spec: 'galv. 24ga ~5 kg/m²', unit: 't', driver: 'mw', ratio: 3.0, rateKey: 'ductwork_t', laborPct: 0.40, confidence: 'low', source: 'boq.takeoff' }
+                ],
+                fire: [
+                    { desc: 'Clean-agent charge', spec: 'Novec 1230 ~0.55 kg/m³ protected', unit: 'kg', driver: 'protectedM3', ratio: 0.55, rateKey: 'cleanAgent_kg', laborPct: 0.20, confidence: 'high', source: 'boq.takeoff' },
+                    { desc: 'Detection (VESDA/smoke/heat) + pipework', spec: 'per protected volume', unit: 'm³', driver: 'protectedM3', ratio: 1.0, rateKey: 'fireDetect_m3', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                ],
+                elv_ict: [
+                    { desc: 'Structured cabling + containment', spec: 'OM4/Cat6A backbone', unit: 'rack', driver: 'racks', ratio: 1, rateKey: 'ictPerRack', laborPct: 0.40, confidence: 'low', source: 'boq.takeoff' },
+                    { desc: 'BMS / DCIM points + head-end', spec: 'per MW monitored', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'bmsPerMw', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                ],
+                security: [
+                    { desc: 'CCTV / ACS / intrusion', spec: 'per rack + perimeter', unit: 'rack', driver: 'racks', ratio: 1, rateKey: 'securityPerRack', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                ],
+                testing_cx: [
+                    { desc: 'Commissioning agent + IST/IFC/load-bank', spec: 'Cx labor', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'cxPerMw', laborPct: 0.85, confidence: 'low', source: 'boq.takeoff' }
+                ],
+                permits: [
+                    { desc: 'Permits, approvals, authority fees', spec: 'jurisdiction fees', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'permitPerMw', laborPct: 0.10, confidence: 'low', source: 'boq.takeoff' }
+                ]
+            },
+            /* US 2025 baseline material+install $/unit; regionalize via locMult. Placeholder
+             * unitRates for aggregate line items (ict/bms/security/cx/permits/fireDetect) are
+             * anchors the reconcileFactor scales to the category $ — their absolute value is
+             * indicative, the category total is authoritative. */
+            unitRates: {
+                concrete_m3:    { usd: 320,  confidence: 'med',  source: 'boq.unitRates' },
+                rebar_t:        { usd: 2100, confidence: 'med',  source: 'boq.unitRates' },
+                steel_t:        { usd: 3300, confidence: 'med',  source: 'boq.unitRates' },
+                raisedFloor_m2: { usd: 270,  confidence: 'med',  source: 'boq.unitRates' },
+                lvCable_m:      { usd: 45,   confidence: 'low',  source: 'boq.unitRates' },
+                mvCable_m:      { usd: 140,  confidence: 'low',  source: 'boq.unitRates' },
+                cableTray_m:    { usd: 65,   confidence: 'low',  source: 'boq.unitRates' },
+                groundingCu_t:  { usd: 15000,confidence: 'low',  source: 'boq.unitRates' },
+                cwPipe_m:       { usd: 40,   confidence: 'low',  source: 'boq.unitRates' },
+                glycol_L:       { usd: 6,    confidence: 'low',  source: 'boq.unitRates' },
+                ductwork_t:     { usd: 6000, confidence: 'low',  source: 'boq.unitRates' },
+                cleanAgent_kg:  { usd: 55,   confidence: 'med',  source: 'boq.unitRates' },
+                fireDetect_m3:  { usd: 25,   confidence: 'low',  source: 'boq.unitRates' },
+                ictPerRack:     { usd: 4500, confidence: 'low',  source: 'boq.unitRates' },
+                bmsPerMw:       { usd: 160000,confidence: 'low', source: 'boq.unitRates' },
+                securityPerRack:{ usd: 1500, confidence: 'low',  source: 'boq.unitRates' },
+                cxPerMw:        { usd: 270000,confidence: 'low', source: 'boq.unitRates' },
+                permitPerMw:    { usd: 80000, confidence: 'low', source: 'boq.unitRates' }
+            },
+            /* bare BLS national-mean trade wages ($/hr) — informational (labor is folded as
+             * laborPct of material in screening mode; burden +35-60% for a real bid). */
+            laborRates: {
+                electrician:  { usdHr: 34.4, confidence: 'high', source: 'boq.unitRates' },
+                pipefitter:   { usdHr: 34.7, confidence: 'high', source: 'boq.unitRates' },
+                ironworker:   { usdHr: 31.0, confidence: 'med',  source: 'boq.unitRates' },
+                laborer:      { usdHr: 25.0, confidence: 'high', source: 'boq.unitRates' }
+            },
+            commercialBasis: {
+                epcMarginPctGross: 10,       /* gross margin (profit÷price) on LSTK mission-critical EPC */
+                marginBandGross: [8, 12],
+                netRealizedPct: [2, 6],       /* DC-specific net realized margin (tightest sourced) */
+                contingencyRuleOfThumbPct: [20, 30],  /* AACE sets by risk; screening rule-of-thumb */
+                aaceClass: 4,
+                aaceBand: '−30% / +50%',
+                marginNote: 'Benchmark $/kW are owner-delivered costs that ALREADY embed contractor margin; the margin shown is DISCLOSED (backed out of the subtotal via m/(1+m)), not added on top. 10% margin = 11.1% markup on cost.',
+                safetyFactors: {
+                    electricalContinuous: 1.25,   /* NEC 210.20(A)/215.3 continuous-load 125% */
+                    structuralLRFD: '1.2D + 1.6L', /* ASCE 7-22 §2.3 */
+                    cableAmpacityDerate: 0.75,     /* NEC 310.15 grouping×ambient (0.5-0.8) */
+                    coolingRedundancy: 'N+1',      /* Uptime Tier-3 concurrently maintainable */
+                    seismic: 'per zone factor (DATA.capexDetail.seismicMult)'
+                },
+                disclaimer: 'SCREENING-GRADE (AACE Class-4, −30%/+50%) — engine-computed decomposition of the parametric CAPEX total; NOT a quotation, tender, or detailed quantity survey. Quantities from sourced per-MW/per-rack ratios (many low-confidence rule-of-thumb, folded into the accuracy band), reconciled to the CAPEX category totals. Validate against RSMeans/Spon’s + a full engineering design before procurement.'
+            }
+        },
+
         /* ══ v2.3.0 — DATA.deepSeaCooling: chiller-less deep-sea water cooling physics.
          * Design basis: the 150 MW AI DC reference architecture (owner poster, 2026) —
          * 3 separated loops (TCS rack CDU → FWS closed → seawater open), titanium Gr2 PHE,
@@ -6987,6 +7099,10 @@
             'capexDetail': { source: 'Turner & Townsend DCCI 2025 + Cushman & Wakefield DC Cost Guide 2025 (city $/W anchor table) + JLL 2026 escalation; category factors calibrated to the anchor (locMult = perW/4.65) — lineage: capex-calculator inline model, lifted v2.3.0', asOf: '2025', method: 'budgetary estimate-grade; NOT detailed engineering' },
             'capexDetail.costFactors.electrical': { source: 'calculator lineage 1200 $/kW (DCMOC A7 2025 used 1550 for a different model shape — NOT merged; engine detailed model is the shared source from v2.3.0)', asOf: '2025', unit: '$/kW IT' },
             'deepSeaCooling': { source: 'Design basis: 150 MW AI DC deep-sea cooling reference architecture (owner, 2026) — chiller-less primary + hybrid trim backup; seawater properties: TEOS-10/IOC tables at S=35, 5 °C; intake-temp bands: NOAA World Ocean Atlas typical tropical/subtropical profiles; SWAC cost scaling: Makai Ocean Engineering SWAC studies + Hawaii/InterContinental SWAC projects (public figures), HDPE marine pipeline install multipliers 2.5-4x onshore', asOf: '2026', method: 'poster mode reproduces the reference (cp 4.0, rho 1000): 172.5 MW / (4.0*5) = 8.625 m3/s = 31,050 m3/h, 4+1 pumps 2.9 m3/s @ 60 m ≈ 2.0 MW each; accurate mode uses rho 1025 / cp 3985' },
+            'boq.gfaM2PerMw':    { source: 'Turner & Townsend DC Cost Index 2025-26 (~10-11.4k sqft/MW gross) + Silverback WPSF series — screening; 900 m²/MW mid-band', asOf: '2025', unit: 'm² GFA per MW IT', method: 'SCREENING rule-of-thumb' },
+            'boq.takeoff':       { source: 'SCREENING quantity-takeoff ratios: rebar ~130 kg/m³ (One Click LCA), structural steel ~40 kg/m² (CalcTree), raised floor ~4.6 m²/rack (dgtlinfra), clean-agent Novec 1230 ~0.55 kg/m³ per NFPA 2001/3M TDS (HIGH), CW coolant ~8 L/kW (B&V Water). Per-kW cable/tray/conduit/pipe-per-MW ratios = rule-of-thumb LOW confidence (Spon’s/RSMeans price installed length not per-kW) — folded into AACE −30/+50 band; each line carries its own confidence tag. Reconciled to CAPEX category totals so absolute ratio error does not move the total.', asOf: '2026', unit: 'material/labor qty per driver', method: 'AACE Class-4 screening; reconciled to parametric CAPEX' },
+            'boq.unitRates':     { source: 'US-2025 material+install $/unit: concrete ~$320/m³ + rebar ~$2100/t (Gordian/HomeGuide), structural steel ~$3300/t (SteelFlo 2026), raised floor ~$270/m² (datacenterfloortiles), LV/MV cable + tray + CW pipe (1xTechnologies/DistributorWire/RSMeans/MEP Academy — LOW), bare BLS trade wages (electrician/pipefitter/ironworker/laborer). Regionalized via locMult; +5.5%/yr escalation (T&T). Aggregate line rates (ict/bms/security/cx/permits) are anchors scaled by reconcileFactor to the category $.', asOf: '2025', unit: 'USD per material/labor unit', method: 'SCREENING; add ~35-60% labor burden for a bid' },
+            'boq.commercialBasis': { source: 'EPC margin 8-12% gross / 2-6% net realized on LSTK mission-critical (XYZ Reality) — DISCLOSED, embedded in benchmark not added. Safety factors: NEC 210.20/215.3 continuous 1.25 (HIGH), ASCE 7-22 LRFD 1.2D+1.6L (HIGH), NEC 310.15 ampacity derate ~0.75 (HIGH), Uptime Tier-3 N+1 (HIGH). AACE 18R-97/17R-97 Class-4 −30%/+50% (HIGH); contingency set by risk, screening rule-of-thumb 20-30%.', asOf: '2026', unit: 'margin % + design safety factors', method: 'code-mandated factors HIGH; margin band screening' },
             'coolingTech': { source: 'Vendor datasheets + OCP/press for COMMERCIAL (CoolIT/JetCool/ZutaCore/GRC/Submer/Iceotope — TRL 8-9, shipping); research disclosures for EMERGING (Corintis EPFL+Microsoft in-chip validation 2024-25, TSMC DSLC, IMEC impinging-jet >600 W/cm², IBM microfluidic — TRL 5-7 pilot/lab). rackKwClaim + PUE ladder = screening; NO public per-rack CAPEX for microfluidic (multiplier SCREENING-only). Microfluidic is NOT an NVIDIA architecture fact.', asOf: '2026-07', unit: 'per-tech TRL + rack-kW capability + coolant/WUE basis', method: 'technology-readiness classification; commercial=deployable, emerging=pilot/research' },
             'refrigerants': { source: 'GWP100 IPCC AR4 (consistent with sitewide published values); ASHRAE 34 safety classes; copIndex: AHRI/manufacturer typical relative cycle efficiency at water-cooled chiller conditions (R-134a=1.00) — estimate-grade; charge/leak: GHG Protocol + EPA GreenChill typical ranges', asOf: '2026', method: 'copIndex and charge/leak are screening estimates, not equipment selections' },
             'energy': { source: 'Lazard LCOE+ 2025 (solar/wind capex+CF ranges), IRENA Renewable Power Generation Costs 2024 (APAC/ID), BNEF BESS pack+BOS 2026 ~$180/kWh installed', asOf: '2026', method: 'screening-grade; not an interconnection/reliability study' },
@@ -11039,6 +11155,85 @@
                     scored.sort(function (a, b) { return b.closeness - a.closeness; });
                     scored.forEach(function (s, i) { s.rank = i + 1; });
                     return scored;
+                }
+            },
+
+            /* ── BOQ Ship-1: Bill-of-Quantities decomposition (Layer, reconciled) ──
+             * Decomposes a computed CapexResult.costs map into a hierarchical BOQ whose
+             * discipline sums RECONCILE to the parametric category $ (single source of
+             * truth). Pure function of DATA.boq + the passed costs/metrics — no economic
+             * literal in the body. */
+            boq: {
+                /* driver values from CapexResult.metrics + input. */
+                drivers: function (costs, metrics, input) {
+                    var mw = (input && input.itLoad != null ? input.itLoad : 0) / 1000;
+                    var itKw = (input && input.itLoad != null ? input.itLoad : 0);
+                    var racks = metrics && metrics.racks ? metrics.racks : 0;
+                    var floorSpaceM2 = metrics && metrics.floorSpace ? metrics.floorSpace : 0;
+                    var gfaM2 = mw * DATA.boq.gfaM2PerMw;
+                    var pue = metrics && metrics.pue ? metrics.pue : 1.4;
+                    var coolingKw = itKw * (pue > 1 ? (pue - 1) : 0.4);   /* heat rejection ≈ (PUE−1)×IT + IT */
+                    coolingKw = itKw + coolingKw;                          /* total kW to reject ≈ IT + overhead */
+                    var protectedM3 = mw * 1500;                           /* ~1500 m³/MW protected (2kW/m² × ~5m) */
+                    return { mw: mw, itKw: itKw, racks: racks, floorSpaceM2: floorSpaceM2, gfaM2: gfaM2, coolingKw: coolingKw, protectedM3: protectedM3, lump: 1 };
+                },
+                /* Build reconciled discipline BOQ from costs{} + drivers. locMult scales
+                 * material rates back toward the region (default 1 = US baseline). */
+                generate: function (costs, metrics, input, opts) {
+                    opts = opts || {};
+                    var B = DATA.boq;
+                    var loc = opts.locMult != null ? opts.locMult : 1.0;
+                    var drivers = RZEngine.models.boq.drivers(costs, metrics, input);
+                    var disciplines = [];
+                    B.disciplines.forEach(function (d) {
+                        var catTotal = 0;
+                        d.categories.forEach(function (c) { catTotal += (costs && costs[c] ? costs[c] : 0); });
+                        if (!(catTotal > 0)) return;
+                        var raw = (B.takeoff[d.key] || []).map(function (t) {
+                            var qty = (drivers[t.driver] != null ? drivers[t.driver] : 0) * t.ratio;
+                            var rate = (B.unitRates[t.rateKey] && B.unitRates[t.rateKey].usd) || 0;
+                            rate = rate * loc;
+                            var mat = qty * rate;
+                            var labor = mat * (t.laborPct != null ? t.laborPct : 0);
+                            return { desc: t.desc, spec: t.spec, unit: t.unit, qty: qty, unitRate: rate, matCost: mat, laborCost: labor, total: mat + labor, confidence: t.confidence, source: t.source };
+                        });
+                        var bottomUp = raw.reduce(function (s, l) { return s + l.total; }, 0);
+                        var reconcileFactor = bottomUp > 0 ? catTotal / bottomUp : 1;
+                        raw.forEach(function (l) { l.matCost *= reconcileFactor; l.laborCost *= reconcileFactor; l.total *= reconcileFactor; l.unitRate = l.qty > 0 ? l.total / l.qty : l.unitRate; });
+                        disciplines.push({ key: d.key, label: d.label, categories: d.categories, categoryTotal: catTotal, lines: raw, reconcileFactor: +reconcileFactor.toFixed(3), bottomUpRaw: +bottomUp.toFixed(0) });
+                    });
+                    return { disciplines: disciplines, drivers: drivers, hardTotal: disciplines.reduce(function (s, d) { return s + d.categoryTotal; }, 0) };
+                },
+                /* Commercial roll-up: discloses embedded EPC margin (backed out of the
+                 * hard subtotal, m/(1+m)) + safety factors; grandTotal ties to capexTotal. */
+                summary: function (costs, softCosts, contingency, fomTotal, capexTotal, opts) {
+                    opts = opts || {};
+                    var cb = DATA.boq.commercialBasis;
+                    var m = (opts.epcMarginPct != null ? opts.epcMarginPct : cb.epcMarginPctGross) / 100;
+                    var hard = 0; for (var k in costs) { if (Object.prototype.hasOwnProperty.call(costs, k)) hard += (costs[k] || 0); }
+                    var soft = ((softCosts && softCosts.design) || 0) + ((softCosts && softCosts.pm) || 0);
+                    var embeddedMargin = hard * (m / (1 + m));
+                    var directCost = hard - embeddedMargin;
+                    var grandTotal = capexTotal;
+                    var accounted = hard + soft + (contingency || 0) + (fomTotal || 0);
+                    return {
+                        directCost: directCost,
+                        embeddedMargin: embeddedMargin,
+                        marginPctGross: cb.epcMarginPctGross,
+                        marginMarkupOnCost: +((m / (1 - m)) * 100).toFixed(1),
+                        hardSubtotal: hard,
+                        softCosts: soft,
+                        contingency: contingency || 0,
+                        fom: fomTotal || 0,
+                        grandTotal: grandTotal,
+                        /* hard+soft+contingency+fom should ≈ capexTotal; residual = greenCert
+                         * premium + renewables (disclosed as unaccounted, not hidden). */
+                        reconciles: Math.abs(accounted - capexTotal) / (capexTotal || 1) < 0.12,
+                        unaccounted: +(capexTotal - accounted).toFixed(0),
+                        safetyFactors: cb.safetyFactors,
+                        aaceClass: cb.aaceClass, aaceBand: cb.aaceBand,
+                        disclaimer: cb.disclaimer, marginNote: cb.marginNote
+                    };
                 }
             }
         },

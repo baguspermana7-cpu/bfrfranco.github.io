@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.102.0 — 2026-07-21 (DCMOC BOQ Dossier: clickable CAPEX → engine-traceable Bill of Quantities + margin/safety disclaimer)
+
+### Added
+- **RZEngine `DATA.boq` + `models.boq`** — screening-grade Bill-of-Quantities engine (owner: click "$2.25B" → generate BOQ PDF/HTML). `DATA.boq` = 8 disciplines (civil/structural, electrical, mechanical/cooling, fire, ELV/ICT/BMS, security, testing/cx, permits) mapped to the 14 CapexResult cost categories + `takeoff` quantity ratios (concrete m³/m², rebar 130 kg/m³, steel 40 kg/m², raised floor 4.6 m²/rack, clean-agent 0.55 kg/m³, coolant 8 L/kW, cable/tray/pipe per-kW…) + `unitRates` (US-2025 material+install, regionalized via locMult) + `laborRates` (BLS trade wages) + `commercialBasis`. Every leaf sourced + per-line confidence (high/med/low). **`models.boq.generate(costs, metrics, input, {locMult})`** decomposes a computed CapexResult into hierarchical line items and **RECONCILES** each discipline's bottom-up sum to the parametric category $ via `reconcileFactor` (BOQ = decomposition of the same total, never a divergent number; raw factor disclosed). **`models.boq.summary(...)`** rolls up + **DISCLOSES embedded EPC margin** (backed out of subtotal via m/(1+m), NOT added on top — benchmark $/kW already embed it; 10% gross = 11.1% markup) + safety factors (NEC 1.25, ASCE 7 LRFD 1.2D+1.6L, ampacity 0.75, Uptime N+1); grandTotal ties to CAPEX total. AACE Class-4 (−30/+50). Standard: `standarization/BOQ_DOSSIER_STANDARD.md`.
+- **DCMOC BOQ Dossier** (`dcmoc/src/modules/reporting/boq/BoqDossier.ts`) — `buildBoqModel` + `renderBoqDossierHTML` (dark/instrument A4-print HTML5: cover · prominent disclaimer + safety-factor table + disclosed-margin block · commercial summary reconciled to CAPEX · 8 discipline line-item tables with confidence chips + reconcile note) + `openBoqDossier` (print-window → viewable HTML, export PDF via browser print). Entry points: **clickable `$2.25B`** — `TraceValue.tsx` popover on `capex.total` gets a "⬇ Download BOQ" button; + prominent "Bill of Quantities (BOQ)" buttons on Construction Engine (where owner clicked) + CAPEX Engine page. 2 value-trace nodes (`boq.grandTotal`, `boq.marginPct`).
+
+### Verified
+- engine 677/0 · parity 155/0 · calibration 19/0 · bindings 85/0 (catalog 207fn/114src) · dc-corpus 2678/0 · trace-parity 117/117 · walk 24/0 · synergy 6/0 · export 44/0 · tsc 0 + next build · js-syntax/script-tags/dark CLEAN. Reconciliation invariant Σ(lines)===categoryTotal proven per discipline; dossier grand total === CAPEX total; margin disclosed-not-added; no `</script>` hazard. Engine ?v `-b`→`-c` (74 uniform incl. DCMOC layout.tsx). Phased grand plan: P1 shipped; P2 (equipment schedule/procurement/labor) + P3 (full 20-section EPC dossier) queued.
+
 ## v1.101.0 — 2026-07-21 (DCMOC Ship-B: cooling ladder + microfluidic + EMEA region fix)
 
 ### Added

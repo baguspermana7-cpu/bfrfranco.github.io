@@ -1306,6 +1306,47 @@ if (M.opex && M.opex.totalAnnual) {
     ok('capexDetail.coolingMult microfluidic > immersion_2p > immersion_1p > liquid', D.capexDetail.coolingMult.microfluidic > D.capexDetail.coolingMult.immersion_2p && D.capexDetail.coolingMult.immersion_2p > D.capexDetail.coolingMult.immersion_1p && D.capexDetail.coolingMult.immersion_1p > D.capexDetail.coolingMult.liquid);
 }
 
+/* ── BOQ Ship-1: reconciled Bill-of-Quantities decomposition ── */
+{
+    const boq = D.boq;
+    ok('DATA.boq present + gfa sourced', !!boq && !!D.sources['boq.gfaM2PerMw'] && !!D.sources['boq.takeoff'] && !!D.sources['boq.unitRates'] && !!D.sources['boq.commercialBasis']);
+    ok('boq disciplines map to cost categories (8)', Array.isArray(boq.disciplines) && boq.disciplines.length === 8 && boq.disciplines.every(d => Array.isArray(d.categories) && d.categories.length >= 1));
+    /* every takeoff line + unitRate carries confidence + source */
+    let takeoffOk = true, rateOk = true;
+    for (const d of boq.disciplines) {
+        for (const t of (boq.takeoff[d.key] || [])) { if (!t.confidence || !t.source || !t.rateKey) takeoffOk = false; if (!boq.unitRates[t.rateKey]) rateOk = false; }
+    }
+    ok('every takeoff line sourced + confidence + rateKey resolves', takeoffOk && rateOk);
+    ok('every unitRate has usd + confidence + source', Object.values(boq.unitRates).every(r => Number.isFinite(r.usd) && r.confidence && r.source));
+    /* synthetic 20 MW costs map → generate + reconcile */
+    const costs = { building: 60e6, seismic: 3e6, electrical: 90e6, ups: 40e6, generator: 25e6, cooling: 55e6, fireSuppression: 6e6, fireAlarm: 3e6, bms: 5e6, network: 8e6, security: 3e6, commissioning: 5e6, testing: 4e6, permits: 2e6 };
+    const metrics = { racks: 334, floorSpace: 1000, pue: 1.3 };
+    const input = { itLoad: 20000 };
+    const g = M.boq.generate(costs, metrics, input, { locMult: 1.0 });
+    ok('boq.generate returns disciplines', Array.isArray(g.disciplines) && g.disciplines.length === 8);
+    /* RECONCILIATION INVARIANT: Σ(line totals) === categoryTotal per discipline */
+    let reconciled = true, tiesToCat = true;
+    for (const d of g.disciplines) {
+        const sumLines = d.lines.reduce((s, l) => s + l.total, 0);
+        if (Math.abs(sumLines - d.categoryTotal) > 1) reconciled = false;
+        const catSum = d.categories.reduce((s, c) => s + costs[c], 0);
+        if (Math.abs(catSum - d.categoryTotal) > 0.01) tiesToCat = false;
+    }
+    ok('boq reconciliation: Σ lines === categoryTotal (all disciplines)', reconciled);
+    ok('boq categoryTotal === Σ mapped CapexResult categories', tiesToCat);
+    ok('boq hardTotal === Σ all 14 costs', Math.abs(g.hardTotal - Object.values(costs).reduce((s, v) => s + v, 0)) < 1);
+    ok('boq drivers derive gfa + coolingKw + protectedM3', g.drivers.gfaM2 === 20 * boq.gfaM2PerMw && g.drivers.protectedM3 === 20 * 1500 && g.drivers.coolingKw > input.itLoad);
+    /* summary: margin disclosed (backed out, not added), grandTotal ties to capexTotal */
+    const capexTotal = 340e6, soft = { design: 12e6, pm: 8e6 }, cont = 30e6, fom = 15e6;
+    const sm = M.boq.summary(costs, soft, cont, fom, capexTotal, {});
+    ok('boq.summary grandTotal === capexTotal', sm.grandTotal === capexTotal);
+    ok('boq embedded margin backed out (m/(1+m)), not added', Math.abs(sm.embeddedMargin - sm.hardSubtotal * (0.10 / 1.10)) < 1 && sm.directCost < sm.hardSubtotal);
+    ok('boq margin markup on cost ≈ 11.1%', Math.abs(sm.marginMarkupOnCost - 11.1) < 0.2);
+    ok('boq safety factors present (NEC 1.25 + LRFD + N+1)', sm.safetyFactors.electricalContinuous === 1.25 && /1\.2D/.test(sm.safetyFactors.structuralLRFD) && sm.safetyFactors.coolingRedundancy === 'N+1');
+    ok('boq disclaimer = screening, not a quotation', /SCREENING/i.test(sm.disclaimer) && /not a quotation/i.test(sm.disclaimer));
+    ok('boq marginNote discloses embedded-not-added', /embed/i.test(sm.marginNote) && /not added/i.test(sm.marginNote));
+}
+
 /* ── Arc-1 calibrationSpec structural ── */
 {
     const cs = D.calibrationSpec;

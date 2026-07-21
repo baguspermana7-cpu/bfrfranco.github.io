@@ -2044,3 +2044,29 @@ Object.assign(TRACE, {
     },
 } satisfies Record<string, TraceNode>);
 TRACE_IDS.push('req.provisionedRackKw', 'capex.provisionedPowerUplift');
+
+/* ═══ BOQ wave (append-bottom) — Bill of Quantities dossier surface ═══════════
+ * The BOQ dossier decomposes the parametric CAPEX total into a screening-grade
+ * bill of quantities via the shared engine (models.boq.generate/.summary). The
+ * dossier grand total IS the CAPEX total (the decomposition reconciles to it),
+ * so boq.grandTotal derives from capex.total. boq.marginPct is the DISCLOSED
+ * EPC margin basis (backed out of the subtotal — the benchmark $/kW already
+ * embed it), an engine constant sourced via DATA.boq.commercialBasis. */
+Object.assign(TRACE, {
+    'boq.grandTotal': {
+        label: 'BOQ Grand Total (= CAPEX total)', page: 'capex', unit: '$', provenance: 'derived',
+        formulaTemplate: 'models.boq.summary(...).grandTotal — the BOQ decomposition reconciles to capex.total (direct cost + disclosed margin + soft + contingency + FOM + unaccounted residual)',
+        deps: ['capex.total'],
+        get: () => cap().results?.total ?? null,
+    },
+    'boq.marginPct': {
+        label: 'BOQ Disclosed EPC Margin (% gross)', page: 'capex', unit: '%', provenance: 'engine',
+        formulaTemplate: 'DATA.boq.commercialBasis.epcMarginPctGross — DISCLOSED margin backed out of the benchmark $/kW subtotal (m ÷ (1+m)), NOT added on top; the T&T/C&W $/kW already embed contractor margin',
+        sourceKey: 'boq.commercialBasis',
+        get: () => {
+            const b = (rzData() as { boq?: { commercialBasis?: { epcMarginPctGross?: number } } }).boq;
+            return b?.commercialBasis?.epcMarginPctGross ?? null;
+        },
+    },
+} satisfies Record<string, TraceNode>);
+TRACE_IDS.push('boq.grandTotal', 'boq.marginPct');

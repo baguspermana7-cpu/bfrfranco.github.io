@@ -15,6 +15,9 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { resolveTrace, type ResolvedTrace } from '@/lib/value-trace';
 import { useSimulationStore } from '@/store/simulation';
+import { useCapexStore } from '@/store/capex';
+import { useRequirementsStore } from '@/store/requirements';
+import { buildBoqModel, openBoqDossier, withProjectMeta } from '@/modules/reporting/boq/BoqDossier';
 
 const PROV_STYLE: Record<string, { pill: string; chip: string; label: string }> = {
     input: { pill: 'border-violet-400/60 bg-violet-500/10 hover:bg-violet-500/20', chip: 'bg-violet-500/15 text-violet-500 dark:text-violet-300', label: 'Your input' },
@@ -104,6 +107,21 @@ function Panel({ root }: { root: ResolvedTrace }) {
     const node = path[path.length - 1];
     const st = PROV_STYLE[node.provenance];
     const summary = React.useMemo(() => leafSummary(root), [root]);
+    const [boqBlocked, setBoqBlocked] = React.useState(false);
+
+    /* CAPEX total → Bill of Quantities dossier (screening-grade HTML → PDF). */
+    const downloadBoq = () => {
+        const { inputs, results } = useCapexStore.getState();
+        if (!results) return;
+        const model = buildBoqModel(inputs, results);
+        if (!model) { setBoqBlocked(true); setTimeout(() => setBoqBlocked(false), 2400); return; }
+        const meta = withProjectMeta(model, {
+            projectName: useRequirementsStore.getState().overview.projectName,
+            tierLevel: useSimulationStore.getState().inputs.tierLevel,
+        }).projectMeta;
+        const ok = openBoqDossier(model, meta);
+        if (!ok) { setBoqBlocked(true); setTimeout(() => setBoqBlocked(false), 2400); }
+    };
 
     const copyChain = async () => {
         const text = `Trace: ${root.label}\n${traceToText(root)}`;
@@ -252,6 +270,21 @@ function Panel({ root }: { root: ResolvedTrace }) {
                     </a>
                 )}
             </div>
+
+            {/* CAPEX total → downloadable Bill of Quantities dossier */}
+            {node.id === 'capex.total' && (
+                <div className="mt-2">
+                    <button onClick={downloadBoq}
+                        aria-label="Download the Bill of Quantities technical dossier (opens a printable page — save as PDF)"
+                        title="Full Bill of Quantities — line items by discipline, disclosed margin, safety factors; save as PDF from the print dialog"
+                        className="w-full rounded-lg border border-cyan-500/50 py-1.5 text-center text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10">
+                        ⬇ Download BOQ / Bill of Quantities
+                    </button>
+                    {boqBlocked && (
+                        <p className="mt-1 text-[9px] text-amber-500">Popup blocked (or no CAPEX result yet). Allow popups for this site and retry.</p>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
