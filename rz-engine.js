@@ -5530,7 +5530,33 @@
                     seismic: 'per zone factor (DATA.capexDetail.seismicMult)'
                 },
                 disclaimer: 'SCREENING-GRADE (AACE Class-4, −30%/+50%) — engine-computed decomposition of the parametric CAPEX total; NOT a quotation, tender, or detailed quantity survey. Quantities from sourced per-MW/per-rack ratios (many low-confidence rule-of-thumb, folded into the accuracy band), reconciled to the CAPEX category totals. Validate against RSMeans/Spon’s + a full engineering design before procurement.'
-            }
+            },
+            /* BOQ Ship-2 — nominal unit capacities for equipment-count sizing (N + redundancy).
+             * Screening ratings; real selection depends on the design. Lead times are the
+             * long-lead reality (MV transformer/switchgear dominate at ~120 wk, 2026). */
+            equipmentSizing: {
+                upsModuleKw: 500, gensetKw: 2500, transformerMva: 2.5, transformerPf: 0.9,
+                crahKw: 150, cduKw: 700, chillerKw: 1400, pduKw: 300,
+                leadTimeWk: { transformer: 120, mvSwitchgear: 120, ups: 26, generator: 40, chiller: 32, crah: 20, cdu: 30, pdu: 18 }
+            },
+            laborBurdenPct: 45,   /* add to bare BLS wages for a bid (35-60%); informational */
+            /* BOQ Ship-2 — standard DC EPC procurement packages. Each maps to disciplines
+             * whose CapexResult category $ give the package est value. leadTimeWk = order-to-
+             * site; FAT/SAT + warranty per mission-critical norms. */
+            procurement: [
+                { pkgNo: 'P01', name: 'Enabling & Civil Works',       scope: 'earthworks, foundations, structure, envelope, raised floor', disciplines: ['civil_structural'], tenderMethod: 'lump-sum design-build', leadTimeWk: 8,   fatSat: 'N/A',            warrantyYr: 1, confidence: 'med', source: 'boq.procurement' },
+                { pkgNo: 'P02', name: 'MV Switchgear & Transformers',  scope: 'incomer, RMU, MV switchgear, dry/oil transformers', disciplines: ['electrical'], tenderMethod: 'nominated supply+install', leadTimeWk: 120, fatSat: 'FAT + SAT',       warrantyYr: 2, confidence: 'med', source: 'boq.procurement' },
+                { pkgNo: 'P03', name: 'LV Distribution & Busway',      scope: 'LV switchboards, busway, PDUs, cabling', disciplines: ['electrical'], tenderMethod: 'supply+install', leadTimeWk: 30, fatSat: 'FAT + SAT',       warrantyYr: 2, confidence: 'low', source: 'boq.procurement' },
+                { pkgNo: 'P04', name: 'UPS & Battery Energy Storage',  scope: 'modular UPS, Li-ion/VRLA strings, STS', disciplines: ['electrical'], tenderMethod: 'nominated OEM', leadTimeWk: 26, fatSat: 'FAT + witness SAT', warrantyYr: 2, confidence: 'med', source: 'boq.procurement' },
+                { pkgNo: 'P05', name: 'Standby Generators & Fuel',     scope: 'gensets, day/bulk tanks, exhaust, acoustic', disciplines: ['electrical'], tenderMethod: 'nominated OEM', leadTimeWk: 40, fatSat: 'FAT + load-bank SAT', warrantyYr: 2, confidence: 'med', source: 'boq.procurement' },
+                { pkgNo: 'P06', name: 'Cooling Plant',                 scope: 'chillers, CRAH/CRAC, CDU/DLC, cooling towers, pumps', disciplines: ['mechanical_cooling'], tenderMethod: 'nominated OEM+install', leadTimeWk: 32, fatSat: 'FAT + SAT', warrantyYr: 2, confidence: 'med', source: 'boq.procurement' },
+                { pkgNo: 'P07', name: 'Mechanical Piping & BMS',       scope: 'CW/CHW piping, valves, insulation, leak-detect, BMS', disciplines: ['mechanical_cooling', 'elv_ict'], tenderMethod: 'supply+install', leadTimeWk: 22, fatSat: 'SAT', warrantyYr: 2, confidence: 'low', source: 'boq.procurement' },
+                { pkgNo: 'P08', name: 'Fire Detection & Suppression',  scope: 'VESDA, clean-agent, sprinkler, fire pumps, C&E', disciplines: ['fire'], tenderMethod: 'specialist supply+install', leadTimeWk: 20, fatSat: 'SAT + discharge test', warrantyYr: 2, confidence: 'med', source: 'boq.procurement' },
+                { pkgNo: 'P09', name: 'ELV / ICT / DCIM',             scope: 'structured cabling, DCIM, network, MMR', disciplines: ['elv_ict'], tenderMethod: 'supply+install', leadTimeWk: 18, fatSat: 'SAT', warrantyYr: 3, confidence: 'low', source: 'boq.procurement' },
+                { pkgNo: 'P10', name: 'Security Systems',              scope: 'CCTV, ACS, intrusion, SOC/PSIM, barriers', disciplines: ['security'], tenderMethod: 'supply+install', leadTimeWk: 16, fatSat: 'SAT', warrantyYr: 3, confidence: 'low', source: 'boq.procurement' },
+                { pkgNo: 'P11', name: 'Integrated Commissioning (CxA)', scope: 'L1-L5 Cx: IST, IFC, load-bank, IST, black-building', disciplines: ['testing_cx'], tenderMethod: 'appointed CxA', leadTimeWk: 0, fatSat: 'IST/IFC/Level-5', warrantyYr: 0, confidence: 'med', source: 'boq.procurement' },
+                { pkgNo: 'P12', name: 'Permits & Authority Approvals', scope: 'building/env/fire/utility permits, occupancy', disciplines: ['permits'], tenderMethod: 'owner + consultant', leadTimeWk: 0, fatSat: 'authority inspection', warrantyYr: 0, confidence: 'low', source: 'boq.procurement' }
+            ]
         },
 
         /* ══ v2.3.0 — DATA.deepSeaCooling: chiller-less deep-sea water cooling physics.
@@ -7102,6 +7128,8 @@
             'boq.gfaM2PerMw':    { source: 'Turner & Townsend DC Cost Index 2025-26 (~10-11.4k sqft/MW gross) + Silverback WPSF series — screening; 900 m²/MW mid-band', asOf: '2025', unit: 'm² GFA per MW IT', method: 'SCREENING rule-of-thumb' },
             'boq.takeoff':       { source: 'SCREENING quantity-takeoff ratios: rebar ~130 kg/m³ (One Click LCA), structural steel ~40 kg/m² (CalcTree), raised floor ~4.6 m²/rack (dgtlinfra), clean-agent Novec 1230 ~0.55 kg/m³ per NFPA 2001/3M TDS (HIGH), CW coolant ~8 L/kW (B&V Water). Per-kW cable/tray/conduit/pipe-per-MW ratios = rule-of-thumb LOW confidence (Spon’s/RSMeans price installed length not per-kW) — folded into AACE −30/+50 band; each line carries its own confidence tag. Reconciled to CAPEX category totals so absolute ratio error does not move the total.', asOf: '2026', unit: 'material/labor qty per driver', method: 'AACE Class-4 screening; reconciled to parametric CAPEX' },
             'boq.unitRates':     { source: 'US-2025 material+install $/unit: concrete ~$320/m³ + rebar ~$2100/t (Gordian/HomeGuide), structural steel ~$3300/t (SteelFlo 2026), raised floor ~$270/m² (datacenterfloortiles), LV/MV cable + tray + CW pipe (1xTechnologies/DistributorWire/RSMeans/MEP Academy — LOW), bare BLS trade wages (electrician/pipefitter/ironworker/laborer). Regionalized via locMult; +5.5%/yr escalation (T&T). Aggregate line rates (ict/bms/security/cx/permits) are anchors scaled by reconcileFactor to the category $.', asOf: '2025', unit: 'USD per material/labor unit', method: 'SCREENING; add ~35-60% labor burden for a bid' },
+            'boq.equipmentSizing': { source: 'SCREENING nominal unit ratings for equipment-count sizing (UPS 500kW module, genset 2.5MW, transformer 2.5MVA, CRAH 150kW, CDU 700kW, chiller 1.4MW) + redundancy addend by topology. Lead times reflect the 2026 long-lead reality — MV transformer/switchgear ~120 wk dominant (industry supply-chain reporting); UPS ~26, genset ~40, chiller ~32 wk.', asOf: '2026', unit: 'kW/MVA per unit + weeks lead time', method: 'SCREENING — real selection depends on the design' },
+            'boq.procurement':      { source: 'Standard mission-critical DC EPC procurement packaging (12 packages P01-P12) with tender method, lead time, FAT/SAT, warranty — industry norm (Uptime/BICSI procurement practice). Package value = Σ mapped CapexResult category $.', asOf: '2026', unit: 'package scope + lead-time + FAT/SAT + warranty', method: 'SCREENING packaging convention' },
             'boq.commercialBasis': { source: 'EPC margin 8-12% gross / 2-6% net realized on LSTK mission-critical (XYZ Reality) — DISCLOSED, embedded in benchmark not added. Safety factors: NEC 210.20/215.3 continuous 1.25 (HIGH), ASCE 7-22 LRFD 1.2D+1.6L (HIGH), NEC 310.15 ampacity derate ~0.75 (HIGH), Uptime Tier-3 N+1 (HIGH). AACE 18R-97/17R-97 Class-4 −30%/+50% (HIGH); contingency set by risk, screening rule-of-thumb 20-30%.', asOf: '2026', unit: 'margin % + design safety factors', method: 'code-mandated factors HIGH; margin band screening' },
             'coolingTech': { source: 'Vendor datasheets + OCP/press for COMMERCIAL (CoolIT/JetCool/ZutaCore/GRC/Submer/Iceotope — TRL 8-9, shipping); research disclosures for EMERGING (Corintis EPFL+Microsoft in-chip validation 2024-25, TSMC DSLC, IMEC impinging-jet >600 W/cm², IBM microfluidic — TRL 5-7 pilot/lab). rackKwClaim + PUE ladder = screening; NO public per-rack CAPEX for microfluidic (multiplier SCREENING-only). Microfluidic is NOT an NVIDIA architecture fact.', asOf: '2026-07', unit: 'per-tech TRL + rack-kW capability + coolant/WUE basis', method: 'technology-readiness classification; commercial=deployable, emerging=pilot/research' },
             'refrigerants': { source: 'GWP100 IPCC AR4 (consistent with sitewide published values); ASHRAE 34 safety classes; copIndex: AHRI/manufacturer typical relative cycle efficiency at water-cooled chiller conditions (R-134a=1.00) — estimate-grade; charge/leak: GHG Protocol + EPA GreenChill typical ranges', asOf: '2026', method: 'copIndex and charge/leak are screening estimates, not equipment selections' },
@@ -11234,6 +11262,43 @@
                         aaceClass: cb.aaceClass, aaceBand: cb.aaceBand,
                         disclaimer: cb.disclaimer, marginNote: cb.marginNote
                     };
+                },
+                /* BOQ Ship-2 — major equipment schedule: qty (N + redundancy), unit
+                 * capacity, lead time. INFORMATIONAL (not reconciled to $ — the BOQ line
+                 * items already carry the cost); indicative only. */
+                equipmentSchedule: function (costs, metrics, input) {
+                    var E = DATA.boq.equipmentSizing;
+                    var itKw = (input && input.itLoad) || 0;
+                    var pue = (metrics && metrics.pue) || 1.4;
+                    var red = (input && input.redundancy) || 'n1';
+                    var install = function (base) { if (red === 'n1' || red === '2n1') { return red === '2n1' ? base * 2 + 1 : base + 1; } if (red === '2n') return base * 2; return base; };
+                    var lt = E.leadTimeWk;
+                    var upsN = Math.ceil(itKw / E.upsModuleKw);
+                    var genN = Math.ceil((itKw * pue) / E.gensetKw);
+                    var txN = Math.ceil((itKw * pue) / (E.transformerMva * 1000 * E.transformerPf));
+                    var coolKw = itKw + itKw * (pue > 1 ? pue - 1 : 0.4);
+                    var crahN = Math.ceil(coolKw / E.crahKw);
+                    var cduN = Math.ceil(itKw / E.cduKw);
+                    var pduN = Math.ceil(itKw / E.pduKw);
+                    return [
+                        { discipline: 'electrical', equipment: 'UPS module', spec: E.upsModuleKw + ' kW modular', unit: 'ea', capacityKw: E.upsModuleKw, qtyN: upsN, qtyInstalled: install(upsN), redundancy: red, leadTimeWk: lt.ups, category: 'ups', confidence: 'med' },
+                        { discipline: 'electrical', equipment: 'Standby generator', spec: (E.gensetKw / 1000) + ' MW diesel', unit: 'ea', capacityKw: E.gensetKw, qtyN: genN, qtyInstalled: install(genN), redundancy: red, leadTimeWk: lt.generator, category: 'generator', confidence: 'med' },
+                        { discipline: 'electrical', equipment: 'MV transformer', spec: E.transformerMva + ' MVA', unit: 'ea', capacityKw: E.transformerMva * 1000, qtyN: txN, qtyInstalled: install(txN), redundancy: red, leadTimeWk: lt.transformer, category: 'electrical', confidence: 'med' },
+                        { discipline: 'electrical', equipment: 'PDU / RPP', spec: E.pduKw + ' kW', unit: 'ea', capacityKw: E.pduKw, qtyN: pduN, qtyInstalled: install(pduN), redundancy: red, leadTimeWk: lt.pdu, category: 'electrical', confidence: 'low' },
+                        { discipline: 'mechanical_cooling', equipment: 'CRAH / CRAC', spec: E.crahKw + ' kW', unit: 'ea', capacityKw: E.crahKw, qtyN: crahN, qtyInstalled: install(crahN), redundancy: red, leadTimeWk: lt.crah, category: 'cooling', confidence: 'low' },
+                        { discipline: 'mechanical_cooling', equipment: 'Coolant Distribution Unit (CDU)', spec: E.cduKw + ' kW DLC', unit: 'ea', capacityKw: E.cduKw, qtyN: cduN, qtyInstalled: install(cduN), redundancy: red, leadTimeWk: lt.cdu, category: 'cooling', confidence: 'low' }
+                    ];
+                },
+                /* BOQ Ship-2 — procurement packages with est value = Σ mapped category $. */
+                procurementPackages: function (costs) {
+                    return DATA.boq.procurement.map(function (p) {
+                        var est = p.disciplines.reduce(function (s, dk) {
+                            var d = DATA.boq.disciplines.filter(function (x) { return x.key === dk; })[0];
+                            if (!d) return s;
+                            return s + d.categories.reduce(function (ss, c) { return ss + ((costs && costs[c]) || 0); }, 0);
+                        }, 0);
+                        return { pkgNo: p.pkgNo, name: p.name, scope: p.scope, disciplines: p.disciplines, tenderMethod: p.tenderMethod, leadTimeWk: p.leadTimeWk, fatSat: p.fatSat, warrantyYr: p.warrantyYr, estValue: est, confidence: p.confidence, source: p.source };
+                    });
                 }
             }
         },

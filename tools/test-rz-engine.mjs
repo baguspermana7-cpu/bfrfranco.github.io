@@ -1345,6 +1345,16 @@ if (M.opex && M.opex.totalAnnual) {
     ok('boq safety factors present (NEC 1.25 + LRFD + N+1)', sm.safetyFactors.electricalContinuous === 1.25 && /1\.2D/.test(sm.safetyFactors.structuralLRFD) && sm.safetyFactors.coolingRedundancy === 'N+1');
     ok('boq disclaimer = screening, not a quotation', /SCREENING/i.test(sm.disclaimer) && /not a quotation/i.test(sm.disclaimer));
     ok('boq marginNote discloses embedded-not-added', /embed/i.test(sm.marginNote) && /not added/i.test(sm.marginNote));
+    /* ── BOQ Ship-2: equipment schedule + procurement packages ── */
+    ok('boq.equipmentSizing + procurement sourced', !!D.sources['boq.equipmentSizing'] && !!D.sources['boq.procurement']);
+    const eq = M.boq.equipmentSchedule(costs, metrics, { itLoad: 20000, redundancy: 'n1' });
+    ok('equipmentSchedule returns major kit', Array.isArray(eq) && eq.length === 6 && eq.every(e => e.qtyN > 0 && e.leadTimeWk >= 0 && e.category && e.confidence));
+    ok('equipment N+1 installs one more than N', eq.every(e => e.qtyInstalled === e.qtyN + 1));
+    ok('equipment 2N doubles', M.boq.equipmentSchedule(costs, metrics, { itLoad: 20000, redundancy: '2n' }).every(e => e.qtyInstalled === e.qtyN * 2));
+    ok('transformer lead-time = 120 wk (long-lead reality)', eq.find(e => e.equipment === 'MV transformer').leadTimeWk === 120);
+    const pk = M.boq.procurementPackages(costs);
+    ok('procurementPackages 12 with value + FAT/SAT + warranty', Array.isArray(pk) && pk.length === 12 && pk.every(p => p.pkgNo && Number.isFinite(p.estValue) && p.fatSat != null && p.warrantyYr != null && p.source));
+    ok('procurement value non-additive (electrical spans multiple pkgs)', pk.reduce((s, p) => s + p.estValue, 0) > Object.values(costs).reduce((s, v) => s + v, 0));
 }
 
 /* ── Arc-1 calibrationSpec structural ── */

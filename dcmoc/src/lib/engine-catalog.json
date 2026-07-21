@@ -3,8 +3,8 @@
  "note": "AUTO-GENERATED from rz-engine.js — do not hand-edit. Consumers are grep-derived from real usage.",
  "dataVersion": "2.5.1",
  "modelCount": 50,
- "functionCount": 207,
- "sourceCount": 114,
+ "functionCount": 209,
+ "sourceCount": 116,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -190,12 +190,26 @@
      ]
     },
     {
+     "name": "equipmentSchedule",
+     "params": [
+      "costs",
+      "metrics",
+      "input"
+     ]
+    },
+    {
      "name": "generate",
      "params": [
       "costs",
       "metrics",
       "input",
       "opts"
+     ]
+    },
+    {
+     "name": "procurementPackages",
+     "params": [
+      "costs"
      ]
     },
     {
@@ -210,7 +224,10 @@
      ]
     }
    ],
-   "consumers": []
+   "consumers": [
+    "dcmoc/src/lib/value-trace.ts",
+    "dcmoc/src/modules/reporting/boq/BoqDossier.ts"
+   ]
   },
   {
    "name": "capacity",
@@ -1956,10 +1973,22 @@
    "method": "code-mandated factors HIGH; margin band screening"
   },
   {
+   "key": "boq.equipmentSizing",
+   "source": "SCREENING nominal unit ratings for equipment-count sizing (UPS 500kW module, genset 2.5MW, transformer 2.5MVA, CRAH 150kW, CDU 700kW, chiller 1.4MW) + redundancy addend by topology. Lead times reflect the 2026 long-lead reality — MV transformer/switchgear ~120 wk dominant (industry supply-chain reporting); UPS ~26, genset ~40, chiller ~32 wk.",
+   "asOf": "2026",
+   "method": "SCREENING — real selection depends on the design"
+  },
+  {
    "key": "boq.gfaM2PerMw",
    "source": "Turner & Townsend DC Cost Index 2025-26 (~10-11.4k sqft/MW gross) + Silverback WPSF series — screening; 900 m²/MW mid-band",
    "asOf": "2025",
    "method": "SCREENING rule-of-thumb"
+  },
+  {
+   "key": "boq.procurement",
+   "source": "Standard mission-critical DC EPC procurement packaging (12 packages P01-P12) with tender method, lead time, FAT/SAT, warranty — industry norm (Uptime/BICSI procurement practice). Package value = Σ mapped CapexResult category $.",
+   "asOf": "2026",
+   "method": "SCREENING packaging convention"
   },
   {
    "key": "boq.takeoff",

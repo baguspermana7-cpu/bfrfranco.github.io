@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.103.0 — 2026-07-21 (BOQ Dossier Phase 2: equipment schedule + procurement packages)
+
+### Added
+- **RZEngine `models.boq.equipmentSchedule`** — major-equipment schedule from `DATA.boq.equipmentSizing`: UPS modules / gensets / MV transformers / PDU / CRAH / CDU sized by IT load × PUE with **N + redundancy** counts (N+1 → +1, 2N → ×2, 2N+1 → ×2+1) + **lead times** reflecting the 2026 long-lead reality — **MV transformer/switchgear ~120 wk dominant**, UPS 26, genset 40, chiller 32. Informational (indicative, not reconciled to $).
+- **RZEngine `DATA.boq.procurement` + `models.boq.procurementPackages`** — 12 standard mission-critical DC EPC packages (P01 civil → P12 permits) with scope, tender method, lead time, FAT/SAT, warranty; est value = Σ mapped CapexResult category $. Flagged **non-additive** (electrical/mechanical categories span several packages — indicative scope envelopes for procurement planning, NOT a cost rollup). `DATA.boq.laborBurdenPct` (45%, informational) added.
+- **BOQ dossier** (`BoqDossier.ts`) +2 sections after the discipline tables: **Equipment Schedule** (Equipment · Spec · Capacity · Qty N · Qty Installed · Redundancy · Lead Time · confidence; long-lead ≥52 wk amber-highlighted with LONG-LEAD tag) + **Procurement Packages** (Pkg# · Name · Scope · Tender · Lead · FAT/SAT · Warranty · Indicative Value · confidence; prominent non-additive-overlap caption).
+
+### Verified
+- engine 684/0 · parity 155/0 · calibration 19/0 · bindings 85/0 (catalog 209fn/116src) · dc-corpus 2678/0 · trace-parity 117/117 · walk 24/0 · synergy 6/0 · export 44/0 · tsc 0 + next build · js-syntax/script-tags/dark CLEAN. N+1/2N sizing + 120-wk transformer lead + non-additive procurement asserted. Engine ?v `-c`→`-d`. Grand plan: BOQ P1+P2 shipped; P3 (full 20-section EPC dossier) queued.
+
 ## v1.102.0 — 2026-07-21 (DCMOC BOQ Dossier: clickable CAPEX → engine-traceable Bill of Quantities + margin/safety disclaimer)
 
 ### Added

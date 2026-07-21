@@ -90,6 +90,34 @@ export interface BoqSummary {
     marginNote: string;
 }
 
+export interface BoqEquipmentItem {
+    discipline: string;
+    equipment: string;
+    spec: string;
+    unit: string;
+    capacityKw: number;
+    qtyN: number;
+    qtyInstalled: number;
+    redundancy: string;
+    leadTimeWk: number;
+    category: string;
+    confidence: BoqConfidence;
+}
+
+export interface BoqPackage {
+    pkgNo: string;
+    name: string;
+    scope: string;
+    disciplines: string[];
+    tenderMethod: string;
+    leadTimeWk: number;
+    fatSat: string;
+    warrantyYr: number;
+    estValue: number;
+    confidence: BoqConfidence;
+    source: string;
+}
+
 export interface BoqProjectMeta {
     projectName: string;
     location: string;
@@ -102,6 +130,12 @@ export interface BoqModel {
     generated: BoqGenerated;
     summary: BoqSummary;
     projectMeta: BoqProjectMeta;
+    /** INFORMATIONAL — indicative equipment counts + N+redundancy sizing;
+     *  NOT reconciled to $. Empty when the engine does not expose it. */
+    equipment: BoqEquipmentItem[];
+    /** INDICATIVE procurement scope envelopes — values OVERLAP across packages
+     *  and are NOT additive to the CAPEX total. Empty when unavailable. */
+    procurement: BoqPackage[];
 }
 
 export interface BuildBoqOpts {
@@ -142,6 +176,12 @@ export function buildBoqModel(
                 capexTotal: number,
                 o: { epcMarginPct?: number },
             ) => BoqSummary;
+            equipmentSchedule?: (
+                costs: Record<string, number>,
+                metrics: { racks: number; floorSpace: number; pue: number },
+                input: CapexInput,
+            ) => BoqEquipmentItem[];
+            procurementPackages?: (costs: Record<string, number>) => BoqPackage[];
         };
     };
     const boq = models.boq;
@@ -163,6 +203,14 @@ export function buildBoqModel(
         { epcMarginPct: opts?.epcMarginPct },
     );
 
+    // Ship-2 informational surfaces — null-guarded (older engines omit them).
+    const equipment: BoqEquipmentItem[] = boq.equipmentSchedule
+        ? boq.equipmentSchedule(result.costs, metrics, input)
+        : [];
+    const procurement: BoqPackage[] = boq.procurementPackages
+        ? boq.procurementPackages(result.costs)
+        : [];
+
     const data = rzData() as { version?: string };
     const projectMeta: BoqProjectMeta = {
         projectName: '',       // filled by the caller (requirements store)
@@ -172,7 +220,7 @@ export function buildBoqModel(
         version: data.version ?? '—',
     };
 
-    return { generated, summary, projectMeta };
+    return { generated, summary, projectMeta, equipment, procurement };
 }
 
 /** Return a copy of the model with projectName / tierLevel filled from the
@@ -395,12 +443,102 @@ function disciplineSection(d: BoqDiscipline): string {
     </section>`;
 }
 
+/** Lead-time threshold (weeks) above which an item is flagged as long-lead
+ *  (schedule-driving) and highlighted in amber. */
+const LONG_LEAD_WK = 52;
+
+function equipmentScheduleSection(items: BoqEquipmentItem[]): string {
+    if (!items.length) return '';
+    const rows = items.map((e, i) => {
+        const longLead = Number.isFinite(e.leadTimeWk) && e.leadTimeWk >= LONG_LEAD_WK;
+        const rowBg = longLead
+            ? 'rgba(251,191,36,0.10)'
+            : (i % 2 ? T.surfaceAlt : 'transparent');
+        const ltCell = longLead
+            ? `<td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.amber};font-weight:800;">${qtyFmt(e.leadTimeWk)}<span style="margin-left:5px;font-size:8px;font-weight:700;letter-spacing:.4px;">LONG-LEAD</span></td>`
+            : `<td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.muted};">${qtyFmt(e.leadTimeWk)}</td>`;
+        return `<tr style="background:${rowBg};">
+            <td style="padding:5px 8px;font-size:10px;color:${T.text};">${esc(e.equipment)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(e.spec)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};">${qtyFmt(e.capacityKw)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};">${qtyFmt(e.qtyN)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};font-weight:700;">${qtyFmt(e.qtyInstalled)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;text-align:center;color:${T.muted};text-transform:uppercase;letter-spacing:.5px;">${esc(e.redundancy)}</td>
+            ${ltCell}
+            <td style="padding:5px 8px;text-align:center;">${confChip(e.confidence)}</td>
+        </tr>`;
+    }).join('');
+    return `<section class="block">
+        <h2 class="sec-title" style="margin-top:28px;">Equipment Schedule <span style="font-size:8.5px;color:${T.slate};letter-spacing:.5px;">— informational, not reconciled to $</span></h2>
+        <table class="tbl">
+            <thead><tr>
+                <th style="text-align:left;">Equipment</th>
+                <th style="text-align:left;">Spec</th>
+                <th style="text-align:right;">Capacity (kW)</th>
+                <th style="text-align:right;">Qty (N)</th>
+                <th style="text-align:right;">Qty Installed</th>
+                <th style="text-align:center;">Redundancy</th>
+                <th style="text-align:right;">Lead Time (wk)</th>
+                <th style="text-align:center;">Confidence</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+        </table>
+        <p style="font-size:9.5px;line-height:1.6;color:${T.muted};margin:6px 0 0;">
+            <span style="color:${T.amber};">Amber rows</span> are long-lead (≥ ${LONG_LEAD_WK} wk) — they drive the delivery programme, order early.
+            Indicative equipment counts — screening, N+redundancy sizing; real selection per detailed design.
+        </p>
+    </section>`;
+}
+
+function procurementPackagesSection(pkgs: BoqPackage[]): string {
+    if (!pkgs.length) return '';
+    const rows = pkgs.map((p, i) =>
+        `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:5px 8px;font-size:10px;font-family:'JetBrains Mono',monospace;color:${T.cyan};font-weight:700;">${esc(p.pkgNo)}</td>
+            <td style="padding:5px 8px;font-size:10px;color:${T.text};font-weight:700;">${esc(p.name)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(p.scope)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;text-align:center;color:${T.muted};text-transform:uppercase;letter-spacing:.4px;">${esc(p.tenderMethod)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.muted};">${qtyFmt(p.leadTimeWk)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;text-align:center;color:${T.muted};">${esc(p.fatSat)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};">${qtyFmt(p.warrantyYr)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.amber};font-weight:700;">${money(p.estValue)}</td>
+            <td style="padding:5px 8px;text-align:center;">${confChip(p.confidence)}</td>
+        </tr>`,
+    ).join('');
+    return `<section class="block">
+        <h2 class="sec-title" style="margin-top:28px;">Procurement Packages</h2>
+        <div style="border-left:3px solid ${T.amber};background:rgba(251,191,36,0.08);border-radius:0 10px 10px 0;padding:10px 13px;margin-bottom:10px;">
+            <p style="font-size:10px;line-height:1.6;color:${T.text};margin:0;">
+                <b style="color:${T.amber};">Indicative scope envelopes</b> — package values <b>OVERLAP</b> (the electrical / mechanical
+                categories span several packages) and are <b>NOT additive</b> to the CAPEX total; shown for procurement
+                planning, not cost rollup.
+            </p>
+        </div>
+        <table class="tbl">
+            <thead><tr>
+                <th style="text-align:left;">Pkg #</th>
+                <th style="text-align:left;">Name</th>
+                <th style="text-align:left;">Scope</th>
+                <th style="text-align:center;">Tender Method</th>
+                <th style="text-align:right;">Lead Time (wk)</th>
+                <th style="text-align:center;">FAT/SAT</th>
+                <th style="text-align:right;">Warranty (yr)</th>
+                <th style="text-align:right;">Indicative Value</th>
+                <th style="text-align:center;">Confidence</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+        </table>
+    </section>`;
+}
+
 /* ── document assembly ─────────────────────────────────────────────────── */
 
 /** Render the full BOQ dossier as a complete, standalone HTML5 document. */
 export function renderBoqDossierHTML(model: BoqModel, projectMeta?: BoqProjectMeta): string {
     const merged: BoqModel = projectMeta ? { ...model, projectMeta } : model;
     const disciplinesHtml = merged.generated.disciplines.map(disciplineSection).join('');
+    const equipmentHtml = equipmentScheduleSection(merged.equipment ?? []);
+    const procurementHtml = procurementPackagesSection(merged.procurement ?? []);
     const v = esc(merged.projectMeta.version);
 
     return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
@@ -449,6 +587,8 @@ export function renderBoqDossierHTML(model: BoqModel, projectMeta?: BoqProjectMe
     ${commercialSummarySection(merged)}
     <h2 class="sec-title" style="margin-top:28px;">Bill of Quantities — by Discipline</h2>
     ${disciplinesHtml}
+    ${equipmentHtml}
+    ${procurementHtml}
     <footer>
         <span>SCREENING-GRADE · not a quotation · resistancezero.com · v${v}</span>
         <span>DC-OS · Bill of Quantities · Technical Dossier</span>
