@@ -625,6 +625,8 @@ All 9 standalone calculator pages: pue, capex, opex, roi, carbon-footprint, data
 - **HTML**: Max-width 800px container with accent-colored border, rounded corners, lazy loading
 - **Alt text**: Descriptive, includes calculator name and key feature
 
+> **v1.99.x supersedes the frame on image-hero calculators — see [Feature 34](#feature-34-hero-image-blur-letterbox--shared-engine-v199x).** Mark the hero `<img data-rz-hero …>` and load `js/rz-hero-fit.js`. The shared module REPLACES this lone 800px wrapper with a `.rz-hero-fit` blur-letterbox box (default width 1400px, `data-rz-hero-width` to override) so the whole image sits `object-fit:contain` (never stretched/cropped) over a blurred fill. The static 800px `<div>` below is still the correct authoring markup — the module re-frames it at runtime. Guard: `tools/audit-hero-images.mjs --strict`.
+
 ```html
 <div style="max-width:800px;margin:1.5rem auto;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.12);border:1px solid rgba(ACCENT_RGB,0.15);">
     <img src="assets/[name]-hero.webp" alt="[Descriptive alt text]" style="width:100%;height:auto;display:block;" loading="lazy">

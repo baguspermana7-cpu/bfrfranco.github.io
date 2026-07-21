@@ -28,7 +28,9 @@
       'transform:scale(1.12);filter:blur(20px) brightness(0.9);z-index:0;pointer-events:none;}' +
       '.rz-hero-fit-img{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;}' +
       '[data-theme="dark"] .rz-hero-fit{border-color:rgba(148,163,184,0.14);}' +
-      '@media (prefers-reduced-motion:reduce){.rz-hero-fit-bg{filter:blur(20px);}}';
+      '@media (prefers-reduced-motion:reduce){.rz-hero-fit-bg{filter:blur(20px);}}' +
+      '@media print{.rz-hero-fit{box-shadow:none;border:1px solid #ccc;background:#fff;}' +
+      '.rz-hero-fit-bg{display:none;}}';
     var s = d.createElement('style');
     s.id = 'rzHeroFitStyle';
     s.textContent = css;

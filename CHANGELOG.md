@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.99.11 — 2026-07-21 (hero blur-letterbox: print-safe + doc align)
+
+### Changed
+- **`js/rz-hero-fit.js` sekarang print-safe** — tambah blok `@media print`: sembunyikan copy blur latar, buang box-shadow, latar putih + border tipis biar hero cetak bersih (sebelumnya Feature 34 klaim "print-safe" tapi CSS tak punya blok print). Cache-bust `?v=2026-07-21`→`-b` di 7 kalkulator (opex/capex/roi/carbon-footprint/pue/tier-advisor/tia-942).
+- **`standarization/UI_FEATURES_STANDARD.md`** — "Calculator Hero Section Standard" (wrapper 800px lawas) kini rujuk-silang ke Feature 34: modul shared REPLACE wrapper 800px jadi `.rz-hero-fit` (default 1400px) saat runtime; markup statis 800px tetap markup authoring benar.
+
+### Verified
+- audit-hero-images CLEAN (7 halaman) · js-syntax CLEAN · script-tags CLEAN · blok `@media print` ada.
+
 ## v1.99.10 — 2026-07-21 (pin Chart.js CDN versi sitewide — stabilitas)
 
 ### Changed
