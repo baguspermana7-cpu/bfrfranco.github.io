@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.103.1 — 2026-07-21 (BOQ correctness fixes — adversarial review)
+
+### Fixed
+- **BOQ cooling-quantity overcount (HIGH)** — `models.boq.drivers.coolingKw` (and `equipmentSchedule`) used IT×PUE, inflating the displayed CRAH count + glycol/coolant volume by a factor of PUE (~1.4-1.6×). Cooling *duty* ≈ IT heat load (the (PUE−1) overhead is the cooling plant's own fan/pump/chiller power, not extra white-space heat), so `coolingKw = itKw`. Gensets/transformers correctly stay sized to IT×PUE (they power the whole facility). Line-item $ were already correct (reconciled); this fixes the physical quantities an engineer reads off the schedule.
+- **Margin-override label (HIGH)** — `models.boq.summary.marginPctGross` returned the constant (10%) even when `opts.epcMarginPct` overrode it, contradicting the embedded-margin $ on the same disclosure. Now reflects the actual margin used.
+- **Popup-blocked feedback (MED)** — CAPEX Engine + Construction Engine BOQ buttons ignored `openBoqDossier`'s `false` return; now alert the user when the dossier popup is blocked (TraceValue already handled it).
+- **Vacuous reconcile (MED)** — `summary.reconciles` read true at `capexTotal === 0`; now requires `capexTotal > 0`.
+- **Zero-load reconciliation guard (LOW)** — `generate` now carries the category $ as a lump line if bottom-up is 0 while the category $ is nonzero, preserving Σ(lines)===categoryTotal.
+
+### Verified
+- engine 686/0 (new: coolingKw=IT-heat, margin-override, zero-capex reconcile guards) · parity 155/0 · calibration 19/0 · bindings 85/0 · trace-parity 117/117 · export 44/0 · tsc 0 + build · script-tags/dark CLEAN. Engine ?v `-d`→`-e`. Found by an adversarial code-review pass (0 CRITICAL, 2 HIGH + 2 MED + 1 LOW — all resolved).
+
 ## v1.103.0 — 2026-07-21 (BOQ Dossier Phase 2: equipment schedule + procurement packages)
 
 ### Added

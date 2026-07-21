@@ -110,7 +110,9 @@ export function CapexEnginePage() {
             projectName: useRequirementsStore.getState().overview.projectName,
             tierLevel: useSimulationStore.getState().inputs.tierLevel,
         }).projectMeta;
-        openBoqDossier(m, meta);
+        if (!openBoqDossier(m, meta)) {
+            window.alert('Popup blocked — allow popups for this site to open the BOQ dossier.');
+        }
     };
 
     return (

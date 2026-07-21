@@ -1335,7 +1335,11 @@ if (M.opex && M.opex.totalAnnual) {
     ok('boq reconciliation: Σ lines === categoryTotal (all disciplines)', reconciled);
     ok('boq categoryTotal === Σ mapped CapexResult categories', tiesToCat);
     ok('boq hardTotal === Σ all 14 costs', Math.abs(g.hardTotal - Object.values(costs).reduce((s, v) => s + v, 0)) < 1);
-    ok('boq drivers derive gfa + coolingKw + protectedM3', g.drivers.gfaM2 === 20 * boq.gfaM2PerMw && g.drivers.protectedM3 === 20 * 1500 && g.drivers.coolingKw > input.itLoad);
+    ok('boq drivers derive gfa + coolingKw(=IT heat, not IT×PUE) + protectedM3', g.drivers.gfaM2 === 20 * boq.gfaM2PerMw && g.drivers.protectedM3 === 20 * 1500 && g.drivers.coolingKw === input.itLoad);
+    /* margin override reflected in the label (F2 regression guard) */
+    const smOverride = M.boq.summary(costs, { design: 12e6, pm: 8e6 }, 30e6, 15e6, 340e6, { epcMarginPct: 15 });
+    ok('boq marginPctGross reflects override (15 not 10)', smOverride.marginPctGross === 15);
+    ok('boq reconciles false when capexTotal=0 (no vacuous truth)', M.boq.summary(costs, {}, 0, 0, 0, {}).reconciles === false);
     /* summary: margin disclosed (backed out, not added), grandTotal ties to capexTotal */
     const capexTotal = 340e6, soft = { design: 12e6, pm: 8e6 }, cont = 30e6, fom = 15e6;
     const sm = M.boq.summary(costs, soft, cont, fom, capexTotal, {});

@@ -14,7 +14,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-  <title>Changelog — Resistance Zero (v1.103.0 latest)</title>
+  <title>Changelog — Resistance Zero (v1.103.1 latest)</title>
   <meta name="description" content="Live release notes for resistancezero.com — every shipped version, Plan v12 → v15+, with Awwwards uplift, dark-mode coverage, and SEO/AI-search work.">
   <meta name="author" content="Bagus Dwi Permana">
   <meta name="robots" content="index, follow">
@@ -50,7 +50,7 @@
         "@id": "https://resistancezero.com/changelog.html",
         "url": "https://resistancezero.com/changelog.html",
         "name": "Changelog — Resistance Zero",
-        "description": "Live release notes for resistancezero.com — 526 shipped versions.",
+        "description": "Live release notes for resistancezero.com — 527 shipped versions.",
         "dateModified": "2026-07-21",
         "author": {
           "@type": "Person",
@@ -73,18 +73,18 @@
       {
         "@type": "ItemList",
         "name": "Release history",
-        "numberOfItems": 526,
+        "numberOfItems": 527,
         "itemListElement": [
-        {"@type":"ListItem","position":1,"name":"v1.103.0 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.103.0"},
-        {"@type":"ListItem","position":2,"name":"v1.102.0 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.102.0"},
-        {"@type":"ListItem","position":3,"name":"v1.101.0 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.101.0"},
-        {"@type":"ListItem","position":4,"name":"v1.100.0 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.100.0"},
-        {"@type":"ListItem","position":5,"name":"v1.99.11 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.99.11"},
+        {"@type":"ListItem","position":1,"name":"v1.103.1 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.103.1"},
+        {"@type":"ListItem","position":2,"name":"v1.103.0 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.103.0"},
+        {"@type":"ListItem","position":3,"name":"v1.102.0 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.102.0"},
+        {"@type":"ListItem","position":4,"name":"v1.101.0 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.101.0"},
+        {"@type":"ListItem","position":5,"name":"v1.100.0 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.100.0"},
         {"@type":"ListItem","position":6,"name":"v1.99.11 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.99.11"},
-        {"@type":"ListItem","position":7,"name":"v1.99.10 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.99.10"},
-        {"@type":"ListItem","position":8,"name":"v1.99.9 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.99.9"},
-        {"@type":"ListItem","position":9,"name":"v1.99.8 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.99.8"},
-        {"@type":"ListItem","position":10,"name":"v1.99.7 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.99.7"}
+        {"@type":"ListItem","position":7,"name":"v1.99.11 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.99.11"},
+        {"@type":"ListItem","position":8,"name":"v1.99.10 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.99.10"},
+        {"@type":"ListItem","position":9,"name":"v1.99.9 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.99.9"},
+        {"@type":"ListItem","position":10,"name":"v1.99.8 — 2026-07-21","url":"https://resistancezero.com/changelog.html#v1.99.8"}
         ]
       }
     ]
@@ -607,10 +607,10 @@
       <h1 id="cl-heading">Changelog</h1>
       <p class="cl-subtitle">Live release notes &mdash; every shipped version</p>
       <p class="cl-meta">
-        Latest: <strong style="color:#7dd5b4;">v1.103.0</strong>
+        Latest: <strong style="color:#7dd5b4;">v1.103.1</strong>
         &nbsp;&bull;&nbsp;
         <span id="rzVersionAnchor"></span>
-        <span class="cl-count-badge">526 releases</span>
+        <span class="cl-count-badge">527 releases</span>
       </p>
 
       <div class="filter-chips" role="group" aria-label="Filter by version tier">
@@ -624,7 +624,30 @@
     <!-- ── Entry list ── -->
     <section class="changelog-list" aria-label="Release history">
 
-    <article class="changelog-entry is-current" data-version-tier="minor" data-version="v1.103.0">
+    <article class="changelog-entry is-current" data-version-tier="patch" data-version="v1.103.1">
+      <div class="changelog-meta">
+        <span class="changelog-version-badge" style="--tier-color:#10b981;">v1.103.1</span>
+        <span class="changelog-tier-pill" style="--tier-color:#10b981;background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>
+        <time class="changelog-date" datetime="2026-07-21">July 21, 2026</time>
+      </div>
+      <p class="changelog-caption">BOQ correctness fixes — adversarial review</p>
+      <div class="changelog-body">
+        <h3 class="cl-subhead">Fixed</h3>
+<ul>
+  <li><strong>BOQ cooling-quantity overcount (HIGH)</strong> — <code>models.boq.drivers.coolingKw</code> (and <code>equipmentSchedule</code>) used IT×PUE, inflating the displayed CRAH count + glycol/coolant volume by a factor of PUE (~1.4-1.6×). Cooling <em>duty</em> ≈ IT heat load (the (PUE−1) overhead is the cooling plant's own fan/pump/chiller power, not extra white-space heat), so <code>coolingKw = itKw</code>. Gensets/transformers correctly stay sized to IT×PUE (they power the whole facility). Line-item $ were already correct (reconciled); this fixes the physical quantities an engineer reads off the schedule.</li>
+  <li><strong>Margin-override label (HIGH)</strong> — <code>models.boq.summary.marginPctGross</code> returned the constant (10%) even when <code>opts.epcMarginPct</code> overrode it, contradicting the embedded-margin $ on the same disclosure. Now reflects the actual margin used.</li>
+  <li><strong>Popup-blocked feedback (MED)</strong> — CAPEX Engine + Construction Engine BOQ buttons ignored <code>openBoqDossier</code>'s <code>false</code> return; now alert the user when the dossier popup is blocked (TraceValue already handled it).</li>
+  <li><strong>Vacuous reconcile (MED)</strong> — <code>summary.reconciles</code> read true at <code>capexTotal === 0</code>; now requires <code>capexTotal &gt; 0</code>.</li>
+  <li><strong>Zero-load reconciliation guard (LOW)</strong> — <code>generate</code> now carries the category $ as a lump line if bottom-up is 0 while the category $ is nonzero, preserving Σ(lines)===categoryTotal.</li>
+</ul>
+<h3 class="cl-subhead">Verified</h3>
+<ul>
+  <li>engine 686/0 (new: coolingKw=IT-heat, margin-override, zero-capex reconcile guards) · parity 155/0 · calibration 19/0 · bindings 85/0 · trace-parity 117/117 · export 44/0 · tsc 0 + build · script-tags/dark CLEAN. Engine ?v <code>-d</code>→<code>-e</code>. Found by an adversarial code-review pass (0 CRITICAL, 2 HIGH + 2 MED + 1 LOW — all resolved).</li>
+</ul>
+      </div>
+    </article>
+
+    <article class="changelog-entry" data-version-tier="minor" data-version="v1.103.0">
       <div class="changelog-meta">
         <span class="changelog-version-badge" style="--tier-color:#06b6d4;">v1.103.0</span>
         <span class="changelog-tier-pill" style="--tier-color:#06b6d4;background:#06b6d420;color:#06b6d4;border:1px solid #06b6d440;">MINOR</span>

@@ -11199,9 +11199,12 @@
                     var racks = metrics && metrics.racks ? metrics.racks : 0;
                     var floorSpaceM2 = metrics && metrics.floorSpace ? metrics.floorSpace : 0;
                     var gfaM2 = mw * DATA.boq.gfaM2PerMw;
-                    var pue = metrics && metrics.pue ? metrics.pue : 1.4;
-                    var coolingKw = itKw * (pue > 1 ? (pue - 1) : 0.4);   /* heat rejection ≈ (PUE−1)×IT + IT */
-                    coolingKw = itKw + coolingKw;                          /* total kW to reject ≈ IT + overhead */
+                    /* Cooling DUTY = heat to reject ≈ IT load: essentially 100% of IT
+                     * power becomes heat removed by the cooling plant. The (PUE−1)
+                     * overhead is the cooling plant's OWN power (fans/pumps/chillers),
+                     * NOT extra heat in the white space — so CRAH/CDU count + coolant
+                     * charge size to IT kW, not IT×PUE (fixed: was overcounting ×PUE). */
+                    var coolingKw = itKw;
                     var protectedM3 = mw * 1500;                           /* ~1500 m³/MW protected (2kW/m² × ~5m) */
                     return { mw: mw, itKw: itKw, racks: racks, floorSpaceM2: floorSpaceM2, gfaM2: gfaM2, coolingKw: coolingKw, protectedM3: protectedM3, lump: 1 };
                 },
@@ -11227,7 +11230,14 @@
                         });
                         var bottomUp = raw.reduce(function (s, l) { return s + l.total; }, 0);
                         var reconcileFactor = bottomUp > 0 ? catTotal / bottomUp : 1;
-                        raw.forEach(function (l) { l.matCost *= reconcileFactor; l.laborCost *= reconcileFactor; l.total *= reconcileFactor; l.unitRate = l.qty > 0 ? l.total / l.qty : l.unitRate; });
+                        if (bottomUp > 0) {
+                            raw.forEach(function (l) { l.matCost *= reconcileFactor; l.laborCost *= reconcileFactor; l.total *= reconcileFactor; l.unitRate = l.qty > 0 ? l.total / l.qty : l.unitRate; });
+                        } else if (raw.length) {
+                            /* zero bottom-up but nonzero category $ (all drivers 0) — keep the
+                             * reconciliation invariant by carrying the whole category $ on the
+                             * first line as an unquantified lump, so Σ lines === categoryTotal. */
+                            raw[0].total = catTotal; raw[0].matCost = catTotal; raw[0].laborCost = 0; raw[0].unitRate = 0; raw[0].spec = (raw[0].spec || '') + ' (lump — quantity not derivable at zero load)';
+                        }
                         disciplines.push({ key: d.key, label: d.label, categories: d.categories, categoryTotal: catTotal, lines: raw, reconcileFactor: +reconcileFactor.toFixed(3), bottomUpRaw: +bottomUp.toFixed(0) });
                     });
                     return { disciplines: disciplines, drivers: drivers, hardTotal: disciplines.reduce(function (s, d) { return s + d.categoryTotal; }, 0) };
@@ -11247,7 +11257,7 @@
                     return {
                         directCost: directCost,
                         embeddedMargin: embeddedMargin,
-                        marginPctGross: cb.epcMarginPctGross,
+                        marginPctGross: +(m * 100).toFixed(1),   /* reflects opts.epcMarginPct override, not just the constant */
                         marginMarkupOnCost: +((m / (1 - m)) * 100).toFixed(1),
                         hardSubtotal: hard,
                         softCosts: soft,
@@ -11256,7 +11266,7 @@
                         grandTotal: grandTotal,
                         /* hard+soft+contingency+fom should ≈ capexTotal; residual = greenCert
                          * premium + renewables (disclosed as unaccounted, not hidden). */
-                        reconciles: Math.abs(accounted - capexTotal) / (capexTotal || 1) < 0.12,
+                        reconciles: capexTotal > 0 && Math.abs(accounted - capexTotal) / capexTotal < 0.12,
                         unaccounted: +(capexTotal - accounted).toFixed(0),
                         safetyFactors: cb.safetyFactors,
                         aaceClass: cb.aaceClass, aaceBand: cb.aaceBand,
@@ -11276,7 +11286,7 @@
                     var upsN = Math.ceil(itKw / E.upsModuleKw);
                     var genN = Math.ceil((itKw * pue) / E.gensetKw);
                     var txN = Math.ceil((itKw * pue) / (E.transformerMva * 1000 * E.transformerPf));
-                    var coolKw = itKw + itKw * (pue > 1 ? pue - 1 : 0.4);
+                    var coolKw = itKw;   /* cooling DUTY ≈ IT heat load (not IT×PUE; gensets/transformers below DO use IT×PUE — they power the whole facility incl. cooling) */
                     var crahN = Math.ceil(coolKw / E.crahKw);
                     var cduN = Math.ceil(itKw / E.cduKw);
                     var pduN = Math.ceil(itKw / E.pduKw);
