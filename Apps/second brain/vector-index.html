@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
 (function(){
@@ -242,6 +242,9 @@ table.results-table tr:hover td{background:rgba(255,255,255,0.02)}
 <div class="dashboard">
   <!-- TOPBAR -->
   <div class="topbar">
+    <a class="topbar-back" href="index.html" title="Back to SecondBrain graph">
+      <i class="fas fa-arrow-left"></i><span>SecondBrain</span>
+    </a>
     <div class="topbar-brand">
       <span class="brain">🧠</span>
       <span class="name">SecondBrain</span>
@@ -254,24 +257,27 @@ table.results-table tr:hover td{background:rgba(255,255,255,0.02)}
       <span class="search-hint">⌘K</span>
     </div>
     <div class="topbar-right">
-      <button class="topbar-icon" title="Notifications"><i class="fas fa-bell"></i></button>
-      <div class="avatar" title="Profile">RZ</div>
-      <button class="topbar-icon" title="Settings"><i class="fas fa-cog"></i></button>
+      <button class="topbar-icon" id="tbBell" title="Notifications"><i class="fas fa-bell"></i></button>
+      <div class="avatar" id="tbAvatar" title="Profile">RZ</div>
+      <button class="topbar-icon" id="tbCog" title="Settings"><i class="fas fa-cog"></i></button>
     </div>
   </div>
 
   <!-- TABS -->
   <div class="tabbar">
-    <div class="tab">Overview</div>
-    <div class="tab">Documents</div>
-    <div class="tab">Chunks</div>
-    <div class="tab">Embeddings</div>
-    <div class="tab active">Vector Visualization</div>
-    <div class="tab">Search</div>
-    <div class="tab">Analytics</div>
-    <div class="tab">Settings</div>
+    <div class="tab" data-view="overview">Overview</div>
+    <div class="tab" data-view="documents">Documents</div>
+    <div class="tab" data-view="chunks">Chunks</div>
+    <div class="tab" data-view="embeddings">Embeddings</div>
+    <div class="tab active" data-view="viz">Vector Visualization</div>
+    <div class="tab" data-view="search">Search</div>
+    <div class="tab" data-view="analytics">Analytics</div>
+    <div class="tab" data-view="settings">Settings</div>
   </div>
+  <div class="views" id="views">
 
+  <!-- ══ VIEW: VECTOR VISUALIZATION ══ -->
+  <div class="view active" id="view-viz">
   <!-- THREE COLUMNS -->
   <div class="body-row">
 
@@ -431,6 +437,44 @@ table.results-table tr:hover td{background:rgba(255,255,255,0.02)}
       <span class="mono" id="footerMono">nomic-embed-text · 768d</span>
     </div>
   </div>
+  </div><!-- /view-viz -->
+
+  <!-- ══ VIEW: OVERVIEW ══ -->
+  <div class="view" id="view-overview"><div class="view-scroll" id="ovBody"></div></div>
+  <!-- ══ VIEW: DOCUMENTS ══ -->
+  <div class="view" id="view-documents"><div class="view-scroll">
+    <div class="vh"><h2>Documents</h2><input type="text" class="vsearch" id="docSearch" placeholder="Filter documents…"></div>
+    <div id="docBody"></div>
+  </div></div>
+  <!-- ══ VIEW: CHUNKS ══ -->
+  <div class="view" id="view-chunks"><div class="view-scroll">
+    <div class="vh"><h2>Chunks</h2><input type="text" class="vsearch" id="chunkSearch" placeholder="Filter chunks by file or text…"></div>
+    <div id="chunkBody"></div>
+    <div class="vpager" id="chunkPager"></div>
+  </div></div>
+  <!-- ══ VIEW: EMBEDDINGS ══ -->
+  <div class="view" id="view-embeddings"><div class="view-scroll">
+    <div class="vh"><h2>Embeddings</h2><input type="text" class="vsearch" id="embSearch" placeholder="Filter embeddings…"></div>
+    <div id="embBody"></div>
+    <div class="vpager" id="embPager"></div>
+  </div></div>
+  <!-- ══ VIEW: SEARCH ══ -->
+  <div class="view" id="view-search"><div class="view-scroll">
+    <div class="vh"><h2>Semantic Search</h2></div>
+    <div class="search-big">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchBig" placeholder="Search embeddings by meaning — e.g. 'cooling redundancy', 'CAPEX uplift'…" autocomplete="off">
+      <button id="searchBigBtn">Search</button>
+    </div>
+    <p class="search-note" id="searchNote">Uses local ollama embeddings when reachable (localhost), else text match over previews.</p>
+    <div id="searchBigBody"></div>
+  </div></div>
+  <!-- ══ VIEW: ANALYTICS ══ -->
+  <div class="view" id="view-analytics"><div class="view-scroll" id="anBody"></div></div>
+  <!-- ══ VIEW: SETTINGS ══ -->
+  <div class="view" id="view-settings"><div class="view-scroll" id="setBody"></div></div>
+
+  </div><!-- /views -->
 </div>
 
 <!-- TOOLTIP -->

@@ -363,10 +363,11 @@ html.light #stars{opacity:.06}
 </head>
 <body class="locked">
 <style>
-  .root-gate{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;
+  .root-gate{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;
     background:rgba(6,9,13,.72);backdrop-filter:blur(4px)}
   body.locked .root-gate{display:flex}
-  body.locked > *:not(.root-gate):not(script):not(style){filter:blur(7px);pointer-events:none;user-select:none}
+  /* blur the page content behind the gate, but NEVER the auth login modal (z-index 99999) — else its fields render invisible */
+  body.locked > *:not(.root-gate):not(#rzModalOverlay):not(script):not(style){filter:blur(7px);pointer-events:none;user-select:none}
   .root-gate-card{background:#121820;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:2rem 2.2rem;
     max-width:360px;text-align:center;font-family:'JetBrains Mono',ui-monospace,monospace;color:#e7edf3;box-shadow:0 20px 60px rgba(0,0,0,.5)}
   .root-gate-card .lock{width:54px;height:54px;margin:0 auto 1rem;border-radius:12px;background:#f59e0b;color:#0b0f14;
@@ -442,6 +443,12 @@ html.light #stars{opacity:.06}
     <span style="font-size:12px;margin-left:4px;">Wiki</span>
   </a>
 
+  <a href="vector-index.html" class="nbk" id="bVec" title="Vector Index — AI embedding visualization (root only)" style="text-decoration:none;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="6" r="1.7"/><circle cx="12" cy="4" r="1.7"/><circle cx="19" cy="7" r="1.7"/><circle cx="7" cy="13" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="10" cy="19" r="1.7"/><circle cx="19" cy="17" r="1.7"/></svg>
+    <span style="font-size:12px;margin-left:4px;">Vector Index</span>
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:4px;opacity:.7"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+  </a>
+
   <a href="../../index.html" class="nbk">
     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
     Back to site
@@ -472,9 +479,6 @@ html.light #stars{opacity:.06}
 
   <div class="tdv"></div>
   <div class="tbr-r">
-    <a class="lb" href="vector-index.html" id="bVec" title="Vector Index — AI embedding visualization (root)" style="text-decoration:none">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="6" r="1.7"/><circle cx="12" cy="4" r="1.7"/><circle cx="19" cy="7" r="1.7"/><circle cx="7" cy="13" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="10" cy="19" r="1.7"/><circle cx="19" cy="17" r="1.7"/></svg>
-    </a>
     <button class="lb on" id="bF" title="Force">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="12" cy="19" r="2"/><line x1="7" y1="5" x2="17" y2="5"/><line x1="6" y1="7" x2="11" y2="17"/><line x1="18" y1="7" x2="13" y2="17"/></svg>
     </button>

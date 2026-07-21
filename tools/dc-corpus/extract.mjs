@@ -31,6 +31,11 @@ const PATTERNS = [
     { metric: 'capex_usd_per_kw', unit: '$/kW', re: /\$\s?(\d{1,3}(?:,\d{3})*)\s?(?:per|\/)\s?k(?:ilo)?[wW](?:att)?\b(?!h)(?!\s?h)/g, min: 1000, max: 40000 },
     { metric: 'rack_density_kw', unit: 'kW/rack', re: /(\d{1,3}(?:\.\d)?)\s?kW\s?(?:per|\/)\s?rack/gi, min: 2, max: 400 },
     { metric: 'rack_density_kw', unit: 'kW/rack', re: /rack\s+densit(?:y|ies)[^.\n]{0,40}?(\d{1,3}(?:\.\d)?)\s?kW/gi, min: 2, max: 400 },
+    /* Ship-D (2026-07-21) — AI-architecture rack POWER draw (distinct from rack_density_kw which
+     * needs an explicit "per rack"/"density" token). Captures "rack exceeds 40 kW", "rack to over
+     * 100kW", "rack density above 50 kW". Number sits right after a rack + magnitude cue; the small
+     * cue-word set (exceed/above/over/to/require/…) keeps it from grabbing unrelated kW figures. */
+    { metric: 'rack_power_kw', unit: 'kW/rack', re: /rack[a-z ]{0,20}?(?:densit[a-z]+ )?(?:to |of |exceed[a-z]* |above |over |up to |require[a-z]* |around |about )?(\d{2,3})\s?kW\b/gi, min: 5, max: 400 },
 ];
 
 const yearRe = /\b(20[12]\d)\b/;

@@ -36,6 +36,9 @@ ok('pue plausible band', pueVals.every((v) => v >= 1.0 && v <= 2.5));
         ['rack_density_kw', 'rack density of 60 kW supported', true],
         ['rack_density_kw', 'supports 132 kW per rack liquid-cooled', true],
         ['rack_density_kw', 'a 500 kW UPS module per rack row', false],
+        ['rack_power_kw', 'power consumption per rack exceeds 40 kW in this layout', true],
+        ['rack_power_kw', 'racks require 20kW/rack to over 100kW/rack for AI', true],
+        ['rack_power_kw', 'the campus needs a 30 MW substation nearby', false],
     ];
     const P = [
         { m: 'construction_months', re: /(\d{1,2})[\s-]*months?[^.\n]{0,40}?(?:construction|programme|build(?:ing)? (?:period|schedule)|schedule)/gi, min: 4, max: 72 },
@@ -43,6 +46,7 @@ ok('pue plausible band', pueVals.every((v) => v >= 1.0 && v <= 2.5));
         { m: 'capex_usd_per_kw', re: /\$\s?(\d{1,3}(?:,\d{3})*)\s?(?:per|\/)\s?k(?:ilo)?[wW](?:att)?\b(?!h)(?!\s?h)/g, min: 1000, max: 40000 },
         { m: 'rack_density_kw', re: /(\d{1,3}(?:\.\d)?)\s?kW\s?(?:per|\/)\s?rack/gi, min: 2, max: 400 },
         { m: 'rack_density_kw', re: /rack\s+densit(?:y|ies)[^.\n]{0,40}?(\d{1,3}(?:\.\d)?)\s?kW/gi, min: 2, max: 400 },
+        { m: 'rack_power_kw', re: /rack[a-z ]{0,20}?(?:densit[a-z]+ )?(?:to |of |exceed[a-z]* |above |over |up to |require[a-z]* |around |about )?(\d{2,3})\s?kW\b/gi, min: 5, max: 400 },
     ];
     for (const [metric, text, want] of CASES) {
         let hit = false;

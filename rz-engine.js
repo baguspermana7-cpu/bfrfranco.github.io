@@ -6455,6 +6455,22 @@
                                 "sources": 2
                         }
                 },
+                "rack_power_kw": {
+                        "research": {
+                                "n": 3,
+                                "unit": "kW/rack",
+                                "p10": 20,
+                                "p25": 20,
+                                "p50": 50,
+                                "p75": 100,
+                                "p90": 100,
+                                "companies": [
+                                        "IMDA Green DC Roadmap",
+                                        "Uptime Survey 2024"
+                                ],
+                                "sources": 2
+                        }
+                },
                 "renewable_share": {
                         "finance": {
                                 "n": 4,

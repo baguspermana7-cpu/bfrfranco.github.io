@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.106.0 — 2026-07-21 (Ship-D: DC Corpus / KB dive-deep — new-domain sources + rack-power metric)
+
+### Added
+- **DC Corpus deepened** — 12 new authoritative public sources appended (append-only) to `tools/dc-corpus/sources.yaml`: microfluidic/advanced cooling (Corintis, Microsoft in-chip, IMEC, arXiv power-stabilization + microfluidic-survey), AI-arch power (OCP ORV3 HPR/Mount Diablo, NVIDIA GB200 NVL72, arXiv AI-DC-power), supply-chain (US BIS EAR, WTO Tariff Profiles 2024, DCD supply-chain lead-time, T&T DC Cost Index). 10/12 fetched (2 bot-blocked, handled gracefully — remain as provenance citations).
+- **New corpus metric `rack_power_kw`** (extract.mjs, bounded 5-400 kW/rack) — AI-architecture rack power draw, distinct from `rack_density_kw`. Yielded 4 source-quoted facts (20/40/50/100 kW; IMDA, NVIDIA DGX H100, Uptime 2024). Distribution n=3, monotonic, 2 independent sources.
+
+### Verified
+- engine 708/0 · parity 155/0 · calibration 19/0 (constants still in-band vs deepened corpus) · bindings 85/0 (catalog 216fn/118src) · **dc-corpus 2678→2700 asserts, all green** · export 44/0 · tsc 0 + next build. corpus-facts 649→653 (+4). Engine ?v `-h`→`-i`. HONESTY: `heat_flux_wcm2` + `import_duty_pct` patterns DROPPED (0 matches / trade-vs-utility-tariff false positives) rather than ship noise — arXiv PDFs converted poorly (binary), so W/cm² + GPU-TDP-W + import-duty-% don't exist in extractable form; sources stand as citations. Ship-D COMPLETE — the full CAPEX+BOQ program (Ships A/B, BOQ P1-P3, C, D) is shipped.
+
 ## v1.105.0 — 2026-07-21 (Supply-Chain per Country: landed cost + export-control + customs lead-time)
 
 ### Added
