@@ -48,10 +48,10 @@ export function AiAssistantModal({ open, onClose }: { open: boolean; onClose: ()
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
             <div role="dialog" aria-modal="true" aria-label="AI Assistant configuration"
-                className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[#0f1424] text-slate-100 shadow-2xl">
+                className="relative w-full max-w-md rounded border border-white/10 bg-[#0f1424] text-slate-100 shadow-2xl">
                 <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
                     <div className="flex items-center gap-2">
-                        <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-cyan-600 flex items-center justify-center"><Sparkles className="w-4 h-4 text-white" /></span>
+                        <span className="w-7 h-7 rounded-lg bg-rz-info/15 border border-rz-info/30 flex items-center justify-center"><Sparkles className="w-4 h-4 text-rz-info" /></span>
                         <h2 className="text-sm font-bold">AI Assistant</h2>
                     </div>
                     <button onClick={onClose} className="p-1 rounded hover:bg-white/10" aria-label="Close"><X className="w-4 h-4 text-slate-400" /></button>
@@ -59,7 +59,7 @@ export function AiAssistantModal({ open, onClose }: { open: boolean; onClose: ()
 
                 <div className="p-5 space-y-4">
                     {/* status chip */}
-                    <div className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs ${usingAi ? 'border-cyan-500/30 bg-cyan-500/10 text-cyan-300' : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'}`}>
+                    <div className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs ${usingAi ? 'border-cyan-500/30 bg-cyan-500/10 text-cyan-300' : 'border-rz-data/30 bg-rz-data/10 text-rz-data'}`}>
                         {usingAi ? <Sparkles className="w-3.5 h-3.5" /> : <Cpu className="w-3.5 h-3.5" />}
                         {usingAi ? `Routing through ${cfg.provider} · ${cfg.model}` : 'Using the built-in deterministic RZ Decision Engine'}
                     </div>
@@ -96,7 +96,7 @@ export function AiAssistantModal({ open, onClose }: { open: boolean; onClose: ()
                     </label>
 
                     {test.state !== 'idle' && (
-                        <div className={`flex items-start gap-2 rounded-lg px-3 py-2 text-[11px] ${test.state === 'ok' ? 'bg-emerald-500/10 text-emerald-300' : test.state === 'fail' ? 'bg-amber-500/10 text-amber-300' : 'bg-white/5 text-slate-300'}`}>
+                        <div className={`flex items-start gap-2 rounded-lg px-3 py-2 text-[11px] ${test.state === 'ok' ? 'bg-rz-data/10 text-rz-data' : test.state === 'fail' ? 'bg-amber-500/10 text-amber-300' : 'bg-white/5 text-slate-300'}`}>
                             {test.state === 'running' ? <Loader2 className="w-3.5 h-3.5 animate-spin mt-0.5" /> : test.state === 'ok' ? <CheckCircle2 className="w-3.5 h-3.5 mt-0.5" /> : <AlertTriangle className="w-3.5 h-3.5 mt-0.5" />}
                             <span>{test.state === 'running' ? 'Testing endpoint…' : test.msg}</span>
                         </div>

@@ -126,8 +126,8 @@ export function StaffingDashboard() {
                 <div className="flex flex-wrap items-center gap-4 px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/70 text-xs">
                     <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Uptime Staffing Benchmark</span>
                     <span className="text-slate-600 dark:text-slate-300">Benchmark <b className="tabular-nums text-cyan-500">{staffBench.totalFte} FTE</b> <span className="text-slate-400">({staffBench.ftePerMw ?? '—'}/MW, Tier {inputs.tierLevel}, {staffMw.toFixed(1)} MW)</span></span>
-                    <span className="text-slate-600 dark:text-slate-300">Configured <b className="tabular-nums text-emerald-500">{results.totalHeadcount} FTE</b></span>
-                    {(() => { const d = results.totalHeadcount - staffBench.totalFte; const over = d > 0; return <span className={`tabular-nums font-semibold ${Math.abs(d) <= 2 ? 'text-emerald-500' : over ? 'text-amber-500' : 'text-rose-400'}`}>{over ? '+' : ''}{d} vs benchmark {Math.abs(d) <= 2 ? '· aligned' : over ? '· above' : '· below'}</span>; })()}
+                    <span className="text-slate-600 dark:text-slate-300">Configured <b className="tabular-nums text-rz-data">{results.totalHeadcount} FTE</b></span>
+                    {(() => { const d = results.totalHeadcount - staffBench.totalFte; const over = d > 0; return <span className={`tabular-nums font-semibold ${Math.abs(d) <= 2 ? 'text-rz-data' : over ? 'text-amber-500' : 'text-rose-400'}`}>{over ? '+' : ''}{d} vs benchmark {Math.abs(d) <= 2 ? '· aligned' : over ? '· above' : '· below'}</span>; })()}
                     <span className="text-[9px] text-slate-400 ml-auto">Uptime Institute · 4.2 FTE/24×7 position × tier + per-MW techs</span>
                 </div>
             )}
@@ -143,7 +143,7 @@ export function StaffingDashboard() {
                         &nbsp;·&nbsp;
                         <span className="text-cyan-600 dark:text-cyan-400 font-mono font-bold">{inputs.shiftModel.toUpperCase()} SHIFT</span>
                         &nbsp;·&nbsp;
-                        <span className="text-emerald-600 dark:text-emerald-400 font-mono font-bold">{results.totalHeadcount} FTEs</span>
+                        <span className="text-rz-data font-mono font-bold">{results.totalHeadcount} FTEs</span>
                     </p>
                 </div>
 
@@ -319,7 +319,7 @@ export function StaffingDashboard() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none flex flex-col">
                             <div className="flex justify-between items-start mb-2">
-                                <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                <div className="p-2 rounded-lg bg-rz-data/10 text-rz-data">
                                     <Users className="w-5 h-5" />
                                 </div>
                                 <span className="text-xs text-slate-400 flex items-center gap-1">Total Headcount <Tooltip content="Total full-time equivalent employees across all roles and shifts" /></span>
@@ -481,7 +481,7 @@ export function StaffingDashboard() {
                                             <td className="px-4 py-3 text-right text-slate-600 dark:text-slate-400">{fmtMoney(r.breakdown.baseSalaries)}</td>
                                             <td className="px-4 py-3 text-right text-cyan-600 dark:text-cyan-400">{fmtMoney(r.breakdown.shiftAllowance)}</td>
                                             <td className="px-4 py-3 text-right text-amber-600 dark:text-amber-500">{r.breakdown.overtime > 0 ? fmtMoney(r.breakdown.overtime) : '–'}</td>
-                                            <td className="px-4 py-3 text-right font-bold text-emerald-600 dark:text-emerald-400">{fmtMoney(r.monthlyCost)}</td>
+                                            <td className="px-4 py-3 text-right font-bold text-rz-data">{fmtMoney(r.monthlyCost)}</td>
                                         </tr>
                                     ))}
                                     <tr className="bg-slate-100 dark:bg-slate-800/80 font-bold text-slate-900 dark:text-white border-t border-slate-300 dark:border-slate-600">
@@ -492,7 +492,7 @@ export function StaffingDashboard() {
                                         <td className="px-4 py-3 text-right">{fmtMoney(results.staffingResults.reduce((a, b) => a + b.breakdown.baseSalaries, 0))}</td>
                                         <td className="px-4 py-3 text-right">{fmtMoney(results.staffingResults.reduce((a, b) => a + b.breakdown.shiftAllowance, 0))}</td>
                                         <td className="px-4 py-3 text-right text-amber-600 dark:text-amber-500">{fmtMoney(results.staffingResults.reduce((a, b) => a + b.breakdown.overtime, 0))}</td>
-                                        <td className="px-4 py-3 text-right text-emerald-600 dark:text-emerald-400">{fmtMoney(results.totalMonthlyCost)}</td>
+                                        <td className="px-4 py-3 text-right text-rz-data">{fmtMoney(results.totalMonthlyCost)}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -545,7 +545,7 @@ export function StaffingDashboard() {
                                         <div className="bg-white dark:bg-black/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
                                             <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Utilization Rate <Tooltip content="Net productive hours as a percentage of total scheduled hours, after accounting for shrinkage (breaks, training, admin)." /></div>
                                             <TraceValue traceId="staff.utilizationPct">
-                                                <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">{((1 - shrinkage) * 100).toFixed(0)}%</div>
+                                                <div className="text-xl font-bold text-rz-data">{((1 - shrinkage) * 100).toFixed(0)}%</div>
                                             </TraceValue>
                                             <div className="text-[10px] text-slate-500">Net productive hours</div>
                                         </div>
@@ -559,7 +559,7 @@ export function StaffingDashboard() {
                                         <div className="bg-white dark:bg-black/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
                                             <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">OT Ratio <Tooltip content="Overtime cost as a percentage of total payroll. Values above 15% indicate potential scheduling issues." /></div>
                                             <TraceValue traceId="staff.otRatioPct">
-                                                <div className={`text-xl font-bold ${totalCost > 0 && (totalOT / totalCost) > 0.15 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                                                <div className={`text-xl font-bold ${totalCost > 0 && (totalOT / totalCost) > 0.15 ? 'text-amber-600 dark:text-amber-400' : 'text-rz-data'}`}>
                                                     {totalCost > 0 ? ((totalOT / totalCost) * 100).toFixed(1) : 0}%
                                                 </div>
                                             </TraceValue>
@@ -581,7 +581,7 @@ export function StaffingDashboard() {
                     {/* Sensitivity Analysis */}
                     <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-6 mt-6">
                         <h3 className="text-md font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                            <TrendingUp className="w-4 h-4 text-rz-mint" />
                             Headcount Sensitivity Analysis
                             <Tooltip content="Impact analysis showing how percentage changes in headcount affect monthly staffing costs." />
                         </h3>
@@ -601,12 +601,12 @@ export function StaffingDashboard() {
                                         <div key={pct}
                                             className={`flex items-center gap-3 px-3 py-2 rounded-lg ${isBase ? 'bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-800/50' : 'bg-white dark:bg-slate-800/30'}`}
                                         >
-                                            <div className={`w-14 text-xs font-mono ${pct < 0 ? 'text-emerald-600 dark:text-emerald-400' : pct > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-cyan-600 dark:text-cyan-400'}`}>
+                                            <div className={`w-14 text-xs font-mono ${pct < 0 ? 'text-rz-data' : pct > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-cyan-600 dark:text-cyan-400'}`}>
                                                 {pct > 0 ? '+' : ''}{pct}%
                                             </div>
                                             <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                                                 <div
-                                                    className={`h-full rounded-full ${pct < 0 ? 'bg-emerald-500' : pct > 0 ? 'bg-rose-500' : 'bg-cyan-500'}`}
+                                                    className={`h-full rounded-full ${pct < 0 ? 'bg-rz-data' : pct > 0 ? 'bg-rose-500' : 'bg-cyan-500'}`}
                                                     style={{ width: `${(adjustedCost / (baseCost * 1.25)) * 100}%` }}
                                                 />
                                             </div>
@@ -632,12 +632,12 @@ export function StaffingDashboard() {
                     <div className={clsx(
                         "p-6 rounded-xl border",
                         results.totalSavings > 0
-                            ? "bg-emerald-950/30 border-emerald-700"
+                            ? "bg-rz-data/10 border-rz-data/40"
                             : "bg-amber-950/30 border-amber-700"
                     )}>
                         <div className="flex items-center gap-3 mb-3">
                             {results.totalSavings > 0
-                                ? <CheckCircle className="w-6 h-6 text-emerald-400" />
+                                ? <CheckCircle className="w-6 h-6 text-rz-data" />
                                 : <XCircle className="w-6 h-6 text-amber-400" />
                             }
                             <h3 className="text-lg font-bold text-white">
@@ -696,7 +696,7 @@ export function StaffingDashboard() {
                                         <td className="px-6 py-3 text-center font-mono text-cyan-400">{typeof row.fmt === 'function' ? (row.fmt as any)(row.v12) : row.v12}</td>
                                         <td className="px-6 py-3 text-center font-mono">
                                             {typeof row.v8 === 'number' && typeof row.v12 === 'number'
-                                                ? <span className={row.v12 < row.v8 ? 'text-emerald-400' : row.v12 > row.v8 ? 'text-red-400' : 'text-slate-500'}>
+                                                ? <span className={row.v12 < row.v8 ? 'text-rz-data' : row.v12 > row.v8 ? 'text-red-400' : 'text-slate-500'}>
                                                     {row.v12 < row.v8 ? `↓ ${(row.fmt as any)(row.v8 - row.v12)}` : row.v12 > row.v8 ? `↑ ${(row.fmt as any)(row.v12 - row.v8)}` : '—'}
                                                 </span>
                                                 : <span className="text-slate-500">—</span>
@@ -721,7 +721,7 @@ export function StaffingDashboard() {
                                 <div className="p-3 bg-cyan-50 dark:bg-cyan-950/20 rounded-lg border border-cyan-200 dark:border-cyan-900/30">
                                     <div className="text-xs text-slate-600 dark:text-slate-500 uppercase mb-1">12h 4on/4off</div>
                                     <div className="text-lg font-mono text-cyan-600 dark:text-cyan-400">{fmtMoney(comp.comparison.model12h.monthlyCost)}</div>
-                                    <div className="text-xs text-emerald-600 dark:text-emerald-400">{comp.comparison.model12h.headcount} FTEs, Zero OT</div>
+                                    <div className="text-xs text-rz-data">{comp.comparison.model12h.headcount} FTEs, Zero OT</div>
                                 </div>
                             </div>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">{comp.comparison.recommendation}</p>

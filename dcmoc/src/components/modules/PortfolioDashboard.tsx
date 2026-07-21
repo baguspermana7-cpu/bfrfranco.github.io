@@ -14,7 +14,7 @@ import { Tooltip } from '@/components/ui/Tooltip';
 import clsx from 'clsx';
 import { fmtMoney } from '@/lib/format';
 
-const SITE_COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444', '#10b981'];
+const SITE_COLORS = ['#06b6d4', '#7DDDB4', '#f59e0b', '#ef4444', '#10b981'];
 
 type PortfolioTab = 'overview' | 'financial' | 'staffing' | 'risk' | 'carbon';
 

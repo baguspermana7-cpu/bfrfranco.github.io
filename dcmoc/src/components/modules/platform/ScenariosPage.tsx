@@ -17,7 +17,7 @@ import { useSimulationStore } from '@/store/simulation';
 import { COUNTRIES } from '@/constants/countries';
 import { Layers, GitCompare, Search, Star, Trash2, FolderOpen, ChevronRight } from 'lucide-react';
 
-const SC_COLORS = ['#a78bfa', '#22d3ee', '#34d399', '#f59e0b'];
+const SC_COLORS = ['#7DDDB4', '#22d3ee', '#34d399', '#f59e0b'];
 const fm = (v: number | undefined | null, pfx = '$') =>
     v == null ? '—' : v >= 1e6 ? `${pfx}${(v / 1e6).toFixed(1)}M` : v >= 1e3 ? `${pfx}${(v / 1e3).toFixed(0)}K` : `${pfx}${Math.round(v)}`;
 
@@ -28,7 +28,7 @@ export function PlatformHeader({ icon: Icon, title, sub, tone, actions }: {
     return (
         <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-                <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${tone} shadow-lg`}><Icon className="h-6 w-6 text-white" /></div>
+                <div className="flex h-11 w-11 items-center justify-center rounded border border-rz-2 bg-rz-elevated"><Icon className="h-6 w-6 text-rz-info" /></div>
                 <div>
                     <div className="text-[10px] uppercase tracking-wide text-slate-400">Platform</div>
                     <h1 className="text-2xl font-bold leading-tight text-slate-900 dark:text-white">{title}</h1>
@@ -79,15 +79,15 @@ export function ScenariosPage() {
         const d = delta(v, b);
         if (d == null || Math.abs(d) < 0.05) return <span className="text-slate-400">—</span>;
         const good = invert ? d < 0 : d > 0;
-        return <span className={good ? 'text-emerald-500' : 'text-rose-400'} title={`${d >= 0 ? '+' : ''}${d.toFixed(1)}% vs baseline (${baseline?.name})`}>{d >= 0 ? '+' : ''}{d.toFixed(1)}%</span>;
+        return <span className={good ? 'text-rz-data' : 'text-rose-400'} title={`${d >= 0 ? '+' : ''}${d.toFixed(1)}% vs baseline (${baseline?.name})`}>{d >= 0 ? '+' : ''}{d.toFixed(1)}%</span>;
     };
 
     return (
         <div className="space-y-4">
-            <PlatformHeader icon={Layers} title="Scenarios" sub="Create, compare, and analyze different configurations and outcomes" tone="from-violet-500 to-purple-600"
+            <PlatformHeader icon={Layers} title="Scenarios" sub="Create, compare, and analyze different configurations and outcomes" tone="from-cyan-500 to-blue-600"
                 actions={<>
-                    <button onClick={() => setActiveTab('scenario-compare')} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-violet-400"><GitCompare className="h-3.5 w-3.5" /> Compare</button>
-                    <button onClick={() => st.openPanel()} className="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">＋ New Scenario</button>
+                    <button onClick={() => setActiveTab('scenario-compare')} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-rz-mint"><GitCompare className="h-3.5 w-3.5" /> Compare</button>
+                    <button onClick={() => st.openPanel()} className="rounded-lg bg-rz-signal px-3 py-1.5 text-xs font-semibold text-rz-base hover:bg-rz-signal/90">＋ New Scenario</button>
                 </>} />
 
             <KpiChips items={[
@@ -100,14 +100,14 @@ export function ScenariosPage() {
             <div className="flex items-center gap-2">
                 <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-2 top-1.5 h-3.5 w-3.5 text-slate-400" />
-                    <input className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 py-1.5 pl-7 pr-2 text-xs outline-none focus:border-violet-500 text-slate-900 dark:text-slate-100"
+                    <input className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 py-1.5 pl-7 pr-2 text-xs outline-none focus:border-rz-signal text-slate-900 dark:text-slate-100"
                         placeholder="Search scenarios…" value={q} onChange={(e) => setQ(e.target.value)} />
                 </div>
                 <span className="text-[10px] text-slate-400">Deltas vs baseline · ✓ = in comparison set</span>
             </div>
 
             <div className="grid gap-4 lg:grid-cols-[1fr_290px]">
-                <div className="min-w-0 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+                <div className="min-w-0 overflow-hidden rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
                     <table className="w-full text-xs">
                         <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400">
                             <th className="w-8 px-2 py-2"></th><th className="text-left">Scenario</th><th className="text-left">Country</th>
@@ -124,11 +124,11 @@ export function ScenariosPage() {
                             )}
                             {filtered.map((s) => (
                                 <tr key={s.id} onClick={() => setSelId(s.id)}
-                                    className={`cursor-pointer border-b border-slate-100 dark:border-slate-800/60 ${sel?.id === s.id ? 'bg-violet-600/10' : 'hover:bg-slate-50 dark:hover:bg-slate-800/40'}`}>
+                                    className={`cursor-pointer border-b border-slate-100 dark:border-slate-800/60 ${sel?.id === s.id ? 'bg-rz-signal/10' : 'hover:bg-slate-50 dark:hover:bg-slate-800/40'}`}>
                                     <td className="px-2 py-2">
                                         <button onClick={(e) => { e.stopPropagation(); st.toggleComparisonSelection(s.id); }}
                                             title={st.comparisonIds.includes(s.id) ? 'Remove from comparison' : 'Add to comparison (max 4)'}
-                                            className={st.comparisonIds.includes(s.id) ? 'text-violet-500' : 'text-slate-300 dark:text-slate-600 hover:text-violet-400'}>
+                                            className={st.comparisonIds.includes(s.id) ? 'text-rz-mint' : 'text-slate-300 dark:text-slate-600 hover:text-rz-mint'}>
                                             <Star className="h-3.5 w-3.5" fill={st.comparisonIds.includes(s.id) ? 'currentColor' : 'none'} />
                                         </button>
                                     </td>
@@ -153,7 +153,7 @@ export function ScenariosPage() {
 
                 {/* detail rail */}
                 <div className="space-y-3">
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                         <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Scenario Details</h3>
                         {!sel ? <p className="text-[10px] text-slate-400">Select a scenario.</p> : (
                             <div className="space-y-1 text-[11px]">
@@ -183,12 +183,12 @@ export function ScenariosPage() {
                         )}
                     </div>
                     {sel && (
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 space-y-1.5">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 space-y-1.5">
                             <h3 className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Quick Actions</h3>
                             <button onClick={() => { simActions.setInputs(sel.simInputs); capexSetInputs(sel.capexInputs); simActions.selectCountry(sel.countryId); }}
-                                className="w-full rounded-lg bg-violet-600 py-1.5 text-[11px] font-semibold text-white hover:bg-violet-500"><FolderOpen className="mr-1 inline h-3 w-3" /> Open (restore inputs)</button>
-                            <button onClick={() => { st.toggleComparisonSelection(sel.id); }} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 py-1.5 text-[11px] text-slate-600 dark:text-slate-300 hover:border-violet-400">{st.comparisonIds.includes(sel.id) ? 'Remove from' : 'Add to'} comparison</button>
-                            <button onClick={() => setActiveTab('scenario-compare')} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 py-1.5 text-[11px] text-slate-600 dark:text-slate-300 hover:border-violet-400">Open Comparison <ChevronRight className="inline h-3 w-3" /></button>
+                                className="w-full rounded-lg bg-rz-signal py-1.5 text-[11px] font-semibold text-rz-base hover:bg-rz-signal/90"><FolderOpen className="mr-1 inline h-3 w-3" /> Open (restore inputs)</button>
+                            <button onClick={() => { st.toggleComparisonSelection(sel.id); }} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 py-1.5 text-[11px] text-slate-600 dark:text-slate-300 hover:border-rz-mint">{st.comparisonIds.includes(sel.id) ? 'Remove from' : 'Add to'} comparison</button>
+                            <button onClick={() => setActiveTab('scenario-compare')} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 py-1.5 text-[11px] text-slate-600 dark:text-slate-300 hover:border-rz-mint">Open Comparison <ChevronRight className="inline h-3 w-3" /></button>
                         </div>
                     )}
                 </div>
@@ -274,17 +274,17 @@ export function ScenarioComparePage() {
     return (
         <div className="space-y-4">
             <PlatformHeader icon={GitCompare} title="Scenario Comparison" sub="Compare multiple scenarios across key performance, cost, risk, and sustainability" tone="from-cyan-500 to-blue-600"
-                actions={<button onClick={() => setActiveTab('scenarios')} className="rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400">Manage scenarios</button>} />
+                actions={<button onClick={() => setActiveTab('scenarios')} className="rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-rz-mint">Manage scenarios</button>} />
 
             {chosen.length < 2 ? (
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-8 text-center text-sm text-slate-500">
+                <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-8 text-center text-sm text-slate-500">
                     Select at least 2 scenarios (★ in the Scenarios page) to compare. {st.scenarios.length === 0 && 'No scenarios saved yet.'}
                 </div>
             ) : (<>
                 {/* scenario header cards */}
                 <div className={`grid gap-3 md:grid-cols-${Math.min(4, chosen.length)}`}>
                     {chosen.map((s, i) => (
-                        <div key={s.id} className="rounded-2xl border p-3" style={{ borderColor: SC_COLORS[i] + '66', background: SC_COLORS[i] + '0d' }}>
+                        <div key={s.id} className="rounded border p-3" style={{ borderColor: SC_COLORS[i] + '66', background: SC_COLORS[i] + '0d' }}>
                             <div className="flex items-center gap-2">
                                 <span className="h-2.5 w-2.5 rounded-full" style={{ background: SC_COLORS[i] }} />
                                 <span className="truncate text-xs font-bold text-slate-900 dark:text-white">{s.name}</span>
@@ -303,7 +303,7 @@ export function ScenarioComparePage() {
                 </div>
 
                 {/* KPI comparison table w/ best-cell highlight */}
-                <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+                <div className="overflow-hidden rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
                     <table className="w-full text-xs">
                         <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400">
                             <th className="px-3 py-2 text-left">Metric</th>
@@ -321,7 +321,7 @@ export function ScenarioComparePage() {
                                             const v = vals[i];
                                             const best = v != null && v === bestVal;
                                             return <td key={s.id} title={v != null ? `${r.label}: ${r.fmt(v)}${best ? ' — best of the set' : ''}` : undefined}
-                                                className={`px-2 py-1.5 text-right tabular-nums ${best ? 'bg-emerald-500/10 font-bold text-emerald-500' : 'text-slate-600 dark:text-slate-300'}`}>{v != null ? r.fmt(v) : '—'}</td>;
+                                                className={`px-2 py-1.5 text-right tabular-nums ${best ? 'bg-rz-data/10 font-bold text-rz-data' : 'text-slate-600 dark:text-slate-300'}`}>{v != null ? r.fmt(v) : '—'}</td>;
                                         })}
                                     </tr>
                                 );
@@ -332,7 +332,7 @@ export function ScenarioComparePage() {
 
                 <div className="grid gap-4 xl:grid-cols-[1fr_1fr]">
                     {/* radar */}
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Dimension Radar <span className="text-[9px] normal-case text-slate-400">normalized within the chosen set</span></h2>
                         <div className="h-60">
                             <ResponsiveContainer width="100%" height="100%">
@@ -351,7 +351,7 @@ export function ScenarioComparePage() {
                     </div>
                     {/* score summary + insights */}
                     <div className="space-y-3">
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Score Summary <span className="text-[9px] normal-case text-slate-400">weights: cost 35 · efficiency 25 · financial 25 · carbon 15</span></h2>
                             <div className="space-y-1.5">
                                 {[...scores].sort((a, b) => b.total - a.total).map((sc) => {
@@ -367,10 +367,10 @@ export function ScenarioComparePage() {
                                 })}
                             </div>
                         </div>
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Scenario Insights <span className="text-[9px] normal-case text-slate-400">deterministic rules</span></h2>
                             <ul className="space-y-1 text-[11px] text-slate-600 dark:text-slate-300">
-                                {insights.map((t, i) => <li key={i} className="flex gap-1.5"><span className="text-violet-500">▸</span>{t}</li>)}
+                                {insights.map((t, i) => <li key={i} className="flex gap-1.5"><span className="text-rz-mint">▸</span>{t}</li>)}
                             </ul>
                         </div>
                     </div>

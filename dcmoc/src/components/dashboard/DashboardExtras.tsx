@@ -30,7 +30,7 @@ export function DataFlowRail({ stats }: { stats?: FlowStats }) {
                     return (
                         <React.Fragment key={f.label}>
                             <div className="group flex flex-col items-center gap-1 flex-1 min-w-[44px]" title={`${f.label} — ${f.hint}`}>
-                                <div className="relative w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500/15 to-violet-500/10 border border-white/10 flex items-center justify-center transition-all group-hover:border-cyan-400/50 group-hover:from-cyan-500/25">
+                                <div className="relative w-9 h-9 rounded-lg bg-rz-info/10 border border-white/10 flex items-center justify-center transition-colors group-hover:border-rz-info/50">
                                     <Icon className="w-4 h-4 text-cyan-400" />
                                     {f.count != null && <span className="absolute -top-1.5 -right-1.5 min-w-[15px] h-[15px] px-0.5 rounded-full bg-cyan-500 text-[8px] font-bold text-white flex items-center justify-center tabular-nums">{f.count}</span>}
                                 </div>

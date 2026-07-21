@@ -19,11 +19,16 @@ import { useCapexStore } from '@/store/capex';
 import { useRequirementsStore } from '@/store/requirements';
 import { buildBoqModel, openBoqDossier, withProjectMeta } from '@/modules/reporting/boq/BoqDossier';
 
+/* SEMANTIC provenance palette (design.md §5) — color = data lineage state:
+ *   input → mint (user-entered, neutral interactive; replaces violet #3)
+ *   engine → data-green (engine-sourced / confirmed)
+ *   derived → instrument-cyan (computed / measured)
+ *   screening → signal-amber (caution / estimate) */
 const PROV_STYLE: Record<string, { pill: string; chip: string; label: string }> = {
-    input: { pill: 'border-violet-400/60 bg-violet-500/10 hover:bg-violet-500/20', chip: 'bg-violet-500/15 text-violet-500 dark:text-violet-300', label: 'Your input' },
-    engine: { pill: 'border-emerald-400/60 bg-emerald-500/10 hover:bg-emerald-500/20', chip: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400', label: 'Engine (sourced)' },
-    derived: { pill: 'border-cyan-400/60 bg-cyan-500/10 hover:bg-cyan-500/20', chip: 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400', label: 'Computed' },
-    screening: { pill: 'border-amber-400/60 bg-amber-500/10 hover:bg-amber-500/20', chip: 'bg-amber-500/15 text-amber-600 dark:text-amber-400', label: 'Screening estimate' },
+    input: { pill: 'border-rz-mint/60 bg-rz-mint/10 hover:bg-rz-mint/20', chip: 'bg-rz-mint/15 text-emerald-700 dark:text-rz-mint', label: 'Your input' },
+    engine: { pill: 'border-emerald-400/60 bg-rz-data/10 hover:bg-rz-data/20', chip: 'bg-rz-data/15 text-emerald-600 dark:text-rz-data', label: 'Engine (sourced)' },
+    derived: { pill: 'border-cyan-400/60 bg-rz-info/10 hover:bg-rz-info/20', chip: 'bg-rz-info/15 text-cyan-600 dark:text-rz-info', label: 'Computed' },
+    screening: { pill: 'border-amber-400/60 bg-rz-signal/10 hover:bg-rz-signal/20', chip: 'bg-rz-signal/15 text-amber-600 dark:text-rz-signal', label: 'Screening estimate' },
 };
 
 /** Short human word per provenance — used in the leaf composition summary. */
@@ -155,7 +160,7 @@ function Panel({ root }: { root: ResolvedTrace }) {
                         <React.Fragment key={p.id}>
                             {i > 0 && <span>▸</span>}
                             <button onClick={() => setPath(path.slice(0, i + 1))}
-                                className={i === path.length - 1 ? 'font-semibold text-violet-500' : 'hover:text-violet-400'}>
+                                className={i === path.length - 1 ? 'font-semibold text-rz-mint' : 'hover:text-rz-mint'}>
                                 {p.label}
                             </button>
                         </React.Fragment>
@@ -258,7 +263,7 @@ function Panel({ root }: { root: ResolvedTrace }) {
             <div className="mt-2 flex gap-2">
                 <button onClick={() => setActiveTab(node.page as never)}
                     aria-label={`Open or edit in the ${node.page} tab`}
-                    className="flex-1 rounded-lg bg-violet-600 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">
+                    className="flex-1 rounded bg-rz-signal py-1.5 text-xs font-semibold text-slate-900 hover:bg-rz-signal/85">
                     ↗ Open / edit in tab: {node.page}
                 </button>
                 {node.external && (
@@ -295,7 +300,7 @@ function templateOf(node: ResolvedTrace): string {
     return TRACE[node.id]?.formulaTemplate ?? node.children.map((c) => c.id).join(' · ');
 }
 
-export function TraceValue({ traceId, children }: { traceId: string; children: React.ReactNode }) {
+export function TraceValue({ traceId, children, className }: { traceId: string; children: React.ReactNode; className?: string }) {
     const [anchor, setAnchor] = React.useState<{ x: number; y: number } | null>(null);
     const [tree, setTree] = React.useState<ResolvedTrace | null>(null);
 
@@ -308,19 +313,19 @@ export function TraceValue({ traceId, children }: { traceId: string; children: R
     return (
         <>
             <button onClick={openAt} data-bind={traceId} data-trace={traceId}
-                className="group relative cursor-pointer border-b border-dotted border-violet-400/60 hover:border-violet-500 text-left"
+                className={`group relative cursor-pointer border-b border-dotted border-rz-signal/60 hover:border-rz-signal text-left ${className ?? ''}`}
                 title="Click: trace the formula & sources of this number (formula field)">
                 {children}
                 {/* DJ2 — clear affordance: permanent ƒx badge (owner couldn't find the trace feature) */}
-                <span aria-hidden className="absolute -right-4 top-0 rounded bg-violet-500/15 px-0.5 text-[9px] font-bold text-violet-500 group-hover:bg-violet-500/30">ƒx</span>
+                <span aria-hidden className="absolute -right-4 top-0 rounded bg-rz-signal/15 px-0.5 text-[9px] font-bold text-amber-600 dark:text-rz-signal group-hover:bg-rz-signal/30">ƒx</span>
             </button>
             {anchor && tree && typeof document !== 'undefined' && createPortal(
                 <div className="fixed inset-0 z-[9998]" onClick={() => setAnchor(null)}>
-                    <div className="fixed z-[9999] w-[400px] max-w-[95vw] max-h-[70vh] overflow-y-auto rounded-2xl border border-violet-500/40 bg-white dark:bg-slate-900 p-4 shadow-2xl"
+                    <div className="fixed z-[9999] w-[400px] max-w-[95vw] max-h-[70vh] overflow-y-auto rounded border border-rz-signal/40 bg-white dark:bg-rz-elevated p-4 shadow-2xl"
                         style={{ left: anchor.x, top: Math.min(anchor.y, window.innerHeight - 340) }}
                         onClick={(e) => e.stopPropagation()}>
                         <div className="mb-2 flex items-center gap-2">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-violet-500">🔍 Trace Number</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-rz-signal">🔍 Trace Number</span>
                             <button onClick={() => setAnchor(null)} className="ml-auto rounded p-0.5 text-slate-400 hover:text-slate-600" aria-label="Close">✕</button>
                         </div>
                         <Panel root={tree} />

@@ -37,6 +37,17 @@ export interface BoqLine {
     source: string;
 }
 
+/** A subsystem grouping WITHIN a discipline — the deepened (Phase-4) engine
+ *  splits each discipline's flat line list into named subsystems, each with
+ *  its own component lines + rolled-up subtotal. Optional for backward-compat
+ *  with older engines that only expose the flat `lines` union. */
+export interface BoqSubsystem {
+    key: string;
+    label: string;
+    lines: BoqLine[];
+    subtotal: number;
+}
+
 export interface BoqDiscipline {
     key: string;
     label: string;
@@ -44,7 +55,12 @@ export interface BoqDiscipline {
     categoryTotal: number;
     reconcileFactor: number;
     bottomUpRaw: number;
+    /** Flat union of every component line across all subsystems — kept for
+     *  backward-compat (older engines expose only this). */
     lines: BoqLine[];
+    /** Deepened 3-level tree: discipline → subsystem → component lines.
+     *  Missing/empty on older engines (the render falls back to `lines`). */
+    subsystems?: BoqSubsystem[];
 }
 
 export interface BoqDrivers {
@@ -474,25 +490,28 @@ const qtyFmt = (n: number): string => {
 const rateFmt = (n: number): string =>
     Number.isFinite(n) ? `$${n.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : '—';
 
-/* ── instrument theme tokens ── */
+/* ── instrument theme tokens — resistancezero.com brand (--rz-*) ──
+ * instrument-cyan measured/headers · signal-amber money/estimates ·
+ * data-green good · fault-red risk. Base #0a0e1a, elevated #111827,
+ * hairlines for borders. No violet, no gradients-as-fill, 4px radii. */
 const T = {
-    bg: '#0b0f14',
-    surface: '#111820',
+    bg: '#0a0e1a',
+    surface: '#111827',
     surfaceAlt: '#0f1620',
     line: '#1e2a36',
     text: '#e6edf3',
     muted: '#8b9bab',
-    cyan: '#22d3ee',
-    amber: '#fbbf24',
-    emerald: '#34d399',
+    cyan: '#00DDFF',
+    amber: '#FFAA00',
+    emerald: '#00FF88',
     slate: '#94a3b8',
     fault: '#f87171',
 } as const;
 
-/* Confidence chip palette (high=emerald, med=amber, low=slate/"rule-of-thumb"). */
+/* Confidence chip palette (high=data-green, med=signal-amber, low=slate/"rule-of-thumb"). */
 const CONF: Record<BoqConfidence, { bg: string; fg: string; label: string }> = {
-    high: { bg: 'rgba(52,211,153,0.16)', fg: T.emerald, label: 'high' },
-    med: { bg: 'rgba(251,191,36,0.16)', fg: T.amber, label: 'med' },
+    high: { bg: 'rgba(0,255,136,0.16)', fg: T.emerald, label: 'high' },
+    med: { bg: 'rgba(255,170,0,0.16)', fg: T.amber, label: 'med' },
     low: { bg: 'rgba(148,163,184,0.16)', fg: T.slate, label: 'rule-of-thumb' },
 };
 
@@ -504,7 +523,7 @@ function confChip(c: BoqConfidence): string {
 /* Risk band chip (high=fault-red, med=signal-amber, low=slate). */
 const RISK_CHIP: Record<DossierRisk, { bg: string; fg: string }> = {
     high: { bg: 'rgba(248,113,113,0.16)', fg: T.fault },
-    med: { bg: 'rgba(251,191,36,0.16)', fg: T.amber },
+    med: { bg: 'rgba(255,170,0,0.16)', fg: T.amber },
     low: { bg: 'rgba(148,163,184,0.16)', fg: T.slate },
 };
 
@@ -538,7 +557,7 @@ function coverSection(model: BoqModel): string {
             ${cell('Tier', p.tierLevel ? `Tier ${p.tierLevel}` : '—')}
             ${cell('Generated', dateStr)}
         </div>
-        <div style="display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:12px;background:linear-gradient(135deg,rgba(34,211,238,0.10),rgba(251,191,36,0.06));border:1px solid ${T.line};">
+        <div style="display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:4px;background:${T.surface};border:1px solid ${T.line};border-left:3px solid ${T.amber};">
             <div style="flex:1;">
                 <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:${T.muted};">Grand Total (= Parametric CAPEX)</div>
                 <div style="font-size:34px;font-weight:800;color:${T.amber};font-family:'JetBrains Mono',monospace;line-height:1.1;">${money(summary.grandTotal)}</div>
@@ -594,7 +613,7 @@ function disclaimerSection(model: BoqModel): string {
 function commercialSummarySection(model: BoqModel): string {
     const { summary } = model;
     const row = (label: string, value: number, opts?: { emphasis?: boolean; disclosed?: boolean }) =>
-        `<tr${opts?.emphasis ? ` style="background:rgba(251,191,36,0.08);"` : ''}>
+        `<tr${opts?.emphasis ? ` style="background:rgba(255,170,0,0.08);"` : ''}>
             <td style="padding:7px 10px;border-bottom:1px solid ${T.line};font-size:11px;${opts?.emphasis ? `font-weight:800;color:${T.amber};` : `color:${T.text};`}">
                 ${esc(label)}${opts?.disclosed ? `<span style="margin-left:6px;font-size:8.5px;font-weight:700;color:${T.cyan};letter-spacing:.5px;">DISCLOSED</span>` : ''}
             </td>
@@ -622,9 +641,10 @@ function commercialSummarySection(model: BoqModel): string {
     </section>`;
 }
 
-function disciplineSection(d: BoqDiscipline): string {
-    const rows = d.lines.map((l, i) =>
-        `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+/** One component-line <tr> — shared by the nested subsystem tables and the
+ *  flat fallback table so both stay pixel-identical. */
+function boqLineRow(l: BoqLine, i: number): string {
+    return `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
             <td style="padding:5px 8px;font-size:10px;color:${T.text};">${esc(l.desc)}</td>
             <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(l.spec)}</td>
             <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};text-align:center;">${esc(l.unit)}</td>
@@ -635,16 +655,13 @@ function disciplineSection(d: BoqDiscipline): string {
             <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};font-weight:700;">${dollarsFull(l.total)}</td>
             <td style="padding:5px 8px;text-align:center;">${confChip(l.confidence)}</td>
             <td style="padding:5px 8px;font-size:9px;color:${T.muted};">${esc(l.source)}</td>
-        </tr>`,
-    ).join('');
-    const rf = Number.isFinite(d.reconcileFactor) ? d.reconcileFactor.toFixed(2) : '—';
-    return `<section class="discipline">
-        <div style="display:flex;align-items:baseline;gap:10px;border-bottom:2px solid ${T.cyan};padding-bottom:5px;margin:0 0 8px;">
-            <h2 style="font-size:14px;font-weight:800;color:${T.text};margin:0;">${esc(d.label)}</h2>
-            <span style="font-size:9px;color:${T.muted};text-transform:uppercase;letter-spacing:1px;">${esc(d.categories.join(' · '))}</span>
-            <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:800;color:${T.amber};">${money(d.categoryTotal)}</span>
-        </div>
-        <table class="tbl">
+        </tr>`;
+}
+
+/** Component-line table (header + body) — shared by the nested + flat paths. */
+function boqLineTable(lines: BoqLine[]): string {
+    const rows = lines.map(boqLineRow).join('');
+    return `<table class="tbl">
             <thead><tr>
                 <th style="text-align:left;">Description</th>
                 <th style="text-align:left;">Spec</th>
@@ -658,8 +675,38 @@ function disciplineSection(d: BoqDiscipline): string {
                 <th style="text-align:left;">Source</th>
             </tr></thead>
             <tbody>${rows}</tbody>
-        </table>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px;padding:4px 8px;background:${T.surface};border-radius:8px;">
+        </table>`;
+}
+
+/** One subsystem block within a discipline — h3-style sub-heading row (label +
+ *  subtotal) over its component-line table. `page-break-inside:avoid` keeps a
+ *  subsystem intact across PDF pages. */
+function subsystemBlock(s: BoqSubsystem): string {
+    return `<div style="page-break-inside:avoid;margin:12px 0 0;">
+        <div style="display:flex;align-items:baseline;gap:10px;border-bottom:1px solid ${T.line};padding-bottom:3px;margin:0 0 5px;">
+            <h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:${T.cyan};margin:0;">${esc(s.label)}</h3>
+            <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;color:${T.amber};">${money(s.subtotal)}</span>
+        </div>
+        ${boqLineTable(s.lines)}
+    </div>`;
+}
+
+function disciplineSection(d: BoqDiscipline): string {
+    // Deepened tree when the engine exposes non-empty subsystems; otherwise
+    // fall back to the legacy flat line table (backward-compat / older engine).
+    const hasTree = Array.isArray(d.subsystems) && d.subsystems.length > 0;
+    const body = hasTree
+        ? d.subsystems!.map(subsystemBlock).join('')
+        : boqLineTable(d.lines);
+    const rf = Number.isFinite(d.reconcileFactor) ? d.reconcileFactor.toFixed(2) : '—';
+    return `<section class="discipline">
+        <div style="display:flex;align-items:baseline;gap:10px;border-bottom:2px solid ${T.cyan};padding-bottom:5px;margin:0 0 8px;">
+            <h2 style="font-size:14px;font-weight:800;color:${T.text};margin:0;">${esc(d.label)}</h2>
+            <span style="font-size:9px;color:${T.muted};text-transform:uppercase;letter-spacing:1px;">${esc(d.categories.join(' · '))}</span>
+            <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:800;color:${T.amber};">${money(d.categoryTotal)}</span>
+        </div>
+        ${body}
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:4px 8px;background:${T.surface};border-radius:4px;border:1px solid ${T.line};">
             <span style="font-size:9.5px;color:${T.muted};">Bottom-up raw ${money(d.bottomUpRaw)} · reconciled ×${rf} to the parametric CAPEX category</span>
             <span style="font-size:11px;font-weight:800;color:${T.text};font-family:'JetBrains Mono',monospace;">Subtotal ${money(d.categoryTotal)}</span>
         </div>
@@ -675,7 +722,7 @@ function equipmentScheduleSection(items: BoqEquipmentItem[], customsLeadWk?: num
     const rows = items.map((e, i) => {
         const longLead = Number.isFinite(e.leadTimeWk) && e.leadTimeWk >= LONG_LEAD_WK;
         const rowBg = longLead
-            ? 'rgba(251,191,36,0.10)'
+            ? 'rgba(255,170,0,0.10)'
             : (i % 2 ? T.surfaceAlt : 'transparent');
         const ltCell = longLead
             ? `<td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.amber};font-weight:800;">${qtyFmt(e.leadTimeWk)}<span style="margin-left:5px;font-size:8px;font-weight:700;letter-spacing:.4px;">LONG-LEAD</span></td>`
@@ -732,7 +779,7 @@ function procurementPackagesSection(pkgs: BoqPackage[]): string {
     ).join('');
     return `<section class="block">
         ${secHead(7, SECTION_TITLES[6])}
-        <div style="border-left:3px solid ${T.amber};background:rgba(251,191,36,0.08);border-radius:0 10px 10px 0;padding:10px 13px;margin-bottom:10px;">
+        <div style="border-left:3px solid ${T.amber};background:rgba(255,170,0,0.08);border-radius:0 10px 10px 0;padding:10px 13px;margin-bottom:10px;">
             <p style="font-size:10px;line-height:1.6;color:${T.text};margin:0;">
                 <b style="color:${T.amber};">Indicative scope envelopes</b> — package values <b>OVERLAP</b> (the electrical / mechanical
                 categories span several packages) and are <b>NOT additive</b> to the CAPEX total; shown for procurement
@@ -840,7 +887,7 @@ const SECTION_TITLES: readonly string[] = [
 
 function dossierBannerSection(): string {
     return `<section class="block" style="margin-top:16px;">
-        <div style="border-left:3px solid ${T.amber};background:rgba(251,191,36,0.08);border-radius:0 10px 10px 0;padding:10px 13px;">
+        <div style="border-left:3px solid ${T.amber};background:rgba(255,170,0,0.08);border-radius:0 10px 10px 0;padding:10px 13px;">
             <p style="font-size:10px;line-height:1.6;color:${T.text};margin:0;">
                 <b style="color:${T.amber};">STANDARD-PRACTICE EPC reference</b> — permitting durations + risks indicative;
                 validate against the AHJ and a full engineering design. Not a quotation or tender.

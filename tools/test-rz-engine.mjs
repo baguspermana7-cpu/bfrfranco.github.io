@@ -1309,14 +1309,35 @@ if (M.opex && M.opex.totalAnnual) {
 /* ── BOQ Ship-1: reconciled Bill-of-Quantities decomposition ── */
 {
     const boq = D.boq;
-    ok('DATA.boq present + gfa sourced', !!boq && !!D.sources['boq.gfaM2PerMw'] && !!D.sources['boq.takeoff'] && !!D.sources['boq.unitRates'] && !!D.sources['boq.commercialBasis']);
+    ok('DATA.boq present + gfa sourced', !!boq && !!D.sources['boq.gfaM2PerMw'] && !!D.sources['boq.takeoff'] && !!D.sources['boq.unitRates'] && !!D.sources['boq.commercialBasis'] && !!D.sources['boq.paramFactors']);
     ok('boq disciplines map to cost categories (8)', Array.isArray(boq.disciplines) && boq.disciplines.length === 8 && boq.disciplines.every(d => Array.isArray(d.categories) && d.categories.length >= 1));
-    /* every takeoff line + unitRate carries confidence + source */
-    let takeoffOk = true, rateOk = true;
+    /* ── deepened 3-level takeoff: discipline → subsystem → leaf ── */
+    const VALID_CONF = new Set(['high', 'med', 'low']);
+    let takeoffOk = true, rateOk = true, nestedOk = true, confOk = true, leafCount = 0, subCount = 0;
+    const subsystemsPerDiscipline = {};
     for (const d of boq.disciplines) {
-        for (const t of (boq.takeoff[d.key] || [])) { if (!t.confidence || !t.source || !t.rateKey) takeoffOk = false; if (!boq.unitRates[t.rateKey]) rateOk = false; }
+        const subMap = boq.takeoff[d.key];
+        if (!subMap || typeof subMap !== 'object' || Array.isArray(subMap)) { nestedOk = false; continue; }
+        const sks = Object.keys(subMap);
+        if (sks.length < 1) nestedOk = false;
+        subsystemsPerDiscipline[d.key] = sks.length;
+        subCount += sks.length;
+        for (const sk of sks) {
+            const sub = subMap[sk];
+            if (!sub || !sub.label || !Array.isArray(sub.lines) || sub.lines.length < 1) { nestedOk = false; continue; }
+            for (const t of sub.lines) {
+                leafCount++;
+                if (!t.confidence || !t.source || !t.rateKey) takeoffOk = false;
+                if (!VALID_CONF.has(t.confidence)) confOk = false;
+                if (!boq.unitRates[t.rateKey]) rateOk = false;
+            }
+        }
     }
-    ok('every takeoff line sourced + confidence + rateKey resolves', takeoffOk && rateOk);
+    ok('boq.takeoff is NESTED 3-level (discipline → subsystem{label,lines})', nestedOk);
+    ok('every takeoff leaf sourced + confidence + rateKey resolves', takeoffOk && rateOk);
+    ok('every leaf confidence ∈ {high,med,low}', confOk);
+    ok('boq leaf count ≥ 80', leafCount >= 80);
+    ok('boq.paramFactors present (seismic/fuel/cleanAgent/redundancy tables)', !!boq.paramFactors && !!boq.paramFactors.seismicRebarMult && Number.isFinite(boq.paramFactors.fuelTankM3PerMwHour) && !!boq.paramFactors.cleanAgentKgPerM3 && !!boq.paramFactors.redundancyPathMult);
     ok('every unitRate has usd + confidence + source', Object.values(boq.unitRates).every(r => Number.isFinite(r.usd) && r.confidence && r.source));
     /* synthetic 20 MW costs map → generate + reconcile */
     const costs = { building: 60e6, seismic: 3e6, electrical: 90e6, ups: 40e6, generator: 25e6, cooling: 55e6, fireSuppression: 6e6, fireAlarm: 3e6, bms: 5e6, network: 8e6, security: 3e6, commissioning: 5e6, testing: 4e6, permits: 2e6 };
@@ -1324,18 +1345,42 @@ if (M.opex && M.opex.totalAnnual) {
     const input = { itLoad: 20000 };
     const g = M.boq.generate(costs, metrics, input, { locMult: 1.0 });
     ok('boq.generate returns disciplines', Array.isArray(g.disciplines) && g.disciplines.length === 8);
-    /* RECONCILIATION INVARIANT: Σ(line totals) === categoryTotal per discipline */
-    let reconciled = true, tiesToCat = true;
+    /* RECONCILIATION INVARIANT (deepened): Σ(all subsystem lines) === categoryTotal
+     * per discipline AND Σ(flat .lines) === categoryTotal (both hold post-deepen). */
+    let reconciledFlat = true, reconciledSub = true, tiesToCat = true, nestedShape = true;
     for (const d of g.disciplines) {
-        const sumLines = d.lines.reduce((s, l) => s + l.total, 0);
-        if (Math.abs(sumLines - d.categoryTotal) > 1) reconciled = false;
+        const sumFlat = d.lines.reduce((s, l) => s + l.total, 0);
+        if (Math.abs(sumFlat - d.categoryTotal) > 1) reconciledFlat = false;
+        if (!Array.isArray(d.subsystems) || d.subsystems.length < 1) nestedShape = false;
+        const sumSub = (d.subsystems || []).reduce((s, sub) => s + sub.lines.reduce((a, l) => a + l.total, 0), 0);
+        if (Math.abs(sumSub - d.categoryTotal) > 1) reconciledSub = false;
         const catSum = d.categories.reduce((s, c) => s + costs[c], 0);
         if (Math.abs(catSum - d.categoryTotal) > 0.01) tiesToCat = false;
     }
-    ok('boq reconciliation: Σ lines === categoryTotal (all disciplines)', reconciled);
+    ok('boq generate returns nested subsystems[{key,label,lines,subtotal}]', nestedShape && g.disciplines.every(d => d.subsystems.every(s => s.key && s.label && Array.isArray(s.lines) && Number.isFinite(s.subtotal))));
+    ok('boq reconciliation: Σ ALL subsystem lines === categoryTotal (all disciplines)', reconciledSub);
+    ok('boq reconciliation: Σ flat .lines === categoryTotal (backward-compat)', reconciledFlat);
     ok('boq categoryTotal === Σ mapped CapexResult categories', tiesToCat);
     ok('boq hardTotal === Σ all 14 costs', Math.abs(g.hardTotal - Object.values(costs).reduce((s, v) => s + v, 0)) < 1);
     ok('boq drivers derive gfa + coolingKw(=IT heat, not IT×PUE) + protectedM3', g.drivers.gfaM2 === 20 * boq.gfaM2PerMw && g.drivers.protectedM3 === 20 * 1500 && g.drivers.coolingKw === input.itLoad);
+    /* ── param → driver auto-wiring: quantities respond to input params ── */
+    const gZ4 = M.boq.generate(costs, metrics, { itLoad: 20000, seismicZone: 'zone4' }, { locMult: 1.0 });
+    const gZ0 = M.boq.generate(costs, metrics, { itLoad: 20000, seismicZone: 'zone0' }, { locMult: 1.0 });
+    ok('param wiring: seismicZone drives structural rebar qty (zone4 > zone0)', gZ4.drivers.rebarKgFactor > gZ0.drivers.rebarKgFactor && gZ4.drivers.seismicBraceT > gZ0.drivers.seismicBraceT);
+    const gNovec = M.boq.generate(costs, metrics, { itLoad: 20000, fireType: 'novec' }, { locMult: 1.0 });
+    const gWater = M.boq.generate(costs, metrics, { itLoad: 20000, fireType: 'water' }, { locMult: 1.0 });
+    ok('param wiring: fireType drives clean-agent charge (novec > water=0) + sprinkler (water > novec=0)', gNovec.drivers.cleanAgentKg > 0 && gWater.drivers.cleanAgentKg === 0 && gWater.drivers.sprinklerM2 > 0 && gNovec.drivers.sprinklerM2 === 0);
+    const g2n = M.boq.generate(costs, metrics, { itLoad: 20000, redundancy: '2n' }, { locMult: 1.0 });
+    const gn1 = M.boq.generate(costs, metrics, { itLoad: 20000, redundancy: 'n1' }, { locMult: 1.0 });
+    ok('param wiring: redundancy path-scales UPS/genset/chiller/feeder (2N > N+1)', g2n.drivers.upsPaths > gn1.drivers.upsPaths && g2n.drivers.genPaths > gn1.drivers.genPaths && g2n.drivers.chillerPaths > gn1.drivers.chillerPaths && g2n.drivers.feederPaths > gn1.drivers.feederPaths);
+    const gLiq = M.boq.generate(costs, metrics, { itLoad: 20000, coolingType: 'liquid' }, { locMult: 1.0 });
+    const gAir = M.boq.generate(costs, metrics, { itLoad: 20000, coolingType: 'air' }, { locMult: 1.0 });
+    ok('param wiring: coolingType splits CDU vs CRAH (liquid → CDU>0, air → CRAH-only)', gLiq.drivers.cduUnits > 0 && gAir.drivers.cduUnits === 0 && gAir.drivers.crahUnits > gLiq.drivers.crahUnits);
+    const gFuel = M.boq.generate(costs, metrics, { itLoad: 20000, fuelHours: 72 }, { locMult: 1.0 });
+    ok('param wiring: fuelHours drives fuel-tank m³ (72h > default 48h)', gFuel.drivers.fuelTankM3 > g.drivers.fuelTankM3 && g.drivers.fuelTankM3 > 0);
+    /* %-split sanity: electrical is the largest discipline share for the synthetic map */
+    const shares = g.disciplines.map(d => ({ key: d.key, t: d.categoryTotal })).sort((a, b) => b.t - a.t);
+    ok('boq %-split sanity: electrical is the largest discipline share', shares[0].key === 'electrical');
     /* margin override reflected in the label (F2 regression guard) */
     const smOverride = M.boq.summary(costs, { design: 12e6, pm: 8e6 }, 30e6, 15e6, 340e6, { epcMarginPct: 15 });
     ok('boq marginPctGross reflects override (15 not 10)', smOverride.marginPctGross === 15);

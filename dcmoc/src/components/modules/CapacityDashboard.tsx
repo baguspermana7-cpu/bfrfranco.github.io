@@ -15,7 +15,7 @@ import {
 import { fmt, fmtMoney, fmtKw, fmtPct } from '@/lib/format';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 
-const PHASE_COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ec4899'];
+const PHASE_COLORS = ['#06b6d4', '#7DDDB4', '#f59e0b', '#10b981', '#ec4899'];
 
 /* ─── Diagnostics Tier-1: risk-score bands (single source — badge, panel, collector) ─── */
 export const RISK_AT_RISK_THRESHOLD = 60; // red At-Risk band starts here
@@ -318,7 +318,7 @@ const CapacityDashboardMod = () => {
 
             {/* Narrative Summary */}
             {result && (
-                <Card className="bg-gradient-to-r from-cyan-50 to-indigo-50 dark:from-cyan-950/30 dark:to-indigo-950/30 border-cyan-200 dark:border-cyan-800/50">
+                <Card className="bg-cyan-50 dark:bg-rz-info/5 border-cyan-200 dark:border-cyan-800/50">
                     <CardContent className="pt-5 pb-4">
                         <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{result.narrative}</p>
                     </CardContent>
@@ -425,7 +425,7 @@ const CapacityDashboardMod = () => {
                                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                                     <CardContent className="pt-4">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <Users className="w-4 h-4 text-purple-500" />
+                                            <Users className="w-4 h-4 text-rz-mint" />
                                             <span className="text-xs text-slate-500 uppercase">Scalability</span>
                                             <Tooltip content="Composite score (0-100) based on CAPEX efficiency, phase spacing, and number of phases." />
                                         </div>
@@ -654,7 +654,7 @@ const CapacityDashboardMod = () => {
                                     <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#94a3b8' }} />
                                     <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} />
                                     <RTooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 8 }} />
-                                    <Area type="stepAfter" dataKey="fte" fill="#8b5cf6" fillOpacity={0.2} stroke="#8b5cf6" strokeWidth={2} />
+                                    <Area type="stepAfter" dataKey="fte" fill="#7DDDB4" fillOpacity={0.2} stroke="#7DDDB4" strokeWidth={2} />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </CardContent>
@@ -759,7 +759,7 @@ const CapacityDashboardMod = () => {
                                             <td className="py-2 px-3">
                                                 <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium ${
                                                     a.category === 'CAPEX' ? 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400' :
-                                                    a.category === 'Operations' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' :
+                                                    a.category === 'Operations' ? 'bg-rz-mint/10 text-rz-mint' :
                                                     'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
                                                 }`}>{a.category}</span>
                                             </td>

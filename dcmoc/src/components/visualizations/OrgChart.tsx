@@ -22,11 +22,11 @@ interface NodeProps {
 
 // Static color map — avoids dynamic Tailwind class generation issues
 const COLOR_MAP: Record<string, { card: string; icon: string }> = {
-    purple:  { card: 'bg-purple-950/30 border-purple-800',   icon: 'bg-purple-500/20 text-purple-400' },
+    purple:  { card: 'bg-rz-mint/10 border-rz-mint/40',      icon: 'bg-rz-mint/20 text-rz-mint' },
     slate:   { card: 'bg-slate-800/30 border-slate-700',     icon: 'bg-slate-500/20 text-slate-400' },
     cyan:    { card: 'bg-cyan-950/30 border-cyan-800',       icon: 'bg-cyan-500/20 text-cyan-400' },
     blue:    { card: 'bg-blue-950/30 border-blue-800',       icon: 'bg-blue-500/20 text-blue-400' },
-    emerald: { card: 'bg-emerald-950/30 border-emerald-800', icon: 'bg-emerald-500/20 text-emerald-400' },
+    emerald: { card: 'bg-rz-data/10 border-rz-data/40',      icon: 'bg-rz-data/20 text-rz-data' },
     amber:   { card: 'bg-amber-950/30 border-amber-800',     icon: 'bg-amber-500/20 text-amber-400' },
 };
 
@@ -42,7 +42,7 @@ const OrgNode = ({ role, count, color, salary, turnoverRate, utilization, childr
 
             <div
                 className={clsx(
-                    "p-3 rounded-xl border w-52 transition-all hover:scale-105 hover:shadow-lg hover:shadow-cyan-900/20 z-10 cursor-pointer",
+                    "p-3 rounded-xl border w-52 transition-colors hover:border-rz-info/50 z-10 cursor-pointer",
                     COLOR_MAP[color]?.card
                 )}
                 onClick={() => setExpanded(!expanded)}
@@ -75,7 +75,7 @@ const OrgNode = ({ role, count, color, salary, turnoverRate, utilization, childr
                         {salary !== undefined && (
                             <div className="flex justify-between">
                                 <span className="text-slate-500">Avg Salary</span>
-                                <span className="text-emerald-600 dark:text-emerald-400 font-mono">{formatMoney(salary)}/mo</span>
+                                <span className="text-rz-data font-mono">{formatMoney(salary)}/mo</span>
                             </div>
                         )}
                         {turnoverRate !== undefined && (

@@ -85,7 +85,7 @@ export function CreatableCombobox<T extends string | number = number>({
     if (customMode) {
         return (
             <div ref={rootRef} className={`relative ${className}`}>
-                <div className="flex items-center gap-1 rounded-lg border border-violet-500 bg-white dark:bg-slate-900/60 px-2">
+                <div className="flex items-center gap-1 rounded-lg border border-rz-mint bg-white dark:bg-slate-900/60 px-2">
                     <input ref={inputRef}
                         className="w-full bg-transparent py-1.5 text-xs text-slate-900 dark:text-slate-100 outline-none placeholder:text-slate-400"
                         placeholder={min != null && max != null ? `${min}–${max}${unit ? ' ' + unit : ''}` : 'Custom value'}
@@ -96,7 +96,7 @@ export function CreatableCombobox<T extends string | number = number>({
                             else if (e.key === 'Escape') { setCustomMode(false); setText(''); }
                         }} />
                     {unit && <span className="text-[10px] text-slate-400 whitespace-nowrap">{unit}</span>}
-                    <button type="button" onClick={commitCustom} className="text-emerald-500"><Check className="h-3.5 w-3.5" /></button>
+                    <button type="button" onClick={commitCustom} className="text-rz-data"><Check className="h-3.5 w-3.5" /></button>
                     <button type="button" onClick={() => { setCustomMode(false); setText(''); }} className="text-slate-400"><X className="h-3.5 w-3.5" /></button>
                 </div>
                 {hint && <div className="absolute z-40 mt-0.5 text-[10px] text-amber-500">{hint}</div>}
@@ -108,10 +108,10 @@ export function CreatableCombobox<T extends string | number = number>({
         <div ref={rootRef} className={`relative ${className}`}>
             {/* select-style button — the familiar simple dropdown */}
             <button type="button" disabled={disabled} onClick={() => setOpen((o) => !o)}
-                className={`flex w-full items-center gap-1 rounded-lg border bg-white dark:bg-slate-900/60 border-slate-300 dark:border-slate-700 px-2 py-1.5 text-left text-xs ${disabled ? 'opacity-50' : 'hover:border-violet-400'}`}>
+                className={`flex w-full items-center gap-1 rounded-lg border bg-white dark:bg-slate-900/60 border-slate-300 dark:border-slate-700 px-2 py-1.5 text-left text-xs ${disabled ? 'opacity-50' : 'hover:border-rz-mint'}`}>
                 <span className={`flex-1 truncate ${display ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400'}`}>{display || placeholder}</span>
                 {value?.isCustom && (
-                    <span className="inline-flex items-center gap-0.5 rounded bg-violet-600/20 px-1 py-0.5 text-[9px] font-semibold text-violet-500 dark:text-violet-300"
+                    <span className="inline-flex items-center gap-0.5 rounded bg-rz-mint/20 px-1 py-0.5 text-[9px] font-semibold text-rz-mint"
                         title="Custom value — click × to return to defaults"
                         onClick={(e) => { e.stopPropagation(); onChange(null); }}>
                         custom <X className="h-2.5 w-2.5" />
@@ -124,7 +124,7 @@ export function CreatableCombobox<T extends string | number = number>({
                 <ul role="listbox" className="absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl text-xs">
                     {options.map((o) => (
                         <li key={String(o.value)} role="option" aria-selected={value != null && !value.isCustom && value.value === o.value}
-                            className={`cursor-pointer px-2 py-1.5 ${value != null && !value.isCustom && value.value === o.value ? 'bg-violet-600/15 text-violet-600 dark:text-violet-300' : 'text-slate-700 dark:text-slate-200 hover:bg-violet-600/10'}`}
+                            className={`cursor-pointer px-2 py-1.5 ${value != null && !value.isCustom && value.value === o.value ? 'bg-rz-mint/15 text-rz-mint' : 'text-slate-700 dark:text-slate-200 hover:bg-rz-mint/10'}`}
                             onPointerDown={(e) => { e.preventDefault(); onChange({ value: o.value, isCustom: false }); setOpen(false); }}>
                             {o.label}
                         </li>
@@ -135,7 +135,7 @@ export function CreatableCombobox<T extends string | number = number>({
                             Use default
                         </li>
                     )}
-                    <li className="cursor-pointer border-t border-slate-200 dark:border-slate-800 px-2 py-1.5 font-medium text-violet-500 hover:bg-violet-600/10"
+                    <li className="cursor-pointer border-t border-slate-200 dark:border-slate-800 px-2 py-1.5 font-medium text-rz-mint hover:bg-rz-mint/10"
                         onPointerDown={(e) => { e.preventDefault(); setOpen(false); setCustomMode(true); setText(value?.isCustom ? String(value.value) : ''); }}>
                         <Pencil className="mr-1 inline h-3 w-3" /> Custom value…
                     </li>

@@ -29,7 +29,7 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById, 
     const sel = results.find((r) => r.siteId === selectedId);
     const best = (vals: number[], v: number) => vals.length > 1 && v === Math.max(...vals);
     return (
-        <div id="sec-compare" className="scroll-mt-24 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+        <div id="sec-compare" className="scroll-mt-24 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
             <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Site Score & Compare</h2>
             <div className="overflow-x-auto">
                 <table className="w-full text-xs">
@@ -45,7 +45,7 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById, 
                             {sites.map((s) => {
                                 const r = bySite(s.id);
                                 const vals = results.map((x) => x.engine.score);
-                                return <td key={s.id} className={`px-2 py-1.5 text-right font-bold tabular-nums ${r && best(vals, r.engine.score) ? 'text-violet-500' : 'text-slate-700 dark:text-slate-300'}`}>{r?.engine.score ?? '—'}</td>;
+                                return <td key={s.id} className={`px-2 py-1.5 text-right font-bold tabular-nums ${r && best(vals, r.engine.score) ? 'text-rz-signal' : 'text-slate-700 dark:text-slate-300'}`}>{r?.engine.score ?? '—'}</td>;
                             })}
                         </tr>
                         {axes.map((k) => (
@@ -59,7 +59,7 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById, 
                                     const band = raw != null ? axisBand(raw, k === 'naturalRisks') : null;
                                     const isBad = band != null && (band.label === 'Poor' || band.label === 'Fair');
                                     const isOpen = axisExplain?.siteId === s.id && axisExplain?.axis === k;
-                                    return <td key={s.id} className={`px-2 py-1.5 text-right tabular-nums ${r && best(goodVals, good) ? 'text-violet-500 font-semibold' : 'text-slate-600 dark:text-slate-400'}`}>
+                                    return <td key={s.id} className={`px-2 py-1.5 text-right tabular-nums ${r && best(goodVals, good) ? 'text-rz-signal font-semibold' : 'text-slate-600 dark:text-slate-400'}`}>
                                         {raw ?? '—'}{band && (isBad && onExplainAxis ? (
                                             <button onClick={() => onExplainAxis(isOpen ? null : { siteId: s.id, axis: k })}
                                                 title={`Kenapa ${band.label}? Klik untuk alasan + lever terukur`}
@@ -87,12 +87,12 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById, 
                             return (
                                 <tr key={rowDef.label} className="border-b border-slate-100 dark:border-slate-800/60">
                                     <td className="py-1.5 pr-2 text-slate-500">
-                                        <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" title="computed by the sibling engine" />{rowDef.label}
+                                        <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-rz-data" title="computed by the sibling engine" />{rowDef.label}
                                     </td>
                                     {sites.map((s, i) => {
                                         const c = cells[i];
                                         return <td key={s.id} title={c ? `${rowDef.label}: ${c.v}` : undefined}
-                                            className={`px-2 py-1.5 text-right tabular-nums ${c && goods.length > 1 && c.good === Math.max(...goods) ? 'text-violet-500 font-semibold' : 'text-slate-600 dark:text-slate-400'}`}>{c?.v ?? '—'}</td>;
+                                            className={`px-2 py-1.5 text-right tabular-nums ${c && goods.length > 1 && c.good === Math.max(...goods) ? 'text-rz-signal font-semibold' : 'text-slate-600 dark:text-slate-400'}`}>{c?.v ?? '—'}</td>;
                                     })}
                                 </tr>
                             );
@@ -118,7 +118,7 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById, 
                             <div key={f.key} className="flex items-center gap-2 text-[11px]">
                                 <span className="w-16 capitalize text-slate-600 dark:text-slate-300">{f.key}</span>
                                 <div className="h-1.5 flex-1 rounded bg-slate-100 dark:bg-slate-800">
-                                    <div className="h-1.5 rounded bg-violet-500" style={{ width: `${f.value * 100}%` }} />
+                                    <div className="h-1.5 rounded bg-rz-info" style={{ width: `${f.value * 100}%` }} />
                                 </div>
                                 <span className="w-10 text-right tabular-nums text-slate-500">{Math.round(f.value * 100)}%</span>
                                 <span className="w-10 text-right tabular-nums text-slate-400">w{Math.round(f.weight * 100)}</span>
@@ -212,41 +212,41 @@ export function SiteRightRail({ sites, results, selectedId, onSelect, onEdit, on
                     <div className="mt-2 space-y-1">
                         {siteAssess.acts.slice(0, 2).map((a, i) => (
                             <div key={i} className="flex items-start gap-2 text-[10px] text-slate-600 dark:text-slate-300">
-                                <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8px] font-bold text-white ${a.priority === 'HIGH' ? 'bg-red-600' : a.priority === 'MEDIUM' ? 'bg-amber-600' : 'bg-emerald-600'}`}>{a.priority}</span>
+                                <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8px] font-bold text-white ${a.priority === 'HIGH' ? 'bg-red-600' : a.priority === 'MEDIUM' ? 'bg-amber-600' : 'bg-rz-data text-black'}`}>{a.priority}</span>
                                 <span>{a.action}</span>
                             </div>
                         ))}
                     </div>
                 </div>
             )}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 space-y-2">
-                <select className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-violet-500"
+            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 space-y-2">
+                <select className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-rz-mint"
                     value={selectedId ?? ''} onChange={(e) => onSelect(e.target.value)}>
                     {sites.map((s) => <option key={s.id} value={s.id}>Site {s.label} — {s.name}</option>)}
                 </select>
                 <div className="flex gap-1.5">
-                    <button onClick={exportPdf} disabled={busy} className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 py-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-300 hover:border-violet-400">
+                    <button onClick={exportPdf} disabled={busy} className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 py-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-300 hover:border-rz-mint">
                         <FileDown className="h-3 w-3" />{busy ? '…' : 'Export'}
                     </button>
-                    <button onClick={onEdit} className="flex-1 rounded-lg border border-slate-300 dark:border-slate-700 py-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-300 hover:border-violet-400">Edit Criteria</button>
+                    <button onClick={onEdit} className="flex-1 rounded-lg border border-slate-300 dark:border-slate-700 py-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-300 hover:border-rz-mint">Edit Criteria</button>
                 </div>
                 <button onClick={runAnalysis} title="Scores recompute continuously; Run stamps the review point."
-                    className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-violet-600 py-2 text-xs font-semibold text-white hover:bg-violet-500">
+                    className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-rz-signal py-2 text-xs font-semibold text-black hover:bg-rz-signal/90">
                     <Play className="h-3.5 w-3.5" /> Run Analysis
                 </button>
                 {lastRunAt && <p className="text-center text-[9px] text-slate-400">Last run: {new Date(lastRunAt).toLocaleString()}</p>}
             </div>
 
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                 <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Site Score & Ranking</h3>
                 <div className="space-y-1.5">
                     {results.map((r) => {
                         const s = sites.find((x) => x.id === r.siteId);
                         return (
                             <button key={r.siteId} onClick={() => onSelect(r.siteId)} className="flex w-full items-center gap-2 text-left text-[11px]">
-                                <span className={`flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold ${r.rank === 1 ? 'bg-emerald-500 text-white' : 'bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-200'}`}>{r.rank}</span>
+                                <span className={`flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold ${r.rank === 1 ? 'bg-rz-data text-black' : 'bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-200'}`}>{r.rank}</span>
                                 <span className="w-24 truncate text-slate-700 dark:text-slate-200">{s?.name}</span>
-                                <div className="h-1.5 flex-1 rounded bg-slate-100 dark:bg-slate-800"><div className="h-1.5 rounded bg-violet-500" style={{ width: `${r.engine.score}%` }} /></div>
+                                <div className="h-1.5 flex-1 rounded bg-slate-100 dark:bg-slate-800"><div className="h-1.5 rounded bg-rz-info" style={{ width: `${r.engine.score}%` }} /></div>
                                 <span className="w-8 text-right font-semibold tabular-nums text-slate-600 dark:text-slate-300">{r.engine.score}</span>
                             </button>
                         );
@@ -254,10 +254,10 @@ export function SiteRightRail({ sites, results, selectedId, onSelect, onEdit, on
                 </div>
             </div>
 
-            <div className="rounded-2xl border border-violet-500/30 bg-violet-600/5 p-3">
-                <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-violet-500">Key Takeaways — Site {sel?.label}</h3>
+            <div className="rounded border border-rz-signal/30 bg-rz-signal/5 p-3">
+                <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-rz-signal">Key Takeaways — Site {sel?.label}</h3>
                 <ul className="space-y-1">
-                    {takeaways.map((t, i) => <li key={i} className="flex gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"><span className="text-violet-500">✓</span>{t}</li>)}
+                    {takeaways.map((t, i) => <li key={i} className="flex gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"><span className="text-rz-signal">✓</span>{t}</li>)}
                 </ul>
                 {/* Poor/Fair axis chips — click = reason + solved levers in the compare panel */}
                 {sel && selResult && onExplainAxis && (() => {
@@ -287,7 +287,7 @@ export function SiteRightRail({ sites, results, selectedId, onSelect, onEdit, on
                 <p className="mt-1.5 text-[9px] text-slate-400">Deterministic engine rules — not an LLM.</p>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                 <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Next Steps</h3>
                 <ul className="space-y-1 text-[11px] text-slate-600 dark:text-slate-300">
                     <li>✓ Confirm site selection & secure land reservation</li>
@@ -295,7 +295,7 @@ export function SiteRightRail({ sites, results, selectedId, onSelect, onEdit, on
                     <li>✓ Engage utility providers for LOA</li>
                 </ul>
                 <button onClick={() => setActiveTab('architecture')}
-                    className="mt-2 inline-flex w-full items-center justify-center gap-1 rounded-xl bg-violet-600 py-2 text-xs font-semibold text-white hover:bg-violet-500">
+                    className="mt-2 inline-flex w-full items-center justify-center gap-1 rounded-lg bg-rz-signal py-2 text-xs font-semibold text-black hover:bg-rz-signal/90">
                     Proceed to Architecture Engine <ChevronRight className="h-3.5 w-3.5" />
                 </button>
             </div>

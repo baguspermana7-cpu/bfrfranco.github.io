@@ -40,7 +40,7 @@ const GanttChart: React.FC<GanttChartProps> = ({ phases, subPhases, totalMonths 
         { month: phases.find(p => p.name === 'Design & Engineering')?.end ?? 0, label: 'Design Complete', color: '#10b981' },
         { month: phases.find(p => p.name === 'Permitting')?.end ?? 0, label: 'Permits Secured', color: '#f59e0b' },
         { month: phases.find(p => p.name === 'Civil Construction')?.end ?? 0, label: 'Building Ready', color: '#3b82f6' },
-        { month: phases.find(p => p.name === 'MEP Installation')?.end ?? 0, label: 'MEP Complete', color: '#8b5cf6' },
+        { month: phases.find(p => p.name === 'MEP Installation')?.end ?? 0, label: 'MEP Complete', color: '#7DDDB4' },
         { month: totalMonths, label: 'Go-Live', color: '#ec4899' },
     ];
 

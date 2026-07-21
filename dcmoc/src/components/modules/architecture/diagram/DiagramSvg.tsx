@@ -23,7 +23,7 @@ const LANE_FILL: Record<DiagBlock['lane'], string> = {
     power: '#1e293b', gen: '#292018', cooling: '#0f2a2a', it: '#1c2440', bms: '#231c38',
 };
 const LANE_STROKE: Record<DiagBlock['lane'], string> = {
-    power: '#3b82f6', gen: '#f97316', cooling: '#14b8a6', it: '#a78bfa', bms: '#22c55e',
+    power: '#3b82f6', gen: '#f97316', cooling: '#14b8a6', it: '#7DDDB4', bms: '#22c55e',
 };
 
 function anchor(b: DiagBlock, side: 'l' | 'r') {
@@ -137,7 +137,7 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
                                 {b.sub && <text x={tx} y={b.y + 28} fontSize="7.5" fill="#94a3b8">{b.sub}</text>}
                                 {b.badge && (
                                     <>
-                                        <rect x={b.x + b.w - 34} y={b.y + 4} width={30} height={11} rx={5} fill="#a78bfa22" stroke="#a78bfa" strokeWidth={0.5} />
+                                        <rect x={b.x + b.w - 34} y={b.y + 4} width={30} height={11} rx={5} fill="#7DDDB422" stroke="#7DDDB4" strokeWidth={0.5} />
                                         <text x={b.x + b.w - 19} y={b.y + 12.5} fontSize="6.5" textAnchor="middle" fill="#c4b5fd">{b.badge}</text>
                                     </>
                                 )}

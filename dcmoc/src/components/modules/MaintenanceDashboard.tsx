@@ -51,7 +51,7 @@ const riskTone = (v: number): RiskTone =>
 const RISK_TONE_CLASS: Record<RiskTone, string> = {
     red: 'text-red-500 dark:text-red-400',
     amber: 'text-amber-500 dark:text-amber-400',
-    ok: 'text-emerald-600 dark:text-emerald-400',
+    ok: 'text-rz-data',
 };
 
 /* Engine model (MaintenanceStrategyEngine.calculateSLAComparison):
@@ -315,7 +315,7 @@ export function MaintenanceDashboard() {
                                 className={clsx(
                                     "px-3 py-1.5 text-xs font-medium rounded-md transition-all capitalize",
                                     inputs.maintenanceStrategy === strat
-                                        ? "bg-emerald-500 text-white shadow-sm"
+                                        ? "bg-rz-data text-black shadow-sm"
                                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800"
                                 )}
                             >
@@ -389,7 +389,7 @@ export function MaintenanceDashboard() {
                     {/* AQI Slider */}
                     <div className="flex items-center gap-4 bg-slate-100 dark:bg-slate-950 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800">
                         <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                            <Wind className={clsx("w-4 h-4", isHighAQI ? "text-amber-500" : "text-emerald-500")} />
+                            <Wind className={clsx("w-4 h-4", isHighAQI ? "text-amber-500" : "text-rz-data")} />
                             AQI: <Tooltip content="Air Quality Index (0-300) at the facility location. Higher AQI accelerates filter degradation, increases HVAC maintenance frequency, and reduces equipment lifespan." />
                         </div>
                         <input
@@ -408,10 +408,10 @@ export function MaintenanceDashboard() {
             {/* ═══ KPI ROW ═══ */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                    { label: 'Annual Maint Budget', value: fmtMoney(annualBudget), sub: strategyName, icon: DollarSign, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10', tip: 'Total annual maintenance budget based on selected strategy (labor + parts + downtime risk)', trace: 'maint.annualBudget' },
+                    { label: 'Annual Maint Budget', value: fmtMoney(annualBudget), sub: strategyName, icon: DollarSign, color: 'text-rz-data', bg: 'bg-rz-data/10 dark:bg-rz-data/10', tip: 'Total annual maintenance budget based on selected strategy (labor + parts + downtime risk)', trace: 'maint.annualBudget' },
                     { label: 'Maintenance Events', value: `${schedule.length}`, sub: `${totalMaintHours.toFixed(0)} total hours`, icon: Wrench, color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50 dark:bg-cyan-500/10', tip: 'Number of scheduled maintenance events per year based on SFG20 regimes', trace: 'maint.events' },
                     { label: 'Active Assets', value: `${assetCounts.reduce((a, c) => a + c.count, 0)}`, sub: `${activeAssets.length} asset types`, icon: Zap, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-500/10', tip: 'Total physical assets requiring maintenance, auto-generated from CAPEX config', trace: 'maint.activeAssets' },
-                    { label: '5-Year Savings', value: fmtMoney(predictedSavings), sub: 'Optimal vs Worst', icon: TrendingUp, color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-500/10', tip: 'Projected savings over 5 years comparing optimal vs worst maintenance strategy', trace: 'maint.fiveYearSavings' },
+                    { label: '5-Year Savings', value: fmtMoney(predictedSavings), sub: 'Optimal vs Worst', icon: TrendingUp, color: 'text-rz-mint', bg: 'bg-rz-mint/10', tip: 'Projected savings over 5 years comparing optimal vs worst maintenance strategy', trace: 'maint.fiveYearSavings' },
                 ].map((kpi, i) => (
                     <div key={i} className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-sm dark:shadow-none">
                         <div className="flex items-center gap-2 mb-2">
@@ -498,7 +498,7 @@ export function MaintenanceDashboard() {
                                             const bg = intensity === 0
                                                 ? 'bg-slate-100 dark:bg-slate-800'
                                                 : intensity < 0.25
-                                                    ? 'bg-emerald-100 dark:bg-emerald-900/30'
+                                                    ? 'bg-rz-data/10 dark:bg-rz-data/30'
                                                     : intensity < 0.5
                                                         ? 'bg-amber-100 dark:bg-amber-900/30'
                                                         : intensity < 0.75
@@ -530,7 +530,7 @@ export function MaintenanceDashboard() {
                                         <span>Low</span>
                                         <div className="flex gap-0.5">
                                             <div className="w-4 h-2 rounded-sm bg-slate-100 dark:bg-slate-800" />
-                                            <div className="w-4 h-2 rounded-sm bg-emerald-100 dark:bg-emerald-900/30" />
+                                            <div className="w-4 h-2 rounded-sm bg-rz-data/10 dark:bg-rz-data/30" />
                                             <div className="w-4 h-2 rounded-sm bg-amber-100 dark:bg-amber-900/30" />
                                             <div className="w-4 h-2 rounded-sm bg-orange-200 dark:bg-orange-900/40" />
                                             <div className="w-4 h-2 rounded-sm bg-red-200 dark:bg-red-900/40" />
@@ -550,7 +550,7 @@ export function MaintenanceDashboard() {
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
-                            <BarChart3 className="w-4 h-4 text-violet-500 dark:text-violet-400" />
+                            <BarChart3 className="w-4 h-4 text-rz-mint" />
                             Spare Parts ABC Pareto Analysis <Tooltip content="ABC classification of spare parts by value: A-items (top 20% by cost, ~80% of value), B-items (next 30%), C-items (remaining 50%). Drives inventory investment strategy." />
                         </CardTitle>
                     </CardHeader>
@@ -588,7 +588,7 @@ export function MaintenanceDashboard() {
                                             />
                                             <YAxis
                                                 yAxisId="left"
-                                                stroke="#8b5cf6"
+                                                stroke="#FFAA00"
                                                 fontSize={11}
                                                 tickFormatter={(v: number) => fmtMoney(v)}
                                             />
@@ -609,7 +609,7 @@ export function MaintenanceDashboard() {
                                                 ]) as any}
                                             />
                                             <Legend formatter={(value: string) => value === 'cost' ? 'Item Cost' : 'Cumulative %'} />
-                                            <Bar yAxisId="left" dataKey="cost" fill="#8b5cf6" radius={[4, 4, 0, 0]} barSize={24} name="cost" />
+                                            <Bar yAxisId="left" dataKey="cost" fill="#FFAA00" radius={[4, 4, 0, 0]} barSize={24} name="cost" />
                                             <Line yAxisId="right" type="monotone" dataKey="cumulativePct" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3, fill: '#f59e0b' }} name="cumulativePct" />
                                         </ComposedChart>
                                     </ResponsiveContainer>
@@ -628,7 +628,7 @@ export function MaintenanceDashboard() {
                                             return [
                                                 { label: 'Class A (0-80%)', count: aCount, color: 'text-red-500 dark:text-red-400', desc: 'High-value, critical' },
                                                 { label: 'Class B (80-95%)', count: bCount, color: 'text-amber-500 dark:text-amber-400', desc: 'Medium-value' },
-                                                { label: 'Class C (95-100%)', count: cCount, color: 'text-emerald-500 dark:text-emerald-400', desc: 'Low-value, bulk' },
+                                                { label: 'Class C (95-100%)', count: cCount, color: 'text-rz-data', desc: 'Low-value, bulk' },
                                             ].map((cls, i) => (
                                                 <div key={i} className="text-center p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">
                                                     <div className="text-xs text-slate-500 mb-1">{cls.label}</div>
@@ -726,13 +726,13 @@ function AssetsTab({ assets, assetCounts, isPencilMode, handleCountChange, selec
                                     <div key={part.name} className="bg-slate-50 dark:bg-slate-950/30 rounded-lg p-3 text-sm border border-slate-100 dark:border-slate-800/50">
                                         <div className="flex justify-between items-center mb-1">
                                             <span className="text-slate-600 dark:text-slate-300">{part.name}</span>
-                                            <span className={clsx("font-mono font-bold", impact.degradationFactor < 0.8 ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400")}>
+                                            <span className={clsx("font-mono font-bold", impact.degradationFactor < 0.8 ? "text-amber-600 dark:text-amber-400" : "text-rz-data")}>
                                                 {impact.adjustedLifeMonths} Months
                                             </span>
                                         </div>
                                         <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
                                             <div
-                                                className={clsx("h-full rounded-full", impact.degradationFactor < 0.6 ? "bg-red-500" : impact.degradationFactor < 0.8 ? "bg-amber-500" : "bg-emerald-500")}
+                                                className={clsx("h-full rounded-full", impact.degradationFactor < 0.6 ? "bg-red-500" : impact.degradationFactor < 0.8 ? "bg-amber-500" : "bg-rz-data")}
                                                 style={{ width: `${impact.degradationFactor * 100}%` }}
                                             />
                                         </div>
@@ -1037,11 +1037,11 @@ function StrategyTab({ data, fmt, activeStrat, onSelect }: { data: ReturnType<ty
                         onClick={() => onSelect && onSelect(s.id)}
                         className={clsx(
                             "bg-white dark:bg-slate-900/50 border rounded-xl overflow-hidden transition-all relative shadow-sm dark:shadow-none cursor-pointer",
-                            s.id === activeStrat ? `ring-2 ring-offset-2 dark:ring-offset-slate-900 ${s.id === 'reactive' ? 'ring-red-500 border-red-500/50' : s.id === 'planned' ? 'ring-blue-500 border-blue-500/50' : 'ring-emerald-500 border-emerald-500/50'}` : s.id === data.recommended ? "border-emerald-500/50 ring-1 ring-emerald-500/20" : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                            s.id === activeStrat ? `ring-2 ring-offset-2 dark:ring-offset-slate-900 ${s.id === 'reactive' ? 'ring-red-500 border-red-500/50' : s.id === 'planned' ? 'ring-blue-500 border-blue-500/50' : 'ring-rz-data border-rz-data/30'}` : s.id === data.recommended ? "border-rz-data/30 ring-1 ring-rz-data/20" : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
                         )}
                     >
                         {s.id === data.recommended && (
-                            <div className="absolute top-3 right-3 bg-emerald-100 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full">
+                            <div className="absolute top-3 right-3 bg-rz-data/10 dark:bg-rz-data/20 border border-rz-data/30 text-rz-data text-[10px] font-bold uppercase px-2 py-0.5 rounded-full">
                                 Recommended
                             </div>
                         )}
@@ -1097,15 +1097,15 @@ function StrategyTab({ data, fmt, activeStrat, onSelect }: { data: ReturnType<ty
             </div>
 
             {/* Recommendation Box */}
-            <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-xl p-6">
+            <div className="bg-rz-data/10 dark:bg-rz-data/30 border border-rz-data/30 rounded-xl p-6">
                 <div className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-rz-data mt-0.5 flex-shrink-0" />
                     <div>
-                        <h3 className="text-sm font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-1">Strategy Recommendation <Tooltip content="AI-recommended maintenance strategy based on cost-benefit analysis, considering your facility size, equipment mix, and risk tolerance." /></h3>
+                        <h3 className="text-sm font-bold text-rz-data uppercase tracking-wider mb-1">Strategy Recommendation <Tooltip content="AI-recommended maintenance strategy based on cost-benefit analysis, considering your facility size, equipment mix, and risk tolerance." /></h3>
                         <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{data.recommendationReason}</p>
                         <div className="mt-3 px-3 py-2 bg-white dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-800 w-fit">
                             <span className="text-xs text-slate-500">5-Year Savings (Optimal vs Worst): <Tooltip content="Projected cost savings over 5 years by adopting the optimal strategy compared to the most expensive alternative." /></span>
-                            <span className="ml-2 font-mono font-bold text-emerald-600 dark:text-emerald-400">{fmt(data.fiveYearSavings)}</span>
+                            <span className="ml-2 font-mono font-bold text-rz-data">{fmt(data.fiveYearSavings)}</span>
                         </div>
                     </div>
                 </div>
@@ -1140,7 +1140,7 @@ function SLATab({ data, fmt, thirdParty, onThirdParty, facilityAged, onFacilityA
                 <span className={clsx(
                     "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border",
                     cb.fromEngine
-                        ? "bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30"
+                        ? "bg-rz-data/10 dark:bg-rz-data/15 text-rz-data border-rz-data/30"
                         : "bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30"
                 )}>
                     {cb.fromEngine ? 'engine · sourced band' : 'screening fallback'}
@@ -1207,13 +1207,13 @@ function SLATab({ data, fmt, thirdParty, onThirdParty, facilityAged, onFacilityA
                                     <React.Fragment key={tier.id}>
                                         <tr className={clsx(
                                             "border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors",
-                                            tier.recommended && "bg-emerald-50/50 dark:bg-emerald-950/20"
+                                            tier.recommended && "bg-rz-data/50 dark:bg-rz-data/20"
                                         )}>
                                             <td className="py-4 px-4">
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-slate-900 dark:text-white font-medium">{tier.label}</span>
                                                     {tier.recommended && (
-                                                        <span className="bg-emerald-100 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full">
+                                                        <span className="bg-rz-data/10 dark:bg-rz-data/20 border border-rz-data/30 text-rz-data text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full">
                                                             Best Value
                                                         </span>
                                                     )}
@@ -1264,7 +1264,7 @@ function SLATab({ data, fmt, thirdParty, onThirdParty, facilityAged, onFacilityA
                                                             <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-mono">
                                                                 {baseFailures} critical incidents/yr × {respMin.toLocaleString()} min response window × {fmt(downtimeCostPerMin)}/min downtime cost × {SLA_PROB_WEIGHT * 100}% probability weight = {fmt(recomputed)}/yr
                                                                 {parity ? (
-                                                                    <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">≡ engine</span>
+                                                                    <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-rz-data/10 dark:bg-rz-data/40 text-rz-data">≡ engine</span>
                                                                 ) : (
                                                                     <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300" title="The factor decomposition no longer matches the engine output — the table total still comes from the engine; the factors above are indicative.">≠ engine — table total applies</span>
                                                                 )}
@@ -1301,7 +1301,7 @@ function SLATab({ data, fmt, thirdParty, onThirdParty, facilityAged, onFacilityA
                                                                         <span className={clsx(
                                                                             "shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap",
                                                                             lv.netDelta <= 0
-                                                                                ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300"
+                                                                                ? "bg-rz-data/10 dark:bg-rz-data/40 text-rz-data"
                                                                                 : "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300"
                                                                         )}>{lv.label}</span>
                                                                         <span className="flex-1 text-[11px] text-slate-600 dark:text-slate-400 leading-snug">{lv.detail}</span>
@@ -1348,7 +1348,7 @@ function SLATab({ data, fmt, thirdParty, onThirdParty, facilityAged, onFacilityA
                 {/* Cost vs Risk */}
                 <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm dark:shadow-none">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+                        <DollarSign className="w-4 h-4 text-rz-data" />
                         Cost vs Risk Exposure
                     </h3>
                     <div className="space-y-4">
@@ -1359,7 +1359,7 @@ function SLATab({ data, fmt, thirdParty, onThirdParty, facilityAged, onFacilityA
                             return (
                                 <div key={tier.id}>
                                     <div className="flex justify-between text-xs mb-1">
-                                        <span className={clsx("font-medium", tier.recommended ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400")}>{tier.label}</span>
+                                        <span className={clsx("font-medium", tier.recommended ? "text-rz-data" : "text-slate-500 dark:text-slate-400")}>{tier.label}</span>
                                         <span className="font-mono text-slate-500 dark:text-slate-400">{fmt(tier.netAnnualCost)}</span>
                                     </div>
                                     <div className="flex gap-0.5 h-5">
@@ -1419,7 +1419,7 @@ function SparesTab({ data, fmt, bands }: {
                     <span className={clsx(
                         "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border",
                         bands.length > 0
-                            ? "bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30"
+                            ? "bg-rz-data/10 dark:bg-rz-data/15 text-rz-data border-rz-data/30"
                             : "bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30"
                     )}>
                         {bands.length > 0 ? 'engine · sourced band' : 'engine not loaded'}
@@ -1507,8 +1507,8 @@ function SparesTab({ data, fmt, bands }: {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
                     { label: 'Total Inventory Value', value: fmt(data.totalInventoryValue), desc: 'Capital tied up in spares', color: 'text-blue-600 dark:text-blue-400', tip: 'Total capital investment tied up in spare parts inventory. Higher values increase working capital requirements but reduce downtime risk.' },
-                    { label: 'Annual Holding Cost', value: fmt(data.totalHoldingCost), desc: 'Storage & depreciation', color: 'text-purple-600 dark:text-purple-400', tip: 'Annual cost of maintaining spare parts inventory: warehousing, insurance, depreciation, and opportunity cost of capital.' },
-                    { label: 'Annual Spares Budget', value: fmt(data.totalAnnualSparesBudget), desc: 'Consumption + Holding', color: 'text-emerald-600 dark:text-emerald-400', tip: 'Total annual budget for spare parts: consumption (parts used in maintenance) plus holding costs (storage and depreciation).' },
+                    { label: 'Annual Holding Cost', value: fmt(data.totalHoldingCost), desc: 'Storage & depreciation', color: 'text-rz-signal', tip: 'Annual cost of maintaining spare parts inventory: warehousing, insurance, depreciation, and opportunity cost of capital.' },
+                    { label: 'Annual Spares Budget', value: fmt(data.totalAnnualSparesBudget), desc: 'Consumption + Holding', color: 'text-rz-data', tip: 'Total annual budget for spare parts: consumption (parts used in maintenance) plus holding costs (storage and depreciation).' },
                 ].map((kpi, i) => (
                     <div key={i} className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm dark:shadow-none">
                         <div className="text-xs text-slate-500 uppercase tracking-wider mb-2">{kpi.label} <Tooltip content={kpi.tip} /></div>

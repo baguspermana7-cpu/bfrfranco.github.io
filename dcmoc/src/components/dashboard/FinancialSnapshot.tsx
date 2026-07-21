@@ -9,7 +9,7 @@ const CAT_LABELS: Record<string, string> = {
     ups: 'UPS Systems', generator: 'Generator & Fuel', fireSuppression: 'Fire Suppression',
     fireAlarm: 'Fire Alarm', commissioning: 'Cx & Startup', testing: 'Testing', permits: 'Permits', seismic: 'Seismic',
 };
-const COLORS = ['#22d3ee', '#a78bfa', '#34d399', '#60a5fa', '#fbbf24', '#fb7185', '#f472b6', '#818cf8', '#2dd4bf', '#facc15', '#94a3b8'];
+const COLORS = ['#22d3ee', '#7DDDB4', '#34d399', '#60a5fa', '#fbbf24', '#fb7185', '#f472b6', '#818cf8', '#2dd4bf', '#facc15', '#94a3b8'];
 const fmtUsd = (n: number) => n >= 1e9 ? `$${(n / 1e9).toFixed(1)}B` : n >= 1e6 ? `$${(n / 1e6).toFixed(1)}M` : `$${(n / 1e3).toFixed(0)}K`;
 
 /** Financial Snapshot — CAPEX breakdown donut from the engine's cost categories. */

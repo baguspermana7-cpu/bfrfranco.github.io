@@ -25,7 +25,7 @@ import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 
-const DONUT_COLORS = ['#a78bfa', '#14b8a6', '#3b82f6', '#f59e0b', '#64748b'];
+const DONUT_COLORS = ['#7DDDB4', '#14b8a6', '#3b82f6', '#f59e0b', '#64748b'];
 
 /* util-row key → value-trace id (KPI wrap; network row = assumption, no trace) */
 const UTIL_TRACE: Record<string, string | undefined> = {
@@ -213,7 +213,7 @@ export function CapacityPlanningPage() {
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg"><Layers className="h-6 w-6 text-white" /></div>
+                    <div className="flex h-11 w-11 items-center justify-center rounded border border-rz-2 bg-rz-elevated"><Layers className="h-6 w-6 text-rz-info" /></div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Capacity Planning Engine</h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400">Calculate and optimize total capacity requirements across Power, Cooling, Space and Network from the IT load profile and growth strategy</p>
@@ -222,13 +222,13 @@ export function CapacityPlanningPage() {
                 <div className="flex items-center gap-2">
                     <div className="flex rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden">
                         {(['overview', 'phases'] as const).map((t) => (
-                            <button key={t} onClick={() => setTab(t)} className={`px-3 py-1.5 text-xs font-medium ${tab === t ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>
+                            <button key={t} onClick={() => setTab(t)} className={`px-3 py-1.5 text-xs font-medium ${tab === t ? 'bg-rz-signal text-rz-base' : 'text-slate-600 dark:text-slate-300'}`}>
                                 {t === 'overview' ? 'Capacity Overview' : 'Phase Plan & Economics'}
                             </button>
                         ))}
                     </div>
-                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
-                    <button onClick={() => setActiveTab('capex')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: CAPEX Engine <ChevronRight className="h-3.5 w-3.5" /></button>
+                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-rz-mint"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
+                    <button onClick={() => setActiveTab('capex')} className="inline-flex items-center gap-1 rounded-lg bg-rz-signal px-3 py-1.5 text-xs font-semibold text-rz-base hover:bg-rz-signal/90">Next: CAPEX Engine <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>
 
@@ -260,7 +260,7 @@ export function CapacityPlanningPage() {
 
                     <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
                         {/* forecast chart */}
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">IT Load Forecast & Growth</h2>
                             <div className="h-56">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -271,7 +271,7 @@ export function CapacityPlanningPage() {
                                         <Tooltip contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                         <Legend wrapperStyle={{ fontSize: 10 }} formatter={(value) => <span className="text-slate-600 dark:text-slate-300">{value}</span>} />
                                         <Area dataKey="committedMw" name="Committed (phases)" fill="#22d3ee" stroke="#22d3ee" fillOpacity={0.15} />
-                                        <Line dataKey="forecastMw" name="Forecast (growth plan)" stroke="#a78bfa" strokeWidth={2} dot={{ r: 2 }} />
+                                        <Line dataKey="forecastMw" name="Forecast (growth plan)" stroke="#7DDDB4" strokeWidth={2} dot={{ r: 2 }} />
                                         <Line dataKey="designMw" name="Design Capacity" stroke="#f59e0b" strokeDasharray="6 4" dot={false} />
                                     </ComposedChart>
                                 </ResponsiveContainer>
@@ -281,7 +281,7 @@ export function CapacityPlanningPage() {
 
                         {/* breakdown + utilization */}
                         <div className="space-y-4">
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Capacity Breakdown (Current)</h2>
                                 <div className="flex items-center gap-2">
                                     <div className="h-32 w-32">
@@ -306,7 +306,7 @@ export function CapacityPlanningPage() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Capacity Utilization (Current)</h2>
                                 <p className="mb-1.5 text-[10px] text-slate-500" title="Power/cooling capacity is designed = IT load + design margin, so current utilization is structurally ≈ 1/(1+margin). What moves over time is the FORECAST (Forecast & Growth tab) — the exhaustion year per system is in Key Insights.">
                                     Basis: design capacity = IT + margin (current util ≈ 1/(1+margin) by construction) — the STATUS band uses the FORECAST growth peak + estimated exhaustion year per system. ⓘ
@@ -317,7 +317,7 @@ export function CapacityPlanningPage() {
                                             <div className="flex items-center gap-2 text-[11px]">
                                                 <span className="w-24 sm:w-28 truncate text-slate-600 dark:text-slate-300">{u.label}{u.basis === 'assumption' && <span className="ml-1 rounded bg-amber-500/15 px-1 text-[8px] text-amber-500">ASSUMPTION</span>}</span>
                                                 <div className="h-2 flex-1 rounded bg-slate-100 dark:bg-slate-800">
-                                                    <div className={`h-2 rounded ${u.pct >= 85 ? 'bg-rose-500' : u.pct >= 70 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(100, u.pct)}%` }} />
+                                                    <div className={`h-2 rounded ${u.pct >= 85 ? 'bg-rose-500' : u.pct >= 70 ? 'bg-amber-500' : 'bg-rz-data'}`} style={{ width: `${Math.min(100, u.pct)}%` }} />
                                                 </div>
                                                 <span className="w-24 text-right tabular-nums text-slate-500">{u.used.toLocaleString()}/{u.capacity.toLocaleString()} {u.unit}</span>
                                                 <span className="w-9 text-right tabular-nums font-semibold text-slate-700 dark:text-slate-300"
@@ -332,7 +332,7 @@ export function CapacityPlanningPage() {
                                                             className={`w-auto min-w-14 shrink-0 rounded px-1 py-0.5 text-[9px] font-semibold ${bandPct >= 85 ? 'bg-rose-500/15 text-rose-500' : 'bg-amber-500/15 text-amber-500'} ${utilExplain === u.key ? 'ring-1 ring-amber-400' : ''}`}>
                                                             {bandPct >= 85 ? 'At Risk' : 'Watch'}{u.exhaustYear ? ` ·~${u.exhaustYear}` : ''} ⓘ
                                                         </button>
-                                                    ) : <span title={chipTitle} className="w-14 shrink-0 cursor-help rounded px-1 py-0.5 text-center text-[9px] font-semibold bg-emerald-500/15 text-emerald-500">OK</span>;
+                                                    ) : <span title={chipTitle} className="w-14 shrink-0 cursor-help rounded px-1 py-0.5 text-center text-[9px] font-semibold bg-rz-data/15 text-rz-data">OK</span>;
                                                 })()}
                                             </div>
                                             {utilEx && utilEx.row.key === u.key && (
@@ -341,9 +341,9 @@ export function CapacityPlanningPage() {
                                                     <div className="mt-1 space-y-1">
                                                         {utilEx.ex.levers.map((l, idx) => (
                                                             <div key={idx} className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
-                                                                <span className={`shrink-0 rounded px-1 py-0.5 text-[8px] font-bold text-white ${l.priority === 'HIGH' ? 'bg-emerald-600' : 'bg-slate-500'}`}>{l.priority === 'HIGH' ? 'LEVER' : 'NOTE'}</span>
+                                                                <span className={`shrink-0 rounded px-1 py-0.5 text-[8px] font-bold text-white ${l.priority === 'HIGH' ? 'bg-rz-data' : 'bg-slate-500'}`}>{l.priority === 'HIGH' ? 'LEVER' : 'NOTE'}</span>
                                                                 <span><b>{l.label}</b> — {l.detail}
-                                                                    <button onClick={() => leverNav(l.targetTab)} className="ml-1 font-medium text-violet-500 hover:text-violet-400">
+                                                                    <button onClick={() => leverNav(l.targetTab)} className="ml-1 font-medium text-rz-mint hover:text-rz-mint/80">
                                                                         {l.targetTab === 'phases-local' ? 'Buka Phase Plan →' : l.targetTab === 'sim' ? 'Buka Simulation →' : 'Buka Requirements →'}
                                                                     </button>
                                                                 </span>
@@ -362,11 +362,11 @@ export function CapacityPlanningPage() {
                     </div>
 
                     {/* system detail tabs */}
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <div className="mb-2 flex gap-1">
                             {([['power', 'Power Capacity', Zap], ['cooling', 'Cooling Capacity', Snowflake], ['rack', 'Rack & Space', Boxes], ['network', 'Network', Network]] as const).map(([k, label, Icon]) => (
                                 <button key={k} onClick={() => setSysTab(k)}
-                                    className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[11px] font-medium ${sysTab === k ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-violet-600/10'}`}>
+                                    className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[11px] font-medium ${sysTab === k ? 'bg-rz-signal text-rz-base' : 'text-slate-600 dark:text-slate-300 hover:bg-rz-signal/10'}`}>
                                     <Icon className="h-3 w-3" />{label}
                                 </button>
                             ))}
@@ -381,7 +381,7 @@ export function CapacityPlanningPage() {
                                                 <td className="py-1.5 text-slate-700 dark:text-slate-200">{r.label}</td>
                                                 <td className="text-right tabular-nums text-slate-500">{r.config}</td>
                                                 <td className="text-right tabular-nums text-slate-500">{r.utilPct}%</td>
-                                                <td className="text-right"><span title={r.remediation ?? 'Healthy utilization (<70%)'} className={`cursor-help rounded px-1.5 py-0.5 text-[9px] font-semibold ${r.status === 'OK' ? 'bg-emerald-500/15 text-emerald-500' : r.status === 'Watch' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{r.status}{r.remediation ? ' ⓘ' : ''}</span></td>
+                                                <td className="text-right"><span title={r.remediation ?? 'Healthy utilization (<70%)'} className={`cursor-help rounded px-1.5 py-0.5 text-[9px] font-semibold ${r.status === 'OK' ? 'bg-rz-data/15 text-rz-data' : r.status === 'Watch' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{r.status}{r.remediation ? ' ⓘ' : ''}</span></td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -393,8 +393,8 @@ export function CapacityPlanningPage() {
                                                         <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8.5px] font-bold text-white ${r.status === 'At Risk' ? 'bg-rose-600' : 'bg-amber-600'}`}>{r.label}</span>
                                                         <span>{r.remediation}
                                                             {/* klik-navigasi ke parameter: beban/fase di Phase Plan, rating/unit basis di Requirements */}
-                                                            <button onClick={() => setTab('phases')} className="ml-1.5 font-medium text-violet-500 hover:text-violet-400">Phase Plan →</button>
-                                                            <button onClick={() => setActiveTab('requirements')} className="ml-1.5 font-medium text-violet-500 hover:text-violet-400">Requirements →</button>
+                                                            <button onClick={() => setTab('phases')} className="ml-1.5 font-medium text-rz-mint hover:text-rz-mint/80">Phase Plan →</button>
+                                                            <button onClick={() => setActiveTab('requirements')} className="ml-1.5 font-medium text-rz-mint hover:text-rz-mint/80">Requirements →</button>
                                                         </span>
                                                     </div>
                                                 ))}
@@ -423,19 +423,19 @@ export function CapacityPlanningPage() {
                     {/* recommendations */}
                     <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
                         {recs.map((r) => (
-                            <div key={r.title} className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                                <div className="text-[10px] font-semibold uppercase tracking-wide text-violet-500">{r.title}</div>
+                            <div key={r.title} className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                                <div className="text-[10px] font-semibold uppercase tracking-wide text-rz-mint">{r.title}</div>
                                 <p className="mt-1 text-[11px] text-slate-600 dark:text-slate-300">{r.body}</p>
                             </div>
                         ))}
                     </div>
 
-                    <div className="rounded-2xl border border-violet-500/30 bg-violet-600/5 p-3">
-                        <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-violet-500">Key Insights</h3>
+                    <div className="rounded border border-rz-mint/30 bg-rz-mint/5 p-3">
+                        <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Key Insights</h3>
                         <ul className="space-y-0.5">
-                            {insights.map((s, idx) => <li key={idx} className="flex gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"><span className="text-violet-500">✓</span>{s}</li>)}
+                            {insights.map((s, idx) => <li key={idx} className="flex gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"><span className="text-rz-mint">✓</span>{s}</li>)}
                         </ul>
-                        <button onClick={() => setActiveTab('requirements')} className="mt-1.5 text-[10px] font-medium text-violet-500 hover:text-violet-400">Edit Growth Plan (Requirements) →</button>
+                        <button onClick={() => setActiveTab('requirements')} className="mt-1.5 text-[10px] font-medium text-rz-mint hover:text-rz-mint/80">Edit Growth Plan (Requirements) →</button>
                     </div>
                 </div>
             )}

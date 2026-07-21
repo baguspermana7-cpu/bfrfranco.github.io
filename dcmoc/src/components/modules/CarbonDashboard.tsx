@@ -181,7 +181,7 @@ const CarbonDashboard = () => {
                         {[
                             { label: 'Scope 1 — Direct', value: result.scope1, color: '#ef4444', desc: 'Generators, fuel combustion', tip: 'Scope 1: Direct GHG emissions from sources owned or controlled by the facility, such as diesel/gas generators and on-site fuel combustion.' },
                             { label: 'Scope 2 — Grid', value: result.scope2, color: '#f59e0b', desc: 'Purchased electricity', tip: 'Scope 2: Indirect emissions from purchased electricity consumed by the data center. Driven by grid carbon intensity and total energy demand.' },
-                            { label: 'Scope 3 — Supply Chain', value: result.scope3, color: '#8b5cf6', desc: 'Estimated upstream/downstream', tip: 'Scope 3: All other indirect emissions in the value chain — embodied carbon in construction materials, employee commuting, waste disposal, and upstream fuel production.' },
+                            { label: 'Scope 3 — Supply Chain', value: result.scope3, color: '#7DDDB4', desc: 'Estimated upstream/downstream', tip: 'Scope 3: All other indirect emissions in the value chain — embodied carbon in construction materials, employee commuting, waste disposal, and upstream fuel production.' },
                         ].map(scope => (
                             <div key={scope.label}>
                                 <div className="flex justify-between items-baseline mb-1">

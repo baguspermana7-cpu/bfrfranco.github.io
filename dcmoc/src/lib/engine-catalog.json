@@ -4,7 +4,7 @@
  "dataVersion": "2.5.1",
  "modelCount": 52,
  "functionCount": 216,
- "sourceCount": 118,
+ "sourceCount": 119,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -2045,6 +2045,12 @@
    "method": "SCREENING rule-of-thumb"
   },
   {
+   "key": "boq.paramFactors",
+   "source": "SCREENING multiplier tables the param-conditional BOQ drivers read: seismic rebar/bracing scale by ASCE 7-22 Sds zone band (zone0..zone4); diesel bulk-fuel ~0.28 m³ per MW-hour of runtime (~235 g/kWh at ~0.85 kg/L + ullage); clean-agent design concentration by agent (Novec 1230 ~0.55, FM-200 ~0.36 kg/m³ per NFPA 2001/3M/Chemours TDS); redundancy parallel-path multiplier by Uptime Tier topology (N/N+1/2N/2N+1); UPS battery strings per module (rotary carries none); CDU-vs-CRAH split by cooling type; PDU/RPP count per rack by density band. Each factor tunes a quantity base, not the reconciled category $.",
+   "asOf": "2026",
+   "method": "SCREENING — code-band anchored (ASCE/NFPA/Uptime), fold into AACE Class-4"
+  },
+  {
    "key": "boq.procurement",
    "source": "Standard mission-critical DC EPC procurement packaging (12 packages P01-P12) with tender method, lead time, FAT/SAT, warranty — industry norm (Uptime/BICSI procurement practice). Package value = Σ mapped CapexResult category $.",
    "asOf": "2026",
@@ -2052,13 +2058,13 @@
   },
   {
    "key": "boq.takeoff",
-   "source": "SCREENING quantity-takeoff ratios: rebar ~130 kg/m³ (One Click LCA), structural steel ~40 kg/m² (CalcTree), raised floor ~4.6 m²/rack (dgtlinfra), clean-agent Novec 1230 ~0.55 kg/m³ per NFPA 2001/3M TDS (HIGH), CW coolant ~8 L/kW (B&V Water). Per-kW cable/tray/conduit/pipe-per-MW ratios = rule-of-thumb LOW confidence (Spon’s/RSMeans price installed length not per-kW) — folded into AACE −30/+50 band; each line carries its own confidence tag. Reconciled to CAPEX category totals so absolute ratio error does not move the total.",
+   "source": "SCREENING 3-LEVEL quantity takeoff (discipline → subsystem → ~100 component leaves across civil/electrical/mechanical/fire/ELV/security/Cx/permits). Anchor ratios: rebar ~130 kg/m³ (One Click LCA), structural steel ~40 kg/m² (CalcTree), raised floor ~4.6 m²/rack (dgtlinfra), clean-agent Novec 1230 ~0.55 kg/m³ per NFPA 2001/3M TDS (HIGH), CW coolant ~8 L/kW (B&V Water). Equipment counts (UPS/genset/transformer/chiller/CDU/CRAH) mirror boq.equipmentSizing and are path-scaled by redundancy (boq.paramFactors). Per-kW cable/tray/pipe-per-MW and per-m² fit-out ratios = rule-of-thumb LOW confidence (Spon’s/RSMeans price installed length/area not per-kW) — folded into AACE −30/+50 band; each leaf carries its own confidence tag. ONE reconcileFactor per discipline scales Σ(all subsystem lines) to the parametric CAPEX category $ so absolute ratio error does not move the total.",
    "asOf": "2026",
-   "method": "AACE Class-4 screening; reconciled to parametric CAPEX"
+   "method": "AACE Class-4 screening; 3-level, reconciled to parametric CAPEX"
   },
   {
    "key": "boq.unitRates",
-   "source": "US-2025 material+install $/unit: concrete ~$320/m³ + rebar ~$2100/t (Gordian/HomeGuide), structural steel ~$3300/t (SteelFlo 2026), raised floor ~$270/m² (datacenterfloortiles), LV/MV cable + tray + CW pipe (1xTechnologies/DistributorWire/RSMeans/MEP Academy — LOW), bare BLS trade wages (electrician/pipefitter/ironworker/laborer). Regionalized via locMult; +5.5%/yr escalation (T&T). Aggregate line rates (ict/bms/security/cx/permits) are anchors scaled by reconcileFactor to the category $.",
+   "source": "US-2025 installed material+install $/unit, ~90 keys spanning all subsystems. Anchors: concrete ~$320/m³ + rebar ~$2100/t (Gordian/HomeGuide), structural steel ~$3300/t (SteelFlo 2026), raised floor ~$270/m² (datacenterfloortiles), LV/MV cable + tray + CW pipe (1xTechnologies/DistributorWire/RSMeans/MEP Academy — LOW), major equipment (UPS module/genset/chiller/CDU/transformer/PDU) at screening OEM installed price, envelope/fit-out/external-works per-m² (Spon’s/RSMeans), bare BLS trade wages (electrician/pipefitter/ironworker/laborer). Regionalized via locMult; +5.5%/yr escalation (T&T). Aggregate per-MW line rates (dcim/bms/security/Cx-L1..L5/design/PM/permits) are anchors scaled by reconcileFactor to the category $.",
    "asOf": "2025",
    "method": "SCREENING; add ~35-60% labor burden for a bid"
   },

@@ -23,7 +23,7 @@ import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { TraceValue } from '@/components/ui/TraceValue';
 import { Activity, ChevronRight, FileDown } from 'lucide-react';
 
-const CAT_COLORS = ['#3b82f6', '#06b6d4', '#a855f7', '#f59e0b', '#ef4444', '#64748b'];
+const CAT_COLORS = ['#3b82f6', '#06b6d4', '#7DDDB4', '#f59e0b', '#ef4444', '#64748b'];
 
 interface ClassRow { cls: string; label: string; category: string; count: number; health: number; status: string; mtbfHrs: number | null; mttrHrs: number | null; fpPct: number }
 
@@ -140,7 +140,7 @@ export function AssetIntelligencePage() {
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 shadow-lg"><Activity className="h-6 w-6 text-white" /></div>
+                    <div className="flex h-11 w-11 items-center justify-center rounded border border-rz-2 bg-rz-elevated"><Activity className="h-6 w-6 text-rz-info" /></div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Asset Intelligence</h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400">Fleet generated from the design (equipment scaling) · health = engine Weibull model at the set fleet age</p>
@@ -156,14 +156,14 @@ export function AssetIntelligencePage() {
                     </label>
                     <div className="flex rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden">
                         {([['overview', 'Fleet Overview'], ['lifecycle', 'Lifecycle Detail']] as const).map(([k, l]) => (
-                            <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
+                            <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-rz-signal text-rz-base' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
                         ))}
                     </div>
                     <button onClick={exportPdf} disabled={busy}
-                        className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-violet-400 disabled:opacity-50">
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-rz-mint disabled:opacity-50">
                         <FileDown className="h-3.5 w-3.5" /> {busy ? 'Generating…' : 'Export PDF'}
                     </button>
-                    <button onClick={() => setActiveTab('spares')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Spares <ChevronRight className="h-3.5 w-3.5" /></button>
+                    <button onClick={() => setActiveTab('spares')} className="inline-flex items-center gap-1 rounded-lg bg-rz-signal px-3 py-1.5 text-xs font-semibold text-rz-base hover:bg-rz-signal/90">Spares <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>
 
@@ -194,7 +194,7 @@ export function AssetIntelligencePage() {
 
                     <div className="grid gap-4 xl:grid-cols-[1fr_1.4fr]">
                         <div className="space-y-4">
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Assets by Category</h2>
                                 <div className="flex items-center gap-2">
                                     <div className="h-32 w-32 shrink-0">
@@ -218,19 +218,19 @@ export function AssetIntelligencePage() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Fleet Condition Assumption</h2>
                                 <div className="flex items-center gap-2 text-[11px]">
                                     <span className="w-24 text-slate-600 dark:text-slate-300">Condition</span>
                                     <input type="range" min={30} max={100} step={5} value={Math.round(condition * 100)}
-                                        onChange={(e) => setCondition(Number(e.target.value) / 100)} className="flex-1 accent-violet-500" />
+                                        onChange={(e) => setCondition(Number(e.target.value) / 100)} className="flex-1 accent-rz-mint" />
                                     <span className="w-10 text-right tabular-nums text-slate-500">{Math.round(condition * 100)}%</span>
                                 </div>
                                 <p className="mt-1 text-[9px] text-slate-400">Health = engine weighted (remaining-life + condition + duty). Adjust to match the real fleet condition survey.</p>
                             </div>
                         </div>
 
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Class Health & Reliability <span className="text-[9px] normal-case text-slate-400">MTBF/MTTR = engine IEEE-493 component data · — = class not in the component table</span></h2>
                             <table className="w-full text-[11px]">
                                 <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Class</th><th className="text-right">Units</th><th className="text-right">Health</th><th className="text-right">Weibull CDF</th><th className="text-right">MTBF</th><th className="text-right">MTTR</th></tr></thead>
@@ -239,7 +239,7 @@ export function AssetIntelligencePage() {
                                         <tr key={r.cls + r.label} className="border-b border-slate-100 dark:border-slate-800/60">
                                             <td className="py-1 text-slate-700 dark:text-slate-200">{r.label} <span className="text-[9px] text-slate-400">· {r.status}</span></td>
                                             <td className="text-right tabular-nums text-slate-500">{r.count.toLocaleString()}</td>
-                                            <td className="text-right"><span className={`tabular-nums font-semibold ${r.health >= 70 ? 'text-emerald-500' : r.health >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{r.health}</span></td>
+                                            <td className="text-right"><span className={`tabular-nums font-semibold ${r.health >= 70 ? 'text-rz-data' : r.health >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{r.health}</span></td>
                                             <td className="text-right tabular-nums text-slate-500">{r.fpPct}%</td>
                                             <td className="text-right tabular-nums text-slate-500">{r.mtbfHrs ? `${(r.mtbfHrs / 1000).toFixed(0)}k h` : '—'}</td>
                                             <td className="text-right tabular-nums text-slate-500">{r.mttrHrs ? `${r.mttrHrs} h` : '—'}</td>
@@ -250,7 +250,7 @@ export function AssetIntelligencePage() {
                         </div>
                     </div>
 
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Health Distribution by Class</h2>
                         <div className="h-44">
                             <ResponsiveContainer width="100%" height="100%">
@@ -269,7 +269,7 @@ export function AssetIntelligencePage() {
 
                     <div className="flex gap-2 text-[11px]">
                         {([['asset-lifecycle', 'Asset Lifecycle →'], ['cbm', 'CBM / DCIM →'], ['spares', 'Spares Optimization →'], ['maint', 'Maintenance →']] as const).map(([id, l]) => (
-                            <button key={id} onClick={() => setActiveTab(id)} className="rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-slate-600 dark:text-slate-300 hover:border-violet-400">{l}</button>
+                            <button key={id} onClick={() => setActiveTab(id)} className="rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-slate-600 dark:text-slate-300 hover:border-rz-mint">{l}</button>
                         ))}
                     </div>
                 </div>

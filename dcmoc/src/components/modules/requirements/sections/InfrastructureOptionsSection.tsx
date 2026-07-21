@@ -55,7 +55,7 @@ function Group({ title, chip, children, defaultOpen = false }: { title: string; 
 
 /* ── Dynamic-prefill chip (owner mandate: "prefill BASED ON CURRENT PARAMETER,
  * bukan statis"). Amber = rekomendasi differs from the current value (klik =
- * terapkan; title = honest basis); violet ≡ rec = value already matches.
+ * terapkan; title = honest basis); data-green ≡ rec = value already matches.
  * NEVER auto-writes — apply is always an explicit click. ── */
 function RecChip({ rec, display, matches, basis, onApply }: {
     rec: RecValue | null; display: string; matches: boolean; basis: string; onApply: () => void;
@@ -64,7 +64,7 @@ function RecChip({ rec, display, matches, basis, onApply }: {
     if (matches) {
         return (
             <span title={`Sesuai rekomendasi — ${basis}`}
-                className="mt-1 inline-flex w-fit items-center rounded bg-violet-500/10 px-1.5 py-0.5 text-[8.5px] font-semibold text-violet-500">
+                className="mt-1 inline-flex w-fit items-center rounded bg-rz-data/10 px-1.5 py-0.5 text-[8.5px] font-semibold text-rz-data">
                 ≡ rec
             </span>
         );

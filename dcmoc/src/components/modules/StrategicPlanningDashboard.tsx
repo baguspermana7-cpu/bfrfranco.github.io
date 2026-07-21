@@ -232,7 +232,7 @@ export default function StrategicPlanningDashboard() {
     const SourceChip = ({ from, tab }: { from: string; tab: string }) => (
         <button onClick={() => useSimulationStore.getState().actions.setActiveTab(tab as never)}
             title={`Derived from ${from} — click to edit at the source`}
-            className="ml-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[8.5px] font-semibold uppercase text-emerald-500 hover:bg-emerald-500/20">
+            className="ml-1 rounded bg-rz-data/10 px-1.5 py-0.5 text-[8.5px] font-semibold uppercase text-rz-data hover:bg-rz-data/20">
             {from} ↗
         </button>
     );
@@ -370,7 +370,7 @@ export default function StrategicPlanningDashboard() {
                 </p>
             </div>
             {/* #335 — PURPOSE (owner bingung fungsinya): halaman OUTPUT analisis strategis. */}
-            <p className="rounded-lg border border-violet-500/30 bg-violet-600/5 px-3 py-2 text-[11px] text-slate-600 dark:text-slate-300">
+            <p className="rounded-lg border border-rz-mint/30 bg-rz-mint/5 px-3 py-2 text-[11px] text-slate-600 dark:text-slate-300">
                 <b>What this page is for:</b> strategic analysis DERIVED from the project data you've already entered — (1) <b>Feasibility</b>: whether the site's land/grid/climate can host the target MW; (2) <b>Expansion</b>: when & how many expansion phases based on demand growth; (3) <b>Acquisition</b>: buy-vs-build comparison against market comparables. Inputs that already exist in other menus are LOCKED here (single source) — edit them in their origin menu; only local analysis parameters (growth, horizon, comparables) are entered here.
             </p>
 
@@ -521,12 +521,12 @@ export default function StrategicPlanningDashboard() {
                                     {bottleneckExplain.kind === 'grid' ? (
                                         <>
                                             <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
-                                                <span className="shrink-0 rounded bg-emerald-600 px-1 py-0.5 text-[8px] font-bold text-white">LEVER</span>
+                                                <span className="shrink-0 rounded bg-rz-data px-1 py-0.5 text-[8px] font-bold text-black">LEVER</span>
                                                 <span><b>Add grid intake +{bottleneckExplain.deltaGridMW.toFixed(1)} MW</b> (≈ {bottleneckExplain.deltaGridMW.toFixed(1)} MVA at PF≈1.0) → unlocks +{feasibilityResults.lockedOutITMW.toFixed(1)} MW IT until the land becomes binding. Marginal: every +1 MW intake ≈ +{bottleneckExplain.itPerGridMW.toFixed(2)} MW IT at PUE {feasibilityResults.effectivePUE.toFixed(2)}.</span>
                                             </div>
                                             {bottleneckExplain.pueUnlockMW > 0.05 ? (
                                                 <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
-                                                    <span className="shrink-0 rounded bg-emerald-600 px-1 py-0.5 text-[8px] font-bold text-white">LEVER</span>
+                                                    <span className="shrink-0 rounded bg-rz-data px-1 py-0.5 text-[8px] font-bold text-black">LEVER</span>
                                                     <span><b>Improve effective PUE {feasibilityResults.effectivePUE.toFixed(2)} → {bottleneckExplain.bestEffPUE.toFixed(2)}</b> (target PUE {PUE_SLIDER_MIN.toFixed(2)} + climate penalty, cooling-type floor respected) → +{bottleneckExplain.pueUnlockMW.toFixed(1)} MW IT on the same grid, without new intake.</span>
                                                 </div>
                                             ) : (
@@ -538,7 +538,7 @@ export default function StrategicPlanningDashboard() {
                                         </>
                                     ) : (
                                         <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
-                                            <span className="shrink-0 rounded bg-emerald-600 px-1 py-0.5 text-[8px] font-bold text-white">LEVER</span>
+                                            <span className="shrink-0 rounded bg-rz-data px-1 py-0.5 text-[8px] font-bold text-black">LEVER</span>
                                             <span><b>Add land +{bottleneckExplain.deltaAcres.toFixed(1)} acres</b> (+{Math.round(bottleneckExplain.deltaLandM2).toLocaleString()} m²) → unlocks +{feasibilityResults.lockedOutITMW.toFixed(1)} MW IT until the grid becomes binding. Marginal: every +1 acre ≈ +{bottleneckExplain.itPerAcre.toFixed(2)} MW IT ({(HALL_FLOOR_FRACTION * 100).toFixed(0)}% hall @ {IT_DENSITY_W_PER_M2} W/m²).</span>
                                         </div>
                                     )}
@@ -559,7 +559,7 @@ export default function StrategicPlanningDashboard() {
                             {[
                                 { label: 'Buildable IT Load', value: `${feasibilityResults.actualITMW.toFixed(1)} MW`, sub: 'min(land, grid)', color: 'text-cyan-600 dark:text-cyan-400' },
                                 { label: 'Effective PUE', value: feasibilityResults.effectivePUE.toFixed(2), sub: `+${(CLIMATE_PUE_PENALTY[feasibility.climateZone] * 100).toFixed(0)}% climate`, color: 'text-amber-600 dark:text-amber-400' },
-                                { label: 'Grid Headroom', value: `${feasibilityResults.gridHeadroomMW.toFixed(1)} MW`, sub: `${feasibilityResults.gridHeadroomPct.toFixed(0)}% reserve`, color: 'text-emerald-600 dark:text-emerald-400' },
+                                { label: 'Grid Headroom', value: `${feasibilityResults.gridHeadroomMW.toFixed(1)} MW`, sub: `${feasibilityResults.gridHeadroomPct.toFixed(0)}% reserve`, color: 'text-rz-data' },
                                 { label: 'Annual Energy Cost', value: fmtMoney(feasibilityResults.annualEnergyCost), sub: `@ $${selectedCountry?.economy?.electricityRate?.toFixed(2) ?? '0.10'}/kWh`, color: 'text-rose-600 dark:text-rose-400' },
                             ].map(item => (
                                 <div key={item.label} className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
@@ -595,7 +595,7 @@ export default function StrategicPlanningDashboard() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-5 space-y-5">
                         <h3 className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 text-sm">
-                            <DollarSign className="w-4 h-4 text-emerald-500" />
+                            <DollarSign className="w-4 h-4 text-rz-data" />
                             Site Valuation Inputs ($/MW IT Load)
                         </h3>
 
@@ -641,7 +641,7 @@ export default function StrategicPlanningDashboard() {
                             <h4 className="text-xs font-bold uppercase text-slate-500 mb-3">Bid Range Analysis</h4>
                             <div className="space-y-2">
                                 {[
-                                    { label: 'Floor (Aggressive Bid)', value: acquisitionResults.bidFloor, color: 'text-emerald-600 dark:text-emerald-400', note: '88% of comparable avg' },
+                                    { label: 'Floor (Aggressive Bid)', value: acquisitionResults.bidFloor, color: 'text-rz-data', note: '88% of comparable avg' },
                                     { label: 'Fair Value', value: acquisitionResults.fairValue, color: 'text-slate-800 dark:text-slate-200', note: 'Comp average' },
                                     { label: 'Ceiling (Risk-adj.)', value: acquisitionResults.bidCeiling, color: 'text-amber-600 dark:text-amber-400', note: `${(acquisition.riskMultiplier * 100).toFixed(0)}% of fair value` },
                                     { label: 'Target Ask', value: acquisition.targetSiteDollarPerMW, color: acquisitionResults.premiumPct > 10 ? 'text-rose-600 dark:text-rose-400' : 'text-cyan-600 dark:text-cyan-400', note: `${acquisitionResults.premiumPct > 0 ? '+' : ''}${acquisitionResults.premiumPct.toFixed(1)}% vs fair value` },
@@ -676,7 +676,7 @@ export default function StrategicPlanningDashboard() {
                                 ? 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300'
                                 : acquisitionResults.premiumPct > 5
                                 ? 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300'
-                                : 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
+                                : 'bg-rz-data/10 dark:bg-rz-data/10 border-rz-data/40 text-rz-data'
                         )}>
                             <div className="flex items-center gap-2 font-semibold text-xs mb-1">
                                 {acquisitionResults.premiumPct > 15 ? <AlertTriangle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
@@ -700,7 +700,7 @@ export default function StrategicPlanningDashboard() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-5 space-y-5">
                         <h3 className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 text-sm">
-                            <BarChart3 className="w-4 h-4 text-violet-500" />
+                            <BarChart3 className="w-4 h-4 text-rz-mint" />
                             Expansion Parameters
                         </h3>
 
@@ -795,14 +795,14 @@ export default function StrategicPlanningDashboard() {
                                                 <span className="text-slate-600 dark:text-slate-400">Year {row.year}</span>
                                                 <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
                                                     {row.demandMW.toFixed(1)} MW
-                                                    <span className={clsx('ml-2 text-[10px]', utilization >= 1 ? 'text-rose-500' : utilization >= 0.8 ? 'text-amber-500' : 'text-emerald-500')}>
+                                                    <span className={clsx('ml-2 text-[10px]', utilization >= 1 ? 'text-rose-500' : utilization >= 0.8 ? 'text-amber-500' : 'text-rz-data')}>
                                                         ({(utilization * 100).toFixed(0)}%)
                                                     </span>
                                                 </span>
                                             </div>
                                             <div className="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                                                 <div
-                                                    className={clsx('h-full rounded-full transition-all', utilization >= 1 ? 'bg-rose-400' : utilization >= 0.8 ? 'bg-amber-400' : 'bg-emerald-400')}
+                                                    className={clsx('h-full rounded-full transition-all', utilization >= 1 ? 'bg-rose-400' : utilization >= 0.8 ? 'bg-amber-400' : 'bg-rz-data')}
                                                     style={{ width: `${Math.min(100, utilization * 100)}%` }}
                                                 />
                                             </div>
@@ -824,7 +824,7 @@ export default function StrategicPlanningDashboard() {
                                 <div className="space-y-2">
                                     {expansionResults.phases.map(ph => (
                                         <div key={ph.label} className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
-                                            <div className="w-2 h-2 rounded-full bg-violet-400 mt-1.5 shrink-0" />
+                                            <div className="w-2 h-2 rounded-full bg-rz-mint mt-1.5 shrink-0" />
                                             <div className="flex-1">
                                                 <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">{ph.label} — {ph.capacityMW.toFixed(1)} MW</div>
                                                 <div className="text-[10px] text-slate-400">Start: Year {ph.startYear} · CAPEX: {fmtMoney(ph.capex)} · Grid reservation: month {Math.max(1, ph.gridReservationMonth)}</div>

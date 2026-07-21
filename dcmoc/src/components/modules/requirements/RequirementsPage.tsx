@@ -65,8 +65,8 @@ export function RequirementsPage() {
             {/* header */}
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 shadow-lg">
-                        <ClipboardList className="h-6 w-6 text-white" />
+                    <div className="flex h-11 w-11 items-center justify-center rounded bg-rz-mint/15 border border-rz-mint/30">
+                        <ClipboardList className="h-6 w-6 text-rz-mint" />
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Requirements & Workload Engine</h1>
@@ -75,15 +75,15 @@ export function RequirementsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                     <button onClick={() => { markSaved(); showToast('Draft saved'); }}
-                        className="rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-violet-400">
+                        className="rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-rz-mint">
                         Save Draft
                     </button>
                     <button onClick={() => { scrollTo('sec-summary'); showToast(`Validation: ${derived.validation?.flags.length ?? 0} flag(s)`); }}
-                        className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/50 px-3 py-2 text-xs font-medium text-emerald-500 hover:bg-emerald-500/10">
+                        className="inline-flex items-center gap-1 rounded-lg border border-rz-data/50 px-3 py-2 text-xs font-medium text-rz-data hover:bg-rz-data/10">
                         <Check className="h-3.5 w-3.5" /> Validate
                     </button>
                     <button onClick={() => { markSaved(); setActiveTab('site'); }}
-                        className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white hover:bg-violet-500">
+                        className="inline-flex items-center gap-1 rounded-lg bg-rz-signal px-3 py-2 text-xs font-semibold text-rz-base hover:bg-rz-signal/80">
                         Save & Continue <ChevronRight className="h-3.5 w-3.5" />
                     </button>
                 </div>
@@ -94,8 +94,8 @@ export function RequirementsPage() {
                 {TABS.map((t) => (
                     <button key={t.id} onClick={() => scrollTo(t.id)}
                         className={`whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[11px] font-medium transition-colors ${activeSec === t.id
-                            ? 'bg-violet-600 text-white'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-violet-600/10'}`}>
+                            ? 'bg-rz-mint text-rz-base'
+                            : 'text-slate-600 dark:text-slate-300 hover:bg-rz-mint/10'}`}>
                         {t.label}
                     </button>
                 ))}
@@ -122,10 +122,10 @@ export function RequirementsPage() {
                 </span>
                 <div className="flex items-center gap-1.5">
                     {Array.from({ length: 9 }, (_, i) => (
-                        <span key={i} className={`h-1.5 rounded-full ${i === 0 ? 'w-5 bg-violet-500' : 'w-1.5 bg-slate-300 dark:bg-slate-700'}`} />
+                        <span key={i} className={`h-1.5 rounded-full ${i === 0 ? 'w-5 bg-rz-mint' : 'w-1.5 bg-slate-300 dark:bg-slate-700'}`} />
                     ))}
                 </div>
-                <button onClick={() => setActiveTab('site')} className="inline-flex items-center gap-1 text-[11px] font-medium text-violet-500 hover:text-violet-400">
+                <button onClick={() => setActiveTab('site')} className="inline-flex items-center gap-1 text-[11px] font-medium text-rz-mint hover:text-rz-mint/80">
                     Next <ChevronRight className="h-3.5 w-3.5" />
                 </button>
             </div>

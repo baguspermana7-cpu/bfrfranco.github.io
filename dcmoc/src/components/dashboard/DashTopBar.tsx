@@ -23,7 +23,7 @@ export function DashTopBar({ project }: { project: string }) {
                 <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/80 text-sm font-medium text-slate-800 dark:text-slate-100">
                     {project}
                 </span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 font-semibold">Active</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-rz-data/15 text-rz-data font-semibold">Active</span>
             </div>
 
                         {/* Search + AI */}
@@ -36,10 +36,10 @@ export function DashTopBar({ project }: { project: string }) {
                 <button
                     onClick={() => setAiOpen(true)}
                     title="Configure the Layer-13 AI Assistant (optional) — defaults to the built-in RZ engine"
-                    className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-cyan-600 text-white text-xs font-medium transition-transform hover:-translate-y-0.5 active:translate-y-0 hover:shadow-lg hover:shadow-violet-900/30"
+                    className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rz-signal text-rz-base text-xs font-medium transition-colors hover:bg-rz-signal/80"
                 >
                     <Sparkles className="w-3.5 h-3.5" /> AI Assistant
-                    {aiEnabled && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#0f1424]" title="AI endpoint connected" />}
+                    {aiEnabled && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rz-data ring-2 ring-[#0f1424]" title="AI endpoint connected" />}
                 </button>
             </div>
             <AiAssistantModal open={aiOpen} onClose={() => setAiOpen(false)} />

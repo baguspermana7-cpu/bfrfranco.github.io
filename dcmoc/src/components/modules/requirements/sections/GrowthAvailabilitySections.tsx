@@ -33,7 +33,7 @@ export function GrowthPlanSection({ derived }: { derived: ReqDerived }) {
                 </Field>
                 <div className="ml-auto text-right">
                     <div className="text-[10px] uppercase tracking-wide text-slate-500">Growth Rate (5-yr CAGR)</div>
-                    <div className="text-lg font-bold tabular-nums text-violet-500">{derived.cagrPct}%</div>
+                    <div className="text-lg font-bold tabular-nums text-rz-mint">{derived.cagrPct}%</div>
                 </div>
             </div>
             <div className="overflow-x-auto">
@@ -51,7 +51,7 @@ export function GrowthPlanSection({ derived }: { derived: ReqDerived }) {
                                 <td key={y.label} className="text-right px-2 py-1.5 tabular-nums">
                                     {y.editable && i > 0 ? (
                                         <input type="number" min={0}
-                                            className="w-16 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-1 py-0.5 text-right text-xs outline-none focus:border-violet-500"
+                                            className="w-16 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-1 py-0.5 text-right text-xs outline-none focus:border-rz-mint"
                                             value={y.mw}
                                             onChange={(e) => {
                                                 const v = parseFloat(e.target.value);
@@ -89,7 +89,7 @@ export function AvailabilitySection({ derived }: { derived: ReqDerived }) {
                         options={[...(inputs.tierLevel === 2 ? [{ value: 2, label: 'Tier II' }] : []), { value: 3, label: 'Tier III' }, { value: 4, label: 'Tier IV' }]} />
                 </Field>
                 <Field label="Target Availability" explainKey="availability">
-                    <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 px-2 py-1.5 text-sm font-bold tabular-nums text-emerald-500">{derived.tierTargetPct}%</div>
+                    <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 px-2 py-1.5 text-sm font-bold tabular-nums text-rz-data">{derived.tierTargetPct}%</div>
                 </Field>
                 <Field label="Downtime Budget">
                     <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 px-2 py-1.5 text-sm font-bold tabular-nums text-slate-900 dark:text-white">{derived.downtimeMinYr} min/yr</div>
@@ -133,10 +133,10 @@ export function BusinessPrioritySection({ derived }: { derived: ReqDerived }) {
                 <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 mb-1.5">Project Priority (Rank)</div>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                     {b.priorities.map((p, i) => (
-                        <div key={p} className={`rounded-xl border p-2 text-center ${i === 0 ? 'border-violet-500 bg-violet-600/10' : 'border-slate-200 dark:border-slate-800'}`}>
-                            <div className="text-lg font-bold text-violet-500">{i + 1}</div>
+                        <div key={p} className={`rounded border p-2 text-center ${i === 0 ? 'border-rz-mint bg-rz-mint/10' : 'border-slate-200 dark:border-slate-800'}`}>
+                            <div className="text-lg font-bold text-rz-mint">{i + 1}</div>
                             <div className="text-[11px] font-medium text-slate-800 dark:text-slate-200">{PRIORITY_LABELS[p]}</div>
-                            {i === 0 && <div className="text-[9px] text-violet-400">(Highest)</div>}
+                            {i === 0 && <div className="text-[9px] text-rz-mint">(Highest)</div>}
                             <div className="mt-1 flex justify-center gap-1">
                                 <button type="button" disabled={i === 0} onClick={() => req.actions.movePriority(i, -1)}
                                     className="rounded border border-slate-300 dark:border-slate-700 p-0.5 disabled:opacity-30"><ChevronUp className="w-3 h-3" /></button>

@@ -18,7 +18,7 @@ const CATEGORY_COLORS: Record<string, string> = {
     'Fire Safety': 'bg-amber-500',
     'Fuel System': 'bg-orange-500',
     'Water Treatment': 'bg-cyan-500',
-    'BMS & IT': 'bg-purple-500',
+    'BMS & IT': 'bg-rz-mint',
     'Security': 'bg-green-500',
     'Civil': 'bg-slate-500',
 };

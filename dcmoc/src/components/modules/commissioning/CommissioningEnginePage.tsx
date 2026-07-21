@@ -26,7 +26,7 @@ import { CheckCircle2, ChevronRight, ChevronDown, FileDown, ListChecks } from 'l
 
 const WITNESS_STYLE: Record<string, { label: string; cls: string }> = {
     H: { label: 'HOLD', cls: 'bg-amber-500/15 text-amber-500' },
-    W: { label: 'WITNESS', cls: 'bg-violet-500/15 text-violet-400' },
+    W: { label: 'WITNESS', cls: 'bg-rz-mint/15 text-rz-mint' },
     R: { label: 'REVIEW', cls: 'bg-slate-500/15 text-slate-400' },
 };
 
@@ -42,7 +42,7 @@ function itemsFor(key: ReadinessKey, coolingType: string, equip?: Record<string,
         .filter((g) => g.items.length > 0);
 }
 
-const LEVEL_COLORS = ['#64748b', '#22d3ee', '#3b82f6', '#a78bfa', '#f59e0b', '#f43f5e', '#10b981'];
+const LEVEL_COLORS = ['#64748b', '#22d3ee', '#3b82f6', '#7DDDB4', '#f59e0b', '#f43f5e', '#00FF88'];
 
 /** tests-per-unit screening table (labeled on the card). */
 const TESTS_PER: Record<string, { label: string; key: string; per: number }> = {
@@ -143,7 +143,7 @@ export function CommissioningEnginePage() {
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 shadow-lg"><CheckCircle2 className="h-6 w-6 text-white" /></div>
+                    <div className="flex h-11 w-11 items-center justify-center rounded border border-rz-2 bg-rz-elevated"><CheckCircle2 className="h-6 w-6 text-rz-info" /></div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Commissioning Engine</h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400">Program plan engine-real (rich cx model) · progress user-tracked · readiness = engine readinessIndex</p>
@@ -152,7 +152,7 @@ export function CommissioningEnginePage() {
                 <div className="flex items-center gap-2">
                     <div className="flex rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden">
                         {([['overview', 'Progress & Systems'], ['checklist', 'Cx Checklist'], ['cost', 'Program Cost & Risk']] as const).map(([k, l]) => (
-                            <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
+                            <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-rz-signal text-rz-base' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
                         ))}
                     </div>
                     <button onClick={async () => {
@@ -215,17 +215,17 @@ export function CommissioningEnginePage() {
                             } as StandardReport);
                         } finally { setBusy(false); }
                     }} disabled={busy}
-                        className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-violet-400 disabled:opacity-50">
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-rz-mint disabled:opacity-50">
                         <FileDown className="h-3.5 w-3.5" /> {busy ? 'Generating…' : 'Export PDF'}
                     </button>
-                    <button onClick={() => setActiveTab('ops')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: Operations <ChevronRight className="h-3.5 w-3.5" /></button>
+                    <button onClick={() => setActiveTab('ops')} className="inline-flex items-center gap-1 rounded-lg bg-rz-signal px-3 py-1.5 text-xs font-semibold text-rz-base hover:bg-rz-signal/90">Next: Operations <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>
 
             {tab === 'cost' ? <CommissioningDashboard /> : tab === 'checklist' ? (
                 <div className="space-y-3">
                     <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 px-3 py-2 text-[11px] text-slate-500">
-                        <ListChecks className="mr-1 inline h-3.5 w-3.5 text-violet-400" />
+                        <ListChecks className="mr-1 inline h-3.5 w-3.5 text-rz-mint" />
                         Cx test-procedure checklist — activities trace to the DC Hub commissioning templates (NETA ATS / IEEE / ASHRAE basis).
                         PASS/FAIL ticks drive each level&apos;s completion and the engine readiness index; sliders become coarse fallback.
                         System groups & ×N unit counts derive LIVE from engine equipment scaling (models.commissioning.equipScale) — systems absent
@@ -240,16 +240,16 @@ export function CommissioningEnginePage() {
                         const open = openLevel === key;
                         const eq = rich.equip as Record<string, number>;
                         return (
-                            <div key={key} className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+                            <div key={key} className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
                                 <button onClick={() => setOpenLevel(open ? null : key)}
                                     className="flex w-full items-center gap-2 px-4 py-2.5 text-left">
                                     <ChevronDown className={`h-3.5 w-3.5 text-slate-400 transition-transform ${open ? '' : '-rotate-90'}`} />
                                     <span title={levelTip(rk)} className="text-xs font-semibold text-slate-800 dark:text-slate-100">{rk.label}</span>
-                                    <span className="rounded bg-violet-500/10 px-1.5 py-0.5 text-[8.5px] font-semibold text-violet-400"
+                                    <span className="rounded bg-rz-mint/10 px-1.5 py-0.5 text-[8.5px] font-semibold text-rz-mint"
                                         title="Engine readiness weight">w {Math.round(((rzData()?.commissioning?.weights ?? {})[key] ?? 0) * 100)}%</span>
                                     <div className="ml-2 h-1.5 w-32 overflow-hidden rounded bg-slate-100 dark:bg-slate-800"
                                         title={`${st.pass} pass / ${st.fail} fail of ${st.total} items`}>
-                                        <div className="h-1.5 rounded bg-emerald-500" style={{ width: `${st.total ? (st.pass / st.total) * 100 : 0}%` }} />
+                                        <div className="h-1.5 rounded bg-rz-data" style={{ width: `${st.total ? (st.pass / st.total) * 100 : 0}%` }} />
                                     </div>
                                     <span className="ml-auto text-[10px] tabular-nums text-slate-500">{st.pass}/{st.total} passed{st.fail ? ` · ${st.fail} failed` : ''}</span>
                                 </button>
@@ -277,7 +277,7 @@ export function CommissioningEnginePage() {
                                                                                 onClick={() => t.actions.setCheck(ck, opt)}
                                                                                 title={opt === 'pass' ? 'Mark PASS' : opt === 'fail' ? 'Mark FAIL' : 'Clear'}
                                                                                 className={`px-1.5 py-0.5 text-[9px] font-bold ${v === opt
-                                                                                    ? opt === 'pass' ? 'bg-emerald-500 text-white' : opt === 'fail' ? 'bg-rose-500 text-white' : 'bg-slate-400 text-white'
+                                                                                    ? opt === 'pass' ? 'bg-rz-data text-rz-base' : opt === 'fail' ? 'bg-rose-500 text-white' : 'bg-slate-400 text-white'
                                                                                     : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
                                                                                 {opt === 'pass' ? 'PASS' : opt === 'fail' ? 'FAIL' : '—'}
                                                                             </button>
@@ -290,7 +290,7 @@ export function CommissioningEnginePage() {
                                                                             className="whitespace-nowrap rounded border border-rose-400/50 px-1.5 py-0.5 text-[9px] text-rose-400 hover:bg-rose-500/10">log issue</button>
                                                                     )}
                                                                     <button onClick={() => setOpenItem(expanded ? null : ck)}
-                                                                        className="rounded p-0.5 text-slate-400 hover:text-violet-400" title="Procedure detail">
+                                                                        className="rounded p-0.5 text-slate-400 hover:text-rz-mint" title="Procedure detail">
                                                                         <ChevronDown className={`h-3.5 w-3.5 transition-transform ${expanded ? 'rotate-180' : ''}`} />
                                                                     </button>
                                                                 </div>
@@ -301,8 +301,8 @@ export function CommissioningEnginePage() {
                                                                             <ol className="list-decimal space-y-0.5 pl-4 text-[10px] leading-relaxed text-slate-600 dark:text-slate-300">
                                                                                 {proc.procedure.map((s, i) => <li key={i}>{s}</li>)}
                                                                             </ol>
-                                                                            <div className="mt-2 rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-2">
-                                                                                <div className="text-[9px] font-semibold uppercase text-emerald-500">Acceptance</div>
+                                                                            <div className="mt-2 rounded-lg border border-rz-data/30 bg-rz-data/5 p-2">
+                                                                                <div className="text-[9px] font-semibold uppercase text-rz-data">Acceptance</div>
                                                                                 <p className="text-[10px] text-slate-600 dark:text-slate-300">{proc.acceptance.criteria}</p>
                                                                                 <p className="mt-0.5 text-[9px] text-slate-400">{proc.acceptance.standard}</p>
                                                                             </div>
@@ -357,7 +357,7 @@ export function CommissioningEnginePage() {
                                 <div className="mt-2 space-y-1">
                                     {acts.slice(0, 3).map((a, i) => (
                                         <div key={i} className="flex items-start gap-2 text-[10.5px] text-slate-600 dark:text-slate-300">
-                                            <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8.5px] font-bold text-white ${a.priority === 'HIGH' ? 'bg-red-600' : a.priority === 'MEDIUM' ? 'bg-amber-600' : 'bg-emerald-600'}`}>{a.priority}</span>
+                                            <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8.5px] font-bold text-white ${a.priority === 'HIGH' ? 'bg-red-600' : a.priority === 'MEDIUM' ? 'bg-amber-600' : 'bg-rz-data'}`}>{a.priority}</span>
                                             <span>{a.action}</span>
                                         </div>
                                     ))}
@@ -366,7 +366,7 @@ export function CommissioningEnginePage() {
                         );
                     })()}
                     {planMode && (
-                        <div className="rounded-xl border border-violet-500/40 bg-violet-600/10 px-3 py-2 text-[11px] text-violet-500">
+                        <div className="rounded-xl border border-rz-mint/40 bg-rz-signal/10 px-3 py-2 text-[11px] text-rz-mint">
                             <b>Plan Mode</b> — no commissioning progress entered yet. The program plan below is engine-real; set per-level completion to activate the readiness index.
                         </div>
                     )}
@@ -399,7 +399,7 @@ export function CommissioningEnginePage() {
 
                     <div className="grid gap-4 xl:grid-cols-2">
                         {/* level timeline */}
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Commissioning Timeline (L0–L6 · engine staffed durations)</h2>
                             <div className="space-y-1.5">
                                 {(() => {
@@ -422,8 +422,8 @@ export function CommissioningEnginePage() {
                         </div>
 
                         {/* readiness completion input */}
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Readiness Completion <span className="text-[9px] normal-case text-violet-400">feeds engine readinessIndex (weights engine-real)</span></h2>
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Readiness Completion <span className="text-[9px] normal-case text-rz-mint">feeds engine readinessIndex (weights engine-real)</span></h2>
                             <div className="space-y-1.5">
                                 {READY_KEYS.map((rk) => {
                                     const st = checklistStats[rk.key];
@@ -437,14 +437,14 @@ export function CommissioningEnginePage() {
                                                 disabled={derived != null}
                                                 title={derived != null ? `Derived from checklist: ${st.pass}/${st.total} passed` : `${rk.label} completion`}
                                                 onChange={(ev) => t.actions.setCompletion(rk.key, Number(ev.target.value) / 100)}
-                                                className={`flex-1 accent-violet-500 ${derived != null ? 'opacity-60' : ''}`} />
+                                                className={`flex-1 accent-rz-mint ${derived != null ? 'opacity-60' : ''}`} />
                                             <span className="w-10 text-right tabular-nums text-slate-500">{v == null ? '—' : `${Math.round(v * 100)}%`}</span>
                                             {derived != null ? (
                                                 <span className="rounded bg-cyan-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-cyan-500" title={`${st.pass} pass / ${st.fail} fail of ${st.total} items`}>from checklist</span>
                                             ) : (
                                                 st && st.total > 0 && (
                                                     <button onClick={() => { setTab('checklist'); setOpenLevel(rk.key as ReadinessKey); }}
-                                                        className="whitespace-nowrap rounded border border-slate-300 dark:border-slate-700 px-1.5 py-0.5 text-[9px] text-slate-500 hover:border-violet-400 hover:text-violet-400"
+                                                        className="whitespace-nowrap rounded border border-slate-300 dark:border-slate-700 px-1.5 py-0.5 text-[9px] text-slate-500 hover:border-rz-mint hover:text-rz-mint"
                                                         title={`Open the ${st.total}-item Cx checklist for ${rk.label}`}>
                                                         Checklist ▸
                                                     </button>
@@ -455,7 +455,7 @@ export function CommissioningEnginePage() {
                                 })}
                             </div>
                             {readiness && (
-                                <div className={`mt-2 rounded-lg px-2 py-1.5 text-center text-[11px] font-semibold ${readiness.status === 'Ready' ? 'bg-emerald-500/15 text-emerald-500' : readiness.status === 'Conditional' ? 'bg-amber-500/15 text-amber-500' : 'bg-slate-500/15 text-slate-400'}`}>
+                                <div className={`mt-2 rounded-lg px-2 py-1.5 text-center text-[11px] font-semibold ${readiness.status === 'Ready' ? 'bg-rz-data/15 text-rz-data' : readiness.status === 'Conditional' ? 'bg-amber-500/15 text-amber-500' : 'bg-slate-500/15 text-slate-400'}`}>
                                     {readiness.label} — {overall}%
                                 </div>
                             )}
@@ -464,7 +464,7 @@ export function CommissioningEnginePage() {
 
                     <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr]">
                         {/* systems table */}
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Commissioning by System <span className="ml-1 rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">TESTS = SCREENING (counts × per-unit)</span></h2>
                             <table className="w-full text-[11px]">
                                 <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">System</th><th className="text-right">Units</th><th className="text-right">Tests</th></tr></thead>
@@ -481,12 +481,12 @@ export function CommissioningEnginePage() {
                         </div>
 
                         {/* issues & punch */}
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Issues & Punch List</h2>
                             <div className="space-y-1">
                                 {t.issues.map((x) => (
                                     <label key={x.id} className="flex items-center gap-2 text-[11px]">
-                                        <input type="checkbox" checked={!x.open} onChange={() => t.actions.toggleIssue(x.id)} className="accent-violet-500" />
+                                        <input type="checkbox" checked={!x.open} onChange={() => t.actions.toggleIssue(x.id)} className="accent-rz-mint" />
                                         <span className={`rounded px-1 py-0.5 text-[8.5px] font-bold ${x.sev === 'High' ? 'bg-rose-500/15 text-rose-500' : x.sev === 'Medium' ? 'bg-amber-500/15 text-amber-500' : 'bg-slate-500/15 text-slate-400'}`}>{x.sev}</span>
                                         <span className={`flex-1 truncate ${x.open ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400 line-through'}`}>{x.title}</span>
                                         <span className="text-[9px] uppercase text-slate-400">{x.kind}</span>
@@ -495,12 +495,12 @@ export function CommissioningEnginePage() {
                                 ))}
                             </div>
                             <button onClick={() => t.actions.upsertIssue({ id: `c_${Date.now()}`, title: 'New item', sev: 'Medium', kind: 'punch', open: true })}
-                                className="mt-2 rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1 text-[11px] text-slate-600 dark:text-slate-300 hover:border-violet-400">＋ Add item</button>
+                                className="mt-2 rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1 text-[11px] text-slate-600 dark:text-slate-300 hover:border-rz-mint">＋ Add item</button>
                         </div>
                     </div>
 
                     {/* phase donut */}
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Program Cost Share by Level (engine fixed proportions)</h2>
                         <div className="flex items-center gap-3">
                             <div className="h-36 w-36 shrink-0">

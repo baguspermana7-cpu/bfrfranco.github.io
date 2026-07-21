@@ -32,15 +32,15 @@ const useCfg = () => {
 function Head({ icon: Icon, title, sub, tone }: { icon: React.ElementType; title: string; sub: string; tone: string }) {
     return (
         <div className="flex items-center gap-3 mb-5">
-            <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${tone} flex items-center justify-center shadow-lg`}><Icon className="w-6 h-6 text-white" /></div>
+            <div className={`w-11 h-11 rounded-lg ${tone} flex items-center justify-center`}><Icon className="w-6 h-6" /></div>
             <div><h1 className="text-2xl font-bold text-slate-900 dark:text-white">{title}</h1><p className="text-sm text-slate-500 dark:text-slate-400">{sub}</p></div>
         </div>
     );
 }
 function Metric({ label, value, sub }: { label: string; value: string; sub?: string }) {
-    return <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 transition-all hover:-translate-y-0.5 hover:border-cyan-400/50 hover:bg-cyan-500/[0.05] hover:shadow-md hover:shadow-cyan-900/10"><div className="text-[10px] uppercase tracking-wide text-slate-500">{label}</div><div className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{value}</div>{sub && <div className="text-[10px] text-slate-500">{sub}</div>}</div>;
+    return <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 transition-colors hover:border-rz-info/50"><div className="text-[10px] uppercase tracking-wide text-slate-500">{label}</div><div className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{value}</div>{sub && <div className="text-[10px] text-slate-500">{sub}</div>}</div>;
 }
-function Card({ children }: { children: React.ReactNode }) { return <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">{children}</div>; }
+function Card({ children }: { children: React.ReactNode }) { return <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">{children}</div>; }
 function Loading() { return <div className="text-sm text-slate-500 p-8 text-center">Engine loading…</div>; }
 const money = (n: number) => n >= 1e6 ? `$${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `$${(n / 1e3).toFixed(0)}K` : `$${Math.round(n)}`;
 
@@ -193,7 +193,7 @@ export function TierDashboard() {
     const r = m.classify(scores);
     return (
         <div className="space-y-4">
-            <Head icon={ShieldCheck} title="Tier Classification" sub="DC-OS · models.tier (Uptime-style)" tone="from-indigo-500 to-blue-600" />
+            <Head icon={ShieldCheck} title="Tier Classification" sub="DC-OS · models.tier (Uptime-style)" tone="bg-rz-info/10 border border-rz-info/30 text-rz-info" />
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 <Metric label="Classified Tier" value={`Tier ${r.tier}`} sub={r.label.split('—')[1]?.trim()} />
                 <Metric label="Infra Score" value={`${r.score}/100`} sub={r.capped ? 'capped by redundancy' : 'weighted'} />
@@ -231,7 +231,7 @@ export function FireDashboard() {
     const halo = r.type === 'halocarbon';
     return (
         <div className="space-y-4">
-            <Head icon={Flame} title="Fire Suppression" sub="DC-OS · models.fire (NFPA 2001 / 72 / 855)" tone="from-rose-500 to-orange-600" />
+            <Head icon={Flame} title="Fire Suppression" sub="DC-OS · models.fire (NFPA 2001 / 72 / 855)" tone="bg-rz-alert/10 border border-rz-alert/30 text-rz-alert" />
             <div className="flex items-center gap-2 text-xs">
                 <span className="text-slate-500">Agent</span>
                 <select value={agent} onChange={(e) => setAgent(e.target.value)} className="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-slate-700 dark:text-slate-200">
@@ -293,7 +293,7 @@ function FireZonesSection({ volumeM3, agent }: { volumeM3: number; agent: string
                         <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                             <div className="text-[10px] uppercase tracking-wide text-slate-500">Fire System CAPEX</div>
                             <div className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">—</div>
-                            <button onClick={() => setActiveTab('capex')} className="text-[10px] font-medium text-violet-500 hover:text-violet-400">run the CAPEX Engine →</button>
+                            <button onClick={() => setActiveTab('capex')} className="text-[10px] font-medium text-rz-mint hover:text-rz-mint/80">run the CAPEX Engine →</button>
                         </div>
                     )}
                 <Metric label="Selected Agent" value={agent === 'novec1230' ? 'Novec 1230' : agent === 'fm200' ? 'FM-200' : 'IG-541'} sub={`shared capex: ${capexInputs.fireType}`} />
@@ -418,9 +418,9 @@ export function CduDashboard() {
     return (
         <div className="space-y-4">
             <div className="flex items-start justify-between gap-3">
-                <Head icon={Waves} title="CDU / Liquid Cooling" sub="DC-OS · models.cdu + models.cooling.deepSea + DATA.refrigerants" tone="from-cyan-500 to-blue-600" />
+                <Head icon={Waves} title="CDU / Liquid Cooling" sub="DC-OS · models.cdu + models.cooling.deepSea + DATA.refrigerants" tone="bg-rz-info/10 border border-rz-info/30 text-rz-info" />
                 <button onClick={exportPdf} disabled={busy}
-                    className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400 disabled:opacity-50">
+                    className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-rz-mint disabled:opacity-50">
                     <FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}
                 </button>
             </div>
@@ -485,7 +485,7 @@ export function CduDashboard() {
                 <div className="space-y-1.5">
                     {([
                         { lbl: 'Air (CRAC/CRAH)', pue: pueAir, tone: 'bg-slate-400' },
-                        { lbl: `Current (${inputs.coolingType})`, pue: pueCurrent, tone: 'bg-violet-500' },
+                        { lbl: `Current (${inputs.coolingType})`, pue: pueCurrent, tone: 'bg-rz-mint' },
                         { lbl: 'D2C Liquid', pue: pueLiquid, tone: 'bg-cyan-500' },
                     ]).map((row) => (
                         <div key={row.lbl} className="flex items-center gap-2 text-[11px]" title={`${row.lbl} PUE at Tier ${inputs.tierLevel}: ${row.pue} (engine pueMatrix)`}>
@@ -588,7 +588,7 @@ export function CduDashboard() {
                             <span className="text-slate-500">Safety <b>{refDb[refKey].safety}</b></span>
                             <span className="text-slate-500">COP idx <b className="tabular-nums">{refDb[refKey].copIndex}</b></span>
                             <span className="text-slate-500">CAPEX × <b className="tabular-nums">{refDb[refKey].capexMult}</b></span>
-                            <span className={`rounded px-1 py-0.5 text-[8.5px] font-semibold ${capexInputs.refrigerantType ? 'bg-violet-500/15 text-violet-500' : 'bg-emerald-500/15 text-emerald-500'}`}>
+                            <span className={`rounded px-1 py-0.5 text-[8.5px] font-semibold ${capexInputs.refrigerantType ? 'bg-rz-mint/15 text-rz-mint' : 'bg-emerald-500/15 text-emerald-500'}`}>
                                 {capexInputs.refrigerantType ? 'user' : `auto (${inputs.coolingType})`}
                             </span>
                         </div>
@@ -677,7 +677,7 @@ export function CduDashboard() {
                 <Card>
                     <p className="text-[11px] text-slate-500">
                         {!engineReadyCdu ? 'Engine is still loading — the marine section appears when ready. ' : ''}Deep Sea Water Cooling is <b>{capexInputs.deepSea ? 'enabled (waiting for engine)' : 'off'}</b> — enable it in
-                        <button onClick={() => useSimulationStore.getState().actions.setActiveTab('requirements' as never)} className="mx-1 text-violet-500 hover:text-violet-400">Requirements 1.6</button>
+                        <button onClick={() => useSimulationStore.getState().actions.setActiveTab('requirements' as never)} className="mx-1 text-rz-mint hover:text-rz-mint/80">Requirements 1.6</button>
                         or the CAPEX assumptions to unlock the advanced marine section (intake temp @ depth, seawater flow, pump energy, chiller-less PUE, marine capex/opex).
                     </p>
                 </Card>
@@ -700,11 +700,11 @@ const SP_COST_PRESETS = [
     { key: '+50', label: 'Screening +50%', mult: 1.5 },
 ] as const;
 const spSelectCls = (user: boolean) =>
-    `rounded-md border px-1.5 py-1 text-[11px] bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 ${user ? 'border-violet-400 dark:border-violet-500' : 'border-slate-200 dark:border-slate-700'}`;
+    `rounded-md border px-1.5 py-1 text-[11px] bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 ${user ? 'border-rz-mint/60' : 'border-slate-200 dark:border-slate-700'}`;
 
 function SpProvChip({ prov }: { prov: Provenance }) {
     if (prov === 'engine') return <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" title="Engine data (IEEE-493 typical)" />;
-    if (prov === 'user') return <span className="rounded px-1 py-px text-[9px] font-semibold bg-violet-500/15 text-violet-600 dark:text-violet-300" title="User override">user</span>;
+    if (prov === 'user') return <span className="rounded px-1 py-px text-[9px] font-semibold bg-rz-mint/15 text-rz-mint" title="User override">user</span>;
     return <span className="rounded px-1 py-px text-[9px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-300" title="Screening assumption — overridable">scr</span>;
 }
 
@@ -781,7 +781,7 @@ export function SparesDashboard() {
         <div className="space-y-4">
             <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
                 <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg"><Package className="w-6 h-6 text-white" /></div>
+                    <div className="w-11 h-11 rounded-lg bg-rz-data/10 border border-rz-data/30 flex items-center justify-center"><Package className="w-6 h-6 text-rz-data" /></div>
                     <div><h1 className="text-2xl font-bold text-slate-900 dark:text-white">Spares Optimization</h1><p className="text-sm text-slate-500 dark:text-slate-400">DC-OS · models.spares (newsvendor, per equipment class)</p></div>
                 </div>
                 <button onClick={onExport} disabled={busy} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 dark:bg-slate-700 hover:bg-cyan-700 text-white text-xs font-medium transition-colors disabled:opacity-60">
@@ -834,9 +834,9 @@ export function SparesDashboard() {
                                 <th className="py-1.5 pr-3 font-medium">Safety</th>
                                 <th className="py-1.5 pr-3 font-medium">Fill</th>
                                 <th className="py-1.5 pr-3 font-medium">Annual cost</th>
-                                <th className="py-1.5 pr-3 font-medium text-violet-600 dark:text-violet-400">Unit cost</th>
-                                <th className="py-1.5 pr-3 font-medium text-violet-600 dark:text-violet-400">Lead wk</th>
-                                <th className="py-1.5 font-medium text-violet-600 dark:text-violet-400">Fill target</th>
+                                <th className="py-1.5 pr-3 font-medium text-rz-mint">Unit cost</th>
+                                <th className="py-1.5 pr-3 font-medium text-rz-mint">Lead wk</th>
+                                <th className="py-1.5 font-medium text-rz-mint">Fill target</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -872,7 +872,7 @@ export function SparesDashboard() {
                                                 title={below ? `Fill ${(r.fillAchieved * 100).toFixed(1)}% < target ${r.fillTargetPct}% — click for measured levers (Q* / lead time) from the same spares adapter` : undefined}
                                                 onClick={below ? () => setSpDiag((d) => d?.kind === 'fill' && d.key === k ? null : { kind: 'fill', key: k }) : undefined}
                                             >{(r.fillAchieved * 100).toFixed(1)}%</span>
-                                            {r.usedPoissonMode && <span className="ml-1 rounded px-1 py-px text-[9px] font-semibold bg-violet-500/15 text-violet-600 dark:text-violet-300" title="Low-demand mover — Poisson CDF">Poisson</span>}
+                                            {r.usedPoissonMode && <span className="ml-1 rounded px-1 py-px text-[9px] font-semibold bg-rz-mint/15 text-rz-mint" title="Low-demand mover — Poisson CDF">Poisson</span>}
                                         </td>
                                         <td className="py-2 pr-3 tabular-nums text-slate-600 dark:text-slate-300">{money(r.annualCost)}</td>
                                         <td className="py-2 pr-3">
@@ -893,7 +893,7 @@ export function SparesDashboard() {
                                             {costSel === 'custom' && (
                                                 <input type="number" min={1} value={ovCost ?? r.unitCost}
                                                     onChange={(e) => patchOv(k, { unitCost: Math.max(1, Number(e.target.value) || 1) })}
-                                                    className="mt-1 w-24 rounded-md border border-violet-400 dark:border-violet-500 bg-white dark:bg-slate-800 px-1.5 py-1 text-[11px] tabular-nums text-slate-700 dark:text-slate-200" />
+                                                    className="mt-1 w-24 rounded-md border border-rz-mint/60 bg-white dark:bg-slate-800 px-1.5 py-1 text-[11px] tabular-nums text-slate-700 dark:text-slate-200" />
                                             )}
                                         </td>
                                         <td className="py-2 pr-3">
@@ -1035,7 +1035,7 @@ export function SparesDashboard() {
                         </div>
                     );
                 })()}
-                <p className="mt-2 text-[10px] text-slate-500"><span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1" />engine data (IEEE-493) · <span className="rounded px-1 py-px text-[9px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-300">scr</span> screening assumption · <span className="rounded px-1 py-px text-[9px] font-semibold bg-violet-500/15 text-violet-600 dark:text-violet-300">user</span> your override. Fleet from commissioning.equipScale ({bucket} density, {inputs.itLoad.toLocaleString()} kW IT).</p>
+                <p className="mt-2 text-[10px] text-slate-500"><span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1" />engine data (IEEE-493) · <span className="rounded px-1 py-px text-[9px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-300">scr</span> screening assumption · <span className="rounded px-1 py-px text-[9px] font-semibold bg-rz-mint/15 text-rz-mint">user</span> your override. Fleet from commissioning.equipScale ({bucket} density, {inputs.itLoad.toLocaleString()} kW IT).</p>
             </Card>
             <Card>
                 <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Critical ratio — CR = Cu / (Cu + Co)</h2>

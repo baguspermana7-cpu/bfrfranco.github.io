@@ -26,12 +26,12 @@ export function SiteCards({ sites, results, selectedId, onSelect }: {
                 const badge = isTop ? 'Recommended' : (r?.engine.grade === 'A' || r?.engine.grade === 'B') ? 'Good' : r?.engine.label ?? '—';
                 return (
                     <button key={s.id} onClick={() => onSelect(s.id)}
-                        className={`rounded-2xl border p-3 text-left transition-colors ${s.id === selectedId ? 'border-violet-500 bg-violet-600/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-violet-400/60'}`}>
+                        className={`rounded border p-3 text-left transition-colors ${s.id === selectedId ? 'border-rz-signal bg-rz-signal/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-rz-signal/60'}`}>
                         <div className="flex items-center gap-2">
                             <span className="flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold text-slate-900" style={{ background: SITE_COLORS[i] }}>{s.label}</span>
                             <span className="truncate text-xs font-semibold text-slate-900 dark:text-white">{s.name}</span>
                             {s.isExample && <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">EXAMPLE</span>}
-                            <span className={`ml-auto rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${isTop ? 'bg-emerald-500/15 text-emerald-500' : 'bg-slate-500/15 text-slate-400'}`}>{badge}</span>
+                            <span className={`ml-auto rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${isTop ? 'bg-rz-data/15 text-rz-data' : 'bg-slate-500/15 text-slate-400'}`}>{badge}</span>
                         </div>
                         <div className="mt-1.5 text-xl font-bold tabular-nums text-slate-900 dark:text-white">{r ? r.engine.score : '—'}<span className="text-xs text-slate-400">/100</span></div>
                         <div className="mt-1 flex flex-wrap gap-1 text-[9px] text-slate-500">
@@ -68,7 +68,7 @@ const DETAIL_TRACE: Record<string, string> = {
 };
 
 function Provenance({ source }: { source: PanelValue['source'] }) {
-    const color = source === 'site' ? 'bg-violet-500' : source === 'country' ? 'bg-cyan-500' : 'bg-slate-500';
+    const color = source === 'site' ? 'bg-rz-mint' : source === 'country' ? 'bg-cyan-500' : 'bg-slate-500';
     const title = source === 'site' ? 'site attribute' : source === 'country' ? 'country baseline' : 'not set';
     return <span title={title} className={`inline-block h-1.5 w-1.5 rounded-full ${color}`} />;
 }
@@ -81,16 +81,16 @@ export function SiteDetailPanels({ site }: { site: CandidateSite | null }) {
         <div>
             <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                 Detail Panels — Site {site.label} · {site.name}
-                <span className="ml-2 text-[9px] normal-case text-slate-400">● violet = site attribute · ● cyan = country baseline</span>
+                <span className="ml-2 text-[9px] normal-case text-slate-400">● mint = site attribute · ● cyan = country baseline</span>
             </h2>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {PANELS.map((p) => {
                     const rows = data[p.key].filter((r) => r.value !== '—').slice(0, 8);
                     const empty = data[p.key].length - rows.length;
                     return (
-                        <div key={p.key} className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                        <div key={p.key} className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                             <h3 className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                                <p.icon className="h-3.5 w-3.5 text-violet-500" /> {p.title}
+                                <p.icon className="h-3.5 w-3.5 text-rz-mint" /> {p.title}
                             </h3>
                             <div className="space-y-1">
                                 {rows.length === 0 && <p className="text-[10px] text-slate-400">No data — edit via Edit Criteria.</p>}
@@ -108,7 +108,7 @@ export function SiteDetailPanels({ site }: { site: CandidateSite | null }) {
                             </div>
                             {p.linkTab && (
                                 <button onClick={() => setActiveTab(p.linkTab as never)}
-                                    className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">{p.linkLabel} →</button>
+                                    className="mt-2 text-[10px] font-medium text-rz-mint hover:text-rz-mint/80">{p.linkLabel} →</button>
                             )}
                         </div>
                     );
@@ -126,12 +126,12 @@ export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSi
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
     if (!analyses) return null;
     const { grid, disaster, tax, talent, compliance } = analyses;
-    const card = 'rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3';
+    const card = 'rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3';
     const row = (label: string, value: string, title?: string, traceId?: string) => {
         const valueEl = <span className="font-medium tabular-nums text-slate-800 dark:text-slate-200">{value}</span>;
         return (
             <div key={label} className="flex items-center justify-between gap-2 text-[11px]" title={title ?? `${label}: ${value}`}>
-                <span className="flex items-center gap-1.5 text-slate-500"><span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" title="computed by the sibling engine" />{label}</span>
+                <span className="flex items-center gap-1.5 text-slate-500"><span className="inline-block h-1.5 w-1.5 rounded-full bg-rz-data" title="computed by the sibling engine" />{label}</span>
                 {traceId ? <TraceValue traceId={traceId}>{valueEl}</TraceValue> : valueEl}
             </div>
         );
@@ -140,13 +140,13 @@ export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSi
         <div>
             <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                 Integrated Analyses — Site {site.label} · computed per site by the tax / disaster / grid / talent / compliance engines
-                <span className="ml-2 text-[9px] normal-case text-emerald-500">● engine-computed</span>
+                <span className="ml-2 text-[9px] normal-case text-rz-data">● engine-computed</span>
             </h2>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 <div className={card}>
                     <h3 className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                         Grid Reliability
-                        {grid && <span className={`rounded px-1.5 py-0.5 text-[9px] font-bold ${grid.reliabilityGrade === 'A' ? 'bg-emerald-500/15 text-emerald-500' : grid.reliabilityGrade === 'B' ? 'bg-lime-500/15 text-lime-500' : 'bg-amber-500/15 text-amber-500'}`}>Grade {grid.reliabilityGrade}</span>}
+                        {grid && <span className={`rounded px-1.5 py-0.5 text-[9px] font-bold ${grid.reliabilityGrade === 'A' ? 'bg-rz-data/15 text-rz-data' : grid.reliabilityGrade === 'B' ? 'bg-lime-500/15 text-lime-500' : 'bg-amber-500/15 text-amber-500'}`}>Grade {grid.reliabilityGrade}</span>}
                     </h3>
                     {grid ? (
                         <div className="space-y-1">
@@ -158,12 +158,12 @@ export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSi
                         </div>
                     ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
                     <p className="mt-1 text-[9px] text-slate-400">Outage min/yr = blended engine model (brownout events + SAIDI-derived interruptions) — the SAIDI figure in Detail Panels is the raw country baseline, so the two differ by design.</p>
-                    <button onClick={() => setActiveTab('grid' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Grid deep-dive →</button>
+                    <button onClick={() => setActiveTab('grid' as never)} className="mt-2 text-[10px] font-medium text-rz-mint hover:text-rz-mint/80">Grid deep-dive →</button>
                 </div>
                 <div className={card}>
                     <h3 className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                         Disaster Risk
-                        {disaster && <span className={`rounded px-1.5 py-0.5 text-[9px] font-bold ${disaster.riskCategory === 'Low' ? 'bg-emerald-500/15 text-emerald-500' : disaster.riskCategory === 'Moderate' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{disaster.riskCategory}</span>}
+                        {disaster && <span className={`rounded px-1.5 py-0.5 text-[9px] font-bold ${disaster.riskCategory === 'Low' ? 'bg-rz-data/15 text-rz-data' : disaster.riskCategory === 'Moderate' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{disaster.riskCategory}</span>}
                     </h3>
                     {disaster ? (
                         <div className="space-y-1">
@@ -174,12 +174,12 @@ export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSi
                             {row('Revenue at risk', fm(disaster.revenueAtRisk), undefined, 'site.riskRevenueAtRisk')}
                         </div>
                     ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
-                    <button onClick={() => setActiveTab('disaster' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Risk deep-dive →</button>
+                    <button onClick={() => setActiveTab('disaster' as never)} className="mt-2 text-[10px] font-medium text-rz-mint hover:text-rz-mint/80">Risk deep-dive →</button>
                 </div>
                 <div className={card}>
                     <h3 className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                         Tax & Incentives
-                        {tax && <span className="rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-bold text-violet-400">rank #{tax.countryRanking}</span>}
+                        {tax && <span className="rounded bg-rz-mint/15 px-1.5 py-0.5 text-[9px] font-bold text-rz-mint">rank #{tax.countryRanking}</span>}
                     </h3>
                     {tax ? (
                         <div className="space-y-1">
@@ -190,12 +190,12 @@ export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSi
                             {row('IRR w/ incentives', `${tax.irrWithIncentives.toFixed(1)}%`, undefined, 'site.taxIrrWith')}
                         </div>
                     ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
-                    <button onClick={() => setActiveTab('tax' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Incentives deep-dive →</button>
+                    <button onClick={() => setActiveTab('tax' as never)} className="mt-2 text-[10px] font-medium text-rz-mint hover:text-rz-mint/80">Incentives deep-dive →</button>
                 </div>
                 <div className={card}>
                     <h3 className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                         Talent Availability
-                        {talent && <span className={`rounded px-1.5 py-0.5 text-[9px] font-bold ${talent.hiringDifficulty === 'Easy' ? 'bg-emerald-500/15 text-emerald-500' : talent.hiringDifficulty === 'Moderate' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{talent.hiringDifficulty}</span>}
+                        {talent && <span className={`rounded px-1.5 py-0.5 text-[9px] font-bold ${talent.hiringDifficulty === 'Easy' ? 'bg-rz-data/15 text-rz-data' : talent.hiringDifficulty === 'Moderate' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{talent.hiringDifficulty}</span>}
                     </h3>
                     {talent ? (
                         <div className="space-y-1">
@@ -206,7 +206,7 @@ export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSi
                             {row('Turnover rate', `${(talent.adjustedTurnoverRate * 100).toFixed(1)}%/yr`, undefined, 'site.talentTurnover')}
                         </div>
                     ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
-                    <button onClick={() => setActiveTab('talent' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Talent deep-dive →</button>
+                    <button onClick={() => setActiveTab('talent' as never)} className="mt-2 text-[10px] font-medium text-rz-mint hover:text-rz-mint/80">Talent deep-dive →</button>
                 </div>
                 <div className={card}>
                     <h3 className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-slate-500">
@@ -220,7 +220,7 @@ export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSi
                             {row('Annual cost', fm(compliance.totalAnnualCost), undefined, 'site.compAnnualCost')}
                         </div>
                     ) : <p className="text-[10px] text-slate-400">Engine loading…</p>}
-                    <button onClick={() => setActiveTab('compliance' as never)} className="mt-2 text-[10px] font-medium text-violet-500 hover:text-violet-400">Compliance deep-dive →</button>
+                    <button onClick={() => setActiveTab('compliance' as never)} className="mt-2 text-[10px] font-medium text-rz-mint hover:text-rz-mint/80">Compliance deep-dive →</button>
                 </div>
             </div>
         </div>

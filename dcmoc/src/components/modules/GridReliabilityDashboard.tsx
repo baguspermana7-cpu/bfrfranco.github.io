@@ -15,7 +15,7 @@ import {
 import { fmt, fmtMoney } from '@/lib/format';
 
 const gradeColors: Record<string, string> = {
-    A: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
+    A: 'text-rz-data bg-rz-data/10 border-rz-data/30',
     B: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30',
     C: 'text-amber-400 bg-amber-500/10 border-amber-500/30',
     D: 'text-orange-400 bg-orange-500/10 border-orange-500/30',
@@ -135,7 +135,7 @@ function computeGridDiag(result: GridReliabilityResult, grid: CountryProfile['gr
  *  honest drift warning when it does not (MaintenanceDashboard pattern). */
 const ParityChip = ({ ok }: { ok: boolean }) => (
     ok
-        ? <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">≡ engine</span>
+        ? <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-rz-data/10 text-rz-data">≡ engine</span>
         : <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">⚠ drift vs engine — runtime decomposition does not match, trust the KPI numbers</span>
 );
 
@@ -272,7 +272,7 @@ const GridReliabilityDashboard = () => {
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-2 mb-1">
-                            <Shield className="w-4 h-4 text-emerald-500" />
+                            <Shield className="w-4 h-4 text-rz-mint" />
                             <span className="text-xs text-slate-500 uppercase">Gen Capacity</span>
                             <Tooltip content="Seconds from power failure to generator reaching rated voltage and frequency. Typically 10-15s for diesel." />
                         </div>
@@ -296,7 +296,7 @@ const GridReliabilityDashboard = () => {
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-2 mb-1">
-                            <Battery className="w-4 h-4 text-purple-500" />
+                            <Battery className="w-4 h-4 text-rz-mint" />
                             <span className="text-xs text-slate-500 uppercase">BESS ROI</span>
                             <Tooltip content="Battery Energy Storage System payback period in years." />
                         </div>
@@ -503,7 +503,7 @@ const GridReliabilityDashboard = () => {
                                     {countryComparison.slice(0, 15).map((entry) => (
                                         <Cell
                                             key={entry.code}
-                                            fill={entry.code === selectedCountry.id ? '#06b6d4' : entry.score >= 80 ? '#10b981' : entry.score >= 50 ? '#f59e0b' : '#ef4444'}
+                                            fill={entry.code === selectedCountry.id ? '#06b6d4' : entry.score >= 80 ? '#00FF88' : entry.score >= 50 ? '#f59e0b' : '#ef4444'}
                                             opacity={entry.code === selectedCountry.id ? 1 : 0.6}
                                         />
                                     ))}

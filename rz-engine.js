@@ -5564,66 +5564,330 @@
                 { key: 'testing_cx',        label: 'Testing & Commissioning', categories: ['commissioning', 'testing'] },
                 { key: 'permits',           label: 'Permits & Approvals',  categories: ['permits'] }
             ],
-            /* per-discipline line items. driver ∈ gfaM2|itKw|racks|mw|protectedM3|coolingKw|lump.
-             * ratio × driver = qty; qty × unitRates[rateKey] = material; +laborPct labor. */
+            /* ── v2.5.5 (BOQ deepen) — 3-LEVEL takeoff: discipline → subsystem → component
+             * leaves. Each discipline is an ordered map of subsystemKey → { label, lines }.
+             * Every leaf keeps the flat shape { desc, spec, unit, driver, ratio, rateKey,
+             * laborPct, confidence, source }. driver ∈ the extended driver set returned by
+             * models.boq.drivers (gfaM2|itKw|racks|mw|protectedM3|coolingKw|floorSpaceM2|lump
+             * PLUS the param-conditional drivers rebarKgFactor/fuelTankM3/cleanAgentM3/
+             * upsPaths/genPaths/chillerPaths/feederPaths/cduUnits/crahUnits/pduCount/…).
+             * ratio × driver = qty; qty × unitRates[rateKey]×locMult = material; +laborPct
+             * labor. Confidence per line: high=near face value, med=range, low=rule-of-thumb.
+             * models.boq.generate reconciles Σ(all subsystem lines in a discipline) to the
+             * parametric category $ (SSOT) via ONE reconcileFactor per discipline. */
             takeoff: {
-                civil_structural: [
-                    { desc: 'Structural concrete (foundations, slabs, cores)', spec: 'C32/40 in-place', unit: 'm³', driver: 'gfaM2', ratio: 0.30, rateKey: 'concrete_m3', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' },
-                    { desc: 'Reinforcement steel', spec: 'rebar ~130 kg/m³ concrete', unit: 't', driver: 'gfaM2', ratio: 0.30 * 0.130, rateKey: 'rebar_t', laborPct: 0.30, confidence: 'med', source: 'boq.takeoff' },
-                    { desc: 'Structural steel (frame, platforms)', spec: 'fabricated + erected', unit: 't', driver: 'gfaM2', ratio: 0.040, rateKey: 'steel_t', laborPct: 0.35, confidence: 'med', source: 'boq.takeoff' },
-                    { desc: 'Raised access floor', spec: 'heavy-duty, ~50 sqft/rack', unit: 'm²', driver: 'racks', ratio: 4.6, rateKey: 'raisedFloor_m2', laborPct: 0.25, confidence: 'med', source: 'boq.takeoff' }
-                ],
-                electrical: [
-                    { desc: 'LV power cable', spec: 'Cu XLPE ~500 kcmil equiv', unit: 'm', driver: 'itKw', ratio: 8, rateKey: 'lvCable_m', laborPct: 0.40, confidence: 'low', source: 'boq.takeoff' },
-                    { desc: 'MV cable', spec: '15 kV Cu 500 kcmil', unit: 'm', driver: 'mw', ratio: 600, rateKey: 'mvCable_m', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' },
-                    { desc: 'Cable tray / ladder', spec: 'GI, ≤40% fill', unit: 'm', driver: 'itKw', ratio: 0.15, rateKey: 'cableTray_m', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' },
-                    { desc: 'Earthing / grounding conductor', spec: 'Cu, IEEE 80/142 ring', unit: 't', driver: 'mw', ratio: 0.35, rateKey: 'groundingCu_t', laborPct: 0.30, confidence: 'low', source: 'boq.takeoff' }
-                ],
-                mechanical_cooling: [
-                    { desc: 'Chilled / condenser-water pipe', spec: 'welded steel, insulated', unit: 'm', driver: 'mw', ratio: 40, rateKey: 'cwPipe_m', laborPct: 0.45, confidence: 'low', source: 'boq.takeoff' },
-                    { desc: 'Coolant / glycol charge', spec: 'closed-loop CW (~8 L/kW cooling)', unit: 'L', driver: 'coolingKw', ratio: 8, rateKey: 'glycol_L', laborPct: 0.05, confidence: 'med', source: 'boq.takeoff' },
-                    { desc: 'Ductwork (sheet metal)', spec: 'galv. 24ga ~5 kg/m²', unit: 't', driver: 'mw', ratio: 3.0, rateKey: 'ductwork_t', laborPct: 0.40, confidence: 'low', source: 'boq.takeoff' }
-                ],
-                fire: [
-                    { desc: 'Clean-agent charge', spec: 'Novec 1230 ~0.55 kg/m³ protected', unit: 'kg', driver: 'protectedM3', ratio: 0.55, rateKey: 'cleanAgent_kg', laborPct: 0.20, confidence: 'high', source: 'boq.takeoff' },
-                    { desc: 'Detection (VESDA/smoke/heat) + pipework', spec: 'per protected volume', unit: 'm³', driver: 'protectedM3', ratio: 1.0, rateKey: 'fireDetect_m3', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
-                ],
-                elv_ict: [
-                    { desc: 'Structured cabling + containment', spec: 'OM4/Cat6A backbone', unit: 'rack', driver: 'racks', ratio: 1, rateKey: 'ictPerRack', laborPct: 0.40, confidence: 'low', source: 'boq.takeoff' },
-                    { desc: 'BMS / DCIM points + head-end', spec: 'per MW monitored', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'bmsPerMw', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
-                ],
-                security: [
-                    { desc: 'CCTV / ACS / intrusion', spec: 'per rack + perimeter', unit: 'rack', driver: 'racks', ratio: 1, rateKey: 'securityPerRack', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
-                ],
-                testing_cx: [
-                    { desc: 'Commissioning agent + IST/IFC/load-bank', spec: 'Cx labor', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'cxPerMw', laborPct: 0.85, confidence: 'low', source: 'boq.takeoff' }
-                ],
-                permits: [
-                    { desc: 'Permits, approvals, authority fees', spec: 'jurisdiction fees', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'permitPerMw', laborPct: 0.10, confidence: 'low', source: 'boq.takeoff' }
-                ]
+                civil_structural: {
+                    substructure: { label: 'Substructure & Foundations', lines: [
+                        { desc: 'Site clearance + bulk earthworks', spec: 'cut/fill, compaction', unit: 'm²', driver: 'gfaM2', ratio: 1.2, rateKey: 'earthworks_m2', laborPct: 0.55, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'Piling / ground improvement', spec: 'bored/CFA pile equiv', unit: 'm', driver: 'gfaM2', ratio: 0.35, rateKey: 'piling_m', laborPct: 0.45, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'Foundation & ground-slab concrete', spec: 'C32/40 in-place', unit: 'm³', driver: 'gfaM2', ratio: 0.14, rateKey: 'concrete_m3', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'Foundation reinforcement (seismic-scaled)', spec: 'rebar, zone-factored', unit: 't', driver: 'rebarKgFactor', ratio: 0.14 * 0.130, rateKey: 'rebar_t', laborPct: 0.30, confidence: 'med', source: 'boq.takeoff' }
+                    ] },
+                    superstructure: { label: 'Superstructure & Frame', lines: [
+                        { desc: 'Suspended slab / core concrete', spec: 'C32/40', unit: 'm³', driver: 'gfaM2', ratio: 0.16, rateKey: 'concrete_m3', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'Superstructure reinforcement (seismic-scaled)', spec: 'rebar ~130 kg/m³, zone-factored', unit: 't', driver: 'rebarKgFactor', ratio: 0.16 * 0.130, rateKey: 'rebar_t', laborPct: 0.30, confidence: 'med', source: 'boq.takeoff' },
+                        { desc: 'Structural steel frame + platforms', spec: 'fabricated + erected', unit: 't', driver: 'gfaM2', ratio: 0.040, rateKey: 'steel_t', laborPct: 0.35, confidence: 'med', source: 'boq.takeoff' },
+                        { desc: 'Seismic bracing / dampers', spec: 'lateral system, zone-factored', unit: 't', driver: 'seismicBraceT', ratio: 0.010, rateKey: 'steel_t', laborPct: 0.40, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    envelope: { label: 'Building Envelope', lines: [
+                        { desc: 'External wall / cladding system', spec: 'insulated metal panel', unit: 'm²', driver: 'gfaM2', ratio: 0.55, rateKey: 'cladding_m2', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'Roofing + waterproofing', spec: 'single-ply membrane', unit: 'm²', driver: 'gfaM2', ratio: 0.42, rateKey: 'roofing_m2', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'External doors, louvres, dampers', spec: 'weather + fire-rated', unit: 'm²', driver: 'gfaM2', ratio: 0.02, rateKey: 'doorLouvre_m2', laborPct: 0.30, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    internal_fitout: { label: 'Internal Fit-out', lines: [
+                        { desc: 'Raised access floor', spec: 'heavy-duty, ~4.6 m²/rack', unit: 'm²', driver: 'racks', ratio: 4.6, rateKey: 'raisedFloor_m2', laborPct: 0.25, confidence: 'med', source: 'boq.takeoff' },
+                        { desc: 'Partitions, fire-rated walls, doors', spec: '2-hr rated', unit: 'm²', driver: 'gfaM2', ratio: 0.35, rateKey: 'partition_m2', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'Ceilings, finishes, sealing', spec: 'white-space grade', unit: 'm²', driver: 'gfaM2', ratio: 0.60, rateKey: 'finishes_m2', laborPct: 0.30, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    external_works: { label: 'External Works', lines: [
+                        { desc: 'Roads, hardstanding, parking', spec: 'flexible pavement', unit: 'm²', driver: 'gfaM2', ratio: 0.45, rateKey: 'paving_m2', laborPct: 0.45, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'Perimeter fencing + gates', spec: 'security-grade', unit: 'm', driver: 'gfaM2', ratio: 0.06, rateKey: 'fencing_m', laborPct: 0.40, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'Site drainage + attenuation', spec: 'SuDS/stormwater', unit: 'm', driver: 'gfaM2', ratio: 0.10, rateKey: 'drainage_m', laborPct: 0.45, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    plinths: { label: 'Equipment Plinths & Bunds', lines: [
+                        { desc: 'Genset / transformer plinths', spec: 'reinforced pad', unit: 'm³', driver: 'mw', ratio: 1.4, rateKey: 'concrete_m3', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'Fuel tank bund / containment', spec: '110% secondary containment', unit: 'm³', driver: 'fuelTankM3', ratio: 1.1, rateKey: 'concrete_m3', laborPct: 0.40, confidence: 'med', source: 'boq.takeoff' }
+                    ] }
+                },
+                electrical: {
+                    utility_mv: { label: 'Utility Intake & MV', lines: [
+                        { desc: 'MV switchgear (incomer, RMU)', spec: '≤36 kV metal-clad', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'mvSwgr_perMw', laborPct: 0.20, confidence: 'med', source: 'boq.takeoff' },
+                        { desc: 'MV/LV transformers', spec: 'cast-resin/oil, path-scaled', unit: 'MVA', driver: 'txMva', ratio: 1, rateKey: 'transformer_mva', laborPct: 0.15, confidence: 'med', source: 'boq.takeoff' },
+                        { desc: 'MV cable', spec: '15 kV Cu 500 kcmil', unit: 'm', driver: 'mw', ratio: 600, rateKey: 'mvCable_m', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    lv_distribution: { label: 'LV Distribution', lines: [
+                        { desc: 'LV switchboards / panelboards', spec: '415/480 V, path-scaled', unit: 'MW', driver: 'feederPaths', ratio: 1, rateKey: 'lvSwbd_perMw', laborPct: 0.25, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'Busway / busduct risers', spec: 'sandwich busway', unit: 'm', driver: 'mw', ratio: 120, rateKey: 'busway_m', laborPct: 0.30, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'PDU / RPP units', spec: '300 kW, rack-scaled', unit: 'ea', driver: 'pduCount', ratio: 1, rateKey: 'pdu_ea', laborPct: 0.25, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    ups_system: { label: 'UPS & Energy Storage', lines: [
+                        { desc: 'UPS modules', spec: '500 kW modular, path-scaled', unit: 'ea', driver: 'upsPaths', ratio: 1, rateKey: 'upsModule_ea', laborPct: 0.15, confidence: 'med', source: 'boq.takeoff' },
+                        { desc: 'Battery strings (Li-ion/VRLA)', spec: 'per UPS module, tech-scaled', unit: 'ea', driver: 'upsBatt', ratio: 1, rateKey: 'battString_ea', laborPct: 0.15, confidence: 'med', source: 'boq.takeoff' },
+                        { desc: 'Static transfer switches', spec: 'STS per path', unit: 'ea', driver: 'stsCount', ratio: 1, rateKey: 'sts_ea', laborPct: 0.20, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    standby_gen: { label: 'Standby Generation & Fuel', lines: [
+                        { desc: 'Standby gensets', spec: '2.5 MW, path-scaled', unit: 'ea', driver: 'genPaths', ratio: 1, rateKey: 'genset_ea', laborPct: 0.20, confidence: 'med', source: 'boq.takeoff' },
+                        { desc: 'Fuel storage tanks + polishing', spec: 'bulk tank, hours-scaled', unit: 'm³', driver: 'fuelTankM3', ratio: 1, rateKey: 'fuelTank_m3', laborPct: 0.25, confidence: 'med', source: 'boq.takeoff' },
+                        { desc: 'Exhaust, silencers, acoustic', spec: 'per genset', unit: 'ea', driver: 'genPaths', ratio: 1, rateKey: 'genExhaust_ea', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    epms: { label: 'EPMS / Power Monitoring', lines: [
+                        { desc: 'EPMS meters + head-end', spec: 'per MW monitored', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'epms_perMw', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    earthing_lps: { label: 'Earthing & Lightning Protection', lines: [
+                        { desc: 'Earthing / grounding conductor', spec: 'Cu, IEEE 80/142 ring', unit: 't', driver: 'mw', ratio: 0.35, rateKey: 'groundingCu_t', laborPct: 0.30, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'Lightning protection + SPD', spec: 'air terminals + down-conductors', unit: 'm²', driver: 'gfaM2', ratio: 0.05, rateKey: 'lps_m2', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    containment: { label: 'Power Cable Containment', lines: [
+                        { desc: 'Cable tray / ladder (power)', spec: 'GI, ≤40% fill', unit: 'm', driver: 'itKw', ratio: 0.15, rateKey: 'cableTray_m', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    cabling: { label: 'Power Cabling', lines: [
+                        { desc: 'LV power cable', spec: 'Cu XLPE ~500 kcmil equiv', unit: 'm', driver: 'itKw', ratio: 8, rateKey: 'lvCable_m', laborPct: 0.40, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    small_power_lighting: { label: 'Small Power & Lighting', lines: [
+                        { desc: 'Lighting + emergency luminaires', spec: 'LED, per m² GFA', unit: 'm²', driver: 'gfaM2', ratio: 1, rateKey: 'lighting_m2', laborPct: 0.40, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'Small power / general services', spec: 'per m² GFA', unit: 'm²', driver: 'gfaM2', ratio: 1, rateKey: 'smallPower_m2', laborPct: 0.40, confidence: 'low', source: 'boq.takeoff' }
+                    ] }
+                },
+                mechanical_cooling: {
+                    heat_rejection: { label: 'Heat Rejection', lines: [
+                        { desc: 'Chillers / dry-coolers', spec: '1.4 MW, path-scaled', unit: 'ea', driver: 'chillerPaths', ratio: 1, rateKey: 'chiller_ea', laborPct: 0.20, confidence: 'med', source: 'boq.takeoff' },
+                        { desc: 'Cooling towers / adiabatic', spec: 'per MW rejected', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'coolTower_perMw', laborPct: 0.30, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    cdu_dlc: { label: 'CDU / Direct Liquid Cooling', lines: [
+                        { desc: 'Coolant Distribution Units', spec: '700 kW DLC, split by cooling type', unit: 'ea', driver: 'cduUnits', ratio: 1, rateKey: 'cdu_ea', laborPct: 0.25, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'In-rack manifolds + quick-disconnects', spec: 'per DLC rack', unit: 'rack', driver: 'dlcRacks', ratio: 1, rateKey: 'manifold_rack', laborPct: 0.30, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    air_handling: { label: 'Air Handling', lines: [
+                        { desc: 'CRAH / CRAC units', spec: '150 kW, split by cooling type', unit: 'ea', driver: 'crahUnits', ratio: 1, rateKey: 'crah_ea', laborPct: 0.25, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'Ductwork (sheet metal)', spec: 'galv. 24ga ~5 kg/m²', unit: 't', driver: 'mw', ratio: 3.0, rateKey: 'ductwork_t', laborPct: 0.40, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    pumps: { label: 'Pumps & Prime Movers', lines: [
+                        { desc: 'CW/CHW circulation pumps', spec: 'end-suction, N+1', unit: 'ea', driver: 'chillerPaths', ratio: 2, rateKey: 'pump_ea', laborPct: 0.30, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    pipework: { label: 'Pipework', lines: [
+                        { desc: 'Chilled / condenser-water pipe', spec: 'welded steel', unit: 'm', driver: 'mw', ratio: 40, rateKey: 'cwPipe_m', laborPct: 0.45, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'Coolant / glycol charge', spec: 'closed-loop (~8 L/kW cooling)', unit: 'L', driver: 'coolingKw', ratio: 8, rateKey: 'glycol_L', laborPct: 0.05, confidence: 'med', source: 'boq.takeoff' }
+                    ] },
+                    valves: { label: 'Valves & Specialties', lines: [
+                        { desc: 'Isolation / control valves + BFVs', spec: 'per m of pipe', unit: 'ea', driver: 'mw', ratio: 6, rateKey: 'valve_ea', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    water_treatment: { label: 'Water Treatment', lines: [
+                        { desc: 'Filtration / dosing / side-stream', spec: 'per MW cooling', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'waterTreat_perMw', laborPct: 0.30, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    humidity: { label: 'Humidity Control', lines: [
+                        { desc: 'Humidifiers / dehumidification', spec: 'per m² white space', unit: 'm²', driver: 'floorSpaceM2', ratio: 1, rateKey: 'humidity_m2', laborPct: 0.30, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    bms_field: { label: 'BMS Field Devices', lines: [
+                        { desc: 'BMS sensors, actuators, field panels', spec: 'per MW controlled', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'bmsField_perMw', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    insulation: { label: 'Thermal Insulation', lines: [
+                        { desc: 'Pipe + duct insulation', spec: 'closed-cell, per m of pipe', unit: 'm', driver: 'mw', ratio: 40, rateKey: 'insulation_m', laborPct: 0.45, confidence: 'low', source: 'boq.takeoff' }
+                    ] }
+                },
+                fire: {
+                    detection: { label: 'Detection & Aspiration', lines: [
+                        { desc: 'VESDA / aspirating smoke detection', spec: 'per protected volume', unit: 'm³', driver: 'protectedM3', ratio: 1.0, rateKey: 'fireDetect_m3', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'Addressable smoke/heat + FACP', spec: 'per m² GFA', unit: 'm²', driver: 'gfaM2', ratio: 1, rateKey: 'fireDetPoint_m2', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    clean_agent: { label: 'Clean-Agent Suppression', lines: [
+                        { desc: 'Clean-agent charge', spec: 'Novec/FM-200, fireType-scaled', unit: 'kg', driver: 'cleanAgentKg', ratio: 1, rateKey: 'cleanAgent_kg', laborPct: 0.20, confidence: 'high', source: 'boq.takeoff' },
+                        { desc: 'Cylinders, nozzles, discharge pipe', spec: 'per protected volume', unit: 'm³', driver: 'cleanAgentM3', ratio: 1, rateKey: 'cleanAgentKit_m3', laborPct: 0.35, confidence: 'med', source: 'boq.takeoff' }
+                    ] },
+                    sprinkler_preaction: { label: 'Sprinkler / Pre-action', lines: [
+                        { desc: 'Pre-action sprinkler pipe + heads', spec: 'double-interlock, fireType-scaled', unit: 'm²', driver: 'sprinklerM2', ratio: 1, rateKey: 'sprinkler_m2', laborPct: 0.40, confidence: 'med', source: 'boq.takeoff' }
+                    ] },
+                    fire_pumps: { label: 'Fire Pumps & Water', lines: [
+                        { desc: 'Fire pump + jockey + tank', spec: 'NFPA 20, per m² GFA', unit: 'm²', driver: 'gfaM2', ratio: 1, rateKey: 'firePump_m2', laborPct: 0.30, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    alarm: { label: 'Alarm & C&E', lines: [
+                        { desc: 'Alarm devices + cause-and-effect', spec: 'per m² GFA', unit: 'm²', driver: 'gfaM2', ratio: 1, rateKey: 'fireAlarm_m2', laborPct: 0.40, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    passive: { label: 'Passive Fire Protection', lines: [
+                        { desc: 'Fire-stopping, dampers, intumescent', spec: 'per m² GFA', unit: 'm²', driver: 'gfaM2', ratio: 1, rateKey: 'passiveFire_m2', laborPct: 0.45, confidence: 'low', source: 'boq.takeoff' }
+                    ] }
+                },
+                elv_ict: {
+                    structured_cabling: { label: 'Structured Cabling', lines: [
+                        { desc: 'Structured cabling + patching', spec: 'OM4/Cat6A backbone', unit: 'rack', driver: 'racks', ratio: 1, rateKey: 'ictPerRack', laborPct: 0.40, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    dcim: { label: 'DCIM', lines: [
+                        { desc: 'DCIM software + gateways', spec: 'per MW monitored', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'dcim_perMw', laborPct: 0.30, confidence: 'low', source: 'boq.takeoff' },
+                        { desc: 'BMS / DCIM head-end integration', spec: 'per MW', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'bmsPerMw', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    network_oob: { label: 'Out-of-Band Network', lines: [
+                        { desc: 'OOB switches + console servers', spec: 'per rack', unit: 'rack', driver: 'racks', ratio: 1, rateKey: 'oobPerRack', laborPct: 0.30, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    mmr_carrier: { label: 'MMR & Carrier Entry', lines: [
+                        { desc: 'Meet-me-room + carrier fibre entry', spec: 'per MW', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'mmr_perMw', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    av_pa: { label: 'AV & PA', lines: [
+                        { desc: 'Public-address + AV / signage', spec: 'per m² GFA', unit: 'm²', driver: 'gfaM2', ratio: 1, rateKey: 'avpa_m2', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    containment: { label: 'ELV Containment', lines: [
+                        { desc: 'ELV cable tray / basket', spec: 'segregated from power', unit: 'm', driver: 'itKw', ratio: 0.10, rateKey: 'elvTray_m', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] }
+                },
+                security: {
+                    access_control: { label: 'Access Control', lines: [
+                        { desc: 'ACS readers, controllers, doors', spec: 'multi-factor, per rack + perimeter', unit: 'rack', driver: 'racks', ratio: 1, rateKey: 'acs_perRack', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    cctv: { label: 'CCTV / VMS', lines: [
+                        { desc: 'IP cameras + VMS + storage', spec: 'per rack + perimeter', unit: 'rack', driver: 'racks', ratio: 1, rateKey: 'cctv_perRack', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    intrusion: { label: 'Intrusion Detection', lines: [
+                        { desc: 'Intrusion sensors + monitoring', spec: 'per m² GFA', unit: 'm²', driver: 'gfaM2', ratio: 1, rateKey: 'intrusion_m2', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    perimeter: { label: 'Perimeter Security', lines: [
+                        { desc: 'Fence detection, barriers, bollards', spec: 'per m perimeter', unit: 'm', driver: 'gfaM2', ratio: 0.06, rateKey: 'perimeterSec_m', laborPct: 0.40, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    soc: { label: 'Security Operations Centre', lines: [
+                        { desc: 'SOC / PSIM integration + workstations', spec: 'per MW', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'soc_perMw', laborPct: 0.35, confidence: 'low', source: 'boq.takeoff' }
+                    ] }
+                },
+                testing_cx: {
+                    l1_fwt: { label: 'L1 — Factory Witness Test', lines: [
+                        { desc: 'FWT / FAT witnessing', spec: 'per MW', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'cxL1_perMw', laborPct: 0.90, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    l2_prefunc: { label: 'L2 — Pre-functional', lines: [
+                        { desc: 'Component verification / pre-functional', spec: 'per MW', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'cxL2_perMw', laborPct: 0.90, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    l3_functional: { label: 'L3 — Functional', lines: [
+                        { desc: 'Functional performance testing', spec: 'per MW', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'cxL3_perMw', laborPct: 0.90, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    l4_ist: { label: 'L4 — Integrated Systems Test', lines: [
+                        { desc: 'IST / black-building / failover', spec: 'per MW', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'cxL4_perMw', laborPct: 0.90, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    l5_loadbank: { label: 'L5 — Load-bank & Thermal', lines: [
+                        { desc: 'Load-bank hire + thermal/IST run', spec: 'per MW', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'cxL5_perMw', laborPct: 0.80, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    cxa: { label: 'CxA & Documentation', lines: [
+                        { desc: 'Commissioning authority + docs', spec: 'per MW', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'cxa_perMw', laborPct: 0.95, confidence: 'low', source: 'boq.takeoff' }
+                    ] }
+                },
+                permits: {
+                    design_fees: { label: 'Design & Engineering Fees', lines: [
+                        { desc: 'A&E design fees', spec: 'per MW', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'designFee_perMw', laborPct: 0.95, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    pm: { label: 'Project / Programme Management', lines: [
+                        { desc: 'PM + cost management', spec: 'per MW', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'pm_perMw', laborPct: 0.95, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    prelims: { label: 'Preliminaries & Site Setup', lines: [
+                        { desc: 'Site establishment, welfare, plant', spec: 'per MW', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'prelims_perMw', laborPct: 0.55, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    insurance: { label: 'Insurance & Bonds', lines: [
+                        { desc: 'CAR / bonds / warranties', spec: 'per MW', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'insurance_perMw', laborPct: 0.05, confidence: 'low', source: 'boq.takeoff' }
+                    ] },
+                    permit_fees: { label: 'Permit & Authority Fees', lines: [
+                        { desc: 'Building/env/fire/utility permit fees', spec: 'per MW', unit: 'MW', driver: 'mw', ratio: 1, rateKey: 'permitFee_perMw', laborPct: 0.10, confidence: 'low', source: 'boq.takeoff' }
+                    ] }
+                }
+            },
+            /* Small sourced multiplier tables the param-conditional drivers read. Screening. */
+            paramFactors: {
+                seismicRebarMult: { zone0: 0.85, zone1: 1.0, zone2: 1.15, zone3: 1.35, zone4: 1.6 },  /* extra rebar/bracing by seismic zone (ASCE 7-22 Sds bands) */
+                seismicBraceMult: { zone0: 0.4, zone1: 1.0, zone2: 1.5, zone3: 2.2, zone4: 3.0 },       /* lateral bracing tonnage scale by zone */
+                fuelTankM3PerMwHour: 0.28,   /* diesel bulk-store m³ per MW-hour of runtime (≈235 g/kWh × ~0.85 kg/L, +ullage) */
+                cleanAgentKgPerM3: { novec: 0.55, fm200: 0.36, inergen: 0.30, n2: 0.30, water: 0 },     /* agent design conc. by type (NFPA 2001 / 3M/Chemours TDS) */
+                cleanAgentKitM3Frac: { novec: 1.0, fm200: 1.0, inergen: 1.0, n2: 1.0, water: 0 },       /* hardware present only for gaseous systems */
+                sprinklerFrac: { novec: 0, fm200: 0, inergen: 0, n2: 0, water: 1 },                     /* pre-action sprinkler present when fireType=water */
+                redundancyPathMult: { n: 1.0, n1: 1.15, '2n': 2.0, '2n1': 2.15 },                        /* parallel-path multiplier for UPS/genset/chiller/feeder (Uptime Tier) */
+                upsBattPerModule: { standalone: 1, modular: 1, distributed: 1, rotary: 0 },              /* battery strings per UPS module (rotary/flywheel carries none) */
+                cduFrac: { air: 0, inrow: 0, rdhx: 0.4, liquid: 1.0, immersion_1p: 1.0, immersion_2p: 1.0, microfluidic: 1.0, dlc: 1.0, immersion: 1.0 },  /* CDU vs CRAH split by cooling type */
+                pduPerRackType: { standard: 0.08, medium: 0.10, high: 0.14, ai: 0.20 }                  /* PDU/RPP count per rack by rack density (higher density = more feeds) */
             },
             /* US 2025 baseline material+install $/unit; regionalize via locMult. Placeholder
              * unitRates for aggregate line items (ict/bms/security/cx/permits/fireDetect) are
              * anchors the reconcileFactor scales to the category $ — their absolute value is
              * indicative, the category total is authoritative. */
             unitRates: {
+                /* ── civil_structural ── */
+                earthworks_m2:  { usd: 45,   confidence: 'low',  source: 'boq.unitRates' },
+                piling_m:       { usd: 130,  confidence: 'low',  source: 'boq.unitRates' },
                 concrete_m3:    { usd: 320,  confidence: 'med',  source: 'boq.unitRates' },
                 rebar_t:        { usd: 2100, confidence: 'med',  source: 'boq.unitRates' },
                 steel_t:        { usd: 3300, confidence: 'med',  source: 'boq.unitRates' },
+                cladding_m2:    { usd: 220,  confidence: 'low',  source: 'boq.unitRates' },
+                roofing_m2:     { usd: 130,  confidence: 'low',  source: 'boq.unitRates' },
+                doorLouvre_m2:  { usd: 900,  confidence: 'low',  source: 'boq.unitRates' },
                 raisedFloor_m2: { usd: 270,  confidence: 'med',  source: 'boq.unitRates' },
-                lvCable_m:      { usd: 45,   confidence: 'low',  source: 'boq.unitRates' },
+                partition_m2:   { usd: 110,  confidence: 'low',  source: 'boq.unitRates' },
+                finishes_m2:    { usd: 85,   confidence: 'low',  source: 'boq.unitRates' },
+                paving_m2:      { usd: 70,   confidence: 'low',  source: 'boq.unitRates' },
+                fencing_m:      { usd: 320,  confidence: 'low',  source: 'boq.unitRates' },
+                drainage_m:     { usd: 180,  confidence: 'low',  source: 'boq.unitRates' },
+                /* ── electrical ── */
+                mvSwgr_perMw:   { usd: 120000,confidence: 'med', source: 'boq.unitRates' },
+                transformer_mva:{ usd: 55000, confidence: 'med', source: 'boq.unitRates' },
                 mvCable_m:      { usd: 140,  confidence: 'low',  source: 'boq.unitRates' },
-                cableTray_m:    { usd: 65,   confidence: 'low',  source: 'boq.unitRates' },
+                lvSwbd_perMw:   { usd: 90000, confidence: 'low', source: 'boq.unitRates' },
+                busway_m:       { usd: 600,  confidence: 'low',  source: 'boq.unitRates' },
+                pdu_ea:         { usd: 42000, confidence: 'low', source: 'boq.unitRates' },
+                upsModule_ea:   { usd: 180000,confidence: 'med', source: 'boq.unitRates' },
+                battString_ea:  { usd: 55000, confidence: 'med', source: 'boq.unitRates' },
+                sts_ea:         { usd: 28000, confidence: 'low', source: 'boq.unitRates' },
+                genset_ea:      { usd: 850000,confidence: 'med', source: 'boq.unitRates' },
+                fuelTank_m3:    { usd: 2600, confidence: 'med',  source: 'boq.unitRates' },
+                genExhaust_ea:  { usd: 45000, confidence: 'low', source: 'boq.unitRates' },
+                epms_perMw:     { usd: 45000, confidence: 'low', source: 'boq.unitRates' },
                 groundingCu_t:  { usd: 15000,confidence: 'low',  source: 'boq.unitRates' },
+                lps_m2:         { usd: 950,  confidence: 'low',  source: 'boq.unitRates' },
+                cableTray_m:    { usd: 65,   confidence: 'low',  source: 'boq.unitRates' },
+                lvCable_m:      { usd: 45,   confidence: 'low',  source: 'boq.unitRates' },
+                lighting_m2:    { usd: 42,   confidence: 'low',  source: 'boq.unitRates' },
+                smallPower_m2:  { usd: 30,   confidence: 'low',  source: 'boq.unitRates' },
+                /* ── mechanical_cooling ── */
+                chiller_ea:     { usd: 420000,confidence: 'med', source: 'boq.unitRates' },
+                coolTower_perMw:{ usd: 55000, confidence: 'low', source: 'boq.unitRates' },
+                cdu_ea:         { usd: 130000,confidence: 'med', source: 'boq.unitRates' },
+                manifold_rack:  { usd: 6500, confidence: 'low',  source: 'boq.unitRates' },
+                crah_ea:        { usd: 45000, confidence: 'low', source: 'boq.unitRates' },
+                ductwork_t:     { usd: 6000, confidence: 'low',  source: 'boq.unitRates' },
+                pump_ea:        { usd: 32000, confidence: 'low', source: 'boq.unitRates' },
                 cwPipe_m:       { usd: 40,   confidence: 'low',  source: 'boq.unitRates' },
                 glycol_L:       { usd: 6,    confidence: 'low',  source: 'boq.unitRates' },
-                ductwork_t:     { usd: 6000, confidence: 'low',  source: 'boq.unitRates' },
-                cleanAgent_kg:  { usd: 55,   confidence: 'med',  source: 'boq.unitRates' },
+                valve_ea:       { usd: 2200, confidence: 'low',  source: 'boq.unitRates' },
+                waterTreat_perMw:{ usd: 35000,confidence: 'low', source: 'boq.unitRates' },
+                humidity_m2:    { usd: 55,   confidence: 'low',  source: 'boq.unitRates' },
+                bmsField_perMw: { usd: 90000, confidence: 'low', source: 'boq.unitRates' },
+                insulation_m:   { usd: 55,   confidence: 'low',  source: 'boq.unitRates' },
+                /* ── fire ── */
                 fireDetect_m3:  { usd: 25,   confidence: 'low',  source: 'boq.unitRates' },
+                fireDetPoint_m2:{ usd: 38,   confidence: 'low',  source: 'boq.unitRates' },
+                cleanAgent_kg:  { usd: 55,   confidence: 'med',  source: 'boq.unitRates' },
+                cleanAgentKit_m3:{ usd: 22,  confidence: 'med',  source: 'boq.unitRates' },
+                sprinkler_m2:   { usd: 45,   confidence: 'med',  source: 'boq.unitRates' },
+                firePump_m2:    { usd: 28,   confidence: 'low',  source: 'boq.unitRates' },
+                fireAlarm_m2:   { usd: 24,   confidence: 'low',  source: 'boq.unitRates' },
+                passiveFire_m2: { usd: 30,   confidence: 'low',  source: 'boq.unitRates' },
+                /* ── elv_ict ── */
                 ictPerRack:     { usd: 4500, confidence: 'low',  source: 'boq.unitRates' },
+                dcim_perMw:     { usd: 70000, confidence: 'low', source: 'boq.unitRates' },
                 bmsPerMw:       { usd: 160000,confidence: 'low', source: 'boq.unitRates' },
+                oobPerRack:     { usd: 2200, confidence: 'low',  source: 'boq.unitRates' },
+                mmr_perMw:      { usd: 40000, confidence: 'low', source: 'boq.unitRates' },
+                avpa_m2:        { usd: 22,   confidence: 'low',  source: 'boq.unitRates' },
+                elvTray_m:      { usd: 55,   confidence: 'low',  source: 'boq.unitRates' },
+                /* ── security ── */
+                acs_perRack:    { usd: 900,  confidence: 'low',  source: 'boq.unitRates' },
+                cctv_perRack:   { usd: 1100, confidence: 'low',  source: 'boq.unitRates' },
+                intrusion_m2:   { usd: 14,   confidence: 'low',  source: 'boq.unitRates' },
+                perimeterSec_m: { usd: 480,  confidence: 'low',  source: 'boq.unitRates' },
+                soc_perMw:      { usd: 45000, confidence: 'low', source: 'boq.unitRates' },
                 securityPerRack:{ usd: 1500, confidence: 'low',  source: 'boq.unitRates' },
+                /* ── testing_cx (per-MW anchors, scaled to category $) ── */
+                cxL1_perMw:     { usd: 40000, confidence: 'low', source: 'boq.unitRates' },
+                cxL2_perMw:     { usd: 45000, confidence: 'low', source: 'boq.unitRates' },
+                cxL3_perMw:     { usd: 55000, confidence: 'low', source: 'boq.unitRates' },
+                cxL4_perMw:     { usd: 60000, confidence: 'low', source: 'boq.unitRates' },
+                cxL5_perMw:     { usd: 45000, confidence: 'low', source: 'boq.unitRates' },
+                cxa_perMw:      { usd: 65000, confidence: 'low', source: 'boq.unitRates' },
                 cxPerMw:        { usd: 270000,confidence: 'low', source: 'boq.unitRates' },
+                /* ── permits / soft (per-MW anchors) ── */
+                designFee_perMw:{ usd: 180000,confidence: 'low', source: 'boq.unitRates' },
+                pm_perMw:       { usd: 140000,confidence: 'low', source: 'boq.unitRates' },
+                prelims_perMw:  { usd: 120000,confidence: 'low', source: 'boq.unitRates' },
+                insurance_perMw:{ usd: 60000, confidence: 'low', source: 'boq.unitRates' },
+                permitFee_perMw:{ usd: 80000, confidence: 'low', source: 'boq.unitRates' },
                 permitPerMw:    { usd: 80000, confidence: 'low', source: 'boq.unitRates' }
             },
             /* bare BLS national-mean trade wages ($/hr) — informational (labor is folded as
@@ -7347,8 +7611,9 @@
             'capexDetail.costFactors.electrical': { source: 'calculator lineage 1200 $/kW (DCMOC A7 2025 used 1550 for a different model shape — NOT merged; engine detailed model is the shared source from v2.3.0)', asOf: '2025', unit: '$/kW IT' },
             'deepSeaCooling': { source: 'Design basis: 150 MW AI DC deep-sea cooling reference architecture (owner, 2026) — chiller-less primary + hybrid trim backup; seawater properties: TEOS-10/IOC tables at S=35, 5 °C; intake-temp bands: NOAA World Ocean Atlas typical tropical/subtropical profiles; SWAC cost scaling: Makai Ocean Engineering SWAC studies + Hawaii/InterContinental SWAC projects (public figures), HDPE marine pipeline install multipliers 2.5-4x onshore', asOf: '2026', method: 'poster mode reproduces the reference (cp 4.0, rho 1000): 172.5 MW / (4.0*5) = 8.625 m3/s = 31,050 m3/h, 4+1 pumps 2.9 m3/s @ 60 m ≈ 2.0 MW each; accurate mode uses rho 1025 / cp 3985' },
             'boq.gfaM2PerMw':    { source: 'Turner & Townsend DC Cost Index 2025-26 (~10-11.4k sqft/MW gross) + Silverback WPSF series — screening; 900 m²/MW mid-band', asOf: '2025', unit: 'm² GFA per MW IT', method: 'SCREENING rule-of-thumb' },
-            'boq.takeoff':       { source: 'SCREENING quantity-takeoff ratios: rebar ~130 kg/m³ (One Click LCA), structural steel ~40 kg/m² (CalcTree), raised floor ~4.6 m²/rack (dgtlinfra), clean-agent Novec 1230 ~0.55 kg/m³ per NFPA 2001/3M TDS (HIGH), CW coolant ~8 L/kW (B&V Water). Per-kW cable/tray/conduit/pipe-per-MW ratios = rule-of-thumb LOW confidence (Spon’s/RSMeans price installed length not per-kW) — folded into AACE −30/+50 band; each line carries its own confidence tag. Reconciled to CAPEX category totals so absolute ratio error does not move the total.', asOf: '2026', unit: 'material/labor qty per driver', method: 'AACE Class-4 screening; reconciled to parametric CAPEX' },
-            'boq.unitRates':     { source: 'US-2025 material+install $/unit: concrete ~$320/m³ + rebar ~$2100/t (Gordian/HomeGuide), structural steel ~$3300/t (SteelFlo 2026), raised floor ~$270/m² (datacenterfloortiles), LV/MV cable + tray + CW pipe (1xTechnologies/DistributorWire/RSMeans/MEP Academy — LOW), bare BLS trade wages (electrician/pipefitter/ironworker/laborer). Regionalized via locMult; +5.5%/yr escalation (T&T). Aggregate line rates (ict/bms/security/cx/permits) are anchors scaled by reconcileFactor to the category $.', asOf: '2025', unit: 'USD per material/labor unit', method: 'SCREENING; add ~35-60% labor burden for a bid' },
+            'boq.takeoff':       { source: 'SCREENING 3-LEVEL quantity takeoff (discipline → subsystem → ~100 component leaves across civil/electrical/mechanical/fire/ELV/security/Cx/permits). Anchor ratios: rebar ~130 kg/m³ (One Click LCA), structural steel ~40 kg/m² (CalcTree), raised floor ~4.6 m²/rack (dgtlinfra), clean-agent Novec 1230 ~0.55 kg/m³ per NFPA 2001/3M TDS (HIGH), CW coolant ~8 L/kW (B&V Water). Equipment counts (UPS/genset/transformer/chiller/CDU/CRAH) mirror boq.equipmentSizing and are path-scaled by redundancy (boq.paramFactors). Per-kW cable/tray/pipe-per-MW and per-m² fit-out ratios = rule-of-thumb LOW confidence (Spon’s/RSMeans price installed length/area not per-kW) — folded into AACE −30/+50 band; each leaf carries its own confidence tag. ONE reconcileFactor per discipline scales Σ(all subsystem lines) to the parametric CAPEX category $ so absolute ratio error does not move the total.', asOf: '2026', unit: 'material/labor qty per driver', method: 'AACE Class-4 screening; 3-level, reconciled to parametric CAPEX' },
+            'boq.unitRates':     { source: 'US-2025 installed material+install $/unit, ~90 keys spanning all subsystems. Anchors: concrete ~$320/m³ + rebar ~$2100/t (Gordian/HomeGuide), structural steel ~$3300/t (SteelFlo 2026), raised floor ~$270/m² (datacenterfloortiles), LV/MV cable + tray + CW pipe (1xTechnologies/DistributorWire/RSMeans/MEP Academy — LOW), major equipment (UPS module/genset/chiller/CDU/transformer/PDU) at screening OEM installed price, envelope/fit-out/external-works per-m² (Spon’s/RSMeans), bare BLS trade wages (electrician/pipefitter/ironworker/laborer). Regionalized via locMult; +5.5%/yr escalation (T&T). Aggregate per-MW line rates (dcim/bms/security/Cx-L1..L5/design/PM/permits) are anchors scaled by reconcileFactor to the category $.', asOf: '2025', unit: 'USD per material/labor unit', method: 'SCREENING; add ~35-60% labor burden for a bid' },
+            'boq.paramFactors':  { source: 'SCREENING multiplier tables the param-conditional BOQ drivers read: seismic rebar/bracing scale by ASCE 7-22 Sds zone band (zone0..zone4); diesel bulk-fuel ~0.28 m³ per MW-hour of runtime (~235 g/kWh at ~0.85 kg/L + ullage); clean-agent design concentration by agent (Novec 1230 ~0.55, FM-200 ~0.36 kg/m³ per NFPA 2001/3M/Chemours TDS); redundancy parallel-path multiplier by Uptime Tier topology (N/N+1/2N/2N+1); UPS battery strings per module (rotary carries none); CDU-vs-CRAH split by cooling type; PDU/RPP count per rack by density band. Each factor tunes a quantity base, not the reconciled category $.', asOf: '2026', unit: 'dimensionless multipliers + per-unit factors', method: 'SCREENING — code-band anchored (ASCE/NFPA/Uptime), fold into AACE Class-4' },
             'supplyChain': { source: 'PROXY/SCREENING per-country landed-cost + export-control. Import-duty bands (equipment): FTA 0 / low ~3% / med ~7.5% / high ~17% (IN ~15, BR ~16) / punitive ~30% (China↔US), applied to the imported-EQUIPMENT fraction per category (BOM split: ups ~70/gen ~75/network ~80/cooling ~55/electrical ~40%, labor-heavy ~0) — WTO/national tariff schedules, screening. Export-control tiers = US BIS Fed-Register PROXY; AI Diffusion Rule RESCINDED 2025 so caps are NOT in force — advisory only, NOT statutory/legal advice. Customs lead +2-12 wk by jurisdiction. Per-country band assignment in CountryProfile.supplyChain.', asOf: '2026', unit: 'duty rate + export tier + customs weeks', method: 'PROXY/SCREENING — duty on equipment fraction only; export-control advisory, policy fluid' },
             'dossier': { source: 'STANDARD-PRACTICE EPC Technical Dossier scaffold — permitting matrix (typical AHJ permits + indicative durations), design basis (IEC/NEC/ASHRAE TC9.9/ASCE 7/NFPA/Uptime references), risk register (typical mission-critical DC risks), document register, ops-readiness gates. Reference convention (Uptime/TIA-942/BICSI/NFPA), NOT a project-specific submission; durations/risks indicative. models.dossier.sections composes these with live engine outputs.', asOf: '2026', unit: 'permit/risk/document/readiness scaffold + calc→model references', method: 'STANDARD-PRACTICE reference — validate against the AHJ + full design' },
             'boq.equipmentSizing': { source: 'SCREENING nominal unit ratings for equipment-count sizing (UPS 500kW module, genset 2.5MW, transformer 2.5MVA, CRAH 150kW, CDU 700kW, chiller 1.4MW) + redundancy addend by topology. Lead times reflect the 2026 long-lead reality — MV transformer/switchgear ~120 wk dominant (industry supply-chain reporting); UPS ~26, genset ~40, chiller ~32 wk.', asOf: '2026', unit: 'kW/MVA per unit + weeks lead time', method: 'SCREENING — real selection depends on the design' },
@@ -11415,13 +11680,20 @@
              * truth). Pure function of DATA.boq + the passed costs/metrics — no economic
              * literal in the body. */
             boq: {
-                /* driver values from CapexResult.metrics + input. */
+                /* driver values from CapexResult.metrics + input. Includes the base drivers
+                 * AND param-conditional drivers auto-wired to input.* (seismicZone, fireType,
+                 * upsType, genType, fuelHours, redundancy, coolingType, buildingType, rackType).
+                 * Each conditional driver already folds in the small paramFactors multiplier so
+                 * a leaf just references it via `driver`. */
                 drivers: function (costs, metrics, input) {
-                    var mw = (input && input.itLoad != null ? input.itLoad : 0) / 1000;
-                    var itKw = (input && input.itLoad != null ? input.itLoad : 0);
+                    var B = DATA.boq, PF = B.paramFactors, E = B.equipmentSizing;
+                    input = input || {};
+                    var mw = (input.itLoad != null ? input.itLoad : 0) / 1000;
+                    var itKw = (input.itLoad != null ? input.itLoad : 0);
                     var racks = metrics && metrics.racks ? metrics.racks : 0;
                     var floorSpaceM2 = metrics && metrics.floorSpace ? metrics.floorSpace : 0;
-                    var gfaM2 = mw * DATA.boq.gfaM2PerMw;
+                    var gfaM2 = mw * B.gfaM2PerMw;
+                    var pue = (metrics && metrics.pue) || 1.4;
                     /* Cooling DUTY = heat to reject ≈ IT load: essentially 100% of IT
                      * power becomes heat removed by the cooling plant. The (PUE−1)
                      * overhead is the cooling plant's OWN power (fans/pumps/chillers),
@@ -11429,7 +11701,59 @@
                      * charge size to IT kW, not IT×PUE (fixed: was overcounting ×PUE). */
                     var coolingKw = itKw;
                     var protectedM3 = mw * 1500;                           /* ~1500 m³/MW protected (2kW/m² × ~5m) */
-                    return { mw: mw, itKw: itKw, racks: racks, floorSpaceM2: floorSpaceM2, gfaM2: gfaM2, coolingKw: coolingKw, protectedM3: protectedM3, lump: 1 };
+
+                    /* ── param-conditional inputs (with page-DOM defaults) ── */
+                    var seismicZone = input.seismicZone || 'zone1';
+                    var fireType    = input.fireType || 'novec';
+                    var upsType     = input.upsType || 'modular';
+                    var genType     = input.genType || 'diesel';   /* informational — fuel volume is diesel-store screening */
+                    var fuelHours   = input.fuelHours != null ? input.fuelHours : 48;
+                    var red         = (input.redundancy || 'n1').toLowerCase().replace(/\s+/g, '');
+                    var coolingType = input.coolingType || 'air';
+                    var rackType    = input.rackType || 'standard';
+
+                    var pathMult    = PF.redundancyPathMult[red] != null ? PF.redundancyPathMult[red] : 1.0;
+                    var seismicReb  = PF.seismicRebarMult[seismicZone] != null ? PF.seismicRebarMult[seismicZone] : 1.0;
+                    var seismicBr   = PF.seismicBraceMult[seismicZone] != null ? PF.seismicBraceMult[seismicZone] : 1.0;
+
+                    /* equipment N counts (mirror equipmentSchedule sizing) */
+                    var upsN     = itKw > 0 ? Math.ceil(itKw / E.upsModuleKw) : 0;
+                    var genN     = itKw > 0 ? Math.ceil((itKw * pue) / E.gensetKw) : 0;
+                    var txN      = itKw > 0 ? Math.ceil((itKw * pue) / (E.transformerMva * 1000 * E.transformerPf)) : 0;
+                    var chillerN = itKw > 0 ? Math.ceil(itKw / E.chillerKw) : 0;
+                    var cduTotal = itKw > 0 ? Math.ceil(itKw / E.cduKw) : 0;
+                    var crahTotal= itKw > 0 ? Math.ceil(itKw / E.crahKw) : 0;
+
+                    var cduFrac  = PF.cduFrac[coolingType] != null ? PF.cduFrac[coolingType] : 0;
+                    var pduPer   = PF.pduPerRackType[rackType] != null ? PF.pduPerRackType[rackType] : 0.08;
+                    var cleanKgM3= PF.cleanAgentKgPerM3[fireType] != null ? PF.cleanAgentKgPerM3[fireType] : 0;
+
+                    return {
+                        mw: mw, itKw: itKw, racks: racks, floorSpaceM2: floorSpaceM2, gfaM2: gfaM2,
+                        coolingKw: coolingKw, protectedM3: protectedM3, lump: 1,
+                        /* structural — seismic-scaled rebar/bracing quantity bases */
+                        rebarKgFactor: gfaM2 * seismicReb,
+                        seismicBraceT: gfaM2 * seismicBr,
+                        /* electrical — redundancy path-scaled equipment counts */
+                        txMva: txN * E.transformerMva * pathMult,
+                        feederPaths: mw * pathMult,
+                        upsPaths: upsN * pathMult,
+                        upsBatt: upsN * pathMult * (PF.upsBattPerModule[upsType] != null ? PF.upsBattPerModule[upsType] : 1),
+                        stsCount: upsN * pathMult,
+                        genPaths: genN * pathMult,
+                        pduCount: racks * pduPer,
+                        /* fuel — tank m³ from fuelHours × MW (genType informational) */
+                        fuelTankM3: mw * fuelHours * PF.fuelTankM3PerMwHour,
+                        /* cooling — CDU vs CRAH split by cooling type, path-scaled chillers */
+                        chillerPaths: chillerN * pathMult,
+                        cduUnits: cduTotal * cduFrac,
+                        crahUnits: crahTotal * (1 - cduFrac),
+                        dlcRacks: racks * cduFrac,
+                        /* fire — fireType-driven agent charge / kit / sprinkler */
+                        cleanAgentKg: protectedM3 * cleanKgM3,
+                        cleanAgentM3: protectedM3 * (PF.cleanAgentKitM3Frac[fireType] != null ? PF.cleanAgentKitM3Frac[fireType] : 0),
+                        sprinklerM2: floorSpaceM2 * (PF.sprinklerFrac[fireType] != null ? PF.sprinklerFrac[fireType] : 0)
+                    };
                 },
                 /* Build reconciled discipline BOQ from costs{} + drivers. locMult scales
                  * material rates back toward the region (default 1 = US baseline). */
@@ -11443,25 +11767,40 @@
                         var catTotal = 0;
                         d.categories.forEach(function (c) { catTotal += (costs && costs[c] ? costs[c] : 0); });
                         if (!(catTotal > 0)) return;
-                        var raw = (B.takeoff[d.key] || []).map(function (t) {
+                        /* build every subsystem's raw lines (3-level: discipline → subsystem → line) */
+                        var subMap = B.takeoff[d.key] || {};
+                        var subKeys = Object.keys(subMap);
+                        var buildLine = function (t) {
                             var qty = (drivers[t.driver] != null ? drivers[t.driver] : 0) * t.ratio;
                             var rate = (B.unitRates[t.rateKey] && B.unitRates[t.rateKey].usd) || 0;
                             rate = rate * loc;
                             var mat = qty * rate;
                             var labor = mat * (t.laborPct != null ? t.laborPct : 0);
-                            return { desc: t.desc, spec: t.spec, unit: t.unit, qty: qty, unitRate: rate, matCost: mat, laborCost: labor, total: mat + labor, confidence: t.confidence, source: t.source };
+                            return { desc: t.desc, spec: t.spec, unit: t.unit, subsystem: t.__sub, driver: t.driver, qty: qty, unitRate: rate, matCost: mat, laborCost: labor, total: mat + labor, confidence: t.confidence, source: t.source };
+                        };
+                        var subsystems = subKeys.map(function (sk) {
+                            var sub = subMap[sk];
+                            var lines = (sub.lines || []).map(function (t) { var tt = {}; for (var k in t) tt[k] = t[k]; tt.__sub = sk; return buildLine(tt); });
+                            return { key: sk, label: sub.label, lines: lines };
                         });
-                        var bottomUp = raw.reduce(function (s, l) { return s + l.total; }, 0);
+                        /* flat union of ALL subsystem lines (backward-compat consumers read .lines) */
+                        var flat = [];
+                        subsystems.forEach(function (s) { s.lines.forEach(function (l) { flat.push(l); }); });
+                        /* ONE reconcileFactor per DISCIPLINE = categoryTotal / Σ(ALL subsystem line
+                         * totals) — scale every line in every subsystem so the discipline's line
+                         * sum ≡ categoryTotal exactly (SSOT invariant preserved across the deepen). */
+                        var bottomUp = flat.reduce(function (s, l) { return s + l.total; }, 0);
                         var reconcileFactor = bottomUp > 0 ? catTotal / bottomUp : 1;
                         if (bottomUp > 0) {
-                            raw.forEach(function (l) { l.matCost *= reconcileFactor; l.laborCost *= reconcileFactor; l.total *= reconcileFactor; l.unitRate = l.qty > 0 ? l.total / l.qty : l.unitRate; });
-                        } else if (raw.length) {
-                            /* zero bottom-up but nonzero category $ (all drivers 0) — keep the
-                             * reconciliation invariant by carrying the whole category $ on the
-                             * first line as an unquantified lump, so Σ lines === categoryTotal. */
-                            raw[0].total = catTotal; raw[0].matCost = catTotal; raw[0].laborCost = 0; raw[0].unitRate = 0; raw[0].spec = (raw[0].spec || '') + ' (lump — quantity not derivable at zero load)';
+                            flat.forEach(function (l) { l.matCost *= reconcileFactor; l.laborCost *= reconcileFactor; l.total *= reconcileFactor; l.unitRate = l.qty > 0 ? l.total / l.qty : l.unitRate; });
+                        } else if (flat.length) {
+                            /* zero bottom-up but nonzero category $ (all drivers 0) — carry the
+                             * whole category $ on the first line so Σ lines === categoryTotal. */
+                            flat[0].total = catTotal; flat[0].matCost = catTotal; flat[0].laborCost = 0; flat[0].unitRate = 0; flat[0].spec = (flat[0].spec || '') + ' (lump — quantity not derivable at zero load)';
                         }
-                        disciplines.push({ key: d.key, label: d.label, categories: d.categories, categoryTotal: catTotal, lines: raw, reconcileFactor: +reconcileFactor.toFixed(3), bottomUpRaw: +bottomUp.toFixed(0) });
+                        /* subsystem subtotals (post-reconcile; lines are shared references) */
+                        subsystems.forEach(function (s) { s.subtotal = s.lines.reduce(function (a, l) { return a + l.total; }, 0); });
+                        disciplines.push({ key: d.key, label: d.label, categories: d.categories, categoryTotal: catTotal, subsystems: subsystems, lines: flat, reconcileFactor: +reconcileFactor.toFixed(3), bottomUpRaw: +bottomUp.toFixed(0) });
                     });
                     return { disciplines: disciplines, drivers: drivers, hardTotal: disciplines.reduce(function (s, d) { return s + d.categoryTotal; }, 0) };
                 },

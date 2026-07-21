@@ -43,9 +43,9 @@ export function AxisExplainPanel({ site, result, axis, onEdit, onClose }: {
                 <div className="mt-2 space-y-1">
                     {ex.levers.map((l, i) => (
                         <div key={i} className="flex items-start gap-2 text-[10.5px] text-slate-600 dark:text-slate-300">
-                            <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8px] font-bold text-white ${l.priority === 'HIGH' ? 'bg-emerald-600' : 'bg-slate-500'}`}>{l.priority === 'HIGH' ? 'LEVER' : 'NOTE'}</span>
+                            <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8px] font-bold ${l.priority === 'HIGH' ? 'bg-rz-data/15 text-rz-data' : 'bg-slate-500 text-white'}`}>{l.priority === 'HIGH' ? 'LEVER' : 'NOTE'}</span>
                             <span><b>{l.label}</b> — {l.detail}{l.targetTab === EDIT_CRITERIA_TAB && (
-                                <button onClick={openEditor} className="ml-1 font-medium text-violet-500 hover:text-violet-400">Edit Criteria →</button>
+                                <button onClick={openEditor} className="ml-1 font-medium text-rz-mint hover:text-rz-mint/80">Edit Criteria →</button>
                             )}</span>
                         </div>
                     ))}
@@ -53,12 +53,12 @@ export function AxisExplainPanel({ site, result, axis, onEdit, onClose }: {
             )}
             <div className="mt-2 flex flex-wrap gap-1.5">
                 <button onClick={openEditor}
-                    className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-2.5 py-1 text-[10px] font-semibold text-white hover:bg-violet-500">
+                    className="inline-flex items-center gap-1 rounded-lg bg-rz-signal px-2.5 py-1 text-[10px] font-semibold text-black hover:bg-rz-signal/90">
                     <SlidersHorizontal className="h-3 w-3" /> Edit Criteria — Site {site.label}
                 </button>
                 {deep && (
                     <button onClick={() => setActiveTab(deep.tab as never)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 hover:border-violet-400">
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 hover:border-rz-mint">
                         {deep.label} <ChevronRight className="h-3 w-3" />
                     </button>
                 )}

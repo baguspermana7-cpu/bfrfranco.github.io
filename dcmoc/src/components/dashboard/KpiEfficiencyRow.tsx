@@ -14,8 +14,8 @@ export function KpiEfficiencyRow({ d }: { d: DashboardData }) {
     const cards: { icon: React.ElementType; label: string; value: string; color: string; tip: string; trace?: string }[] = [
         { icon: Gauge, label: 'PUE (Design)', value: d.pue.toFixed(2), color: 'text-cyan-400', tip: 'pue', trace: 'engine.pueTier3' },
         { icon: Droplets, label: 'WUE (L/kWh)', value: d.wue != null ? d.wue.toFixed(2) : '—', color: 'text-blue-400', tip: 'wue', trace: 'sus.wue' },
-        { icon: Leaf, label: 'CUE (kgCO₂/kWh)', value: d.cue != null ? d.cue.toFixed(3) : '—', color: 'text-emerald-400', tip: 'cue', trace: 'sus.cue' },
-        { icon: Activity, label: 'Availability', value: d.availabilityPct != null ? `${d.availabilityPct}%` : '—', color: 'text-violet-400', tip: 'availability', trace: 'rel.systemAvailability' },
+        { icon: Leaf, label: 'CUE (kgCO₂/kWh)', value: d.cue != null ? d.cue.toFixed(3) : '—', color: 'text-rz-data', tip: 'cue', trace: 'sus.cue' },
+        { icon: Activity, label: 'Availability', value: d.availabilityPct != null ? `${d.availabilityPct}%` : '—', color: 'text-rz-mint', tip: 'availability', trace: 'rel.systemAvailability' },
         { icon: DollarSign, label: 'LCC (15yr)', value: fmtUsd(d.lcc), color: 'text-amber-400', tip: 'tco', trace: 'fin.lcc15' },
     ];
     return (

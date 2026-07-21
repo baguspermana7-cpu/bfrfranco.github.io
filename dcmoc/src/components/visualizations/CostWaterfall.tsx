@@ -30,8 +30,8 @@ export function CostWaterfall({ staffing, currency, trainingCostMonthly = 0, tur
     const categories = [
         { label: 'Base Salary', value: totalBase, color: 'bg-blue-500', text: 'text-blue-400', desc: 'Core monthly salaries for all FTEs.' },
         { label: 'Overtime / Loading', value: totalOT, color: 'bg-amber-500', text: 'text-amber-400', desc: 'Variable costs from shift patterns & holidays.' },
-        { label: 'Social Security', value: totalSocial, color: 'bg-purple-500', text: 'text-purple-400', desc: 'Pension, Healthcare, BPJS contributions.' },
-        { label: 'Allowances', value: totalBenefits, color: 'bg-emerald-500', text: 'text-emerald-400', desc: 'Transport, Meal, Housing allowances.' },
+        { label: 'Social Security', value: totalSocial, color: 'bg-rz-mint', text: 'text-rz-mint', desc: 'Pension, Healthcare, BPJS contributions.' },
+        { label: 'Allowances', value: totalBenefits, color: 'bg-rz-data', text: 'text-rz-data', desc: 'Transport, Meal, Housing allowances.' },
         { label: 'Shift Differential', value: shiftAllowance, color: 'bg-cyan-500', text: 'text-cyan-400', desc: 'Night/weekend shift premium (est. 15% of OT).' },
         { label: 'Training', value: training, color: 'bg-teal-500', text: 'text-teal-400', desc: 'Ongoing certification & skills development.' },
         { label: 'Turnover Cost', value: turnover, color: 'bg-rose-500', text: 'text-rose-400', desc: 'Recruitment, onboarding & lost productivity.' },
@@ -54,16 +54,16 @@ export function CostWaterfall({ staffing, currency, trainingCostMonthly = 0, tur
         <div className="p-6 bg-slate-900/50 border border-slate-800 rounded-xl h-full flex flex-col">
             <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <DollarSign className="w-5 h-5 text-emerald-400" />
+                    <DollarSign className="w-5 h-5 text-rz-data" />
                     Cost Structure Decomposition
                 </h3>
                 <div className="flex items-center gap-3">
                     <div className="text-xs bg-slate-800 border border-slate-700 rounded px-2 py-1">
                         <span className="text-slate-400">Per FTE: </span>
-                        <span className="text-emerald-400 font-bold">{formatMoney(perFTE)}</span>
+                        <span className="text-rz-data font-bold">{formatMoney(perFTE)}</span>
                     </div>
                     {perFTE > 0 && (
-                        <div className={`text-xs px-2 py-1 rounded ${perFTE <= INDUSTRY_BENCHMARK_PER_FTE ? 'bg-emerald-950/30 text-emerald-400' : 'bg-amber-950/30 text-amber-400'}`}>
+                        <div className={`text-xs px-2 py-1 rounded ${perFTE <= INDUSTRY_BENCHMARK_PER_FTE ? 'bg-rz-data/10 text-rz-data' : 'bg-amber-950/30 text-amber-400'}`}>
                             {perFTE <= INDUSTRY_BENCHMARK_PER_FTE ? '✅' : '⚠️'} vs ${INDUSTRY_BENCHMARK_PER_FTE.toLocaleString()} benchmark
                         </div>
                     )}
@@ -84,7 +84,7 @@ export function CostWaterfall({ staffing, currency, trainingCostMonthly = 0, tur
                 </div>
                 <div className="mt-1 flex justify-between text-[10px] text-slate-500">
                     <span>0%</span>
-                    <span>Monthly total <span className="font-bold text-emerald-400">{formatMoney(total)}</span></span>
+                    <span>Monthly total <span className="font-bold text-rz-data">{formatMoney(total)}</span></span>
                     <span>100%</span>
                 </div>
             </div>

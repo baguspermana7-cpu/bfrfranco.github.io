@@ -360,7 +360,7 @@ const PhasedFinancialDashboard = () => {
                         </div>
                         <TraceValue traceId="pf.blendedIrr">
                             <div
-                                className={`text-2xl font-bold ${blendedIrr >= 12 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
+                                className={`text-2xl font-bold ${blendedIrr >= 12 ? 'text-rz-data' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
                                 title={blendedIrr < 12 ? (overallExplain?.reason ?? 'IRR below hurdle') + ' Click to see per-phase levers.' : undefined}
                                 onClick={blendedIrr < 12 ? (e) => { e.stopPropagation(); openWorstPhase(); } : undefined}
                             >
@@ -373,12 +373,12 @@ const PhasedFinancialDashboard = () => {
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-2 mb-1">
-                            <DollarSign className="w-4 h-4 text-emerald-500" />
+                            <DollarSign className="w-4 h-4 text-rz-data" />
                             <span className="text-xs text-slate-500 uppercase">Total NPV</span>
                         </div>
                         <TraceValue traceId="pf.totalNpv">
                             <div
-                                className={`text-2xl font-bold ${blendedNpv >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
+                                className={`text-2xl font-bold ${blendedNpv >= 0 ? 'text-rz-data' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
                                 title={blendedNpv < 0 ? `NPV negative ${fmtMoney(blendedNpv)} at the discount rate used. Click to see the reason & levers of the weakest phase.` : undefined}
                                 onClick={blendedNpv < 0 ? (e) => { e.stopPropagation(); openWorstPhase(); } : undefined}
                             >
@@ -415,7 +415,7 @@ const PhasedFinancialDashboard = () => {
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-2 mb-1">
-                            <TrendingUp className="w-4 h-4 text-purple-500" />
+                            <TrendingUp className="w-4 h-4 text-rz-mint" />
                             <span className="text-xs text-slate-500 uppercase">PI</span>
                             <Tooltip content="Profitability Index: (NPV + Investment) / Investment. Above 1.0 = value-creating." />
                         </div>
@@ -434,7 +434,7 @@ const PhasedFinancialDashboard = () => {
 
             {/* Narrative Summary */}
             {narrative && (
-                <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200 dark:border-blue-800/50">
+                <Card className="bg-bg-white dark:bg-rz-elevated border-slate-200 dark:border-rz-2">
                     <CardContent className="pt-5 pb-4">
                         <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{narrative}</p>
                     </CardContent>
@@ -469,15 +469,15 @@ const PhasedFinancialDashboard = () => {
                                             >
                                                 <td className="py-2 px-2 font-medium text-slate-900 dark:text-white">{pf.phaseLabel}</td>
                                                 <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{fmtMoney(pf.capex)}</td>
-                                                <td className={`text-right py-2 px-2 font-semibold ${pf.irr >= 12 ? 'text-emerald-500' : 'text-red-500 underline decoration-dotted underline-offset-2'}`}>
+                                                <td className={`text-right py-2 px-2 font-semibold ${pf.irr >= 12 ? 'text-rz-data' : 'text-red-500 underline decoration-dotted underline-offset-2'}`}>
                                                     {pf.irr.toFixed(1)}%
                                                 </td>
-                                                <td className={`text-right py-2 px-2 ${pf.npv >= 0 ? 'text-emerald-500' : 'text-red-500 underline decoration-dotted underline-offset-2'}`}>
+                                                <td className={`text-right py-2 px-2 ${pf.npv >= 0 ? 'text-rz-data' : 'text-red-500 underline decoration-dotted underline-offset-2'}`}>
                                                     {fmtMoney(pf.npv)}
                                                 </td>
                                                 <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{pf.payback} yr</td>
                                                 <td className="text-center py-2 px-2">
-                                                    <span className={`inline-flex items-center gap-1 font-semibold ${pf.goNoGo ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                    <span className={`inline-flex items-center gap-1 font-semibold ${pf.goNoGo ? 'text-rz-data' : 'text-red-500'}`}>
                                                         {pf.goNoGo ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                                                         {pf.goNoGo ? 'GO' : 'NO-GO'}
                                                         <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${openPhase === idx ? 'rotate-180' : ''}`} />
@@ -488,7 +488,7 @@ const PhasedFinancialDashboard = () => {
                                                 <tr className="border-b border-slate-100 dark:border-slate-800">
                                                     <td colSpan={6} className="py-0 px-0">
                                                         <div className={`m-2 p-3 rounded-lg border text-left ${pf.goNoGo
-                                                            ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/40'
+                                                            ? 'bg-rz-data/10 dark:bg-rz-data/10 border-rz-data/40'
                                                             : 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800/40'}`}>
                                                             <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{pf.explain.reason}</p>
                                                             {pf.explain.levers.length > 0 && (
@@ -529,7 +529,7 @@ const PhasedFinancialDashboard = () => {
                             <div className="grid grid-cols-2 gap-3 text-xs">
                                 <div className="flex justify-between">
                                     <span className="text-slate-600 dark:text-slate-400">Tax Incentive Value</span>
-                                    <span className="font-medium text-emerald-500">+{fmtMoney(adjustments.tax)}</span>
+                                    <span className="font-medium text-rz-data">+{fmtMoney(adjustments.tax)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-slate-600 dark:text-slate-400">Disaster Risk Cost/Yr</span>
@@ -541,7 +541,7 @@ const PhasedFinancialDashboard = () => {
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-slate-600 dark:text-slate-400">Talent Premium/Yr</span>
-                                    <span className="font-medium text-purple-500">-{fmtMoney(adjustments.talent)}</span>
+                                    <span className="font-medium text-rz-signal">-{fmtMoney(adjustments.talent)}</span>
                                 </div>
                             </div>
                         </div>
@@ -564,7 +564,7 @@ const PhasedFinancialDashboard = () => {
                                 <ReferenceLine y={0} stroke="#64748b" strokeDasharray="3 3" />
                                 <Bar dataKey="cashflow" radius={[4, 4, 0, 0]}>
                                     {cashflowData.map((entry, i) => (
-                                        <Cell key={i} fill={entry.cashflow >= 0 ? '#10b981' : '#ef4444'} opacity={0.6} />
+                                        <Cell key={i} fill={entry.cashflow >= 0 ? '#00FF88' : '#ef4444'} opacity={0.6} />
                                     ))}
                                 </Bar>
                                 <Line type="monotone" dataKey="cumulative" stroke="#06b6d4" strokeWidth={2} dot={false} />
@@ -598,14 +598,14 @@ const PhasedFinancialDashboard = () => {
                                             <td className="py-2 px-2 font-medium text-slate-900 dark:text-white capitalize flex items-center gap-1.5">
                                                 {s.scenario === 'conservative' && <AlertTriangle className="w-3 h-3 text-amber-500" />}
                                                 {s.scenario === 'base' && <Target className="w-3 h-3 text-cyan-500" />}
-                                                {s.scenario === 'aggressive' && <TrendingUp className="w-3 h-3 text-emerald-500" />}
+                                                {s.scenario === 'aggressive' && <TrendingUp className="w-3 h-3 text-rz-data" />}
                                                 {s.scenario}
                                             </td>
                                             <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{fmtMoney(s.capex)}</td>
-                                            <td className={`text-right py-2 px-2 font-semibold ${s.irr >= 12 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                            <td className={`text-right py-2 px-2 font-semibold ${s.irr >= 12 ? 'text-rz-data' : 'text-red-500'}`}>
                                                 {s.irr.toFixed(1)}%
                                             </td>
-                                            <td className={`text-right py-2 px-2 ${s.npv >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                            <td className={`text-right py-2 px-2 ${s.npv >= 0 ? 'text-rz-data' : 'text-red-500'}`}>
                                                 {fmtMoney(s.npv)}
                                             </td>
                                             <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{s.payback} yr</td>

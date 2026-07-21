@@ -195,7 +195,7 @@ export default function MonteCarloDashboard() {
                         <span className="text-slate-600 dark:text-slate-400"><span className="font-semibold text-slate-800 dark:text-slate-200">NPV Distribution</span> <Tooltip content="Net Present Value histogram across all simulation runs. Shows the full range of discounted cash flow outcomes and the probability of achieving positive returns." /> — Probability of achieving positive net present value across all scenarios</span>
                     </div>
                     <div className="flex items-start gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-1.5 shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-rz-mint mt-1.5 shrink-0" />
                         <span className="text-slate-600 dark:text-slate-400"><span className="font-semibold text-slate-800 dark:text-slate-200">IRR Risk</span> <Tooltip content="Internal Rate of Return distribution. Shows the probability that returns fall below the minimum acceptable rate (hurdle rate), typically 8-12% for data center investments." /> — Likelihood that internal rate of return falls below your hurdle rate (e.g., 10%)</span>
                     </div>
                     <div className="flex items-start gap-2">
@@ -215,11 +215,11 @@ export default function MonteCarloDashboard() {
                         <div className="text-[10px] font-semibold uppercase text-slate-500 dark:text-slate-400 mb-1 flex items-center">Base Case <Tooltip content="The simulation base values are DERIVED from the live project configuration (country · electricity rate · IT load · PUE · CAPEX · single-source revenue basis) — not inputs on this page. The inputs below (Iterations, Seed, Variables) are this page's analysis controls." /></div>
                         <div className="text-[11px] text-slate-700 dark:text-slate-300">
                             {selectedCountry.name} · {(inputs.itLoad / 1000).toFixed(1)} MW · Tier {inputs.tierLevel} · ${selectedCountry.economy.electricityRate.toFixed(2)}/kWh
-                            <span className="ml-1.5 rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-emerald-500">project</span>
+                            <span className="ml-1.5 rounded bg-rz-data/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-rz-data">project</span>
                         </div>
                         <div className="text-[10px] text-slate-500 dark:text-slate-400">Revenue basis ${DEFAULT_REVENUE_PER_KW_MONTH}/kW·mo (illustrative, single-source)</div>
                         <button onClick={() => simActions.setActiveTab('requirements')}
-                            className="mt-0.5 text-[10px] text-violet-500 hover:underline">Edit in Requirements ↗</button>
+                            className="mt-0.5 text-[10px] text-rz-mint hover:underline">Edit in Requirements ↗</button>
                     </div>
                     {/* Iteration Count */}
                     <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
@@ -363,7 +363,7 @@ function DistributionsTab({ result }: { result: MonteCarloResult }) {
                 titleTip="Mean Internal Rate of Return across simulations. Compare against hurdle rate to assess project viability. IRR below discount rate implies negative NPV."
                 data={result.irrHistogram}
                 stats={result.irrStats}
-                color="#8b5cf6"
+                color="#00DDFF"
                 formatValue={(n) => `${n.toFixed(1)}%`}
             />
             <HistogramChart
@@ -447,7 +447,7 @@ function StatisticsTab({ result }: { result: MonteCarloResult }) {
                     <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30">
                         <th className="text-left px-4 py-3 font-semibold text-slate-900 dark:text-white"><span className="flex items-center">Percentile <Tooltip content="Statistical breakpoints showing how outcomes are distributed. P10/P50/P90 are the most commonly used for investment decisions." /></span></th>
                         <th className="text-center px-4 py-3 font-semibold text-cyan-600 dark:text-cyan-400"><span className="flex items-center justify-center">NPV <Tooltip content="Net Present Value: total discounted cash flows minus initial investment. Positive NPV means the project creates value." /></span></th>
-                        <th className="text-center px-4 py-3 font-semibold text-purple-600 dark:text-purple-400"><span className="flex items-center justify-center">IRR <Tooltip content="Internal Rate of Return: the discount rate at which NPV equals zero. Compare against WACC/hurdle rate to evaluate viability." /></span></th>
+                        <th className="text-center px-4 py-3 font-semibold text-rz-info"><span className="flex items-center justify-center">IRR <Tooltip content="Internal Rate of Return: the discount rate at which NPV equals zero. Compare against WACC/hurdle rate to evaluate viability." /></span></th>
                         <th className="text-center px-4 py-3 font-semibold text-amber-600 dark:text-amber-400"><span className="flex items-center justify-center">Payback <Tooltip content="Simple payback period: years required to recover total CAPEX from cumulative net cash flows." /></span></th>
                     </tr>
                 </thead>
@@ -530,7 +530,7 @@ function RiskTab({ result, baseInputs, variables, seed, onNavigate }: {
                     clickHint={npvRiskRed ? (showNpvPanel ? 'close diagnosis ▲' : 'click: drivers + levers ▼') : undefined}
                 />
                 <RiskCard
-                    icon={<Activity className="w-5 h-5 text-purple-500" />}
+                    icon={<Activity className="w-5 h-5 text-rz-mint" />}
                     label="P(IRR < 10%)"
                     tip="Probability that the Internal Rate of Return falls below the 10% hurdle rate. Higher probability means the project is less likely to meet minimum return requirements."
                     value={`${(result.probIrrBelow10 * 100).toFixed(1)}%`}
@@ -575,7 +575,7 @@ function RiskTab({ result, baseInputs, variables, seed, onNavigate }: {
                             {/* Lever terukur — atau kejujuran bila tak ada satu variabel yang cukup */}
                             {topDriver ? (
                                 <div className="rounded-lg bg-white dark:bg-slate-900/50 border border-red-200 dark:border-red-800/50 p-3">
-                                    <div className="text-[11px] font-semibold uppercase text-emerald-600 dark:text-emerald-400 mb-1">Lever</div>
+                                    <div className="text-[11px] font-semibold uppercase text-rz-data mb-1">Lever</div>
                                     <p className="text-xs text-slate-700 dark:text-slate-300">
                                         Lock <span className="font-semibold">{topDriver.name}</span> (e.g. fixed-price contract / hedging)
                                         → P(NPV&lt;0) drops {(attribution.pBase * 100).toFixed(1)}% → <span className="font-mono font-semibold">{(topDriver.pWithout * 100).toFixed(1)}%</span>
@@ -611,10 +611,10 @@ function RiskTab({ result, baseInputs, variables, seed, onNavigate }: {
                     )}
 
                     <div className="flex gap-3 pt-1">
-                        <button onClick={() => onNavigate('requirements')} className="text-[11px] font-medium text-violet-500 hover:underline">
+                        <button onClick={() => onNavigate('requirements')} className="text-[11px] font-medium text-rz-mint hover:underline">
                             ↗ Revenue basis (Requirements)
                         </button>
-                        <button onClick={() => onNavigate('capex')} className="text-[11px] font-medium text-violet-500 hover:underline">
+                        <button onClick={() => onNavigate('capex')} className="text-[11px] font-medium text-rz-mint hover:underline">
                             ↗ CAPEX basis (CAPEX Engine)
                         </button>
                     </div>
@@ -633,7 +633,7 @@ function RiskTab({ result, baseInputs, variables, seed, onNavigate }: {
                         data={result.sensitivity.map(s => ({
                             name: s.variable,
                             correlation: Math.round(s.correlation * 1000) / 1000,
-                            fill: s.correlation >= 0 ? '#10b981' : '#ef4444',
+                            fill: s.correlation >= 0 ? '#00FF88' : '#ef4444',
                         }))}
                         layout="vertical"
                         margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
@@ -647,7 +647,7 @@ function RiskTab({ result, baseInputs, variables, seed, onNavigate }: {
                         <ReferenceLine x={0} stroke="#475569" />
                         <Bar dataKey="correlation" radius={[0, 4, 4, 0]}>
                             {result.sensitivity.map((s, i) => (
-                                <Cell key={i} fill={s.correlation >= 0 ? '#10b981' : '#ef4444'} />
+                                <Cell key={i} fill={s.correlation >= 0 ? '#00FF88' : '#ef4444'} />
                             ))}
                         </Bar>
                     </BarChart>
@@ -668,7 +668,7 @@ function RiskCard({ icon, label, tip, value, description, severity, onClick, cli
     onClick?: () => void;
     clickHint?: string;
 }) {
-    const borderColor = severity === 'high' ? 'border-red-300 dark:border-red-800' : severity === 'medium' ? 'border-amber-300 dark:border-amber-800' : 'border-emerald-300 dark:border-emerald-800';
+    const borderColor = severity === 'high' ? 'border-red-300 dark:border-red-800' : severity === 'medium' ? 'border-amber-300 dark:border-amber-800' : 'border-rz-data/40';
     const body = (
         <>
             <div className="flex items-center gap-2 mb-2">
@@ -726,7 +726,7 @@ function ConvergenceTab({ result }: { result: MonteCarloResult }) {
                         labelFormatter={(label) => `Iteration ${label.toLocaleString()}`}
                     />
                     <Line type="monotone" dataKey="meanNpv" stroke="#06b6d4" strokeWidth={2} dot={false} />
-                    <ReferenceLine y={result.npvStats.mean} stroke="#10b981" strokeDasharray="4 4" label={{ value: `Final: ${fmtMoney(result.npvStats.mean)}`, fill: '#10b981', fontSize: 10 }} />
+                    <ReferenceLine y={result.npvStats.mean} stroke="#00FF88" strokeDasharray="4 4" label={{ value: `Final: ${fmtMoney(result.npvStats.mean)}`, fill: '#00FF88', fontSize: 10 }} />
                 </LineChart>
             </ResponsiveContainer>
         </div>
@@ -783,14 +783,14 @@ function ScatterTab({ result }: { result: MonteCarloResult }) {
                     <ReferenceLine y={10} stroke="#f59e0b" strokeDasharray="4 4" />
                     <Scatter data={scatterData} fill="#06b6d4" opacity={0.4}>
                         {scatterData.map((d, i) => {
-                            const paybackColor = d.payback <= 4 ? '#10b981' : d.payback <= 7 ? '#f59e0b' : '#ef4444';
+                            const paybackColor = d.payback <= 4 ? '#00FF88' : d.payback <= 7 ? '#f59e0b' : '#ef4444';
                             return <Cell key={i} fill={paybackColor} />;
                         })}
                     </Scatter>
                 </ScatterChart>
             </ResponsiveContainer>
             <div className="flex justify-center gap-4 mt-2 text-[10px] text-slate-500">
-                <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-500" /> Payback ≤ 4yr</span>
+                <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-rz-data" /> Payback ≤ 4yr</span>
                 <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-amber-500" /> 4-7yr</span>
                 <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-red-500" /> &gt; 7yr</span>
             </div>

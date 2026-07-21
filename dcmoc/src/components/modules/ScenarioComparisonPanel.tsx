@@ -13,7 +13,7 @@ import clsx from 'clsx';
 import { fmtMoney } from '@/lib/format';
 import type { SimulationState } from '@/store/simulation';
 
-const SCENARIO_COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444'];
+const SCENARIO_COLORS = ['#00DDFF', '#7DDDB4', '#FFAA00', '#FF3030'];
 
 interface ScenarioMetrics {
     scenario: SavedScenario;
@@ -176,8 +176,8 @@ export function ScenarioComparisonPanel() {
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                        <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
-                            <GitCompare className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                        <div className="p-2 bg-rz-mint/10 rounded">
+                            <GitCompare className="w-6 h-6 text-rz-mint" />
                         </div>
                         Scenario Comparison
                     </h2>
@@ -288,7 +288,7 @@ export function ScenarioComparisonPanel() {
                                             <span className="text-slate-900 dark:text-white font-mono">{row.fmt(val)}</span>
                                             {i > 0 && (
                                                 <span
-                                                    className={clsx('ml-1', isWorse ? 'text-red-500' : isBetter ? 'text-emerald-500' : 'text-slate-400')}
+                                                    className={clsx('ml-1', isWorse ? 'text-rz-alert' : isBetter ? 'text-rz-data' : 'text-slate-400')}
                                                     title={isWorse ? worseTitle(row.fmt(Math.abs(val - baseVal)), m.scenario) : undefined}
                                                 >
                                                     ({fmtPct(d)})
@@ -360,9 +360,9 @@ function KpiCell({ label, value, delta, invertDelta, worseTitle }: {
     let colorClass = 'text-slate-400';
     if (delta && delta !== '+0.0%') {
         if (invertDelta) {
-            colorClass = isPositive ? 'text-red-500' : isNegative ? 'text-emerald-500' : 'text-slate-400';
+            colorClass = isPositive ? 'text-rz-alert' : isNegative ? 'text-rz-data' : 'text-slate-400';
         } else {
-            colorClass = isPositive ? 'text-emerald-500' : isNegative ? 'text-red-500' : 'text-slate-400';
+            colorClass = isPositive ? 'text-rz-data' : isNegative ? 'text-rz-alert' : 'text-slate-400';
         }
     }
     const isWorse = colorClass === 'text-red-500';

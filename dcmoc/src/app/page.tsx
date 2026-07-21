@@ -163,10 +163,10 @@ export default function Home() {
       default: // 'sim'
         return (
           <div className="text-center space-y-4 max-w-2xl mx-auto pt-20">
-            <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xl shadow-cyan-900/50 mb-8">
-              <Calculator className="w-10 h-10 text-white" />
+            <div className="w-20 h-20 bg-rz-info/10 border border-rz-info/30 rounded flex items-center justify-center mx-auto mb-8">
+              <Calculator className="w-10 h-10 text-rz-info" />
             </div>
-            <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+            <h1 className="text-4xl font-bold text-white">
               Data Center M&O Calculator
             </h1>
             <p className="text-slate-400 text-lg leading-relaxed">

@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v1.110.0 — 2026-07-22 (DCMOC quality program: deep BOQ dossier + design de-slop + KPI cards)
+
+Four-phase DCMOC overhaul (owner: dossier too shallow "3 levels deeper" + "design warna terlalu AI slop, harus intuitive" + KPI cards uneven/overflowing).
+
+### Added — deep BOQ (3 levels: discipline → subsystem → component)
+- **RZEngine `DATA.boq` deepened** — flat 18 lines → **83 component leaves across 53 subsystems / 8 disciplines** (civil substructure/superstructure/envelope/fit-out/external/plinths; electrical utility-MV/LV/UPS/genset/EPMS/earthing/containment/cabling/small-power; mechanical heat-rejection/CDU-DLC/air/pumps/pipework/valves/water-treat/humidity/BMS/insulation; fire; ELV; security; L1-L5 Cx; soft/prelims). Each leaf sourced + [H/M/L] confidence; ~81 unit-rate keys. `models.boq.generate` returns nested `subsystems[]` + flat `lines[]` (backward-compat).
+- **Parameters auto-wired** — `models.boq.drivers` + new sourced `DATA.boq.paramFactors` now read `input.seismicZone` (rebar/bracing), `fireType` (clean-agent vs sprinkler volume), `fuelHours`+`genType` (fuel-tank m³), `redundancy`/tier (parallel-path multiplier), `coolingType` (CDU vs CRAH), `upsType`, `rackType` (PDU count) — was itLoad-only. **Reconciliation invariant preserved** (Σ all subsystem lines ≡ discipline categoryTotal ≡ CAPEX SSOT; asserted).
+- **Dossier nested render** (`BoqDossier.ts`) — BOQ section is now a 3-level tree: discipline → subsystem (label + subtotal) → component table, `page-break-inside:avoid`; falls back to flat on older engines. Dossier grew ~2× (272 KB, 11 sections).
+
+### Changed — design de-slop (semantic instrument aesthetic)
+- **Token layer** (`globals.css`, `tailwind.config.ts`, `layout.tsx`) — adopted brand `--rz-*` semantic tokens (base `#0a0e1a`, signal-amber `#FFAA00` = estimate/CTA, data-green `#00FF88` = confirmed, instrument-cyan `#00DDFF` = derived, fault-red `#FF3030` = risk, mint `#7DDDB4` = input), **font Inter → IBM Plex Sans** + JetBrains Mono slashed-zero.
+- **Sweep** — violet/purple color-classes **560→0** (Anthropic-purple hexes 8→0), decorative gradients 35→3 (only data severity-ramps kept), `rounded-2xl/3xl` 126→0 (4px cards), killed the 13-color rainbow engine badges. Color now MEANS something (per `documentation/design.md` §5). ~71 files.
+- **TraceValue** provenance re-map (input→mint, engine→data-green, derived→cyan, screening→amber); violet ƒx/CTA → amber; 4px popover.
+
+### Fixed — KPI cards (Capacity & Architecture Overview)
+- Uneven card sizes (TraceValue's inline-block button didn't fill the grid cell) + value overflow ("100.0 MW"/"Direct Liquid"/"99.99802%" spilling). Fix: TraceValue optional `className` → `block h-full w-full`; grid `auto-rows-fr`; Tile `h-full flex overflow-hidden`; value `text-sm break-words min-w-0`; value color carries STATE (PUE/availability meeting target → data-green).
+
+### Verified
+- engine 722/0 · parity 155/0 · calibration 19/0 · bindings 85/0 (catalog 216fn/119src) · dc-corpus 2678/0 · trace-parity 117/117 · walk 24/0 · synergy 6/0 · export 44/0 · tsc 0 + next build · js-syntax/script-tags CLEAN. BOQ reconciliation invariant asserted at subsystem level; nested dossier + de-slop screenshot-verified. Engine ?v `-j`→`-k`.
+
 ## v1.109.0 — 2026-07-21 (SecondBrain overhaul — pro-grade Vector Index dashboard + graph toolbar fix)
 
 ### Vector Index dashboard (`Apps/second brain/vector-index.html`)

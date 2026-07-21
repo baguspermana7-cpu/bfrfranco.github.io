@@ -158,7 +158,7 @@ export function OperationsDashboard() {
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-cyan-600 shadow-lg"><Wrench className="h-6 w-6 text-white" /></div>
+                    <div className="flex h-11 w-11 items-center justify-center rounded border border-rz-2 bg-rz-elevated"><Wrench className="h-6 w-6 text-rz-info" /></div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Operations Engine</h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400">Operations overview & performance — simulated from the planning state, ops log user-entered</p>
@@ -167,18 +167,18 @@ export function OperationsDashboard() {
                 <div className="flex items-center gap-2">
                     <div className="flex rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden">
                         {([['overview', 'Overview'], ['staff', 'Shift & People'], ['maint', 'Maintenance']] as const).map(([k, l]) => (
-                            <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
+                            <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-rz-signal text-rz-base' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
                         ))}
                     </div>
-                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
-                    <button onClick={() => setActiveTab('finance')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: Financial <ChevronRight className="h-3.5 w-3.5" /></button>
+                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-rz-mint"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
+                    <button onClick={() => setActiveTab('finance')} className="inline-flex items-center gap-1 rounded-lg bg-rz-signal px-3 py-1.5 text-xs font-semibold text-rz-base hover:bg-rz-signal/90">Next: Financial <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>
 
             {tab === 'staff' ? <StaffingDashboard /> : tab === 'maint' ? <MaintenanceDashboard /> : (
                 <div className="space-y-4">
                     {planMode && (
-                        <div className="rounded-xl border border-violet-500/40 bg-violet-600/10 px-3 py-2 text-[11px] text-violet-500">
+                        <div className="rounded-xl border border-rz-mint/40 bg-rz-signal/10 px-3 py-2 text-[11px] text-rz-mint">
                             <b>Plan Mode</b> — alarm/incident/ticket counts come from the EXAMPLE-seeded ops log; edit or add entries to make them yours. Derived KPIs (availability target, PUE, load, energy) are engine-real from the planning state.
                         </div>
                     )}
@@ -211,7 +211,7 @@ export function OperationsDashboard() {
                     <div className="grid gap-4 lg:grid-cols-[1fr_290px]">
                         <div className="min-w-0 space-y-4">
                             {/* load curve */}
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">IT & Facility Load — 24h <span className="ml-1 rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">SIMULATED PROFILE</span> <span className="text-[9px] normal-case text-slate-400">deterministic diurnal cosine ±5% · peak 14:00</span></h2>
                                 <div className="h-48">
                                     <ResponsiveContainer width="100%" height="100%">
@@ -222,7 +222,7 @@ export function OperationsDashboard() {
                                             <Tooltip contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                             <Legend wrapperStyle={{ fontSize: 10 }} />
                                             <Area dataKey="itMw" name="IT Load" stroke="#22d3ee" fill="#22d3ee" fillOpacity={0.15} />
-                                            <Line dataKey="facilityMw" name="Facility Load" stroke="#a78bfa" strokeWidth={1.6} dot={false} />
+                                            <Line dataKey="facilityMw" name="Facility Load" stroke="#7DDDB4" strokeWidth={1.6} dot={false} />
                                             <Line dataKey="capMw" name="IT Capacity" stroke="#f59e0b" strokeDasharray="6 4" dot={false} />
                                         </ComposedChart>
                                     </ResponsiveContainer>
@@ -231,7 +231,7 @@ export function OperationsDashboard() {
 
                             {/* alarms + asset health */}
                             <div className="grid gap-4 xl:grid-cols-2">
-                                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                                <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                     <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Recent Alarms (ops log)</h2>
                                     <div className="space-y-1">
                                         {log.alarms.slice(0, 6).map((a) => (
@@ -260,26 +260,26 @@ export function OperationsDashboard() {
                                         </div>
                                     )}
                                 </div>
-                                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                                <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                     <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Asset Health <span className="text-[9px] normal-case text-slate-400">Weibull model @ 40% design life (screening age)</span></h2>
                                     <div className="mb-1 text-2xl font-bold tabular-nums text-slate-900 dark:text-white">{model.assetHealth.avg}<span className="text-sm text-slate-400">/100 avg</span></div>
                                     <div className="space-y-1">
                                         {model.assetHealth.rows.slice(0, 6).map((r) => (
                                             <div key={r.cls} className="flex items-center gap-2 text-[11px]">
                                                 <span className="w-20 capitalize text-slate-600 dark:text-slate-300">{r.cls}</span>
-                                                <div className="h-1.5 flex-1 rounded bg-slate-100 dark:bg-slate-800"><div className={`h-1.5 rounded ${r.health >= 70 ? 'bg-emerald-500' : r.health >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`} style={{ width: `${r.health}%` }} /></div>
+                                                <div className="h-1.5 flex-1 rounded bg-slate-100 dark:bg-slate-800"><div className={`h-1.5 rounded ${r.health >= 70 ? 'bg-rz-data' : r.health >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`} style={{ width: `${r.health}%` }} /></div>
                                                 <span className="w-8 text-right tabular-nums text-slate-500">{Math.round(r.health)}</span>
                                                 <span className="w-14 text-right text-[9px] tabular-nums text-slate-400">{r.fp}% CDF</span>
                                             </div>
                                         ))}
                                     </div>
-                                    <button onClick={() => setActiveTab('asset-health')} className="mt-1.5 text-[10px] font-medium text-violet-500">View Asset Dashboard →</button>
+                                    <button onClick={() => setActiveTab('asset-health')} className="mt-1.5 text-[10px] font-medium text-rz-mint">View Asset Dashboard →</button>
                                 </div>
                             </div>
 
                             {/* incidents + tickets */}
                             <div className="grid gap-4 xl:grid-cols-2">
-                                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                                <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                     <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Incidents ({openIncidents.length} open)</h2>
                                     <div className="space-y-1">
                                         {log.incidents.slice(0, 5).map((i2) => (
@@ -295,7 +295,7 @@ export function OperationsDashboard() {
                                         ))}
                                     </div>
                                 </div>
-                                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                                <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                     <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Service Tickets ({openTickets.length} open)</h2>
                                     <div className="space-y-1">
                                         {log.tickets.slice(0, 5).map((tk) => (
@@ -316,7 +316,7 @@ export function OperationsDashboard() {
 
                         {/* rail */}
                         <aside className="space-y-4 lg:sticky lg:top-4 self-start">
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Shift Overview <span className="text-[8px] normal-case text-slate-400">({inputs.shiftModel} model · engine staffing basis)</span></h3>
                                 <div className="space-y-1.5">
                                     {shifts.map((s) => (
@@ -326,25 +326,25 @@ export function OperationsDashboard() {
                                         </div>
                                     ))}
                                 </div>
-                                <button onClick={() => setTab('staff')} className="mt-1.5 text-[10px] font-medium text-violet-500">View Shift & People →</button>
+                                <button onClick={() => setTab('staff')} className="mt-1.5 text-[10px] font-medium text-rz-mint">View Shift & People →</button>
                             </div>
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Quick Actions</h3>
                                 <div className="space-y-1 text-[11px]">
-                                    <button onClick={() => log.actions.addTicket({ time: 'now', priority: 'Medium', title: 'New work order', status: 'Open' })} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-left text-slate-600 dark:text-slate-300 hover:border-violet-400">＋ Create Work Order</button>
-                                    <button onClick={() => log.actions.addIncident({ time: 'now', priority: 'P3', title: 'New incident', status: 'Open' })} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-left text-slate-600 dark:text-slate-300 hover:border-violet-400">＋ Report Incident</button>
-                                    <button onClick={() => setTab('maint')} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-left text-slate-600 dark:text-slate-300 hover:border-violet-400">Add Maintenance Plan</button>
-                                    <button onClick={() => setActiveTab('sim')} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-left text-slate-600 dark:text-slate-300 hover:border-violet-400">Configure Staff Model</button>
-                                    <button onClick={() => setActiveTab('users')} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-left text-slate-600 dark:text-slate-300 hover:border-violet-400">Request Access</button>
+                                    <button onClick={() => log.actions.addTicket({ time: 'now', priority: 'Medium', title: 'New work order', status: 'Open' })} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-left text-slate-600 dark:text-slate-300 hover:border-rz-mint">＋ Create Work Order</button>
+                                    <button onClick={() => log.actions.addIncident({ time: 'now', priority: 'P3', title: 'New incident', status: 'Open' })} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-left text-slate-600 dark:text-slate-300 hover:border-rz-mint">＋ Report Incident</button>
+                                    <button onClick={() => setTab('maint')} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-left text-slate-600 dark:text-slate-300 hover:border-rz-mint">Add Maintenance Plan</button>
+                                    <button onClick={() => setActiveTab('sim')} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-left text-slate-600 dark:text-slate-300 hover:border-rz-mint">Configure Staff Model</button>
+                                    <button onClick={() => setActiveTab('users')} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-left text-slate-600 dark:text-slate-300 hover:border-rz-mint">Request Access</button>
                                 </div>
                             </div>
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Shortcuts</h3>
                                 <div className="grid grid-cols-2 gap-1 text-[11px]">
-                                    <button onClick={() => setActiveTab('knowledge')} className="rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-slate-600 dark:text-slate-300 hover:border-violet-400">SOP Library</button>
-                                    <button onClick={() => setActiveTab('report')} className="rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-slate-600 dark:text-slate-300 hover:border-violet-400">Reports</button>
-                                    <button onClick={() => setActiveTab('dashboard')} className="rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-slate-600 dark:text-slate-300 hover:border-violet-400">Dashboards</button>
-                                    <button onClick={() => setActiveTab('knowledge')} className="rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-slate-600 dark:text-slate-300 hover:border-violet-400">Knowledge Base</button>
+                                    <button onClick={() => setActiveTab('knowledge')} className="rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-slate-600 dark:text-slate-300 hover:border-rz-mint">SOP Library</button>
+                                    <button onClick={() => setActiveTab('report')} className="rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-slate-600 dark:text-slate-300 hover:border-rz-mint">Reports</button>
+                                    <button onClick={() => setActiveTab('dashboard')} className="rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-slate-600 dark:text-slate-300 hover:border-rz-mint">Dashboards</button>
+                                    <button onClick={() => setActiveTab('knowledge')} className="rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-slate-600 dark:text-slate-300 hover:border-rz-mint">Knowledge Base</button>
                                 </div>
                             </div>
                         </aside>

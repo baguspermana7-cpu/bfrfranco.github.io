@@ -21,7 +21,7 @@ const SENSOR_COLORS: Record<SensorCategory, string> = {
     'vibration': 'bg-orange-500',
     'fluid-leak': 'bg-cyan-500',
     'airflow': 'bg-green-500',
-    'door-access': 'bg-purple-500',
+    'door-access': 'bg-rz-mint',
 };
 
 const SENSOR_TOOLTIPS: Record<SensorCategory, string> = {
@@ -91,8 +91,8 @@ export default function CBMDashboard() {
             {/* Header */}
             <div>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                    <div className="p-2 bg-purple-500/10 rounded-xl">
-                        <Activity className="w-6 h-6 text-purple-500" />
+                    <div className="p-2 bg-rz-info/10 rounded-lg">
+                        <Activity className="w-6 h-6 text-rz-info" />
                     </div>
                     Condition-Based Monitoring ROI
                 </h2>

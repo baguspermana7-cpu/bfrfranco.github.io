@@ -2,7 +2,7 @@
 
 /* ─── Requirements page UI primitives (Phase A) ──────────────────────────────
  * SectionCard / Field / Segmented / ChipRow / RadioList / QuarterPicker /
- * SliderRow — dual-theme Tailwind, violet accent per the DC-OS reference.
+ * SliderRow — dual-theme Tailwind, mint (neutral user-input) accent per design.md §5.
  * ──────────────────────────────────────────────────────────────────────── */
 
 import React from 'react';
@@ -12,10 +12,10 @@ export function SectionCard({ num, title, caption, id, children }: {
     num: string; title: string; caption?: string; id: string; children: React.ReactNode;
 }) {
     return (
-        <section id={id} className="scroll-mt-24 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+        <section id={id} className="scroll-mt-24 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
             <div className="mb-3">
                 <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-                    <span className="text-violet-500 mr-1.5">{num}</span>{title}
+                    <span className="text-rz-mint mr-1.5">{num}</span>{title}
                 </h2>
                 {caption && <p className="text-[11px] text-slate-500 mt-0.5">{caption}</p>}
             </div>
@@ -29,14 +29,14 @@ export function Field({ label, required, children, hint, explainKey }: {
     /** CC — RZExplain DB key; when set, an ⓘ tooltip renders beside the label. */
     explainKey?: string;
 }) {
-    /* OWNER UX CONVENTION: editable INPUT areas carry a violet left-accent on the
+    /* OWNER UX CONVENTION: editable INPUT areas carry a mint left-accent on the
      * label — GENERATED values never do (they render as tinted read-only panels).
      * CC cascade: EVERY Field label is hoverable — explainKey → RZExplain panel;
      * else the hint doubles as the hover title; else a generated fallback. */
     return (
         <label className="block" title={hint ?? `${label} — parameter input`}>
-            <span className="mb-1 flex items-center gap-1 border-l-2 border-violet-500 pl-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500 cursor-help">
-                {label}{required && <span className="text-violet-500 ml-0.5">*</span>}
+            <span className="mb-1 flex items-center gap-1 border-l-2 border-rz-mint pl-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500 cursor-help">
+                {label}{required && <span className="text-rz-mint ml-0.5">*</span>}
                 {explainKey && <Explain k={explainKey} />}
             </span>
             {children}
@@ -50,7 +50,7 @@ export function TextInput({ value, onChange, placeholder }: {
 }) {
     return (
         <input
-            className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-violet-500 placeholder:text-slate-400"
+            className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-rz-mint placeholder:text-slate-400"
             value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)}
         />
     );
@@ -61,7 +61,7 @@ export function Select<T extends string>({ value, onChange, options }: {
 }) {
     return (
         <select
-            className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-violet-500"
+            className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-rz-mint"
             value={value} onChange={(e) => onChange(e.target.value as T)}
         >
             {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -77,8 +77,8 @@ export function Segmented<T extends string | number>({ value, onChange, options 
             {options.map((o) => (
                 <button key={String(o.value)} type="button" onClick={() => onChange(o.value)}
                     className={`px-2.5 py-1.5 text-[11px] font-medium transition-colors ${o.value === value
-                        ? 'bg-violet-600 text-white'
-                        : 'bg-white dark:bg-slate-900/60 text-slate-600 dark:text-slate-300 hover:bg-violet-600/10'}`}>
+                        ? 'bg-rz-mint text-rz-base'
+                        : 'bg-white dark:bg-slate-900/60 text-slate-600 dark:text-slate-300 hover:bg-rz-mint/10'}`}>
                     {o.label}
                 </button>
             ))}
@@ -94,8 +94,8 @@ export function ChipRow<T extends string>({ value, onChange, options }: {
             {options.map((o) => (
                 <button key={o.value} type="button" onClick={() => onChange(o.value)}
                     className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors ${o.value === value
-                        ? 'border-violet-500 bg-violet-600/15 text-violet-600 dark:text-violet-300'
-                        : 'border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-violet-400'}`}>
+                        ? 'border-rz-mint bg-rz-mint/15 text-rz-mint'
+                        : 'border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-rz-mint'}`}>
                     {o.label}
                 </button>
             ))}
@@ -111,9 +111,9 @@ export function RadioList<T extends string>({ value, onChange, options }: {
             {options.map((o) => (
                 <button key={o.value} type="button" onClick={() => onChange(o.value)}
                     className={`flex w-full items-center gap-2 rounded-lg border px-2.5 py-1.5 text-left text-xs transition-colors ${o.value === value
-                        ? 'border-violet-500 bg-violet-600/10'
-                        : 'border-slate-200 dark:border-slate-800 hover:border-violet-400/60'}`}>
-                    <span className={`h-3 w-3 rounded-full border-2 ${o.value === value ? 'border-violet-500 bg-violet-500' : 'border-slate-400'}`} />
+                        ? 'border-rz-mint bg-rz-mint/10'
+                        : 'border-slate-200 dark:border-slate-800 hover:border-rz-mint/60'}`}>
+                    <span className={`h-3 w-3 rounded-full border-2 ${o.value === value ? 'border-rz-mint bg-rz-mint' : 'border-slate-400'}`} />
                     <span className="text-slate-800 dark:text-slate-200">{o.label}</span>
                     {o.sub && <span className="ml-auto text-[10px] text-slate-400">{o.sub}</span>}
                 </button>
@@ -129,11 +129,11 @@ export function QuarterPicker({ value, onChange }: {
     const years = Array.from({ length: 8 }, (_, i) => new Date().getFullYear() + i);
     return (
         <div className="flex gap-1.5">
-            <select className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-violet-500 text-slate-900 dark:text-slate-100"
+            <select className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-rz-mint text-slate-900 dark:text-slate-100"
                 value={value.quarter} onChange={(e) => onChange({ ...value, quarter: Number(e.target.value) as 1 | 2 | 3 | 4 })}>
                 {[1, 2, 3, 4].map((q) => <option key={q} value={q}>Q{q}</option>)}
             </select>
-            <select className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-violet-500 text-slate-900 dark:text-slate-100"
+            <select className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-rz-mint text-slate-900 dark:text-slate-100"
                 value={value.year} onChange={(e) => onChange({ ...value, year: Number(e.target.value) })}>
                 {years.map((y) => <option key={y} value={y}>{y}</option>)}
             </select>
@@ -149,7 +149,7 @@ export function SliderRow({ label, value, onChange, min = 0, max = 100, unit = '
             <span className="w-32 text-slate-600 dark:text-slate-300">{label}</span>
             <input type="range" min={min} max={max} value={value}
                 onChange={(e) => onChange(Number(e.target.value))}
-                className="flex-1 accent-violet-500" />
+                className="flex-1 accent-rz-mint" />
             <span className="w-12 text-right tabular-nums text-slate-500">{value}{unit}</span>
         </div>
     );
@@ -168,7 +168,7 @@ export function NumInput({ value, onChange, min, max, placeholder, unit }: {
     const [draft, setDraft] = React.useState<string | null>(null);
     const shown = draft != null ? draft : (value ?? '');
     return (
-        <div className="flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 focus-within:border-violet-500">
+        <div className="flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 focus-within:border-rz-mint">
             <input
                 type="number" min={min} max={max}
                 className="w-full bg-transparent py-1.5 text-xs text-slate-900 dark:text-slate-100 outline-none placeholder:text-slate-400"

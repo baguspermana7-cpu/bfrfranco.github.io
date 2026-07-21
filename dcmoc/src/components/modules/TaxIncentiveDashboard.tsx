@@ -73,7 +73,7 @@ const TaxIncentiveDashboard = () => {
             {/* Header */}
             <div>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Receipt className="w-6 h-6 text-emerald-500" />
+                    <Receipt className="w-6 h-6 text-rz-data" />
                     Tax & Incentive Analysis
                 </h2>
                 <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
@@ -86,12 +86,12 @@ const TaxIncentiveDashboard = () => {
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-2 mb-1">
-                            <DollarSign className="w-4 h-4 text-emerald-500" />
+                            <DollarSign className="w-4 h-4 text-rz-data" />
                             <span className="text-xs text-slate-500 uppercase">Total Savings</span>
                             <Tooltip content="Net present value of all tax incentives over the project lifetime." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.totalIncentiveValue)}</div>
-                        <div className="text-xs text-emerald-500 mt-1">NPV of incentives</div>
+                        <div className="text-xs text-rz-data mt-1">NPV of incentives</div>
                     </CardContent>
                 </Card>
 
@@ -121,7 +121,7 @@ const TaxIncentiveDashboard = () => {
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-2 mb-1">
-                            <TrendingUp className="w-4 h-4 text-purple-500" />
+                            <TrendingUp className="w-4 h-4 text-rz-mint" />
                             <span className="text-xs text-slate-500 uppercase">IRR Uplift</span>
                             <Tooltip content="Increase in Internal Rate of Return attributable to tax incentives. Higher uplift makes the jurisdiction more attractive." />
                         </div>
@@ -176,7 +176,7 @@ const TaxIncentiveDashboard = () => {
                                     }}
                                 />
                                 <Area type="stepAfter" dataKey="standardRate" fill="#ef4444" fillOpacity={0.1} stroke="#ef4444" strokeDasharray="5 5" strokeWidth={1} />
-                                <Area type="stepAfter" dataKey="effectiveRate" fill="#10b981" fillOpacity={0.2} stroke="#10b981" strokeWidth={2} />
+                                <Area type="stepAfter" dataKey="effectiveRate" fill="#00FF88" fillOpacity={0.2} stroke="#00FF88" strokeWidth={2} />
                                 <Bar dataKey="savings" fill="#06b6d4" opacity={0.3} />
                             </ComposedChart>
                         </ResponsiveContainer>
@@ -187,7 +187,7 @@ const TaxIncentiveDashboard = () => {
                             <ul className="space-y-1">
                                 {result.incentiveSummary.map((item, i) => (
                                     <li key={i} className="text-xs text-slate-600 dark:text-slate-400 flex items-start gap-2">
-                                        <span className="text-emerald-500 mt-0.5">•</span> {item}
+                                        <span className="text-rz-data mt-0.5">•</span> {item}
                                     </li>
                                 ))}
                             </ul>
@@ -220,7 +220,7 @@ const TaxIncentiveDashboard = () => {
                                     {countryIncentiveData.slice(0, 15).map((entry) => (
                                         <Cell
                                             key={entry.code}
-                                            fill={entry.code === selectedCountry.id ? '#10b981' : '#06b6d4'}
+                                            fill={entry.code === selectedCountry.id ? '#00FF88' : '#00DDFF'}
                                             opacity={entry.code === selectedCountry.id ? 1 : 0.5}
                                         />
                                     ))}

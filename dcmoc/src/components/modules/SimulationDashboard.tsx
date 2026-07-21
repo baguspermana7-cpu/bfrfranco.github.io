@@ -246,10 +246,10 @@ export function SimulationDashboard() {
                         <div className="flex items-center justify-between rounded-md border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/60 px-3 py-2">
                             <span className="text-sm text-slate-900 dark:text-white">
                                 {selectedCountry ? `${selectedCountry.name} (${selectedCountry.id})` : '—'}
-                                <span className="ml-2 rounded bg-emerald-500/15 px-1 text-[9px] font-bold text-emerald-500">project</span>
+                                <span className="ml-2 rounded bg-rz-data/15 px-1 text-[9px] font-bold text-rz-data">project</span>
                             </span>
                             <button onClick={() => actions.setActiveTab('requirements')}
-                                className="text-[11px] text-violet-500 hover:underline">Edit in Requirements ↗</button>
+                                className="text-[11px] text-rz-mint hover:underline">Edit in Requirements ↗</button>
                         </div>
                     </div>
                     <div className="mb-8">
@@ -323,7 +323,7 @@ export function SimulationDashboard() {
                             {scenarioAQI === baselineAqi
                                 ? <span className="rounded bg-cyan-500/15 px-1.5 py-0.5 font-bold text-cyan-500" title={`Predefined from the ${selectedCountry.name} environment table (baselineAQI) — drag to override manually`}>≡ baseline {selectedCountry.id}: {baselineAqi} AQI</span>
                                 : <>
-                                    <span className="rounded bg-violet-500/15 px-1.5 py-0.5 font-bold text-violet-500">manual override</span>
+                                    <span className="rounded bg-rz-mint/15 px-1.5 py-0.5 font-bold text-rz-mint">manual override</span>
                                     <button className="text-cyan-500 hover:underline" onClick={() => { setScenarioAQI(baselineAqi); setAqiTouched(false); }}>reset to baseline {selectedCountry.id} ({baselineAqi})</button>
                                 </>}
                         </div>
@@ -357,9 +357,9 @@ export function SimulationDashboard() {
                         />
                         <div className="mt-1 flex items-center gap-2 text-[10px]">
                             {Math.abs(scenarioTurnover - baselineTurnover) < 0.005
-                                ? <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 font-bold text-emerald-500" title="Predefined from engine DATA.attritionFactors.voluntaryAttritionAvg (sourced) — drag to override manually">≡ engine baseline: {(baselineTurnover * 100).toFixed(0)}%</span>
+                                ? <span className="rounded bg-rz-data/15 px-1.5 py-0.5 font-bold text-rz-data" title="Predefined from engine DATA.attritionFactors.voluntaryAttritionAvg (sourced) — drag to override manually">≡ engine baseline: {(baselineTurnover * 100).toFixed(0)}%</span>
                                 : <>
-                                    <span className="rounded bg-violet-500/15 px-1.5 py-0.5 font-bold text-violet-500">manual override</span>
+                                    <span className="rounded bg-rz-mint/15 px-1.5 py-0.5 font-bold text-rz-mint">manual override</span>
                                     <button className="text-cyan-500 hover:underline" onClick={() => { setScenarioTurnover(baselineTurnover); setTurnoverTouched(false); }}>reset to engine baseline ({(baselineTurnover * 100).toFixed(0)}%)</button>
                                 </>}
                         </div>
@@ -431,7 +431,7 @@ export function SimulationDashboard() {
                             <div className="text-2xl font-bold text-slate-900 dark:text-white truncate" title={fmtMoneyFull(results.monthlyInternalCost)}>
                                 {fmtMoney(results.monthlyInternalCost)}
                             </div>
-                            <div className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1">
+                            <div className="text-[10px] text-rz-data mt-1 flex items-center gap-1">
                                 <Users className="w-3 h-3" />
                                 {results.headcount} Internal FTEs
                             </div>
@@ -489,7 +489,7 @@ export function SimulationDashboard() {
                     {/* --- OVERTIME REGULATORY ANALYSIS --- */}
                     <div className="bg-slate-200 dark:bg-slate-700/50 rounded-xl p-6 border border-slate-300 dark:border-slate-600 mb-6">
                         <div className="flex items-center gap-2 mb-4">
-                            <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <TrendingUp className="w-4 h-4 text-rz-data" />
                             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">Overtime & Regulatory Analysis (PP 35/2021) <Tooltip content="Overtime cost calculation based on local labor law multipliers. First 1-2 hours typically at 1.5x, subsequent hours at 2x base rate." /></h3>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -500,7 +500,7 @@ export function SimulationDashboard() {
                                 </div>
                                 <div className="h-2 bg-slate-300 dark:bg-slate-600 rounded-full overflow-hidden">
                                     <div
-                                        className={clsx("h-full transition-all duration-500", results.overtimeHours > 12 ? "bg-red-500" : "bg-emerald-500")}
+                                        className={clsx("h-full transition-all duration-500", results.overtimeHours > 12 ? "bg-red-500" : "bg-rz-data")}
                                         style={{ width: `${Math.min(100, (results.overtimeHours / 18) * 100)}%` }}
                                     />
                                 </div>
@@ -529,7 +529,7 @@ export function SimulationDashboard() {
                                 <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">Environmental Physics (Power Law) <Tooltip content="Mathematical model of environmental impact on equipment: temperature derating, humidity corrosion factor, and particulate accumulation rates." /></h3>
                             </div>
                             <div className="flex items-start gap-4">
-                                <div className="flex-1 bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg font-mono text-[10px] text-emerald-700 dark:text-emerald-400 border border-slate-400 dark:border-slate-700/50">
+                                <div className="flex-1 bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg font-mono text-[10px] text-rz-data border border-slate-400 dark:border-slate-700/50">
                                     <div className="text-slate-500 dark:text-slate-500 mb-1">Mathematical Formula</div>
                                     Life_Actual = Life_Base × (AQI_Base / AQI_Actual)^1.5
                                 </div>
@@ -599,7 +599,7 @@ export function SimulationDashboard() {
                                         </div>
                                         <div className="bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-400 dark:border-slate-700">
                                             <div className="text-[9px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1 flex items-center gap-1">Annual Energy <Tooltip content="Total facility energy consumption over a year in megawatt-hours." /></div>
-                                            <div className="text-lg font-bold text-violet-600 dark:text-purple-400 truncate">{fmtUnit(annualEnergyMWh, 'MWh')}</div>
+                                            <div className="text-lg font-bold text-rz-mint truncate">{fmtUnit(annualEnergyMWh, 'MWh')}</div>
                                             <div className="text-[9px] text-slate-500">{fmtMoney(annualCost)} @ ${elecRate.toFixed(2)}</div>
                                         </div>
                                     </>
@@ -610,11 +610,11 @@ export function SimulationDashboard() {
                         <div className="mt-4">
                             <div className="text-[9px] text-slate-500 font-bold uppercase mb-2">Power Chain Efficiency</div>
                             <div className="flex flex-wrap items-center text-[10px] font-mono gap-1">
-                                <div className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded w-24 text-center">Grid 98%</div>
+                                <div className="bg-rz-data/15 text-rz-data px-2 py-1 rounded w-24 text-center">Grid 98%</div>
                                 <div className="text-slate-400">→</div>
                                 <div className="bg-blue-500/20 text-blue-700 dark:text-blue-400 px-2 py-1 rounded w-24 text-center">UPS 94%</div>
                                 <div className="text-slate-400">→</div>
-                                <div className="bg-purple-500/20 text-purple-700 dark:text-purple-400 px-2 py-1 rounded w-24 text-center">PDU 97%</div>
+                                <div className="bg-rz-data/20 text-rz-data px-2 py-1 rounded w-24 text-center">PDU 97%</div>
                                 <div className="text-slate-400">→</div>
                                 <div className="bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 px-2 py-1 rounded w-24 text-center">IT Load OK</div>
                             </div>
@@ -677,7 +677,7 @@ export function SimulationDashboard() {
                         <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
                             <div className={`shrink-0 w-2 h-2 rounded-full mt-1.5 ${
                                 row.direction === 'cost-up' ? 'bg-rose-400' :
-                                row.direction === 'mixed' ? 'bg-amber-400' : 'bg-emerald-400'
+                                row.direction === 'mixed' ? 'bg-amber-400' : 'bg-rz-data'
                             }`} />
                             <div className="flex-1 min-w-0">
                                 <div className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-0.5">{row.lever}</div>
@@ -695,14 +695,14 @@ export function SimulationDashboard() {
                 <div className="mt-3 flex items-center gap-4 text-[10px] text-slate-500">
                     <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-400 inline-block" /> Increases cost</span>
                     <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-400 inline-block" /> Mixed (cost + benefit)</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" /> Reduces cost</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rz-data inline-block" /> Reduces cost</span>
                 </div>
             </div>
 
             {/* Environmental Impact */}
             <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-6 mt-6">
                 <h3 className="text-md font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                    <CloudFog className="w-4 h-4 text-emerald-500" />
+                    <CloudFog className="w-4 h-4 text-rz-data" />
                     Environmental Impact
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

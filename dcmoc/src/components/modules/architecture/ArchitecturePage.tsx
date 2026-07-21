@@ -194,8 +194,8 @@ export function ArchitecturePage() {
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-lg">
-                        <Boxes className="h-6 w-6 text-white" />
+                    <div className="flex h-11 w-11 items-center justify-center rounded border border-rz-2 bg-rz-elevated">
+                        <Boxes className="h-6 w-6 text-rz-info" />
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Architecture Engine</h1>
@@ -205,13 +205,13 @@ export function ArchitecturePage() {
                 <div className="flex flex-wrap items-center gap-2">
                     <label className="text-[10px] uppercase text-slate-500">Standard
                         <select value={arch.designStandard} onChange={(e) => onStandard(e.target.value as DesignStandard)}
-                            className="ml-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs normal-case text-slate-900 dark:text-slate-100 outline-none focus:border-violet-500">
+                            className="ml-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs normal-case text-slate-900 dark:text-slate-100 outline-none focus:border-rz-signal">
                             {DESIGN_STANDARDS.map((d) => <option key={d.id} value={d.id}>{d.label}</option>)}
                         </select>
                     </label>
                     <label className="text-[10px] uppercase text-slate-500">Profile
                         <select value={arch.profileId} onChange={(e) => onProfile(e.target.value)}
-                            className={`ml-1.5 rounded-lg border ${profileDrift ? 'border-amber-500/70' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs normal-case text-slate-900 dark:text-slate-100 outline-none focus:border-violet-500`}>
+                            className={`ml-1.5 rounded-lg border ${profileDrift ? 'border-amber-500/70' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs normal-case text-slate-900 dark:text-slate-100 outline-none focus:border-rz-signal`}>
                             {ARCH_PROFILES.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
                         </select>
                     </label>
@@ -221,16 +221,16 @@ export function ArchitecturePage() {
                             ⚠ {profileDrift.msg} · apply
                         </button>
                     )}
-                    <button onClick={onExport} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
-                    <button onClick={onSave} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><Save className="h-3.5 w-3.5" />Save</button>
-                    <button onClick={() => setActiveTab('capacity')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: Capacity Planning <ChevronRight className="h-3.5 w-3.5" /></button>
+                    <button onClick={onExport} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-rz-mint"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
+                    <button onClick={onSave} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-rz-mint"><Save className="h-3.5 w-3.5" />Save</button>
+                    <button onClick={() => setActiveTab('capacity')} className="inline-flex items-center gap-1 rounded-lg bg-rz-signal px-3 py-1.5 text-xs font-semibold text-rz-base hover:bg-rz-signal/90">Next: Capacity Planning <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>
 
             <div className="flex gap-1 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-1">
                 {STRIP.map((t) => (
                     <button key={t.id} onClick={() => document.getElementById(t.id)?.scrollIntoView({ behavior: 'smooth' })}
-                        className="whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-300 hover:bg-violet-600/10">{t.label}</button>
+                        className="whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-300 hover:bg-rz-signal/10">{t.label}</button>
                 ))}
             </div>
 
@@ -261,13 +261,13 @@ export function ArchitecturePage() {
                     </div>
 
                     {/* dynamic diagram */}
-                    <div id="sec-arch-diagram" className="scroll-mt-24 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                    <div id="sec-arch-diagram" className="scroll-mt-24 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <div className="mb-2 flex items-center justify-between">
-                            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">System Architecture Diagram <span className="ml-1 text-[9px] normal-case text-violet-400">live — recomputed from requirements</span></h2>
+                            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">System Architecture Diagram <span className="ml-1 text-[9px] normal-case text-rz-mint">live — recomputed from requirements</span></h2>
                             <div className="flex gap-1">
                                 {(['logical', 'sld'] as const).map((v) => (
                                     <button key={v} onClick={() => arch.actions.set({ diagramView: v })}
-                                        className={`rounded px-2 py-0.5 text-[10px] font-medium ${arch.diagramView === v ? 'bg-violet-600 text-white' : 'text-slate-500 hover:bg-violet-600/10'}`}>
+                                        className={`rounded px-2 py-0.5 text-[10px] font-medium ${arch.diagramView === v ? 'bg-rz-signal text-rz-base' : 'text-slate-500 hover:bg-rz-signal/10'}`}>
                                         {v === 'logical' ? 'Logical View' : 'Single Line Diagram'}
                                     </button>
                                 ))}

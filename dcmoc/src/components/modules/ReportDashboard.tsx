@@ -82,7 +82,7 @@ export function ReportDashboard() {
     // Branding State
     const [branding, setBranding] = useState({
         primaryColor: '#0891b2', // Cyan-600
-        secondaryColor: '#10b981', // Emerald-500
+        secondaryColor: '#00FF88', // data green
         companyName: 'DCMOC v2.0',
         logoBase64: ''
     });
@@ -502,7 +502,7 @@ export function ReportDashboard() {
                     <button
                         onClick={() => handleExport('detailed')}
                         disabled={!!isGenerating}
-                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white rounded-lg text-sm font-medium shadow-lg shadow-cyan-900/20 transition-all disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2 bg-rz-signal hover:bg-rz-signal/90 text-black rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
                     >
                         {isGenerating === 'detailed' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                         Generate Full Report
@@ -516,7 +516,7 @@ export function ReportDashboard() {
                     {/* Branding */}
                     <div className="space-y-4">
                         <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                            <Shield className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+                            <Shield className="w-4 h-4 text-rz-data" />
                             Branding Configuration
                         </h3>
                         <div className="space-y-3">
@@ -611,7 +611,7 @@ export function ReportDashboard() {
                                 <h4 className="text-sm font-medium text-slate-700 dark:text-slate-200">{section.title}</h4>
                                 <span className={clsx(
                                     "text-xs px-2 py-0.5 rounded-full font-medium",
-                                    section.status === 'positive' ? "bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900" :
+                                    section.status === 'positive' ? "bg-rz-data/10 dark:bg-rz-data/10 text-rz-data border border-rz-data/30 dark:border-rz-data/30" :
                                         section.status === 'negative' ? "bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900" :
                                             "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
                                 )}>
@@ -631,7 +631,7 @@ export function ReportDashboard() {
                 <div className="bg-white dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm dark:shadow-none">
                     <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
                         <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                            <BarChart3 className="w-5 h-5 text-violet-500 dark:text-violet-400" />
+                            <BarChart3 className="w-5 h-5 text-rz-mint" />
                             Scenario Comparison
                         </h3>
                         <p className="text-xs text-slate-500 mt-1">Select two saved scenarios to compare side-by-side</p>
@@ -687,7 +687,7 @@ export function ReportDashboard() {
                                     <thead>
                                         <tr className="border-b border-slate-200 dark:border-slate-700">
                                             <th className="py-2 text-left text-xs text-slate-500 font-medium">Metric</th>
-                                            <th className="py-2 text-right text-xs text-violet-600 dark:text-violet-400 font-medium">{sA.name}</th>
+                                            <th className="py-2 text-right text-xs text-rz-mint font-medium">{sA.name}</th>
                                             <th className="py-2 text-right text-xs text-cyan-600 dark:text-cyan-400 font-medium">{sB.name}</th>
                                             <th className="py-2 text-right text-xs text-slate-500 font-medium">Delta (B-A)</th>
                                         </tr>
@@ -700,7 +700,7 @@ export function ReportDashboard() {
                                                 <td className="py-3 text-right font-mono text-slate-600 dark:text-slate-400">{row.b}</td>
                                                 <td className="py-3 text-right font-mono">
                                                     <span className={clsx(
-                                                        row.delta > 0 ? 'text-red-500 dark:text-red-400' : row.delta < 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500'
+                                                        row.delta > 0 ? 'text-red-500 dark:text-red-400' : row.delta < 0 ? 'text-rz-data' : 'text-slate-500'
                                                     )}>
                                                         {row.delta > 0 ? '+' : row.delta < 0 ? '-' : ''}{row.fmtDelta}
                                                     </span>
@@ -735,9 +735,9 @@ export function ReportDashboard() {
                 <button
                     onClick={() => handleExport('capex')}
                     disabled={!!isGenerating}
-                    className="flex flex-col items-center justify-center gap-2 p-5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 rounded-xl transition-all group shadow-sm dark:shadow-none"
+                    className="flex flex-col items-center justify-center gap-2 p-5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-rz-data/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 rounded-xl transition-all group shadow-sm dark:shadow-none"
                 >
-                    <div className="p-3 rounded-full bg-slate-100 dark:bg-slate-800 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
+                    <div className="p-3 rounded-full bg-slate-100 dark:bg-slate-800 group-hover:bg-rz-data/10 text-rz-data group-hover:text-rz-data transition-colors">
                         <Building2 className="w-5 h-5" />
                     </div>
                     <div className="text-center">
@@ -763,9 +763,9 @@ export function ReportDashboard() {
                 <button
                     onClick={() => handleExport('country-intel')}
                     disabled={!!isGenerating}
-                    className="flex flex-col items-center justify-center gap-2 p-5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-purple-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 rounded-xl transition-all group shadow-sm dark:shadow-none"
+                    className="flex flex-col items-center justify-center gap-2 p-5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-rz-mint/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 rounded-xl transition-all group shadow-sm dark:shadow-none"
                 >
-                    <div className="p-3 rounded-full bg-slate-100 dark:bg-slate-800 group-hover:bg-purple-100 dark:group-hover:bg-purple-950/50 text-purple-600 dark:text-purple-400 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors">
+                    <div className="p-3 rounded-full bg-slate-100 dark:bg-slate-800 group-hover:bg-rz-mint/10 text-rz-mint transition-colors">
                         <Globe className="w-5 h-5" />
                     </div>
                     <div className="text-center">
@@ -793,9 +793,9 @@ export function ReportDashboard() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     {[
                         { label: 'Total Headcount', value: `${fullData.totalHeadcount}`, sub: 'FTE', icon: Users, color: 'text-cyan-600 dark:text-cyan-400' },
-                        { label: 'Monthly OPEX', value: fmtMoney(fullData.totalMonthlyLabor), sub: 'Labor + Staff', icon: DollarSign, color: 'text-emerald-600 dark:text-emerald-400' },
+                        { label: 'Monthly OPEX', value: fmtMoney(fullData.totalMonthlyLabor), sub: 'Labor + Staff', icon: DollarSign, color: 'text-rz-data' },
                         { label: 'Annual TCO', value: fmtMoney(fullData.annualTCO), sub: 'OPEX + Maint + Depr', icon: TrendingUp, color: 'text-amber-600 dark:text-amber-400' },
-                        { label: '5-Year TCO', value: fmtMoney(fullData.fiveYearTCO), sub: `${simYear}-${simYear + 4}`, icon: BarChart3, color: 'text-violet-600 dark:text-violet-400' },
+                        { label: '5-Year TCO', value: fmtMoney(fullData.fiveYearTCO), sub: `${simYear}-${simYear + 4}`, icon: BarChart3, color: 'text-rz-mint' },
                         { label: 'CAPEX $/kW', value: `$${fullData.capex.metrics?.perKw?.toLocaleString() || '0'}`, sub: `PUE ${fullData.capex.pue?.toFixed(2) || 'N/A'}`, icon: Zap, color: 'text-orange-600 dark:text-orange-400' },
                         { label: 'Availability', value: `${fullData.riskData?.availability?.toFixed(3) || ({2:'99.741',3:'99.982',4:'99.995'}[inputs.tierLevel as 2|3|4] || '—')}%`, sub: `Tier ${inputs.tierLevel}`, icon: Shield, color: 'text-blue-600 dark:text-blue-400' },
                     ].map((kpi, i) => (
@@ -819,7 +819,7 @@ export function ReportDashboard() {
                         className="w-full flex items-center justify-between px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors"
                     >
                         <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                            <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                            <DollarSign className="w-5 h-5 text-rz-data" />
                             Annual Cost Capitulation
                         </h3>
                         <ChevronDown className={clsx('w-5 h-5 text-slate-400 transition-transform', expandedSection === 'cost' && 'rotate-180')} />
@@ -979,7 +979,7 @@ export function ReportDashboard() {
                     {/* Shift Model Summary */}
                     <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm dark:shadow-none">
                         <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
-                            <Clock className="w-5 h-5 text-violet-500 dark:text-violet-400" />
+                            <Clock className="w-5 h-5 text-rz-mint" />
                             Shift Model Analysis
                         </h3>
                         <div className="space-y-3">
@@ -1021,7 +1021,7 @@ export function ReportDashboard() {
                             <div className="text-xs text-slate-500">Redundancy Level</div>
                         </div>
                         <div className="text-center p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg border border-slate-100 dark:border-slate-800">
-                            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{fullData.riskData?.availability?.toFixed(3) || ({2:'99.741',3:'99.982',4:'99.995'}[inputs.tierLevel as 2|3|4] || '—')}%</div>
+                            <div className="text-2xl font-bold text-rz-data">{fullData.riskData?.availability?.toFixed(3) || ({2:'99.741',3:'99.982',4:'99.995'}[inputs.tierLevel as 2|3|4] || '—')}%</div>
                             <div className="text-xs text-slate-500">Expected Availability</div>
                         </div>
                         <div className="text-center p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg border border-slate-100 dark:border-slate-800">
@@ -1040,20 +1040,20 @@ export function ReportDashboard() {
             {visibleSections.has('maintStrategy') && (
                 <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm dark:shadow-none">
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
-                        <Wrench className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
+                        <Wrench className="w-5 h-5 text-rz-data" />
                         Maintenance Strategy Overview
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         {fullData.strategyData.strategies.map((s) => (
                             <div key={s.id} className={clsx(
                                 "bg-slate-50 dark:bg-slate-950/50 rounded-lg p-4 border transition-colors",
-                                s.id === fullData.strategyData.recommended ? "border-emerald-500/30 dark:border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-950/10" : "border-slate-200 dark:border-slate-800"
+                                s.id === fullData.strategyData.recommended ? "border-rz-data/30 bg-rz-data/10" : "border-slate-200 dark:border-slate-800"
                             )}>
                                 <div className="flex items-center gap-2 mb-2">
                                     <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.color }} />
                                     <span className="text-sm font-bold text-slate-900 dark:text-white">{s.label}</span>
                                     {s.id === fullData.strategyData.recommended && (
-                                        <span className="text-[9px] bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded-full font-bold">REC</span>
+                                        <span className="text-[9px] bg-rz-data/10 dark:bg-rz-data/10 text-rz-data px-1.5 py-0.5 rounded-full font-bold">REC</span>
                                     )}
                                 </div>
                                 <div className="grid grid-cols-2 gap-y-1 text-xs">
@@ -1067,7 +1067,7 @@ export function ReportDashboard() {
                             </div>
                         ))}
                     </div>
-                    <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/30 rounded-lg p-3">
+                    <div className="bg-rz-data/10 dark:bg-rz-data/10 border border-rz-data/30 dark:border-rz-data/30 rounded-lg p-3">
                         <p className="text-sm text-slate-700 dark:text-slate-300">{fullData.strategyData.recommendationReason}</p>
                     </div>
                 </div>
@@ -1088,7 +1088,7 @@ export function ReportDashboard() {
                                     </div>
                                     {insight.severity === 'high' && <AlertTriangle className="w-5 h-5 text-red-500" />}
                                     {insight.severity === 'medium' && <TrendingUp className="w-5 h-5 text-amber-500" />}
-                                    {insight.severity === 'low' && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
+                                    {insight.severity === 'low' && <CheckCircle2 className="w-5 h-5 text-rz-data" />}
                                 </div>
                                 <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-2">{insight.title}</h3>
                                 <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-3">{insight.description}</p>
@@ -1161,14 +1161,14 @@ export function ReportDashboard() {
                 const total = staffCost + energyCost + maintenanceCost + complianceCost;
 
                 const nodes: SankeyNode[] = [
-                    { id: 'total', label: 'Annual OPEX', value: total, color: '#06b6d4', column: 0 },
-                    { id: 'labor', label: 'Labor', value: staffCost, color: '#8b5cf6', column: 1 },
+                    { id: 'total', label: 'Annual OPEX', value: total, color: '#00DDFF', column: 0 },
+                    { id: 'labor', label: 'Labor', value: staffCost, color: '#7DDDB4', column: 1 },
                     { id: 'energy', label: 'Energy', value: energyCost, color: '#f59e0b', column: 1 },
-                    { id: 'maint', label: 'Maintenance', value: maintenanceCost, color: '#10b981', column: 1 },
+                    { id: 'maint', label: 'Maintenance', value: maintenanceCost, color: '#00FF88', column: 1 },
                     { id: 'compliance', label: 'Compliance', value: complianceCost, color: '#ef4444', column: 1 },
-                    { id: 'leads', label: 'Shift Leads', value: (selectedCountry?.labor.baseSalary_ShiftLead || 0) * inputs.headcount_ShiftLead * 12, color: '#a78bfa', column: 2 },
-                    { id: 'engineers', label: 'Engineers', value: (selectedCountry?.labor.baseSalary_Engineer || 0) * inputs.headcount_Engineer * 12, color: '#a78bfa', column: 2 },
-                    { id: 'techs', label: 'Technicians', value: (selectedCountry?.labor.baseSalary_Technician || 0) * inputs.headcount_Technician * 12, color: '#a78bfa', column: 2 },
+                    { id: 'leads', label: 'Shift Leads', value: (selectedCountry?.labor.baseSalary_ShiftLead || 0) * inputs.headcount_ShiftLead * 12, color: '#5FB894', column: 2 },
+                    { id: 'engineers', label: 'Engineers', value: (selectedCountry?.labor.baseSalary_Engineer || 0) * inputs.headcount_Engineer * 12, color: '#5FB894', column: 2 },
+                    { id: 'techs', label: 'Technicians', value: (selectedCountry?.labor.baseSalary_Technician || 0) * inputs.headcount_Technician * 12, color: '#5FB894', column: 2 },
                     { id: 'cooling_e', label: 'Cooling Energy', value: energyCost * 0.35, color: '#fbbf24', column: 2 },
                     { id: 'it_e', label: 'IT Power', value: energyCost * 0.65, color: '#fbbf24', column: 2 },
                 ];
@@ -1210,27 +1210,27 @@ export function ReportDashboard() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {[
-                        { type: 'simulation', label: 'Full Simulation Report', desc: 'OPEX, projections, insights', color: 'from-cyan-600 to-blue-600' },
-                        { type: 'staffing', label: 'Staffing Analysis PDF', desc: 'Roles, shifts, roster, 5yr projection', color: 'from-violet-600 to-purple-600' },
-                        { type: 'capex', label: 'CAPEX Report PDF', desc: 'Cost breakdown, timeline, PUE', color: 'from-orange-600 to-red-600' },
-                        { type: 'maintenance', label: 'Maintenance Report PDF', desc: 'Strategy, SLA, spares analysis', color: 'from-emerald-600 to-teal-600' },
-                        { type: 'country-intel', label: 'Country Intelligence PDF', desc: 'Tax, disaster, grid, talent index', color: 'from-purple-600 to-indigo-600' },
-                        { type: 'capacity-plan', label: 'Capacity Planning PDF', desc: 'Phased build, staffing ramp, finance', color: 'from-indigo-600 to-blue-600' },
+                        { type: 'simulation', label: 'Full Simulation Report', desc: 'OPEX, projections, insights' },
+                        { type: 'staffing', label: 'Staffing Analysis PDF', desc: 'Roles, shifts, roster, 5yr projection' },
+                        { type: 'capex', label: 'CAPEX Report PDF', desc: 'Cost breakdown, timeline, PUE' },
+                        { type: 'maintenance', label: 'Maintenance Report PDF', desc: 'Strategy, SLA, spares analysis' },
+                        { type: 'country-intel', label: 'Country Intelligence PDF', desc: 'Tax, disaster, grid, talent index' },
+                        { type: 'capacity-plan', label: 'Capacity Planning PDF', desc: 'Phased build, staffing ramp, finance' },
                     ].map(btn => (
                         <button
                             key={btn.type}
                             onClick={() => handleExport(btn.type)}
                             disabled={isGenerating !== null}
                             className={clsx(
-                                'flex items-center gap-3 px-5 py-4 rounded-xl text-left transition-all',
-                                `bg-gradient-to-r ${btn.color} hover:opacity-90`,
-                                'disabled:opacity-50 disabled:cursor-not-allowed text-white shadow-md'
+                                'flex items-center gap-3 px-5 py-4 rounded text-left transition-colors',
+                                'bg-white dark:bg-rz-elevated border border-slate-200 dark:border-rz-2 hover:border-rz-signal/50',
+                                'disabled:opacity-50 disabled:cursor-not-allowed'
                             )}
                         >
-                            {isGenerating === btn.type ? <Loader2 className="w-5 h-5 animate-spin text-white" /> : <Download className="w-5 h-5 text-white" />}
+                            {isGenerating === btn.type ? <Loader2 className="w-5 h-5 animate-spin text-rz-signal" /> : <Download className="w-5 h-5 text-rz-signal" />}
                             <div>
-                                <div className="text-white font-medium text-sm">{btn.label}</div>
-                                <div className="text-white/60 text-xs">{btn.desc}</div>
+                                <div className="text-slate-900 dark:text-white font-medium text-sm">{btn.label}</div>
+                                <div className="text-slate-500 dark:text-slate-400 text-xs">{btn.desc}</div>
                             </div>
                         </button>
                     ))}

@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { IBM_Plex_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Shell } from '@/components/layout/Shell';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 
-const inter = Inter({
-  variable: '--font-inter',
+// IBM Plex Sans over Inter (design.md §4) — "engineering document made
+// beautiful" rather than "SaaS default"; needs explicit weights.
+const ibmPlexSans = IBM_Plex_Sans({
+  variable: '--font-ibm-plex-sans',
+  weight: ['400', '600', '700'],
   subsets: ['latin'],
 });
 
@@ -36,14 +39,14 @@ export default function RootLayout({
             Consumed via src/lib/rz-engine.ts (with local fallbacks). v2.4.0 adds
             the DC-OS Layer engines: reliability/site/commissioning/asset/
             construction/requirements/architecture. */}
-        <script src="/rz-engine.min.js?v=2026-07-21-j" defer></script>
+        <script src="/rz-engine.min.js?v=2026-07-21-k" defer></script>
         {/* Shared RZExplain knowledge DB (window.RZ_EXPLAIN_DB, 802 entries) —
             consumed via src/lib/explain.ts + <Explain k="..."/> (SSR-guarded,
             renders nothing when absent). */}
         <script src="/js/rz-explain-db.js?v=2026-07-19-cc" defer></script>
       </head>
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
+        className={`${ibmPlexSans.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <ThemeProvider defaultTheme="dark" storageKey="dcmoc-theme">
           <Shell>

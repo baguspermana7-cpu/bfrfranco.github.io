@@ -26,7 +26,7 @@ const BOM_TRACE: Partial<Record<string, string>> = {
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
     return (
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
             <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">{title}</h3>
             {children}
         </div>
@@ -49,7 +49,7 @@ export function ThermalTopologyRow({ i }: { i: ArchInputs }) {
                         <div className="flex justify-between"><span className="text-slate-500">Class</span><span className="font-medium text-slate-800 dark:text-slate-200">{thermal.label}</span></div>
                         <div className="flex justify-between"><span className="text-slate-500">Supply Temp</span><span className="tabular-nums text-slate-800 dark:text-slate-200">{thermal.supplyTempC} °C</span></div>
                         <div className="flex justify-between"><span className="text-slate-500">ΔT</span><span className="tabular-nums text-slate-800 dark:text-slate-200">{thermal.deltaTK} K (band {thermal.deltaTBand?.join('–')} K)</span></div>
-                        <div className={`rounded px-2 py-1 text-center text-[10px] font-semibold ${thermal.compliant ? 'bg-emerald-500/15 text-emerald-500' : 'bg-amber-500/15 text-amber-500'}`}>
+                        <div className={`rounded px-2 py-1 text-center text-[10px] font-semibold ${thermal.compliant ? 'bg-rz-data/15 text-rz-data' : 'bg-amber-500/15 text-amber-500'}`}>
                             {thermal.compliant ? 'Compliant' : `${thermal.flags?.length ?? 0} flag(s)`}
                         </div>
                         {(thermal.flags ?? []).map((fl, idx) => <p key={idx} className="text-[10px] text-amber-500">⚠ {fl}</p>)}
@@ -118,9 +118,9 @@ export function BomSection({ i, eq }: { i: ArchInputs; eq: EquipCounts }) {
                     ))}
                 </div>
                 {fee && (
-                    <div className="mt-2 rounded-lg bg-violet-600/10 px-2 py-1.5 text-[11px]">
+                    <div className="mt-2 rounded-lg bg-rz-signal/10 px-2 py-1.5 text-[11px]">
                         <span className="text-slate-500">Design fee ({band} complexity): </span>
-                        <b className="text-violet-500">{(fee.rate * 100).toFixed(0)}% · ${(fee.feeUsd / 1e6).toFixed(1)}M</b>
+                        <b className="text-rz-mint">{(fee.rate * 100).toFixed(0)}% · ${(fee.feeUsd / 1e6).toFixed(1)}M</b>
                         <span className="text-[9px] text-slate-400"> of construction capex</span>
                     </div>
                 )}
@@ -156,7 +156,7 @@ export function BottomCards({ i, targetTier }: { i: ArchInputs; targetTier: 3 | 
             </Card>
             <Card title="Reference Design Selected">
                 <div className="text-[11px] space-y-1">
-                    <div className="font-mono font-semibold text-violet-500">{referenceDesignId(i)}</div>
+                    <div className="font-mono font-semibold text-rz-mint">{referenceDesignId(i)}</div>
                     <p className="text-slate-600 dark:text-slate-300">{i.useCase.toUpperCase()} data center with {i.coolingType === 'liquid' ? 'direct-to-chip liquid cooling' : `${i.coolingType} cooling`}, {i.redundancy} power & cooling.</p>
                     <p className="text-[10px] text-slate-500">Applicable load: {Math.round(i.itLoadKw / 2000)}–{Math.round(i.itLoadKw / 500)} MW</p>
                     <p className="text-[9px] text-slate-400">Pattern template (screening reference, not a certified design). Saved scenarios: {scenarios.length}.</p>
@@ -174,7 +174,7 @@ export function BottomCards({ i, targetTier }: { i: ArchInputs; targetTier: 3 | 
                             </div>
                             {c.pct != null && (
                                 <div className="mt-0.5 h-1 rounded bg-slate-100 dark:bg-slate-800">
-                                    <div className={`h-1 rounded ${c.pct >= 100 ? 'bg-emerald-500' : 'bg-amber-500'}`} style={{ width: `${c.pct}%` }} />
+                                    <div className={`h-1 rounded ${c.pct >= 100 ? 'bg-rz-data' : 'bg-amber-500'}`} style={{ width: `${c.pct}%` }} />
                                 </div>
                             )}
                             <div className="text-[9px] text-slate-400">{c.note}</div>
@@ -190,7 +190,7 @@ export function BottomCards({ i, targetTier }: { i: ArchInputs; targetTier: 3 | 
                     <li>✓ Export architecture package</li>
                 </ul>
                 <button onClick={() => setActiveTab('capacity')}
-                    className="mt-2 inline-flex w-full items-center justify-center gap-1 rounded-xl bg-violet-600 py-2 text-xs font-semibold text-white hover:bg-violet-500">
+                    className="mt-2 inline-flex w-full items-center justify-center gap-1 rounded-xl bg-rz-signal py-2 text-xs font-semibold text-rz-base hover:bg-rz-signal/90">
                     Next: Capacity Planning <ChevronRight className="h-3.5 w-3.5" />
                 </button>
             </Card>

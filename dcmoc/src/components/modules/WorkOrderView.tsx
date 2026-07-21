@@ -301,7 +301,7 @@ export function WorkOrderView() {
                                                     <div
                                                         className={clsx(
                                                             'h-2 rounded-full transition-all',
-                                                            loadPct > 80 ? 'bg-red-500' : loadPct > 50 ? 'bg-amber-500' : 'bg-emerald-500'
+                                                            loadPct > 80 ? 'bg-red-500' : loadPct > 50 ? 'bg-amber-500' : 'bg-rz-data'
                                                         )}
                                                         style={{ width: `${Math.max(2, loadPct)}%` }}
                                                     />
@@ -330,9 +330,9 @@ export function WorkOrderView() {
                                         <div
                                             className={clsx(
                                                 'h-6 rounded-full flex items-center justify-end px-2 transition-all',
-                                                barWidth > 80 ? 'bg-gradient-to-r from-red-600 to-red-500' :
-                                                    barWidth > 50 ? 'bg-gradient-to-r from-amber-600 to-amber-500' :
-                                                        'bg-gradient-to-r from-emerald-600 to-cyan-500'
+                                                barWidth > 80 ? 'bg-rz-alert' :
+                                                    barWidth > 50 ? 'bg-rz-signal' :
+                                                        'bg-rz-data'
                                             )}
                                             style={{ width: `${Math.max(3, barWidth)}%` }}
                                         >
@@ -427,7 +427,7 @@ function PersonCalendar({
                                 <span className={clsx(
                                     'px-2 py-1 rounded text-xs font-medium',
                                     week.status === 'overloaded' ? 'bg-red-900/50 text-red-400' :
-                                        week.status === 'normal' ? 'bg-emerald-900/50 text-emerald-400' :
+                                        week.status === 'normal' ? 'bg-rz-data/10 text-rz-data' :
                                             'bg-slate-800 text-slate-400'
                                 )}>
                                     {week.totalWOHours.toFixed(1)}h / {week.shiftHoursAvailable.toFixed(0)}h
@@ -465,7 +465,7 @@ function PersonCalendar({
                                         className={clsx(
                                             'h-1.5 rounded-full',
                                             week.utilizationPercent > 90 ? 'bg-red-500' :
-                                                week.utilizationPercent > 60 ? 'bg-amber-500' : 'bg-emerald-500'
+                                                week.utilizationPercent > 60 ? 'bg-amber-500' : 'bg-rz-data'
                                         )}
                                         style={{ width: `${Math.min(100, Math.max(2, week.utilizationPercent))}%` }}
                                     />

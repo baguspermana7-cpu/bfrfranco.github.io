@@ -87,7 +87,7 @@ export function RealMap({ sites, selectedId, onSelect, height = 300, mapStyle = 
                 const el = document.createElement('button');
                 el.setAttribute('aria-label', s.name);
                 el.style.cssText = `width:26px;height:26px;border-radius:50%;border:2.5px solid #fff;cursor:pointer;
-                    background:${s.id === selectedId ? '#8b5cf6' : '#0ea5e9'};color:#fff;font-size:11px;font-weight:800;
+                    background:${s.id === selectedId ? '#7DDDB4' : '#0ea5e9'};color:#fff;font-size:11px;font-weight:800;
                     box-shadow:0 2px 8px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;`;
                 el.textContent = s.label;
                 el.onclick = () => onSelect?.(s.id);

@@ -24,7 +24,7 @@ export function CountrySelect({ value, onChange, className = '' }: {
     React.useEffect(() => { setRegion(regionOf(value)); }, [value]);
 
     const countries = REGIONS[region] ?? [];
-    const base = 'rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-violet-500';
+    const base = 'rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-rz-mint';
 
     return (
         <div className={`flex gap-1.5 ${className}`}>

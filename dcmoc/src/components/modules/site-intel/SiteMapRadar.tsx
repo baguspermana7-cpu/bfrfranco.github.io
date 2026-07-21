@@ -10,7 +10,7 @@ import { AXIS_LABELS } from '@/types/site-intel';
 import { integratedAxes, type SiteAnalyses } from '@/lib/site-adapter';
 
 const MAP_STYLES = ['Map', 'Satellite'] as const;   // DI5 — hanya style NYATA (Hybrid/3D dihapus, no fake)
-const SITE_COLORS = ['#a78bfa', '#22d3ee', '#34d399', '#f59e0b', '#fb7185'];
+const SITE_COLORS = ['#7DDDB4', '#00DDFF', '#00FF88', '#FFAA00', '#FF3030'];
 
 export function SiteMapPanel({ sites, results, selectedId, onSelect }: {
     sites: CandidateSite[]; results: SiteScoreResult[]; selectedId: string | null; onSelect: (id: string) => void;
@@ -25,13 +25,13 @@ export function SiteMapPanel({ sites, results, selectedId, onSelect }: {
     }[style];
     const score = (id: string) => results.find((r) => r.siteId === id);
     return (
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
             <div className="mb-2 flex items-center justify-between">
                 <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Site Location & Overview</h2>
                 <div className="flex gap-1">
                     {MAP_STYLES.map((s) => (
                         <button key={s} onClick={() => setStyle(s)}
-                            className={`rounded px-1.5 py-0.5 text-[10px] ${style === s ? 'bg-violet-600 text-white' : 'text-slate-500 hover:bg-violet-600/10'}`}>{s}</button>
+                            className={`rounded px-1.5 py-0.5 text-[10px] ${style === s ? 'bg-rz-signal text-black' : 'text-slate-500 hover:bg-rz-signal/10'}`}>{s}</button>
                     ))}
                 </div>
             </div>
@@ -98,7 +98,7 @@ export function SiteRadarPanel({ sites, results, analysesById }: {
         });
     }
     return (
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
             <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Site Intelligence Score Breakdown</h2>
             <p className="mb-1 text-[9px] text-slate-400">{integrated ? 'Integrated axes — grid/disaster/tax/talent/compliance computed per site by the sibling engines' : '8-axis presentation view — authoritative Total Score = engine models.site.score'}</p>
             <div className="h-64">

@@ -80,8 +80,8 @@ export function SiteIntelligencePage() {
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg">
-                        <MapPin className="h-6 w-6 text-white" />
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-rz-info/15 border border-rz-info/40">
+                        <MapPin className="h-6 w-6 text-rz-info" />
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Site Intelligence Engine</h1>
@@ -91,14 +91,14 @@ export function SiteIntelligencePage() {
                 <div className="flex items-center gap-2 text-[11px] text-slate-500">
                     <span className="rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5">{sites.length} site{sites.length > 1 ? 's' : ''} selected</span>
                     <span className="rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5">IT Load Target: <b className="text-slate-900 dark:text-white">{itLoadMw.toFixed(0)} MW</b></span>
-                    <button onClick={() => setDrawer(true)} className="rounded-lg bg-violet-600 px-3 py-1.5 font-semibold text-white hover:bg-violet-500">Edit Criteria</button>
+                    <button onClick={() => setDrawer(true)} className="rounded-lg bg-rz-signal px-3 py-1.5 font-semibold text-black hover:bg-rz-signal/90">Edit Criteria</button>
                 </div>
             </div>
 
             <div className="flex gap-1 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-1">
                 {STRIP.map((t) => (
                     <button key={t.id} onClick={() => document.getElementById(t.id)?.scrollIntoView({ behavior: 'smooth' })}
-                        className={`whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[11px] font-medium ${activeSec === t.id ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-violet-600/10'}`}>
+                        className={`whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[11px] font-medium ${activeSec === t.id ? 'bg-rz-signal text-black' : 'text-slate-600 dark:text-slate-300 hover:bg-rz-signal/10'}`}>
                         {t.label}
                     </button>
                 ))}
@@ -120,7 +120,7 @@ export function SiteIntelligencePage() {
                             { label: 'Water & Cooling', value: `${kpi.waterCoolingScore}`, sub: 'water + climate' },
                             { label: 'Risk Score', value: `${kpi.riskScore}`, sub: 'lower is better' },
                         ].map((k) => (
-                            <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className={`rounded-xl border p-3 ${k.hi ? 'border-violet-500/50 bg-violet-600/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50'}`}>
+                            <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className={`rounded-xl border p-3 ${k.hi ? 'border-rz-signal/50 bg-rz-signal/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50'}`}>
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
                                 <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}<span className="text-[10px] text-slate-400">{k.hi ? '' : '/100'}</span></div>
                                 <div className="truncate text-[10px] text-slate-500">{k.sub}</div>

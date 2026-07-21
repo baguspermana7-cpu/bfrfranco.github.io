@@ -28,7 +28,7 @@ function Head({ icon: Icon, title, sub, tone = 'from-cyan-500 to-blue-600', repo
     return (
         <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
             <div className="flex items-center gap-3">
-                <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${tone} flex items-center justify-center shadow-lg`}><Icon className="w-6 h-6 text-white" /></div>
+                <div className="w-11 h-11 rounded bg-rz-info/10 border border-rz-info/30 flex items-center justify-center"><Icon className="w-6 h-6 text-rz-info" /></div>
                 <div><h1 className="text-2xl font-bold text-slate-900 dark:text-white">{title}</h1><p className="text-sm text-slate-500 dark:text-slate-400">{sub}</p></div>
             </div>
             {report && (
@@ -39,9 +39,9 @@ function Head({ icon: Icon, title, sub, tone = 'from-cyan-500 to-blue-600', repo
         </div>
     );
 }
-function Card({ children }: { children: React.ReactNode }) { return <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">{children}</div>; }
+function Card({ children }: { children: React.ReactNode }) { return <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">{children}</div>; }
 function Metric({ label, value, sub }: { label: string; value: string; sub?: string }) {
-    return <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 transition-all hover:-translate-y-0.5 hover:border-cyan-400/50 hover:bg-cyan-500/[0.05] hover:shadow-md hover:shadow-cyan-900/10"><div className="text-[10px] uppercase tracking-wide text-slate-500">{label}</div><div className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{value}</div>{sub && <div className="text-[10px] text-slate-500">{sub}</div>}</div>;
+    return <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 transition-colors hover:border-rz-info/50"><div className="text-[10px] uppercase tracking-wide text-slate-500">{label}</div><div className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{value}</div>{sub && <div className="text-[10px] text-slate-500">{sub}</div>}</div>;
 }
 function Loading() { return <div className="text-sm text-slate-500 p-8 text-center">Engine loading…</div>; }
 
@@ -59,7 +59,7 @@ export function SiteIntelDashboard() {
     const r = m.score(factors);
     return (
         <div className="space-y-4">
-            <Head icon={MapPin} title="Site Intelligence" sub="DC-OS Layer 2 · models.site.score" tone="from-emerald-500 to-cyan-600"
+            <Head icon={MapPin} title="Site Intelligence" sub="DC-OS Layer 2 · models.site.score" tone=""
                 report={() => ({
                     title: 'Site Intelligence', layer: 'Layer 2 · Site Score', project: '—',
                     kpis: [{ label: 'Site Score', value: `${r.score}/100`, sub: `Grade ${r.grade} · ${r.label}` }, { label: 'Coverage', value: `${Math.round(r.coverage * 100)}%` }, { label: 'Factors', value: String(r.breakdown.length) }],
@@ -146,7 +146,7 @@ export function CommissioningDashboard() {
         const pc = m.programCost ? m.programCost({ itLoadKw: inputs.itLoad, cooling: inputs.coolingType, redundancy: (REDUNDANCY_KEY[inputs.powerRedundancy] || 'n1'), countryId: country?.id }) : null;
         return (
             <div className="space-y-4">
-                <Head icon={CheckCircle2} title="Commissioning" sub="DC-OS Layer 7 · models.commissioning" tone="from-emerald-500 to-teal-600" />
+                <Head icon={CheckCircle2} title="Commissioning" sub="DC-OS Layer 7 · models.commissioning" tone="" />
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3"><Metric label="Cx Program Cost" value={pc ? cxMoney(pc.total) : '—'} sub={pc ? `${cxMoney(pc.perKw)}/kW` : ''} /></div>
                 <p className="text-[10px] text-slate-400">Rich Cx engine not present in this build — showing compact estimate.</p>
             </div>
@@ -160,7 +160,7 @@ export function CommissioningDashboard() {
 
     return (
         <div className="space-y-4">
-            <Head icon={CheckCircle2} title="Commissioning" sub="DC-OS Layer 7 · models.commissioning.programRich (equipment-scaled Cx program · cx-calculator.html parity)" tone="from-emerald-500 to-teal-600"
+            <Head icon={CheckCircle2} title="Commissioning" sub="DC-OS Layer 7 · models.commissioning.programRich (equipment-scaled Cx program · cx-calculator.html parity)" tone=""
                 report={() => ({
                     title: 'Commissioning', layer: 'Layer 7 · Cx Program (rich)', project: country?.name || '—',
                     kpis: [
@@ -188,7 +188,7 @@ export function CommissioningDashboard() {
             {mc && (
                 <Card>
                     <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Cost Uncertainty <span className="text-[9px] text-slate-400">(Monte-Carlo · IT load ±7.5%, pricing ±5% · N=4000)</span></h2>
-                    <div className="relative h-3 rounded-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 mb-1">
+                    <div className="relative h-3 rounded-full bg-gradient-to-r from-[#00FF88] via-[#FFAA00] to-[#FF3030] mb-1">
                         <div className="absolute -top-1 w-0.5 h-5 bg-slate-900 dark:bg-white" style={{ left: `${p50pos}%` }} title={`P50 ${cxMoney(mc.p50)}`} />
                     </div>
                     <div className="flex justify-between text-[10px] text-slate-500 tabular-nums"><span>P5 {cxMoney(mc.p5)}</span><span>P50 {cxMoney(mc.p50)}</span><span>P95 {cxMoney(mc.p95)}</span></div>
@@ -208,7 +208,7 @@ export function CommissioningDashboard() {
                         {rich.levels.map((l) => (
                             <div key={l.id} className="flex items-center gap-2 text-xs">
                                 <span className="w-36 text-slate-600 dark:text-slate-300 truncate">{l.label}</span>
-                                <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className="h-2 rounded bg-emerald-500" style={{ width: `${l.pct}%` }} /></div>
+                                <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className="h-2 rounded bg-rz-data" style={{ width: `${l.pct}%` }} /></div>
                                 <span className="w-12 text-right tabular-nums text-slate-500">{l.days}d</span>
                                 <span className="w-14 text-right tabular-nums text-slate-400">{cxMoney(l.cost)}</span>
                             </div>
@@ -272,7 +272,7 @@ export function AssetIntelDashboard() {
     const health = m.healthIndex({ assetClass: 'ups', ageYears: 3, condition: 0.9, duty: 0.6 });
     return (
         <div className="space-y-4">
-            <Head icon={Activity} title="Asset Intelligence" sub="DC-OS Layer 9 · models.asset" tone="from-blue-500 to-violet-600"
+            <Head icon={Activity} title="Asset Intelligence" sub="DC-OS Layer 9 · models.asset" tone=""
                 report={() => ({
                     title: 'Asset Intelligence', layer: 'Layer 9 · Asset Health & Lifecycle', project: '—',
                     kpis: [{ label: 'Sample Health (UPS 3yr)', value: `${health.health}/100`, sub: health.status }, { label: 'Remaining Life', value: `${health.remainingYears} yr`, sub: `of ${health.designLifeYears}` }, { label: 'Tracked Assets', value: String(rows.length) }],
@@ -313,7 +313,7 @@ export function AssetIntelDashboard() {
                             const age = Math.round(life * 0.6);
                             const fp = m.failureProbability(cls, age);
                             const pctv = Math.round(fp.failureProb * 100);
-                            const col = pctv >= 40 ? 'bg-rose-500' : pctv >= 20 ? 'bg-amber-500' : 'bg-emerald-500';
+                            const col = pctv >= 40 ? 'bg-rose-500' : pctv >= 20 ? 'bg-amber-500' : 'bg-rz-data';
                             return (
                                 <div key={cls} className="flex items-center gap-2 text-xs">
                                     <span className="w-24 capitalize text-slate-600 dark:text-slate-300">{cls}</span>
@@ -337,7 +337,7 @@ export function AssetIntelDashboard() {
                                 <td className="py-1.5 text-slate-700 dark:text-slate-200">{r.label}</td>
                                 <td className="text-right tabular-nums text-slate-500">{r.intervalYears}yr</td>
                                 <td className="text-right tabular-nums text-slate-500">{r.events}</td>
-                                <td className="text-right tabular-nums text-emerald-600 dark:text-emerald-400">${(r.totalNominalUsd / 1e6).toFixed(2)}M</td>
+                                <td className="text-right tabular-nums text-rz-data">${(r.totalNominalUsd / 1e6).toFixed(2)}M</td>
                             </tr>
                         ))}
                     </tbody>

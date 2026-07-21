@@ -342,11 +342,9 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
         { num: 12, label: 'Financial', icon: TrendingUp, childIds: ['finance', 'invest', 'portfolio', 'benchmark', 'strategic'] },
         { num: 13, label: 'AI Decision Engine', icon: BrainCircuit, childIds: [] },
     ];
-    // Per-engine accent (reference: color-coded number badges 1–13)
-    const ENGINE_COLORS: Record<number, string> = {
-        1: '#22d3ee', 2: '#34d399', 3: '#a78bfa', 4: '#fbbf24', 5: '#60a5fa', 6: '#fb923c',
-        7: '#2dd4bf', 8: '#38bdf8', 9: '#818cf8', 10: '#fb7185', 11: '#4ade80', 12: '#10b981', 13: '#e879f9',
-    };
+    // Engine number badge — SEMANTIC, not decorative (design.md §5): one
+    // neutral instrument chip for every engine; signal-amber marks ONLY the
+    // engine whose tab is active. Replaces the 13-color AI-slop rainbow.
     // PLATFORM + SUPPORT sections (route to engine-backed where possible, else stub tabs)
     const PLATFORM: { label: string; icon: LucideIcon; id?: typeof activeTab; action?: () => void }[] = [
         { label: 'Projects', icon: FolderOpen, id: 'projects' },
@@ -436,8 +434,8 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
                     </a>
                     <div className="px-5 pb-4 pt-2">
                         <div className="flex items-center gap-2.5">
-                            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-900/40 shrink-0">
-                                <BrainCircuit className="w-5 h-5 text-white" />
+                            <div className="w-9 h-9 rounded-lg bg-rz-info flex items-center justify-center shadow-lg shadow-cyan-900/40 shrink-0">
+                                <BrainCircuit className="w-5 h-5 text-slate-900" />
                             </div>
                             <div className="min-w-0">
                                 <h1 className="text-base font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5 leading-none">
@@ -518,7 +516,12 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
                                             active ? "text-cyan-700 dark:text-cyan-400" : "text-slate-600 dark:text-slate-300"
                                         )}
                                     >
-                                        <span className="text-[10px] font-mono font-bold w-5 h-5 rounded flex items-center justify-center shrink-0 text-slate-900" style={{ background: ENGINE_COLORS[g.num] }}>{g.num}</span>
+                                        <span className={clsx(
+                                            "text-[10px] font-mono font-bold w-5 h-5 rounded flex items-center justify-center shrink-0 tabular-nums",
+                                            active
+                                                ? "bg-rz-signal text-slate-900"
+                                                : "bg-slate-200 text-slate-600 dark:bg-white/10 dark:text-slate-400"
+                                        )}>{g.num}</span>
                                         <GroupIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
                                         <span className="flex-1 text-left truncate">{g.label}</span>
                                         {!hasChildren && <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-400 shrink-0">soon</span>}
@@ -683,7 +686,7 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
                     aria-orientation="vertical"
                     aria-label="Resize sidebar"
                     title="Drag to resize · double-click to reset"
-                    className="hidden lg:block absolute top-0 right-0 h-full w-1 cursor-col-resize hover:bg-violet-500/40 z-50 touch-none"
+                    className="hidden lg:block absolute top-0 right-0 h-full w-1 cursor-col-resize hover:bg-rz-mint/40 z-50 touch-none"
                     onPointerDown={onResizePointerDown}
                     onPointerMove={onResizePointerMove}
                     onPointerUp={onResizePointerUp}
@@ -705,10 +708,10 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
                             <Menu className="w-5 h-5" />
                         </button>
                         <div className="text-sm breadcrumbs text-slate-500 dark:text-slate-400">
-                            <button className="hidden sm:inline text-slate-400 dark:text-slate-600 hover:text-violet-500" onClick={() => actions.setActiveTab('projects')}>Projects</button>
+                            <button className="hidden sm:inline text-slate-400 dark:text-slate-600 hover:text-rz-mint" onClick={() => actions.setActiveTab('projects')}>Projects</button>
                             <span className="hidden sm:inline"> / </span>
                             {activeProject && (<>
-                                <span className="hidden sm:inline max-w-[160px] truncate align-bottom text-violet-500 font-medium">{activeProject.name}</span>
+                                <span className="hidden sm:inline max-w-[160px] truncate align-bottom text-rz-mint font-medium">{activeProject.name}</span>
                                 <span className="hidden sm:inline"> / </span>
                             </>)}
                             <span className="text-slate-800 dark:text-slate-200 font-medium">{activeTab === 'dashboard' ? 'Executive Overview' : navItems.find(n => n.id === activeTab)?.label || SUPPORT.find(s => s.id === activeTab)?.label || PLATFORM.find(p => p.id === activeTab)?.label || ({ faq: 'FAQ', montecarlo: 'Monte Carlo', tier: 'Tier Classification', diagnostics: 'Diagnostics Center' } as Record<string, string>)[activeTab] || 'Overview'}</span>
@@ -774,7 +777,7 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
                 {!vintageBannerDismissed && (
                     <div data-tour="context-bar" className="mx-4 sm:mx-6 lg:mx-8 mt-4 flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs text-slate-500 dark:text-slate-400">
                         <span className="flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0">
-                            <span className="font-semibold text-violet-600 dark:text-violet-300 truncate">
+                            <span className="font-semibold text-rz-mint truncate">
                                 {projectName || 'Untitled Project'}
                             </span>
                             <span className="text-slate-300 dark:text-slate-600">·</span>
@@ -878,10 +881,10 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
 
                         {/* Compare Button */}
                         {scenarioStore.comparisonIds.length >= 2 && (
-                            <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800 bg-purple-50 dark:bg-purple-900/20">
+                            <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800 bg-rz-mint/5 dark:bg-rz-mint/10">
                                 <button
                                     onClick={scenarioStore.enterComparisonMode}
-                                    className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm"
+                                    className="w-full px-4 py-2 bg-rz-mint hover:bg-rz-mint/80 text-slate-900 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm"
                                 >
                                     <GitCompare className="w-4 h-4" />
                                     Compare Selected ({scenarioStore.comparisonIds.length})
@@ -900,8 +903,8 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
                                     const isSelected = scenarioStore.comparisonIds.includes(s.id);
                                     return (
                                         <div key={s.id} className={clsx(
-                                            "p-3 rounded-xl border bg-white dark:bg-slate-800/30 hover:border-cyan-500/50 dark:hover:border-slate-700 transition-colors group shadow-sm dark:shadow-none",
-                                            isSelected ? "border-purple-400 dark:border-purple-600 ring-1 ring-purple-400/30" : "border-slate-200 dark:border-slate-800"
+                                            "p-3 rounded-sm border bg-white dark:bg-slate-800/30 hover:border-cyan-500/50 dark:hover:border-slate-700 transition-colors group shadow-sm dark:shadow-none",
+                                            isSelected ? "border-rz-mint ring-1 ring-rz-mint/30" : "border-slate-200 dark:border-slate-800"
                                         )}>
                                             <div className="flex items-start justify-between mb-2">
                                                 <div className="flex items-start gap-2">
@@ -911,8 +914,8 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
                                                         className={clsx(
                                                             "mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors",
                                                             isSelected
-                                                                ? "bg-purple-600 border-purple-600 text-white"
-                                                                : "border-slate-300 dark:border-slate-600 hover:border-purple-400"
+                                                                ? "bg-rz-mint border-rz-mint text-slate-900"
+                                                                : "border-slate-300 dark:border-slate-600 hover:border-rz-mint"
                                                         )}
                                                     >
                                                         {isSelected && <Check className="w-3 h-3" />}

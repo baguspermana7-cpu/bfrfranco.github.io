@@ -10,7 +10,7 @@ import { CreatableCombobox, type ComboValue } from '@/components/ui/CreatableCom
 import { densityToEngineBucket } from '@/lib/requirementsMappings';
 import { computeLoadBreakdown, type ArchInputs, type EquipCounts, type FacilityCalc, type LayerCheck } from '@/state/adapters/arch-adapter';
 
-const DONUT_COLORS = ['#a78bfa', '#14b8a6', '#3b82f6', '#f59e0b', '#64748b'];
+const DONUT_COLORS = ['#7DDDB4', '#14b8a6', '#3b82f6', '#f59e0b', '#64748b'];
 
 export function ArchRail({ i, eq, f, layers, overall }: {
     i: ArchInputs; eq: EquipCounts; f: FacilityCalc; layers: LayerCheck[]; overall: boolean;
@@ -38,7 +38,7 @@ export function ArchRail({ i, eq, f, layers, overall }: {
 
     return (
         <aside className="space-y-4 lg:sticky lg:top-4 self-start">
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                 <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Architecture Summary</h3>
                 <div className="space-y-1 text-[11px]">
                     {rows.map(([k, v]) => (
@@ -59,7 +59,7 @@ export function ArchRail({ i, eq, f, layers, overall }: {
                 </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                 <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Load Breakdown</h3>
                 <p className="mb-1 text-[9px] text-slate-400">Derived from design PUE {f.pue} ({f.pueSource}) — screening split of overhead</p>
                 <div className="h-36">
@@ -86,18 +86,18 @@ export function ArchRail({ i, eq, f, layers, overall }: {
                 </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                 <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Design Validation</h3>
                 <div className="space-y-1">
                     {layers.map((l) => (
                         <div key={l.key} className="flex items-center gap-1.5 text-[11px]">
-                            <span className={`h-2 w-2 rounded-full ${l.pass ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                            <span className={`h-2 w-2 rounded-full ${l.pass ? 'bg-rz-data' : 'bg-amber-500'}`} />
                             <span className="text-slate-600 dark:text-slate-300">{l.label}</span>
-                            <span className={`ml-auto text-[9px] font-semibold ${l.pass ? 'text-emerald-500' : 'text-amber-500'}`}>{l.pass ? 'Passed' : 'Review'}</span>
+                            <span className={`ml-auto text-[9px] font-semibold ${l.pass ? 'text-rz-data' : 'text-amber-500'}`}>{l.pass ? 'Passed' : 'Review'}</span>
                         </div>
                     ))}
                 </div>
-                <div className={`mt-2 rounded-lg px-2 py-1.5 text-center text-[11px] font-semibold ${overall ? 'bg-emerald-500/15 text-emerald-500' : 'bg-amber-500/15 text-amber-500'}`}>
+                <div className={`mt-2 rounded-lg px-2 py-1.5 text-center text-[11px] font-semibold ${overall ? 'bg-rz-data/15 text-rz-data' : 'bg-amber-500/15 text-amber-500'}`}>
                     Overall Status: {overall ? 'Passed' : 'Review Required'}
                 </div>
             </div>

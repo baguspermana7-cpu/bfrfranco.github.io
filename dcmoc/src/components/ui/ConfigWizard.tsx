@@ -54,7 +54,7 @@ export function ConfigWizard({ onComplete }: { onComplete: () => void }) {
 
     return (
         <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl max-w-3xl w-full flex overflow-hidden min-h-[500px]">
+            <div className="bg-slate-900 border border-slate-800 rounded shadow-lg max-w-3xl w-full flex overflow-hidden min-h-[500px]">
 
                 {/* Sidebar Progress */}
                 <div className="w-1/3 bg-slate-950 p-6 border-r border-slate-800 hidden md:block">
@@ -174,7 +174,7 @@ export function ConfigWizard({ onComplete }: { onComplete: () => void }) {
                                 </button>
                                 <button
                                     onClick={() => handleStrategySelect('predictive')}
-                                    className="w-full p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-700 hover:border-purple-500 transition-all text-left"
+                                    className="w-full p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-700 hover:border-rz-mint transition-colors text-left"
                                 >
                                     <div className="font-bold text-white">Ultimate / Predictive</div>
                                     <div className="text-xs text-slate-500">Vendor Premium Support. Zero Downtime Goal. Highest Cost.</div>
@@ -237,7 +237,7 @@ function SystemsStep({ onSelect, tier }: { onSelect: (c: any, p: any) => void, t
 
             <button
                 onClick={() => onSelect(cooling, power)}
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold shadow-lg shadow-cyan-900/50 flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-lg bg-rz-signal hover:bg-rz-signal/90 text-black font-bold flex items-center justify-center gap-2"
             >
                 Confirm Systems <ArrowRight className="w-5 h-5" />
             </button>
@@ -247,10 +247,10 @@ function SystemsStep({ onSelect, tier }: { onSelect: (c: any, p: any) => void, t
 
 function StepItem({ active, completed, label, icon: Icon }: any) {
     return (
-        <div className={clsx("flex items-center gap-3", active ? "text-cyan-400" : completed ? "text-emerald-500" : "text-slate-500")}>
+        <div className={clsx("flex items-center gap-3", active ? "text-cyan-400" : completed ? "text-rz-data" : "text-slate-500")}>
             <div className={clsx(
                 "w-8 h-8 rounded-full flex items-center justify-center border",
-                active ? "border-cyan-400 bg-cyan-950/50" : completed ? "border-emerald-500 bg-emerald-950/50" : "border-slate-700 bg-slate-900"
+                active ? "border-cyan-400 bg-cyan-950/50" : completed ? "border-rz-data bg-rz-data/10" : "border-slate-700 bg-slate-900"
             )}>
                 {completed ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
             </div>

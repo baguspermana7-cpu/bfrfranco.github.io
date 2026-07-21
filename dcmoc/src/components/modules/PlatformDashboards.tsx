@@ -26,15 +26,15 @@ import CORPUS_FACTS from '@/lib/corpus-facts.json';
 import { Database, Boxes, FolderOpen, HelpCircle, Zap, Wrench, ClipboardCheck, Users, Sun, Moon, Cpu, Server, Building, ArrowRight, CheckCircle2, Circle, ExternalLink } from 'lucide-react';
 import { COUNTRIES, type CountryProfile } from '@/constants/countries';
 
-function Head({ icon: Icon, title, sub, tone = 'from-cyan-500 to-blue-600' }: { icon: React.ElementType; title: string; sub: string; tone?: string }) {
+function Head({ icon: Icon, title, sub }: { icon: React.ElementType; title: string; sub: string; tone?: string }) {
     return (
         <div className="flex items-center gap-3 mb-5">
-            <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${tone} flex items-center justify-center shadow-lg`}><Icon className="w-6 h-6 text-white" /></div>
+            <div className="w-11 h-11 rounded bg-rz-info/10 border border-rz-info/30 flex items-center justify-center"><Icon className="w-6 h-6 text-rz-info" /></div>
             <div><h1 className="text-2xl font-bold text-slate-900 dark:text-white">{title}</h1><p className="text-sm text-slate-500 dark:text-slate-400">{sub}</p></div>
         </div>
     );
 }
-function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) { return <div className={`rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 ${className}`}>{children}</div>; }
+function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) { return <div className={`rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 ${className}`}>{children}</div>; }
 const pct = (n: number) => `${Math.round(n * 100)}%`;
 
 /* ── Country Data Coverage — computed LIVE from constants/countries.ts ──
@@ -125,7 +125,7 @@ function CountryCoverageSection() {
         <div className="space-y-3">
             <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Country Data Coverage — {COV_FIELDS.length} fields × {cov.rows.length} countries</h2>
-                <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">computed live</span>
+                <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">computed live</span>
             </div>
             {/* Summary: totals + biggest gaps + fullest/thinnest countries */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
@@ -137,7 +137,7 @@ function CountryCoverageSection() {
                 <div className="rounded-lg border border-slate-200 dark:border-white/10 px-3 py-2">
                     <p className="text-[9px] uppercase text-slate-400">Biggest gaps</p>
                     {cov.fieldGaps.length === 0
-                        ? <p className="text-xs text-emerald-500 font-medium">No gaps — all fields filled</p>
+                        ? <p className="text-xs text-rz-data font-medium">No gaps — all fields filled</p>
                         : cov.fieldGaps.slice(0, 3).map((g) => (
                             <p key={g.key} className="text-[10px] text-slate-600 dark:text-slate-300"><span className="font-mono text-amber-500">{g.key.split('.').pop()}</span> kosong di <b>{g.gaps}</b> negara</p>
                         ))}
@@ -174,7 +174,7 @@ function CountryCoverageSection() {
                         <button onClick={() => setSel(null)} className="ml-auto text-[10px] text-slate-400 hover:text-cyan-500">✕ close</button>
                     </div>
                     {selRow.missing.length === 0
-                        ? <p className="mt-1 text-[10px] text-emerald-500">Lengkap — tidak ada field kosong.</p>
+                        ? <p className="mt-1 text-[10px] text-rz-data">Lengkap — tidak ada field kosong.</p>
                         : (<div className="mt-1.5 flex flex-wrap gap-1.5">
                             {selRow.missing.map((f) => (
                                 <span key={f.key} className="rounded-md border border-amber-400/40 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-mono text-amber-600 dark:text-amber-400" title={COV_GROUP_LABELS[f.group]}>{f.key}</span>
@@ -204,7 +204,7 @@ function CountryCoverageSection() {
                                 {visFields.map(({ f, i }) => (
                                     <td key={f.key} className="px-0.5 text-center">
                                         {r.cells[i]
-                                            ? <span className="text-emerald-500">✓</span>
+                                            ? <span className="text-rz-data">✓</span>
                                             : <span className="text-amber-500 font-bold" title={`${f.key} kosong`}>—</span>}
                                     </td>
                                 ))}
@@ -283,7 +283,7 @@ export function DataLibraryDashboard() {
     const asOfYears = (Object.values(sources).map((v) => v.asOf).filter(Boolean) as string[]).filter((v) => /^\d{4}/.test(v));
     return (
         <div className="space-y-4">
-            <PlatformHeader icon={Database} title="Data Library" sub="Centralized repository of all engine reference data, methods, and sources" tone="from-sky-500 to-cyan-600" />
+            <PlatformHeader icon={Database} title="Data Library" sub="Centralized repository of all engine reference data, methods, and sources" tone="" />
             <KpiChips items={[
                 { label: 'Datasets', value: String(tabs.length - 1), sub: `${totalRows} rows total` },
                 { label: 'Provenance Entries', value: String(Object.keys(sources).length), sub: 'gate-enforced' },
@@ -352,7 +352,7 @@ export function DataLibraryDashboard() {
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Advanced &amp; Emerging Cooling — DATA.coolingTech (cooling ladder + microfluidic)</h2>
-                            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">engine · TRL-classified</span>
+                            <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">engine · TRL-classified</span>
                         </div>
                         {Object.keys(coolingTech).length === 0
                             ? <p className="text-xs text-slate-400">Engine not loaded — DATA.coolingTech unavailable in this session.</p>
@@ -371,7 +371,7 @@ export function DataLibraryDashboard() {
                                                 <td className="pr-3 text-slate-500">{t.coolant ?? '—'}</td>
                                                 <td className="pr-3 text-slate-500 max-w-[180px]">{t.wueBasis ?? '—'}</td>
                                                 <td className="pr-3">
-                                                    <span className={`rounded px-1.5 py-0.5 text-[8.5px] font-semibold uppercase ${emerging ? 'bg-amber-500/15 text-amber-500' : 'bg-emerald-500/15 text-emerald-500'}`}>{emerging ? 'Emerging' : 'Commercial'}</span>
+                                                    <span className={`rounded px-1.5 py-0.5 text-[8.5px] font-semibold uppercase ${emerging ? 'bg-rz-signal/15 text-rz-signal' : 'bg-rz-data/15 text-rz-data'}`}>{emerging ? 'Emerging' : 'Commercial'}</span>
                                                 </td>
                                                 <td className="text-slate-400 text-[9px] max-w-[280px]">{t.ref ?? '—'}</td>
                                             </tr>
@@ -386,7 +386,7 @@ export function DataLibraryDashboard() {
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Supply Chain &amp; Import — per-country landed cost / export tier / customs lead</h2>
-                            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">engine · proxy screen</span>
+                            <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">engine · proxy screen</span>
                         </div>
                         <table className="w-full text-xs min-w-[680px]">
                             <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Country</th><th className="pr-3">Region</th><th className="pr-3">Import-Duty Band</th><th className="pr-3 text-right">Duty %</th><th className="pr-3 text-right">Export Tier</th><th className="pr-3 text-right">Customs Lead (wk)</th><th className="text-center">FTA?</th></tr></thead>
@@ -403,7 +403,7 @@ export function DataLibraryDashboard() {
                                         <td className="pr-3 text-right tabular-nums"><span className={dutyPct > 0 ? 'text-amber-500 font-medium' : 'text-slate-400'}>{dutyPct.toLocaleString(undefined, { maximumFractionDigits: 1 })}%</span></td>
                                         <td className="pr-3 text-right tabular-nums text-slate-500">{c.supplyChain.gpuExportTier}</td>
                                         <td className="pr-3 text-right tabular-nums text-slate-500">{leadWk != null ? `+${leadWk}` : '—'}</td>
-                                        <td className="text-center">{isFta ? <span className="text-emerald-500">✓</span> : <span className="text-slate-400">—</span>}</td>
+                                        <td className="text-center">{isFta ? <span className="text-rz-data">✓</span> : <span className="text-slate-400">—</span>}</td>
                                     </tr>
                                 );
                             })}</tbody>
@@ -415,7 +415,7 @@ export function DataLibraryDashboard() {
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">O&amp;M Contract Pricing — DATA.omContracts ($/kW IT per year, fixed-fee)</h2>
-                            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">engine · sourced band</span>
+                            <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">engine · sourced band</span>
                         </div>
                         {Object.keys(omContracts.tiers || {}).length === 0
                             ? <p className="text-xs text-slate-400">Engine not loaded — DATA.omContracts unavailable in this session.</p>
@@ -445,7 +445,7 @@ export function DataLibraryDashboard() {
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Spares Pricing — DATA.sparesPricing (unit list-price bands, USD)</h2>
-                            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">engine · sourced band</span>
+                            <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">engine · sourced band</span>
                         </div>
                         {Object.keys(sparesPricing).length === 0
                             ? <p className="text-xs text-slate-400">Engine not loaded — DATA.sparesPricing unavailable in this session.</p>
@@ -470,7 +470,7 @@ export function DataLibraryDashboard() {
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Environmental Costs — DATA.envCosts (carbon compliance price + waste bands)</h2>
-                            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">engine · sourced band</span>
+                            <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">engine · sourced band</span>
                         </div>
                         {carbonRows.length === 0
                             ? <p className="text-xs text-slate-400">Engine not loaded — DATA.envCosts unavailable in this session.</p>
@@ -539,19 +539,19 @@ export function TemplatesDashboard() {
     const entries = Object.entries(profiles);
     return (
         <div className="space-y-4">
-            <PlatformHeader icon={Boxes} title="Template Library" sub="Pre-built engine profiles for data-center planning — one click seeds the whole project" tone="from-violet-500 to-fuchsia-600" />
+            <PlatformHeader icon={Boxes} title="Template Library" sub="Pre-built engine profiles for data-center planning — one click seeds the whole project" tone="" />
             <KpiChips items={[
                 { label: 'Templates', value: String(entries.length), sub: 'engine useCaseProfiles' },
                 { label: 'Cooling classes', value: String(new Set(entries.map(([, p]) => p.cooling)).size), sub: 'air → liquid' },
                 { label: 'Density range', value: entries.length ? `${Math.min(...entries.map(([, p]) => p.rackKw))}–${Math.max(...entries.map(([, p]) => p.rackKw))} kW` : '—', sub: 'per rack' },
                 { label: 'Source', value: 'engine', sub: 'models.requirements — live values' },
             ]} />
-            {toast && <div className="rounded-lg border border-violet-500/40 bg-violet-600/10 px-3 py-2 text-[11px] text-violet-500">{toast}</div>}
+            {toast && <div className="rounded-lg border border-rz-mint/40 bg-rz-mint/10 px-3 py-2 text-[11px] text-rz-mint">{toast}</div>}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {entries.map(([k, p]) => { const Icon = icon[k] || Boxes; return (
                     <Card key={k}>
-                        <div className="flex items-center gap-2 mb-2"><Icon className="w-4 h-4 text-violet-500" /><h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">{p.label}</h3>
-                            <span className="ml-auto rounded bg-emerald-500/10 px-1.5 py-0.5 text-[8px] font-semibold uppercase text-emerald-500" title="Values from the live engine profile">engine</span></div>
+                        <div className="flex items-center gap-2 mb-2"><Icon className="w-4 h-4 text-rz-mint" /><h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">{p.label}</h3>
+                            <span className="ml-auto rounded bg-rz-data/10 px-1.5 py-0.5 text-[8px] font-semibold uppercase text-rz-data" title="Values from the live engine profile">engine</span></div>
                         <div className="text-[11px] text-slate-500 space-y-0.5 mb-2">
                             {([
                                 ['Rack density', `${p.rackKw} kW/rack`],
@@ -562,7 +562,7 @@ export function TemplatesDashboard() {
                                 <div key={l} className="flex justify-between" title={`${l}: ${v}`}><span>✓ {l}</span><span className="font-medium capitalize text-slate-700 dark:text-slate-300">{v}</span></div>
                             ))}
                         </div>
-                        <button onClick={() => apply(k)} className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-medium transition-colors">
+                        <button onClick={() => apply(k)} className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-rz-signal hover:bg-rz-signal/90 text-black text-xs font-medium transition-colors">
                             {applied === k ? <><CheckCircle2 className="w-3.5 h-3.5" /> Applied</> : <>Use This Template <ArrowRight className="w-3.5 h-3.5" /></>}
                         </button>
                     </Card>
@@ -578,7 +578,7 @@ export function ProjectsDashboard() {
     const { scenarios, deleteScenario, togglePanel } = useScenarioStore();
     return (
         <div className="space-y-4">
-            <Head icon={FolderOpen} title="Projects" sub="Saved scenarios — configurations you can restore or compare" tone="from-cyan-500 to-blue-600" />
+            <Head icon={FolderOpen} title="Projects" sub="Saved scenarios — configurations you can restore or compare" tone="" />
             <button onClick={togglePanel} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-medium"><FolderOpen className="w-3.5 h-3.5" /> Open Scenario Manager</button>
             {scenarios.length === 0
                 ? <Card><p className="text-xs text-slate-500">No saved scenarios yet. Configure a project and use <b>Quick Actions → New Scenario</b> (or the Scenario Manager) to save one.</p></Card>
@@ -604,7 +604,7 @@ export function SettingsDashboard() {
     const { selectedCountry } = useSimulationStore();
     return (
         <div className="space-y-4">
-            <Head icon={Wrench} title="Settings" sub="Appearance, data source, and AI overlay" tone="from-slate-500 to-slate-700" />
+            <Head icon={Wrench} title="Settings" sub="Appearance, data source, and AI overlay" tone="" />
             <Card>
                 <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Appearance</h2>
                 <div className="flex gap-2">
@@ -617,7 +617,7 @@ export function SettingsDashboard() {
                 <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1">
                     <div className="flex justify-between"><span>Reference source</span><span className="text-slate-500">rz-engine.js DATA (single source)</span></div>
                     <div className="flex justify-between"><span>Active country</span><span className="text-slate-500">{selectedCountry?.name || '—'}</span></div>
-                    <div className="flex justify-between"><span>AI decision overlay</span><span className={ai.enabled ? 'text-emerald-500' : 'text-slate-500'}>{ai.enabled ? `${ai.provider} · ${ai.model}` : 'built-in deterministic engine'}</span></div>
+                    <div className="flex justify-between"><span>AI decision overlay</span><span className={ai.enabled ? 'text-rz-data' : 'text-slate-500'}>{ai.enabled ? `${ai.provider} · ${ai.model}` : 'built-in deterministic engine'}</span></div>
                 </div>
                 <p className="mt-2 text-[10px] text-slate-400">Configure the AI overlay from the dashboard top bar (AI Assistant).</p>
             </Card>
@@ -627,9 +627,9 @@ export function SettingsDashboard() {
 
 /* ── Knowledge Base ── */
 const PROV_STYLE: Record<string, string> = {
-    input: 'bg-violet-500/15 text-violet-400', engine: 'bg-emerald-500/15 text-emerald-500',
-    derived: 'bg-cyan-500/15 text-cyan-500', tracking: 'bg-sky-500/15 text-sky-400',
-    assumption: 'bg-amber-500/15 text-amber-500', screening: 'bg-amber-500/15 text-amber-500',
+    input: 'bg-rz-mint/15 text-rz-mint', engine: 'bg-rz-data/15 text-rz-data',
+    derived: 'bg-rz-info/15 text-rz-info', tracking: 'bg-rz-info/15 text-rz-info',
+    assumption: 'bg-rz-signal/15 text-rz-signal', screening: 'bg-rz-signal/15 text-rz-signal',
 };
 
 export function KnowledgeDashboard() {
@@ -644,10 +644,10 @@ export function KnowledgeDashboard() {
         (!q || (b.label + ' ' + b.id + ' ' + b.formula + ' ' + (b.engineFn ?? '') + ' ' + b.sourceParams.join(' ')).toLowerCase().includes(q.toLowerCase())));
     return (
         <div className="space-y-4">
-            <PlatformHeader icon={HelpCircle} title="Knowledge Base" sub="Value Binding & Sync Manual — where every number comes from, and who consumes it" tone="from-amber-500 to-orange-600"
+            <PlatformHeader icon={HelpCircle} title="Knowledge Base" sub="Value Binding & Sync Manual — where every number comes from, and who consumes it" tone=""
                 actions={<div className="flex rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden">
                     {([['bindings', 'Value Bindings'], ['models', 'Engine Models']] as const).map(([k, l]) => (
-                        <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
+                        <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-rz-signal text-black' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
                     ))}
                 </div>} />
 
@@ -659,12 +659,12 @@ export function KnowledgeDashboard() {
                     { label: 'Single-source rule', value: '100%', sub: 'every value one origin, N consumers' },
                 ]} />
                 <div className="flex flex-wrap items-center gap-2">
-                    <input className="w-64 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-violet-500 text-slate-900 dark:text-slate-100"
+                    <input className="w-64 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-rz-mint text-slate-900 dark:text-slate-100"
                         placeholder="Search value, formula, engine fn…" value={q} onChange={(e) => setQ(e.target.value)} />
                     <div className="flex flex-wrap gap-1">
                         {['all', ...BINDING_GROUPS].map((g) => (
                             <button key={g} onClick={() => setGrp(g)}
-                                className={`rounded-full px-2 py-1 text-[10px] ${grp === g ? 'bg-violet-600 text-white' : 'border border-slate-300 dark:border-slate-700 text-slate-500 hover:border-violet-400'}`}>{g}</button>
+                                className={`rounded-full px-2 py-1 text-[10px] ${grp === g ? 'bg-rz-signal text-black' : 'border border-slate-300 dark:border-slate-700 text-slate-500 hover:border-rz-mint'}`}>{g}</button>
                         ))}
                     </div>
                     <span className="ml-auto text-[10px] text-slate-400">{rows.length} of {VALUE_BINDINGS.length}</span>
@@ -684,16 +684,16 @@ export function KnowledgeDashboard() {
                                         <div><span className="text-[9px] font-semibold uppercase text-slate-400">Formula / derivation</span>
                                             <p className="text-slate-600 dark:text-slate-300">{b.formula}</p></div>
                                         {b.engineFn && <div><span className="text-[9px] font-semibold uppercase text-slate-400">Engine function</span>
-                                            <p><code className="text-emerald-500">{b.engineFn}</code></p></div>}
+                                            <p><code className="text-rz-data">{b.engineFn}</code></p></div>}
                                         <div><span className="text-[9px] font-semibold uppercase text-slate-400">Source parameters</span>
-                                            <div className="flex flex-wrap gap-1">{b.sourceParams.map((sp) => <code key={sp} className="rounded bg-violet-500/10 px-1.5 py-0.5 text-[9px] text-violet-400">{sp}</code>)}</div></div>
+                                            <div className="flex flex-wrap gap-1">{b.sourceParams.map((sp) => <code key={sp} className="rounded bg-rz-mint/10 px-1.5 py-0.5 text-[9px] text-rz-mint">{sp}</code>)}</div></div>
                                         {b.notes && <p className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-2 py-1 text-[10px] text-amber-600 dark:text-amber-400">{b.notes}</p>}
                                     </div>
                                     <div className="space-y-1.5">
                                         <div><span className="text-[9px] font-semibold uppercase text-slate-400">Rendered on</span>
                                             <div className="flex flex-wrap gap-1">{b.pages.map((pg) => (
                                                 <button key={pg} onClick={() => setActiveTab(pg as never)}
-                                                    className="rounded border border-slate-300 dark:border-slate-700 px-1.5 py-0.5 text-[9px] text-slate-500 hover:border-violet-400 hover:text-violet-400">{pg} ↗</button>
+                                                    className="rounded border border-slate-300 dark:border-slate-700 px-1.5 py-0.5 text-[9px] text-slate-500 hover:border-rz-mint hover:text-rz-mint">{pg} ↗</button>
                                             ))}</div></div>
                                         <div><span className="text-[9px] font-semibold uppercase text-slate-400">Consumers (sync targets)</span>
                                             <ul className="list-disc pl-4 text-[10px] text-slate-600 dark:text-slate-300">{b.consumers.map((c, i) => <li key={i}>{c}</li>)}</ul></div>
@@ -703,7 +703,7 @@ export function KnowledgeDashboard() {
                         </div>
                     ))}
                 </div>
-                <p className="text-[10px] text-slate-400">Every entry: one origin (violet source params) → one formula/engine fn → N consumers. The synergy probe asserts cross-page equality per binding id; KPI elements carry matching <code>data-bind</code> anchors.</p>
+                <p className="text-[10px] text-slate-400">Every entry: one origin (mint source params) → one formula/engine fn → N consumers. The synergy probe asserts cross-page equality per binding id; KPI elements carry matching <code>data-bind</code> anchors.</p>
             </>)}
 
             {tab === 'models' && (<>
@@ -712,7 +712,7 @@ export function KnowledgeDashboard() {
                         <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                             Engine catalog — {ENGINE_CATALOG.modelCount} namespaces · {ENGINE_CATALOG.functionCount} functions · {ENGINE_CATALOG.sourceCount} sourced tables · DATA v{ENGINE_CATALOG.dataVersion}
                         </h2>
-                        <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">auto-generated</span>
+                        <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">auto-generated</span>
                     </div>
                     <p className="mb-2 text-[10px] text-slate-400">
                         Generated from <code>rz-engine.js</code> by <code>tools/build-engine-catalog.mjs</code> — consumers are grep-derived from real usage across the site + DC-OS.
@@ -767,7 +767,7 @@ export function KnowledgeDashboard() {
                 <Card>
                     <div className="mb-2 flex items-center gap-2">
                         <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Research Library — dokumen korpus publik ({RESEARCH_LIB.docs.length})</h2>
-                        <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">auto-generated</span>
+                        <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">auto-generated</span>
                     </div>
                     <div className="space-y-1.5">
                         {RESEARCH_LIB.docs.map((doc) => (
@@ -813,7 +813,7 @@ function CorpusSection({ corpus }: { corpus: Record<string, Record<string, Corpu
         <Card>
             <div className="mb-2 flex items-center gap-2">
                 <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">DC Public-Data Corpus — distribusi multi-sumber</h2>
-                <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">auto-generated</span>
+                <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">auto-generated</span>
             </div>
             <p className="mb-2 text-[10px] text-slate-400">Setiap fakta membawa source_url + kutipan verbatim (gate-enforced) — pipeline tools/dc-corpus (markitdown). Persentil p10-p90 per metrik × segmen. Klik baris untuk drill-down fakta mentah.</p>
             <div className="mb-2 flex flex-wrap items-center gap-1.5">
@@ -899,9 +899,9 @@ export function IntegrationsDashboard() {
     ];
     return (
         <div className="space-y-4">
-            <Head icon={Zap} title="Integrations" sub="Connected services powering the platform" tone="from-emerald-500 to-teal-600" />
+            <Head icon={Zap} title="Integrations" sub="Connected services powering the platform" tone="" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{rows.map(([name, on, note]) => (
-                <Card key={name}><div className="flex items-center gap-2">{on ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <Circle className="w-4 h-4 text-slate-400" />}<div><div className="text-sm font-medium text-slate-800 dark:text-slate-100">{name}</div><div className="text-[10px] text-slate-500">{note}</div></div></div></Card>
+                <Card key={name}><div className="flex items-center gap-2">{on ? <CheckCircle2 className="w-4 h-4 text-rz-data" /> : <Circle className="w-4 h-4 text-slate-400" />}<div><div className="text-sm font-medium text-slate-800 dark:text-slate-100">{name}</div><div className="text-[10px] text-slate-500">{note}</div></div></div></Card>
             ))}</div>
         </div>
     );
@@ -923,7 +923,7 @@ export function AuditDashboard() {
     ].sort((a, b) => b.ts - a.ts).slice(0, 50);
     return (
         <div className="space-y-4">
-            <PlatformHeader icon={ClipboardCheck} title="Audit Trail" sub="Local change history (real) + server-side audit scope" tone="from-slate-500 to-slate-700" />
+            <PlatformHeader icon={ClipboardCheck} title="Audit Trail" sub="Local change history (real) + server-side audit scope" tone="" />
             <KpiChips items={[
                 { label: 'Local Events', value: String(rows.length), sub: 'settings · scenarios · projects' },
                 { label: 'Actor', value: user?.email?.split('@')[0] ?? 'local', sub: user?.role ?? 'session' },
@@ -956,7 +956,7 @@ export function UsersDashboard() {
     const root = user?.role === 'root';
     return (
         <div className="space-y-4">
-            <Head icon={Users} title="User Management" sub="Accounts + roles" tone="from-indigo-500 to-blue-600" />
+            <Head icon={Users} title="User Management" sub="Accounts + roles" tone="" />
             <Card>
                 <div className="text-xs text-slate-600 dark:text-slate-300"><div className="flex justify-between py-1"><span>Signed in as</span><span className="font-medium">{user?.email || '—'}</span></div><div className="flex justify-between py-1"><span>Role</span><span className="font-medium capitalize">{user?.role || '—'}</span></div></div>
                 <p className="mt-2 text-[10px] text-slate-400">{root ? 'Account provisioning (create / reset / migrate) is handled by the rz-ops admin panel via the Supabase admin-users Edge Function.' : 'User administration is available to root accounts via the rz-ops panel.'}</p>

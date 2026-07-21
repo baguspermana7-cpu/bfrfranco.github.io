@@ -51,8 +51,8 @@ function ArchProfilePicker({ selected, onPick }: { selected: ArchKey | null; onP
                     type="button"
                     onClick={() => onPick(null)}
                     className={`rounded-md border px-2 py-0.5 text-[10px] font-medium transition ${selected == null
-                        ? 'border-violet-400 bg-violet-500/10 text-violet-600 dark:text-violet-300'
-                        : 'border-slate-300 dark:border-slate-700 text-slate-500 hover:border-violet-400'}`}
+                        ? 'border-rz-mint bg-rz-mint/10 text-rz-mint'
+                        : 'border-slate-300 dark:border-slate-700 text-slate-500 hover:border-rz-mint'}`}
                 >
                     None
                 </button>
@@ -69,14 +69,14 @@ function ArchProfilePicker({ selected, onPick }: { selected: ArchKey | null; onP
                             onClick={() => onPick(a.key)}
                             title={live?.ref || a.blurb}
                             className={`flex flex-col items-start gap-1 rounded-lg border p-2.5 text-left transition ${isSel
-                                ? 'border-violet-500 bg-violet-500/10 ring-1 ring-violet-500/40'
-                                : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:border-violet-400'}`}
+                                ? 'border-rz-mint bg-rz-mint/10 ring-1 ring-rz-mint/40'
+                                : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:border-rz-mint'}`}
                         >
                             <div className="flex w-full items-start justify-between gap-1.5">
                                 <span className="text-[11px] font-semibold leading-tight text-slate-800 dark:text-slate-100">{a.label}</span>
                                 <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide ${analyst
                                     ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
-                                    : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'}`}>
+                                    : 'bg-rz-data/15 text-rz-data'}`}>
                                     {analyst ? 'Analyst' : 'Official'}
                                 </span>
                             </div>
@@ -148,7 +148,7 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
     return (
         <SectionCard num="1.2" title="Workload Profile" caption="Define the type and characteristics of IT workload" id="sec-workload">
             {toast && (
-                <div className="mb-3 rounded-lg border border-violet-500/40 bg-violet-600/10 px-3 py-2 text-[11px] text-violet-600 dark:text-violet-300">
+                <div className="mb-3 rounded-lg border border-rz-mint/40 bg-rz-mint/10 px-3 py-2 text-[11px] text-rz-mint">
                     {toast}
                 </div>
             )}
@@ -162,10 +162,10 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                             options={(Object.keys(USE_CASE_LABELS) as UseCase[]).map((k) => ({ value: k, label: USE_CASE_LABELS[k], sub: USE_CASE_SUBS[k] }))} />
                     </Field>
                     {profile && (
-                        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-2.5">
+                        <div className="rounded-lg border border-rz-data/30 bg-rz-data/5 p-2.5">
                             <div className="mb-1 flex items-center gap-1.5">
-                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                                <span className="text-[9px] font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">Reference guidance — engine profile</span>
+                                <span className="h-1.5 w-1.5 rounded-full bg-rz-data" />
+                                <span className="text-[9px] font-semibold uppercase tracking-wide text-rz-data">Reference guidance — engine profile</span>
                             </div>
                             <p className="text-[10px] leading-relaxed text-slate-600 dark:text-slate-300">
                                 {profile.label}: typical {profile.rackKw} kW/rack, {profile.cooling} cooling, Tier ≥{profile.tierFloor}.
@@ -189,12 +189,12 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                     <Field label={`Peak IT Load (${unit})`} explainKey="peak-it-load" hint="Validated ≥ IT load">
                         <NumInput value={disp(w.peakItLoadKw)} min={0} unit={unit}
                             onChange={(v) => set({ peakItLoadKw: toKw(v) })} />
-                        {w.peakItLoadKw === inputs.itLoad && <span className="mt-0.5 inline-block rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] text-violet-500 dark:text-violet-300">predefined = IT Load</span>}
+                        {w.peakItLoadKw === inputs.itLoad && <span className="mt-0.5 inline-block rounded bg-rz-mint/15 px-1.5 py-0.5 text-[9px] text-rz-mint">predefined = IT Load</span>}
                     </Field>
                     <Field label={`Average IT Load (${unit})`} explainKey="avg-it-load">
                         <NumInput value={disp(w.avgItLoadKw)} min={0} unit={unit}
                             onChange={(v) => set({ avgItLoadKw: toKw(v) })} />
-                        {w.avgItLoadKw === Math.round(inputs.itLoad * 0.75) && <span className="mt-0.5 inline-block rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] text-violet-500 dark:text-violet-300">predefined 75% peak</span>}
+                        {w.avgItLoadKw === Math.round(inputs.itLoad * 0.75) && <span className="mt-0.5 inline-block rounded bg-rz-mint/15 px-1.5 py-0.5 text-[9px] text-rz-mint">predefined 75% peak</span>}
                     </Field>
                     {w.peakItLoadKw != null && w.peakItLoadKw < inputs.itLoad && (
                         <p className="text-[10px] text-amber-500">Peak load is below the base IT load — check the values.</p>
@@ -217,12 +217,12 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                                 <NumInput value={w.totalRacksOverride ?? totalRacks} min={1} max={100000}
                                     onChange={(v) => set({ totalRacksOverride: v })} />
                                 <button onClick={() => { set({ totalRacksOverride: null }); setEditRacks(false); }}
-                                    className="whitespace-nowrap rounded-md border border-slate-300 dark:border-slate-700 px-1.5 py-1 text-[9px] text-slate-500 hover:border-violet-400"
+                                    className="whitespace-nowrap rounded-md border border-slate-300 dark:border-slate-700 px-1.5 py-1 text-[9px] text-slate-500 hover:border-rz-mint"
                                     title={`Reset to auto (${totalRacks.toLocaleString()})`}>auto</button>
                             </div>
                         ) : (
                             <button onClick={() => setEditRacks(true)} title="Click to override the computed count"
-                                className="flex w-full items-center justify-between rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 px-2 py-1.5 text-sm font-bold tabular-nums text-slate-900 dark:text-white hover:border-violet-400">
+                                className="flex w-full items-center justify-between rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 px-2 py-1.5 text-sm font-bold tabular-nums text-slate-900 dark:text-white hover:border-rz-mint">
                                 {racksEffective.toLocaleString()}
                                 <span className="rounded bg-slate-200 dark:bg-slate-800 px-1 py-0.5 text-[8px] font-semibold uppercase text-slate-500">auto</span>
                             </button>
@@ -245,12 +245,12 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                                     const manual = e.target.checked;
                                     set(manual ? { mixManual: true } : { mixManual: false, workloadMix: { ...preset } });
                                 }}
-                                className="h-3.5 w-3.5 accent-violet-600" />
+                                className="h-3.5 w-3.5 accent-rz-mint" />
                             Manual override
                         </label>
                     </div>
                     {!w.mixManual && (
-                        <p className="mb-1 text-[9px] text-emerald-600 dark:text-emerald-400">
+                        <p className="mb-1 text-[9px] text-rz-data">
                             predefined from the {USE_CASE_LABELS[req.overview.useCase]} profile — tick to adjust
                         </p>
                     )}

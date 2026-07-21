@@ -202,7 +202,7 @@ export function ReliabilityEnginePage() {
     const statusOf = (a: number): 'meets' | 'within' | 'below' =>
         a >= model.tierTargetFrac ? 'meets' : (1 - a) <= 10 * (1 - model.tierTargetFrac) ? 'within' : 'below';
     const STATUS_CHIP: Record<'meets' | 'within' | 'below', { cls: string; label: string }> = {
-        meets: { cls: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400', label: 'Meets target' },
+        meets: { cls: 'bg-rz-data/15 text-rz-data', label: 'Meets target' },
         within: { cls: 'bg-amber-500/15 text-amber-600 dark:text-amber-400', label: 'Within 10× budget' },
         below: { cls: 'bg-rose-500/15 text-rose-600 dark:text-rose-400', label: 'Below' },
     };
@@ -267,7 +267,7 @@ export function ReliabilityEnginePage() {
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 shadow-lg"><ShieldCheck className="h-6 w-6 text-white" /></div>
+                    <div className="flex h-11 w-11 items-center justify-center rounded bg-rz-elevated border border-rz-2"><ShieldCheck className="h-6 w-6 text-rz-data" /></div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Reliability Engine</h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400">Availability chains composed engine-real from IEEE-493 component MTBF/MTTR at the current redundancy</p>
@@ -276,11 +276,11 @@ export function ReliabilityEnginePage() {
                 <div className="flex items-center gap-2">
                     <div className="flex rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden">
                         {([['overview', 'Availability & SPOF'], ['ram', 'RAM Detail'], ['tier', 'Tier Classification']] as const).map(([k, l]) => (
-                            <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
+                            <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-rz-mint text-rz-base' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
                         ))}
                     </div>
-                    <button onClick={onExport} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400 disabled:opacity-50"><FileDown className="h-3.5 w-3.5" /> {busy ? 'Exporting…' : 'Export PDF'}</button>
-                    <button onClick={() => setActiveTab('risk')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Risk Analysis <ChevronRight className="h-3.5 w-3.5" /></button>
+                    <button onClick={onExport} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-rz-mint disabled:opacity-50"><FileDown className="h-3.5 w-3.5" /> {busy ? 'Exporting…' : 'Export PDF'}</button>
+                    <button onClick={() => setActiveTab('risk')} className="inline-flex items-center gap-1 rounded-lg bg-rz-mint px-3 py-1.5 text-xs font-semibold text-rz-base hover:bg-rz-mint/80">Risk Analysis <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>
 
@@ -304,7 +304,7 @@ export function ReliabilityEnginePage() {
                                 <div className="mt-2 space-y-1">
                                     {acts.slice(0, 3).map((a, i) => (
                                         <div key={i} className="flex items-start gap-2 text-[10.5px] text-slate-600 dark:text-slate-300">
-                                            <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8.5px] font-bold text-white ${a.priority === 'HIGH' ? 'bg-red-600' : a.priority === 'MEDIUM' ? 'bg-amber-600' : 'bg-emerald-600'}`}>{a.priority}</span>
+                                            <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8.5px] font-bold ${a.priority === 'HIGH' ? 'bg-red-600 text-white' : a.priority === 'MEDIUM' ? 'bg-amber-600 text-white' : 'bg-rz-data text-rz-base'}`}>{a.priority}</span>
                                             <span>{a.action}</span>
                                         </div>
                                     ))}
@@ -330,12 +330,12 @@ export function ReliabilityEnginePage() {
                                             type="button"
                                             onClick={() => setActiveTab(lv.targetTab as Parameters<typeof setActiveTab>[0])}
                                             title={`Open the "${lv.targetTab}" tab to change this parameter`}
-                                            className="group flex w-full items-start gap-2 rounded-md border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/50 p-2 text-left transition-colors hover:border-violet-400 dark:hover:border-violet-500"
+                                            className="group flex w-full items-start gap-2 rounded-md border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/50 p-2 text-left transition-colors hover:border-rz-mint dark:hover:border-rz-mint"
                                         >
                                             <span className={`mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold text-white ${lv.priority === 'HIGH' ? 'bg-red-600' : 'bg-amber-600'}`}>{lv.priority ?? 'MED'}</span>
-                                            <span className="mt-0.5 shrink-0 whitespace-nowrap rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-bold text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">{lv.label}</span>
+                                            <span className="mt-0.5 shrink-0 whitespace-nowrap rounded bg-rz-mint/15 px-1.5 py-0.5 text-[10px] font-bold text-rz-mint">{lv.label}</span>
                                             <span className="flex-1 text-[11px] leading-snug text-slate-600 dark:text-slate-400">{lv.detail}</span>
-                                            <ArrowUpRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400 group-hover:text-violet-500" />
+                                            <ArrowUpRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400 group-hover:text-rz-mint" />
                                         </button>
                                     ))}
                                 </div>
@@ -361,7 +361,7 @@ export function ReliabilityEnginePage() {
                                     ) : (
                                         <div className="text-base font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
                                     )}
-                                    {(k as { chip?: string }).chip && <span className="rounded bg-violet-500/15 px-1 py-0.5 text-[8.5px] font-semibold text-violet-600 dark:text-violet-400">{(k as { chip?: string }).chip}</span>}
+                                    {(k as { chip?: string }).chip && <span className="rounded bg-rz-mint/15 px-1 py-0.5 text-[8.5px] font-semibold text-rz-mint">{(k as { chip?: string }).chip}</span>}
                                 </div>
                                 <div className={`truncate text-[10px] ${k.sub.startsWith('BELOW') ? 'text-rose-500 font-semibold' : 'text-slate-500'}`}>{k.sub}</div>
                             </div>
@@ -369,7 +369,7 @@ export function ReliabilityEnginePage() {
                     </div>
 
                     <div className="grid gap-4 xl:grid-cols-2">
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Availability by System <span className="text-[9px] normal-case text-slate-400">documented chains · {inputs.powerRedundancy} = {model.paths} path(s)</span></h2>
                             <table className="w-full text-[11px]">
                                 <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">System</th><th className="text-left">Chain</th><th className="text-right">Availability</th><th className="text-right">Status</th></tr></thead>
@@ -393,7 +393,7 @@ export function ReliabilityEnginePage() {
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2" title={`Tier ${inputs.tierLevel} budget · ${fmtDowntime(model.budgetMin)}`}>
                                         <span className="w-32 shrink-0 truncate text-[9px] text-slate-500">Tier budget</span>
-                                        <div className="h-2 flex-1 rounded bg-slate-100 dark:bg-slate-800"><div className="h-2 rounded bg-violet-500/70" style={{ width: '100%' }} /></div>
+                                        <div className="h-2 flex-1 rounded bg-slate-100 dark:bg-slate-800"><div className="h-2 rounded bg-rz-mint/70" style={{ width: '100%' }} /></div>
                                         <span className="w-16 shrink-0 text-right text-[9px] tabular-nums text-slate-500">{fmtDowntime(model.budgetMin)}</span>
                                     </div>
                                     {model.systems.map((s) => {
@@ -412,10 +412,10 @@ export function ReliabilityEnginePage() {
                         </div>
 
                         <div className="space-y-4">
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">SPOF — Single Points of Failure ({model.spof.length})</h2>
                                 {model.spof.length === 0 ? (
-                                    <p className="text-[11px] text-emerald-500">✓ No single-path components at {inputs.powerRedundancy} — fully redundant paths.</p>
+                                    <p className="text-[11px] text-rz-data">✓ No single-path components at {inputs.powerRedundancy} — fully redundant paths.</p>
                                 ) : (
                                     <ul className="space-y-2">
                                         {model.spof.map((s) => {
@@ -428,11 +428,11 @@ export function ReliabilityEnginePage() {
                                                             type="button"
                                                             onClick={() => setActiveTab(r.targetTab)}
                                                             title={`Open the "${r.targetTab}" tab to change redundancy`}
-                                                            className="group mt-0.5 flex w-full items-start gap-1.5 rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-2 py-1 text-left text-[10px] text-slate-600 dark:text-slate-300 transition-colors hover:border-violet-400 dark:hover:border-violet-500"
+                                                            className="group mt-0.5 flex w-full items-start gap-1.5 rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-2 py-1 text-left text-[10px] text-slate-600 dark:text-slate-300 transition-colors hover:border-rz-mint dark:hover:border-rz-mint"
                                                         >
                                                             <span className="mt-0.5 shrink-0 rounded bg-amber-600 px-1 py-0.5 text-[8px] font-bold text-white">FIX</span>
                                                             <span className="flex-1 leading-snug">{r.fix}</span>
-                                                            <ArrowUpRight className="mt-0.5 h-3 w-3 shrink-0 text-slate-400 group-hover:text-violet-500" />
+                                                            <ArrowUpRight className="mt-0.5 h-3 w-3 shrink-0 text-slate-400 group-hover:text-rz-mint" />
                                                         </button>
                                                     )}
                                                 </li>
@@ -441,7 +441,7 @@ export function ReliabilityEnginePage() {
                                     </ul>
                                 )}
                             </div>
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Sensitivity <span className="text-[9px] normal-case text-slate-400">vs base (β-adjusted)</span></h2>
                                 <table className="w-full text-[11px]">
                                     <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Scenario</th><th className="text-right">Availability</th><th className="text-right">Δ downtime</th></tr></thead>
@@ -456,7 +456,7 @@ export function ReliabilityEnginePage() {
                                     </tbody>
                                 </table>
                             </div>
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Active Failure Events <span className="text-[9px] normal-case text-slate-400">from the shared ops log</span></h2>
                                 {failures.length === 0 ? <p className="text-[11px] text-slate-500">No active events.</p> : (
                                     <div className="space-y-1">
@@ -470,13 +470,13 @@ export function ReliabilityEnginePage() {
                                         ))}
                                     </div>
                                 )}
-                                <button onClick={() => setActiveTab('ops')} className="mt-1.5 text-[10px] font-medium text-violet-500">Open Operations log →</button>
+                                <button onClick={() => setActiveTab('ops')} className="mt-1.5 text-[10px] font-medium text-rz-mint">Open Operations log →</button>
                             </div>
                         </div>
                     </div>
 
                     {/* per-component RAM table (IEEE-493 + equipScale fleet) */}
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Component RAM <span className="text-[9px] normal-case text-slate-400">IEEE-493 data{model.hasFleet ? ' · fleet counts from engine equipScale' : ''}</span></h2>
                         <div className="overflow-x-auto">
                             <table className="w-full text-[11px]">
@@ -504,7 +504,7 @@ export function ReliabilityEnginePage() {
                     </div>
 
                     {/* component MTBF chart */}
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Component MTBF (engine IEEE-493 data)</h2>
                         <div className="h-40">
                             <ResponsiveContainer width="100%" height="100%">

@@ -28,7 +28,7 @@ export const ENGINES: EngineNode[] = [
 // Per-engine accent — IDENTICAL to the sidebar ENGINE_COLORS (Shell.tsx) so the
 // lifecycle chips read intuitively as the same engines as the submenu numbers.
 const ENGINE_COLORS: Record<number, string> = {
-    1: '#22d3ee', 2: '#34d399', 3: '#a78bfa', 4: '#fbbf24', 5: '#60a5fa', 6: '#fb923c',
+    1: '#22d3ee', 2: '#34d399', 3: '#7DDDB4', 4: '#fbbf24', 5: '#60a5fa', 6: '#fb923c',
     7: '#2dd4bf', 8: '#38bdf8', 9: '#818cf8', 10: '#fb7185', 11: '#4ade80', 12: '#10b981', 13: '#e879f9',
 };
 

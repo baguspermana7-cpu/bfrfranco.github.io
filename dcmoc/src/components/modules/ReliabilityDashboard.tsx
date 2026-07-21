@@ -84,8 +84,8 @@ export function ReliabilityDashboard() {
         <div className="space-y-6">
             <div className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-600 flex items-center justify-center shadow-lg">
-                        <ShieldCheck className="w-6 h-6 text-white" />
+                    <div className="w-11 h-11 rounded bg-rz-data/10 border border-rz-data/30 flex items-center justify-center">
+                        <ShieldCheck className="w-6 h-6 text-rz-data" />
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Reliability (RAM)</h1>
@@ -103,7 +103,7 @@ export function ReliabilityDashboard() {
                 <Metric icon={Clock} label="Annual Downtime" value={fmtDowntime(model.downtimeMin)} sub={`target ≤ ${fmtDowntime(model.targetDowntimeMin)} · unplanned`} tone={model.meetsTarget ? 'good' : 'warn'} />
             </div>
 
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 overflow-hidden">
+            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 overflow-hidden">
                 <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
                     <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Component Reliability (IEEE 493)</h2>
                 </div>
@@ -122,7 +122,7 @@ export function ReliabilityDashboard() {
                                 <td className="px-4 py-2 text-slate-700 dark:text-slate-200">{c.label}</td>
                                 <td className="px-4 py-2 text-right tabular-nums text-slate-600 dark:text-slate-300">{c.mtbf.toLocaleString()}</td>
                                 <td className="px-4 py-2 text-right tabular-nums text-slate-600 dark:text-slate-300">{c.mttr}</td>
-                                <td className="px-4 py-2 text-right tabular-nums font-medium text-emerald-600 dark:text-emerald-400">{fmtAvail(c.availability)}</td>
+                                <td className="px-4 py-2 text-right tabular-nums font-medium text-rz-data">{fmtAvail(c.availability)}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -137,9 +137,9 @@ export function ReliabilityDashboard() {
 }
 
 function Metric({ icon: Icon, label, value, sub, tone }: { icon: React.ElementType; label: string; value: string; sub?: string; tone?: 'good' | 'warn' }) {
-    const color = tone === 'good' ? 'text-emerald-500' : tone === 'warn' ? 'text-amber-500' : 'text-cyan-500';
+    const color = tone === 'good' ? 'text-rz-data' : tone === 'warn' ? 'text-rz-signal' : 'text-rz-info';
     return (
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
             <div className="flex items-center gap-2 text-slate-400 mb-1.5">
                 <Icon className={`w-4 h-4 ${color}`} />
                 <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</span>

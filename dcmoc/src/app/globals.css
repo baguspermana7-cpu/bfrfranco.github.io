@@ -4,56 +4,115 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  /* Brand vars repointed to the resistancezero SEMANTIC palette (design.md §5).
+     Legacy names kept so existing consumers keep resolving — but they now map
+     to instrument tokens, not decorative Tailwind defaults. */
   --color-brand-blue: #1e3a5f;
-  --color-brand-cyan: #06b6d4;
-  --color-brand-emerald: #10b981;
-  --color-brand-amber: #fbbf24;
-  --font-sans: var(--font-inter);
+  --color-brand-cyan: var(--rz-accent-info);     /* was #06b6d4 → instrument-cyan */
+  --color-brand-emerald: var(--rz-accent-data);  /* was #10b981 → data-green */
+  --color-brand-amber: var(--rz-accent-signal);  /* was #fbbf24 → signal-amber */
+
+  /* ── Semantic instrument tokens (bg-rz-* / text-rz-* / border-rz-*) ── */
+  --color-rz-base: var(--rz-bg-base);
+  --color-rz-elevated: var(--rz-bg-elevated);
+  --color-rz-overlay: var(--rz-bg-overlay);
+  --color-rz-signal: var(--rz-accent-signal);
+  --color-rz-data: var(--rz-accent-data);
+  --color-rz-info: var(--rz-accent-info);
+  --color-rz-alert: var(--rz-accent-alert);
+  --color-rz-mint: var(--rz-accent-mint);
+
+  --font-sans: var(--font-ibm-plex-sans);
   --font-mono: var(--font-jetbrains-mono);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   resistancezero SEMANTIC color tokens (design.md §5 — color signals STATE,
+   not decoration). Both light + dark. Amber = caution/estimate/primary CTA,
+   data-green = engine-sourced/confirmed, instrument-cyan = derived/computed,
+   fault-red = risk/delete, mint = user input (replaces violet — CLAUDE.md #3).
+   ═══════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* Light Mode Defaults */
+  /* Accent families — identical hues across themes (instrument signals are
+     absolute, not theme-relative) */
+  --rz-accent-signal: #FFAA00;
+  --rz-accent-signal-dim: #CC8800;
+  --rz-accent-signal-bg: rgba(255, 170, 0, 0.08);
+
+  --rz-accent-data: #00FF88;
+  --rz-accent-data-dim: #00CC6A;
+  --rz-accent-data-bg: rgba(0, 255, 136, 0.07);
+
+  --rz-accent-info: #00DDFF;
+  --rz-accent-info-dim: #00AACC;
+  --rz-accent-info-bg: rgba(0, 221, 255, 0.07);
+
+  --rz-accent-alert: #FF3030;
+  --rz-accent-alert-dim: #CC2020;
+  --rz-accent-alert-bg: rgba(255, 48, 48, 0.08);
+
+  --rz-accent-mint: #7DDDB4;
+  --rz-accent-mint-bg: rgba(125, 221, 180, 0.08);
+
+  /* Tier-graded hairlines (SLD stroke discipline) */
+  --rz-line-tier-1: rgba(15, 23, 42, 0.18);
+  --rz-line-tier-2: rgba(15, 23, 42, 0.12);
+  --rz-line-tier-3: rgba(15, 23, 42, 0.07);
+
+  /* Surfaces — LIGHT default (presentation mode) */
+  --rz-bg-base: #f8fafc;
+  --rz-bg-elevated: #ffffff;
+  --rz-bg-overlay: #ffffff;
+
+  /* Legacy surface vars (light) */
   --background: #f8fafc;
-  /* Slate 50 */
   --foreground: #0f172a;
-  /* Slate 900 */
   --card-bg: #ffffff;
   --card-border: #e2e8f0;
-  /* Slate 200 */
   --muted: #f1f5f9;
-  /* Slate 100 */
   --muted-fg: #64748b;
-  /* Slate 500 */
 }
 
 /* Force Dark Mode styles when .dark class is present */
 .dark {
-  --background: #0f172a;
-  /* Slate 900 */
-  --foreground: #f1f5f9;
-  /* Slate 100 */
-  --card-bg: #1e293b;
-  /* Slate 800 */
+  /* 3-layer elevation system (design.md §5 — SCADA console conventions) */
+  --rz-bg-base: #0a0e1a;      /* page bg (replaces slate-900 #0f172a) */
+  --rz-bg-elevated: #111827;  /* cards / tiles / sidebar / popover */
+  --rz-bg-overlay: #1c2333;   /* modal / dropdown / tooltip */
+
+  /* Hairlines invert to white-on-dark in dark mode */
+  --rz-line-tier-1: rgba(255, 255, 255, 0.18);
+  --rz-line-tier-2: rgba(255, 255, 255, 0.12);
+  --rz-line-tier-3: rgba(255, 255, 255, 0.07);
+
+  /* Legacy surface vars (dark) — repointed to the instrument base/elevated */
+  --background: #0a0e1a;      /* was #0f172a */
+  --foreground: #E8EDF5;      /* off-white, not pure white (design.md §5) */
+  --card-bg: #111827;         /* was #1e293b — instrument elevated */
   --card-border: #334155;
-  /* Slate 700 */
-  --muted: #1e293b;
-  /* Slate 800 */
+  --muted: #111827;
   --muted-fg: #94a3b8;
-  /* Slate 400 */
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), sans-serif;
+  font-family: var(--font-ibm-plex-sans), 'Segoe UI', system-ui, -apple-system, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Slashed-zero + tabular figures on all mono numerics (design.md §4) — kills
+   the 0/O ambiguity in engineering data. */
+.font-mono,
+.tabular-nums,
+[class*="tabular"] {
+  font-feature-settings: "tnum" 1, "zero" 1;
 }
 
 /* Light mode background pattern */
 body {
   background-image:
-    radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.05) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, rgba(0, 221, 255, 0.05) 0px, transparent 50%),
     radial-gradient(at 100% 0%, rgba(30, 58, 95, 0.05) 0px, transparent 50%);
 }
 
@@ -61,7 +120,7 @@ body {
 .dark body {
   background-image:
     radial-gradient(at 0% 0%, rgba(30, 58, 95, 0.3) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%);
+    radial-gradient(at 100% 0%, rgba(0, 221, 255, 0.12) 0px, transparent 50%);
 }
 
 @media print {

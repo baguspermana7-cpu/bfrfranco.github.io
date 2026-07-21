@@ -26,7 +26,7 @@ import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 
-const OPEX_COLORS = ['#f59e0b', '#10b981', '#3b82f6', '#a855f7', '#64748b', '#14b8a6'];
+const OPEX_COLORS = ['#f59e0b', '#00FF88', '#3b82f6', '#7DDDB4', '#64748b', '#14b8a6'];
 
 export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledger' | 'proforma' | 'montecarlo' } = {}) {
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
@@ -155,7 +155,7 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg"><TrendingUp className="h-6 w-6 text-white" /></div>
+                    <div className="flex h-11 w-11 items-center justify-center rounded border border-rz-2 bg-rz-elevated"><TrendingUp className="h-6 w-6 text-rz-info" /></div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Financial Engine</h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400">Financial performance & analytics across the project lifecycle</p>
@@ -164,23 +164,23 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                 <div className="flex items-center gap-2">
                     <div className="flex rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden">
                         {([['overview', 'Overview'], ['ledger', 'Transactions & AR/AP'], ['montecarlo', 'Monte Carlo Risk'], ['proforma', 'Pro Forma (Full)']] as const).map(([k, l]) => (
-                            <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
+                            <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-rz-signal text-rz-base' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
                         ))}
                     </div>
-                    <button onClick={() => setActiveTab('invest')} className="rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400">Investment & Capitalization</button>
-                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
-                    <button onClick={() => setActiveTab('report')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: Results <ChevronRight className="h-3.5 w-3.5" /></button>
+                    <button onClick={() => setActiveTab('invest')} className="rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-rz-mint">Investment & Capitalization</button>
+                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-rz-mint"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
+                    <button onClick={() => setActiveTab('report')} className="inline-flex items-center gap-1 rounded-lg bg-rz-signal px-3 py-1.5 text-xs font-semibold text-rz-base hover:bg-rz-signal/90">Next: Results <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>
 
             {tab === 'proforma' ? <FinancialDashboard /> : tab === 'montecarlo' ? <MonteCarloDashboard /> : tab === 'ledger' ? (
                 <div className="grid gap-4 xl:grid-cols-2">
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Recent Financial Transactions {fin.touched ? '' : <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">EXAMPLE LEDGER</span>}</h2>
                         <div className="space-y-1">
                             {fin.transactions.map((t) => (
                                 <div key={t.id} className="flex items-center gap-2 text-[11px]">
-                                    <span className={`rounded px-1 py-0.5 text-[8.5px] font-semibold uppercase ${t.type === 'po' ? 'bg-violet-500/15 text-violet-500' : t.type === 'invoice' ? 'bg-cyan-500/15 text-cyan-500' : 'bg-emerald-500/15 text-emerald-500'}`}>{t.type}</span>
+                                    <span className={`rounded px-1 py-0.5 text-[8.5px] font-semibold uppercase ${t.type === 'po' ? 'bg-rz-mint/15 text-rz-mint' : t.type === 'invoice' ? 'bg-cyan-500/15 text-cyan-500' : 'bg-rz-data/15 text-rz-data'}`}>{t.type}</span>
                                     <span className="min-w-0 flex-1">
                                         <span className="block truncate text-slate-700 dark:text-slate-200">{t.description}</span>
                                         <span className="block truncate text-[9px] text-slate-400">{t.vendor}</span>
@@ -194,15 +194,15 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                             ))}
                         </div>
                         <button onClick={() => fin.actions.addTxn({ date: 'now', type: 'invoice', vendor: 'New vendor', description: 'New transaction', amountFrac: 0.001, status: 'pending' })}
-                            className="mt-2 rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1 text-[11px] text-slate-600 dark:text-slate-300 hover:border-violet-400">＋ New Financial Entry</button>
+                            className="mt-2 rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1 text-[11px] text-slate-600 dark:text-slate-300 hover:border-rz-mint">＋ New Financial Entry</button>
                     </div>
                     <div className="space-y-4">
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Outstanding Invoices (AR/AP)</h2>
                             <div className="space-y-1">
                                 {fin.invoices.map((iv) => (
                                     <div key={iv.id} className="flex items-center gap-2 text-[11px]">
-                                        <span className={`rounded px-1 py-0.5 text-[8.5px] font-bold ${iv.direction === 'AP' ? 'bg-rose-500/15 text-rose-500' : 'bg-emerald-500/15 text-emerald-500'}`}>{iv.direction}</span>
+                                        <span className={`rounded px-1 py-0.5 text-[8.5px] font-bold ${iv.direction === 'AP' ? 'bg-rose-500/15 text-rose-500' : 'bg-rz-data/15 text-rz-data'}`}>{iv.direction}</span>
                                         <span className="min-w-0 flex-1 truncate text-slate-700 dark:text-slate-200">{iv.vendor} <span className="text-[9px] text-slate-400">{iv.invoiceNo} · {iv.dueLabel}</span></span>
                                         <span className="tabular-nums text-slate-600 dark:text-slate-300">{fmtMoney(iv.amountFrac * model.baseline)}</span>
                                         <select className="rounded border border-slate-300 dark:border-slate-700 bg-transparent px-1 py-0.5 text-[9px] text-slate-500"
@@ -213,11 +213,11 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                                 ))}
                             </div>
                         </div>
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Budget Revisions (change orders)</h2>
                             {fin.revisions.map((r) => (
                                 <label key={r.id} className="flex items-center gap-2 py-0.5 text-[11px]">
-                                    <input type="checkbox" checked={r.approved} onChange={() => fin.actions.toggleRevision(r.id)} className="accent-violet-500" />
+                                    <input type="checkbox" checked={r.approved} onChange={() => fin.actions.toggleRevision(r.id)} className="accent-rz-mint" />
                                     <span className="flex-1 truncate text-slate-700 dark:text-slate-200">{r.description}</span>
                                     <span className="tabular-nums text-slate-500">{fmtMoney(r.amountFrac * model.baseline)}</span>
                                 </label>
@@ -254,7 +254,7 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                     <div className="grid gap-4 lg:grid-cols-[1fr_290px]">
                         <div className="min-w-0 space-y-4">
                             {/* budget curve */}
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Budget vs Plan Over Time <span className="text-[9px] normal-case text-slate-400">PV from the engine CPM schedule</span></h2>
                                 <div className="h-52">
                                     <ResponsiveContainer width="100%" height="100%">
@@ -264,14 +264,14 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                                             <YAxis tick={{ fontSize: 8 }} tickFormatter={(v) => `$${(v / 1e6).toFixed(0)}M`} />
                                             <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                             <Legend wrapperStyle={{ fontSize: 10 }} />
-                                            <Area dataKey="pvUsd" name="Planned Value (cumulative)" stroke="#a78bfa" fill="#a78bfa" fillOpacity={0.15} />
+                                            <Area dataKey="pvUsd" name="Planned Value (cumulative)" stroke="#7DDDB4" fill="#7DDDB4" fillOpacity={0.15} />
                                         </ComposedChart>
                                     </ResponsiveContainer>
                                 </div>
                             </div>
 
                             {/* OPEX */}
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Annual OPEX by Type <span className="text-[9px] normal-case text-slate-400">engine models.opex · DC-contract basis (Phase-Q preset)</span></h2>
                                 {model.opex ? (
                                     <div className="flex items-center gap-3">
@@ -306,10 +306,10 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
 
                         {/* rail */}
                         <aside className="space-y-4 lg:sticky lg:top-4 self-start">
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 text-center">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 text-center">
                                 <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Financial Health</h3>
                                 <TraceValue traceId="fin.healthScore">
-                                    <div className={`text-4xl font-bold ${model.grade === 'A' ? 'text-emerald-500' : model.grade === 'B' ? 'text-lime-500' : model.grade === 'C' ? 'text-amber-500' : 'text-rose-500'}`}>
+                                    <div className={`text-4xl font-bold ${model.grade === 'A' ? 'text-rz-data' : model.grade === 'B' ? 'text-lime-500' : model.grade === 'C' ? 'text-amber-500' : 'text-rose-500'}`}>
                                         {model.grade}{model.planMode && <span className="text-base font-semibold text-slate-400"> (baseline)</span>}
                                     </div>
                                 </TraceValue>
@@ -320,22 +320,22 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                                     <span className="mt-1 inline-block rounded bg-slate-400/15 px-1 py-0.5 text-[8px] font-semibold text-slate-500">Plan Mode — baseline (belum ada actuals)</span>
                                 )}
                                 <div className="mt-1.5 space-y-0.5 text-left text-[11px]">
-                                    <div className="flex justify-between"><span className="text-slate-500">Budget Variance</span><span className={`tabular-nums ${Math.abs(model.fac - model.revised) / model.revised < 0.02 ? 'text-emerald-500' : 'text-amber-500'}`}>{((model.fac - model.revised) / model.revised * 100).toFixed(1)}%</span></div>
+                                    <div className="flex justify-between"><span className="text-slate-500">Budget Variance</span><span className={`tabular-nums ${Math.abs(model.fac - model.revised) / model.revised < 0.02 ? 'text-rz-data' : 'text-amber-500'}`}>{((model.fac - model.revised) / model.revised * 100).toFixed(1)}%</span></div>
                                     <div className="flex justify-between"><span className="text-slate-500">CPI</span><span className="tabular-nums text-slate-700 dark:text-slate-200">{model.cpi}</span></div>
                                     <div className="flex justify-between"><span className="text-slate-500">SPI</span><span className="tabular-nums text-slate-700 dark:text-slate-200">{model.spi}</span></div>
                                 </div>
                             </div>
-                            <div className="rounded-2xl border border-violet-500/30 bg-violet-600/5 p-3">
-                                <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-violet-500">Key Insights</h3>
+                            <div className="rounded border border-rz-mint/30 bg-rz-mint/5 p-3">
+                                <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Key Insights</h3>
                                 <ul className="space-y-0.5">
-                                    {insights.map((s, idx) => <li key={idx} className="flex gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"><span className="text-violet-500">✓</span>{s}</li>)}
+                                    {insights.map((s, idx) => <li key={idx} className="flex gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"><span className="text-rz-mint">✓</span>{s}</li>)}
                                 </ul>
                             </div>
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Deep Dives</h3>
                                 <div className="space-y-1 text-[11px]">
                                     {([['invest', 'Investment & Capitalization'], ['montecarlo', 'Monte Carlo'], ['portfolio', 'Portfolio'], ['benchmark', 'Benchmarks'], ['strategic', 'Strategic Planning']] as const).map(([id, l]) => (
-                                        <button key={id} onClick={() => setActiveTab(id)} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-left text-slate-600 dark:text-slate-300 hover:border-violet-400">{l} →</button>
+                                        <button key={id} onClick={() => setActiveTab(id)} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5 text-left text-slate-600 dark:text-slate-300 hover:border-rz-mint">{l} →</button>
                                     ))}
                                 </div>
                             </div>

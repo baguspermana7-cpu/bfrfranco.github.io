@@ -160,7 +160,7 @@ const CATEGORY_COLORS: Record<ComplianceCategory, string> = {
     electrical: 'bg-amber-500',
     environmental: 'bg-green-500',
     building: 'bg-blue-500',
-    'data-protection': 'bg-purple-500',
+    'data-protection': 'bg-rz-mint',
     telecom: 'bg-cyan-500',
 };
 
@@ -169,7 +169,7 @@ const CATEGORY_BG: Record<ComplianceCategory, string> = {
     electrical: 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800',
     environmental: 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800',
     building: 'bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800',
-    'data-protection': 'bg-purple-50 dark:bg-purple-900/10 border-purple-200 dark:border-purple-800',
+    'data-protection': 'bg-rz-mint/10 dark:bg-rz-mint/5 border-rz-mint/30 dark:border-rz-mint/20',
     telecom: 'bg-cyan-50 dark:bg-cyan-900/10 border-cyan-200 dark:border-cyan-800',
 };
 

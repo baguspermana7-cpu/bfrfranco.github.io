@@ -550,7 +550,7 @@ const FinancialDashboard = () => {
                         {/* ── Financial Section ───────────── */}
                         <div className="text-[10px] uppercase text-indigo-600 dark:text-indigo-400 font-semibold tracking-wider border-b border-indigo-200 dark:border-indigo-800/40 pb-1">
                             Financial Analysis
-                        <p className="mt-1 rounded bg-violet-500/10 px-2 py-1 text-[9px] text-violet-500 dark:text-violet-300">All parameters in this panel are PREDEFINED from data (country · tier · CAPEX · requirements) — you may override them; manual edits are preserved. The remaining inputs are this page's analysis controls (not duplicates of requirements); canonical values (Tax Rate, Lease Term) are shown derived + with an Edit link in Requirements.</p></div>
+                        <p className="mt-1 rounded bg-rz-info/10 px-2 py-1 text-[9px] text-rz-info">All parameters in this panel are PREDEFINED from data (country · tier · CAPEX · requirements) — you may override them; manual edits are preserved. The remaining inputs are this page's analysis controls (not duplicates of requirements); canonical values (Tax Rate, Lease Term) are shown derived + with an Edit link in Requirements.</p></div>
                         <div className="space-y-1">
                             <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Revenue per kW/month ($) <Tooltip content="Monthly colocation rate charged per kW of IT power. Industry range: $100-250/kW/month depending on market and tier. This page's analysis control — the real revenue figure is set HERE (single edit surface); the illustrative default is derived from country + tier." /></label>
                             <input type="number" className={inpCls}
@@ -595,7 +595,7 @@ const FinancialDashboard = () => {
                                         <span className="ml-1.5 rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-emerald-500">country</span>
                                     </div>
                                     <button onClick={() => simActions.setActiveTab('requirements')}
-                                        className="text-[9px] text-violet-500 hover:underline">Edit in Requirements ↗</button>
+                                        className="text-[9px] text-rz-mint hover:underline">Edit in Requirements ↗</button>
                                 </div>
                             </div>
                             <div className="space-y-1">
@@ -669,7 +669,7 @@ const FinancialDashboard = () => {
                                         <span className="ml-1.5 rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-emerald-500">requirements</span>
                                     </div>
                                     <button onClick={() => simActions.setActiveTab('requirements')}
-                                        className="text-[9px] text-violet-500 hover:underline">Edit in Requirements ↗</button>
+                                        className="text-[9px] text-rz-mint hover:underline">Edit in Requirements ↗</button>
                                 </div>
                             </div>
                             <div className="space-y-1">
@@ -961,7 +961,7 @@ const FinancialDashboard = () => {
                                     } />
                                     <Bar yAxisId="left" dataKey="nrc" stackId="rev" fill="#06b6d4" radius={[0, 0, 0, 0]} />
                                     <Bar yAxisId="left" dataKey="mrc" stackId="rev" fill="#10b981" radius={[0, 0, 0, 0]} />
-                                    <Bar yAxisId="left" dataKey="crossConnect" stackId="rev" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                                    <Bar yAxisId="left" dataKey="crossConnect" stackId="rev" fill="#7DDDB4" radius={[4, 4, 0, 0]} />
                                     <Line yAxisId="right" type="monotone" dataKey="cumRevenue" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} />
                                 </ComposedChart>
                             </ResponsiveContainer>
@@ -1225,7 +1225,7 @@ const FinancialDashboard = () => {
 
                     const opexBreakdown = [
                         { category: 'Energy', value: energyCost, color: '#f59e0b' },
-                        { category: 'Staffing', value: staffCost, color: '#8b5cf6' },
+                        { category: 'Staffing', value: staffCost, color: '#7DDDB4' },
                         { category: 'Maintenance', value: maintenanceCost, color: '#06b6d4' },
                         { category: 'Insurance', value: insuranceCost, color: '#ec4899' },
                         { category: 'Overhead', value: overheadCost, color: '#64748b' },
@@ -1236,7 +1236,7 @@ const FinancialDashboard = () => {
                         <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm text-slate-800 dark:text-slate-300 flex items-center gap-2">
-                                    <Receipt className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+                                    <Receipt className="w-4 h-4 text-rz-mint" />
                                     OPEX Breakdown (Annual) <Tooltip content="Annual operating expenditure breakdown by category. Energy is typically the largest cost (40-60%), followed by staffing. Understanding the mix helps identify cost optimization opportunities." />
                                 </CardTitle>
                             </CardHeader>

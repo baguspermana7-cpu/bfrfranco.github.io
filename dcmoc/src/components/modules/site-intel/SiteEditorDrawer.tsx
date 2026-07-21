@@ -67,7 +67,7 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
 
     /* PREFILL (owner): unset fields show the EFFECTIVE value — country baseline
      * (cyan) else screening typical (amber) — as placeholder; store stays unset
-     * (= baseline semantics) until the user picks/enters a value (violet custom). */
+     * (= baseline semantics) until the user picks/enters a value (mint custom). */
     const baseline = countryBaselineAttributes(site.countryId);
     const numVal = (k: NumKey): ComboValue<number> | null => {
         const v = site.attributes[k] as number | undefined;
@@ -81,7 +81,7 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
     };
     const srcChip = (k: NumKey) => {
         if ((site.attributes[k] as number | undefined) != null)
-            return <span className="ml-1 rounded bg-violet-500/15 px-1 text-[8px] font-bold text-violet-500">custom</span>;
+            return <span className="ml-1 rounded bg-rz-mint/15 px-1 text-[8px] font-bold text-rz-mint">custom</span>;
         const p = prefill(k);
         if (p?.src === 'baseline') return <span className="ml-1 rounded bg-cyan-500/15 px-1 text-[8px] font-bold text-cyan-500" title={`Baseline negara ${COUNTRIES[site.countryId]?.name ?? site.countryId} — dipakai engine sampai diganti`}>baseline</span>;
         if (p?.src === 'screening') return <span className="ml-1 rounded bg-amber-500/15 px-1 text-[8px] font-bold text-amber-500" title="Screening typical — belum ada data negara/site; isi untuk mempertajam skor">screening</span>;
@@ -99,7 +99,7 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
                 <div className="mb-3 flex flex-wrap items-center gap-1.5">
                     {sites.map((s) => (
                         <button key={s.id} onClick={() => selectSite(s.id)}
-                            className={`rounded-full border px-2 py-1 text-[11px] ${s.id === site.id ? 'border-violet-500 bg-violet-600/15 text-violet-500' : 'border-slate-300 dark:border-slate-700 text-slate-500'}`}>
+                            className={`rounded-full border px-2 py-1 text-[11px] ${s.id === site.id ? 'border-rz-mint bg-rz-mint/15 text-rz-mint' : 'border-slate-300 dark:border-slate-700 text-slate-500'}`}>
                             {s.label}
                         </button>
                     ))}
@@ -112,7 +112,7 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
                 <div className="mb-3 grid grid-cols-2 gap-2">
                     <label className="block">
                         <span className="text-[10px] font-semibold uppercase text-slate-500">Name</span>
-                        <input className="mt-0.5 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-violet-500 text-slate-900 dark:text-slate-100"
+                        <input className="mt-0.5 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-rz-mint text-slate-900 dark:text-slate-100"
                             value={site.name} onChange={(e) => updateSite(site.id, { name: e.target.value })} />
                     </label>
                     <label className="block">
@@ -121,7 +121,7 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
                     </label>
                 </div>
 
-                <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-violet-500">Numeric attributes (preset or custom — clears to country baseline)</h3>
+                <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Numeric attributes (preset or custom — clears to country baseline)</h3>
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
                     {NUM_FIELDS.map((f) => {
                         const b = ATTR_BOUNDS[f.key]!;
@@ -138,12 +138,12 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
                     })}
                 </div>
 
-                <h3 className="mb-1 mt-3 text-[10px] font-semibold uppercase tracking-wide text-violet-500">Categorical attributes</h3>
+                <h3 className="mb-1 mt-3 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Categorical attributes</h3>
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
                     {ENUM_FIELDS.map((f) => (
                         <label key={String(f.key)} className="block">
                             <span className="text-[9px] font-medium uppercase text-slate-500">{f.label}</span>
-                            <select className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-violet-500 text-slate-900 dark:text-slate-100"
+                            <select className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-rz-mint text-slate-900 dark:text-slate-100"
                                 value={(site.attributes[f.key] as string | undefined) ?? ''}
                                 onChange={(e) => updateAttributes(site.id, { [f.key]: e.target.value || undefined } as Partial<SiteAttributes>)}>
                                 <option value="">— country baseline —</option>
@@ -153,12 +153,12 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
                     ))}
                 </div>
 
-                <h3 className="mb-1 mt-3 text-[10px] font-semibold uppercase tracking-wide text-violet-500">Text attributes</h3>
+                <h3 className="mb-1 mt-3 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Text attributes</h3>
                 <div className="grid grid-cols-1 gap-1.5">
                     {TEXT_FIELDS.map((f) => (
                         <label key={String(f.key)} className="block">
                             <span className="text-[9px] font-medium uppercase text-slate-500">{f.label}</span>
-                            <input className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-violet-500 text-slate-900 dark:text-slate-100"
+                            <input className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-rz-mint text-slate-900 dark:text-slate-100"
                                 value={(site.attributes[f.key] as string | undefined) ?? ''}
                                 onChange={(e) => updateAttributes(site.id, { [f.key]: e.target.value || undefined } as Partial<SiteAttributes>)} />
                         </label>

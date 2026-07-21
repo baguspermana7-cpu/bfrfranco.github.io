@@ -17,7 +17,7 @@ export function ExportPDFButton({ onExport, isGenerating, label = "Export PDF", 
             aria-label={isGenerating ? 'Generating PDF, please wait' : label}
             aria-busy={isGenerating}
             className={clsx(
-                "flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white rounded-lg text-sm font-medium shadow-lg shadow-cyan-900/20 transition-all disabled:opacity-50",
+                "flex items-center gap-2 px-4 py-2 bg-rz-signal hover:bg-rz-signal/90 text-black rounded-lg text-sm font-medium transition-colors disabled:opacity-50",
                 className
             )}
         >

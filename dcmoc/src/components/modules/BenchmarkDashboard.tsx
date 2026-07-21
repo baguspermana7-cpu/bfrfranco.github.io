@@ -438,7 +438,7 @@ export default function BenchmarkDashboard() {
         <div className="space-y-6">
             {/* #334b — corpus distributions (metric × segment) */}
             {corpusGroups.length > 0 && (
-                <div className="rounded-2xl border border-emerald-500/30 bg-white dark:bg-slate-900/50 p-4">
+                <div className="rounded border border-emerald-500/30 bg-white dark:bg-slate-900/50 p-4">
                     <div className="mb-2 flex items-center gap-2">
                         <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Corpus Distributions — Project Position vs Multi-Source Public Corpus</h3>
                         <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">live corpus</span>
@@ -450,7 +450,7 @@ export default function BenchmarkDashboard() {
                                     <span className="font-semibold text-slate-800 dark:text-slate-100">{def.label}</span>
                                     <span className="text-[9px] text-slate-400">({segs[0][1].unit})</span>
                                     {def.project != null && (
-                                        <span className="rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-violet-600 dark:text-violet-300" title={def.projectNote}>
+                                        <span className="rounded bg-rz-mint/15 px-1.5 py-0.5 text-[9px] font-semibold text-rz-mint" title={def.projectNote}>
                                             your project: {def.fmt(def.project)} {segs[0][1].unit}
                                         </span>
                                     )}
@@ -468,7 +468,7 @@ export default function BenchmarkDashboard() {
                                                     <span className="tabular-nums text-slate-500">n={d.n} · p10 {d.p10.toLocaleString()} · p50 <b className="text-slate-900 dark:text-white">{d.p50.toLocaleString()}</b> · p90 {d.p90.toLocaleString()}</span>
                                                     {d.n < 5 && <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-medium text-amber-600 dark:text-amber-400">small n — indicative</span>}
                                                     {rank != null && (
-                                                        <span className="ml-auto rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-violet-600 dark:text-violet-300">
+                                                        <span className="ml-auto rounded bg-rz-mint/15 px-1.5 py-0.5 text-[9px] font-semibold text-rz-mint">
                                                             {def.label} {def.fmt(def.project as number)} = percentile {rank.label} in {seg} (n={d.n})
                                                         </span>
                                                     )}
@@ -476,7 +476,7 @@ export default function BenchmarkDashboard() {
                                                 <div className="relative mt-1 h-2 rounded bg-slate-100 dark:bg-slate-800">
                                                     <div className="absolute h-2 rounded bg-emerald-500/30" style={{ left: `${((d.p25 - d.p10) / span) * 100}%`, width: `${((d.p75 - d.p25) / span) * 100}%` }} />
                                                     <div className="absolute top-[-2px] h-3 w-0.5 bg-slate-400" style={{ left: `${((d.p50 - d.p10) / span) * 100}%` }} />
-                                                    {pos != null && <div className="absolute top-[-3px] h-4 w-1 rounded bg-violet-500" style={{ left: `${pos}%` }} title={`Your project: ${def.fmt(def.project as number)} ${d.unit} (${rank?.label})`} />}
+                                                    {pos != null && <div className="absolute top-[-3px] h-4 w-1 rounded bg-rz-mint" style={{ left: `${pos}%` }} title={`Your project: ${def.fmt(def.project as number)} ${d.unit} (${rank?.label})`} />}
                                                 </div>
                                                 <div className="mt-0.5 text-[9px] text-slate-400">{d.sources} documents · {d.companies.slice(0, 4).join(', ')}{d.companies.length > 4 ? ` +${d.companies.length - 4}` : ''}</div>
                                             </div>
@@ -493,7 +493,7 @@ export default function BenchmarkDashboard() {
              * Sumber tunggal DATA.calibrationSpec; semantik rule identik dengan
              * gate tools/test-model-calibration.mjs (lib/calibration.ts). */}
             {calib && calib.rows.length > 0 && (
-                <div ref={calibCardRef} className="rounded-2xl border border-cyan-500/30 bg-white dark:bg-slate-900/50 p-4">
+                <div ref={calibCardRef} className="rounded border border-cyan-500/30 bg-white dark:bg-slate-900/50 p-4">
                     <div className="flex w-full items-center gap-2">
                         <button
                             type="button"
@@ -649,8 +649,8 @@ export default function BenchmarkDashboard() {
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                        <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
-                            <Target className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                        <div className="p-2 bg-rz-mint/10 rounded-lg">
+                            <Target className="w-6 h-6 text-rz-mint" />
                         </div>
                         Industry Benchmarks
                         <InfoTooltip content={TOOLTIP_TEXTS.industryBenchmarks} />
@@ -709,7 +709,7 @@ function ScorecardTab({ result, tier, coolingType }: { result: ReturnType<typeof
     return (
         <div className="space-y-6">
             {/* Overall Score Ring */}
-            <div className="bg-white dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 p-8 text-center">
+            <div className="bg-white dark:bg-slate-800/50 rounded border border-slate-200 dark:border-slate-700 p-8 text-center">
                 <div className="inline-flex flex-col items-center">
                     <div className="relative w-40 h-40">
                         <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">

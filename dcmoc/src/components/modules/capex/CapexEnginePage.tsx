@@ -119,7 +119,7 @@ export function CapexEnginePage() {
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg"><Building className="h-6 w-6 text-white" /></div>
+                    <div className="flex h-11 w-11 items-center justify-center rounded border border-rz-2 bg-rz-elevated"><Building className="h-6 w-6 text-rz-info" /></div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">CAPEX Engine</h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400">Estimate, analyze and optimize total capital expenditure with risk-adjusted forecasting</p>
@@ -128,21 +128,21 @@ export function CapexEnginePage() {
                 <div className="flex items-center gap-2">
                     <div className="flex rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden">
                         {(['analysis', 'config'] as const).map((t) => (
-                            <button key={t} onClick={() => setTab(t)} className={`px-3 py-1.5 text-xs font-medium ${tab === t ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>
+                            <button key={t} onClick={() => setTab(t)} className={`px-3 py-1.5 text-xs font-medium ${tab === t ? 'bg-rz-signal text-rz-base' : 'text-slate-600 dark:text-slate-300'}`}>
                                 {t === 'analysis' ? 'Cost Analysis' : 'Assumptions & Config'}
                             </button>
                         ))}
                     </div>
-                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
+                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-rz-mint"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
                     <button onClick={openBoq} title="Bill of Quantities — line items by discipline, disclosed margin, safety factors (save as PDF)" className="inline-flex items-center gap-1 rounded-lg border border-cyan-500/60 px-2.5 py-1.5 text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10"><ClipboardList className="h-3.5 w-3.5" />BOQ</button>
-                    <button onClick={() => setActiveTab('construction')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: Construction <ChevronRight className="h-3.5 w-3.5" /></button>
+                    <button onClick={() => setActiveTab('construction')} className="inline-flex items-center gap-1 rounded-lg bg-rz-signal px-3 py-1.5 text-xs font-semibold text-rz-base hover:bg-rz-signal/90">Next: Construction <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>
 
             {tab === 'config' ? (
                 <div>
-                    <p className="mb-2 rounded-lg border border-violet-500/30 bg-violet-600/5 px-3 py-2 text-[11px] text-slate-600 dark:text-slate-300">
-                        Shared canonicals (IT load, cooling, redundancy, country, rack class) are owned by <button className="font-semibold text-violet-500" onClick={() => setActiveTab('requirements')}>Requirements</button> — edit them there. CAPEX-only assumptions below.
+                    <p className="mb-2 rounded-lg border border-rz-mint/30 bg-rz-mint/5 px-3 py-2 text-[11px] text-slate-600 dark:text-slate-300">
+                        Shared canonicals (IT load, cooling, redundancy, country, rack class) are owned by <button className="font-semibold text-rz-mint" onClick={() => setActiveTab('requirements')}>Requirements</button> — edit them there. CAPEX-only assumptions below.
                     </p>
                     <CapexDashboard />
                 </div>
@@ -174,7 +174,7 @@ export function CapexEnginePage() {
 
                     <div className="grid gap-4 xl:grid-cols-2">
                         {/* breakdown */}
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">CAPEX Breakdown (P50)</h2>
                             <div className="flex items-center gap-3">
                                 <div className="h-40 w-40 shrink-0">
@@ -204,7 +204,7 @@ export function CapexEnginePage() {
                         </div>
 
                         {/* risk curve */}
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">CAPEX Forecast (Risk-Adjusted) <span className="ml-1 text-[9px] normal-case text-slate-400">AACE band · deterministic normal approx</span></h2>
                             <div className="h-40">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -212,12 +212,12 @@ export function CapexEnginePage() {
                                         <XAxis dataKey="x" tick={{ fontSize: 8 }} tickFormatter={(v) => `$${(v / 1e6).toFixed(0)}M`} />
                                         <YAxis hide />
                                         <Tooltip formatter={() => ''} labelFormatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
-                                        <Area dataKey="y" stroke="#a78bfa" fill="#a78bfa" fillOpacity={0.25} />
+                                        <Area dataKey="y" stroke="#7DDDB4" fill="#7DDDB4" fillOpacity={0.25} />
                                     </ComposedChart>
                                 </ResponsiveContainer>
                             </div>
                             <div className="mt-1 grid grid-cols-4 gap-2 text-center text-[10px]">
-                                {[['P10', band.p10, 'text-emerald-500', 'capex.p10'], ['P50 · Base', band.p50, 'text-violet-500', 'capex.total'], ['P80', band.p80, 'text-amber-500', 'capex.p80'], ['P90', band.p90, 'text-rose-500', 'capex.p90']].map(([l, v, c, t]) => (
+                                {[['P10', band.p10, 'text-rz-data', 'capex.p10'], ['P50 · Base', band.p50, 'text-rz-mint', 'capex.total'], ['P80', band.p80, 'text-amber-500', 'capex.p80'], ['P90', band.p90, 'text-rose-500', 'capex.p90']].map(([l, v, c, t]) => (
                                     <div key={l as string}>
                                         <TraceValue traceId={t as string}>
                                             <div className={`font-bold tabular-nums ${c}`}>{fmtMoney(v as number)}</div>
@@ -231,7 +231,7 @@ export function CapexEnginePage() {
 
                     <div className="grid gap-4 xl:grid-cols-2">
                         {/* BOQ */}
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">BOQ Summary (by category) <span className="ml-1 text-[9px] normal-case text-slate-400">assembly-level Class-4 budgetary — not a QTO</span></h2>
                             <div className="max-h-64 overflow-y-auto">
                                 <table className="w-full text-[11px]">
@@ -251,7 +251,7 @@ export function CapexEnginePage() {
 
                         {/* sensitivity sweep + tornado */}
                         <div className="space-y-4">
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Cost Sensitivity — IT Load sweep</h2>
                                 <div className="h-36">
                                     <ResponsiveContainer width="100%" height="100%">
@@ -262,13 +262,13 @@ export function CapexEnginePage() {
                                             <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                             <Legend wrapperStyle={{ fontSize: 9 }} />
                                             <Line dataKey="p90" name="P90" stroke="#fb7185" strokeWidth={1.5} dot={false} />
-                                            <Line dataKey="p50" name="P50" stroke="#a78bfa" strokeWidth={2} dot={{ r: 2 }} />
+                                            <Line dataKey="p50" name="P50" stroke="#7DDDB4" strokeWidth={2} dot={{ r: 2 }} />
                                             <Line dataKey="p10" name="P10" stroke="#34d399" strokeWidth={1.5} dot={false} />
                                         </ComposedChart>
                                     </ResponsiveContainer>
                                 </div>
                             </div>
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Top Cost Drivers (one-at-a-time swing)</h2>
                                 <div className="space-y-1">
                                     {model.tornado.map((d) => {
@@ -288,7 +288,7 @@ export function CapexEnginePage() {
 
                     {/* bottom row */}
                     <div className="grid gap-3 md:grid-cols-3">
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                             <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Contingency & Soft Costs</h3>
                             {model.cont.map((c) => (
                                 <div key={c.type} className="flex justify-between gap-2 py-0.5 text-[11px]">
@@ -297,16 +297,16 @@ export function CapexEnginePage() {
                                 </div>
                             ))}
                         </div>
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                             <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Cost Escalation <span className="text-[8px] normal-case text-slate-400">· basis: projYear index (engine-real, no commodity indices)</span></h3>
                             {model.esc.map((e) => (
-                                <div key={e.year} className={`flex justify-between py-0.5 text-[11px] ${e.year === inputs.projYear ? 'font-semibold text-violet-500' : 'text-slate-600 dark:text-slate-300'}`}>
+                                <div key={e.year} className={`flex justify-between py-0.5 text-[11px] ${e.year === inputs.projYear ? 'font-semibold text-rz-mint' : 'text-slate-600 dark:text-slate-300'}`}>
                                     <span>{e.year}{e.year === inputs.projYear ? ' · selected' : ''}</span>
                                     <span className="tabular-nums">×{e.mult.toFixed(2)}</span>
                                 </div>
                             ))}
                         </div>
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                             <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Payment Terms <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">ASSUMPTION</span></h3>
                             <div className="h-24">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -314,17 +314,17 @@ export function CapexEnginePage() {
                                         <XAxis dataKey="milestone" tick={{ fontSize: 7 }} interval={0} angle={-18} height={34} textAnchor="end" />
                                         <YAxis hide />
                                         <Tooltip formatter={(v) => `${v}%`} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
-                                        <Bar dataKey="pct" fill="#a78bfa" radius={[3, 3, 0, 0]} />
+                                        <Bar dataKey="pct" fill="#7DDDB4" radius={[3, 3, 0, 0]} />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>
                         </div>
                     </div>
 
-                    <div className="rounded-2xl border border-violet-500/30 bg-violet-600/5 p-3">
-                        <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-violet-500">Key Insights</h3>
+                    <div className="rounded border border-rz-mint/30 bg-rz-mint/5 p-3">
+                        <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Key Insights</h3>
                         <ul className="space-y-0.5">
-                            {model.insights.map((s, idx) => <li key={idx} className="flex gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"><span className="text-violet-500">✓</span>{s}</li>)}
+                            {model.insights.map((s, idx) => <li key={idx} className="flex gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"><span className="text-rz-mint">✓</span>{s}</li>)}
                         </ul>
                         <p className="mt-1 text-[9px] text-slate-400">Deterministic engine-derived analysis — cost DB v{rzVersion()}.</p>
                     </div>

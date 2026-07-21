@@ -583,7 +583,7 @@ const CapexDashboard = () => {
             <div className="flex-1 flex flex-col gap-4 overflow-y-auto pb-6 lg:pb-20">
                 {/* KPI Cards Row 1 */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <Card className="bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-950/30 dark:to-slate-800 border-indigo-100 dark:border-indigo-800">
+                    <Card className="bg-indigo-50 dark:bg-slate-800 border-indigo-100 dark:border-indigo-800">
                         <CardContent className="pt-4">
                             <div className="text-sm font-medium text-indigo-600 dark:text-indigo-400 flex items-center gap-1">Total CAPEX <Tooltip content="Total project capital expenditure including building, MEP, IT infrastructure, and contingency. Shown with the AACE 18R-97 Class-4 budgetary accuracy range." /></div>
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(total)}</div>
@@ -750,7 +750,7 @@ const CapexDashboard = () => {
                             </div>
                             {results.fomTotal > 0 && (
                                 <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                                    <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-purple-400" /><span className="text-sm text-slate-600 dark:text-slate-400">Front-of-Meter</span></div>
+                                    <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-rz-mint" /><span className="text-sm text-slate-600 dark:text-slate-400">Front-of-Meter</span></div>
                                     <span className="text-sm font-medium text-slate-900 dark:text-white">${(results.fomTotal / 1000).toFixed(0)}k</span>
                                 </div>
                             )}

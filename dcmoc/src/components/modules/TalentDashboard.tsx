@@ -28,7 +28,7 @@ const TALENT_DIFFICULT_THRESHOLD = 55;      // mirror: engine band 'Difficult' =
 const PREMIUM_UPLIFTS = [0, 0.10, 0.20] as const;
 
 const difficultyColors: Record<string, string> = {
-    'Easy': 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
+    'Easy': 'text-rz-data bg-rz-data/10 border-rz-data/30',
     'Moderate': 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30',
     [HIRING_AMBER_DIFFICULTY]: 'text-amber-400 bg-amber-500/10 border-amber-500/30',
     [HIRING_RED_DIFFICULTY]: 'text-red-400 bg-red-500/10 border-red-500/30',
@@ -162,7 +162,7 @@ const TalentDashboard = () => {
             {/* Header */}
             <div>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <GraduationCap className="w-6 h-6 text-purple-500" />
+                    <GraduationCap className="w-6 h-6 text-rz-mint" />
                     Talent Availability Index
                 </h2>
                 <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
@@ -175,7 +175,7 @@ const TalentDashboard = () => {
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-2 mb-1">
-                            <Award className="w-4 h-4 text-purple-500" />
+                            <Award className="w-4 h-4 text-rz-mint" />
                             <span className="text-xs text-slate-500 uppercase">Talent Score</span>
                             <Tooltip content="Composite talent availability score (0-100) based on engineer pool, university pipeline, hyperscaler competition, hiring speed, and certifications." />
                         </div>
@@ -234,7 +234,7 @@ const TalentDashboard = () => {
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-2 mb-1">
-                            <GraduationCap className="w-4 h-4 text-emerald-500" />
+                            <GraduationCap className="w-4 h-4 text-rz-data" />
                             <span className="text-xs text-slate-500 uppercase">Training/Yr</span>
                             <Tooltip content="Annual training hours per employee. Critical for maintaining certifications and operational competency." />
                         </div>
@@ -272,7 +272,7 @@ const TalentDashboard = () => {
                             {' '}Depressing factors: {result.talentBreakdown.filter(b => isNegativeImpact(b.impact)).map(b => `${b.metric} (${b.value})`).join(' · ') || 'mixed factor profile — no single factor is red'}.
                         </p>
                         {bandParityOk ? (
-                            <span className="shrink-0 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[8.5px] font-semibold uppercase text-emerald-500" title="Panel numeric banding matches the engine's band string">≡ engine</span>
+                            <span className="shrink-0 rounded bg-rz-data/10 px-1.5 py-0.5 text-[8.5px] font-semibold uppercase text-rz-data" title="Panel numeric banding matches the engine's band string">≡ engine</span>
                         ) : (
                             <span className="shrink-0 rounded bg-red-500/10 px-1.5 py-0.5 text-[8.5px] font-semibold uppercase text-red-500" title="DRIFT: the panel mirror threshold no longer matches the engine banding — update the mirror constant">band drift!</span>
                         )}
@@ -306,7 +306,7 @@ const TalentDashboard = () => {
                     <div className="mt-2 space-y-1">
                         {timeToStaffResponds ? (
                             <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
-                                <span className="shrink-0 rounded bg-emerald-600 px-1 py-0.5 text-[8px] font-bold text-white">LEVER</span>
+                                <span className="shrink-0 rounded bg-rz-data px-1 py-0.5 text-[8px] font-bold text-black">LEVER</span>
                                 <span><b>Raise salary spend</b> — the engine re-run shows time-to-staff dropping from {premiumScenarios[0].r.timeToFullStaff} mo to {premiumScenarios[premiumScenarios.length - 1].r.timeToFullStaff} mo at +{(PREMIUM_UPLIFTS[PREMIUM_UPLIFTS.length - 1] * 100).toFixed(0)}% (figures in the table).</span>
                             </div>
                         ) : (
@@ -316,7 +316,7 @@ const TalentDashboard = () => {
                             </div>
                         )}
                         <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
-                            <span className="shrink-0 rounded bg-emerald-600 px-1 py-0.5 text-[8px] font-bold text-white">LEVER</span>
+                            <span className="shrink-0 rounded bg-rz-data px-1 py-0.5 text-[8px] font-bold text-black">LEVER</span>
                             <span><b>Start recruiting {Math.ceil(result.timeToFullStaff)} months earlier</b> than the operations target — a {totalFTE} FTE pipeline needs {result.timeToFullStaff} mo on the {selectedCountry.name} hiring profile; every month of delayed start ≈ {(totalFTE / Math.max(1, result.timeToFullStaff)).toFixed(1)} positions unfilled on day one.</span>
                         </div>
                         <div className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
@@ -350,7 +350,7 @@ const TalentDashboard = () => {
                                         <span className="text-sm font-semibold text-slate-900 dark:text-white">{item.value}</span>
                                         <span className={`text-xs px-2 py-0.5 rounded ${
                                             isPositiveImpact(item.impact)
-                                                ? 'bg-emerald-500/10 text-emerald-400'
+                                                ? 'bg-rz-data/10 text-rz-data'
                                                 : isNegativeImpact(item.impact)
                                                     ? 'bg-red-500/10 text-red-400'
                                                     : 'bg-slate-500/10 text-slate-400'
@@ -378,7 +378,7 @@ const TalentDashboard = () => {
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-slate-600 dark:text-slate-400">+ Training Cost</span>
-                                    <span className="font-medium text-purple-500">+{fmtMoney(result.annualTrainingCost)}</span>
+                                    <span className="font-medium text-rz-signal">+{fmtMoney(result.annualTrainingCost)}</span>
                                 </div>
                                 <div className="border-t border-slate-200 dark:border-slate-700 pt-2 flex justify-between">
                                     <span className="font-bold text-slate-700 dark:text-slate-300">Talent-Adjusted Total</span>
@@ -409,7 +409,7 @@ const TalentDashboard = () => {
                                     {countryComparison.slice(0, 15).map((entry) => (
                                         <Cell
                                             key={entry.code}
-                                            fill={entry.code === selectedCountry.id ? '#a855f7' : entry.score >= 70 ? '#10b981' : entry.score >= 45 ? '#f59e0b' : '#ef4444'}
+                                            fill={entry.code === selectedCountry.id ? '#FFAA00' : entry.score >= 70 ? '#00FF88' : entry.score >= 45 ? '#f59e0b' : '#ef4444'}
                                             opacity={entry.code === selectedCountry.id ? 1 : 0.6}
                                         />
                                     ))}

@@ -202,7 +202,7 @@ export function ProjectsPage() {
             ]} />
 
             {/* active configuration + lifecycle strip */}
-            <div className="rounded-2xl border border-violet-500/30 bg-violet-600/5 p-4">
+            <div className="rounded border border-rz-mint/30 bg-rz-mint/5 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <div className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -212,12 +212,12 @@ export function ProjectsPage() {
                     </div>
                     <div className="flex items-center gap-2">
                         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Project name…"
-                            className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-violet-500 text-slate-900 dark:text-slate-100" />
+                            className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-rz-signal text-slate-900 dark:text-slate-100" />
                         <button onClick={() => { projects.saveCurrentAs(name || undefined as unknown as string); setName(''); }}
-                            className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500"><Plus className="h-3.5 w-3.5" /> Save as Project</button>
+                            className="inline-flex items-center gap-1 rounded-lg bg-rz-signal px-3 py-1.5 text-xs font-semibold text-rz-base hover:bg-rz-signal/90"><Plus className="h-3.5 w-3.5" /> Save as Project</button>
                         {projects.activeProjectId && (
                             <button onClick={projects.updateActive}
-                                className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><Save className="h-3.5 w-3.5" /> Update</button>
+                                className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-rz-mint"><Save className="h-3.5 w-3.5" /> Update</button>
                         )}
                     </div>
                 </div>
@@ -227,8 +227,8 @@ export function ProjectsPage() {
                         <React.Fragment key={l.id}>
                             <button onClick={() => setActiveTab(l.tab as never)}
                                 className={`rounded-full border px-2 py-1 text-[10px] font-medium transition-colors ${completion[l.id]
-                                    ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-500'
-                                    : 'border-slate-300 dark:border-slate-700 text-slate-500 hover:border-violet-400'}`}>
+                                    ? 'border-rz-data/50 bg-rz-data/10 text-rz-data'
+                                    : 'border-slate-300 dark:border-slate-700 text-slate-500 hover:border-rz-mint'}`}>
                                 {i + 1}. {l.label} {completion[l.id] ? '✓' : ''}
                             </button>
                             {i < LIFECYCLE.length - 1 && <ChevronRight className="h-3 w-3 text-slate-300 dark:text-slate-700" />}
@@ -242,7 +242,7 @@ export function ProjectsPage() {
             <div>
                 <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Saved Projects ({projects.projects.length}/10)</h2>
                 {projects.projects.length === 0 ? (
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-6 text-center text-xs text-slate-500">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-6 text-center text-xs text-slate-500">
                         No projects saved yet — configure the engines, then “Save as Project”.
                     </div>
                 ) : (
@@ -254,10 +254,10 @@ export function ProjectsPage() {
                             const isActive = p.id === projects.activeProjectId;
                             const differs = p.countryId !== (country?.id ?? '') || p.itLoadKw !== simInputs.itLoad;
                             return (
-                            <div key={p.id} className={`rounded-2xl border p-3 ${isActive ? 'border-violet-500 bg-violet-600/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50'}`}>
+                            <div key={p.id} className={`rounded border p-3 ${isActive ? 'border-rz-signal bg-rz-signal/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50'}`}>
                                 <div className="flex items-center gap-2">
                                     <span className="truncate text-sm font-semibold text-slate-900 dark:text-white">{p.name}</span>
-                                    {isActive && <span className="rounded-full bg-violet-600 px-1.5 py-0.5 text-[9px] font-semibold text-white">Active</span>}
+                                    {isActive && <span className="rounded-full bg-rz-signal px-1.5 py-0.5 text-[9px] font-semibold text-rz-base">Active</span>}
                                 </div>
                                 <div className="mt-0.5 text-[10px] text-slate-500">
                                     {isActive
@@ -266,7 +266,7 @@ export function ProjectsPage() {
                                 </div>
                                 <div className="mt-1 flex flex-wrap items-center gap-1">
                                     {isActive ? (
-                                        <span title="Nilai kartu ini dibaca dari simulasi live saat render (bukan snapshot)" className="rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-emerald-500">live sim</span>
+                                        <span title="Nilai kartu ini dibaca dari simulasi live saat render (bukan snapshot)" className="rounded bg-rz-data/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-rz-data">live sim</span>
                                     ) : (
                                         <span title="Nilai kartu ini dari snapshot tersimpan — bukan state live" className="rounded bg-slate-500/15 px-1 py-0.5 text-[8px] font-semibold text-slate-500 dark:text-slate-400">saved snapshot · {new Date(p.updatedAt).toLocaleDateString()}</span>
                                     )}
@@ -285,7 +285,7 @@ export function ProjectsPage() {
                                 </div>
                                 <div className="mt-2 flex gap-1.5">
                                     <button onClick={() => projects.openProject(p.id)}
-                                        className="flex-1 rounded-lg bg-violet-600 py-1.5 text-[11px] font-semibold text-white hover:bg-violet-500">Open (restores all stores)</button>
+                                        className="flex-1 rounded-lg bg-rz-signal py-1.5 text-[11px] font-semibold text-rz-base hover:bg-rz-signal/90">Open (restores all stores)</button>
                                     {user && (
                                         <button onClick={() => void handleUploadToCloud(p)}
                                             disabled={cloudBusy === `up:${p.id}`}
@@ -328,18 +328,18 @@ export function ProjectsPage() {
                         </div>
                     )}
                     {cloudMsg && (
-                        <div className="mb-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-2.5 text-[11px] text-emerald-600 dark:text-emerald-400">{cloudMsg}</div>
+                        <div className="mb-2 rounded-xl border border-rz-data/40 bg-rz-data/10 p-2.5 text-[11px] text-rz-data dark:text-rz-data">{cloudMsg}</div>
                     )}
 
                     {cloudItems && cloudItems.length === 0 && !cloudErr && (
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 text-center text-[11px] text-slate-500">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 text-center text-[11px] text-slate-500">
                             Belum ada project di cloud — pakai tombol “☁ Simpan ke cloud” pada kartu project lokal di atas.
                         </div>
                     )}
                     {cloudItems && cloudItems.length > 0 && (
                         <div className="grid gap-3 md:grid-cols-2">
                             {cloudItems.map((item) => (
-                                <div key={item.id} className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                                <div key={item.id} className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                     <div className="flex items-center gap-2">
                                         <Cloud className="h-3.5 w-3.5 shrink-0 text-cyan-500" />
                                         <span className="truncate text-sm font-semibold text-slate-900 dark:text-white">{item.name}</span>
@@ -354,7 +354,7 @@ export function ProjectsPage() {
                                         <button onClick={() => void handleLoadCloud(item)}
                                             disabled={cloudBusy === `load:${item.id}` || readOnly}
                                             title="Ambil bundle dari cloud, validasi, lalu restore ke semua store (jalur restore kanonik)"
-                                            className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-2.5 py-1.5 text-[11px] font-semibold text-white hover:bg-violet-500 disabled:opacity-50">
+                                            className="inline-flex items-center gap-1 rounded-lg bg-rz-signal px-2.5 py-1.5 text-[11px] font-semibold text-rz-base hover:bg-rz-signal/90 disabled:opacity-50">
                                             <Download className="h-3.5 w-3.5" /> {cloudBusy === `load:${item.id}` ? 'Memuat…' : 'Muat'}
                                         </button>
                                         {!item.share_token ? (
@@ -404,7 +404,7 @@ export function ProjectsPage() {
                 <div className="grid gap-2 md:grid-cols-3 xl:grid-cols-6">
                     {templates.map((t) => (
                         <button key={t.key} onClick={() => applyTemplate(t)}
-                            className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-2.5 text-left hover:border-violet-400">
+                            className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-2.5 text-left hover:border-rz-mint">
                             <div className="truncate text-[11px] font-semibold capitalize text-slate-900 dark:text-white">{t.label}</div>
                             <div className="text-[9px] text-slate-500">{(t.itLoadKw / 1000).toFixed(1)} MW · {t.cooling} · {t.redundancy}</div>
                         </button>
@@ -413,7 +413,7 @@ export function ProjectsPage() {
             </div>
 
             {/* scenarios link */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 text-[11px] text-slate-500">
+            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 text-[11px] text-slate-500">
                 Lightweight input-only snapshots live in <b>Scenarios</b> ({scenarios.length} saved) — projects here bundle EVERY store (tracking logs included).
             </div>
         </div>

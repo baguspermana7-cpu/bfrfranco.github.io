@@ -42,7 +42,7 @@ export default function RiskDashboard() {
             case 'Natural': return <Waves className="w-4 h-4 text-blue-400" />;
             case 'Operational': return <Zap className="w-4 h-4 text-amber-400" />;
             case 'Labor': return <Construction className="w-4 h-4 text-red-400" />;
-            case 'Financial': return <DollarSign className="w-4 h-4 text-emerald-400" />;
+            case 'Financial': return <DollarSign className="w-4 h-4 text-rz-data" />;
             default: return <AlertTriangle className="w-4 h-4 text-slate-400" />;
         }
     };
@@ -51,7 +51,7 @@ export default function RiskDashboard() {
         const score = ({ 'Low': 1, 'Medium': 2, 'High': 3, 'Critical': 4 }[prob] || 2) * ({ 'Low': 1, 'Medium': 2, 'High': 3, 'Catastrophic': 4 }[impact] || 2);
         if (score >= 9) return 'border-red-500/50 bg-red-100 dark:bg-red-950/20';
         if (score >= 6) return 'border-amber-500/50 bg-amber-100 dark:bg-amber-950/20';
-        return 'border-emerald-500/50 bg-emerald-100 dark:bg-emerald-950/20';
+        return 'border-rz-data/50 bg-rz-data/10';
     };
 
     const matrixColor = (score: number, hasRisks: boolean) => {
@@ -59,7 +59,7 @@ export default function RiskDashboard() {
         if (score >= 12) return 'bg-red-500/80 dark:bg-red-600/80';
         if (score >= 8) return 'bg-orange-500/75 dark:bg-orange-600/75';
         if (score >= 4) return 'bg-amber-500/70 dark:bg-amber-600/70';
-        return 'bg-emerald-500/70 dark:bg-emerald-600/70';
+        return 'bg-rz-data/70 dark:bg-rz-data/70';
     };
 
     const handleCellClick = useCallback((row: number, col: number, hasRisks: boolean) => {
@@ -97,7 +97,7 @@ export default function RiskDashboard() {
                         <ShieldAlert className="w-3 h-3" /> Risk Score <Tooltip content="Aggregated risk score across all categories. Higher = more risk. Normalized to % of maximum possible score." />
                     </div>
                     <div className="text-3xl font-bold text-slate-900 dark:text-white">{totalScore}</div>
-                    <div className={`text-xs mt-1 ${normalizedScore > 60 ? 'text-red-600 dark:text-red-400' : normalizedScore > 35 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                    <div className={`text-xs mt-1 ${normalizedScore > 60 ? 'text-red-600 dark:text-red-400' : normalizedScore > 35 ? 'text-amber-600 dark:text-amber-400' : 'text-rz-data'}`}>
                         {normalizedScore}% of maximum • {risks.length} risks
                     </div>
                 </div>
@@ -118,7 +118,7 @@ export default function RiskDashboard() {
                     <div className="text-slate-500 dark:text-slate-400 text-xs uppercase mb-1 flex items-center gap-1">
                         <Activity className="w-3 h-3" /> Availability <Tooltip content="Expected annual uptime per Uptime Institute Tier Standard 2025. Tier III ≥ 99.982% (95 min/yr), Tier IV ≥ 99.99943% (26 min/yr)." />
                     </div>
-                    <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{downtime.availability}%</div>
+                    <div className="text-3xl font-bold text-rz-data">{downtime.availability}%</div>
                     <div className="text-xs text-slate-500 mt-1">
                         Tier {tierLevel} SLA target
                     </div>
@@ -128,7 +128,7 @@ export default function RiskDashboard() {
                     <div className="text-slate-500 dark:text-slate-400 text-xs uppercase mb-1 flex items-center gap-1">
                         <AlertTriangle className="w-3 h-3" /> SLA Breach Prob. <Tooltip content="Annual probability of exceeding the SLA downtime allowance. Factors in equipment age, maintenance strategy, and environmental conditions." />
                     </div>
-                    <div className={`text-3xl font-bold ${slaBreachProbability > 0.1 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                    <div className={`text-3xl font-bold ${slaBreachProbability > 0.1 ? 'text-red-600 dark:text-red-400' : 'text-rz-data'}`}>
                         {(slaBreachProbability * 100).toFixed(1)}%
                     </div>
                     <div className="text-xs text-slate-500 mt-1">Annual breach likelihood</div>
@@ -285,7 +285,7 @@ export default function RiskDashboard() {
                 {/* Downtime Analysis */}
                 <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-5">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" /> Downtime Analysis (Tier {tierLevel})
+                        <Clock className="w-4 h-4 text-rz-mint" /> Downtime Analysis (Tier {tierLevel})
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="bg-white dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
@@ -295,7 +295,7 @@ export default function RiskDashboard() {
                         </div>
                         <div className="bg-white dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
                             <div className="text-[10px] text-slate-500 uppercase">Availability</div>
-                            <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">{downtime.availability}%</div>
+                            <div className="text-xl font-bold text-rz-data">{downtime.availability}%</div>
                             <div className="text-[10px] text-slate-500 dark:text-slate-400">annual uptime</div>
                         </div>
                         <div className="bg-white dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
@@ -322,7 +322,7 @@ export default function RiskDashboard() {
                         </div>
                         <div>
                             <div className="text-[10px] text-slate-500 uppercase flex items-center">Est. MTBF <Tooltip content="Mean Time Between Failures: average operating time between equipment failures." /></div>
-                            <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                            <div className="text-sm font-bold text-rz-data">
                                 {tierLevel === 4 ? '8,760 hrs' : '4,380 hrs'}
                             </div>
                             <div className="text-[10px] text-slate-500">Mean Time Between Failures</div>
@@ -375,13 +375,13 @@ export default function RiskDashboard() {
                     <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-slate-600 dark:text-slate-400 flex items-center">AQI Impact <Tooltip content="Air Quality Index effect on equipment: high AQI accelerates filter clogging, increases cooling load, and may require facility shutdown above AQI 300." /></span>
-                            <span className={`font-bold ${(selectedCountry.environment?.baselineAQI ?? 50) > 100 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                            <span className={`font-bold ${(selectedCountry.environment?.baselineAQI ?? 50) > 100 ? 'text-red-600 dark:text-red-400' : 'text-rz-data'}`}>
                                 AQI {selectedCountry.environment?.baselineAQI ?? 50}
                             </span>
                         </div>
                         <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                             <div
-                                className="h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500"
+                                className="h-full bg-gradient-to-r from-[#00FF88] via-[#FFAA00] to-[#FF3030]"
                                 style={{ width: `${Math.min(100, ((selectedCountry.environment?.baselineAQI ?? 50) / 300) * 100)}%` }}
                             />
                         </div>
@@ -403,7 +403,7 @@ export default function RiskDashboard() {
                     <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-slate-600 dark:text-slate-400">Import Difficulty</span>
-                            <span className={`font-bold ${selectedCountry.id === 'ID' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                            <span className={`font-bold ${selectedCountry.id === 'ID' ? 'text-amber-600 dark:text-amber-400' : 'text-rz-data'}`}>
                                 {selectedCountry.id === 'ID' || selectedCountry.id === 'IN' ? 'High' : selectedCountry.id === 'JP' || selectedCountry.id === 'AU' ? 'Low' : 'Medium'}
                             </span>
                         </div>
@@ -415,7 +415,7 @@ export default function RiskDashboard() {
                         </div>
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-slate-600 dark:text-slate-400">Local MFG Availability</span>
-                            <span className={`font-bold ${selectedCountry.id === 'US' || selectedCountry.id === 'JP' ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                            <span className={`font-bold ${selectedCountry.id === 'US' || selectedCountry.id === 'JP' ? 'text-rz-data' : 'text-amber-600 dark:text-amber-400'}`}>
                                 {selectedCountry.id === 'US' || selectedCountry.id === 'JP' || selectedCountry.id === 'DE' ? 'Good' : 'Limited'}
                             </span>
                         </div>
@@ -428,7 +428,7 @@ export default function RiskDashboard() {
                 {/* Compliance */}
                 <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-5">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                        <FileCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> Compliance Risk
+                        <FileCheck className="w-4 h-4 text-rz-data" /> Compliance Risk
                     </h3>
                     <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm">
@@ -459,7 +459,7 @@ export default function RiskDashboard() {
             {/* Mitigation Strategies */}
             <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-5">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                    <Server className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> Mitigation Strategies
+                    <Server className="w-4 h-4 text-rz-data" /> Mitigation Strategies
                 </h3>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                     {topRisks.slice(0, 6).map((risk) => (
@@ -467,7 +467,7 @@ export default function RiskDashboard() {
                             {getIcon(risk.category)}
                             <div>
                                 <div className="text-xs font-medium text-slate-900 dark:text-white">{risk.title}</div>
-                                <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1">→ {risk.mitigation}</div>
+                                <div className="text-[11px] text-rz-data mt-1">→ {risk.mitigation}</div>
                             </div>
                         </div>
                     ))}

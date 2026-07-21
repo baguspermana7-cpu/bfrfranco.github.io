@@ -24,7 +24,7 @@ import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 
-const SCOPE_COLORS = ['#f59e0b', '#a78bfa', '#64748b'];
+const SCOPE_COLORS = ['#f59e0b', '#00DDFF', '#64748b'];
 const MIX_COLORS = ['#34d399', '#22d3ee', '#64748b'];
 
 export function SustainabilityEnginePage() {
@@ -184,7 +184,7 @@ export function SustainabilityEnginePage() {
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg"><Leaf className="h-6 w-6 text-white" /></div>
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-rz-data/15 border border-rz-data/40"><Leaf className="h-6 w-6 text-rz-data" /></div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Sustainability Engine</h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400">GHG scopes, energy & water — engine-real; initiatives & certifications user-attested</p>
@@ -193,11 +193,11 @@ export function SustainabilityEnginePage() {
                 <div className="flex items-center gap-2">
                     <div className="flex rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden">
                         {([['overview', 'Overview'], ['detail', 'Carbon / ESG Detail']] as const).map(([k, l]) => (
-                            <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
+                            <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-rz-signal text-black' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
                         ))}
                     </div>
-                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
-                    <button onClick={() => setActiveTab('finance')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: Financial <ChevronRight className="h-3.5 w-3.5" /></button>
+                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-rz-mint"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
+                    <button onClick={() => setActiveTab('finance')} className="inline-flex items-center gap-1 rounded-lg bg-rz-signal px-3 py-1.5 text-xs font-semibold text-black hover:bg-rz-signal/90">Next: Financial <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>
 
@@ -227,7 +227,7 @@ export function SustainabilityEnginePage() {
                     </div>
 
                     <div className="grid gap-4 xl:grid-cols-3">
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Carbon Footprint (GHG scopes · engine)</h2>
                             {model.scopes ? (
                                 <div className="flex items-center gap-2">
@@ -253,7 +253,7 @@ export function SustainabilityEnginePage() {
                                 </div>
                             ) : <p className="text-xs text-slate-500">Engine loading…</p>}
                         </div>
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Energy Mix <span className="text-[9px] normal-case text-slate-400">derived from capex renewable + certification inputs</span></h2>
                             <div className="flex items-center gap-2">
                                 <div className="h-32 w-32 shrink-0">
@@ -277,7 +277,7 @@ export function SustainabilityEnginePage() {
                                 </div>
                             </div>
                         </div>
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Sustainability Scorecard <span className="text-[9px] normal-case text-slate-400">documented composites</span></h2>
                             <div className="space-y-1.5">
                                 {[
@@ -289,7 +289,7 @@ export function SustainabilityEnginePage() {
                                     <div key={label as string} className="flex items-center gap-2 text-[11px]">
                                         <span className="w-40 truncate text-slate-600 dark:text-slate-300">{label}</span>
                                         <div className="h-1.5 flex-1 rounded bg-slate-100 dark:bg-slate-800">
-                                            {v != null && <div className={`h-1.5 rounded ${(v as number) >= 70 ? 'bg-emerald-500' : (v as number) >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`} style={{ width: `${v}%` }} />}
+                                            {v != null && <div className={`h-1.5 rounded ${(v as number) >= 70 ? 'bg-rz-data' : (v as number) >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`} style={{ width: `${v}%` }} />}
                                         </div>
                                         <span className="w-9 text-right tabular-nums text-slate-500">{v != null ? `${v}` : '—'}</span>
                                     </div>
@@ -298,18 +298,18 @@ export function SustainabilityEnginePage() {
                             <div className="mt-1.5 flex items-center gap-2 text-[11px]">
                                 <span className="text-slate-500">Waste diversion</span>
                                 <input type="range" min={0} max={100} step={5} value={sus.wasteDiversionPct ?? 0}
-                                    onChange={(e) => sus.actions.set({ wasteDiversionPct: Number(e.target.value) })} className="flex-1 accent-violet-500" />
+                                    onChange={(e) => sus.actions.set({ wasteDiversionPct: Number(e.target.value) })} className="flex-1 accent-rz-mint" />
                                 <span className="w-9 text-right tabular-nums text-slate-500">{sus.wasteDiversionPct != null ? `${sus.wasteDiversionPct}%` : '—'}</span>
                             </div>
                         </div>
                     </div>
 
                     {env && (
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <div className="mb-2 flex flex-wrap items-center gap-2">
                                 <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Environmental Costs <span className="text-[9px] normal-case text-slate-400">country-auto rates</span></h2>
-                                <span className="rounded bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-violet-500">{env.cname} · {env.cid}</span>
-                                <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-500">engine DATA.envCosts + waterFootprint</span>
+                                <span className="rounded bg-rz-mint/15 px-1.5 py-0.5 text-[9px] font-semibold text-rz-mint">{env.cname} · {env.cid}</span>
+                                <span className="rounded bg-rz-data/15 px-1.5 py-0.5 text-[9px] font-semibold text-rz-data">engine DATA.envCosts + waterFootprint</span>
                                 <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-500">screening</span>
                             </div>
                             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -336,7 +336,7 @@ export function SustainabilityEnginePage() {
                                     <div className="text-[10px] text-slate-500">{fmt(env.scope2)} tCO₂e scope-2 (rendered above) × ${env.carbonRate}/tCO₂e</div>
                                     <div className="mt-1 flex flex-wrap gap-1">
                                         {env.hasScheme
-                                            ? <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-500">compliance price — {env.cid} ${env.carbonRate}/t</span>
+                                            ? <span className="rounded bg-rz-data/15 px-1.5 py-0.5 text-[9px] font-semibold text-rz-data">compliance price — {env.cid} ${env.carbonRate}/t</span>
                                             : <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-500">voluntary basis — no compliance scheme in {env.cname} yet (offset ${env.carbonRate}/t)</span>}
                                         <span className="rounded bg-slate-500/10 px-1.5 py-0.5 text-[9px] text-slate-500">World Bank / OECD / NCCS 2025-26</span>
                                     </div>
@@ -349,10 +349,10 @@ export function SustainabilityEnginePage() {
                                     <div className="text-[10px] text-slate-500">general {fmt(env.genTonnes, 1)} t × ${env.genRate}/t ({env.developed ? 'developed' : 'emerging'} band) + e-waste {fmt(env.eKg)} kg × ${env.eRate}/kg</div>
                                     <div className="mt-1 inline-block rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-500">screening — packaging/consumables + certified ITAD, IT refresh excluded</div>
                                 </div>
-                                <div className="rounded-xl border border-violet-300 dark:border-violet-800 bg-violet-500/5 p-3">
+                                <div className="rounded border border-rz-signal/30 bg-rz-signal/5 p-3">
                                     <div className="text-[10px] uppercase tracking-wide text-slate-500">Total Environmental Cost /yr</div>
                                     <TraceValue traceId="sus.envTotal">
-                                        <div className="text-lg font-bold tabular-nums text-violet-600 dark:text-violet-400">{fmtMoney(env.total)}</div>
+                                        <div className="text-lg font-bold tabular-nums text-rz-signal">{fmtMoney(env.total)}</div>
                                     </TraceValue>
                                     <div className="text-[10px] text-slate-500">water + carbon + waste · rates auto-switch with country ({env.cid})</div>
                                 </div>
@@ -377,7 +377,7 @@ export function SustainabilityEnginePage() {
                         </div>
                     )}
 
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Initiatives in Progress {sus.touched ? '' : <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">EXAMPLE</span>}</h2>
                         <div className="space-y-1.5">
                             {sus.initiatives.map((i) => (
@@ -385,15 +385,15 @@ export function SustainabilityEnginePage() {
                                     <span className="w-16 rounded bg-slate-500/10 px-1 py-0.5 text-center text-[9px] text-slate-500">{i.category}</span>
                                     <span className="w-52 truncate text-slate-700 dark:text-slate-200">{i.title}</span>
                                     <input type="range" min={0} max={100} step={5} value={i.progressPct}
-                                        onChange={(e) => sus.actions.setInitiativeProgress(i.id, Number(e.target.value))} className="flex-1 accent-violet-500" />
+                                        onChange={(e) => sus.actions.setInitiativeProgress(i.id, Number(e.target.value))} className="flex-1 accent-rz-mint" />
                                     <span className="w-9 text-right tabular-nums text-slate-500">{i.progressPct}%</span>
-                                    <span className={`rounded px-1.5 py-0.5 text-[9px] font-semibold ${i.status === 'On Track' ? 'bg-emerald-500/15 text-emerald-500' : i.status === 'At Risk' ? 'bg-amber-500/15 text-amber-500' : 'bg-slate-500/15 text-slate-400'}`}>{i.status}</span>
+                                    <span className={`rounded px-1.5 py-0.5 text-[9px] font-semibold ${i.status === 'On Track' ? 'bg-rz-data/15 text-rz-data' : i.status === 'At Risk' ? 'bg-amber-500/15 text-amber-500' : 'bg-slate-500/15 text-slate-400'}`}>{i.status}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Compliance & Standards <span className="text-[9px] normal-case text-slate-400">user-attested status</span></h2>
                         <div className="grid gap-1.5 md:grid-cols-3">
                             {sus.certs.map((c) => (

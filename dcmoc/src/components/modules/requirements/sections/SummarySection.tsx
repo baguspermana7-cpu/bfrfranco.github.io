@@ -109,11 +109,11 @@ export function SummarySection({ derived }: { derived: ReqDerived }) {
     return (
         <SectionCard num="1.7" title="Summary & Validation" caption="Engine-real intake validation (models.requirements.validate)" id="sec-summary">
             <div className="flex flex-wrap items-center gap-2 mb-3">
-                {prof && <span className="rounded-full bg-violet-600/15 text-violet-500 dark:text-violet-300 px-2 py-0.5 text-[10px] font-semibold">{prof.label} · {prof.rackKw} kW/rack profile</span>}
-                {band && <span className="rounded-full bg-cyan-600/15 text-cyan-600 dark:text-cyan-300 px-2 py-0.5 text-[10px] font-semibold">{band.band} density band</span>}
-                {v?.recommendedTierFloor && <span className="rounded-full bg-emerald-600/15 text-emerald-600 dark:text-emerald-300 px-2 py-0.5 text-[10px] font-semibold">Tier floor ≥ {v.recommendedTierFloor}</span>}
+                {prof && <span className="rounded-full bg-rz-mint/15 text-rz-mint px-2 py-0.5 text-[10px] font-semibold">{prof.label} · {prof.rackKw} kW/rack profile</span>}
+                {band && <span className="rounded-full bg-rz-info/15 text-rz-info px-2 py-0.5 text-[10px] font-semibold">{band.band} density band</span>}
+                {v?.recommendedTierFloor && <span className="rounded-full bg-rz-data/15 text-rz-data px-2 py-0.5 text-[10px] font-semibold">Tier floor ≥ {v.recommendedTierFloor}</span>}
                 <button onClick={exportPdf} disabled={busy}
-                    className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-slate-800 dark:bg-slate-700 hover:bg-violet-700 px-3 py-1.5 text-xs font-medium text-white transition-colors disabled:opacity-60">
+                    className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-slate-800 dark:bg-slate-700 hover:bg-rz-signal hover:text-rz-base px-3 py-1.5 text-xs font-medium text-white transition-colors disabled:opacity-60">
                     <FileDown className="w-3.5 h-3.5" />{busy ? 'Generating…' : 'Generate Report'}
                 </button>
             </div>
@@ -123,7 +123,7 @@ export function SummarySection({ derived }: { derived: ReqDerived }) {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5">
                         {[...v.have.map((f) => ({ f, ok: true })), ...v.missing.map((f) => ({ f, ok: false }))].map(({ f, ok }) => (
                             <div key={f} className="flex items-center gap-1.5 text-xs">
-                                <span className={`h-2 w-2 rounded-full ${ok ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                                <span className={`h-2 w-2 rounded-full ${ok ? 'bg-rz-data' : 'bg-slate-400'}`} />
                                 <span className={ok ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400'}>{f}</span>
                             </div>
                         ))}
@@ -139,7 +139,7 @@ export function SummarySection({ derived }: { derived: ReqDerived }) {
                             ))}
                         </div>
                     ) : (
-                        <p className="mt-3 text-[11px] text-emerald-500">✓ All engine validation checks pass.</p>
+                        <p className="mt-3 text-[11px] text-rz-data">✓ All engine validation checks pass.</p>
                     )}
                 </>
             ) : (

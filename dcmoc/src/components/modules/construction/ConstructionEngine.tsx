@@ -49,9 +49,9 @@ export function ConstructionEngine() {
 
     if (!results || !sched || !e) {
         return (
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-10 text-center text-sm text-slate-500">
+            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-10 text-center text-sm text-slate-500">
                 Run the CAPEX engine first — the construction schedule derives from the CAPEX timeline.
-                <div className="mt-3"><button onClick={() => setActiveTab('capex')} className="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white">Open CAPEX Engine</button></div>
+                <div className="mt-3"><button onClick={() => setActiveTab('capex')} className="rounded-lg bg-rz-signal px-3 py-1.5 text-xs font-semibold text-rz-base">Open CAPEX Engine</button></div>
             </div>
         );
     }
@@ -133,7 +133,7 @@ export function ConstructionEngine() {
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 shadow-lg"><HardHat className="h-6 w-6 text-white" /></div>
+                    <div className="flex h-11 w-11 items-center justify-center rounded border border-rz-2 bg-rz-elevated"><HardHat className="h-6 w-6 text-rz-info" /></div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Construction Engine</h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400">Plan, track and control construction from mobilization to handover</p>
@@ -148,13 +148,13 @@ export function ConstructionEngine() {
                         </div>
                     </label>
                     <button onClick={openBoq} title="Bill of Quantities — line items by discipline, disclosed margin, safety factors (save as PDF)" className="inline-flex items-center gap-1 rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-cyan-500"><ClipboardList className="h-3.5 w-3.5" />Bill of Quantities (BOQ)</button>
-                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-violet-400"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
-                    <button onClick={() => setActiveTab('commissioning')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Next: Commissioning <ChevronRight className="h-3.5 w-3.5" /></button>
+                    <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-rz-mint"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
+                    <button onClick={() => setActiveTab('commissioning')} className="inline-flex items-center gap-1 rounded-lg bg-rz-signal px-3 py-1.5 text-xs font-semibold text-rz-base hover:bg-rz-signal/90">Next: Commissioning <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>
 
             {planMode && (
-                <div className="rounded-xl border border-violet-500/40 bg-violet-600/10 px-3 py-2 text-[11px] text-violet-500">
+                <div className="rounded-xl border border-rz-mint/40 bg-rz-signal/10 px-3 py-2 text-[11px] text-rz-mint">
                     <b>Plan Mode</b> — showing the baseline plan; no site actuals entered. SPI/CPI = 1.00 by definition. Set a status month + phase actuals to start tracking.
                 </div>
             )}
@@ -192,7 +192,7 @@ export function ConstructionEngine() {
             <div className="grid gap-4 lg:grid-cols-[1fr_290px]">
                 <div className="min-w-0 space-y-4">
                     {/* master schedule */}
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Master Construction Schedule <span className="ml-1 text-[9px] normal-case text-slate-400">engine CPM · L2 detail from CAPEX timeline</span></h2>
                         <div className="mb-3 space-y-1">
                             {sched.rows.map((r) => {
@@ -202,7 +202,7 @@ export function ConstructionEngine() {
                                     <div key={r.key} className="flex items-center gap-2 text-[11px]">
                                         <span className="w-32 truncate text-slate-600 dark:text-slate-300">{r.label}</span>
                                         <div className="relative h-3 flex-1 rounded bg-slate-100 dark:bg-slate-800">
-                                            <div className={`absolute h-3 rounded ${behind ? 'bg-rose-500/70' : 'bg-violet-500/70'}`}
+                                            <div className={`absolute h-3 rounded ${behind ? 'bg-rose-500/70' : 'bg-rz-mint/70'}`}
                                                 style={{ left: `${(r.startMonth / sched.totalMonths) * 100}%`, width: `${(r.months / sched.totalMonths) * 100}%` }} />
                                         </div>
                                         <span className="w-20 text-right tabular-nums text-slate-500">M{r.startMonth}–M{r.endMonth.toFixed(0)}</span>
@@ -219,7 +219,7 @@ export function ConstructionEngine() {
 
                     {/* S-curve + manpower */}
                     <div className="grid gap-4 xl:grid-cols-2">
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Progress S-Curve (PV{planMode ? '' : ' vs EV'})</h2>
                             <div className="h-44">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -228,7 +228,7 @@ export function ConstructionEngine() {
                                         <XAxis dataKey="month" tick={{ fontSize: 9 }} unit="mo" />
                                         <YAxis tick={{ fontSize: 9 }} unit="%" domain={[0, 100]} />
                                         <Tooltip contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
-                                        <Area dataKey="pvPct" name="Planned %" stroke="#a78bfa" fill="#a78bfa" fillOpacity={0.15} />
+                                        <Area dataKey="pvPct" name="Planned %" stroke="#7DDDB4" fill="#7DDDB4" fillOpacity={0.15} />
                                         {!planMode && t.statusMonth != null && (
                                             <Line data={[{ month: t.statusMonth, ev: e.evPct }]} dataKey="ev" name="Actual (EV) %" stroke="#34d399" dot={{ r: 5 }} />
                                         )}
@@ -236,7 +236,7 @@ export function ConstructionEngine() {
                                 </ResponsiveContainer>
                             </div>
                         </div>
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Manpower Plan <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">SCREENING MODEL</span></h2>
                             <div className="h-44">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -262,7 +262,7 @@ export function ConstructionEngine() {
                     </div>
 
                     {/* procurement */}
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Procurement & Delivery <span className="ml-1 text-[9px] normal-case text-slate-400">engine long-lead data · 2024-26 supply-constrained market · vendors = examples</span></h2>
                         <table className="w-full text-[11px]">
                             <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Item</th><th className="text-left">Vendor</th><th className="text-right">Lead</th><th className="text-right">PO by</th><th className="text-right">ETA</th><th className="text-right">Status</th></tr></thead>
@@ -274,7 +274,7 @@ export function ConstructionEngine() {
                                         <td className="text-right tabular-nums text-slate-500">{r.leadMonths} mo</td>
                                         <td className="text-right tabular-nums text-slate-500">M{r.poMonth}</td>
                                         <td className="text-right tabular-nums text-slate-500">M{r.etaMonth}</td>
-                                        <td className="text-right"><span className={`rounded px-1.5 py-0.5 text-[9px] font-semibold ${r.critical ? 'bg-rose-500/15 text-rose-500' : 'bg-emerald-500/15 text-emerald-500'}`}>{r.critical ? 'Order now' : 'In window'}</span></td>
+                                        <td className="text-right"><span className={`rounded px-1.5 py-0.5 text-[9px] font-semibold ${r.critical ? 'bg-rose-500/15 text-rose-500' : 'bg-rz-data/15 text-rz-data'}`}>{r.critical ? 'Order now' : 'In window'}</span></td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -286,25 +286,25 @@ export function ConstructionEngine() {
                 {/* rail */}
                 <aside className="space-y-4 lg:sticky lg:top-4 self-start">
                     {health && (
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 text-center">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 text-center">
                             <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Health Score</h3>
-                            <div className={`text-3xl font-bold tabular-nums ${health.score >= 85 ? 'text-emerald-500' : health.score >= 65 ? 'text-amber-500' : 'text-rose-500'}`}>{health.score}<span className="text-sm text-slate-400">/100</span></div>
+                            <div className={`text-3xl font-bold tabular-nums ${health.score >= 85 ? 'text-rz-data' : health.score >= 65 ? 'text-amber-500' : 'text-rose-500'}`}>{health.score}<span className="text-sm text-slate-400">/100</span></div>
                             <div className="text-[10px] text-slate-500">{health.band} · SPI 40 + CPI 30 + schedule 15 + issues 15</div>
                             {planMode && (
                                 <span className="mt-1 inline-block rounded bg-slate-400/15 px-1 py-0.5 text-[8px] font-semibold text-slate-500">Plan Mode — baseline (belum ada actuals)</span>
                             )}
                         </div>
                     )}
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                         <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Milestones (engine)</h3>
                         <div className="space-y-1 text-[11px]">
                             {Object.entries(sched.milestones).map(([k, v]) => (
                                 <div key={k} className="flex justify-between"><span className="capitalize text-slate-600 dark:text-slate-300">{k.replace(/([A-Z])/g, ' $1')}</span><span className="tabular-nums text-slate-500">M{(v as number).toFixed(1)}</span></div>
                             ))}
-                            <div className="flex justify-between border-t border-slate-200 dark:border-slate-800 pt-1 font-semibold"><span className="text-slate-700 dark:text-slate-200">Final handover</span><span className="tabular-nums text-violet-500">M{e.forecastTotalMonths}</span></div>
+                            <div className="flex justify-between border-t border-slate-200 dark:border-slate-800 pt-1 font-semibold"><span className="text-slate-700 dark:text-slate-200">Final handover</span><span className="tabular-nums text-rz-mint">M{e.forecastTotalMonths}</span></div>
                         </div>
                     </div>
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                         <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Risks (Top)</h3>
                         <div className="space-y-1">
                             {t.risks.slice(0, 5).map((r) => (
@@ -318,7 +318,7 @@ export function ConstructionEngine() {
                             ))}
                         </div>
                     </div>
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                         <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Issues ({openIssues} open)</h3>
                         <div className="space-y-1">
                             {t.issues.slice(0, 5).map((i2) => (

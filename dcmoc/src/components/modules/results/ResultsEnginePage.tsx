@@ -207,7 +207,7 @@ export function ResultsEnginePage() {
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg"><Trophy className="h-6 w-6 text-white" /></div>
+                    <div className="flex h-11 w-11 items-center justify-center rounded bg-rz-mint/15 border border-rz-mint/30"><Trophy className="h-6 w-6 text-rz-mint" /></div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Results Engine</h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400">Final scorecard & verdict for the current configuration — composites documented per dimension</p>
@@ -216,14 +216,14 @@ export function ResultsEnginePage() {
                 <div className="flex items-center gap-2">
                     <div className="flex rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden">
                         {([['scorecard', 'Scorecard'], ['full', 'Full Report']] as const).map(([k, l]) => (
-                            <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-violet-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
+                            <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-rz-mint text-rz-base' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
                         ))}
                     </div>
                     <button onClick={exportPdf} disabled={busy}
-                        className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-violet-400 disabled:opacity-50">
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-rz-mint disabled:opacity-50">
                         <FileDown className="h-3.5 w-3.5" /> {busy ? 'Generating…' : 'Export PDF'}
                     </button>
-                    <button onClick={() => setActiveTab('dashboard')} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500">Executive Dashboard <ChevronRight className="h-3.5 w-3.5" /></button>
+                    <button onClick={() => setActiveTab('dashboard')} className="inline-flex items-center gap-1 rounded-lg bg-rz-mint px-3 py-1.5 text-xs font-semibold text-rz-base hover:bg-rz-mint/80">Executive Dashboard <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>
             </div>
 
@@ -247,7 +247,7 @@ export function ResultsEnginePage() {
                                 <div className="mt-2 space-y-1">
                                     {acts.slice(0, 3).map((a, i) => (
                                         <div key={i} className="flex items-start gap-2 text-[10.5px] text-slate-600 dark:text-slate-300">
-                                            <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8.5px] font-bold text-white ${a.priority === 'HIGH' ? 'bg-red-600' : a.priority === 'MEDIUM' ? 'bg-amber-600' : 'bg-emerald-600'}`}>{a.priority}</span>
+                                            <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8.5px] font-bold ${a.priority === 'HIGH' ? 'bg-red-600 text-white' : a.priority === 'MEDIUM' ? 'bg-amber-600 text-white' : 'bg-rz-data text-rz-base'}`}>{a.priority}</span>
                                             <span>{a.action}</span>
                                         </div>
                                     ))}
@@ -263,7 +263,7 @@ export function ResultsEnginePage() {
                                                     <span>
                                                         {s.topLever ? <><b>{s.topLever.label}</b> — {s.topLever.detail}</> : 'Tidak ada lever parameter pada state sekarang.'}
                                                         {s.liftPts > 0 && <span className="text-slate-500"> Mencapai {s.liftTarget} menambah +{s.liftPts} poin overall (bobot {Math.round(s.weight * 100)}%).</span>}
-                                                        <button onClick={() => goTab(s.topLever?.targetTab || s.targetTab)} className="ml-1 font-medium text-violet-500 hover:text-violet-400">↗ {s.targetLabel}</button>
+                                                        <button onClick={() => goTab(s.topLever?.targetTab || s.targetTab)} className="ml-1 font-medium text-rz-mint hover:text-rz-mint/80">↗ {s.targetLabel}</button>
                                                     </span>
                                                 </div>
                                             ))}
@@ -276,12 +276,12 @@ export function ResultsEnginePage() {
                     })()}
                     <div className="grid gap-4 xl:grid-cols-[300px_1fr_300px]">
                         {/* overall */}
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 text-center">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 text-center">
                             <h2 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Overall Score (Weighted)</h2>
                             <TraceValue traceId="results.score">
-                                <div className="text-5xl font-bold tabular-nums text-violet-500">{model.overall}<span className="text-lg text-slate-400">/100</span></div>
+                                <div className="text-5xl font-bold tabular-nums text-rz-mint">{model.overall}<span className="text-lg text-slate-400">/100</span></div>
                             </TraceValue>
-                            <div className={`mt-1 text-sm font-semibold ${model.overall >= 85 ? 'text-emerald-500' : model.overall >= 70 ? 'text-lime-500' : 'text-amber-500'}`}>{model.grade}</div>
+                            <div className={`mt-1 text-sm font-semibold ${model.overall >= 85 ? 'text-rz-data' : model.overall >= 70 ? 'text-rz-info' : 'text-rz-signal'}`}>{model.grade}</div>
                             {baselineDimKeys.length > 0 && (
                                 <p className="mt-1 text-[9px] leading-snug text-slate-400">
                                     {baselineDimKeys.length} dimensi masih baseline plan-mode (Construction SPI/CPI 1.00 definisional · Financial screening pro-forma) — belum ada actuals tracking; komposit ikut terangkat oleh baseline ini.
@@ -298,7 +298,7 @@ export function ResultsEnginePage() {
                             </div>
                         </div>
                         {/* radar */}
-                        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Performance Radar</h2>
                             <div className="h-72">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -306,7 +306,7 @@ export function ResultsEnginePage() {
                                         <PolarGrid stroke="#334155" />
                                         <PolarAngleAxis dataKey="axis" tick={{ fontSize: 9, fill: '#94a3b8' }} />
                                         <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 8, fill: '#64748b' }} />
-                                        <Radar name="Score" dataKey="score" stroke="#a78bfa" fill="#a78bfa" fillOpacity={0.2} strokeWidth={2} />
+                                        <Radar name="Score" dataKey="score" stroke="#7DDDB4" fill="#7DDDB4" fillOpacity={0.2} strokeWidth={2} />
                                         <Tooltip contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
                                     </RadarChart>
                                 </ResponsiveContainer>
@@ -314,7 +314,7 @@ export function ResultsEnginePage() {
                         </div>
                         {/* financial outcomes */}
                         <div className="space-y-4">
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Key Financial Outcomes</h3>
                                 <div className="space-y-1 text-[11px]">
                                     {/* audit #5: screening IRR basis made explicit — this page's IRR is
@@ -344,13 +344,13 @@ export function ResultsEnginePage() {
                                 </div>
                                 <p className="mt-1.5 text-[9px] text-slate-400">Screening outcomes (engine roi/opex models, dcContract basis) — not investment advice.</p>
                             </div>
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                            <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Result Validation</h3>
                                 {validation.map((v) => (
                                     <div key={v.label} className="flex items-center gap-1.5 py-0.5 text-[11px]">
-                                        <span className={`h-2 w-2 rounded-full ${v.ok ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                        <span className={`h-2 w-2 rounded-full ${v.ok ? 'bg-rz-data' : 'bg-amber-500'}`} />
                                         <span className="text-slate-600 dark:text-slate-300">{v.label}</span>
-                                        <span className={`ml-auto text-[9px] font-semibold ${v.ok ? 'text-emerald-500' : 'text-amber-500'}`}>{v.ok ? 'OK' : 'Pending'}</span>
+                                        <span className={`ml-auto text-[9px] font-semibold ${v.ok ? 'text-rz-data' : 'text-amber-500'}`}>{v.ok ? 'OK' : 'Pending'}</span>
                                     </div>
                                 ))}
                                 <p className="mt-1 text-[9px] text-slate-400">Honest chips: “computed successfully”, not an external audit.</p>
@@ -359,7 +359,7 @@ export function ResultsEnginePage() {
                     </div>
 
                     {/* dimension table */}
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                    <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Dimension Scores — documented composites</h2>
                         <table className="w-full text-[11px]">
                             <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Dimension</th><th className="text-right">Score</th><th className="text-right">Weight</th><th className="text-left pl-4">Basis (formula)</th></tr></thead>
@@ -367,7 +367,7 @@ export function ResultsEnginePage() {
                                 {model.dims.map((d) => {
                                     const dimTrace: Record<string, string> = { capex: 'results.capexScore', sus: 'results.susScore', fin: 'results.finScore', constr: 'results.constrScore' };
                                     const tr = dimTrace[d.key];
-                                    const scoreEl = <span className={`tabular-nums font-semibold ${d.score >= 70 ? 'text-emerald-500' : d.score >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{d.score}</span>;
+                                    const scoreEl = <span className={`tabular-nums font-semibold ${d.score >= 70 ? 'text-rz-data' : d.score >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{d.score}</span>;
                                     const low = d.score < DIM_CHIP_FLOOR;
                                     return (
                                     <React.Fragment key={d.key}>
@@ -399,10 +399,10 @@ export function ResultsEnginePage() {
                                                     <div className="mt-1 space-y-1">
                                                         {dimEx.levers.map((l, idx) => (
                                                             <div key={idx} className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
-                                                                <span className={`shrink-0 rounded px-1 py-0.5 text-[8px] font-bold text-white ${l.priority === 'HIGH' ? 'bg-emerald-600' : 'bg-slate-500'}`}>{l.priority === 'HIGH' ? 'LEVER' : 'NOTE'}</span>
+                                                                <span className={`shrink-0 rounded px-1 py-0.5 text-[8px] font-bold ${l.priority === 'HIGH' ? 'bg-rz-signal text-rz-base' : 'bg-slate-500 text-white'}`}>{l.priority === 'HIGH' ? 'LEVER' : 'NOTE'}</span>
                                                                 <span><b>{l.label}</b> — {l.detail}
                                                                     {l.targetTab && (
-                                                                        <button onClick={() => goTab(l.targetTab)} className="ml-1 font-medium text-violet-500 hover:text-violet-400">
+                                                                        <button onClick={() => goTab(l.targetTab)} className="ml-1 font-medium text-rz-mint hover:text-rz-mint/80">
                                                                             ↗ {l.targetTab === dimEx.targetTab ? dimEx.targetLabel : 'Buka'}
                                                                         </button>
                                                                     )}
@@ -413,7 +413,7 @@ export function ResultsEnginePage() {
                                                     </div>
                                                     <div className="mt-1 flex items-center justify-between gap-2">
                                                         <p className="text-[8.5px] text-slate-400">Angka lever di-solve dari formula dimensi yang SAMA dengan skor di tabel (bisection / tabel engine) — bukan estimasi statis.</p>
-                                                        <button onClick={() => goTab(dimEx.targetTab)} className="shrink-0 text-[9px] font-semibold text-violet-500 hover:text-violet-400">↗ {dimEx.targetLabel}</button>
+                                                        <button onClick={() => goTab(dimEx.targetTab)} className="shrink-0 text-[9px] font-semibold text-rz-mint hover:text-rz-mint/80">↗ {dimEx.targetLabel}</button>
                                                     </div>
                                                 </div>
                                             </td>
@@ -426,11 +426,11 @@ export function ResultsEnginePage() {
                         </table>
                     </div>
 
-                    <div className="rounded-2xl border border-violet-500/30 bg-violet-600/5 p-3">
-                        <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-violet-500">Top Recommendations (deterministic)</h3>
+                    <div className="rounded border border-rz-mint/30 bg-rz-mint/5 p-3">
+                        <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Top Recommendations (deterministic)</h3>
                         <ul className="space-y-0.5">
-                            {model.recs.length === 0 && <li className="text-[11px] text-emerald-500">✓ No corrective actions flagged — configuration performs across all dimensions.</li>}
-                            {model.recs.map((r, idx) => <li key={idx} className="flex gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"><span className="text-violet-500">✓</span>{r}</li>)}
+                            {model.recs.length === 0 && <li className="text-[11px] text-rz-data">✓ No corrective actions flagged — configuration performs across all dimensions.</li>}
+                            {model.recs.map((r, idx) => <li key={idx} className="flex gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"><span className="text-rz-mint">✓</span>{r}</li>)}
                         </ul>
                     </div>
                 </div>
