@@ -1868,3 +1868,51 @@ Adoption: `data-explain="key"` explicit, `data-explain-scan` container auto-wiri
 **DEPRECATED**: all per-page tooltip families (`.tooltip-trigger`/`.tooltip-content` (removed from
 capex v1.59.0), `.tco-tooltip-*`, `.calc-tooltip`, `.mcl-tooltip-*`, +40 others). No new instances —
 add content to the DB instead.
+
+
+## Feature 33: Floating Technical-Manual button — SHARED ENGINE (v1.99.x)
+
+Every calculator/tool page shows ONE consistent floating **"manual"** button (book glyph + label)
+at bottom-right, linking to that page's methodology manual `manual/<slug>.html`. It replaces the
+ad-hoc inline `.rz-manual-link` pills (present on some calculators, missing on others).
+
+### How it works
+Shared self-injecting module **`js/rz-manual-fab.js`** (same pattern as `rz-cookie-consent.js`):
+1. Derives the slug from an existing `a[href*="manual/"]` on the page, else a built-in `filename→slug`
+   map (covers all calculators incl. `opex-calculator→opex`, `cdu-calculator/cdu-checklist→cdu-hub`).
+2. Removes any legacy inline `.rz-manual-link` pill (de-dupe → one entry point).
+3. Injects the FAB + its own guarded `<style id="rzManualFabStyle">` — so it renders identically even
+   on inline-styled pages that don't load `styles.css` (e.g. `dc-market-tracker.html`).
+Guard: `window.__rzManualFab`.
+
+### Adoption
+Add ONE tag to a calculator page — nothing else (slug self-derives):
+```html
+<script src="js/rz-manual-fab.js?v=YYYY-MM-DD" defer></script>
+```
+Rollout: 16 calculator pages (capex/opex/tco/roi/pue/carbon-footprint/fire-calculator/cx/cdu-calculator/
+cdu-checklist/tia-942-checklist/fire-checklist/spares-readiness-calculator/rfs-readiness-workbench/
+tier-advisor/dc-market-tracker). Do NOT re-add inline `.rz-manual-link` pills.
+
+### Positioning + multi-FAB z-index coordination
+`.rz-manual-fab` is `position:fixed; right:20px; bottom:140px; z-index:600` — **stacked ABOVE** the
+scroll-to-top (`bottom:24px`) and night-mode toggle (`bottom:80px`) FABs. Mobile (`≤768px`):
+`right:14px; bottom:150px`. Dark-mode override + `prefers-reduced-motion` + `@media print{display:none}`
+are all in the injected style. **FAB stacking order (z-index):**
+
+| Layer | z-index | Examples |
+|---|---|---|
+| page content | (auto) | — |
+| **manual FAB** | **600** | `.rz-manual-fab` |
+| page FABs / toggles | 200–999 | `.scroll-top-btn` (200), `.dmt-*` (999) |
+| expandable FAB menu | 9000 | `.rfs-fab` |
+| modals / cookie banner | 9999+ | search modal, cookie banner |
+
+Keep the manual FAB below page toggles/menus/modals so it never overlays an open dialog; it sits at a
+distinct vertical offset so it never visually collides with the toggles beneath it.
+
+### Related — sticky-footer guard
+Pages whose `<body>` has `min-height:100vh` must use the **sticky-footer flex** layout
+(`body{display:flex;flex-direction:column}` + `footer{margin-top:auto}`) so min-height slack goes
+ABOVE the footer, never below (prevents an empty scrollable band under the footer when content is short).
+Applied to `dc-market-tracker.html` (v1.99.x).
