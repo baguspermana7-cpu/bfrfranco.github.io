@@ -1916,3 +1916,20 @@ Pages whose `<body>` has `min-height:100vh` must use the **sticky-footer flex** 
 (`body{display:flex;flex-direction:column}` + `footer{margin-top:auto}`) so min-height slack goes
 ABOVE the footer, never below (prevents an empty scrollable band under the footer when content is short).
 Applied to `dc-market-tracker.html` (v1.99.x).
+
+
+## Feature 34: Hero image blur-letterbox — SHARED ENGINE (v1.99.x)
+
+Calculator hero/OG images must never stretch or distort, and must sit in a clean frame the
+width of the page's content container. Shared self-injecting module **`js/rz-hero-fit.js`**:
+- Targets `img.brief-hero-img` or any `img[data-rz-hero]`; reads the image's `width`/`height`
+  attrs for a fixed `aspect-ratio` (no distortion).
+- Wraps it in `.rz-hero-fit`: the SHARP image sits `object-fit:contain` (whole image, never
+  cropped/stretched) over a full-bleed **blurred copy** of the same image (`filter:blur`) that
+  fills the letterbox sides. If the hero img's parent is a lone image wrapper (e.g. an inline
+  `max-width:800px` div), the module REPLACES it and re-aligns width (`data-rz-hero-width`,
+  default 1400px); otherwise it wraps the img in place (fills the surrounding card).
+- Injects its own guarded `<style>` (dark-safe, `prefers-reduced-motion`, print-safe).
+Adoption: one `<script src="js/rz-hero-fit.js?v=…" defer>` + mark the hero img. Rolled to the
+7 image-hero calculators (opex/capex/roi/carbon-footprint/pue/tier-advisor/tia-942-checklist).
+Guard: `tools/audit-hero-images.mjs` (ship-suite) fails any hero-image page missing the module.
