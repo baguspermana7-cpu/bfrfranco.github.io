@@ -221,6 +221,14 @@ window.RZ_FEATURE_FLAGS = {
     'scenario-save':           { free: false, demo: false, pro: true, root: true  }
   },
 
+  /* ── Second Brain + Vector Index dashboard (ROOT-ONLY: bagus@/admin@) ────── */
+  'second-brain': {
+    'page-access':             { free: false, demo: false, pro: false, root: true }
+  },
+  'vector-index': {
+    'page-access':             { free: false, demo: false, pro: false, root: true }
+  },
+
   /* ── DC Conventional ──────────────────────────────────────────────────── */
   'dc-conventional': {
     'page-access':             { free: false, demo: false, pro: true, root: true  },

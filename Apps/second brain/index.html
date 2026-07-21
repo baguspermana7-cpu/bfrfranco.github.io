@@ -361,7 +361,33 @@ html.light #stars{opacity:.06}
 @media(max-width:720px){:root{--sb-w:100vw}#leg{display:none}#mmwrap{display:none}.nstats{display:none}.tsrch{width:130px}}
 </style>
 </head>
-<body>
+<body class="locked">
+<style>
+  .root-gate{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;
+    background:rgba(6,9,13,.72);backdrop-filter:blur(4px)}
+  body.locked .root-gate{display:flex}
+  body.locked > *:not(.root-gate):not(script):not(style){filter:blur(7px);pointer-events:none;user-select:none}
+  .root-gate-card{background:#121820;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:2rem 2.2rem;
+    max-width:360px;text-align:center;font-family:'JetBrains Mono',ui-monospace,monospace;color:#e7edf3;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .root-gate-card .lock{width:54px;height:54px;margin:0 auto 1rem;border-radius:12px;background:#f59e0b;color:#0b0f14;
+    display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+  .root-gate-card h2{margin:0 0 .5rem;font-size:1.15rem;color:#f6f7f9}
+  .root-gate-card p{margin:0 0 1.2rem;font-size:.82rem;color:#93a1b0;line-height:1.5}
+  .root-gate-actions{display:flex;gap:.6rem;justify-content:center}
+  .root-gate-actions .login{background:#8b5cf6;color:#fff;border:none;border-radius:8px;padding:.55rem 1.1rem;cursor:pointer;font:inherit;font-weight:600}
+  .root-gate-actions .back{color:#93a1b0;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:.55rem 1.1rem;text-decoration:none}
+</style>
+<div class="root-gate" id="rootGate" aria-live="polite">
+  <div class="root-gate-card">
+    <div class="lock"><i class="fas fa-lock"></i>&#128274;</div>
+    <h2>Root access required</h2>
+    <p>Second Brain is restricted to root accounts. Sign in with a root account to continue.</p>
+    <div class="root-gate-actions">
+      <button class="login" id="rootLoginBtn" type="button">Sign In</button>
+      <a class="back" href="../../index.html">Back</a>
+    </div>
+  </div>
+</div>
 
 <canvas id="stars"></canvas>
 <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
@@ -446,6 +472,9 @@ html.light #stars{opacity:.06}
 
   <div class="tdv"></div>
   <div class="tbr-r">
+    <a class="lb" href="vector-index.html" id="bVec" title="Vector Index — AI embedding visualization (root)" style="text-decoration:none">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="6" r="1.7"/><circle cx="12" cy="4" r="1.7"/><circle cx="19" cy="7" r="1.7"/><circle cx="7" cy="13" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="10" cy="19" r="1.7"/><circle cx="19" cy="17" r="1.7"/></svg>
+    </a>
     <button class="lb on" id="bF" title="Force">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="12" cy="19" r="2"/><line x1="7" y1="5" x2="17" y2="5"/><line x1="6" y1="7" x2="11" y2="17"/><line x1="18" y1="7" x2="13" y2="17"/></svg>
     </button>
@@ -1687,6 +1716,31 @@ document.getElementById('focbanner').addEventListener('click',exitFocus);
 setTimeout(()=>document.getElementById('ldr').classList.add('gone'),850);
 
 })();
+</script>
+
+<script src="../../js/rz-feature-flags.js?v=2026-07-21" defer></script>
+<script src="../../auth.js?v=2026-07-21" defer></script>
+<script>
+  /* ===== Root-only access gate ===== */
+  (function(){
+    function ag(){
+      if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){
+        window._rzAuth.enforceTierFeatureAccess('second-brain');
+      }else{
+        try{
+          var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');
+          var r=s&&s.role, e=(s&&s.email||'').toLowerCase();
+          var isRoot=!!s&&(r==='root'||e==='bagus@resistancezero.com'||e==='admin@resistancezero.com');
+          document.body.classList.toggle('locked',!isRoot);
+        }catch(x){document.body.classList.add('locked');}
+      }
+    }
+    var b=document.getElementById('rootLoginBtn');
+    if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();});
+    window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});
+    window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});
+    ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);
+  })();
 </script>
 </body>
 </html>
