@@ -1531,7 +1531,7 @@ async function loadOverviewDominance(){
     S.charts.ovDom=new Chart($('overviewDominance'),{
       type:'doughnut',
       data:{labels:entries.map(e=>e[0].toUpperCase()),datasets:[{data:entries.map(e=>e[1]),backgroundColor:['#f7931a','#627eea','#34d399','#f87171','#60a5fa','#fbbf24'],borderColor:'transparent',borderWidth:0}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:10},padding:6,boxWidth:10}}},cutout:'65%'}
+      options:{responsive:true,interaction:{intersect:false},maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:10},padding:6,boxWidth:10}}},cutout:'65%'}
     });
   }catch(e){}
 }
@@ -2334,7 +2334,7 @@ async function loadFxChart(){
       S.charts.fx=new Chart($('fxChart'),{
         type:'line',
         data:{labels,datasets:[{label:S.fxPair,data:values,borderColor:cc.green,backgroundColor:'rgba(52,211,153,.1)',fill:true,tension:.3,pointRadius:0,borderWidth:2}]},
-        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>S.fxPair+': '+ctx.raw.toFixed(4)}}},scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,maxTicksLimit:8,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,font:{size:10}}}}}
+        options:{responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>S.fxPair+': '+ctx.raw.toFixed(4)}}},scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,maxTicksLimit:8,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,font:{size:10}}}}}
       });
     }catch(e){}
     // FT Phase 2 Task B — analytics panel for FX (Yahoo FX symbol format: e.g. EURUSD=X)
@@ -2355,7 +2355,7 @@ async function loadFxChart(){
     S.charts.fx=new Chart($('fxChart'),{
       type:'line',
       data:{labels:labels.map(l=>{const d=new Date(l);return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}),datasets:[{label:S.fxPair,data:values,borderColor:cc.green,backgroundColor:'rgba(52,211,153,.1)',fill:true,tension:.3,pointRadius:0,borderWidth:2}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>S.fxPair+': '+ctx.raw.toFixed(4)}}},scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,maxTicksLimit:8,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,font:{size:10}}}}}
+      options:{responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>S.fxPair+': '+ctx.raw.toFixed(4)}}},scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,maxTicksLimit:8,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,font:{size:10}}}}}
     });
   }catch(e){}
 }
@@ -2837,7 +2837,7 @@ async function renderPortfolio(){
   S.charts.alloc=new Chart($('allocChart'),{
     type:'doughnut',
     data:{labels:aLabels,datasets:[{data:aValues,backgroundColor:aColors.slice(0,aLabels.length),borderColor:cc.grid,borderWidth:1}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:cc.text,font:{size:11}}}}}
+    options:{responsive:true,interaction:{intersect:false},maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:cc.text,font:{size:11}}}}}
   });
 }
 
@@ -3086,7 +3086,7 @@ async function loadCmdChartLegacy(){
         datasets:[{label:name,data:data.c,borderColor:cc.amber,backgroundColor:'rgba(251,191,36,.1)',fill:true,tension:.3,pointRadius:0,borderWidth:2},
           ...(data.c.length>=20?[{label:'SMA 20',data:calcSMA(data.c,20),borderColor:cc.blue,borderWidth:1.5,pointRadius:0,tension:.3,fill:false}]:[])
         ]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:cc.text,font:{size:10}}},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>ctx.dataset.label+': $'+fmtP(ctx.raw)}}},scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,maxTicksLimit:8,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>'$'+fmt(v),font:{size:10}}}}}
+      options:{responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,plugins:{legend:{labels:{color:cc.text,font:{size:10}}},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>ctx.dataset.label+': $'+fmtP(ctx.raw)}}},scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,maxTicksLimit:8,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>'$'+fmt(v),font:{size:10}}}}}
     });
   }catch(e){console.error('Commodity chart error:',e)}
 }
@@ -3101,7 +3101,7 @@ async function loadCmdComparison(existingQ){
   S.charts.cmdCmp=new Chart($('cmdCompare'),{
     type:'bar',
     data:{labels:changes.map(c=>c.sym),datasets:[{label:'Day Change %',data:changes.map(c=>c.dp),backgroundColor:changes.map(c=>c.dp>=0?'rgba(52,211,153,.6)':'rgba(248,113,113,.6)'),borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw>0?'+':'')+fmtP(ctx.raw)+'%'}}},scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:10}}},y:{grid:{display:false},ticks:{color:cc.text,font:{size:11,weight:'bold'}}}}}
+    options:{responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw>0?'+':'')+fmtP(ctx.raw)+'%'}}},scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:10}}},y:{grid:{display:false},ticks:{color:cc.text,font:{size:11,weight:'bold'}}}}}
   });
 }
 
@@ -3139,7 +3139,7 @@ async function loadSectorsV2(){
     S.charts.sector=new Chart($('sectorChart'),{
       type:'bar',
       data:{labels:data.map(d=>d.name),datasets:[{label:'Day Change %',data:data.map(d=>d.dp),backgroundColor:data.map(d=>d.dp>=0?'rgba(52,211,153,.7)':'rgba(248,113,113,.7)'),borderRadius:6}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw>0?'+':'')+fmtP(ctx.raw)+'%'}}},scales:{x:{grid:{display:false},ticks:{color:cc.text,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:10}}}}}
+      options:{responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw>0?'+':'')+fmtP(ctx.raw)+'%'}}},scales:{x:{grid:{display:false},ticks:{color:cc.text,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:10}}}}}
     });
     tb.innerHTML=data.map(d=>`<tr><td class="fw7 c-t1">${d.name}</td><td class="mono c-t4">${d.sym}</td><td class="txt-r mono c-t1">$${fmtP(d.c)}</td><td class="txt-r fw6" style="color:${chgColor(d.dp)}">${d.dp>0?'+':''}${fmtP(d.dp)}%</td><td class="txt-r mono c-t4">${d.v?fmt(d.v):'--'}</td></tr>`).join('');
     destroyChart('secPie');
@@ -3147,7 +3147,7 @@ async function loadSectorsV2(){
     S.charts.secPie=new Chart($('sectorPie'),{
       type:'doughnut',
       data:{labels:data.map(d=>d.name),datasets:[{data:weights,backgroundColor:data.map(d=>d.color),borderColor:'transparent',borderWidth:0}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:9},padding:4,boxWidth:10}}},cutout:'55%'}
+      options:{responsive:true,interaction:{intersect:false},maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:9},padding:4,boxWidth:10}}},cutout:'55%'}
     });
     wireTable('sectorTable','sectorFilter'); // B-004 (sort+filter; idempotent)
   }catch(e){
@@ -3172,7 +3172,7 @@ async function loadSectors(){
     S.charts.sector=new Chart($('sectorChart'),{
       type:'bar',
       data:{labels:data.map(d=>d.name),datasets:[{label:'Day Change %',data:data.map(d=>d.dp),backgroundColor:data.map(d=>d.dp>=0?'rgba(52,211,153,.7)':'rgba(248,113,113,.7)'),borderRadius:6}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw>0?'+':'')+fmtP(ctx.raw)+'%'}}},scales:{x:{grid:{display:false},ticks:{color:cc.text,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:10}}}}}
+      options:{responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw>0?'+':'')+fmtP(ctx.raw)+'%'}}},scales:{x:{grid:{display:false},ticks:{color:cc.text,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:10}}}}}
     });
   }catch(e){}
   // Pie chart (guarded — decorative)
@@ -3182,7 +3182,7 @@ async function loadSectors(){
     S.charts.secPie=new Chart($('sectorPie'),{
       type:'doughnut',
       data:{labels:data.map(d=>d.name),datasets:[{data:weights,backgroundColor:data.map(d=>d.color),borderColor:'transparent',borderWidth:0}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:9},padding:4,boxWidth:10}}},cutout:'55%'}
+      options:{responsive:true,interaction:{intersect:false},maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:9},padding:4,boxWidth:10}}},cutout:'55%'}
     });
   }catch(e){}
 }
@@ -3219,7 +3219,7 @@ async function loadEconomyV2(){
     if(yields.length){
       S.charts.yield=new Chart($('yieldChart'),{
         type:'bar',data:{labels:yields.map(y=>y.sym),datasets:[{label:'Day %',data:yields.map(y=>y.chgPct||0),backgroundColor:yields.map(y=>(y.chgPct||0)>=0?'rgba(96,165,250,.6)':'rgba(248,113,113,.6)'),borderRadius:4}]},
-        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:cc.text}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%'}}}}
+        options:{responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:cc.text}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%'}}}}
       });
     }
     // Currency table.
@@ -3270,7 +3270,7 @@ async function loadYields(){
   if(chgs.length){
     S.charts.yield=new Chart($('yieldChart'),{
       type:'bar',data:{labels:chgs.map(c=>c.sym),datasets:[{label:'Day %',data:chgs.map(c=>c.dp),backgroundColor:chgs.map(c=>c.dp>=0?'rgba(96,165,250,.6)':'rgba(248,113,113,.6)'),borderRadius:4}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:cc.text}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%'}}}}
+      options:{responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:cc.text}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%'}}}}
     });
   }
 }
@@ -3395,7 +3395,7 @@ async function openCryptoDetail(coinId){
       type:'line',data:{
         labels:prices.map(p=>new Date(p[0]).toLocaleDateString('en-US',{month:'short',day:'numeric'})),
         datasets:[{label:'Price',data:prices.map(p=>p[1]),borderColor:cc.line,backgroundColor:cc.fill,fill:true,tension:.3,pointRadius:0,borderWidth:2}]
-      },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>'$'+fmtP(ctx.raw)}}},
+      },options:{responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>'$'+fmtP(ctx.raw)}}},
         scales:{x:{grid:{color:cc.grid,drawOnChartArea:false},ticks:{color:cc.text,maxTicksLimit:8,font:{size:10}}},y:{position:'right',grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>'$'+fmt(v),font:{size:10}}}}}
     });
     // Coin info
@@ -3586,7 +3586,7 @@ async function loadPortfolioAnalytics(){
     type:'line',data:{labels:perfLabels,datasets:[
       {label:'Portfolio',data:perfLine.map(v=>(v-1)*100),borderColor:cc.line,borderWidth:2,pointRadius:0,tension:.3,fill:false},
       {label:'S&P 500',data:spyPerf.slice(0,perfLine.length).map(v=>(v-1)*100),borderColor:cc.amber,borderWidth:1.5,pointRadius:0,tension:.3,fill:false,borderDash:[4,2]}
-    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{color:cc.text,font:{size:10},boxWidth:12}},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>ctx.dataset.label+': '+(ctx.raw>=0?'+':'')+fmtP(ctx.raw,1)+'%'}}},
+    ]},options:{responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{color:cc.text,font:{size:10},boxWidth:12}},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>ctx.dataset.label+': '+(ctx.raw>=0?'+':'')+fmtP(ctx.raw,1)+'%'}}},
       scales:{x:{grid:{color:cc.grid,drawOnChartArea:false},ticks:{color:cc.text,maxTicksLimit:6,font:{size:9}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:9}}}}}
   });
   // Correlation matrix
@@ -3671,7 +3671,7 @@ async function loadFuturesV2(){
     destroyChart('futuresPerf');
     S.charts.futuresPerf=new Chart($('futuresPerfChart'),{
       type:'bar',data:{labels:perf.map(p=>p.name),datasets:[{data:perf.map(p=>p.dp),backgroundColor:perf.map(p=>p.dp>=0?'rgba(52,211,153,.6)':'rgba(248,113,113,.6)'),borderRadius:4}]},
-      options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw>=0?'+':'')+fmtP(ctx.raw)+'%'}}},
+      options:{responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw>=0?'+':'')+fmtP(ctx.raw)+'%'}}},
         scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:9}}},y:{grid:{display:false},ticks:{color:cc.text,font:{size:9}}}}}
     });
     if(!S.futSym)S.futSym=topSyms[0]||'SPY';
@@ -3707,7 +3707,7 @@ async function loadFutures(){
   destroyChart('futuresPerf');
   S.charts.futuresPerf=new Chart($('futuresPerfChart'),{
     type:'bar',data:{labels:perf.map(p=>p.name),datasets:[{data:perf.map(p=>p.dp),backgroundColor:perf.map(p=>p.dp>=0?'rgba(52,211,153,.6)':'rgba(248,113,113,.6)'),borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw>=0?'+':'')+fmtP(ctx.raw)+'%'}}},
+    options:{responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw>=0?'+':'')+fmtP(ctx.raw)+'%'}}},
       scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:9}}},y:{grid:{display:false},ticks:{color:cc.text,font:{size:9}}}}}
   });
   wireTable('futuresTable','futuresFilter'); // B-004: sortable/filterable in non-V2 mode too
@@ -3730,7 +3730,7 @@ async function loadFuturesChart(tf){
       type:'line',data:{labels,datasets:[
         {label:fname,data:data.c,borderColor:cc.line,backgroundColor:cc.fill,fill:true,tension:.3,pointRadius:0,borderWidth:2},
         ...(data.c.length>=20?[{label:'SMA 20',data:calcSMA(data.c,20),borderColor:cc.amber,borderWidth:1,pointRadius:0,tension:.3,fill:false}]:[])
-      ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{color:cc.text,font:{size:10},boxWidth:12}},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>ctx.dataset.label+': $'+fmtP(ctx.raw)}}},
+      ]},options:{responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{color:cc.text,font:{size:10},boxWidth:12}},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>ctx.dataset.label+': $'+fmtP(ctx.raw)}}},
         scales:{x:{grid:{color:cc.grid,drawOnChartArea:false},ticks:{color:cc.text,maxTicksLimit:8,font:{size:10}}},y:{position:'right',grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>'$'+fmt(v),font:{size:10}}}}}
     });
   }catch(e){console.error('Futures chart error:',e)}
@@ -3960,7 +3960,7 @@ async function loadCompareChart(){
   destroyChart('compare');
   S.charts.compare=new Chart($('compareChart'),{
     type:'line',data:{labels,datasets},
-    options:{responsive:true,maintainAspectRatio:false,
+    options:{responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,
       plugins:{legend:{display:true,position:'top',labels:{color:cc.text,font:{size:10},boxWidth:12}},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>ctx.dataset.label+': '+(ctx.raw>=0?'+':'')+fmtP(ctx.raw,1)+'%'}}},
       scales:{x:{grid:{color:cc.grid,drawOnChartArea:false},ticks:{color:cc.text,maxTicksLimit:8,font:{size:9}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:9}}}}}
   });
@@ -4286,7 +4286,7 @@ async function loadYieldCurve(){
     type:'line',data:{labels,datasets:[{
       label:'Yield Curve (approx.)',data:normalizedYields,borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,.1)',
       fill:true,tension:.4,pointRadius:5,pointBackgroundColor:'#60a5fa',borderWidth:2.5
-    }]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.label+': ~'+fmtP(ctx.raw,2)+'%'}}},
+    }]},options:{responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.label+': ~'+fmtP(ctx.raw,2)+'%'}}},
       scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,font:{size:11}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v.toFixed(1)+'%',font:{size:10}},title:{display:true,text:'Approx. Yield %',color:cc.text,font:{size:10}}}}}
   });
 }

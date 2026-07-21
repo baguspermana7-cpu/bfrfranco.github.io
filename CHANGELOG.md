@@ -20,6 +20,14 @@ release sections rather than semver.
 ### Verified
 - audit-hero-images CLEAN (7 halaman) · js-syntax CLEAN · script-tags CLEAN · blok `@media print` ada.
 
+## v1.99.11 — 2026-07-21 (finance-terminal chart hover tooltips)
+
+### Fixed
+- **Finance Terminal (Apps/finance-terminal) 19 chart** interaction=0 → tooltip strict intersect. Tambah `interaction:{mode:'index',intersect:false}` (15 line/bar) + `{intersect:false}` (4 doughnut); tooltip callbacks harga/persen dipertahankan. Chart.js sudah @4.4.0 pinned. Melengkapi sweep tooltip sitewide (v1.99.7-8).
+
+### Verified
+- js-syntax audit CLEAN · interaction count = chart count (19/19).
+
 ## v1.99.10 — 2026-07-21 (pin Chart.js CDN versi sitewide — stabilitas)
 
 ### Changed
