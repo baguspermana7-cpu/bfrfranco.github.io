@@ -6762,7 +6762,35 @@
                 { minKw: 40, band: 'High', coolingRecommended: 'liquid' },
                 { minKw: 20, band: 'Medium', coolingRecommended: 'rdhx' },
                 { minKw: 0,  band: 'Standard', coolingRecommended: 'air' }
-            ]
+            ],
+            /* ══ AI ARCHITECTURE PROFILES (Ship-A 2026-07-21) — explicit reference
+             * architectures with sourced per-rack power. rackKwNominal = vendor
+             * nominal/TDP; rackKwPeak = EDPp provisioning target (~1.5× nominal —
+             * power plant sized to peak). confidence: 'official' (NVIDIA RA / OCP
+             * spec) vs 'analyst' (Rubin — NVIDIA has NOT published rack-kW; only
+             * NVLink6 / 45°C warm-water DLC / 800 VDC are official). Microfluidic is
+             * NOT encoded as any NVIDIA arch fact (rumor; official roadmap = warm-
+             * water DLC + 800 VDC). GPU/IT hardware cost stays EXCLUDED from capex. */
+            peakProvisionFactor: 1.5,
+            /* Conventional-DC peak/nominal headroom ALREADY embedded in the
+             * T&T/C&W/JLL 2025 base $/kW power-chain costs (electrical/UPS/gen
+             * benchmarked on CPU-era facilities where sustained peak ≈ 1.2×
+             * design/nominal IT). The AI-rack power-provisioning uplift is
+             * therefore MARGINAL — (arch peak/nominal) ÷ baselinePeakRatio —
+             * never the raw ratio, else the ~1.2× already priced into the base
+             * is double-counted. Floored at 1.0 (an uplift, never a discount). */
+            baselinePeakRatio: 1.2,
+            archProfiles: {
+                h100_pod:    { label: 'NVIDIA H100 SuperPOD', rackKwNominal: 30, rackKwPeak: 45, gpuCount: 32, cooling: 'air', tierFloor: 3, confidence: 'official', ref: 'DGX H100 10.2kW/8U system, ~2-4/rack air; SU=32 nodes' },
+                gb200_nvl72: { label: 'NVIDIA GB200 NVL72', rackKwNominal: 120, rackKwPeak: 192, gpuCount: 72, cooling: 'liquid', tierFloor: 3, confidence: 'official', ref: '72 Blackwell + 36 Grace, 120kW nominal / 132kW TDP (both OFFICIAL) / 192kW peak = EDPp ANALYST est ~1.5×TDP (SemiAnalysis/HPE, not NVIDIA-published), DLC+CDU' },
+                gb300_nvl72: { label: 'NVIDIA GB300 NVL72', rackKwNominal: 140, rackKwPeak: 192, gpuCount: 72, cooling: 'liquid', tierFloor: 3, confidence: 'official', coolingKitUsdPerRack: 50000, ref: 'Blackwell Ultra, 142kW ref-arch cap (OFFICIAL); 192kW peak = EDPp ANALYST est; cooling kit ~$50k/rack = Morgan Stanley BOM ANALYST ($49,860), not NVIDIA list' },
+                rubin_vr200: { label: 'NVIDIA Vera Rubin VR200 NVL72', rackKwNominal: 200, rackKwPeak: 300, gpuCount: 144, cooling: 'liquid', tierFloor: 4, confidence: 'analyst', ref: 'ANALYST est 190-230kW — NVIDIA has NOT published rack-kW; official: NVLink6 260TB/s, 45C warm-water DLC, 800VDC' },
+                ocp_hpr:     { label: 'OCP ORV3 High-Power Rack', rackKwNominal: 120, rackKwPeak: 140, cooling: 'liquid', tierFloor: 3, confidence: 'official', roadmapKw: 750, ref: 'Open Rack v3 HPR 92-140kW; liquid busbar roadmap to 750kW then 1MW (Mount Diablo)' }
+            },
+            interconnect: {
+                infiniband: { usdPerGpu: 4900, label: 'InfiniBand NDR/Quantum-2', confidence: 'analyst', ref: 'SemiAnalysis 512-GPU cluster $2.5M / 512 ~ $4900/GPU' },
+                ethernet:   { usdPerGpu: 2600, label: 'Ethernet 400/800G (Spectrum-X)', confidence: 'analyst', ref: 'SemiAnalysis $1.3M / 512 ~ $2600/GPU' }
+            }
         },
         /* ══ v2.4.0 — DATA.architecture: Architecture disciplines + design-complexity
          * (Layer 3). Canonical discipline list + cooling/tier complexity multipliers
@@ -6949,6 +6977,9 @@
             'countries':              { source: 'DCMOC country reference 2026-Q1 (per-country economy/labor/environment/gridReliability/naturalDisaster/talentPool/fuelDiesel/taxIncentives/compliance/constructionIndex); PLN/EMA/TEPCO/national tariff filings + IMF WEO + Ember grid-intensity + national labor statistics. GENERATED from dcmoc/src/constants/countries.ts — single source of truth for the site + DCMOC.', asOf: '2026-Q1', unit: 'mixed (see per-country fields)' },
             'opex.basisPresets':      { source: 'Phase-Q shared-engine alignment: utilization presets parameterize the documented opex-calculator (retail 0.7 util) vs DCMOC (DC-contract 1.0 util) basis divergence', asOf: '2026', method: 'multiplier on energy-driven lines (power/water/carbon); default 1.0 = legacy-identical' },
             'commissioning.cx':       { source: 'Commissioning program cost/schedule methodology promoted from cx-calculator.html. RICH engine (cx.rich): equipment quantities scaled from IT load + rack density → per-level (L0-L6) staffed durations at 30 regional day-rate cards ($/day cxDay/fieldDay/oemDay/witnessDay + per-diem + diesel $/L + cost mult), gm-normalized (^0.45) base blend vs level-sum, Monte-Carlo (N=10000) band + 7-param sensitivity tornado. Base rates + multipliers calibrated to DC Cx budgetary practice (ASHRAE Guideline 0 / BCxA / NETA ECS scope, Uptime IST scenario counts). Compact cx.* kept for back-compat.', asOf: '2026', method: 'budgetary estimate-grade Cx program model; NOT a detailed Cx plan' },
+            'requirements.baselinePeakRatio': { source: 'ANALYST — CPU-era enterprise DC power-chain design headroom (sustained peak ≈ 1.2× nominal/design IT) already embedded in the T&T/C&W/JLL 2025 base $/kW; used to make the AI-rack power-provisioning uplift MARGINAL (peak÷nominal ÷ this), preventing double-count.', asOf: '2026-07', unit: 'ratio (peak/nominal already in base cost)' },
+            'requirements.archProfiles':      { source: 'OFFICIAL where confidence=official (NVIDIA GB200/GB300 NVL72 reference architectures + DGX H100 SuperPOD RA + OCP ORV3 HPR spec) — rackKw nominal/TDP/peak(EDPp ~1.5x); ANALYST for rubin_vr200 (NVIDIA has NOT published Rubin rack-kW; only NVLink6/45C warm-water DLC/800VDC are official — kW is analyst 190-230 est). IT/GPU hardware cost EXCLUDED from capex.', asOf: '2026-07', unit: 'kW/rack per architecture' },
+            'requirements.interconnect':      { source: 'ANALYST — SemiAnalysis 512-GPU cluster: InfiniBand NDR ~$2.5M vs 400/800G Ethernet ~$1.3M; per-GPU derived (÷512). Not vendor list price; optional labeled capex line, off by default.', asOf: '2025', unit: 'USD/GPU' },
             'requirements.coolingMaxRackKw': { source: 'ASHRAE TC9.9 5th Ed. 2021 (air ~20-25 kW/rack limit; H1-H3 liquid envelopes); NVIDIA GB200 NVL72 132 kW observed; OCP High Power Rack 92 kW+ (Meta/Rittal OCP Summit 2024); IEA 4E Liquid Cooling in Data Centres 2026', asOf: '2025', unit: 'kW/rack per cooling type' },
             'architecture.ashraeClasses': { source: 'ASHRAE TC9.9 5th Ed. 2021 "Thermal Guidelines for Data Processing Environments" — A1/A2/A3/A4 air + H1 liquid supply-temp envelopes + ΔT limits', asOf: '2021', unit: '°C supply range + °C ΔT max' },
             'architecture.tierTopology': { source: 'Uptime Institute Tier Standard: Topology 2022 (T1-T4 redundancy paths); ANSI/TIA-942-C 2024 Rated-1..Rated-4', asOf: '2024', unit: 'topology description + TIA rating' },
@@ -10220,6 +10251,38 @@
                 profile: function (useCase) {
                     var p = DATA.requirements.useCaseProfiles[(useCase || '').toLowerCase()];
                     return p || null;
+                },
+                /** AI reference-architecture profile (h100_pod, gb200_nvl72,
+                 *  gb300_nvl72, rubin_vr200, ocp_hpr), or null. (Ship-A) */
+                archProfile: function (key) {
+                    var a = DATA.requirements.archProfiles[(key || '').toLowerCase()];
+                    return a || null;
+                },
+                /** Provisioned (peak/EDPp) rack kW for an arch key — power plant is
+                 *  sized to peak, not nominal. Falls back to nominal × peakProvisionFactor. */
+                provisionedRackKw: function (key) {
+                    var a = RZEngine.models.requirements.archProfile(key);
+                    if (!a) return null;
+                    return a.rackKwPeak != null ? a.rackKwPeak : Math.round(a.rackKwNominal * DATA.requirements.peakProvisionFactor);
+                },
+                /** Marginal power-chain provisioning uplift for an arch key —
+                 *  (peak/nominal) ÷ baselinePeakRatio, floored at 1.0. Applied to
+                 *  electrical/UPS/generator base $/kW ONLY (the CPU-era base already
+                 *  prices ~1.2× headroom; raw peak/nominal would double-count it).
+                 *  Returns 1.0 for unknown/null arch (no-op) and for archs whose
+                 *  peak/nominal ≤ baseline (e.g. OCP-HPR 140/120). */
+                powerProvisionUplift: function (key) {
+                    var a = RZEngine.models.requirements.archProfile(key);
+                    if (!a || !a.rackKwNominal) return 1.0;
+                    var prov = RZEngine.models.requirements.provisionedRackKw(key);
+                    var ratio = prov / a.rackKwNominal;
+                    var uplift = ratio / DATA.requirements.baselinePeakRatio;
+                    return uplift > 1.0 ? uplift : 1.0;
+                },
+                /** Interconnect fabric cost for a GPU count (analyst estimate). */
+                interconnectCost: function (fabric, gpuCount) {
+                    var f = DATA.requirements.interconnect[(fabric || '').toLowerCase()];
+                    return f && gpuCount ? Math.round(f.usdPerGpu * gpuCount) : 0;
                 },
                 /** Intake completeness: fraction of required fields present + the
                  *  missing list + a ready flag. A value is "present" if non-null,

@@ -9,7 +9,7 @@ import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { COUNTRIES } from '@/constants/countries';
 import { sanitizeNum } from '@/state/registry';
-import { rzModels } from '@/lib/rz-engine';
+import { rzData, rzModels } from '@/lib/rz-engine';
 import { useRequirementsStore, type UseCase } from '@/store/requirements';
 
 /* UI use case → engine useCaseProfiles key (engine has no network/dr profile). */
@@ -157,4 +157,130 @@ export function effectiveTotalRacks(itLoadKw: number, densityKw: number, overrid
     const auto = densityKw > 0 ? Math.ceil(itLoadKw / densityKw) : 0;
     if (override == null) return auto;
     return Math.round(sanitizeNum(override, 1, 100_000, auto));
+}
+
+/* ── Ship-A: AI reference-architecture (engine DATA.requirements.archProfiles) ──
+ * Consume-only. The engine holds the canonical rack-kW / GPU / cooling / tier /
+ * confidence per architecture; this layer maps them to the Requirements UI and
+ * writes the shared density/cooling/tier fields exactly like applyUseCaseProfile. */
+
+export type ArchKey = 'h100_pod' | 'gb200_nvl72' | 'gb300_nvl72' | 'rubin_vr200' | 'ocp_hpr';
+
+export type ArchConfidence = 'official' | 'analyst';
+
+/** Static UI order + copy (engine values are read live via archProfileLive). */
+export interface ArchUiEntry { key: ArchKey; label: string; confidence: ArchConfidence; blurb: string }
+
+export const ARCH_UI: ArchUiEntry[] = [
+    { key: 'gb300_nvl72', label: 'NVIDIA GB300 NVL72', confidence: 'official', blurb: 'Blackwell Ultra rack — hybrid liquid+air, dedicated cooling kit.' },
+    { key: 'gb200_nvl72', label: 'NVIDIA GB200 NVL72', confidence: 'official', blurb: '72 Blackwell + 36 Grace, direct-to-chip liquid + CDU.' },
+    { key: 'rubin_vr200', label: 'NVIDIA Vera Rubin VR200 NVL72', confidence: 'analyst', blurb: 'Next-gen NVLink6, 800VDC, 45°C warm-water DLC — rack-kW analyst estimate.' },
+    { key: 'ocp_hpr', label: 'OCP ORV3 High-Power Rack', confidence: 'official', blurb: 'Open Rack v3 HPR 92–140 kW; liquid busbar roadmap to 750 kW+.' },
+    { key: 'h100_pod', label: 'NVIDIA H100 SuperPOD', confidence: 'official', blurb: 'DGX H100 SuperPOD — air-cooled, 2–4 systems/rack.' },
+];
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+export interface ArchProfileLive {
+    key: ArchKey;
+    label: string;
+    rackKwNominal: number;
+    rackKwPeak: number;
+    provisionedRackKw: number;
+    gpuCount: number | null;
+    cooling: string;
+    tierFloor: number;
+    confidence: ArchConfidence;
+    coolingKitUsdPerRack: number | null;
+    roadmapKw: number | null;
+    ref: string;
+    /** DATA.sources['requirements.archProfiles'].source provenance string. */
+    source: string | null;
+}
+
+/** Rich engine-live facts for one architecture, or null when the engine is absent. */
+export function archProfileLive(key: ArchKey): ArchProfileLive | null {
+    try {
+        const req = (rzModels() as any)?.requirements;
+        const p = req?.archProfile ? req.archProfile(key) : null;
+        if (!p) return null;
+        const prov = req?.provisionedRackKw ? req.provisionedRackKw(key) : null;
+        const src = (rzData() as any)?.sources?.['requirements.archProfiles']?.source ?? null;
+        return {
+            key,
+            label: p.label,
+            rackKwNominal: p.rackKwNominal,
+            rackKwPeak: p.rackKwPeak ?? p.rackKwNominal,
+            provisionedRackKw: prov ?? p.rackKwPeak ?? p.rackKwNominal,
+            gpuCount: p.gpuCount ?? null,
+            cooling: p.cooling,
+            tierFloor: p.tierFloor ?? 3,
+            confidence: (p.confidence === 'analyst' ? 'analyst' : 'official'),
+            coolingKitUsdPerRack: p.coolingKitUsdPerRack ?? null,
+            roadmapKw: p.roadmapKw ?? null,
+            ref: p.ref ?? '',
+            source: src,
+        };
+    } catch { return null; }
+}
+
+/** Provisioned (peak/EDPp) rack kW for an arch key — 0-safe (CapexEngine consumer). */
+export function provisionedRackKwFor(key: ArchKey): number {
+    try {
+        const req = (rzModels() as any)?.requirements;
+        return (req?.provisionedRackKw ? req.provisionedRackKw(key) : 0) || 0;
+    } catch { return 0; }
+}
+
+/** Marginal power-chain provisioning uplift for an arch key — 1.0-safe. */
+export function powerUpliftFor(key: ArchKey): number {
+    try {
+        const req = (rzModels() as any)?.requirements;
+        const u = req?.powerProvisionUplift ? req.powerProvisionUplift(key) : 1.0;
+        return u && u > 0 ? u : 1.0;
+    } catch { return 1.0; }
+}
+
+/** Interconnect fabric cost for a GPU count (analyst estimate) — 0-safe. */
+export function interconnectCostFor(fabric: 'infiniband' | 'ethernet', gpuCount: number): number {
+    try {
+        const req = (rzModels() as any)?.requirements;
+        return (req?.interconnectCost ? req.interconnectCost(fabric, gpuCount) : 0) || 0;
+    } catch { return 0; }
+}
+
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
+/** Auto-apply an AI reference architecture (mirrors applyUseCaseProfile):
+ *  shared rack density = rackKwNominal (density UI shows nameplate, NOT peak),
+ *  cooling from the profile, tier-floor bump if current tier is lower, and
+ *  records archKey on the requirements workload + capex stores. Returns a human
+ *  summary for the toast. Passing null clears the arch selection. */
+export function applyArchProfile(key: ArchKey | null): string {
+    if (key == null) {
+        useRequirementsStore.getState().actions.setWorkload({ archKey: null });
+        useCapexStore.getState().setInputs({ archKey: undefined });
+        return 'Reference architecture cleared';
+    }
+    const p = archProfileLive(key);
+    // Record the arch key on both stores regardless (capex uplift keys off it).
+    useRequirementsStore.getState().actions.setWorkload({ archKey: key });
+    useCapexStore.getState().setInputs({ archKey: key });
+    if (!p) return `${key} selected`;
+
+    const parts: string[] = [];
+    writeSharedRackDensity(p.rackKwNominal);
+    parts.push(`${p.rackKwNominal} kW/rack nominal`);
+    const coolKey = (p.cooling === 'liquid' || p.cooling === 'dlc') ? 'liquid'
+        : p.cooling === 'rdhx' ? 'rdhx' : p.cooling === 'inrow' ? 'inrow' : 'air';
+    writeSharedCooling(coolKey as 'air' | 'inrow' | 'rdhx' | 'liquid');
+    parts.push(coolKey === 'liquid' ? 'D2C liquid' : coolKey);
+    const curTier = useSimulationStore.getState().inputs.tierLevel;
+    if (p.tierFloor > curTier) {
+        useSimulationStore.getState().actions.setTierLevel(p.tierFloor as 2 | 3 | 4);
+        parts.push(`Tier ≥${p.tierFloor}`);
+    }
+    parts.push(`${p.provisionedRackKw} kW/rack peak provisioned`);
+    if (p.confidence === 'analyst') parts.push('analyst estimate');
+    return `${p.label}: ${parts.join(' · ')}`;
 }

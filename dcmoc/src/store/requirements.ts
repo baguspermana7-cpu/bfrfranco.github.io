@@ -10,6 +10,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { registerReqProvider, sanitizeNum } from '@/state/registry';
 import { useSettingsStore } from '@/store/settings';
+import type { ArchKey } from '@/lib/requirementsMappings';
 
 export type SiteStatus = 'not_started' | 'identified' | 'shortlisted' | 'secured';
 export type Industry = 'csp' | 'colo_provider' | 'enterprise' | 'government' | 'telecom' | 'financial';
@@ -53,6 +54,8 @@ export interface ReqWorkload {
     totalRacksOverride: number | null;
     /** Owner: mix is predefined from the use-case profile; sliders unlock via this tick. */
     mixManual: boolean;
+    /** Ship-A: selected AI reference architecture (engine archProfiles key). null = none. */
+    archKey: ArchKey | null;
 }
 
 export interface ReqGrowth {
@@ -109,6 +112,7 @@ const DEFAULTS: Omit<RequirementsState, 'actions'> = {
         workloadMix: { aiGpu: 70, storage: 15, general: 10, network: 5 },
         aiChipType: 'h100',
         totalRacksOverride: null, mixManual: false,
+        archKey: null,
     },
     growth: {
         growthType: 'linear',

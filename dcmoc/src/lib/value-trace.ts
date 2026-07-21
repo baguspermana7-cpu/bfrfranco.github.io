@@ -2010,3 +2010,37 @@ Object.assign(TRACE, {
 TRACE_IDS.push('calib.pueLiquidPctile', 'calib.capexRatioFinance');
 
 import { computeCalibration } from '@/lib/calibration';
+
+/* ═══ SHIP-A wave (append-bottom) — AI reference-architecture provisioning ═════
+ * Two nodes trace the arch-driven power-provisioning path. Both read the selected
+ * arch key from the requirements workload (single source; the capex store mirrors
+ * it). get() delegates to the shared engine models.requirements.* — no local
+ * economic constant. Kept acyclic: provisionedRackKw is an engine leaf;
+ * provisionedPowerUplift derives from it + capex.total + sim.itLoad. */
+Object.assign(TRACE, {
+    'req.provisionedRackKw': {
+        label: 'Provisioned Rack kW (peak/EDPp) — AI reference architecture', page: 'requirements', unit: 'kW/rack', provenance: 'engine',
+        formulaTemplate: 'models.requirements.provisionedRackKw(archKey) — rackKwPeak (EDPp), or rackKwNominal × DATA.requirements.peakProvisionFactor (1.5) when peak is unpublished; the power plant is sized to peak, not nominal',
+        sourceKey: 'requirements.archProfiles',
+        get: () => {
+            const key = req().workload.archKey;
+            if (!key) return null;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const m = (rzModels() as any)?.requirements;
+            return m?.provisionedRackKw ? (m.provisionedRackKw(key) ?? null) : null;
+        },
+    },
+    'capex.provisionedPowerUplift': {
+        label: 'Power-Plant Provisioning Uplift (electrical+UPS+gen)', page: 'capex', unit: 'x', provenance: 'derived',
+        formulaTemplate: 'models.requirements.powerProvisionUplift(archKey) = (req.provisionedRackKw ÷ rackKwNominal) ÷ DATA.requirements.baselinePeakRatio (1.2), floored at 1.0 — MARGINAL multiplier applied ONLY to the electrical/UPS/generator base $/kW (the CPU-era base already prices ~1.2× headroom, so raw peak/nominal would double-count)',
+        deps: ['req.provisionedRackKw', 'capex.total', 'sim.itLoad'],
+        get: () => {
+            const key = req().workload.archKey;
+            if (!key) return null;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const m = (rzModels() as any)?.requirements;
+            return m?.powerProvisionUplift ? (m.powerProvisionUplift(key) ?? null) : null;
+        },
+    },
+} satisfies Record<string, TraceNode>);
+TRACE_IDS.push('req.provisionedRackKw', 'capex.provisionedPowerUplift');

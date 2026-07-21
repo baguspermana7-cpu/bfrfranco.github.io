@@ -3,8 +3,8 @@
  "note": "AUTO-GENERATED from rz-engine.js — do not hand-edit. Consumers are grep-derived from real usage.",
  "dataVersion": "2.5.1",
  "modelCount": 49,
- "functionCount": 200,
- "sourceCount": 106,
+ "functionCount": 204,
+ "sourceCount": 109,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -1226,6 +1226,12 @@
    "name": "requirements",
    "functions": [
     {
+     "name": "archProfile",
+     "params": [
+      "key"
+     ]
+    },
+    {
      "name": "completeness",
      "params": [
       "intake"
@@ -1238,9 +1244,28 @@
      ]
     },
     {
+     "name": "interconnectCost",
+     "params": [
+      "fabric",
+      "gpuCount"
+     ]
+    },
+    {
+     "name": "powerProvisionUplift",
+     "params": [
+      "key"
+     ]
+    },
+    {
      "name": "profile",
      "params": [
       "useCase"
+     ]
+    },
+    {
+     "name": "provisionedRackKw",
+     "params": [
+      "key"
      ]
     },
     {
@@ -1260,7 +1285,9 @@
    "consumers": [
     "dcmoc/src/components/modules/PlatformDashboards.tsx",
     "dcmoc/src/components/modules/requirements/sections/SummarySection.tsx",
-    "dcmoc/src/components/modules/requirements/useRequirementsDerived.ts"
+    "dcmoc/src/components/modules/requirements/useRequirementsDerived.ts",
+    "dcmoc/src/lib/CapexEngine.ts",
+    "dcmoc/src/lib/value-trace.ts"
    ]
   },
   {
@@ -2294,8 +2321,23 @@
    "method": "completeness + profile defaults; not a design basis"
   },
   {
+   "key": "requirements.archProfiles",
+   "source": "OFFICIAL where confidence=official (NVIDIA GB200/GB300 NVL72 reference architectures + DGX H100 SuperPOD RA + OCP ORV3 HPR spec) — rackKw nominal/TDP/peak(EDPp ~1.5x); ANALYST for rubin_vr200 (NVIDIA has NOT published Rubin rack-kW; only NVLink6/45C warm-water DLC/800VDC are official — kW is analyst 190-230 est). IT/GPU hardware cost EXCLUDED from capex.",
+   "asOf": "2026-07"
+  },
+  {
+   "key": "requirements.baselinePeakRatio",
+   "source": "ANALYST — CPU-era enterprise DC power-chain design headroom (sustained peak ≈ 1.2× nominal/design IT) already embedded in the T&T/C&W/JLL 2025 base $/kW; used to make the AI-rack power-provisioning uplift MARGINAL (peak÷nominal ÷ this), preventing double-count.",
+   "asOf": "2026-07"
+  },
+  {
    "key": "requirements.coolingMaxRackKw",
    "source": "ASHRAE TC9.9 5th Ed. 2021 (air ~20-25 kW/rack limit; H1-H3 liquid envelopes); NVIDIA GB200 NVL72 132 kW observed; OCP High Power Rack 92 kW+ (Meta/Rittal OCP Summit 2024); IEA 4E Liquid Cooling in Data Centres 2026",
+   "asOf": "2025"
+  },
+  {
+   "key": "requirements.interconnect",
+   "source": "ANALYST — SemiAnalysis 512-GPU cluster: InfiniBand NDR ~$2.5M vs 400/800G Ethernet ~$1.3M; per-GPU derived (÷512). Not vendor list price; optional labeled capex line, off by default.",
    "asOf": "2025"
   },
   {

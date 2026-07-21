@@ -215,3 +215,11 @@ export const permitRegionMult: Record<string, { permits: number; testing: number
 };
 
 export const testingRedundancyMult: Record<string, number> = { n: 0.7, n1: 1.0, '2n': 1.5, '2n1': 1.8 };
+
+/* ─── Ship-A — cosmetic breakdown meta for arch-driven cost lines ──────────────
+ * LOCAL cosmetic only (label/icon/color for the CAPEX breakdown UI). The dollar
+ * VALUE comes from the shared engine (coolingKitUsdPerRack × racks). Matches the
+ * costFactors {label,icon,color} shape so the dashboard can render it uniformly. */
+export const archExtraCostMeta: Record<string, { label: string; icon: string; color: string }> = {
+    coolingKit: { label: 'AI Cooling Kit', icon: 'droplets', color: '#0ea5e9' },
+};

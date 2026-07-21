@@ -9,7 +9,9 @@
  * explicitly NOT merged), cityData, CountryProfile constructionIndex,
  * locationMultipliers, permitRegionMult, testingRedundancyMult.
  * ──────────────────────────────────────────────────────────────────────── */
-import { rzData } from './rz-engine';
+import { rzData, rzModels } from './rz-engine';
+import type { ArchKey } from './requirementsMappings';
+import { archExtraCostMeta } from './capex-data';
 import {
     costFactors,
     redundancyMultipliers,
@@ -78,6 +80,19 @@ export interface CapexInput {
     dsDeltaTC?: number;                 // loop ΔT (°C)
     renewSolarMwp?: number;             // on-site solar sizing
     renewBessMwh?: number;              // BESS sizing
+    /* Ship-A — selected AI reference architecture (engine archProfiles key).
+     * Drives a MARGINAL power-provisioning uplift on electrical/UPS/generator
+     * (peak-sized power plant) + an optional GB300 cooling-kit line + interconnect
+     * estimates. Consumed via the shared engine (models.requirements.*). */
+    archKey?: ArchKey;
+}
+
+/** Ship-A — analyst interconnect fabric estimates, EXCLUDED from the infra total. */
+export interface CapexInterconnect {
+    infiniband: number;
+    ethernet: number;
+    gpuCount: number;
+    note: string;
 }
 
 export interface CapexResult {
@@ -99,6 +114,8 @@ export interface CapexResult {
         subPhases: { parent: string; name: string; start: number; end: number; color: string }[];
         totalMonths: number;
     };
+    /** Ship-A — analyst interconnect estimates (EXCLUDED from `total` and `costs`). */
+    interconnect?: CapexInterconnect;
 }
 
 export const calculateCapex = (input: CapexInput): CapexResult => {
@@ -106,8 +123,18 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
         itLoad, location, country, cityMarket, buildingType, coolingType, redundancy,
         rackType, upsType, genType, fuelHours, fireType, alarmType,
         projYear, designFee, pmFee, contingency, includeFOM,
-        substationType, utilityRate, greenCert, renewableOption
+        substationType, utilityRate, greenCert, renewableOption, archKey
     } = input;
+
+    /* Ship-A — arch-aware MARGINAL power-provisioning uplift (electrical/UPS/gen
+     * only). The engine's powerProvisionUplift already divides peak/nominal by
+     * baselinePeakRatio (~1.2×) so the CPU-era headroom priced into the base
+     * $/kW is not double-counted. Returns 1.0 (no-op) when arch is absent. */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const reqModel = (rzModels() as any)?.requirements;
+    const powerUplift: number = archKey && reqModel?.powerProvisionUplift
+        ? (reqModel.powerProvisionUplift(archKey) || 1.0)
+        : 1.0;
 
     // 1. Determine Base Multipliers — engine DATA.capexDetail tables first
     // (same names), locals from capex-data.ts as fallback (see header note).
@@ -164,9 +191,9 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
 
         if (key === 'building') multiplier *= buildMult * rackMult;
         else if (key === 'seismic') multiplier *= seismicMult * buildMult;
-        else if (key === 'electrical') multiplier *= redMult * rackMult * upsMult;
-        else if (key === 'ups') multiplier *= redMult * rackMult * upsMult;
-        else if (key === 'generator') multiplier *= redMult * fuelMult * genMult;
+        else if (key === 'electrical') multiplier *= redMult * rackMult * upsMult * powerUplift;
+        else if (key === 'ups') multiplier *= redMult * rackMult * upsMult * powerUplift;
+        else if (key === 'generator') multiplier *= redMult * fuelMult * genMult * powerUplift;
         else if (key === 'cooling') multiplier *= coolMult * rackMult;
         else if (key === 'fireSuppression') multiplier *= fireSupMult;
         else if (key === 'fireAlarm') multiplier *= alarmMult;
@@ -186,6 +213,18 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
 
     // Fixed Costs (PDU, Cabling - Simplified for MVP)
     const racks = Math.ceil(itLoad / (rackType === 'standard' ? 6 : rackType === 'medium' ? 12.5 : rackType === 'high' ? 25 : 75));
+
+    /* Ship-A — GB300 (any arch carrying coolingKitUsdPerRack) adds a real infra
+     * cooling-kit line = coolingKitUsdPerRack × racks INTO costs + total. */
+    if (archKey) {
+        const archProfile = reqModel?.archProfile ? reqModel.archProfile(archKey) : null;
+        const kitPerRack: number = archProfile?.coolingKitUsdPerRack ?? 0;
+        if (kitPerRack > 0) {
+            const kitCost = kitPerRack * racks;
+            costs.coolingKit = kitCost;
+            totalHardCost += kitCost;
+        }
+    }
 
     // 3. Soft Costs
     const softCosts: { design?: number; pm?: number } = {};
@@ -233,6 +272,23 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
     // Compute Timeline
     const timeline = computeTimeline(redundancy, buildingType, coolingType, effectiveRegion);
 
+    /* Ship-A — interconnect fabric estimates (ANALYST). Returned as a SEPARATE
+     * field, EXCLUDED from `total` and `costs` (not vendor list price; the IT
+     * hardware fabric is out of the infrastructure CAPEX scope). */
+    let interconnect: CapexInterconnect | undefined;
+    if (archKey) {
+        const archProfile = reqModel?.archProfile ? reqModel.archProfile(archKey) : null;
+        const gpuCount: number = archProfile?.gpuCount ?? 0;
+        if (gpuCount > 0 && reqModel?.interconnectCost) {
+            interconnect = {
+                infiniband: reqModel.interconnectCost('infiniband', gpuCount) || 0,
+                ethernet: reqModel.interconnectCost('ethernet', gpuCount) || 0,
+                gpuCount,
+                note: 'ANALYST estimate · not vendor list · excluded from infra total',
+            };
+        }
+    }
+
     return {
         total: currentTotal,
         costs,
@@ -247,7 +303,8 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
             racks,
             timelineMonths: timeline.totalMonths
         },
-        timeline
+        timeline,
+        interconnect
     };
 };
 

@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.100.0 — 2026-07-21 (DCMOC CAPEX Ship-A: AI reference-architecture profiles + peak-provisioning)
+
+### Added
+- **RZEngine `DATA.requirements.archProfiles`** — 5 AI reference architectures ber-sumber + confidence-tagged: NVIDIA H100 SuperPOD (~30/45kW air, OFFICIAL), GB200 NVL72 (120 nominal / 132 TDP OFFICIAL / 192 peak = EDPp ANALYST est ~1.5×, liquid), GB300 NVL72 (140/192, cooling-kit ~$50k/rack = Morgan Stanley BOM ANALYST, hybrid), Vera Rubin VR200 NVL72 (~200/300kW, **ANALYST** — NVIDIA belum publish rack-kW), OCP ORV3 HPR (92-140kW→roadmap 750/1MW, OFFICIAL). Plus `peakProvisionFactor:1.5`, `baselinePeakRatio:1.2`, `interconnect` (IB $4900 / Ethernet $2600 per GPU, ANALYST — SemiAnalysis 512-GPU cluster ÷512). Model fns `models.requirements.archProfile / provisionedRackKw / powerProvisionUplift / interconnectCost`. Semua leaf punya `DATA.sources` entry dgn confidence tag di string. Fact-checked vs NVIDIA RA / OCP spec / SemiAnalysis / Morgan Stanley — semua angka firm + label jujur.
+- **DCMOC Reference-Architecture picker** (WorkloadProfileSection) — pilih arsitektur AI mutakhir; tiap opsi tampil peak/nominal kW + GPU + cooling + Tier-floor + confidence chip (emerald OFFICIAL / amber ANALYST + sub-note "estimasi analis, bukan datasheet vendor"). `applyArchProfile` set density=nominal + cooling + tier-floor bump, mirror `applyUseCaseProfile`. Store additive `archKey` (default null).
+- **CapexEngine peak-provisioning** — arch terpilih menerapkan **MARGINAL** power-plant uplift (`powerProvisionUplift = (peak/nominal) ÷ baselinePeakRatio 1.2`, floored 1.0) HANYA di electrical/UPS/generator (bukan raw peak/nominal — CPU-era base $/kW sudah harga ~1.2× headroom via NEC 125% + Google power-provisioning literature, jadi raw ratio = double-count). GB200 → ×1.333. GB300 tambah cooling-kit line ($50k×rack) ke total. Interconnect IB/Ethernet = field terpisah, EXCLUDED dari infra total (fabric IT di luar scope CAPEX). 2 value-trace node baru (`req.provisionedRackKw`, `capex.provisionedPowerUplift`).
+
+### Verified
+- engine 633/0 · parity 155/0 · calibration 19/0 · bindings 85/0 (catalog 204fn/109src current) · dc-corpus 2678/0 · trace-parity 117/117 · walk 24/0 · synergy 6/0 · export 44/0 · tsc 0 + next build clean · js-syntax/script-tags/dark CLEAN. GB200 sample (2500kW liquid 2N ai-rack): electrical/ups/gen ×1.333 tepat, total $49.35M→$59.02M (+19.6%, wajar utk 2N high-density; jauh di bawah ~60% kalau raw 1.6× disebar). Adversarial source fact-check: 6/6 angka firm, label jujur, premis EDPp+baseline-headroom valid.
+
 ## v1.99.11 — 2026-07-21 (hero blur-letterbox: print-safe + doc align)
 
 ### Changed

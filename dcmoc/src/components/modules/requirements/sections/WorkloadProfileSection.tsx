@@ -8,6 +8,7 @@ import { useRequirementsStore, normalizeMix } from '@/store/requirements';
 import {
     writeSharedItLoad, writeSharedCooling, writeSharedRackDensity, COOLING_UI,
     USE_CASE_LABELS, MIX_PRESETS, applyUseCaseProfile, engineProfileFor, effectiveTotalRacks,
+    ARCH_UI, archProfileLive, applyArchProfile, type ArchKey,
 } from '@/lib/requirementsMappings';
 import { CreatableCombobox, type ComboValue } from '@/components/ui/CreatableCombobox';
 import { SectionCard, Field, Select, Segmented, RadioList, SliderRow, NumInput } from '../ui';
@@ -35,6 +36,70 @@ const USE_CASE_SUBS: Record<UseCase, string> = {
     ai: '~60 kW/rack · liquid', hpc: '~45 kW/rack · RDHx', cloud: '~20 kW/rack · in-row',
     enterprise: '~8 kW/rack · air', network: '~10 kW/rack · air', dr: '~12 kW/rack · in-row',
 };
+
+/* ── Ship-A — rich AI reference-architecture picker (full-width row) ───────────
+ * Each option shows engine-live facts (peak/nominal kW, GPU count, cooling, tier
+ * floor) + a confidence chip. ANALYST options carry a visible datasheet caveat.
+ * Selecting applies the arch profile (density/cooling/tier + archKey). */
+function ArchProfilePicker({ selected, onPick }: { selected: ArchKey | null; onPick: (k: ArchKey | null) => void }) {
+    return (
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/30 p-3">
+            <div className="mb-2 flex items-center justify-between">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Reference Architecture</span>
+                <button
+                    type="button"
+                    onClick={() => onPick(null)}
+                    className={`rounded-md border px-2 py-0.5 text-[10px] font-medium transition ${selected == null
+                        ? 'border-violet-400 bg-violet-500/10 text-violet-600 dark:text-violet-300'
+                        : 'border-slate-300 dark:border-slate-700 text-slate-500 hover:border-violet-400'}`}
+                >
+                    None
+                </button>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {ARCH_UI.map((a) => {
+                    const live = archProfileLive(a.key);
+                    const isSel = selected === a.key;
+                    const analyst = a.confidence === 'analyst';
+                    return (
+                        <button
+                            key={a.key}
+                            type="button"
+                            onClick={() => onPick(a.key)}
+                            title={live?.ref || a.blurb}
+                            className={`flex flex-col items-start gap-1 rounded-lg border p-2.5 text-left transition ${isSel
+                                ? 'border-violet-500 bg-violet-500/10 ring-1 ring-violet-500/40'
+                                : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:border-violet-400'}`}
+                        >
+                            <div className="flex w-full items-start justify-between gap-1.5">
+                                <span className="text-[11px] font-semibold leading-tight text-slate-800 dark:text-slate-100">{a.label}</span>
+                                <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide ${analyst
+                                    ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+                                    : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'}`}>
+                                    {analyst ? 'Analyst' : 'Official'}
+                                </span>
+                            </div>
+                            {live ? (
+                                <div className="text-[9px] leading-relaxed text-slate-500 dark:text-slate-400">
+                                    <span className="font-semibold tabular-nums text-slate-700 dark:text-slate-200">{live.rackKwPeak}</span> peak /{' '}
+                                    <span className="tabular-nums">{live.rackKwNominal}</span> kW nominal
+                                    {live.gpuCount != null && <> · {live.gpuCount} GPU</>}
+                                    <br />
+                                    {live.cooling} · Tier ≥{live.tierFloor}
+                                </div>
+                            ) : (
+                                <div className="text-[9px] leading-relaxed text-slate-500 dark:text-slate-400">{a.blurb}</div>
+                            )}
+                            {analyst && (
+                                <span className="text-[8px] italic leading-tight text-amber-600/90 dark:text-amber-400/90">estimasi analis — bukan datasheet vendor</span>
+                            )}
+                        </button>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
 
 export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
     const inputs = useSimulationStore((s) => s.inputs);
@@ -70,6 +135,12 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
         window.setTimeout(() => setToast(null), 6000);
     };
 
+    const pickArch = (k: ArchKey | null) => {
+        const summary = applyArchProfile(k);
+        setToast(k == null ? summary : `Reference architecture applied — ${summary}`);
+        window.setTimeout(() => setToast(null), 6000);
+    };
+
     return (
         <SectionCard num="1.2" title="Workload Profile" caption="Define the type and characteristics of IT workload" id="sec-workload">
             {toast && (
@@ -77,6 +148,9 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                     {toast}
                 </div>
             )}
+            <div className="mb-4">
+                <ArchProfilePicker selected={w.archKey} onPick={pickArch} />
+            </div>
             <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-3">
                     <Field label="IT Workload / Use Case" required explainKey="workload" hint="Single source — picking a category auto-applies the engine profile (density, cooling, tier floor, mix)">

@@ -1253,6 +1253,33 @@ if (M.opex && M.opex.totalAnnual) {
     ok('opex basisPresets provenance', !!D.sources['opex.basisPresets']);
 }
 
+/* ── Ship-A AI architecture profiles ── */
+{
+    const rq = D.requirements;
+    ok('archProfiles present (5)', rq.archProfiles && Object.keys(rq.archProfiles).length === 5);
+    ok('archProfiles keys stable', Object.keys(rq.archProfiles).join(',') === 'h100_pod,gb200_nvl72,gb300_nvl72,rubin_vr200,ocp_hpr');
+    for (const [k, a] of Object.entries(rq.archProfiles)) {
+        ok(`arch ${k}: peak >= nominal`, (a.rackKwPeak ?? a.rackKwNominal) >= a.rackKwNominal);
+        ok(`arch ${k}: confidence valid`, a.confidence === 'official' || a.confidence === 'analyst');
+        ok(`arch ${k}: has ref`, typeof a.ref === 'string' && a.ref.length > 10);
+    }
+    ok('provisionedRackKw(gb200)=192', M.requirements.provisionedRackKw('gb200_nvl72') === 192);
+    ok('provisionedRackKw uses peakFactor fallback', rq.peakProvisionFactor === 1.5);
+    ok('rubin flagged analyst (not datasheet)', rq.archProfiles.rubin_vr200.confidence === 'analyst');
+    ok('archProfiles sourced', !!D.sources['requirements.archProfiles']);
+    ok('interconnect sourced + analyst', !!D.sources['requirements.interconnect'] && rq.interconnect.infiniband.confidence === 'analyst');
+    ok('interconnectCost IB 72gpu', M.requirements.interconnectCost('infiniband', 72) === 352800);
+    /* power-provisioning uplift: MARGINAL (peak/nominal ÷ baseline 1.2), floored at 1.0 */
+    ok('baselinePeakRatio present + sourced', rq.baselinePeakRatio === 1.2 && !!D.sources['requirements.baselinePeakRatio']);
+    ok('powerProvisionUplift(gb200)=1.6/1.2≈1.333', Math.abs(M.requirements.powerProvisionUplift('gb200_nvl72') - (192 / 120 / 1.2)) < 1e-9);
+    ok('powerProvisionUplift never a discount (ocp_hpr 140/120<baseline → 1.0)', M.requirements.powerProvisionUplift('ocp_hpr') === 1.0);
+    ok('powerProvisionUplift(null)=1.0 no-op', M.requirements.powerProvisionUplift(null) === 1.0 && M.requirements.powerProvisionUplift('nope') === 1.0);
+    ok('powerProvisionUplift(gb300) marginal < raw ratio', M.requirements.powerProvisionUplift('gb300_nvl72') < (192 / 140) && M.requirements.powerProvisionUplift('gb300_nvl72') > 1.0);
+    /* validate: gb200 arch density + air = critical physics flag */
+    const v = M.requirements.validate({ useCase: 'ai', rackKw: 120, coolingType: 'air', itLoadKw: 2500 });
+    ok('validate flags 120kW on air as critical', v.flags.some(f => f.level === 'critical' && f.field === 'coolingType'));
+}
+
 /* ── Arc-1 calibrationSpec structural ── */
 {
     const cs = D.calibrationSpec;
