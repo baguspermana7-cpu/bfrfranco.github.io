@@ -87,12 +87,19 @@
             immersionTier3:    1.04
         },
         pueMatrix: {
-            /* inrow/rdhx rows added v2.3.0 so capex-calculator + DCMOC granularity is engine-owned */
-            inrow:     { tier2: 1.34, tier3: 1.27, tier4: 1.22 },
-            rdhx:      { tier2: 1.24, tier3: 1.18, tier4: 1.14 },
-            air:       { tier2: 1.62, tier3: 1.50, tier4: 1.44 },
-            liquid:    { tier2: 1.22, tier3: 1.15, tier4: 1.10 },
-            immersion: { tier2: 1.07, tier3: 1.04, tier4: 1.03 }
+            /* inrow/rdhx rows added v2.3.0 so capex-calculator + DCMOC granularity is engine-owned.
+             * v2.5.2 (Ship-B cooling ladder): immersion split into 1φ/2φ + microfluidic EMERGING.
+             * `immersion` kept as backward-compat alias (≈ immersion_1p). Monotonic ladder:
+             * air > inrow > rdhx > liquid > immersion_1p > immersion_2p; microfluidic (EMERGING,
+             * in-chip) sits ~immersion_2p — no production PUE published, modelled at DLC+free-cool. */
+            inrow:        { tier2: 1.34, tier3: 1.27, tier4: 1.22 },
+            rdhx:         { tier2: 1.24, tier3: 1.18, tier4: 1.14 },
+            air:          { tier2: 1.62, tier3: 1.50, tier4: 1.44 },
+            liquid:       { tier2: 1.22, tier3: 1.15, tier4: 1.10 },
+            immersion:    { tier2: 1.07, tier3: 1.04, tier4: 1.03 },
+            immersion_1p: { tier2: 1.07, tier3: 1.04, tier4: 1.03 },
+            immersion_2p: { tier2: 1.05, tier3: 1.03, tier4: 1.02 },
+            microfluidic: { tier2: 1.06, tier3: 1.03, tier4: 1.02 }
         },
 
         // Capex per-MW build cost (USD, raw build excluding land/IT), refreshed 2026.
@@ -5271,7 +5278,7 @@
                 security: 80, commissioning: 120, testing: 90, permits: 60
             },
             redundancyMult: { n: 1.0, n1: 1.25, '2n': 1.85, '2n1': 2.1 },
-            coolingMult: { air: 1.0, inrow: 1.2, rdhx: 1.35, liquid: 1.6 },
+            coolingMult: { air: 1.0, inrow: 1.2, rdhx: 1.35, liquid: 1.6, immersion_1p: 1.8, immersion_2p: 2.0, microfluidic: 2.2 },
             rackMult: { standard: 1.0, medium: 1.1, high: 1.3, ai: 1.9 },
             rackKw: { standard: 6, medium: 12.5, high: 25, ai: 75 },
             buildingMult: { warehouse: 0.7, modular: 0.85, purpose: 1.0, highrise: 1.4 },
@@ -5488,6 +5495,24 @@
         refrigerantBaseline: 'R134a',
         refrigerantAutoByCooling: { air: 'R410A', inrow: 'R410A', rdhx: 'R134a', liquid: null, deepsea: 'R1234ze' },
         chillerBaseCopWaterCooled: 6.5,
+
+        /* ══ v2.5.2 (Ship-B) — DATA.coolingTech: advanced/emerging cooling vendor +
+         * technology-readiness database. Honesty regime: confidence 'commercial'
+         * = TRL 8-9, shipping in production DCs today; 'emerging' = TRL 5-7,
+         * pilot/lab/research — NEVER surfaced as a deployable datasheet, and
+         * microfluidic in-chip is NOT encoded as any NVIDIA architecture fact
+         * (official Rubin roadmap = warm-water DLC + 800 VDC). rackKwClaim = the
+         * per-rack heat-rejection the tech can serve (screening). No public per-
+         * rack CAPEX exists for microfluidic → capex multiplier is SCREENING-only
+         * (capexDetail.coolingMult.microfluidic). ══ */
+        coolingTech: {
+            dlc_coldplate:  { vendor: 'CoolIT Systems',   tech: 'Direct-to-chip cold plate (DLC)',        family: 'dlc',        trl: 9, rackKwClaim: 120, coolant: 'water/PG (single-phase)',   wueBasis: 'facility water at CDU, low direct', confidence: 'commercial', ref: 'Coldplate + row/rack CDU manifolds; shipping in GB200 NVL72 deployments', source: 'coolingTech' },
+            dlc_microconv:  { vendor: 'JetCool (Flex)',    tech: 'Microconvective direct-to-chip (SmartPlate/SmartRack)', family: 'dlc', trl: 8, rackKwClaim: 100, coolant: 'water/PG (single-phase)', wueBasis: 'closed-loop, low', confidence: 'commercial', ref: 'Targeted microjet impingement on die; commercial modules', source: 'coolingTech' },
+            dlc_2p_waterless:{ vendor: 'ZutaCore',         tech: 'Two-phase waterless direct-to-chip (HyperCool)', family: 'dlc_2p', trl: 8, rackKwClaim: 100, coolant: 'dielectric (2-phase)',   wueBasis: 'waterless loop, ~0 direct WUE', confidence: 'commercial', ref: 'Evaporative dielectric on cold plate; no facility water at rack', source: 'coolingTech' },
+            immersion_1p:   { vendor: 'GRC / Submer',      tech: 'Single-phase immersion (ElectroSafe / SmartPod)', family: 'immersion_1p', trl: 9, rackKwClaim: 200, coolant: 'dielectric oil (single-phase)', wueBasis: 'waterless tank, near-zero WUE', confidence: 'commercial', ref: 'Tank immersion, production at scale (GRC, Submer, Iceotope chassis)', source: 'coolingTech' },
+            immersion_2p:   { vendor: 'LiquidStack',       tech: 'Two-phase immersion (DataTank)',          family: 'immersion_2p', trl: 7, rackKwClaim: 200, coolant: 'fluorocarbon dielectric (2-phase)', wueBasis: 'waterless, near-zero WUE', confidence: 'emerging',   ref: 'Best-in-class PUE but PFAS/F-gas regulatory pressure on 2φ fluids has slowed rollout', source: 'coolingTech' },
+            microfluidic:   { vendor: 'Corintis / TSMC / IMEC / IBM', tech: 'In-chip microfluidic (silicon microchannels / impinging jet)', family: 'microfluidic', trl: 6, rackKwClaim: 250, coolant: 'water/dielectric in-die microchannels', wueBasis: 'research — no production basis', confidence: 'emerging', ref: 'PILOT/RESEARCH TRL~6-7: Corintis (EPFL, Microsoft-validated in-chip), TSMC DSLC silicon microchannels, IMEC impinging-jet >600 W/cm², IBM pioneer. Enabler for >200kW→1MW racks (~2027-28). NO public per-rack price. NOT an NVIDIA architecture fact.', source: 'coolingTech' }
+        },
 
         /* ══ v2.3.0 — DATA.energy: screening-grade on-site renewables + BESS module.
          * Answers 'BESS/solar/wind: engine ini atau terpisah?' → INSIDE RZEngine (one
@@ -6756,7 +6781,7 @@
             /* v2.5.0 research pass — max sustainable rack density by cooling type.
              * Air is physically limited ~20-25 kW/rack (ASHRAE TC9.9 5th ed. 2021);
              * liquid unlocks GB200-class 120-132 kW; immersion higher still. */
-            coolingMaxRackKw: { air: 20, inrow: 30, rdhx: 50, liquid: 132, immersion: 200 },
+            coolingMaxRackKw: { air: 20, inrow: 30, rdhx: 50, liquid: 132, immersion: 200, immersion_1p: 200, immersion_2p: 200, microfluidic: 250 },
             densityBands: [
                 { minKw: 80, band: 'Extreme', coolingMandatory: 'liquid' },
                 { minKw: 40, band: 'High', coolingRecommended: 'liquid' },
@@ -6962,6 +6987,7 @@
             'capexDetail': { source: 'Turner & Townsend DCCI 2025 + Cushman & Wakefield DC Cost Guide 2025 (city $/W anchor table) + JLL 2026 escalation; category factors calibrated to the anchor (locMult = perW/4.65) — lineage: capex-calculator inline model, lifted v2.3.0', asOf: '2025', method: 'budgetary estimate-grade; NOT detailed engineering' },
             'capexDetail.costFactors.electrical': { source: 'calculator lineage 1200 $/kW (DCMOC A7 2025 used 1550 for a different model shape — NOT merged; engine detailed model is the shared source from v2.3.0)', asOf: '2025', unit: '$/kW IT' },
             'deepSeaCooling': { source: 'Design basis: 150 MW AI DC deep-sea cooling reference architecture (owner, 2026) — chiller-less primary + hybrid trim backup; seawater properties: TEOS-10/IOC tables at S=35, 5 °C; intake-temp bands: NOAA World Ocean Atlas typical tropical/subtropical profiles; SWAC cost scaling: Makai Ocean Engineering SWAC studies + Hawaii/InterContinental SWAC projects (public figures), HDPE marine pipeline install multipliers 2.5-4x onshore', asOf: '2026', method: 'poster mode reproduces the reference (cp 4.0, rho 1000): 172.5 MW / (4.0*5) = 8.625 m3/s = 31,050 m3/h, 4+1 pumps 2.9 m3/s @ 60 m ≈ 2.0 MW each; accurate mode uses rho 1025 / cp 3985' },
+            'coolingTech': { source: 'Vendor datasheets + OCP/press for COMMERCIAL (CoolIT/JetCool/ZutaCore/GRC/Submer/Iceotope — TRL 8-9, shipping); research disclosures for EMERGING (Corintis EPFL+Microsoft in-chip validation 2024-25, TSMC DSLC, IMEC impinging-jet >600 W/cm², IBM microfluidic — TRL 5-7 pilot/lab). rackKwClaim + PUE ladder = screening; NO public per-rack CAPEX for microfluidic (multiplier SCREENING-only). Microfluidic is NOT an NVIDIA architecture fact.', asOf: '2026-07', unit: 'per-tech TRL + rack-kW capability + coolant/WUE basis', method: 'technology-readiness classification; commercial=deployable, emerging=pilot/research' },
             'refrigerants': { source: 'GWP100 IPCC AR4 (consistent with sitewide published values); ASHRAE 34 safety classes; copIndex: AHRI/manufacturer typical relative cycle efficiency at water-cooled chiller conditions (R-134a=1.00) — estimate-grade; charge/leak: GHG Protocol + EPA GreenChill typical ranges', asOf: '2026', method: 'copIndex and charge/leak are screening estimates, not equipment selections' },
             'energy': { source: 'Lazard LCOE+ 2025 (solar/wind capex+CF ranges), IRENA Renewable Power Generation Costs 2024 (APAC/ID), BNEF BESS pack+BOS 2026 ~$180/kWh installed', asOf: '2026', method: 'screening-grade; not an interconnection/reliability study' },
             'carbon.offsetPrice': { source: 'Voluntary carbon market 2026 blend (nature-based + engineered mid-range); reconciles DCMOC $45 vs legacy $18', asOf: '2026', unit: '$/tCO2e' },

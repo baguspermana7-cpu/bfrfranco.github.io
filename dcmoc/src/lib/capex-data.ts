@@ -31,7 +31,7 @@ export const costFactors = {
 };
 
 export const redundancyMultipliers: Record<string, number> = { n: 1.0, n1: 1.25, '2n': 1.85, '2n1': 2.1 };
-export const coolingMultipliers: Record<string, number> = { air: 1.0, inrow: 1.2, rdhx: 1.35, liquid: 1.6 };
+export const coolingMultipliers: Record<string, number> = { air: 1.0, inrow: 1.2, rdhx: 1.35, liquid: 1.6, immersion_1p: 1.8, immersion_2p: 2.0, microfluidic: 2.2 };
 export const rackMultipliers: Record<string, number> = { standard: 1.0, medium: 1.1, high: 1.3, ai: 1.6 };
 export const buildingMultipliers: Record<string, number> = { warehouse: 0.7, modular: 0.85, purpose: 1.0, highrise: 1.4 };
 export const seismicMultipliers: Record<string, number> = { zone0: 0.2, zone1: 1.0, zone2: 2.5, zone3: 5.0, zone4: 8.0 };

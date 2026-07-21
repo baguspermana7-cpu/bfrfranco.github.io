@@ -1280,6 +1280,32 @@ if (M.opex && M.opex.totalAnnual) {
     ok('validate flags 120kW on air as critical', v.flags.some(f => f.level === 'critical' && f.field === 'coolingType'));
 }
 
+/* ── Ship-B cooling ladder + microfluidic ── */
+{
+    const ct = D.coolingTech;
+    ok('coolingTech present (6)', ct && Object.keys(ct).length === 6);
+    ok('coolingTech sourced', !!D.sources['coolingTech']);
+    for (const [k, t] of Object.entries(ct)) {
+        ok(`coolingTech ${k}: trl 1-9`, Number.isFinite(t.trl) && t.trl >= 1 && t.trl <= 9);
+        ok(`coolingTech ${k}: confidence commercial|emerging`, t.confidence === 'commercial' || t.confidence === 'emerging');
+        ok(`coolingTech ${k}: rackKwClaim + vendor + ref`, t.rackKwClaim > 0 && !!t.vendor && typeof t.ref === 'string' && t.ref.length > 15);
+    }
+    /* microfluidic must be honest EMERGING research — never a datasheet */
+    ok('microfluidic = emerging + TRL<8', ct.microfluidic.confidence === 'emerging' && ct.microfluidic.trl < 8);
+    ok('microfluidic ref flags research/pilot', /research|pilot|EMERGING|TRL/i.test(ct.microfluidic.ref));
+    ok('2p immersion emerging (PFAS pressure)', ct.immersion_2p.confidence === 'emerging');
+    ok('dlc/1p immersion commercial', ct.dlc_coldplate.confidence === 'commercial' && ct.immersion_1p.confidence === 'commercial');
+    /* PUE ladder monotonic: immersion_2p ≤ immersion_1p ≤ liquid (design-basis tier3) */
+    const pm = D.pueMatrix;
+    ok('pueMatrix ladder immersion_2p ≤ immersion_1p ≤ liquid (t3)', pm.immersion_2p.tier3 <= pm.immersion_1p.tier3 && pm.immersion_1p.tier3 <= pm.liquid.tier3);
+    ok('pueMatrix microfluidic best-in-class (≤ liquid t3)', pm.microfluidic.tier3 <= pm.liquid.tier3);
+    ok('immersion backward-compat alias kept', !!pm.immersion && !!pm.immersion.tier3);
+    /* density ceilings + capex multipliers reachable for new families */
+    const cm = D.requirements.coolingMaxRackKw;
+    ok('coolingMaxRackKw microfluidic=250 highest', cm.microfluidic === 250 && cm.microfluidic >= cm.immersion_1p);
+    ok('capexDetail.coolingMult microfluidic > immersion_2p > immersion_1p > liquid', D.capexDetail.coolingMult.microfluidic > D.capexDetail.coolingMult.immersion_2p && D.capexDetail.coolingMult.immersion_2p > D.capexDetail.coolingMult.immersion_1p && D.capexDetail.coolingMult.immersion_1p > D.capexDetail.coolingMult.liquid);
+}
+
 /* ── Arc-1 calibrationSpec structural ── */
 {
     const cs = D.calibrationSpec;

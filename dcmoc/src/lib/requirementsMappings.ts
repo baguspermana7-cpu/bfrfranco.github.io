@@ -23,12 +23,21 @@ export const USE_CASE_LABELS: Record<UseCase, string> = {
 };
 
 /* Cooling select — sim/capex share the SAME keys (verified capex-data.ts).
- * 'immersion' exists only in engine data → deliberately NOT offered. */
-export const COOLING_UI: { key: 'air' | 'inrow' | 'rdhx' | 'liquid'; label: string; topology: 'in-row' | 'perimeter' | 'dlc' }[] = [
+ * Ship-B: the immersion + microfluidic keys map to real engine rows
+ * (DATA.pueMatrix / requirements.coolingMaxRackKw / capexDetail.coolingMult),
+ * so they compute end-to-end. `emerging` flags the pilot/research techs
+ * (immersion_2p + microfluidic) so the UI can label them advisory. */
+export type CoolingKey = 'air' | 'inrow' | 'rdhx' | 'liquid' | 'immersion_1p' | 'immersion_2p' | 'microfluidic';
+export type CoolingTopology = 'in-row' | 'perimeter' | 'dlc' | 'immersion' | 'in-chip';
+export interface CoolingUiItem { key: CoolingKey; label: string; topology: CoolingTopology; emerging?: boolean }
+export const COOLING_UI: CoolingUiItem[] = [
     { key: 'liquid', label: 'Direct-to-Chip Liquid Cooling', topology: 'dlc' },
     { key: 'rdhx', label: 'Rear-Door Heat Exchanger', topology: 'in-row' },
     { key: 'inrow', label: 'In-Row Cooling', topology: 'in-row' },
     { key: 'air', label: 'Air (CRAC/CRAH)', topology: 'perimeter' },
+    { key: 'immersion_1p', label: 'Single-phase Immersion', topology: 'immersion' },
+    { key: 'immersion_2p', label: 'Two-phase Immersion', topology: 'immersion', emerging: true },
+    { key: 'microfluidic', label: 'Microfluidic (in-chip)', topology: 'in-chip', emerging: true },
 ];
 
 /* Density (kW/rack) → capex rack class. Thresholds bracket CapexEngine's
@@ -56,9 +65,28 @@ export function writeSharedItLoad(kw: number): void {
     useCapexStore.getState().setInputs({ itLoad: v }); // auto-recalcs capex
 }
 
-export function writeSharedCooling(key: 'air' | 'inrow' | 'rdhx' | 'liquid'): void {
-    const meta = COOLING_UI.find((c) => c.key === key) ?? COOLING_UI[3];
-    useSimulationStore.getState().actions.setInputs({ coolingType: key, coolingTopology: meta.topology });
+/* The simulation store + its downstream engines (benchmark, grid-reliability,
+ * capacity, diagnostics, PDF …) classify cooling into 4 canonical classes.
+ * Immersion + microfluidic are direct-liquid thermally, so they downcast to
+ * 'liquid'/'dlc' for those engines. The CAPEX store keeps the TRUE key
+ * (coolingType: string) → drives the real capexDetail.coolingMult + PUE row,
+ * so the advanced/emerging techs still compute end-to-end. */
+type SimCoolingKey = 'air' | 'inrow' | 'rdhx' | 'liquid';
+type SimCoolingTopology = 'in-row' | 'perimeter' | 'dlc';
+export function simCoolingClass(key: CoolingKey): { type: SimCoolingKey; topology: SimCoolingTopology } {
+    switch (key) {
+        case 'air': return { type: 'air', topology: 'perimeter' };
+        case 'inrow': return { type: 'inrow', topology: 'in-row' };
+        case 'rdhx': return { type: 'rdhx', topology: 'in-row' };
+        // liquid + immersion_1p/2p + microfluidic → direct-liquid class
+        default: return { type: 'liquid', topology: 'dlc' };
+    }
+}
+
+export function writeSharedCooling(key: CoolingKey): void {
+    const sim = simCoolingClass(key);
+    useSimulationStore.getState().actions.setInputs({ coolingType: sim.type, coolingTopology: sim.topology });
+    // CAPEX keeps the TRUE key (string-typed) → real coolingMult + PUE row.
     useCapexStore.getState().setInputs({ coolingType: key });
 }
 

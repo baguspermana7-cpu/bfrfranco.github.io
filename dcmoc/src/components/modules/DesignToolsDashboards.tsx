@@ -66,6 +66,11 @@ const spFillBelow = (r: Pick<SparesRow, 'fillAchieved' | 'fillTargetPct'>): bool
 interface RefrigerantRow {
     label: string; gwp: number; safety: string; copIndex: number; capexMult: number; apps: string[]; note: string;
 }
+/* Ship-B — DATA.coolingTech row (advanced/emerging cooling ladder + microfluidic). */
+interface CoolingTechRow {
+    vendor?: string; tech?: string; family?: string; trl?: number; rackKwClaim?: number;
+    coolant?: string; wueBasis?: string; confidence?: 'commercial' | 'emerging'; ref?: string; source?: string;
+}
 
 /** ASHRAE-34 / application-envelope compatibility note for a low-GWP swap —
  *  derived from the live DATA.refrigerants apps + safety fields. */
@@ -326,6 +331,7 @@ export function CduDashboard() {
         refrigerants?: Record<string, RefrigerantRow>;
         pueMatrix?: Record<string, Record<string, number>>;
         refrigerantAutoByCooling?: Record<string, string | null>;
+        coolingTech?: Record<string, CoolingTechRow>;
     };
     /* deep-sea advanced — gated on the SHARED capex tick (Requirements 1.6 /
      * CAPEX drawer). Hook stays ABOVE the early return (hooks-order rule). */
@@ -587,6 +593,40 @@ export function CduDashboard() {
                             </span>
                         </div>
                     )}
+                </Card>
+            )}
+
+            {/* Ship-B — Advanced & Emerging Cooling ladder (DATA.coolingTech) */}
+            {Object.keys(data.coolingTech ?? {}).length > 0 && (
+                <Card>
+                    <h3 className="mb-1.5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                        Advanced &amp; Emerging Cooling <EngChip src="DATA.coolingTech" />
+                        <span className="text-[9px] normal-case text-slate-400">{Object.keys(data.coolingTech ?? {}).length} techs · TRL-classified ladder</span>
+                    </h3>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-[10.5px]">
+                            <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Vendor</th><th className="text-left pl-2">Technology</th><th className="text-center">TRL</th><th className="text-right">Rack kW</th><th className="text-center">Confidence</th></tr></thead>
+                            <tbody>
+                                {Object.entries(data.coolingTech ?? {}).map(([k, t]) => {
+                                    const emerging = t.confidence === 'emerging';
+                                    return (
+                                        <tr key={k} className="border-b border-slate-100 dark:border-slate-800/60 align-top" title={t.ref}>
+                                            <td className="py-1 font-medium text-slate-700 dark:text-slate-200">{t.vendor ?? '—'}</td>
+                                            <td className="pl-2 text-slate-500">{t.tech ?? '—'}</td>
+                                            <td className="text-center">
+                                                <span className={`rounded px-1 py-0.5 text-[8.5px] font-bold tabular-nums ${emerging ? 'bg-amber-500/15 text-amber-500' : 'bg-emerald-500/15 text-emerald-500'}`}>TRL {t.trl ?? '—'}</span>
+                                            </td>
+                                            <td className="text-right tabular-nums text-slate-500">{t.rackKwClaim ?? '—'}</td>
+                                            <td className="text-center">
+                                                <span className={`rounded px-1.5 py-0.5 text-[8.5px] font-semibold uppercase ${emerging ? 'bg-amber-500/15 text-amber-500' : 'bg-emerald-500/15 text-emerald-500'}`}>{emerging ? 'Emerging' : 'Commercial'}</span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p className="mt-1.5 text-[9px] text-slate-400">COMMERCIAL = TRL 8-9 shipping; EMERGING = TRL 5-7 pilot/riset. Microfluidic in-chip belum punya harga per-rak publik &amp; BUKAN fakta arsitektur NVIDIA.</p>
                 </Card>
             )}
 

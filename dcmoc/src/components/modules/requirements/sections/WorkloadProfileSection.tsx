@@ -4,11 +4,12 @@
 
 import React from 'react';
 import { useSimulationStore } from '@/store/simulation';
+import { useCapexStore } from '@/store/capex';
 import { useRequirementsStore, normalizeMix } from '@/store/requirements';
 import {
     writeSharedItLoad, writeSharedCooling, writeSharedRackDensity, COOLING_UI,
     USE_CASE_LABELS, MIX_PRESETS, applyUseCaseProfile, engineProfileFor, effectiveTotalRacks,
-    ARCH_UI, archProfileLive, applyArchProfile, type ArchKey,
+    ARCH_UI, archProfileLive, applyArchProfile, type ArchKey, type CoolingKey,
 } from '@/lib/requirementsMappings';
 import { CreatableCombobox, type ComboValue } from '@/components/ui/CreatableCombobox';
 import { SectionCard, Field, Select, Segmented, RadioList, SliderRow, NumInput } from '../ui';
@@ -103,6 +104,9 @@ function ArchProfilePicker({ selected, onPick }: { selected: ArchKey | null; onP
 
 export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
     const inputs = useSimulationStore((s) => s.inputs);
+    // CAPEX store holds the TRUE cooling key (incl. immersion/microfluidic),
+    // so the picker reflects the advanced/emerging selection the sim store downcasts.
+    const capexCooling = useCapexStore((s) => s.inputs.coolingType) as CoolingKey;
     const req = useRequirementsStore();
     const w = req.workload;
     const set = req.actions.setWorkload;
@@ -260,8 +264,21 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                 <div className="space-y-3">
                     <Field label="AI Chip Type (Primary)" explainKey="gpu"><Select value={w.aiChipType} onChange={(v) => set({ aiChipType: v })} options={CHIPS} /></Field>
                     <Field label="Cooling Approach (Preferred)" explainKey="cooling-type" hint="Writes the shared cooling type (CAPEX + all engines)">
-                        <Select value={inputs.coolingType} onChange={(v) => writeSharedCooling(v)}
-                            options={COOLING_UI.map((c) => ({ value: c.key, label: c.label }))} />
+                        <Select<CoolingKey> value={capexCooling} onChange={(v) => writeSharedCooling(v)}
+                            options={COOLING_UI.map((c) => ({
+                                value: c.key,
+                                label: c.emerging ? `${c.label}  ·  EMERGING · pilot/riset` : c.label,
+                            }))} />
+                        {capexCooling === 'microfluidic' && (
+                            <p className="mt-1 rounded-md border border-amber-400/40 bg-amber-500/10 px-2 py-1 text-[9px] leading-snug text-amber-600 dark:text-amber-400">
+                                Pendingin mikrofluida in-chip — TRL~6-7 (pilot/riset), belum deployable; enabler rak &gt;200kW→1MW (Corintis/TSMC/IMEC). Untuk pemodelan skenario, bukan pilihan produksi.
+                            </p>
+                        )}
+                        {COOLING_UI.find((c) => c.key === capexCooling)?.emerging && capexCooling !== 'microfluidic' && (
+                            <p className="mt-1 text-[9px] leading-snug text-amber-600 dark:text-amber-400">
+                                EMERGING · pilot/riset — belum production-standard; dipakai untuk pemodelan skenario.
+                            </p>
+                        )}
                     </Field>
                 </div>
             </div>

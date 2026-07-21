@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.101.0 — 2026-07-21 (DCMOC Ship-B: cooling ladder + microfluidic + EMEA region fix)
+
+### Added
+- **RZEngine cooling ladder** — `pueMatrix` +immersion_1p (1.04 t3) / immersion_2p (1.03, best-in-class) / microfluidic (1.03), `immersion` kept as backward-compat alias; ladder monotonic immersion_2p ≤ immersion_1p ≤ liquid. `coolingMaxRackKw` +immersion_1p:200 / immersion_2p:200 / microfluidic:250. `capexDetail.coolingMult` (+ DCMOC fallback) +immersion_1p:1.8 / immersion_2p:2.0 / microfluidic:2.2 (SCREENING — no public microfluidic per-rack price).
+- **RZEngine `DATA.coolingTech`** — 6-entry vendor/TRL database, honesty-tagged: COMMERCIAL (CoolIT DLC, JetCool microconvective, ZutaCore 2φ waterless, GRC/Submer/Iceotope 1φ immersion — TRL 8-9 shipping) vs **EMERGING** (LiquidStack 2φ immersion — PFAS-limited; Corintis/TSMC/IMEC/IBM in-chip microfluidic — TRL 6-7 pilot/riset). Each carries vendor·tech·TRL·rackKwClaim·coolant·wueBasis·confidence·ref + sourced. Standard: `standarization/COOLING_LADDER_STANDARD.md`.
+- **DCMOC surfaces** — Requirements cooling picker +3 options (immersion_1p/2p/microfluidic) with amber "EMERGING · pilot/riset" tag + microfluidic TRL~6-7 advisory note (selectable for scenario modelling, clearly not-production; true 7-key on CAPEX store drives real coolingMult/PUE, sim store gets thermally-equivalent downcast). New Data Library "Cooling Tech" tab (vendor table + COMMERCIAL/EMERGING chips + honesty caption). CDU dashboard "Advanced & Emerging Cooling" subsection (TRL badges). Microfluidic NEVER encoded as an NVIDIA architecture fact.
+
+### Fixed
+- **Region dropdown EMEA/MENA/Africa overlap** (owner report "EMEA kok ada 2") — `regions.ts` REGION_LABELS relabels the `EMEA` bucket "Europe, Middle East & Africa" → **"Europe"**. All 14 EMEA-tagged countries are European; Middle East (MENA) + Africa (AFR) are already separate buckets, so the old label double-listed those geographies. Bucket key + CapexEngine `region==='EMEA'→europe` mapping unchanged; label only.
+
+### Verified
+- engine 662/0 · parity 155/0 · calibration 19/0 (unaffected — mapping-1 checks air/inrow/rdhx/liquid only) · bindings 85/0 (catalog 204fn/110src) · dc-corpus 2678/0 · trace-parity 117/117 · walk 24/0 · synergy 6/0 · export 44/0 · tsc 0 + next build · js-syntax/script-tags/dark CLEAN. Engine ?v `2026-07-21-a`→`-b` (74 occ uniform, incl. DCMOC layout.tsx source).
+
 ## v1.100.0 — 2026-07-21 (DCMOC CAPEX Ship-A: AI reference-architecture profiles + peak-provisioning)
 
 ### Added

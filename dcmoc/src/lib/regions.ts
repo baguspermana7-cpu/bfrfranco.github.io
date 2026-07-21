@@ -14,7 +14,7 @@ export const REGIONS = Object.values(COUNTRIES).reduce((acc, c) => {
 
 export const REGION_LABELS: Record<string, string> = {
     'APAC': '🌏 Asia Pacific',
-    'EMEA': '🌍 Europe, Middle East & Africa',
+    'EMEA': '🌍 Europe',
     'AMER': '🌎 Americas',
     'MENA': '🕌 Middle East & North Africa',
     'AFR': '🌍 Africa',

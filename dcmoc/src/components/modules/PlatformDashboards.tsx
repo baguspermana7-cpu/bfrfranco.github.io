@@ -45,6 +45,11 @@ const pct = (n: number) => `${Math.round(n * 100)}%`;
  * (price 0 + hvoAvailable:false = no HVO supply in that market). */
 type CovGroup = 'economy' | 'labor' | 'environment' | 'gridReliability' | 'fuelDiesel' | 'naturalDisaster' | 'talentPool' | 'compliance' | 'constructionIndex';
 interface CovField { group: CovGroup; key: string; short: string; get: (c: CountryProfile) => unknown; }
+/* Ship-B — DATA.coolingTech row (advanced/emerging cooling ladder). */
+interface CoolingTechRow {
+    vendor?: string; tech?: string; family?: string; trl?: number; rackKwClaim?: number;
+    coolant?: string; wueBasis?: string; confidence?: 'commercial' | 'emerging'; ref?: string; source?: string;
+}
 const COV_GROUP_LABELS: Record<CovGroup, string> = {
     economy: 'Economy', labor: 'Labor', environment: 'Environment', gridReliability: 'Grid Reliability',
     fuelDiesel: 'Fuel / Diesel', naturalDisaster: 'Natural Disaster', talentPool: 'Talent Pool', compliance: 'Compliance', constructionIndex: 'Construction Idx',
@@ -217,7 +222,7 @@ function CountryCoverageSection() {
 /* ── Data Library — browse the canonical engine DATA (single source) ── */
 export function DataLibraryDashboard() {
     const d = rzData();
-    const [tab, setTab] = React.useState<'countries' | 'coverage' | 'markets' | 'pue' | 'refrigerants' | 'omcontracts' | 'sparespricing' | 'envcosts' | 'sources' | 'corpus'>('countries');
+    const [tab, setTab] = React.useState<'countries' | 'coverage' | 'markets' | 'pue' | 'refrigerants' | 'coolingtech' | 'omcontracts' | 'sparespricing' | 'envcosts' | 'sources' | 'corpus'>('countries');
     const [srcQuery, setSrcQuery] = React.useState('');
     // Carbon-price table sort (Environmental Costs)
     const [envSort, setEnvSort] = React.useState<'country' | 'price'>('price');
@@ -226,6 +231,8 @@ export function DataLibraryDashboard() {
     const markets = d.markets || {};
     const pue = d.pueMatrix || {};
     const refr = d.refrigerants || {};
+    /* Ship-B — advanced/emerging cooling ladder (DATA.coolingTech), live from engine */
+    const coolingTech = (d.coolingTech || {}) as Record<string, CoolingTechRow>;
     /* v2.5.2 sourced screening bands — rendered LIVE from rzData(), no local copy */
     const omContracts = (d.omContracts || {}) as {
         tiers?: Record<string, { low?: number; mid?: number; high?: number; scope?: string }>;
@@ -256,6 +263,7 @@ export function DataLibraryDashboard() {
         ['markets', 'Markets', Object.keys(markets).length],
         ['pue', 'PUE Matrix', Object.keys(pue).length],
         ['refrigerants', 'Refrigerants', Object.keys(refr).length],
+        ['coolingtech', 'Cooling Tech', Object.keys(coolingTech).length],
         ['omcontracts', 'O&M Contracts', Object.keys(omContracts.tiers || {}).length],
         ['sparespricing', 'Spares Pricing', Object.keys(sparesPricing).length],
         ['envcosts', 'Env Costs', carbonRows.length],
@@ -331,6 +339,40 @@ export function DataLibraryDashboard() {
                 )}
                 {tab === 'refrigerants' && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">{Object.entries(refr).map(([k, v]) => { const r = v as { label?: string; gwp?: number; safety?: string }; return (<div key={k} className="flex justify-between text-xs border border-slate-100 dark:border-white/5 rounded-lg px-3 py-2"><span className="text-slate-700 dark:text-slate-200">{r.label || k}</span><span className="text-slate-400 tabular-nums">GWP {r.gwp ?? '—'}{r.safety ? ` · ${r.safety}` : ''}</span></div>); })}</div>
+                )}
+                {tab === 'coolingtech' && (
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Advanced &amp; Emerging Cooling — DATA.coolingTech (cooling ladder + microfluidic)</h2>
+                            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">engine · TRL-classified</span>
+                        </div>
+                        {Object.keys(coolingTech).length === 0
+                            ? <p className="text-xs text-slate-400">Engine not loaded — DATA.coolingTech unavailable in this session.</p>
+                            : (<>
+                                <table className="w-full text-xs min-w-[720px]">
+                                    <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Vendor</th><th className="pr-3">Technology</th><th className="pr-3">Family</th><th className="pr-3 text-right">TRL</th><th className="pr-3 text-right">Rack kW</th><th className="pr-3">Coolant</th><th className="pr-3">WUE basis</th><th className="pr-3">Confidence</th><th>Ref</th></tr></thead>
+                                    <tbody>{Object.entries(coolingTech).map(([k, t]) => {
+                                        const emerging = t.confidence === 'emerging';
+                                        return (
+                                            <tr key={k} className="border-t border-slate-100 dark:border-white/5 align-top">
+                                                <td className="py-1.5 pr-3 font-medium text-slate-700 dark:text-slate-200">{t.vendor ?? '—'}</td>
+                                                <td className="pr-3 text-slate-600 dark:text-slate-300 max-w-[220px]">{t.tech ?? '—'}</td>
+                                                <td className="pr-3 font-mono text-slate-500">{t.family ?? '—'}</td>
+                                                <td className="pr-3 text-right tabular-nums text-slate-500">{t.trl ?? '—'}</td>
+                                                <td className="pr-3 text-right tabular-nums text-slate-500">{t.rackKwClaim ?? '—'}</td>
+                                                <td className="pr-3 text-slate-500">{t.coolant ?? '—'}</td>
+                                                <td className="pr-3 text-slate-500 max-w-[180px]">{t.wueBasis ?? '—'}</td>
+                                                <td className="pr-3">
+                                                    <span className={`rounded px-1.5 py-0.5 text-[8.5px] font-semibold uppercase ${emerging ? 'bg-amber-500/15 text-amber-500' : 'bg-emerald-500/15 text-emerald-500'}`}>{emerging ? 'Emerging' : 'Commercial'}</span>
+                                                </td>
+                                                <td className="text-slate-400 text-[9px] max-w-[280px]">{t.ref ?? '—'}</td>
+                                            </tr>
+                                        );
+                                    })}</tbody>
+                                </table>
+                                <p className="text-[9px] text-slate-400">COMMERCIAL = TRL 8-9 shipping; EMERGING = TRL 5-7 pilot/riset. Microfluidic in-chip belum punya harga per-rak publik &amp; BUKAN fakta arsitektur NVIDIA.</p>
+                            </>)}
+                    </div>
                 )}
                 {tab === 'omcontracts' && (
                     <div className="space-y-3">
