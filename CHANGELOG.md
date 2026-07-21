@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.99.9 — 2026-07-21 (tier-advisor plugin errors fixed)
+
+### Fixed
+- **tier-advisor.html 2 pageerror pre-existing** ("Cannot set properties of undefined (setting 'annotations')" + "reading 'visibleElements'"): race — Chart.js `onload` memicu `calculate()` (membangun histogram ber-config annotation) SEBELUM `chartjs-plugin-annotation` (`defer`, tanpa onload) ter-register. Fix: (1) pin versi (`chart.js@4.4.1` + `chartjs-plugin-annotation@3.1.0`), (2) gate init pada KEDUA script siap (onload flags + `Chart.registry.plugins.get('annotation')` cek) + timeout 4s fallback (chart tetap render tanpa guide-line bila plugin CDN diblok), (3) guard defensif `options.plugins.annotation` sebelum set annotations. Verifikasi headless: **0 pageerror** (was 2), plugin ter-register, 4 canvas render.
+
+### Verified
+- js-syntax audit CLEAN · headless tier-advisor 0 error + annotation registered.
+
 ## v1.99.8 — 2026-07-21 (chart hover-tooltip sweep sitewide + article-25 stretch)
 
 ### Fixed

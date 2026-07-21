@@ -1228,6 +1228,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
             histogramChart.options.scales.x.ticks.color = isDark?'#94a3b8':'#495057';
             histogramChart.options.scales.y.grid.color = isDark?'rgba(148,163,184,0.15)':'rgba(0,0,0,0.06)';
             histogramChart.options.scales.y.ticks.color = isDark?'#94a3b8':'#495057';
+            if (!histogramChart.options.plugins.annotation) histogramChart.options.plugins.annotation = { annotations: {} };
             histogramChart.options.plugins.annotation.annotations = annots;
             histogramChart.update();
         } else {
@@ -1954,20 +1955,36 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
       window.toggleUserDropdown = toggleUserDropdown;
     } catch(e) { if(window.console)console.warn('v1.17.2 export block error:',e); }
         // ═══ INIT ═══
-    var chartJsReady = typeof Chart !== 'undefined';
-    function onChartsReady() {
-        chartJsReady = true;
-        calculate();
+    /* Chart init gated on BOTH Chart.js AND the annotation plugin being ready —
+       fixes the race where Chart.js onload fired calculate() (which builds a chart
+       carrying annotation config) before the annotation plugin had registered,
+       throwing "visibleElements" / "set annotations on undefined". A 4s timeout
+       falls through so charts still render (without the tier guide-lines) if the
+       plugin CDN is blocked. */
+    var chartJsReady = (typeof Chart !== 'undefined');
+    var annoReady = false, domReady = false, didInit = false;
+    function annoRegistered() {
+        try { return !!(Chart && Chart.registry && Chart.registry.plugins && Chart.registry.plugins.get('annotation')); } catch(e){ return false; }
     }
+    function maybeInit() {
+        if (didInit) return;
+        if (chartJsReady && domReady && (annoReady || annoRegistered())) { didInit = true; calculate(); }
+    }
+    function onChartsReady() { chartJsReady = true; annoReady = annoReady || annoRegistered(); maybeInit(); }
+    function onAnnotationReady() { annoReady = true; maybeInit(); }
     document.addEventListener('DOMContentLoaded', function() {
         updateNavbarAuthUI();
-        if (chartJsReady) calculate();
+        domReady = true;
+        maybeInit();
+        /* fallback: don't wait forever on a blocked plugin CDN */
+        setTimeout(function(){ if (!didInit && chartJsReady) { didInit = true; calculate(); } }, 4000);
     });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" onload="if(typeof onChartsReady==='function')onChartsReady();" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1" onload="if(typeof onChartsReady==='function')onChartsReady();" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0" onload="if(typeof onAnnotationReady==='function')onAnnotationReady();" defer></script>
 
     
     
+    <script src="js/rz-manual-fab.js?v=2026-07-21" defer></script>
 </body>
 </html>
