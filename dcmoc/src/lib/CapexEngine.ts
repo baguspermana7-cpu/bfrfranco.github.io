@@ -226,7 +226,10 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
         const archProfile = reqModel?.archProfile ? reqModel.archProfile(archKey) : null;
         const kitPerRack: number = archProfile?.coolingKitUsdPerRack ?? 0;
         if (kitPerRack > 0) {
-            const kitCost = kitPerRack * racks;
+            /* imported hardware → apply the same per-country landed factor (this line
+             * is added after the cost loop, so it needs its own landedFactor call). */
+            const kitLanded = (rzModels() as any)?.supplyChain?.landedFactor ? (rzModels() as any).supplyChain.landedFactor(country ?? null, 'coolingKit') : 1.0;
+            const kitCost = kitPerRack * racks * kitLanded;
             costs.coolingKit = kitCost;
             totalHardCost += kitCost;
         }

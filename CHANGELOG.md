@@ -11,6 +11,17 @@ release sections rather than semver.
 
 ---
 
+## v1.108.0 — 2026-07-21 (Supply-Chain correctness fixes — adversarial review)
+
+### Fixed
+- **China duty band (HIGH)** — `CN.importDutyBand` was `high` (17%) but `DATA.sources` documented `punitive` (~30% China↔US). For AI DCs the frontier equipment is predominantly US-origin (Section-301 / retaliatory tariffs dominate), so CN is now `punitive` — matches the documented intent + the realistic worst-case, and retires the previously-unused `punitive` band.
+- **GB300 cooling-kit duty (HIGH)** — the $50k/rack cooling kit is added after the CapexEngine cost loop, so it bypassed `landedFactor` — import duty was silently zero on imported cooling hardware. Now applies `landedFactor(country,'coolingKit')` (new `equipmentShareByCategory.coolingKit` 0.90); a 72-rack GB300 in a high-duty country was ~$0.4M short.
+- **Dossier landed table completeness (MED)** — the per-category supply-chain table disclosed only 5 of the duty-receiving categories; now shows all material equipment disciplines (adds bms/security 0.60, fireSuppression/fireAlarm 0.50) so the disclosed uplift matches the cost math.
+- **Type widening (MED)** — `CountryProfileLike` in BoqDossier now includes `gpuExportTier`/`customsLeadBand` (were read via a cast, hidden from tsc).
+
+### Verified
+- engine 710/0 · parity 155/0 (after country regen: CN punitive) · calibration 19/0 · bindings 85/0 (catalog 216fn/118src) · trace-parity 117/117 · export 44/0 · tsc 0 + build. Split-rule / null-safety / country-coverage / honesty PASSED the review (0 CRITICAL). Engine ?v `-i`→`-j`. Closes the review-discipline gap on Ship-C (which shipped without a dedicated review).
+
 ## v1.107.0 — 2026-07-21 (Vector Index dashboard revision + SecondBrain gate/lock/modal fixes)
 
 ### Added

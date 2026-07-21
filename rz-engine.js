@@ -2408,7 +2408,7 @@
                 },
                 "supplyChain": {
                     "importDifficultyFactor": 1.1,
-                    "importDutyBand": "high",
+                    "importDutyBand": "punitive",
                     "gpuExportTier": 3,
                     "customsLeadBand": "slow"
                 },
@@ -5749,7 +5749,7 @@
         supplyChain: {
             /* import-exposed (equipment) fraction per CapexResult cost category — duty
              * only bites this portion (BOM split, screening). Labor-heavy ≈ 0. */
-            equipmentShareByCategory: { electrical: 0.40, ups: 0.70, generator: 0.75, cooling: 0.55, network: 0.80, bms: 0.60, security: 0.60, fireSuppression: 0.50, fireAlarm: 0.50, building: 0.05, seismic: 0.05, commissioning: 0.0, testing: 0.0, permits: 0.0 },
+            equipmentShareByCategory: { electrical: 0.40, ups: 0.70, generator: 0.75, cooling: 0.55, network: 0.80, bms: 0.60, security: 0.60, fireSuppression: 0.50, fireAlarm: 0.50, building: 0.05, seismic: 0.05, commissioning: 0.0, testing: 0.0, permits: 0.0, coolingKit: 0.90 },
             /* effective duty rate on imported equipment by band (band midpoints). */
             importDutyBands: { fta: 0.0, low: 0.03, med: 0.075, high: 0.17, punitive: 0.30 },
             /* GPU export-control tiers — PROXY (AI Diffusion Rule RESCINDED). */

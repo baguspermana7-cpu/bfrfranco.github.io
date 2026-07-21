@@ -1564,7 +1564,10 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         risk: { downtimeCostPerMin: 2500 },
         supplyChain: {
             importDifficultyFactor: 1.1,
-            importDutyBand: 'high',
+            /* punitive: AI-DC frontier equipment is predominantly US-origin →
+             * Section-301 / retaliatory tariffs (~25-30%) dominate; matches the
+             * DATA.sources 'punitive ~30% China↔US' intent. Tier-3 export-restricted. */
+            importDutyBand: 'punitive',
             gpuExportTier: 3,
             customsLeadBand: 'slow',
         },

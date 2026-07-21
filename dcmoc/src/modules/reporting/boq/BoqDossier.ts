@@ -260,18 +260,24 @@ export interface BuildBoqOpts {
  *  models (they read `.name` + `.supplyChain.{importDutyBand,…}`). */
 interface CountryProfileLike {
     name?: string;
-    supplyChain?: { importDutyBand?: string };
+    supplyChain?: { importDutyBand?: string; gpuExportTier?: number; customsLeadBand?: string };
 }
 
-/** Equipment categories surfaced in the per-category landed-cost table (the
- *  import-exposed disciplines — labor-heavy categories are omitted). Order is
- *  the reporting order. */
+/** Equipment categories surfaced in the per-category landed-cost table — ALL
+ *  import-exposed disciplines that CapexEngine actually applies duty to (kept in
+ *  sync with DATA.supplyChain.equipmentShareByCategory > 0), so the disclosed
+ *  table matches the cost math. Labor-heavy (commissioning/testing/permits ≈ 0)
+ *  are omitted. Order is the reporting order. */
 const SUPPLY_CHAIN_CATEGORIES: readonly string[] = [
     'electrical',
     'ups',
     'generator',
     'cooling',
     'network',
+    'bms',
+    'security',
+    'fireSuppression',
+    'fireAlarm',
 ] as const;
 
 /** Location multiplier for the bottom-up take-off: country constructionIndex

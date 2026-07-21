@@ -1378,6 +1378,7 @@ if (M.opex && M.opex.totalAnnual) {
     const sc = D.supplyChain;
     ok('DATA.supplyChain present + sourced', !!sc && !!D.sources['supplyChain']);
     ok('equipmentShareByCategory covers 14 categories, labor≈0', sc.equipmentShareByCategory.ups === 0.70 && sc.equipmentShareByCategory.permits === 0 && sc.equipmentShareByCategory.building < 0.1);
+    ok('coolingKit share present (GB300 import duty applies)', sc.equipmentShareByCategory.coolingKit >= 0.85 && M.supplyChain.landedFactor({ supplyChain: { importDutyBand: 'high' } }, 'coolingKit') > 1.0);
     ok('importDutyBands fta=0 < low < med < high < punitive', sc.importDutyBands.fta === 0 && sc.importDutyBands.low < sc.importDutyBands.med && sc.importDutyBands.med < sc.importDutyBands.high && sc.importDutyBands.high < sc.importDutyBands.punitive);
     const cHigh = { supplyChain: { importDutyBand: 'high', gpuExportTier: 3, customsLeadBand: 'slow' } };
     const cFta = { supplyChain: { importDutyBand: 'fta', gpuExportTier: 2, customsLeadBand: 'fast' } };
@@ -1390,6 +1391,8 @@ if (M.opex && M.opex.totalAnnual) {
     ok('exportControl: frontier GPU + Tier-3 restricted + note RESCINDED', ecFrontier.restricted === true && /RESCINDED/i.test(ecFrontier.note));
     ok('exportControl: non-frontier or Tier<3 not restricted', M.supplyChain.exportControl(cHigh, 'h100_pod').restricted === false && M.supplyChain.exportControl(cFta, 'gb200_nvl72').restricted === false);
     ok('leadTimeCustomsWk: slow > fast, null→normal', M.supplyChain.leadTimeCustomsWk(cHigh) === 12 && M.supplyChain.leadTimeCustomsWk(cFta) === 2 && M.supplyChain.leadTimeCustomsWk(null) === 6);
+    /* review-fix: CN uses the punitive band (US-origin frontier equip + Section-301), not high */
+    ok('CN importDutyBand = punitive (matches sources intent, punitive not dead)', D.countries?.CN?.supplyChain?.importDutyBand === 'punitive' && Object.values(D.countries || {}).some(c => c.supplyChain?.importDutyBand === 'punitive'));
 }
 
 /* ── Arc-1 calibrationSpec structural ── */
