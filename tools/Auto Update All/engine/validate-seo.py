@@ -112,7 +112,7 @@ def main():
                 issues['WARNING'].append(f"{rel}: Missing og:title")
 
         # Sitemap check (only for root-level and key subdir pages)
-        if '/' not in rel or rel.startswith('dc-market/') or rel.startswith('id/') or rel.startswith('embed/'):
+        if '/' not in rel or rel.startswith('id/') or rel.startswith('embed/'):
             # Check if it should be in sitemap
             if rel not in sitemap_urls and rel.replace('.html', '') not in sitemap_urls:
                 # Skip known excluded pages

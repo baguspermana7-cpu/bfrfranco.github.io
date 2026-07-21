@@ -27,7 +27,6 @@ EXCLUDE_DIRS = {
 
 # Subdirectories to INCLUDE (relative to SITE_ROOT) with their URL prefix
 INCLUDE_SUBDIRS = {
-    "dc-market": "dc-market",
     "id": "id",
     "manual": "manual",
 }
@@ -127,10 +126,6 @@ def is_noindex(filepath):
 
 def get_priority_changefreq_subdir(subdir, fname):
     """Determine priority/changefreq for subdir pages."""
-    if subdir == "dc-market":
-        if fname == "index.html":
-            return 0.9, "weekly"
-        return 0.75, "monthly"
     if subdir == "id":
         if fname == "index.html":
             return 0.85, "weekly"

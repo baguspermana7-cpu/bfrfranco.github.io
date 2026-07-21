@@ -362,11 +362,44 @@
         .dmt-cards-grid {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;
         }
+        /* FLIP CARD CONTAINER */
         .dmt-market-card {
-            background: var(--dmt-bg); border: 1px solid var(--dmt-border);
-            border-radius: 14px; padding: 1.25rem; transition: all 0.3s; cursor: default;
+            background: transparent; border: none; border-radius: 14px;
+            height: 260px; position: relative;
+            transform-style: preserve-3d;
+            transition: transform .55s cubic-bezier(.4,0,.2,1);
+            cursor: pointer;
         }
-        .dmt-market-card:hover { transform: translateY(-3px); box-shadow: var(--dmt-shadow-md); border-color: rgba(var(--dmt-primary-rgb), 0.3); }
+        @media (prefers-reduced-motion: reduce) { .dmt-market-card { transition: none; } }
+        .dmt-market-card.flipped { transform: rotateY(180deg); }
+        .dmt-market-card:not(.flipped):hover .dmt-card-front {
+            box-shadow: var(--dmt-shadow-md); border-color: rgba(var(--dmt-primary-rgb), 0.3);
+        }
+        /* FRONT FACE */
+        .dmt-card-front {
+            backface-visibility: hidden; -webkit-backface-visibility: hidden;
+            background: var(--dmt-bg); border: 1px solid var(--dmt-border);
+            border-radius: 14px; padding: 1.25rem;
+            position: absolute; inset: 0;
+            transition: box-shadow 0.3s, border-color 0.3s;
+        }
+        /* BACK FACE */
+        .dmt-card-back {
+            backface-visibility: hidden; -webkit-backface-visibility: hidden;
+            transform: rotateY(180deg);
+            background: var(--dmt-bg); border: 1px solid var(--dmt-border);
+            border-radius: 14px; padding: 1.25rem;
+            position: absolute; inset: 0; overflow: auto;
+        }
+        .dmt-cb-title { font-size: 0.9rem; font-weight: 700; color: var(--dmt-text); margin-bottom: 0.75rem; }
+        .dmt-cb-row { margin-bottom: 0.55rem; }
+        .dmt-cb-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.4px; color: var(--dmt-text3); margin-bottom: 0.15rem; }
+        .dmt-cb-val { font-size: 0.72rem; color: var(--dmt-text2); line-height: 1.45; }
+        .dmt-cb-challenges { margin: 0; padding-left: 1rem; }
+        .dmt-cb-challenges li { font-size: 0.7rem; color: var(--dmt-text2); line-height: 1.45; margin-bottom: 0.2rem; }
+        .dmt-cb-back-hint { font-size: 0.62rem; color: var(--dmt-text3); margin-top: 0.6rem; text-align: right; }
+        /* Ensure cards grid has proper stacking context */
+        .dmt-cards-grid { perspective: 1000px; }
         .dmt-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
         .dmt-card-name { font-size: 1rem; font-weight: 700; color: var(--dmt-text); }
         .dmt-card-region { font-size: 0.7rem; color: var(--dmt-text3); }
@@ -729,7 +762,6 @@
                 </div>
             </a>
             <div class="nav-links">
-                <a href="dc-market/index.html" class="nav-link" style="color:#14b8a6;">DC Markets</a>
                 <a href="pln-java-grid.html" class="nav-link" style="color:#3b82f6;">PLN Java Grid</a>
                 <a href="tco-calculator.html" class="nav-link" style="color:#4f46e5;">TCO Calc</a>
                 <a href="pue-calculator.html" class="nav-link" style="color:#06b6d4;">PUE Calc</a>
@@ -978,69 +1010,6 @@
         </div>
     </div>
 
-    <!-- Browse Market Guides -->
-    <section class="dmt-markets-section">
-        <h2>Browse In-Depth Market Guides</h2>
-        <p>Each market has a dedicated page covering capacity, PUE, regulation, hyperscale operators, and growth pipeline.</p>
-        <div class="dmt-markets-grid">
-            <a href="dc-market/index.html" class="dmt-market-card-link is-hub">
-                <span class="city">All Markets Hub</span>
-                <span class="region">Index page</span>
-                <span class="meta">10 cities indexed</span>
-            </a>
-            <a href="dc-market/northern-virginia.html" class="dmt-market-card-link">
-                <span class="city">Northern Virginia</span>
-                <span class="region">North America</span>
-                <span class="meta">~4 GW operational</span>
-            </a>
-            <a href="dc-market/london.html" class="dmt-market-card-link">
-                <span class="city">London</span>
-                <span class="region">Europe</span>
-                <span class="meta">~1.5 GW operational</span>
-            </a>
-            <a href="dc-market/frankfurt.html" class="dmt-market-card-link">
-                <span class="city">Frankfurt</span>
-                <span class="region">Europe</span>
-                <span class="meta">~900 MW operational</span>
-            </a>
-            <a href="dc-market/singapore.html" class="dmt-market-card-link">
-                <span class="city">Singapore</span>
-                <span class="region">Asia Pacific</span>
-                <span class="meta">~850 MW operational</span>
-            </a>
-            <a href="dc-market/tokyo.html" class="dmt-market-card-link">
-                <span class="city">Tokyo</span>
-                <span class="region">Asia Pacific</span>
-                <span class="meta">~1.2 GW operational</span>
-            </a>
-            <a href="dc-market/sydney.html" class="dmt-market-card-link">
-                <span class="city">Sydney</span>
-                <span class="region">Asia Pacific</span>
-                <span class="meta">~600 MW operational</span>
-            </a>
-            <a href="dc-market/mumbai.html" class="dmt-market-card-link">
-                <span class="city">Mumbai</span>
-                <span class="region">Asia Pacific</span>
-                <span class="meta">~500 MW operational</span>
-            </a>
-            <a href="dc-market/jakarta.html" class="dmt-market-card-link">
-                <span class="city">Jakarta</span>
-                <span class="region">Asia Pacific</span>
-                <span class="meta">~350 MW operational</span>
-            </a>
-            <a href="dc-market/kuala-lumpur.html" class="dmt-market-card-link">
-                <span class="city">Kuala Lumpur</span>
-                <span class="region">Asia Pacific</span>
-                <span class="meta">~250 MW operational</span>
-            </a>
-            <a href="dc-market/dubai.html" class="dmt-market-card-link">
-                <span class="city">Dubai</span>
-                <span class="region">Middle East</span>
-                <span class="meta">~200 MW operational</span>
-            </a>
-        </div>
-    </section>
-
     <!-- Login Modal -->
     <div id="dmtLoginModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:99999;align-items:center;justify-content:center;">
         <div style="background:var(--dmt-bg);border-radius:20px;padding:2.5rem;max-width:420px;width:90%;box-shadow:0 25px 60px rgba(0,0,0,0.3);position:relative;animation:dmtModalIn 0.3s ease;">
@@ -1175,6 +1144,22 @@
     <script>
     (function(){
         'use strict';
+
+        // ═══════════════════════════════════════════
+        // FLIP CARD DETAIL DATA
+        // ═══════════════════════════════════════════
+        var MARKET_DETAILS = {
+          'n-virginia': { climate:'Humid Subtropical; water-side economizers + liquid cooling for AI/GPU', regulatory:'FedRAMP for gov; moratorium debates in Prince William County', fiber:'MAE-East IXP; routes 70%+ of global internet traffic', renewable:'40% renewable; large PPAs (Amazon, Microsoft, Google)', challenges:['Grid strain in Loudoun County — new capacity delayed 3-4 years','Community opposition in expansion zones','Water competition and rising land costs in Ashburn core'] },
+          'london': { climate:'Mild Maritime; air-side economizers 6,000-7,000 hrs/yr; PUE 1.2-1.3', regulatory:'Post-Brexit divergence from EU GDPR; tough planning permission', fiber:'LINX — one of world\'s largest IXPs; Docklands fiber hub', renewable:'45% renewable', challenges:['Grid capacity constraints in West London — 3-5 yr delays','High volatile energy prices','Planning permission complexity limits expansion'] },
+          'frankfurt': { climate:'Continental; 5,000+ free cooling hours; waste heat to district heating', regulatory:'EnEfG 2024: PUE <1.3 mandatory, 40% waste heat reuse by 2028; GDPR', fiber:'DE-CIX — world\'s largest IXP by peak traffic', renewable:'52% renewable', challenges:['Highest electricity prices in Europe ($0.25+/kWh)','Strict PUE and waste-heat compliance','Grid constraints in Rhein-Main corridor'] },
+          'singapore': { climate:'Tropical Equatorial; chilled water + containment; liquid cooling for AI/HPC', regulatory:'Moratorium 2019, partially lifted 2022; max PUE 1.3; BCA-IMDA Green Mark', fiber:'30+ submarine cable systems; primary APAC gateway hub', renewable:'Limited; heavy reliance on imported natural gas', challenges:['Moratorium limits new capacity','Land scarcity drives multi-story designs','Tropical heat makes PUE optimization hard'] },
+          'tokyo': { climate:'Humid Subtropical, Seismic Zone; hybrid + liquid cooling for AI/HPC', regulatory:'FISC Security Guidelines (financial); no data localization', fiber:'Otemachi IXP; NTT/KDDI backbone', renewable:'22% renewable; post-Fukushima mix challenges', challenges:['Seismic risk adds 15-20% to construction cost','Highest power costs in APAC','Limited large land parcels and aging grid'] },
+          'sydney': { climate:'Temperate Oceanic; economizer-assisted chilled water; 4,000+ free cooling hrs', regulatory:'NABERS rating (gov min 4-star); ACSC Essential Eight', fiber:'Western Sydney Aerotropolis; higher latency to Asia/US', renewable:'35% renewable; grid transition pricing uncertainty', challenges:['Rising energy costs and grid transition','Water scarcity in Western Sydney','Distance to Asian/US markets adds latency'] },
+          'mumbai': { climate:'Tropical Monsoon; water-cooled chillers; liquid cooling emerging in Navi Mumbai', regulatory:'DPDPA 2023 data localization; RBI IT Framework', fiber:'10+ submarine cable systems; primary India landing; NIXI IXP', renewable:'18% renewable; diesel dependency for reliability', challenges:['Grid reliability varies; dual feeds often unavailable','Monsoon flooding and extreme humidity','High real estate pushes dev to Navi Mumbai'] },
+          'jakarta': { climate:'Tropical Monsoon; chilled water + CRAH; liquid cooling in newer sites', regulatory:'GR 71/2019 data localization (public systems in Indonesia)', fiber:'Growing; AWS/Google/Azure regions; Telkom backbone', renewable:'12% renewable; PLN utility; Java-Bali grid', challenges:['Unreliable grid needs N+1/2N genset backup','Land subsidence in North Jakarta','Regulatory complexity across jurisdictions'] },
+          'kuala-lumpur': { climate:'Tropical Rainforest; water-cooled chillers; evaporative cooling', regulatory:'Malaysia Digital (MD) tax incentives; no data localization law', fiber:'PEACE + SEA-H2X improving; Johor cross-border to Singapore', renewable:'8% renewable', challenges:['Grid constraints in Cyberjaya/Johor','Tropical climate limits free cooling','Competition from Singapore and Jakarta'] },
+          'dubai': { climate:'Hot Desert (Extreme Heat); district cooling; thermal energy storage', regulatory:'Zero corporate tax in free zones; Smart Dubai / D33', fiber:'Gateway Europe-Asia-Africa; strong submarine connectivity', renewable:'10% renewable; DEWA 75% clean by 2050; 5 GW solar planned', challenges:['Extreme ambient (45-50C) drives cooling CAPEX','Sand/dust ingress needs special filtration','Water scarcity; desalinated water costly'] }
+        };
 
         // ═══════════════════════════════════════════
         // DATA
@@ -1358,31 +1343,79 @@
         // ═══════════════════════════════════════════
         // MARKET CARDS
         // ═══════════════════════════════════════════
+        function buildCardBack(k, m) {
+            var d = MARKET_DETAILS[k];
+            if (!d) {
+                return '<div class="dmt-card-back">' +
+                    '<div class="dmt-cb-title">' + m.name + '</div>' +
+                    '<div class="dmt-cb-val" style="color:var(--dmt-text3);font-style:italic;">Detailed profile coming soon.</div>' +
+                    '<div class="dmt-cb-back-hint">&#8617; tap to flip back</div>' +
+                    '</div>';
+            }
+            var challengeItems = d.challenges.map(function(c) {
+                return '<li>' + c + '</li>';
+            }).join('');
+            return '<div class="dmt-card-back">' +
+                '<div class="dmt-cb-title">' + m.name + '</div>' +
+                '<div class="dmt-cb-row"><div class="dmt-cb-label">Climate &amp; Cooling</div><div class="dmt-cb-val">' + d.climate + '</div></div>' +
+                '<div class="dmt-cb-row"><div class="dmt-cb-label">Regulatory</div><div class="dmt-cb-val">' + d.regulatory + '</div></div>' +
+                '<div class="dmt-cb-row"><div class="dmt-cb-label">Fiber / Connectivity</div><div class="dmt-cb-val">' + d.fiber + '</div></div>' +
+                '<div class="dmt-cb-row"><div class="dmt-cb-label">Renewables</div><div class="dmt-cb-val">' + d.renewable + '</div></div>' +
+                '<div class="dmt-cb-row"><div class="dmt-cb-label">Key Challenges</div><ul class="dmt-cb-challenges">' + challengeItems + '</ul></div>' +
+                '<div class="dmt-cb-back-hint">&#8617; tap to flip back</div>' +
+                '</div>';
+        }
+
         function renderCards() {
             var grid = document.getElementById('dmtCardsGrid');
             var keys = getSortedMarkets(getFilteredMarkets(), activeSort);
             var html = '';
             keys.forEach(function(k) {
                 var m = MARKETS[k];
-                html += '<div class="dmt-market-card">';
-                html += '<div class="dmt-card-header">';
-                html += '<div><div class="dmt-card-name">' + m.name + '</div><div class="dmt-card-region">' + m.region + '</div></div>';
-                html += '<span class="dmt-cagr-badge ' + cagrClass(m.cagr) + '">' + (m.cagr * 100).toFixed(0) + '% CAGR</span>';
-                html += '</div>';
-                html += '<div class="dmt-card-metrics">';
-                html += '<div class="dmt-card-metric"><div class="dmt-cm-val" style="color:var(--dmt-primary);">' + m.operational.toLocaleString() + '</div><div class="dmt-cm-label">Operational MW</div></div>';
-                html += '<div class="dmt-card-metric"><div class="dmt-cm-val" style="color:var(--dmt-amber);">' + m.construction.toLocaleString() + '</div><div class="dmt-cm-label">Construction MW</div></div>';
-                html += '<div class="dmt-card-metric"><div class="dmt-cm-val" style="color:var(--dmt-blue);">' + m.planned.toLocaleString() + '</div><div class="dmt-cm-label">Planned MW</div></div>';
-                html += '</div>';
-                html += '<div class="dmt-card-details">';
-                html += '<div class="dmt-cd-item"><div class="dmt-cd-val">' + m.vacancy + '%</div><div class="dmt-cd-label">Vacancy</div></div>';
-                html += '<div class="dmt-cd-item"><div class="dmt-cd-val">$' + m.coloPrice + '</div><div class="dmt-cd-label">$/kW/mo</div></div>';
-                html += '<div class="dmt-cd-item"><div class="dmt-cd-val">$' + m.powerCost.toFixed(3) + '</div><div class="dmt-cd-label">$/kWh</div></div>';
-                html += '</div>';
-                html += '<div class="dmt-card-players"><span>' + m.players.slice(0, 4).join('</span> &middot; <span>') + '</span></div>';
-                html += '</div>';
+                var frontHtml = '<div class="dmt-card-front">' +
+                    '<div class="dmt-card-header">' +
+                    '<div><div class="dmt-card-name">' + m.name + '</div><div class="dmt-card-region">' + m.region + '</div></div>' +
+                    '<span class="dmt-cagr-badge ' + cagrClass(m.cagr) + '">' + (m.cagr * 100).toFixed(0) + '% CAGR</span>' +
+                    '</div>' +
+                    '<div class="dmt-card-metrics">' +
+                    '<div class="dmt-card-metric"><div class="dmt-cm-val" style="color:var(--dmt-primary);">' + m.operational.toLocaleString() + '</div><div class="dmt-cm-label">Operational MW</div></div>' +
+                    '<div class="dmt-card-metric"><div class="dmt-cm-val" style="color:var(--dmt-amber);">' + m.construction.toLocaleString() + '</div><div class="dmt-cm-label">Construction MW</div></div>' +
+                    '<div class="dmt-card-metric"><div class="dmt-cm-val" style="color:var(--dmt-blue);">' + m.planned.toLocaleString() + '</div><div class="dmt-cm-label">Planned MW</div></div>' +
+                    '</div>' +
+                    '<div class="dmt-card-details">' +
+                    '<div class="dmt-cd-item"><div class="dmt-cd-val">' + m.vacancy + '%</div><div class="dmt-cd-label">Vacancy</div></div>' +
+                    '<div class="dmt-cd-item"><div class="dmt-cd-val">$' + m.coloPrice + '</div><div class="dmt-cd-label">$/kW\/mo</div></div>' +
+                    '<div class="dmt-cd-item"><div class="dmt-cd-val">$' + m.powerCost.toFixed(3) + '</div><div class="dmt-cd-label">$/kWh</div></div>' +
+                    '</div>' +
+                    '<div class="dmt-card-players"><span>' + m.players.slice(0, 4).join('</span> &middot; <span>') + '</span></div>' +
+                    '<div style="font-size:0.6rem;color:var(--dmt-text3);text-align:right;margin-top:0.4rem;">tap for details &#8618;</div>' +
+                    '</div>';
+                html += '<div class="dmt-market-card" role="button" tabindex="0" aria-expanded="false" data-key="' + k + '">' +
+                    frontHtml +
+                    buildCardBack(k, m) +
+                    '</div>';
             });
             grid.innerHTML = html;
+            bindCardFlip();
+        }
+
+        function bindCardFlip() {
+            var cards = document.querySelectorAll('#dmtCardsGrid .dmt-market-card');
+            cards.forEach(function(card) {
+                card.addEventListener('click', function(e) {
+                    // Don't flip if user clicked a link or button inside the card
+                    if (e.target.closest('a, button')) return;
+                    var flipped = card.classList.toggle('flipped');
+                    card.setAttribute('aria-expanded', flipped ? 'true' : 'false');
+                });
+                card.addEventListener('keydown', function(e) {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                        e.preventDefault();
+                        var flipped = card.classList.toggle('flipped');
+                        card.setAttribute('aria-expanded', flipped ? 'true' : 'false');
+                    }
+                });
+            });
         }
 
         // ═══════════════════════════════════════════
