@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.111.2 — 2026-07-22 (SecondBrain → Claude Session Manager entry pill)
+
+### Added
+- **"Sessions" entry pill** in the SecondBrain graph nav, next to "Vector Index" (amber→green filled-glow CTA, so the two portals read as a pair) → opens the local **Claude Session Manager** at `http://localhost:8770/`.
+- The manager itself is a local-only tool (lives in `~/.claude/rzsessions/`, auto-started by a systemd user service; **not** in this repo): a dark, reference-grade 3-column web GUI that lists every AI-CLI session on the PC — **Claude** (`~/.claude/projects`) + **Codex** (`~/.codex/sessions`) + persistent **ollama** chats — each with the correct provider logo, title, model, folder, event count, and a per-session **Resume** button that opens a terminal running `claude --resume` / `codex resume` / `rzchat --resume` in the session's cwd. Search, provider/model/folder filters, sort, and a detail panel (Summary + Key Topics + Metadata). Backend is bounded-parse (never full-reads the 80 MB+ Codex logs) + mtime-cached; localhost-bound, UUID-validated resume.
+
+### Verified
+- Headless: pill renders next to Vector Index → localhost:8770, **0 console errors**. Manager: 71 sessions (8 Claude + 63 Codex) render, provider filters + detail panel + dry-run resume all work; favicon 204 (no stray 404). systemd user service `active + enabled`. (Session data never leaves the PC; nothing session-related is committed to the repo.)
+
 ## v1.111.1 — 2026-07-22 (worked-calc accuracy fixes — adversarial review)
 
 ### Fixed
