@@ -39,6 +39,11 @@
         bindTabs();
         bindRunBtn();
         buildTopbar();
+        // Swap the P&ID render (day/night) whenever the theme attribute changes.
+        try {
+            new MutationObserver(syncPidTheme).observe(document.documentElement,
+                { attributes: true, attributeFilter: ['data-theme'] });
+        } catch (e) {}
         patchApplyModelToUI();
         // Initial paint: the engine's first applyModelToUI runs BEFORE this scaffold
         // exists (both scripts are `defer`; the engine's DOMContentLoaded handler is
@@ -296,73 +301,27 @@
     // ════════════════════════════════════════════════════════
     // buildSystemOverviewSVG — inline SVG schematic
     // ════════════════════════════════════════════════════════
+    function pidThemeName() {
+        return (document.documentElement.getAttribute('data-theme') === 'dark') ? 'night' : 'day';
+    }
     function buildSystemOverviewSVG() {
-        return [
-            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 160" style="font-family:JetBrains Mono,monospace">',
-            // Background sections
-            '<rect x="0" y="0" width="760" height="160" fill="none"/>',
-
-            // IT Load block
-            '<rect x="10" y="30" width="130" height="100" rx="8" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3"/>',
-            '<text x="75" y="58" text-anchor="middle" font-size="8" fill="currentColor" opacity="0.6" font-weight="600" letter-spacing="0.05em">IT LOAD</text>',
-            '<text x="75" y="78" text-anchor="middle" font-size="11" fill="currentColor" font-weight="700" id="schItLoad">—</text>',
-            '<text x="75" y="92" text-anchor="middle" font-size="8" fill="currentColor" opacity="0.5">MW</text>',
-            '<text x="75" y="108" text-anchor="middle" font-size="7" fill="currentColor" opacity="0.45" id="schRackDensity">— kW/rack</text>',
-
-            // Supply pipe (blue, flowing left→right)
-            '<line x1="140" y1="70" x2="220" y2="70" stroke="#337eea" stroke-width="2.5" class="ltc-flow-supply"/>',
-            '<text x="180" y="64" text-anchor="middle" font-size="7" fill="#337eea" font-weight="600">SUPPLY</text>',
-            '<text x="180" y="82" text-anchor="middle" font-size="8" fill="#337eea" font-weight="700" id="schSupplyT">—°C</text>',
-
-            // CDU block
-            '<rect x="220" y="20" width="120" height="120" rx="8" fill="none" stroke="#337eea" stroke-width="1.5" opacity="0.7"/>',
-            '<text x="280" y="48" text-anchor="middle" font-size="8" fill="currentColor" opacity="0.6" font-weight="600" letter-spacing="0.05em">CDU / MANIFOLD</text>',
-            '<text x="280" y="68" text-anchor="middle" font-size="10" fill="#337eea" font-weight="700" id="schFlow">—</text>',
-            '<text x="280" y="80" text-anchor="middle" font-size="7" fill="#337eea">LPM</text>',
-            '<text x="280" y="96" text-anchor="middle" font-size="8" fill="currentColor" font-weight="600" id="schCdu">— CDU</text>',
-            '<text x="280" y="110" text-anchor="middle" font-size="7" fill="currentColor" opacity="0.5" id="schPump">Pump —kW</text>',
-            '<text x="280" y="124" text-anchor="middle" font-size="7" fill="currentColor" opacity="0.45" id="schCapture">—% capture</text>',
-
-            // Return pipe (red, flowing right→left)
-            '<line x1="340" y1="100" x2="420" y2="100" stroke="#e5484d" stroke-width="2.5" class="ltc-flow-return"/>',
-            '<text x="380" y="116" text-anchor="middle" font-size="7" fill="#e5484d" font-weight="600">RETURN</text>',
-            '<text x="380" y="90" text-anchor="middle" font-size="8" fill="#e5484d" font-weight="700" id="schReturnT">—°C</text>',
-
-            // Performance block
-            '<rect x="420" y="20" width="150" height="120" rx="8" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3"/>',
-            '<text x="495" y="44" text-anchor="middle" font-size="8" fill="currentColor" opacity="0.6" font-weight="600" letter-spacing="0.04em">PERFORMANCE</text>',
-            // PUE
-            '<text x="430" y="62" font-size="7" fill="currentColor" opacity="0.55">PUE</text>',
-            '<text x="560" y="62" text-anchor="end" font-size="9" fill="currentColor" font-weight="700" id="schPue">—</text>',
-            // COP
-            '<text x="430" y="78" font-size="7" fill="currentColor" opacity="0.55">System COP</text>',
-            '<text x="560" y="78" text-anchor="end" font-size="9" fill="currentColor" font-weight="700" id="schCop">—</text>',
-            // DeltaT
-            '<text x="430" y="94" font-size="7" fill="currentColor" opacity="0.55">ΔT</text>',
-            '<text x="560" y="94" text-anchor="end" font-size="9" fill="currentColor" font-weight="700" id="schDeltaT">—K</text>',
-            // WUE
-            '<text x="430" y="110" font-size="7" fill="currentColor" opacity="0.55">WUE</text>',
-            '<text x="560" y="110" text-anchor="end" font-size="9" fill="currentColor" font-weight="700" id="schWue">—</text>',
-            // Arch
-            '<text x="430" y="126" font-size="7" fill="currentColor" opacity="0.45" id="schArch">direct_liquid</text>',
-
-            // Carbon block
-            '<rect x="590" y="30" width="155" height="100" rx="8" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3"/>',
-            '<text x="667" y="54" text-anchor="middle" font-size="8" fill="currentColor" opacity="0.6" font-weight="600" letter-spacing="0.04em">SUSTAINABILITY</text>',
-            '<text x="600" y="72" font-size="7" fill="currentColor" opacity="0.55">Net Carbon</text>',
-            '<text x="738" y="72" text-anchor="end" font-size="9" fill="currentColor" font-weight="700" id="schCarbon">—</text>',
-            '<text x="600" y="88" font-size="7" fill="currentColor" opacity="0.55">Avoided CO₂</text>',
-            '<text x="738" y="88" text-anchor="end" font-size="9" fill="#12a150" font-weight="700" id="schAvoided">—</text>',
-            '<text x="600" y="104" font-size="7" fill="currentColor" opacity="0.55">Net OPEX</text>',
-            '<text x="738" y="104" text-anchor="end" font-size="9" fill="currentColor" font-weight="700" id="schOpex">—</text>',
-            '<text x="600" y="120" font-size="7" fill="currentColor" opacity="0.45" id="schScore">Score —/100</text>',
-
-            // Arrow connectors
-            '<polygon points="220,66 210,62 210,70" fill="#337eea"/>',
-            '<polygon points="340,104 350,100 340,96" fill="#e5484d"/>',
-
-            '</svg>'
-        ].join('');
+        // Pixel-match P&ID: the reference equipment render (dry-cooler bank → pump →
+        // plate heat-exchanger → cold-plate racks, blue supply / red return pipes) is
+        // used verbatim as a theme-swapped image; only the Supply/Return temperature
+        // chips are overlaid live-wired to the model (they cover the baked labels).
+        return '' +
+            '<div class="ltc-pid">' +
+                '<img class="ltc-pid-img" id="ltcPidImg" alt="Liquid-to-Chip P&amp;ID: dry-cooler bank, pump, heat exchanger, cold-plate racks" ' +
+                    'src="assets/ltc/pid-' + pidThemeName() + '.png?v=2026-07-23b">' +
+                '<span class="ltc-pid-chip ltc-pid-supply" id="schSupplyT">Supply —&nbsp;°C</span>' +
+                '<span class="ltc-pid-chip ltc-pid-return" id="schReturnT">Return —&nbsp;°C</span>' +
+            '</div>';
+    }
+    function syncPidTheme() {
+        var img = document.getElementById('ltcPidImg');
+        if (!img) return;
+        var want = 'assets/ltc/pid-' + pidThemeName() + '.png?v=2026-07-23b';
+        if (img.getAttribute('src') !== want) img.setAttribute('src', want);
     }
 
     // ════════════════════════════════════════════════════════
@@ -708,23 +667,9 @@
     // renderSchematic
     // ════════════════════════════════════════════════════════
     function renderSchematic(model) {
-        setText2('schItLoad',     fmt(model.itKw / 1000, 2));
-        setText2('schRackDensity', fmt(model.rackDensity, 1) + ' kW/rack');
-        setText2('schSupplyT',    fmt(model.input.supplyTemp, 1) + '°C');
-        setText2('schFlow',       fmt(model.flowLpm, 0));
-        setText2('schCdu',        model.cduCount + ' CDU');
-        setText2('schPump',       'Pump ' + fmt(model.pumpPowerKw, 1) + 'kW');
-        setText2('schCapture',    fmt(model.effectiveCapture, 1) + '% capture');
-        setText2('schReturnT',    fmt(model.input.returnTemp, 1) + '°C');
-        setText2('schPue',        fmt(model.pue, 3));
-        setText2('schCop',        fmt(model.systemCop, 2));
-        setText2('schDeltaT',     fmt(model.deltaT, 1) + 'K');
-        setText2('schWue',        fmt(model.wue, 3));
-        setText2('schArch',       model.input.coolingArchitecture || '—');
-        setText2('schCarbon',     fmt(model.netCarbonTons, 0) + ' tCO2e/yr');
-        setText2('schAvoided',    fmt(model.avoidedCarbonTons, 0) + ' tCO2e/yr');
-        setText2('schOpex',       fmtUsd(model.netOpex));
-        setText2('schScore',      'Score ' + fmt(model.scores.total, 1) + '/100');
+        setText2('schSupplyT', 'Supply ' + fmt(model.input.supplyTemp, 1) + ' °C');
+        setText2('schReturnT', 'Return ' + fmt(model.input.returnTemp, 1) + ' °C');
+        syncPidTheme();
     }
 
     // ════════════════════════════════════════════════════════
@@ -735,12 +680,12 @@
         if (!host) return;
 
         var items = [
-            { name: 'ASHRAE Thermal',      score: model.scores.ashrae },
-            { name: 'ANSI/BICSI Standards', score: model.scores.ansi },
-            { name: 'ISO Energy Governance', score: model.scores.iso },
-            { name: 'NFPA Safety Posture',  score: model.scores.nfpa },
-            { name: 'Uptime Tier Alignment', score: model.scores.uptime },
-            { name: 'Composite Score',       score: model.scores.total }
+            { name: 'ASHRAE TC 9.9',    score: model.scores.ashrae },
+            { name: 'ASHRAE 90.4',      score: model.scores.iso },
+            { name: 'ISO 14644',        score: model.scores.iso },
+            { name: 'ANSI/BICSI 002',   score: model.scores.ansi },
+            { name: 'NFPA 75',          score: model.scores.nfpa },
+            { name: 'Uptime Institute', score: model.scores.uptime }
         ];
 
         var allPass = items.every(function (it) { return it.score >= 60; });
@@ -751,16 +696,13 @@
         }
 
         host.innerHTML = items.map(function (it) {
-            var sc = it.score || 0;
-            var barClass = sc >= 75 ? 'ltc-bar-good' : sc >= 50 ? 'ltc-bar-warn' : 'ltc-bar-bad';
+            var ok = (it.score || 0) >= 60;
             return '<div class="ltc-comp-row">' +
-                '<div class="ltc-comp-head">' +
+                '<span class="ltc-comp-check' + (ok ? '' : ' ltc-comp-check-fail') + '">' +
+                    '<i class="fas fa-' + (ok ? 'check' : 'exclamation') + '"></i></span>' +
                 '<span class="ltc-comp-name">' + it.name + '</span>' +
-                '<span class="ltc-comp-score">' + sc.toFixed(0) + '</span>' +
-                '</div>' +
-                '<div class="ltc-comp-bar-track">' +
-                '<div class="ltc-comp-bar-fill ' + barClass + '" style="width:' + Math.min(sc, 100) + '%"></div>' +
-                '</div>' +
+                '<span class="ltc-comp-status' + (ok ? '' : ' ltc-comp-status-fail') + '">' +
+                    (ok ? 'Compliant' : 'Review') + '</span>' +
                 '</div>';
         }).join('');
     }
@@ -777,13 +719,12 @@
         var bar = document.getElementById('ltcRadialBar');
         if (bar) {
             bar.style.strokeDasharray = filled.toFixed(1) + ' ' + (circumference - filled).toFixed(1);
-            // Color by score
-            bar.style.stroke = score >= 75 ? 'var(--ltc-green)' : score >= 50 ? '#f59e0b' : 'var(--ltc-pipe-return)';
+            bar.style.stroke = 'var(--ltc-accent)'; // reference ring is blue
         }
         setText2('ltcRadialPct', score.toFixed(0) + '%');
 
         var gradeEl = document.getElementById('ltcDesignGrade');
-        if (gradeEl) gradeEl.textContent = grade(score);
+        if (gradeEl) gradeEl.textContent = gradeWord(score); // word grade, not letter
 
         // Sub-bars: Efficiency, Resilience, Sustainability, Operability
         var subBars = document.getElementById('ltcSubBars');
@@ -812,6 +753,13 @@
                 '</div>' +
                 '</div>';
         }).join('');
+    }
+
+    function gradeWord(s) {
+        if (s >= 85) return 'Excellent';
+        if (s >= 70) return 'Good';
+        if (s >= 55) return 'Fair';
+        return 'Needs Work';
     }
 
     // ════════════════════════════════════════════════════════

@@ -11,6 +11,29 @@ release sections rather than semver.
 
 ---
 
+## v1.115.1 — 2026-07-23 (Critical Spares Engine — rebuilt to the reference 3-column dashboard)
+
+### Changed
+- **`spares-readiness-calculator.html` — actual reference LAYOUT** (the prior ship only recolored the old top-to-bottom sprawl; owner rejected it). Rebuilt the page body into the reference's dense **3-column analyst dashboard** (`.sp-shell` grid, 264px / fluid / 312px, contained ~1460px so no empty voids; rails stack < 1180px):
+  - **LEFT rail — ANALYSIS SETUP**: Select Commodity + 12 compact Fleet & Operational inputs (`rail_*` mirrored two-way to the real `c1_*`/`s_*`/`r_*` calc inputs via `sp_bind` + native event dispatch, so the existing calc reruns), Edit All Inputs, SCENARIO Active pill, **▶ Run Analysis** (→ `recalcAll()`), Last-run stamp.
+  - **CENTER**: the 8-module KPI strip + all 25 module tabs + panes, restyled to the flat reference card language.
+  - **RIGHT rail**: View Methodology, Monte-Carlo card, Portfolio Summary, Supply-Risk × RPN 3×3 heat map, Quick Actions (Export Full Report / Save / Reset — wired to existing handlers). Filled by `renderSpRails()` appended to `recalcAll` (original body untouched).
+  - Workflow-Overview flowchart hidden (not in the reference). Hero-banner band added at top (`assets/spares-readiness-calculator-hero.webp` via `js/rz-hero-fit.js` blur-letterbox; collapses cleanly to nothing until the owner adds the image — no dark void). Day + night both screenshot-matched to `uiux_day.png` / `uiux_night.png`. All calc functions + element ids preserved.
+
+## v1.115.2 — 2026-07-23 (LTC Modelling Lab — pixel-match rebuild to reference: real P&ID + de-terminal skin + gate fix)
+
+### Changed
+- **SYSTEM OVERVIEW is now the reference photorealistic P&ID.** The generic outlined-box SVG was replaced by the actual reference equipment render (dry-cooler bank → pump → plate heat-exchanger → cold-plate racks, blue supply / red return pipes with valves), cropped from the reference mockups into `assets/ltc/pid-day.png` + `pid-night.png` and theme-swapped live. Only the **Supply/Return temperature chips** are overlaid, live-wired to the model (they cover the baked labels). This closes the owner's "P&ID tidak sama" report.
+- **De-terminalized the whole dashboard skin.** Every `JetBrains Mono` declaration in `css/ltc-lab.css` (~20 rules, incl. all KPI numbers) is now Inter sans to match the reference's clean SaaS look — no monospace, no thin-outline instrument aesthetic. Font Awesome icon fonts untouched.
+- **Right rail matched to reference**: COMPLIANCE & STANDARDS rows are now green-check circles + "Compliant" (ASHRAE TC 9.9 / ASHRAE 90.4 / ISO 14644 / ANSI/BICSI 002 / NFPA 75 / Uptime Institute), not score-bars; DESIGN STATUS radial is the reference blue ring + word grade (Excellent/Good/Fair). All still wired to `model.scores.*`.
+
+### Fixed
+- **LTC page false access-gate lock ("keep asking Sign In").** The tier gate flashed "Pro or Educator access required" for a logged-in owner because `_rzAuth`/`_rzFeatures` load after the gate's first checks and the heavy dashboard init widened that window. Added an **email-allowlist fast-path** in the page's inline gate script: an allowlisted root email (`bagus@`/`admin@resistancezero.com`) unlocks on the very first synchronous check, before `_rzFeatures` exists — no gate flash. Logged-out still gates (login modal renders on top, z=99999).
+- **Initial-paint gap** carried from v1.114.x: the new dashboard now renders the cached model at the end of `init()` (defer ordering had the engine's first `applyModelToUI` fire before the scaffold existed).
+
+### Notes
+- Backend math untouched — `computeModel` and all solvers unchanged (the only engine-file edit remains the additive return fields + hook from v1.114.0). Every KPI is engine-wired (values differ from the mockup's illustrative figures because they are computed from the live default inputs).
+
 ## v1.114.2 — 2026-07-23 (Fix: login state now persists on every page — real root cause)
 
 ### Fixed
