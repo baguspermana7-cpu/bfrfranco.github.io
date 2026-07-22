@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.114.1 — 2026-07-23 (LTC Modelling Lab — mockup topbar)
+
+### Added
+- **LTC Modelling Lab topbar (mockup match)** — `js/ltc-lab-ui.js` now injects (non-destructively, via `buildTopbar()`) the reference top navigation to finish the pixel-match: a **center nav** (Home / DC Solutions / Technical Manuals / LTC Modelling Lab [active underline] / Contact — all real destinations) and a **right action cluster** — What's-new bell → `changelog.html`, report-doc icon → REPORT tab, **Save Scenario** → the existing `#saveScenarioBtn` (or focuses the scenario-name field on the REPORT tab when unnamed), **Export Report** → the existing `#exportExecutive`. Every control wires to a REAL existing handler — no fake buttons. The existing theme toggle, auth widget, and mobile hamburger are preserved: the center nav + action cluster are desktop-only (≥ 981px), the legacy back-links are hidden on desktop and remain in the mobile drawer. Styled for both themes under `body.ltc-revamp` in `css/ltc-lab.css`. Fixed an initial-paint gap from the same session: because both the engine and the UI module are `defer`, the engine's first `applyModelToUI` fired the `__ltcModelHook` before the dashboard scaffold existed, so the new KPI strip/schematic/right-rail showed placeholders until the first input — `init()` now re-renders the cached model once the scaffold is built.
+
+---
+
 ## v1.114.0 — 2026-07-22 (LTC Modelling Lab dashboard revamp · Critical Spares Engine reskin · TCO engine-wiring · auth login-drift fix)
 
 ### Added

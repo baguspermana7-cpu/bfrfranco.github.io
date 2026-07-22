@@ -1059,3 +1059,99 @@ body.ltc-revamp #ltcDetailedHost {
         padding: 7px 9px 6px;
     }
 }
+
+/* ── Topbar (mockup match): center nav + right action cluster ───────────── */
+body.ltc-revamp .navbar {
+    background: var(--ltc-topbar-bg);
+    border-bottom: 1px solid var(--ltc-hairline);
+}
+body.ltc-revamp .navbar .nav-container {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+body.ltc-revamp .navbar .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+}
+/* Center nav */
+body.ltc-revamp .ltc-nav-center {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    margin: 0 auto;
+}
+body.ltc-revamp .ltc-nav-link {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ltc-muted);
+    text-decoration: none;
+    padding: 6px 2px;
+    position: relative;
+    transition: color .15s;
+    white-space: nowrap;
+}
+body.ltc-revamp .ltc-nav-link:hover { color: var(--ltc-text); }
+body.ltc-revamp .ltc-nav-link-active { color: var(--ltc-text); }
+body.ltc-revamp .ltc-nav-link-active::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -14px;
+    height: 2px;
+    background: var(--ltc-accent);
+    border-radius: 2px;
+}
+/* Right action cluster */
+body.ltc-revamp .ltc-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+body.ltc-revamp .ltc-nav-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    border: 1px solid var(--ltc-hairline);
+    border-radius: 9px;
+    background: var(--ltc-card-bg);
+    color: var(--ltc-muted);
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s, color .15s, border-color .15s;
+}
+body.ltc-revamp .ltc-nav-icon:hover { color: var(--ltc-text); border-color: var(--ltc-accent); }
+body.ltc-revamp .ltc-nav-btn {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 9px;
+    cursor: pointer;
+    white-space: nowrap;
+    border: 1px solid var(--ltc-hairline);
+    transition: background .15s, color .15s, border-color .15s, box-shadow .15s;
+}
+body.ltc-revamp .ltc-nav-btn-outline {
+    background: var(--ltc-card-bg);
+    color: var(--ltc-text);
+}
+body.ltc-revamp .ltc-nav-btn-outline:hover { border-color: var(--ltc-accent); color: var(--ltc-accent); }
+body.ltc-revamp .ltc-nav-btn-primary {
+    background: var(--ltc-accent);
+    color: #fff;
+    border-color: var(--ltc-accent);
+    box-shadow: 0 1px 3px rgba(11,95,234,.28);
+}
+body.ltc-revamp .ltc-nav-btn-primary:hover { filter: brightness(1.06); }
+/* Desktop replaces the legacy back-links with the center nav */
+@media (min-width: 981px) {
+    body.ltc-revamp .navbar .nav-links .nav-back { display: none !important; }
+}
+/* Mobile: hide the injected desktop nav/actions; keep brand + hamburger + theme + auth */
+@media (max-width: 980px) {
+    body.ltc-revamp .ltc-nav-center,
+    body.ltc-revamp .ltc-nav-actions { display: none !important; }
+}

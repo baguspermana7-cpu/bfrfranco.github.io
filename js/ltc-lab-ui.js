@@ -38,6 +38,7 @@
         bindArchPresets();
         bindTabs();
         bindRunBtn();
+        buildTopbar();
         patchApplyModelToUI();
         // Initial paint: the engine's first applyModelToUI runs BEFORE this scaffold
         // exists (both scripts are `defer`; the engine's DOMContentLoaded handler is
@@ -532,6 +533,74 @@
                 if (activePanel) activePanel.style.display = '';
             });
         });
+    }
+
+    // ════════════════════════════════════════════════════════
+    // activateLtcTab — programmatic tab switch (topbar shortcuts)
+    // ════════════════════════════════════════════════════════
+    function activateLtcTab(name) {
+        var b = document.querySelector('.ltc-tab-btn[data-tab="' + name + '"]');
+        if (b) b.click();
+    }
+
+    // ════════════════════════════════════════════════════════
+    // buildTopbar — mockup topbar: center nav + right action cluster.
+    // Non-destructive: keeps the existing theme toggle + auth widget +
+    // hamburger. Actions wire to REAL existing handlers (no fake buttons).
+    // ════════════════════════════════════════════════════════
+    function buildTopbar() {
+        var navContainer = document.querySelector('.navbar .nav-container');
+        if (!navContainer || navContainer.querySelector('.ltc-nav-center')) return;
+        var navLinks = navContainer.querySelector('.nav-links');
+
+        // Center nav (real destinations)
+        var center = el('div', { className: 'ltc-nav-center' });
+        [
+            ['Home', 'index.html', false],
+            ['DC Solutions', 'datacenter-solutions.html', false],
+            ['Technical Manuals', 'manual/index.html', false],
+            ['LTC Modelling Lab', '#', true],
+            ['Contact', 'index.html#contact', false]
+        ].forEach(function (l) {
+            var a = el('a', { href: l[1], textContent: l[0],
+                className: 'ltc-nav-link' + (l[2] ? ' ltc-nav-link-active' : '') });
+            if (l[2]) a.addEventListener('click', function (e) { e.preventDefault(); });
+            center.appendChild(a);
+        });
+        if (navLinks) navContainer.insertBefore(center, navLinks);
+        else navContainer.appendChild(center);
+
+        // Right action cluster → real handlers
+        var actions = el('div', { className: 'ltc-nav-actions' });
+        var bell = el('a', { href: 'changelog.html', className: 'ltc-nav-icon',
+            title: "What's new", innerHTML: '<i class="fas fa-bell"></i>' });
+        var docBtn = el('button', { type: 'button', className: 'ltc-nav-icon',
+            title: 'Report', innerHTML: '<i class="fas fa-file-lines"></i>' });
+        docBtn.addEventListener('click', function () { activateLtcTab('report'); });
+        var saveBtn = el('button', { type: 'button',
+            className: 'ltc-nav-btn ltc-nav-btn-outline', textContent: 'Save Scenario' });
+        saveBtn.addEventListener('click', function () {
+            var nameEl = document.getElementById('scenarioName');
+            if (nameEl && String(nameEl.value).trim()) {
+                var b = document.getElementById('saveScenarioBtn'); if (b) b.click();
+            } else {
+                activateLtcTab('report'); if (nameEl) nameEl.focus();
+            }
+        });
+        var expBtn = el('button', { type: 'button',
+            className: 'ltc-nav-btn ltc-nav-btn-primary', textContent: 'Export Report' });
+        expBtn.addEventListener('click', function () {
+            var b = document.getElementById('exportExecutive');
+            if (b) b.click(); else activateLtcTab('report');
+        });
+        actions.appendChild(bell);
+        actions.appendChild(docBtn);
+        actions.appendChild(saveBtn);
+        actions.appendChild(expBtn);
+
+        var theme = document.getElementById('themeToggle');
+        if (theme && theme.parentNode) theme.parentNode.insertBefore(actions, theme);
+        else if (navLinks) navLinks.insertBefore(actions, navLinks.firstChild);
     }
 
     // ════════════════════════════════════════════════════════
