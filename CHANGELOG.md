@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.113.2 — 2026-07-22 (Fix: mobile hamburger appearing + misfiring on desktop)
+
+### Fixed
+- The injected mobile hamburger (`js/rz-mobile-nav.js`) was hard-coded with inline `display:inline-flex !important`, which overrode the stylesheet's desktop `.rz-nav-burger{display:none}` rule — so on pages without a pre-existing `.hamburger` (e.g. the LTC labs) the burger appeared **at desktop width** and, when clicked, set `body{overflow:hidden}` while the drawer CSS only exists ≤768px → no menu opened and the top HUD collapsed. Now the injected burger's visibility is gated by `matchMedia('(max-width:768px)')` (+ change listener), so it shows only on mobile and never misfires on desktop. Cache-busted `js/rz-mobile-nav.js?v=` across 119 pages.
+
 ## v1.113.1 — 2026-07-22 (DCMOC sidebar color restored — semantic lifecycle-phase coding)
 
 ### Fixed

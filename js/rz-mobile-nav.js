@@ -56,7 +56,6 @@
             // Inline styles as a defensive fallback — ensures rendering even if
             // CSS doesn't load or specificity collisions happen on calc pages
             burger.style.cssText =
-                'display:inline-flex !important;' +
                 'width:44px !important;height:44px !important;' +
                 'min-width:44px !important;min-height:44px !important;' +
                 'flex-shrink:0 !important;' +
@@ -83,6 +82,18 @@
                 '.nav-right, .nav-container, .cx-nav-inner, .rfs-nav-inner, .nav-inner'
             ) || navbar;
             host.appendChild(burger);
+
+            // Show the INJECTED burger only at the mobile breakpoint (≤768px).
+            // (The old inline `display:inline-flex !important` overrode the desktop
+            //  `.rz-nav-burger{display:none}` rule, so the burger appeared — and
+            //  misfired — on desktop pages that inject it, e.g. the LTC labs.)
+            var mq = window.matchMedia('(max-width:768px)');
+            var applyBurgerDisplay = function(){
+                burger.style.display = mq.matches ? 'inline-flex' : 'none';
+            };
+            applyBurgerDisplay();
+            (mq.addEventListener ? mq.addEventListener('change', applyBurgerDisplay)
+                                 : window.addEventListener('resize', applyBurgerDisplay));
         }
 
         // Store reference on window so the close-on-outside handler can find it

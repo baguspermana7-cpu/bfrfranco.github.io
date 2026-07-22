@@ -529,9 +529,12 @@
         .reference-item a { color: #1d4ed8; text-decoration: none; }
         [data-theme="dark"] .reference-item a { color: #93c5fd; }
         .reference-item a:hover { text-decoration: underline; }
+
+    /* Keep wide data tables inside the reading column — scroll internally instead of overflowing */
+    .article-body .ws-lever-table { display: block; max-width: 100%; overflow-x: auto; }
     /* v1.5.0 — article typography uplift (Awwwards-tier polish) */
 
-/* Gradient drop-cap on first paragraph of article body */
+/* Drop-cap on first paragraph of article body — solid accent (editorial skin, no gradient) */
 .article-body > p:first-of-type::first-letter,
 article > p:first-of-type::first-letter,
 .article-content > p:first-of-type::first-letter {
@@ -540,12 +543,8 @@ article > p:first-of-type::first-letter,
     line-height: 1;
     font-weight: 800;
     margin: 0.1em 0.15em 0 0;
-    background: linear-gradient(135deg, #fbbf24 0%, #10b981 50%, #3b82f6 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--rz-art-accent, #E8B563);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
 }
 
 /* Scroll-reveal class — IntersectionObserver toggles .is-visible */
@@ -574,9 +573,9 @@ article h2::before {
     position: absolute;
     left: -1rem;
     top: 0.45em;
-    width: 4px;
+    width: 2px;
     height: 0.55em;
-    background: linear-gradient(180deg, #fbbf24, #10b981);
+    background: var(--rz-art-accent, #E8B563);
     border-radius: 2px;
     opacity: 0;
     transform: translateX(-8px);
@@ -693,15 +692,14 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 [data-theme="dark"] .col-card-stat span:first-child { color:#94a3b8 !important; }
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
-    <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-07-22-navfix" defer></script>
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
     <script>(function(){var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-<!-- Scroll Progress Bar -->
-<div class="scroll-progress-container"><div class="scroll-progress-bar" id="scrollProgress" style="background: linear-gradient(90deg, #b45309, #fcd34d);"></div></div>
+<!-- Read-progress is provided by the shared editorial runtime (js/rz-article-editorial.js) -->
 
 <!-- TOC Sidebar -->
 <aside class="toc-sidebar" id="tocSidebar"><ul class="toc-sidebar-list" id="tocSidebarList"></ul></aside>
@@ -848,12 +846,12 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 <!-- Series Navigation -->
 <div class="series-nav" style="margin-top: 1rem;">
     <div class="series-badge">
-        <span class="series-badge-icon">23</span>
-        Engineering Journal &mdash; Article 23
+        <span class="series-badge-icon">28</span>
+        Engineering Journal &mdash; Article 28
     </div>
     <span class="series-title"></span>
     <div class="series-links">
-        <a href="article-22.html" class="series-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Prev</a>
+        <a href="article-27.html" class="series-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Prev</a>
         <a href="#" class="series-link" style="opacity:0.4;pointer-events:none;">Next<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
     </div>
 </div>
@@ -861,6 +859,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 <!-- Article Content -->
 <main id="main-content">
 <article class="article-content">
+<div class="article-body">
     <p class="ws-lead">A friend handed me two provocations that sound like science fiction and, taken literally, are. First: compress hundreds of terabytes of AI training data &mdash; millions of times over &mdash; down to about one kilobyte. Second: make a single CPU-only laptop the equal of a gigawatt of datacenter AI compute. Both collide head-on with two of the most durable walls in all of science. And yet the honest answer is not &ldquo;no.&rdquo; It is far more interesting than that.</p>
 
     <p>In twelve years around data centers I have learned to respect physical limits &mdash; a busbar carries what it carries, a chiller rejects what it rejects. Information and computation have limits every bit as hard. But those limits govern <em>bytes</em> and <em>joules</em>. They say almost nothing about the thing we actually care about: <strong>capability</strong>. And capability, it turns out, compresses and travels in ways that look like magic from the outside. This is a map of both walls, the real research climbing them, and a practical pipeline that turns a default local model into something that feels genuinely brilliant on your own work.</p>
@@ -878,9 +877,9 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
     <h2 id="capability-compresses">How far capability actually compresses</h2>
 
-    <p>Here the numbers get genuinely absurd &mdash; and they are shipping, not speculative. <a href="glossary.html#term-knowledge-distillation">Knowledge distillation</a> trains a small &ldquo;student&rdquo; to mimic a large teacher, inheriting most of its ability at a fraction of the parameters. <strong>Dataset distillation</strong> goes further, synthesizing a tiny set of artificial examples that train a model almost as well as the full dataset &mdash; though even state-of-the-art methods still lose accuracy and often cost more compute to distill than they save, a caveat the hype usually omits.</p>
+    <p>Here the numbers get genuinely absurd &mdash; and they are shipping, not speculative. <a href="glossary.html#term-knowledge-distillation">Knowledge distillation</a> trains a small &ldquo;student&rdquo; to mimic a large teacher: <strong>DistilBERT</strong> keeps <span class="ws-stat">~97% of BERT-base</span> on language understanding with <span class="ws-stat">40% fewer parameters</span> (66M vs 110M) and runs <span class="ws-stat">~60% faster</span> <a href="https://arxiv.org/abs/1910.01108" target="_blank" rel="noopener">(Sanh et&nbsp;al., 2019)</a>. <strong>Dataset distillation</strong> goes further, synthesizing a tiny set of artificial examples that train a model almost as well as the full dataset: on ImageNet-1K, <span class="ws-stat">50 synthetic images per class</span> (4.2% of the data) trains to within <span class="ws-stat">~5.9% accuracy</span> of full-dataset training <a href="https://proceedings.neurips.cc/paper_files/paper/2024/file/1da9ca7e9cef4b1af63913f05d1630a4-Paper-Conference.pdf" target="_blank" rel="noopener">(NeurIPS 2024)</a>. The honest caveat the hype omits: distilled sets still trail full data, need <em>soft</em> probabilistic labels to scale, and often cost more compute to distill than they save.</p>
 
-    <p>The densest proven result is at the bit level. Microsoft's <strong>BitNet b1.58</strong> stores every weight as one of three values &mdash; &minus;1, 0, +1 &mdash; which is <span class="ws-stat">log&#8322;(3) &asymp; 1.58 bits</span> per weight. Trained that way from scratch, it <em>matches</em> full-precision models of the same size on quality, while a 70B version ran <span class="ws-stat">4.1&times; faster with 8.9&times; the throughput</span> of an FP16 LLaMA. The knowledge distilled from trillions of tokens survives at 1.58 bits. That is the highest capability-per-bit humanity has demonstrated.</p>
+    <p>The densest proven result is at the bit level. Microsoft's <strong>BitNet b1.58</strong> stores every weight as one of three values &mdash; &minus;1, 0, +1 &mdash; which is <span class="ws-stat">log&#8322;(3) &asymp; 1.58 bits</span> per weight. Trained that way <em>from scratch</em>, it <em>matches</em> a full-precision LLaMA of the <strong>same model size and token budget</strong> on perplexity and end-task accuracy; a 70B version ran <span class="ws-stat">4.1&times; faster</span>, delivered <span class="ws-stat">8.9&times; the throughput</span>, used <span class="ws-stat">7.16&times; less memory</span>, and cut matmul energy <span class="ws-stat">71.4&times;</span> on 7&nbsp;nm silicon <a href="https://arxiv.org/abs/2402.17764" target="_blank" rel="noopener">(Microsoft, arXiv:2402.17764)</a>. The load-bearing caveat: this is a native low-bit model <em>trained</em> ternary. You <strong>cannot</strong> post-quantize an existing FP16 model to 1.58 bits and keep the quality &mdash; the crossover only holds when the model learns in ternary from the start. The first shipped weights, <code>bitnet-b1.58-2B-4T</code> (2B params, 4T tokens), landed in April&nbsp;2025. That is the highest capability-per-bit humanity has demonstrated.</p>
 
     <figure class="rz-chart" data-rz-chart>
       <div class="rz-chart-canvas"><canvas></canvas></div>
@@ -891,18 +890,18 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
     <p>And the data need not be stored as data at all. <strong>Implicit neural representations</strong> (the COIN line of work) throw away the pixels and keep a small network that <em>regenerates</em> them &mdash; the image becomes a tiny function, beating JPEG at low bitrates. <a href="glossary.html#term-hyperdimensional-computing">Hyperdimensional computing</a> superposes many items into a single high-dimensional vector and pulls them back out approximately &mdash; the principled version of &ldquo;compress a knowledge base into one vector.&rdquo; And <strong>Matryoshka embeddings</strong> (now inside OpenAI's text-embedding models) pack coarse-to-fine meaning so a truncated prefix is still a good vector, cutting storage up to <span class="ws-stat">14&times;</span> at equal accuracy. None of these hit 1&nbsp;KB for rich signals &mdash; but every one moves the floor.</p>
 
-    <p>Put those together and you get the honest &ldquo;millions&times;&rdquo; number &mdash; but of <em>capability</em>, not bytes. Take a frontier-class 70-billion-parameter model. The raw corpus that taught it is on the order of <span class="ws-stat">~60&nbsp;TB</span> of text (roughly 15 trillion tokens). Its learned weights are <span class="ws-stat">140&nbsp;GB</span> at FP16 &mdash; already a ~430&times; distillation of the corpus into the capability. Quantize to INT8 and it is <span class="ws-stat">70&nbsp;GB</span>; push to BitNet's 1.58 bits and it is <span class="ws-stat">~14&nbsp;GB</span>. That is the corpus's <em>useful ability</em> compressed roughly <span class="ws-stat">4,000&times;</span> &mdash; and it runs on a workstation. Not 1&nbsp;KB, never 1&nbsp;KB for arbitrary data, but a genuinely staggering collapse of capability into a fraction of the space.</p>
+    <p>Put those together and you get the honest &ldquo;millions&times;&rdquo; number &mdash; but of <em>capability</em>, not bytes, and you have to show the arithmetic or it becomes a lie. Take a frontier-class 70-billion-parameter model trained on roughly <span class="ws-stat">15 trillion tokens</span> &mdash; on the order of <span class="ws-stat">~15&ndash;20&nbsp;TB</span> of text. Its learned weights are <span class="ws-stat">140&nbsp;GB</span> at FP16: a <span class="ws-stat">~100&ndash;150&times;</span> lossy collapse of the corpus into capability. <strong>That ~100&ndash;150&times; is the solid, defensible number.</strong> Quantize to INT8 (<span class="ws-stat">70&nbsp;GB</span>) and it approaches ~250&times;; push to BitNet's 1.58 bits (<span class="ws-stat">~14&nbsp;GB</span>) and this 70B lands near <span class="ws-stat">~1,300&times;</span>. The eye-popping <span class="ws-stat">~4,000&times;</span> you see quoted is real arithmetic but a <em>different</em> model &mdash; an 8B trained on the same corpus, at 4-bit, is only ~4&ndash;5&nbsp;GB against ~15&ndash;20&nbsp;TB. Legitimate, but you swapped the model mid-sentence, so treat ~4,000&times; as <strong>illustrative, not a cited constant</strong>. And note the deeper point: unlike a ZIP, none of this can reconstruct the training data. It is lossy compression of <em>regularities</em>, not bytes &mdash; never 1&nbsp;KB for arbitrary data, but a genuinely staggering collapse of <em>ability</em> into a fraction of the space.</p>
 
     <figure class="rz-chart" data-rz-chart>
       <div class="rz-chart-canvas"><canvas></canvas></div>
       <script type="application/json" class="rz-chart-cfg">
-{"type": "bar", "title": "The capability cascade: a ~60 TB corpus becomes ~14 GB of usable model (log scale)", "labels": ["Training corpus", "FP16 weights (70B)", "INT8 weights", "BitNet 1.58-bit"], "series": [{"label": "Size", "data": [60000, 140, 70, 14], "unit": " GB", "colorAccents": ["muted", "data", "signal", "positive"]}], "source": "~15T tokens x ~4 bytes ~ 60 TB raw text (order-of-magnitude); 70B params x 2/1 bytes = 140/70 GB; 70B x 1.58 bits/8 = 13.8 GB (arXiv:2402.17764). data/article-28/compression-cascade.csv", "basisTag": "derived", "logY": true, "x": "Representation", "y": "Size (GB, log)"}
+{"type": "bar", "title": "The capability cascade: a ~15-20 TB corpus becomes ~14 GB of usable model (log scale)", "labels": ["Training corpus", "FP16 weights (70B)", "INT8 weights", "BitNet 1.58-bit"], "series": [{"label": "Size", "data": [18000, 140, 70, 14], "unit": " GB", "colorAccents": ["muted", "data", "signal", "positive"]}], "source": "~15T tokens ~ 15-20 TB text after tokenization (order-of-magnitude, mid ~18 TB); 70B params x 2/1 bytes = 140/70 GB; 70B x 1.58 bits/8 = 13.8 GB (BitNet, arXiv:2402.17764). Corpus->FP16 ~100-150x is the solid figure; deeper ratios swap model size. data/article-28/compression-cascade.csv", "basisTag": "derived", "logY": true, "x": "Representation", "y": "Size (GB, log)"}
       </script>
     </figure>
 
     <h2 id="wall-2">Wall Two: the thermodynamic limit</h2>
 
-    <p>Now the second target. In 1961 Rolf Landauer proved that erasing one bit of information <em>irreversibly</em> must dissipate at least <span class="ws-stat">kT&middot;ln2 &asymp; 2.8&times;10&#8315;&sup2;&sup1; joules</span> of heat &mdash; about 0.018&nbsp;eV at room temperature. It is not an engineering hurdle; it is thermodynamics, and it was directly confirmed in 2012 with a single colloidal particle in a double-well trap. A 1&nbsp;GW datacenter performs some vast number of irreversible operations per second. To match that operation rate inside a laptop's ~50&nbsp;W envelope would mean doing roughly <span class="ws-stat">20 million times</span> more work per joule than the datacenter. On today's silicon, which already burns <span class="ws-stat">more than 1,000&times;</span> the Landauer minimum per bit, that is flatly impossible.</p>
+    <p>Now the second target. In 1961 Rolf Landauer proved that erasing one bit of information <em>irreversibly</em> must dissipate at least <span class="ws-stat">kT&middot;ln2 &asymp; 2.8&times;10&#8315;&sup2;&sup1; joules</span> (2.8&nbsp;zJ) of heat at 300&nbsp;K &mdash; about 0.018&nbsp;eV. It is not an engineering hurdle; it is thermodynamics, and it was directly confirmed in 2012 with a single colloidal particle in a double-well trap <a href="https://www.nature.com/articles/nature10872" target="_blank" rel="noopener">(B&eacute;rut et&nbsp;al., Nature 2012)</a>. A 1&nbsp;GW datacenter performs some vast number of irreversible operations per second. To match that operation rate inside a laptop's ~50&nbsp;W envelope would mean doing roughly <span class="ws-stat">20 million times</span> more work per joule than the datacenter. On today's silicon, which already burns <span class="ws-stat">10&#8308;&ndash;10&#8310;&times;</span> the Landauer minimum per bit <a href="https://arxiv.org/abs/2312.08595" target="_blank" rel="noopener">(arXiv:2312.08595)</a>, that is flatly impossible.</p>
 
     <div class="ws-insight-box">
         <h4><i class="fas fa-bolt" style="color:#E8B563;margin-right:0.4rem;"></i>Inference is not training</h4>
@@ -916,8 +915,8 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     <ul>
       <li><strong>Reversible computing</strong> (Landauer, then Bennett, Fredkin, Toffoli): compute without erasing bits and the Landauer floor no longer applies &mdash; IEEE Spectrum frames a potential <span class="ws-stat">~4,000&times;</span> efficiency upside. Decades-old theory; unsolved at scale.</li>
       <li><strong>Analog in-memory computing</strong>: <a href="glossary.html#term-memristor">memristor</a> crossbars do a whole matrix-multiply &mdash; the core AI operation &mdash; in one physical step via Ohm's and Kirchhoff's laws, with no data movement. Recent devices report <span class="ws-stat">tens of TOPS per watt</span> and ~85&times; efficiency gains for the right workloads.</li>
-      <li><strong>Photonic and neuromorphic</strong>: multiply with light; or compute with brain-like spikes &mdash; Intel's Loihi&nbsp;2 shows <span class="ws-stat">&gt;100&times;</span> efficiency on suitable tasks. The existence proof is your own head: roughly <span class="ws-stat">20 watts</span> of general intelligence, six orders of magnitude below a training cluster.</li>
-      <li><strong>Thermodynamic computing</strong> (Extropic, Normal Computing): stop fighting noise and use it, targeting generative workloads with claimed <span class="ws-stat">10,000&times;</span> energy savings &mdash; still early, simulation-level claims, not shipped performance.</li>
+      <li><strong>Photonic and neuromorphic</strong>: multiply with light; or compute with brain-like spikes. Intel's <strong>Hala&nbsp;Point</strong> (Loihi&nbsp;2) packs <span class="ws-stat">1.15B neurons across 140,544 cores in &le;2,600&nbsp;W</span> and shows up to <span class="ws-stat">~100&times;</span> less energy on sparse, event-driven workloads <a href="https://newsroom.intel.com/artificial-intelligence/intel-builds-worlds-largest-neuromorphic-system" target="_blank" rel="noopener">(Intel, 2024)</a> &mdash; but it is a research machine, not a general-purpose LLM box. The existence proof is your own head: roughly <span class="ws-stat">20 watts</span> of general intelligence, six orders of magnitude below a training cluster.</li>
+      <li><strong>Thermodynamic computing</strong> (Extropic, Normal Computing): stop fighting thermal noise and sample from it, targeting generative workloads with an <em>aspirational</em> <span class="ws-stat">~10,000&times;</span> energy claim <a href="https://extropic.ai/writing/thermodynamic-computing-from-zero-to-one" target="_blank" rel="noopener">(Extropic)</a> &mdash; a prototype/startup figure that &ldquo;deserves scrutiny,&rdquo; not a shipped benchmark. Print it as a bet, not a fact.</li>
     </ul>
 
     <table class="ws-lever-table">
@@ -941,7 +940,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
     <h2 id="algorithmic-efficiency">The lever that actually reaches the laptop</h2>
 
-    <p>There is a fifth path, and it is the one that quietly wins. The <em>compute needed to reach a given capability</em> keeps falling as algorithms improve. Hernandez &amp; Brown found the compute to hit AlexNet-level accuracy dropped <span class="ws-stat">44&times;</span> between 2012 and 2019 &mdash; a doubling of efficiency every ~16 months, <strong>faster than Moore's Law</strong>. Epoch&nbsp;AI later found that for language models the compute to reach a fixed capability <span class="ws-stat">halves roughly every 8 months</span>. That is the real mechanism by which yesterday's gigawatt capability lands on tomorrow's laptop &mdash; not by cramming a power plant into the case, but by needing far less of it for the same mind.</p>
+    <p>There is a fifth path, and it is the one that quietly wins. The <em>compute needed to reach a given capability</em> keeps falling as algorithms improve. Hernandez &amp; Brown found the compute to hit AlexNet-level accuracy dropped <span class="ws-stat">44&times;</span> between 2012 and 2019 &mdash; a doubling of efficiency every ~16 months, <strong>faster than Moore's Law</strong> <a href="https://arxiv.org/abs/2005.04305" target="_blank" rel="noopener">(arXiv:2005.04305)</a>. Epoch&nbsp;AI later put a tighter number on language models across <span class="ws-stat">231 models</span>: the compute to reach a fixed capability <span class="ws-stat">halves roughly every 8 months</span> (95% CI 5&ndash;14&nbsp;months) <a href="https://epoch.ai/blog/algorithmic-progress-in-language-models" target="_blank" rel="noopener">(Epoch AI)</a>. That is the real mechanism by which yesterday's gigawatt capability lands on tomorrow's laptop &mdash; not by cramming a power plant into the case, but by needing far less of it for the same mind. It is also the most <em>reliable</em> lever here: the exotic hardware below is promise; this is measured, repeatedly.</p>
 
     <figure class="rz-chart" data-rz-chart>
       <div class="rz-chart-canvas"><canvas></canvas></div>
@@ -962,6 +961,19 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     <h2 id="pipeline">From default model to domain genius</h2>
 
     <p>Which brings us home to something you can build this week. A ~7B model on a CPU-only PC will never equal a frontier system &mdash; that is physics, not defeatism. But it can become a genuinely sharp expert <em>on your data and your tasks</em>, often indistinguishable from &ldquo;very smart&rdquo; for the work you actually do. The gains form a pipeline, ordered by return on effort. The two highest-leverage stages &mdash; retrieval and tools &mdash; require no training at all.</p>
+
+    <h3 id="hardware-ceiling">First, the honest ceiling: what fits on your machine</h3>
+    <p>Before the pipeline, the hard constraint. A model must fit in memory to run at usable speed, and the rule of thumb is simple: <span class="ws-stat">usable RAM/VRAM (GB) &asymp; params(B) &times; bits&nbsp;&divide;&nbsp;8</span> plus KV-cache overhead &mdash; so a 4-bit (Q4) model costs about <span class="ws-stat">0.5&nbsp;GB per 1&nbsp;billion parameters</span>. That single line tells you exactly how far you can go.</p>
+    <table class="ws-lever-table">
+      <thead><tr><th scope="col">Your hardware</th><th scope="col">Max model (Q4)</th><th scope="col">Realistic speed</th><th scope="col">Notes</th></tr></thead>
+      <tbody>
+        <tr><td>16&nbsp;GB laptop / M-series</td><td><strong>7B&ndash;13B</strong></td><td>7B: ~12&ndash;18 tok/s (older) &rarr; 60&ndash;80 tok/s (M4&nbsp;Pro); 13B: ~6&ndash;50 tok/s</td><td>The everyday sweet spot; unified memory helps Apple silicon</td></tr>
+        <tr><td>24&ndash;32&nbsp;GB / single 24GB GPU</td><td><strong>up to ~32B</strong></td><td>tens of tok/s</td><td>Comfortable for coder + RAG agents</td></tr>
+        <tr class="lever-extend"><td>70B at Q4</td><td>needs <strong>~43&ndash;45&nbsp;GB</strong></td><td>dual RTX&nbsp;3090 (48GB): ~16&ndash;21 tok/s; CPU-offload: ~2&ndash;4 tok/s</td><td>Does <strong>not</strong> fit any single consumer GPU; needs 2 cards or offload</td></tr>
+        <tr><td>CPU-only, 32&ndash;64&nbsp;GB RAM</td><td>7B&ndash;34B</td><td>a few&ndash;low-tens tok/s</td><td>Works; slower, but RAG + tools still feel smart</td></tr>
+      </tbody>
+    </table>
+    <p>So the &ldquo;max&rdquo; on a normal laptop today is a <strong>~13B model at 4-bit</strong>, or ~32B on a 24&ndash;32&nbsp;GB machine. Everything below is about making <em>that</em> model punch far above its size &mdash; because raw size was never the lever that mattered most. Sources: Apple-silicon + consumer-GPU local-LLM benchmarks, 2026 <a href="https://blog.easecloud.io/ai-cloud/run-70b-models-on-consumer-gpus/" target="_blank" rel="noopener">(EaseCloud)</a>.</p>
 
     <figure class="rz-figure" aria-label="Pipeline from a default local model to a smart domain AI">
       <svg viewBox="0 0 960 300" role="img" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;background:#0b0f16;border:1px solid rgba(255,255,255,0.08);border-radius:12px">
@@ -1003,19 +1015,20 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     <p>Concretely: pick the strongest base your RAM allows and quantize it to fit; write a real system prompt; then &mdash; the biggest single lift &mdash; add <a href="glossary.html#term-rag">retrieval-augmented generation</a> so the model answers from <em>your</em> documents instead of hallucinating; give it tools so it can act, not just chat; and only then reach for LoRA fine-tuning (which wants a GPU) to bake in voice and domain reflexes, ideally distilling from a stronger teacher. Retrieval plus tools is where a laptop captures roughly four-fifths of the felt intelligence for a fifth of the work &mdash; no training required.</p>
 
     <table class="ws-lever-table">
-      <thead><tr><th scope="col">#</th><th scope="col">Stage</th><th scope="col">What it buys</th><th scope="col">Cost</th><th scope="col">ROI</th></tr></thead>
+      <thead><tr><th scope="col">#</th><th scope="col">Stage</th><th scope="col">What you need</th><th scope="col">Cost</th><th scope="col">Time</th><th scope="col">ROI</th><th scope="col">Main risk</th></tr></thead>
       <tbody>
-        <tr><td>1</td><td>Base model</td><td>Raw ceiling (qwen2.5 / -coder, biggest that fits RAM)</td><td>download</td><td>Foundation</td></tr>
-        <tr><td>2</td><td>Quantization</td><td>Fit a bigger/faster model on CPU (GGUF Q4/Q5; 1.58-bit frontier)</td><td>one-time</td><td>High</td></tr>
-        <tr><td>3</td><td>Prompt / system</td><td>Steer latent ability you already paid for</td><td>~free</td><td>High, instant</td></tr>
-        <tr class="lever-create"><td>4</td><td><strong>RAG / retrieval</strong></td><td>Answers grounded in <em>your</em> docs; kills hallucination; updates with no retraining</td><td>modest</td><td><strong>Highest</strong></td></tr>
-        <tr class="lever-create"><td>5</td><td><strong>Tools + agent</strong></td><td>Read/write files, run code &rarr; a coding agent that <em>acts</em></td><td>medium</td><td><strong>Very high</strong></td></tr>
-        <tr><td>6</td><td>Fine-tune / distill</td><td>Bake in voice + domain reflexes; LoRA (GPU); distill from a stronger teacher</td><td>GPU-bound</td><td>Medium</td></tr>
-        <tr><td>7</td><td>Memory / continual</td><td>Learns across sessions via episodic memory + reflection</td><td>modest</td><td>Compounding</td></tr>
-        <tr><td>8</td><td>Orchestrate / verify</td><td>Self-consistency, critic, ensembles &rarr; reliability</td><td>compute</td><td>High</td></tr>
-        <tr><td>9</td><td>Eval loop</td><td>Measure &ldquo;smarter&rdquo; &rarr; drive stages 1&ndash;8</td><td>modest</td><td>Directional</td></tr>
+        <tr><td>1</td><td>Base model</td><td>Pick strongest open weight that fits (Qwen3 / DeepSeek / Mistral, Apache/MIT)</td><td>free</td><td>minutes</td><td>Foundation</td><td>License traps (Llama community &ne; open); over-sizing</td></tr>
+        <tr><td>2</td><td>Quantize</td><td>GGUF Q4_K_M (llama.cpp / Ollama); AWQ&middot;GPTQ on GPU; MLX on Mac</td><td>free</td><td>minutes</td><td>High</td><td>Below Q4 breaks: Q3 loses reasoning, Q2 collapses</td></tr>
+        <tr><td>3</td><td>System prompt / few-shot</td><td>A real role prompt + a few worked examples</td><td>~free (tokens)</td><td>hours</td><td>High, instant</td><td>Brittleness; long prompts cost context + latency</td></tr>
+        <tr class="lever-create"><td>4</td><td><strong>RAG / retrieval</strong></td><td>Embedder + vector store + chunking over <em>your</em> docs</td><td>modest ($18&ndash;45K at scale; ~free locally)</td><td>days</td><td><strong>Highest</strong></td><td>Retrieval/chunking quality dominates; added latency</td></tr>
+        <tr class="lever-create"><td>5</td><td><strong>Tools + agent (MCP)</strong></td><td>Function-calling / MCP: file R/W, shell, APIs, loop</td><td>medium</td><td>days</td><td><strong>Very high</strong></td><td>Tool-selection errors, error cascades, tool-injection security</td></tr>
+        <tr class="lever-extend"><td>6</td><td>Fine-tune (QLoRA)</td><td>One 48GB GPU + a clean Q&amp;A dataset (ideally distilled from a stronger teacher)</td><td>~$15&ndash;30/run compute; $5&ndash;15K all-in</td><td>~24h/run + data prep</td><td>Situational</td><td>Catastrophic forgetting; stale baked knowledge; data prep dominates</td></tr>
+        <tr><td>7</td><td>Memory / continual</td><td>Episodic memory + reflection across sessions</td><td>modest</td><td>days</td><td>Compounding</td><td>Memory drift; retrieval of stale facts</td></tr>
+        <tr><td>8</td><td>Orchestrate / verify</td><td>Self-consistency, critic, ensembles</td><td>compute (N&times; calls)</td><td>days</td><td>High</td><td>Cost multiplies; diminishing returns</td></tr>
+        <tr><td>9</td><td>Eval loop</td><td>A held-out task set you actually score against</td><td>modest</td><td>ongoing</td><td>Directional</td><td>Gaming your own metric</td></tr>
       </tbody>
     </table>
+    <p class="ws-note" style="font-size:0.85rem;opacity:0.85;">The rule that saves the most money: <strong>RAG for knowledge, fine-tuning for behavior.</strong> If the model lacks <em>facts</em> (that also change), reach for retrieval &mdash; it stays fresh and cites its source, and below ~100K interactions/month it is usually cheaper than fine-tuning. Only reach for QLoRA when prompting + RAG + tools still leave a <em>style, format, or reflex</em> gap that production data reveals. And a sobering frontier marker: even the best model scores only <span class="ws-stat">57.77%</span> on the hardest agentic-tool benchmark <a href="https://arxiv.org/abs/2508.16260" target="_blank" rel="noopener">(MCPVerse)</a> &mdash; tools multiply capability, but orchestrating them reliably is still unsolved.</p>
 
     <h3 id="recipe">A concrete recipe (what actually works on a laptop)</h3>
     <p>The pipeline is not abstract. Here is the minimal, no-GPU path &mdash; roughly the stack behind this site's own local tooling:</p>
@@ -1027,6 +1040,19 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
       <li><strong>Only then</strong> consider LoRA fine-tuning (needs a GPU) to bake in your voice and domain &mdash; ideally on question/answer pairs distilled from a stronger teacher model.</li>
     </ol>
     <p>Stages 1&ndash;4 need <strong>zero training</strong> and run on a CPU-only machine. In practice they deliver the bulk of the felt intelligence: a model that is grounded, current, and able to act on your actual material.</p>
+
+    <h3 id="provider-notes">Which tool for which job (Claude, ChatGPT, Ollama, Gemini)</h3>
+    <p>The stages above are provider-agnostic, but each ecosystem has a sweet spot &mdash; and the honest trick is to <em>match the tool to the stage</em>, not to pick one and force everything through it.</p>
+    <table class="ws-lever-table">
+      <thead><tr><th scope="col">Tool</th><th scope="col">Best at</th><th scope="col">The trick</th><th scope="col">Where it fits</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Ollama</strong> (local)</td><td>Running Q4 GGUF models on your own hardware, offline &amp; private</td><td><code>ollama pull qwen3</code>; obey the 0.5&nbsp;GB/1B rule; add an embedder (<code>nomic-embed-text</code>) for RAG</td><td>Stages 1&ndash;5, fully local &mdash; the backbone of a private assistant</td></tr>
+        <tr><td><strong>Claude</strong></td><td>Long-context reasoning + <strong>MCP-native</strong> tool/agent loops</td><td>Wire tools via MCP so it can read files, run code, and iterate; lean on the large context for whole-repo work</td><td>Stages 3&amp;5 &mdash; the agentic layer + hardest reasoning</td></tr>
+        <tr><td><strong>ChatGPT</strong></td><td>Function-calling + custom GPTs + a broad plugin/tool surface</td><td>Define JSON function schemas for your tools; package a domain assistant as a custom GPT with instructions + files</td><td>Stages 3&ndash;5 &mdash; quick tool-using assistants</td></tr>
+        <tr><td><strong>Gemini</strong></td><td>Very long context + native web grounding + multimodal</td><td>Feed large document sets directly; use grounding to keep answers current without a self-hosted RAG store</td><td>Stage 4 alternative &mdash; retrieval-lite over huge inputs</td></tr>
+      </tbody>
+    </table>
+    <p class="ws-note" style="font-size:0.85rem;opacity:0.85;">A realistic build mixes them: <strong>Ollama</strong> for the private, always-on local model + RAG over your own files; a frontier API (<strong>Claude</strong> / <strong>ChatGPT</strong> / <strong>Gemini</strong>) for the hard reasoning, the agent loop, or as the <em>teacher</em> whose answers you distill into QLoRA data for the local model. Local for privacy and cost; frontier for the ceiling.</p>
 
     <h2 id="verdict">Myths versus reality</h2>
 
@@ -1050,29 +1076,86 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
     <h2 id="faq">Frequently asked questions</h2>
     <div class="ws-insight-box">
-        <h4>Can you really compress 300&nbsp;TB of data to 1&nbsp;KB?</h4>
-        <p>Not arbitrary data &mdash; Shannon and <a href="glossary.html#term-kolmogorov-complexity">Kolmogorov complexity</a> forbid it. But the <em>capability</em> learned from a corpus compresses enormously: a ~60&nbsp;TB corpus becomes ~14&nbsp;GB of usable model at 1.58 bits per weight, which is a ~4,000&times; collapse of ability into space.</p>
+        <h4>What is the real maximum &mdash; how far <em>can</em> you compress?</h4>
+        <p>For <strong>arbitrary/lossless</strong> data: essentially zero headroom &mdash; Shannon and <a href="glossary.html#term-kolmogorov-complexity">Kolmogorov complexity</a> mean most long files are incompressible, so 300&nbsp;TB&rarr;1&nbsp;KB is impossible. For <strong>capability</strong>, the demonstrated ceilings are concrete: weights down to <span class="ws-stat">1.58 bits</span> at full quality (BitNet, <em>if trained ternary from scratch</em>); a corpus&rarr;weights collapse of <span class="ws-stat">~100&ndash;150&times;</span> (solid) rising to ~1,300&times; at 1.58-bit; distillation keeping <span class="ws-stat">~97%</span> of a model at 40% of the size. The often-quoted &ldquo;~4,000&times;&rdquo; is illustrative arithmetic (a small model at 4-bit), not a single measured constant.</p>
     </div>
     <div class="ws-insight-box">
-        <h4>Can a laptop equal a 1&nbsp;GW datacenter?</h4>
-        <p>Not in raw FLOPs &mdash; <a href="glossary.html#term-memristor">Landauer's principle</a> and the power budget forbid it. But <em>inference is far cheaper than training</em>, so a laptop can run a capability that a gigawatt cluster trained; and algorithmic efficiency keeps halving the compute a given capability needs (~every 8 months for LLMs).</p>
+        <h4>Can a laptop equal a 1&nbsp;GW datacenter &mdash; and what would it take?</h4>
+        <p>In raw FLOPs, <strong>no</strong>: the <a href="glossary.html#term-entropy">Landauer</a> floor (2.8&nbsp;zJ/bit) plus a ~7-orders power gap forbid it. What a laptop <em>can</em> do, and the conditions to get there: <strong>(1)</strong> <em>run</em> (not train) the model &mdash; inference costs ~2P vs ~6P FLOPs/token; <strong>(2)</strong> fit it &mdash; ~13B at Q4 on a 16&nbsp;GB machine, ~32B on 24&ndash;32&nbsp;GB; <strong>(3)</strong> ride algorithmic efficiency &mdash; the compute for a fixed capability halves every ~8&nbsp;months. You never move the datacenter in; you run the capability it trained.</p>
     </div>
     <div class="ws-insight-box">
-        <h4>How do I make my local AI genuinely smart?</h4>
-        <p>Strong base model &rarr; quantize to fit &rarr; a good system prompt &rarr; then the two highest-ROI stages: <a href="glossary.html#term-rag">retrieval-augmented generation</a> over your own data, and tool/agent loops. Fine-tuning (LoRA) comes last and wants a GPU. Stages 1&ndash;4 need no training at all.</p>
+        <h4>How do I make my local AI genuinely smart &mdash; concretely?</h4>
+        <p>Follow the ROI order, and know the pass/fail bar at each step: <strong>(1)</strong> strongest open model that fits (Qwen3/DeepSeek, Apache/MIT); <strong>(2)</strong> quantize to <strong>Q4_K_M</strong> &mdash; never below Q4 (Q3 loses reasoning, Q2 collapses); <strong>(3)</strong> a real system prompt + few-shot examples (reported 30&ndash;60% quality lift, ~free); <strong>(4)</strong> <a href="glossary.html#term-rag">RAG</a> over your own docs &mdash; the biggest single lift, and the fix whenever facts are missing or change; <strong>(5)</strong> tool/agent loops so it can act. Only <strong>(6)</strong> QLoRA fine-tune (one 48&nbsp;GB GPU, ~24h, ~$15&ndash;30/run) when a style/format gap remains. Stages 1&ndash;5 need <strong>no training</strong>. Rule: RAG for knowledge, fine-tune for behavior.</p>
     </div>
 
     <h2 id="sources">Sources &amp; further reading</h2>
+    <p style="font-size:0.85rem;opacity:0.85;">Confidence tags: <strong>[proven]</strong> primary/peer-reviewed; <strong>[reported]</strong> secondary benchmark or vendor figure; <strong>[frontier]</strong> early research; <strong>[claim]</strong> aspirational, unverified.</p>
     <ul class="ws-sources">
-      <li>Shu Yang et al., <em>The Era of 1-bit LLMs (BitNet b1.58)</em>, 2024 &mdash; arXiv:2402.17764</li>
-      <li>Danny Hernandez &amp; Tom Brown, <em>Measuring the Algorithmic Efficiency of Neural Networks</em>, 2020 &mdash; arXiv:2005.04305; Epoch&nbsp;AI, <em>Algorithmic progress in language models</em>, 2024</li>
-      <li>Emilien Dupont et al., <em>COIN: Compression with Implicit Neural Representations</em>, 2021 &mdash; arXiv:2103.03123</li>
-      <li>Kleyko et al., <em>A Survey on Hyperdimensional Computing / VSA</em>, 2021 &mdash; arXiv:2111.06077 (Kanerva 2009)</li>
-      <li>Kusupati et al., <em>Matryoshka Representation Learning</em>, NeurIPS 2022</li>
-      <li>B&eacute;rut, Lutz et al., <em>Experimental verification of Landauer's principle</em>, Nature 2012; IEEE Spectrum, <em>Reversible Computing</em></li>
-      <li>Intel, <em>Loihi&nbsp;2 / Hala Point</em> neuromorphic; Extropic &amp; Normal Computing, thermodynamic computing (early)</li>
+      <li>Ma, Wang et al., <em>The Era of 1-bit LLMs (BitNet b1.58)</em>, 2024 &mdash; <a href="https://arxiv.org/abs/2402.17764" target="_blank" rel="noopener">arXiv:2402.17764</a>; <a href="https://github.com/microsoft/BitNet" target="_blank" rel="noopener">microsoft/BitNet</a> &middot; <em>bitnet.cpp CPU inference</em> <a href="https://www.microsoft.com/en-us/research/publication/1-bit-ai-infra-part-1-1-fast-and-lossless-bitnet-b1-58-inference-on-cpus/" target="_blank" rel="noopener">(Microsoft Research)</a> <strong>[proven]</strong></li>
+      <li>Hernandez &amp; Brown, <em>Measuring the Algorithmic Efficiency of Neural Networks</em>, 2020 &mdash; <a href="https://arxiv.org/abs/2005.04305" target="_blank" rel="noopener">arXiv:2005.04305</a>; Epoch&nbsp;AI, <em>Algorithmic progress in language models</em> &mdash; <a href="https://epoch.ai/blog/algorithmic-progress-in-language-models" target="_blank" rel="noopener">epoch.ai</a> (<a href="https://arxiv.org/abs/2403.05812" target="_blank" rel="noopener">arXiv:2403.05812</a>) <strong>[proven]</strong></li>
+      <li>Sanh et al., <em>DistilBERT</em>, 2019 &mdash; <a href="https://arxiv.org/abs/1910.01108" target="_blank" rel="noopener">arXiv:1910.01108</a>; <em>Are Large-scale Soft Labels Necessary for Dataset Distillation?</em>, NeurIPS 2024 &mdash; <a href="https://proceedings.neurips.cc/paper_files/paper/2024/file/1da9ca7e9cef4b1af63913f05d1630a4-Paper-Conference.pdf" target="_blank" rel="noopener">PDF</a> <strong>[proven]</strong></li>
+      <li>Dupont et al., <em>COIN: Compression with Implicit Neural Representations</em>, 2021 &mdash; <a href="https://arxiv.org/abs/2103.03123" target="_blank" rel="noopener">arXiv:2103.03123</a>; Kusupati et al., <em>Matryoshka Representation Learning</em>, NeurIPS 2022 &mdash; <a href="https://arxiv.org/abs/2205.13147" target="_blank" rel="noopener">arXiv:2205.13147</a> <strong>[proven]</strong></li>
+      <li>Kanerva / Kleyko et al., <em>A Survey on Hyperdimensional Computing (VSA), Part I</em> &mdash; <a href="https://dl.acm.org/doi/10.1145/3538531" target="_blank" rel="noopener">ACM Computing Surveys</a> <strong>[proven]</strong></li>
+      <li>B&eacute;rut, Lutz et al., <em>Experimental verification of Landauer's principle</em>, Nature 2012 &mdash; <a href="https://www.nature.com/articles/nature10872" target="_blank" rel="noopener">nature10872</a>; <em>Limits to Energy Efficiency of CMOS</em> &mdash; <a href="https://arxiv.org/abs/2312.08595" target="_blank" rel="noopener">arXiv:2312.08595</a> <strong>[proven]</strong></li>
+      <li>Intel, <em>Hala Point / Loihi&nbsp;2</em> &mdash; <a href="https://newsroom.intel.com/artificial-intelligence/intel-builds-worlds-largest-neuromorphic-system" target="_blank" rel="noopener">Intel Newsroom, 2024</a> <strong>[frontier]</strong></li>
+      <li>Yin et al., <em>MCPVerse: agentic tool-use benchmark</em>, 2025 &mdash; <a href="https://arxiv.org/abs/2508.16260" target="_blank" rel="noopener">arXiv:2508.16260</a> <strong>[proven]</strong>; Dettmers et al., <em>QLoRA</em>, 2023 &mdash; <a href="https://arxiv.org/abs/2305.14314" target="_blank" rel="noopener">arXiv:2305.14314</a> <strong>[proven]</strong></li>
+      <li>Extropic, <em>Thermodynamic Computing: From Zero to One</em> &mdash; <a href="https://extropic.ai/writing/thermodynamic-computing-from-zero-to-one" target="_blank" rel="noopener">extropic.ai</a> <strong>[claim]</strong></li>
     </ul>
 
+    <div class="author-bio">
+        <div class="author-bio-image">
+            <img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" width="400" height="400">
+        </div>
+        <div class="author-bio-content">
+            <h4>Bagus Dwi Permana</h4>
+            <p class="author-bio-title">Engineering Operations Manager | Ahli K3 Listrik</p>
+            <p>12+ years in data center operations across Southeast Asia and the Middle East. CDFOM certified. Writes about the engineering and physics behind mission-critical infrastructure &mdash; and, increasingly, the local-AI tooling that runs alongside it.</p>
+            <div class="author-bio-links">
+                <a href="https://linkedin.com/in/baguspermana" target="_blank" rel="noopener noreferrer">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    LinkedIn
+                </a>
+                <a href="https://x.com/BagusDPermana" target="_blank" rel="noopener noreferrer">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    X / Twitter
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="related-articles">
+        <h3>Continue Reading</h3>
+        <div class="related-grid">
+            <a href="article-25.html" class="related-card">
+                <div class="related-card-number">25</div>
+                <div class="related-card-content">
+                    <h4>PJM Is 6 GW Short by 2027. 65 Million People Are in the Blast Zone.</h4>
+                    <p>The largest power grid in North America faces a capacity shortfall driven partly by data center demand.</p>
+                </div>
+            </a>
+            <a href="article-26.html" class="related-card">
+                <div class="related-card-number">26</div>
+                <div class="related-card-content">
+                    <h4>The Invisible Leak: PFAS Vapor Release in Data Centers</h4>
+                    <p>Maintenance vapor release is 20&ndash;30&times; larger than sealed-system leaks &mdash; and zero federal reporting is required.</p>
+                </div>
+            </a>
+            <a href="article-27.html" class="related-card">
+                <div class="related-card-number">27</div>
+                <div class="related-card-content">
+                    <h4>The H-1B Fee Shock and the Data Center Talent Squeeze</h4>
+                    <p>How a new fee structure reshapes mid-level hiring for the facilities that power AI.</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="article-nav">
+        <a href="article-27.html"><i class="fas fa-arrow-left"></i> Previous Article</a>
+        <a href="articles.html">All Articles</a>
+        <span style="color:#64748b;cursor:default;">Latest Article</span>
+    </div>
+</div>
 </article>
 
                 <!-- Independence Disclaimer -->
@@ -1146,25 +1229,7 @@ function shareWhatsApp(){window.open('https://wa.me/?text='+encodeURIComponent(s
 function copyLink(){navigator.clipboard.writeText(shareUrl).then(function(){var c=document.querySelector('.share-btn.copy .copy-icon'),k=document.querySelector('.share-btn.copy .check-icon');c.style.display='none';k.style.display='block';setTimeout(function(){c.style.display='block';k.style.display='none'},2000)})}
 </script>
 
-<!-- Reading Progress Bar -->
-<script>
-(function() {
-    var bar = document.getElementById('scrollProgress');
-    if (!bar) return;
-    var ticking = false;
-    function updateProgress() {
-        var scrollTop = window.scrollY || document.documentElement.scrollTop;
-        var docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        var pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-        bar.style.width = Math.min(pct, 100) + '%';
-        ticking = false;
-    }
-    window.addEventListener('scroll', function() {
-        if (!ticking) { requestAnimationFrame(updateProgress); ticking = true; }
-    }, { passive: true });
-    updateProgress();
-})();
-</script>
+<!-- Reading progress handled by shared js/rz-article-editorial.js -->
 
 <!-- TOC: shared js/rz-article-toc.js -->
 <script src="js/rz-article-toc.js?v=1.50.42" defer></script>
