@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.110.2 — 2026-07-22 (BOQ dossier input-sync fix — dossier tracks the live project)
+
+### Fixed
+- **Dossier showed the wrong project (usa · 1 MW vs the app's Indonesia · 2.5 MW).** The CAPEX store persists `inputs`; on reload after any CAPEX edit, `onRehydrateStorage` respected the STALE persisted `itLoad`/`location` instead of reconciling to the Simulation store (the SSOT the top bar reads). So `buildBoqModel` built the header — AND the CAPEX `results` the whole BOQ decomposes — on stale inputs. Now `onRehydrateStorage` ALWAYS reconciles the shared canonicals (`itLoad`, `country/location`) from the live Simulation store (capex-specific fields like fireType/redundancy stay persisted), so the dossier total recomputes on the live project. Belt-and-suspenders: `withProjectMeta` + all 3 dossier callers (`CapexEnginePage`, `ConstructionEngine`, `TraceValue`) now pass `location`/`itMw` from the Simulation SSOT (same source as the top bar), so the header can't diverge.
+
+### Verified
+- Seeded headless test (persisted capex = usa/1000, sim = ID/2500) → dossier header now reads **Indonesia / 2.5 MW** (was usa / 1 MW). tsc 0 + build · trace-parity 117/117 · walk 24 · export 44. No engine change (DCMOC-only).
+
 ## v1.110.1 — 2026-07-22 (deep-BOQ correctness fixes — adversarial review)
 
 ### Fixed

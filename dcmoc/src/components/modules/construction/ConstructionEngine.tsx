@@ -120,9 +120,12 @@ export function ConstructionEngine() {
         if (!results) return;
         const m = buildBoqModel(capexInputs, results);
         if (!m) return;
+        const sim = useSimulationStore.getState();
         const meta = withProjectMeta(m, {
             projectName: useRequirementsStore.getState().overview.projectName,
-            tierLevel: useSimulationStore.getState().inputs.tierLevel,
+            tierLevel: sim.inputs.tierLevel,
+            location: sim.selectedCountry?.name ?? undefined,
+            itMw: +(sim.inputs.itLoad / 1000).toFixed(2),
         }).projectMeta;
         if (!openBoqDossier(m, meta)) {
             window.alert('Popup blocked — allow popups for this site to open the BOQ dossier.');

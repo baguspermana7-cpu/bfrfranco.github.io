@@ -25,11 +25,8 @@ export interface CapexStore {
 const HERO_KEY = 'dcmoc-hero-image';
 const CAPEX_PERSIST_KEY = 'dcmoc-capex';
 /* HIGH-1 reconciliation flag — captured BEFORE create() so we know whether
- * THIS session started with a persisted capex state (respect it) or fresh
- * (adopt the live simulation canonicals in onRehydrateStorage below). */
-const hadPersistedCapex = (() => {
-    try { return typeof window !== 'undefined' && localStorage.getItem(CAPEX_PERSIST_KEY) != null; } catch { return false; }
-})();
+ * onRehydrateStorage ALWAYS reconciles the shared canonicals (itLoad/country)
+ * from the live simulation store, regardless of persisted state. */
 const loadHero = (): string | null => { try { return typeof window !== 'undefined' ? localStorage.getItem(HERO_KEY) : null; } catch { return null; } };
 
 /* HIGH-1 (visual audit) — capex defaults MUST mirror the simulation-store
@@ -108,20 +105,21 @@ export const useCapexStore = create<CapexStore>()(persist((set, get) => ({
     onRehydrateStorage: () => (state) => {
         try {
             if (!state) return;
-            if (!hadPersistedCapex) {
-                /* New session (no persisted capex): adopt the LIVE simulation
-                 * canonicals (itLoad + country/location) so capex never runs on
-                 * defaults the rest of the app has moved past. setInputs writes
-                 * capex ONLY (no writeShared* → no store loop) and auto-recalcs. */
-                const sim = useSimulationStore.getState();
-                const cid = sim.selectedCountry?.id;
-                state.setInputs({
-                    itLoad: sim.inputs.itLoad,
-                    ...(cid && COUNTRIES[cid] ? { location: cid, country: COUNTRIES[cid] } : {}),
-                });
-            } else {
-                state.runCalculation(); // persisted inputs respected; results recompute
-            }
+            /* ALWAYS reconcile the SHARED canonicals (itLoad + country/location) to
+             * the LIVE simulation store — these are simulation-owned project geometry
+             * (the top bar reads them from sim), NOT capex-owned. Persisted capex-
+             * specific fields (fireType/redundancy/upsType/…) are respected as-is.
+             * Previously only new sessions synced, so a returning user whose capex
+             * was persisted at a stale itLoad/country (e.g. usa/1000) diverged from
+             * the app's live project (ID/2500) — the BOQ dossier header AND its $
+             * total were then computed on stale inputs. setInputs writes capex ONLY
+             * (no writeShared* → no loop) and auto-recalcs on the live geometry. */
+            const sim = useSimulationStore.getState();
+            const cid = sim.selectedCountry?.id;
+            state.setInputs({
+                itLoad: sim.inputs.itLoad,
+                ...(cid && COUNTRIES[cid] ? { location: cid, country: COUNTRIES[cid] } : {}),
+            });
         } catch { /* engine absent */ }
     },
 }));

@@ -449,7 +449,7 @@ function buildSupplyChain(
  *  UI stores (the engine build can't reach them). Immutable. */
 export function withProjectMeta(
     model: BoqModel,
-    fields: { projectName?: string; tierLevel?: number },
+    fields: { projectName?: string; tierLevel?: number; location?: string; itMw?: number },
 ): BoqModel {
     return {
         ...model,
@@ -457,6 +457,10 @@ export function withProjectMeta(
             ...model.projectMeta,
             projectName: fields.projectName ?? model.projectMeta.projectName,
             tierLevel: fields.tierLevel ?? model.projectMeta.tierLevel,
+            // location + itMw come from the SIMULATION SSOT (same source as the app
+            // top bar) so the dossier header can never diverge from the live project.
+            location: fields.location ?? model.projectMeta.location,
+            itMw: fields.itMw ?? model.projectMeta.itMw,
         },
     };
 }

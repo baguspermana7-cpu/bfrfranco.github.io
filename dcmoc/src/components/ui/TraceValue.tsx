@@ -120,9 +120,12 @@ function Panel({ root }: { root: ResolvedTrace }) {
         if (!results) return;
         const model = buildBoqModel(inputs, results);
         if (!model) { setBoqBlocked(true); setTimeout(() => setBoqBlocked(false), 2400); return; }
+        const sim = useSimulationStore.getState();
         const meta = withProjectMeta(model, {
             projectName: useRequirementsStore.getState().overview.projectName,
-            tierLevel: useSimulationStore.getState().inputs.tierLevel,
+            tierLevel: sim.inputs.tierLevel,
+            location: sim.selectedCountry?.name ?? undefined,
+            itMw: +(sim.inputs.itLoad / 1000).toFixed(2),
         }).projectMeta;
         const ok = openBoqDossier(model, meta);
         if (!ok) { setBoqBlocked(true); setTimeout(() => setBoqBlocked(false), 2400); }
