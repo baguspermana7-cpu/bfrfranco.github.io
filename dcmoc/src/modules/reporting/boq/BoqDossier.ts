@@ -19,6 +19,7 @@
 
 import { rzData, rzModels } from '@/lib/rz-engine';
 import type { CapexInput, CapexResult } from '@/lib/CapexEngine';
+import { equipmentBrands } from '@/lib/capex-data';
 
 /* ── engine output types (named, mirrors the documented shape) ── */
 
@@ -120,6 +121,51 @@ export interface BoqEquipmentItem {
     confidence: BoqConfidence;
 }
 
+/** Phase-C — an equipment-schedule row enriched with a representative make/model
+ *  (from equipmentBrands), a rating string, efficiency (when the brand carries it)
+ *  and an indicative unit cost (engine unitRates rateKey). Fields are optional so
+ *  the render degrades gracefully when a brand/rate is unavailable (never fabricated). */
+export interface BoqEquipmentDeep extends BoqEquipmentItem {
+    make?: string;
+    modelName?: string;
+    rating?: string;
+    efficiency?: string;
+    unitCost?: number;
+    unitCostBasis?: string;
+    unitCostConfidence?: BoqConfidence;
+}
+
+/** Phase-C — one critical-spares stock row (rzModels().boq.criticalSpares). */
+export interface BoqSpareRow {
+    key: string;
+    label: string;
+    component: string;
+    mtbfHours: number;
+    installedQty: number;
+    failRatePerYr: number;
+    recommendedStockQty: number;
+    unitCost: number;
+    holdingCost: number;
+    annualReplacementCost: number;
+    serviceLevelPct: number;
+    priceClass: string;
+    confidence: BoqConfidence;
+    source: string;
+}
+
+/** Phase-C — one preventive-maintenance schedule row (rzModels().boq.pmSchedule). */
+export interface BoqPmRow {
+    key: string;
+    system: string;
+    installedQty: number;
+    pmInterval: string;
+    tasks: string;
+    annualLaborHr: number;
+    annualPmCost: number;
+    confidence: BoqConfidence;
+    source: string;
+}
+
 export interface BoqPackage {
     pkgNo: string;
     name: string;
@@ -160,6 +206,13 @@ export interface BoqLandedCategory {
     category: string;
     share: number;
     landedFactor: number;
+    /** BOQ Ship-D — the live CapexResult category $ (base cost before landed
+     *  uplift), for the per-category landed-cost WORKED example. 0 when the
+     *  category is not in result.costs. */
+    categoryUsd: number;
+    /** BOQ Ship-D — the effective duty rate (fraction) on this country's imports,
+     *  for the worked line (category $ × share × duty → uplift $). */
+    dutyRate: number;
 }
 
 /** Supply-chain & import screening block — computed from input.country + input.archKey.
@@ -218,6 +271,32 @@ export interface RiskRow {
     impact: DossierRisk;
     mitigation: string;
     owner: string;
+    /** BOQ Ship-D — screening $-impact as a %-of-CAPEX band [lo, hi] (order-of-
+     *  magnitude, NOT a quotation). Optional (older engines omit it). */
+    costImpactPctBand?: [number, number];
+    /** BOQ Ship-D — schedule slip (weeks) if unmitigated. Optional. */
+    scheduleSlipWk?: number;
+    /** BOQ Ship-D — post-mitigation residual risk band. Optional. */
+    residual?: DossierRisk;
+    /** BOQ Ship-D — the leading indicator to watch. Optional. */
+    earlyWarning?: string;
+}
+
+/** BOQ Ship-D — one country-specific location risk row, derived live from the
+ *  selected country's hazard/grid/talent fields (models.dossier.countryRisks). */
+export interface CountryRiskRow {
+    hazard: string;
+    metric: string;
+    severity: DossierRisk;
+    mitigation: string;
+    standard: string;
+}
+
+/** BOQ Ship-D — one document-delivery-schedule row (DATA.dossier.documentSchedule). */
+export interface DocScheduleRow {
+    deliverable: string;
+    phase: string;
+    approver: string;
 }
 
 export interface OpsReadyRow {
@@ -227,6 +306,31 @@ export interface OpsReadyRow {
     engineRef?: string;
 }
 
+/** One labelled input / step / result value inside a worked-calc sheet. */
+export interface EngCalcValue {
+    label: string;
+    value: number | string;
+    unit: string;
+    /** Present on step rows only — the arithmetic expression evaluated. */
+    expr?: string;
+}
+
+/** A REAL worked engineering calculation — rzModels().dossier.engineeringCalcs(input, result).
+ *  Formula + input values + arithmetic steps + a highlighted result, each tagged
+ *  with a standard reference + [high|med|low] confidence. AACE Class-4 screening. */
+export interface EngCalcSheet {
+    id: string;
+    title: string;
+    discipline: string;
+    standard: string;
+    confidence: BoqConfidence;
+    formula: string;
+    inputs: EngCalcValue[];
+    steps: EngCalcValue[];
+    result: EngCalcValue;
+}
+
+/** Legacy flat reference-table row (older engines expose only DATA.dossier.engineeringCalcs). */
 export interface EngCalcRow {
     calc: string;
     engineRef: string;
@@ -241,6 +345,11 @@ export interface DossierData {
     documentRegister: string[];
     opsReadiness: OpsReadyRow[];
     engineeringCalcs: EngCalcRow[];
+    /** BOQ Ship-D — document delivery schedule (deliverable × phase × approver).
+     *  Optional (older engines omit it). */
+    documentSchedule?: DocScheduleRow[];
+    /** BOQ Ship-D — version-control convention applied to the schedule. Optional. */
+    documentControlNote?: string;
 }
 
 export interface BoqModel {
@@ -250,6 +359,15 @@ export interface BoqModel {
     /** INFORMATIONAL — indicative equipment counts + N+redundancy sizing;
      *  NOT reconciled to $. Empty when the engine does not expose it. */
     equipment: BoqEquipmentItem[];
+    /** Phase-C — equipment rows enriched with make/model/rating/efficiency +
+     *  indicative unit cost. Empty when the engine equipment schedule is empty. */
+    equipmentDeep: BoqEquipmentDeep[];
+    /** Phase-C — critical-spares stock rows (rzModels().boq.criticalSpares).
+     *  Empty when the engine does not expose the model. */
+    spares: BoqSpareRow[];
+    /** Phase-C — preventive-maintenance schedule rows (rzModels().boq.pmSchedule).
+     *  Empty when the engine does not expose the model. */
+    pmSchedule: BoqPmRow[];
     /** INDICATIVE procurement scope envelopes — values OVERLAP across packages
      *  and are NOT additive to the CAPEX total. Empty when unavailable. */
     procurement: BoqPackage[];
@@ -259,10 +377,19 @@ export interface BoqModel {
     /** Static EPC dossier scaffold (permitting / design basis / risk / …).
      *  Null when the engine does not expose DATA.dossier. */
     dossier: DossierData | null;
+    /** REAL worked engineering calculations (formula + inputs + steps + result),
+     *  computed live from the CAPEX input + result. Empty when the engine does
+     *  not expose models.dossier.engineeringCalcs (older engines — the render
+     *  falls back to the flat DATA.dossier.engineeringCalcs reference table). */
+    engineeringCalcs: EngCalcSheet[];
     /** Ship-C per-country supply-chain & import screening (landed cost /
      *  export-control / customs lead). Null when no country is selected or the
      *  engine does not expose models.supplyChain. */
     supplyChain: BoqSupplyChain | null;
+    /** BOQ Ship-D — country-specific location risks derived live from the
+     *  selected country (models.dossier.countryRisks). Empty when no country is
+     *  selected or the engine does not expose the model. */
+    countryRisks: CountryRiskRow[];
 }
 
 export interface BuildBoqOpts {
@@ -333,9 +460,20 @@ export function buildBoqModel(
                 input: CapexInput,
             ) => BoqEquipmentItem[];
             procurementPackages?: (costs: Record<string, number>) => BoqPackage[];
+            equipmentUnitCost?: (
+                equipKey: string,
+            ) => { rateKey: string; unitUsd: number; confidence: BoqConfidence; unit: string } | null;
+            criticalSpares?: (
+                input: CapexInput,
+                metrics: { pue: number },
+                serviceLevelPct?: number,
+            ) => BoqSpareRow[];
+            pmSchedule?: (input: CapexInput, metrics: { pue: number }) => BoqPmRow[];
         };
         dossier?: {
             executiveSummary?: (input: CapexInput, result: CapexResult) => DossierExecSummary;
+            engineeringCalcs?: (input: CapexInput, result: CapexResult) => EngCalcSheet[];
+            countryRisks?: (country: unknown) => CountryRiskRow[];
         };
         supplyChain?: {
             dutyRate?: (country: CountryProfileLike | null) => number;
@@ -372,10 +510,38 @@ export function buildBoqModel(
         ? boq.procurementPackages(result.costs)
         : [];
 
+    // Phase-C — enrich the equipment schedule with a representative make/model +
+    // rating + efficiency (from equipmentBrands, LOCAL) and an indicative unit cost
+    // (engine unitRates rateKey). Missing fields are omitted, never fabricated.
+    const equipmentDeep: BoqEquipmentDeep[] = equipment.map((e) =>
+        enrichEquipment(e, input, boq.equipmentUnitCost),
+    );
+
+    // Phase-C — critical spares (newsvendor over MTBF-driven demand) + PM schedule.
+    // Both null-guarded; both read only existing engine models/data.
+    const spares: BoqSpareRow[] = boq.criticalSpares
+        ? (boq.criticalSpares(input, { pue: result.pue }, 99) ?? [])
+        : [];
+    const pmSchedule: BoqPmRow[] = boq.pmSchedule
+        ? (boq.pmSchedule(input, { pue: result.pue }) ?? [])
+        : [];
+
     // Ship-3 dossier surfaces — null-guarded (older engines omit them).
     const executiveSummary: DossierExecSummary | null = models.dossier?.executiveSummary
         ? models.dossier.executiveSummary(input, result)
         : null;
+
+    // Ship-3 (deepened) — REAL worked engineering calculations. Null-guarded:
+    // older engines omit the model, so the render falls back to the flat table.
+    const engineeringCalcs: EngCalcSheet[] = models.dossier?.engineeringCalcs
+        ? (models.dossier.engineeringCalcs(input, result) ?? [])
+        : [];
+
+    // BOQ Ship-D — country-specific location risks (seismic / flood / grid / talent).
+    // Null-guarded: empty when no country is selected or the engine omits the model.
+    const countryRisks: CountryRiskRow[] = (models.dossier?.countryRisks && input.country)
+        ? (models.dossier.countryRisks(input.country) ?? [])
+        : [];
 
     const data = rzData() as {
         version?: string;
@@ -386,7 +552,7 @@ export function buildBoqModel(
 
     // Ship-C supply-chain surface — null when no country is selected (the
     // section then renders a "no country" note) or the engine omits the models.
-    const supplyChain: BoqSupplyChain | null = buildSupplyChain(input, models.supplyChain, data.supplyChain);
+    const supplyChain: BoqSupplyChain | null = buildSupplyChain(input, models.supplyChain, data.supplyChain, result.costs);
 
     const projectMeta: BoqProjectMeta = {
         projectName: '',       // filled by the caller (requirements store)
@@ -396,7 +562,67 @@ export function buildBoqModel(
         version: data.version ?? '—',
     };
 
-    return { generated, summary, projectMeta, equipment, procurement, executiveSummary, dossier, supplyChain };
+    return { generated, summary, projectMeta, equipment, equipmentDeep, spares, pmSchedule, procurement, executiveSummary, engineeringCalcs, dossier, supplyChain, countryRisks };
+}
+
+/* ── Phase-C equipment enrichment ──────────────────────────────────────────
+ * Pick a representative brand row from equipmentBrands (LOCAL DCMOC data — the
+ * capex-data.ts header keeps it local, not engine-merged) keyed by the item's
+ * category + the project's upsType/genType/coolingType selection, and attach an
+ * indicative unit cost from the engine unitRates rateKey. Every enriched field is
+ * OPTIONAL — when a brand table or rate is missing, we omit it (never fabricate). */
+
+interface BrandRow { brand?: string; model?: string; range?: string; efficiency?: string; note?: string }
+
+/** Map an equipment item (by engine category) to (a) its brand-table family + the
+ *  input-selected variant key, and (b) the engine equipmentUnitCost key. */
+const EQUIP_META: Record<string, { costKey: string; brandFamily?: keyof typeof equipmentBrands; variantOf?: (i: CapexInput) => string }> = {
+    ups: { costKey: 'ups', brandFamily: 'ups', variantOf: (i) => i.upsType },
+    generator: { costKey: 'generator', brandFamily: 'generator', variantOf: (i) => i.genType },
+    // MV transformer + PDU/RPP share the 'electrical' category — no dedicated brand
+    // table, but they DO have their own unitRates rateKey (transformer / pdu).
+    electrical: { costKey: 'transformer' },
+    cooling: { costKey: 'crah', brandFamily: 'cooling', variantOf: (i) => i.coolingType },
+};
+
+/** Pick the first brand row of a family/variant, or the family's first available. */
+function pickBrand(family: keyof typeof equipmentBrands, variant: string): BrandRow | null {
+    const fam = equipmentBrands[family] as Record<string, unknown> | undefined;
+    if (!fam) return null;
+    const rows = (fam[variant] ?? Object.values(fam)[0]) as BrandRow[] | undefined;
+    return Array.isArray(rows) && rows.length ? rows[0] : null;
+}
+
+/** Human rating string from the item's capacityKw (kW below 1 MVA, MVA for the
+ *  transformer whose capacityKw carries MVA×1000). */
+function ratingOf(e: BoqEquipmentItem): string {
+    if (!Number.isFinite(e.capacityKw) || e.capacityKw <= 0) return '';
+    if (e.equipment === 'MV transformer') return `${(e.capacityKw / 1000).toLocaleString()} MVA`;
+    if (e.capacityKw >= 1000) return `${(e.capacityKw / 1000).toLocaleString(undefined, { maximumFractionDigits: 2 })} MW`;
+    return `${e.capacityKw.toLocaleString()} kW`;
+}
+
+function enrichEquipment(
+    e: BoqEquipmentItem,
+    input: CapexInput,
+    unitCostFn?: (k: string) => { rateKey: string; unitUsd: number; confidence: BoqConfidence; unit: string } | null,
+): BoqEquipmentDeep {
+    // Route PDU/RPP to its own rate; keep the transformer on 'transformer'.
+    const isPdu = /PDU/i.test(e.equipment);
+    const meta = EQUIP_META[e.category] ?? (e.category === 'electrical' ? EQUIP_META.electrical : undefined);
+    const costKey = isPdu ? 'pdu' : meta?.costKey;
+    const brand = meta?.brandFamily && meta.variantOf ? pickBrand(meta.brandFamily, meta.variantOf(input)) : null;
+    const uc = costKey && unitCostFn ? unitCostFn(costKey) : null;
+    return {
+        ...e,
+        make: brand?.brand,
+        modelName: brand?.model,
+        rating: ratingOf(e),
+        efficiency: brand?.efficiency,
+        unitCost: uc?.unitUsd,
+        unitCostBasis: uc ? `unitRates.${uc.rateKey} (${uc.unit})` : undefined,
+        unitCostConfidence: uc?.confidence,
+    };
 }
 
 /** Engine supply-chain model surface (subset consumed here). */
@@ -415,6 +641,7 @@ function buildSupplyChain(
     input: CapexInput,
     models: SupplyChainModels | undefined,
     scData: { equipmentShareByCategory?: Record<string, number> } | undefined,
+    costs: Record<string, number>,
 ): BoqSupplyChain | null {
     const country = input.country;
     if (!country || !models?.exportControl || !models?.landedFactor) return null;
@@ -423,12 +650,15 @@ function buildSupplyChain(
     const archKey: string | null = input.archKey ?? null;
     const shares = scData?.equipmentShareByCategory ?? {};
 
-    const dutyRatePct = (models.dutyRate ? models.dutyRate(c) : 0) * 100;
+    const dutyRate = models.dutyRate ? models.dutyRate(c) : 0;
+    const dutyRatePct = dutyRate * 100;
     const exportControl = models.exportControl(c, input.archKey);
     const perCategoryLanded: BoqLandedCategory[] = SUPPLY_CHAIN_CATEGORIES.map((category) => ({
         category,
         share: shares[category] ?? 0,
         landedFactor: models.landedFactor!(c, category),
+        categoryUsd: Number.isFinite(costs[category]) ? costs[category] : 0,
+        dutyRate,
     }));
 
     return {
@@ -721,52 +951,212 @@ function disciplineSection(d: BoqDiscipline): string {
  *  (schedule-driving) and highlighted in amber. */
 const LONG_LEAD_WK = 52;
 
-function equipmentScheduleSection(items: BoqEquipmentItem[], customsLeadWk?: number): string {
+/** Group a deepened equipment list by discipline (keeps reporting order). */
+function groupByDiscipline(items: BoqEquipmentDeep[]): { label: string; rows: BoqEquipmentDeep[] }[] {
+    const LABELS: Record<string, string> = {
+        electrical: 'Electrical',
+        mechanical_cooling: 'Mechanical / Cooling',
+    };
+    const order: string[] = [];
+    const map = new Map<string, BoqEquipmentDeep[]>();
+    for (const e of items) {
+        if (!map.has(e.discipline)) { map.set(e.discipline, []); order.push(e.discipline); }
+        map.get(e.discipline)!.push(e);
+    }
+    return order.map((k) => ({ label: LABELS[k] ?? esc(k), rows: map.get(k)! }));
+}
+
+function equipmentScheduleSection(items: BoqEquipmentDeep[], customsLeadWk?: number): string {
     if (!items.length) return '';
-    const rows = items.map((e, i) => {
+    const makeRows = (rows: BoqEquipmentDeep[]) => rows.map((e, i) => {
         const longLead = Number.isFinite(e.leadTimeWk) && e.leadTimeWk >= LONG_LEAD_WK;
-        const rowBg = longLead
-            ? 'rgba(255,170,0,0.10)'
-            : (i % 2 ? T.surfaceAlt : 'transparent');
+        const rowBg = longLead ? 'rgba(255,170,0,0.10)' : (i % 2 ? T.surfaceAlt : 'transparent');
+        const makeModel = [e.make, e.modelName].filter(Boolean).join(' ') || '—';
         const ltCell = longLead
-            ? `<td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.amber};font-weight:800;">${qtyFmt(e.leadTimeWk)}<span style="margin-left:5px;font-size:8px;font-weight:700;letter-spacing:.4px;">LONG-LEAD</span></td>`
+            ? `<td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.amber};font-weight:800;">${qtyFmt(e.leadTimeWk)}<span style="margin-left:4px;font-size:7.5px;font-weight:700;letter-spacing:.4px;">LONG</span></td>`
             : `<td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.muted};">${qtyFmt(e.leadTimeWk)}</td>`;
         return `<tr style="background:${rowBg};">
-            <td style="padding:5px 8px;font-size:10px;color:${T.text};">${esc(e.equipment)}</td>
-            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(e.spec)}</td>
-            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};">${qtyFmt(e.capacityKw)}</td>
+            <td style="padding:5px 8px;font-size:10px;color:${T.text};font-weight:700;">${esc(e.equipment)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(makeModel)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};">${esc(e.rating || '—')}</td>
+            <td style="padding:5px 8px;font-size:9.5px;text-align:center;color:${T.muted};">${esc(e.efficiency || '—')}</td>
             <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};">${qtyFmt(e.qtyN)}</td>
             <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};font-weight:700;">${qtyFmt(e.qtyInstalled)}</td>
             <td style="padding:5px 8px;font-size:9.5px;text-align:center;color:${T.muted};text-transform:uppercase;letter-spacing:.5px;">${esc(e.redundancy)}</td>
             ${ltCell}
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${Number.isFinite(e.unitCost) ? T.amber : T.muted};">${Number.isFinite(e.unitCost) ? money(e.unitCost!) : '—'}</td>
             <td style="padding:5px 8px;text-align:center;">${confChip(e.confidence)}</td>
         </tr>`;
     }).join('');
+    const head = `<thead><tr>
+            <th style="text-align:left;">Equipment</th>
+            <th style="text-align:left;">Make / Model</th>
+            <th style="text-align:right;">Rating</th>
+            <th style="text-align:center;">Efficiency</th>
+            <th style="text-align:right;">Qty (N)</th>
+            <th style="text-align:right;">Installed</th>
+            <th style="text-align:center;">Redundancy</th>
+            <th style="text-align:right;">Lead (wk)</th>
+            <th style="text-align:right;">Indic. Unit Cost</th>
+            <th style="text-align:center;">Conf.</th>
+        </tr></thead>`;
+    const groups = groupByDiscipline(items).map((g) => `<div style="page-break-inside:avoid;margin:10px 0 0;">
+        <h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:${T.cyan};margin:0 0 4px;border-bottom:1px solid ${T.line};padding-bottom:3px;">${esc(g.label)}</h3>
+        <table class="tbl">${head}<tbody>${makeRows(g.rows)}</tbody></table>
+    </div>`).join('');
     return `<section class="block">
         ${secHead(5, SECTION_TITLES[4], 'informational, not reconciled to $')}
-        <table class="tbl">
-            <thead><tr>
-                <th style="text-align:left;">Equipment</th>
-                <th style="text-align:left;">Spec</th>
-                <th style="text-align:right;">Capacity (kW)</th>
-                <th style="text-align:right;">Qty (N)</th>
-                <th style="text-align:right;">Qty Installed</th>
-                <th style="text-align:center;">Redundancy</th>
-                <th style="text-align:right;">Lead Time (wk)</th>
-                <th style="text-align:center;">Confidence</th>
-            </tr></thead>
-            <tbody>${rows}</tbody>
-        </table>
-        <p style="font-size:9.5px;line-height:1.6;color:${T.muted};margin:6px 0 0;">
+        ${groups}
+        <p style="font-size:9.5px;line-height:1.6;color:${T.muted};margin:8px 0 0;">
             <span style="color:${T.amber};">Amber rows</span> are long-lead (≥ ${LONG_LEAD_WK} wk) — they drive the delivery programme, order early.
-            Indicative equipment counts — screening, N+redundancy sizing; real selection per detailed design.${Number.isFinite(customsLeadWk) && (customsLeadWk ?? 0) > 0
+            Make / model are <b style="color:${T.text};">representative</b> selections from the brand library for the chosen UPS / generator / cooling type — real selection per detailed design.
+            Indicative unit cost is the screening <b style="color:${T.text};">unitRates</b> figure used in the take-off (per unit, or per MVA for the transformer).${Number.isFinite(customsLeadWk) && (customsLeadWk ?? 0) > 0
             ? ` Add <b style="color:${T.text};">+${qtyFmt(customsLeadWk!)} wk</b> customs / inland-logistics lead on imported items (see Supply Chain &amp; Import).`
             : ''}
         </p>
     </section>`;
 }
 
-function procurementPackagesSection(pkgs: BoqPackage[]): string {
+/* ── Phase-C: critical spares + PM schedule (Operations Readiness sub-sections) ── */
+
+/** Format an MTBF in hours → compact "250k h (~29 yr)" screening string. */
+function mtbfFmt(hours: number): string {
+    if (!Number.isFinite(hours) || hours <= 0) return '—';
+    const yr = hours / 8760;
+    const hStr = hours >= 1000 ? `${(hours / 1000).toLocaleString(undefined, { maximumFractionDigits: 0 })}k h` : `${hours.toLocaleString()} h`;
+    return `${hStr} · ~${yr.toLocaleString(undefined, { maximumFractionDigits: 0 })} yr`;
+}
+
+function criticalSparesBlock(rows: BoqSpareRow[]): string {
+    if (!rows.length) return '';
+    const sl = rows[0]?.serviceLevelPct ?? 99;
+    const body = rows.map((s, i) => `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:5px 8px;font-size:10px;color:${T.text};font-weight:700;">${esc(s.label)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.muted};">${esc(mtbfFmt(s.mtbfHours))}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};">${qtyFmt(s.installedQty)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};">${s.failRatePerYr.toLocaleString(undefined, { maximumFractionDigits: 3 })}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.cyan};font-weight:800;">${qtyFmt(s.recommendedStockQty)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.muted};">${money(s.unitCost)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.muted};">${money(s.holdingCost)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.amber};font-weight:700;">${money(s.annualReplacementCost)}</td>
+            <td style="padding:5px 8px;text-align:center;">${confChip(s.confidence)}</td>
+        </tr>`).join('');
+    return `<div style="page-break-inside:avoid;margin:14px 0 0;">
+        <h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:${T.cyan};margin:0 0 4px;border-bottom:1px solid ${T.line};padding-bottom:3px;">Critical Spares — newsvendor stock (${sl}% service level)</h3>
+        <table class="tbl">
+            <thead><tr>
+                <th style="text-align:left;">Component</th>
+                <th style="text-align:right;">MTBF</th>
+                <th style="text-align:right;">Installed</th>
+                <th style="text-align:right;">Failures / yr</th>
+                <th style="text-align:right;">Rec. Stock</th>
+                <th style="text-align:right;">Unit Cost</th>
+                <th style="text-align:right;">Holding / yr</th>
+                <th style="text-align:right;">Annual Replace</th>
+                <th style="text-align:center;">Conf.</th>
+            </tr></thead>
+            <tbody>${body}</tbody>
+        </table>
+        <p style="font-size:9px;line-height:1.55;color:${T.slate};margin:5px 0 0;">
+            Failure demand = installed qty × 8760 / MTBF (IEEE 493 Gold Book). Recommended stock = critical-fractile
+            newsvendor (Φ⁻¹ / Poisson) over lead-time demand; ≥1 critical spare always carried. Holding = 25% carry × unit cost × stock.
+            SCREENING — validate against OEM RCM data.
+        </p>
+    </div>`;
+}
+
+function pmScheduleBlock(rows: BoqPmRow[]): string {
+    if (!rows.length) return '';
+    const totalHr = rows.reduce((s, r) => s + (r.annualLaborHr || 0), 0);
+    const totalCost = rows.reduce((s, r) => s + (r.annualPmCost || 0), 0);
+    const body = rows.map((p, i) => `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:5px 8px;font-size:10px;color:${T.text};font-weight:700;">${esc(p.system)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(p.pmInterval)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(p.tasks)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};">${qtyFmt(p.annualLaborHr)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.amber};font-weight:700;">${money(p.annualPmCost)}</td>
+            <td style="padding:5px 8px;text-align:center;">${confChip(p.confidence)}</td>
+        </tr>`).join('');
+    return `<div style="page-break-inside:avoid;margin:14px 0 0;">
+        <h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:${T.cyan};margin:0 0 4px;border-bottom:1px solid ${T.line};padding-bottom:3px;">Preventive-Maintenance Schedule</h3>
+        <table class="tbl">
+            <thead><tr>
+                <th style="text-align:left;">System</th>
+                <th style="text-align:left;">PM Interval</th>
+                <th style="text-align:left;">Tasks</th>
+                <th style="text-align:right;">Annual Labor-hr</th>
+                <th style="text-align:right;">Annual PM Cost</th>
+                <th style="text-align:center;">Conf.</th>
+            </tr></thead>
+            <tbody>${body}</tbody>
+            <tfoot><tr>
+                <td colspan="3" style="padding:5px 8px;font-size:9.5px;color:${T.muted};text-align:right;text-transform:uppercase;letter-spacing:.5px;">Total (major systems)</td>
+                <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};font-weight:800;">${qtyFmt(totalHr)}</td>
+                <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.amber};font-weight:800;">${money(totalCost)}</td>
+                <td></td>
+            </tr></tfoot>
+        </table>
+        <p style="font-size:9px;line-height:1.55;color:${T.slate};margin:5px 0 0;">
+            PM intervals + tasks are STANDARD-PRACTICE (OEM / NFPA 110 genset / ASHRAE chiller). Annual labor-hr = installed qty × visits/yr × hr/visit.
+            Annual PM cost allocated from the O&amp;M preventive $/kW-yr band (DATA.omContracts) by system weight. SCREENING — validate against OEM RCM + vendor SLA.
+        </p>
+    </div>`;
+}
+
+/** BOQ Ship-D — procurement critical-path / sequencing sub-view. Sorts packages
+ *  by lead-time (descending), flags the longest-lead gating items, and computes
+ *  an "order-by" week measured back from power-on (= construction timeline in
+ *  weeks). Packages whose lead-time exceeds the available construction window
+ *  gate power-on and must be ordered before mobilisation (order-by ≤ 0). */
+function procurementSequencing(pkgs: BoqPackage[], timelineMonths: number): string {
+    const withLead = pkgs.filter((p) => Number.isFinite(p.leadTimeWk) && p.leadTimeWk > 0);
+    if (!withLead.length) return '';
+    const timelineWk = Number.isFinite(timelineMonths) && timelineMonths > 0 ? timelineMonths * 4.345 : 0;
+    const sorted = [...withLead].sort((a, b) => b.leadTimeWk - a.leadTimeWk);
+    const maxLead = sorted[0].leadTimeWk;
+    // Gating threshold: within ~15% of the longest lead OR exceeds the construction window.
+    const gatingCut = maxLead * 0.85;
+    const body = sorted.map((p, i) => {
+        // Order-by week (measured from project start): power-on week − lead-time.
+        // Negative ⇒ must be ordered before / at mobilisation (long-lead gating).
+        const orderByWk = timelineWk > 0 ? Math.round(timelineWk - p.leadTimeWk) : NaN;
+        const gates = p.leadTimeWk >= gatingCut || (timelineWk > 0 && p.leadTimeWk >= timelineWk);
+        const orderByStr = timelineWk > 0
+            ? (orderByWk <= 0 ? `pre-mobilise (${qtyFmt(orderByWk)})` : `wk ${qtyFmt(orderByWk)}`)
+            : '—';
+        return `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:5px 8px;font-size:10px;font-family:'JetBrains Mono',monospace;color:${T.cyan};font-weight:700;">${esc(p.pkgNo)}</td>
+            <td style="padding:5px 8px;font-size:10px;color:${T.text};font-weight:${gates ? 700 : 400};">${esc(p.name)}${gates ? ` <span style="font-size:8px;color:${T.fault};font-weight:800;text-transform:uppercase;letter-spacing:.5px;">◆ gates power-on</span>` : ''}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${gates ? T.fault : T.muted};font-weight:${gates ? 700 : 400};">${qtyFmt(p.leadTimeWk)}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${orderByWk <= 0 ? T.fault : T.amber};font-weight:700;">${esc(orderByStr)}</td>
+        </tr>`;
+    }).join('');
+    const gatingNames = sorted.filter((p) => p.leadTimeWk >= gatingCut || (timelineWk > 0 && p.leadTimeWk >= timelineWk)).map((p) => `${p.name} (${qtyFmt(p.leadTimeWk)} wk)`);
+    return `<div style="page-break-inside:avoid;margin-top:14px;">
+        <h3 style="font-size:11px;font-weight:800;color:${T.cyan};text-transform:uppercase;letter-spacing:.8px;margin:0 0 6px;">
+            Critical-Path Sequencing <span style="font-size:8.5px;color:${T.slate};letter-spacing:.5px;text-transform:none;font-weight:600;">— longest-lead items gate power-on; order-by measured back from RFS</span>
+        </h3>
+        <table class="tbl">
+            <thead><tr>
+                <th style="text-align:left;">Pkg #</th>
+                <th style="text-align:left;">Package</th>
+                <th style="text-align:right;">Lead (wk)</th>
+                <th style="text-align:right;">Order-By</th>
+            </tr></thead>
+            <tbody>${body}</tbody>
+        </table>
+        <div style="border-left:3px solid ${T.fault};background:rgba(248,113,113,0.08);border-radius:0 8px 8px 0;padding:8px 12px;margin-top:8px;">
+            <p style="font-size:9.5px;line-height:1.6;color:${T.text};margin:0;">
+                <b style="color:${T.fault};">Gating (power-on-critical):</b> ${esc(gatingNames.length ? gatingNames.join('; ') : 'none flagged')}.
+                ${timelineWk > 0
+                    ? `Construction window ≈ ${qtyFmt(Math.round(timelineWk))} wk (${qtyFmt(timelineMonths)} mo). Any package with <b>order-by ≤ 0</b> must be committed at or before mobilisation, else it slips ready-for-service (RFS).`
+                    : `No live timeline — order-by shown relative to lead-time only. The longest-lead package is the schedule pacer.`}
+            </p>
+        </div>
+    </div>`;
+}
+
+function procurementPackagesSection(pkgs: BoqPackage[], timelineMonths: number): string {
     if (!pkgs.length) return '';
     const rows = pkgs.map((p, i) =>
         `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
@@ -804,6 +1194,7 @@ function procurementPackagesSection(pkgs: BoqPackage[]): string {
             </tr></thead>
             <tbody>${rows}</tbody>
         </table>
+        ${procurementSequencing(pkgs, timelineMonths)}
     </section>`;
 }
 
@@ -864,11 +1255,65 @@ function supplyChainSection(no: number, sc: BoqSupplyChain | null): string {
             Duty applies to the <b style="color:${T.text};">imported-equipment fraction only</b> — local labor / civil is already
             captured in the construction index, so the landed factor lifts just the equipment share of each category.
         </p>
+        ${supplyChainWorkedExample(sc)}
         <p style="font-size:9px;line-height:1.55;color:${T.slate};margin:4px 0 0;">
             ${esc(sc.exportNote)} Import-duty band + export tier are SCREENING / PROXY (US BIS Fed-Register proxy;
             AI Diffusion Rule rescinded — advisory, not statutory / not legal advice).
         </p>
     </section>`;
+}
+
+/** Categories shown in the landed-cost worked example — the equipment-heavy
+ *  disciplines (per the prompt), in reporting order. */
+const SUPPLY_CHAIN_WORKED_CATEGORIES: readonly string[] = ['electrical', 'ups', 'generator', 'cooling', 'network'] as const;
+
+/** BOQ Ship-D — supply-chain landed-cost WORKED example for the top equipment-
+ *  heavy categories: category $ × equipment-share × duty-rate → landed uplift $,
+ *  plus a customs-lead vs construction-window note. Omitted when there is no
+ *  live category $ or no duty (FTA/no-country → zero uplift, nothing to show). */
+function supplyChainWorkedExample(sc: BoqSupplyChain): string {
+    const rows = sc.perCategoryLanded.filter((r) =>
+        SUPPLY_CHAIN_WORKED_CATEGORIES.includes(r.category) && r.categoryUsd > 0 && r.share > 0);
+    if (!rows.length) return '';
+    const dutyPct = (sc.dutyRatePct).toLocaleString(undefined, { maximumFractionDigits: 1 });
+    let totalUplift = 0;
+    const body = rows.map((r, i) => {
+        const upliftUsd = r.categoryUsd * r.share * r.dutyRate;
+        totalUplift += upliftUsd;
+        const expr = `${money(r.categoryUsd)} × ${(r.share * 100).toLocaleString(undefined, { maximumFractionDigits: 0 })}% × ${dutyPct}%`;
+        return `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:4px 8px;font-size:10px;color:${T.text};text-transform:capitalize;">${esc(r.category)}</td>
+            <td style="padding:4px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.muted};">${money(r.categoryUsd)}</td>
+            <td style="padding:4px 8px;font-size:9.5px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.slate};">${esc(expr)}</td>
+            <td style="padding:4px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${upliftUsd > 0 ? T.amber : T.muted};font-weight:700;">${money(upliftUsd)}</td>
+        </tr>`;
+    }).join('');
+    return `<div style="page-break-inside:avoid;margin-top:14px;">
+        <h3 style="font-size:11px;font-weight:800;color:${T.cyan};text-transform:uppercase;letter-spacing:.8px;margin:0 0 6px;">
+            Landed-Cost Worked Example <span style="font-size:8.5px;color:${T.slate};letter-spacing:.5px;text-transform:none;font-weight:600;">— category $ × equipment-share × duty-rate → import uplift $ (screening)</span>
+        </h3>
+        <table class="tbl">
+            <thead><tr>
+                <th style="text-align:left;">Category</th>
+                <th style="text-align:right;">Category $</th>
+                <th style="text-align:right;">$ × share × duty</th>
+                <th style="text-align:right;">Landed Uplift $</th>
+            </tr></thead>
+            <tbody>${body}</tbody>
+            <tfoot><tr style="border-top:1px solid ${T.line};">
+                <td colspan="3" style="padding:5px 8px;font-size:10px;text-align:right;color:${T.muted};font-weight:700;">Σ import uplift (shown categories)</td>
+                <td style="padding:5px 8px;font-size:11px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.amber};font-weight:800;">${money(totalUplift)}</td>
+            </tr></tfoot>
+        </table>
+        <div style="border-left:3px solid ${T.amber};background:rgba(255,170,0,0.08);border-radius:0 8px 8px 0;padding:8px 12px;margin-top:8px;">
+            <p style="font-size:9.5px;line-height:1.6;color:${T.text};margin:0;">
+                <b style="color:${T.amber};">Customs window:</b> add <b style="font-family:'JetBrains Mono',monospace;">+${qtyFmt(sc.customsLeadWk)} wk</b> customs-clearance
+                + inland-logistics lead on imported long-lead equipment — this stacks on top of the OEM lead-times in the
+                procurement critical-path (Section 7), so an import from a slow-clearance jurisdiction must be ordered
+                <b>${qtyFmt(sc.customsLeadWk)} wk earlier</b> than a domestically-sourced equivalent to hit the same power-on date.
+            </p>
+        </div>
+    </div>`;
 }
 
 /* ── dossier sections (Ship-3) ─────────────────────────────────────────── */
@@ -972,18 +1417,74 @@ function permittingSection(no: number, rows: PermitRow[]): string {
     </section>`;
 }
 
-function designBasisSection(no: number, rows: DesignBasisRow[]): string {
+/** Live design inputs threaded into the Design Basis narrative. */
+interface DesignBasisInputs {
+    coolingType: string;
+    redundancy: string;
+    tierLevel: number;
+    pue: number;
+}
+
+/** BOQ Ship-D — per-discipline engineering rationale + a short sensitivity note,
+ *  computed from the live inputs (cooling / redundancy / tier / PUE). Screening
+ *  guidance — matched to the design-basis discipline by keyword. Returns '' when
+ *  no discipline-specific narrative applies. */
+function designBasisNarrative(discipline: string, s: DesignBasisInputs): string {
+    const d = discipline.toLowerCase();
+    const cool = (s.coolingType || 'air').toLowerCase();
+    const red = (s.redundancy || 'n1').toUpperCase();
+    const is2N = /2N/.test(red);
+    const tier = s.tierLevel || 3;
+    const pueStr = Number.isFinite(s.pue) && s.pue > 0 ? s.pue.toFixed(2) : '—';
+
+    if (/electric/.test(d)) {
+        return `${red} electrical distribution is set by the Tier-${tier} availability target — ${is2N
+            ? '2N gives fully-independent A/B paths with no shared single point of failure, at roughly double the switchgear/UPS/genset count of an N topology.'
+            : 'N+1 provides one redundant module per bus, a lighter first-cost than 2N but with a shared-path exposure that a fault-tree study should confirm meets the SLA.'} Sensitivity: moving N+1→2N typically adds ~40–60% to electrical CAPEX for a step-change in concurrent-maintainability.`;
+    }
+    if (/mechanical|cooling/.test(d)) {
+        const coolLabel = cool.includes('liquid') || cool.includes('dlc') ? 'direct liquid cooling'
+            : cool.includes('immersion') ? 'immersion cooling'
+            : cool.includes('deep') || cool.includes('sea') ? 'deep-sea / seawater cooling'
+            : 'air cooling';
+        return `${coolLabel.charAt(0).toUpperCase() + coolLabel.slice(1)} was selected for the target rack density and a design PUE of ${pueStr}. ${cool.includes('air')
+            ? 'Air is lowest first-cost and simplest to service but caps rack density and holds PUE higher; a liquid retrofit path should be kept open for AI-density growth.'
+            : 'Liquid/immersion paths carry a higher plant first-cost but unlock high-density AI racks and materially lower PUE (less mechanical energy per IT watt).'} Sensitivity: each 0.1 reduction in PUE cuts facility (non-IT) power ~proportionally, compounding the OPEX case over the asset life.`;
+    }
+    if (/structural/.test(d)) {
+        return `Floor loading and seismic detailing follow the site's hazard profile (see the Location Risk supplement). ${cool.includes('immersion')
+            ? 'Immersion tanks impose a heavy concentrated floor load that drives slab/foundation design.'
+            : 'Raised-floor / slab loading is sized to the equipment schedule plus a live-load margin.'} Sensitivity: a higher seismic zone raises structural reinforcement and can shift plant to grade-level, affecting layout and cost.`;
+    }
+    if (/fire|life safety/.test(d)) {
+        return `Detection + clean-agent suppression are sized to the protected volume and the Tier-${tier} continuity requirement (a discharge must not force an unplanned shutdown of the redundant path). Sensitivity: liquid-cooled halls change the fire model (reduced air volume, coolant considerations) versus a conventional air-cooled white space.`;
+    }
+    if (/availability|tier|reliab/.test(d)) {
+        return `The Tier-${tier} topology fixes the availability target and, with it, the ${red} redundancy of every critical system above. Sensitivity: each Tier step tightens the concurrent-maintainability / fault-tolerance requirement and compounds the redundancy cost across electrical, mechanical and controls together — it is the single biggest CAPEX lever in this basis.`;
+    }
+    return '';
+}
+
+function designBasisSection(no: number, rows: DesignBasisRow[], inputs: DesignBasisInputs): string {
     if (!rows.length) return '';
-    const body = rows.map((r, i) =>
-        `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
-            <td style="padding:5px 8px;font-size:10px;color:${T.text};font-weight:700;">${esc(r.discipline)}</td>
-            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(r.basis)}</td>
-            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(r.standard)}</td>
-            <td style="padding:5px 8px;font-size:9px;font-family:'JetBrains Mono',monospace;color:${T.cyan};">${esc(r.engineRef)}</td>
-        </tr>`,
-    ).join('');
+    const body = rows.map((r, i) => {
+        const narrative = designBasisNarrative(r.discipline, inputs);
+        const narrativeRow = narrative
+            ? `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+                <td colspan="4" style="padding:2px 8px 8px 8px;font-size:9.5px;line-height:1.6;color:${T.slate};border-bottom:1px solid ${T.line};">
+                    <span style="color:${T.amber};font-weight:700;">Rationale (screening):</span> ${esc(narrative)}
+                </td>
+            </tr>`
+            : '';
+        return `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:5px 8px 2px;font-size:10px;color:${T.text};font-weight:700;">${esc(r.discipline)}</td>
+            <td style="padding:5px 8px 2px;font-size:9.5px;color:${T.muted};">${esc(r.basis)}</td>
+            <td style="padding:5px 8px 2px;font-size:9.5px;color:${T.muted};">${esc(r.standard)}</td>
+            <td style="padding:5px 8px 2px;font-size:9px;font-family:'JetBrains Mono',monospace;color:${T.cyan};">${esc(r.engineRef)}</td>
+        </tr>${narrativeRow}`;
+    }).join('');
     return `<section class="block">
-        ${secHead(no, SECTION_TITLES[no - 1])}
+        ${secHead(no, SECTION_TITLES[no - 1], 'with live engineering rationale + sensitivity — screening guidance')}
         <table class="tbl">
             <thead><tr>
                 <th style="text-align:left;">Discipline</th>
@@ -996,9 +1497,84 @@ function designBasisSection(no: number, rows: DesignBasisRow[]): string {
     </section>`;
 }
 
-function engCalcsSection(no: number, rows: EngCalcRow[]): string {
-    if (!rows.length) return '';
-    const body = rows.map((r, i) =>
+/** Format a worked-calc value cell — numbers get JetBrains Mono thousands-grouped
+ *  (1 dp when small-fractional); strings pass through escaped. */
+function calcVal(v: number | string): string {
+    if (typeof v === 'number') {
+        if (!Number.isFinite(v)) return '—';
+        return Math.abs(v) !== 0 && Math.abs(v) < 100
+            ? v.toLocaleString(undefined, { maximumFractionDigits: 4 })
+            : Math.round(v).toLocaleString();
+    }
+    return esc(v);
+}
+
+const mono = (s: string): string =>
+    `<span style="font-family:'JetBrains Mono',monospace;">${s}</span>`;
+
+/** One worked-calc sheet CARD — title + discipline + standard + confidence chip,
+ *  then Formula (mono), an Inputs table, the Steps (expr → value), and a
+ *  highlighted Result. `page-break-inside:avoid` keeps each card intact. */
+function engCalcCard(c: EngCalcSheet): string {
+    const inputRows = c.inputs.map((v, i) =>
+        `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:3px 8px;font-size:9.5px;color:${T.muted};">${esc(v.label)}</td>
+            <td style="padding:3px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.text};">${calcVal(v.value)}</td>
+            <td style="padding:3px 8px;font-size:9px;color:${T.muted};">${esc(v.unit)}</td>
+        </tr>`,
+    ).join('');
+    const stepRows = c.steps.map((s, i) =>
+        `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:3px 8px;font-size:9.5px;color:${T.text};">${esc(s.label)}</td>
+            <td style="padding:3px 8px;font-size:9.5px;color:${T.muted};font-family:'JetBrains Mono',monospace;">${s.expr ? esc(s.expr) : ''}</td>
+            <td style="padding:3px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${T.cyan};">${calcVal(s.value)}</td>
+            <td style="padding:3px 8px;font-size:9px;color:${T.muted};">${esc(s.unit)}</td>
+        </tr>`,
+    ).join('');
+    return `<div style="page-break-inside:avoid;border:1px solid ${T.line};border-radius:8px;background:${T.surface};padding:12px 14px;margin:0 0 12px;">
+        <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;border-bottom:1px solid ${T.line};padding-bottom:5px;margin-bottom:8px;">
+            <h3 style="font-size:12px;font-weight:800;color:${T.text};margin:0;">${esc(c.title)}</h3>
+            <span style="font-size:9px;color:${T.muted};text-transform:uppercase;letter-spacing:.6px;">${esc(c.discipline)}</span>
+            <span style="margin-left:auto;font-size:9px;color:${T.cyan};font-family:'JetBrains Mono',monospace;">${esc(c.standard)}</span>
+            ${confChip(c.confidence)}
+        </div>
+        <div style="font-size:8.5px;text-transform:uppercase;letter-spacing:1px;color:${T.muted};margin-bottom:2px;">Formula</div>
+        <div style="font-size:10.5px;font-family:'JetBrains Mono',monospace;color:${T.text};background:${T.surfaceAlt};border:1px solid ${T.line};border-radius:4px;padding:6px 9px;margin-bottom:9px;">${esc(c.formula)}</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:200px;">
+                <div style="font-size:8.5px;text-transform:uppercase;letter-spacing:1px;color:${T.muted};margin-bottom:2px;">Inputs</div>
+                <table style="width:100%;border-collapse:collapse;"><tbody>${inputRows}</tbody></table>
+            </div>
+            <div style="flex:2;min-width:260px;">
+                <div style="font-size:8.5px;text-transform:uppercase;letter-spacing:1px;color:${T.muted};margin-bottom:2px;">Steps</div>
+                <table style="width:100%;border-collapse:collapse;"><tbody>${stepRows}</tbody></table>
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:9px;padding:7px 11px;border-radius:4px;background:${T.surfaceAlt};border:1px solid ${T.line};border-left:3px solid ${T.amber};">
+            <span style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:${T.muted};">${esc(c.result.label)}</span>
+            <span style="margin-left:auto;font-size:15px;font-weight:800;color:${T.amber};font-family:'JetBrains Mono',monospace;">${mono(calcVal(c.result.value))} <span style="font-size:10px;color:${T.muted};font-weight:600;">${esc(c.result.unit)}</span></span>
+        </div>
+    </div>`;
+}
+
+/** Section 4 — REAL worked calc-sheet cards (deepened engine). Falls back to the
+ *  flat reference table when the engine only exposes DATA.dossier.engineeringCalcs. */
+function engCalcsSection(no: number, sheets: EngCalcSheet[], fallback: EngCalcRow[]): string {
+    if (sheets.length) {
+        const cards = sheets.map(engCalcCard).join('');
+        return `<section class="block">
+            ${secHead(no, SECTION_TITLES[no - 1], 'worked screening calcs — live from the project inputs')}
+            <p style="font-size:9.5px;line-height:1.6;color:${T.muted};margin:0 0 10px;">
+                AACE Class-4 screening — each sheet shows the formula, the live input values, the arithmetic,
+                and the result, with a standard reference + confidence tag. Numbers track the current project;
+                validate against a full engineering design.
+            </p>
+            ${cards}
+        </section>`;
+    }
+    // Backward-compat fallback: the flat reference table.
+    if (!fallback.length) return '';
+    const body = fallback.map((r, i) =>
         `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
             <td style="padding:5px 8px;font-size:10px;color:${T.text};">${esc(r.calc)}</td>
             <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(r.standard)}</td>
@@ -1021,38 +1597,96 @@ function engCalcsSection(no: number, rows: EngCalcRow[]): string {
     </section>`;
 }
 
-function riskRegisterSection(no: number, rows: RiskRow[]): string {
+/** Render a risk-register $-impact band cell — the %-of-CAPEX band × the grand
+ *  total, shown as a screening $ order-of-magnitude range. Falls back to '—'. */
+function riskDollarBand(band: [number, number] | undefined, grandTotal: number): string {
+    if (!band || !Number.isFinite(grandTotal) || grandTotal <= 0) return '—';
+    const lo = money(band[0] * grandTotal);
+    const hi = money(band[1] * grandTotal);
+    return `${lo}–${hi}`;
+}
+
+function riskRegisterSection(no: number, rows: RiskRow[], grandTotal: number, countryRisks: CountryRiskRow[]): string {
     if (!rows.length) return '';
-    const body = rows.map((r, i) =>
-        `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+    const quantified = rows.some((r) => r.costImpactPctBand || r.scheduleSlipWk != null || r.residual || r.earlyWarning);
+    const body = rows.map((r, i) => {
+        const slip = Number.isFinite(r.scheduleSlipWk) ? qtyFmt(r.scheduleSlipWk!) : '—';
+        return `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
             <td style="padding:5px 8px;font-size:10px;font-family:'JetBrains Mono',monospace;color:${T.cyan};font-weight:700;">${esc(r.id)}</td>
             <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};text-transform:uppercase;letter-spacing:.4px;">${esc(r.category)}</td>
             <td style="padding:5px 8px;font-size:10px;color:${T.text};">${esc(r.risk)}</td>
             <td style="padding:5px 8px;text-align:center;">${riskChip(r.probability)}</td>
             <td style="padding:5px 8px;text-align:center;">${riskChip(r.impact)}</td>
+            ${quantified ? `<td style="padding:5px 8px;font-size:9.5px;text-align:right;font-family:'JetBrains Mono',monospace;color:${r.costImpactPctBand ? T.amber : T.muted};font-weight:${r.costImpactPctBand ? 700 : 400};">${esc(riskDollarBand(r.costImpactPctBand, grandTotal))}</td>
+            <td style="padding:5px 8px;font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${(r.scheduleSlipWk ?? 0) > 0 ? T.fault : T.muted};">${slip}</td>
+            <td style="padding:5px 8px;text-align:center;">${r.residual ? riskChip(r.residual) : '<span style="color:' + T.muted + ';">—</span>'}</td>` : ''}
             <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(r.mitigation)}</td>
+            ${quantified ? `<td style="padding:5px 8px;font-size:9px;color:${T.slate};font-style:italic;">${esc(r.earlyWarning ?? '—')}</td>` : ''}
             <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};text-align:center;">${esc(r.owner)}</td>
-        </tr>`,
-    ).join('');
+        </tr>`;
+    }).join('');
     return `<section class="block">
-        ${secHead(no, SECTION_TITLES[no - 1])}
+        ${secHead(no, SECTION_TITLES[no - 1], quantified ? 'quantified — screening $-impact bands (order-of-magnitude, not a quotation)' : undefined)}
+        ${quantified ? `<p style="font-size:9.5px;line-height:1.6;color:${T.muted};margin:0 0 10px;">
+            <b style="color:${T.amber};">$-impact</b> = a screening %-of-CAPEX band × the parametric total (order-of-magnitude, AACE Class-4);
+            <b style="color:${T.fault};">slip</b> = schedule impact if unmitigated; <b style="color:${T.text};">residual</b> = post-mitigation band.
+            Validate against a project-specific risk workshop.
+        </p>` : ''}
         <table class="tbl">
             <thead><tr>
                 <th style="text-align:left;">ID</th>
                 <th style="text-align:left;">Category</th>
                 <th style="text-align:left;">Risk</th>
-                <th style="text-align:center;">Probability</th>
+                <th style="text-align:center;">Prob.</th>
                 <th style="text-align:center;">Impact</th>
+                ${quantified ? `<th style="text-align:right;">$-Impact</th>
+                <th style="text-align:right;">Slip (wk)</th>
+                <th style="text-align:center;">Residual</th>` : ''}
                 <th style="text-align:left;">Mitigation</th>
+                ${quantified ? `<th style="text-align:left;">Early-Warning Indicator</th>` : ''}
                 <th style="text-align:center;">Owner</th>
             </tr></thead>
             <tbody>${body}</tbody>
         </table>
+        ${countryRiskSubTable(countryRisks)}
     </section>`;
 }
 
-function opsReadySection(no: number, rows: OpsReadyRow[]): string {
+/** BOQ Ship-D — country-specific location-risk sub-table, keyed to the live
+ *  project's selected country (seismic / flood / grid / talent). Rendered inside
+ *  the Risk Register section; omitted when no country risks are available. */
+function countryRiskSubTable(rows: CountryRiskRow[]): string {
     if (!rows.length) return '';
+    const body = rows.map((r, i) =>
+        `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:5px 8px;font-size:10px;color:${T.text};font-weight:700;">${esc(r.hazard)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;font-family:'JetBrains Mono',monospace;color:${T.muted};">${esc(r.metric)}</td>
+            <td style="padding:5px 8px;text-align:center;">${riskChip(r.severity)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;color:${T.muted};">${esc(r.mitigation)}</td>
+            <td style="padding:5px 8px;font-size:9px;font-family:'JetBrains Mono',monospace;color:${T.cyan};">${esc(r.standard)}</td>
+        </tr>`,
+    ).join('');
+    return `<div style="page-break-inside:avoid;margin-top:14px;">
+        <h3 style="font-size:11px;font-weight:800;color:${T.cyan};text-transform:uppercase;letter-spacing:.8px;margin:0 0 6px;">
+            Location Risk Supplement <span style="font-size:8.5px;color:${T.slate};letter-spacing:.5px;text-transform:none;font-weight:600;">— live from the selected country's hazard / grid / talent profile (screening)</span>
+        </h3>
+        <table class="tbl">
+            <thead><tr>
+                <th style="text-align:left;">Hazard</th>
+                <th style="text-align:left;">Site Metric</th>
+                <th style="text-align:center;">Severity</th>
+                <th style="text-align:left;">Mitigation</th>
+                <th style="text-align:left;">Standard</th>
+            </tr></thead>
+            <tbody>${body}</tbody>
+        </table>
+    </div>`;
+}
+
+function opsReadySection(no: number, rows: OpsReadyRow[], spares: BoqSpareRow[], pm: BoqPmRow[]): string {
+    // Render the section when there is EITHER a readiness matrix OR the Phase-C
+    // spares / PM depth (so the depth still shows on older dossier data).
+    if (!rows.length && !spares.length && !pm.length) return '';
     const body = rows.map((r, i) =>
         `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
             <td style="padding:5px 8px;font-size:10px;color:${T.text};">${esc(r.item)}</td>
@@ -1061,9 +1695,8 @@ function opsReadySection(no: number, rows: OpsReadyRow[]): string {
             <td style="padding:5px 8px;font-size:9px;font-family:'JetBrains Mono',monospace;color:${r.engineRef ? T.cyan : T.muted};">${esc(r.engineRef ?? '—')}</td>
         </tr>`,
     ).join('');
-    return `<section class="block">
-        ${secHead(no, SECTION_TITLES[no - 1])}
-        <table class="tbl">
+    const matrixTable = rows.length
+        ? `<table class="tbl">
             <thead><tr>
                 <th style="text-align:left;">Item</th>
                 <th style="text-align:center;">Owner</th>
@@ -1071,12 +1704,62 @@ function opsReadySection(no: number, rows: OpsReadyRow[]): string {
                 <th style="text-align:left;">Engine Ref</th>
             </tr></thead>
             <tbody>${body}</tbody>
-        </table>
+        </table>`
+        : '';
+    return `<section class="block">
+        ${secHead(no, SECTION_TITLES[no - 1])}
+        ${matrixTable}
+        ${criticalSparesBlock(spares)}
+        ${pmScheduleBlock(pm)}
     </section>`;
 }
 
-function docRegisterSection(no: number, docs: string[]): string {
-    if (!docs.length) return '';
+/** BOQ Ship-D — project-phase chip palette (design→handover), left-to-right. */
+const PHASE_CHIP: Record<string, { bg: string; fg: string }> = {
+    design: { bg: 'rgba(0,221,255,0.14)', fg: T.cyan },
+    procurement: { bg: 'rgba(255,170,0,0.14)', fg: T.amber },
+    construction: { bg: 'rgba(148,163,184,0.16)', fg: T.slate },
+    commissioning: { bg: 'rgba(0,255,136,0.14)', fg: T.emerald },
+    handover: { bg: 'rgba(0,221,255,0.14)', fg: T.cyan },
+};
+
+function phaseChip(phase: string): string {
+    const s = PHASE_CHIP[(phase || '').toLowerCase()] ?? PHASE_CHIP.construction;
+    return `<span style="display:inline-block;padding:1px 7px;border-radius:999px;background:${s.bg};color:${s.fg};font-size:9px;font-weight:700;letter-spacing:.3px;text-transform:capitalize;">${esc(phase)}</span>`;
+}
+
+/** BOQ Ship-D — document delivery schedule sub-table + version-control note. */
+function docScheduleSubTable(rows: DocScheduleRow[], controlNote?: string): string {
+    if (!rows.length) return '';
+    const body = rows.map((r, i) =>
+        `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
+            <td style="padding:5px 8px;font-size:10px;color:${T.text};">${esc(r.deliverable)}</td>
+            <td style="padding:5px 8px;text-align:center;">${phaseChip(r.phase)}</td>
+            <td style="padding:5px 8px;font-size:9.5px;text-align:center;font-family:'JetBrains Mono',monospace;color:${T.cyan};">${esc(r.approver)}</td>
+        </tr>`,
+    ).join('');
+    return `<div style="page-break-inside:avoid;margin-top:14px;">
+        <h3 style="font-size:11px;font-weight:800;color:${T.cyan};text-transform:uppercase;letter-spacing:.8px;margin:0 0 6px;">
+            Delivery Schedule <span style="font-size:8.5px;color:${T.slate};letter-spacing:.5px;text-transform:none;font-weight:600;">— deliverable × project phase × approver role (Owner Eng / CxA / AHJ / EPC)</span>
+        </h3>
+        <table class="tbl">
+            <thead><tr>
+                <th style="text-align:left;">Deliverable</th>
+                <th style="text-align:center;">Phase</th>
+                <th style="text-align:center;">Approver</th>
+            </tr></thead>
+            <tbody>${body}</tbody>
+        </table>
+        ${controlNote ? `<div style="border-left:3px solid ${T.cyan};background:rgba(0,221,255,0.06);border-radius:0 8px 8px 0;padding:8px 12px;margin-top:8px;">
+            <p style="font-size:9.5px;line-height:1.6;color:${T.text};margin:0;">
+                <b style="color:${T.cyan};">Version control:</b> ${esc(controlNote)}
+            </p>
+        </div>` : ''}
+    </div>`;
+}
+
+function docRegisterSection(no: number, docs: string[], schedule: DocScheduleRow[], controlNote?: string): string {
+    if (!docs.length && !schedule.length) return '';
     const items = docs.map((d) =>
         `<div style="display:flex;align-items:baseline;gap:8px;padding:4px 0;border-bottom:1px solid ${T.line};">
             <span style="color:${T.cyan};font-size:11px;line-height:1;">▪</span>
@@ -1085,7 +1768,8 @@ function docRegisterSection(no: number, docs: string[]): string {
     ).join('');
     return `<section class="block">
         ${secHead(no, SECTION_TITLES[no - 1])}
-        <div style="columns:2;column-gap:26px;">${items}</div>
+        ${docs.length ? `<div style="columns:2;column-gap:26px;">${items}</div>` : ''}
+        ${docScheduleSubTable(schedule, controlNote)}
     </section>`;
 }
 
@@ -1095,20 +1779,29 @@ function docRegisterSection(no: number, docs: string[]): string {
 export function renderBoqDossierHTML(model: BoqModel, projectMeta?: BoqProjectMeta): string {
     const merged: BoqModel = projectMeta ? { ...model, projectMeta } : model;
     const disciplinesHtml = merged.generated.disciplines.map(disciplineSection).join('');
-    const equipmentHtml = equipmentScheduleSection(merged.equipment ?? [], merged.supplyChain?.customsLeadWk);
-    const procurementHtml = procurementPackagesSection(merged.procurement ?? []);
+    const equipmentHtml = equipmentScheduleSection(merged.equipmentDeep ?? [], merged.supplyChain?.customsLeadWk);
+    const procurementHtml = procurementPackagesSection(merged.procurement ?? [], merged.executiveSummary?.timelineMonths ?? 0);
     const v = esc(merged.projectMeta.version);
 
     // Ship-3 dossier surfaces (null-guarded — degrade to the BOQ-only document).
     const execHtml = merged.executiveSummary ? execSummarySection(1, merged.executiveSummary) : '';
     const d = merged.dossier;
     const permittingHtml = d ? permittingSection(2, d.permittingMatrix) : '';
-    const designBasisHtml = d ? designBasisSection(3, d.designBasis) : '';
-    const engCalcsHtml = d ? engCalcsSection(4, d.engineeringCalcs) : '';
+    const designBasisHtml = d ? designBasisSection(3, d.designBasis, {
+        coolingType: merged.executiveSummary?.cooling ?? 'air',
+        redundancy: merged.executiveSummary?.redundancy ?? 'N+1',
+        tierLevel: merged.projectMeta.tierLevel || 3,
+        pue: merged.executiveSummary?.pue ?? 0,
+    }) : '';
+    const engCalcsHtml = (merged.engineeringCalcs?.length || d)
+        ? engCalcsSection(4, merged.engineeringCalcs ?? [], d?.engineeringCalcs ?? [])
+        : '';
     const supplyChainHtml = supplyChainSection(8, merged.supplyChain);
-    const riskHtml = d ? riskRegisterSection(9, d.riskRegister) : '';
-    const opsReadyHtml = d ? opsReadySection(10, d.opsReadiness) : '';
-    const docRegisterHtml = d ? docRegisterSection(11, d.documentRegister) : '';
+    const riskHtml = d ? riskRegisterSection(9, d.riskRegister, merged.summary.grandTotal, merged.countryRisks ?? []) : '';
+    const opsReadyHtml = (d || merged.spares?.length || merged.pmSchedule?.length)
+        ? opsReadySection(10, d?.opsReadiness ?? [], merged.spares ?? [], merged.pmSchedule ?? [])
+        : '';
+    const docRegisterHtml = d ? docRegisterSection(11, d.documentRegister, d.documentSchedule ?? [], d.documentControlNote) : '';
 
     return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

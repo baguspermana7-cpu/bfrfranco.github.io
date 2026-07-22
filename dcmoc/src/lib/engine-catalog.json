@@ -3,8 +3,8 @@
  "note": "AUTO-GENERATED from rz-engine.js — do not hand-edit. Consumers are grep-derived from real usage.",
  "dataVersion": "2.5.1",
  "modelCount": 52,
- "functionCount": 216,
- "sourceCount": 119,
+ "functionCount": 221,
+ "sourceCount": 123,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -182,6 +182,14 @@
    "name": "boq",
    "functions": [
     {
+     "name": "criticalSpares",
+     "params": [
+      "input",
+      "metrics",
+      "serviceLevelPct"
+     ]
+    },
+    {
      "name": "drivers",
      "params": [
       "costs",
@@ -198,12 +206,25 @@
      ]
     },
     {
+     "name": "equipmentUnitCost",
+     "params": [
+      "equipKey"
+     ]
+    },
+    {
      "name": "generate",
      "params": [
       "costs",
       "metrics",
       "input",
       "opts"
+     ]
+    },
+    {
+     "name": "pmSchedule",
+     "params": [
+      "input",
+      "metrics"
      ]
     },
     {
@@ -693,6 +714,19 @@
   {
    "name": "dossier",
    "functions": [
+    {
+     "name": "countryRisks",
+     "params": [
+      "country"
+     ]
+    },
+    {
+     "name": "engineeringCalcs",
+     "params": [
+      "input",
+      "result"
+     ]
+    },
     {
      "name": "executiveSummary",
      "params": [
@@ -2033,6 +2067,12 @@
    "method": "code-mandated factors HIGH; margin band screening"
   },
   {
+   "key": "boq.criticalSpares",
+   "source": "SCREENING critical-spares stock — installed-population failure demand from DATA.reliability.components MTBF (IEEE 493 Gold Book) × equipmentSchedule population, priced from DATA.sparesPricing list-price bands, run through models.spares.newsvendor (critical-fractile, Acklam Φ⁻¹ / exact Poisson) to a service level. Understock (downtime-per-event) consequence costs are screening assumptions folded into the critical-fractile — NOT vendor quotes.",
+   "asOf": "2026-07",
+   "method": "AACE Class-4 screening; newsvendor over MTBF-driven demand — validate against OEM RCM data"
+  },
+  {
    "key": "boq.equipmentSizing",
    "source": "SCREENING nominal unit ratings for equipment-count sizing (UPS 500kW module, genset 2.5MW, transformer 2.5MVA, CRAH 150kW, CDU 700kW, chiller 1.4MW) + redundancy addend by topology. Lead times reflect the 2026 long-lead reality — MV transformer/switchgear ~120 wk dominant (industry supply-chain reporting); UPS ~26, genset ~40, chiller ~32 wk.",
    "asOf": "2026",
@@ -2049,6 +2089,12 @@
    "source": "SCREENING multiplier tables the param-conditional BOQ drivers read: seismic rebar/bracing scale by ASCE 7-22 Sds zone band (zone0..zone4); diesel bulk-fuel ~0.28 m³ per MW-hour of runtime (~235 g/kWh at ~0.85 kg/L + ullage); clean-agent design concentration by agent (Novec 1230 ~0.55, FM-200 ~0.36 kg/m³ per NFPA 2001/3M/Chemours TDS); redundancy parallel-path multiplier by Uptime Tier topology (N/N+1/2N/2N+1); UPS battery strings per module (rotary carries none); CDU-vs-CRAH split by cooling type; PDU/RPP count per rack by density band. Each factor tunes a quantity base, not the reconciled category $.",
    "asOf": "2026",
    "method": "SCREENING — code-band anchored (ASCE/NFPA/Uptime), fold into AACE Class-4"
+  },
+  {
+   "key": "boq.pmSchedule",
+   "source": "SCREENING preventive-maintenance schedule — PM intervals + task lists are STANDARD-PRACTICE (OEM / NFPA 110 genset / ASHRAE chiller convention); annual labor-hours = installed population (equipmentSchedule sizing) × PM visits/yr × hr/visit; annual PM cost allocated from the DATA.omContracts preventive $/kW-yr band by per-system weight.",
+   "asOf": "2026-07",
+   "method": "AACE Class-4 screening; standard-practice PM tasking — validate against OEM RCM + vendor SLA"
   },
   {
    "key": "boq.procurement",
@@ -2241,9 +2287,21 @@
   },
   {
    "key": "dossier",
-   "source": "STANDARD-PRACTICE EPC Technical Dossier scaffold — permitting matrix (typical AHJ permits + indicative durations), design basis (IEC/NEC/ASHRAE TC9.9/ASCE 7/NFPA/Uptime references), risk register (typical mission-critical DC risks), document register, ops-readiness gates. Reference convention (Uptime/TIA-942/BICSI/NFPA), NOT a project-specific submission; durations/risks indicative. models.dossier.sections composes these with live engine outputs.",
+   "source": "STANDARD-PRACTICE EPC Technical Dossier scaffold — permitting matrix (typical AHJ permits + indicative durations), design basis (IEC/NEC/ASHRAE TC9.9/ASCE 7/NFPA/Uptime references), risk register (typical mission-critical DC risks) QUANTIFIED with screening cost-impact %-of-CAPEX bands + schedule-slip weeks + post-mitigation residual band + early-warning indicators, document register + document delivery schedule (deliverable × phase × approver, ISO 19650 / Uptime CDE convention), ops-readiness gates. Reference convention (Uptime/TIA-942/BICSI/NFPA), NOT a project-specific submission; durations/risks/bands indicative. models.dossier.sections composes these with live engine outputs.",
    "asOf": "2026",
-   "method": "STANDARD-PRACTICE reference — validate against the AHJ + full design"
+   "method": "STANDARD-PRACTICE reference — validate against the AHJ + full design + a project risk workshop"
+  },
+  {
+   "key": "dossier.countryRisks",
+   "source": "SCREENING location-risk supplement DERIVED LIVE from the selected DATA.countries[id] hazard/grid/talent fields (naturalDisaster.{seismicZone,floodRisk,typhoon/volcano/tsunami,compositeScore,insuranceMultiplier}, gridReliability.{gridUptime,brownoutFrequency,gridTier,recommendedGenHours}, talentPool.{dcEngineerPool,avgHiringDays,talentScore}) — seismic (ASCE 7), flood/natural-disaster (FM Global/local), grid reliability (NFPA 110/Uptime), talent depth. Severity is a screening band off the source metric; no new economic literals (reads countries.ts single-source).",
+   "asOf": "2026",
+   "method": "SCREENING — a project-specific site-risk study supersedes"
+  },
+  {
+   "key": "dossier.engineeringCalcs",
+   "source": "AACE Class-4 SCREENING worked engineering calculations DERIVED LIVE from the requirement input + CAPEX result + existing engine models/data (equipmentSizing, reliability, waterFootprint, pueMatrix, paramFactors, architecture.floorLoadingKnM2) — electrical continuous load (NEC 210.19/215.2), transformer/UPS/genset/cooling sizing (IEEE 3006/3007, NFPA 110, ASHRAE TC9.9), fuel storage (NFPA 30/110), clean-agent + fire-water (NFPA 2001/13), structural floor load (ASCE 7), cable derate (NEC 310.15), system availability (IEEE 493 / Uptime). No new economic literals — each sheet references the model/table that computes it, each carries a standard + confidence tag.",
+   "asOf": "2026",
+   "method": "AACE Class-4 screening; live from inputs + engine models — validate against a full design"
   },
   {
    "key": "energy",

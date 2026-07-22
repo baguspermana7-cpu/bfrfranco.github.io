@@ -5967,19 +5967,49 @@
                 { discipline: 'Fire & Life Safety', basis: 'Detection (VESDA), clean-agent suppression, compartmentation, egress', standard: 'NFPA 75/76/2001', engineRef: 'models.fire' },
                 { discipline: 'Availability / Tier', basis: 'Uptime tier topology + availability target', standard: 'Uptime Tier / TIA-942', engineRef: 'models.tier, models.reliability' }
             ],
+            /* Quantified risk register (BOQ Ship-D). Each row carries order-of-magnitude
+             * screening fields for AACE Class-4 planning: costImpactPctBand = the $-impact
+             * as a %-of-CAPEX BAND (rendered ×CAPEX to a $ order-of-magnitude, NOT a
+             * quotation); scheduleSlipWk = schedule slip if unmitigated; residual = the
+             * post-mitigation risk band (low/med/high); earlyWarning = the leading
+             * indicator to watch. Bands are STANDARD-PRACTICE mission-critical DC
+             * screening — validate against a project-specific risk workshop. */
             riskRegister: [
-                { id: 'R01', category: 'Procurement', risk: 'Long-lead equipment (MV transformer ~120 wk) slips schedule', probability: 'high', impact: 'high', mitigation: 'Early procurement, pre-order, buffer float, alt vendors', owner: 'PMC' },
-                { id: 'R02', category: 'Authority', risk: 'Permit / grid-connection delay', probability: 'med', impact: 'high', mitigation: 'Early submission, utility engagement, parallel tracks', owner: 'Owner Eng' },
-                { id: 'R03', category: 'Technical', risk: 'Cooling under-performance at high density', probability: 'med', impact: 'high', mitigation: 'CFD, IST/load-bank, N+1 margin', owner: 'CxA' },
-                { id: 'R04', category: 'Cost', risk: 'Escalation / FX on imported equipment', probability: 'high', impact: 'med', mitigation: 'Fixed-price packages, hedging, contingency', owner: 'QS' },
-                { id: 'R05', category: 'Construction', risk: 'Interface / integration gaps between packages', probability: 'med', impact: 'med', mitigation: 'Integration matrix, single Cx authority', owner: 'EPC' },
-                { id: 'R06', category: 'Safety', risk: 'Working-at-height / confined-space / hot-work incidents', probability: 'med', impact: 'high', mitigation: 'Permit-to-work, method statements, HSE plan', owner: 'EPC HSE' },
-                { id: 'R07', category: 'Supply Chain', risk: 'Single-source dependency (GPU/UPS/genset)', probability: 'med', impact: 'high', mitigation: 'Dual-source, framework agreements', owner: 'Procurement' },
-                { id: 'R08', category: 'Commissioning', risk: 'Failure at integrated systems / black-building test', probability: 'low', impact: 'high', mitigation: 'Level 1-5 Cx, scripted scenarios, witness tests', owner: 'CxA' }
+                { id: 'R01', category: 'Procurement', risk: 'Long-lead equipment (MV transformer ~120 wk) slips schedule', probability: 'high', impact: 'high', mitigation: 'Early procurement, pre-order, buffer float, alt vendors', owner: 'PMC', costImpactPctBand: [0.01, 0.03], scheduleSlipWk: 16, residual: 'med', earlyWarning: 'Transformer PO not placed by design-freeze +4 wk' },
+                { id: 'R02', category: 'Authority', risk: 'Permit / grid-connection delay', probability: 'med', impact: 'high', mitigation: 'Early submission, utility engagement, parallel tracks', owner: 'Owner Eng', costImpactPctBand: [0.005, 0.02], scheduleSlipWk: 12, residual: 'med', earlyWarning: 'Utility connection agreement unsigned by RFS −52 wk' },
+                { id: 'R03', category: 'Technical', risk: 'Cooling under-performance at high density', probability: 'med', impact: 'high', mitigation: 'CFD, IST/load-bank, N+1 margin', owner: 'CxA', costImpactPctBand: [0.005, 0.015], scheduleSlipWk: 6, residual: 'low', earlyWarning: 'CFD hotspot > ASHRAE allowable at design review' },
+                { id: 'R04', category: 'Cost', risk: 'Escalation / FX on imported equipment', probability: 'high', impact: 'med', mitigation: 'Fixed-price packages, hedging, contingency', owner: 'QS', costImpactPctBand: [0.01, 0.04], scheduleSlipWk: 0, residual: 'med', earlyWarning: 'FX drift > 5% vs tender basis; index escalation > contingency draw-rate' },
+                { id: 'R05', category: 'Construction', risk: 'Interface / integration gaps between packages', probability: 'med', impact: 'med', mitigation: 'Integration matrix, single Cx authority', owner: 'EPC', costImpactPctBand: [0.003, 0.01], scheduleSlipWk: 4, residual: 'low', earlyWarning: 'Open interface-matrix items > 10% at 60% construction' },
+                { id: 'R06', category: 'Safety', risk: 'Working-at-height / confined-space / hot-work incidents', probability: 'med', impact: 'high', mitigation: 'Permit-to-work, method statements, HSE plan', owner: 'EPC HSE', costImpactPctBand: [0.002, 0.01], scheduleSlipWk: 3, residual: 'low', earlyWarning: 'Near-miss rate rising; permit-to-work compliance audit < 95%' },
+                { id: 'R07', category: 'Supply Chain', risk: 'Single-source dependency (GPU/UPS/genset)', probability: 'med', impact: 'high', mitigation: 'Dual-source, framework agreements', owner: 'Procurement', costImpactPctBand: [0.005, 0.02], scheduleSlipWk: 10, residual: 'med', earlyWarning: 'OEM lead-time quote extends > 10% vs tender; no qualified alternate' },
+                { id: 'R08', category: 'Commissioning', risk: 'Failure at integrated systems / black-building test', probability: 'low', impact: 'high', mitigation: 'Level 1-5 Cx, scripted scenarios, witness tests', owner: 'CxA', costImpactPctBand: [0.002, 0.008], scheduleSlipWk: 4, residual: 'low', earlyWarning: 'L4 sub-system Cx defects unclosed entering IST' }
             ],
             documentRegister: [
                 'Design Drawings & Specifications', 'Engineering Calculations', 'Single-Line Diagrams', 'Method Statements', 'Inspection & Test Plans (ITP)', 'Factory Acceptance Test Reports', 'Site Acceptance Test Reports', 'Cable/Panel/Equipment Schedules', 'Shop & As-Built Drawings', 'Commissioning Report (L1-L5)', 'Asset Register / CMMS Data', 'O&M Manuals', 'Training Records', 'Warranty Documents', 'Closeout / Handover Package', 'BIM Model / Digital Twin'
             ],
+            /* Document delivery schedule (BOQ Ship-D) — each key deliverable mapped to the
+             * project PHASE it is issued in and the APPROVER role that accepts it. Approvers:
+             * Owner Eng = owner's engineer, CxA = commissioning authority, AHJ = authority
+             * having jurisdiction, EPC = the contractor. STANDARD-PRACTICE EPC document-
+             * control convention (ISO 19650 / Uptime), NOT a project submission list. */
+            documentSchedule: [
+                { deliverable: 'Basis of Design (BoD) / Owner Project Requirements', phase: 'design', approver: 'Owner Eng' },
+                { deliverable: 'Design Drawings & Specifications (IFC set)', phase: 'design', approver: 'Owner Eng' },
+                { deliverable: 'Engineering Calculations & Single-Line Diagrams', phase: 'design', approver: 'Owner Eng' },
+                { deliverable: 'Permit / Authority Submission Package', phase: 'design', approver: 'AHJ' },
+                { deliverable: 'Procurement Specs & Vendor Data Sheets', phase: 'procurement', approver: 'Owner Eng' },
+                { deliverable: 'Factory Acceptance Test (FAT) Reports', phase: 'procurement', approver: 'CxA' },
+                { deliverable: 'Method Statements & Inspection/Test Plans (ITP)', phase: 'construction', approver: 'EPC' },
+                { deliverable: 'Shop & Coordinated Drawings', phase: 'construction', approver: 'Owner Eng' },
+                { deliverable: 'Site Acceptance Test (SAT) Reports', phase: 'construction', approver: 'CxA' },
+                { deliverable: 'Integrated Systems Test (L4-L5) / Cx Report', phase: 'commissioning', approver: 'CxA' },
+                { deliverable: 'Occupancy / Energization Approvals', phase: 'commissioning', approver: 'AHJ' },
+                { deliverable: 'As-Built Drawings & Asset Register / CMMS', phase: 'handover', approver: 'Owner Eng' },
+                { deliverable: 'O&M Manuals, Warranties & Training Records', phase: 'handover', approver: 'Owner Eng' },
+                { deliverable: 'Closeout / Handover Package + BIM / Digital Twin', phase: 'handover', approver: 'Owner Eng' }
+            ],
+            /* Version-control convention applied to every deliverable above. */
+            documentControlNote: 'All deliverables issued under a controlled revision scheme (P-series for preliminary, C-series for construction/IFC, AB for as-built) via a CDE (Common Data Environment, ISO 19650); superseded revisions retained; approver sign-off recorded per revision.',
             opsReadiness: [
                 { item: 'Asset register + CMMS load', owner: 'FM', gate: 'pre-handover' },
                 { item: 'Critical spares stocked (newsvendor)', owner: 'Ops', gate: 'pre-go-live', engineRef: 'models.spares' },
@@ -7612,9 +7642,13 @@
             'boq.unitRates':     { source: 'US-2025 installed material+install $/unit, ~90 keys spanning all subsystems. Anchors: concrete ~$320/m³ + rebar ~$2100/t (Gordian/HomeGuide), structural steel ~$3300/t (SteelFlo 2026), raised floor ~$270/m² (datacenterfloortiles), LV/MV cable + tray + CW pipe (1xTechnologies/DistributorWire/RSMeans/MEP Academy — LOW), major equipment (UPS module/genset/chiller/CDU/transformer/PDU) at screening OEM installed price, envelope/fit-out/external-works per-m² (Spon’s/RSMeans), bare BLS trade wages (electrician/pipefitter/ironworker/laborer). Regionalized via locMult; +5.5%/yr escalation (T&T). Aggregate per-MW line rates (dcim/bms/security/Cx-L1..L5/design/PM/permits) are anchors scaled by reconcileFactor to the category $.', asOf: '2025', unit: 'USD per material/labor unit', method: 'SCREENING; add ~35-60% labor burden for a bid' },
             'boq.paramFactors':  { source: 'SCREENING multiplier tables the param-conditional BOQ drivers read: seismic rebar/bracing scale by ASCE 7-22 Sds zone band (zone0..zone4); diesel bulk-fuel ~0.28 m³ per MW-hour of runtime (~235 g/kWh at ~0.85 kg/L + ullage); clean-agent design concentration by agent (Novec 1230 ~0.55, FM-200 ~0.36 kg/m³ per NFPA 2001/3M/Chemours TDS); redundancy parallel-path multiplier by Uptime Tier topology (N/N+1/2N/2N+1); UPS battery strings per module (rotary carries none); CDU-vs-CRAH split by cooling type; PDU/RPP count per rack by density band. Each factor tunes a quantity base, not the reconciled category $.', asOf: '2026', unit: 'dimensionless multipliers + per-unit factors', method: 'SCREENING — code-band anchored (ASCE/NFPA/Uptime), fold into AACE Class-4' },
             'supplyChain': { source: 'PROXY/SCREENING per-country landed-cost + export-control. Import-duty bands (equipment): FTA 0 / low ~3% / med ~7.5% / high ~17% (IN ~15, BR ~16) / punitive ~30% (China↔US), applied to the imported-EQUIPMENT fraction per category (BOM split: ups ~70/gen ~75/network ~80/cooling ~55/electrical ~40%, labor-heavy ~0) — WTO/national tariff schedules, screening. Export-control tiers = US BIS Fed-Register PROXY; AI Diffusion Rule RESCINDED 2025 so caps are NOT in force — advisory only, NOT statutory/legal advice. Customs lead +2-12 wk by jurisdiction. Per-country band assignment in CountryProfile.supplyChain.', asOf: '2026', unit: 'duty rate + export tier + customs weeks', method: 'PROXY/SCREENING — duty on equipment fraction only; export-control advisory, policy fluid' },
-            'dossier': { source: 'STANDARD-PRACTICE EPC Technical Dossier scaffold — permitting matrix (typical AHJ permits + indicative durations), design basis (IEC/NEC/ASHRAE TC9.9/ASCE 7/NFPA/Uptime references), risk register (typical mission-critical DC risks), document register, ops-readiness gates. Reference convention (Uptime/TIA-942/BICSI/NFPA), NOT a project-specific submission; durations/risks indicative. models.dossier.sections composes these with live engine outputs.', asOf: '2026', unit: 'permit/risk/document/readiness scaffold + calc→model references', method: 'STANDARD-PRACTICE reference — validate against the AHJ + full design' },
+            'dossier': { source: 'STANDARD-PRACTICE EPC Technical Dossier scaffold — permitting matrix (typical AHJ permits + indicative durations), design basis (IEC/NEC/ASHRAE TC9.9/ASCE 7/NFPA/Uptime references), risk register (typical mission-critical DC risks) QUANTIFIED with screening cost-impact %-of-CAPEX bands + schedule-slip weeks + post-mitigation residual band + early-warning indicators, document register + document delivery schedule (deliverable × phase × approver, ISO 19650 / Uptime CDE convention), ops-readiness gates. Reference convention (Uptime/TIA-942/BICSI/NFPA), NOT a project-specific submission; durations/risks/bands indicative. models.dossier.sections composes these with live engine outputs.', asOf: '2026', unit: 'permit/risk/document/readiness scaffold + quantified risk bands + doc-schedule + calc→model references', method: 'STANDARD-PRACTICE reference — validate against the AHJ + full design + a project risk workshop' },
+            'dossier.countryRisks': { source: 'SCREENING location-risk supplement DERIVED LIVE from the selected DATA.countries[id] hazard/grid/talent fields (naturalDisaster.{seismicZone,floodRisk,typhoon/volcano/tsunami,compositeScore,insuranceMultiplier}, gridReliability.{gridUptime,brownoutFrequency,gridTier,recommendedGenHours}, talentPool.{dcEngineerPool,avgHiringDays,talentScore}) — seismic (ASCE 7), flood/natural-disaster (FM Global/local), grid reliability (NFPA 110/Uptime), talent depth. Severity is a screening band off the source metric; no new economic literals (reads countries.ts single-source).', asOf: '2026', unit: 'location hazard + screening severity + mitigation per country', method: 'SCREENING — a project-specific site-risk study supersedes' },
+            'dossier.engineeringCalcs': { source: 'AACE Class-4 SCREENING worked engineering calculations DERIVED LIVE from the requirement input + CAPEX result + existing engine models/data (equipmentSizing, reliability, waterFootprint, pueMatrix, paramFactors, architecture.floorLoadingKnM2) — electrical continuous load (NEC 210.19/215.2), transformer/UPS/genset/cooling sizing (IEEE 3006/3007, NFPA 110, ASHRAE TC9.9), fuel storage (NFPA 30/110), clean-agent + fire-water (NFPA 2001/13), structural floor load (ASCE 7), cable derate (NEC 310.15), system availability (IEEE 493 / Uptime). No new economic literals — each sheet references the model/table that computes it, each carries a standard + confidence tag.', asOf: '2026', unit: 'formula + inputs + steps + result per discipline (screening worked calcs)', method: 'AACE Class-4 screening; live from inputs + engine models — validate against a full design' },
             'boq.equipmentSizing': { source: 'SCREENING nominal unit ratings for equipment-count sizing (UPS 500kW module, genset 2.5MW, transformer 2.5MVA, CRAH 150kW, CDU 700kW, chiller 1.4MW) + redundancy addend by topology. Lead times reflect the 2026 long-lead reality — MV transformer/switchgear ~120 wk dominant (industry supply-chain reporting); UPS ~26, genset ~40, chiller ~32 wk.', asOf: '2026', unit: 'kW/MVA per unit + weeks lead time', method: 'SCREENING — real selection depends on the design' },
             'boq.procurement':      { source: 'Standard mission-critical DC EPC procurement packaging (12 packages P01-P12) with tender method, lead time, FAT/SAT, warranty — industry norm (Uptime/BICSI procurement practice). Package value = Σ mapped CapexResult category $.', asOf: '2026', unit: 'package scope + lead-time + FAT/SAT + warranty', method: 'SCREENING packaging convention' },
+            'boq.criticalSpares':   { source: 'SCREENING critical-spares stock — installed-population failure demand from DATA.reliability.components MTBF (IEEE 493 Gold Book) × equipmentSchedule population, priced from DATA.sparesPricing list-price bands, run through models.spares.newsvendor (critical-fractile, Acklam Φ⁻¹ / exact Poisson) to a service level. Understock (downtime-per-event) consequence costs are screening assumptions folded into the critical-fractile — NOT vendor quotes.', asOf: '2026-07', unit: 'recommended stock qty + holding $ + annual replacement $', method: 'AACE Class-4 screening; newsvendor over MTBF-driven demand — validate against OEM RCM data' },
+            'boq.pmSchedule':       { source: 'SCREENING preventive-maintenance schedule — PM intervals + task lists are STANDARD-PRACTICE (OEM / NFPA 110 genset / ASHRAE chiller convention); annual labor-hours = installed population (equipmentSchedule sizing) × PM visits/yr × hr/visit; annual PM cost allocated from the DATA.omContracts preventive $/kW-yr band by per-system weight.', asOf: '2026-07', unit: 'PM interval + annual labor-hr + annual PM $', method: 'AACE Class-4 screening; standard-practice PM tasking — validate against OEM RCM + vendor SLA' },
             'boq.commercialBasis': { source: 'EPC margin 8-12% gross / 2-6% net realized on LSTK mission-critical (XYZ Reality) — DISCLOSED, embedded in benchmark not added. Safety factors: NEC 210.20/215.3 continuous 1.25 (HIGH), ASCE 7-22 LRFD 1.2D+1.6L (HIGH), NEC 310.15 ampacity derate ~0.75 (HIGH), Uptime Tier-3 N+1 (HIGH). AACE 18R-97/17R-97 Class-4 −30%/+50% (HIGH); contingency set by risk, screening rule-of-thumb 20-30%.', asOf: '2026', unit: 'margin % + design safety factors', method: 'code-mandated factors HIGH; margin band screening' },
             'coolingTech': { source: 'Vendor datasheets + OCP/press for COMMERCIAL (CoolIT/JetCool/ZutaCore/GRC/Submer/Iceotope — TRL 8-9, shipping); research disclosures for EMERGING (Corintis EPFL+Microsoft in-chip validation 2024-25, TSMC DSLC, IMEC impinging-jet >600 W/cm², IBM microfluidic — TRL 5-7 pilot/lab). rackKwClaim + PUE ladder = screening; NO public per-rack CAPEX for microfluidic (multiplier SCREENING-only). Microfluidic is NOT an NVIDIA architecture fact.', asOf: '2026-07', unit: 'per-tech TRL + rack-kW capability + coolant/WUE basis', method: 'technology-readiness classification; commercial=deployable, emerging=pilot/research' },
             'refrigerants': { source: 'GWP100 IPCC AR4 (consistent with sitewide published values); ASHRAE 34 safety classes; copIndex: AHRI/manufacturer typical relative cycle efficiency at water-cooled chiller conditions (R-134a=1.00) — estimate-grade; charge/leak: GHG Protocol + EPA GreenChill typical ranges', asOf: '2026', method: 'copIndex and charge/leak are screening estimates, not equipment selections' },
@@ -11870,6 +11904,118 @@
                         }, 0);
                         return { pkgNo: p.pkgNo, name: p.name, scope: p.scope, disciplines: p.disciplines, tenderMethod: p.tenderMethod, leadTimeWk: p.leadTimeWk, fatSat: p.fatSat, warrantyYr: p.warrantyYr, estValue: est, confidence: p.confidence, source: p.source };
                     });
+                },
+                /* ── BOQ Phase-C: indicative per-unit equipment cost — maps each
+                 * equipmentSchedule category to its DATA.boq.unitRates rateKey so the
+                 * deepened Equipment Schedule can surface an indicative unit cost
+                 * without a new economic literal. Returns { rateKey, unitUsd, confidence }
+                 * per equipment key (ups/generator/transformer/pdu/crah/cdu); null when
+                 * no rate exists. SCREENING — same rates the take-off uses. */
+                equipmentUnitCost: function (equipKey) {
+                    var map = {
+                        ups: 'upsModule_ea', generator: 'genset_ea', transformer: 'transformer_mva',
+                        pdu: 'pdu_ea', crah: 'crah_ea', cdu: 'cdu_ea'
+                    };
+                    var rk = map[equipKey];
+                    var r = rk && DATA.boq.unitRates ? DATA.boq.unitRates[rk] : null;
+                    if (!r) return null;
+                    return { rateKey: rk, unitUsd: r.usd, confidence: r.confidence || 'low', unit: (rk === 'transformer_mva') ? 'per MVA' : 'per unit' };
+                },
+                /* ── BOQ Phase-C: critical spares stock model. For each critical
+                 * component, derives the annual failure demand from
+                 * DATA.reliability.components[*].mtbf (installed qty × 8760 / MTBF),
+                 * prices it from DATA.sparesPricing, and runs models.spares.newsvendor
+                 * to a service level → recommended stock qty + holding + annual
+                 * replacement cost. AACE Class-4 SCREENING — real MTBF + list-price
+                 * bands; validate against OEM RCM data. input {itLoad, redundancy, tier};
+                 * metrics {pue}. serviceLevelPct default 99. */
+                criticalSpares: function (input, metrics, serviceLevelPct) {
+                    input = input || {}; metrics = metrics || {};
+                    var itKw = input.itLoad || 0;
+                    var pue = metrics.pue || 1.4;
+                    var red = (input.redundancy || 'n1');
+                    var tier = input.tier || 3;
+                    var fill = Math.max(50, Math.min(99.9, serviceLevelPct || 99));
+                    var E = DATA.boq.equipmentSizing, C = DATA.reliability.components, SP = DATA.sparesPricing.classes;
+                    var lt = E.leadTimeWk, nv = RZEngine.models.spares.newsvendor;
+                    var install = function (base) { if (red === 'n1' || red === '2n1') { return red === '2n1' ? base * 2 + 1 : base + 1; } if (red === '2n') return base * 2; return base; };
+                    /* installed populations that drive spares demand (units in service). */
+                    var upsInst  = install(Math.ceil(itKw / E.upsModuleKw));
+                    var genInst  = install(Math.ceil((itKw * pue) / E.gensetKw));
+                    var crahInst = install(Math.ceil(itKw / E.crahKw));
+                    var cduInst  = install(Math.ceil(itKw / E.cduKw));
+                    var pduInst  = install(Math.ceil(itKw / E.pduKw));
+                    /* per-spec: component MTBF, installed population, price class, LT, part life. */
+                    var band = function (cls, key) { var c = SP[cls]; return c ? c[key] : 0; };
+                    var specs = [
+                        { key: 'ups_module',  label: 'UPS power module',   comp: 'ups',       pop: upsInst,  cls: 'ups_module_50kw',     lt: lt.ups,       partLife: 12, cu: 200000 },
+                        { key: 'ups_battery', label: 'UPS battery string', comp: 'ups',       pop: upsInst,  cls: 'ups_battery_string',  lt: lt.ups,       partLife: 6,  cu: 120000 },
+                        { key: 'genset',      label: 'Genset PM/overhaul', comp: 'generator', pop: genInst,  cls: 'genset_pm_kit',       lt: lt.generator, partLife: 3,  cu: 250000 },
+                        { key: 'chiller',     label: 'Chiller compressor',  comp: 'chiller',  pop: cduInst,  cls: 'chiller_compressor',  lt: lt.cdu,       partLife: 15, cu: 300000 },
+                        { key: 'crah',        label: 'CRAH EC/VFD fan kit', comp: 'crac',     pop: crahInst, cls: 'crah_ec_fan_kit',     lt: lt.crah,      partLife: 8,  cu: 60000 },
+                        { key: 'pdu',         label: 'PDU MCCB breaker',    comp: 'pdu',      pop: pduInst,  cls: 'pdu_breaker_mccb',    lt: lt.pdu,       partLife: 15, cu: 45000 }
+                    ];
+                    return specs.map(function (s) {
+                        var comp = C[s.comp] || { mtbf: 200000, mttr: 8, label: s.label };
+                        var mtbf = comp.mtbf;
+                        var failRatePerUnit = mtbf > 0 ? 8760 / mtbf : 0;               /* λ per unit-year */
+                        var muAnnual = failRatePerUnit * Math.max(1, s.pop);            /* population failures/yr */
+                        var unitCost = band(s.cls, 'mid') || 4500;
+                        var carryRatePct = 25;
+                        var nvOut = nv({
+                            unitCost: unitCost, understockCostPerEvent: s.cu, carryRatePct: carryRatePct,
+                            partLifeYrs: s.partLife, muAnnual: muAnnual, sigmaAnnual: Math.sqrt(muAnnual),
+                            ltWeeks: s.lt || 16, ltSigmaWeeks: Math.max(2, (s.lt || 16) * 0.25),
+                            fillRatePct: fill
+                        });
+                        var stockQty = Math.max(nvOut.qStar, 1);                        /* carry ≥1 critical spare */
+                        var failRate = +muAnnual.toFixed(3);
+                        var holdingCost = Math.round(carryRatePct / 100 * unitCost * stockQty);  /* annual carry */
+                        var annualReplacement = Math.round(failRate * unitCost);        /* expected consumption $/yr */
+                        return {
+                            key: s.key, label: s.label,
+                            component: s.comp, mtbfHours: mtbf, installedQty: s.pop,
+                            failRatePerYr: failRate, recommendedStockQty: stockQty,
+                            unitCost: unitCost, holdingCost: holdingCost, annualReplacementCost: annualReplacement,
+                            serviceLevelPct: fill, priceClass: s.cls, confidence: 'low',
+                            source: 'DATA.reliability + DATA.sparesPricing + models.spares.newsvendor'
+                        };
+                    });
+                },
+                /* ── BOQ Phase-C: preventive-maintenance schedule per major system.
+                 * PM intervals + task lists are STANDARD-PRACTICE (OEM/NFPA-110/ASHRAE
+                 * convention). Annual labor-hours scale with the installed population
+                 * (models.boq.equipmentSchedule sizing) × PM visits/yr × hr/visit; annual
+                 * PM cost from the DATA.omContracts preventive $/kW-yr band allocated by
+                 * each system's share. SCREENING — validate against OEM RCM + vendor SLA.
+                 * input {itLoad, redundancy, tier}; metrics {pue}. */
+                pmSchedule: function (input, metrics) {
+                    input = input || {}; metrics = metrics || {};
+                    var itKw = input.itLoad || 0, mw = itKw / 1000;
+                    var pue = metrics.pue || 1.4;
+                    var red = (input.redundancy || 'n1');
+                    var E = DATA.boq.equipmentSizing;
+                    var install = function (base) { if (red === 'n1' || red === '2n1') { return red === '2n1' ? base * 2 + 1 : base + 1; } if (red === '2n') return base * 2; return base; };
+                    var pdurate = DATA.omContracts.tiers.preventive;                    /* $/kW-yr band */
+                    var pmBudgetYr = pdurate.mid * itKw;                                /* total preventive PM $/yr */
+                    /* per-system PM template: visits/yr, hr per visit, PM budget weight. */
+                    var systems = [
+                        { key: 'generator', label: 'Standby generators',      pop: install(Math.ceil((itKw * pue) / E.gensetKw)), interval: 'Monthly load-test + annual major', tasks: 'Oil/filter, coolant, load-bank, ATS, fuel polishing (NFPA 110)', visitsYr: 12, hrPerVisit: 4, weight: 0.22 },
+                        { key: 'ups',       label: 'UPS + battery strings',   pop: install(Math.ceil(itKw / E.upsModuleKw)),      interval: 'Quarterly + annual cap/batt', tasks: 'Capacitor/fan check, battery impedance, calibration, thermal scan', visitsYr: 4,  hrPerVisit: 3, weight: 0.20 },
+                        { key: 'chiller',   label: 'Chillers / CDU',          pop: install(Math.ceil(itKw / E.cduKw)),            interval: 'Quarterly + annual overhaul', tasks: 'Compressor, refrigerant, tube-clean, VFD, water treatment (ASHRAE)', visitsYr: 4,  hrPerVisit: 5, weight: 0.24 },
+                        { key: 'crah',      label: 'CRAH / CRAC units',       pop: install(Math.ceil(itKw / E.crahKw)),           interval: 'Quarterly filter + belt', tasks: 'Filter change, EC-fan, condensate, coil clean, humidity cal', visitsYr: 4,  hrPerVisit: 2, weight: 0.18 },
+                        { key: 'pumps',     label: 'CW pumps / valves',       pop: Math.max(2, Math.ceil(mw)),                    interval: 'Semi-annual', tasks: 'Seal/bearing, alignment, valve actuation, vibration analysis', visitsYr: 2,  hrPerVisit: 3, weight: 0.16 }
+                    ];
+                    return systems.map(function (s) {
+                        var laborHrYr = Math.round(Math.max(1, s.pop) * s.visitsYr * s.hrPerVisit);
+                        var annualPmCost = Math.round(pmBudgetYr * s.weight);
+                        return {
+                            key: s.key, system: s.label, installedQty: s.pop,
+                            pmInterval: s.interval, tasks: s.tasks,
+                            annualLaborHr: laborHrYr, annualPmCost: annualPmCost,
+                            confidence: 'low', source: 'DATA.omContracts + models.boq.equipmentSchedule sizing'
+                        };
+                    });
                 }
             },
 
@@ -11901,6 +12047,380 @@
                         racks: (result && result.metrics && result.metrics.racks) || 0
                     };
                 },
+                /* ── BOQ Ship-D: country-specific location risk supplement ──
+                 * Reads the SELECTED country's hazard/grid/talent fields
+                 * (DATA.countries[id].naturalDisaster / .gridReliability / .talentPool,
+                 * single-sourced from countries.ts) and returns a small array of
+                 * location risks, each with a screening SEVERITY (low/med/high) +
+                 * mitigation. Tolerates a null country (returns []). Screening — a
+                 * project-specific site risk study supersedes. */
+                countryRisks: function (country) {
+                    if (!country) return [];
+                    var out = [];
+                    var band = function (n, lo, hi) { return n >= hi ? 'high' : (n >= lo ? 'med' : 'low'); };
+                    var wordSev = function (w, map) { return map[(w || '').toLowerCase()] || 'low'; };
+                    var floodMap = { extreme: 'high', high: 'high', 'severe': 'high', moderate: 'med', low: 'low', minimal: 'low', none: 'low' };
+
+                    var nd = country.naturalDisaster || {};
+                    /* Seismic — zone 0-4 (higher = worse); zone ≥3 high, 2 med. */
+                    if (nd.seismicZone != null) {
+                        var sz = nd.seismicZone;
+                        out.push({ hazard: 'Seismic', metric: 'Seismic zone ' + sz + (nd.structuralReinforcement ? ' · +' + Math.round(nd.structuralReinforcement * 100) + '% structural' : ''),
+                            severity: band(sz, 2, 3), mitigation: 'Seismic-qualified anchoring, base isolation where zone ≥ 3, ASCE 7 design', standard: 'ASCE 7 / IBC seismic' });
+                    }
+                    /* Flood / natural-disaster composite. */
+                    if (nd.floodRisk != null || nd.compositeScore != null) {
+                        var floodSev = nd.floodRisk != null ? wordSev(nd.floodRisk, floodMap) : band(nd.compositeScore || 0, 50, 70);
+                        var disasters = [];
+                        if (nd.floodRisk && nd.floodRisk !== 'none') disasters.push('flood ' + nd.floodRisk);
+                        if (nd.typhoonRisk && nd.typhoonRisk !== 'none') disasters.push('typhoon ' + nd.typhoonRisk);
+                        if (nd.volcanoRisk && nd.volcanoRisk !== 'none') disasters.push('volcano ' + nd.volcanoRisk);
+                        if (nd.tsunamiRisk && nd.tsunamiRisk !== 'none') disasters.push('tsunami ' + nd.tsunamiRisk);
+                        out.push({ hazard: 'Flood / Natural Disaster', metric: (disasters.length ? disasters.join(', ') : 'composite ' + (nd.compositeScore || 0)) + (nd.insuranceMultiplier ? ' · ins ×' + nd.insuranceMultiplier : ''),
+                            severity: floodSev, mitigation: 'Elevated critical plant, flood barriers, site drainage, insurance cover', standard: 'FM Global / local flood code' });
+                    }
+                    /* Grid reliability — brownout frequency + outage duration drive genset reliance. */
+                    var gr = country.gridReliability || {};
+                    if (gr.gridUptime != null || gr.brownoutFrequency != null) {
+                        var brown = gr.brownoutFrequency != null ? gr.brownoutFrequency : 0;
+                        out.push({ hazard: 'Grid Reliability', metric: (gr.gridUptime != null ? gr.gridUptime + '% uptime' : '') + (brown ? ' · ' + brown + ' brownouts/yr' : '') + (gr.gridTier != null ? ' · grid-tier ' + gr.gridTier : ''),
+                            severity: band(brown, 6, 15), mitigation: 'N+1 generation, extended fuel autonomy (' + (gr.recommendedGenHours || 72) + ' h), voltage stabilization', standard: 'NFPA 110 / Uptime Tier' });
+                    }
+                    /* Talent pool — hiring lead-time + depth drive staffing / Cx risk. */
+                    var tp = country.talentPool || {};
+                    if (tp.talentScore != null || tp.avgHiringDays != null) {
+                        var ts = tp.talentScore != null ? tp.talentScore : 50;
+                        out.push({ hazard: 'Talent Pool', metric: (tp.dcEngineerPool ? tp.dcEngineerPool + ' pool' : '') + (tp.avgHiringDays ? ' · ' + tp.avgHiringDays + 'd hire' : '') + (ts != null ? ' · score ' + ts : ''),
+                            severity: ts >= 65 ? 'low' : (ts >= 45 ? 'med' : 'high'), mitigation: 'Early recruitment, OEM secondment, training pipeline, managed-services O&M', standard: 'STANDARD-PRACTICE staffing' });
+                    }
+                    return out;
+                },
+                /* ── BOQ Ship-3 (deepened): REAL worked engineering calculations ──
+                 * Returns an ARRAY of worked-calc sheets computed LIVE from the
+                 * requirement input + CAPEX result + existing engine models/data.
+                 * Each sheet = { id, title, discipline, standard, confidence,
+                 * formula, inputs:[{label,value,unit}], steps:[{label,expr,value,
+                 * unit}], result:{label,value,unit} }. AACE Class-4 SCREENING — real
+                 * engine values, never fabricated; each carries a standard reference
+                 * + [high|med|low] confidence. Undefined inputs → safe defaults so
+                 * every result.value is finite. Mirrors models.boq.drivers /
+                 * .equipmentSchedule sizing + models.reliability + DATA.pueMatrix /
+                 * DATA.boq.paramFactors / DATA.architecture.floorLoadingKnM2 /
+                 * DATA.waterFootprint (single source, no re-derivation drift). */
+                engineeringCalcs: function (input, result) {
+                    input = input || {};
+                    result = result || {};
+                    var E = DATA.boq.equipmentSizing;
+                    var PF = DATA.boq.paramFactors;
+                    var r2 = function (x, d) { var f = Math.pow(10, d == null ? 2 : d); var v = Math.round((x || 0) * f) / f; return Number.isFinite(v) ? v : 0; };
+
+                    /* ── live drivers (safe defaults; guard undefined) ── */
+                    var itKw = input.itLoad != null && Number.isFinite(input.itLoad) ? input.itLoad : 0;
+                    var mw = itKw / 1000;
+                    var metrics = result.metrics || {};
+                    var pue = (result.pue != null && result.pue > 0) ? result.pue :
+                              (metrics.pue != null && metrics.pue > 0 ? metrics.pue : 1.4);
+                    var racks = Number.isFinite(metrics.racks) ? metrics.racks : 0;
+                    var floorSpaceM2 = Number.isFinite(metrics.floorSpace) ? metrics.floorSpace : 0;
+                    var facilityKw = itKw * pue;
+                    var red = (input.redundancy || 'n1').toLowerCase().replace(/\s+/g, '');
+                    var coolingType = (input.coolingType || 'air').toLowerCase();
+                    var fireType = (input.fireType || 'novec').toLowerCase();
+                    var fuelHours = input.fuelHours != null && Number.isFinite(input.fuelHours) ? input.fuelHours : 48;
+                    var tier = input.tier || (metrics.tier) || 3;
+                    var V = 400, pf = E.transformerPf;                 /* LV design voltage / power factor */
+                    var protectedM3 = mw * 1500;                        /* ~1500 m³/MW protected volume (mirrors boq.drivers) */
+
+                    var calcs = [];
+
+                    /* 1 — Electrical continuous load (NEC 210.19/215.2 — 125% continuous) */
+                    (function () {
+                        var contKw = itKw * 1.25;
+                        var kva = pf > 0 ? contKw / pf : 0;
+                        var amps = (V * Math.sqrt(3)) > 0 ? (contKw * 1000) / (Math.sqrt(3) * V * pf) : 0;
+                        calcs.push({
+                            id: 'elecContinuous', title: 'Electrical Continuous Load', discipline: 'Electrical',
+                            standard: 'NEC 210.19 / 215.2 (125% continuous)', confidence: 'high',
+                            formula: 'I_design = 1.25 × IT_kW × 1000 / (√3 × V × pf)',
+                            inputs: [
+                                { label: 'IT load', value: r2(itKw, 0), unit: 'kW' },
+                                { label: 'Continuous factor', value: 1.25, unit: '×' },
+                                { label: 'Design voltage', value: V, unit: 'V' },
+                                { label: 'Power factor', value: pf, unit: '' }
+                            ],
+                            steps: [
+                                { label: 'Continuous load', expr: '1.25 × ' + r2(itKw, 0), value: r2(contKw, 0), unit: 'kW' },
+                                { label: 'Apparent power', expr: r2(contKw, 0) + ' / ' + pf, value: r2(kva, 0), unit: 'kVA' },
+                                { label: 'Design current', expr: r2(contKw, 0) + '·1000 / (√3·' + V + '·' + pf + ')', value: r2(amps, 0), unit: 'A' }
+                            ],
+                            result: { label: 'Design service current', value: r2(amps, 0), unit: 'A' }
+                        });
+                    })();
+
+                    /* 2 — Transformer sizing (facility kW / (√3·V·pf) → MVA + N) */
+                    (function () {
+                        var perTxMva = E.transformerMva;
+                        var facMva = pf > 0 ? (facilityKw / 1000) / pf : 0;
+                        var txN = itKw > 0 ? Math.ceil(facilityKw / (perTxMva * 1000 * pf)) : 0;
+                        calcs.push({
+                            id: 'transformer', title: 'MV Transformer Sizing', discipline: 'Electrical',
+                            standard: 'IEEE C57.12 / NEC 450', confidence: 'med',
+                            formula: 'N_tx = ⌈ (IT_kW × PUE) / (MVA_unit × 1000 × pf) ⌉',
+                            inputs: [
+                                { label: 'Facility load', value: r2(facilityKw, 0), unit: 'kW' },
+                                { label: 'PUE', value: r2(pue, 3), unit: '' },
+                                { label: 'Unit rating', value: perTxMva, unit: 'MVA' },
+                                { label: 'Power factor', value: pf, unit: '' }
+                            ],
+                            steps: [
+                                { label: 'Facility apparent power', expr: r2(facilityKw / 1000, 2) + ' / ' + pf, value: r2(facMva, 2), unit: 'MVA' },
+                                { label: 'Per-unit capacity', expr: perTxMva + ' × ' + pf, value: r2(perTxMva * pf, 2), unit: 'MW' },
+                                { label: 'Transformer count (N)', expr: '⌈' + r2(facilityKw, 0) + ' / ' + r2(perTxMva * 1000 * pf, 0) + '⌉', value: txN, unit: 'ea' }
+                            ],
+                            result: { label: 'Transformers required (N)', value: txN, unit: 'ea' }
+                        });
+                    })();
+
+                    /* 3 — UPS sizing + battery autonomy (IT / module → N; kWh for autonomy) */
+                    (function () {
+                        var moduleKw = E.upsModuleKw;
+                        var upsN = itKw > 0 ? Math.ceil(itKw / moduleKw) : 0;
+                        var autonomyMin = 10;                               /* typical Li-ion ride-through to genset start */
+                        var battKwh = itKw * (autonomyMin / 60);
+                        calcs.push({
+                            id: 'upsBattery', title: 'UPS Sizing & Battery Autonomy', discipline: 'Electrical',
+                            standard: 'IEEE 3007 / IEEE 485 (battery sizing)', confidence: 'med',
+                            formula: 'N_ups = ⌈ IT_kW / module_kW ⌉ ;  E_batt = IT_kW × (t_min / 60)',
+                            inputs: [
+                                { label: 'IT load', value: r2(itKw, 0), unit: 'kW' },
+                                { label: 'UPS module', value: moduleKw, unit: 'kW' },
+                                { label: 'Autonomy', value: autonomyMin, unit: 'min' }
+                            ],
+                            steps: [
+                                { label: 'UPS modules (N)', expr: '⌈' + r2(itKw, 0) + ' / ' + moduleKw + '⌉', value: upsN, unit: 'ea' },
+                                { label: 'Battery energy', expr: r2(itKw, 0) + ' × (' + autonomyMin + '/60)', value: r2(battKwh, 0), unit: 'kWh' }
+                            ],
+                            result: { label: 'Battery energy for autonomy', value: r2(battKwh, 0), unit: 'kWh' }
+                        });
+                    })();
+
+                    /* 4 — Standby generator sizing (facility kW / genset kW → N + redundancy) */
+                    (function () {
+                        var gensetKw = E.gensetKw;
+                        var genN = itKw > 0 ? Math.ceil(facilityKw / gensetKw) : 0;
+                        var installed = (red === 'n1' || red === '2n1') ? (red === '2n1' ? genN * 2 + 1 : genN + 1) : (red === '2n' ? genN * 2 : genN);
+                        calcs.push({
+                            id: 'generator', title: 'Standby Generator Sizing', discipline: 'Electrical',
+                            standard: 'NFPA 110 / ISO 8528', confidence: 'med',
+                            formula: 'N_gen = ⌈ (IT_kW × PUE) / genset_kW ⌉ ; installed per redundancy',
+                            inputs: [
+                                { label: 'Facility load', value: r2(facilityKw, 0), unit: 'kW' },
+                                { label: 'Genset rating', value: gensetKw, unit: 'kW' },
+                                { label: 'Redundancy', value: red.toUpperCase(), unit: '' }
+                            ],
+                            steps: [
+                                { label: 'Gensets (N)', expr: '⌈' + r2(facilityKw, 0) + ' / ' + gensetKw + '⌉', value: genN, unit: 'ea' },
+                                { label: 'Installed (w/ redundancy)', expr: red.toUpperCase() + ' on N=' + genN, value: installed, unit: 'ea' }
+                            ],
+                            result: { label: 'Gensets installed', value: installed, unit: 'ea' }
+                        });
+                    })();
+
+                    /* 5 — Cooling / heat load (IT heat + cooling-plant overhead → rejection kW + N) */
+                    (function () {
+                        var itHeatKw = itKw;                                /* ≈100% IT power → heat */
+                        var overheadKw = (pue - 1) * itKw;                  /* cooling-plant own power */
+                        var rejectKw = itHeatKw + overheadKw;               /* = facility kW */
+                        var crahN = itKw > 0 ? Math.ceil(itKw / E.crahKw) : 0;
+                        var cduN = itKw > 0 ? Math.ceil(itKw / E.cduKw) : 0;
+                        var chillerN = itKw > 0 ? Math.ceil(itKw / E.chillerKw) : 0;
+                        calcs.push({
+                            id: 'coolingLoad', title: 'Cooling / Heat Rejection Load', discipline: 'Mechanical / Cooling',
+                            standard: 'ASHRAE TC9.9 / TIA-942', confidence: 'high',
+                            formula: 'Q_reject = IT_kW + (PUE − 1) × IT_kW',
+                            inputs: [
+                                { label: 'IT heat load', value: r2(itHeatKw, 0), unit: 'kW' },
+                                { label: 'PUE', value: r2(pue, 3), unit: '' },
+                                { label: 'CRAH unit', value: E.crahKw, unit: 'kW' },
+                                { label: 'CDU unit', value: E.cduKw, unit: 'kW' }
+                            ],
+                            steps: [
+                                { label: 'Plant overhead', expr: '(' + r2(pue, 3) + ' − 1) × ' + r2(itKw, 0), value: r2(overheadKw, 0), unit: 'kW' },
+                                { label: 'Total rejection', expr: r2(itHeatKw, 0) + ' + ' + r2(overheadKw, 0), value: r2(rejectKw, 0), unit: 'kW' },
+                                { label: 'CRAH count', expr: '⌈' + r2(itKw, 0) + ' / ' + E.crahKw + '⌉', value: crahN, unit: 'ea' },
+                                { label: 'CDU count', expr: '⌈' + r2(itKw, 0) + ' / ' + E.cduKw + '⌉', value: cduN, unit: 'ea' },
+                                { label: 'Chiller count', expr: '⌈' + r2(itKw, 0) + ' / ' + E.chillerKw + '⌉', value: chillerN, unit: 'ea' }
+                            ],
+                            result: { label: 'Total heat rejection', value: r2(rejectKw, 0), unit: 'kW' }
+                        });
+                    })();
+
+                    /* 6 — Fuel storage (genset kW × fuelHours × burn-rate → tank m³) */
+                    (function () {
+                        var perMwHr = PF.fuelTankM3PerMwHour;
+                        var facMw = facilityKw / 1000;
+                        var tankM3 = facMw * fuelHours * perMwHr;
+                        calcs.push({
+                            id: 'fuelStorage', title: 'Diesel Fuel Storage', discipline: 'Mechanical / Fuel',
+                            standard: 'NFPA 30 / NFPA 110', confidence: 'med',
+                            formula: 'V_tank = MW_facility × t_hours × k  (k = ' + perMwHr + ' m³/MW·h)',
+                            inputs: [
+                                { label: 'Facility load', value: r2(facMw, 2), unit: 'MW' },
+                                { label: 'Runtime', value: fuelHours, unit: 'h' },
+                                { label: 'Burn factor', value: perMwHr, unit: 'm³/MW·h' }
+                            ],
+                            steps: [
+                                { label: 'Bulk volume', expr: r2(facMw, 2) + ' × ' + fuelHours + ' × ' + perMwHr, value: r2(tankM3, 1), unit: 'm³' }
+                            ],
+                            result: { label: 'Bulk fuel storage', value: r2(tankM3, 1), unit: 'm³' }
+                        });
+                    })();
+
+                    /* 7 — Fire clean-agent (protected m³ × agent density → kg agent) */
+                    (function () {
+                        var density = PF.cleanAgentKgPerM3[fireType] != null ? PF.cleanAgentKgPerM3[fireType] : 0;
+                        var agentKg = protectedM3 * density;
+                        calcs.push({
+                            id: 'cleanAgent', title: 'Fire Clean-Agent Charge', discipline: 'Fire & Life Safety',
+                            standard: 'NFPA 2001 (clean-agent design)', confidence: 'high',
+                            formula: 'm_agent = V_protected × ρ_design  (ρ per agent type)',
+                            inputs: [
+                                { label: 'Protected volume', value: r2(protectedM3, 0), unit: 'm³' },
+                                { label: 'Agent (' + fireType + ')', value: density, unit: 'kg/m³' }
+                            ],
+                            steps: [
+                                { label: 'Agent charge', expr: r2(protectedM3, 0) + ' × ' + density, value: r2(agentKg, 0), unit: 'kg' }
+                            ],
+                            result: { label: 'Clean-agent charge', value: r2(agentKg, 0), unit: 'kg' }
+                        });
+                    })();
+
+                    /* 8 — Fire-water demand (sprinkler systems only — density × area → L/min + tank) */
+                    (function () {
+                        var isSprinkler = (PF.sprinklerFrac[fireType] != null ? PF.sprinklerFrac[fireType] : 0) > 0;
+                        var area = isSprinkler ? floorSpaceM2 : 0;
+                        var densLpmM2 = 12.2;                               /* NFPA 13 Ordinary Hazard Grp 2 ≈ 8.1 mm/min → ~12.2 L/min·m² over design area */
+                        var demandLpm = area * densLpmM2;
+                        var durationMin = 90;                               /* OH-2 water supply duration */
+                        var tankM3 = demandLpm * durationMin / 1000;
+                        calcs.push({
+                            id: 'fireWater', title: 'Fire-Water Sprinkler Demand', discipline: 'Fire & Life Safety',
+                            standard: 'NFPA 13 (OH-2 density)', confidence: isSprinkler ? 'med' : 'low',
+                            formula: 'Q = A_design × density ;  V_tank = Q × t_supply',
+                            inputs: [
+                                { label: 'Sprinkler system', value: isSprinkler ? 'yes' : 'no (gaseous)', unit: '' },
+                                { label: 'Protected area', value: r2(area, 0), unit: 'm²' },
+                                { label: 'Density', value: densLpmM2, unit: 'L/min·m²' },
+                                { label: 'Duration', value: durationMin, unit: 'min' }
+                            ],
+                            steps: [
+                                { label: 'Water demand', expr: r2(area, 0) + ' × ' + densLpmM2, value: r2(demandLpm, 0), unit: 'L/min' },
+                                { label: 'Storage tank', expr: r2(demandLpm, 0) + ' × ' + durationMin + ' / 1000', value: r2(tankM3, 1), unit: 'm³' }
+                            ],
+                            result: { label: 'Fire-water storage', value: r2(tankM3, 1), unit: 'm³' }
+                        });
+                    })();
+
+                    /* 9 — Structural floor loading (DATA.architecture.floorLoadingKnM2[coolingType]) */
+                    (function () {
+                        var floorMap = DATA.architecture.floorLoadingKnM2;
+                        var load = floorMap[coolingType] != null ? floorMap[coolingType] : floorMap.air;
+                        var totalKn = load * floorSpaceM2;
+                        calcs.push({
+                            id: 'floorLoading', title: 'Structural Floor Loading', discipline: 'Structural',
+                            standard: 'ASCE 7 / IBC (live load)', confidence: 'med',
+                            formula: 'w_design = floor-loading[cooling] ;  W = w × A_floor',
+                            inputs: [
+                                { label: 'Cooling type', value: coolingType, unit: '' },
+                                { label: 'Design load', value: load, unit: 'kN/m²' },
+                                { label: 'White-space area', value: r2(floorSpaceM2, 0), unit: 'm²' }
+                            ],
+                            steps: [
+                                { label: 'Total floor reaction', expr: load + ' × ' + r2(floorSpaceM2, 0), value: r2(totalKn, 0), unit: 'kN' }
+                            ],
+                            result: { label: 'Design floor loading', value: load, unit: 'kN/m²' }
+                        });
+                    })();
+
+                    /* 10 — Cable ampacity derate (base ampacity × 0.75 grouping/ambient) */
+                    (function () {
+                        var derate = 0.75;
+                        var baseAmp = itKw > 0 ? (itKw * 1.25 * 1000) / (Math.sqrt(3) * V * pf) : 0;
+                        var deratedAmp = baseAmp / derate;                  /* uprate conductor to carry the load after derate */
+                        calcs.push({
+                            id: 'cableAmpacity', title: 'Cable Ampacity Derate', discipline: 'Electrical',
+                            standard: 'NEC 310.15 (grouping × ambient)', confidence: 'high',
+                            formula: 'I_conductor = I_design / 0.75  (grouping × ambient derate)',
+                            inputs: [
+                                { label: 'Design current', value: r2(baseAmp, 0), unit: 'A' },
+                                { label: 'Derate factor', value: derate, unit: '' }
+                            ],
+                            steps: [
+                                { label: 'Conductor ampacity', expr: r2(baseAmp, 0) + ' / ' + derate, value: r2(deratedAmp, 0), unit: 'A' }
+                            ],
+                            result: { label: 'Required conductor ampacity', value: r2(deratedAmp, 0), unit: 'A' }
+                        });
+                    })();
+
+                    /* 11 — System availability (models.reliability — matches its output exactly) */
+                    (function () {
+                        var Rel = RZEngine.models.reliability;
+                        var components = ['ups', 'crac', 'chiller'];
+                        var paths = DATA.reliability.redundancyPaths[red] != null ? DATA.reliability.redundancyPaths[red] : 1;
+                        var avail = Rel.systemAvailability(components, red);
+                        var downMin = Rel.annualDowntimeMinutes(avail);
+                        var groupSteps = components.map(function (name) {
+                            var c = DATA.reliability.components[name];
+                            var a = Rel.availability(c.mtbf, c.mttr);
+                            var pa = Rel.parallelAvailability(a, paths);
+                            return { label: (c.label || name) + ' (×' + paths + ')', expr: '1−(1−' + r2(a, 6) + ')^' + paths, value: r2(pa * 100, 4), unit: '%' };
+                        });
+                        groupSteps.push({ label: 'Series availability', expr: 'Π group availabilities', value: r2(avail * 100, 5), unit: '%' });
+                        calcs.push({
+                            id: 'availability', title: 'System Availability (RAM)', discipline: 'Availability / Reliability',
+                            standard: 'IEEE 493 (Gold Book) / Uptime Tier', confidence: 'med',
+                            formula: 'A_sys = Π [ 1 − (1 − MTBF/(MTBF+MTTR))^paths ]',
+                            inputs: [
+                                { label: 'Redundancy', value: red.toUpperCase(), unit: '' },
+                                { label: 'Parallel paths', value: paths, unit: '' },
+                                { label: 'Component groups', value: components.length, unit: '' }
+                            ],
+                            steps: groupSteps.concat([
+                                { label: 'Annual downtime', expr: '(1 − A) × 8760 × 60', value: r2(downMin, 2), unit: 'min/yr' }
+                            ]),
+                            result: { label: 'System availability', value: r2(avail * 100, 5), unit: '%' },
+                            /* raw (unrounded) availability for the test to match models.reliability exactly */
+                            _availRaw: avail
+                        });
+                    })();
+
+                    /* 12 — Water / WUE (DATA.waterFootprint via models.water.annualM3) */
+                    (function () {
+                        /* map the cooling architecture → a DATA.water.wueByType class (air|rearDoor|directToChip|immersion) */
+                        var coolMap = { air: 'air', inrow: 'air', rdhx: 'rearDoor', liquid: 'directToChip', dlc: 'directToChip', microfluidic: 'directToChip', immersion: 'immersion', immersion_1p: 'immersion', immersion_2p: 'immersion' };
+                        var wKey = coolMap[coolingType] || 'air';
+                        var wue = RZEngine.models.water.wue(wKey);
+                        var annualM3 = RZEngine.models.water.annualM3(mw, wKey);
+                        var facKwh = facilityKw * DATA.hoursPerYear;
+                        calcs.push({
+                            id: 'waterWue', title: 'Water Consumption / WUE', discipline: 'Mechanical / Water',
+                            standard: 'ASHRAE / Uptime WUE', confidence: 'low',
+                            formula: 'V_annual = WUE × IT_kWh / 1000  (WUE by cooling class)',
+                            inputs: [
+                                { label: 'IT capacity', value: r2(mw, 2), unit: 'MW' },
+                                { label: 'Cooling class', value: wKey, unit: '' },
+                                { label: 'WUE', value: r2(wue, 3), unit: 'L/kWh' }
+                            ],
+                            steps: [
+                                { label: 'Annual IT energy', expr: r2(mw, 2) + ' MW × 8760 h', value: r2(mw * DATA.hoursPerYear, 0), unit: 'MWh' },
+                                { label: 'Annual water', expr: r2(wue, 3) + ' × IT_kWh / 1000', value: r2(annualM3, 0), unit: 'm³' }
+                            ],
+                            result: { label: 'Annual water consumption', value: r2(annualM3, 0), unit: 'm³' }
+                        });
+                    })();
+
+                    return calcs;
+                },
                 /* ordered section manifest for the dossier table-of-contents; `data`
                  * names the engine source the renderer pulls each section from. */
                 sections: function () {
@@ -11908,14 +12428,14 @@
                         { key: 'exec',        title: 'Executive Summary',            data: 'models.dossier.executiveSummary' },
                         { key: 'permitting',  title: 'Regulatory & Permitting Matrix', data: 'DATA.dossier.permittingMatrix' },
                         { key: 'designBasis', title: 'Design Basis',                 data: 'DATA.dossier.designBasis' },
-                        { key: 'engCalcs',    title: 'Engineering Calculations',     data: 'DATA.dossier.engineeringCalcs' },
+                        { key: 'engCalcs',    title: 'Engineering Calculations',     data: 'models.dossier.engineeringCalcs' },
                         { key: 'equipment',   title: 'Equipment Schedule',           data: 'models.boq.equipmentSchedule' },
                         { key: 'boq',         title: 'Bill of Quantities',           data: 'models.boq.generate' },
                         { key: 'procurement', title: 'Procurement Packages',         data: 'models.boq.procurementPackages' },
                         { key: 'supplyChain', title: 'Supply Chain & Import',         data: 'models.supplyChain + DATA.supplyChain' },
-                        { key: 'risk',        title: 'Risk Register',                data: 'DATA.dossier.riskRegister' },
+                        { key: 'risk',        title: 'Risk Register',                data: 'DATA.dossier.riskRegister + models.dossier.countryRisks' },
                         { key: 'opsReady',    title: 'Operations Readiness',         data: 'DATA.dossier.opsReadiness' },
-                        { key: 'docRegister', title: 'Document Register',            data: 'DATA.dossier.documentRegister' }
+                        { key: 'docRegister', title: 'Document Register',            data: 'DATA.dossier.documentRegister + DATA.dossier.documentSchedule' }
                     ];
                 }
             },

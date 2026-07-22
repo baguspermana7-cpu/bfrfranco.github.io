@@ -1404,15 +1404,80 @@ if (M.opex && M.opex.totalAnnual) {
     const pk = M.boq.procurementPackages(costs);
     ok('procurementPackages 12 with value + FAT/SAT + warranty', Array.isArray(pk) && pk.length === 12 && pk.every(p => p.pkgNo && Number.isFinite(p.estValue) && p.fatSat != null && p.warrantyYr != null && p.source));
     ok('procurement value non-additive (electrical spans multiple pkgs)', pk.reduce((s, p) => s + p.estValue, 0) > Object.values(costs).reduce((s, v) => s + v, 0));
+    /* ── BOQ Phase-C: deepened equipment unit cost + critical spares + PM schedule ── */
+    ok('boq.criticalSpares + pmSchedule sourced', !!D.sources['boq.criticalSpares'] && !!D.sources['boq.pmSchedule']);
+    const euc = M.boq.equipmentUnitCost('generator');
+    ok('equipmentUnitCost maps category → unitRates rateKey', euc && euc.rateKey === 'genset_ea' && euc.unitUsd === D.boq.unitRates.genset_ea.usd && euc.confidence);
+    ok('equipmentUnitCost transformer per-MVA + null for unknown', M.boq.equipmentUnitCost('transformer').unit === 'per MVA' && M.boq.equipmentUnitCost('bogus') === null);
+    const cs = M.boq.criticalSpares({ itLoad: 20000, redundancy: 'n1', tier: 3 }, metrics, 99);
+    ok('criticalSpares returns 6 components w/ mtbf + failRate + stock + costs', Array.isArray(cs) && cs.length === 6 && cs.every(s => s.mtbfHours > 0 && s.failRatePerYr >= 0 && s.recommendedStockQty >= 1 && Number.isFinite(s.unitCost) && Number.isFinite(s.holdingCost) && Number.isFinite(s.annualReplacementCost) && VALID_CONF.has(s.confidence)));
+    ok('criticalSpares failRate scales with installed population', cs.every(s => s.installedQty >= 1 && Math.abs(s.failRatePerYr - (8760 / s.mtbfHours) * s.installedQty) < 1e-3));
+    ok('criticalSpares carries ≥1 spare (never zero critical stock)', cs.every(s => s.recommendedStockQty >= 1));
+    ok('criticalSpares annual replacement = failRate × unitCost', cs.every(s => s.annualReplacementCost === Math.round(s.failRatePerYr * s.unitCost)));
+    const pm = M.boq.pmSchedule({ itLoad: 20000, redundancy: 'n1', tier: 3 }, metrics);
+    ok('pmSchedule returns 5 systems w/ interval + tasks + labor-hr + cost', Array.isArray(pm) && pm.length === 5 && pm.every(s => s.system && s.pmInterval && s.tasks && s.annualLaborHr > 0 && s.annualPmCost > 0 && VALID_CONF.has(s.confidence)));
+    ok('pmSchedule annual PM cost bounded by omContracts preventive band', pm.reduce((s, p) => s + p.annualPmCost, 0) <= D.omContracts.tiers.preventive.mid * 20000 + 1);
     /* ── BOQ Ship-3: EPC Technical Dossier scaffold ── */
     const dos = D.dossier;
     ok('DATA.dossier present + sourced', !!dos && !!D.sources['dossier']);
     ok('permittingMatrix complete', Array.isArray(dos.permittingMatrix) && dos.permittingMatrix.length >= 8 && dos.permittingMatrix.every(p => p.permit && p.authority && Number.isFinite(p.durationWk) && p.risk));
     ok('designBasis per-discipline w/ standard + engineRef', dos.designBasis.length >= 4 && dos.designBasis.every(d => d.discipline && d.basis && d.standard && d.engineRef));
     ok('riskRegister w/ prob/impact/mitigation/owner', dos.riskRegister.length >= 6 && dos.riskRegister.every(r => r.id && r.probability && r.impact && r.mitigation && r.owner));
+    /* ── BOQ Ship-D: risk register QUANTIFIED (cost-impact band + schedule slip + residual + early-warning) ── */
+    const RB = new Set(['high', 'med', 'low']);
+    ok('riskRegister quantified: cost band + schedule slip + residual + early-warning', dos.riskRegister.every(r =>
+        Array.isArray(r.costImpactPctBand) && r.costImpactPctBand.length === 2
+        && r.costImpactPctBand[0] > 0 && r.costImpactPctBand[1] >= r.costImpactPctBand[0] && r.costImpactPctBand[1] < 0.5
+        && Number.isFinite(r.scheduleSlipWk) && r.scheduleSlipWk >= 0
+        && RB.has(r.residual) && typeof r.earlyWarning === 'string' && r.earlyWarning.length > 8));
+    ok('riskRegister residual never worse than impact (mitigation reduces or holds)', dos.riskRegister.every(r => {
+        const rank = { low: 0, med: 1, high: 2 }; return rank[r.residual] <= rank[r.impact];
+    }));
+    /* ── BOQ Ship-D: country-specific location risk supplement (models.dossier.countryRisks) ── */
+    ok('countryRisks null country → [] (no-op)', Array.isArray(M.dossier.countryRisks(null)) && M.dossier.countryRisks(null).length === 0);
+    const crID = M.dossier.countryRisks(D.countries.ID);
+    ok('countryRisks(ID) returns seismic+flood+grid+talent w/ severity+mitigation', Array.isArray(crID) && crID.length === 4
+        && crID.every(r => r.hazard && r.metric && RB.has(r.severity) && r.mitigation && r.standard)
+        && crID.some(r => /Seismic/i.test(r.hazard)) && crID.some(r => /Grid/i.test(r.hazard)) && crID.some(r => /Talent/i.test(r.hazard)));
+    ok('countryRisks severity tracks the source metric (ID seismic zone 3 = high, SG zone 0 = low)',
+        M.dossier.countryRisks(D.countries.ID).find(r => /Seismic/i.test(r.hazard)).severity === 'high'
+        && M.dossier.countryRisks(D.countries.SG).find(r => /Seismic/i.test(r.hazard)).severity === 'low');
+    ok('countryRisks sourced', !!D.sources['dossier.countryRisks']);
     ok('documentRegister non-empty list', Array.isArray(dos.documentRegister) && dos.documentRegister.length >= 10);
+    /* ── BOQ Ship-D: document delivery schedule (deliverable × phase × approver) + version-control note ── */
+    const PHASES = new Set(['design', 'procurement', 'construction', 'commissioning', 'handover']);
+    const APPROVERS = new Set(['Owner Eng', 'CxA', 'AHJ', 'EPC']);
+    ok('documentSchedule maps deliverable×phase×approver (valid enums, all 5 phases covered)', Array.isArray(dos.documentSchedule) && dos.documentSchedule.length >= 10
+        && dos.documentSchedule.every(d => d.deliverable && PHASES.has(d.phase) && APPROVERS.has(d.approver))
+        && [...PHASES].every(p => dos.documentSchedule.some(d => d.phase === p)));
+    ok('documentControlNote present (ISO 19650 CDE convention)', typeof dos.documentControlNote === 'string' && /19650|CDE|revision/i.test(dos.documentControlNote));
     ok('opsReadiness w/ owner + gate', dos.opsReadiness.every(o => o.item && o.owner && o.gate));
     ok('engineeringCalcs reference engine models', dos.engineeringCalcs.every(c => c.calc && c.engineRef && c.standard));
+    /* ── BOQ Ship-3 (deepened): REAL worked engineering calculations from models.dossier ── */
+    const ecInput = { itLoad: 20000, redundancy: '2n', coolingType: 'liquid', fireType: 'novec', fuelHours: 48, tier: 3 };
+    const ecResult = { total: 340e6, pue: 1.2, metrics: { perKw: 17000, timelineMonths: 28, racks: 334, floorSpace: 4000, tier: 3 } };
+    const ec = M.dossier.engineeringCalcs(ecInput, ecResult);
+    ok('dossier.engineeringCalcs returns ≥10 worked calcs', Array.isArray(ec) && ec.length >= 10);
+    const CONF = new Set(['high', 'med', 'low']);
+    ok('each worked calc: finite result + formula + standard + confidence + ≥1 input',
+        ec.every(c => c && c.result && Number.isFinite(c.result.value) && typeof c.formula === 'string' && c.formula.length > 3
+            && typeof c.standard === 'string' && c.standard.length > 2 && CONF.has(c.confidence)
+            && Array.isArray(c.inputs) && c.inputs.length >= 1 && Array.isArray(c.steps) && c.steps.length >= 1
+            && typeof c.title === 'string' && typeof c.discipline === 'string'));
+    ok('each worked calc: every step value finite', ec.every(c => c.steps.every(s => Number.isFinite(s.value))));
+    ok('worked calcs are sourced', !!D.sources['dossier.engineeringCalcs']);
+    /* availability worked-calc matches models.reliability for the SAME inputs (2N = 2 paths, ups/crac/chiller series) */
+    const avSheet = ec.find(c => c.id === 'availability');
+    const avExpect = M.reliability.systemAvailability(['ups', 'crac', 'chiller'], '2n');
+    ok('availability worked-calc equals models.reliability.systemAvailability (same inputs)',
+        !!avSheet && Number.isFinite(avSheet._availRaw) && Math.abs(avSheet._availRaw - avExpect) < 1e-12);
+    /* live numbers track the inputs — cooling rejection = facility kW (IT×PUE), transformer/genset counts > 0 */
+    const coolSheet = ec.find(c => c.id === 'coolingLoad');
+    ok('cooling worked-calc rejection = IT×PUE (live)', !!coolSheet && Math.abs(coolSheet.result.value - Math.round(20000 * 1.2)) < 1);
+    ok('electrical continuous uses 125% factor (live)', ec.some(c => c.id === 'elecContinuous' && c.inputs.some(i => i.value === 1.25)));
+    /* undefined inputs → safe, finite results (zero load must not NaN/throw) */
+    const ecEmpty = M.dossier.engineeringCalcs({}, {});
+    ok('engineeringCalcs guards undefined inputs (all finite, ≥10)', Array.isArray(ecEmpty) && ecEmpty.length >= 10 && ecEmpty.every(c => Number.isFinite(c.result.value) && c.steps.every(s => Number.isFinite(s.value))));
     const es = M.dossier.executiveSummary({ itLoad: 20000, redundancy: '2n', coolingType: 'liquid' }, { total: 340e6, pue: 1.2, metrics: { perKw: 17000, timelineMonths: 28, racks: 334 } });
     ok('dossier.executiveSummary derives capacity + capex + redundancy', es.capacityMw === 20 && es.totalCapex === 340e6 && /2N/i.test(es.redundancy) && es.timelineMonths === 28);
     ok('executiveSummary timelineMonths falls back to result.timeline.totalMonths (native path)', M.dossier.executiveSummary({ itLoad: 20000 }, { total: 340e6, timeline: { totalMonths: 33 } }).timelineMonths === 33);

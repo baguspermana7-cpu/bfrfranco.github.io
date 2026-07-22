@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v1.111.0 — 2026-07-22 (Technical Project Dossier → EPC-grade depth: worked calcs + equipment/spares/PM + quantified risk)
+
+Owner: dossier "masih jauh" from a real EPC reference. Deepened engine-sourced across 4 sections (dossier 272 KB → 380 KB, all numbers track the live project).
+
+### Added — Engineering Calculations = WORKED CALCS (Section 4, the biggest gap)
+- **`models.dossier.engineeringCalcs(input, result)`** — 12 worked calculation sheets (electrical continuous load NEC 125%, transformer IEEE C57, UPS+battery IEEE 3007/485, generator NFPA 110, cooling ASHRAE TC9.9, fuel NFPA 30, clean-agent NFPA 2001, fire-water NFPA 13, structural ASCE 7, cable ampacity NEC 310.15, system availability = `models.reliability`, water/WUE), each `{formula, inputs[], steps[], result, standard, confidence}` computed LIVE. Section 4 renders as calc-sheet cards (Formula · Inputs · Steps arithmetic · Result). Availability sheet asserted equal to `models.reliability`.
+
+### Added — Equipment / Spares / PM (Sections 5 + 10)
+- **Equipment Schedule** now surfaces make + model + rating + efficiency + indicative unit cost (via `models.boq.equipmentUnitCost`), grouped by discipline.
+- **Critical Spares** (`models.boq.criticalSpares`) — 6 components (UPS module/battery, genset, chiller, CRAH, PDU breaker): MTBF (IEEE 493) → failures/yr → newsvendor stock (`models.spares.newsvendor`, service level) → unit/holding/annual-replacement cost.
+- **PM Schedule** (`models.boq.pmSchedule`) — 5 systems: interval (NFPA 110/ASHRAE/OEM) + annual labor-hr + annual PM cost from `DATA.omContracts`.
+
+### Added — Quantified risk + procurement/supply-chain/narrative (Sections 3/7/8/9/11)
+- **Risk Register quantified** — per-risk $-impact band (×grand total), schedule-slip wk, residual, early-warning; + **`models.dossier.countryRisks(country)`** Location Risk Supplement (seismic/flood/grid/talent from the live `DATA.countries[id]`).
+- **Procurement sequencing** — critical-path by lead-time, longest-lead "gates power-on" flag + order-by week vs construction window.
+- **Supply-chain worked example** — per-category landed uplift ($ × equipment-share × duty) + customs-lead-vs-timeline.
+- **Design-basis narrative** — 2-3 sentence rationale + sensitivity per discipline from the live inputs.
+- **Document delivery schedule** (`DATA.dossier.documentSchedule`, ISO 19650 CDE) — deliverable × phase × approver + version-control note.
+
+### Verified
+- engine 747/0 (from 722: +engineeringCalcs/criticalSpares/pmSchedule/countryRisks + quantified-risk + doc-schedule asserts) · parity 155/0 · calibration 19/0 · bindings 85/0 (catalog 221fn/123src) · dc-corpus 2678/0 · trace-parity 117/117 · walk 24/0 · synergy 6/0 · export 44/0 · tsc 0 + build. Screenshot-verified worked-calc cards render EPC-grade + track the live 2.5 MW project. Engine ?v `-l`→`-m`.
+
 ## v1.110.2 — 2026-07-22 (BOQ dossier input-sync fix — dossier tracks the live project)
 
 ### Fixed
