@@ -11,6 +11,12 @@ release sections rather than semver.
 
 ---
 
+## v1.112.2 — 2026-07-22 (Article 28 cross-linkage: post-drafts + llms-full)
+
+### Added
+- Platform post-drafts for Article 28 in `Article/Post Draft/Article 28/` (LinkedIn, X thread, Mastodon, Medium long-form, Facebook) — completes the CONTENT_LINKAGE_PLAYBOOK §1 distribution mandate.
+- Rebuilt `llms-full.txt` (130 pages) so the AI-content mirror includes Article 28.
+
 ## v1.112.1 — 2026-07-22 (Article 28 deepened — more detail + comprehensiveness)
 
 ### Changed
