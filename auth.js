@@ -627,19 +627,26 @@
     /* ───────── UI Update ───────── */
     function updateAuthUI() {
         var session = getSession();
-        var loginBtn = document.getElementById('rzLoginBtn');
-        var userBtn = document.getElementById('rzUserBtn');
-        var dropdown = document.getElementById('rzUserDropdown');
+        /* Prefer the shared injected buttons (rz*), but FALL BACK to a page's own
+           hardcoded nav auth markup (nav*) — calculators, spares, dc-market-tracker,
+           and any page carrying #navAuthWrap. injectAuthButton() skips shared-button
+           injection on those pages, so without this fallback updateAuthUI() would
+           early-return and the page's Login button would stay stale even when logged
+           in (the recurring "login button shows on every page" bug). Idempotent +
+           safe on pages that also run their own local sync (same end state). */
+        var loginBtn = document.getElementById('rzLoginBtn') || document.getElementById('navLoginBtn');
+        var userBtn = document.getElementById('rzUserBtn') || document.getElementById('navUserBtn');
+        var dropdown = document.getElementById('rzUserDropdown') || document.getElementById('navUserDropdown');
 
         if (!loginBtn || !userBtn) return;
 
         if (session) {
             loginBtn.style.display = 'none';
             userBtn.style.display = 'inline-flex';
-            var avatar = document.getElementById('rzUserAvatar');
-            var emailEl = document.getElementById('rzUserEmail');
-            var ddBadge = document.getElementById('rzDdBadge');
-            var ddEmail = document.getElementById('rzDdEmail');
+            var avatar = document.getElementById('rzUserAvatar') || document.getElementById('navUserAvatar');
+            var emailEl = document.getElementById('rzUserEmail') || document.getElementById('navUserEmail');
+            var ddBadge = document.getElementById('rzDdBadge') || document.getElementById('navDdTierBadge');
+            var ddEmail = document.getElementById('rzDdEmail') || document.getElementById('navDdEmail');
             if (avatar) avatar.textContent = session.email.charAt(0).toUpperCase();
             if (emailEl) emailEl.textContent = session.email.split('@')[0];
             if (ddEmail) ddEmail.textContent = session.email;

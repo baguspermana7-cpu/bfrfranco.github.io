@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.114.2 — 2026-07-23 (Fix: login state now persists on every page — real root cause)
+
+### Fixed
+- **Login button wrongly shown on pages after logging in** (recurring; the earlier `?v=` cache-bust fixed a real drift but not this). TRUE root cause in `auth.js`: pages that carry their OWN hardcoded nav auth markup (`#navAuthWrap` with `navLoginBtn`/`navUserBtn`) — calculators, **spares-readiness-calculator.html**, dc-market-tracker, etc. — make `injectAuthButton()` skip injecting the shared `rzLoginBtn`/`rzUserBtn` (line 543), and then `updateAuthUI()` early-returned because those shared buttons don't exist (line 634) → the page's own Login button was **never** switched to the account widget even with a valid `localStorage.rz_premium_session`. Calculators masked it with their own local sync; spares had the markup but no sync, so it always showed "Login". Fix: `updateAuthUI()` now falls back to the page-local `nav*` button/avatar/email/badge/dropdown IDs when the shared `rz*` ones are absent — one additive change that syncs auth state on every page carrying `#navAuthWrap`, permanently (idempotent + safe on pages that also self-sync). Verified headless on spares + a manual page + tco. Cache-bust: `auth.js?v=2026-07-16b → 2026-07-23` unified across all 155 pages that load it.
+
 ## v1.114.1 — 2026-07-23 (LTC Modelling Lab — mockup topbar)
 
 ### Added
