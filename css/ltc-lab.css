@@ -1,0 +1,1061 @@
+/* ============================================================
+   ltc-lab.css — LTC Modelling Lab dashboard revamp
+   Scope: body.ltc-revamp
+   v2026-07-22-ltc
+   ============================================================ */
+
+/* ── Light theme tokens ───────────────────────────────────── */
+:root:not([data-theme="dark"]) body.ltc-revamp {
+    --ltc-page-bg:      #f6f8fc;
+    --ltc-card-bg:      #ffffff;
+    --ltc-tile-bg:      #f0f4fa;
+    --ltc-topbar-bg:    #ffffff;
+    --ltc-hairline:     #e6ebf2;
+    --ltc-text:         #0f1b2d;
+    --ltc-muted:        #64748b;
+    --ltc-accent:       #0b5fea;
+    --ltc-link:         #006cef;
+    --ltc-green:        #12a150;
+    --ltc-pipe-supply:  #337eea;
+    --ltc-pipe-return:  #e5484d;
+    --ltc-radial-track: #eef2f7;
+    --ltc-shadow:       0 1px 4px rgba(11,95,234,.08), 0 4px 16px rgba(15,27,45,.07);
+    --ltc-shadow-sm:    0 1px 3px rgba(15,27,45,.06);
+    --ltc-badge-bg:     rgba(11,95,234,.08);
+    --ltc-badge-text:   #0b5fea;
+    --ltc-sens-bar-bg:  #e6ebf2;
+    --ltc-kpi-good-bg:  rgba(18,161,80,.07);
+}
+
+/* ── Dark theme tokens ────────────────────────────────────── */
+[data-theme="dark"] body.ltc-revamp {
+    --ltc-page-bg:      #0d1720;
+    --ltc-card-bg:      #0c141d;
+    --ltc-tile-bg:      #111a25;
+    --ltc-topbar-bg:    #060e18;
+    --ltc-hairline:     rgba(255,255,255,.08);
+    --ltc-text:         #e6eef8;
+    --ltc-muted:        #7f92a8;
+    --ltc-accent:       #036cf2;
+    --ltc-link:         #4c8dff;
+    --ltc-green:        #34d399;
+    --ltc-pipe-supply:  #4c8dff;
+    --ltc-pipe-return:  #f26d72;
+    --ltc-radial-track: rgba(255,255,255,.08);
+    --ltc-shadow:       0 1px 4px rgba(0,0,0,.3), 0 4px 20px rgba(0,0,0,.4);
+    --ltc-shadow-sm:    0 1px 3px rgba(0,0,0,.25);
+    --ltc-badge-bg:     rgba(3,108,242,.18);
+    --ltc-badge-text:   #4c8dff;
+    --ltc-sens-bar-bg:  rgba(255,255,255,.10);
+    --ltc-kpi-good-bg:  rgba(52,211,153,.08);
+}
+
+/* ── Reset page bg ────────────────────────────────────────── */
+body.ltc-revamp {
+    background: var(--ltc-page-bg);
+    color: var(--ltc-text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Dashboard 3-column grid ──────────────────────────────── */
+body.ltc-revamp .ltc-dashboard {
+    display: grid;
+    grid-template-columns: 280px 1fr 280px;
+    grid-template-rows: auto;
+    gap: 12px;
+    padding: 12px 14px 24px;
+    align-items: start;
+    min-height: calc(100vh - 60px);
+}
+
+/* ── Rail shared ──────────────────────────────────────────── */
+body.ltc-revamp .ltc-left-rail,
+body.ltc-revamp .ltc-right-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+/* ── Rail card ────────────────────────────────────────────── */
+body.ltc-revamp .ltc-rail-card {
+    background: var(--ltc-card-bg);
+    border: 1px solid var(--ltc-hairline);
+    border-radius: 10px;
+    padding: 14px 14px 16px;
+    box-shadow: var(--ltc-shadow-sm);
+}
+
+/* ── Rail header ──────────────────────────────────────────── */
+body.ltc-revamp .ltc-rail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+body.ltc-revamp .ltc-rail-title {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--ltc-muted);
+}
+
+/* ── Reset button ─────────────────────────────────────────── */
+body.ltc-revamp .ltc-reset-btn {
+    background: none;
+    border: 1px solid var(--ltc-hairline);
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--ltc-muted);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+}
+body.ltc-revamp .ltc-reset-btn:hover {
+    border-color: var(--ltc-accent);
+    color: var(--ltc-accent);
+}
+
+/* ── Section label ────────────────────────────────────────── */
+body.ltc-revamp .ltc-section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.60rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ltc-muted);
+    margin-bottom: 10px;
+}
+body.ltc-revamp .ltc-muted {
+    opacity: 0.72;
+}
+
+/* ════════════════════════════════════════════════════════════
+   SLIDER ROWS
+   ════════════════════════════════════════════════════════════ */
+body.ltc-revamp .ltc-primary-sliders {
+    margin-bottom: 16px;
+}
+
+body.ltc-revamp .ltc-slider-row {
+    margin-bottom: 12px;
+}
+
+body.ltc-revamp .ltc-slider-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+body.ltc-revamp .ltc-slider-label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--ltc-text);
+}
+
+body.ltc-revamp .ltc-slider-value-box {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+body.ltc-revamp .ltc-slider-numbox {
+    width: 54px;
+    padding: 2px 5px;
+    background: var(--ltc-tile-bg);
+    border: 1px solid var(--ltc-hairline);
+    border-radius: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--ltc-text);
+    text-align: right;
+    outline: none;
+    transition: border-color 0.15s;
+}
+body.ltc-revamp .ltc-slider-numbox:focus {
+    border-color: var(--ltc-accent);
+}
+
+body.ltc-revamp .ltc-slider-unit {
+    font-size: 0.62rem;
+    color: var(--ltc-muted);
+    white-space: nowrap;
+}
+
+/* range track + thumb */
+body.ltc-revamp .ltc-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(
+        to right,
+        var(--ltc-accent) 0%,
+        var(--ltc-accent) var(--range-pct, 50%),
+        var(--ltc-radial-track) var(--range-pct, 50%),
+        var(--ltc-radial-track) 100%
+    );
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+body.ltc-revamp .ltc-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--ltc-accent);
+    border: 2px solid var(--ltc-card-bg);
+    box-shadow: 0 0 0 1px var(--ltc-accent);
+    cursor: pointer;
+    transition: transform 0.12s;
+}
+body.ltc-revamp .ltc-range::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+body.ltc-revamp .ltc-range::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--ltc-accent);
+    border: 2px solid var(--ltc-card-bg);
+    box-shadow: 0 0 0 1px var(--ltc-accent);
+    cursor: pointer;
+}
+
+/* ════════════════════════════════════════════════════════════
+   ARCHITECTURE PRESET CARDS
+   ════════════════════════════════════════════════════════════ */
+body.ltc-revamp .ltc-arch-preset-section {
+    margin-bottom: 14px;
+}
+
+body.ltc-revamp .ltc-arch-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+}
+
+body.ltc-revamp .ltc-arch-card {
+    background: var(--ltc-tile-bg);
+    border: 1px solid var(--ltc-hairline);
+    border-radius: 8px;
+    padding: 8px 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+body.ltc-revamp .ltc-arch-card:hover {
+    border-color: var(--ltc-accent);
+}
+body.ltc-revamp .ltc-arch-card.ltc-arch-active {
+    background: var(--ltc-badge-bg);
+    border-color: var(--ltc-accent);
+    box-shadow: 0 0 0 1px var(--ltc-accent);
+}
+
+body.ltc-revamp .ltc-arch-icon {
+    font-size: 1.1rem;
+    margin-bottom: 3px;
+    line-height: 1;
+}
+
+body.ltc-revamp .ltc-arch-name {
+    font-size: 0.61rem;
+    font-weight: 600;
+    color: var(--ltc-text);
+    line-height: 1.2;
+}
+
+body.ltc-revamp .ltc-arch-sub {
+    font-size: 0.56rem;
+    color: var(--ltc-muted);
+    margin-top: 1px;
+}
+
+/* ── Other params collapse ────────────────────────────────── */
+body.ltc-revamp .ltc-other-params {
+    margin-bottom: 14px;
+}
+
+body.ltc-revamp .ltc-collapse-btn {
+    background: none;
+    border: 1px solid var(--ltc-hairline);
+    border-radius: 6px;
+    padding: 6px 10px;
+    width: 100%;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+    color: var(--ltc-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: border-color 0.15s, color 0.15s;
+}
+body.ltc-revamp .ltc-collapse-btn:hover {
+    border-color: var(--ltc-accent);
+    color: var(--ltc-text);
+}
+
+body.ltc-revamp .ltc-chevron {
+    margin-left: auto;
+    transition: transform 0.2s;
+}
+body.ltc-revamp .ltc-collapse-btn.open .ltc-chevron {
+    transform: rotate(180deg);
+}
+
+body.ltc-revamp .ltc-other-params-body {
+    padding-top: 10px;
+    font-size: 0.71rem;
+    color: var(--ltc-muted);
+}
+
+/* ── Run section ──────────────────────────────────────────── */
+body.ltc-revamp .ltc-run-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+body.ltc-revamp .ltc-run-btn {
+    background: var(--ltc-accent);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 0;
+    width: 100%;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+}
+body.ltc-revamp .ltc-run-btn:hover {
+    opacity: 0.88;
+}
+body.ltc-revamp .ltc-run-btn:active {
+    transform: scale(0.98);
+}
+
+body.ltc-revamp .ltc-last-run {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.60rem;
+    color: var(--ltc-muted);
+    text-align: center;
+}
+
+/* ════════════════════════════════════════════════════════════
+   CENTER COLUMN
+   ════════════════════════════════════════════════════════════ */
+body.ltc-revamp .ltc-center-col {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* breadcrumb */
+body.ltc-revamp .ltc-breadcrumb {
+    font-size: 0.68rem;
+    color: var(--ltc-muted);
+    margin-bottom: 2px;
+}
+
+/* title row */
+body.ltc-revamp .ltc-title-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+body.ltc-revamp .ltc-page-title {
+    font-size: 1.22rem;
+    font-weight: 700;
+    color: var(--ltc-text);
+    line-height: 1.2;
+    flex: 1 1 auto;
+    margin: 0;
+}
+
+body.ltc-revamp .ltc-edu-badge {
+    flex-shrink: 0;
+    background: var(--ltc-badge-bg);
+    color: var(--ltc-badge-text);
+    border: 1px solid currentColor;
+    border-radius: 5px;
+    padding: 3px 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.60rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    margin-top: 4px;
+    opacity: 0.9;
+}
+
+body.ltc-revamp .ltc-subtitle {
+    font-size: 0.80rem;
+    color: var(--ltc-muted);
+    line-height: 1.45;
+    margin-top: -4px;
+}
+
+/* ── System Overview card ─────────────────────────────────── */
+body.ltc-revamp .ltc-overview-card {
+    background: var(--ltc-card-bg);
+    border: 1px solid var(--ltc-hairline);
+    border-radius: 10px;
+    padding: 12px 14px 14px;
+    box-shadow: var(--ltc-shadow-sm);
+}
+
+body.ltc-revamp .ltc-overview-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    color: var(--ltc-green);
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+/* ── Schematic SVG wrapper ────────────────────────────────── */
+body.ltc-revamp .ltc-schematic {
+    width: 100%;
+    overflow-x: auto;
+}
+body.ltc-revamp .ltc-schematic svg {
+    width: 100%;
+    min-width: 480px;
+    height: auto;
+    display: block;
+}
+
+/* SVG flow animation */
+@keyframes ltc-flow-dash {
+    to { stroke-dashoffset: -26; }
+}
+@media (prefers-reduced-motion: no-preference) {
+    body.ltc-revamp .ltc-flow-supply {
+        stroke-dasharray: 8 5;
+        animation: ltc-flow-dash 1.2s linear infinite;
+    }
+    body.ltc-revamp .ltc-flow-return {
+        stroke-dasharray: 8 5;
+        animation: ltc-flow-dash 1.5s linear infinite reverse;
+    }
+}
+
+/* ── KPI strip ────────────────────────────────────────────── */
+body.ltc-revamp .ltc-kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+}
+
+body.ltc-revamp .ltc-kpi-card {
+    background: var(--ltc-card-bg);
+    border: 1px solid var(--ltc-hairline);
+    border-radius: 8px;
+    padding: 10px 10px 8px;
+    text-align: center;
+    box-shadow: var(--ltc-shadow-sm);
+}
+body.ltc-revamp .ltc-kpi-card.ltc-kpi-good {
+    background: var(--ltc-kpi-good-bg);
+    border-color: rgba(18,161,80,.22);
+}
+[data-theme="dark"] body.ltc-revamp .ltc-kpi-card.ltc-kpi-good {
+    border-color: rgba(52,211,153,.2);
+}
+
+body.ltc-revamp .ltc-kpi-label {
+    font-size: 0.60rem;
+    color: var(--ltc-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+body.ltc-revamp .ltc-kpi-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ltc-text);
+    line-height: 1;
+    word-break: break-all;
+}
+body.ltc-revamp .ltc-kpi-value.ltc-kpi-green {
+    color: var(--ltc-green);
+}
+
+body.ltc-revamp .ltc-kpi-unit {
+    font-size: 0.58rem;
+    color: var(--ltc-muted);
+    margin-top: 2px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   TABS
+   ════════════════════════════════════════════════════════════ */
+body.ltc-revamp .ltc-tabs-bar {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--ltc-hairline);
+    padding-bottom: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+body.ltc-revamp .ltc-tabs-bar::-webkit-scrollbar { display: none; }
+
+body.ltc-revamp .ltc-tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 8px 14px 7px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ltc-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+    position: relative;
+    top: 1px;
+}
+body.ltc-revamp .ltc-tab-btn:hover {
+    color: var(--ltc-text);
+}
+body.ltc-revamp .ltc-tab-btn.ltc-tab-active {
+    color: var(--ltc-accent);
+    border-bottom-color: var(--ltc-accent);
+}
+
+/* tab panels */
+body.ltc-revamp .ltc-tab-panel {
+    padding-top: 14px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   RESULTS TAB
+   ════════════════════════════════════════════════════════════ */
+body.ltc-revamp .ltc-results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 200px;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+body.ltc-revamp .ltc-res-card {
+    background: var(--ltc-card-bg);
+    border: 1px solid var(--ltc-hairline);
+    border-radius: 10px;
+    padding: 12px 14px;
+    box-shadow: var(--ltc-shadow-sm);
+}
+
+body.ltc-revamp .ltc-res-card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.60rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ltc-muted);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+body.ltc-revamp .ltc-res-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--ltc-hairline);
+    gap: 8px;
+}
+body.ltc-revamp .ltc-res-row:last-child {
+    border-bottom: none;
+}
+
+body.ltc-revamp .ltc-res-lbl {
+    font-size: 0.68rem;
+    color: var(--ltc-muted);
+    flex-shrink: 0;
+}
+
+body.ltc-revamp .ltc-res-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ltc-text);
+    text-align: right;
+}
+
+/* Power donut card */
+body.ltc-revamp .ltc-donut-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+body.ltc-revamp .ltc-donut-svg {
+    width: 120px;
+    height: 120px;
+}
+body.ltc-revamp .ltc-donut-legend {
+    width: 100%;
+}
+body.ltc-revamp .ltc-donut-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 0;
+}
+body.ltc-revamp .ltc-donut-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+body.ltc-revamp .ltc-donut-lbl {
+    font-size: 0.58rem;
+    color: var(--ltc-muted);
+    flex: 1;
+}
+body.ltc-revamp .ltc-donut-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.60rem;
+    color: var(--ltc-text);
+}
+
+/* Temperature profile */
+body.ltc-revamp .ltc-results-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+body.ltc-revamp .ltc-temp-profile-card {
+    background: var(--ltc-card-bg);
+    border: 1px solid var(--ltc-hairline);
+    border-radius: 10px;
+    padding: 12px 14px;
+    box-shadow: var(--ltc-shadow-sm);
+}
+
+body.ltc-revamp .ltc-temp-profile-svg {
+    width: 100%;
+    height: 120px;
+    display: block;
+}
+
+/* Energy balance table */
+body.ltc-revamp .ltc-energy-table {
+    background: var(--ltc-card-bg);
+    border: 1px solid var(--ltc-hairline);
+    border-radius: 10px;
+    padding: 12px 14px;
+    box-shadow: var(--ltc-shadow-sm);
+}
+
+body.ltc-revamp .ltc-etable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.72rem;
+}
+body.ltc-revamp .ltc-etable thead th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.60rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ltc-muted);
+    text-align: left;
+    padding: 4px 8px 6px;
+    border-bottom: 1px solid var(--ltc-hairline);
+}
+body.ltc-revamp .ltc-etable tbody td {
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--ltc-hairline);
+    color: var(--ltc-text);
+}
+body.ltc-revamp .ltc-etable tbody tr:last-child td {
+    border-bottom: none;
+}
+body.ltc-revamp .ltc-etable .ltc-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+}
+body.ltc-revamp .ltc-etable .ltc-etotal {
+    font-weight: 700;
+    color: var(--ltc-accent);
+}
+
+/* ════════════════════════════════════════════════════════════
+   RIGHT RAIL — COMPLIANCE
+   ════════════════════════════════════════════════════════════ */
+body.ltc-revamp .ltc-pass-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.60rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--ltc-green);
+    border: 1px solid var(--ltc-green);
+    border-radius: 4px;
+    padding: 2px 7px;
+}
+body.ltc-revamp .ltc-pass-pill.ltc-fail {
+    color: var(--ltc-pipe-return);
+    border-color: var(--ltc-pipe-return);
+}
+
+body.ltc-revamp .ltc-compliance-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+body.ltc-revamp .ltc-comp-row {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+body.ltc-revamp .ltc-comp-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+body.ltc-revamp .ltc-comp-name {
+    font-size: 0.68rem;
+    color: var(--ltc-text);
+}
+
+body.ltc-revamp .ltc-comp-score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--ltc-accent);
+}
+
+body.ltc-revamp .ltc-comp-bar-track {
+    width: 100%;
+    height: 3px;
+    background: var(--ltc-sens-bar-bg);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+body.ltc-revamp .ltc-comp-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--ltc-accent);
+    transition: width 0.4s ease;
+}
+body.ltc-revamp .ltc-comp-bar-fill.ltc-bar-good {
+    background: var(--ltc-green);
+}
+body.ltc-revamp .ltc-comp-bar-fill.ltc-bar-warn {
+    background: #f59e0b;
+}
+body.ltc-revamp .ltc-comp-bar-fill.ltc-bar-bad {
+    background: var(--ltc-pipe-return);
+}
+
+/* ════════════════════════════════════════════════════════════
+   RIGHT RAIL — DESIGN STATUS RADIAL
+   ════════════════════════════════════════════════════════════ */
+body.ltc-revamp .ltc-design-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+body.ltc-revamp .ltc-radial-wrap {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+body.ltc-revamp .ltc-radial-svg {
+    width: 120px;
+    height: 120px;
+}
+
+body.ltc-revamp .ltc-radial-track {
+    stroke: var(--ltc-radial-track);
+}
+
+body.ltc-revamp .ltc-radial-bar {
+    stroke: var(--ltc-accent);
+    stroke-dasharray: 0 301.6;
+    transition: stroke-dasharray 0.6s ease;
+}
+
+body.ltc-revamp .ltc-radial-pct {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    fill: var(--ltc-text);
+    dominant-baseline: central;
+}
+
+body.ltc-revamp .ltc-radial-label {
+    font-size: 7px;
+    fill: var(--ltc-muted);
+    dominant-baseline: central;
+}
+
+body.ltc-revamp .ltc-design-grade {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ltc-accent);
+    margin-top: -4px;
+}
+
+body.ltc-revamp .ltc-sub-bars {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+body.ltc-revamp .ltc-sub-bar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+body.ltc-revamp .ltc-sub-bar-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+body.ltc-revamp .ltc-sub-bar-lbl {
+    font-size: 0.66rem;
+    color: var(--ltc-muted);
+}
+
+body.ltc-revamp .ltc-sub-bar-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    color: var(--ltc-text);
+}
+
+body.ltc-revamp .ltc-sub-bar-track {
+    width: 100%;
+    height: 3px;
+    background: var(--ltc-sens-bar-bg);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+body.ltc-revamp .ltc-sub-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--ltc-accent);
+    transition: width 0.4s ease;
+}
+
+/* ════════════════════════════════════════════════════════════
+   RIGHT RAIL — SENSITIVITY
+   ════════════════════════════════════════════════════════════ */
+body.ltc-revamp .ltc-sens-label {
+    font-size: 0.65rem;
+    color: var(--ltc-muted);
+    margin-bottom: 10px;
+}
+
+body.ltc-revamp .ltc-sens-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+body.ltc-revamp .ltc-sens-row {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+body.ltc-revamp .ltc-sens-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+}
+
+body.ltc-revamp .ltc-sens-name {
+    font-size: 0.66rem;
+    color: var(--ltc-text);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+body.ltc-revamp .ltc-sens-delta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.64rem;
+    color: var(--ltc-pipe-return);
+    flex-shrink: 0;
+}
+body.ltc-revamp .ltc-sens-delta.ltc-pos {
+    color: var(--ltc-green);
+}
+
+body.ltc-revamp .ltc-sens-track {
+    width: 100%;
+    height: 4px;
+    background: var(--ltc-sens-bar-bg);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+body.ltc-revamp .ltc-sens-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--ltc-pipe-return);
+    transition: width 0.4s ease;
+}
+body.ltc-revamp .ltc-sens-fill.ltc-pos {
+    background: var(--ltc-green);
+}
+
+/* ════════════════════════════════════════════════════════════
+   RIGHT RAIL — SCENARIO INFO
+   ════════════════════════════════════════════════════════════ */
+body.ltc-revamp .ltc-scenario-card {
+    border-top: 3px solid var(--ltc-accent);
+}
+
+body.ltc-revamp .ltc-scenario-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+body.ltc-revamp .ltc-scenario-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--ltc-hairline);
+}
+body.ltc-revamp .ltc-scenario-item:last-child {
+    border-bottom: none;
+}
+
+body.ltc-revamp .ltc-scenario-key {
+    font-size: 0.67rem;
+    color: var(--ltc-muted);
+}
+
+body.ltc-revamp .ltc-scenario-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--ltc-text);
+    font-weight: 600;
+    text-align: right;
+}
+
+body.ltc-revamp .ltc-scenario-note {
+    font-size: 0.63rem;
+    color: var(--ltc-muted);
+    line-height: 1.4;
+    font-style: italic;
+}
+
+/* ════════════════════════════════════════════════════════════
+   DETAILED HOST (existing engine output moved here)
+   ════════════════════════════════════════════════════════════ */
+body.ltc-revamp #ltcDetailedHost {
+    /* engine output unstyled, just contained */
+    min-height: 200px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE: collapse below 1024px
+   ════════════════════════════════════════════════════════════ */
+@media (max-width: 1280px) {
+    body.ltc-revamp .ltc-dashboard {
+        grid-template-columns: 260px 1fr 260px;
+    }
+    body.ltc-revamp .ltc-kpi-strip {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    body.ltc-revamp .ltc-results-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 1024px) {
+    body.ltc-revamp .ltc-dashboard {
+        grid-template-columns: 240px 1fr;
+        grid-template-areas:
+            "left center"
+            "right right";
+    }
+    body.ltc-revamp .ltc-left-rail  { grid-area: left; }
+    body.ltc-revamp .ltc-center-col { grid-area: center; }
+    body.ltc-revamp .ltc-right-rail {
+        grid-area: right;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    body.ltc-revamp .ltc-kpi-strip {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    body.ltc-revamp .ltc-dashboard {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "center"
+            "left"
+            "right";
+        padding: 8px 10px 20px;
+    }
+    body.ltc-revamp .ltc-right-rail {
+        grid-template-columns: 1fr;
+    }
+    body.ltc-revamp .ltc-kpi-strip {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    body.ltc-revamp .ltc-results-grid {
+        grid-template-columns: 1fr;
+    }
+    body.ltc-revamp .ltc-results-bottom {
+        grid-template-columns: 1fr;
+    }
+    body.ltc-revamp .ltc-arch-cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    body.ltc-revamp .ltc-page-title {
+        font-size: 1.0rem;
+    }
+    body.ltc-revamp .ltc-tab-btn {
+        font-size: 0.56rem;
+        padding: 7px 9px 6px;
+    }
+}

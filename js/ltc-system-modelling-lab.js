@@ -2894,6 +2894,9 @@
                     pueGap: pueGap,
                     copGap: copGap,
                     totalFacilityKw: totalFacilityKw,
+                    liquidCop: liquidCop,
+                    airCopEff: airCopEff,
+                    massFlowKgS: massFlowKgS,
                     internals: {
                         yearDelta: yearDelta,
                         densityStress: densityStress,
@@ -8812,6 +8815,8 @@
                 renderExplorerWithModel(model);
                 refreshLiteralTermHotspots();
                 applyUniversalTermTooltips(document.getElementById('calculator'));
+                // ltc-lab-ui.js hook (additive, v2026-07-22-ltc)
+                if (typeof window.__ltcModelHook === 'function') { try { window.__ltcModelHook(model); } catch(e) {} }
             }
 
             function runModel(resetOptimization) {
