@@ -254,6 +254,13 @@ export interface PermitRow {
     dependency: string;
     risk: DossierRisk;
     standard: string;
+    /* EPC-grade fields (v1.112 — optional for older-engine backward-compat). */
+    phase?: string;
+    purpose?: string;
+    requiredDocs?: string[];
+    submissionFlow?: string;
+    inspection?: string;
+    renewal?: string;
 }
 
 export interface DesignBasisRow {
@@ -1389,8 +1396,49 @@ function execSummarySection(no: number, s: DossierExecSummary): string {
     </section>`;
 }
 
+const PERMIT_PHASES: { key: string; label: string }[] = [
+    { key: 'pre-construction', label: 'Pre-Construction' },
+    { key: 'construction', label: 'Construction' },
+    { key: 'energization', label: 'Energization & Connection' },
+    { key: 'occupation-operation', label: 'Occupancy & Operation' },
+];
+
+function permitDetailBlock(r: PermitRow): string {
+    const meta = (label: string, val?: string) => val
+        ? `<div style="margin-top:3px;"><span style="font-size:8.5px;text-transform:uppercase;letter-spacing:.04em;color:${T.muted};">${label}</span> <span style="font-size:9.5px;color:${T.text};">${esc(val)}</span></div>` : '';
+    const docs = r.requiredDocs && r.requiredDocs.length
+        ? `<div style="margin-top:3px;"><span style="font-size:8.5px;text-transform:uppercase;letter-spacing:.04em;color:${T.muted};">Required docs</span> <span style="font-size:9.5px;color:${T.text};">${r.requiredDocs.map(esc).join(' · ')}</span></div>` : '';
+    return `<div style="border:1px solid ${T.line};border-radius:4px;padding:8px 10px;margin-top:8px;page-break-inside:avoid;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;">
+            <div style="font-size:11px;font-weight:600;color:${T.text};">${esc(r.permit)}</div>
+            <div style="display:flex;align-items:center;gap:8px;white-space:nowrap;">${riskChip(r.risk)}<span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:${T.cyan};">${qtyFmt(r.durationWk)} wk</span></div>
+        </div>
+        <div style="font-size:9px;color:${T.muted};margin-top:1px;">${esc(r.authority)}</div>
+        ${r.purpose ? `<div style="font-size:9.5px;color:${T.text};margin-top:4px;">${esc(r.purpose)}</div>` : ''}
+        ${docs}
+        ${meta('Submission flow', r.submissionFlow)}
+        ${meta('Dependency', r.dependency)}
+        ${meta('Inspection', r.inspection)}
+        ${meta('Renewal', r.renewal)}
+        ${meta('Standard', r.standard)}
+    </div>`;
+}
+
 function permittingSection(no: number, rows: PermitRow[]): string {
     if (!rows.length) return '';
+    // EPC-grade detailed render when the engine supplies the deep fields; else the flat table.
+    const detailed = rows.some((r) => r.purpose || r.requiredDocs);
+    if (detailed) {
+        const grouped = PERMIT_PHASES.map((ph) => {
+            const inPhase = rows.filter((r) => (r.phase ?? 'pre-construction') === ph.key);
+            if (!inPhase.length) return '';
+            return `<div style="margin-top:12px;"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:${T.cyan};border-bottom:1px solid ${T.line};padding-bottom:3px;">${ph.label}</div>${inPhase.map(permitDetailBlock).join('')}</div>`;
+        }).join('');
+        return `<section class="block">
+            ${secHead(no, SECTION_TITLES[no - 1], 'indicative reference — validate against the AHJ; statutory durations are jurisdiction-dependent')}
+            ${grouped}
+        </section>`;
+    }
     const body = rows.map((r, i) =>
         `<tr${i % 2 ? ` style="background:${T.surfaceAlt};"` : ''}>
             <td style="padding:5px 8px;font-size:10px;color:${T.text};">${esc(r.permit)}</td>

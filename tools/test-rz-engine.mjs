@@ -1420,7 +1420,7 @@ if (M.opex && M.opex.totalAnnual) {
     /* ── BOQ Ship-3: EPC Technical Dossier scaffold ── */
     const dos = D.dossier;
     ok('DATA.dossier present + sourced', !!dos && !!D.sources['dossier']);
-    ok('permittingMatrix complete', Array.isArray(dos.permittingMatrix) && dos.permittingMatrix.length >= 8 && dos.permittingMatrix.every(p => p.permit && p.authority && Number.isFinite(p.durationWk) && p.risk));
+    ok('permittingMatrix complete (EPC-grade ≥18, full fields)', Array.isArray(dos.permittingMatrix) && dos.permittingMatrix.length >= 18 && dos.permittingMatrix.every(p => p.permit && p.authority && p.purpose && Array.isArray(p.requiredDocs) && p.requiredDocs.length >= 2 && p.submissionFlow && Number.isFinite(p.durationWk) && ['low', 'med', 'high'].includes(p.risk) && p.inspection && p.renewal && p.standard && p.phase));
     ok('designBasis per-discipline w/ standard + engineRef', dos.designBasis.length >= 4 && dos.designBasis.every(d => d.discipline && d.basis && d.standard && d.engineRef));
     ok('riskRegister w/ prob/impact/mitigation/owner', dos.riskRegister.length >= 6 && dos.riskRegister.every(r => r.id && r.probability && r.impact && r.mitigation && r.owner));
     /* ── BOQ Ship-D: risk register QUANTIFIED (cost-impact band + schedule slip + residual + early-warning) ── */

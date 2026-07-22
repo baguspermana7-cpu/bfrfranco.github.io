@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.113.0 — 2026-07-22 (dossier Permitting Matrix → EPC-grade register)
+
+### Added
+- **`DATA.dossier.permittingMatrix` deepened** — 10 → **21 permits** across the full DC lifecycle (zoning/EIA/building/fire/grid-interconnection · excavation/crane/confined-space/hot-work/working-at-height/traffic/temp-power/temp-water/fuel/hazmat · water-discharge/MV-HV-energization/telecom · occupancy/operational-license/periodic-inspection). Each permit carries the full EPC fields: `phase`, `purpose`, `requiredDocs[]`, `submissionFlow`, `durationWk`, `dependency`, `approvalRisk`, `inspection`, `renewal`, `standard`. STANDARD-PRACTICE reference (jurisdiction-agnostic; validate against the AHJ).
+- **Dossier Section 2 render** — flat table → detailed per-permit blocks grouped by lifecycle phase (Pre-Construction / Construction / Energization / Occupancy-Operation), each showing purpose · required docs · submission flow · dependency · inspection · renewal · standard + risk chip + duration. Flat-table fallback for older engines. Dossier 380 KB → 423 KB.
+
+### Verified
+- engine 747/0 (permit assert ≥18 with full fields) · parity 155/0 · bindings 85/0 (catalog 221fn/123src) · export 44/0 · tsc 0 + build · no `</script>`. Screenshot-verified phase-grouped permit blocks render EPC-grade. Engine ?v `-n`→`-o`.
+
 ## v1.112.2 — 2026-07-22 (Article 28 cross-linkage: post-drafts + llms-full)
 
 ### Added
