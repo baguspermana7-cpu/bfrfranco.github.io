@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.111.1 — 2026-07-22 (worked-calc accuracy fixes — adversarial review)
+
+### Fixed
+- **Fire-water density mislabeled (HIGH)** — the sprinkler-demand calc tagged "NFPA 13 OH-2" but used 12.2 L/min·m² (that's Extra-Hazard-1). Corrected to the true OH-2 density **8.15 L/min·m²** (0.20 gpm/ft²; 1 mm/min = 1 L/min·m²). (Only surfaces for water-suppression projects; novec default = zeros.)
+- **Availability rendered "100 %" (MED)** — a redundant chain rounds to 7+ nines and the renderer caps at 4 decimals → an unqualified, physically-impossible "100 %". Now clamped to **99.9999 %** (4-nines display); the Annual-downtime step carries the real per-topology figure. `_availRaw` (the reliability-model match) unchanged.
+- **Transformer step-3 unit mix (MED)** — the count step used kW while the prior steps were MVA/MW, breaking the audit trail; now `⌈facMVA / unitMVA⌉` (all MVA).
+- **WUE step not self-contained (MED)** — the annual-water step referenced `IT_kWh` with no kWh value shown; now the IT-energy step outputs kWh and the water step shows the full `WUE × kWh ÷ 1000` arithmetic.
+- **Disclosure notes (LOW)** — UPS autonomy flagged "(screening default — validate vs project UPS spec)"; availability inputs note the 3-group (ups/crac/chiller) screening scope vs a full IEEE 493 RAM study.
+
+### Verified
+- engine 747/0 (`_availRaw` still == `models.reliability`) · parity 155/0 · bindings 85/0 (catalog 221fn/123src) · export 44/0 · tsc 0 + build. Hand-verified UPS/cooling/fuel calcs reconcile. Availability now renders 99.9999% (screenshot-confirmed). Engine ?v `-m`→`-n`. 0 CRITICAL in review; 1 HIGH + 3 MED + 2 LOW all resolved.
+
 ## v1.111.0 — 2026-07-22 (Technical Project Dossier → EPC-grade depth: worked calcs + equipment/spares/PM + quantified risk)
 
 Owner: dossier "masih jauh" from a real EPC reference. Deepened engine-sourced across 4 sections (dossier 272 KB → 380 KB, all numbers track the live project).

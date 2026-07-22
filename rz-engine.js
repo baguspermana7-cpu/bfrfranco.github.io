@@ -12175,7 +12175,7 @@
                             steps: [
                                 { label: 'Facility apparent power', expr: r2(facilityKw / 1000, 2) + ' / ' + pf, value: r2(facMva, 2), unit: 'MVA' },
                                 { label: 'Per-unit capacity', expr: perTxMva + ' × ' + pf, value: r2(perTxMva * pf, 2), unit: 'MW' },
-                                { label: 'Transformer count (N)', expr: '⌈' + r2(facilityKw, 0) + ' / ' + r2(perTxMva * 1000 * pf, 0) + '⌉', value: txN, unit: 'ea' }
+                                { label: 'Transformer count (N)', expr: '⌈' + r2(facMva, 2) + ' MVA / ' + perTxMva + ' MVA⌉', value: txN, unit: 'ea' }
                             ],
                             result: { label: 'Transformers required (N)', value: txN, unit: 'ea' }
                         });
@@ -12194,7 +12194,7 @@
                             inputs: [
                                 { label: 'IT load', value: r2(itKw, 0), unit: 'kW' },
                                 { label: 'UPS module', value: moduleKw, unit: 'kW' },
-                                { label: 'Autonomy', value: autonomyMin, unit: 'min' }
+                                { label: 'Autonomy', value: autonomyMin + ' (screening default — validate vs project UPS spec)', unit: 'min' }
                             ],
                             steps: [
                                 { label: 'UPS modules (N)', expr: '⌈' + r2(itKw, 0) + ' / ' + moduleKw + '⌉', value: upsN, unit: 'ea' },
@@ -12299,7 +12299,7 @@
                     (function () {
                         var isSprinkler = (PF.sprinklerFrac[fireType] != null ? PF.sprinklerFrac[fireType] : 0) > 0;
                         var area = isSprinkler ? floorSpaceM2 : 0;
-                        var densLpmM2 = 12.2;                               /* NFPA 13 Ordinary Hazard Grp 2 ≈ 8.1 mm/min → ~12.2 L/min·m² over design area */
+                        var densLpmM2 = 8.15;                               /* NFPA 13 Ordinary Hazard Grp 2 = 0.20 gpm/ft² = 8.15 L/min·m² (1 mm/min = 1 L/min·m²) */
                         var demandLpm = area * densLpmM2;
                         var durationMin = 90;                               /* OH-2 water supply duration */
                         var tankM3 = demandLpm * durationMin / 1000;
@@ -12383,12 +12383,16 @@
                             inputs: [
                                 { label: 'Redundancy', value: red.toUpperCase(), unit: '' },
                                 { label: 'Parallel paths', value: paths, unit: '' },
-                                { label: 'Component groups', value: components.length, unit: '' }
+                                { label: 'Model scope', value: 'ups/crac/chiller series (3-group screening; full chain per IEEE 493 RAM study)', unit: '' }
                             ],
                             steps: groupSteps.concat([
                                 { label: 'Annual downtime', expr: '(1 − A) × 8760 × 60', value: r2(downMin, 2), unit: 'min/yr' }
                             ]),
-                            result: { label: 'System availability', value: r2(avail * 100, 5), unit: '%' },
+                            /* clamp to 99.9999 (4-nines display) — a redundant chain rounds to
+                             * 7+ nines; the renderer caps at 4 decimals so an unclamped value
+                             * would re-round to an unqualified "100%" (impossible + erodes trust).
+                             * The Annual-downtime step above carries the real per-topology figure. */
+                            result: { label: 'System availability', value: Math.min(99.9999, +(avail * 100).toFixed(4)), unit: '%' },
                             /* raw (unrounded) availability for the test to match models.reliability exactly */
                             _availRaw: avail
                         });
@@ -12412,8 +12416,8 @@
                                 { label: 'WUE', value: r2(wue, 3), unit: 'L/kWh' }
                             ],
                             steps: [
-                                { label: 'Annual IT energy', expr: r2(mw, 2) + ' MW × 8760 h', value: r2(mw * DATA.hoursPerYear, 0), unit: 'MWh' },
-                                { label: 'Annual water', expr: r2(wue, 3) + ' × IT_kWh / 1000', value: r2(annualM3, 0), unit: 'm³' }
+                                { label: 'Annual IT energy', expr: r2(mw, 2) + ' MW × 8760 h × 1000', value: r2(mw * DATA.hoursPerYear * 1000, 0), unit: 'kWh' },
+                                { label: 'Annual water', expr: r2(wue, 3) + ' L/kWh × ' + r2(mw * DATA.hoursPerYear * 1000, 0) + ' kWh ÷ 1000', value: r2(annualM3, 0), unit: 'm³' }
                             ],
                             result: { label: 'Annual water consumption', value: r2(annualM3, 0), unit: 'm³' }
                         });
