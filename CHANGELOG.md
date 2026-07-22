@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.112.0 — 2026-07-22 (Article 28: "The Compression Horizon")
+
+### Added
+- **`article-28.html` — "The Compression Horizon: how close can a laptop get to a datacenter's mind?"** (Future Forward). A rigorous, bold-but-fenced take on two impossible-sounding targets — 300 TB of data into 1 KB, one CPU-only PC equal to a 1 GW datacenter — mapping the hard walls (Shannon, **Kolmogorov complexity**, **Landauer's principle**) against the real frontier that climbs them (dataset distillation, **BitNet b1.58**, implicit neural representations, **hyperdimensional computing**, Matryoshka embeddings; reversible/**analog memristor**/photonic/neuromorphic/thermodynamic compute; **algorithmic-efficiency** halving). Introduces the **Capability Density** / **Compression Horizon** framing, a **default→genius local-AI pipeline** with an inline SVG block diagram, 2 sourced charts (bits-per-weight; compute-per-capability over time), and a myths-vs-reality confidence table.
+- Cross-linkage: prepended to `insights.html` (Latest Publications) + `articles.html` grid; **6 new glossary terms** (Shannon entropy, Kolmogorov complexity, knowledge/dataset distillation, hyperdimensional computing, memristor, RAG); `search-index.json` (id 46) + `search-sections.json`; `sitemap.xml` (145 URLs) + `llms.txt`; OG card `assets/og/article-28.webp`; two provenance-tagged datasets in `data/article-28/`.
+
+### Verified
+- Headless: 2 charts render, SVG pipeline diagram, 8 sections, **0 console errors**; article-charts provenance gate CLEAN (source+basisTag on both); dark-coverage CLEAN; script-tags CLEAN; article-28 passes version-stamp + mobile + responsive. (Pre-existing gate noise on `tools/dc-corpus/raw/*` version stamps and `setup-supabase.html` mobile overflow is unrelated and untouched.)
+
 ## v1.111.2 — 2026-07-22 (SecondBrain → Claude Session Manager entry pill)
 
 ### Added

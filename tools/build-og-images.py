@@ -451,7 +451,7 @@ def _extract_title_and_desc(html_path):
     return title or None, desc if len(desc) > 10 else None
 
 # Article pages — emerald accent
-for i in range(1, 28):
+for i in range(1, 30):
     fname = f"article-{i}.html"
     p = _ROOT / fname
     if p.exists():
