@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.113.1 — 2026-07-22 (DCMOC sidebar color restored — semantic lifecycle-phase coding)
+
+### Fixed
+- **Sidebar lost its color** (owner report) — the v1.110.0 de-slop killed the 13-color engine rainbow but overshot to all-grey (only the active engine had amber), so the "13-Layer Lifecycle" nav read colorless. Restored color by **lifecycle phase** (not the rejected rainbow): engine badges + icons now colored by phase — Plan & Design (1-5) instrument-cyan, Deliver (6-7) signal-amber, Operate (8-10) data-green, Optimize (11-13) mint. Color now MEANS the lifecycle stage (design.md §5); the active engine keeps its solid signal-amber "you are here" chip. `Shell.tsx` only, no engine change. tsc 0 + build, screenshot-verified.
+
 ## v1.113.0 — 2026-07-22 (dossier Permitting Matrix → EPC-grade register)
 
 ### Added

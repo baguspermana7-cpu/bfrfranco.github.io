@@ -342,9 +342,24 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
         { num: 12, label: 'Financial', icon: TrendingUp, childIds: ['finance', 'invest', 'portfolio', 'benchmark', 'strategic'] },
         { num: 13, label: 'AI Decision Engine', icon: BrainCircuit, childIds: [] },
     ];
-    // Engine number badge — SEMANTIC, not decorative (design.md §5): one
-    // neutral instrument chip for every engine; signal-amber marks ONLY the
-    // engine whose tab is active. Replaces the 13-color AI-slop rainbow.
+    // Engine badge/icon color — SEMANTIC by LIFECYCLE PHASE (design.md §5: color
+    // MEANS something). The 13 engines are a lifecycle sequence → 4 brand-hue
+    // phases (Plan→cyan, Deliver→amber, Operate→green, Optimize→mint). Restores
+    // color WITHOUT the rejected 13-color rainbow; the ACTIVE engine still gets a
+    // solid signal-amber chip as the single "you are here" accent.
+    const ENGINE_HUE: Record<number, 'info' | 'signal' | 'data' | 'mint'> = {
+        1: 'info', 2: 'info', 3: 'info', 4: 'info', 5: 'info',   // Plan & Design
+        6: 'signal', 7: 'signal',                                 // Deliver
+        8: 'data', 9: 'data', 10: 'data',                         // Operate
+        11: 'mint', 12: 'mint', 13: 'mint',                       // Optimize
+    };
+    const HUE_BADGE: Record<string, string> = {
+        info: 'bg-rz-info/15 text-rz-info', signal: 'bg-rz-signal/15 text-rz-signal',
+        data: 'bg-rz-data/15 text-rz-data', mint: 'bg-rz-mint/15 text-rz-mint',
+    };
+    const HUE_ICON: Record<string, string> = {
+        info: 'text-rz-info/80', signal: 'text-rz-signal/80', data: 'text-rz-data/80', mint: 'text-rz-mint/80',
+    };
     // PLATFORM + SUPPORT sections (route to engine-backed where possible, else stub tabs)
     const PLATFORM: { label: string; icon: LucideIcon; id?: typeof activeTab; action?: () => void }[] = [
         { label: 'Projects', icon: FolderOpen, id: 'projects' },
@@ -520,9 +535,9 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
                                             "text-[10px] font-mono font-bold w-5 h-5 rounded flex items-center justify-center shrink-0 tabular-nums",
                                             active
                                                 ? "bg-rz-signal text-slate-900"
-                                                : "bg-slate-200 text-slate-600 dark:bg-white/10 dark:text-slate-400"
+                                                : HUE_BADGE[ENGINE_HUE[g.num]]
                                         )}>{g.num}</span>
-                                        <GroupIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
+                                        <GroupIcon className={clsx("w-4 h-4 shrink-0", !active && HUE_ICON[ENGINE_HUE[g.num]])} aria-hidden="true" />
                                         <span className="flex-1 text-left truncate">{g.label}</span>
                                         {!hasChildren && <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-400 shrink-0">soon</span>}
                                         {hasChildren && <ChevronRight className={clsx("w-3.5 h-3.5 shrink-0 transition-transform", open && "rotate-90")} aria-hidden="true" />}
