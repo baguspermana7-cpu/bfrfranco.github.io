@@ -229,8 +229,7 @@
         /* Background */
         .tco-page-background {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            inset: 0;
             pointer-events: none;
             z-index: 0;
             background:
@@ -1893,6 +1892,16 @@
             background-size: 12px 12px;
         }
 
+        /* Dropdown option list dark-mode styling — harmonizes .tco-input-field selects
+           with the canonical .input-field look used on capex/opex/roi (which style the
+           <option> element). Without this the open option list rendered with the OS
+           default (white) background in dark mode. */
+        [data-theme="dark"] .tco-input-field option,
+        [data-theme="dark"] select.tco-input-field option {
+            background: #1e293b;
+            color: #f1f5f9;
+        }
+
         [data-theme="dark"] .tco-market-info { background: rgba(79, 70, 229, 0.1); border-color: rgba(79, 70, 229, 0.2); }
         [data-theme="dark"] .tco-market-chip { background: #1e293b; border-color: rgba(255,255,255,0.1); color: #cbd5e1; }
         [data-theme="dark"] .tco-market-chip strong { color: #f1f5f9; }
@@ -2910,7 +2919,25 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             var _pue = window.RZEngine && window.RZEngine.data && window.RZEngine.data.pueMatrix;
             if (_pue && _pue.air && _pue.air.tier3 != null)
                 COOLING_PUE['air'] = _pue.air.tier3;
+            syncMarketRatesFromEngine();
         });
+
+        /* Single-source the market RATES (power/colo/CAGR) from RZEngine.data.markets
+         * (shared DC-market intelligence in rz-engine.js). Keys match 1:1 with MARKET_DATA.
+         * Overlays only the three engine-backed fields; TCO-specific fields (buildCost,
+         * staff, land, projection curves) are left untouched. Defensive: no-op if the
+         * engine or its markets snapshot is unavailable, so the inline seeds still work. */
+        function syncMarketRatesFromEngine() {
+            var M = window.RZEngine && window.RZEngine.data && window.RZEngine.data.markets;
+            if (!M) return; // engine unavailable → keep inline seeds
+            Object.keys(MARKET_DATA).forEach(function(k) {
+                var em = M[k];
+                if (!em) return;
+                if (em.powerCost != null) MARKET_DATA[k].power = em.powerCost;   // $/kWh
+                if (em.coloPrice != null) MARKET_DATA[k].coloKW = em.coloPrice;  // $/kW/month
+                if (em.cagr != null)      MARKET_DATA[k].cagr = em.cagr;         // fraction
+            });
+        }
         var CLOUD_BASE = 420; // $/kW/month equivalent
 
         /* ─────────── YEAR-BY-YEAR PROJECTIONS (2025-2030) ─────────── */
@@ -3082,6 +3109,44 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
         function getSelect(id) { return el(id).value; }
 
+        /* ─────────── ENGINE DELEGATION (single source of truth) ───────────
+         * The TCO roll-up is sourced from RZEngine (window.RZEngine, loaded via
+         * rz-engine.min.js) wherever the engine already implements the formula, so
+         * "update the engine → updates here". Each delegate is a numerically-exact
+         * mirror of the prior inline math and carries an inline fallback so the page
+         * still computes if the engine object is unavailable.
+         *
+         * Market RATES (power $/kWh, colo $/kW/mo, CAGR) are SOURCED from the engine's
+         * public snapshot RZEngine.data.markets at load time (see syncMarketRatesFromEngine
+         * below) — verified byte-identical to the inline seeds, so the engine is now the
+         * single source for those three. Build $/MW, staff $/yr, land $/sqft and the
+         * per-year projection curves have no engine-market equivalent and stay inline. */
+        function engHasOpex() {
+            return !!(window.RZEngine && RZEngine.models && RZEngine.models.opex && typeof RZEngine.models.opex.powerCostAnnual === 'function');
+        }
+        function engHasTco() {
+            return !!(window.RZEngine && RZEngine.models && RZEngine.models.tco && typeof RZEngine.models.tco.costPerMwYear === 'function');
+        }
+        /* Annual facility power cost. Delegates to RZEngine.models.opex.powerCostAnnual:
+         * powerCostAnnual(mw, pue, rate, hrs) = mw*1000*pue*hrs*rate. Utilization is folded
+         * into effective hours (8760 * util), so the result is identical to the prior inline
+         * `itMW * pue * 8760 * util * rate * 1000`. */
+        function tcoPowerAnnual(itMW, pue, util, rate) {
+            if (engHasOpex()) {
+                return RZEngine.models.opex.powerCostAnnual(itMW, pue, rate, 8760 * util);
+            }
+            return itMW * pue * 8760 * util * rate * 1000; // fallback: engine unavailable
+        }
+        /* Cost per kW-year of the winning option. Delegates to RZEngine.models.tco.costPerMwYear
+         * (= totalTco / mw / years) then converts $/MW-yr → $/kW-yr (÷1000). Identical to the
+         * prior inline `bestTco / (itMW * 1000) / years`. */
+        function tcoCostPerKw(bestTco, itMW, years) {
+            if (engHasTco()) {
+                return RZEngine.models.tco.costPerMwYear(bestTco, itMW, years) / 1000;
+            }
+            return bestTco / (itMW * 1000) / years; // fallback: engine unavailable
+        }
+
         /* ─────────── CALCULATION ENGINE ─────────── */
         function calculate() {
             // Production hardening: non-blocking input feedback (calc is defensive via
@@ -3121,7 +3186,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             var buildStaffCount = staffOverride > 0 ? staffOverride : Math.ceil(staffPerMW * itMW);
 
             // Annual OPEX components (Year 1)
-            var annualPower = itMW * pue * 8760 * util * powerRate * 1000;
+            var annualPower = tcoPowerAnnual(itMW, pue, util, powerRate); // engine-sourced (opex.powerCostAnnual)
             var annualStaff = buildStaffCount * staffSalary;
             var annualMaint = capex * 0.03;
             var annualInsurance = capex * 0.007;
@@ -3137,7 +3202,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                 // Use market-specific projection data when available, fall back to global rates
                 var yPowerRate = getMktProjection(mkt, 'powerCostByYear', y, powerRate * Math.pow(1 + getYearRate(PROJECTIONS.powerInflationByYear, y, 0.04), y));
                 var yStaffCost = getMktProjection(mkt, 'staffCostByYear', y, staffSalary * Math.pow(1 + PROJECTIONS.staffInflation, y));
-                var yPower = itMW * pue * 8760 * util * yPowerRate * 1000;
+                var yPower = tcoPowerAnnual(itMW, pue, util, yPowerRate); // engine-sourced (opex.powerCostAnnual)
                 var yStaff = buildStaffCount * yStaffCost;
                 var yMaint = annualMaint * Math.pow(1 + PROJECTIONS.maintenanceInflation, y);
                 var yIns = annualInsurance;
@@ -3230,7 +3295,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             for (var y = 0; y < 15; y++) {
                 var bePwrRate = getMktProjection(mkt, 'powerCostByYear', y, powerRate * Math.pow(1 + getYearRate(PROJECTIONS.powerInflationByYear, y, 0.04), y));
                 var beStfCost = getMktProjection(mkt, 'staffCostByYear', y, staffSalary * Math.pow(1.05, y));
-                var bePwr = itMW * pue * 8760 * util * bePwrRate * 1000;
+                var bePwr = tcoPowerAnnual(itMW, pue, util, bePwrRate); // engine-sourced (opex.powerCostAnnual)
                 var beStf = buildStaffCount * beStfCost;
                 var beMnt = capex * 0.03 * Math.pow(1.03, y);
                 var beIns = capex * 0.007;
@@ -3252,7 +3317,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
             /* ── COST/kW ── */
             var bestTco = winner.tco;
-            var costPerKw = bestTco / (itMW * 1000) / years;
+            var costPerKw = tcoCostPerKw(bestTco, itMW, years); // engine-sourced (tco.costPerMwYear)
 
             /* ── STORE RESULTS ── */
             lastResults = {

@@ -1085,6 +1085,152 @@ html:not([data-theme="dark"]) .tab-btn:not(.active) { color:#475569 !important; 
     <!-- PLAN02 E4 — editorial chrome (dark-only, chrome only) -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/rz-calc-editorial.css?v=1.43.55">
+
+<!-- ============================================================================
+     SPARES REVAMP v1 — "Critical Spares Engine" reference design system (day+night).
+     Re-points the page's accent tokens to instrument-blue + reference surfaces,
+     then restyles hero / KPI strip / tabs / cards / tables / badges to match the
+     reference screenshots. Loaded LAST so it wins the cascade.
+     ============================================================================ -->
+<style id="sp-revamp">
+:root{
+  /* re-point existing amber accent tokens -> reference instrument-blue (whole page shifts at once) */
+  --amber:#2563eb; --amber-light:#3b82f6; --amber-dark:#1d4ed8; --amber-deeper:#1e40af;
+  --accent:#2563eb; --accent-light:#3b82f6;
+  --primary-gradient:linear-gradient(135deg,#2563eb 0%,#3b82f6 100%);
+  --status-green:#059669; --status-yellow:#d97706; --status-red:#dc2626;
+  /* reference DAY surfaces */
+  --sp-page:#f6f7f9; --sp-surface:#ffffff; --sp-surface-2:#f8fafc;
+  --sp-line:#e6e8ec; --sp-line-strong:#d4d8df;
+  --sp-text:#1c2534; --sp-text-2:#475569; --sp-muted:#64748b;
+  --sp-primary:#2563eb; --sp-primary-2:#1d4ed8; --sp-primary-soft:#eef4ff;
+  --sp-vital:#dc2626; --sp-ess:#d97706; --sp-des:#0891b2;
+  --sp-red:#dc2626; --sp-amber:#d97706; --sp-green:#059669;
+  --sp-radius:12px;
+  --sp-shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.05);
+  --sp-shadow-hover:0 4px 14px rgba(16,24,40,.10);
+  /* re-point the page's own generic tokens */
+  --bg-primary:var(--sp-page); --bg-secondary:var(--sp-surface); --bg-tertiary:var(--sp-surface-2);
+  --text-primary:var(--sp-text); --text-secondary:var(--sp-text-2); --text-muted:var(--sp-muted);
+  --glass-bg:rgba(255,255,255,.9); --glass-border:var(--sp-line);
+}
+[data-theme="dark"]{
+  --amber:#3b82f6; --amber-light:#60a5fa; --amber-dark:#2563eb; --amber-deeper:#1d4ed8;
+  --accent:#3b82f6; --accent-light:#60a5fa;
+  --primary-gradient:linear-gradient(135deg,#2563eb 0%,#3b82f6 100%);
+  --status-green:#34d399; --status-yellow:#fbbf24; --status-red:#f87171;
+  /* reference NIGHT surfaces (sampled from uiux_night.png) */
+  --sp-page:#061119; --sp-surface:#0c1826; --sp-surface-2:#0a1420;
+  --sp-line:rgba(148,163,184,.14); --sp-line-strong:rgba(148,163,184,.24);
+  --sp-text:#f1f5f9; --sp-text-2:#94a3b8; --sp-muted:#7c8aa0;
+  --sp-primary:#3b82f6; --sp-primary-2:#60a5fa; --sp-primary-soft:rgba(59,130,246,.14);
+  --sp-vital:#f87171; --sp-ess:#fbbf24; --sp-des:#22d3ee;
+  --sp-red:#f87171; --sp-amber:#fbbf24; --sp-green:#34d399;
+  --sp-shadow:0 1px 2px rgba(0,0,0,.45);
+  --sp-shadow-hover:0 6px 20px rgba(0,0,0,.5);
+  --bg-primary:var(--sp-page); --bg-secondary:var(--sp-surface); --bg-tertiary:var(--sp-surface-2);
+  --text-primary:var(--sp-text); --text-secondary:var(--sp-text-2); --text-muted:var(--sp-muted);
+  --glass-bg:rgba(12,24,38,.9); --glass-border:var(--sp-line);
+}
+body{ background:var(--sp-page)!important; color:var(--sp-text); }
+
+/* ---------- HERO -> reference analysis header (breadcrumb + title + meta trio) ---------- */
+.hero{ background:var(--sp-surface)!important; border-bottom:1px solid var(--sp-line); text-align:left!important;
+  padding:1.5rem 2rem 1.4rem!important; max-width:none!important; }
+.sp-breadcrumb{ display:flex; align-items:center; gap:.4rem; font-size:.76rem; color:var(--sp-muted); margin-bottom:1rem; flex-wrap:wrap; }
+.sp-breadcrumb a{ color:var(--sp-muted); text-decoration:none; }
+.sp-breadcrumb a:hover{ color:var(--sp-primary); }
+.sp-breadcrumb .sep{ opacity:.5; }
+.sp-head-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:2rem; flex-wrap:wrap; max-width:1360px; }
+.sp-head-left{ min-width:280px; }
+.sp-title-line{ display:flex; align-items:center; gap:.85rem; flex-wrap:wrap; }
+.hero h1{ font-size:1.9rem!important; font-weight:800; letter-spacing:-.02em; color:var(--sp-text)!important;
+  -webkit-text-fill-color:var(--sp-text)!important; background:none!important; -webkit-background-clip:border-box!important; background-clip:border-box!important; margin:0!important; }
+.sp-analysis-badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 11px; border-radius:6px;
+  background:var(--sp-primary-soft); color:var(--sp-primary); border:1px solid color-mix(in srgb,var(--sp-primary) 24%,transparent);
+  font-size:.68rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+.hero .sp-subtitle{ font-size:.9rem; color:var(--sp-muted); margin:.55rem 0 0!important; max-width:640px; line-height:1.55; }
+.hero-badge, .hero-stats, .hero p:not(.sp-subtitle){ display:none!important; }
+.sp-meta-trio{ display:flex; gap:2.4rem; flex-wrap:wrap; }
+.sp-meta{ display:flex; flex-direction:column; gap:2px; }
+.sp-meta .k{ font-size:.66rem; letter-spacing:.05em; text-transform:uppercase; color:var(--sp-muted); }
+.sp-meta .v{ font-size:.86rem; font-weight:700; color:var(--sp-text); font-variant-numeric:tabular-nums; }
+
+/* ---------- KPI STRIP -> reference 8-module cards ---------- */
+.summary-strip{ background:transparent!important; border:none!important; box-shadow:none!important; padding:1.4rem 2rem .4rem!important; max-width:1360px; margin:0 auto!important; }
+.summary-strip-title{ font-size:.72rem!important; letter-spacing:.06em; text-transform:uppercase; color:var(--sp-muted)!important; font-weight:700!important; margin-bottom:.8rem!important; }
+.summary-kpi-grid-8{ display:grid!important; grid-template-columns:repeat(8,1fr)!important; gap:.7rem!important; }
+@media(max-width:1200px){ .summary-kpi-grid-8{ grid-template-columns:repeat(4,1fr)!important; } }
+@media(max-width:640px){ .summary-kpi-grid-8{ grid-template-columns:repeat(2,1fr)!important; } }
+.summary-kpi{ background:var(--sp-surface)!important; border:1px solid var(--sp-line)!important; border-radius:var(--sp-radius)!important;
+  padding:.85rem .8rem!important; box-shadow:var(--sp-shadow)!important; transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; position:relative; overflow:hidden; }
+.summary-kpi:hover{ transform:translateY(-2px); box-shadow:var(--sp-shadow-hover)!important; border-color:var(--sp-line-strong)!important; }
+.summary-kpi.sp-active{ border-color:var(--sp-primary)!important; box-shadow:0 0 0 1px var(--sp-primary)!important; }
+.summary-kpi-label{ font-size:.68rem!important; color:var(--sp-muted)!important; font-weight:600!important; display:flex; align-items:center; gap:4px; margin-bottom:.35rem; }
+.summary-kpi-value{ font-size:1.5rem!important; font-weight:800!important; color:var(--sp-text)!important; line-height:1.05; font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+.summary-kpi-module{ font-size:.64rem!important; color:var(--sp-primary)!important; font-weight:700!important; margin-top:.3rem; letter-spacing:.02em; }
+
+/* ---------- TABS -> clean reference tabs ---------- */
+.tabs-wrap{ background:var(--sp-surface)!important; border:1px solid var(--sp-line); border-radius:var(--sp-radius); box-shadow:var(--sp-shadow); }
+.tabs-row{ gap:.25rem!important; padding:.35rem!important; }
+.tabs-group-label{ color:var(--sp-muted)!important; font-size:.62rem!important; letter-spacing:.06em; }
+.tab-btn{ background:transparent!important; border:1px solid transparent!important; color:var(--sp-text-2)!important;
+  border-radius:8px!important; font-size:.78rem!important; font-weight:600!important; padding:.5rem .8rem!important; transition:background .15s, color .15s; }
+.tab-btn:hover{ background:var(--sp-surface-2)!important; color:var(--sp-text)!important; }
+.tab-btn.active{ background:var(--sp-primary)!important; color:#fff!important; border-color:var(--sp-primary)!important; box-shadow:0 1px 3px rgba(37,99,235,.3); }
+.tab-divider{ color:var(--sp-line-strong)!important; }
+
+/* ---------- CARDS -> flat reference surfaces ---------- */
+.module-card, .result-card, .module-summary-card, .module-flow-card, .metric-box, .faq-item, .info-box{
+  background:var(--sp-surface)!important; border:1px solid var(--sp-line)!important; border-radius:var(--sp-radius)!important;
+  box-shadow:var(--sp-shadow)!important; }
+.module-card:hover{ border-color:var(--sp-line-strong)!important; }
+.card-title{ color:var(--sp-text)!important; font-weight:700!important; }
+.card-title i{ color:var(--sp-primary)!important; }
+.module-summary-card{ border-left:3px solid var(--sp-primary)!important; }
+.module-summary-card .q{ color:var(--sp-text)!important; font-weight:700; }
+.module-flow-card{ background:var(--sp-surface-2)!important; }
+.module-flow-col h4{ color:var(--sp-primary)!important; }
+.module-flow-arrow{ color:var(--sp-primary)!important; }
+
+/* ---------- INPUTS ---------- */
+.input-field, select.input-field{ background:var(--sp-surface)!important; border:1px solid var(--sp-line-strong)!important;
+  color:var(--sp-text)!important; border-radius:8px!important; }
+.input-field:focus{ border-color:var(--sp-primary)!important; box-shadow:0 0 0 3px color-mix(in srgb,var(--sp-primary) 15%,transparent)!important; }
+.input-label{ color:var(--sp-text-2)!important; }
+[data-theme="dark"] select option{ background:var(--sp-surface)!important; color:var(--sp-text)!important; }
+
+/* ---------- BADGES / STATUS ---------- */
+.status-red,.tier-vital{ background:color-mix(in srgb,var(--sp-red) 12%,transparent)!important; color:var(--sp-red)!important; }
+.status-yellow,.tier-essential{ background:color-mix(in srgb,var(--sp-amber) 14%,transparent)!important; color:var(--sp-amber)!important; }
+.status-green,.tier-desirable{ background:color-mix(in srgb,var(--sp-green) 14%,transparent)!important; color:var(--sp-green)!important; }
+
+/* ---------- TABLES ---------- */
+.table-sm th{ background:var(--sp-surface-2)!important; color:var(--sp-primary)!important; border-bottom:1px solid var(--sp-line)!important; }
+.table-sm td{ border-color:var(--sp-line)!important; color:var(--sp-text)!important; }
+.table-sm tr:nth-child(even) td{ background:color-mix(in srgb,var(--sp-muted) 5%,transparent)!important; }
+
+/* ---------- SCENARIO BAR / BUTTONS ---------- */
+.scenario-bar{ background:var(--sp-surface)!important; border:1px solid var(--sp-line)!important; border-radius:var(--sp-radius)!important; box-shadow:var(--sp-shadow)!important; }
+.btn-scenario{ background:var(--sp-surface-2)!important; border:1px solid var(--sp-line-strong)!important; color:var(--sp-text)!important; border-radius:8px!important; font-weight:600!important; }
+.btn-scenario:hover{ border-color:var(--sp-primary)!important; color:var(--sp-primary)!important; }
+
+/* ---------- RUN / primary action + footer stamp ---------- */
+.sp-run-btn{ display:inline-flex; align-items:center; gap:.5rem; background:var(--sp-primary); color:#fff; border:none;
+  border-radius:9px; padding:.7rem 1.3rem; font-weight:700; font-size:.9rem; cursor:pointer; box-shadow:0 1px 3px rgba(37,99,235,.35); transition:background .15s, transform .12s; }
+.sp-run-btn:hover{ background:var(--sp-primary-2); }
+.sp-run-btn:active{ transform:translateY(1px); }
+.sp-engine-stamp{ display:flex; align-items:center; justify-content:center; gap:.5rem; padding:1rem; font-size:.72rem; color:var(--sp-muted);
+  border-top:1px solid var(--sp-line); margin-top:1.5rem; }
+.sp-engine-stamp .dot{ width:6px; height:6px; border-radius:50%; background:var(--sp-green); }
+
+/* ---------- micro-interactions ---------- */
+@keyframes sp-fade-up{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:none;} }
+.module-pane.active{ animation:sp-fade-up .28s ease both; }
+.summary-kpi-value.sp-flash{ animation:sp-num .5s ease; }
+@keyframes sp-num{ 0%{ color:var(--sp-primary);} 100%{ color:var(--sp-text);} }
+@media(prefers-reduced-motion:reduce){ .module-pane.active,.summary-kpi-value.sp-flash{ animation:none!important; } .summary-kpi{ transition:none; } }
+</style>
 </head>
 <body>
 <script>
@@ -1161,19 +1307,27 @@ html:not([data-theme="dark"]) .tab-btn:not(.active) { color:#475569 !important; 
   <!-- Deep-link carrier banner -->
   <div class="carrier-banner" id="carrierBanner"><i class="fas fa-link"></i> <span id="carrierBannerText">Your config carried over from another calculator.</span></div>
 
-  <!-- Hero -->
+  <!-- Hero — reference analysis header -->
   <section class="hero">
-    <div class="hero-badge"><i class="fas fa-warehouse"></i> M&amp;E Spare Parts Management</div>
-    <h1>Critical Spares Engine</h1>
-    <p>A quantitative + qualitative work engine for Program Managers and Supply-Chain leads responsible for data-center M&amp;E spare-parts readiness. Built for hyperscale operators, facilities teams, and sourcing professionals who need rigorous, transparent math — not spreadsheet guesswork. 20 modules: 9 quantitative analytical engines + 10 operating-engine generators + 1 methodology reference.</p>
-    <div class="hero-stats">
-      <span class="hero-stat"><i class="fas fa-th"></i> 20 modules</span>
-      <span class="hero-stat"><i class="fas fa-chart-bar"></i> 8 live charts</span>
-      <span class="hero-stat"><i class="fas fa-dice"></i> Monte-Carlo</span>
-      <span class="hero-stat"><i class="fas fa-file-pdf"></i> PDF &amp; Full Report export</span>
-      <span class="hero-stat"><i class="fas fa-link"></i> Deep-link params</span>
-      <span class="hero-stat"><i class="fas fa-bookmark"></i> 5 scenario presets</span>
-      <span class="hero-stat"><i class="fas fa-chart-pie"></i> 22 modules</span>
+    <nav class="sp-breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Home</a><span class="sep">›</span>
+      <a href="datacenter-solutions.html">DC Solutions</a><span class="sep">›</span>
+      <a href="manual/index.html">Technical Manuals</a><span class="sep">›</span>
+      <span aria-current="page" style="color:var(--sp-text);font-weight:600;">Critical Spares Engine</span>
+    </nav>
+    <div class="sp-head-row">
+      <div class="sp-head-left">
+        <div class="sp-title-line">
+          <h1>Critical Spares Engine</h1>
+          <span class="sp-analysis-badge"><i class="fas fa-layer-group"></i> Analysis Summary</span>
+        </div>
+        <p class="sp-subtitle">Eight analytical modules. One intelligent engine. Optimise spare-parts strategy, cost, and availability for data-center M&amp;E equipment.</p>
+      </div>
+      <div class="sp-meta-trio">
+        <div class="sp-meta"><span class="k">Analysis ID</span><span class="v" id="sp_meta_id">SP-000000-001</span></div>
+        <div class="sp-meta"><span class="k">Created</span><span class="v" id="sp_meta_created">—</span></div>
+        <div class="sp-meta"><span class="k">Scenario</span><span class="v" id="sp_meta_scenario">Production DC (Base Case)</span></div>
+      </div>
     </div>
   </section>
 
@@ -4503,6 +4657,7 @@ html:not([data-theme="dark"]) .tab-btn:not(.active) { color:#475569 !important; 
     <span>&copy; 2026 Bagus Dwi Permana · resistancezero.com</span>
     <span class="version-stamp" id="rzVersionStamp"><a href="changelog.html" style="color:#475569;text-decoration:none;">v—</a></span>
   </div>
+  <div class="sp-engine-stamp"><span class="dot"></span> Powered by <strong id="sp_engine_ver" style="color:var(--sp-text-2);">RZEngine</strong> · <span style="font-family:'IBM Plex Mono',monospace;">rz-engine.js</span> · all calculations follow the methodologies in the Technical Manual — for planning &amp; decision support only.</div>
 </footer>
 
 <!-- Scripts -->
@@ -4524,7 +4679,7 @@ html:not([data-theme="dark"]) .tab-btn:not(.active) { color:#475569 !important; 
 
 // Beasley-Springer-Moro rational approximation of the inverse normal CDF
 // Returns z such that Φ(z) = p. Valid for 0 < p < 1.
-function normInvCDF(p) {
+function _sp_normInvLocal(p) {
   if (p <= 0) return -6;
   if (p >= 1) return 6;
   var a = [2.50662823884, -18.61500062529, 41.39119773534, -25.44106049637];
@@ -4544,7 +4699,7 @@ function normInvCDF(p) {
 }
 
 // Standard normal CDF (rational approximation)
-function normCDF(x) {
+function _sp_normCDFLocal(x) {
   var t = 1 / (1 + 0.2316419 * Math.abs(x));
   var poly = t * (0.319381530 + t*(-0.356563782 + t*(1.781477937 + t*(-1.821255978 + t*1.330274429))));
   var phi = 1 - (1/Math.sqrt(2*Math.PI)) * Math.exp(-0.5*x*x) * poly;
@@ -4554,7 +4709,7 @@ function normCDF(x) {
 // Poisson CDF: P(X <= k) for rate lambda
 // Uses iterative computation to avoid factorial overflow.
 // Falls back to normal approximation (continuity-corrected) for lambda > 200.
-function poissonCDF(k, lambda) {
+function _sp_poissonLocal(k, lambda) {
   if (lambda <= 0) return (k >= 0) ? 1 : 0;
   // Normal approximation for large lambda (CLT: Poisson ≈ N(λ, λ))
   if (lambda > 200) {
@@ -4573,6 +4728,14 @@ function poissonCDF(k, lambda) {
   }
   return Math.min(1, sum);
 }
+
+/* ── Engine wiring: statistical kernels are single-sourced to RZEngine.models.spares
+   (the shared DCMOC/RZ engine). Local implementations above are the fallback if the
+   engine failed to load. This is the "update the engine → updates everywhere" contract. */
+function _sp_eng(){ return (window.RZEngine && window.RZEngine.models && window.RZEngine.models.spares) || null; }
+function normInvCDF(p){ var e=_sp_eng(); return (e && e.normInv) ? e.normInv(p) : _sp_normInvLocal(p); }
+function normCDF(x){ var e=_sp_eng(); return (e && e.normCdf) ? e.normCdf(x) : _sp_normCDFLocal(x); }
+function poissonCDF(k, lambda){ var e=_sp_eng(); return (e && e.poissonCdf) ? e.poissonCdf(k, lambda) : _sp_poissonLocal(k, lambda); }
 
 // NPV of cash flows (array indexed from t=0)
 function npv(rate, cashflows) {
@@ -10870,5 +11033,72 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 if(window.MutationObserver)new MutationObserver(m).observe(document.documentElement,{childList:true,subtree:true});})();
 </script>
     <script src="js/rz-manual-fab.js?v=2026-07-21" defer></script>
+
+<!-- SPARES REVAMP — analysis header meta, engine stamp, active-KPI sync, count-up (no sound) -->
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function two(n){ return (n<10?'0':'')+n; }
+  function initMeta(){
+    var d = new Date();
+    var idEl = document.getElementById('sp_meta_id');
+    if (idEl){
+      var yy=two(d.getFullYear()%100), stamp=yy+two(d.getMonth()+1)+two(d.getDate());
+      idEl.textContent = 'SP-'+stamp+'-001';
+    }
+    var cEl = document.getElementById('sp_meta_created');
+    if (cEl){
+      var mon=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+      cEl.textContent = d.getDate()+' '+mon+' '+d.getFullYear()+' · '+two(d.getHours())+':'+two(d.getMinutes());
+    }
+  }
+
+  // Engine version stamp (single source: RZEngine.version)
+  function initEngineStamp(){
+    try{
+      var E = window.RZEngine || {};
+      var v = (E.DATA && E.DATA.version) || (E.data && E.data.version) || E.version;
+      var el = document.getElementById('sp_engine_ver');
+      if (el && v) el.textContent = 'RZEngine v'+v;
+    }catch(e){}
+  }
+
+  // Active-KPI highlight synced to the current tab (module → summary card)
+  var TAB2KPI = { criticality:'sum_tier', readiness:'sum_readiness', stock:'sum_qstar',
+    hub:'sum_hub_read', meio:'sum_hub_read', supplier:'sum_supplier', ltb:'sum_ltb',
+    kraljic:'sum_kraljic', montecarlo:'sum_pstockout' };
+  function syncActiveKpi(name){
+    try{
+      [].forEach.call(document.querySelectorAll('.summary-kpi.sp-active'),function(c){c.classList.remove('sp-active');});
+      var id = TAB2KPI[name]; if(!id) return;
+      var val = document.getElementById(id); if(!val) return;
+      var card = val.closest('.summary-kpi'); if(card) card.classList.add('sp-active');
+    }catch(e){}
+  }
+  // wrap switchTab (defined earlier) to add the highlight without touching its logic
+  if (typeof window.switchTab === 'function'){
+    var _orig = window.switchTab;
+    window.switchTab = function(name){ var r=_orig.apply(this, arguments); syncActiveKpi(name); return r; };
+  }
+
+  // Count-up flash: when a summary KPI value changes, briefly tint it (visual only)
+  function watchKpis(){
+    if (reduce) return;
+    ['sum_tier','sum_readiness','sum_qstar','sum_hub_read','sum_supplier','sum_ltb','sum_kraljic','sum_pstockout'].forEach(function(id){
+      var el=document.getElementById(id); if(!el) return;
+      var mo=new MutationObserver(function(){ el.classList.remove('sp-flash'); void el.offsetWidth; el.classList.add('sp-flash'); });
+      mo.observe(el,{childList:true,characterData:true,subtree:true});
+    });
+  }
+
+  function boot(){ initMeta(); watchKpis(); syncActiveKpi('criticality');
+    // engine may finish loading after DOMready (deferred) — retry the stamp briefly
+    initEngineStamp(); var tries=0, iv=setInterval(function(){ tries++; initEngineStamp();
+      if ((document.getElementById('sp_engine_ver')||{}).textContent!=='RZEngine' || tries>20) clearInterval(iv); },200);
+  }
+  if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
 </body>
 </html>
