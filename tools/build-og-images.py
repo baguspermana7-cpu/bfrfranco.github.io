@@ -35,6 +35,10 @@ except ImportError:
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent
 OUTPUT_DIR = REPO_ROOT / "assets" / "og"
+PROFILE_PHOTO = REPO_ROOT / "assets" / "profile-photo.jpg"
+
+# Slugs that get the owner-photo hero treatment (index card + profile fallback).
+PHOTO_SLUGS = {"index", "profile"}
 
 # ---------------------------------------------------------------------------
 # Per-page targets: (slug, title, subtitle, accent_hex)
@@ -599,6 +603,13 @@ STRIP_COLOR = "#7DDDB4"
 
 BORDER_STOPS = ["#fbbf24", "#10b981", "#3b82f6"]
 
+# --- Index-hero palette (matches site index look: near-black base + gold/mint aurora) ---
+HERO_BASE = "#0a0e1a"          # index dark base
+HERO_AURORA_GOLD = "#fbbf24"   # signal amber
+HERO_AURORA_MINT = "#7DDDB4"   # mint accent
+AVATAR_DIAMETER = 224          # px, hero avatar
+AVATAR_RING = (255, 255, 255, 128)  # thin brand hairline ~ rgba(255,255,255,0.5)
+
 
 def _make_gradient_bg() -> Image.Image:
     """Dark-slate linear gradient top-left → bottom-right."""
@@ -613,6 +624,75 @@ def _make_gradient_bg() -> Image.Image:
             b = int(tl[2] + (br[2] - tl[2]) * t)
             img.putpixel((x, y), (r, g, b))
     return img
+
+
+def _make_hero_bg() -> Image.Image:
+    """Index-hero base: near-black (#0a0e1a) with a soft gold + mint aurora wash.
+
+    Low-opacity radial washes only (gold upper-left, mint lower-right) — no
+    saturated generic gradient, matching the site's index hero treatment.
+    """
+    base = _hex(HERO_BASE)
+    img = Image.new("RGBA", (W, H), (*base, 255))
+
+    def _aurora(cx: int, cy: int, radius: int, hex_color: str, max_alpha: int) -> None:
+        blob = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        d = ImageDraw.Draw(blob)
+        ar, ag, ab = _hex(hex_color)
+        step = max(1, radius // 70)
+        for r in range(radius, 0, -step):
+            alpha = int(max_alpha * (1 - r / radius) ** 1.6)
+            d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(ar, ag, ab, alpha))
+        img.alpha_composite(blob)
+
+    # Gold aurora upper-left, mint aurora lower-right — both very low opacity.
+    _aurora(int(W * 0.26), int(H * 0.24), int(W * 0.48), HERO_AURORA_GOLD, 16)
+    _aurora(int(W * 0.82), int(H * 0.86), int(W * 0.50), HERO_AURORA_MINT, 14)
+    return img.convert("RGB")
+
+
+def _circular_avatar(
+    path: Path, diameter: int, ring_rgba: tuple[int, int, int, int]
+) -> Image.Image | None:
+    """Load a photo, center-crop to square, apply an anti-aliased circular mask
+    (rendered at 4× then downscaled), and draw a thin hairline ring.
+
+    Returns an RGBA image of size (diameter, diameter), or None if the source
+    photo is missing/unreadable (caller falls back to a photo-less card).
+    """
+    if not path.exists():
+        return None
+    try:
+        src = Image.open(path).convert("RGB")
+    except Exception:
+        return None
+
+    # Center-crop to a square.
+    w, h = src.size
+    side = min(w, h)
+    left = (w - side) // 2
+    top = (h - side) // 2
+    src = src.crop((left, top, left + side, top + side))
+
+    ss = 4  # supersample factor for anti-aliased mask + ring
+    big = diameter * ss
+    photo = src.resize((big, big), Image.LANCZOS).convert("RGBA")
+
+    mask = Image.new("L", (big, big), 0)
+    ImageDraw.Draw(mask).ellipse([0, 0, big - 1, big - 1], fill=255)
+
+    avatar_big = Image.new("RGBA", (big, big), (0, 0, 0, 0))
+    avatar_big.paste(photo, (0, 0), mask)
+
+    # Thin hairline ring, drawn at supersampled scale (≈1.5px after downscale).
+    ring_w = max(1, int(round(1.5 * ss)))
+    ImageDraw.Draw(avatar_big).ellipse(
+        [ring_w // 2, ring_w // 2, big - 1 - ring_w // 2, big - 1 - ring_w // 2],
+        outline=ring_rgba,
+        width=ring_w,
+    )
+
+    return avatar_big.resize((diameter, diameter), Image.LANCZOS)
 
 
 def _add_radial_blob(img: Image.Image, accent_hex: str) -> None:
@@ -685,11 +765,29 @@ def _wrapped_lines(text: str, font, max_width: int, max_lines: int) -> list[str]
 
 def build_og_image(slug: str, title: str, subtitle: str, accent_hex: str) -> Image.Image:
     """Render a 1200×630 OG card and return the PIL Image."""
-    img = _make_gradient_bg()
+    # Photo slugs (index + profile fallback) get the index-hero base + avatar.
+    avatar = None
+    if slug in PHOTO_SLUGS:
+        avatar = _circular_avatar(PROFILE_PHOTO, AVATAR_DIAMETER, AVATAR_RING)
 
-    _add_radial_blob(img, accent_hex)
+    if avatar is not None:
+        img = _make_hero_bg()
+    else:
+        img = _make_gradient_bg()
+        _add_radial_blob(img, accent_hex)
+
     _add_grain(img)
     _add_bottom_border(img)
+
+    # ---- Composite the hero avatar (left of the title, vertically centered) ----
+    pad_x = 72
+    pad_y_top = 52
+    avatar_x = pad_x
+    if avatar is not None:
+        avatar_y = (H - AVATAR_DIAMETER) // 2
+        rgba = img.convert("RGBA")
+        rgba.alpha_composite(avatar, (avatar_x, avatar_y))
+        img = rgba.convert("RGB")
 
     draw = ImageDraw.Draw(img)
 
@@ -699,23 +797,25 @@ def build_og_image(slug: str, title: str, subtitle: str, accent_hex: str) -> Ima
     font_subtitle = _load_font("regular", 26)
     font_mono = _load_font("mono", 22)
 
-    pad_x = 72
-    pad_y_top = 52
+    # Text block shifts right of the avatar when a photo is present.
+    text_x = pad_x
+    if avatar is not None:
+        text_x = avatar_x + AVATAR_DIAMETER + 56
 
     # ---- Brand mark "RZ" ----
-    draw.text((pad_x, pad_y_top), "RZ", font=font_brand_sm, fill=BRAND_COLOR)
+    draw.text((text_x, pad_y_top), "RZ", font=font_brand_sm, fill=BRAND_COLOR)
 
     # ---- Accent line under brand ----
-    brand_bbox = draw.textbbox((pad_x, pad_y_top), "RZ", font=font_brand_sm)
+    brand_bbox = draw.textbbox((text_x, pad_y_top), "RZ", font=font_brand_sm)
     line_y = brand_bbox[3] + 8
     line_x_end = brand_bbox[2] + 40
     ar, ag, ab = _hex(accent_hex)
-    for i, x in enumerate(range(pad_x, line_x_end)):
-        alpha = max(0, 1 - (x - pad_x) / (line_x_end - pad_x))
+    for i, x in enumerate(range(text_x, line_x_end)):
+        alpha = max(0, 1 - (x - text_x) / (line_x_end - text_x))
         draw.point((x, line_y), fill=(ar, ag, ab))
 
     # ---- Title block (vertically centered in upper 70% of card) ----
-    max_text_w = W - pad_x * 2
+    max_text_w = W - text_x - pad_x
     title_lines = _wrapped_lines(title, font_title, max_text_w, 2)
     title_line_h = 74  # approx line height for 64px
 
@@ -732,14 +832,14 @@ def build_og_image(slug: str, title: str, subtitle: str, accent_hex: str) -> Ima
 
     # Title
     for line in title_lines:
-        draw.text((pad_x, text_y), line, font=font_title, fill=TITLE_COLOR)
+        draw.text((text_x, text_y), line, font=font_title, fill=TITLE_COLOR)
         text_y += title_line_h
 
     text_y += 20
 
     # Subtitle
     for line in subtitle_lines:
-        draw.text((pad_x, text_y), line, font=font_subtitle, fill=SUBTITLE_COLOR)
+        draw.text((text_x, text_y), line, font=font_subtitle, fill=SUBTITLE_COLOR)
         text_y += subtitle_line_h
 
     # ---- Bottom brand strip ----
