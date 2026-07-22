@@ -1230,6 +1230,70 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
 .summary-kpi-value.sp-flash{ animation:sp-num .5s ease; }
 @keyframes sp-num{ 0%{ color:var(--sp-primary);} 100%{ color:var(--sp-text);} }
 @media(prefers-reduced-motion:reduce){ .module-pane.active,.summary-kpi-value.sp-flash{ animation:none!important; } .summary-kpi{ transition:none; } }
+
+/* ===== HERO BANNER ===== */
+.sp-hero-banner{ position:relative; width:100%; height:170px; overflow:hidden; background:#0b1220; }
+.sp-hero-banner img{ width:100%; height:100%; object-fit:cover; display:block; }
+.sp-hero-banner::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(6,17,25,.10),rgba(6,17,25,.55)); pointer-events:none; }
+/* No hero image yet -> collapse the band entirely (no dark void). Shows automatically once the webp exists. */
+.sp-hero-noimg{ display:none !important; }
+
+/* ===== 3-COLUMN SHELL ===== */
+.sp-shell{ display:grid; grid-template-columns:264px minmax(0,1fr) 312px; gap:1.25rem; align-items:start;
+  max-width:1460px; margin:0 auto; padding:1.25rem 1.5rem 0; }
+.sp-setup, .sp-rail{ position:sticky; top:76px; align-self:start; display:flex; flex-direction:column; gap:1rem; }
+.sp-setup{ background:var(--sp-surface); border:1px solid var(--sp-line); border-radius:12px; padding:1rem; box-shadow:var(--sp-shadow); }
+.sp-center{ min-width:0; }
+@media(max-width:1180px){ .sp-shell{ grid-template-columns:1fr; } .sp-setup,.sp-rail{ position:static; } }
+
+/* the center's inner strips were max-width:1100px centered — let them fill the column now */
+.sp-center .summary-strip,.sp-center .scenario-bar,.sp-center .tabs-wrap,.sp-center .module-wrap{ max-width:none!important; }
+.sp-center .summary-strip,.sp-center .scenario-bar{ padding-left:0!important; padding-right:0!important; }
+.sp-center .module-wrap{ padding-left:0!important; padding-right:0!important; }
+@media(max-width:1180px){ .sp-center .summary-strip,.sp-center .scenario-bar,.sp-center .module-wrap{ padding-left:.5rem!important; padding-right:.5rem!important; } }
+
+/* ----- LEFT RAIL: Analysis Setup ----- */
+.sp-setup-head{ font-size:.82rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:var(--sp-text);
+  display:flex; align-items:center; gap:.5rem; padding-bottom:.6rem; border-bottom:1px solid var(--sp-line); }
+.sp-setup-head i{ color:var(--sp-primary); }
+.sp-setup-sec{ display:flex; flex-direction:column; gap:.5rem; }
+.sp-setup-num{ font-size:.7rem; font-weight:700; letter-spacing:.03em; color:var(--sp-text-2); text-transform:uppercase; }
+.sp-setup .input-field{ width:100%; font-size:.82rem; padding:.4rem .5rem!important; }
+.sp-rail-row{ display:flex; flex-direction:column; gap:.2rem; }
+.sp-rail-row label{ font-size:.68rem; color:var(--sp-muted); font-weight:600; }
+.sp-editall{ font-size:.72rem; font-weight:700; color:var(--sp-primary); text-decoration:none; margin-top:.35rem; }
+.sp-editall:hover{ text-decoration:underline; }
+.sp-scenario{ border-top:1px solid var(--sp-line); padding-top:.85rem; gap:.6rem; }
+.sp-scenario-top{ display:flex; align-items:center; }
+.sp-scenario-pill{ display:inline-flex; align-items:center; gap:6px; font-size:.68rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+  color:var(--sp-green); background:color-mix(in srgb,var(--sp-green) 12%,transparent); border:1px solid color-mix(in srgb,var(--sp-green) 30%,transparent);
+  border-radius:999px; padding:3px 10px; }
+.sp-scenario-pill .dot{ width:6px; height:6px; border-radius:50%; background:var(--sp-green); }
+.sp-run-full{ width:100%; justify-content:center; }
+.sp-lastrun{ font-size:.66rem; color:var(--sp-muted); text-align:center; }
+
+/* ----- RIGHT RAIL ----- */
+.sp-rail-method{ font-size:.74rem; font-weight:700; color:var(--sp-primary); text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+.sp-rail-method:hover{ text-decoration:underline; }
+.sp-rail-card{ background:var(--sp-surface); border:1px solid var(--sp-line); border-radius:12px; padding:1rem; box-shadow:var(--sp-shadow); }
+.sp-rail-title{ font-size:.74rem; font-weight:800; letter-spacing:.03em; text-transform:uppercase; color:var(--sp-text);
+  display:flex; align-items:center; gap:.5rem; margin-bottom:.7rem; }
+.sp-rail-title i{ color:var(--sp-primary); }
+.sp-rail-scope{ margin-left:auto; font-size:.6rem; font-weight:600; letter-spacing:.02em; text-transform:none; color:var(--sp-muted);
+  background:var(--sp-surface-2); border:1px solid var(--sp-line); border-radius:999px; padding:1px 7px; }
+.sp-rail-metric{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:.28rem 0; border-bottom:1px dashed var(--sp-line); }
+.sp-rail-metric:last-child{ border-bottom:none; }
+.sp-rail-metric .k{ font-size:.72rem; color:var(--sp-muted); }
+.sp-rail-metric .v{ font-size:.82rem; font-weight:700; color:var(--sp-text); font-variant-numeric:tabular-nums; text-align:right; }
+.sp-heat{ display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
+.sp-heat-cell{ aspect-ratio:1; border-radius:6px; position:relative; opacity:.42; transition:opacity .18s; }
+.sp-heat-cell.g{ background:var(--sp-green); }
+.sp-heat-cell.a{ background:var(--sp-amber); }
+.sp-heat-cell.r{ background:var(--sp-red); }
+.sp-heat-cell.sp-heat-on{ opacity:1; box-shadow:0 0 0 2px var(--sp-surface),0 0 0 4px var(--sp-text); }
+.sp-heat-axis{ display:flex; justify-content:space-between; font-size:.62rem; color:var(--sp-muted); margin-top:.4rem; }
+.sp-qa{ width:100%; justify-content:center; text-align:center; margin-top:.4rem; }
+.sp-qa:first-of-type{ margin-top:0; }
 </style>
 </head>
 <body>
@@ -1304,6 +1368,11 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
 </nav>
 
 <main class="main-content" id="main-content">
+  <!-- Hero banner (v1.111.x — reference dashboard cover) -->
+  <div class="sp-hero-banner" data-rz-hero>
+    <img class="brief-hero-img" src="assets/spares-readiness-calculator-hero.webp" alt="Data center campus" onerror="this.style.display='none';this.parentElement.classList.add('sp-hero-noimg')">
+  </div>
+
   <!-- Deep-link carrier banner -->
   <div class="carrier-banner" id="carrierBanner"><i class="fas fa-link"></i> <span id="carrierBannerText">Your config carried over from another calculator.</span></div>
 
@@ -1331,8 +1400,63 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
     </div>
   </section>
 
+  <!-- ===== 3-COLUMN ANALYST SHELL (v1.111.x) ===== -->
+  <div class="sp-shell">
+  <aside class="sp-setup" aria-label="Analysis setup">
+    <div class="sp-setup-head"><i class="fas fa-sliders"></i> Analysis Setup</div>
+
+    <div class="sp-setup-sec">
+      <div class="sp-setup-num">① Select Commodity</div>
+      <select id="rail_commodity" class="input-field" aria-label="Select commodity">
+        <option value="chiller">Chiller Compressor</option>
+        <option value="crac">CRAC / CRAH</option>
+        <option value="ups">UPS Module / Battery</option>
+        <option value="switchgear">MV Switchgear Breaker</option>
+        <option value="transformer">Transformer</option>
+        <option value="generator">Generator / Genset</option>
+        <option value="pump">Pump / Valve</option>
+        <option value="hx">Heat Exchanger</option>
+        <option value="cooling-tower">Cooling Tower</option>
+        <option value="bms">BMS Controller Board</option>
+        <option value="fuel">Fuel System</option>
+        <option value="fire">Fire Suppression</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+    <div class="sp-setup-sec">
+      <div class="sp-setup-num">② Fleet &amp; Operational Inputs</div>
+      <div class="sp-rail-row"><label for="rail_lambda">Annual Failure Rate λ</label><input type="number" id="rail_lambda" class="input-field" step="0.01" min="0.001"></div>
+      <div class="sp-rail-row"><label for="rail_installed">Installed Base</label><input type="number" id="rail_installed" class="input-field" step="1" min="1"></div>
+      <div class="sp-rail-row"><label for="rail_severity">Severity (1–10)</label><input type="number" id="rail_severity" class="input-field" step="1" min="1" max="10"></div>
+      <div class="sp-rail-row"><label for="rail_detectability">Detectability (1–10)</label><input type="number" id="rail_detectability" class="input-field" step="1" min="1" max="10"></div>
+      <div class="sp-rail-row"><label for="rail_redundancy">Redundancy</label>
+        <select id="rail_redundancy" class="input-field">
+          <option value="n">N (no redundancy)</option>
+          <option value="n1">N+1</option>
+          <option value="2n">2N (fully redundant)</option>
+        </select></div>
+      <div class="sp-rail-row"><label for="rail_alternates">Qualified Alternates</label><input type="number" id="rail_alternates" class="input-field" step="1" min="0" max="20"></div>
+      <div class="sp-rail-row"><label for="rail_lt_weeks">Lead Time (wk)</label><input type="number" id="rail_lt_weeks" class="input-field" step="1" min="1"></div>
+      <div class="sp-rail-row"><label for="rail_lt_sigma">Lead Time Sigma</label><input type="number" id="rail_lt_sigma" class="input-field" step="1" min="0"></div>
+      <div class="sp-rail-row"><label for="rail_unit_cost">Unit Cost ($)</label><input type="number" id="rail_unit_cost" class="input-field" step="1" min="1"></div>
+      <div class="sp-rail-row"><label for="rail_understk_cost">Understock Cost ($)</label><input type="number" id="rail_understk_cost" class="input-field" step="1" min="1"></div>
+      <div class="sp-rail-row"><label for="rail_carry_rate">Carrying Cost Rate (%)</label><input type="number" id="rail_carry_rate" class="input-field" step="1" min="1" max="100"></div>
+      <div class="sp-rail-row"><label for="rail_fill_rate">Target Fill Rate (%)</label><input type="number" id="rail_fill_rate" class="input-field" step="0.5" min="50" max="99.99"></div>
+      <a class="sp-editall" href="#pane-criticality" onclick="switchTab('criticality');var m=document.getElementById('pane-criticality');if(m)m.scrollIntoView({behavior:'smooth',block:'start'});return false;">Edit All Inputs →</a>
+    </div>
+
+    <div class="sp-setup-sec sp-scenario">
+      <div class="sp-scenario-top"><span class="sp-scenario-pill"><span class="dot"></span> Active</span></div>
+      <button class="sp-run-btn sp-run-full" onclick="recalcAll();spRailMarkRun();"><i class="fas fa-play"></i> Run Analysis</button>
+      <div class="sp-lastrun" id="sp_lastrun">Last run — not yet</div>
+    </div>
+  </aside>
+
+  <div class="sp-center">
+
   <!-- Workflow flowchart (v1.17.3) -->
-  <div style="max-width:1100px;margin:0 auto;padding:0 2rem;">
+  <div style="max-width:1100px;margin:0 auto;padding:0 2rem;display:none;">
   <details class="workflow-flowchart-wrap" open>
     <summary class="workflow-flowchart-summary">
       <i class="fas fa-project-diagram"></i> <strong>Workflow Overview</strong>
@@ -4588,6 +4712,47 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
     </div>
 
   </div><!-- /module-wrap -->
+
+  </div><!-- /.sp-center -->
+
+  <aside class="sp-rail" aria-label="Analysis outputs">
+    <a class="sp-rail-method" href="manual/spares.html"><i class="fas fa-book"></i> View Methodology →</a>
+
+    <div class="sp-rail-card">
+      <div class="sp-rail-title"><i class="fas fa-dice"></i> Monte-Carlo</div>
+      <div class="sp-rail-metric"><span class="k">Stockout Risk</span><span class="v" id="sp_mc_risk">Run →</span></div>
+      <div class="sp-rail-metric"><span class="k">Iterations</span><span class="v" id="sp_mc_iter">—</span></div>
+      <div class="sp-rail-metric"><span class="k">Level</span><span class="v" id="sp_mc_level">—</span></div>
+    </div>
+
+    <div class="sp-rail-card">
+      <div class="sp-rail-title"><i class="fas fa-layer-group"></i> Portfolio Summary <span class="sp-rail-scope">current part</span></div>
+      <div class="sp-rail-metric"><span class="k">Parts Analyzed</span><span class="v" id="sp_pf_parts">1</span></div>
+      <div class="sp-rail-metric"><span class="k">Tier</span><span class="v" id="sp_pf_tier">—</span></div>
+      <div class="sp-rail-metric"><span class="k">Inventory Value</span><span class="v" id="sp_pf_value">—</span></div>
+      <div class="sp-rail-metric"><span class="k">Ann. Shortage Cost</span><span class="v" id="sp_pf_shortage">—</span></div>
+      <div class="sp-rail-metric"><span class="k">Service Level</span><span class="v" id="sp_pf_service">—</span></div>
+    </div>
+
+    <div class="sp-rail-card">
+      <div class="sp-rail-title"><i class="fas fa-table-cells"></i> Supply-Risk × RPN</div>
+      <div class="sp-heat" id="sp_heat" role="img" aria-label="Supply risk by RPN heat map">
+        <div class="sp-heat-cell g"></div><div class="sp-heat-cell a"></div><div class="sp-heat-cell r"></div>
+        <div class="sp-heat-cell g"></div><div class="sp-heat-cell a"></div><div class="sp-heat-cell r"></div>
+        <div class="sp-heat-cell g"></div><div class="sp-heat-cell a"></div><div class="sp-heat-cell r"></div>
+      </div>
+      <div class="sp-heat-axis"><span>Low RPN</span><span>High RPN →</span></div>
+    </div>
+
+    <div class="sp-rail-card">
+      <div class="sp-rail-title"><i class="fas fa-bolt"></i> Quick Actions</div>
+      <button class="btn-scenario sp-qa" onclick="exportFullReportPDF()"><i class="fas fa-file-pdf"></i> Export Full Report</button>
+      <button class="btn-scenario sp-qa" onclick="saveScenario()"><i class="fas fa-floppy-disk"></i> Save</button>
+      <button class="btn-scenario sp-qa danger" onclick="resetDefaults()"><i class="fas fa-rotate-left"></i> Reset</button>
+    </div>
+  </aside>
+
+  </div><!-- /.sp-shell -->
 </main>
 
 <!-- Share buttons -->
@@ -11033,6 +11198,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 if(window.MutationObserver)new MutationObserver(m).observe(document.documentElement,{childList:true,subtree:true});})();
 </script>
     <script src="js/rz-manual-fab.js?v=2026-07-21" defer></script>
+    <script src="js/rz-hero-fit.js?v=2026-07-23" defer></script>
 
 <!-- SPARES REVAMP — analysis header meta, engine stamp, active-KPI sync, count-up (no sound) -->
 <script>
@@ -11096,6 +11262,120 @@ if(window.MutationObserver)new MutationObserver(m).observe(document.documentElem
     // engine may finish loading after DOMready (deferred) — retry the stamp briefly
     initEngineStamp(); var tries=0, iv=setInterval(function(){ tries++; initEngineStamp();
       if ((document.getElementById('sp_engine_ver')||{}).textContent!=='RZEngine' || tries>20) clearInterval(iv); },200);
+  }
+  if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+
+<!-- SPARES REVAMP — left-rail mirroring + right-rail render (v1.111.x) -->
+<script>
+(function(){
+  // Mirror a rail input to its real input; dispatch native events so the existing calc reruns.
+  function sp_bind(railId, realId){
+    var rail = document.getElementById(railId), real = document.getElementById(realId);
+    if(!rail || !real) return;
+    // initial sync: rail reflects the real input's current value
+    rail.value = real.value;
+    var isSelect = real.tagName === 'SELECT';
+    var handler = function(){
+      real.value = rail.value;
+      try{ real.dispatchEvent(new Event('input', {bubbles:true})); }catch(e){ real.oninput && real.oninput(); }
+      if(isSelect){ try{ real.dispatchEvent(new Event('change', {bubbles:true})); }catch(e){ real.onchange && real.onchange(); } }
+      if(typeof recalcAll==='function') recalcAll();
+    };
+    rail.addEventListener('input', handler);
+    rail.addEventListener('change', handler);
+  }
+
+  var PAIRS = [
+    ['rail_lambda','c1_lambda'], ['rail_installed','c1_installed'],
+    ['rail_severity','c1_severity'], ['rail_detectability','c1_detectability'],
+    ['rail_redundancy','c1_redundancy'], ['rail_alternates','c1_alternates'],
+    ['rail_lt_weeks','r_lt_weeks'], ['rail_lt_sigma','r_lt_sigma'],
+    ['rail_unit_cost','s_unit_cost'], ['rail_understk_cost','s_understk_cost'],
+    ['rail_carry_rate','s_carry_rate'], ['rail_fill_rate','s_fill_rate']
+  ];
+
+  // Commodity select drives the real defaults, then recalcs everything.
+  function bindCommodity(){
+    var rail = document.getElementById('rail_commodity'), real = document.getElementById('c1_commodity');
+    if(!rail || !real) return;
+    rail.value = real.value;
+    rail.addEventListener('change', function(){
+      real.value = rail.value;
+      try{ if(typeof applyCommodityDefaults==='function') applyCommodityDefaults(rail.value,'criticality'); }catch(e){}
+      // keep the mirrored rail inputs fresh after defaults populate the real ones
+      PAIRS.forEach(function(p){ var r=document.getElementById(p[0]), x=document.getElementById(p[1]); if(r&&x) r.value=x.value; });
+      if(typeof recalcAll==='function') recalcAll();
+      renderSpRails();
+    });
+  }
+
+  window.spRailMarkRun = function(){
+    var d = new Date();
+    function two(n){ return (n<10?'0':'')+n; }
+    var el = document.getElementById('sp_lastrun');
+    if(el) el.textContent = 'Last run — '+two(d.getHours())+':'+two(d.getMinutes())+':'+two(d.getSeconds());
+    renderSpRails();
+  };
+
+  function txt(id, fb){ var e=document.getElementById(id); return e ? (e.textContent||'').trim() : (fb||'—'); }
+  function num(id){ var e=document.getElementById(id); return e ? (parseFloat(e.value)||0) : 0; }
+
+  // Fill Monte-Carlo + Portfolio + heatmap from current outputs.
+  window.renderSpRails = function(){
+    try{
+      // ----- Monte-Carlo -----
+      var pso = txt('mc_pstockout','—');
+      document.getElementById('sp_mc_risk').textContent = (pso && pso!=='—') ? pso : 'Run →';
+      var iterSel = document.getElementById('mc_iterations');
+      document.getElementById('sp_mc_iter').textContent = iterSel ? (iterSel.options[iterSel.selectedIndex]||{}).text || iterSel.value : '—';
+      var lvl='—';
+      if(pso && pso!=='—'){ var p=parseFloat(pso); if(!isNaN(p)) lvl = p<5?'Low':(p<15?'Moderate':'High'); }
+      document.getElementById('sp_mc_level').textContent = lvl;
+
+      // ----- Portfolio (current single-part analysis) -----
+      var tier = txt('sum_tier','—');
+      document.getElementById('sp_pf_tier').textContent = tier;
+      var qstarTxt = txt('s_qstar','');
+      var qstar = parseFloat(qstarTxt) || 0;
+      var unit = num('s_unit_cost');
+      var invVal = qstar * unit;
+      document.getElementById('sp_pf_value').textContent = invVal>0 ? '$'+Math.round(invVal).toLocaleString() : '—';
+      // annual shortage cost ≈ expected downtime cost if MC run, else understock cost proxy
+      var expDown = txt('mc_exp_down','');
+      document.getElementById('sp_pf_shortage').textContent = (expDown && expDown!=='—') ? expDown : ('$'+Math.round(num('s_understk_cost')).toLocaleString()+' / event');
+      document.getElementById('sp_pf_service').textContent = (num('s_fill_rate')||0)+'%';
+
+      // ----- Heat map: RPN band (x) × supply-risk band (y) -----
+      var rpn = parseFloat(txt('c1_rpn','0')) || 0;
+      var alts = num('rail_alternates') || num('c1_alternates');
+      // column: RPN band → 0 low / 1 mid / 2 high
+      var col = rpn>=200 ? 2 : (rpn>=80 ? 1 : 0);
+      // row: supply risk from alternates → 0 alts = high risk (top), 2+ = low risk (bottom)
+      var risk = alts<=0 ? 2 : (alts===1 ? 1 : 0); // 2=high,1=med,0=low
+      var row = 2 - risk; // top row (0) = highest risk
+      var idx = row*3 + col;
+      var cells = document.querySelectorAll('#sp_heat .sp-heat-cell');
+      [].forEach.call(cells, function(c){ c.classList.remove('sp-heat-on'); });
+      if(cells[idx]) cells[idx].classList.add('sp-heat-on');
+    }catch(e){ /* non-fatal */ }
+  };
+
+  // Append renderSpRails to recalcAll without rewriting its body.
+  function wrapRecalc(){
+    if(typeof window.recalcAll === 'function' && !window.recalcAll.__spWrapped){
+      var _orig = window.recalcAll;
+      window.recalcAll = function(){ var r=_orig.apply(this, arguments); try{ renderSpRails(); }catch(e){} return r; };
+      window.recalcAll.__spWrapped = true;
+    }
+  }
+
+  function boot(){
+    bindCommodity();
+    PAIRS.forEach(function(p){ sp_bind(p[0], p[1]); });
+    wrapRecalc();
+    renderSpRails();
   }
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
