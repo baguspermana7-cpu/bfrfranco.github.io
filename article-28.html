@@ -891,6 +891,15 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
     <p>And the data need not be stored as data at all. <strong>Implicit neural representations</strong> (the COIN line of work) throw away the pixels and keep a small network that <em>regenerates</em> them &mdash; the image becomes a tiny function, beating JPEG at low bitrates. <a href="glossary.html#term-hyperdimensional-computing">Hyperdimensional computing</a> superposes many items into a single high-dimensional vector and pulls them back out approximately &mdash; the principled version of &ldquo;compress a knowledge base into one vector.&rdquo; And <strong>Matryoshka embeddings</strong> (now inside OpenAI's text-embedding models) pack coarse-to-fine meaning so a truncated prefix is still a good vector, cutting storage up to <span class="ws-stat">14&times;</span> at equal accuracy. None of these hit 1&nbsp;KB for rich signals &mdash; but every one moves the floor.</p>
 
+    <p>Put those together and you get the honest &ldquo;millions&times;&rdquo; number &mdash; but of <em>capability</em>, not bytes. Take a frontier-class 70-billion-parameter model. The raw corpus that taught it is on the order of <span class="ws-stat">~60&nbsp;TB</span> of text (roughly 15 trillion tokens). Its learned weights are <span class="ws-stat">140&nbsp;GB</span> at FP16 &mdash; already a ~430&times; distillation of the corpus into the capability. Quantize to INT8 and it is <span class="ws-stat">70&nbsp;GB</span>; push to BitNet's 1.58 bits and it is <span class="ws-stat">~14&nbsp;GB</span>. That is the corpus's <em>useful ability</em> compressed roughly <span class="ws-stat">4,000&times;</span> &mdash; and it runs on a workstation. Not 1&nbsp;KB, never 1&nbsp;KB for arbitrary data, but a genuinely staggering collapse of capability into a fraction of the space.</p>
+
+    <figure class="rz-chart" data-rz-chart>
+      <div class="rz-chart-canvas"><canvas></canvas></div>
+      <script type="application/json" class="rz-chart-cfg">
+{"type": "bar", "title": "The capability cascade: a ~60 TB corpus becomes ~14 GB of usable model (log scale)", "labels": ["Training corpus", "FP16 weights (70B)", "INT8 weights", "BitNet 1.58-bit"], "series": [{"label": "Size", "data": [60000, 140, 70, 14], "unit": " GB", "colorAccents": ["muted", "data", "signal", "positive"]}], "source": "~15T tokens x ~4 bytes ~ 60 TB raw text (order-of-magnitude); 70B params x 2/1 bytes = 140/70 GB; 70B x 1.58 bits/8 = 13.8 GB (arXiv:2402.17764). data/article-28/compression-cascade.csv", "basisTag": "derived", "logY": true, "x": "Representation", "y": "Size (GB, log)"}
+      </script>
+    </figure>
+
     <h2 id="wall-2">Wall Two: the thermodynamic limit</h2>
 
     <p>Now the second target. In 1961 Rolf Landauer proved that erasing one bit of information <em>irreversibly</em> must dissipate at least <span class="ws-stat">kT&middot;ln2 &asymp; 2.8&times;10&#8315;&sup2;&sup1; joules</span> of heat &mdash; about 0.018&nbsp;eV at room temperature. It is not an engineering hurdle; it is thermodynamics, and it was directly confirmed in 2012 with a single colloidal particle in a double-well trap. A 1&nbsp;GW datacenter performs some vast number of irreversible operations per second. To match that operation rate inside a laptop's ~50&nbsp;W envelope would mean doing roughly <span class="ws-stat">20 million times</span> more work per joule than the datacenter. On today's silicon, which already burns <span class="ws-stat">more than 1,000&times;</span> the Landauer minimum per bit, that is flatly impossible.</p>
@@ -911,6 +920,25 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
       <li><strong>Thermodynamic computing</strong> (Extropic, Normal Computing): stop fighting noise and use it, targeting generative workloads with claimed <span class="ws-stat">10,000&times;</span> energy savings &mdash; still early, simulation-level claims, not shipped performance.</li>
     </ul>
 
+    <table class="ws-lever-table">
+      <thead><tr><th scope="col">Substrate</th><th scope="col">How it computes</th><th scope="col">Efficiency vs silicon</th><th scope="col">Maturity</th><th scope="col">Hard part</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Reversible / adiabatic</strong></td><td>Never erase bits &rarr; escape the Landauer tax</td><td>~4,000&times; (theoretical)</td><td>Lab / theory</td><td>Practical reversible logic at scale</td></tr>
+        <tr><td><strong>Analog in-memory</strong></td><td><a href="glossary.html#term-memristor">Memristor</a> crossbar does matmul in physics</td><td>~85&times; measured</td><td>Research silicon</td><td>Precision, noise, programming drift</td></tr>
+        <tr><td><strong>Photonic</strong></td><td>Multiply-accumulate with interference of light</td><td>High (workload-specific)</td><td>Startups shipping</td><td>Optical nonlinearity, integration</td></tr>
+        <tr><td><strong>Neuromorphic</strong></td><td>Event-driven spikes; memory + compute fused</td><td>&gt;100&times; on fit tasks</td><td>Research (Loihi&nbsp;2)</td><td>Programming model; training SNNs</td></tr>
+        <tr><td><strong>Thermodynamic</strong></td><td>Harness thermal noise as the computation</td><td>~10,000&times; (claimed)</td><td>Early / simulation</td><td>Unproven at product scale</td></tr>
+        <tr><td><strong>Human brain</strong> (reference)</td><td>~86B neurons, massively parallel, sparse</td><td>~10&#8310;&times; (existence proof)</td><td>Shipping for 300k years</td><td>We cannot build one yet</td></tr>
+      </tbody>
+    </table>
+
+    <figure class="rz-chart" data-rz-chart>
+      <div class="rz-chart-canvas"><canvas></canvas></div>
+      <script type="application/json" class="rz-chart-cfg">
+{"type": "bar", "title": "Efficiency headroom beyond today's silicon (log scale) — proven, frontier, and claimed", "labels": ["Analog in-memory", "Neuromorphic (Loihi 2)", "Reversible", "Thermodynamic", "Human brain"], "series": [{"label": "Efficiency gain vs conventional", "data": [85, 100, 4000, 10000, 1000000], "unit": "x", "colorAccents": ["data", "data", "signal", "alert", "positive"]}], "source": "Memristor ~85x (Science Advances, sciadv.adf7474); Loihi 2 >100x (Intel); reversible ~4000x theoretical (IEEE Spectrum); Extropic DTM ~10,000x simulation-claim; brain ~20W vs ~MW cluster (order-of-magnitude). data/article-28/substrate-efficiency.csv", "basisTag": "representative", "logY": true, "x": "Substrate", "y": "Efficiency gain (x, log)"}
+      </script>
+    </figure>
+
     <h2 id="algorithmic-efficiency">The lever that actually reaches the laptop</h2>
 
     <p>There is a fifth path, and it is the one that quietly wins. The <em>compute needed to reach a given capability</em> keeps falling as algorithms improve. Hernandez &amp; Brown found the compute to hit AlexNet-level accuracy dropped <span class="ws-stat">44&times;</span> between 2012 and 2019 &mdash; a doubling of efficiency every ~16 months, <strong>faster than Moore's Law</strong>. Epoch&nbsp;AI later found that for language models the compute to reach a fixed capability <span class="ws-stat">halves roughly every 8 months</span>. That is the real mechanism by which yesterday's gigawatt capability lands on tomorrow's laptop &mdash; not by cramming a power plant into the case, but by needing far less of it for the same mind.</p>
@@ -925,6 +953,11 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     <h2 id="synthesis">The reframe: capability density</h2>
 
     <p>Put the two walls together and a single idea falls out. <strong>Store the generator, not the data</strong> (Kolmogorov, implicit representations, generative priors): the north star is not a 1-KB file but a small program plus a shared prior that <em>reconstructs</em> what you need. And <strong>exploit physics, not FLOPs</strong> (analog, reversible, neuromorphic): stop paying a Landauer tax you can avoid. The honest metric is neither bytes nor operations. It is <strong>Capability Density</strong> &mdash; usable task-ability per byte and per watt &mdash; and the <strong>Compression Horizon</strong>: for a given body of knowledge, the smallest generator that reproduces its <em>useful capability</em>. Kolmogorov bounds it from below, but for real, redundant knowledge that horizon sits dramatically closer than the raw size suggests.</p>
+
+    <div class="ws-insight-box">
+        <h4><i class="fas fa-ruler-combined" style="color:#6FBF9A;margin-right:0.4rem;"></i>Definition &mdash; Capability Density</h4>
+        <p>The <a href="glossary.html#term-rag">usable</a> task-capability delivered per unit of storage and per unit of power: informally, <strong>CD &asymp; (task capability) / (bytes &times; watts)</strong>. It replaces the two vanity metrics &mdash; raw bytes and raw FLOPs &mdash; that the &ldquo;1&nbsp;KB / 1&nbsp;GW&rdquo; dream fixates on. Every advance above raises CD: distillation and 1.58-bit quantization shrink the bytes; analog, neuromorphic, and algorithmic efficiency shrink the watts. The <strong>Compression Horizon</strong> is CD's ceiling for a given body of knowledge &mdash; the smallest generator that still reproduces its useful capability, bounded below by Kolmogorov but, for real redundant knowledge, dramatically closer than the raw size.</p>
+    </div>
 
     <h2 id="pipeline">From default model to domain genius</h2>
 
@@ -969,6 +1002,32 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
     <p>Concretely: pick the strongest base your RAM allows and quantize it to fit; write a real system prompt; then &mdash; the biggest single lift &mdash; add <a href="glossary.html#term-rag">retrieval-augmented generation</a> so the model answers from <em>your</em> documents instead of hallucinating; give it tools so it can act, not just chat; and only then reach for LoRA fine-tuning (which wants a GPU) to bake in voice and domain reflexes, ideally distilling from a stronger teacher. Retrieval plus tools is where a laptop captures roughly four-fifths of the felt intelligence for a fifth of the work &mdash; no training required.</p>
 
+    <table class="ws-lever-table">
+      <thead><tr><th scope="col">#</th><th scope="col">Stage</th><th scope="col">What it buys</th><th scope="col">Cost</th><th scope="col">ROI</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Base model</td><td>Raw ceiling (qwen2.5 / -coder, biggest that fits RAM)</td><td>download</td><td>Foundation</td></tr>
+        <tr><td>2</td><td>Quantization</td><td>Fit a bigger/faster model on CPU (GGUF Q4/Q5; 1.58-bit frontier)</td><td>one-time</td><td>High</td></tr>
+        <tr><td>3</td><td>Prompt / system</td><td>Steer latent ability you already paid for</td><td>~free</td><td>High, instant</td></tr>
+        <tr class="lever-create"><td>4</td><td><strong>RAG / retrieval</strong></td><td>Answers grounded in <em>your</em> docs; kills hallucination; updates with no retraining</td><td>modest</td><td><strong>Highest</strong></td></tr>
+        <tr class="lever-create"><td>5</td><td><strong>Tools + agent</strong></td><td>Read/write files, run code &rarr; a coding agent that <em>acts</em></td><td>medium</td><td><strong>Very high</strong></td></tr>
+        <tr><td>6</td><td>Fine-tune / distill</td><td>Bake in voice + domain reflexes; LoRA (GPU); distill from a stronger teacher</td><td>GPU-bound</td><td>Medium</td></tr>
+        <tr><td>7</td><td>Memory / continual</td><td>Learns across sessions via episodic memory + reflection</td><td>modest</td><td>Compounding</td></tr>
+        <tr><td>8</td><td>Orchestrate / verify</td><td>Self-consistency, critic, ensembles &rarr; reliability</td><td>compute</td><td>High</td></tr>
+        <tr><td>9</td><td>Eval loop</td><td>Measure &ldquo;smarter&rdquo; &rarr; drive stages 1&ndash;8</td><td>modest</td><td>Directional</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="recipe">A concrete recipe (what actually works on a laptop)</h3>
+    <p>The pipeline is not abstract. Here is the minimal, no-GPU path &mdash; roughly the stack behind this site's own local tooling:</p>
+    <ol>
+      <li><strong>Runtime + model:</strong> install <a href="glossary.html#term-rag">ollama</a>, then <code>ollama pull qwen2.5</code> (or <code>qwen2.5-coder</code> for code). Ollama is the engine; qwen is one model it serves.</li>
+      <li><strong>Persistent chat:</strong> wrap it so conversations are saved and resumable rather than lost on exit &mdash; the difference between <code>ollama run</code> (ephemeral) and a thin logging wrapper that records each turn.</li>
+      <li><strong>Retrieval (the big lift):</strong> embed your notes/docs with an embedding model (e.g. <code>nomic-embed-text</code>), store the vectors, and at query time fetch the top matches and inject them into the prompt. Now the model answers from <em>your</em> knowledge, not its training-set average.</li>
+      <li><strong>Tools / agent:</strong> expose file-read/write and shell to the model via function-calling and loop: propose &rarr; act &rarr; observe &rarr; repeat. That is what turns a chatbot into a coding agent.</li>
+      <li><strong>Only then</strong> consider LoRA fine-tuning (needs a GPU) to bake in your voice and domain &mdash; ideally on question/answer pairs distilled from a stronger teacher model.</li>
+    </ol>
+    <p>Stages 1&ndash;4 need <strong>zero training</strong> and run on a CPU-only machine. In practice they deliver the bulk of the felt intelligence: a model that is grounded, current, and able to act on your actual material.</p>
+
     <h2 id="verdict">Myths versus reality</h2>
 
     <table class="ws-lever-table">
@@ -988,6 +1047,31 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     <p>The literal dream lives on the impossible side of that table. But look at what sits on the <em>proven</em> side: the knowledge of a trillion-token corpus at 1.58 bits a weight, a gigawatt-trained mind running on the machine on your desk, and the compute for any given capability halving twice a year. We were never going to shrink the datacenter into the laptop. We are, instead, watching the <em>mind</em> of the datacenter walk in on its own &mdash; and there is real, sober physics telling us how much further it can go.</p>
 
     <p class="ws-closing"><em>The compression horizon is not a wall. It is a coastline we are still mapping &mdash; and every year the tide of capability density comes in a little further.</em></p>
+
+    <h2 id="faq">Frequently asked questions</h2>
+    <div class="ws-insight-box">
+        <h4>Can you really compress 300&nbsp;TB of data to 1&nbsp;KB?</h4>
+        <p>Not arbitrary data &mdash; Shannon and <a href="glossary.html#term-kolmogorov-complexity">Kolmogorov complexity</a> forbid it. But the <em>capability</em> learned from a corpus compresses enormously: a ~60&nbsp;TB corpus becomes ~14&nbsp;GB of usable model at 1.58 bits per weight, which is a ~4,000&times; collapse of ability into space.</p>
+    </div>
+    <div class="ws-insight-box">
+        <h4>Can a laptop equal a 1&nbsp;GW datacenter?</h4>
+        <p>Not in raw FLOPs &mdash; <a href="glossary.html#term-memristor">Landauer's principle</a> and the power budget forbid it. But <em>inference is far cheaper than training</em>, so a laptop can run a capability that a gigawatt cluster trained; and algorithmic efficiency keeps halving the compute a given capability needs (~every 8 months for LLMs).</p>
+    </div>
+    <div class="ws-insight-box">
+        <h4>How do I make my local AI genuinely smart?</h4>
+        <p>Strong base model &rarr; quantize to fit &rarr; a good system prompt &rarr; then the two highest-ROI stages: <a href="glossary.html#term-rag">retrieval-augmented generation</a> over your own data, and tool/agent loops. Fine-tuning (LoRA) comes last and wants a GPU. Stages 1&ndash;4 need no training at all.</p>
+    </div>
+
+    <h2 id="sources">Sources &amp; further reading</h2>
+    <ul class="ws-sources">
+      <li>Shu Yang et al., <em>The Era of 1-bit LLMs (BitNet b1.58)</em>, 2024 &mdash; arXiv:2402.17764</li>
+      <li>Danny Hernandez &amp; Tom Brown, <em>Measuring the Algorithmic Efficiency of Neural Networks</em>, 2020 &mdash; arXiv:2005.04305; Epoch&nbsp;AI, <em>Algorithmic progress in language models</em>, 2024</li>
+      <li>Emilien Dupont et al., <em>COIN: Compression with Implicit Neural Representations</em>, 2021 &mdash; arXiv:2103.03123</li>
+      <li>Kleyko et al., <em>A Survey on Hyperdimensional Computing / VSA</em>, 2021 &mdash; arXiv:2111.06077 (Kanerva 2009)</li>
+      <li>Kusupati et al., <em>Matryoshka Representation Learning</em>, NeurIPS 2022</li>
+      <li>B&eacute;rut, Lutz et al., <em>Experimental verification of Landauer's principle</em>, Nature 2012; IEEE Spectrum, <em>Reversible Computing</em></li>
+      <li>Intel, <em>Loihi&nbsp;2 / Hala Point</em> neuromorphic; Extropic &amp; Normal Computing, thermodynamic computing (early)</li>
+    </ul>
 
 </article>
 

@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.112.1 — 2026-07-22 (Article 28 deepened — more detail + comprehensiveness)
+
+### Changed
+- Expanded `article-28.html` substantially: **+2 sourced charts** (the ~60 TB corpus → ~14 GB capability cascade on a log scale; efficiency headroom of analog/neuromorphic/reversible/thermodynamic/brain substrates), **+2 tables** (a substrate comparison matrix and the full 9-stage local-AI pipeline), a **Capability Density formula** callout, a **concrete no-GPU recipe** (ollama + qwen + persistent chat + RAG + tools, mapping to the site's own local stack), an in-body **FAQ**, and a **Sources & further reading** list. Now 4 charts + 3 tables + SVG diagram, ~2,900 words.
+- New datasets `data/article-28/compression-cascade.csv` + `substrate-efficiency.csv` (both provenance-tagged).
+
+### Verified
+- Headless: 4 charts all render, 0 console errors; article-charts provenance + dark-coverage + script-tags gates CLEAN.
+
 ## v1.112.0 — 2026-07-22 (Article 28: "The Compression Horizon")
 
 ### Added
