@@ -195,6 +195,11 @@
         // Hosts for other tabs
         panelDetailed.appendChild(el('div', { id: 'ltcDetailedHost' }));
         panelFlow.appendChild(el('div', { id: 'ltcFlowHost' }));
+        // Sensitivity TORNADO (two-directional, engine-computed) — comprehensiveness add
+        var tornadoCard = el('div', { className: 'ltc-overview-card ltc-tornado-card' });
+        tornadoCard.innerHTML = '<div class="ltc-overview-label">● SENSITIVITY TORNADO <span class="ltc-muted">— ΔPUE for ±1 step per input (engine-computed)</span></div>' +
+            '<div id="ltcTornado" class="ltc-tornado"></div>';
+        panelCharts.appendChild(tornadoCard);
         panelCharts.appendChild(el('div', { id: 'ltcChartsHost' }));
         panelReport.appendChild(el('div', { id: 'ltcReportHost' }));
 
@@ -645,6 +650,7 @@
         renderCompliance(model);
         renderDesignStatus(model);
         renderSensitivity(model);
+        renderTornado(model);
         renderScenarioInfo(model);
         renderResultsTab(model);
     }
@@ -869,6 +875,44 @@
     // ════════════════════════════════════════════════════════
     // renderScenarioInfo
     // ════════════════════════════════════════════════════════
+    // Two-directional sensitivity tornado — perturbs each engine impactParam
+    // ±1 step through models.ltc.compute (single source; no hardcoded deltas).
+    function renderTornado(model) {
+        var host = document.getElementById('ltcTornado');
+        if (!host || !model || !model.input) return;
+        var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.ltc;
+        var data = window.RZEngine && window.RZEngine.data;
+        if (!eng || typeof eng.compute !== 'function' || !data || !data.ltcCalibration || !data.ltcCalibration.impactParams) {
+            host.innerHTML = '<div class="ltc-muted" style="padding:10px">Engine unavailable — tornado needs RZEngine.models.ltc.</div>';
+            return;
+        }
+        var base = model.pue;
+        function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
+        var rows = data.ltcCalibration.impactParams.map(function (cfg) {
+            var lo = Object.assign({}, model.input); lo[cfg.key] = clamp((lo[cfg.key] || 0) - cfg.step, cfg.min, cfg.max);
+            var hi = Object.assign({}, model.input); hi[cfg.key] = clamp((hi[cfg.key] || 0) + cfg.step, cfg.min, cfg.max);
+            var dLow = eng.compute(lo).pue - base;
+            var dHigh = eng.compute(hi).pue - base;
+            return { label: cfg.label, dLow: dLow, dHigh: dHigh, range: Math.abs(dHigh - dLow) };
+        }).filter(function (r) { return r.range > 1e-9; })
+          .sort(function (a, b) { return b.range - a.range; })
+          .slice(0, 8);
+        var maxAbs = rows.reduce(function (m, r) { return Math.max(m, Math.abs(r.dLow), Math.abs(r.dHigh)); }, 1e-6);
+        host.innerHTML = rows.map(function (r) {
+            var lo = Math.min(r.dLow, r.dHigh), hi = Math.max(r.dLow, r.dHigh);
+            var leftPct = (lo + maxAbs) / (2 * maxAbs) * 100;
+            var widthPct = (hi - lo) / (2 * maxAbs) * 100;
+            return '<div class="ltc-tor-row">' +
+                '<span class="ltc-tor-lbl">' + r.label + '</span>' +
+                '<span class="ltc-tor-track">' +
+                    '<span class="ltc-tor-zero"></span>' +
+                    '<span class="ltc-tor-bar" style="left:' + leftPct.toFixed(1) + '%;width:' + Math.max(widthPct, 0.6).toFixed(1) + '%"></span>' +
+                '</span>' +
+                '<span class="ltc-tor-val">' + (hi >= 0 ? '+' : '') + hi.toFixed(3) + ' / ' + (lo >= 0 ? '+' : '') + lo.toFixed(3) + '</span>' +
+                '</div>';
+        }).join('') || '<div class="ltc-muted" style="padding:10px">No sensitivity range at current inputs.</div>';
+    }
+
     function renderScenarioInfo(model) {
         var host = document.getElementById('ltcScenarioList');
         if (!host) return;

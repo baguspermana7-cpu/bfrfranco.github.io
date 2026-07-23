@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.11 — 2026-07-23 (LTC — sensitivity tornado in CHARTS, engine-computed)
+
+### Added
+- **Two-directional sensitivity TORNADO** in the CHARTS tab (`renderTornado`). For each of the engine's `DATA.ltcCalibration.impactParams` it perturbs the input −1 and +1 step through `window.RZEngine.models.ltc.compute` and draws a horizontal bar spanning ΔPUE(low)…ΔPUE(high) on a zero-centered axis (top-8 by range, blue→red). Fully engine-computed — no hardcoded deltas; wired to the same single source as the right-rail sensitivity. Both themes; responsive.
+
 ## v1.115.10 — 2026-07-23 (Shared engine data crawl: coolants/CDU vendors, refrigerants, electricity+water tariffs, lead times)
 
 ### Added

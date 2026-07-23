@@ -1269,3 +1269,15 @@ body.ltc-revamp .ltc-range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4
     body.ltc-revamp.ltc-booting .ltc-overview-card,
     body.ltc-revamp.ltc-booting .ltc-rail-card { animation: none; }
 }
+
+/* ── Sensitivity tornado (two-directional, engine-computed) ─────────────── */
+body.ltc-revamp .ltc-tornado { margin-top: 10px; display: flex; flex-direction: column; gap: 9px; }
+body.ltc-revamp .ltc-tor-row { display: grid; grid-template-columns: 160px 1fr 128px; align-items: center; gap: 10px; }
+body.ltc-revamp .ltc-tor-lbl { font-size: 12px; color: var(--ltc-text); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.ltc-revamp .ltc-tor-track { position: relative; height: 16px; background: var(--ltc-tile-bg); border-radius: 4px; }
+body.ltc-revamp .ltc-tor-zero { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--ltc-muted); opacity: .5; }
+body.ltc-revamp .ltc-tor-bar { position: absolute; top: 2px; bottom: 2px; border-radius: 3px;
+    background: linear-gradient(90deg, var(--ltc-pipe-supply), var(--ltc-pipe-return)); transition: left .3s ease, width .3s ease; }
+body.ltc-revamp .ltc-tor-val { font-size: 11px; color: var(--ltc-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+body.ltc-revamp .ltc-tornado-card { margin-bottom: 12px; }
+@media (max-width: 640px) { body.ltc-revamp .ltc-tor-row { grid-template-columns: 96px 1fr; } body.ltc-revamp .ltc-tor-val { display: none; } }
