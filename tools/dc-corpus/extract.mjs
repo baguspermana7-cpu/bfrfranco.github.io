@@ -36,6 +36,24 @@ const PATTERNS = [
      * 100kW", "rack density above 50 kW". Number sits right after a rack + magnitude cue; the small
      * cue-word set (exceed/above/over/to/require/…) keeps it from grabbing unrelated kW figures. */
     { metric: 'rack_power_kw', unit: 'kW/rack', re: /rack[a-z ]{0,20}?(?:densit[a-z]+ )?(?:to |of |exceed[a-z]* |above |over |up to |require[a-z]* |around |about )?(\d{2,3})\s?kW\b/gi, min: 5, max: 400 },
+    /* Spares corpus (2026-07-23) — SPARE-PARTS reliability / lead-time / obsolescence.
+     * Each pattern requires its own metric token nearby (MTBF / MTTR / lead-time /
+     * EOL-LTB) so it never grabs an unrelated number — mirrors the rack_power_kw
+     * negation-guard style. Bands drop junk; the gate has positive+negative unit tests. */
+    /* mtbf_hours — MTBF token then a ≥4-digit hour figure. Guarded: the "hours"/"hrs"
+     * unit MUST follow, so it won't grab "MTBF of 250,000" without a unit, nor a $/year. */
+    { metric: 'mtbf_hours', unit: 'hours', re: /(?:MTBF|mean time between failures?)[^.\n]{0,70}?(\d{1,3}(?:,\d{3})+|\d{4,7})\s*(?:hours?|hrs?)\b/gi, min: 1000, max: 2000000 },
+    /* mttr_hours — MTTR/mean-time-to-repair token then N hours (small integers/decimals). */
+    { metric: 'mttr_hours', unit: 'hours', re: /(?:MTTR|mean time to (?:repair|recover(?:y)?))[^.\n]{0,70}?(\d{1,3}(?:\.\d)?)\s*hours?\b/gi, min: 1, max: 200 },
+    /* lead_time_weeks — a lead-time/delivery/procurement/backlog cue then N weeks (guard: the
+     * cue must be within 45 chars BEFORE the figure), OR N weeks then a lead-time cue after.
+     * Negative guard: bare "3 weeks after commissioning" has no cue → dropped. */
+    { metric: 'lead_time_weeks', unit: 'weeks', re: /(?:lead[- ]?time|delivery|procurement|backlog|quote)[^.\n]{0,45}?\b(\d{2,3})(?:[\s–-]{1,4}(?:to|–|-)?\s?\d{1,3})?\s*weeks?\b/gi, min: 4, max: 260 },
+    { metric: 'lead_time_weeks', unit: 'weeks', re: /\b(\d{2,3})(?:[\s–-]{1,4}(?:to|–|-)?\s?\d{1,3})?\s*weeks?\b[^.\n]{0,35}?(?:lead[- ]?time|delivery|to deliver)/gi, min: 4, max: 260 },
+    /* obsolescence_months — an EOL / last-time-buy / discontinuation / JEDEC cue then N months.
+     * Negative guard: a plain "18 months" (e.g. "tech shifts every 6–18 months") has no
+     * obsolescence cue in the 60-char lookbehind window → dropped. */
+    { metric: 'obsolescence_months', unit: 'months', re: /(?:last[- ]?time[- ]?buy|last[- ]?time[- ]?ship|\bLTB\b|\bLTS\b|end[- ]?of[- ]?life|\bEOL\b|obsolescen|discontinu|product (?:change|discontinu)|\bPCN\b|\bPDN\b|final[- ]?order|JEDEC)[^.\n]{0,60}?\b(\d{1,2})(?:[\s–-]{1,4}(?:to|–|-)?\s?\d{1,2})?\s*months?\b/gi, min: 3, max: 36 },
 ];
 
 const yearRe = /\b(20[12]\d)\b/;

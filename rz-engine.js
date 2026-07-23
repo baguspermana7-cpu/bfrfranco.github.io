@@ -6573,6 +6573,20 @@
                                         "LBNL DC Water 2021"
                                 ],
                                 "sources": 6
+                        },
+                        "spares": {
+                                "n": 4,
+                                "unit": "MW",
+                                "p10": 50,
+                                "p25": 50,
+                                "p50": 60,
+                                "p75": 100,
+                                "p90": 100,
+                                "companies": [
+                                        "DC Atlas Supply Lead Times",
+                                        "iRecruit DC Schedule Risks"
+                                ],
+                                "sources": 2
                         }
                 },
                 "construction_months": {
@@ -6589,6 +6603,21 @@
                                         "EIAR Vantage DUB11"
                                 ],
                                 "sources": 2
+                        },
+                        "spares": {
+                                "n": 3,
+                                "unit": "months",
+                                "p10": 18,
+                                "p25": 18,
+                                "p50": 18,
+                                "p75": 48,
+                                "p90": 48,
+                                "companies": [
+                                        "Build Transformer Procurement 2026",
+                                        "DC Atlas Supply Lead Times",
+                                        "iRecruit DC Schedule Risks"
+                                ],
+                                "sources": 3
                         }
                 },
                 "energy_gwh": {
@@ -6697,6 +6726,57 @@
                                         "LBNL DC 2024"
                                 ],
                                 "sources": 2
+                        }
+                },
+                "lead_time_weeks": {
+                        "spares": {
+                                "n": 12,
+                                "unit": "weeks",
+                                "p10": 16,
+                                "p25": 20,
+                                "p50": 30,
+                                "p75": 52,
+                                "p90": 52,
+                                "companies": [
+                                        "Build Transformer Procurement 2026",
+                                        "DC Atlas Supply Lead Times",
+                                        "iRecruit DC Schedule Risks"
+                                ],
+                                "sources": 3
+                        }
+                },
+                "mtbf_hours": {
+                        "spares": {
+                                "n": 5,
+                                "unit": "hours",
+                                "p10": 2800,
+                                "p25": 3000,
+                                "p50": 4800,
+                                "p75": 5000,
+                                "p90": 250000,
+                                "companies": [
+                                        "Future-tech MTBF DC",
+                                        "Oxmaint FM Reliability",
+                                        "Riello UPS MTBF"
+                                ],
+                                "sources": 3
+                        }
+                },
+                "obsolescence_months": {
+                        "spares": {
+                                "n": 6,
+                                "unit": "months",
+                                "p10": 4,
+                                "p25": 6,
+                                "p50": 8,
+                                "p75": 12,
+                                "p90": 12,
+                                "companies": [
+                                        "EOLManager Lifecycle",
+                                        "QueenEMS EOL PCB",
+                                        "Utmel EOL Playbook"
+                                ],
+                                "sources": 3
                         }
                 },
                 "pue": {
@@ -7340,6 +7420,19 @@
                 crah_ec_fan_kit:      { low: 8000,  mid: 15000,  high: 20000,  unit: 'per EC/VFD fan retrofit kit installed' },
                 pdu_breaker_mccb:     { low: 1000,  mid: 2500,   high: 5000,   unit: 'per DC-grade MCCB breaker' },
                 air_filter_set_g4:    { low: 1500,  mid: 2500,   high: 4000,   unit: 'per CRAH/PAC filter set-year' }
+            },
+            /* Corpus-backed SANITY BANDS (2026-07-23) — descriptive p10/p50/p90 pulled
+             * live from DATA.benchmarksCorpus (tools/dc-corpus, provenance-mandatory:
+             * every underlying fact carries source_url + verbatim quote). These are
+             * ADDITIONAL sourced context for the spares newsvendor's reliability /
+             * lead-time / obsolescence inputs — NOT a replacement for the golden
+             * DATA.reliability + sparesCatalog + classes values above. A consumer may
+             * cross-check its screening inputs against band = benchmarksCorpus[metric].spares.
+             * Only bands with a real distribution (n≥3) are referenced. */
+            corpusBands: {
+                mtbf_hours:          { ref: 'benchmarksCorpus.mtbf_hours.spares',          note: 'component MTBF (hours) — IEEE-493/OEM screening figures' },
+                lead_time_weeks:     { ref: 'benchmarksCorpus.lead_time_weeks.spares',     note: 'DC equipment / spare procurement lead time (weeks)' },
+                obsolescence_months: { ref: 'benchmarksCorpus.obsolescence_months.spares', note: 'EOL / last-time-buy window (months) — JEDEC J-STD-048 + industry' }
             }
         },
         /* ══ v2.5.3 — DATA.sparesCatalog: COMPACT per-commodity aggregate of the
@@ -8025,6 +8118,9 @@
             'techDebt':               { source: 'Article-5 technical-debt risk model: criticality weights 10/5/1, Weibull screening (beta 2.5 base, eta 60 months, facility-age adjustments), 15%/yr risk growth, 8% discount, escalation 1+(age/24)x0.5, inaction 30% factor, SLA 0.1% revenue factor, insurance bands 1-8% by risk score', asOf: '2026', method: 'hazard-weighted composite scaled to 100; Lanczos gamma for MTTF; screening-grade' },
             'rcaScore':               { source: 'Article-6 RCA program effectiveness rubric: completion 20% + implementation 25% + recurrence 20% + time-to-close 15% (90-day target) + design-authority involvement 10% + verification 10%', asOf: '2026', method: 'weighted 6-component composite 0-100' },
             'benchmarksCorpus':       { source: 'DC public-data corpus (tools/dc-corpus): operator/hyperscaler sustainability & annual reports + research bodies — every fact carries source_url + verbatim quote; distributions p10-p90 per metric x segment', asOf: '2026-07-19', method: 'markitdown ingestion + heuristic extraction + percentile aggregation; regenerate via the corpus pipeline (append-only)' },
+            'sparesPricing.corpusBands.mtbf_hours':          { source: 'DC spares corpus (tools/dc-corpus segment=spares): component MTBF (hours) — Riello UPS reliability page (online-UPS ~250,000 h), Oxmaint facility-management MTBF/MTTR benchmarks (chiller/generator run-hour figures), Future-tech DC MTBF primer; screening-grade, IEEE-493-lineage; every fact carries source_url + verbatim quote', asOf: '2026-07-23', unit: 'hours', method: 'corpus pipeline p10-p90 → benchmarksCorpus.mtbf_hours.spares; descriptive sanity band, NOT a replacement for DATA.reliability golden MTBF' },
+            'sparesPricing.corpusBands.lead_time_weeks':     { source: 'DC spares corpus (tools/dc-corpus segment=spares): DC equipment / spare-parts procurement lead time (weeks) — iRecruit DC schedule-risks, DC Atlas supply-chain lead-times (Wood Mackenzie Q2-2025: transformers ~128 wk; generators, switchgear, chillers, UPS, fiber), Build transformer-procurement 2026; every fact carries source_url + verbatim quote', asOf: '2026-07-23', unit: 'weeks', method: 'corpus pipeline p10-p90 → benchmarksCorpus.lead_time_weeks.spares; distinct from prior LTC lead-time crawl; descriptive sanity band' },
+            'sparesPricing.corpusBands.obsolescence_months': { source: 'DC spares corpus (tools/dc-corpus segment=spares): component obsolescence / last-time-buy window (months) — Utmel (JEDEC J-STD-048: 6-month LTB, 12-month LTS), QueenEMS EOL-in-PCB (6-12 month notice), EOLManager lifecycle; every fact carries source_url + verbatim quote', asOf: '2026-07-23', unit: 'months', method: 'corpus pipeline p10-p90 → benchmarksCorpus.obsolescence_months.spares; descriptive sanity band' },
             'opsMaturity':            { source: 'Article-1 ops-maturity assessment: 8 weighted dimensions (weights sum 1.0, expert screening), 5 maturity levels (Reactive..Generative); risk translation basis Uptime Institute 2024 Annual Outage Analysis (>55% outages ops/human factors, ~$200K median outage cost, 2.5 outages/yr low-maturity screening base)', asOf: '2026', method: 'weighted 1-5 composite scaled 0-100; risk factor max(0.05, 1-score/120) — screening-grade' },
             'alarmMgmt':              { source: 'ISA-18.2 / EEMUA-191 alarm-management targets: avg rate <=1 alarm/10 min per operator, flood >=10 alarms/10 min, actionable >=85%; cognitive-load knee at 70% utilization (human-factors literature); Erlang-C standard queueing formula', asOf: '2026', method: 'Poisson flood probability via the shared Acklam/Poisson kernel (models.spares.poissonCdf); composite = rate 50% + flood 30% + actionable 20% (article-2 rubric)' },
             'maintCompliance':        { source: 'Article-3 maintenance-compliance capacity model: friction factors (High .55/Med .70/Low .85 productive-time share), CMMS maturity multipliers (.70-.100), evidence multipliers (.85-.98), backlog aging weight (0.3 + 0.02/month, cap 0.5) — industry screening estimates', asOf: '2026', method: 'compliance = min(100, capacity/demand*100) x cmms x evidence; deterministic (page-side Monte Carlo stays page-side)' },

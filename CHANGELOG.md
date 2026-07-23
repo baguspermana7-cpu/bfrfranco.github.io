@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.15 — 2026-07-23 (Spares KB — deep-research crawl-enrich into the shared engine)
+
+### Added
+- **Spares knowledge base enriched with real, sourced facts** via the provenance-mandatory `dc-corpus` pipeline (every fact carries a source URL + verbatim quote or it's rejected — nothing fabricated). New sources appended to `tools/dc-corpus/sources.yaml` (segment `spares`): OEM/FM reliability (Riello UPS ~250,000 h MTBF, Oxmaint, IEEE-493-lineage), procurement lead-times (DC Atlas / Wood Mackenzie Q2-2025 — transformers ~128 wk, gensets/switchgear/chillers/UPS), and obsolescence/DMSMS (JEDEC J-STD-048 6-mo LTB / 12-mo LTS). New negation-guarded extract patterns (`mtbf_hours`, `mttr_hours`, `lead_time_weeks`, `obsolescence_months`) in `extract.mjs`. **25 spares facts** aggregated into 3 monotonic multi-source distributions in the engine `@@CORPUS` block: lead-time p10/p50/p90 = 16/30/52 wk, MTBF = 2.8k/4.8k/250k h, obsolescence = 4/8/12 mo. Wired as `DATA.sparesPricing.corpusBands` — **additional sourced sanity bands, NOT replacing** the golden `reliability`/`sparesCatalog`/`classes` values — with `DATA.sources` provenance (asOf 2026-07-23). Shared engine → benefits the spares calculator + DCMOC. Gates: test-dc-corpus 2847/0, test-rz-engine 747/0, value-bindings 85/0, calibration 19/0, min reproducible; `rz-engine.min.js?v` → `2026-07-23-sp`. Unfetchable sources (403/404/429) were dropped, `mttr` kept below the distribution floor rather than fabricated.
+
 ## v1.115.14 — 2026-07-23 (DCMOC Architecture diagram — hover intuitiveness + polish)
 
 ### Changed

@@ -4,7 +4,7 @@
  "dataVersion": "2.5.1",
  "modelCount": 53,
  "functionCount": 224,
- "sourceCount": 138,
+ "sourceCount": 141,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -2723,6 +2723,24 @@
    "source": "SCREENING list-price bands — Schneider/APC Galaxy VS 50kW module class, criticalpowerbatterysolutions.com VRLA string TCO 2026 (~$10K/string), Schneider CRAH VFD retrofit kit ~$15K installed, OnPoint/secondwatt genset maintenance guides 2026, industrial MCCB distributor ranges",
    "asOf": "2026-07",
    "method": "public list/retrofit price synthesis per class"
+  },
+  {
+   "key": "sparesPricing.corpusBands.lead_time_weeks",
+   "source": "DC spares corpus (tools/dc-corpus segment=spares): DC equipment / spare-parts procurement lead time (weeks) — iRecruit DC schedule-risks, DC Atlas supply-chain lead-times (Wood Mackenzie Q2-2025: transformers ~128 wk; generators, switchgear, chillers, UPS, fiber), Build transformer-procurement 2026; every fact carries source_url + verbatim quote",
+   "asOf": "2026-07-23",
+   "method": "corpus pipeline p10-p90 → benchmarksCorpus.lead_time_weeks.spares; distinct from prior LTC lead-time crawl; descriptive sanity band"
+  },
+  {
+   "key": "sparesPricing.corpusBands.mtbf_hours",
+   "source": "DC spares corpus (tools/dc-corpus segment=spares): component MTBF (hours) — Riello UPS reliability page (online-UPS ~250,000 h), Oxmaint facility-management MTBF/MTTR benchmarks (chiller/generator run-hour figures), Future-tech DC MTBF primer; screening-grade, IEEE-493-lineage; every fact carries source_url + verbatim quote",
+   "asOf": "2026-07-23",
+   "method": "corpus pipeline p10-p90 → benchmarksCorpus.mtbf_hours.spares; descriptive sanity band, NOT a replacement for DATA.reliability golden MTBF"
+  },
+  {
+   "key": "sparesPricing.corpusBands.obsolescence_months",
+   "source": "DC spares corpus (tools/dc-corpus segment=spares): component obsolescence / last-time-buy window (months) — Utmel (JEDEC J-STD-048: 6-month LTB, 12-month LTS), QueenEMS EOL-in-PCB (6-12 month notice), EOLManager lifecycle; every fact carries source_url + verbatim quote",
+   "asOf": "2026-07-23",
+   "method": "corpus pipeline p10-p90 → benchmarksCorpus.obsolescence_months.spares; descriptive sanity band"
   },
   {
    "key": "staffingLoadFactor",
