@@ -1,8 +1,12 @@
 'use client';
 
-/* ─── Dynamic SVG renderer + pan/zoom + legend (Phase C) ─────────────────────
+/* ─── Dynamic SVG renderer + pan/zoom + legend (Phase C + SYM) ───────────────
  * Renders the DiagramModel (layout.ts) — logical & SLD skins of the SAME
- * graph. Pan = drag, zoom = wheel/buttons. No diagram library.
+ * graph. Each node IS an engineering symbol (IEC single-line-diagram style,
+ * palette.tsx → assets/engineering) centred in its cell, with the title/sub as
+ * a label BELOW it — no filled box, just a faint hairline cell so the symbols
+ * read like a real schematic. Group rects are labelled group boxes with an
+ * uppercase header. Pan = drag, zoom = wheel/buttons. No diagram library.
  * ──────────────────────────────────────────────────────────────────────── */
 
 import React from 'react';
@@ -19,12 +23,24 @@ const EDGE_STYLE: Record<EdgeKind, { stroke: string; dash?: string; label: strin
     coolReturn: { stroke: '#14b8a6', dash: '5 4', label: 'Cooling Return' },
 };
 
-const LANE_FILL: Record<DiagBlock['lane'], string> = {
-    power: '#1e293b', gen: '#292018', cooling: '#0f2a2a', it: '#1c2440', bms: '#231c38',
-};
+/* Lane accent colours (logical view). Symbols + labels recolour by lane; in
+ * SLD they render neutral slate. Surfaces prefer CSS vars with a hex fallback
+ * so the diagram follows day/night without hardcoding a single palette. */
 const LANE_STROKE: Record<DiagBlock['lane'], string> = {
     power: '#3b82f6', gen: '#f97316', cooling: '#14b8a6', it: '#7DDDB4', bms: '#22c55e',
 };
+const LANE_FILL: Record<DiagBlock['lane'], string> = {
+    power: '#1e293b', gen: '#292018', cooling: '#0f2a2a', it: '#1c2440', bms: '#231c38',
+};
+
+/* Diagram canvas surfaces — CSS-var-driven with the existing hexes as fallback. */
+const BG = 'var(--rz-base, #0b1020)';
+const CELL_STROKE = 'var(--rz-border, #334155)';
+const LABEL_MAIN = 'var(--rz-text, #e2e8f0)';
+const LABEL_SUB = 'var(--rz-text-dim, #94a3b8)';
+const SLD_NEUTRAL = '#cbd5e1';
+
+const SYMBOL_SIZE = 44;
 
 function anchor(b: DiagBlock, side: 'l' | 'r') {
     return { x: side === 'l' ? b.x : b.x + b.w, y: b.y + b.h / 2 };
@@ -34,8 +50,8 @@ function edgePath(from: DiagBlock, to: DiagBlock, offset = 0): string {
     const a = anchor(from, 'r'); const b = anchor(to, 'l');
     // orthogonal H-V-H; when target is to the LEFT (feedback edge), route below
     if (b.x <= a.x) {
-        const dropY = Math.max(from.y + from.h, to.y + to.h) + 14 + Math.abs(offset);
-        return `M${a.x},${a.y + offset} H${a.x + 8} V${dropY} H${b.x - 8} V${b.y + offset} H${b.x}`;
+        const dropY = Math.max(from.y + from.h, to.y + to.h) + 16 + Math.abs(offset);
+        return `M${a.x},${a.y + offset} H${a.x + 10} V${dropY} H${b.x - 10} V${b.y + offset} H${b.x}`;
     }
     const midX = (a.x + b.x) / 2 + offset;
     return `M${a.x},${a.y + offset} H${midX} V${b.y + offset} H${b.x}`;
@@ -72,41 +88,43 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
                 <button onClick={() => set({ zoom: Math.max(0.5, zoom * 0.85) })} className="rounded bg-slate-800/80 p-1 text-slate-300 hover:text-white"><ZoomOut className="h-3.5 w-3.5" /></button>
                 <button onClick={resetView} className="rounded bg-slate-800/80 p-1 text-slate-300 hover:text-white"><Maximize2 className="h-3.5 w-3.5" /></button>
             </div>
-            <svg viewBox={`${vx} ${vy} ${vw} ${vh}`} className="w-full cursor-grab rounded-xl active:cursor-grabbing" style={{ background: '#0b1020', minHeight: 260 }}
+            <svg viewBox={`${vx} ${vy} ${vw} ${vh}`} className="w-full cursor-grab rounded-xl active:cursor-grabbing" style={{ background: BG, minHeight: 320 }}
                 onWheel={onWheel} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerLeave={onUp}>
                 <g transform={`translate(${panX},${panY}) scale(${zoom})`} style={{ transformOrigin: 'center' }}>
-                    {/* group containment boxes (under everything) — header rendered as a chip */}
+                    {/* labelled group containment boxes (under everything) */}
                     {model.groups?.map((gr, i) => {
-                        const chipW = gr.title.length * 3.6 + 12;
+                        const accent = LANE_STROKE[gr.lane];
                         return (
                             <g key={'grp' + i}>
-                                <rect x={gr.x} y={gr.y} width={gr.w} height={gr.h} rx={6}
-                                    fill={sld ? 'none' : LANE_FILL[gr.lane]} fillOpacity={sld ? 0 : 0.25}
-                                    stroke={LANE_STROKE[gr.lane]} strokeWidth={0.6} strokeDasharray="5 4" opacity={0.7}>
+                                <rect x={gr.x} y={gr.y} width={gr.w} height={gr.h} rx={8}
+                                    fill={sld ? 'none' : LANE_FILL[gr.lane]} fillOpacity={sld ? 0 : 0.14}
+                                    stroke={accent} strokeWidth={0.9} strokeDasharray="6 4" opacity={0.75}>
                                     <title>{gr.title}</title>
                                 </rect>
-                                <rect x={gr.x + 4} y={gr.y - 5} width={chipW} height={11} rx={5.5}
-                                    fill="#0b1020" stroke={LANE_STROKE[gr.lane]} strokeWidth={0.6} opacity={0.95} />
-                                <text x={gr.x + 10} y={gr.y + 3} fontSize="6.5" fontWeight={700} letterSpacing="0.8"
-                                    fill={LANE_STROKE[gr.lane]}>{gr.title}</text>
+                                {/* uppercase header on the group top edge */}
+                                <text x={gr.x + 12} y={gr.y - 4} fontSize="8" fontWeight={800} letterSpacing="1.1"
+                                    fill={accent} style={{ textTransform: 'uppercase' }}>{gr.title}</text>
                             </g>
                         );
                     })}
-                    {/* A/B bus bars — emphasized: end junction dots + tap points */}
-                    {model.buses?.map((b, i) => (
-                        <g key={'bus' + i}>
-                            <line x1={b.x1} y1={b.y} x2={b.x2} y2={b.y}
-                                stroke={b.spare ? '#f97316' : '#3b82f6'} strokeWidth={b.spare ? 1.8 : 3}
-                                strokeDasharray={b.spare ? '4 3' : undefined} opacity={0.95} strokeLinecap="round">
-                                <title>{b.label} — {b.spare ? 'spare trunk (2N+1)' : 'main distribution bus'}</title>
-                            </line>
-                            <circle cx={b.x1} cy={b.y} r={2.1} fill={b.spare ? '#f97316' : '#3b82f6'} />
-                            <circle cx={b.x2} cy={b.y} r={2.1} fill={b.spare ? '#f97316' : '#3b82f6'} />
-                            <circle cx={(b.x1 + b.x2) / 2} cy={b.y} r={1.4} fill="#0b1020" stroke={b.spare ? '#fb923c' : '#60a5fa'} strokeWidth={0.7} />
-                            <text x={(b.x1 + b.x2) / 2} y={b.y - 4} fontSize="5.5" fontWeight={700} textAnchor="middle"
-                                fill={b.spare ? '#fb923c' : '#60a5fa'}>{b.label}</text>
-                        </g>
-                    ))}
+                    {/* A/B bus bars — thick busbar with junction + tap dots + voltage label */}
+                    {model.buses?.map((b, i) => {
+                        const c = b.spare ? '#f97316' : '#3b82f6';
+                        return (
+                            <g key={'bus' + i}>
+                                <line x1={b.x1} y1={b.y} x2={b.x2} y2={b.y}
+                                    stroke={c} strokeWidth={b.spare ? 2 : 3.4}
+                                    strokeDasharray={b.spare ? '4 3' : undefined} opacity={0.95} strokeLinecap="round">
+                                    <title>{b.label} — {b.spare ? 'spare trunk (2N+1)' : 'main distribution bus'}</title>
+                                </line>
+                                <circle cx={b.x1} cy={b.y} r={2.4} fill={c} />
+                                <circle cx={b.x2} cy={b.y} r={2.4} fill={c} />
+                                <circle cx={(b.x1 + b.x2) / 2} cy={b.y} r={1.6} fill={BG} stroke={b.spare ? '#fb923c' : '#60a5fa'} strokeWidth={0.8} />
+                                <text x={(b.x1 + b.x2) / 2} y={b.y - 5} fontSize="6.5" fontWeight={700} textAnchor="middle"
+                                    fill={b.spare ? '#fb923c' : '#60a5fa'}>{b.label}</text>
+                            </g>
+                        );
+                    })}
                     {/* edges under blocks */}
                     {model.edges.map((e: DiagEdge, i) => {
                         const from = byId[e.from]; const to = byId[e.to];
@@ -116,41 +134,43 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
                         if (hidden) return null;
                         return <path key={i} d={edgePath(from, to, e.offset ?? 0)} fill="none"
                             stroke={sld ? (e.kind === 'backup' ? '#f97316' : '#94a3b8') : s.stroke}
-                            strokeWidth={sld ? 1.4 : 1.6} strokeDasharray={s.dash} opacity={0.9} />;
+                            strokeWidth={sld ? 1.4 : 1.6} strokeDasharray={s.dash} opacity={0.85} />;
                     })}
+                    {/* NODES: the engineering symbol IS the node, label BELOW it */}
                     {model.blocks.map((b) => {
                         const hidden = sld && (b.lane === 'cooling' || b.lane === 'bms');
                         if (hidden) return null;
-                        const hasGlyph = !!b.kind;
-                        const tx = hasGlyph ? b.x + 28 : b.x + 8;
+                        const accent = sld ? SLD_NEUTRAL : LANE_STROKE[b.lane];
+                        const cx = b.x + b.w / 2;
+                        // symbol occupies the upper part of the cell, labels below it
+                        const symTop = b.y + 6;
+                        const labelY = symTop + SYMBOL_SIZE + 11;
                         return (
                             <g key={b.id}>
-                                <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={sld ? 2 : 8}
-                                    fill={sld ? '#0f172a' : LANE_FILL[b.lane]} stroke={sld ? '#94a3b8' : LANE_STROKE[b.lane]} strokeWidth={1}>
+                                {/* faint hittable cell — no fill, hairline only */}
+                                <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={6}
+                                    fill="transparent" stroke={CELL_STROKE} strokeWidth={0.7} strokeOpacity={0.5}>
                                     <title>{b.hover ?? `${b.title}${b.sub ? ` — ${b.sub}` : ''}`}</title>
                                 </rect>
                                 {b.kind && (
-                                    <SymbolGlyph kind={b.kind} x={b.x + 4} y={b.y + (b.h - 22) / 2} s={22}
-                                        color={sld ? '#cbd5e1' : LANE_STROKE[b.lane]} sld={sld} />
+                                    <SymbolGlyph kind={b.kind} x={cx - SYMBOL_SIZE / 2} y={symTop} s={SYMBOL_SIZE} color={accent} sld={sld} />
                                 )}
-                                <text x={tx} y={b.y + 16} fontSize="9" fontWeight={700} fill="#e2e8f0">{b.title}</text>
-                                {b.sub && <text x={tx} y={b.y + 28} fontSize="7.5" fill="#94a3b8">{b.sub}</text>}
+                                {/* real unit count badge (×N) when a stage aggregates many units */}
+                                {b.units != null && b.units > 1 && (
+                                    <g>
+                                        <rect x={b.x + b.w - 26} y={b.y + 5} width={22} height={13} rx={6}
+                                            fill={BG} stroke={accent} strokeWidth={0.7} opacity={0.95} />
+                                        <text x={b.x + b.w - 15} y={b.y + 14.5} fontSize="8" fontWeight={700} textAnchor="middle" fill={accent}>×{b.units}</text>
+                                    </g>
+                                )}
+                                {/* label below the symbol */}
+                                <text x={cx} y={labelY} fontSize="9.5" fontWeight={700} textAnchor="middle" fill={LABEL_MAIN}>{b.title}</text>
+                                {b.sub && <text x={cx} y={labelY + 11} fontSize="7.5" textAnchor="middle" fill={LABEL_SUB}>{b.sub}</text>}
                                 {b.badge && (
                                     <>
-                                        <rect x={b.x + b.w - 34} y={b.y + 4} width={30} height={11} rx={5} fill="#7DDDB422" stroke="#7DDDB4" strokeWidth={0.5} />
-                                        <text x={b.x + b.w - 19} y={b.y + 12.5} fontSize="6.5" textAnchor="middle" fill="#c4b5fd">{b.badge}</text>
+                                        <rect x={cx - 20} y={b.y + b.h - 13} width={40} height={11} rx={5.5} fill="#7DDDB422" stroke="#7DDDB4" strokeWidth={0.5} />
+                                        <text x={cx} y={b.y + b.h - 4.5} fontSize="6.5" textAnchor="middle" fill="#a7f3d0">{b.badge}</text>
                                     </>
-                                )}
-                                {/* stacked-unit cascade: offset repeated outlines + ×N when real count exceeds the drawn glyphs */}
-                                {b.glyphs != null && Array.from({ length: b.glyphs }, (_, gi) => (
-                                    sld
-                                        ? <circle key={gi} cx={b.x + 12 + gi * 11} cy={b.y + b.h - 9} r={3.4} fill="none" stroke="#cbd5e1" strokeWidth={0.8} />
-                                        : <rect key={gi} x={b.x + 8 + gi * 10} y={b.y + b.h - 13 - gi * 1.2} width={9} height={9} rx={1.5}
-                                            fill={LANE_FILL[b.lane]} stroke={LANE_STROKE[b.lane]} strokeWidth={0.8} opacity={0.9} />
-                                ))}
-                                {b.units != null && b.glyphs != null && b.units > b.glyphs && (
-                                    <text x={b.x + 12 + b.glyphs * (sld ? 11 : 10)} y={b.y + b.h - 6.5} fontSize="7" fontWeight={700}
-                                        fill={sld ? '#cbd5e1' : LANE_STROKE[b.lane]}>×{b.units}</text>
                                 )}
                             </g>
                         );

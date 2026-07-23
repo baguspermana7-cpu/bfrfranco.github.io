@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.9 — 2026-07-23 (DCMOC Architecture diagram — blocks → proper engineering standard symbols)
+
+### Changed
+- **DCMOC Architecture-Engine single-line diagram rebuilt from filled blocks to real engineering standard symbols.** Vendored a shared engineering-symbol SVG library **`assets/engineering/`** (20 IEC/single-line symbols, `viewBox 0 0 48 48`, `fill=none stroke=currentColor` — utility pylon, transformer two-circle, MV switchgear, breaker, disconnect, ATS, genset+G, fuel tank, UPS, battery, PDU, rack, spine/leaf fabric, chiller, cooling-tower, dry-cooler, CDU, CRAH, pump, heat-exchanger, BMS, IT-load) + `manifest.json` — the canonical seam the parallel session's symbol DB merges into. New `tools/build-engineering-symbols.mjs` inlines them into `dcmoc/.../diagram/symbols.gen.ts`. Rewrote `palette.tsx` to render each node AS its symbol (44px), `DiagramSvg.tsx` so the node is the symbol + a label below (no filled box), inside **labeled group boxes** (POWER TRAIN / GENERATION / COOLING PLANT / NETWORK & CONTROL / IT HALL / GROWTH PHASES) with A/B **bus voltage labels**, day/night CSS-var surfaces, pan/zoom + Logical/SLD switch intact. `layout.ts`: enlarged cells to fit the symbols + labels and fixed the IT-HALL 3-cell / NETWORK-lane overlap. Topology/edges/buses unchanged; `tsc --noEmit` clean, `next build` green, arch-diagram probe 7/7. (Excludes the concurrent LTC session's uncommitted `rz-engine.js` edits.)
+
 ## v1.115.8 — 2026-07-23 (LTC — sensitivity + design sub-scores single-sourced to the engine; DCMOC PUE fallback reconciled)
 
 ### Changed
