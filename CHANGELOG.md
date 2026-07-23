@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.27 — 2026-07-24 (LTC SYSTEM OVERVIEW — clean SVG P&ID from the RZ Engineering Symbol Atlas)
+
+### Changed
+- **The P&ID is now a crisp, theme-aware inline SVG** built from the RZ Engineering Symbol Atlas — equinor ISO P&ID symbols (PP001A centrifugal pump, PV005A gate valves; recolored to `currentColor`) + lucide fan/server (dry-cooler fans, rack servers), with a plate-HEX/CDU line-art vessel: dry cooler → valve → pump → valve → CDU/plate HEX ⇄ IT racks with liquid cold plates. Blue supply / red return dashed lines with arrowheads and animated flow (reduced-motion aware). **Every label is live-wired** — Supply/Return °C, total flow LPM, pump kW, CDU count update with the model; no baked text, so nothing bleeds. Replaces the muddy cropped-PNG strip (`pid-day/night.png` deleted; atlas source symbols vendored to `assets/ltc/src/` for provenance). Sharp at any width, both themes.
+
 ## v1.115.26 — 2026-07-24 (LTC Modelling Lab is now ONE app — old page fully consolidated into the dashboard)
 
 ### Fixed

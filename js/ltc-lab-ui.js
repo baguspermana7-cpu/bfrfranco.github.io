@@ -43,11 +43,6 @@
         bindFlowScenarios();
         bindReportCompare();
         buildTopbar();
-        // Swap the P&ID render (day/night) whenever the theme attribute changes.
-        try {
-            new MutationObserver(syncPidTheme).observe(document.documentElement,
-                { attributes: true, attributeFilter: ['data-theme'] });
-        } catch (e) {}
         patchApplyModelToUI();
         // Initial paint: the engine's first applyModelToUI runs BEFORE this scaffold
         // exists (both scripts are `defer`; the engine's DOMContentLoaded handler is
@@ -379,27 +374,73 @@
     // ════════════════════════════════════════════════════════
     // buildSystemOverviewSVG — inline SVG schematic
     // ════════════════════════════════════════════════════════
-    function pidThemeName() {
-        return (document.documentElement.getAttribute('data-theme') === 'dark') ? 'night' : 'day';
+    // ── Engineering symbols from the RZ Engineering Symbol Atlas ────────────
+    // equinor PP001A (ISO P&ID centrifugal pump) + PV005A (gate valve) — solid
+    // paths recolored via fill=currentColor; lucide fan + server — stroke
+    // currentColor. Vendored verbatim; composed into one theme-aware schematic.
+    var SYM = {
+        pump: '<g fill="currentColor"><path d="M52 40.5C52 38.2909 50.2091 36.5 48 36.5C45.7909 36.5 44 38.2909 44 40.5C44 42.7091 45.7909 44.5 48 44.5C50.2091 44.5 52 42.7091 52 40.5ZM51 40.5C51 42.1569 49.6569 43.5 48 43.5C46.3431 43.5 45 42.1569 45 40.5C45 38.8431 46.3431 37.5 48 37.5C49.6569 37.5 51 38.8431 51 40.5Z"/><path d="M83 40.5C83 21.17 67.33 5.5 48 5.5C28.67 5.5 13 21.17 13 40.5C13 50.9622 17.5904 60.3522 24.8671 66.7659L13 90.5H83L71.1329 66.7659C78.4096 60.3522 83 50.9622 83 40.5ZM48 74.5C29.2223 74.5 14 59.2777 14 40.5C14 21.7223 29.2223 6.5 48 6.5C66.7777 6.5 82 21.7223 82 40.5C82 59.2777 66.7777 74.5 48 74.5ZM48 75.5C56.4973 75.5 64.2874 72.4719 70.3499 67.4359L81.382 89.5H14.618L25.6501 67.4359C31.7126 72.4719 39.5027 75.5 48 75.5Z"/></g>',
+        valve: '<path fill="currentColor" d="M24 12.5L43 22V2L24 11.5L5 2V22L24 12.5ZM6 3.61803L22.7639 12L6 20.382V3.61803ZM42 20.382L25.2361 12L42 3.61803V20.382Z"/>',
+        fan: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.827 16.379a6.082 6.082 0 0 1-8.618-7.002l5.412 1.45a6.082 6.082 0 0 1 7.002-8.618l-1.45 5.412a6.082 6.082 0 0 1 8.618 7.002l-5.412-1.45a6.082 6.082 0 0 1-7.002 8.618l1.45-5.412Z"/><path d="M12 12v.01"/></g>',
+        server: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></g>'
+    };
+    function sym(name, x, y, w, h, vb) {
+        return '<svg x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" viewBox="' + vb + '">' + SYM[name] + '</svg>';
     }
     function buildSystemOverviewSVG() {
-        // Pixel-match P&ID: the reference equipment render (dry-cooler bank → pump →
-        // plate heat-exchanger → cold-plate racks, blue supply / red return pipes) is
-        // used verbatim as a theme-swapped image; only the Supply/Return temperature
-        // chips are overlaid live-wired to the model (they cover the baked labels).
-        return '' +
-            '<div class="ltc-pid">' +
-                '<img class="ltc-pid-img" id="ltcPidImg" alt="Liquid-to-Chip P&amp;ID: dry-cooler bank, pump, heat exchanger, cold-plate racks" ' +
-                    'src="assets/ltc/pid-' + pidThemeName() + '.png?v=2026-07-23b">' +
-                '<span class="ltc-pid-chip ltc-pid-supply" id="schSupplyT">Supply —&nbsp;°C</span>' +
-                '<span class="ltc-pid-chip ltc-pid-return" id="schReturnT">Return —&nbsp;°C</span>' +
-            '</div>';
-    }
-    function syncPidTheme() {
-        var img = document.getElementById('ltcPidImg');
-        if (!img) return;
-        var want = 'assets/ltc/pid-' + pidThemeName() + '.png?v=2026-07-23b';
-        if (img.getAttribute('src') !== want) img.setAttribute('src', want);
+        var eq = 'opacity=".8"';                       // equipment tone
+        var lbl = 'font-size="11" font-weight="600" fill="currentColor" opacity=".55" text-anchor="middle" letter-spacing=".06em"';
+        var val = 'font-size="12" font-weight="700" text-anchor="middle"';
+        var s = [];
+        s.push('<svg class="ltc-pid-svg" viewBox="0 0 1000 235" role="img" aria-label="Liquid-to-chip cooling loop: dry cooler, pump, plate heat exchanger, IT racks">');
+        s.push('<defs>',
+            '<marker id="pidArrS" markerWidth="9" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" class="ltc-pid-fill-supply"/></marker>',
+            '<marker id="pidArrR" markerWidth="9" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" class="ltc-pid-fill-return"/></marker>',
+            '</defs>');
+
+        // ── DRY COOLER (heat rejection) ──
+        s.push('<g ' + eq + '>',
+            '<rect x="38" y="72" width="150" height="92" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>',
+            sym('fan', 56, 82, 44, 44, '0 0 24 24'), sym('fan', 122, 82, 44, 44, '0 0 24 24'),
+            '<line x1="50" y1="140" x2="176" y2="140" stroke="currentColor" stroke-width="1.2" opacity=".5"/>',
+            '<line x1="50" y1="150" x2="176" y2="150" stroke="currentColor" stroke-width="1.2" opacity=".5"/>',
+            '</g>');
+        s.push('<text x="113" y="185" ' + lbl + '>DRY COOLER</text>');
+
+        // ── facility loop: dry cooler → valve → pump → HEX (hot to cooler on top, cooled back on bottom) ──
+        s.push('<path d="M188 96 H 420" class="ltc-pid-return ltc-flow-return" marker-end="url(#pidArrR)" transform="rotate(180 304 96)"/>'); // HEX→cooler (hot)
+        s.push('<path d="M188 140 H 236" class="ltc-pid-supply ltc-flow-supply"/>');
+        s.push(sym('valve', 238, 131, 36, 18, '0 0 48 24'));
+        s.push('<path d="M274 140 H 300" class="ltc-pid-supply ltc-flow-supply"/>');
+        s.push(sym('pump', 298, 96, 64, 64, '0 0 96 96'));
+        s.push('<text x="330" y="185" ' + lbl + '>PUMP</text>');
+        s.push('<text x="330" y="205" ' + val + ' fill="currentColor" opacity=".8" id="schPumpKw">— kW</text>');
+        s.push('<path d="M362 140 H 396" class="ltc-pid-supply ltc-flow-supply"/>');
+        s.push(sym('valve', 396, 131, 36, 18, '0 0 48 24'));
+        s.push('<path d="M432 140 H 470" class="ltc-pid-supply ltc-flow-supply" marker-end="url(#pidArrS)"/>');
+
+        // ── CDU / PLATE HEX ──
+        s.push('<g ' + eq + '><rect x="472" y="66" width="118" height="104" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>');
+        for (var i = 0; i < 6; i++) s.push('<line x1="' + (492 + i * 16) + '" y1="80" x2="' + (492 + i * 16) + '" y2="156" stroke="currentColor" stroke-width="2" opacity=".55"/>');
+        s.push('</g>');
+        s.push('<text x="531" y="185" ' + lbl + '>CDU / PLATE HEX</text>');
+        s.push('<text x="531" y="205" ' + val + ' fill="currentColor" opacity=".8" id="schCduN">— CDU</text>');
+
+        // ── technology loop: HEX ⇄ IT racks (blue supply top, red return bottom) ──
+        s.push('<path d="M590 92 H 790" class="ltc-pid-supply ltc-flow-supply" marker-end="url(#pidArrS)"/>');
+        s.push('<path d="M790 148 H 590" class="ltc-pid-return ltc-flow-return" marker-end="url(#pidArrR)"/>');
+        s.push('<text x="690" y="78" ' + val + ' class="ltc-pid-fill-supply" id="schSupplyT">Supply — °C</text>');
+        s.push('<text x="690" y="170" ' + val + ' class="ltc-pid-fill-return" id="schReturnT">Return — °C</text>');
+        s.push('<text x="690" y="126" font-size="11" font-weight="600" text-anchor="middle" fill="currentColor" opacity=".6" id="schFlowLpm">— LPM</text>');
+
+        // ── IT RACKS (cold plates) ──
+        s.push('<g ' + eq + '><rect x="792" y="60" width="170" height="116" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>',
+            sym('server', 812, 76, 40, 40, '0 0 24 24'), sym('server', 866, 76, 40, 40, '0 0 24 24'), sym('server', 920, 76, 40, 40, '0 0 24 24'),
+            sym('server', 812, 122, 40, 40, '0 0 24 24'), sym('server', 866, 122, 40, 40, '0 0 24 24'), sym('server', 920, 122, 40, 40, '0 0 24 24'),
+            '</g>');
+        s.push('<text x="877" y="196" ' + lbl + '>IT RACKS · LIQUID COLD PLATES</text>');
+        s.push('</svg>');
+        return '<div class="ltc-pid">' + s.join('') + '</div>';
     }
 
     // ════════════════════════════════════════════════════════
@@ -780,7 +821,9 @@
     function renderSchematic(model) {
         setText2('schSupplyT', 'Supply ' + fmt(model.input.supplyTemp, 1) + ' °C');
         setText2('schReturnT', 'Return ' + fmt(model.input.returnTemp, 1) + ' °C');
-        syncPidTheme();
+        setText2('schFlowLpm', _fmtNum(model.flowLpm, 0, true) + ' LPM');
+        setText2('schPumpKw', fmt(model.pumpPowerKw, 1) + ' kW');
+        setText2('schCduN', model.cduCount + ' CDU');
     }
 
     // ════════════════════════════════════════════════════════
