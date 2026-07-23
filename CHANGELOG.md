@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.16 — 2026-07-23 (LTC — REPORT A/B scenario compare)
+
+### Added
+- **Scenario compare in the REPORT tab.** "Pin current as A" snapshots the current design's engine KPIs; as you tune inputs, a table shows A (pinned) vs B (current) with color-coded deltas (green = better) for PUE / System COP / Total Flow / Pump Power / Risk / Net OPEX / Carbon. Snapshots and deltas are pure engine values — no hardcode.
+
 ## v1.115.15 — 2026-07-23 (Spares KB — deep-research crawl-enrich into the shared engine)
 
 ### Added

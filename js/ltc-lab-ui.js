@@ -41,6 +41,7 @@
         bindTabs();
         bindRunBtn();
         bindFlowScenarios();
+        bindReportCompare();
         buildTopbar();
         // Swap the P&ID render (day/night) whenever the theme attribute changes.
         try {
@@ -212,6 +213,15 @@
             '<div id="ltcTornado" class="ltc-tornado"></div>';
         panelCharts.appendChild(tornadoCard);
         panelCharts.appendChild(el('div', { id: 'ltcChartsHost' }));
+        // REPORT: A/B scenario compare — pin a design, compare current vs it (engine values).
+        var cmp = el('div', { className: 'ltc-overview-card ltc-compare-card' });
+        cmp.innerHTML = '<div class="ltc-overview-label">● SCENARIO COMPARE <span class="ltc-muted">— pin a design (A), tune inputs, compare vs current (B)</span></div>' +
+            '<div class="ltc-compare-actions">' +
+            '<button type="button" class="ltc-nav-btn ltc-nav-btn-primary" id="ltcPinA">📌 Pin current as A</button>' +
+            '<button type="button" class="ltc-nav-btn ltc-nav-btn-outline" id="ltcClearA">Clear</button>' +
+            '</div>' +
+            '<div id="ltcCompareTable" class="ltc-compare-table"></div>';
+        panelReport.appendChild(cmp);
         panelReport.appendChild(el('div', { id: 'ltcReportHost' }));
 
         centerCol.appendChild(panelResults);
@@ -663,6 +673,7 @@
         renderSensitivity(model);
         renderTornado(model);
         renderScenarioReadout(model);
+        renderReportCompare(model);
         renderScenarioInfo(model);
         renderResultsTab(model);
     }
@@ -952,6 +963,43 @@
             '<div class="ltc-scenario-metric"><span>System COP</span><b>' + fmt(model.systemCop, 2) + '</b>' + (norm ? d(model.systemCop - norm.systemCop, 2) : '') + '</div>' +
             '<div class="ltc-scenario-metric"><span>Risk Index</span><b>' + fmt(model.riskIndex, 1) + '</b>' + (norm ? d(model.riskIndex - norm.riskIndex, 1) : '') + '</div>' +
             '<div class="ltc-scenario-metric"><span>Pump Power</span><b>' + fmt(model.pumpPowerKw, 1) + ' kW</b>' + (norm ? d(model.pumpPowerKw - norm.pumpPowerKw, 1) : '') + '</div>';
+    }
+
+    // REPORT scenario-compare — snapshots are pure engine KPIs; deltas are computed.
+    function _snapKpis(m) {
+        return { pue: m.pue, cop: m.systemCop, flow: m.flowLpm, pump: m.pumpPowerKw,
+                 risk: m.riskIndex, opex: m.netOpex, carbon: m.netCarbonTons };
+    }
+    var CMP_METRICS = [
+        { k: 'pue',    lbl: 'PUE',              dec: 3, lowerBetter: true },
+        { k: 'cop',    lbl: 'System COP',       dec: 2, lowerBetter: false },
+        { k: 'flow',   lbl: 'Total Flow (LPM)', dec: 0, neutral: true },
+        { k: 'pump',   lbl: 'Pump Power (kW)',  dec: 1, lowerBetter: true },
+        { k: 'risk',   lbl: 'Risk Index',       dec: 1, lowerBetter: true },
+        { k: 'opex',   lbl: 'Net OPEX ($/yr)',  dec: 0, lowerBetter: true, usd: true },
+        { k: 'carbon', lbl: 'Carbon (tCO2e/yr)', dec: 0, lowerBetter: true }
+    ];
+    function bindReportCompare() {
+        var pin = document.getElementById('ltcPinA'), clr = document.getElementById('ltcClearA');
+        if (pin) pin.addEventListener('click', function () {
+            if (window.__ltcLastModel) { window.__ltcCompareA = _snapKpis(window.__ltcLastModel); renderReportCompare(window.__ltcLastModel); }
+        });
+        if (clr) clr.addEventListener('click', function () { window.__ltcCompareA = null; renderReportCompare(window.__ltcLastModel); });
+    }
+    function renderReportCompare(model) {
+        var host = document.getElementById('ltcCompareTable');
+        if (!host || !model) return;
+        var A = window.__ltcCompareA, B = _snapKpis(model);
+        if (!A) { host.innerHTML = '<div class="ltc-muted" style="padding:10px">Pin a design as A, then adjust inputs — the delta vs current (B) appears here.</div>'; return; }
+        function f(v, m) { return m.usd ? fmtUsd(v) : fmt(v, m.dec); }
+        var rows = CMP_METRICS.map(function (m) {
+            var a = A[m.k], b = B[m.k], d = b - a;
+            var cls = (m.neutral || Math.abs(d) < 1e-9) ? '' : ((m.lowerBetter ? d < 0 : d > 0) ? 'down' : 'up');
+            return '<div class="ltc-cmp-row"><span class="ltc-cmp-lbl">' + m.lbl + '</span>' +
+                '<span>' + f(a, m) + '</span><span>' + f(b, m) + '</span>' +
+                '<span class="ltc-cmp-d ' + cls + '">' + (d >= 0 ? '+' : '') + f(d, m) + '</span></div>';
+        }).join('');
+        host.innerHTML = '<div class="ltc-cmp-row ltc-cmp-head"><span>Metric</span><span>A (pinned)</span><span>B (current)</span><span>Δ</span></div>' + rows;
     }
 
     function renderScenarioInfo(model) {
