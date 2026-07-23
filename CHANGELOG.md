@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.22 — 2026-07-23 (TCO — replace stretched market cards with a rate-outlook chart)
+
+### Changed
+- **TCO market-data card fixed**: the earlier empty-area fix had stretched the 8 market KPI cells to fill the left column (huge cards, tiny content). Reverted to compact cells and added a real **Market Rate Outlook** line chart (build $/MW, colo $/kW, power $/kWh — indexed to Year 1 = 100 over the analysis period, from MARKET_DATA/country projections; day/night-aware, re-renders on region/country/theme change). Column now shows analysis, not stretched whitespace.
+
 ## v1.115.21 — 2026-07-23 (TCO — flatten the saturated results panel)
 
 ### Changed

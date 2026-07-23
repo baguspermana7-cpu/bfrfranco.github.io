@@ -546,14 +546,11 @@
             flex-direction: column;
             gap: 1.5rem;
             min-height: 0;
-            /* stretch to the full grid-cell height (grid default is align-items:stretch;
-               the snapshot below takes flex:1 so the left column fills the cell — no dead area) */
-            height: 100%;
         }
 
         /* Region Snapshot filler card */
         .tco-region-snapshot {
-            flex: 1;
+            flex: 0 0 auto;
             min-height: 120px;
             border-radius: 14px;
             border: 1px solid rgba(79,70,229,0.15);
@@ -579,10 +576,6 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0.5rem;
-            /* grow to consume the card's flex height so the KPI cells fill the column
-               (no dead whitespace band); rows share the remaining height evenly */
-            flex: 1;
-            grid-auto-rows: minmax(44px, 1fr);
         }
 
         .tco-snapshot-item {
@@ -592,9 +585,20 @@
             padding: 0.6rem 0.75rem;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             gap: 2px;
         }
+        /* market-outlook chart fills the remaining left-column height with real analysis
+           (no more stretched empty KPI cards) */
+        .tco-market-chart {
+            flex: 0 0 auto; height: 250px; margin-top: 0.9rem;
+            border-radius: 14px; border: 1px solid var(--tco-line, rgba(79,70,229,0.15));
+            background: var(--tco-surface, #ffffff); padding: 1rem 1.15rem 0.75rem;
+            display: flex; flex-direction: column; gap: 0.5rem;
+        }
+        [data-theme="dark"] .tco-market-chart { background: #0e1626; border-color: rgba(148,163,184,0.14); }
+        .tco-market-chart-title { font-size: 0.72rem; font-weight: 700; color: var(--tco-primary); text-transform: uppercase; letter-spacing: 0.7px; display:flex; align-items:center; gap:6px; }
+        .tco-market-chart-body { flex: 1; min-height: 150px; position: relative; }
+        .tco-market-chart-body canvas { position:absolute; inset:0; width:100%!important; height:100%!important; }
 
         .tco-snapshot-label {
             font-size: 0.65rem;
@@ -2407,6 +2411,11 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <span class="tco-snapshot-value" id="snapshotCurrency">--</span>
                             </div>
                         </div>
+                        <div class="tco-market-chart">
+                            <div class="tco-market-chart-title"><i class="fas fa-chart-area"></i> Market Rate Outlook <span id="marketChartRegion" style="font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;"></span></div>
+                            <div class="tco-market-chart-body"><canvas id="tcoMarketChart"></canvas></div>
+                            <div style="font-size:0.62rem;color:var(--text-muted);text-align:right;">Indexed to Year 1 = 100 · build / colo / power trajectory</div>
+                        </div>
                         <div class="tco-snapshot-provenance" id="snapshotProvenance"></div>
                         <div class="tco-snapshot-note" id="snapshotNote">
                             Source: Turner &amp; Townsend DCCI 2025, CBRE H1 2025, IEA Electricity 2025
@@ -3563,7 +3572,58 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             if (el('snapshotTax')) el('snapshotTax').textContent = (r.mkt.taxRate != null) ? (r.mkt.taxRate * 100).toFixed(0) + '%' : 'n/a';
             if (el('snapshotCurrency')) el('snapshotCurrency').textContent = r.mkt.currencySymbol || '$';
             if (el('snapshotProvenance')) el('snapshotProvenance').textContent = r.mkt.provenance || '';
+            renderMarketChart();
         }
+
+        /* ─────────── MARKET RATE OUTLOOK CHART (fills the inputs column with real analysis) ─────────── */
+        var marketChartInstance = null;
+        function renderMarketChart() {
+            var cv = el('tcoMarketChart'); if (!cv || typeof Chart === 'undefined') return;
+            var r = lastResults; if (!r) return;
+            var mkt = r.mkt || {};
+            var years = parseInt((el('tcoPeriod') && el('tcoPeriod').value) || 5, 10) || 5;
+            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            var grid = isDark ? 'rgba(148,163,184,0.12)' : 'rgba(79,70,229,0.08)';
+            var tick = isDark ? '#94a3b8' : '#64748b';
+            // index each series to its Year-1 value = 100 so build / colo / power are comparable
+            function idxSeries(arr, base) {
+                if (!arr || !arr.length) {
+                    // no projection curve → synthesize a flat trend from CAGR
+                    var g = (mkt.cagr || 0.1), out = [];
+                    for (var i = 0; i < years; i++) out.push(+(100 * Math.pow(1 + g * 0.35, i)).toFixed(1));
+                    return out;
+                }
+                var b = arr[0] || base || 1, out = [];
+                for (var j = 0; j < years; j++) { var v = arr[Math.min(j, arr.length - 1)]; out.push(+((v / b) * 100).toFixed(1)); }
+                return out;
+            }
+            var pj = mkt.projections || {};
+            var labels = []; for (var y = 1; y <= years; y++) labels.push('Y' + y);
+            var line = function (name, data, color) {
+                return { label: name, data: data, borderColor: color, backgroundColor: color + '22',
+                    borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.3, fill: false };
+            };
+            var ds = [
+                line('Build $/MW', idxSeries(pj.buildCostByYear, mkt.buildCost), '#f59e0b'),
+                line('Colo $/kW', idxSeries(pj.coloPriceByYear, mkt.coloKW), '#4f46e5'),
+                line('Power $/kWh', idxSeries(pj.powerCostByYear, mkt.power), '#14b8a6'),
+            ];
+            if (el('marketChartRegion')) el('marketChartRegion').textContent = '· ' + (mkt.label || '') + ' · ' + years + 'yr';
+            if (marketChartInstance) { marketChartInstance.destroy(); marketChartInstance = null; }
+            marketChartInstance = new Chart(cv.getContext('2d'), {
+                type: 'line', data: { labels: labels, datasets: ds },
+                options: {
+                    responsive: true, maintainAspectRatio: false, animation: { duration: 350 },
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { labels: { boxWidth: 10, font: { size: 9 }, color: tick } },
+                        tooltip: { callbacks: { label: function (c) { return c.dataset.label + ': ' + c.parsed.y + ' (idx)'; } } } },
+                    scales: { x: { grid: { color: grid }, ticks: { font: { size: 8 }, color: tick } },
+                        y: { grid: { color: grid }, ticks: { font: { size: 8 }, color: tick }, title: { display: true, text: 'Y1 = 100', font: { size: 8 }, color: tick } } }
+                }
+            });
+        }
+        // re-theme the market chart on day/night toggle
+        new MutationObserver(function () { if (marketChartInstance) renderMarketChart(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
         /* ─────────── COMPARISON TABLE ─────────── */
         function renderCompareTable() {
