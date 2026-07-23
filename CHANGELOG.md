@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.18 — 2026-07-23 (Spares — left-rail input unit labels)
+
+### Fixed
+- **Spares ANALYSIS SETUP rail units**: added the missing unit hints to input labels — Annual Failure Rate λ (/yr), Installed Base (units), Lead Time Sigma (wk), Qualified Alternates (suppliers) — so every input reads self-explanatory (the rest already carried wk/$/% units).
+
 ## v1.115.17 — 2026-07-23 (Spares — KPI strip tidy: no truncation, one-line values)
 
 ### Fixed
