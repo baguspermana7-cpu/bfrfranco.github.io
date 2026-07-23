@@ -284,6 +284,10 @@
         scenCard.appendChild(el('div', { className: 'ltc-scenario-list', id: 'ltcScenarioList' }));
         var scenNote = el('p', { className: 'ltc-scenario-note', textContent: 'This is a SIMULATED / educational model. For design and commissioning, use site-specific thermal & hydraulic analysis.' });
         scenCard.appendChild(scenNote);
+        // Legal notice (replaces the hidden .legal-disclaimer-wrap — must survive)
+        var legalNote = el('p', { className: 'ltc-scenario-note ltc-legal-note' });
+        legalNote.innerHTML = 'Independent personal research; educational/planning context only — not legal, financial, procurement, safety, or engineering advice. Use is subject to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.';
+        scenCard.appendChild(legalNote);
         rightRail.appendChild(scenCard);
 
         // ── Assemble dashboard ─────────────────────────────
@@ -313,28 +317,63 @@
     }
 
     // ════════════════════════════════════════════════════════
-    // relocateExistingPanels
+    // relocateExistingPanels — ONE-APP consolidation.
+    // Routes EVERY child of the old .calc-output-panel into a dashboard tab
+    // (catch-all → DETAILED, so nothing is ever orphaned below the dashboard),
+    // moves fixed-position modals to <body>, folds the old input panel into
+    // OTHER PARAMETERS, then flags body.ltc-consolidated so CSS can hide the
+    // emptied old shells. Fail-safe: if anything throws, the flag is never
+    // set and the original page remains fully usable.
     // ════════════════════════════════════════════════════════
     function relocateExistingPanels() {
-        // Move pipeline/flow diagram section
-        var flowSect = document.querySelector('.pipeline-section, #pipelineSection, .flow-section, [id*="pipeline"]');
-        var flowHost = document.getElementById('ltcFlowHost');
-        if (flowSect && flowHost) flowHost.appendChild(flowSect);
+        try {
+            var detailedHost = document.getElementById('ltcDetailedHost');
+            var flowHost     = document.getElementById('ltcFlowHost');
+            var chartsHost   = document.getElementById('ltcChartsHost');
+            var reportHost   = document.getElementById('ltcReportHost');
+            var outPanel     = document.querySelector('.calc-output-panel');
+            if (!detailedHost || !flowHost || !chartsHost || !reportHost || !outPanel) return;
 
-        // Move charts / sankey / pareto
-        var chartSect = document.querySelector('.sankey-section, .pareto-section, [id*="sankey"], [id*="pareto"], [id*="monteCarlo"]');
-        var chartsHost = document.getElementById('ltcChartsHost');
-        if (chartSect && chartsHost) chartsHost.appendChild(chartSect);
+            // Fixed-overlay modals must live under <body> (a display:none tab
+            // panel would trap an open modal).
+            ['blockDetailModal', 'sankeyDrillModal', 'modeHelpModal'].forEach(function (id) {
+                var m = document.getElementById(id);
+                if (m && m.parentNode !== document.body) document.body.appendChild(m);
+            });
 
-        // Move calc output panel / detailed section
-        var detailedSect = document.querySelector('.calc-output-section, [id*="calcOutput"], .detailed-section, [id*="detailed"]');
-        var detailedHost = document.getElementById('ltcDetailedHost');
-        if (detailedSect && detailedHost) detailedHost.appendChild(detailedSect);
+            function routeFor(node) {
+                var cl = node.classList || { contains: function () { return false; } };
+                var has = function (sel) { try { return !!node.querySelector(sel); } catch (e) { return false; } };
+                if (cl.contains('pipeline-block') || cl.contains('fullmap-block') || cl.contains('flow-block')) return flowHost;
+                if (cl.contains('target-block') || has('#paretoSamples') || has('#mcSamples') ||
+                    has('#sankeyMode') || has('#conPueMax')) return chartsHost;
+                if (cl.contains('method-block') || has('#pdfSingleSource') || has('#exportExecutive') ||
+                    has('#scenarioName') || has('#refreshLedger') || has('[id*="Csv"]') || has('[id*="csv"]')) return reportHost;
+                return detailedHost;                       // catch-all: nothing orphaned
+            }
 
-        // Move report section
-        var reportSect = document.querySelector('.report-section, [id*="report"], .pdf-section, [id*="pdf"]');
-        var reportHost = document.getElementById('ltcReportHost');
-        if (reportSect && reportHost) reportHost.appendChild(reportSect);
+            // Route every remaining child (snapshot first — appendChild mutates the list).
+            Array.prototype.slice.call(outPanel.children).forEach(function (node) {
+                if (node.tagName === 'H3') { node.style.display = 'none'; return; } // old "Engineering Output" title
+                routeFor(node).appendChild(node);
+            });
+
+            // Fold the full old input panel (30+ inputs, guardrails, calibration,
+            // Run/Optimize/Reset) into the OTHER PARAMETERS collapsible.
+            var inPanel = document.querySelector('.calc-input-panel');
+            var otherBody = document.getElementById('ltcOtherParamsBody');
+            if (inPanel && otherBody && inPanel.parentNode !== otherBody) {
+                otherBody.appendChild(inPanel);
+                var h3 = inPanel.querySelector('h3');
+                if (h3) h3.style.display = 'none';
+                var cnt = document.getElementById('ltcOtherParamsCount');
+                if (cnt) cnt.textContent = inPanel.querySelectorAll('input, select').length + ' settings';
+            }
+
+            document.body.classList.add('ltc-consolidated');
+        } catch (e) {
+            try { if (window.console) console.warn('LTC consolidation skipped:', e); } catch (_) {}
+        }
     }
 
     // ════════════════════════════════════════════════════════

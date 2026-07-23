@@ -13,6 +13,12 @@ release sections rather than semver.
 
 ---
 
+## v1.115.26 — 2026-07-24 (LTC Modelling Lab is now ONE app — old page fully consolidated into the dashboard)
+
+### Fixed
+- **"Seperti ada 2 apps."** The dashboard revamp had left the ENTIRE original page visible below it (hero "Root Only Module", Legal Notice, "Integrated Engineering Architecture Focus", "High-Fidelity Engineering Calculator" + Workspace Controls) because `relocateExistingPanels()` targeted class names that don't exist (`.pipeline-section`/`.sankey-section`/`.calc-output-section`/`.report-section` — zero matches), so all ~27 analytical blocks stayed put and the tabs stayed empty. Rewritten as a route-everything consolidation: every child of the old `.calc-output-panel` is routed into a dashboard tab by its REAL class/contained-id — FLOW gets the pipeline/variable-flow/energy-breakdown blocks; CHARTS gets Target Guidance, Constraint/Degraded-Mode, Pareto, Monte-Carlo and Sankey; REPORT gets the Scenario Manager, Provenance Ledger, CSV + Executive/Engineering export packs and Methodology; DETAILED (catch-all — nothing can be orphaned) gets the quick-KPI snapshot, the full 23-card output grid, block/control diagrams, Explorer, Rule DSL, Equation Inspector, Calibration Quality, Self-Test and the rest. Fixed-overlay modals (`#blockDetailModal`, `#sankeyDrillModal`, `#modeHelpModal`) move to `<body>` so a hidden tab can't trap them; the full 61-input legacy panel folds into OTHER PARAMETERS (with a settings count); the emptied old shells + chrome are hidden under `body.ltc-consolidated` (fail-safe: if consolidation throws, the flag is never set and the original page still renders). The legal notice text now lives in the dashboard's SCENARIO INFO card (Terms/Privacy links kept).
+- Acceptance verified headless: single shell (page height ~1,577px, previously multi-screen dual-render), DETAILED 14 blocks / FLOW 3 / CHARTS 5 / REPORT 4, all functional; every element id preserved (engine bindings intact); both themes; 0 console errors. Gates: ltc-parity 15,750/0, dark-coverage, page-gates, a11y, interactions all CLEAN.
+
 ## v1.115.25 — 2026-07-24 (Fix: login no longer drops when navigating — Supabase session rehydration)
 
 ### Fixed

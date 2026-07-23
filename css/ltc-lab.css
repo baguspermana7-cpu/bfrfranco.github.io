@@ -1320,3 +1320,38 @@ body.ltc-revamp .ltc-cmp-head span { font-size: 11px; color: var(--ltc-muted); f
 body.ltc-revamp .ltc-cmp-d.up { color: var(--ltc-pipe-return); font-weight: 700; }
 body.ltc-revamp .ltc-cmp-d.down { color: var(--ltc-green); font-weight: 700; }
 @media (max-width: 640px) { body.ltc-revamp .ltc-cmp-row { grid-template-columns: 1.4fr 1fr 1fr; } body.ltc-revamp .ltc-cmp-row span:nth-child(2){display:none} body.ltc-revamp .ltc-cmp-head span:nth-child(2){display:none} }
+
+/* ── ONE-APP consolidation: hide old page chrome ────────────────────────── */
+body.ltc-revamp .hero,
+body.ltc-revamp .legal-disclaimer-wrap,
+body.ltc-revamp #architecture,
+body.ltc-revamp #calculator > .section-header,
+body.ltc-revamp #calculator > .workspace-toolbar { display: none !important; }
+/* After relocation the old shells are empty — remove them from flow. */
+body.ltc-consolidated #calculator { padding: 0 !important; margin: 0 !important; }
+body.ltc-consolidated .calculator-layout { display: none !important; }
+/* Relocated analytical blocks: fit the dashboard card language. */
+body.ltc-revamp .ltc-tab-panel > div > .feature-block,
+body.ltc-revamp .ltc-tab-panel > div > .model-block,
+body.ltc-revamp .ltc-tab-panel > div > .control-block,
+body.ltc-revamp .ltc-tab-panel > div > .logic-seq-block,
+body.ltc-revamp .ltc-tab-panel > div > .pipeline-block,
+body.ltc-revamp .ltc-tab-panel > div > .fullmap-block,
+body.ltc-revamp .ltc-tab-panel > div > .flow-block,
+body.ltc-revamp .ltc-tab-panel > div > .target-block,
+body.ltc-revamp .ltc-tab-panel > div > .trace-block,
+body.ltc-revamp .ltc-tab-panel > div > .sensitivity-block,
+body.ltc-revamp .ltc-tab-panel > div > .method-block {
+    background: var(--ltc-card-bg);
+    border: 1px solid var(--ltc-hairline);
+    border-radius: 10px;
+    box-shadow: var(--ltc-shadow-sm);
+    margin: 0 0 12px;
+    padding: 14px 16px;
+}
+body.ltc-revamp .ltc-tab-panel .output-quickbar,
+body.ltc-revamp .ltc-tab-panel .result-grid { margin-bottom: 12px; }
+/* Old input panel inside OTHER PARAMETERS: neutralize its card chrome. */
+body.ltc-revamp #ltcOtherParamsBody .calc-input-panel {
+    background: none; border: none; box-shadow: none; padding: 0; max-height: none;
+}
