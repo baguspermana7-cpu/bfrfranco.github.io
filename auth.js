@@ -1000,6 +1000,48 @@
         updateAuthUI();
     });
 
+    /* v1.115.21 — Supabase→mirror rehydration. ROOT CAUSE of "login state lepas
+       saat pindah page / back": getSession() reads ONLY the localStorage mirror
+       (rz_premium_session); when the mirror is missing/expired but the Supabase
+       session token (sb-*-auth-token) is still valid, every page showed "Login"
+       although the user is signed in (the Supabase→sitewide bridge was never
+       implemented — rz-supabase.js "plan B4"). Rebuild the mirror from Supabase
+       once per page-load. Async + fail-silent; skips entirely when no Supabase
+       token exists (no module load, no network) so offline/demo flows are
+       untouched. */
+    function rehydrateFromSupabase() {
+        try {
+            if (getSession()) return;                          // mirror healthy
+            var hasSbToken = false;
+            for (var i = 0; i < localStorage.length; i++) {
+                var k = localStorage.key(i);
+                if (k && k.indexOf('sb-') === 0 && k.indexOf('auth-token') !== -1) { hasSbToken = true; break; }
+            }
+            if (!hasSbToken) return;                           // not Supabase-logged-in
+            ensureSupabase().then(function () {
+                var supa = window.rzSupa;
+                if (!supa || typeof supa.getSession !== 'function') return;
+                Promise.resolve(supa.getSession()).then(function (sess) {
+                    var email = sess && sess.user && sess.user.email;
+                    if (!email) return;
+                    email = String(email).toLowerCase().trim();
+                    var role = detectRole(email);
+                    var finish = function (tier) {
+                        setSession(email, tier || (role === 'demo' ? 'demo' : 'pro'), role);
+                        updateAuthUI();
+                        updateRootOnlyLinksUI();
+                        try { window.dispatchEvent(new Event('rz-auth-change')); } catch (e) {}
+                    };
+                    if (typeof supa.getProfile === 'function') {
+                        Promise.resolve(supa.getProfile())
+                            .then(function (p) { finish(p && p.tier); })
+                            .catch(function () { finish(null); });
+                    } else finish(null);
+                }).catch(function () {});
+            }).catch(function () {});
+        } catch (e) {}
+    }
+
     /* ───────── Init ───────── */
     function init() {
         injectCSS();
@@ -1007,6 +1049,7 @@
         injectLoginModal();
         updateAuthUI();
         updateRootOnlyLinksUI();
+        rehydrateFromSupabase();
         /* Phase 3: when flag is on, refresh the local mirror from the
            Worker once per page-load. hydrateSessionFromWorker() resolves
            with null on failure and clears the mirror — we re-render after

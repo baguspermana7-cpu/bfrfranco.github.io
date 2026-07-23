@@ -13,6 +13,14 @@ release sections rather than semver.
 
 ---
 
+## v1.115.25 — 2026-07-24 (Fix: login no longer drops when navigating — Supabase session rehydration)
+
+### Fixed
+- **Login state "lepas" on navigation/back — real root cause.** `auth.js getSession()` reads only the `rz_premium_session` localStorage mirror; when that mirror was missing/expired while the Supabase session token (`sb-*-auth-token`) was still valid, every page showed "Login" although the user was signed in (the Supabase→sitewide bridge was never implemented — rz-supabase.js "plan B4"). New `rehydrateFromSupabase()` in `init()`: when the mirror is absent but a Supabase token exists, it lazy-loads the shared client, reads `supabase.auth.getSession()`, rebuilds the mirror (tier from the profile when available, role via the allowlist), re-renders the auth UI and dispatches `rz-auth-change` (so page gates like the LTC lab unlock immediately). Async + fail-silent; skips entirely (no module load) when no Supabase token exists, so offline/demo flows are untouched.
+- **Second real cause on the homepage:** `index.html` loads **`auth.min.js`**, a minified twin that was a week stale (2026-07-16) — the homepage always ran old auth logic regardless of auth.js fixes. Rebuilt `auth.min.js` from the fixed `auth.js` (terser) and bumped its `?v=`.
+- Cache-bust: `auth.js?v=2026-07-24a` unified across ALL 156 pages (three divergent versions found: 2026-07-23 ×154, 2026-07-16b, 2026-07-14a).
+- Verified headless: Supabase-token-only → mirror rebuilt in <10ms (cached), user pill shows, LTC gate unlocks; navigation keeps state; logged-out still shows Login. 0 console errors.
+
 ## v1.115.24 — 2026-07-23 (DCMOC tooltips — double-title fix + Phased-Financial KPI tooltips + KpiCard explainKey)
 
 ### Fixed
