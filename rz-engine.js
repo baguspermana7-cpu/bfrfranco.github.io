@@ -6129,16 +6129,21 @@
          * copIndex = relative cycle efficiency at water-cooled chiller conditions,
          * R-134a centrifugal = 1.00 baseline (AHRI/manufacturer typical — estimate-grade).
          * safety = ASHRAE 34. capexMult = flammability/toxicity mitigation premium. ══ */
+        /* ══ W3 extended refrigerants — GWP100 IPCC AR4; ASHRAE 34 safety class; priceUsdPerKg:
+         * market spot/contract 2025 (Chemours/Honeywell/trade publications); pfas: EU PFAS
+         * restriction scope (fluorocarbon = true); sourced /data/refrigerants.csv. ══ */
         refrigerants: {
-            R410A:   { label: 'R-410A',      gwp: 2088, safety: 'A1',  copIndex: 0.95, chargeKgPerKwth: 0.15, leakPctYr: 0.04, capexMult: 1.00, apps: ['crac', 'chiller'], note: 'US AIM Act restricts GWP>700 in new equipment from 2025; EU F-Gas phase-down' },
-            R134a:   { label: 'R-134a',      gwp: 1430, safety: 'A1',  copIndex: 1.00, chargeKgPerKwth: 0.20, leakPctYr: 0.03, capexMult: 1.00, apps: ['chiller'], note: 'Kigali HFC phase-down; baseline centrifugal-chiller refrigerant' },
-            R513A:   { label: 'R-513A',      gwp: 631,  safety: 'A1',  copIndex: 0.97, chargeKgPerKwth: 0.20, leakPctYr: 0.03, capexMult: 1.00, apps: ['chiller'], note: 'Lower-GWP drop-in for R-134a (~3% capacity/efficiency penalty)' },
-            R32:     { label: 'R-32',        gwp: 675,  safety: 'A2L', copIndex: 1.02, chargeKgPerKwth: 0.12, leakPctYr: 0.03, capexMult: 1.03, apps: ['crac'], note: 'Mildly flammable (A2L) — ventilation/leak-detection mitigation' },
-            R454B:   { label: 'R-454B',      gwp: 466,  safety: 'A2L', copIndex: 0.98, chargeKgPerKwth: 0.13, leakPctYr: 0.03, capexMult: 1.03, apps: ['crac', 'chiller'], note: 'Primary R-410A replacement in new DX equipment' },
-            R1234ze: { label: 'R-1234ze(E)', gwp: 7,    safety: 'A2L', copIndex: 0.96, chargeKgPerKwth: 0.20, leakPctYr: 0.02, capexMult: 1.03, apps: ['chiller'], note: 'Ultra-low-GWP HFO; EU F-Gas-proof; centrifugal/screw chillers' },
-            R1233zd: { label: 'R-1233zd(E)', gwp: 1,    safety: 'A1',  copIndex: 1.02, chargeKgPerKwth: 0.22, leakPctYr: 0.015, capexMult: 1.02, apps: ['chiller'], note: 'Low-pressure centrifugal; non-flammable ultra-low GWP' },
-            R717:    { label: 'R-717 (ammonia)', gwp: 0, safety: 'B2L', copIndex: 1.04, chargeKgPerKwth: 0.10, leakPctYr: 0.02, capexMult: 1.07, apps: ['chiller'], note: 'Zero GWP, excellent efficiency; toxicity — machine-room isolation, occupied-space charge limits (IIAR/EN 378)' },
-            R290:    { label: 'R-290 (propane)', gwp: 3, safety: 'A3', copIndex: 1.00, chargeKgPerKwth: 0.05, leakPctYr: 0.02, capexMult: 1.06, apps: ['chiller'], note: 'Highly flammable (A3) — strict charge limits; outdoor/rooftop packaged' }
+            R410A:   { label: 'R-410A',          gwp: 2088, safety: 'A1',  copIndex: 0.95, chargeKgPerKwth: 0.15, leakPctYr: 0.04, capexMult: 1.00, priceUsdPerKg: 4.5,  pfas: false, apps: ['crac', 'chiller'], note: 'US AIM Act restricts GWP>700 in new equipment from 2025; EU F-Gas phase-down' },
+            R134a:   { label: 'R-134a',          gwp: 1430, safety: 'A1',  copIndex: 1.00, chargeKgPerKwth: 0.20, leakPctYr: 0.03, capexMult: 1.00, priceUsdPerKg: 3.8,  pfas: false, apps: ['chiller'], note: 'Kigali HFC phase-down; baseline centrifugal-chiller refrigerant' },
+            R513A:   { label: 'R-513A',          gwp: 631,  safety: 'A1',  copIndex: 0.97, chargeKgPerKwth: 0.20, leakPctYr: 0.03, capexMult: 1.00, priceUsdPerKg: 7.2,  pfas: false, apps: ['chiller'], note: 'Lower-GWP drop-in for R-134a (~3% capacity/efficiency penalty); Chemours Opteon XP10' },
+            R32:     { label: 'R-32',            gwp: 675,  safety: 'A2L', copIndex: 1.02, chargeKgPerKwth: 0.12, leakPctYr: 0.03, capexMult: 1.03, priceUsdPerKg: 3.2,  pfas: false, apps: ['crac'], note: 'Mildly flammable (A2L) — ventilation/leak-detection mitigation' },
+            R454B:   { label: 'R-454B (Puron Advance)', gwp: 466, safety: 'A2L', copIndex: 0.98, chargeKgPerKwth: 0.13, leakPctYr: 0.03, capexMult: 1.03, priceUsdPerKg: 6.5,  pfas: false, apps: ['crac', 'chiller'], note: 'Primary R-410A replacement per EPA SNAP 2020; Chemours Opteon XL41' },
+            R1234ze: { label: 'R-1234ze(E)',     gwp: 7,    safety: 'A2L', copIndex: 0.96, chargeKgPerKwth: 0.20, leakPctYr: 0.02, capexMult: 1.03, priceUsdPerKg: 18.0, pfas: false, apps: ['chiller'], note: 'Ultra-low-GWP HFO; EU F-Gas-proof; centrifugal/screw chillers; Honeywell Solstice ze' },
+            R1233zd: { label: 'R-1233zd(E)',     gwp: 1,    safety: 'A1',  copIndex: 1.02, chargeKgPerKwth: 0.22, leakPctYr: 0.015, capexMult: 1.02, priceUsdPerKg: 22.0, pfas: false, apps: ['chiller'], note: 'Low-pressure centrifugal; non-flammable ultra-low GWP; Honeywell Solstice zd' },
+            R717:    { label: 'R-717 (ammonia)', gwp: 0,    safety: 'B2L', copIndex: 1.04, chargeKgPerKwth: 0.10, leakPctYr: 0.02, capexMult: 1.07, priceUsdPerKg: 1.2,  pfas: false, apps: ['chiller'], note: 'Zero GWP, excellent efficiency; toxicity — machine-room isolation, charge limits (IIAR/EN 378)' },
+            R290:    { label: 'R-290 (propane)', gwp: 3,    safety: 'A3',  copIndex: 1.00, chargeKgPerKwth: 0.05, leakPctYr: 0.02, capexMult: 1.06, priceUsdPerKg: 1.0,  pfas: false, apps: ['chiller'], note: 'Highly flammable (A3) — strict charge limits; outdoor/rooftop packaged' },
+            R744:    { label: 'R-744 (CO2)',     gwp: 1,    safety: 'A1',  copIndex: 0.80, chargeKgPerKwth: 0.08, leakPctYr: 0.02, capexMult: 1.05, priceUsdPerKg: 0.8,  pfas: false, apps: ['chiller'], note: 'Transcritical CO2; zero ODP; IIR recommended for heat-recovery + ultra-low-temp; high operating pressure' },
+            Novec7000:{ label: 'Novec 7000 (HFE-7000)', gwp: 530, safety: 'A1', copIndex: 0.70, chargeKgPerKwth: 0.30, leakPctYr: 0.01, capexMult: 1.10, priceUsdPerKg: 95.0, pfas: true, apps: ['immersion'], note: '3M Novec 7000; boiling point 34 °C; HoV 142 kJ/kg; PFAS classification under EU restriction proposal 2023; 3M announced exit from PFAS production by end 2025' }
         },
         refrigerantBaseline: 'R134a',
         refrigerantAutoByCooling: { air: 'R410A', inrow: 'R410A', rdhx: 'R134a', liquid: null, deepsea: 'R1234ze' },
@@ -7677,10 +7682,16 @@
         /* ══ v2.6.0 — LTC calibration tables lifted from ltc-system-modelling-lab.js.
          * Values are VERBATIM copies — moving them here makes them the single source
          * of truth; computeModel reads them via models.ltc.compute (fallback inline). */
+        /* ══ W3 extended coolants — ASHRAE HoF 2021 ch.31 + IAPWS-IF97 + OCP Immersion Fluid Spec 2022.
+         * viscosityMpas + thermalCondWmk added to all entries for hydraulic/heat-transfer calcs.
+         * Sourced in DATA.sources['coolants'] + curated in /data/cdu/coolant-properties-extended.csv. ══ */
         coolants: {
-            water: { cp: 4.186, rho: 997, viscosityMpas: 0.893, thermalCondWmk: 0.610, safetyNote: 'Non-toxic, standard DC coolant' },
-            pg20:  { cp: 3.92,  rho: 1025 },
-            pg30:  { cp: 3.75,  rho: 1038 }
+            water:        { cp: 4.186, rho: 997,  viscosityMpas: 1.002, thermalCondWmk: 0.598, ashraeClass: 'non-toxic',              safetyNote: 'Non-toxic, standard DC coolant; cp 4.186 kJ/kg·K IAPWS-IF97 engineering average (25 °C); rho 997 kg/m³ at 25 °C' },
+            pg20:         { cp: 3.92,  rho: 1025,  viscosityMpas: 2.0,   thermalCondWmk: 0.460, ashraeClass: 'non-toxic A1',           safetyNote: '20% propylene glycol; ASHRAE HoF 2021 ch.31; freeze point −9 °C' },
+            pg30:         { cp: 3.75,  rho: 1038,  viscosityMpas: 2.8,   thermalCondWmk: 0.430, ashraeClass: 'non-toxic A1',           safetyNote: '30% propylene glycol; ASHRAE HoF 2021 ch.31; freeze point −16 °C' },
+            pg40:         { cp: 3.58,  rho: 1050,  viscosityMpas: 4.0,   thermalCondWmk: 0.400, ashraeClass: 'non-toxic A1',           safetyNote: '40% propylene glycol; ASHRAE HoF 2021 ch.31; freeze point −23 °C' },
+            dielectric_1p:{ cp: 1.50,  rho: 1600,  viscosityMpas: 3.5,   thermalCondWmk: 0.070, ashraeClass: 'A1-equivalent non-conductive', safetyNote: 'Single-phase dielectric (mineral/silicone oil class); OCP Immersion Fluid Base Spec 2022; PFAS-free variants available' },
+            dielectric_2p:{ cp: 1.10,  rho: 1700,  viscosityMpas: 0.4,   thermalCondWmk: 0.065, ashraeClass: 'A1-equivalent non-conductive', safetyNote: 'Two-phase fluorocarbon dielectric; boiling 49-60 °C; OCP Immersion Fluid Spec; PFAS regulatory pressure on fluorocarbon class' }
         },
         rackProfiles: {
             ai_hpc_direct_liquid:   { label: 'AI/HPC Direct Liquid',     baseDensity: 70,  liquidBias: 1.18, airResidual: 0.24, riskBias: 7,  futureBias: 1.18 },
@@ -8040,7 +8051,93 @@
             'coolingArchProfiles': { source: 'LTC System Modelling Lab COOLING_ARCH_PROFILES (ltc-system-modelling-lab.js, v2026-Q2). Architecture presets calibrated to OCP DLC reference (direct_liquid), Uptime hybrid-cooling survey benchmarks (hybrid), and ASHRAE TC9.9 close-coupled air guidelines (air_inrow_dahu). Supply/return temps: OCP/NVIDIA warm-water DLC basis + ASHRAE A3/H1 envelopes.', asOf: '2026', unit: '% liquid capture, deg-C supply/return, COP ratio, W/(m2·K) heat-transfer', method: 'model-calibration vs OCP/ASHRAE/Uptime reference baselines' },
             'ltcCalibration':      { source: 'LTC System Modelling Lab model calibration constants (ltc-system-modelling-lab.js computeModel, v2026-Q2). copBase 6.1 and climate/supply/control bonuses: calibrated to ASHRAE HoF 2021 ch.39 liquid-cooled chiller COP ranges for representative DC conditions (warm-water DLC 28-35 deg-C supply; temperate climate COP bias +0.38 consistent with Uptime 2026 survey DLC cohort). pumpDensityStress 0.22: hydraulic sensitivity to rack power density per CDU sizing practice. heatReuseCredit 0.62: economic credit fraction for recovered heat (LTC model convention). Score weights (ASHRAE 0.24 / ANSI 0.16 / ISO 0.16 / NFPA 0.20 / Uptime 0.24) and score-function thresholds: LTC engineering heuristic rubric, NOT a certified compliance assessment.', asOf: '2026', unit: 'dimensionless coefficients + score weights', method: 'model-calibration — review before using for a certified compliance assessment' },
             'ltcCalibration.impactParams': { source: 'Verbatim copy of IMPACT_PARAMS from ltc-system-modelling-lab.js (same file, same version) — 12 parameters with key/label/step/min/max/unit for sensitivity perturbation. Single source of truth shared between models.ltc.sensitivity() and the page UI.', asOf: '2026', unit: 'param metadata array', method: 'model-calibration' },
-            'ltcCalibration.designSubScores': { source: 'Design sub-score band thresholds derived from the LTC compute model output fields: Efficiency band effPueBest/Worst from ASHRAE TC9.9 + Uptime Survey 2026 DLC PUE range; sustainRef 400 tCO2e/GWh = global average grid intensity (IEA 2026); sustainFloor 30 = model convention matching legacy UI floor; Operability = confidence field range (0-99 from LTC calibration).', asOf: '2026', unit: 'threshold constants for 0-100 sub-score mapping', method: 'model-calibration' }
+            'ltcCalibration.designSubScores': { source: 'Design sub-score band thresholds derived from the LTC compute model output fields: Efficiency band effPueBest/Worst from ASHRAE TC9.9 + Uptime Survey 2026 DLC PUE range; sustainRef 400 tCO2e/GWh = global average grid intensity (IEA 2026); sustainFloor 30 = model convention matching legacy UI floor; Operability = confidence field range (0-99 from LTC calibration).', asOf: '2026', unit: 'threshold constants for 0-100 sub-score mapping', method: 'model-calibration' },
+            /* ── W3 provenance entries ── */
+            'coolants.extended':    { source: 'W3-D1 coolant extension: pg40 + dielectric_1p/2p added. pg40: ASHRAE HoF 2021 ch.31 propylene glycol tables (cp 3.58 kJ/kg·K, rho 1050 kg/m³, freeze −23 °C). dielectric_1p: OCP Immersion Fluid Base Specification Rev 2022 (cp ~1.5 kJ/kg·K, rho 1600 kg/m³, viscosity ~3.5 mPa·s). dielectric_2p: OCP Immersion Fluid Base Spec (fluorocarbon class, boiling 49-60 °C, cp ~1.1 kJ/kg·K). viscosityMpas + thermalCondWmk added to all entries from /data/cdu/coolant-properties-extended.csv (IAPWS-IF97 for water; ASHRAE HoF 2021 for PG; OCP spec for dielectrics).', asOf: '2025', unit: 'kJ/kg·K (cp), kg/m³ (rho), mPa·s (viscosity), W/m·K (k)', method: 'STANDARD thermophysical properties; curated CSV /data/cdu/coolant-properties-extended.csv' },
+            'cduVendors':           { source: 'W3-D1 CDU vendor specs — vendor datasheets 2024-25: CoolIT Systems RACK CDU datasheet (200 kW, 340 Lpm); Asetek RackCDU D2C product page 2025 (250 kW); Vertiv Liebert XDU specification 2025 (150 kW, 265 Lpm); Boyd Technologies thermal datasheet 2024 (300 kW); Airedale product range 2025 (120 kW); Schneider Electric data center cooling portfolio 2025 (180 kW). costUsdPerKw = budgetary installed estimate. Curated /data/cdu/cdu-vendor-specs.csv.', asOf: '2025', unit: 'kW (capacity), Lpm (flow), bar (dP), weeks (lead), USD/kW (budgetary cost)', method: 'SCREENING — vendor published capability; verify with current quote for project procurement' },
+            'refrigerants.extended':{ source: 'W3-D2 refrigerant extension: R744 + Novec7000 added; priceUsdPerKg + pfas flag added to all 11 entries. R744 (CO2): IIR Informatory Note; transcritical high-pressure cycle. Novec7000: 3M Technical Data Sheet (GWP 530, boiling 34 °C, HoV 142 kJ/kg); PFAS flag per EU PFAS restriction proposal 2023 (3M announced PFAS production exit by end-2025). Prices: 2025 market spot/contract (Chemours/Honeywell/3M trade publications + distributor surveys). ASHRAE 34 safety class per ASHRAE Standard 34-2022. Curated /data/refrigerants.csv.', asOf: '2025', unit: 'GWP (IPCC AR4), ASHRAE 34 safety, $/kg (market price 2025), boolean (PFAS scope)', method: 'AUTHORITATIVE for GWP/safety; MARKET-SCREENING for price (spot ± 20%); PFAS scope per EU proposal (not yet final)' },
+            'electricityTariffs':   { source: 'W3-D3 electricity tariffs — industrial/DC blended $/kWh per country: US EIA Electric Power Monthly Table 5.6 (7.9¢/kWh 2024); Eurostat Electricity Price Statistics 2024 H2 (DE/NL/IE/GB/FR); EMA Singapore 2024 non-residential; PLN Indonesia industrial B3 tariff 2024; TNB Malaysia Tariff D 2024; IEA 2024 (IN/AU); Japan METI large industrial 2024. Grid carbon: Ember 2024/2025 country-level grid intensity. ToU bands: utility ToU tariff schedules (indicative). Cross-checked vs DATA.countries[id].economy.electricityRate (same source tier; this table adds ToU+carbon, does not diverge from countries rate). Curated /data/energy/electricity-tariffs.csv.', asOf: '2025', unit: '$/kWh (rate + ToU bands), kgCO2/kWh (grid carbon)', method: 'PUBLISHED tariff schedules; exclude recoverable VAT; blended rate for large industrial — site-specific PPA may differ significantly' },
+            'waterTariffs':         { source: 'W3-D3 water tariffs — industrial/municipal $/m³ per country: Circle of Blue Water Pricing Survey 2024 (US 1.50); Eurostat water supply prices 2023 (DE/NL/FR); Irish Water non-domestic schedule 2024 (IE); PUB Singapore 2024 non-domestic waterborne fee (SG 2.70); BPS/PDAM Jakarta 2024 (ID 0.35); Malaysia National Water Services Commission Selangor industrial 2024 (MY 0.18); UN FAO AQUASTAT India (IN 0.15); Japan MLIT 2024 (JP 1.30); Water Services Association of Australia 2024 (AU 1.85); Ofwat England & Wales non-household 2024 (GB 2.20); Brazil ANA 2024 (BR 0.40); South Africa DWS 2024 (ZA 0.80). Scarcity: WRI Aqueduct 4.0 2023 overall water risk 0-5. Curated /data/water/water-tariffs.csv.', asOf: '2025', unit: '$/m³ (industrial/municipal tariff), WRI Aqueduct 4.0 index (0-5)', method: 'PUBLISHED utility tariff schedules; industrial tier where published; reclaimed/well water not included' },
+            'leadTimes':            { source: 'W3-D4 equipment lead times — 2025 supply-constrained market observation: CDU (Vertiv supply chain update 2025; CoolIT APAC 2025); UPS (Schneider Electric Galaxy VX lead-time advisory 2025; Vertiv EMEA 2025); Genset (Caterpillar 2025 dealer updates; MTU Emergency Power EMEA 2025); Chiller (Trane commercial lead-time advisory 2025; Carrier EMEA; York APAC); MV Transformer (PJM Dominion DC Load Forecast documentation 2025 citing 52-72 wk MV transformer lead; Siemens Energy 2025; Hitachi Energy APAC 2025). Curated /data/supply/lead-times.csv.', asOf: '2025', unit: 'weeks (lead time typical + stressed)', method: 'SCREENING — 2025 supply-chain snapshot; verify with current vendor for project procurement; transformer lead is the dominant critical path' }
+        },
+
+        /* ══ W3-D1: DATA.cduVendors — CDU vendor specs database.
+         * capacity_kw / flow_lpm / dp_bar / leadWeeks / costUsdPerKw from vendor datasheets 2024-25.
+         * Curated in /data/cdu/cdu-vendor-specs.csv. Screening-grade; verify with current vendor quote. ══ */
+        cduVendors: {
+            coolit_rack200:   { vendor: 'CoolIT Systems',    model: 'RACK CDU 200kW',     capacityKw: 200, flowLpm: 340, dpBar: 1.2, leadWeeks: 20, costUsdPerKw: 350, coolant: 'water/PG', note: 'CoolIT RACK CDU; shipping in GB200 NVL72 deployments; CoolIT datasheet 2024' },
+            asetek_d2c250:    { vendor: 'Asetek',            model: 'RackCDU D2C 250kW',  capacityKw: 250, flowLpm: 380, dpBar: 1.0, leadWeeks: 18, costUsdPerKw: 380, coolant: 'water/PG', note: 'Asetek RackCDU D2C 250 kW; direct-to-chip; Asetek product page 2025' },
+            vertiv_xdu150:    { vendor: 'Vertiv',            model: 'Liebert XDU 150kW',  capacityKw: 150, flowLpm: 265, dpBar: 0.9, leadWeeks: 16, costUsdPerKw: 420, coolant: 'water/PG', note: 'Vertiv Liebert XDU 150 kW; product spec 2025' },
+            boyd_infrared300: { vendor: 'Boyd Technologies', model: 'InfraRed CDU 300kW', capacityKw: 300, flowLpm: 450, dpBar: 1.1, leadWeeks: 24, costUsdPerKw: 320, coolant: 'water/PG', note: 'Boyd CDU 300 kW for high-density AI; Boyd datasheet 2024' },
+            airedale_icdu120: { vendor: 'Airedale',          model: 'iCDU 120kW',         capacityKw: 120, flowLpm: 200, dpBar: 0.8, leadWeeks: 14, costUsdPerKw: 460, coolant: 'water/PG', note: 'Airedale iCDU 120 kW; 2025 product range' },
+            se_ecobreeze180:  { vendor: 'Schneider Electric', model: 'EcoBreeze CDU 180kW', capacityKw: 180, flowLpm: 300, dpBar: 1.0, leadWeeks: 18, costUsdPerKw: 390, coolant: 'water/PG', note: 'Schneider Electric CDU 180 kW; portfolio 2025' }
+        },
+
+        /* ══ W3-D3: DATA.electricityTariffs — per-country electricity cost + grid-carbon.
+         * rateUsdPerKwh = industrial/DC blended rate (excl. VAT where recoverable).
+         * touPeak/touOffpeak = ToU bands where known; gridCarbonKgCo2PerKwh = Ember 2024/2025.
+         * Cross-check: aligns with DATA.countries[id].economy.electricityRate (same source layer;
+         * this table adds ToU + carbon fields not in the countries schema). Curated in
+         * /data/energy/electricity-tariffs.csv. Source in DATA.sources['electricityTariffs']. ══ */
+        electricityTariffs: {
+            US: { rateUsdPerKwh: 0.079, touPeakUsdPerKwh: 0.110, touOffpeakUsdPerKwh: 0.060, gridCarbonKgCo2PerKwh: 0.386, tariffType: 'industrial-blended', label: 'United States' },
+            DE: { rateUsdPerKwh: 0.200, touPeakUsdPerKwh: 0.260, touOffpeakUsdPerKwh: 0.140, gridCarbonKgCo2PerKwh: 0.364, tariffType: 'industrial',         label: 'Germany' },
+            NL: { rateUsdPerKwh: 0.165, touPeakUsdPerKwh: 0.220, touOffpeakUsdPerKwh: 0.120, gridCarbonKgCo2PerKwh: 0.285, tariffType: 'industrial',         label: 'Netherlands' },
+            IE: { rateUsdPerKwh: 0.185, touPeakUsdPerKwh: 0.240, touOffpeakUsdPerKwh: 0.130, gridCarbonKgCo2PerKwh: 0.295, tariffType: 'industrial',         label: 'Ireland' },
+            SG: { rateUsdPerKwh: 0.175, touPeakUsdPerKwh: 0.210, touOffpeakUsdPerKwh: 0.140, gridCarbonKgCo2PerKwh: 0.408, tariffType: 'industrial',         label: 'Singapore' },
+            ID: { rateUsdPerKwh: 0.082, touPeakUsdPerKwh: 0.095, touOffpeakUsdPerKwh: 0.065, gridCarbonKgCo2PerKwh: 0.726, tariffType: 'industrial-pln',     label: 'Indonesia' },
+            MY: { rateUsdPerKwh: 0.072, touPeakUsdPerKwh: 0.090, touOffpeakUsdPerKwh: 0.055, gridCarbonKgCo2PerKwh: 0.567, tariffType: 'industrial-tnb',     label: 'Malaysia' },
+            IN: { rateUsdPerKwh: 0.095, touPeakUsdPerKwh: 0.120, touOffpeakUsdPerKwh: 0.070, gridCarbonKgCo2PerKwh: 0.694, tariffType: 'industrial-state-avg', label: 'India' },
+            JP: { rateUsdPerKwh: 0.165, touPeakUsdPerKwh: 0.200, touOffpeakUsdPerKwh: 0.120, gridCarbonKgCo2PerKwh: 0.453, tariffType: 'industrial',         label: 'Japan' },
+            AU: { rateUsdPerKwh: 0.095, touPeakUsdPerKwh: 0.130, touOffpeakUsdPerKwh: 0.060, gridCarbonKgCo2PerKwh: 0.490, tariffType: 'industrial',         label: 'Australia' },
+            GB: { rateUsdPerKwh: 0.180, touPeakUsdPerKwh: 0.235, touOffpeakUsdPerKwh: 0.120, gridCarbonKgCo2PerKwh: 0.229, tariffType: 'industrial',         label: 'United Kingdom' },
+            FR: { rateUsdPerKwh: 0.145, touPeakUsdPerKwh: 0.190, touOffpeakUsdPerKwh: 0.100, gridCarbonKgCo2PerKwh: 0.062, tariffType: 'industrial',         label: 'France' },
+            BR: { rateUsdPerKwh: 0.090, touPeakUsdPerKwh: 0.120, touOffpeakUsdPerKwh: 0.060, gridCarbonKgCo2PerKwh: 0.128, tariffType: 'industrial',         label: 'Brazil' },
+            ZA: { rateUsdPerKwh: 0.065, touPeakUsdPerKwh: 0.085, touOffpeakUsdPerKwh: 0.045, gridCarbonKgCo2PerKwh: 0.927, tariffType: 'industrial',         label: 'South Africa' }
+        },
+
+        /* ══ W3-D3: DATA.waterTariffs — per-country industrial water cost + scarcity tier.
+         * rateUsdPerM3 = industrial/municipal published tariff; scarcityTier low/med/high per
+         * WRI Aqueduct 4.0 (2023) overall water risk. Curated in /data/water/water-tariffs.csv.
+         * Source in DATA.sources['waterTariffs']. ══ */
+        waterTariffs: {
+            US: { rateUsdPerM3: 1.50, scarcityTier: 'low',    wriAqueductIndex: 1.2, label: 'United States' },
+            DE: { rateUsdPerM3: 2.10, scarcityTier: 'low',    wriAqueductIndex: 0.8, label: 'Germany' },
+            NL: { rateUsdPerM3: 1.85, scarcityTier: 'low',    wriAqueductIndex: 0.9, label: 'Netherlands' },
+            IE: { rateUsdPerM3: 2.00, scarcityTier: 'low',    wriAqueductIndex: 0.5, label: 'Ireland' },
+            SG: { rateUsdPerM3: 2.70, scarcityTier: 'medium', wriAqueductIndex: 2.8, label: 'Singapore' },
+            ID: { rateUsdPerM3: 0.35, scarcityTier: 'low',    wriAqueductIndex: 1.4, label: 'Indonesia' },
+            MY: { rateUsdPerM3: 0.18, scarcityTier: 'low',    wriAqueductIndex: 1.0, label: 'Malaysia' },
+            IN: { rateUsdPerM3: 0.15, scarcityTier: 'high',   wriAqueductIndex: 3.5, label: 'India' },
+            JP: { rateUsdPerM3: 1.30, scarcityTier: 'low',    wriAqueductIndex: 0.6, label: 'Japan' },
+            AU: { rateUsdPerM3: 1.85, scarcityTier: 'medium', wriAqueductIndex: 2.5, label: 'Australia' },
+            GB: { rateUsdPerM3: 2.20, scarcityTier: 'low',    wriAqueductIndex: 0.7, label: 'United Kingdom' },
+            FR: { rateUsdPerM3: 1.70, scarcityTier: 'low',    wriAqueductIndex: 0.9, label: 'France' },
+            BR: { rateUsdPerM3: 0.40, scarcityTier: 'low',    wriAqueductIndex: 1.3, label: 'Brazil' },
+            ZA: { rateUsdPerM3: 0.80, scarcityTier: 'high',   wriAqueductIndex: 3.2, label: 'South Africa' }
+        },
+
+        /* ══ W3-D4: DATA.leadTimes — equipment lead-time table by class + region.
+         * typicalWeeks = normal-market delivery; stressedWeeks = constrained-market (2025 observed).
+         * Sourced from Vertiv/Caterpillar/Schneider/Trane/Siemens supply-chain disclosures 2025;
+         * anchored by PJM Dominion DC load forecast documentation.
+         * Curated in /data/supply/lead-times.csv. Source in DATA.sources['leadTimes']. ══ */
+        leadTimes: {
+            cdu_americas:         { class: 'cdu',          region: 'Americas', typicalWeeks: 16, stressedWeeks: 28, note: 'CDU 100-300 kW; Vertiv 2025' },
+            cdu_emea:             { class: 'cdu',          region: 'EMEA',     typicalWeeks: 18, stressedWeeks: 30, note: 'CDU 100-300 kW; Vertiv EMEA 2025' },
+            cdu_apac:             { class: 'cdu',          region: 'APAC',     typicalWeeks: 20, stressedWeeks: 32, note: 'CDU 100-300 kW; CoolIT APAC 2025' },
+            ups_americas:         { class: 'ups_module',   region: 'Americas', typicalWeeks: 22, stressedWeeks: 40, note: '500 kW UPS module; Schneider Galaxy VX 2025' },
+            ups_emea:             { class: 'ups_module',   region: 'EMEA',     typicalWeeks: 24, stressedWeeks: 42, note: '500 kW UPS module; Vertiv EMEA 2025' },
+            ups_apac:             { class: 'ups_module',   region: 'APAC',     typicalWeeks: 26, stressedWeeks: 44, note: '500 kW UPS module; APC/Schneider APAC 2025' },
+            genset_americas:      { class: 'genset',       region: 'Americas', typicalWeeks: 36, stressedWeeks: 60, note: '2-3 MW diesel genset; Caterpillar 2025' },
+            genset_emea:          { class: 'genset',       region: 'EMEA',     typicalWeeks: 40, stressedWeeks: 64, note: '2-3 MW diesel genset; MTU 2025' },
+            genset_apac:          { class: 'genset',       region: 'APAC',     typicalWeeks: 38, stressedWeeks: 62, note: '2-3 MW diesel genset; Caterpillar APAC 2025' },
+            chiller_americas:     { class: 'chiller',      region: 'Americas', typicalWeeks: 28, stressedWeeks: 48, note: '1-2 MW water-cooled; Trane 2025' },
+            chiller_emea:         { class: 'chiller',      region: 'EMEA',     typicalWeeks: 30, stressedWeeks: 50, note: '1-2 MW water-cooled; Carrier EMEA 2025' },
+            chiller_apac:         { class: 'chiller',      region: 'APAC',     typicalWeeks: 32, stressedWeeks: 52, note: '1-2 MW water-cooled; York APAC 2025' },
+            transformer_americas: { class: 'transformer_mv', region: 'Americas', typicalWeeks: 60, stressedWeeks: 100, note: '2.5 MVA MV transformer; PJM/Dominion DC documentation 2025' },
+            transformer_emea:     { class: 'transformer_mv', region: 'EMEA',   typicalWeeks: 56, stressedWeeks: 96,  note: '2.5 MVA MV transformer; Siemens Energy 2025' },
+            transformer_apac:     { class: 'transformer_mv', region: 'APAC',   typicalWeeks: 52, stressedWeeks: 88,  note: '2.5 MVA MV transformer; Hitachi Energy 2025' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.

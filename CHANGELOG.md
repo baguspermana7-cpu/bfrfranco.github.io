@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.115.10 — 2026-07-23 (Shared engine data crawl: coolants/CDU vendors, refrigerants, electricity+water tariffs, lead times)
+
+### Added
+- **Real sourced DC data crawled into the shared `rz-engine.js` (consumed by LTC + TCO + DCMOC via the engine — no page-local copies).** Six new curated CSVs under `/data/` + engine DATA keys, every value carrying a `DATA.sources` entry (source+asOf+unit+method):
+  - `DATA.coolants` extended — added pg40 + dielectric_1p/2p and `viscosityMpas`/`thermalCondWmk`/`ashraeClass` on all fluids (ASHRAE HoF 2021 ch.31 / IAPWS-IF97 / OCP Immersion Fluid Base Spec).
+  - `DATA.refrigerants` extended — added R744 + Novec7000 and `priceUsdPerKg`/`pfas` on all 11 (Chemours/Honeywell/3M TDS · EPA SNAP · ASHRAE 34-2022).
+  - `DATA.cduVendors` (6: CoolIT/Asetek/Vertiv/Boyd/Airedale/Schneider — capacity/flow/dP/lead/$-per-kW).
+  - `DATA.electricityTariffs` (14 countries: $/kWh + ToU peak/offpeak + grid-carbon gCO2/kWh — EIA/Eurostat/PLN/EMA/METI/Ember) and `DATA.waterTariffs` (14 countries: $/m³ + WRI Aqueduct scarcity tier — Circle of Blue/PUB/FAO AQUASTAT/Ofwat).
+  - `DATA.leadTimes` (5 equipment classes × 3 regions: typical + stressed weeks — Vertiv/Caterpillar/Schneider/Trane/Siemens/PJM 2025).
+- New plausibility gate `tools/test-ltc-data.mjs` (410 checks: cp 1.5–4.5, GWP ≥0, electricity 0.02–0.6 $/kWh, lead 4–72 wk, every value sourced).
+
+### Notes
+- Additive — `test-ltc-parity.mjs` 15,750/0 (LTC formulas unchanged). Engine chain green: `test-rz-engine` 747/0 (refrigerant-count assertion 9→11), `test-value-bindings` 85/0, `test-reference-parity` 155/0, `test-dc-corpus` 2700/0; `rz-engine.min.js` reproducibly rebuilt (`engine-catalog.json` = 53 ns · 224 fns · 138 sources).
+
 ## v1.115.9 — 2026-07-23 (DCMOC Architecture diagram — blocks → proper engineering standard symbols)
 
 ### Changed

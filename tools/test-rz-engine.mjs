@@ -608,7 +608,7 @@ if (D.regionsCountry) {
 {
     const REQ = ['label', 'gwp', 'safety', 'copIndex', 'chargeKgPerKwth', 'leakPctYr', 'capexMult'];
     const keys = Object.keys(D.refrigerants);
-    ok('refrigerants: 9 entries', keys.length === 9, '' + keys.length);
+    ok('refrigerants: 11 entries (W3: +R744 +Novec7000)', keys.length === 11, '' + keys.length);
     const bad = keys.filter(k => REQ.some(f => D.refrigerants[k][f] == null));
     ok('every refrigerant carries all fields', bad.length === 0, bad.join(','));
     eq('R410A GWP (AR4, sitewide-consistent)', D.refrigerants.R410A.gwp, 2088);

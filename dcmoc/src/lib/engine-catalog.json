@@ -4,7 +4,7 @@
  "dataVersion": "2.5.1",
  "modelCount": 53,
  "functionCount": 224,
- "sourceCount": 132,
+ "sourceCount": 138,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -2217,6 +2217,12 @@
    "asOf": "2026"
   },
   {
+   "key": "cduVendors",
+   "source": "W3-D1 CDU vendor specs — vendor datasheets 2024-25: CoolIT Systems RACK CDU datasheet (200 kW, 340 Lpm); Asetek RackCDU D2C product page 2025 (250 kW); Vertiv Liebert XDU specification 2025 (150 kW, 265 Lpm); Boyd Technologies thermal datasheet 2024 (300 kW); Airedale product range 2025 (120 kW); Schneider Electric data center cooling portfolio 2025 (180 kW). costUsdPerKw = budgetary installed estimate. Curated /data/cdu/cdu-vendor-specs.csv.",
+   "asOf": "2025",
+   "method": "SCREENING — vendor published capability; verify with current quote for project procurement"
+  },
+  {
    "key": "commissioning",
    "source": "Standard DC commissioning sequence (ASHRAE Guideline 0 / BCxA + Uptime Cx) — L1–L5 levels + IST/SAT/FAT + punchlist; weights are an engine readiness heuristic",
    "asOf": "2026",
@@ -2261,6 +2267,12 @@
    "source": "LTC System Modelling Lab COOLANTS (ltc-system-modelling-lab.js, v2026-Q2). cp/rho verbatim. Water: IAPWS-IF97 at ~20-35 deg-C typical DC supply range. PG20/PG30: ASHRAE HoF 2021 ch.31 propylene-glycol tables at representative DC operating temperature (~25 deg-C); additional viscosity/k from /data/cdu/coolant-fluid-properties.csv (IAPWS/ASHRAE).",
    "asOf": "2026",
    "method": "STANDARD thermophysical properties at representative DC operating temperature"
+  },
+  {
+   "key": "coolants.extended",
+   "source": "W3-D1 coolant extension: pg40 + dielectric_1p/2p added. pg40: ASHRAE HoF 2021 ch.31 propylene glycol tables (cp 3.58 kJ/kg·K, rho 1050 kg/m³, freeze −23 °C). dielectric_1p: OCP Immersion Fluid Base Specification Rev 2022 (cp ~1.5 kJ/kg·K, rho 1600 kg/m³, viscosity ~3.5 mPa·s). dielectric_2p: OCP Immersion Fluid Base Spec (fluorocarbon class, boiling 49-60 °C, cp ~1.1 kJ/kg·K). viscosityMpas + thermalCondWmk added to all entries from /data/cdu/coolant-properties-extended.csv (IAPWS-IF97 for water; ASHRAE HoF 2021 for PG; OCP spec for dielectrics).",
+   "asOf": "2025",
+   "method": "STANDARD thermophysical properties; curated CSV /data/cdu/coolant-properties-extended.csv"
   },
   {
    "key": "coolingArchProfiles",
@@ -2341,6 +2353,12 @@
    "source": "AACE Class-4 SCREENING worked engineering calculations DERIVED LIVE from the requirement input + CAPEX result + existing engine models/data (equipmentSizing, reliability, waterFootprint, pueMatrix, paramFactors, architecture.floorLoadingKnM2) — electrical continuous load (NEC 210.19/215.2), transformer/UPS/genset/cooling sizing (IEEE 3006/3007, NFPA 110, ASHRAE TC9.9), fuel storage (NFPA 30/110), clean-agent + fire-water (NFPA 2001/13), structural floor load (ASCE 7), cable derate (NEC 310.15), system availability (IEEE 493 / Uptime). No new economic literals — each sheet references the model/table that computes it, each carries a standard + confidence tag.",
    "asOf": "2026",
    "method": "AACE Class-4 screening; live from inputs + engine models — validate against a full design"
+  },
+  {
+   "key": "electricityTariffs",
+   "source": "W3-D3 electricity tariffs — industrial/DC blended $/kWh per country: US EIA Electric Power Monthly Table 5.6 (7.9¢/kWh 2024); Eurostat Electricity Price Statistics 2024 H2 (DE/NL/IE/GB/FR); EMA Singapore 2024 non-residential; PLN Indonesia industrial B3 tariff 2024; TNB Malaysia Tariff D 2024; IEA 2024 (IN/AU); Japan METI large industrial 2024. Grid carbon: Ember 2024/2025 country-level grid intensity. ToU bands: utility ToU tariff schedules (indicative). Cross-checked vs DATA.countries[id].economy.electricityRate (same source tier; this table adds ToU+carbon, does not diverge from countries rate). Curated /data/energy/electricity-tariffs.csv.",
+   "asOf": "2025",
+   "method": "PUBLISHED tariff schedules; exclude recoverable VAT; blended rate for large industrial — site-specific PPA may differ significantly"
   },
   {
    "key": "energy",
@@ -2427,6 +2445,12 @@
    "key": "land",
    "source": "JLL / CBRE industrial land + shell 2026",
    "asOf": "2026"
+  },
+  {
+   "key": "leadTimes",
+   "source": "W3-D4 equipment lead times — 2025 supply-constrained market observation: CDU (Vertiv supply chain update 2025; CoolIT APAC 2025); UPS (Schneider Electric Galaxy VX lead-time advisory 2025; Vertiv EMEA 2025); Genset (Caterpillar 2025 dealer updates; MTU Emergency Power EMEA 2025); Chiller (Trane commercial lead-time advisory 2025; Carrier EMEA; York APAC); MV Transformer (PJM Dominion DC Load Forecast documentation 2025 citing 52-72 wk MV transformer lead; Siemens Energy 2025; Hitachi Energy APAC 2025). Curated /data/supply/lead-times.csv.",
+   "asOf": "2025",
+   "method": "SCREENING — 2025 supply-chain snapshot; verify with current vendor for project procurement; transformer lead is the dominant critical path"
   },
   {
    "key": "ltcCalibration",
@@ -2580,6 +2604,12 @@
    "source": "GWP100 IPCC AR4 (consistent with sitewide published values); ASHRAE 34 safety classes; copIndex: AHRI/manufacturer typical relative cycle efficiency at water-cooled chiller conditions (R-134a=1.00) — estimate-grade; charge/leak: GHG Protocol + EPA GreenChill typical ranges",
    "asOf": "2026",
    "method": "copIndex and charge/leak are screening estimates, not equipment selections"
+  },
+  {
+   "key": "refrigerants.extended",
+   "source": "W3-D2 refrigerant extension: R744 + Novec7000 added; priceUsdPerKg + pfas flag added to all 11 entries. R744 (CO2): IIR Informatory Note; transcritical high-pressure cycle. Novec7000: 3M Technical Data Sheet (GWP 530, boiling 34 °C, HoV 142 kJ/kg); PFAS flag per EU PFAS restriction proposal 2023 (3M announced PFAS production exit by end-2025). Prices: 2025 market spot/contract (Chemours/Honeywell/3M trade publications + distributor surveys). ASHRAE 34 safety class per ASHRAE Standard 34-2022. Curated /data/refrigerants.csv.",
+   "asOf": "2025",
+   "method": "AUTHORITATIVE for GWP/safety; MARKET-SCREENING for price (spot ± 20%); PFAS scope per EU proposal (not yet final)"
   },
   {
    "key": "regions.APAC.powerKwh",
@@ -2749,6 +2779,12 @@
    "source": "Article-10 SEA water-stress model: per-city stress scores + water tariffs (WRI Aqueduct 4.0 stress classes; PAM Jaya/PUB/Ranhill/city-utility published tariffs $/m3), aquifer subsidence (Jakarta ~25 cm/yr, BRIN/JICA), DLC ~87% water reduction (vendor/Uptime screening), recycling capex ~$450K/MW at 40% saving, water-energy nexus 650-1000 kWh/ML (SEA pumping+treatment)",
    "asOf": "2026",
    "method": "screening-grade water cost/risk model with 3% escalation + 8% discount; not a site water balance or utility filing"
+  },
+  {
+   "key": "waterTariffs",
+   "source": "W3-D3 water tariffs — industrial/municipal $/m³ per country: Circle of Blue Water Pricing Survey 2024 (US 1.50); Eurostat water supply prices 2023 (DE/NL/FR); Irish Water non-domestic schedule 2024 (IE); PUB Singapore 2024 non-domestic waterborne fee (SG 2.70); BPS/PDAM Jakarta 2024 (ID 0.35); Malaysia National Water Services Commission Selangor industrial 2024 (MY 0.18); UN FAO AQUASTAT India (IN 0.15); Japan MLIT 2024 (JP 1.30); Water Services Association of Australia 2024 (AU 1.85); Ofwat England & Wales non-household 2024 (GB 2.20); Brazil ANA 2024 (BR 0.40); South Africa DWS 2024 (ZA 0.80). Scarcity: WRI Aqueduct 4.0 2023 overall water risk 0-5. Curated /data/water/water-tariffs.csv.",
+   "asOf": "2025",
+   "method": "PUBLISHED utility tariff schedules; industrial tier where published; reclaimed/well water not included"
   },
   {
    "key": "workforceParams",
