@@ -773,16 +773,20 @@
         var subBars = document.getElementById('ltcSubBars');
         if (!subBars) return;
 
-        var eff  = Math.min(100, Math.max(0, (2.0 - model.pue) / (2.0 - 1.02) * 100));
-        var res  = Math.min(100, Math.max(0, 100 - model.riskIndex));
-        var sust = Math.min(100, Math.max(0, model.avoidedCarbonTons > 0 ? Math.min(100, model.avoidedCarbonTons / (model.annualGwh * 0.4) * 100) : 30));
-        var oper = Math.min(100, Math.max(0, model.confidence));
+        var ss = (window.RZEngine && window.RZEngine.models && window.RZEngine.models.ltc)
+            ? window.RZEngine.models.ltc.designSubScores(model)
+            : {
+                efficiency:     model.scores.iso || 0,
+                resilience:     model.scores.uptime || 0,
+                sustainability: model.scores.iso || 0,
+                operability:    model.confidence || 0
+              };
 
         var rows = [
-            { lbl: 'Efficiency',    val: eff },
-            { lbl: 'Resilience',    val: res },
-            { lbl: 'Sustainability', val: sust },
-            { lbl: 'Operability',   val: oper }
+            { lbl: 'Efficiency',     val: ss.efficiency },
+            { lbl: 'Resilience',     val: ss.resilience },
+            { lbl: 'Sustainability', val: ss.sustainability },
+            { lbl: 'Operability',    val: ss.operability }
         ];
 
         subBars.innerHTML = rows.map(function (r) {
@@ -806,17 +810,23 @@
     }
 
     // ════════════════════════════════════════════════════════
-    // renderSensitivity — read impactRows table, top-5 by |ΔPUE|
+    // renderSensitivity — top-5 by |ΔPUE|, sourced from engine
     // ════════════════════════════════════════════════════════
     function renderSensitivity(model) {
         var host = document.getElementById('ltcSensBars');
         if (!host) return;
 
-        // Try to read the impact matrix table that the engine rendered
-        var impactRows = document.querySelectorAll('#impactRows tr, .impact-rows tr, [id*="impact"] tr');
         var entries = [];
 
-        if (impactRows.length > 0) {
+        // Primary: engine sensitivity (single source of truth)
+        if (window.RZEngine && window.RZEngine.models && window.RZEngine.models.ltc && model.input) {
+            var rows = window.RZEngine.models.ltc.sensitivity(model.input);
+            entries = rows.map(function (r) { return { name: r.label, delta: r.dpue }; });
+        }
+
+        // Fallback: read the impact matrix table already rendered on the page
+        if (entries.length === 0) {
+            var impactRows = document.querySelectorAll('#impactRows tr, .impact-rows tr, [id*="impact"] tr');
             impactRows.forEach(function (row) {
                 var cells = row.querySelectorAll('td, th');
                 if (cells.length >= 3) {
@@ -829,15 +839,10 @@
             });
         }
 
-        // Fallback: compute approximate sensitivity from model internals
+        // If still nothing (e.g. page table not yet rendered), show placeholder
         if (entries.length === 0) {
-            entries = [
-                { name: 'Liquid Capture', delta: -(model.liquidKw / model.totalFacilityKw) * 0.15 },
-                { name: 'Supply Temp',    delta:  (model.input.supplyTemp - 24) * 0.003 },
-                { name: 'Pump Efficiency', delta: -(model.pumpPowerKw / model.totalFacilityKw) * 0.05 },
-                { name: 'IT Load',         delta:  0.002 },
-                { name: 'Return Temp',     delta:  (model.input.returnTemp - 40) * 0.001 }
-            ];
+            host.innerHTML = '<div class="ltc-sens-row"><span class="ltc-sens-name">—</span></div>';
+            return;
         }
 
         // Sort by absolute ΔPUE descending, take top 5

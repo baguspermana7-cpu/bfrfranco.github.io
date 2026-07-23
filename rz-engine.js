@@ -7876,7 +7876,34 @@
             uptimeUpsRef:             95,
             uptimeCtrlSlope:          0.14,
             uptimeCtrlRef:            70,
-            uptimeConcurrentAdd:      6
+            uptimeConcurrentAdd:      6,
+            /* ── impactParams (verbatim from ltc-system-modelling-lab.js IMPACT_PARAMS) ── */
+            impactParams: [
+                { key: 'itLoadMw',         label: 'IT Load',              step: 0.2,  min: 0.5, max: 80,  unit: 'MW' },
+                { key: 'liquidCapture',    label: 'Liquid Capture',       step: 2,    min: 0,   max: 100, unit: '%' },
+                { key: 'rackDensityTarget',label: 'Target Density',       step: 2,    min: 5,   max: 180, unit: 'kW/rack' },
+                { key: 'supplyTemp',       label: 'Supply Temp',          step: 0.5,  min: 16,  max: 42,  unit: 'C' },
+                { key: 'pumpEff',          label: 'Pump Efficiency',      step: 1,    min: 35,  max: 95,  unit: '%' },
+                { key: 'airCop',           label: 'Air COP',              step: 0.2,  min: 1.5, max: 12,  unit: '' },
+                { key: 'economizerHours',  label: 'Economizer',           step: 3,    min: 0,   max: 95,  unit: '%' },
+                { key: 'controlQuality',   label: 'Control Quality',      step: 3,    min: 0,   max: 100, unit: '%' },
+                { key: 'predictiveGain',   label: 'Predictive Gain',      step: 3,    min: 0,   max: 60,  unit: '%' },
+                { key: 'coefHeatTransfer', label: 'Heat Transfer Coef',   step: 0.5,  min: 60,  max: 99,  unit: '%' },
+                { key: 'coefPipeLoss',     label: 'Pipe Loss Multiplier', step: 0.02, min: 0.75,max: 1.8, unit: '' },
+                { key: 'coefFutureTech',   label: 'Future Tech Multiplier',step: 2,   min: -10, max: 45,  unit: '%' }
+            ],
+            /* ── designSubScores thresholds (model-calibration: engine score → 0-100 sub-score) ── */
+            designSubScores: {
+                /* Efficiency: PUE-band mapping. effPueBest = PUE at the lower end of elite DLC systems. */
+                effPueBest:   1.02,
+                effPueWorst:  2.0,
+                /* Resilience: pure riskIndex inversion (riskMin-riskMax are already in ltcCalibration). */
+                /* Sustainability: avoidedCarbonTons expressed as % of annualGwh × sustainRef tCO2e/GWh. */
+                sustainRef:   400,   /* tCO2e per GWh (typical grid baseline) */
+                sustainFloor: 30,    /* floor % when avoidedCarbonTons ≤ 0 */
+                /* Operability: confidence field (already 0-99 range). */
+                operMaxConf:  99
+            }
         },
 
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
@@ -8011,7 +8038,9 @@
             'coolants':            { source: 'LTC System Modelling Lab COOLANTS (ltc-system-modelling-lab.js, v2026-Q2). cp/rho verbatim. Water: IAPWS-IF97 at ~20-35 deg-C typical DC supply range. PG20/PG30: ASHRAE HoF 2021 ch.31 propylene-glycol tables at representative DC operating temperature (~25 deg-C); additional viscosity/k from /data/cdu/coolant-fluid-properties.csv (IAPWS/ASHRAE).', asOf: '2026', unit: 'kJ/kg·K (cp), kg/m3 (rho), mPa·s (viscosity), W/m·K (k)', method: 'STANDARD thermophysical properties at representative DC operating temperature' },
             'rackProfiles':        { source: 'LTC System Modelling Lab RACK_PROFILES (ltc-system-modelling-lab.js, v2026-Q2). Density/bias factors calibrated against OCP High Power Rack (HPR) spec, NVIDIA GB200 NVL72 reference architecture, ASHRAE TC9.9 5th Ed. rack-power envelopes, and LTC model fitting. futureBias represents projected efficiency trajectory.', asOf: '2026', unit: 'kW/rack + dimensionless bias factors', method: 'model-calibration vs OCP/NVIDIA/ASHRAE reference architectures' },
             'coolingArchProfiles': { source: 'LTC System Modelling Lab COOLING_ARCH_PROFILES (ltc-system-modelling-lab.js, v2026-Q2). Architecture presets calibrated to OCP DLC reference (direct_liquid), Uptime hybrid-cooling survey benchmarks (hybrid), and ASHRAE TC9.9 close-coupled air guidelines (air_inrow_dahu). Supply/return temps: OCP/NVIDIA warm-water DLC basis + ASHRAE A3/H1 envelopes.', asOf: '2026', unit: '% liquid capture, deg-C supply/return, COP ratio, W/(m2·K) heat-transfer', method: 'model-calibration vs OCP/ASHRAE/Uptime reference baselines' },
-            'ltcCalibration':      { source: 'LTC System Modelling Lab model calibration constants (ltc-system-modelling-lab.js computeModel, v2026-Q2). copBase 6.1 and climate/supply/control bonuses: calibrated to ASHRAE HoF 2021 ch.39 liquid-cooled chiller COP ranges for representative DC conditions (warm-water DLC 28-35 deg-C supply; temperate climate COP bias +0.38 consistent with Uptime 2026 survey DLC cohort). pumpDensityStress 0.22: hydraulic sensitivity to rack power density per CDU sizing practice. heatReuseCredit 0.62: economic credit fraction for recovered heat (LTC model convention). Score weights (ASHRAE 0.24 / ANSI 0.16 / ISO 0.16 / NFPA 0.20 / Uptime 0.24) and score-function thresholds: LTC engineering heuristic rubric, NOT a certified compliance assessment.', asOf: '2026', unit: 'dimensionless coefficients + score weights', method: 'model-calibration — review before using for a certified compliance assessment' }
+            'ltcCalibration':      { source: 'LTC System Modelling Lab model calibration constants (ltc-system-modelling-lab.js computeModel, v2026-Q2). copBase 6.1 and climate/supply/control bonuses: calibrated to ASHRAE HoF 2021 ch.39 liquid-cooled chiller COP ranges for representative DC conditions (warm-water DLC 28-35 deg-C supply; temperate climate COP bias +0.38 consistent with Uptime 2026 survey DLC cohort). pumpDensityStress 0.22: hydraulic sensitivity to rack power density per CDU sizing practice. heatReuseCredit 0.62: economic credit fraction for recovered heat (LTC model convention). Score weights (ASHRAE 0.24 / ANSI 0.16 / ISO 0.16 / NFPA 0.20 / Uptime 0.24) and score-function thresholds: LTC engineering heuristic rubric, NOT a certified compliance assessment.', asOf: '2026', unit: 'dimensionless coefficients + score weights', method: 'model-calibration — review before using for a certified compliance assessment' },
+            'ltcCalibration.impactParams': { source: 'Verbatim copy of IMPACT_PARAMS from ltc-system-modelling-lab.js (same file, same version) — 12 parameters with key/label/step/min/max/unit for sensitivity perturbation. Single source of truth shared between models.ltc.sensitivity() and the page UI.', asOf: '2026', unit: 'param metadata array', method: 'model-calibration' },
+            'ltcCalibration.designSubScores': { source: 'Design sub-score band thresholds derived from the LTC compute model output fields: Efficiency band effPueBest/Worst from ASHRAE TC9.9 + Uptime Survey 2026 DLC PUE range; sustainRef 400 tCO2e/GWh = global average grid intensity (IEA 2026); sustainFloor 30 = model convention matching legacy UI floor; Operability = confidence field range (0-99 from LTC calibration).', asOf: '2026', unit: 'threshold constants for 0-100 sub-score mapping', method: 'model-calibration' }
         },
 
         // Human-readable citation list (org, year, url) each table draws from.
@@ -13054,6 +13083,79 @@
                         elecLoss: upsLossKw + distLossKw,
                         aux: auxKw + fanKw
                     }
+                };
+            },
+
+            /* ── models.ltc.sensitivity(input) ────────────────────────────────────────
+             * For each param in DATA.ltcCalibration.impactParams: clone input, perturb
+             * key += step (clamped to [min,max]), compute base and perturbed model,
+             * return Δpue/Δcop/Δopex/Δcarbon/Δrisk. Mirrors pdfImpactRows /
+             * mutateInputForParam from ltc-system-modelling-lab.js EXACTLY.
+             * Returns array sorted by |Δpue| descending. ──────────────────────────── */
+            sensitivity: function (input) {
+                var self = this;
+                var params = DATA.ltcCalibration.impactParams;
+                var baseModel = self.compute(input);
+                var rows = params.map(function (cfg) {
+                    var candidate = Object.assign({}, input);
+                    candidate[cfg.key] = candidate[cfg.key] + cfg.step;
+                    if (candidate[cfg.key] < cfg.min) candidate[cfg.key] = cfg.min;
+                    if (candidate[cfg.key] > cfg.max) candidate[cfg.key] = cfg.max;
+                    if (cfg.key === 'supplyTemp') {
+                        var baseDeltaT = Math.max(input.returnTemp - input.supplyTemp, 6);
+                        candidate.returnTemp = candidate.supplyTemp + baseDeltaT;
+                    }
+                    var alt = self.compute(candidate);
+                    return {
+                        key:     cfg.key,
+                        label:   cfg.label,
+                        step:    cfg.step,
+                        unit:    cfg.unit,
+                        dpue:    alt.pue - baseModel.pue,
+                        dcop:    alt.systemCop - baseModel.systemCop,
+                        dopex:   alt.netOpex - baseModel.netOpex,
+                        dcarbon: alt.netCarbonTons - baseModel.netCarbonTons,
+                        drisk:   alt.riskIndex - baseModel.riskIndex
+                    };
+                });
+                rows.sort(function (a, b) { return Math.abs(b.dpue) - Math.abs(a.dpue); });
+                return rows;
+            },
+
+            /* ── models.ltc.designSubScores(model) ────────────────────────────────────
+             * Derives Efficiency/Resilience/Sustainability/Operability 0-100 from the
+             * model's real output fields + model.scores.*. Thresholds live in
+             * DATA.ltcCalibration.designSubScores (single source of truth).
+             * No magic literals in this function body. ────────────────────────────── */
+            designSubScores: function (model) {
+                var ds = DATA.ltcCalibration.designSubScores;
+                var CAL = DATA.ltcCalibration;
+
+                var efficiency = Math.min(100, Math.max(0,
+                    (ds.effPueWorst - model.pue) / (ds.effPueWorst - ds.effPueBest) * 100
+                ));
+
+                var resilience = Math.min(100, Math.max(0,
+                    (CAL.riskMax - model.riskIndex) / (CAL.riskMax - CAL.riskMin) * 100
+                ));
+
+                var sustainability;
+                if (model.avoidedCarbonTons > 0 && model.annualGwh > 0) {
+                    sustainability = Math.min(100, (model.avoidedCarbonTons / (model.annualGwh * ds.sustainRef)) * 100);
+                } else {
+                    sustainability = ds.sustainFloor;
+                }
+                sustainability = Math.max(0, sustainability);
+
+                var operability = Math.min(100, Math.max(0,
+                    (model.confidence / ds.operMaxConf) * 100
+                ));
+
+                return {
+                    efficiency:     efficiency,
+                    resilience:     resilience,
+                    sustainability: sustainability,
+                    operability:    operability
                 };
             }
         }

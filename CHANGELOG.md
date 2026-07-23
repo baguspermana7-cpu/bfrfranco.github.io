@@ -11,6 +11,17 @@ release sections rather than semver.
 
 ---
 
+## v1.115.8 — 2026-07-23 (LTC — sensitivity + design sub-scores single-sourced to the engine; DCMOC PUE fallback reconciled)
+
+### Changed
+- **Sensitivity is now real, engine-computed — no fabricated numbers.** The dashboard's SENSITIVITY ANALYSIS previously invented deltas from hardcoded coefficients (`*0.15`, `*0.003`, `*0.05`, `0.002`, `*0.001`, refs 24/40) whenever it couldn't read the page's impact table. Added `models.ltc.sensitivity(input)` to `rz-engine.js` — it perturbs each of `DATA.ltcCalibration.impactParams` (the single-source copy of the page's `IMPACT_PARAMS`) by its step through `models.ltc.compute` and returns ranked ΔPUE/ΔCOP/ΔOPEX/ΔCarbon/ΔRisk, mirroring the page's `pdfImpactRows` exactly. `renderSensitivity` now calls it (offline fallback reads the page's own `#impactRows` table, else "—"); the fabricated block is deleted.
+- **Design sub-scores single-sourced.** Efficiency/Resilience/Sustainability/Operability were UI-invented (`(2.0-pue)/(2.0-1.02)`, `annualGwh*0.4`, `:30`). Added `models.ltc.designSubScores(model)` with its thresholds in `DATA.ltcCalibration.designSubScores` (+ `DATA.sources` entries); `renderDesignStatus` reads it — no magic numbers in the UI.
+- **DCMOC `pue.ts` fallback reconciled to the engine** (was a divergent second source): `air` 1.42→1.50, `liquid` 1.08→1.15, `DEFAULT_PUE` 1.42→1.50 — now mirrors `DATA.pueMatrix[type].tier3` exactly (engine stays primary via `getPUE`).
+- Owner mandate "wired satu sama lain jangan hardcode sendiri2": LTC sensitivity, design sub-scores, PUE (LTC/TCO/DCMOC) and all LTC data now resolve through the one shared engine.
+
+### Notes
+- Additive only — `test-ltc-parity.mjs` still 15,750/15,750 with 0 drift (`computeModel` output unchanged). Engine chain green: `test-rz-engine` 747/0, `test-value-bindings` 85/0, `test-reference-parity` 155/0; `rz-engine.min.js` reproducibly rebuilt.
+
 ## v1.115.7 — 2026-07-23 (LTC Modelling Lab — data basis migrated to the shared RZ engine + micro-interaction polish)
 
 ### Changed

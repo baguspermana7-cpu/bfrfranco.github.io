@@ -3,8 +3,8 @@
  "note": "AUTO-GENERATED from rz-engine.js — do not hand-edit. Consumers are grep-derived from real usage.",
  "dataVersion": "2.5.1",
  "modelCount": 53,
- "functionCount": 222,
- "sourceCount": 130,
+ "functionCount": 224,
+ "sourceCount": 132,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -959,6 +959,18 @@
    "functions": [
     {
      "name": "compute",
+     "params": [
+      "input"
+     ]
+    },
+    {
+     "name": "designSubScores",
+     "params": [
+      "model"
+     ]
+    },
+    {
+     "name": "sensitivity",
      "params": [
       "input"
      ]
@@ -2421,6 +2433,18 @@
    "source": "LTC System Modelling Lab model calibration constants (ltc-system-modelling-lab.js computeModel, v2026-Q2). copBase 6.1 and climate/supply/control bonuses: calibrated to ASHRAE HoF 2021 ch.39 liquid-cooled chiller COP ranges for representative DC conditions (warm-water DLC 28-35 deg-C supply; temperate climate COP bias +0.38 consistent with Uptime 2026 survey DLC cohort). pumpDensityStress 0.22: hydraulic sensitivity to rack power density per CDU sizing practice. heatReuseCredit 0.62: economic credit fraction for recovered heat (LTC model convention). Score weights (ASHRAE 0.24 / ANSI 0.16 / ISO 0.16 / NFPA 0.20 / Uptime 0.24) and score-function thresholds: LTC engineering heuristic rubric, NOT a certified compliance assessment.",
    "asOf": "2026",
    "method": "model-calibration — review before using for a certified compliance assessment"
+  },
+  {
+   "key": "ltcCalibration.designSubScores",
+   "source": "Design sub-score band thresholds derived from the LTC compute model output fields: Efficiency band effPueBest/Worst from ASHRAE TC9.9 + Uptime Survey 2026 DLC PUE range; sustainRef 400 tCO2e/GWh = global average grid intensity (IEA 2026); sustainFloor 30 = model convention matching legacy UI floor; Operability = confidence field range (0-99 from LTC calibration).",
+   "asOf": "2026",
+   "method": "model-calibration"
+  },
+  {
+   "key": "ltcCalibration.impactParams",
+   "source": "Verbatim copy of IMPACT_PARAMS from ltc-system-modelling-lab.js (same file, same version) — 12 parameters with key/label/step/min/max/unit for sensitivity perturbation. Single source of truth shared between models.ltc.sensitivity() and the page UI.",
+   "asOf": "2026",
+   "method": "model-calibration"
   },
   {
    "key": "ltcClimate",
