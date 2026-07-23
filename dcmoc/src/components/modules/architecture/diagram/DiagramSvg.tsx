@@ -166,12 +166,20 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
                                 {/* label below the symbol */}
                                 <text x={cx} y={labelY} fontSize="9.5" fontWeight={700} textAnchor="middle" fill={LABEL_MAIN}>{b.title}</text>
                                 {b.sub && <text x={cx} y={labelY + 11} fontSize="7.5" textAnchor="middle" fill={LABEL_SUB}>{b.sub}</text>}
-                                {b.badge && (
+                                {b.badge && (b.kind ? (
+                                    /* symbol nodes: badge as a top-LEFT corner pill so it never collides with the
+                                       title/sub labels below the symbol (units ×N sits top-right) */
+                                    <>
+                                        <rect x={b.x + 4} y={b.y + 5} width={Math.max(20, b.badge.length * 5 + 8)} height={11} rx={5.5} fill="#7DDDB422" stroke="#7DDDB4" strokeWidth={0.5} />
+                                        <text x={b.x + 4 + Math.max(20, b.badge.length * 5 + 8) / 2} y={b.y + 13} fontSize="6.5" textAnchor="middle" fill="#a7f3d0">{b.badge}</text>
+                                    </>
+                                ) : (
+                                    /* label-only nodes (phase boxes): badge centered at the bottom of the box */
                                     <>
                                         <rect x={cx - 20} y={b.y + b.h - 13} width={40} height={11} rx={5.5} fill="#7DDDB422" stroke="#7DDDB4" strokeWidth={0.5} />
                                         <text x={cx} y={b.y + b.h - 4.5} fontSize="6.5" textAnchor="middle" fill="#a7f3d0">{b.badge}</text>
                                     </>
-                                )}
+                                ))}
                             </g>
                         );
                     })}

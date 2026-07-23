@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.12 — 2026-07-23 (DCMOC Architecture diagram — label/badge polish)
+
+### Fixed
+- **DCMOC Architecture diagram label overlaps**: the per-node redundancy/use-case **badge** (e.g. "2N", "AI") was drawn at the cell bottom where the sub-label already sits, colliding (MV Switchgear "1× boards", IT-Load "+10% margin"). Symbol nodes now render the badge as a **top-left corner pill** (the ×N unit count stays top-right), clear of the title/sub labels; phase boxes keep their bottom-centered NOW/PLAN badge. `next build` green, arch-probe 7/7.
+
 ## v1.115.11 — 2026-07-23 (LTC — sensitivity tornado in CHARTS, engine-computed)
 
 ### Added
