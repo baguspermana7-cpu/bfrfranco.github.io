@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.3 — 2026-07-23 (LTC Modelling Lab — topbar brand + design-status radial to match reference)
+
+### Changed
+- **Topbar brand** now matches the reference: "Bagus Dwi Permana / LTC Modelling Lab" with a light hex-tile mark (`fa-diagram-project` on a blue-tint tile), replacing the dark gradient chip + "LTC System Modelling Lab / Comprehensive…" line.
+- **DESIGN STATUS** restructured to the reference layout — the blue ring sits on the **left** with the score % inside, and "Design Score" + the word grade (Excellent/Good/Fair) sit to the **right** of the ring (was a centered ring with the grade below). Sub-bars unchanged below.
+- Confirmed (screenshot, seeded root session): the light-theme topbar is white and the legacy DC-Solutions/Glossary back-links are hidden on desktop; both themes verified 0 console errors.
+
 ## v1.115.1 — 2026-07-23 (Critical Spares Engine — rebuilt to the reference 3-column dashboard)
 
 ### Changed

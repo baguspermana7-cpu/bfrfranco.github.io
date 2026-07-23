@@ -214,14 +214,18 @@
         dsCard.appendChild(dsHeader);
         var dsBody = el('div', { className: 'ltc-design-status' });
         dsBody.innerHTML = [
+            '<div class="ltc-design-top">',
             '<div class="ltc-radial-wrap">',
             '<svg class="ltc-radial-svg" viewBox="0 0 120 120" id="ltcRadialSvg">',
             '<circle class="ltc-radial-track" cx="60" cy="60" r="48" fill="none" stroke-width="10"/>',
             '<circle class="ltc-radial-bar" cx="60" cy="60" r="48" fill="none" stroke-width="10" stroke-linecap="round" transform="rotate(-90 60 60)" id="ltcRadialBar"/>',
-            '<text class="ltc-radial-pct" x="60" y="56" text-anchor="middle" id="ltcRadialPct">—</text>',
-            '<text class="ltc-radial-label" x="60" y="72" text-anchor="middle">Design Score</text>',
+            '<text class="ltc-radial-pct" x="60" y="68" text-anchor="middle" id="ltcRadialPct">—</text>',
             '</svg>',
+            '</div>',
+            '<div class="ltc-design-meta">',
+            '<div class="ltc-design-scorelbl">Design Score</div>',
             '<div class="ltc-design-grade" id="ltcDesignGrade">—</div>',
+            '</div>',
             '</div>',
             '<div class="ltc-sub-bars" id="ltcSubBars"></div>'
         ].join('');
