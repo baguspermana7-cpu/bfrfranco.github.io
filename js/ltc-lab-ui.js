@@ -33,6 +33,8 @@
     // ── Init ─────────────────────────────────────────────────
     function init() {
         document.body.classList.add('ltc-revamp');
+        document.body.classList.add('ltc-booting');   // one-time entrance stagger
+        setTimeout(function () { document.body.classList.remove('ltc-booting'); }, 1400);
         buildDashboard();
         bindSliders();
         bindArchPresets();
@@ -55,6 +57,13 @@
             var rc = document.getElementById('runCalc');
             if (rc) rc.click();
         }
+        // Wire hover-explanations (RZExplain) across the freshly-built dashboard so
+        // every glossary term (PUE, COP, WUE, CDU, ΔT, economizer…) is explainable.
+        try {
+            if (window.RZExplain && typeof window.RZExplain.scan === 'function') {
+                window.RZExplain.scan(document.querySelector('.ltc-dashboard') || document.body);
+            }
+        } catch (e) {}
     }
 
     // ════════════════════════════════════════════════════════
@@ -490,10 +499,15 @@
                     if (p) p.style.display = 'none';
                 });
 
-                // Activate selected
+                // Activate selected (with entrance animation)
                 btn.classList.add('ltc-tab-active');
                 var activePanel = document.getElementById(panelMap[btn.dataset.tab]);
-                if (activePanel) activePanel.style.display = '';
+                if (activePanel) {
+                    activePanel.style.display = '';
+                    activePanel.classList.remove('ltc-tab-anim');
+                    void activePanel.offsetWidth;   // reflow to restart the animation
+                    activePanel.classList.add('ltc-tab-anim');
+                }
             });
         });
     }
@@ -658,13 +672,38 @@
     // ════════════════════════════════════════════════════════
     // renderKpi
     // ════════════════════════════════════════════════════════
+    var _prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function _fmtNum(v, decimals, comma) {
+        if (v === null || v === undefined || isNaN(v)) return '—';
+        if (comma) return Number(v).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+        return Number(v).toFixed(decimals);
+    }
+    // Eased count-up on KPI updates (respects prefers-reduced-motion).
+    function animateNum(id, to, decimals, comma) {
+        var node = document.getElementById(id);
+        if (!node) return;
+        if (to === null || to === undefined || isNaN(to)) { node.textContent = '—'; return; }
+        var from = parseFloat(node.getAttribute('data-val'));
+        if (isNaN(from)) from = 0;
+        node.setAttribute('data-val', to);
+        if (_prefersReduced || Math.abs(to - from) < 1e-9) { node.textContent = _fmtNum(to, decimals, comma); return; }
+        var dur = 480, start = null;
+        function step(ts) {
+            if (start === null) start = ts;
+            var p = Math.min((ts - start) / dur, 1);
+            var e = 1 - Math.pow(1 - p, 3);           // ease-out cubic
+            node.textContent = _fmtNum(from + (to - from) * e, decimals, comma);
+            if (p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
     function renderKpi(model) {
-        setText2('kpiItLoad', fmt(model.itKw / 1000, 2));
-        setText2('kpiLiquid', fmt(model.liquidKw / 1000, 2));
-        setText2('kpiFlow',   fmt(model.flowLpm, 0));
-        setText2('kpiPump',   fmt(model.pumpPowerKw, 1));
-        setText2('kpiPue',    fmt(model.pue, 3));
-        setText2('kpiCop',    fmt(model.systemCop, 2));
+        animateNum('kpiItLoad', model.itKw / 1000, 2);
+        animateNum('kpiLiquid', model.liquidKw / 1000, 2);
+        animateNum('kpiFlow',   model.flowLpm, 0, true);
+        animateNum('kpiPump',   model.pumpPowerKw, 1);
+        animateNum('kpiPue',    model.pue, 3);
+        animateNum('kpiCop',    model.systemCop, 2);
     }
 
     // ════════════════════════════════════════════════════════

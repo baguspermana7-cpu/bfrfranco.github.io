@@ -2692,6 +2692,10 @@
             }
 
             function computeModel(input) {
+                /* Delegate to shared engine when available; inline tables are fallback. */
+                if (window.RZEngine && window.RZEngine.models && window.RZEngine.models.ltc) {
+                    return window.RZEngine.models.ltc.compute(input);
+                }
                 var climateData = CLIMATE_FACTORS[input.climate] || CLIMATE_FACTORS.tropical;
                 var coolant = COOLANTS[input.coolantKey] || COOLANTS.water;
                 var rackProfile = RACK_PROFILES[input.rackType] || RACK_PROFILES.ai_hpc_direct_liquid;

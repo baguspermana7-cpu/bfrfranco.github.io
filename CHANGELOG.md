@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.7 — 2026-07-23 (LTC Modelling Lab — data basis migrated to the shared RZ engine + micro-interaction polish)
+
+### Changed
+- **LTC data basis is now the shared RZ engine (was 100% inline heuristics).** Lifted the LTC lab's inline constant tables + every "magic" coefficient out of `computeModel` into provenance-tagged `rz-engine.js` DATA — `DATA.coolants`, `DATA.rackProfiles`, `DATA.coolingArchProfiles`, `DATA.ltcClimate`, `DATA.ltcCountryProfiles`, `DATA.ltcCalibration` — each with a `DATA.sources` entry (ASHRAE HoF / OCP / Uptime where empirical; `method:"model-calibration"` labeled honestly where a coefficient is a modeling choice). Added `models.ltc.compute()` that runs the LTC formulas from those DATA. `js/ltc-system-modelling-lab.js` `computeModel()` now delegates to `window.RZEngine.models.ltc.compute` (inline tables retained as offline fallback), and the LTC page now loads `rz-engine.min.js`. **LTC + TCO + DCMOC now share one sourced knowledge base.**
+- **Formulas unchanged — golden-parity locked.** New gate `tools/test-ltc-parity.mjs` drives the old inline model and the new engine model over 250 seeded input combinations (15,750 field checks) and asserts bit-identical output (max relative drift 0.000e+0). Engine chain re-run green: `test-rz-engine` 747/0, `test-value-bindings` 85/0 (catalog regenerated), `test-reference-parity` 155/0; `rz-engine.min.js` reproducibly rebuilt.
+- **Micro-interaction polish (`js/ltc-lab-ui.js` + `css/ltc-lab.css`).** KPI values now count up (eased, `prefers-reduced-motion` aware) with thousands-separated flow (e.g. `23,312`); tab switches get a fade+slide entrance; a one-time card-entrance stagger on load; WCAG 2.4.7 `:focus-visible` rings on all sliders/tabs/buttons/preset-cards; and hover-explanations (RZExplain) wired across the dashboard (22 glossary terms: PUE/COP/WUE/CDU/ΔT/economizer…).
+
 ## v1.115.6 — 2026-07-23 (Spares: interactive heatmaps + count-up + 445-part catalog wired into the engine, calc & DCMOC)
 
 ### Changed
