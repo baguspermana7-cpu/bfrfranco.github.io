@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+---
+
+## v1.115.13 — 2026-07-23 (LTC — power-breakdown donut: center total + per-slice %)
+
+### Added
+- **POWER BREAKDOWN donut** now shows the facility total in the ring center (e.g. "15.42 MW Total") and each legend row carries both kW and its % of total — all from `model.breakdown` (engine single-source), matching the reference.
+
 ## v1.115.12 — 2026-07-23 (DCMOC Architecture diagram — label/badge polish)
 
 ### Fixed

@@ -1077,17 +1077,21 @@
 
         var legend = slices.map(function (s, i) {
             var color = DONUT_COLORS[i % DONUT_COLORS.length];
+            var pct = (s.kw / total) * 100;
             return '<div class="ltc-donut-legend-row">' +
                 '<div class="ltc-donut-dot" style="background:' + color + '"></div>' +
                 '<span class="ltc-donut-lbl">' + s.lbl + '</span>' +
-                '<span class="ltc-donut-val">' + fmt(s.kw, 0) + 'kW</span>' +
+                '<span class="ltc-donut-val">' + fmt(s.kw, 0) + ' kW <span class="ltc-donut-pct">' + pct.toFixed(1) + '%</span></span>' +
                 '</div>';
         }).join('');
 
         return '<div class="ltc-res-card">' +
             '<div class="ltc-res-card-title">POWER BREAKDOWN</div>' +
             '<div class="ltc-donut-wrap">' +
+            '<div class="ltc-donut-ring">' +
             '<svg class="ltc-donut-svg" viewBox="0 0 120 120">' + arcs + '</svg>' +
+            '<div class="ltc-donut-center"><b>' + fmt(total / 1000, 2) + '</b><span>MW Total</span></div>' +
+            '</div>' +
             '<div class="ltc-donut-legend">' + legend + '</div>' +
             '</div>' +
             '</div>';
