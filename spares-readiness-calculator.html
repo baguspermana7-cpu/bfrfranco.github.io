@@ -1368,9 +1368,12 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
 </nav>
 
 <main class="main-content" id="main-content">
-  <!-- Hero banner (v1.111.x — reference dashboard cover) -->
-  <div class="sp-hero-banner" data-rz-hero>
-    <img class="brief-hero-img" src="assets/spares-readiness-calculator-hero.webp" alt="Data center campus" onerror="this.style.display='none';this.parentElement.classList.add('sp-hero-noimg')">
+  <!-- Hero banner — hidden by default; reveals ONLY when the cover image actually loads
+       (owner drops assets/spares-readiness-calculator-hero.webp). No image = no band, no dark box. -->
+  <div class="sp-hero-banner" style="display:none">
+    <img class="sp-hero-img" src="assets/spares-readiness-calculator-hero.webp" alt="Data center campus at dusk" loading="eager"
+         onload="var p=this.closest('.sp-hero-banner'); if(this.naturalWidth>1){p.style.display='block';}"
+         onerror="var p=this.closest('.sp-hero-banner'); if(p) p.remove();">
   </div>
 
   <!-- Deep-link carrier banner -->
@@ -11198,7 +11201,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 if(window.MutationObserver)new MutationObserver(m).observe(document.documentElement,{childList:true,subtree:true});})();
 </script>
     <script src="js/rz-manual-fab.js?v=2026-07-21" defer></script>
-    <script src="js/rz-hero-fit.js?v=2026-07-23" defer></script>
 
 <!-- SPARES REVAMP — analysis header meta, engine stamp, active-KPI sync, count-up (no sound) -->
 <script>
