@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.20 — 2026-07-23 (LTC — coolant thermophysical properties surfaced from the shared engine)
+
+### Added
+- The RESULTS **Flow & Temperature** card now shows the selected coolant's Cp / density / **viscosity / thermal conductivity**, read live from the shared `DATA.coolants` (including the crawled/sourced viscosity + thermal-conductivity fields) — connecting the v1.115.10 data crawl to visible UI use. Switching coolant updates the props from the engine. No hardcode.
+
 ## v1.115.19 — 2026-07-23 (Spares — tab-group chips for the module nav)
 
 ### Changed

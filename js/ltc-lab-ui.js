@@ -1039,15 +1039,26 @@
         var inp = model.input || {};
         var intern = model.internals || {};
 
-        // Card 1: Flow & Temperature
-        var c1 = resCard('FLOW & TEMPERATURE', [
+        // Coolant thermophysical properties — from the shared engine DATA.coolants
+        // (crawled/sourced: cp, rho, viscosity, thermal conductivity).
+        var cool = (window.RZEngine && window.RZEngine.data && window.RZEngine.data.coolants &&
+                    window.RZEngine.data.coolants[inp.coolantKey]) || {};
+        var coolLabel = ({ water: 'Water', pg20: '20% PG', pg30: '30% PG', pg40: '40% PG',
+                           dielectric_1p: 'Dielectric 1P', dielectric_2p: 'Dielectric 2P' })[inp.coolantKey] || (inp.coolantKey || '—');
+        var c1rows = [
             { lbl: 'Supply Temperature',  val: fmt(inp.supplyTemp, 1) + ' °C' },
             { lbl: 'Return Temperature',  val: fmt(inp.returnTemp, 1) + ' °C' },
             { lbl: 'ΔT',                  val: fmt(model.deltaT, 1) + ' K' },
-            { lbl: 'Volumetric Flow',     val: fmt(model.flowLpm, 0) + ' LPM' },
-            { lbl: 'Effective Capture',   val: fmt(model.effectiveCapture, 1) + '%' },
-            { lbl: 'CDU Count',           val: model.cduCount + ' units' }
-        ]);
+            { lbl: 'Coolant',             val: coolLabel },
+            { lbl: 'Cp',                  val: cool.cp != null ? fmt(cool.cp, 3) + ' kJ/kg·K' : '—' },
+            { lbl: 'Density',             val: cool.rho != null ? fmt(cool.rho, 0) + ' kg/m³' : '—' }
+        ];
+        if (cool.viscosityMpas != null) c1rows.push({ lbl: 'Viscosity', val: fmt(cool.viscosityMpas, 3) + ' mPa·s' });
+        if (cool.thermalCondWmk != null) c1rows.push({ lbl: 'Thermal Cond.', val: fmt(cool.thermalCondWmk, 3) + ' W/m·K' });
+        c1rows.push({ lbl: 'Volumetric Flow',   val: fmt(model.flowLpm, 0) + ' LPM' });
+        c1rows.push({ lbl: 'Effective Capture', val: fmt(model.effectiveCapture, 1) + '%' });
+        c1rows.push({ lbl: 'CDU Count',         val: model.cduCount + ' units' });
+        var c1 = resCard('FLOW & TEMPERATURE', c1rows);
 
         // Card 2: Pump & Hydraulic
         var c2 = resCard('PUMP & HYDRAULIC', [
