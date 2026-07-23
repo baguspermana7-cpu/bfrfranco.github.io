@@ -81,8 +81,30 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
 
     const [vx, vy, vw, vh] = model.viewBox;
 
+    /* hover: highlight a node + the edges it touches, dim the rest, show a rich tooltip */
+    const wrapRef = React.useRef<HTMLDivElement>(null);
+    const [hover, setHover] = React.useState<string | null>(null);
+    const [tip, setTip] = React.useState<{ x: number; y: number; b: DiagBlock } | null>(null);
+    const connected = React.useMemo(() => {
+        if (!hover) return null;
+        const nodes = new Set<string>([hover]);
+        model.edges.forEach((e) => { if (e.from === hover) nodes.add(e.to); if (e.to === hover) nodes.add(e.from); });
+        return nodes;
+    }, [hover, model.edges]);
+    const enterNode = (b: DiagBlock) => (e: React.PointerEvent) => {
+        const r = wrapRef.current?.getBoundingClientRect();
+        setHover(b.id);
+        setTip({ x: e.clientX - (r?.left ?? 0), y: e.clientY - (r?.top ?? 0), b });
+    };
+    const moveNode = (b: DiagBlock) => (e: React.PointerEvent) => {
+        if (drag.current) return;
+        const r = wrapRef.current?.getBoundingClientRect();
+        setTip({ x: e.clientX - (r?.left ?? 0), y: e.clientY - (r?.top ?? 0), b });
+    };
+    const leaveNode = () => { setHover(null); setTip(null); };
+
     return (
-        <div className="relative">
+        <div className="relative" ref={wrapRef}>
             <div className="absolute right-2 top-2 z-10 flex gap-1">
                 <button onClick={() => set({ zoom: Math.min(3, zoom * 1.2) })} className="rounded bg-slate-800/80 p-1 text-slate-300 hover:text-white"><ZoomIn className="h-3.5 w-3.5" /></button>
                 <button onClick={() => set({ zoom: Math.max(0.5, zoom * 0.85) })} className="rounded bg-slate-800/80 p-1 text-slate-300 hover:text-white"><ZoomOut className="h-3.5 w-3.5" /></button>
@@ -132,9 +154,12 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
                         const s = EDGE_STYLE[e.kind];
                         const hidden = sld && (e.kind === 'coolSupply' || e.kind === 'coolReturn' || e.kind === 'control');
                         if (hidden) return null;
+                        const on = !hover || e.from === hover || e.to === hover;
                         return <path key={i} d={edgePath(from, to, e.offset ?? 0)} fill="none"
                             stroke={sld ? (e.kind === 'backup' ? '#f97316' : '#94a3b8') : s.stroke}
-                            strokeWidth={sld ? 1.4 : 1.6} strokeDasharray={s.dash} opacity={0.85} />;
+                            strokeWidth={on && hover ? (sld ? 2.2 : 2.6) : (sld ? 1.4 : 1.6)} strokeDasharray={s.dash}
+                            opacity={on ? (hover ? 1 : 0.85) : 0.1}
+                            style={{ transition: 'opacity .15s, stroke-width .15s' }} />;
                     })}
                     {/* NODES: the engineering symbol IS the node, label BELOW it */}
                     {model.blocks.map((b) => {
@@ -145,11 +170,16 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
                         // symbol occupies the upper part of the cell, labels below it
                         const symTop = b.y + 6;
                         const labelY = symTop + SYMBOL_SIZE + 11;
+                        const isHover = hover === b.id;
+                        const dim = !!connected && !connected.has(b.id);
                         return (
-                            <g key={b.id}>
-                                {/* faint hittable cell — no fill, hairline only */}
+                            <g key={b.id} onPointerEnter={enterNode(b)} onPointerMove={moveNode(b)} onPointerLeave={leaveNode}
+                                style={{ opacity: dim ? 0.32 : 1, transition: 'opacity .15s', cursor: 'pointer' }}>
+                                {/* hittable cell — faint hairline; lights up on hover */}
                                 <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={6}
-                                    fill="transparent" stroke={CELL_STROKE} strokeWidth={0.7} strokeOpacity={0.5}>
+                                    fill={isHover ? accent : 'transparent'} fillOpacity={isHover ? 0.08 : 0}
+                                    stroke={isHover ? accent : CELL_STROKE} strokeWidth={isHover ? 1.3 : 0.7} strokeOpacity={isHover ? 0.9 : 0.5}
+                                    style={{ transition: 'fill-opacity .15s, stroke .15s' }}>
                                     <title>{b.hover ?? `${b.title}${b.sub ? ` — ${b.sub}` : ''}`}</title>
                                 </rect>
                                 {b.kind && (
@@ -185,6 +215,19 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
                     })}
                 </g>
             </svg>
+            {/* rich hover tooltip — equipment detail, follows the cursor */}
+            {tip && (
+                <div className="pointer-events-none absolute z-20 max-w-[240px] rounded-lg border px-2.5 py-1.5 text-[11px] shadow-xl"
+                    style={{ left: Math.min(tip.x + 14, (wrapRef.current?.clientWidth ?? 400) - 240), top: Math.max(4, tip.y - 8),
+                        background: 'var(--rz-elevated, #0f172a)', borderColor: LANE_STROKE[tip.b.lane], color: 'var(--rz-text, #e2e8f0)' }}>
+                    <div className="flex items-center gap-1.5 font-semibold">
+                        <span className="inline-block h-2 w-2 rounded-full" style={{ background: LANE_STROKE[tip.b.lane] }} />
+                        {tip.b.title}{tip.b.badge ? ` · ${tip.b.badge}` : ''}
+                    </div>
+                    {tip.b.sub && <div className="mt-0.5 text-slate-400">{tip.b.sub}</div>}
+                    {tip.b.hover && tip.b.hover !== tip.b.sub && <div className="mt-1 leading-snug text-slate-300">{tip.b.hover}</div>}
+                </div>
+            )}
             {/* legend */}
             <div className="mt-2 flex flex-wrap items-center gap-3 rounded-lg border border-slate-200 dark:border-slate-800 px-2 py-1.5 text-[9px] text-slate-500">
                 <span className="font-semibold uppercase">Legend:</span>

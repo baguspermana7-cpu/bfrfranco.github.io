@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.14 — 2026-07-23 (DCMOC Architecture diagram — hover intuitiveness + polish)
+
+### Changed
+- **DCMOC Architecture diagram — interactive topology tracing**: hovering (or tapping) any node now shows a rich equipment tooltip (title · badge · counts · description) and **highlights the edges it connects to while dimming everything else**, so the power/backup/cooling/control topology reads itself. The hovered node's cell lights up (lane-accent glow); pan/zoom/Logical-SLD unchanged; `prefers-reduced-motion` respected via short CSS transitions. `next build` green, arch-probe 7/7, 24 interactive nodes.
+
 ## v1.115.13 — 2026-07-23 (LTC — power-breakdown donut: center total + per-slice %)
 
 ### Added
