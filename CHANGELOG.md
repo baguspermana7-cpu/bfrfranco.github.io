@@ -13,6 +13,12 @@ release sections rather than semver.
 
 ---
 
+## v1.115.29 — 2026-07-24 (article-28 — hero image + fixed card thumbnail)
+
+### Added
+- **article-28 cover image** (`assets/article-28-hero.webp`, 1200×509): generated dark-editorial hero — a datacenter rack wall compressing through golden data streams into a single glowing laptop (the article's Compression Horizon motif, matching its gold/amber palette). Inserted at the top of the article body per the article-27 pattern.
+- **Fixed the broken-looking article card**: the articles-grid thumbnail now uses the hero image instead of the dark OG card (which rendered as an empty block with overlapping title); dimensions corrected (1200×509).
+
 ## v1.115.28 — 2026-07-24 (DCMOC — universal tooltip sweep · Cx 7832-day fix · 4-level construction WBS · red-value diagnostics)
 
 ### Fixed
