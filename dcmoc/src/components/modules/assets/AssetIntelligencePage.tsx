@@ -11,6 +11,7 @@
 
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
 import { useSimulationStore } from '@/store/simulation';
 import { useRequirementsStore } from '@/store/requirements';
 import { rzModels, rzData } from '@/lib/rz-engine';
@@ -171,15 +172,15 @@ export function AssetIntelligencePage() {
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'Total Tracked Units', value: model.total.toLocaleString(), sub: 'engine equipment scaling', trace: 'asset.fleetUnits' },
-                            { label: 'Avg Health', value: `${model.avgHealth}/100`, sub: `age ${ageYears} yr · condition ${Math.round(condition * 100)}%`, trace: 'asset.avgHealth' },
-                            { label: 'Excellent / Good', value: (model.buckets.excellent + model.buckets.good).toLocaleString(), sub: `${model.buckets.excellent.toLocaleString()} excellent`, trace: 'asset.healthExcellentGood' },
-                            { label: 'Fair', value: model.buckets.fair.toLocaleString(), sub: 'monitor', trace: 'asset.healthFair' },
-                            { label: 'Poor / Critical', value: (model.buckets.poor + model.buckets.critical).toLocaleString(), sub: 'plan replacement', trace: 'asset.healthPoorCritical' },
-                            { label: 'At Wear-Out Risk', value: model.atRisk.toLocaleString(), sub: '≥25% Weibull CDF', trace: 'asset.atRiskUnits' },
+                            { label: 'Total Tracked Units', value: model.total.toLocaleString(), sub: 'engine equipment scaling', trace: 'asset.fleetUnits', tip: 'Fleet size from the engine equipment-scaling model — UPS modules, generators, cooling units, switchgear, batteries etc. sized from the IT load and redundancy config. Not a manually entered register: it re-scales when Requirements change, so treat it as the design fleet, not an as-built inventory.' },
+                            { label: 'Avg Health', value: `${model.avgHealth}/100`, sub: `age ${ageYears} yr · condition ${Math.round(condition * 100)}%`, trace: 'asset.avgHealth', tip: 'Fleet-average health index (0-100) computed from the fleet-age and condition assumptions set in the header controls, degraded per class by Weibull ageing on IEEE-493 life data. Move the fleet-age slider to explore how health decays; below ~60 average, replacement planning should already be underway.' },
+                            { label: 'Excellent / Good', value: (model.buckets.excellent + model.buckets.good).toLocaleString(), sub: `${model.buckets.excellent.toLocaleString()} excellent`, trace: 'asset.healthExcellentGood', tip: 'Units in the top two health bands — operating within normal parameters with no near-term action needed beyond routine PM. The share here shrinks as the fleet-age assumption grows; a healthy mature fleet keeps most units in these bands through mid-life refreshes.' },
+                            { label: 'Fair', value: model.buckets.fair.toLocaleString(), sub: 'monitor', trace: 'asset.healthFair', tip: 'Units in the middle health band — serviceable but trending down. These are the condition-monitoring priority: catching them here (oil analysis, thermography, battery impedance) is far cheaper than letting them slide into the poor/critical bands.' },
+                            { label: 'Poor / Critical', value: (model.buckets.poor + model.buckets.critical).toLocaleString(), sub: 'plan replacement', trace: 'asset.healthPoorCritical', tip: 'Units in the bottom health bands where failure risk is materially elevated — budget and schedule replacement or major overhaul. Cross-check against the Class Health table: if a critical class (e.g. UPS batteries) dominates this bucket, it is also a reliability/SPOF concern, not just a maintenance line.' },
+                            { label: 'At Wear-Out Risk', value: model.atRisk.toLocaleString(), sub: '≥25% Weibull CDF', trace: 'asset.atRiskUnits', tip: 'Units whose Weibull cumulative failure probability is ≥25% at the assumed fleet age — statistically entering the wear-out zone of the bathtub curve. Basis: IEEE-493 class life parameters, not sensor data. Use it to size the replacement CAPEX wave and critical-spares stock before failures cluster.' },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                                <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
+                                <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { tip?: string }).tip && <InfoTip content={(k as { tip?: string }).tip!} />}</div>
                                 {(k as { trace?: string }).trace ? (
                                     <TraceValue traceId={(k as { trace?: string }).trace!}>
                                         <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>

@@ -7550,6 +7550,147 @@
                 chiller:         [30, 50],  /* water-cooled chillers */
                 cdu:             [20, 40],  /* coolant distribution units */
                 genset_paralleling: [40, 60]
+            },
+            /* ── 4-level WBS templates (v2.5.x, Workstream E1) ───────────────────
+             * Keyed by the L2 sub-phase name of the DCMOC CAPEX timeline. Each L3
+             * task: { n:name, w:weight (share of the L2 window), basis:duration
+             * basis, dep?:predecessor L3 name, lead?:longLeadWeeks key (procure-
+             * ment-bound → critical-path check), l4?:[{n,w,basis}] work packages.
+             * Weights are normalized at compute time; sequencing inside an L2 is
+             * serial with a fastTrackOverlap fraction (design-build practice). */
+            wbsFastTrackOverlap: 0.25,
+            wbs: {
+                'Concept Design': [
+                    { n: 'Basis of Design (BOD)', w: 0.3, basis: 'Owner requirements → BOD narrative; sets tier, density, cooling & redundancy targets' },
+                    { n: 'Site test fits & block plans', w: 0.25, basis: 'Hall/yard/substation massing on the parcel; drives civil quantities', dep: 'Basis of Design (BOD)' },
+                    { n: 'Utility & authority pre-consultation', w: 0.25, basis: 'Grid capacity + AHJ pre-checks; long queue regions bind the whole program', dep: 'Basis of Design (BOD)' },
+                    { n: 'Class-4 estimate & funding gate', w: 0.2, basis: 'AACE Class-4 CAPEX from the concept set → investment committee gate', dep: 'Site test fits & block plans' }
+                ],
+                'Detailed Design': [
+                    { n: 'Electrical detailed design (SLD → IFC)', w: 0.3, basis: 'MV/LV SLDs, protection coordination, cable schedules to IFC issue', l4: [
+                        { n: 'SLD & protection study', w: 0.4, basis: 'Fault levels + relay coordination per IEEE 242' },
+                        { n: 'Cable & containment schedules', w: 0.3, basis: 'Feeder sizing per ampacity derating (NEC 310)' },
+                        { n: 'IFC issue & squad check', w: 0.3, basis: 'Interdisciplinary review → Issued-For-Construction set' }
+                    ] },
+                    { n: 'Mechanical/cooling detailed design', w: 0.3, basis: 'Cooling plant P&IDs, hydraulic calcs, plant room GA per selected cooling technology', l4: [
+                        { n: 'P&ID + hydraulic network calcs', w: 0.4, basis: 'Loop ΔT/flow duty from IT heat load' },
+                        { n: 'Plant room & piping GA', w: 0.35, basis: 'Equipment footprints + maintenance clearances' },
+                        { n: 'Controls sequence of operation', w: 0.25, basis: 'Staging, economizer & failure sequences' }
+                    ] },
+                    { n: 'Structural & civil packages', w: 0.2, basis: 'Foundations, steel, floor loading (kN/m²) per tier + seismic zone', dep: 'Electrical detailed design (SLD → IFC)' },
+                    { n: 'Fire & life-safety design', w: 0.2, basis: 'Clean-agent/water-mist zones, VESDA layout, egress per NFPA 75/76' }
+                ],
+                'Equipment Specification': [
+                    { n: 'Electrical equipment specs', w: 0.35, basis: 'Transformer/switchgear/UPS/genset datasheets + factory-test requirements', lead: 'transformer' },
+                    { n: 'Mechanical equipment specs', w: 0.3, basis: 'Chiller/CDU/CRAH schedules + performance points at design ambient', lead: 'chiller' },
+                    { n: 'Controls & monitoring specs', w: 0.15, basis: 'BMS/EPMS points list, network architecture, cyber requirements' },
+                    { n: 'Technical bid evaluation criteria', w: 0.2, basis: 'Scoring matrix: compliance, efficiency, lead time, service coverage', dep: 'Electrical equipment specs' }
+                ],
+                'Vendor Selection': [
+                    { n: 'RFQ issue & bid period', w: 0.35, basis: 'Long-lead RFQs first — transformer/switchgear queues set the program', lead: 'switchgear' },
+                    { n: 'Bid leveling & clarifications', w: 0.25, basis: 'Commercial + technical leveling, exception logs', dep: 'RFQ issue & bid period' },
+                    { n: 'Award & PO placement (long-lead first)', w: 0.25, basis: 'PO date starts the lead-time clock — the real schedule driver', dep: 'Bid leveling & clarifications' },
+                    { n: 'Vendor drawings & FAT planning', w: 0.15, basis: 'Submittal register + factory-acceptance-test windows', dep: 'Award & PO placement (long-lead first)' }
+                ],
+                'Environmental Assessment': [
+                    { n: 'Baseline studies & screening', w: 0.4, basis: 'Noise, air, water, traffic baselines per jurisdiction scope' },
+                    { n: 'Impact assessment & mitigation plan', w: 0.35, basis: 'Generator emissions, cooling discharge, construction impacts', dep: 'Baseline studies & screening' },
+                    { n: 'Public consultation & determination', w: 0.25, basis: 'Statutory consultation window — authority-controlled, region-dependent', dep: 'Impact assessment & mitigation plan' }
+                ],
+                'Building Permit': [
+                    { n: 'Permit package assembly', w: 0.3, basis: 'Architectural/structural/MEP permit sets + code compliance narrative' },
+                    { n: 'AHJ review cycles & responses', w: 0.5, basis: 'Authority review rounds — the binding step; slow-permit regions apply permitMult', dep: 'Permit package assembly' },
+                    { n: 'Permit issue & conditions closeout', w: 0.2, basis: 'Conditions register → construction may start', dep: 'AHJ review cycles & responses' }
+                ],
+                'Utility Connection': [
+                    { n: 'Interconnection application & studies', w: 0.4, basis: 'Load-flow/short-circuit studies at the POI; queue position matters' },
+                    { n: 'Connection agreement & works order', w: 0.3, basis: 'Utility commercial agreement + upstream reinforcement scope', dep: 'Interconnection application & studies' },
+                    { n: 'Utility-side works & metering', w: 0.3, basis: 'Utility builds its side (line/bay/metering) — utility-controlled window', dep: 'Connection agreement & works order' }
+                ],
+                'Fire Safety Approval': [
+                    { n: 'Fire strategy & hydraulic calcs', w: 0.45, basis: 'Suppression concept, water demand, clean-agent concentration calcs' },
+                    { n: 'Fire authority review & approval', w: 0.55, basis: 'AHJ fire review — separate authority track from building permit', dep: 'Fire strategy & hydraulic calcs' }
+                ],
+                'Site Prep & Excavation': [
+                    { n: 'Mobilization & site establishment', w: 0.25, basis: 'Access, hoarding, welfare, temporary power/water' },
+                    { n: 'Clearing, grading & drainage', w: 0.4, basis: 'Earthworks volume from site area; weather-exposed activity', dep: 'Mobilization & site establishment' },
+                    { n: 'Utilities diversion & temporary works', w: 0.35, basis: 'Existing services diversion + crane pads/haul roads', dep: 'Clearing, grading & drainage' }
+                ],
+                'Foundations & Structural': [
+                    { n: 'Piling / ground improvement', w: 0.3, basis: 'Geotech-driven; seismic zone raises foundation scope' },
+                    { n: 'Foundations & ground slabs', w: 0.35, basis: 'Equipment plinths + hall slabs to flatness spec', dep: 'Piling / ground improvement' },
+                    { n: 'Structural frame erection', w: 0.35, basis: 'Steel/precast frame; topping-out milestone', dep: 'Foundations & ground slabs' }
+                ],
+                'Building Envelope': [
+                    { n: 'Roof & weatherproofing', w: 0.4, basis: 'Watertight date gates all internal fit-out trades' },
+                    { n: 'Walls, cladding & louvers', w: 0.35, basis: 'Facade + acoustic louvers for plant airflow', dep: 'Roof & weatherproofing' },
+                    { n: 'Doors, security shell & finishes', w: 0.25, basis: 'Secure shell → controlled access for MEP phase', dep: 'Walls, cladding & louvers' }
+                ],
+                'Raised Floor & Containment': [
+                    { n: 'Raised floor & grounding grid', w: 0.4, basis: 'Floor grid + signal reference grid per hall' },
+                    { n: 'Hot/cold aisle containment', w: 0.35, basis: 'Containment per cooling design (aisle or rack-level)', dep: 'Raised floor & grounding grid' },
+                    { n: 'Hall finishes & cleanliness regime', w: 0.25, basis: 'ISO 14644-aligned clean regime before IT fit-out', dep: 'Hot/cold aisle containment' }
+                ],
+                'HV/LV Electrical': [
+                    { n: 'Transformer delivery & setting', w: 0.25, basis: 'PROCUREMENT-BOUND: MV/HV transformer lead governs power-on', lead: 'transformer', l4: [
+                        { n: 'Delivery, offload & positioning', w: 0.4, basis: 'Heavy haul + crane windows' },
+                        { n: 'Oil filling & site tests', w: 0.35, basis: 'Dielectric tests, Buchholz, tap-changer checks' },
+                        { n: 'HV cable terminations', w: 0.25, basis: 'Termination + partial-discharge tests' }
+                    ] },
+                    { n: 'MV/LV switchgear install', w: 0.3, basis: 'Switchboard setting, busbar torque + IR tests', lead: 'switchgear', dep: 'Transformer delivery & setting' },
+                    { n: 'Generator & fuel system install', w: 0.25, basis: 'Genset setting, exhaust, day tanks, fuel farm tie-in', lead: 'generator' },
+                    { n: 'Cabling, busway & point-to-point', w: 0.2, basis: 'Feeders + busway runs, then point-to-point continuity to every PDU', dep: 'MV/LV switchgear install' }
+                ],
+                'UPS & Battery': [
+                    { n: 'UPS module install & DC works', w: 0.45, basis: 'Module setting + DC bus + battery racks', lead: 'ups' },
+                    { n: 'Battery install & charge regime', w: 0.3, basis: 'String install, initial charge, capacity verification', dep: 'UPS module install & DC works' },
+                    { n: 'UPS site acceptance tests', w: 0.25, basis: 'Transfer, runtime & parallel tests per module pair', dep: 'Battery install & charge regime' }
+                ],
+                'Cooling Plant': [
+                    { n: 'Heat-rejection & plant equipment set', w: 0.35, basis: 'Chillers/CDUs/towers set on plinths — procurement-bound', lead: 'chiller', l4: [
+                        { n: 'Equipment rigging & setting', w: 0.4, basis: 'Crane lifts + alignment' },
+                        { n: 'Piping tie-ins & insulation', w: 0.35, basis: 'Welded/grooved loops + pressure test' },
+                        { n: 'Refrigerant/coolant charging', w: 0.25, basis: 'Charge + leak test per system' }
+                    ] },
+                    { n: 'Distribution piping & pumps', w: 0.3, basis: 'Primary/secondary loops, pump sets, flushing & chemical treatment', dep: 'Heat-rejection & plant equipment set' },
+                    { n: 'Terminal units (CRAH/CDU/rack loops)', w: 0.2, basis: 'Hall terminal units per cooling technology', dep: 'Distribution piping & pumps', lead: 'cdu' },
+                    { n: 'Water treatment & balancing', w: 0.15, basis: 'System flush, passivation, flow balancing to design duty', dep: 'Terminal units (CRAH/CDU/rack loops)' }
+                ],
+                'BMS / EPMS': [
+                    { n: 'Field devices & cabling', w: 0.35, basis: 'Sensors/meters/actuators + segregated controls network' },
+                    { n: 'Controllers & headend build', w: 0.3, basis: 'Panels, servers, graphics, alarm philosophy', dep: 'Field devices & cabling' },
+                    { n: 'Point-to-point & graphics verification', w: 0.35, basis: 'Every point proven end-to-end — pacing item for L3 commissioning', dep: 'Controllers & headend build' }
+                ],
+                'Fire Suppression': [
+                    { n: 'Pipework & nozzle install', w: 0.4, basis: 'Clean-agent/water-mist distribution per zone' },
+                    { n: 'Detection & VESDA install', w: 0.3, basis: 'Aspirating + spot detection, cross-zoned releases' },
+                    { n: 'Integration & discharge readiness', w: 0.3, basis: 'Interlocks to cooling/power + authority witness prep', dep: 'Detection & VESDA install' }
+                ],
+                'Security Systems': [
+                    { n: 'Perimeter & CCTV install', w: 0.4, basis: 'Fence-line detection + camera coverage plan' },
+                    { n: 'Access control & layered zones', w: 0.35, basis: 'Card/biometric layers: site → building → hall → rack' },
+                    { n: 'SOC integration & acceptance', w: 0.25, basis: 'Monitoring integration + scenario acceptance tests', dep: 'Access control & layered zones' }
+                ],
+                'IST (Individual System Test)': [
+                    { n: 'Pre-functional checklists', w: 0.3, basis: 'Level-2 static verification per system before energization' },
+                    { n: 'Individual system startups', w: 0.4, basis: 'Level-3 startups: each UPS, genset, chiller/CDU, CRAH string', dep: 'Pre-functional checklists' },
+                    { n: 'Functional performance tests', w: 0.3, basis: 'Capacity + control-sequence proof per system', dep: 'Individual system startups' }
+                ],
+                'IFC (Integrated Functional)': [
+                    { n: 'Utility-loss scenarios', w: 0.4, basis: 'Pull-the-plug: utility fail → gen start → retransfer, per path' },
+                    { n: 'Redundancy & concurrent-maintenance drills', w: 0.35, basis: 'N+1/2N path isolation with load held — tier evidence', dep: 'Utility-loss scenarios' },
+                    { n: 'Cascade & recovery scenarios', w: 0.25, basis: 'Compound failures + recovery-time verification', dep: 'Redundancy & concurrent-maintenance drills' }
+                ],
+                'Load Testing': [
+                    { n: 'Load-bank staging', w: 0.3, basis: 'Rack-equivalent load banks placed per hall' },
+                    { n: 'Burn-in at design load', w: 0.45, basis: 'Sustained thermal/electrical proof at 100% design (24-72 h/hall)', dep: 'Load-bank staging' },
+                    { n: 'Heat-rejection proof at peak', w: 0.25, basis: 'Cooling plant at design ambient/duty — PUE evidence run', dep: 'Burn-in at design load' }
+                ],
+                'Handover & Documentation': [
+                    { n: 'Punch-list closeout', w: 0.3, basis: 'A/B items closed with re-test evidence' },
+                    { n: 'As-builts, O&M & training', w: 0.4, basis: 'As-built sets, O&M manuals, CMMS load, operator training', dep: 'Punch-list closeout' },
+                    { n: 'Turnover dossier & RFS certificate', w: 0.3, basis: 'Turnover package + ready-for-service sign-off', dep: 'As-builts, O&M & training' }
+                ]
             }
         },
         /* ══ v2.4.0 — DATA.requirements: Requirements intake (Layer 1). Required-field
@@ -11175,10 +11316,24 @@
                     if (inp.rackDensity === 'ai_hpc') capexPerKw = R.capexPerKw.ai_hpc; else if (inp.rackDensity === 'high') capexPerKw = R.capexPerKw.high;
                     var estCapex = inp.itLoad * capexPerKw;
                     var rd = R.redundancy[inp.redundancy], rate = C._rate(inp.region);
+                    /* CALENDAR duration (v2.5.x fix): dur.total is LABOR-days (per-level crew
+                     * effort summed serially — the faithful cx-calculator port, parity-locked).
+                     * Displaying it as calendar wall-time explodes at scale (100 MW → "7832 d").
+                     * Calendar = the log-damped, capped programSchedule months (crews work levels
+                     * in parallel), never longer than the single-crew serial labor total. */
+                    var schedCool = inp.coolingType === 'dlc' ? 'liquid' : inp.coolingType;
+                    var schedRed = { 'N': 'n', 'N+1': 'n1', '2N': '2n', '2N+1': '2n1' }[inp.redundancy] || 'n1';
+                    var sched = C.programSchedule({ itLoadKw: inp.itLoad, cooling: schedCool, redundancy: schedRed });
+                    var calendarDays = Math.min(dur.total, Math.round(sched.totalMonths * 22));
+                    var calendarMonths = +(calendarDays / 22).toFixed(1);
+                    var crewEquivalent = calendarDays > 0 ? +(dur.total / calendarDays).toFixed(1) : 1;
                     return {
                         grand: Math.round(grand), subtotal: Math.round(subtotal), contingency: Math.round(contingency),
                         perKw: +(grand / inp.itLoad).toFixed(1), pctCapex: +((grand / estCapex) * 100).toFixed(2), capexPerKw: capexPerKw,
                         durationDays: dur.total, durationWeeks: Math.ceil(dur.total / 5), durationMonths: Math.ceil(dur.total / 22),
+                        laborDays: dur.total,
+                        calendarDays: calendarDays, calendarWeeks: Math.ceil(calendarDays / 5), calendarMonths: calendarMonths,
+                        crewEquivalent: crewEquivalent, schedule: sched.byLevel,
                         levels: levels, disciplines: disciplines, equip: eq,
                         region: { key: inp.region, name: rate.name, mult: rate.mult },
                         tierInfo: { tier: rd.tier, avail: rd.avail, scenarios: rd.scenarios, istHrs: rd.istHrs },
@@ -11408,6 +11563,71 @@
                     }
                     items.sort(function (a, b) { return b.leadMonths - a.leadMonths; });
                     return { items: items, criticalItems: critical, maxLeadMonths: items.length ? items[0].leadMonths : 0, recommendEarlyOrder: critical.length > 0 };
+                },
+                /** 4-level WBS (v2.5.x, Workstream E1): expands a models.capex timeline
+                 *  (L1 phases + L2 subPhases) into a nested phase → sub-phase → task →
+                 *  work-package tree using DATA.construction.wbs templates. L3/L4 windows
+                 *  are the L2 window distributed by weight, serial with the design-build
+                 *  fast-track overlap; procurement-bound tasks carry the longLeadWeeks
+                 *  basis + a critical flag when the lead exceeds the task start (order
+                 *  must predate NTP). opts { itLoadKw?, stressed? } enriches the basis
+                 *  with screening equipment counts. Returns { tree, totalMonths }. */
+                detailedSchedule: function (timeline, opts) {
+                    timeline = timeline || {}; opts = opts || {};
+                    var W = DATA.construction.wbs, LL = DATA.construction.longLeadWeeks;
+                    var ovl = DATA.construction.wbsFastTrackOverlap;
+                    var idx = opts.stressed ? 1 : 0;
+                    var kw = +opts.itLoadKw || 0;
+                    var eq = null;
+                    try { if (kw > 0 && RZEngine.models.commissioning && RZEngine.models.commissioning.equipScale) eq = RZEngine.models.commissioning.equipScale({ itLoad: kw, rackDensity: 'standard' }); } catch (e) { /* screening enrich only */ }
+                    var unitFor = { transformer: 'transformers', switchgear: 'switchgear', generator: 'generators', ups: 'ups_modules', chiller: 'chillers', cdu: 'cooling_units' };
+                    /* distribute a window [s,e] across weighted tasks, serial with overlap,
+                     * linearly rescaled so the last task ends exactly at e. */
+                    function layout(tpl, s, e, color, level) {
+                        if (!tpl || !tpl.length || e <= s) return [];
+                        var T = e - s, wSum = 0, i;
+                        for (i = 0; i < tpl.length; i++) wSum += tpl[i].w;
+                        var raw = [], cursor = 0;
+                        for (i = 0; i < tpl.length; i++) {
+                            var d = (tpl[i].w / wSum) * T;
+                            raw.push({ st: cursor, en: cursor + d });
+                            cursor += d * (1 - (i < tpl.length - 1 ? ovl : 0));
+                        }
+                        var span = raw[raw.length - 1].en, k = span > 0 ? T / span : 1;
+                        var out = [];
+                        for (i = 0; i < tpl.length; i++) {
+                            var t = tpl[i];
+                            var st = +(s + raw[i].st * k).toFixed(1), en = +(s + raw[i].en * k).toFixed(1);
+                            var basis = t.basis, critical = false, risk = null;
+                            if (t.lead && LL[t.lead]) {
+                                var leadMo = +(LL[t.lead][idx] / 4.345).toFixed(1);
+                                var units = eq && unitFor[t.lead] && eq[unitFor[t.lead]] != null ? ' · ~' + eq[unitFor[t.lead]] + ' units (screening)' : '';
+                                basis += ' — lead ' + LL[t.lead][0] + '–' + LL[t.lead][1] + ' wk (' + leadMo + ' mo typ.)' + units;
+                                if (leadMo >= st) { critical = true; risk = 'Procurement-bound: PO must be placed ~' + Math.max(0, +(leadMo - st).toFixed(1)) + ' mo before NTP or this task slips the program'; }
+                            }
+                            var node = { id: level + ':' + t.n, name: t.n, level: level, start: st, end: en, months: +(en - st).toFixed(1), color: color, basis: basis, dependsOn: t.dep || null, critical: critical, risk: risk, children: [] };
+                            if (t.l4 && t.l4.length) node.children = layout(t.l4, st, en, color, level + 1);
+                            out.push(node);
+                        }
+                        return out;
+                    }
+                    var phases = timeline.phases || [], subs = timeline.subPhases || [];
+                    var tree = [];
+                    for (var p = 0; p < phases.length; p++) {
+                        var ph = phases[p];
+                        var n1 = { id: '1:' + ph.name, name: ph.name, level: 1, start: ph.start, end: ph.end, months: +(ph.end - ph.start).toFixed(1), color: ph.color, basis: 'CAPEX-timeline phase — redundancy/building/cooling/permit multipliers applied', dependsOn: null, critical: false, risk: null, children: [] };
+                        for (var s2 = 0; s2 < subs.length; s2++) {
+                            var sp = subs[s2];
+                            if (sp.parent !== ph.name) continue;
+                            var n2 = { id: '2:' + sp.name, name: sp.name, level: 2, start: sp.start, end: sp.end, months: +(sp.end - sp.start).toFixed(1), color: sp.color, basis: 'CAPEX-timeline sub-phase window', dependsOn: null, critical: false, risk: null, children: layout(W[sp.name], sp.start, sp.end, sp.color, 3) };
+                            /* roll critical up: a sub-phase holding a critical task is critical */
+                            for (var c = 0; c < n2.children.length; c++) if (n2.children[c].critical) { n2.critical = true; break; }
+                            n1.children.push(n2);
+                        }
+                        for (var c1 = 0; c1 < n1.children.length; c1++) if (n1.children[c1].critical) { n1.critical = true; break; }
+                        tree.push(n1);
+                    }
+                    return { tree: tree, totalMonths: timeline.totalMonths != null ? timeline.totalMonths : 0 };
                 }
             },
 
@@ -13461,7 +13681,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-19-c40"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-23-e0"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

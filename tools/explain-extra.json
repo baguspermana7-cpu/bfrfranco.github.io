@@ -3347,6 +3347,135 @@
     "Water Stress",
     "water stress"
    ]
+  },
+  "irr": {
+   "t": "IRR (Internal Rate of Return)",
+   "d": "The discount rate at which the project's NPV equals zero — the annualized return the cash flows themselves earn. Decision rule: invest when IRR clears the hurdle rate (cost of capital + risk premium). IRR ignores project SCALE (a tiny project can post a huge IRR), so it is read together with NPV. Computed by bisection/Newton on the same cash-flow series as NPV.",
+   "f": "NPV(cashflows, IRR) = 0",
+   "u": "%/yr",
+   "rel": [
+    "npv",
+    "hurdle-rate",
+    "payback"
+   ],
+   "aliases": [
+    "IRR",
+    "internal rate of return"
+   ]
+  },
+  "pi": {
+   "t": "PI (Profitability Index)",
+   "d": "Present value created per dollar invested: (NPV + Investment) / Investment. PI > 1.0 means the discounted benefits exceed the capital; 1.08x reads as 8% value creation over the invested base. Useful for ranking projects when capital is constrained — but like NPV it depends on the discount rate used.",
+   "f": "PI = (NPV + Investment) / Investment",
+   "u": "x",
+   "rel": [
+    "npv",
+    "irr"
+   ],
+   "aliases": [
+    "PI",
+    "profitability index",
+    "profitability-index"
+   ]
+  },
+  "blended-irr": {
+   "t": "Blended IRR",
+   "d": "Investment-weighted IRR across all build phases: each phase's IRR weighted by its share of total CAPEX. A phased campus can hide a weak phase inside a healthy blend — the per-phase decision matrix is the honest view. Adjusted for tax incentives, disaster-risk premium, grid-penalty OPEX, and talent-market costs before weighting.",
+   "f": "Σ(phase IRR × phase CAPEX) / Σ(phase CAPEX)",
+   "u": "%/yr",
+   "rel": [
+    "irr",
+    "npv",
+    "hurdle-rate"
+   ],
+   "aliases": [
+    "blended IRR"
+   ]
+  },
+  "payback": {
+   "t": "Payback Period",
+   "d": "Years until cumulative net cash flow first turns positive. A screening metric only: it ignores the time value of money and everything after the payback point — a project can pay back fast and still destroy value (or slowly and create it). Use NPV/IRR for the decision; use payback for liquidity risk.",
+   "f": "min t where Σ cashflow(0..t) ≥ 0",
+   "u": "yr",
+   "rel": [
+    "npv",
+    "irr",
+    "discounted-payback"
+   ],
+   "aliases": [
+    "simple payback"
+   ]
+  },
+  "hurdle-rate": {
+   "t": "Hurdle Rate",
+   "d": "The minimum acceptable IRR for the investment — typically WACC plus a project-risk premium (construction, market, country risk). DCMOC's phased-finance verdicts compare IRR to a 12% default hurdle: below it a phase is NO-GO even with positive NPV, because capital could earn more at equal risk elsewhere.",
+   "u": "%/yr",
+   "rel": [
+    "irr",
+    "wacc",
+    "discount-rate"
+   ],
+   "aliases": [
+    "hurdle"
+   ]
+  },
+  "discount-rate": {
+   "t": "Discount Rate",
+   "d": "The rate used to translate future cash flows into today's dollars in NPV — the opportunity cost of capital. Usually set to WACC, plus premiums for country and project risk. Higher discount rate shrinks the value of distant cash flows: capital-heavy, long-payback DC projects are very sensitive to it.",
+   "f": "PV = CF / (1 + r)^t",
+   "u": "%/yr",
+   "rel": [
+    "npv",
+    "wacc",
+    "hurdle-rate"
+   ]
+  },
+  "idc": {
+   "t": "IDC (Interest During Construction)",
+   "d": "Financing interest that accrues on capital drawn before revenue starts — a real cost of the build period. Computed from each phase's draw schedule (monthly draws × construction loan rate × months outstanding) and capitalized into effective CAPEX. Longer schedules and front-loaded draws raise IDC; it is why schedule slip costs money even at fixed scope.",
+   "f": "Σ(monthly draw × rate × months outstanding)",
+   "u": "$",
+   "rel": [
+    "capex",
+    "payback"
+   ],
+   "aliases": [
+    "interest during construction"
+   ]
+  },
+  "landed-cost": {
+   "t": "Landed Cost",
+   "d": "Equipment cost delivered to site: base price + import duty on the imported-equipment fraction + freight/insurance/customs. DCMOC applies the duty only to the imported-equipment share of each category (never to local labor), so high-duty countries raise electrical/mechanical CAPEX but not installation labor.",
+   "f": "landedFactor = 1 + duty × importedEquipmentShare",
+   "rel": [
+    "capex",
+    "total-capex"
+   ],
+   "aliases": [
+    "landed factor"
+   ]
+  },
+  "lcoe": {
+   "t": "LCOE (Levelized Cost of Energy)",
+   "d": "Lifetime cost per MWh of an energy source: all discounted costs (CAPEX + OPEX + fuel) divided by discounted MWh produced. The comparison currency for solar vs wind vs grid: a renewable is economic when its LCOE (plus firming/storage) beats the delivered grid tariff. Sensitive to capacity factor and discount rate.",
+   "f": "LCOE = Σ(costs_t/(1+r)^t) / Σ(MWh_t/(1+r)^t)",
+   "u": "$/MWh",
+   "rel": [
+    "discount-rate"
+   ],
+   "aliases": [
+    "levelized cost of energy"
+   ]
+  },
+  "bankability": {
+   "t": "Bankability",
+   "d": "Whether a project can attract debt financing on acceptable terms. Screening test: NPV > 0 AND IRR > WACC, plus debt-service coverage (DSCR ≥ ~1.25), contracted revenue quality, and counterparty/country risk. A technically excellent project with weak contracted cash flows is not bankable; lenders price the cash-flow certainty, not the engineering.",
+   "rel": [
+    "npv",
+    "irr",
+    "dscr",
+    "wacc"
+   ]
   }
  }
 }

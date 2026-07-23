@@ -399,7 +399,7 @@ const CapexDashboard = () => {
                             </label>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                 <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Design Fee</div>
+                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Design Fee <Tooltip content="Architecture & engineering design fee as a percentage of construction cost — covers A&E firms, MEP design and permitting drawings. Typical data-center range 3-6%; complex or fast-track designs trend higher. Applied to the base estimate before contingency." /></div>
                                     <div className="flex items-center gap-1">
                                         <input type="number" className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.designFee}
                                             onChange={(e) => handleChange('designFee', Number(e.target.value))} min={0} max={20} />
@@ -407,7 +407,7 @@ const CapexDashboard = () => {
                                     </div>
                                 </div>
                                 <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">PM Fee</div>
+                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">PM Fee <Tooltip content="Project/construction management fee as a percentage of construction cost — owner's PM team, construction oversight, QA/QC and commissioning coordination. Typical range 2-4%; multi-phase or remote-site builds run higher. Applied to the base estimate before contingency." /></div>
                                     <div className="flex items-center gap-1">
                                         <input type="number" className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.pmFee}
                                             onChange={(e) => handleChange('pmFee', Number(e.target.value))} min={0} max={15} />
@@ -415,7 +415,7 @@ const CapexDashboard = () => {
                                     </div>
                                 </div>
                                 <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Contingency</div>
+                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Contingency <Tooltip content="Owner's contingency percentage for unforeseen conditions, scope growth and estimating error. Industry standard 10-15% at concept stage (AACE Class 4 estimates often carry more); it is drawn down as design matures, not spent by default. This same value acts as the design margin and feeds the P80 risk band on the CAPEX engine page." /></div>
                                     <div className="flex items-center gap-1">
                                         <input type="number" className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.contingency}
                                             onChange={(e) => handleChange('contingency', Number(e.target.value))} min={0} max={30} />

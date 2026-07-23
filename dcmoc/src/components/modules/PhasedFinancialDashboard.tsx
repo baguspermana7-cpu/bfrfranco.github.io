@@ -11,6 +11,7 @@ import { calculateGridReliability } from '@/modules/infrastructure/GridReliabili
 import { calculateTalentAvailability } from '@/modules/staffing/TalentAvailabilityEngine';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { RedValue } from '@/components/ui/RedValue';
 import { Calculator, DollarSign, TrendingUp, Target, Percent, CheckCircle2, XCircle, FileText, AlertTriangle, ChevronDown, ArrowUpRight } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer,
@@ -359,13 +360,17 @@ const PhasedFinancialDashboard = () => {
                             <Tooltip content="Investment-weighted internal rate of return across all phases, adjusted for tax incentives and risk." />
                         </div>
                         <TraceValue traceId="pf.blendedIrr">
-                            <div
-                                className={`text-2xl font-bold ${blendedIrr >= 12 ? 'text-rz-data' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
-                                title={blendedIrr < 12 ? (overallExplain?.reason ?? 'IRR below hurdle') + ' Click to see per-phase levers.' : undefined}
-                                onClick={blendedIrr < 12 ? (e) => { e.stopPropagation(); openWorstPhase(); } : undefined}
-                            >
-                                {blendedIrr.toFixed(1)}%
-                            </div>
+                            {blendedIrr >= 12 ? (
+                                <div className="text-2xl font-bold text-rz-data">{blendedIrr.toFixed(1)}%</div>
+                            ) : (
+                                <RedValue className="text-2xl font-bold" diagnosis={{
+                                    title: 'Blended IRR', reason: overallExplain?.reason ?? 'Blended IRR is below the 12% hurdle rate.',
+                                    actual: `${blendedIrr.toFixed(1)}%`, threshold: '12% hurdle', gap: `${(blendedIrr - 12).toFixed(1)} pp`,
+                                    levers: (overallExplain?.levers ?? []).map((l) => ({ label: l.label, detail: l.detail, tab: l.targetTab })),
+                                    tab: 'phased-finance',
+                                    note: 'Computed by bisection on the same phase cash-flow model as the decision matrix — identical numbers, no separate estimate.',
+                                }}>{blendedIrr.toFixed(1)}%</RedValue>
+                            )}
                         </TraceValue>
                     </CardContent>
                 </Card>
@@ -378,13 +383,17 @@ const PhasedFinancialDashboard = () => {
                             <Tooltip content="Total NPV — sum of every phase's discounted net cash flows over the analysis horizon, at the risk-adjusted discount rate (WACC + risk premium). Positive = the project creates value above its cost of capital; the magnitude is how much. Moves with revenue $/kW·mo, OPEX, the discount rate, and phase timing. NPV can be positive while IRR is still below the hurdle." />
                         </div>
                         <TraceValue traceId="pf.totalNpv">
-                            <div
-                                className={`text-2xl font-bold ${blendedNpv >= 0 ? 'text-rz-data' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
-                                title={blendedNpv < 0 ? `NPV negative ${fmtMoney(blendedNpv)} at the discount rate used. Click to see the reason & levers of the weakest phase.` : undefined}
-                                onClick={blendedNpv < 0 ? (e) => { e.stopPropagation(); openWorstPhase(); } : undefined}
-                            >
-                                {fmtMoney(blendedNpv)}
-                            </div>
+                            {blendedNpv >= 0 ? (
+                                <div className="text-2xl font-bold text-rz-data">{fmtMoney(blendedNpv)}</div>
+                            ) : (
+                                <RedValue className="text-2xl font-bold" diagnosis={{
+                                    title: 'Total NPV', reason: `NPV is negative (${fmtMoney(blendedNpv)}) at the risk-adjusted discount rate — the discounted lifetime cash flows do not recover the invested capital. ${overallExplain?.reason ?? ''}`,
+                                    actual: fmtMoney(blendedNpv), threshold: '≥ $0',
+                                    levers: (overallExplain?.levers ?? []).map((l) => ({ label: l.label, detail: l.detail, tab: l.targetTab })),
+                                    tab: 'phased-finance',
+                                    note: 'Same cash-flow model as the per-phase decision matrix; a negative NPV usually needs a revenue, CAPEX, or discount-rate lever — not more redundancy.',
+                                }}>{fmtMoney(blendedNpv)}</RedValue>
+                            )}
                         </TraceValue>
                     </CardContent>
                 </Card>
@@ -423,13 +432,17 @@ const PhasedFinancialDashboard = () => {
                             <Tooltip content="Profitability Index: (NPV + Investment) / Investment. Above 1.0 = value-creating." />
                         </div>
                         <TraceValue traceId="pf.pi">
-                            <div
-                                className={`text-2xl font-bold ${profitabilityIndex >= 1 ? 'text-slate-900 dark:text-white' : 'text-red-600 dark:text-red-400 cursor-pointer underline decoration-dotted underline-offset-4'}`}
-                                title={profitabilityIndex < 1 ? `PI ${profitabilityIndex}x < 1.0 — PV of benefits is less than the investment. Click to see the levers of the weakest phase.` : undefined}
-                                onClick={profitabilityIndex < 1 ? (e) => { e.stopPropagation(); openWorstPhase(); } : undefined}
-                            >
-                                {profitabilityIndex}x
-                            </div>
+                            {profitabilityIndex >= 1 ? (
+                                <div className="text-2xl font-bold text-slate-900 dark:text-white">{profitabilityIndex}x</div>
+                            ) : (
+                                <RedValue className="text-2xl font-bold" diagnosis={{
+                                    title: 'Profitability Index', reason: `PI ${profitabilityIndex}x < 1.0 — the present value of benefits is smaller than the invested capital, so every dollar in returns less than a dollar of value. ${overallExplain?.reason ?? ''}`,
+                                    actual: `${profitabilityIndex}x`, threshold: '≥ 1.0x',
+                                    levers: (overallExplain?.levers ?? []).map((l) => ({ label: l.label, detail: l.detail, tab: l.targetTab })),
+                                    tab: 'phased-finance',
+                                    note: 'PI = (NPV + Investment) / Investment on the same phase cash-flow model.',
+                                }}>{profitabilityIndex}x</RedValue>
+                            )}
                         </TraceValue>
                     </CardContent>
                 </Card>

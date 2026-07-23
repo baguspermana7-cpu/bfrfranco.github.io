@@ -124,7 +124,7 @@ export function StaffingDashboard() {
         <div className="space-y-6">
             {staffBench && (
                 <div className="flex flex-wrap items-center gap-4 px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/70 text-xs">
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Uptime Staffing Benchmark</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1">Uptime Staffing Benchmark <Tooltip content="Engine benchmark headcount from the Uptime Institute staffing model: 4.2 FTE per 24×7 position (covers rotation, leave and shrinkage) scaled by tier, plus per-MW technicians for the facility size. Your configured headcount is compared against it — within ±2 FTE is considered aligned; a large gap means over-spend or coverage risk." /></span>
                     <span className="text-slate-600 dark:text-slate-300">Benchmark <b className="tabular-nums text-cyan-500">{staffBench.totalFte} FTE</b> <span className="text-slate-400">({staffBench.ftePerMw ?? '—'}/MW, Tier {inputs.tierLevel}, {staffMw.toFixed(1)} MW)</span></span>
                     <span className="text-slate-600 dark:text-slate-300">Configured <b className="tabular-nums text-rz-data">{results.totalHeadcount} FTE</b></span>
                     {(() => { const d = results.totalHeadcount - staffBench.totalFte; const over = d > 0; return <span className={`tabular-nums font-semibold ${Math.abs(d) <= 2 ? 'text-rz-data' : over ? 'text-amber-500' : 'text-rose-400'}`}>{over ? '+' : ''}{d} vs benchmark {Math.abs(d) <= 2 ? '· aligned' : over ? '· above' : '· below'}</span>; })()}
@@ -714,12 +714,12 @@ export function StaffingDashboard() {
                             <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-3">{comp.label}</h4>
                             <div className="grid grid-cols-2 gap-4 text-sm">
                                 <div className="p-3 bg-white dark:bg-slate-950/50 rounded-lg">
-                                    <div className="text-xs text-slate-600 dark:text-slate-500 uppercase mb-1">8h Continental</div>
+                                    <div className="text-xs text-slate-600 dark:text-slate-500 uppercase mb-1 flex items-center gap-1">8h Continental <Tooltip content="Monthly staffing cost under the 8-hour continental rotation (3 shifts/day). Needs more people per position but each works standard weeks; overtime hours per person shown below. Compare against the 12h model — the cheaper option depends on local overtime multipliers and shift allowances." /></div>
                                     <div className="text-lg font-mono text-slate-900 dark:text-white">{fmtMoney(comp.comparison.model8h.monthlyCost)}</div>
                                     <div className="text-xs text-slate-500 dark:text-slate-400">{comp.comparison.model8h.headcount} FTEs, {comp.comparison.model8h.metrics.overtimeHoursPerPerson}h OT/wk</div>
                                 </div>
                                 <div className="p-3 bg-cyan-50 dark:bg-cyan-950/20 rounded-lg border border-cyan-200 dark:border-cyan-900/30">
-                                    <div className="text-xs text-slate-600 dark:text-slate-500 uppercase mb-1">12h 4on/4off</div>
+                                    <div className="text-xs text-slate-600 dark:text-slate-500 uppercase mb-1 flex items-center gap-1">12h 4on/4off <Tooltip content="Monthly staffing cost under the 12-hour 4-on/4-off rotation (2 shifts/day, 4 teams). Fewer heads and typically zero structural overtime, but longer shifts raise fatigue risk and some labor codes cap 12h scheduling. The recommendation line below states which model wins for this country's labor rules." /></div>
                                     <div className="text-lg font-mono text-cyan-600 dark:text-cyan-400">{fmtMoney(comp.comparison.model12h.monthlyCost)}</div>
                                     <div className="text-xs text-rz-data">{comp.comparison.model12h.headcount} FTEs, Zero OT</div>
                                 </div>

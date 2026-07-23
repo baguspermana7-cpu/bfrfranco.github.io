@@ -724,6 +724,13 @@ if (M.commissioning && M.commissioning.programRich) {
     near('cx.rich enterprise_2mw perKw', e2.perKw, 557.9, 0.05);
     near('cx.rich enterprise_2mw pctCapex', e2.pctCapex, 5.31, 0.01);
     eq('cx.rich enterprise_2mw durationDays', e2.durationDays, 155);
+    // calendar-vs-labor split (owner: "7832 hari" display bug) — calendar is the
+    // log-damped programSchedule wall-time, never above the serial labor total.
+    eq('cx.rich enterprise_2mw calendarDays == labor (small site, single crew)', e2.calendarDays, 155);
+    const h100 = RC.programRich({ itLoadKw: 100000, coolingType: 'liquid', powerRedundancy: '2N', countryId: 'QA', rackDensity: 'ai_hpc' });
+    ok('cx.rich 100MW calendarMonths sane (≤ schedMaxMonths 20)', h100.calendarMonths <= 20, `calMo=${h100.calendarMonths}`);
+    ok('cx.rich 100MW crewEquivalent > 5 (parallel crews, not serial)', h100.crewEquivalent > 5, `crew=${h100.crewEquivalent}`);
+    ok('cx.rich calendar ≤ labor invariant', h100.calendarDays <= h100.laborDays, `${h100.calendarDays} vs ${h100.laborDays}`);
     eq('cx.rich enterprise_2mw racks', e2.equip.racks, 334);
     eq('cx.rich enterprise_2mw generators', e2.equip.generators, 1);
     const e2L2 = e2.levels.find(l => l.id === 'L2');

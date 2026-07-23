@@ -679,7 +679,7 @@ const FinancialDashboard = () => {
                             </div>
                         </div>
                         <div className="p-2 bg-cyan-50 dark:bg-cyan-950/30 rounded border border-cyan-200 dark:border-cyan-900/40">
-                            <div className="text-[9px] text-cyan-700 dark:text-cyan-400 uppercase mb-1">Take-or-Pay Summary</div>
+                            <div className="text-[9px] text-cyan-700 dark:text-cyan-400 uppercase mb-1 flex items-center gap-1">Take-or-Pay Summary <Tooltip content="Computed minimum billing floor: take-or-pay % × contracted IT load = the kW billed every month regardless of the customer's actual draw. This is the revenue baseline that de-risks the P&L — lenders and underwriters price against it, so a low take-or-pay % directly weakens bankability." /></div>
                             <div className="text-[10px] text-slate-600 dark:text-slate-400">
                                 Min {revInputs.takeOrPayPct}% of {capexStore.inputs.itLoad || inputs.itLoad || 1000}kW = <span className="text-slate-900 dark:text-white font-medium">{Math.round((revInputs.takeOrPayPct / 100) * (capexStore.inputs.itLoad || inputs.itLoad || 1000))} kW</span> billed regardless of usage
                             </div>
@@ -688,29 +688,29 @@ const FinancialDashboard = () => {
                         {/* ── Quick Summary ────────────────── */}
                         <div className="pt-3 border-t border-slate-200 dark:border-slate-700 space-y-2">
                             <div className="flex justify-between text-xs">
-                                <span className="text-slate-600 dark:text-slate-400">CAPEX Investment</span>
+                                <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1">CAPEX Investment <Tooltip content="Total capital investment from the CAPEX engine (P50 base estimate) — the initial outlay all return metrics (NPV, IRR, payback) are measured against. Re-run CAPEX with different inputs to move it; it is not editable here." /></span>
                                 <span className="text-slate-900 dark:text-white font-medium">{fmtMoney(capexResults.total)}</span>
                             </div>
                             <div className="flex justify-between text-xs">
-                                <span className="text-slate-600 dark:text-slate-400">Annual OPEX (est.)</span>
+                                <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1">Annual OPEX (est.) <Tooltip content="Estimated annual operating cost (energy, maintenance, staffing, insurance) from the OPEX model, escalated yearly by the OPEX escalation rate. Energy is typically 50-70% of it, so utility rate and PUE dominate the cashflow projection." /></span>
                                 <span className="text-slate-900 dark:text-white font-medium">{fmtMoney(annualOpex)}</span>
                             </div>
                             <div className="flex justify-between text-xs">
-                                <span className="text-slate-600 dark:text-slate-400">Annual Revenue (100%)</span>
+                                <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1">Annual Revenue (100%) <Tooltip content="Gross annual revenue at full occupancy = revenue per kW/month × 12 × contracted IT load. Actual revenue follows the occupancy ramp in the projection table — this figure is the ceiling, not the expectation for early years." /></span>
                                 <span className="text-emerald-600 dark:text-emerald-400 font-medium">{fmtMoney(finInputs.revenuePerKwMonth * 12 * inputs.itLoad)}</span>
                             </div>
                             <div className="flex justify-between text-xs">
-                                <span className="text-slate-600 dark:text-slate-400">Break-even Occupancy</span>
+                                <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1">Break-even Occupancy <Tooltip content="Occupancy level at which revenue exactly covers annual OPEX (operating break-even, excluding capital recovery). Below this, every month burns cash operationally. Healthy projects break even at 40-60% occupancy — a high figure means thin margin per kW or heavy fixed costs." /></span>
                                 <span className="text-amber-600 dark:text-amber-400 font-medium">{result.breakEvenOccupancy}%</span>
                             </div>
                             {revResult && (
                                 <>
                                     <div className="flex justify-between text-xs">
-                                        <span className="text-slate-600 dark:text-slate-400">Total NRC</span>
+                                        <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1">Total NRC <Tooltip content="Sum of all one-time Non-Recurring Charges (setup fee × contracted kW, cross-connect installs, custom fit-out). Collected at signing/deployment — improves early cashflow but does not recur." /></span>
                                         <span className="text-cyan-600 dark:text-cyan-400 font-medium">{fmtMoney(revResult.totalNRC)}</span>
                                     </div>
                                     <div className="flex justify-between text-xs">
-                                        <span className="text-slate-600 dark:text-slate-400">TCV ({revInputs.contractYears}yr)</span>
+                                        <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1">TCV ({revInputs.contractYears}yr) <Tooltip content="Total Contract Value = all NRC plus escalated MRC over the full lease term. The headline deal-sizing figure — sensitive to the lease term (set in Requirements) and the MRC escalation rate." /></span>
                                         <span className="text-indigo-600 dark:text-indigo-400 font-medium">{fmtMoney(revResult.contractValue)}</span>
                                     </div>
                                 </>

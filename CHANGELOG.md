@@ -13,6 +13,20 @@ release sections rather than semver.
 
 ---
 
+## v1.115.28 — 2026-07-24 (DCMOC — universal tooltip sweep · Cx 7832-day fix · 4-level construction WBS · red-value diagnostics)
+
+### Fixed
+- **Commissioning "Program Duration 7832 d" (owner: "angkanya ngacau")**: `models.commissioning.programRich` summed per-level LABOR-days serially and the page displayed it as calendar wall-time (100 MW → 7832 d ≈ 356 mo). The engine now also returns `calendarDays/calendarMonths` (the log-damped, capped `programSchedule` wall-time — crews work levels in parallel; never above the single-crew serial total) plus `laborDays` + `crewEquivalent`. Page headline shows CALENDAR (100 MW ≈ 20 mo, ~17.8 crews); labor effort is labeled secondary. Golden cx-calculator parity untouched (`durationDays` semantics preserved); 4 new engine-gate assertions.
+
+### Added
+- **Universal detailed tooltips (owner: "tooltip untuk semuanya… harus detail")**: 74 new bindings across 12 modules (Financial, Maintenance, Staffing, Capacity, Construction, Commissioning, Reliability, Sustainability, CAPEX, Risk, Asset Intelligence) — every KPI strip now carries a 2-4 sentence tooltip (definition + engine basis + drivers + decision caveat). Explain DB enriched with 10 detailed finance/energy keys (`irr`, `pi`, `blended-irr`, `payback`, `hurdle-rate`, `discount-rate`, `idc`, `landed-cost`, `lcoe`, `bankability`) → 818 entries, gate 10/10.
+- **4-level Construction WBS (owner: "jangan hanya 2 level… in such detail")**: new `DATA.construction.wbs` (72 L3 tasks + L4 work-packages across all 22 sub-phases, engineering-real bases) + `models.construction.detailedSchedule` — expands the CAPEX timeline into phase → sub-phase → task → work-package, durations distributed serial-with-fast-track-overlap, procurement-bound tasks carry longLeadWeeks basis + CRITICAL-path flag (e.g. transformer 60–120 wk ⇒ PO before NTP) + screening unit counts. `GanttChart` rebuilt as a recursive N-level renderer (collapse/expand per node, per-bar diagnosis tooltip: basis · depends-on · critical/risk); legacy 2-level API preserved for CapexDashboard.
+- **Red-value diagnostic modal (Workstream C start)**: shared `RedValue` + `DiagnosticModal` (`components/ui/RedValue.tsx`) — any breached value renders red + clickable → modal with WHY (computed reason), threshold vs actual + gap, quantified levers with jump-to-tab, and an Auto-optimize slot (Workstream D). Adopted on Phased-Financial Blended IRR / Total NPV / PI.
+
+### Changed
+- **Operations menu order**: Maintenance now precedes Staffing (the maintenance regime determines headcount).
+- Version-stamp audit: corpus crawl artifacts (`tools/dc-corpus/raw/*.html`) excluded — not site pages.
+
 ## v1.115.27 — 2026-07-24 (LTC SYSTEM OVERVIEW — clean SVG P&ID from the RZ Engineering Symbol Atlas)
 
 ### Changed

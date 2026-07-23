@@ -335,7 +335,8 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
         { num: 5, label: 'CAPEX Engine', icon: Building, childIds: ['capex'] },
         { num: 6, label: 'Construction', icon: HardHat, childIds: ['construction', 'phased-finance'] },
         { num: 7, label: 'Commissioning', icon: CheckCircle2, childIds: ['commissioning'] },
-        { num: 8, label: 'Operations', icon: Wrench, childIds: ['ops', 'sim', 'staff', 'maint'] },
+        /* Maintenance BEFORE Staffing (owner): the maintenance regime determines headcount */
+        { num: 8, label: 'Operations', icon: Wrench, childIds: ['ops', 'sim', 'maint', 'staff'] },
         { num: 9, label: 'Asset Intelligence', icon: Activity, childIds: ['asset-health', 'asset-lifecycle', 'cbm', 'spares'] },
         { num: 10, label: 'Reliability', icon: ShieldCheck, childIds: ['risk', 'reliability'] },
         { num: 11, label: 'Sustainability', icon: Leaf, childIds: ['carbon'] },

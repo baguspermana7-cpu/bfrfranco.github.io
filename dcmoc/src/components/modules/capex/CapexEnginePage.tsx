@@ -9,6 +9,8 @@
 
 import React from 'react';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
+import { Explain } from '@/components/ui/Explain';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Legend, BarChart, Bar } from 'recharts';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
@@ -154,15 +156,15 @@ export function CapexEnginePage() {
                     {/* KPI row */}
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'Total CAPEX (P50)', value: fmtMoney(band.p50), sub: 'base estimate', trace: 'capex.total' },
-                            { label: 'P80 (Risk-Adjusted)', value: fmtMoney(band.p80), sub: `+${(((band.p80 - band.p50) / band.p50) * 100).toFixed(1)}% vs P50`, trace: 'capex.p80' },
-                            { label: 'P10 (Optimistic)', value: fmtMoney(band.p10), sub: `${(((band.p10 - band.p50) / band.p50) * 100).toFixed(1)}% vs P50`, trace: 'capex.p10' },
-                            { label: '$ / kW', value: `$${perKw.toLocaleString()}`, sub: `${(inputs.itLoad / 1000).toFixed(1)} MW IT`, trace: 'capex.perKw' },
-                            { label: 'Contingency', value: fmtMoney(results.contingency ?? 0), sub: `${inputs.contingency}% (= design margin)`, trace: 'capex.contingency' },
-                            { label: 'Estimate Class', value: 'AACE Class 4', sub: '−30% / +50% (engine truth)' },
+                            { label: 'Total CAPEX (P50)', value: fmtMoney(band.p50), sub: 'base estimate', trace: 'capex.total', explain: 'total-capex', tip: 'Base (50th-percentile) capital estimate from the engine cost model — construction, MEP systems, soft costs and contingency across all categories. Driven mainly by IT load, redundancy tier, cooling technology and country/city cost factors. Being P50, there is an even chance the real outcome lands above it — budget approvals should use P80.' },
+                            { label: 'P80 (Risk-Adjusted)', value: fmtMoney(band.p80), sub: `+${(((band.p80 - band.p50) / band.p50) * 100).toFixed(1)}% vs P50`, trace: 'capex.p80', tip: '80th-percentile estimate — an 80% chance the final cost comes in at or below this figure. Computed as a deterministic normal approximation over the AACE Class-4 accuracy band. This is the recommended budget-approval number; the delta vs P50 is the priced-in risk premium.' },
+                            { label: 'P10 (Optimistic)', value: fmtMoney(band.p10), sub: `${(((band.p10 - band.p50) / band.p50) * 100).toFixed(1)}% vs P50`, trace: 'capex.p10', tip: '10th-percentile estimate — only a 10% chance of finishing at or below this. Useful as the optimistic bound of the estimate range for sensitivity discussions. Never budget to P10: doing so builds a near-certain overrun into the plan.' },
+                            { label: '$ / kW', value: `$${perKw.toLocaleString()}`, sub: `${(inputs.itLoad / 1000).toFixed(1)} MW IT`, trace: 'capex.perKw', tip: 'Total CAPEX divided by IT capacity in kW — the industry benchmarking unit. Typical enterprise/colo builds run roughly $7,000-12,000/kW depending on tier, density and market; a figure far outside the band usually means an input error or an unusual scope. Use it to sanity-check against published comparables.' },
+                            { label: 'Contingency', value: fmtMoney(results.contingency ?? 0), sub: `${inputs.contingency}% (= design margin)`, trace: 'capex.contingency', tip: 'Contingency allowance (the design-margin % input) applied on the base estimate for unforeseen scope, conditions and estimating error. AACE Class-4 concept estimates typically carry 15-25%; it is progressively drawn down as design matures toward Class 3/2, not spent by default.' },
+                            { label: 'Estimate Class', value: 'AACE Class 4', sub: '−30% / +50% (engine truth)', tip: 'AACE International estimate classification. Class 4 = feasibility/concept level with expected accuracy −30%/+50% — the numbers on this page are budgetary screening values, not a bid basis. Moving to a Class 3 estimate requires schematic design and vendor quotations.' },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                                <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
+                                <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { tip?: string }).tip && <InfoTip content={(k as { tip?: string }).tip!} />}{(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>
                                 {(k as { trace?: string }).trace ? (
                                     <TraceValue traceId={(k as { trace?: string }).trace!}>
                                         <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>

@@ -10,6 +10,8 @@
 
 import React from 'react';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
+import { Explain } from '@/components/ui/Explain';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { useSimulationStore } from '@/store/simulation';
 import { useRequirementsStore } from '@/store/requirements';
@@ -30,6 +32,14 @@ const DONUT_COLORS = ['#7DDDB4', '#14b8a6', '#3b82f6', '#f59e0b', '#64748b'];
 /* util-row key → value-trace id (KPI wrap; network row = assumption, no trace) */
 const UTIL_TRACE: Record<string, string | undefined> = {
     power: 'cap.powerCapacityMva', cooling: 'cap.coolingCapacityMw', rack: 'cap.rackCapacity',
+};
+
+/* util-row key → KPI tooltip (owner mandate: every KPI label explains itself) */
+const UTIL_TIPS: Record<string, string> = {
+    power: 'Design electrical capacity vs. what the current IT load consumes. Capacity derives from the engine facility sizing (IT load × PUE plus the Requirements design margin). Sustained utilization above ~85% leaves no headroom for growth or concurrent maintenance — trigger the next build phase before reaching it.',
+    cooling: 'Installed heat-rejection capacity vs. the current IT heat load, sized from the IT load and the selected cooling technology. High utilization means the N+1 unit is effectively carrying base load — verify redundancy still holds during a maintenance window before adding load.',
+    rack: 'Rack positions used vs. available, computed from white-space area and the avg rack density (kW/rack) set in Requirements. Raising density shrinks the rack count needed but can force liquid cooling; watch for stranded space when power runs out before rack positions do.',
+    network: 'Network port/uplink utilization — a screening assumption only (the engine has no network model). Treat it as directional and validate against the actual fabric design before making decisions on it.',
 };
 
 /* ─── Watch/At-Risk remediation (owner mandate: no naked bad status chips) ───
@@ -239,13 +249,13 @@ export function CapacityPlanningPage() {
                     {/* KPI row */}
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'IT Load (Total)', value: `${(i.itLoadKw / 1000).toFixed(1)} MW`, sub: 'current', trace: 'sim.itLoad' },
-                            { label: 'Peak Forecast', value: `${peak.toFixed(0)} MW`, sub: 'growth plan', trace: 'cap.peakForecastMw' },
-                            { label: 'Total Facility Load', value: `${snap.facilityMw} MW`, sub: `PUE ${snap.pue} (${snap.source})`, trace: 'arch.facilityMw' },
-                            ...util.rows.slice(0, 3).map((u) => ({ label: u.label, value: `${u.capacity.toLocaleString()} ${u.unit}`, sub: `${u.pct}% utilized${u.basis === 'assumption' ? ' · assumption' : ''}`, trace: UTIL_TRACE[u.key] })),
+                            { label: 'IT Load (Total)', value: `${(i.itLoadKw / 1000).toFixed(1)} MW`, sub: 'current', trace: 'sim.itLoad', explain: 'it-load', tip: 'Current total critical IT load — the demand basis every engine sizes against, set in Requirements/Simulation. Y0 of the growth plan equals this value. Increasing it re-sizes power, cooling, space and CAPEX downstream; the utilization bars below show how much headroom is left.' },
+                            { label: 'Peak Forecast', value: `${peak.toFixed(0)} MW`, sub: 'growth plan', trace: 'cap.peakForecastMw', tip: 'Highest forecast IT load across the Requirements growth plan (Y0→Y10). Compare it against the design-capacity line in the forecast chart — if peak approaches design, plan the next build phase or slow the commit ramp. Driven entirely by the per-year MW entries in Requirements.' },
+                            { label: 'Total Facility Load', value: `${snap.facilityMw} MW`, sub: `PUE ${snap.pue} (${snap.source})`, trace: 'arch.facilityMw', tip: 'Total facility power draw = IT load × PUE (engine pueMatrix for the selected cooling and tier). This is what the utility connection and substation must supply — not just the IT load. Improving PUE via the cooling choice reduces it without giving up IT capacity.' },
+                            ...util.rows.slice(0, 3).map((u) => ({ label: u.label, value: `${u.capacity.toLocaleString()} ${u.unit}`, sub: `${u.pct}% utilized${u.basis === 'assumption' ? ' · assumption' : ''}`, trace: UTIL_TRACE[u.key], tip: UTIL_TIPS[u.key] ?? `Installed ${u.label.toLowerCase()} capacity vs. current usage (${u.pct}% utilized), computed by the capacity adapter from the IT load profile.` })),
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                                <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
+                                <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { tip?: string }).tip && <InfoTip content={(k as { tip?: string }).tip!} />}{(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>
                                 {(k as { trace?: string }).trace ? (
                                     <TraceValue traceId={(k as { trace?: string }).trace!}>
                                         <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
@@ -261,7 +271,7 @@ export function CapacityPlanningPage() {
                     <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
                         {/* forecast chart */}
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">IT Load Forecast & Growth</h2>
+                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">IT Load Forecast & Growth <InfoTip content="Committed load (cumulative build phases) vs. forecast demand (Requirements growth plan) vs. design capacity incl. design margin. Where forecast crosses committed you need the next phase live; where it approaches design you need a new build." /></h2>
                             <div className="h-56">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <ComposedChart data={forecast}>
@@ -282,7 +292,7 @@ export function CapacityPlanningPage() {
                         {/* breakdown + utilization */}
                         <div className="space-y-4">
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Capacity Breakdown (Current)</h2>
+                                <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Capacity Breakdown (Current) <InfoTip content="How the total facility load splits between IT load and infrastructure overhead (cooling, power losses, ancillary) at the current PUE. The overhead slice is what PUE improvements shrink — the IT slice is revenue-earning capacity." /></h2>
                                 <div className="flex items-center gap-2">
                                     <div className="h-32 w-32">
                                         <ResponsiveContainer width="100%" height="100%">
@@ -307,7 +317,7 @@ export function CapacityPlanningPage() {
                                 </div>
                             </div>
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Capacity Utilization (Current)</h2>
+                                <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Capacity Utilization (Current) <InfoTip content="Per-system utilization computed by the capacity adapter (used ÷ installed capacity). OK < 70%, Watch 70-85%, At Risk ≥ 85% — click a Watch/At-Risk chip for a solved remediation plan with concrete levers." /></h2>
                                 <p className="mb-1.5 text-[10px] text-slate-500" title="Power/cooling capacity is designed = IT load + design margin, so current utilization is structurally ≈ 1/(1+margin). What moves over time is the FORECAST (Forecast & Growth tab) — the exhaustion year per system is in Key Insights.">
                                     Basis: design capacity = IT + margin (current util ≈ 1/(1+margin) by construction) — the STATUS band uses the FORECAST growth peak + estimated exhaustion year per system. ⓘ
                                 </p>

@@ -42,6 +42,7 @@ EXCLUDED_DIRS = {
     'embed',
     'Automation',
     '__pycache__',
+    'dc-corpus',
 }
 
 

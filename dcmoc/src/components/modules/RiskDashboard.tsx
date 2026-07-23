@@ -289,24 +289,24 @@ export default function RiskDashboard() {
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="bg-white dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
-                            <div className="text-[10px] text-slate-500 uppercase">Expected Downtime</div>
+                            <div className="text-[10px] text-slate-500 uppercase flex items-center">Expected Downtime <Tooltip content="Expected unplanned downtime minutes per year for the selected tier, adjusted for equipment age, maintenance strategy and environmental factors from the risk model. The Uptime tier budget is the reference (Tier III ≈ 95 min/yr, Tier IV ≈ 26 min/yr) — exceeding it drives the financial impact and SLA breach figures beside it." /></div>
                             <div className="text-xl font-bold text-slate-900 dark:text-white">{downtime.expectedDowntimeMinutes} min</div>
                             <div className="text-[10px] text-slate-500 dark:text-slate-400">per year</div>
                         </div>
                         <div className="bg-white dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
-                            <div className="text-[10px] text-slate-500 uppercase">Availability</div>
+                            <div className="text-[10px] text-slate-500 uppercase flex items-center">Availability <Tooltip content="Annual uptime percentage implied by the expected downtime: availability = 1 − (downtime minutes ÷ 525,600). Compare against the Uptime tier expectation (Tier III ≥ 99.982%, Tier IV ≥ 99.995%). Redundancy level and MTTR move it most — see the Reliability engine for the full composed model." /></div>
                             <div className="text-xl font-bold text-rz-data">{downtime.availability}%</div>
                             <div className="text-[10px] text-slate-500 dark:text-slate-400">annual uptime</div>
                         </div>
                         <div className="bg-white dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
-                            <div className="text-[10px] text-slate-500 uppercase">Financial Impact</div>
+                            <div className="text-[10px] text-slate-500 uppercase flex items-center">Financial Impact <Tooltip content="Annual downtime cost exposure = expected outage minutes × tier-adjusted cost per minute (Uptime Institute 2025 outage-cost benchmarks). A screening expectation for insurance and mitigation-budget sizing, not a worst-case single-event figure — one large outage can exceed the annual number on its own." /></div>
                             <div className="text-xl font-bold text-red-600 dark:text-red-400">
                                 ${Number.isFinite(downtime.financialImpact) ? (downtime.financialImpact / 1000).toFixed(0) : '—'}k
                             </div>
                             <div className="text-[10px] text-slate-500 dark:text-slate-400">annual exposure</div>
                         </div>
                         <div className="bg-white dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
-                            <div className="text-[10px] text-slate-500 uppercase">SLA Breach Risk</div>
+                            <div className="text-[10px] text-slate-500 uppercase flex items-center">SLA Breach Risk <Tooltip content="Probability of exceeding the SLA downtime allowance within a year, given the expected downtime for this tier and the equipment-age/maintenance adjustments. High values mean customer credits and reputational exposure — tighten the maintenance strategy or add redundancy before committing to aggressive SLAs." /></div>
                             <div className="text-xl font-bold text-slate-900 dark:text-white">{downtime.slaBreachProbability}</div>
                             <div className="text-[10px] text-slate-500 dark:text-slate-400">breach probability</div>
                         </div>

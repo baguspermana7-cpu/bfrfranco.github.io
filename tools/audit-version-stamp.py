@@ -38,6 +38,7 @@ EXCLUDED_DIRS = {
     'embed',
     'Automation',
     '__pycache__',
+    'dc-corpus',   # crawl raw artifacts (tools/dc-corpus/raw/*.html) — not site pages
 }
 
 

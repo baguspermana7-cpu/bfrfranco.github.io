@@ -1431,11 +1431,11 @@ function SparesTab({ data, fmt, bands }: {
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/50">
-                                    <th className="py-2.5 px-4 text-left text-xs text-slate-500 font-medium uppercase">Spare Class</th>
-                                    <th className="py-2.5 px-4 text-left text-xs text-slate-500 font-medium uppercase">Unit</th>
-                                    <th className="py-2.5 px-4 text-right text-xs text-slate-500 font-medium uppercase">Low</th>
-                                    <th className="py-2.5 px-4 text-right text-xs text-slate-500 font-medium uppercase">Mid</th>
-                                    <th className="py-2.5 px-4 text-right text-xs text-slate-500 font-medium uppercase">High</th>
+                                    <th className="py-2.5 px-4 text-left text-xs text-slate-500 font-medium uppercase"><span className="flex items-center gap-1">Spare Class <Tooltip content="Engine spare-part class key from the sourced cost-band table (DATA). Each class maps to the newsvendor stocking model — the mid band of that class is the default unit cost the spares optimizer uses." /></span></th>
+                                    <th className="py-2.5 px-4 text-left text-xs text-slate-500 font-medium uppercase"><span className="flex items-center gap-1">Unit <Tooltip content="Costing unit for the class (per module, per battery string, per compressor, etc.). Band prices below are quoted per this unit." /></span></th>
+                                    <th className="py-2.5 px-4 text-right text-xs text-slate-500 font-medium uppercase"><span className="flex items-center justify-end gap-1">Low <Tooltip content="Lower bound of the sourced unit-cost band — budget/refurbished or high-volume pricing. Use for optimistic spares-budget scenarios; stocking at Low risks under-budgeting replenishment." /></span></th>
+                                    <th className="py-2.5 px-4 text-right text-xs text-slate-500 font-medium uppercase"><span className="flex items-center justify-end gap-1">Mid <Tooltip content="Mid band of the sourced cost range — the default unit cost that feeds the newsvendor spares adapter and the inventory KPIs below. Treat it as the planning figure unless you hold vendor quotes." /></span></th>
+                                    <th className="py-2.5 px-4 text-right text-xs text-slate-500 font-medium uppercase"><span className="flex items-center justify-end gap-1">High <Tooltip content="Upper bound of the sourced band — OEM list pricing, expedited or low-volume purchases. Use for conservative budgeting and for spares with single-source OEM lock-in." /></span></th>
                                 </tr>
                             </thead>
                             <tbody>
