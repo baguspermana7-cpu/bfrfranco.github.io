@@ -41,6 +41,8 @@ import { CommissioningEnginePage } from '@/components/modules/commissioning/Comm
 import { AssetIntelligencePage } from '@/components/modules/assets/AssetIntelligencePage';
 import { ReliabilityEnginePage } from '@/components/modules/reliability/ReliabilityEnginePage';
 import { SustainabilityEnginePage } from '@/components/modules/sustainability/SustainabilityEnginePage';
+import { EnergyAuditPage } from '@/components/modules/sustainability/EnergyAuditPage';
+import { RenewableEconomicsPage } from '@/components/modules/sustainability/RenewableEconomicsPage';
 import { ResultsEnginePage } from '@/components/modules/results/ResultsEnginePage';
 import { ProjectsPage } from '@/components/modules/platform/ProjectsPage';
 import { SettingsPage } from '@/components/modules/platform/SettingsPage';
@@ -61,7 +63,10 @@ export default function Home() {
   }
 
   const renderContent = () => {
-    switch (activeTab) {
+    /* Workstream J: 'energy-audit' / 'renewable-economics' are registered in the
+     * Shell nav ahead of the store's activeTab union (owned by a parallel
+     * workstream) — widen to string so their cases type-check. */
+    switch (activeTab as string) {
       case 'dashboard':
         return <ExecutiveDashboard />;
       case 'reliability':
@@ -94,6 +99,10 @@ export default function Home() {
         return <ResultsEnginePage />;
       case 'carbon':
         return <SustainabilityEnginePage />;
+      case 'energy-audit':
+        return <EnergyAuditPage />;
+      case 'renewable-economics':
+        return <RenewableEconomicsPage />;
       case 'finance':
         return <FinancialPage />;
       case 'invest':

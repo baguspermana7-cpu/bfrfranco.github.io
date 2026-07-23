@@ -6041,7 +6041,59 @@
                 { calc: 'Structural floor loading', engineRef: 'DATA.architecture.floorLoadingKnM2', standard: 'ASCE 7' },
                 { calc: 'Fire water / clean-agent demand', engineRef: 'models.fire + DATA.boq.takeoff.fire', standard: 'NFPA 2001/750' },
                 { calc: 'Water consumption / WUE', engineRef: 'DATA.waterFootprint', standard: 'ASHRAE / Uptime WUE' }
-            ]
+            ],
+            /* ══ Workstream I — Delivery-governance deliverable playbooks. The who /
+             * when / how of construction-delivery documents; advanced-PMP practice,
+             * standard-practice reference (screening) wired to the live schedule. ══ */
+            deliverables: [
+                { key: 'ifc', name: 'IFC Drawings (Issued For Construction)', purpose: 'Freeze the buildable design — the ONLY drawings crews may build from', trigger: 'Design discipline reaches 100% + squad check closed', owner: 'Lead design engineer', approver: 'Owner engineer + EOR', cycleDays: 10, holdImpact: 'No IFC = no legal build basis; trades idle or build at risk of rework', standard: 'ISO 19650 C-series' },
+                { key: 'rfi', name: 'RFI (Request For Information)', purpose: 'Resolve a drawing/spec ambiguity BEFORE the crew improvises in the field', trigger: 'Contractor hits a gap/conflict in the IFC set', owner: 'Contractor site engineer', approver: 'Design lead (technical) · PM tracks aging', cycleDays: 7, holdImpact: 'Aging RFIs stall their work-front; >10 open aging RFIs = design-coordination red flag', standard: 'AIA/FIDIC practice' },
+                { key: 'submittal', name: 'Submittal / Shop Drawing', purpose: 'Prove the vendor item matches spec BEFORE fabrication/shipment', trigger: 'PO placed → vendor issues shop drawings + datasheets', owner: 'Vendor via contractor', approver: 'Design engineer (code A/B/C/D)', cycleDays: 14, holdImpact: 'A rejected (D) long-lead submittal restarts the lead-time clock — schedule killer', standard: 'CSI submittal practice' },
+                { key: 'itp', name: 'ITP (Inspection & Test Plan)', purpose: 'Pre-agree WHICH quality points get witnessed by WHOM (H=hold, W=witness, S=surveillance)', trigger: 'Before the covered work starts', owner: 'Contractor QA/QC', approver: 'Owner QA + AHJ on statutory points', cycleDays: 10, holdImpact: 'Missed HOLD point = uncovered work may be ordered reopened (demolition risk)', standard: 'ISO 9001 / EN quality practice' },
+                { key: 'ncr', name: 'NCR (Non-Conformance Report)', purpose: 'Formally capture out-of-spec work + disposition (rework / use-as-is / repair)', trigger: 'QC inspection or witness finds non-conforming work', owner: 'QA/QC engineer', approver: 'Owner engineer (disposition) · EOR for structural', cycleDays: 14, holdImpact: 'Open NCRs block system turnover packages; use-as-is needs engineering justification on file', standard: 'ISO 9001 8.7' },
+                { key: 'lookahead', name: '3-Week Look-Ahead Schedule', purpose: 'Roll the master schedule into a crew-level 3-week work plan (constraint removal)', trigger: 'Weekly — every site coordination meeting', owner: 'Contractor planner', approver: 'PM (constraint actions)', cycleDays: 7, holdImpact: 'No look-ahead = constraints found the day work starts; percent-plan-complete <60% predicts slip', standard: 'Last Planner / lean practice' },
+                { key: 'variation', name: 'Variation / Change Order', purpose: 'Price + approve scope change BEFORE the work is done (cost & time impact)', trigger: 'Owner instruction, design change, or differing site condition', owner: 'Contractor commercial', approver: 'Owner PM within delegation-of-authority band', cycleDays: 21, holdImpact: 'Unapproved variations executed = disputed cost; approval slower than the work-front = claims exposure', standard: 'FIDIC cl.13' },
+                { key: 'punchlist', name: 'Punch List (A/B items)', purpose: 'Catalog incomplete/defective items at completion — A blocks turnover, B does not', trigger: 'Pre-substantial-completion walkdowns per system', owner: 'CxA + owner ops', approver: 'Owner acceptance per system', cycleDays: 30, holdImpact: 'A-items open = no substantial completion certificate = LDs continue accruing', standard: 'Substantial-completion practice' },
+                { key: 'turnover', name: 'Turnover / Handover Dossier', purpose: 'The complete evidence package: as-builts, O&M, test records, warranties, spares, training', trigger: 'Per-system Cx completion → assembled progressively (never at the end)', owner: 'Contractor doc control', approver: 'Owner ops readiness gate', cycleDays: 30, holdImpact: 'Missing dossier = ops cannot maintain safely; retention money held; warranty clock disputes', standard: 'ISO 19650 AB-series + Cx turnover' }
+            ],
+            /* Advanced PM working framework — senior/intermediate practice under
+             * stakeholder pressure. Reference bands (screening), used by the
+             * delivery-governance dossier + decision-velocity analysis. */
+            pmFramework: {
+                controlAccounts: ['Civil & structure', 'Electrical power train', 'Mechanical/cooling', 'IT fit-out & network', 'Site & utilities', 'General conditions'],
+                decisionVelocity: {
+                    bands: [
+                        { decision: 'Field clarification (no cost/time)', authority: 'Resident engineer', targetDays: 2 },
+                        { decision: 'RFI with design impact', authority: 'Design lead', targetDays: 7 },
+                        { decision: 'Variation < 0.1% CAPEX', authority: 'Owner PM', targetDays: 10 },
+                        { decision: 'Variation 0.1–1% CAPEX', authority: 'Project director', targetDays: 15 },
+                        { decision: 'Variation > 1% CAPEX / scope change', authority: 'Steering committee', targetDays: 30 }
+                    ],
+                    note: 'Decision latency is a schedule input: a 30-day approval on the critical path IS 30 days of program. Delegation-of-authority bands exist to keep small decisions off the steering committee.'
+                },
+                reportingRhythm: [
+                    { cadence: 'Daily', artifact: 'Site log + manpower + HSE', audience: 'Site team' },
+                    { cadence: 'Weekly', artifact: 'Look-ahead + RFI/submittal/NCR aging + EVM flash', audience: 'PM + contractor' },
+                    { cadence: 'Monthly', artifact: 'EVM (SPI/CPI) + risk register + variation log + cash curve', audience: 'Steering committee' },
+                    { cadence: 'Stage-gate', artifact: 'Gate dossier (design freeze, NTP, energization, substantial completion)', audience: 'Sponsor/investment committee' }
+                ],
+                stakeholderPressure: [
+                    { scenario: 'Owner pushes RFS date left', response: 'Re-price the compression (overtime/crews/logic) and present cost-vs-schedule options — never absorb silently; fast-track ≠ free', risk: 'Silent absorption converts schedule pressure into quality/HSE debt' },
+                    { scenario: 'Authority slows approvals near election/audit periods', response: 'Front-load statutory submissions; parallel-path non-dependent work; escalate via the authority-interface owner, not site staff', risk: 'Permit idle time on the critical path' },
+                    { scenario: 'Vendor slips a long-lead delivery', response: 'Trigger the pre-agreed recovery ladder: factory expediting → partial shipment → substitution engineering review', risk: 'Transformer/switchgear slip flows 1:1 into power-on' },
+                    { scenario: 'Scope creep via "small" field instructions', response: 'Every instruction through the variation process — the aggregation of smalls is how budgets die', risk: 'Disputed account at closeout' }
+                ],
+                securityExposure: [
+                    { area: 'Site access & workforce vetting', exposure: 'Large transient workforce near future-critical spaces', control: 'Layered access zones from day one; vetting before hall fit-out phase' },
+                    { area: 'Design information', exposure: 'SLDs/layouts reveal critical-infrastructure detail', control: 'CDE access control + NDA + watermarked controlled copies (ISO 19650-5 security-minded)' },
+                    { area: 'Authority interface', exposure: 'Statutory submissions expose facility detail to public record', control: 'Redacted public sets where the jurisdiction allows; sensitive annexes under separate cover' },
+                    { area: 'Supply chain', exposure: 'Counterfeit/grey-market components in critical systems', control: 'OEM-direct or authorized-channel procurement + FAT serial verification' }
+                ],
+                roles: {
+                    senior: 'Owns the governance system: stage-gates, delegation bands, steering-committee interface, claims strategy, authority relationships. Measures: decision latency, forecast honesty (FAC vs actual), risk-register movement.',
+                    intermediate: 'Owns the execution rhythm: look-ahead discipline, RFI/submittal/NCR aging, ITP witness scheduling, variation log hygiene. Measures: percent-plan-complete, document cycle times, punch burn-down.'
+                }
+            }
         },
 
         /* ══ v2.5.5 (Ship-C) — DATA.supplyChain: per-country landed-cost + export-control
@@ -6180,7 +6232,39 @@
             windOffshore: { capexPerMw: 3800000, cfByRegion: { US: 0.44, EU: 0.45, APAC: 0.40, LATAM: 0.45, ID: 0.35, SG: 0.0, JP: 0.38, IN: 0.35, MY: 0.30 },
                             opexPctYr: 0.035, lifeYears: 25 },
             bess: { capexPerKwh: 180, roundtripEff: 0.88, cycleLife: 6000, opexPctYr: 0.02, lifeYears: 15 },
-            solarDaylightFraction: 0.42   /* fraction of 24h a tracking-adjusted array meaningfully produces */
+            solarDaylightFraction: 0.42,  /* fraction of 24h a tracking-adjusted array meaningfully produces */
+            /* ══ Workstream J — energy audit (EnPI/ISO 50001 + IPMVP) + storage
+             * economics screening constants. ══ */
+            enpiSpec: {
+                /* An energy-performance CLAIM is only testable when every term is
+                 * pinned. This spec IS the pinning — surfaced verbatim in the UI. */
+                numerator: 'Total facility energy (kWh) at the utility meter — IT + cooling + power losses + lighting/aux',
+                denominator: 'IT equipment energy (kWh) at the rack/PDU output meter (NOT nameplate, NOT provisioned)',
+                boundary: 'Single facility fence; excludes construction power, office campus loads outside the DC envelope',
+                normalization: 'Weather-normalize the cooling share by CDD (or wet-bulb bins for evaporative/economizer plants); occupancy-normalize by average IT kW in the window',
+                timeWindow: 'Rolling 12 months (minimum) — sub-annual windows bias PUE by season; report the window explicitly',
+                exclusions: 'Commissioning/load-bank test energy, one-off construction loads, metered tenant office space — each exclusion listed with its kWh',
+                claimTest: 'Claim is SUPPORTED when normalized measured EnPI ≤ claimed value with the boundary/window/exclusions stated; else UNSUPPORTED with the gap quantified',
+                standard: 'ISO 50001 EnPI + IPMVP Option C (whole-facility)'
+            },
+            storage: {
+                calendarFadePctYr: 1.5,        /* calendar aging, %/yr of nameplate */
+                cyclesPerDayTypical: 1.0,      /* daily-cycling DC-adjacent BESS */
+                availabilityPct: 97,           /* fleet availability incl. PCS */
+                gridServiceUsdPerMwYr: [15000, 60000], /* freq-reg/capacity band by market */
+                augmentationRule: 'top-up cells when usable capacity < 80% of contracted — price at the then-current $/kWh (declining curve)',
+                capexDeclinePctYr: 5           /* BESS $/kWh learning-curve decline */
+            },
+            regulatory: {
+                US: { export: 'net-billing (most ISOs); wholesale via QF/ISO participation', gridServices: 'open ISO markets (freq-reg, capacity)' },
+                EU: { export: 'feed-in premium / market premium schemes', gridServices: 'FCR/aFRR markets' },
+                ID: { export: 'net-metering capped; excess to PLN at regulated rate', gridServices: 'nascent — bilateral only' },
+                SG: { export: 'wholesale via EMC; DC rooftop limited by land', gridServices: 'EMA regulation market' },
+                JP: { export: 'FIT/FIP transition', gridServices: 'balancing market (EPRX)' },
+                IN: { export: 'net-metering state-by-state; open-access wheeling', gridServices: 'emerging ancillary market' },
+                MY: { export: 'NEM 3.0 net-energy-metering', gridServices: 'single-buyer — none' },
+                default: { export: 'jurisdiction-specific — verify export/net-metering rules', gridServices: 'verify ancillary-market access' }
+            }
         },
         /* ══ v2.4.0 — DATA.reliability: MTBF/MTTR by component + Uptime tier availability.
          * Screening-grade RAM inputs (IEEE 493 Gold Book typical figures + Uptime Tier
@@ -7846,7 +7930,44 @@
             /* v2.5.0 research pass — Uptime Institute critical-facilities staffing
              * benchmark. 24/7 coverage = ~4.2 FTE per manned position (shifts +
              * relief/PTO); positions scale with tier; plus per-MW technicians. */
-            staffing: { ftePerPosition: 4.2, positionsByTier: { 2: 3, 3: 5, 4: 7 }, techFtePerMw: 0.35, minFte: 6 }
+            staffing: { ftePerPosition: 4.2, positionsByTier: { 2: 3, 3: 5, 4: 7 }, techFtePerMw: 0.35, minFte: 6 },
+            /* ══ Workstream G — end-to-end operations staffing model (owner: the
+             * per-MW heuristic was "sangat jauh dari workflow yang accurate").
+             * Labor-hours-driven technicians + campus topology + sourcing split
+             * + strategy %-mix + SLA/MTTR coupling. Screening-grade constants. ══ */
+            ops: {
+                /* PM (planned-preventive) maintenance labor demand — SFG20-informed
+                 * screening: task-hours per MW of IT per year at a planned regime. */
+                pmHoursPerMwYr: 420,
+                /* condition-monitoring/analysis overhead hours per MW-yr under a
+                 * predictive (CBM) regime (sensors reduce wrench tasks but add
+                 * engineering analysis) */
+                cbmAnalysisHoursPerMwYr: 60,
+                /* productive maintenance hours per onsite FTE-year: 2080 nominal
+                 * − leave/training/meetings ≈ 1800 payable, × wrench-time 55% */
+                hoursPerFteYr: 1800, wrenchTimeFrac: 0.55,
+                /* campus topology: hyperscale campuses split into data halls/buildings
+                 * ~30-40 MW each; per-DC floor roles vs once-per-campus shared roles */
+                mwPerDc: 35,
+                /* minimum on-shift floor presence per DC (emergency response),
+                 * by sourcing phenotype: full-vendor+reactive runs a skeleton crew */
+                minOnShiftPerDc: { skeleton: 1, standard: 2 },
+                /* per-campus SHARED roles (counted once per campus, NOT per DC) */
+                campusShared: { networkIt: 2, dcoOps: 2, securityLead: 1, facilityMgmt: 2 },
+                /* SLA response classes — target response window (min) + the effective
+                 * MTTR adder they impose when the fix depends on external response */
+                sla: {
+                    '2hr': { label: '2-Hour Response (24/7 dedicated)', responseMin: 120, mttrAdderH: 1, costPerMwYr: 9000 },
+                    '4hr': { label: '4-Hour Response (24/7)', responseMin: 240, mttrAdderH: 3, costPerMwYr: 5500 },
+                    nbd:   { label: 'Next Business Day', responseMin: 960, mttrAdderH: 12, costPerMwYr: 2500 }
+                },
+                /* strategy-mix → failure-rate + MTTR factors (blend by mix fractions):
+                 * reactive raises failures 3.5× and repair time (90 vs 45 min events);
+                 * predictive avoids 70% of failures. In-house 24/7 crews repair at the
+                 * base MTTR; vendor-dependent repair waits for the SLA response. */
+                strategyFailureMult: { reactive: 3.5, planned: 1.0, predictive: 0.3 },
+                strategyMttrMult: { reactive: 2.0, planned: 1.0, predictive: 0.85 }
+            }
         },
         /* ══ v2.4.0 — DATA.fuelGen: backup generator + diesel economics (Group-2
          * promotion from DCMOC FuelGenEngine). Sizing + fuel storage/consumption. ══ */
@@ -8208,6 +8329,18 @@
             'boq.paramFactors':  { source: 'SCREENING multiplier tables the param-conditional BOQ drivers read: seismic rebar/bracing scale by ASCE 7-22 Sds zone band (zone0..zone4); diesel bulk-fuel ~0.28 m³ per MW-hour of runtime (~235 g/kWh at ~0.85 kg/L + ullage); clean-agent design concentration by agent (Novec 1230 ~0.55, FM-200 ~0.36 kg/m³ per NFPA 2001/3M/Chemours TDS); redundancy parallel-path multiplier by Uptime Tier topology (N/N+1/2N/2N+1); UPS battery strings per module (rotary carries none); CDU-vs-CRAH split by cooling type; PDU/RPP count per rack by density band. Each factor tunes a quantity base, not the reconciled category $.', asOf: '2026', unit: 'dimensionless multipliers + per-unit factors', method: 'SCREENING — code-band anchored (ASCE/NFPA/Uptime), fold into AACE Class-4' },
             'supplyChain': { source: 'PROXY/SCREENING per-country landed-cost + export-control. Import-duty bands (equipment): FTA 0 / low ~3% / med ~7.5% / high ~17% (IN ~15, BR ~16) / punitive ~30% (China↔US), applied to the imported-EQUIPMENT fraction per category (BOM split: ups ~70/gen ~75/network ~80/cooling ~55/electrical ~40%, labor-heavy ~0) — WTO/national tariff schedules, screening. Export-control tiers = US BIS Fed-Register PROXY; AI Diffusion Rule RESCINDED 2025 so caps are NOT in force — advisory only, NOT statutory/legal advice. Customs lead +2-12 wk by jurisdiction. Per-country band assignment in CountryProfile.supplyChain.', asOf: '2026', unit: 'duty rate + export tier + customs weeks', method: 'PROXY/SCREENING — duty on equipment fraction only; export-control advisory, policy fluid' },
             'dossier': { source: 'STANDARD-PRACTICE EPC Technical Dossier scaffold — permitting matrix (typical AHJ permits + indicative durations), design basis (IEC/NEC/ASHRAE TC9.9/ASCE 7/NFPA/Uptime references), risk register (typical mission-critical DC risks) QUANTIFIED with screening cost-impact %-of-CAPEX bands + schedule-slip weeks + post-mitigation residual band + early-warning indicators, document register + document delivery schedule (deliverable × phase × approver, ISO 19650 / Uptime CDE convention), ops-readiness gates. Reference convention (Uptime/TIA-942/BICSI/NFPA), NOT a project-specific submission; durations/risks/bands indicative. models.dossier.sections composes these with live engine outputs.', asOf: '2026', unit: 'permit/risk/document/readiness scaffold + quantified risk bands + doc-schedule + calc→model references', method: 'STANDARD-PRACTICE reference — validate against the AHJ + full design + a project risk workshop' },
+            'energy.enpiSpec': { source: 'ISO 50001 EnPI + IPMVP Option C (whole-facility) energy-performance-claim discipline — numerator (utility-meter facility kWh), denominator (rack/PDU IT kWh, never nameplate), boundary, CDD/wet-bulb weather normalization, rolling-12-month window, itemized exclusions (Cx/load-bank/office). A claim is testable ONLY with every term pinned (owner mandate: define numerator, denominator, climate, time window, exclusion).', asOf: '2026', unit: 'EnPI definition spec', method: 'measurement-and-verification convention' },
+            'energy.storage': { source: 'BESS screening constants — calendar fade ~1.5%/yr + 20% fade budget across cycle life (LFP practice), 1 cycle/day DC-adjacent duty, fleet availability ~97% incl. PCS, ancillary/grid-services revenue $15-60K/MW·yr band (market-dependent), augmentation-at-80% rule with $/kWh learning-curve decline ~5%/yr — BNEF/NREL storage cost + degradation literature', asOf: '2026', unit: 'fade %/yr, availability %, $/MW·yr band', method: 'SCREENING — cell-vendor warranty curves supersede' },
+            'energy.regulatory': { source: 'Per-region renewable export/net-metering + grid-services market access screening notes (US ISO net-billing, EU market-premium + FCR/aFRR, ID PLN capped net-metering, SG EMC wholesale, JP FIT/FIP + EPRX, IN state net-metering, MY NEM 3.0) — regulator publications', asOf: '2026', unit: 'export rule + ancillary-market note per region', method: 'SCREENING — verify with current regulator rules' },
+            'energy.enpi': { source: 'models.energy.enpi — normalized EnPI (exclusions removed, overhead weather-normalized) + claim test vs a stated claimed PUE with SUPPORTED/UNSUPPORTED verdict and quantified gap', asOf: '2026', unit: 'EnPI (normalized PUE) + claim verdict', method: 'IPMVP Option C screening' },
+            'energy.storageEconomics': { source: 'models.energy.storageEconomics — year-by-year usable-capacity curve (cycle + calendar fade), augmentation plan + capex (learning-curve priced), dispatch constraint (daily shiftable MWh at round-trip), grid-services band, per-region regulatory notes', asOf: '2026', unit: 'degradation curve + augmentation $ + dispatch + $/yr band', method: 'screening storage model' },
+            'energy.renewableProject': { source: 'models.energy.renewableProject — hybridScreen coverage → CAPEX (regional $/MWp + $/kWh) → avoided energy cost (covered MWh × tariff) + avoided carbon (offset × regional carbon price) + grid-services mid-band → lifetime cash flows → NPV at regional WACC + IRR + payback → BANKABILITY screening gate (NPV>0 & IRR>WACC) with an explicit GRID-ONLY-WINS verdict when it fails (technology-economics balance, not technology enthusiasm)', asOf: '2026', unit: '$ NPV/IRR/payback + bankability verdict', method: 'screening project finance — PPA structuring + interconnection study supersede' },
+            'maintenance.ops': { source: 'Workstream-G end-to-end operations staffing constants — SFG20-informed PM task-hours (~420 h/MW·yr planned regime, screening), CBM analysis overhead 60 h/MW·yr, productive-hours convention (1800 payable h/FTE·yr × 55% wrench-time — maintenance-productivity literature), campus topology ~35 MW per data hall/building (hyperscale build practice), per-DC emergency-response shift floors (skeleton 1 vs standard 2 per shift), per-campus shared roles (network/IT, DCO ops, security lead, facility mgmt — counted once per campus), SLA response classes (2hr/4hr/NBD windows + effective-MTTR adders + $/MW·yr contract bands), strategy failure/MTTR multipliers consistent with DATA.maintenance (reactive 3.5×, predictive 0.3× failures)', asOf: '2026', unit: 'hours/FTE/topology/SLA screening constants', method: 'SCREENING — org- and contract-specific values supersede' },
+            'maintenance.opsHeadcount': { source: 'models.maintenance.opsHeadcount — labor-hours-driven onsite technicians (PM+CBM+emergency hours × in-house share ÷ productive hours), shift-floor minimum per DC (emergency response, skeleton when vendor+reactive), Uptime 4.2 FTE/position shift operations scaled by campus DC count, per-campus shared roles. Replaces the per-MW×multiplier heuristic as the accuracy basis.', asOf: '2026', unit: 'FTE by role + labor-hours breakdown + basis strings', method: 'labor-demand screening model' },
+            'maintenance.availabilityImpact': { source: 'models.maintenance.availabilityImpact — strategy-mix ⇒ failure-rate factor, sourcing+SLA ⇒ effective MTTR (vendor-dependent repairs wait for the response window), composed as a delta on the Uptime tier design availability, bounded [0.5×, 20×] design unavailability. Couples Maintenance/Staffing/SLA choices to availability + downtime financial exposure (previously hardcoded per tier).', asOf: '2026', unit: 'availability % + downtime min/yr + $ exposure', method: 'screening anchor-and-factor model — an RBD/RAM study supersedes' },
+            'dossier.deliverables': { source: 'STANDARD-PRACTICE construction delivery-governance playbooks (Workstream I) — IFC (ISO 19650 C-series), RFI (AIA/FIDIC practice), Submittal (CSI review codes A-D), ITP hold/witness/surveillance points (ISO 9001), NCR disposition (ISO 9001 8.7), 3-week look-ahead (Last Planner / lean), Variation/Change Order (FIDIC cl.13), Punch A/B items + Turnover dossier (substantial-completion + Cx turnover practice). Cycle-times are typical bands; validate per contract.', asOf: '2026', unit: 'deliverable playbook (purpose/trigger/owner/approver/cycle/hold-impact) × 9', method: 'STANDARD-PRACTICE reference — contract terms supersede' },
+            'dossier.pmFramework': { source: 'Advanced PM working framework (Workstream I) — control-account structure (EVM practice), decision-velocity delegation-of-authority bands (steering-committee governance practice), reporting rhythm (daily/weekly/monthly/stage-gate), stakeholder-pressure response patterns (compression re-pricing, authority front-loading, long-lead recovery ladder, variation discipline), security-minded information management (ISO 19650-5), senior vs intermediate PM role charters. Screening reference bands.', asOf: '2026', unit: 'governance framework (bands/rhythm/scenarios/roles)', method: 'STANDARD-PRACTICE reference — org delegation matrix supersedes' },
+            'dossier.deliveryGovernance': { source: 'models.dossier.deliveryGovernance — wires the deliverable playbooks + PM framework to the LIVE project: document-volume screening bands scaled by MW + program months (industry rules-of-thumb), variation authority bands scaled to project CAPEX, deliverable windows mapped onto the program timeline fractions.', asOf: '2026', unit: 'volumes + $-scaled decision bands + program windows', method: 'SCREENING rules-of-thumb — labeled as such in the dossier output' },
             'dossier.countryRisks': { source: 'SCREENING location-risk supplement DERIVED LIVE from the selected DATA.countries[id] hazard/grid/talent fields (naturalDisaster.{seismicZone,floodRisk,typhoon/volcano/tsunami,compositeScore,insuranceMultiplier}, gridReliability.{gridUptime,brownoutFrequency,gridTier,recommendedGenHours}, talentPool.{dcEngineerPool,avgHiringDays,talentScore}) — seismic (ASCE 7), flood/natural-disaster (FM Global/local), grid reliability (NFPA 110/Uptime), talent depth. Severity is a screening band off the source metric; no new economic literals (reads countries.ts single-source).', asOf: '2026', unit: 'location hazard + screening severity + mitigation per country', method: 'SCREENING — a project-specific site-risk study supersedes' },
             'dossier.engineeringCalcs': { source: 'AACE Class-4 SCREENING worked engineering calculations DERIVED LIVE from the requirement input + CAPEX result + existing engine models/data (equipmentSizing, reliability, waterFootprint, pueMatrix, paramFactors, architecture.floorLoadingKnM2) — electrical continuous load (NEC 210.19/215.2), transformer/UPS/genset/cooling sizing (IEEE 3006/3007, NFPA 110, ASHRAE TC9.9), fuel storage (NFPA 30/110), clean-agent + fire-water (NFPA 2001/13), structural floor load (ASCE 7), cable derate (NEC 310.15), system availability (IEEE 493 / Uptime). No new economic literals — each sheet references the model/table that computes it, each carries a standard + confidence tag.', asOf: '2026', unit: 'formula + inputs + steps + result per discipline (screening worked calcs)', method: 'AACE Class-4 screening; live from inputs + engine models — validate against a full design' },
             'boq.equipmentSizing': { source: 'SCREENING nominal unit ratings for equipment-count sizing (UPS 500kW module, genset 2.5MW, transformer 2.5MVA, CRAH 150kW, CDU 700kW, chiller 1.4MW) + redundancy addend by topology. Lead times reflect the 2026 long-lead reality — MV transformer/switchgear ~120 wk dominant (industry supply-chain reporting); UPS ~26, genset ~40, chiller ~32 wk.', asOf: '2026', unit: 'kW/MVA per unit + weeks lead time', method: 'SCREENING — real selection depends on the design' },
@@ -8852,6 +8985,128 @@
                         carbonOffsetTonnesYr: Math.round(covered * gf),
                         landHa: Math.round((a.solarMwp || 0) * DATA.energy.solar.landHaPerMwp * 10) / 10,
                         method: 'screening-level day/night simplification — not an interconnection or reliability study'
+                    };
+                },
+                /* ══ Workstream J — EnPI / energy-audit model (ISO 50001 + IPMVP).
+                 *  Pins numerator/denominator/boundary/normalization/window/exclusions
+                 *  from DATA.energy.enpiSpec and TESTS a performance claim.
+                 *  input { itMwhYr, facilityMwhYr, claimedPue?, weatherFactor? (CDD
+                 *  normalization ratio vs baseline, default 1), exclusionsMwh? }. ══ */
+                enpi: function (a) {
+                    a = a || {};
+                    var spec = DATA.energy.enpiSpec;
+                    var itMwh = Math.max(1, +a.itMwhYr || 0);
+                    var facMwh = Math.max(itMwh, +a.facilityMwhYr || itMwh * 1.4);
+                    var excl = Math.max(0, +a.exclusionsMwh || 0);
+                    var wf = +a.weatherFactor > 0 ? +a.weatherFactor : 1;
+                    /* normalized: exclusions removed, cooling share weather-normalized —
+                     * screening: apply the weather factor to the overhead (fac − IT) */
+                    var overhead = Math.max(0, facMwh - excl - itMwh);
+                    var normFac = itMwh + overhead / wf;
+                    var enpi = normFac / itMwh; /* == normalized annualized PUE */
+                    var out = {
+                        enpi: +enpi.toFixed(3),
+                        rawPue: +((facMwh) / itMwh).toFixed(3),
+                        normalizedPue: +enpi.toFixed(3),
+                        exclusionsMwh: excl, weatherFactor: wf,
+                        spec: spec, method: spec.standard
+                    };
+                    if (+a.claimedPue > 0) {
+                        var gap = enpi - +a.claimedPue;
+                        out.claim = {
+                            claimedPue: +a.claimedPue,
+                            verdict: gap <= 0.005 ? 'SUPPORTED' : 'UNSUPPORTED',
+                            gap: +gap.toFixed(3),
+                            statement: gap <= 0.005
+                                ? 'Normalized measured ' + enpi.toFixed(3) + ' ≤ claimed ' + (+a.claimedPue).toFixed(2) + ' with boundary/window/exclusions stated — claim supported.'
+                                : 'Normalized measured ' + enpi.toFixed(3) + ' exceeds claimed ' + (+a.claimedPue).toFixed(2) + ' by ' + gap.toFixed(3) + ' — claim unsupported under the stated boundary; check the claimant\'s window, exclusions, and denominator definition.'
+                        };
+                    }
+                    return out;
+                },
+                /* ══ Workstream J — BESS storage economics: degradation (cycle+calendar),
+                 *  augmentation plan, availability, dispatch constraint, grid services.
+                 *  input { bessMwh, years?, cyclesPerDay?, region?, gridServiceMw? }. ══ */
+                storageEconomics: function (a) {
+                    a = a || {};
+                    var B = DATA.energy.bess, S = DATA.energy.storage;
+                    var mwh = Math.max(0.1, +a.bessMwh || 0);
+                    var years = Math.max(1, Math.min(20, +a.years || 15));
+                    var cpd = +a.cyclesPerDay > 0 ? +a.cyclesPerDay : S.cyclesPerDayTypical;
+                    var curve = [], usable = 1.0, augCapex = 0, augYears = [];
+                    var capexKwh = B.capexPerKwh;
+                    for (var y = 1; y <= years; y++) {
+                        var cycleFade = (cpd * 365) / B.cycleLife * 0.2;  /* 20% fade budget across cycle life */
+                        usable -= cycleFade + S.calendarFadePctYr / 100;
+                        capexKwh *= (1 - S.capexDeclinePctYr / 100);
+                        if (usable < 0.8) {
+                            var topUpMwh = mwh * (0.85 - usable); /* restore to 85% */
+                            augCapex += topUpMwh * 1000 * capexKwh;
+                            augYears.push(y);
+                            usable = 0.85;
+                        }
+                        curve.push({ year: y, usableFrac: +usable.toFixed(3), capexPerKwh: Math.round(capexKwh) });
+                    }
+                    var reg = DATA.energy.regulatory[a.region] || DATA.energy.regulatory['default'];
+                    var gsBand = S.gridServiceUsdPerMwYr;
+                    var gsMw = +a.gridServiceMw > 0 ? +a.gridServiceMw : mwh / 4; /* 4h duration assumption */
+                    return {
+                        bessMwh: mwh, cyclesPerDay: cpd, years: years,
+                        degradationCurve: curve,
+                        augmentation: { capexUsd: Math.round(augCapex), years: augYears, rule: S.augmentationRule },
+                        availabilityPct: S.availabilityPct,
+                        dispatch: { dailyMwh: +(mwh * cpd * B.roundtripEff).toFixed(1), constraint: cpd + ' cycle/day × ' + Math.round(B.roundtripEff * 100) + '% round-trip — daily shiftable energy; deeper cycling accelerates fade', durationH: 4 },
+                        gridServices: { mwEligible: +gsMw.toFixed(1), usdYrBand: [Math.round(gsBand[0] * gsMw), Math.round(gsBand[1] * gsMw)], note: reg.gridServices },
+                        regulatory: reg,
+                        method: 'screening: 20% fade budget across cycle life + ' + S.calendarFadePctYr + '%/yr calendar fade; augmentation to 85% when usable < 80%; $/kWh learning decline ' + S.capexDeclinePctYr + '%/yr'
+                    };
+                },
+                /* ══ Workstream J — renewable-project economics: hybridScreen coverage →
+                 *  full project cash flow → NPV/IRR/payback + BANKABILITY verdict +
+                 *  technology-economics balance ("grid-only wins" when true).
+                 *  input { region, itLoadMw, solarMwp, bessMwh, elecRateUsdKwh,
+                 *  carbonPriceUsdT?, years? }. ══ */
+                renewableProject: function (a) {
+                    a = a || {};
+                    var E = DATA.energy, R = RZEngine.models.roi;
+                    var region = a.region || 'US';
+                    var scr = RZEngine.models.energy.hybridScreen({ region: region, itLoadMw: a.itLoadMw, solarMwp: a.solarMwp, bessMwh: a.bessMwh });
+                    var years = Math.max(5, Math.min(30, +a.years || E.solar.lifeYears));
+                    var capex = (a.solarMwp || 0) * (E.solar.capexPerMwp[region] || E.solar.capexPerMwp.US)
+                              + (a.bessMwh || 0) * 1000 * E.bess.capexPerKwh;
+                    var opexYr = capex * ((a.solarMwp || 0) > 0 ? E.solar.opexPctYr : E.bess.opexPctYr);
+                    var rate = +a.elecRateUsdKwh > 0 ? +a.elecRateUsdKwh : 0.10;
+                    var avoidedEnergyYr = scr.coveredMwhYr * 1000 * rate;
+                    var carbonPrice = +a.carbonPriceUsdT >= 0 ? +a.carbonPriceUsdT : ((DATA.carbon && DATA.carbon.carbonPrice && DATA.carbon.carbonPrice[region]) || 0);
+                    var avoidedCarbonYr = scr.carbonOffsetTonnesYr * carbonPrice;
+                    var st = RZEngine.models.energy.storageEconomics({ bessMwh: a.bessMwh || 0, years: years, region: region });
+                    var gridSvcYr = (a.bessMwh || 0) > 0 ? (st.gridServices.usdYrBand[0] + st.gridServices.usdYrBand[1]) / 2 : 0;
+                    var benefitYr = avoidedEnergyYr + avoidedCarbonYr + gridSvcYr;
+                    var cash = [-capex];
+                    for (var y = 1; y <= years; y++) {
+                        var aug = st.augmentation.years.indexOf(y) >= 0 ? st.augmentation.capexUsd / Math.max(1, st.augmentation.years.length) : 0;
+                        cash.push(benefitYr - opexYr - aug);
+                    }
+                    var wacc = (DATA.discountDefaults && (DATA.discountDefaults[region] || DATA.discountDefaults.global)) || 0.10;
+                    var npv = R.npv(cash, wacc);
+                    var irr = R.irr(cash);
+                    var payback = R.paybackPeriod(capex, benefitYr, opexYr);
+                    var bankable = npv > 0 && irr != null && irr > wacc;
+                    return {
+                        coverage: scr,
+                        capexUsd: Math.round(capex), opexUsdYr: Math.round(opexYr),
+                        avoided: { energyUsdYr: Math.round(avoidedEnergyYr), carbonUsdYr: Math.round(avoidedCarbonYr), gridServicesUsdYr: Math.round(gridSvcYr), totalUsdYr: Math.round(benefitYr) },
+                        storage: st,
+                        npvUsd: Math.round(npv), irrPct: irr != null ? +(irr * 100).toFixed(1) : null,
+                        waccPct: +(wacc * 100).toFixed(1), paybackYears: payback === Infinity ? null : +payback.toFixed(1),
+                        bankability: {
+                            verdict: bankable ? 'BANKABLE (screening)' : 'NOT BANKABLE (screening)',
+                            tests: { npvPositive: npv > 0, irrAboveWacc: irr != null && irr > wacc },
+                            note: bankable
+                                ? 'Clears the screening gate (NPV > 0, IRR ' + (irr * 100).toFixed(1) + '% > WACC ' + (wacc * 100).toFixed(1) + '%). Lender diligence adds DSCR, contracted-revenue quality, and counterparty risk.'
+                                : 'GRID-ONLY WINS HERE: the renewable does not clear the cost of capital at this tariff/sizing — the honest verdict; resize, wait for capex decline, or buy green tariffs instead.'
+                        },
+                        method: 'screening project economics over hybridScreen coverage — interconnection, degradation detail, and PPA structuring supersede'
                     };
                 }
             },
@@ -11932,6 +12187,118 @@
                     var techFte = (mw || 0) * s.techFtePerMw;
                     var total = Math.max(s.minFte, Math.round(shiftFte + techFte));
                     return { totalFte: total, shiftFte: Math.round(shiftFte), techFte: Math.round(techFte), ftePerMw: mw > 0 ? +(total / mw).toFixed(2) : null };
+                },
+                /* ══ Workstream G3 — end-to-end operations headcount. Replaces the
+                 *  per-MW×multiplier heuristic with a LABOR-HOURS-driven model +
+                 *  campus topology + sourcing split + strategy %-mix.
+                 *  input { itLoadKw, tier, mix:{reactive,planned,predictive} (fractions
+                 *  summing 1), inHouseFrac (0-1; vendor share = 1-x), mwPerDcOverride? }.
+                 *  Returns per-DC vs per-campus roles + labor breakdown + basis. ══ */
+                opsHeadcount: function (input) {
+                    input = input || {};
+                    var O = DATA.maintenance.ops, S = DATA.maintenance.staffing, M = DATA.maintenance;
+                    var mw = Math.max(0.1, (+input.itLoadKw || 0) / 1000);
+                    var tier = [2, 3, 4].indexOf(+input.tier) >= 0 ? +input.tier : 3;
+                    var mix = input.mix || { reactive: 0, planned: 1, predictive: 0 };
+                    var mixSum = (mix.reactive || 0) + (mix.planned || 0) + (mix.predictive || 0) || 1;
+                    var rx = (mix.reactive || 0) / mixSum, pl = (mix.planned || 0) / mixSum, pd = (mix.predictive || 0) / mixSum;
+                    var inHouse = input.inHouseFrac != null ? Math.max(0, Math.min(1, +input.inHouseFrac)) : 0.6;
+                    /* campus topology: N data centers on the campus */
+                    var mwPerDc = +input.mwPerDcOverride > 0 ? +input.mwPerDcOverride : O.mwPerDc;
+                    var nDc = Math.max(1, Math.ceil(mw / mwPerDc));
+                    /* 1) MAINTENANCE LABOR DEMAND (hours/yr) — the strategy mix:
+                     *    planned share carries the PM program; predictive share cuts
+                     *    task hours (CBM) but adds analysis; reactive share drops PM
+                     *    but pays failure-driven emergency hours. */
+                    var pmHours = O.pmHoursPerMwYr * mw * (pl + pd * (1 - M.predictiveTaskReduction));
+                    var cbmHours = O.cbmAnalysisHoursPerMwYr * mw * pd;
+                    var baseFailures = (tier === 4 ? M.expectedFailuresPerYear.tier4 : M.expectedFailuresPerYear['default']) * mw / 10; /* per-10MW basis */
+                    var failures = baseFailures * (rx * O.strategyFailureMult.reactive + pl * O.strategyFailureMult.planned + pd * O.strategyFailureMult.predictive);
+                    var emergencyHours = failures * M.reactiveFixHours * 2; /* crew of 2 per event */
+                    var laborHours = pmHours + cbmHours + emergencyHours;
+                    /* 2) ONSITE TECHNICIANS from labor: in-house share of the demand ÷
+                     *    productive hours per FTE (payable × wrench-time). */
+                    var prodHours = O.hoursPerFteYr * O.wrenchTimeFrac;
+                    var techFromLabor = (laborHours * inHouse) / prodHours;
+                    /* 3) SHIFT FLOOR: emergency-response presence per DC. Vendor-heavy +
+                     *    reactive-heavy = skeleton (1/shift/DC); else standard (2). */
+                    var skeleton = inHouse < 0.25 && rx > 0.5;
+                    var floorPerShift = skeleton ? O.minOnShiftPerDc.skeleton : O.minOnShiftPerDc.standard;
+                    var techFloorFte = floorPerShift * nDc * S.ftePerPosition;
+                    var techFte = Math.max(techFromLabor, techFloorFte);
+                    /* 4) SHIFT OPERATIONS (DCO/shift-leads): tier positions per DC floor
+                     *    (control-room presence does not vendor out), ×4.2 coverage. */
+                    var positions = S.positionsByTier[tier] != null ? S.positionsByTier[tier] : S.positionsByTier[3];
+                    var shiftOpsFte = Math.round(positions * S.ftePerPosition * Math.max(1, nDc * 0.6)); /* multi-DC campuses share some positions */
+                    /* 5) CAMPUS-SHARED roles — once per campus, NOT per DC (owner:
+                     *    network/IT/DCO guys are per-campus). */
+                    var cs = O.campusShared;
+                    var sharedFte = cs.networkIt + cs.dcoOps + cs.securityLead + cs.facilityMgmt;
+                    var totalFte = Math.round(techFte + shiftOpsFte + sharedFte);
+                    return {
+                        nDc: nDc, mwPerDc: mwPerDc,
+                        laborHours: { pm: Math.round(pmHours), cbmAnalysis: Math.round(cbmHours), emergency: Math.round(emergencyHours), total: Math.round(laborHours) },
+                        failuresPerYr: +failures.toFixed(1),
+                        roles: {
+                            onsiteTechFte: Math.round(techFte),
+                            techBasis: techFromLabor >= techFloorFte
+                                ? 'labor-hours-bound: ' + Math.round(laborHours) + ' h/yr × ' + Math.round(inHouse * 100) + '% in-house ÷ ' + Math.round(prodHours) + ' productive h/FTE'
+                                : 'shift-floor-bound: ' + floorPerShift + '/shift × ' + nDc + ' DC × ' + S.ftePerPosition + ' FTE/position (emergency-response minimum' + (skeleton ? ', skeleton crew — vendor+reactive phenotype' : '') + ')',
+                            shiftOpsFte: shiftOpsFte,
+                            shiftOpsBasis: positions + ' Uptime positions (Tier ' + tier + ') × ' + S.ftePerPosition + ' FTE/position, campus-shared factor ' + Math.max(1, +(nDc * 0.6).toFixed(1)),
+                            campusSharedFte: sharedFte,
+                            campusSharedBasis: 'network/IT ' + cs.networkIt + ' + DCO ops ' + cs.dcoOps + ' + security lead ' + cs.securityLead + ' + facility mgmt ' + cs.facilityMgmt + ' — PER CAMPUS (not per DC)'
+                        },
+                        totalFte: totalFte,
+                        vendorLaborHours: Math.round(laborHours * (1 - inHouse)),
+                        phenotype: skeleton ? 'vendor+reactive skeleton' : (pd > 0.5 ? 'predictive in-house program' : 'balanced hybrid'),
+                        method: 'labor-hours-driven screening (SFG20-informed PM hours, Uptime 4.2 FTE/position coverage, campus topology ' + nDc + '×' + mwPerDc + ' MW)'
+                    };
+                },
+                /* ══ Workstream G5 — availability impact: strategy-mix ⇒ failure rate,
+                 *  staffing/sourcing/SLA ⇒ effective MTTR, composed to an availability
+                 *  DELTA anchored on the tier design band (never below a defensible
+                 *  floor, never above the tier ceiling). input { tier, mix, inHouseFrac,
+                 *  slaKey ('2hr'|'4hr'|'nbd'), downtimeCostPerMin? }. ══ */
+                availabilityImpact: function (input) {
+                    input = input || {};
+                    var O = DATA.maintenance.ops, M = DATA.maintenance;
+                    var tier = [2, 3, 4].indexOf(+input.tier) >= 0 ? +input.tier : 3;
+                    var tierAvail = (DATA.reliability && DATA.reliability.tierAvailability) || { 2: 0.99741, 3: 0.99982, 4: 0.99995 };
+                    var design = tierAvail[tier] || 0.99982;
+                    var mix = input.mix || { reactive: 0, planned: 1, predictive: 0 };
+                    var mixSum = (mix.reactive || 0) + (mix.planned || 0) + (mix.predictive || 0) || 1;
+                    var rx = (mix.reactive || 0) / mixSum, pl = (mix.planned || 0) / mixSum, pd = (mix.predictive || 0) / mixSum;
+                    var inHouse = input.inHouseFrac != null ? Math.max(0, Math.min(1, +input.inHouseFrac)) : 0.6;
+                    var sla = O.sla[input.slaKey] || O.sla['4hr'];
+                    /* failure-rate factor from the strategy mix (1.0 at fully planned) */
+                    var failF = rx * O.strategyFailureMult.reactive + pl * 1 + pd * O.strategyFailureMult.predictive;
+                    /* MTTR factor: strategy repair speed × response dependence — the
+                     * vendor-dependent share of repairs waits for the SLA response. */
+                    var mttrStrategy = rx * O.strategyMttrMult.reactive + pl * 1 + pd * O.strategyMttrMult.predictive;
+                    var baseRepairH = 4; /* screening mean repair, 24/7 in-house crew */
+                    var effMttrH = (baseRepairH * mttrStrategy) + (1 - inHouse) * sla.mttrAdderH;
+                    var mttrF = effMttrH / baseRepairH;
+                    /* unavailability scales with failures × repair time, anchored to the
+                     * tier design point at planned+in-house+4hr (factor 1.0×~1.2). */
+                    var anchorF = 1 * (baseRepairH + 0.4 * O.sla['4hr'].mttrAdderH) / baseRepairH;
+                    var unavail = (1 - design) * (failF * mttrF) / anchorF;
+                    /* bound: never better than the tier ceiling ×0.5 unavail, never worse than 20× */
+                    unavail = Math.max((1 - design) * 0.5, Math.min((1 - design) * 20, unavail));
+                    var avail = 1 - unavail;
+                    var downtimeMin = Math.round(unavail * 525600);
+                    var costPerMin = +input.downtimeCostPerMin > 0 ? +input.downtimeCostPerMin : 5000;
+                    return {
+                        availabilityPct: +(avail * 100).toFixed(4),
+                        designPct: +(design * 100).toFixed(4),
+                        downtimeMinYr: downtimeMin,
+                        designDowntimeMinYr: Math.round((1 - design) * 525600),
+                        exposureUsdYr: Math.round(downtimeMin * costPerMin),
+                        effMttrH: +effMttrH.toFixed(1),
+                        failureFactor: +failF.toFixed(2),
+                        sla: { key: input.slaKey || '4hr', label: sla.label, responseMin: sla.responseMin },
+                        method: 'screening: tier design anchor × (failure-mix × effective-MTTR) — strategy mix moves failures (3.5×/1×/0.3×), sourcing+SLA move repair wait; bounded [0.5×, 20×] design unavailability'
+                    };
                 }
             },
 
@@ -13274,6 +13641,51 @@
                         { key: 'opsReady',    title: 'Operations Readiness',         data: 'DATA.dossier.opsReadiness' },
                         { key: 'docRegister', title: 'Document Register',            data: 'DATA.dossier.documentRegister + DATA.dossier.documentSchedule' }
                     ];
+                },
+                /** Workstream I — delivery-governance model: wires the deliverable
+                 *  playbooks + PM framework to the LIVE project (schedule months,
+                 *  CAPEX-scaled variation authority bands, expected document volumes
+                 *  from equipment counts + duration). input {itLoadKw, totalMonths,
+                 *  capexUsd}. Screening-grade volumes (industry rules-of-thumb). */
+                deliveryGovernance: function (input) {
+                    input = input || {};
+                    var mw = Math.max(0.1, (+input.itLoadKw || 0) / 1000);
+                    var months = +input.totalMonths || 20;
+                    var capex = +input.capexUsd || 0;
+                    var D = DATA.dossier;
+                    /* screening document volumes — scale with MW + duration (industry
+                     * rule-of-thumb bands, labeled screening in the dossier) */
+                    var volumes = {
+                        rfi: Math.round(mw * 8 + months * 6),
+                        submittal: Math.round(mw * 6 + 120),
+                        itp: Math.round(mw * 1.2 + 24),
+                        ncr: Math.round(mw * 2 + months * 1.5),
+                        variation: Math.round(months * 1.2 + mw * 0.5),
+                        punchlist: Math.round(mw * 25 + 200)
+                    };
+                    /* variation authority bands in $ from the CAPEX */
+                    var bands = (D.pmFramework.decisionVelocity.bands || []).map(function (b) {
+                        var out = { decision: b.decision, authority: b.authority, targetDays: b.targetDays, usdBand: null };
+                        if (capex > 0) {
+                            if (b.decision.indexOf('< 0.1%') >= 0) out.usdBand = '< $' + Math.round(capex * 0.001 / 1000) + 'K';
+                            else if (b.decision.indexOf('0.1–1%') >= 0) out.usdBand = '$' + Math.round(capex * 0.001 / 1000) + 'K – $' + Math.round(capex * 0.01 / 1e6 * 10) / 10 + 'M';
+                            else if (b.decision.indexOf('> 1%') >= 0) out.usdBand = '> $' + Math.round(capex * 0.01 / 1e6 * 10) / 10 + 'M';
+                        }
+                        return out;
+                    });
+                    /* deliverable windows on the program: doc-heavy phases mapped to months */
+                    var windows = [
+                        { key: 'ifc', window: 'M0 → M' + Math.round(months * 0.25), note: 'progressive per discipline' },
+                        { key: 'submittal', window: 'M' + Math.round(months * 0.1) + ' → M' + Math.round(months * 0.5), note: 'long-lead first' },
+                        { key: 'rfi', window: 'M' + Math.round(months * 0.2) + ' → M' + Math.round(months * 0.9), note: 'peaks with MEP fit-out' },
+                        { key: 'itp', window: 'M' + Math.round(months * 0.15) + ' → M' + Math.round(months * 0.4), note: 'before each covered work-front' },
+                        { key: 'ncr', window: 'M' + Math.round(months * 0.3) + ' → M' + Math.round(months * 0.95), note: 'tracked to zero before turnover' },
+                        { key: 'lookahead', window: 'weekly, all phases', note: 'Last-Planner rhythm' },
+                        { key: 'variation', window: 'M0 → M' + months, note: 'log closes with final account' },
+                        { key: 'punchlist', window: 'M' + Math.round(months * 0.85) + ' → M' + months, note: 'per-system walkdowns' },
+                        { key: 'turnover', window: 'M' + Math.round(months * 0.8) + ' → M' + months, note: 'assembled progressively' }
+                    ];
+                    return { volumes: volumes, decisionBands: bands, windows: windows, deliverables: D.deliverables, pmFramework: D.pmFramework, method: 'screening volumes (MW + duration rules-of-thumb); playbooks = standard practice reference; decision bands scaled to project CAPEX' };
                 }
             },
 
@@ -13780,7 +14192,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-24-e2"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-24-gj"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

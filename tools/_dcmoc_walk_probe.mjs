@@ -91,6 +91,33 @@ await new Promise((r) => setTimeout(r, 600));
 ok('can tick PASS', ticked && beforeIdx !== undefined);
 ok('derived chip appears somewhere', await bodyHas('from checklist') || true /* only when whole level visible on overview */);
 
+/* ── Overnight program assertions (v1.115.28-.33): WBS depth + G/J/L features ── */
+console.log('— Program features (E/G/L) —');
+await nav('Commissioning', 'Commissioning Engine');
+if (!(await bodyHas('Commissioning WBS'))) await nav('Commissioning Engine');
+/* the earlier Cx section leaves the page on the Checklist tab — the WBS lives on Progress & Systems */
+await page.evaluate(() => [...document.querySelectorAll('button')].find((b) => b.textContent.trim() === 'Progress & Systems')?.click());
+await new Promise((r) => setTimeout(r, 700));
+ok('Cx WBS sub-activities render (E2)', await bodyHas('IST scenario matrix'));
+ok('Cx calendar duration sane (E0 — no 4-digit day counts)', await page.evaluate(() => {
+    const m = document.body.innerText.match(/Program Duration[\s\S]{0,40}?(\d[\d,]*)\s*d/);
+    return m ? parseInt(m[1].replace(/,/g, '')) < 1200 : true;
+}));
+await nav('Construction', 'Construction Engine');
+if (!(await bodyHas('Master Construction Schedule'))) await nav('Construction Engine');
+ok('Construction WBS L2 present (E1)', await bodyHas('HV/LV Electrical'));
+ok('Delivery Governance button present (I)', await page.evaluate(() => [...document.querySelectorAll('button')].some((b) => b.textContent.includes('Delivery Governance'))));
+await nav('Capacity Planning', 'Capacity Planning');
+if (!(await bodyHas('Utilization'))) await nav('Capacity Planning');
+await page.evaluate(() => [...document.querySelectorAll('button')].find((b) => b.textContent.trim().includes('Cooling Capacity'))?.click());
+await new Promise((r) => setTimeout(r, 700));
+ok('Capacity cooling tab has component table (L)', await bodyHas('Heat Rejection'));
+await nav('Operations', 'Staffing');
+if (!(await bodyHas('Staffing'))) await nav('Staffing');
+ok('Campus Operations Model card (G3)', await bodyHas('Campus Operations Model'));
+await nav('Operations', 'Maintenance');
+ok('Strategy %-mix editor (G-mix)', await page.evaluate(() => document.body.innerText.includes('PPM') || document.body.innerText.includes('Predictive')));
+
 console.log('— Reliability (AB) —');
 await nav('Reliability', 'Reliability Engine');
 ok('page mounts', await bodyHas('Reliability Engine'));

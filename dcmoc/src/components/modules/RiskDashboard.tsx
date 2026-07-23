@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useMemo, useState, useCallback } from 'react';
-import { useSimulationStore } from '@/store/simulation';
+import { useSimulationStore, effectiveInHouseFrac } from '@/store/simulation';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 import { calculateRiskProfile, calculateRiskScore, RiskScenario } from '@/modules/risk/RiskEngine';
-import { calculateDowntimeRisk } from '@/modules/risk/DowntimeCalculator';
+import { computedDowntime } from '@/modules/risk/DowntimeCalculator';
+import { useEngineReady } from '@/lib/rz-engine';
 import { generateAssetCounts } from '@/lib/AssetGenerator';
 import {
     AlertTriangle, ShieldAlert, Waves, Zap, Construction,
@@ -19,6 +20,7 @@ export default function RiskDashboard() {
     const tierLevel = (inputs.tierLevel === 4 ? 4 : 3) as 3 | 4;
     const [isExporting, setIsExporting] = useState(false);
     const [selectedRiskCell, setSelectedRiskCell] = useState<{ row: number; col: number } | null>(null);
+    const engineReady = useEngineReady(); // re-run when rz-engine.min.js lands (deferred script)
 
     const analysis = useMemo(() => {
         if (!selectedCountry) return null;
@@ -26,9 +28,22 @@ export default function RiskDashboard() {
         const assets = generateAssetCounts(inputs.itLoad, tierLevel, coolingMap, Math.ceil(inputs.itLoad * 0.6), inputs.coolingTopology, inputs.powerRedundancy);
         const risks = calculateRiskProfile(selectedCountry, tierLevel, assets);
         const aggregation = calculateRiskScore(risks, tierLevel);
-        const downtime = calculateDowntimeRisk(tierLevel, undefined, 4, selectedCountry ?? undefined);
+        /* G-avail — COMPUTED availability: tier design anchor adjusted by the
+         * maintenance strategy mix, sourcing split and selected SLA (engine
+         * models.maintenance.availabilityImpact; falls back to the Uptime
+         * design lookup when the engine is absent). */
+        const downtime = computedDowntime(
+            tierLevel,
+            inputs.strategyMix,
+            effectiveInHouseFrac(inputs),
+            inputs.slaKey ?? '4hr',
+            undefined,
+            selectedCountry ?? undefined
+        );
         return { risks, aggregation, downtime };
-    }, [selectedCountry, tierLevel, inputs.itLoad, inputs.coolingType, inputs.coolingTopology, inputs.powerRedundancy, inputs.headcount_Engineer]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedCountry, tierLevel, inputs.itLoad, inputs.coolingType, inputs.coolingTopology, inputs.powerRedundancy, inputs.headcount_Engineer,
+        inputs.strategyMix, inputs.maintenanceModel, inputs.hybridRatio, inputs.slaKey, engineReady]);
 
     if (!selectedCountry || !analysis) {
         return <div className="p-8 text-center text-slate-500">Select a country to view risk analysis.</div>;
@@ -104,7 +119,9 @@ export default function RiskDashboard() {
 
                 <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                     <div className="text-slate-500 dark:text-slate-400 text-xs uppercase mb-1 flex items-center gap-1">
-                        <DollarSign className="w-3 h-3" /> Financial Exposure <Tooltip content="Estimated annual cost of downtime events based on expected outage minutes × tier-adjusted cost per minute (Uptime Institute 2025 benchmarks)." />
+                        <DollarSign className="w-3 h-3" /> Financial Exposure <Tooltip content={downtime.engineLive
+                            ? `Annual downtime exposure = COMPUTED downtime minutes (maintenance/SLA-adjusted availability) × tier-adjusted cost per minute (Uptime Institute 2025 benchmarks). Changing the strategy mix, sourcing split or SLA moves this number. Method: ${downtime.method}`
+                            : 'Estimated annual cost of downtime events based on expected outage minutes × tier-adjusted cost per minute (Uptime Institute 2025 benchmarks).'} />
                     </div>
                     <div className="text-3xl font-bold text-red-600 dark:text-red-400">
                         ${Number.isFinite(downtime.financialImpact) ? (downtime.financialImpact / 1000).toFixed(0) : '—'}k
@@ -116,11 +133,15 @@ export default function RiskDashboard() {
 
                 <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                     <div className="text-slate-500 dark:text-slate-400 text-xs uppercase mb-1 flex items-center gap-1">
-                        <Activity className="w-3 h-3" /> Availability <Tooltip content="Expected annual uptime per Uptime Institute Tier Standard 2025. Tier III ≥ 99.982% (95 min/yr), Tier IV ≥ 99.99943% (26 min/yr)." />
+                        <Activity className="w-3 h-3" /> {downtime.engineLive ? 'Computed Availability' : 'Availability'} <Tooltip content={downtime.engineLive
+                            ? `Computed expected availability: the Uptime tier design point adjusted for your maintenance strategy mix, in-house/vendor split and selected SLA response class. Method: ${downtime.method}`
+                            : `Expected annual uptime per Uptime Institute Tier Standard 2025. Tier III ≥ 99.982% (95 min/yr), Tier IV ≥ 99.99943% (26 min/yr). ${downtime.method}`} />
                     </div>
                     <div className="text-3xl font-bold text-rz-data">{downtime.availability}%</div>
-                    <div className="text-xs text-slate-500 mt-1">
-                        Tier {tierLevel} SLA target
+                    <div className="text-xs text-slate-500 mt-1" title={downtime.method}>
+                        {downtime.engineLive
+                            ? <>design {downtime.designPct}% · now {downtime.availability}% (maintenance/SLA-adjusted{downtime.slaLabel ? ` · ${downtime.slaLabel}` : ''})</>
+                            : <>Tier {tierLevel} SLA target</>}
                     </div>
                 </div>
 
@@ -296,7 +317,7 @@ export default function RiskDashboard() {
                         <div className="bg-white dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
                             <div className="text-[10px] text-slate-500 uppercase flex items-center">Availability <Tooltip content="Annual uptime percentage implied by the expected downtime: availability = 1 − (downtime minutes ÷ 525,600). Compare against the Uptime tier expectation (Tier III ≥ 99.982%, Tier IV ≥ 99.995%). Redundancy level and MTTR move it most — see the Reliability engine for the full composed model." /></div>
                             <div className="text-xl font-bold text-rz-data">{downtime.availability}%</div>
-                            <div className="text-[10px] text-slate-500 dark:text-slate-400">annual uptime</div>
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400" title={downtime.method}>{downtime.engineLive ? `design ${downtime.designPct}% · adjusted` : 'annual uptime'}</div>
                         </div>
                         <div className="bg-white dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
                             <div className="text-[10px] text-slate-500 uppercase flex items-center">Financial Impact <Tooltip content="Annual downtime cost exposure = expected outage minutes × tier-adjusted cost per minute (Uptime Institute 2025 outage-cost benchmarks). A screening expectation for insurance and mitigation-budget sizing, not a worst-case single-event figure — one large outage can exceed the annual number on its own." /></div>

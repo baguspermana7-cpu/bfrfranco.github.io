@@ -148,7 +148,7 @@ export function utilization(i: CapInputs, facilityMw: number): { rows: UtilRow[]
     return { rows, binding, stranded };
 }
 
-export interface ComponentRow { label: string; config: string; utilPct: number; status: 'OK' | 'Watch' | 'At Risk'; remediation?: string }
+export interface ComponentRow { label: string; config: string; utilPct: number; status: 'OK' | 'Watch' | 'At Risk'; remediation?: string; tip?: string }
 
 /** Power components from the engine equipment-scaling model; ratings = scaling divisors (screening). */
 export function equipmentTable(i: CapInputs): { rows: ComponentRow[]; source: string } {
@@ -186,6 +186,156 @@ export function equipmentTable(i: CapInputs): { rows: ComponentRow[]; source: st
             mk('Chillers', eq.chillers, 500, facilityKw - i.itLoadKw),
         ],
     };
+}
+
+/* ─── Workstream L: deep system-detail tables (cooling / rack & space / network) ──
+ * Same ComponentRow shape + banding as the Power equipment table so all four
+ * system tabs render identically. Counts reuse engine equipScale divisors where
+ * available (screening); cooling DUTY basis = IT heat, NOT IT × PUE (the PUE
+ * overhead is parasitic fan/pump power, not heat the primary loop must reject —
+ * multiplying duty by PUE overcounted CRAH/chilled-water sizing, v1.103.1 rule). */
+
+/** Air-side residual heat share by cooling technology — fraction of IT heat still
+ * rejected through room air handlers after the primary loop (screening split). */
+const AIR_SIDE_SHARE: Record<string, number> = {
+    air: 1, inrow: 1, rdhx: 0.30, liquid: 0.25,
+    immersion: 0.05, immersion_1p: 0.05, immersion_2p: 0.03, microfluidic: 0.05,
+};
+
+/** Practical per-rack density ceiling (kW/rack) by cooling technology — screening
+ * industry ranges (air CRAH ~20, in-row ~30, RDHx ~40, DLC ~120, immersion ~200+). */
+export const DENSITY_CEILING_KW: Record<string, number> = {
+    air: 20, inrow: 30, rdhx: 40, liquid: 120,
+    immersion: 200, immersion_1p: 200, immersion_2p: 250, microfluidic: 250,
+};
+
+const COOLING_LABEL: Record<string, string> = {
+    air: 'air/CRAH', inrow: 'in-row', rdhx: 'rear-door HX', liquid: 'direct liquid (CDU)',
+    immersion: 'immersion 1φ', immersion_1p: 'immersion 1φ', immersion_2p: 'immersion 2φ', microfluidic: 'microfluidic',
+};
+
+const bandStatus = (pct: number): ComponentRow['status'] => (pct < 70 ? 'OK' : pct < 85 ? 'Watch' : 'At Risk');
+
+/** Shared unit-scaled row builder (same math + remediation grammar as the Power
+ * table's mk()): utilization = duty ÷ (units × rating), levers quantified to ≤80%. */
+function mkScaledRow(label: string, count: number, ratingKw: number, loadKw: number, tip: string, escalation?: string): ComponentRow {
+    const pct = Math.min(150, Math.round((loadKw / Math.max(1, count * ratingKw)) * 100));
+    const status = bandStatus(pct);
+    let remediation: string | undefined;
+    if (status !== 'OK') {
+        const needed = Math.ceil(loadKw / (0.8 * ratingKw));
+        const addUnits = Math.max(1, needed - count);
+        remediation = status === 'At Risk'
+            ? `Utilization ${pct}% > 85%: add +${addUnits} unit(s) (${count}→${Math.max(needed, count + addUnits)}) to target ≤80%, OR raise the unit rating above ${(ratingKw / 1000).toFixed(1)} MW, OR shed load via the phase plan.${escalation ? ' ' + escalation : ''}`
+            : `Utilization ${pct}% (Watch 70-85%): the next phase will cross 85% — plan +${addUnits} unit(s) or hold duty at ≤${(Math.floor(count * ratingKw * 0.8) / 1000).toFixed(1)} MW.${escalation ? ' ' + escalation : ''}`;
+    }
+    return { label, config: `${count}× ${(ratingKw / 1000).toFixed(1)} MW`, utilPct: pct, status, remediation, tip };
+}
+
+/** Cooling components: engine equipScale counts (screening divisor ratings); duty
+ * basis = IT heat. Free-cooling note: economizer hours cut compressor ENERGY, not
+ * installed capacity — plants are sized for the design day. */
+export function coolingEquipmentTable(i: CapInputs): { rows: ComponentRow[]; source: string } {
+    const m = rzModels()?.commissioning;
+    let eq: Record<string, number> | null = null;
+    try { eq = m?.equipScale ? m.equipScale({ itLoad: i.itLoadKw, rackDensity: densityToEngineBucket(i.rackKw) }) : null; } catch { /* */ }
+    const itHeatKw = i.itLoadKw;                                   // duty basis = IT heat, NOT IT × PUE
+    const airShare = AIR_SIDE_SHARE[i.coolingType] ?? 1;
+    const isLiquid = airShare <= 0.25;                             // liquid / immersion / microfluidic → CDU loops
+    const techLabel = COOLING_LABEL[i.coolingType] ?? i.coolingType;
+    const chillerCount = eq?.chillers ?? Math.ceil(itHeatKw / 500);
+    const crahCount = eq?.cooling_units ?? Math.ceil(itHeatKw / 200);
+    const pumpCount = eq?.pumps ?? Math.ceil(itHeatKw / 300);
+    const rejCount = Math.ceil(itHeatKw / 1000) + 1;               // N+1 heat-rejection cells @ ~1 MW (screening)
+    const freeNote = 'Free-cooling/economizer hours reduce compressor energy (OPEX), NOT installed capacity — size for the design day.';
+    return {
+        source: eq ? 'engine equipScale · ratings = scaling divisors (screening)' : 'fallback divisors (engine absent) · screening',
+        rows: [
+            mkScaledRow(
+                isLiquid ? `CDU Loops (${techLabel})` : `Chillers (${techLabel})`,
+                chillerCount, 500, itHeatKw,
+                isLiquid
+                    ? 'Coolant distribution units — the primary liquid loop between the rack cold plates/tanks and the facility water system. Duty basis is the IT heat load itself (kW of electronics heat), not IT × PUE. Count scales from the engine equipScale divisor (1 per ~500 kW).'
+                    : 'Central chilled-water plant. Duty basis is the IT heat load (kW), not IT × PUE — the PUE overhead is parasitic fan/pump power, not additional heat the chillers must remove. Count scales from the engine equipScale divisor (1 per ~500 kW).',
+                freeNote),
+            mkScaledRow('CRAH / AHU Units', crahCount, 200, Math.round(itHeatKw * airShare),
+                `Computer-room air handlers and AHUs on the air side. For ${techLabel} cooling the air-side residual is ~${Math.round(airShare * 100)}% of IT heat (the rest leaves via the liquid loop) — a screening split, so the duty here is IT heat × that share. Unit rating from the engine divisor (~200 kW each).`,
+                'Adding CRAH units helps only the AIR-SIDE residual — for liquid-cooled halls the CDU loop is usually the real constraint.'),
+            mkScaledRow('CHW / CDU Pumps', pumpCount, 300, itHeatKw,
+                'Chilled-water (or CDU secondary) pumps circulating the full IT heat duty through the hydronic loop. Count from the engine equipScale divisor (1 per ~300 kW of duty); rating expressed as thermal duty served per pump, a screening convention.',
+                'Pump additions are cheap relative to chillers — verify pipe header capacity before adding load.'),
+            mkScaledRow('Heat Rejection (towers/dry coolers)', rejCount, 1000, itHeatKw,
+                'Cooling towers or dry coolers rejecting the IT heat to ambient, sized N+1 at ~1 MW per cell (screening — compressor work adds ~15-25% on top in a real selection). Duty basis remains IT heat for consistency with the rest of this table.',
+                freeNote),
+        ],
+    };
+}
+
+/** Rack & space rows incl. the power-vs-space BINDING CONSTRAINT (engine
+ * bindingConstraint) and the density ceiling of the selected cooling technology. */
+export function rackSpaceTable(i: CapInputs, utilRows: UtilRow[], binding: string | null): { rows: ComponentRow[]; source: string } {
+    const rack = utilRows.find((u) => u.key === 'rack');
+    const space = utilRows.find((u) => u.key === 'space');
+    const ceiling = DENSITY_CEILING_KW[i.coolingType] ?? 20;
+    const techLabel = COOLING_LABEL[i.coolingType] ?? i.coolingType;
+    const rackFootprint: number = rzData()?.capacity?.rackFootprintM2 ?? 0.72;
+    const densPct = Math.min(150, Math.round((i.rackKw / ceiling) * 100));
+    const densStatus = bandStatus(densPct);
+    const bindsSpace = binding === 'space';
+    const bindPct = Math.max(rack?.pct ?? 0, space?.pct ?? 0);
+    const rows: ComponentRow[] = [
+        {
+            label: 'Rack Positions', config: `${(rack?.used ?? 0).toLocaleString()} used / ${(rack?.capacity ?? 0).toLocaleString()} positions`,
+            utilPct: rack?.pct ?? 0, status: bandStatus(rack?.pct ?? 0),
+            tip: 'Rack positions consumed by the current IT load (IT kW ÷ kW/rack) vs. the positions the white space can physically hold (engine bindingConstraint). When used approaches available, either reserve more area or raise density.',
+            remediation: (rack?.pct ?? 0) >= 70 ? `Rack positions at ${rack?.pct}%: reserve additional white-space area, OR raise avg density above ${i.rackKw} kW/rack (cooling ceiling ~${ceiling} kW for ${techLabel}), OR defer load via the phase plan.` : undefined,
+        },
+        {
+            label: 'Avg Rack Density', config: `${i.rackKw} kW/rack · ceiling ~${ceiling} kW (${techLabel})`,
+            utilPct: densPct, status: densStatus,
+            tip: `Average design density vs. the practical ceiling of the selected cooling technology (~${ceiling} kW/rack for ${techLabel} — screening industry range). Raising density buys rack positions back but pushes toward a liquid-cooling upgrade once the ceiling is neared.`,
+            remediation: densStatus !== 'OK' ? `Density ${i.rackKw} kW/rack is ${densPct}% of the ~${ceiling} kW ${techLabel} ceiling — further density gains require a cooling-technology step-up (RDHx → DLC → immersion), not just more airflow. Change density in Requirements; cooling type in Simulation setup.` : undefined,
+        },
+        {
+            label: 'White Space', config: `${(space?.used ?? 0).toLocaleString()} / ${(space?.capacity ?? 0).toLocaleString()} m² (incl. gross-up)`,
+            utilPct: space?.pct ?? 0, status: bandStatus(space?.pct ?? 0),
+            tip: `Occupied white space vs. total. Occupied = racks × ${rackFootprint} m² footprint ÷ 35% utilization factor — the gross-up covers aisles, containment, ramps and clearances (screening convention, same basis as the utilization bar above).`,
+            remediation: (space?.pct ?? 0) >= 70 ? `White space at ${space?.pct}%: reserve expansion area (building size in Simulation setup) or raise density (ceiling ~${ceiling} kW for ${techLabel}).` : undefined,
+        },
+        {
+            label: 'Binding Constraint', config: bindsSpace ? 'SPACE binds before power' : 'POWER binds before space',
+            utilPct: bindPct, status: bandStatus(bindPct),
+            tip: 'Which resource runs out first as load grows (engine bindingConstraint): if POWER binds, the electrical capacity is exhausted while rack positions remain — adding m² only strands capacity. If SPACE binds, positions run out first — reserve area or raise density.',
+            remediation: bindsSpace
+                ? `Space binds: rack positions exhaust before electrical capacity — reserve additional area or raise density toward the ~${ceiling} kW ${techLabel} ceiling; extra power capacity would sit stranded.`
+                : `Power binds: electrical capacity exhausts before rack positions — additional white space would strand; escalate power (design margin in Requirements, or a new build phase) instead of adding area.`,
+        },
+    ];
+    return { rows, source: `engine bindingConstraint · footprint ${rackFootprint} m²/rack · gross-up ÷0.35 (screening)` };
+}
+
+/** Spine-leaf fabric estimate — SCREENING ASSUMPTION ONLY (no engine network
+ * model): ~1 leaf per 16 racks, ~1 spine per 8 leaves (min 2), 4× 100G uplinks
+ * per leaf, 3:1 oversubscription target. Validate with the fabric design. */
+export function networkTable(i: CapInputs, utilRows: UtilRow[]): { rows: ComponentRow[]; source: string } {
+    const net = utilRows.find((u) => u.key === 'network');
+    const rackRow = utilRows.find((u) => u.key === 'rack');
+    const racks = rackRow?.used ?? Math.ceil(i.itLoadKw / i.rackKw);
+    const leaves = Math.max(1, Math.ceil(racks / 16));
+    const spines = Math.max(2, Math.ceil(leaves / 8));
+    const uplinks = leaves * 4;
+    const fabricTbps = +((uplinks * 100) / 1000).toFixed(1);
+    const pct = net?.pct ?? 0;
+    const status = bandStatus(pct);
+    const rem = status !== 'OK' ? `Fabric utilization ${pct}% (screening): plan spine/uplink expansion at the next phase — and replace this estimate with the real fabric design before committing.` : undefined;
+    const rows: ComponentRow[] = [
+        { label: 'Leaf / ToR Switches', config: `${leaves}× (1 per 16 racks)`, utilPct: pct, status, remediation: rem, tip: 'Top-of-rack/leaf switch count at the screening ratio of one leaf per 16 racks (dual-homed servers halve this in practice). Scales directly with rack positions — no engine network model backs this number.' },
+        { label: 'Spine Switches', config: `${spines}× (1 per 8 leaves, min 2)`, utilPct: pct, status, remediation: rem, tip: 'Spine layer at ~1 spine per 8 leaves with a minimum of 2 for redundancy (screening). Real spine counts depend on radix, oversubscription target and failure-domain design.' },
+        { label: 'Uplinks', config: `${uplinks}× 100G (4 per leaf · ${fabricTbps} Tbps raw)`, utilPct: pct, status, tip: 'Leaf-to-spine uplinks at 4× 100G per leaf (screening) with the raw aggregate they carry. AI/HPC fabrics typically run 8× 400G or more — treat this as a placeholder until the fabric design exists.' },
+        { label: 'Oversubscription', config: '3:1 leaf→spine (target)', utilPct: pct, status, tip: 'Assumed leaf-to-spine oversubscription target. Enterprise fabrics commonly accept 3:1; AI training fabrics require 1:1 (non-blocking) — a fundamentally different switch count than shown here.' },
+        { label: 'Fabric Capacity', config: `${net?.used ?? 0} / ${net?.capacity ?? 0} Tbps`, utilPct: pct, status, remediation: rem, tip: 'Aggregate fabric bandwidth from the utilization model (racks × 1.5 Gbps/rack screening factor vs. design capacity incl. margin). The same ASSUMPTION basis as the Network utilization bar above.' },
+    ];
+    return { rows, source: 'SCREENING ASSUMPTION — no engine network model; validate with the fabric design' };
 }
 
 export function capRecommendations(i: CapInputs, util: UtilRow[], forecast: ForecastRow[]): { title: string; body: string; tone: 'power' | 'cooling' | 'space' | 'network' | 'finance' }[] {

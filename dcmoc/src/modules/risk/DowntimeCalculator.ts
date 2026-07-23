@@ -15,6 +15,8 @@
  */
 
 import { CountryProfile } from '@/constants/countries';
+import { rzModels } from '@/lib/rz-engine';
+import type { StrategyMix } from '@/store/simulation';
 
 export interface DowntimeRisk {
     tier: 2 | 3 | 4;
@@ -81,4 +83,79 @@ export const calculateDowntimeRisk = (
         costPerMinute: effectiveCostPerMin,
         annualEventProbability: stats.annualEventProb,
     };
+};
+
+/* ═══ Workstream G — COMPUTED availability (engine) ═══════════════════════
+ * TIER_STATS above stays the DESIGN reference (Uptime tier standard).
+ * computedDowntime() layers the maintenance reality on top via the shared
+ * engine's models.maintenance.availabilityImpact: strategy %-mix moves the
+ * failure rate (RTF 3.5× / PPM 1× / PdM 0.3×), sourcing + SLA response move
+ * the effective MTTR. Engine absent → graceful fall back to the design
+ * lookup so dashboards never break. ═══════════════════════════════════════ */
+
+export interface ComputedDowntime extends DowntimeRisk {
+    /** Uptime tier DESIGN availability % (the anchor the delta is quoted against). */
+    designPct: number;
+    /** Design-point downtime minutes/yr for the tier. */
+    designDowntimeMinutes: number;
+    /** Engine method string (cite in tooltips) — or the fallback explanation. */
+    method: string;
+    /** true when the engine model produced the numbers; false = design lookup fallback. */
+    engineLive: boolean;
+    effMttrH?: number;
+    failureFactor?: number;
+    slaLabel?: string;
+}
+
+const formatNines = (availPct: number): string => {
+    const unavail = Math.max(1e-9, 1 - availPct / 100);
+    return `${(-Math.log10(unavail)).toFixed(2)} nines`;
+};
+
+export const computedDowntime = (
+    tier: 2 | 3 | 4,
+    strategyMix: StrategyMix | undefined,
+    inHouseFrac: number,
+    slaKey: '2hr' | '4hr' | 'nbd',
+    costPerMin?: number,
+    country?: CountryProfile
+): ComputedDowntime => {
+    // Design reference + country/tier cost-per-minute resolution (single source)
+    const base = calculateDowntimeRisk(tier, costPerMin, 4, country);
+    const fallback: ComputedDowntime = {
+        ...base,
+        designPct: base.availability,
+        designDowntimeMinutes: base.expectedDowntimeMinutes,
+        method: 'Engine unavailable — Uptime Institute tier design lookup (maintenance/SLA adjustment inactive)',
+        engineLive: false,
+    };
+    const fn = rzModels().maintenance?.availabilityImpact;
+    if (typeof fn !== 'function') return fallback;
+    try {
+        const r = fn({
+            tier,
+            mix: strategyMix,
+            inHouseFrac,
+            slaKey,
+            downtimeCostPerMin: base.costPerMinute,
+        });
+        if (!r || !Number.isFinite(r.availabilityPct)) return fallback;
+        return {
+            ...base,
+            availability: r.availabilityPct,
+            availabilityNines: formatNines(r.availabilityPct),
+            expectedDowntimeMinutes: r.downtimeMinYr,
+            expectedDowntimeHours: Math.round((r.downtimeMinYr / 60) * 10) / 10,
+            financialImpact: r.exposureUsdYr,
+            designPct: r.designPct,
+            designDowntimeMinutes: r.designDowntimeMinYr,
+            method: r.method,
+            engineLive: true,
+            effMttrH: r.effMttrH,
+            failureFactor: r.failureFactor,
+            slaLabel: r.sla?.label,
+        };
+    } catch {
+        return fallback;
+    }
 };

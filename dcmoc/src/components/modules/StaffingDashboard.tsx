@@ -2,13 +2,13 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { useSimulationStore } from '@/store/simulation';
-import { rzModels } from '@/lib/rz-engine';
+import { useSimulationStore, effectiveInHouseFrac, STRATEGY_MIX_PRESETS, normalizeStrategyMix } from '@/store/simulation';
+import { rzModels, useEngineReady } from '@/lib/rz-engine';
 import { calculateStaffing, compareShiftModels, generate5YearProjection, StaffRole, StaffingResult, REFERENCE_STAFFING_10MW, ROLE_LABELS, calculateAutoHeadcount } from '@/modules/staffing/ShiftEngine';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
 import { generateAnnualRoster } from '@/modules/staffing/RosterEngine';
 import { calculateTurnoverCost as calculateCostOfTurnover } from '@/modules/staffing/CostOfTurnover';
-import { Users, Clock, DollarSign, AlertTriangle, Calendar, Award, Briefcase, TrendingUp, ArrowRight, CheckCircle, XCircle, BarChart3, Activity } from 'lucide-react';
+import { Users, Clock, DollarSign, AlertTriangle, Calendar, Award, Briefcase, TrendingUp, ArrowRight, CheckCircle, XCircle, BarChart3, Activity, Building2, Wrench } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { TraceValue } from '@/components/ui/TraceValue';
@@ -22,11 +22,51 @@ import { WorkOrderView } from '@/components/modules/WorkOrderView';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 import type { ReportInsight } from '@/modules/reporting/NarrativeEngine';
 
+/** Shape of models.maintenance.opsHeadcount (engine G3 — labor-hours-driven). */
+interface EngineOpsModel {
+    nDc: number;
+    mwPerDc: number;
+    laborHours: { pm: number; cbmAnalysis: number; emergency: number; total: number };
+    failuresPerYr: number;
+    roles: {
+        onsiteTechFte: number; techBasis: string;
+        shiftOpsFte: number; shiftOpsBasis: string;
+        campusSharedFte: number; campusSharedBasis: string;
+    };
+    totalFte: number;
+    vendorLaborHours: number;
+    phenotype: string;
+    method: string;
+}
+
 export function StaffingDashboard() {
     const { selectedCountry, inputs, actions } = useSimulationStore();
     const effectiveInputs = useEffectiveInputs();
     const [activeTab, setActiveTab] = useState<'overview' | 'comparison' | 'org' | 'roster' | 'waterfall' | 'workorders'>('overview');
     const [isExporting, setIsExporting] = useState(false);
+    const engineReady = useEngineReady(); // re-run engine memo once rz-engine.min.js lands
+
+    /* ═══ Workstream G-staffing — Campus Operations Model (engine, ACCURACY).
+     * Labor-hours-driven headcount from models.maintenance.opsHeadcount:
+     * PM + CBM + emergency hours × in-house share ÷ productive hours, with
+     * campus topology (N DC × 35 MW), per-DC shift floors and per-campus
+     * shared roles. The legacy per-MW composition below remains as the
+     * SCREENING model. ═══ */
+    const opsModel: EngineOpsModel | null = useMemo(() => {
+        const fn = rzModels().maintenance?.opsHeadcount;
+        if (typeof fn !== 'function') return null;
+        try {
+            return fn({
+                itLoadKw: inputs.itLoad,
+                tier: inputs.tierLevel,
+                mix: inputs.strategyMix ?? STRATEGY_MIX_PRESETS[inputs.maintenanceStrategy || 'planned'],
+                inHouseFrac: effectiveInHouseFrac(inputs),
+            }) as EngineOpsModel;
+        } catch {
+            return null;
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [inputs.itLoad, inputs.tierLevel, inputs.strategyMix, inputs.maintenanceStrategy, inputs.maintenanceModel, inputs.hybridRatio, engineReady]);
 
     // Auto headcount calculation for rationale display
     const autoResult = useMemo(() => {
@@ -122,6 +162,67 @@ export function StaffingDashboard() {
 
     return (
         <div className="space-y-6">
+            {/* ═══ G-staffing — Campus Operations Model (engine, ACCURACY basis) ═══ */}
+            {opsModel && (() => {
+                const mixN = normalizeStrategyMix(inputs.strategyMix ?? STRATEGY_MIX_PRESETS[inputs.maintenanceStrategy || 'planned']);
+                const inHousePct = Math.round(effectiveInHouseFrac(inputs) * 100);
+                return (
+                    <div className="bg-white dark:bg-slate-900/50 border border-cyan-200 dark:border-cyan-800/60 rounded-xl p-5 shadow-sm dark:shadow-none">
+                        <div className="flex flex-wrap items-center gap-2 mb-4">
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <Building2 className="w-4 h-4 text-cyan-500 dark:text-cyan-400" />
+                                Campus Operations Model (engine)
+                                <Tooltip content={`Labor-hours-driven operations headcount from the shared engine (models.maintenance.opsHeadcount). Maintenance labor demand = SFG20-informed PM hours + CBM analysis + failure-driven emergency hours, shaped by the strategy % mix; the in-house share of that demand ÷ productive hours per FTE gives technicians, with a per-DC emergency-response shift floor; shift operations follow Uptime 4.2 FTE/position; campus-shared roles are counted once per campus. This is the ACCURACY basis — the per-MW composition below is the screening model. Method: ${opsModel.method}`} />
+                            </h3>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-cyan-100 dark:bg-cyan-500/15 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-500/30">accuracy model</span>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700" title="Operating phenotype the engine detected from the strategy mix + sourcing split. Vendor-heavy + reactive-heavy collapses the technician floor to a skeleton crew (1/shift/DC); predictive-heavy in-house runs a CBM analysis program.">
+                                {opsModel.phenotype}
+                            </span>
+                            <span className="ml-auto px-2 py-0.5 rounded text-[10px] font-mono text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800" title="Live inputs driving the model: maintenance strategy % mix (Maintenance page) and in-house share (sourcing model / hybrid slider).">
+                                RTF {Math.round(mixN.reactive * 100)}% · PPM {Math.round(mixN.planned * 100)}% · PdM {Math.round(mixN.predictive * 100)}% · in-house {inHousePct}%
+                            </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+                            <div className="bg-slate-50 dark:bg-slate-950/40 rounded-lg p-3 border border-slate-100 dark:border-slate-800">
+                                <div className="text-[10px] text-slate-500 uppercase font-bold flex items-center gap-1">Campus Topology <Tooltip content={`The engine splits the campus into data halls of ~${opsModel.mwPerDc} MW each (hyperscale build practice). Per-DC roles (technician shift floors) scale with the DC count; campus-shared roles do not.`} /></div>
+                                <div className="text-lg font-bold text-slate-900 dark:text-white mt-1 tabular-nums">{staffMw.toFixed(staffMw >= 10 ? 0 : 1)} MW → {opsModel.nDc} DC × {opsModel.mwPerDc} MW</div>
+                                <div className="text-[10px] text-slate-500">{opsModel.failuresPerYr} expected failures/yr</div>
+                            </div>
+                            <div className="bg-slate-50 dark:bg-slate-950/40 rounded-lg p-3 border border-slate-100 dark:border-slate-800">
+                                <div className="text-[10px] text-slate-500 uppercase font-bold flex items-center gap-1">Onsite Technicians <Tooltip content={`FTE technicians on the campus. Basis: ${opsModel.roles.techBasis}. Labor-hours-bound = demand-driven (in-house share of maintenance hours ÷ productive hours/FTE); shift-floor-bound = the per-DC emergency-response minimum dominates.`} /></div>
+                                <div className="text-lg font-bold text-cyan-600 dark:text-cyan-400 mt-1 tabular-nums">{opsModel.roles.onsiteTechFte} FTE</div>
+                                <div className="text-[10px] text-slate-500 leading-tight" title={opsModel.roles.techBasis}>{opsModel.roles.techBasis}</div>
+                            </div>
+                            <div className="bg-slate-50 dark:bg-slate-950/40 rounded-lg p-3 border border-slate-100 dark:border-slate-800">
+                                <div className="text-[10px] text-slate-500 uppercase font-bold flex items-center gap-1">Shift Operations <Tooltip content={`Control-room / DCO shift positions — this presence does not vendor out. Basis: ${opsModel.roles.shiftOpsBasis}. The 4.2 FTE/position factor covers rotation, leave and shrinkage (Uptime Institute).`} /></div>
+                                <div className="text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-1 tabular-nums">{opsModel.roles.shiftOpsFte} FTE</div>
+                                <div className="text-[10px] text-slate-500 leading-tight" title={opsModel.roles.shiftOpsBasis}>{opsModel.roles.shiftOpsBasis}</div>
+                            </div>
+                            <div className="bg-slate-50 dark:bg-slate-950/40 rounded-lg p-3 border border-slate-100 dark:border-slate-800">
+                                <div className="text-[10px] text-slate-500 uppercase font-bold flex items-center gap-1">Campus-Shared Roles <Tooltip content={`Network/IT, DCO ops, security lead and facility management — counted ONCE PER CAMPUS, not per DC. Basis: ${opsModel.roles.campusSharedBasis}`} /></div>
+                                <div className="text-lg font-bold text-amber-600 dark:text-amber-400 mt-1 tabular-nums">{opsModel.roles.campusSharedFte} FTE</div>
+                                <div className="text-[10px] text-slate-500 leading-tight">per campus, not per DC</div>
+                            </div>
+                            <div className="bg-slate-50 dark:bg-slate-950/40 rounded-lg p-3 border border-cyan-200 dark:border-cyan-800/50">
+                                <div className="text-[10px] text-slate-500 uppercase font-bold flex items-center gap-1">Total FTE <Tooltip content="Sum of onsite technicians + shift operations + campus-shared roles from the engine ops model. Compare against the Uptime benchmark strip and the screening composition below — a large gap flags over-spend or coverage risk." /></div>
+                                <div className="text-lg font-bold text-rz-data mt-1 tabular-nums">{opsModel.totalFte} FTE</div>
+                                <div className="text-[10px] text-slate-500">engine ops total</div>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-800 pt-3">
+                            <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1"><Wrench className="w-3 h-3" /> Labor Demand <Tooltip content="Annual maintenance labor-hours demand shaped by the strategy mix: PM hours carry the planned program (predictive share reduces task hours), CBM analysis hours come with the predictive share, emergency hours are failure-driven (crew of 2 per event). The in-house share of this demand drives the technician count; the rest is vendor-executed." /></span>
+                            <span title="Planned-preventive program hours (SFG20-informed screening rate/MW·yr, reduced by the predictive share's task cut)">PM <b className="tabular-nums">{opsModel.laborHours.pm.toLocaleString()}</b> h/yr</span>
+                            <span title="Condition-based-monitoring analysis hours carried by the predictive share of the mix">CBM <b className="tabular-nums">{opsModel.laborHours.cbmAnalysis.toLocaleString()}</b> h/yr</span>
+                            <span title="Failure-driven emergency repair hours (expected failures × fix hours × crew of 2) — grows with the reactive share">Emergency <b className="tabular-nums">{opsModel.laborHours.emergency.toLocaleString()}</b> h/yr</span>
+                            <span className="text-slate-400">·</span>
+                            <span title="Total annual maintenance labor demand">Total <b className="tabular-nums">{opsModel.laborHours.total.toLocaleString()}</b> h/yr</span>
+                            <span title="Hours executed by the vendor under the O&M contract (1 − in-house share of the demand)">vendor-executed <b className="tabular-nums">{opsModel.vendorLaborHours.toLocaleString()}</b> h/yr</span>
+                        </div>
+                    </div>
+                );
+            })()}
             {staffBench && (
                 <div className="flex flex-wrap items-center gap-4 px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/70 text-xs">
                     <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1">Uptime Staffing Benchmark <Tooltip content="Engine benchmark headcount from the Uptime Institute staffing model: 4.2 FTE per 24×7 position (covers rotation, leave and shrinkage) scaled by tier, plus per-MW technicians for the facility size. Your configured headcount is compared against it — within ±2 FTE is considered aligned; a large gap means over-spend or coverage risk." /></span>
@@ -251,8 +352,9 @@ export function StaffingDashboard() {
             <div className="p-4 bg-slate-100 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800 rounded-lg space-y-3">
                 {/* Auto/Manual Toggle */}
                 <div className="flex items-center justify-between">
-                    <div className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase tracking-wide">
-                        Headcount Composition
+                    <div className="text-xs text-slate-600 dark:text-slate-400 font-medium uppercase tracking-wide flex items-center gap-1">
+                        Headcount Composition <span className="normal-case font-normal text-slate-500">(screening composition · modeled base FTE — before shift relief)</span>
+                        <Tooltip content="These role counts are the MODELED BASE: direct headcount per role BEFORE shift relief and shrinkage are applied. The shift engine then adds relief/shrinkage cover for 24×7 roles, so the Employed totals in the tables and the Org Chart are higher — that difference is by design, not a bug. This per-MW composition is the screening model; the Campus Operations Model card above is the accuracy basis." />
                     </div>
                     <div className="flex items-center gap-1">
                         <button
@@ -730,9 +832,31 @@ export function StaffingDashboard() {
                 </div>
             )} {/* End Comparison Tab */}
 
-            {activeTab === 'org' && (
-                <OrgChart staffing={results.staffingResults} countryName={selectedCountry.name} />
-            )} {/* End Org Tab */}
+            {activeTab === 'org' && (() => {
+                /* G-staffing 18↔20 fix — explicit reconciliation: the composition
+                 * inputs are pre-shrinkage base FTE; the org chart shows employed
+                 * FTE after shift relief & shrinkage. Same staffingResults sums. */
+                const modeledBase = results.roleConfigs.reduce((a, cfg) => a + (effectiveInputs[cfg.qtyKey] || 1), 0);
+                const employedTotal = results.totalHeadcount;
+                const reliefDelta = employedTotal - modeledBase;
+                return (
+                    <div className="space-y-3">
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-xs shadow-sm dark:shadow-none">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                                Base → Employed Reconciliation
+                                <Tooltip content="Why the org chart shows more people than the composition inputs: the composition is the modeled base (direct headcount per role, before shift relief), while employment must also cover rotation gaps, leave and shrinkage for 24×7 roles. The shift engine adds that relief cover, so Employed total = modeled base + relief/shrinkage heads. Both numbers come from the same staffing results — this is a reconciliation, not a discrepancy." />
+                            </span>
+                            <span className="text-slate-600 dark:text-slate-300">Modeled base <b className="tabular-nums text-slate-900 dark:text-white">{modeledBase} FTE</b></span>
+                            <span className="text-slate-400">→</span>
+                            <span className="text-slate-600 dark:text-slate-300">+ relief/shrinkage <b className={clsx('tabular-nums', reliefDelta >= 0 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-500')}>{reliefDelta >= 0 ? '+' : ''}{reliefDelta} FTE</b></span>
+                            <span className="text-slate-400">→</span>
+                            <span className="text-slate-600 dark:text-slate-300">Employed total <b className="tabular-nums text-rz-data">{employedTotal} FTE</b></span>
+                            <span className="ml-auto text-[10px] text-slate-400">Org chart below shows <b>Employed FTE (incl. shift relief &amp; shrinkage)</b></span>
+                        </div>
+                        <OrgChart staffing={results.staffingResults} countryName={selectedCountry.name} />
+                    </div>
+                );
+            })()} {/* End Org Tab */}
 
             {activeTab === 'roster' && (
                 <RosterVisualizer roster={results.roster} year={new Date().getFullYear()} shiftModel={inputs.shiftModel as '8h' | '12h'} staffingResults={results.staffingResults} />

@@ -19,10 +19,10 @@ import CapacityDashboardMod from '@/components/modules/CapacityDashboard';
 import {
     sanitizeCap, facilitySnapshot, overheadDonut, forecastSeries, utilization,
     equipmentTable, capRecommendations, capKeyInsights, type CapInputs, type UtilRow,
+    coolingEquipmentTable, rackSpaceTable, networkTable, type ComponentRow,
 } from '@/state/adapters/capacity-adapter';
 import { explainThresholdMetric, type ThresholdLeverSpec, type ThresholdMetricExplain } from '@/lib/decision-explain';
 import { Layers, ChevronRight, Zap, Snowflake, Boxes, Network, FileDown } from 'lucide-react';
-import { rzData } from '@/lib/rz-engine';
 import { DiagnosticModal } from '@/components/ui/RedValue';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
@@ -41,6 +41,30 @@ const UTIL_TIPS: Record<string, string> = {
     cooling: 'Installed heat-rejection capacity vs. the current IT heat load, sized from the IT load and the selected cooling technology. High utilization means the N+1 unit is effectively carrying base load — verify redundancy still holds during a maintenance window before adding load.',
     rack: 'Rack positions used vs. available, computed from white-space area and the avg rack density (kW/rack) set in Requirements. Raising density shrinks the rack count needed but can force liquid cooling; watch for stranded space when power runs out before rack positions do.',
     network: 'Network port/uplink utilization — a screening assumption only (the engine has no network model). Treat it as directional and validate against the actual fabric design before making decisions on it.',
+};
+
+/* ─── System-detail table header tooltips (owner mandate: every header/metric
+ * explains itself) — one set per system tab, rendered by DetailTable. ─────── */
+type HeadTips = { component: string; capacity: string; utilization: string; status: string };
+const DETAIL_HEAD_TIPS: Record<'cooling' | 'rack' | 'network', HeadTips> = {
+    cooling: {
+        component: 'Cooling-plant component class (primary loop, air side, hydronics, heat rejection). Counts come from the engine equipScale divisors where available — screening quantities, not a selected equipment schedule.',
+        capacity: 'Installed units × unit rating (MW of thermal duty per unit). Ratings are the engine scaling divisors, i.e. the load slice each unit serves — a screening convention, not vendor nameplate data.',
+        utilization: 'Thermal duty ÷ (units × rating). Duty basis = IT heat (kW of electronics heat), NOT IT × PUE — the PUE overhead is parasitic fan/pump power, not heat the loop must reject. High utilization means the N+1 unit is carrying base load.',
+        status: 'OK < 70%, Watch 70-85%, At Risk ≥ 85% — the same banding as the Power table. Non-OK rows list quantified escalation levers (add units, raise rating, or shed load via the phase plan) beneath the table.',
+    },
+    rack: {
+        component: 'Space-domain constraint: rack positions, average density vs. the cooling technology ceiling, white-space area incl. gross-up, and the power-vs-space binding constraint from the engine bindingConstraint model.',
+        capacity: 'Used vs. available for each constraint — positions from IT kW ÷ kW/rack against what the floor can hold; area from rack footprint grossed up ÷ 0.35 for aisles, containment and clearances (screening convention).',
+        utilization: 'Used ÷ available per constraint. The Avg Rack Density row is different: it is design density ÷ the practical ceiling of the selected cooling technology — nearing 100% there means a cooling step-up (RDHx → DLC → immersion), not more floor.',
+        status: 'OK < 70%, Watch 70-85%, At Risk ≥ 85%. The Binding Constraint row carries the max of the rack/space utilizations and its escalation text says which lever actually helps (area vs. power) — adding the wrong one strands capacity.',
+    },
+    network: {
+        component: 'Spine-leaf fabric element estimated from rack count — SCREENING ASSUMPTION ONLY (the engine has no network model). Ratios: ~1 leaf per 16 racks, ~1 spine per 8 leaves (min 2), 4× 100G uplinks per leaf.',
+        capacity: 'Estimated element count and the ratio behind it. These are directional placeholders for budgeting — real counts depend on switch radix, dual-homing, oversubscription target and failure-domain design.',
+        utilization: 'All rows carry the single screening fabric utilization (racks × 1.5 Gbps/rack vs. design capacity incl. margin) — the same ASSUMPTION basis as the Network bar above. There is no per-element measurement behind it.',
+        status: 'OK < 70%, Watch 70-85%, At Risk ≥ 85% on the screening utilization. Treat any non-OK here as a prompt to commission the actual fabric design, not as an engineering finding.',
+    },
 };
 
 /* ─── Watch/At-Risk remediation (owner mandate: no naked bad status chips) ───
@@ -146,12 +170,33 @@ export function CapacityPlanningPage() {
     const forecast = React.useMemo(() => forecastSeries(i, +designPowerMw.toFixed(0)), [i, designPowerMw]);
     const donut = React.useMemo(() => overheadDonut(i, snap.facilityMw), [i, snap.facilityMw]);
     const equip = React.useMemo(() => equipmentTable(i), [i]);
+    const coolEquip = React.useMemo(() => coolingEquipmentTable(i), [i]);
+    const rackSpace = React.useMemo(() => rackSpaceTable(i, util.rows, util.binding), [i, util.rows, util.binding]);
+    const netFabric = React.useMemo(() => networkTable(i, util.rows), [i, util.rows]);
     const recs = React.useMemo(() => capRecommendations(i, util.rows, forecast), [i, util.rows, forecast]);
     const insights = React.useMemo(() => capKeyInsights(util.rows, forecast, i.baseYear), [util.rows, forecast, i.baseYear]);
 
     const peak = Math.max(...forecast.map((f) => f.forecastMw));
     const rackRow = util.rows.find((r) => r.key === 'rack');
     const [busy, setBusy] = React.useState(false);
+
+    /* De-dup (owner): the 5-card strip + Key Insights used to repeat identically on
+     * every system tab. Full strip stays on Power ONLY; other tabs get their own
+     * relevant card(s) + a tab-specific insight (filter over the same adapter data). */
+    const TAB_REC_TONES: Record<string, string[]> = { cooling: ['cooling'], rack: ['space'], network: ['network'] };
+    const activeRecs = sysTab === 'power' ? recs : recs.filter((r) => (TAB_REC_TONES[sysTab] ?? []).includes(r.tone));
+    const TAB_INSIGHT_RE: Record<string, RegExp> = { cooling: /cooling/i, rack: /rack|space|binding/i, network: /network/i };
+    const coolRow = util.rows.find((r) => r.key === 'cooling');
+    const tabExtraInsight = sysTab === 'cooling'
+        ? `Cooling duty basis = IT heat (${(i.itLoadKw / 1000).toFixed(1)} MW), not IT × PUE — utilization ${coolRow?.pct ?? '—'}% of ${coolRow?.capacity ?? '—'} MW design; free-cooling hours cut compressor OPEX, not installed capacity.`
+        : sysTab === 'rack'
+        ? `Binding constraint: ${(util.binding ?? 'power').toUpperCase()} — ${util.binding === 'space' ? 'rack positions exhaust before electrical capacity; reserve area or raise density (cooling-technology ceiling applies)' : 'electrical capacity exhausts before rack positions; extra white space would strand — escalate power (margin/phases) instead'}.`
+        : sysTab === 'network'
+        ? 'Network rows are a screening spine-leaf estimate (no engine network model) — replace with the fabric design before committing.'
+        : null;
+    const activeInsights = sysTab === 'power'
+        ? insights
+        : [...insights.filter((s) => TAB_INSIGHT_RE[sysTab]?.test(s)), ...(tabExtraInsight ? [tabExtraInsight] : [])];
 
     /* Watch/At-Risk chip → solved remediation panel (explainThresholdMetric over the adapter) */
     const [utilExplain, setUtilExplain] = React.useState<string | null>(null);
@@ -414,25 +459,27 @@ export function CapacityPlanningPage() {
                             </div>
                         )}
                         {sysTab === 'cooling' && (
-                            <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1">
-                                <p>Cooling load: <b>{(snap.facilityMw - i.itLoadKw / 1000).toFixed(1)} MW overhead + {(i.itLoadKw / 1000).toFixed(1)} MW heat rejection</b> at PUE {snap.pue} ({i.coolingType}).</p>
-                                <p>Design capacity {util.rows[1].capacity} MW incl. {i.designMarginPct}% margin — utilization {util.rows[1].pct}%.</p>
-                            </div>
+                            <DetailTable table={coolEquip} headTips={DETAIL_HEAD_TIPS.cooling}
+                                onPhase={() => setTab('phases')} onReq={() => setActiveTab('requirements')}
+                                footnote={<>Cooling duty basis = <b>IT heat</b> ({(i.itLoadKw / 1000).toFixed(1)} MW), NOT IT × PUE — the PUE overhead ({(snap.facilityMw - i.itLoadKw / 1000).toFixed(1)} MW at PUE {snap.pue}, {i.coolingType}) is parasitic fan/pump power, not rejected-heat duty. Design capacity {util.rows[1].capacity} MW incl. {i.designMarginPct}% margin — utilization {util.rows[1].pct}%. · {coolEquip.source}</>} />
                         )}
                         {sysTab === 'rack' && (
-                            <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1">
-                                <p>{rackRow?.used.toLocaleString()} racks @ {i.rackKw} kW — binding constraint: <b>{util.binding ?? '—'}</b> (engine bindingConstraint · footprint {rzFootprint()} m²/rack).</p>
-                                <p>White space {i.whiteFloorM2.toLocaleString()} m² — space utilization {util.rows[3].pct}% (gross-up screening).</p>
-                            </div>
+                            <DetailTable table={rackSpace} headTips={DETAIL_HEAD_TIPS.rack}
+                                onPhase={() => setTab('phases')} onReq={() => setActiveTab('requirements')}
+                                footnote={<>{rackRow?.used.toLocaleString()} racks @ {i.rackKw} kW · white space {i.whiteFloorM2.toLocaleString()} m² · binding constraint <b>{util.binding ?? '—'}</b> · {rackSpace.source}</>} />
                         )}
                         {sysTab === 'network' && (
-                            <p className="text-xs text-slate-600 dark:text-slate-300">Spine-leaf estimate ~{Math.ceil((rackRow?.used ?? 0) / 16)} leaf switches · {util.rows[4].used}/{util.rows[4].capacity} Tbps. <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[9px] text-amber-500">SCREENING ASSUMPTION — no engine network model; validate with network design.</span></p>
+                            <DetailTable table={netFabric} headTips={DETAIL_HEAD_TIPS.network}
+                                onPhase={() => setTab('phases')} onReq={() => setActiveTab('requirements')}
+                                footnote={<><span className="rounded bg-amber-500/15 px-1 py-0.5 text-[9px] text-amber-500">SCREENING ASSUMPTION — no engine network model; validate with network design.</span> Spine-leaf estimate from rack count · {util.rows[4].used}/{util.rows[4].capacity} Tbps.</>} />
                         )}
                     </div>
 
-                    {/* recommendations */}
-                    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-                        {recs.map((r) => (
+                    {/* recommendations — de-duplicated per active system tab (owner: the 5-card
+                      * strip + insights repeated identically on every tab). Full strip ONLY on
+                      * Power; other tabs show their own card(s) + a tab-specific insight. */}
+                    <div className={`grid gap-3 md:grid-cols-2 ${activeRecs.length >= 5 ? 'xl:grid-cols-5' : ''}`}>
+                        {activeRecs.map((r) => (
                             <div key={r.title} className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] font-semibold uppercase tracking-wide text-rz-mint">{r.title}</div>
                                 <p className="mt-1 text-[11px] text-slate-600 dark:text-slate-300">{r.body}</p>
@@ -441,9 +488,9 @@ export function CapacityPlanningPage() {
                     </div>
 
                     <div className="rounded border border-rz-mint/30 bg-rz-mint/5 p-3">
-                        <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Key Insights</h3>
+                        <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Key Insights{sysTab !== 'power' && <span className="ml-1.5 font-normal normal-case tracking-normal text-slate-500">— {sysTab === 'cooling' ? 'Cooling' : sysTab === 'rack' ? 'Rack & Space' : 'Network'}</span>}</h3>
                         <ul className="space-y-0.5">
-                            {insights.map((s, idx) => <li key={idx} className="flex gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"><span className="text-rz-mint">✓</span>{s}</li>)}
+                            {activeInsights.map((s, idx) => <li key={idx} className="flex gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"><span className="text-rz-mint">✓</span>{s}</li>)}
                         </ul>
                         <button onClick={() => setActiveTab('requirements')} className="mt-1.5 text-[10px] font-medium text-rz-mint hover:text-rz-mint/80">Edit Growth Plan (Requirements) →</button>
                     </div>
@@ -453,6 +500,49 @@ export function CapacityPlanningPage() {
     );
 }
 
-function rzFootprint(): number {
-    return rzData()?.capacity?.rackFootprintM2 ?? 0.72;
+/* ─── Shared system-detail table (cooling / rack & space / network) ──────────
+ * Same markup + classes as the Power tab's equipment table so all four system
+ * tabs render consistently: component · capacity · utilization · status chip,
+ * plus the per-row escalation-lever block with Phase Plan / Requirements links.
+ * No native title= — remediation renders in the lever block; every header and
+ * row carries an InfoTip instead. */
+function DetailTable({ table, headTips, footnote, onPhase, onReq }: {
+    table: { rows: ComponentRow[]; source: string };
+    headTips: HeadTips;
+    footnote?: React.ReactNode;
+    onPhase: () => void;
+    onReq: () => void;
+}) {
+    return (
+        <div>
+            <table className="w-full text-xs">
+                <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[10px] uppercase text-slate-400"><th className="py-1 text-left">Component <InfoTip content={headTips.component} /></th><th className="text-right">Capacity <InfoTip content={headTips.capacity} /></th><th className="text-right">Utilization <InfoTip content={headTips.utilization} /></th><th className="text-right">Status <InfoTip content={headTips.status} /></th></tr></thead>
+                <tbody>
+                    {table.rows.map((r) => (
+                        <tr key={r.label} className="border-b border-slate-100 dark:border-slate-800/60">
+                            <td className="py-1.5 text-slate-700 dark:text-slate-200">{r.label}{r.tip && <InfoTip content={r.tip} />}</td>
+                            <td className="text-right tabular-nums text-slate-500">{r.config}</td>
+                            <td className="text-right tabular-nums text-slate-500">{r.utilPct}%</td>
+                            <td className="text-right"><span className={`rounded px-1.5 py-0.5 text-[9px] font-semibold ${r.status === 'OK' ? 'bg-rz-data/15 text-rz-data' : r.status === 'Watch' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{r.status}{r.remediation ? ' ⓘ' : ''}</span></td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+            {table.rows.some((r) => r.remediation) && (
+                <div className="mt-2 space-y-1">
+                    {table.rows.filter((r) => r.remediation).map((r) => (
+                        <div key={r.label} className="flex items-start gap-2 text-[10.5px] text-slate-600 dark:text-slate-300">
+                            <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8.5px] font-bold text-white ${r.status === 'At Risk' ? 'bg-rose-600' : 'bg-amber-600'}`}>{r.label}</span>
+                            <span>{r.remediation}
+                                {/* klik-navigasi ke parameter: beban/fase di Phase Plan, rating/unit basis di Requirements */}
+                                <button onClick={onPhase} className="ml-1.5 font-medium text-rz-mint hover:text-rz-mint/80">Phase Plan →</button>
+                                <button onClick={onReq} className="ml-1.5 font-medium text-rz-mint hover:text-rz-mint/80">Requirements →</button>
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            )}
+            <p className="mt-1 text-[9px] text-slate-400">{footnote ?? table.source}</p>
+        </div>
+    );
 }

@@ -724,6 +724,34 @@ if (M.commissioning && M.commissioning.programRich) {
     near('cx.rich enterprise_2mw perKw', e2.perKw, 557.9, 0.05);
     near('cx.rich enterprise_2mw pctCapex', e2.pctCapex, 5.31, 0.01);
     eq('cx.rich enterprise_2mw durationDays', e2.durationDays, 155);
+    /* ── Workstream J — energy audit + renewable/storage economics ── */
+    if (M.energy && M.energy.enpi) {
+        const en = M.energy.enpi({ itMwhYr: 100000, facilityMwhYr: 142000, claimedPue: 1.30, weatherFactor: 1.08, exclusionsMwh: 2000 });
+        ok('J EnPI normalized < raw (weather + exclusions)', en.enpi < en.rawPue, `${en.enpi} vs ${en.rawPue}`);
+        eq('J EnPI claim verdict honest (1.37 > 1.30 claimed)', en.claim.verdict, 'UNSUPPORTED');
+        const st = M.energy.storageEconomics({ bessMwh: 10, years: 15, region: 'ID' });
+        ok('J BESS degradation triggers augmentation inside 15y', st.augmentation.years.length > 0 && st.augmentation.capexUsd > 0, JSON.stringify(st.augmentation.years));
+        const rWeak = M.energy.renewableProject({ region: 'ID', itLoadMw: 100, solarMwp: 5, bessMwh: 10, elecRateUsdKwh: 0.07 });
+        ok('J technology-economics balance: weak case says GRID-ONLY WINS', rWeak.bankability.verdict.includes('NOT BANKABLE') && rWeak.bankability.note.includes('GRID-ONLY'), rWeak.bankability.verdict);
+        const rStrong = M.energy.renewableProject({ region: 'US', itLoadMw: 100, solarMwp: 50, bessMwh: 100, elecRateUsdKwh: 0.12 });
+        ok('J strong case clears bankability (NPV>0 & IRR>WACC)', rStrong.bankability.verdict.includes('BANKABLE') && rStrong.npvUsd > 0 && rStrong.irrPct > rStrong.waccPct, `npv=${rStrong.npvUsd} irr=${rStrong.irrPct}`);
+    }
+    /* ── Workstream G — end-to-end ops staffing + availability coupling ── */
+    if (M.maintenance && M.maintenance.opsHeadcount) {
+        const vend = M.maintenance.opsHeadcount({ itLoadKw: 100000, tier: 3, mix: { reactive: 1, planned: 0, predictive: 0 }, inHouseFrac: 0.1 });
+        eq('G ops 100MW campus splits into 3 DCs (~35MW each)', vend.nDc, 3);
+        ok('G vendor+RTF = skeleton phenotype, tech floor ≈ 1/shift/DC', vend.phenotype.includes('skeleton') && vend.roles.onsiteTechFte <= 14, `tech=${vend.roles.onsiteTechFte}`);
+        ok('G campus-shared roles counted once per campus', vend.roles.campusSharedFte === 7, String(vend.roles.campusSharedFte));
+        const inh = M.maintenance.opsHeadcount({ itLoadKw: 100000, tier: 3, mix: { reactive: 0, planned: 0.5, predictive: 0.5 }, inHouseFrac: 0.8 });
+        ok('G in-house+predictive crews > vendor+RTF skeleton', inh.roles.onsiteTechFte > vend.roles.onsiteTechFte, `${inh.roles.onsiteTechFte} vs ${vend.roles.onsiteTechFte}`);
+        const avBad = M.maintenance.availabilityImpact({ tier: 3, mix: { reactive: 1, planned: 0, predictive: 0 }, inHouseFrac: 0.1, slaKey: 'nbd' });
+        const avMid = M.maintenance.availabilityImpact({ tier: 3, mix: { reactive: 0, planned: 1, predictive: 0 }, inHouseFrac: 0.6, slaKey: '4hr' });
+        const avGood = M.maintenance.availabilityImpact({ tier: 3, mix: { reactive: 0, planned: 0.5, predictive: 0.5 }, inHouseFrac: 0.8, slaKey: '2hr' });
+        ok('G availability ordering: vendor+RTF+NBD < planned+4hr < in-house+pred+2hr',
+            avBad.availabilityPct < avMid.availabilityPct && avMid.availabilityPct < avGood.availabilityPct,
+            `${avBad.availabilityPct} < ${avMid.availabilityPct} < ${avGood.availabilityPct}`);
+        ok('G availability bounded to defensible band around the tier design', avBad.availabilityPct > 99.5 && avGood.availabilityPct < 99.999, `${avBad.availabilityPct}..${avGood.availabilityPct}`);
+    }
     // calendar-vs-labor split (owner: "7832 hari" display bug) — calendar is the
     // log-damped programSchedule wall-time, never above the serial labor total.
     eq('cx.rich enterprise_2mw calendarDays == labor (small site, single crew)', e2.calendarDays, 155);

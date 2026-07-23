@@ -24,8 +24,9 @@ import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNar
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { fmtMoney } from '@/lib/format';
 import { TraceValue } from '@/components/ui/TraceValue';
-import { HardHat, ChevronRight, FileDown, ClipboardList } from 'lucide-react';
+import { HardHat, ChevronRight, FileDown, ClipboardList, ShieldCheck } from 'lucide-react';
 import { buildBoqModel, openBoqDossier, withProjectMeta } from '@/modules/reporting/boq/BoqDossier';
+import { buildDeliveryGovernanceModel, openDeliveryGovernanceDossier } from '@/modules/reporting/dossier/DeliveryGovernanceDossier';
 import { useRequirementsStore } from '@/store/requirements';
 
 const PCT_PRESETS = [0, 10, 25, 50, 75, 90, 100].map((v) => ({ value: v, label: `${v}%` }));
@@ -148,6 +149,19 @@ export function ConstructionEngine() {
         }
     };
 
+    const openPmDossier = () => {
+        if (!results) return;
+        const sim = useSimulationStore.getState();
+        const m = buildDeliveryGovernanceModel(capexInputs, results, t, sim, {
+            projectName: useRequirementsStore.getState().overview.projectName,
+            schedule: sched,
+        });
+        if (!m) return;
+        if (!openDeliveryGovernanceDossier(m)) {
+            window.alert('Popup blocked — allow popups for this site to open the Delivery Governance dossier.');
+        }
+    };
+
     return (
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -167,6 +181,7 @@ export function ConstructionEngine() {
                         </div>
                     </label>
                     <button onClick={openBoq} title="Bill of Quantities — line items by discipline, disclosed margin, safety factors (save as PDF)" className="inline-flex items-center gap-1 rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-cyan-500"><ClipboardList className="h-3.5 w-3.5" />Bill of Quantities (BOQ)</button>
+                    <button onClick={openPmDossier} title="Delivery Governance — document playbooks, decision bands scaled to this CAPEX, live risk/issue log, PM framework (save as PDF)" className="inline-flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500"><ShieldCheck className="h-3.5 w-3.5" />Delivery Governance</button>
                     <button onClick={exportPdf} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-rz-mint"><FileDown className="h-3.5 w-3.5" />{busy ? '…' : 'Export'}</button>
                     <button onClick={() => setActiveTab('commissioning')} className="inline-flex items-center gap-1 rounded-lg bg-rz-signal px-3 py-1.5 text-xs font-semibold text-rz-base hover:bg-rz-signal/90">Next: Commissioning <ChevronRight className="h-3.5 w-3.5" /></button>
                 </div>

@@ -1,16 +1,16 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
-import { useSimulationStore } from '@/store/simulation';
+import { useSimulationStore, effectiveInHouseFrac } from '@/store/simulation';
 import { calculateStaffing } from '@/modules/staffing/ShiftEngine';
 import { calculateTurnoverCost } from '@/modules/staffing/CostOfTurnover';
 import { calculateEnvironmentalDegradation } from '@/modules/maintenance/EnvironmentalLogic';
-import { calculateDowntimeRisk } from '@/modules/risk/DowntimeCalculator';
+import { computedDowntime } from '@/modules/risk/DowntimeCalculator';
 import { ASSETS } from '@/constants/assets';
 import { COUNTRIES } from '@/constants/countries';
 import { getPUE } from '@/constants/pue';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
-import { rzData } from '@/lib/rz-engine';
+import { rzData, useEngineReady } from '@/lib/rz-engine';
 import {
     Users, Wrench, Activity, AlertTriangle, ShieldAlert,
     ArrowRight, TrendingUp, DollarSign, CloudFog, Globe2, Zap
@@ -41,6 +41,7 @@ export function SimulationDashboard() {
     const [aqiTouched, setAqiTouched] = useState(inputs.aqiOverride != null && inputs.aqiOverride !== baselineAqi);
     const [turnoverTouched, setTurnoverTouched] = useState(false);
     const [showLossDetail, setShowLossDetail] = useState(false);
+    const engineReady = useEngineReady(); // computedDowntime re-runs once rz-engine.min.js lands
     const [vizTab, setVizTab] = useState<'overview' | 'environment' | 'power' | 'cause'>('overview');
     useEffect(() => {
         if (!aqiTouched) setScenarioAQI(baselineAqi);
@@ -144,8 +145,17 @@ export function SimulationDashboard() {
             if (scenarioAQI > 250) hazardMultiplier += 0.10; // Extra penalty for hazardous zone
         }
 
-        // 3. Risk Calculation
-        const risk = calculateDowntimeRisk(inputs.tierLevel as 2 | 3 | 4, undefined, 4, selectedCountry ?? undefined);
+        // 3. Risk Calculation — G-avail: COMPUTED availability (engine
+        // availabilityImpact: strategy mix ⇒ failures, sourcing+SLA ⇒ MTTR)
+        // anchored on the tier design point; design lookup when engine absent.
+        const risk = computedDowntime(
+            inputs.tierLevel as 2 | 3 | 4,
+            inputs.strategyMix,
+            effectiveInHouseFrac(inputs),
+            inputs.slaKey ?? '4hr',
+            undefined,
+            selectedCountry ?? undefined
+        );
 
         // 4. Total Monthly Staff Cost (Full Logic)
         const baseStaffCost = eng.monthlyCost;
@@ -182,7 +192,9 @@ export function SimulationDashboard() {
             downtimeMinutes: risk.expectedDowntimeMinutes,
             financialRisk: risk.financialImpact
         };
-    }, [selectedCountry, inputs.shiftModel, scenarioAQI, scenarioTurnover, inputs.tierLevel, inputs.maintenanceModel, inputs.hybridRatio, simYear, baselineTurnover]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedCountry, inputs.shiftModel, scenarioAQI, scenarioTurnover, inputs.tierLevel, inputs.maintenanceModel, inputs.hybridRatio, simYear, baselineTurnover,
+        inputs.strategyMix, inputs.slaKey, engineReady]);
 
     if (!selectedCountry || !results) return null;
 
@@ -572,16 +584,24 @@ export function SimulationDashboard() {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <div className="text-[10px] text-slate-500 uppercase font-bold mb-1 flex items-center gap-1">Expected Availability <Tooltip content="Percentage of time the facility is operational. Determined by tier level and redundancy design." /></div>
+                                    <div className="text-[10px] text-slate-500 uppercase font-bold mb-1 flex items-center gap-1">Expected Availability <Tooltip content={risk.engineLive
+                                        ? `Computed availability: the Uptime tier design point adjusted for your maintenance strategy mix (RTF/PPM/PdM shares move the failure rate), in-house vs vendor sourcing and selected SLA response window (both move effective MTTR). Change any of them on the Maintenance page and this number moves. Method: ${risk.method}`
+                                        : `Percentage of time the facility is operational, from the Uptime tier design lookup. ${risk.method}`} /></div>
                                     <div className="text-2xl font-bold text-slate-900 dark:text-white">{results.availability.toFixed(3)}%</div>
-                                    <div className="text-[10px] text-slate-500">~{results.downtimeMinutes} mins downtime / year</div>
+                                    <div className="text-[10px] text-slate-500" title={risk.method}>
+                                        {risk.engineLive
+                                            ? <>design {risk.designPct}% · now {results.availability.toFixed(3)}% (maintenance/SLA-adjusted) · ~{results.downtimeMinutes} min/yr</>
+                                            : <>~{results.downtimeMinutes} mins downtime / year</>}
+                                    </div>
                                 </div>
                                 <div>
-                                    <div className="text-[10px] text-slate-500 uppercase font-bold mb-1 flex items-center gap-1">Financial Exposure <Tooltip content="Maximum estimated financial loss from downtime events over a year, calculated at $5K per minute." /></div>
+                                    <div className="text-[10px] text-slate-500 uppercase font-bold mb-1 flex items-center gap-1">Financial Exposure <Tooltip content={risk.engineLive
+                                        ? `Annual exposure = computed downtime minutes (maintenance/SLA-adjusted) × ${fmtMoney(risk.costPerMinute)}/min downtime cost (country/tier benchmark). Method: ${risk.method}`
+                                        : 'Maximum estimated financial loss from downtime events over a year, at the country/tier benchmark cost per minute.'} /></div>
                                     <div className="text-2xl font-bold text-rose-500 dark:text-rose-400 truncate" title={fmtMoneyFull(results.financialRisk)}>
                                         {fmtMoney(results.financialRisk)}
                                     </div>
-                                    <div className="text-[10px] text-slate-500">@ $5k/min business impact</div>
+                                    <div className="text-[10px] text-slate-500">@ {fmtMoney(risk.costPerMinute)}/min business impact{risk.engineLive && risk.slaLabel ? ` · SLA ${risk.slaLabel}` : ''}</div>
                                 </div>
                             </div>
                         </div>

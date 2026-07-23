@@ -19,6 +19,13 @@ export interface SimulationState {
         powerRedundancy: 'N+1' | '2N' | '2N+1';
 
         maintenanceStrategy: 'reactive' | 'planned' | 'predictive';
+        /** Workstream G — strategy as a % MIX (fractions summing 1). The legacy
+         *  discrete `maintenanceStrategy` buttons act as pure-mix presets; the
+         *  mix drives the engine's opsHeadcount + availabilityImpact models. */
+        strategyMix?: { reactive: number; planned: number; predictive: number };
+        /** Workstream G — selected vendor SLA response class (Maintenance SLA
+         *  tab). Feeds models.maintenance.availabilityImpact effective MTTR. */
+        slaKey?: '2hr' | '4hr' | 'nbd';
         maintenanceModel: 'in-house' | 'vendor' | 'hybrid';
         hybridRatio: number;
         /** Optimizer tunable (Workstream D): colo revenue price $/kW-mo — a commercial
@@ -51,6 +58,35 @@ export interface SimulationState {
         setInputs: (inputs: Partial<SimulationState['inputs']>) => void; // Bulk update
         setActiveTab: (tab: SimulationState['activeTab']) => void;
     };
+}
+
+/* ── Workstream G — strategy-mix helpers (pure + exported: Maintenance mix
+ * editor, Staffing ops model and Risk availability model all reuse them). ── */
+export type StrategyMix = { reactive: number; planned: number; predictive: number };
+
+/** Pure-mix presets — clicking a discrete strategy button writes one of these. */
+export const STRATEGY_MIX_PRESETS: Record<'reactive' | 'planned' | 'predictive', StrategyMix> = {
+    reactive: { reactive: 1, planned: 0, predictive: 0 },
+    planned: { reactive: 0, planned: 1, predictive: 0 },
+    predictive: { reactive: 0, planned: 0, predictive: 1 },
+};
+
+/** Normalize a mix to fractions summing exactly 1 (empty/degenerate → pure planned). */
+export function normalizeStrategyMix(mix: Partial<StrategyMix> | undefined): StrategyMix {
+    const r = Math.max(0, mix?.reactive ?? 0);
+    const p = Math.max(0, mix?.planned ?? 0);
+    const d = Math.max(0, mix?.predictive ?? 0);
+    const sum = r + p + d;
+    if (sum <= 0) return { ...STRATEGY_MIX_PRESETS.planned };
+    return { reactive: r / sum, planned: p / sum, predictive: d / sum };
+}
+
+/** Effective in-house share for the engine ops models: pure models pin 1/0,
+ *  hybrid uses the hybridRatio slider (owner: hybridRatio IS the in-house %). */
+export function effectiveInHouseFrac(inputs: Pick<SimulationState['inputs'], 'maintenanceModel' | 'hybridRatio'>): number {
+    if (inputs.maintenanceModel === 'in-house') return 1;
+    if (inputs.maintenanceModel === 'vendor') return 0;
+    return Math.max(0, Math.min(1, inputs.hybridRatio ?? 0.5));
 }
 
 /** DA2 — screening 4-phase split of the IT load (25/25/25/25 staggered).
@@ -90,6 +126,8 @@ export const useSimulationStore = create<SimulationState>()(persist((set) => ({
         coolingTopology: 'perimeter',
         powerRedundancy: '2N',
         maintenanceStrategy: 'planned',
+        strategyMix: { reactive: 0, planned: 1, predictive: 0 },
+        slaKey: '4hr',
         // Phase 16 Add
         maintenanceModel: 'hybrid', // Default to Hybrid for demo
         hybridRatio: 0.3, // 30% In-house / 70% Vendor
@@ -151,6 +189,15 @@ export const useSimulationStore = create<SimulationState>()(persist((set) => ({
             set((state) => {
                 const validated = { ...newInputs };
                 if (validated.itLoad !== undefined) validated.itLoad = Math.max(100, Math.min(500000, validated.itLoad));
+                /* Workstream G — discrete strategy buttons are PRESETS of the %
+                 * mix: clicking one also writes the matching pure mix (unless a
+                 * caller passed an explicit mix in the same update). */
+                if (validated.maintenanceStrategy !== undefined && validated.strategyMix === undefined) {
+                    validated.strategyMix = { ...STRATEGY_MIX_PRESETS[validated.maintenanceStrategy] };
+                }
+                if (validated.strategyMix !== undefined) {
+                    validated.strategyMix = normalizeStrategyMix(validated.strategyMix);
+                }
                 /* DA2 — pristine phases FOLLOW itLoad; a manual phase edit flags
                  * customized and derivation stops (Capacity page shows the
                  * divergence chip + "Seed from IT Load" instead). */

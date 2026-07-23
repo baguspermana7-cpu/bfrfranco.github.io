@@ -286,7 +286,12 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
         localStorage.setItem('dcmoc-sidebar-w', String(SIDEBAR_DEFAULT));
     };
 
-    const navItems: { label: string; icon: LucideIcon; id: typeof activeTab; section?: string }[] = [
+    /* Workstream J — two new Sustainability sub-tab ids registered ahead of the
+     * store union (store/simulation.ts is owned by a parallel workstream, so the
+     * ids are widened LOCALLY here and cast at the single setActiveTab call
+     * site; runtime is a plain string either way). */
+    type NavTabId = typeof activeTab | 'energy-audit' | 'renewable-economics';
+    const navItems: { label: string; icon: LucideIcon; id: NavTabId; section?: string }[] = [
         { label: 'CAPEX Engine', icon: Building, id: 'capex' },
         { label: 'Operations Overview', icon: Activity, id: 'ops' },
         { label: 'Staff Model Config', icon: Calculator, id: 'sim' },
@@ -301,6 +306,8 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
         { label: 'Commissioning Engine', icon: CheckCircle2, id: 'commissioning' },
         { label: 'Asset Intelligence', icon: Activity, id: 'asset-health' },
         { label: 'Sustainability Engine', icon: Leaf, id: 'carbon' },
+        { label: 'Energy Audit & Management', icon: Zap, id: 'energy-audit' },
+        { label: 'Renewable & Storage Economics', icon: Sun, id: 'renewable-economics' },
         { label: 'Financial', icon: TrendingUp, id: 'finance' },
         { label: 'Investment', icon: Landmark, id: 'invest' },
         { label: 'Capacity Planning', icon: Layers, id: 'capacity', section: 'planning' },
@@ -326,8 +333,8 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
 
     // ── DC-OS 13-engine lifecycle tree: the 23 modules REGROUPED (not deleted)
     //    under the reference-image engines. Empty engines show a "planned" chip. ──
-    const leaf = (id: typeof activeTab) => navItems.find((n) => n.id === id)!;
-    const ENGINE_GROUPS: { num: number; label: string; icon: LucideIcon; childIds: (typeof activeTab)[] }[] = [
+    const leaf = (id: NavTabId) => navItems.find((n) => n.id === id)!;
+    const ENGINE_GROUPS: { num: number; label: string; icon: LucideIcon; childIds: NavTabId[] }[] = [
         { num: 1, label: 'Requirements', icon: ClipboardCheck, childIds: ['requirements'] },
         { num: 2, label: 'Site Intelligence', icon: MapPin, childIds: ['site', 'tax', 'disaster', 'grid', 'talent', 'compliance'] },
         { num: 3, label: 'Architecture', icon: Boxes, childIds: ['architecture', 'fire'] },
@@ -339,7 +346,7 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
         { num: 8, label: 'Operations', icon: Wrench, childIds: ['ops', 'sim', 'maint', 'staff'] },
         { num: 9, label: 'Asset Intelligence', icon: Activity, childIds: ['asset-health', 'asset-lifecycle', 'cbm', 'spares'] },
         { num: 10, label: 'Reliability', icon: ShieldCheck, childIds: ['risk', 'reliability'] },
-        { num: 11, label: 'Sustainability', icon: Leaf, childIds: ['carbon'] },
+        { num: 11, label: 'Sustainability', icon: Leaf, childIds: ['carbon', 'energy-audit', 'renewable-economics'] },
         { num: 12, label: 'Financial', icon: TrendingUp, childIds: ['finance', 'invest', 'portfolio', 'benchmark', 'strategic'] },
         { num: 13, label: 'AI Decision Engine', icon: BrainCircuit, childIds: [] },
     ];
@@ -551,7 +558,7 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
                                                 return (
                                                     <div key={id} className="flex items-center">
                                                         <button
-                                                            onClick={() => { actions.setActiveTab(id); setSidebarOpen(false); }}
+                                                            onClick={() => { actions.setActiveTab(id as typeof activeTab); setSidebarOpen(false); }}
                                                             title={item.label}
                                                             aria-current={activeTab === id ? 'page' : undefined}
                                                             className={clsx(

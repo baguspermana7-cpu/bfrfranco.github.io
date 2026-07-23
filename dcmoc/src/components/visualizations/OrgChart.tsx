@@ -131,10 +131,11 @@ export function OrgChart({ staffing, countryName }: OrgChartProps) {
 
     return (
         <div className="p-8 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-x-auto">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
                 <Users className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
                 Organization Structure ({countryName})
             </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-8">Employed FTE (incl. shift relief &amp; shrinkage) — higher than the modeled base composition by design</p>
 
             <div className="flex flex-col items-center min-w-[800px]">
                 <OrgNode role="Facility Manager" count={1} color="purple" salary={getSalary('shift-lead') ? (getSalary('shift-lead')! * 1.5) : undefined} utilization={0.95}>

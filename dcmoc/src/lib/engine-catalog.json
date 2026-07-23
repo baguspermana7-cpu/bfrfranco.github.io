@@ -3,8 +3,8 @@
  "note": "AUTO-GENERATED from rz-engine.js — do not hand-edit. Consumers are grep-derived from real usage.",
  "dataVersion": "2.5.1",
  "modelCount": 53,
- "functionCount": 226,
- "sourceCount": 141,
+ "functionCount": 232,
+ "sourceCount": 153,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -735,6 +735,12 @@
      ]
     },
     {
+     "name": "deliveryGovernance",
+     "params": [
+      "input"
+     ]
+    },
+    {
      "name": "engineeringCalcs",
      "params": [
       "input",
@@ -754,12 +760,19 @@
     }
    ],
    "consumers": [
-    "dcmoc/src/modules/reporting/boq/BoqDossier.ts"
+    "dcmoc/src/modules/reporting/boq/BoqDossier.ts",
+    "dcmoc/src/modules/reporting/dossier/DeliveryGovernanceDossier.ts"
    ]
   },
   {
    "name": "energy",
    "functions": [
+    {
+     "name": "enpi",
+     "params": [
+      "a"
+     ]
+    },
     {
      "name": "hybridScreen",
      "params": [
@@ -773,10 +786,24 @@
       "region",
       "opts"
      ]
+    },
+    {
+     "name": "renewableProject",
+     "params": [
+      "a"
+     ]
+    },
+    {
+     "name": "storageEconomics",
+     "params": [
+      "a"
+     ]
     }
    ],
    "consumers": [
-    "capex-calculator.html"
+    "capex-calculator.html",
+    "dcmoc/src/components/modules/sustainability/EnergyAuditPage.tsx",
+    "dcmoc/src/components/modules/sustainability/RenewableEconomicsPage.tsx"
    ]
   },
   {
@@ -1029,6 +1056,12 @@
    "name": "maintenance",
    "functions": [
     {
+     "name": "availabilityImpact",
+     "params": [
+      "input"
+     ]
+    },
+    {
      "name": "downtimeCost",
      "params": [
       "strategy",
@@ -1046,6 +1079,12 @@
      "name": "modelMult",
      "params": [
       "maintenanceModel"
+     ]
+    },
+    {
+     "name": "opsHeadcount",
+     "params": [
+      "input"
      ]
     },
     {
@@ -1068,7 +1107,13 @@
      ]
     }
    ],
-   "consumers": []
+   "consumers": [
+    "dcmoc/src/components/modules/MaintenanceDashboard.tsx",
+    "dcmoc/src/components/modules/RiskDashboard.tsx",
+    "dcmoc/src/components/modules/StaffingDashboard.tsx",
+    "dcmoc/src/modules/risk/DowntimeCalculator.ts",
+    "dcmoc/src/store/simulation.ts"
+   ]
   },
   {
    "name": "market",
@@ -2363,10 +2408,28 @@
    "method": "SCREENING — a project-specific site-risk study supersedes"
   },
   {
+   "key": "dossier.deliverables",
+   "source": "STANDARD-PRACTICE construction delivery-governance playbooks (Workstream I) — IFC (ISO 19650 C-series), RFI (AIA/FIDIC practice), Submittal (CSI review codes A-D), ITP hold/witness/surveillance points (ISO 9001), NCR disposition (ISO 9001 8.7), 3-week look-ahead (Last Planner / lean), Variation/Change Order (FIDIC cl.13), Punch A/B items + Turnover dossier (substantial-completion + Cx turnover practice). Cycle-times are typical bands; validate per contract.",
+   "asOf": "2026",
+   "method": "STANDARD-PRACTICE reference — contract terms supersede"
+  },
+  {
+   "key": "dossier.deliveryGovernance",
+   "source": "models.dossier.deliveryGovernance — wires the deliverable playbooks + PM framework to the LIVE project: document-volume screening bands scaled by MW + program months (industry rules-of-thumb), variation authority bands scaled to project CAPEX, deliverable windows mapped onto the program timeline fractions.",
+   "asOf": "2026",
+   "method": "SCREENING rules-of-thumb — labeled as such in the dossier output"
+  },
+  {
    "key": "dossier.engineeringCalcs",
    "source": "AACE Class-4 SCREENING worked engineering calculations DERIVED LIVE from the requirement input + CAPEX result + existing engine models/data (equipmentSizing, reliability, waterFootprint, pueMatrix, paramFactors, architecture.floorLoadingKnM2) — electrical continuous load (NEC 210.19/215.2), transformer/UPS/genset/cooling sizing (IEEE 3006/3007, NFPA 110, ASHRAE TC9.9), fuel storage (NFPA 30/110), clean-agent + fire-water (NFPA 2001/13), structural floor load (ASCE 7), cable derate (NEC 310.15), system availability (IEEE 493 / Uptime). No new economic literals — each sheet references the model/table that computes it, each carries a standard + confidence tag.",
    "asOf": "2026",
    "method": "AACE Class-4 screening; live from inputs + engine models — validate against a full design"
+  },
+  {
+   "key": "dossier.pmFramework",
+   "source": "Advanced PM working framework (Workstream I) — control-account structure (EVM practice), decision-velocity delegation-of-authority bands (steering-committee governance practice), reporting rhythm (daily/weekly/monthly/stage-gate), stakeholder-pressure response patterns (compression re-pricing, authority front-loading, long-lead recovery ladder, variation discipline), security-minded information management (ISO 19650-5), senior vs intermediate PM role charters. Screening reference bands.",
+   "asOf": "2026",
+   "method": "STANDARD-PRACTICE reference — org delegation matrix supersedes"
   },
   {
    "key": "electricityTariffs",
@@ -2379,6 +2442,42 @@
    "source": "Lazard LCOE+ 2025 (solar/wind capex+CF ranges), IRENA Renewable Power Generation Costs 2024 (APAC/ID), BNEF BESS pack+BOS 2026 ~$180/kWh installed",
    "asOf": "2026",
    "method": "screening-grade; not an interconnection/reliability study"
+  },
+  {
+   "key": "energy.enpi",
+   "source": "models.energy.enpi — normalized EnPI (exclusions removed, overhead weather-normalized) + claim test vs a stated claimed PUE with SUPPORTED/UNSUPPORTED verdict and quantified gap",
+   "asOf": "2026",
+   "method": "IPMVP Option C screening"
+  },
+  {
+   "key": "energy.enpiSpec",
+   "source": "ISO 50001 EnPI + IPMVP Option C (whole-facility) energy-performance-claim discipline — numerator (utility-meter facility kWh), denominator (rack/PDU IT kWh, never nameplate), boundary, CDD/wet-bulb weather normalization, rolling-12-month window, itemized exclusions (Cx/load-bank/office). A claim is testable ONLY with every term pinned (owner mandate: define numerator, denominator, climate, time window, exclusion).",
+   "asOf": "2026",
+   "method": "measurement-and-verification convention"
+  },
+  {
+   "key": "energy.regulatory",
+   "source": "Per-region renewable export/net-metering + grid-services market access screening notes (US ISO net-billing, EU market-premium + FCR/aFRR, ID PLN capped net-metering, SG EMC wholesale, JP FIT/FIP + EPRX, IN state net-metering, MY NEM 3.0) — regulator publications",
+   "asOf": "2026",
+   "method": "SCREENING — verify with current regulator rules"
+  },
+  {
+   "key": "energy.renewableProject",
+   "source": "models.energy.renewableProject — hybridScreen coverage → CAPEX (regional $/MWp + $/kWh) → avoided energy cost (covered MWh × tariff) + avoided carbon (offset × regional carbon price) + grid-services mid-band → lifetime cash flows → NPV at regional WACC + IRR + payback → BANKABILITY screening gate (NPV>0 & IRR>WACC) with an explicit GRID-ONLY-WINS verdict when it fails (technology-economics balance, not technology enthusiasm)",
+   "asOf": "2026",
+   "method": "screening project finance — PPA structuring + interconnection study supersede"
+  },
+  {
+   "key": "energy.storage",
+   "source": "BESS screening constants — calendar fade ~1.5%/yr + 20% fade budget across cycle life (LFP practice), 1 cycle/day DC-adjacent duty, fleet availability ~97% incl. PCS, ancillary/grid-services revenue $15-60K/MW·yr band (market-dependent), augmentation-at-80% rule with $/kWh learning-curve decline ~5%/yr — BNEF/NREL storage cost + degradation literature",
+   "asOf": "2026",
+   "method": "SCREENING — cell-vendor warranty curves supersede"
+  },
+  {
+   "key": "energy.storageEconomics",
+   "source": "models.energy.storageEconomics — year-by-year usable-capacity curve (cycle + calendar fade), augmentation plan + capex (learning-curve priced), dispatch constraint (daily shiftable MWh at round-trip), grid-services band, per-region regulatory notes",
+   "asOf": "2026",
+   "method": "screening storage model"
   },
   {
    "key": "envCosts",
@@ -2507,6 +2606,24 @@
    "source": "DC O&M strategy economics — reactive/planned/predictive failure + downtime multipliers + in-house/hybrid/vendor labor blend; lifted from DCMOC MaintenanceStrategyEngine (RCM/CBM industry conventions)",
    "asOf": "2026",
    "method": "screening O&M cost model; NOT a vendor quote"
+  },
+  {
+   "key": "maintenance.availabilityImpact",
+   "source": "models.maintenance.availabilityImpact — strategy-mix ⇒ failure-rate factor, sourcing+SLA ⇒ effective MTTR (vendor-dependent repairs wait for the response window), composed as a delta on the Uptime tier design availability, bounded [0.5×, 20×] design unavailability. Couples Maintenance/Staffing/SLA choices to availability + downtime financial exposure (previously hardcoded per tier).",
+   "asOf": "2026",
+   "method": "screening anchor-and-factor model — an RBD/RAM study supersedes"
+  },
+  {
+   "key": "maintenance.ops",
+   "source": "Workstream-G end-to-end operations staffing constants — SFG20-informed PM task-hours (~420 h/MW·yr planned regime, screening), CBM analysis overhead 60 h/MW·yr, productive-hours convention (1800 payable h/FTE·yr × 55% wrench-time — maintenance-productivity literature), campus topology ~35 MW per data hall/building (hyperscale build practice), per-DC emergency-response shift floors (skeleton 1 vs standard 2 per shift), per-campus shared roles (network/IT, DCO ops, security lead, facility mgmt — counted once per campus), SLA response classes (2hr/4hr/NBD windows + effective-MTTR adders + $/MW·yr contract bands), strategy failure/MTTR multipliers consistent with DATA.maintenance (reactive 3.5×, predictive 0.3× failures)",
+   "asOf": "2026",
+   "method": "SCREENING — org- and contract-specific values supersede"
+  },
+  {
+   "key": "maintenance.opsHeadcount",
+   "source": "models.maintenance.opsHeadcount — labor-hours-driven onsite technicians (PM+CBM+emergency hours × in-house share ÷ productive hours), shift-floor minimum per DC (emergency response, skeleton when vendor+reactive), Uptime 4.2 FTE/position shift operations scaled by campus DC count, per-campus shared roles. Replaces the per-MW×multiplier heuristic as the accuracy basis.",
+   "asOf": "2026",
+   "method": "labor-demand screening model"
   },
   {
    "key": "maintenance.staffing",

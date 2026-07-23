@@ -13,6 +13,21 @@ release sections rather than semver.
 
 ---
 
+## v1.115.33 — 2026-07-24 (DCMOC MEGA-SLICE — Operations accuracy program (G) · Delivery-Governance Dossier (I) · Energy Audit + Renewable Economics (J) · Capacity tabs deepened (L))
+
+### Added
+- **G — Operations end-to-end accuracy** (owner: staffing "sangat jauh dari workflow yang accurate"):
+  - Engine `DATA.maintenance.ops` + `models.maintenance.opsHeadcount` — LABOR-HOURS-driven staffing (SFG20-informed PM hours + CBM analysis + failure-driven emergency hours ÷ productive FTE-hours), **campus topology** (100 MW → 3 DC × 35 MW; per-DC floor crews vs **per-campus shared** network/IT/DCO/security roles), sourcing split (vendor+reactive ⇒ **skeleton 1/shift/DC**), phenotype chips. `models.maintenance.availabilityImpact` — strategy-mix ⇒ failure rate, sourcing+SLA ⇒ effective MTTR, composed onto the tier design availability (bounded band).
+  - **Strategy as a % mix** (RTF/PPM/PdM editor summing 100%, discrete buttons = presets) + **selectable SLA** (2hr/4hr/NBD radio in the SLA tab) in `store/simulation` — and the Risk/Simulation "Expected Availability"/"Financial Exposure" cards now COMPUTE from these choices (design vs adjusted delta shown) instead of a hardcoded tier lookup.
+  - Staffing page: "Campus Operations Model (engine)" accuracy card (nDc, tech basis strings, labor-hours strip, phenotype) + **18↔20 reconciliation** — modeled base FTE vs employed FTE (+relief/shrinkage) explicitly reconciled; org chart re-captioned. Maintenance now precedes Staffing in the menu (regime determines headcount). 7 new engine-gate assertions (availability ordering, campus split, skeleton floor).
+- **I — Construction "Delivery Governance" dossier** beside BOQ: engine `DATA.dossier.deliverables` (9 playbooks: IFC/RFI/Submittal/ITP/NCR/look-ahead/variation/punch-list/turnover — purpose/trigger/owner/approver/cycle-time/hold-impact/standard) + `DATA.dossier.pmFramework` (control accounts, decision-velocity delegation bands, reporting rhythm, stakeholder-pressure responses, ISO 19650-5 security exposure, senior/intermediate PM charters) + `models.dossier.deliveryGovernance` (document volumes scaled by MW+months, variation bands $-scaled to CAPEX, program windows). New print-window dossier (13 sections, LIVE-WIRED vs STANDARD-PRACTICE chips, live tracked risks/issues).
+- **J — Energy Audit & Management + Renewable & Storage Economics** (2 new Sustainability tabs): engine `models.energy.enpi` (ISO 50001/IPMVP claim test — numerator/denominator/boundary/climate-normalization/window/exclusions PINNED and rendered verbatim; SUPPORTED/UNSUPPORTED verdicts), `models.energy.storageEconomics` (cycle+calendar degradation curve, augmentation plan, dispatch constraint, grid-services band, per-region regulator notes), `models.energy.renewableProject` (hybridScreen coverage → NPV @ regional WACC / IRR / payback → **bankability** gate with the honest **"GRID-ONLY WINS HERE"** verdict — technology-economics balance, not enthusiasm). Renewable tab gated on the CAPEX renewable selection; tariff ±30% / sizing ±50% scenario sensitivity. 5 new engine-gate assertions.
+- **L — Capacity Planning tabs equalized**: Cooling / Rack & Space / Network now carry the same component·capacity·utilization·status table + escalation levers as Power (cooling duty = IT heat not IT×PUE; density ceilings per cooling tech; binding-constraint row; network clearly labeled screening) — and the generic 5-card strip + Key Insights are tab-specific instead of duplicated.
+
+### Changed
+- Walk probe extended with program assertions (Cx WBS sub-activities, sane Cx duration, Construction WBS, Delivery-Governance button, capacity cooling table, campus ops card, strategy mix) — 31/0; full suite green (trace 117/117, optimizer 8/8, synergy 6/6, export 44/44, 0 console errors).
+
+
 ## v1.115.32 — 2026-07-24 (DCMOC Architecture — BESS/PV in the diagram + Mechanical & Cooling view)
 
 ### Added
