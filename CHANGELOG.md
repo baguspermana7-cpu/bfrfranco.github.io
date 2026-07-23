@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.19 — 2026-07-23 (Spares — tab-group chips for the module nav)
+
+### Changed
+- **Spares module tab bar tidied**: the 25-tab wall now shows its group labels (ANALYTICAL / OPERATING ENGINE / REFERENCE / SUPPLY CHAIN & TRANSPORT) as clear blue section chips instead of tiny inline text, so the tabs read as grouped sections; active tab is a solid blue pill. Dropped the faint `|` dividers.
+
 ## v1.115.18 — 2026-07-23 (Spares — left-rail input unit labels)
 
 ### Fixed
