@@ -1286,11 +1286,24 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
 .sp-rail-metric .k{ font-size:.72rem; color:var(--sp-muted); }
 .sp-rail-metric .v{ font-size:.82rem; font-weight:700; color:var(--sp-text); font-variant-numeric:tabular-nums; text-align:right; }
 .sp-heat{ display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
-.sp-heat-cell{ aspect-ratio:1; border-radius:6px; position:relative; opacity:.42; transition:opacity .18s; }
+.sp-heat-cell{ aspect-ratio:1; border-radius:6px; position:relative; opacity:.42; transition:opacity .18s, transform .12s; cursor:help; }
 .sp-heat-cell.g{ background:var(--sp-green); }
 .sp-heat-cell.a{ background:var(--sp-amber); }
 .sp-heat-cell.r{ background:var(--sp-red); }
+.sp-heat-cell:hover, .sp-heat-cell:focus-visible{ opacity:.9; transform:scale(1.06); outline:none; z-index:5; }
 .sp-heat-cell.sp-heat-on{ opacity:1; box-shadow:0 0 0 2px var(--sp-surface),0 0 0 4px var(--sp-text); }
+.sp-heat-cell.sp-heat-on::before{ content:'●'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-size:.6rem; text-shadow:0 1px 2px rgba(0,0,0,.5); }
+/* value-on-hover tooltip for heat-map + kraljic cells (mirrors the .tip::after engine) */
+.sp-heat-cell[data-tip]::after, .kq-cell[data-tip]::after{ content:attr(data-tip); display:none; position:absolute; bottom:calc(100% + 8px); right:0; background:#0f172a; color:#f1f5f9; font-size:.7rem; font-weight:400; line-height:1.5; padding:8px 10px; border-radius:8px; width:230px; max-width:80vw; white-space:normal; z-index:9000; box-shadow:0 6px 20px rgba(0,0,0,.35); border:1px solid rgba(148,163,184,.25); text-align:left; pointer-events:none; }
+.sp-heat-cell:hover[data-tip]::after, .sp-heat-cell:focus-visible[data-tip]::after, .sp-heat-cell.sp-tip-open[data-tip]::after, .kq-cell:hover[data-tip]::after, .kq-cell:focus-visible[data-tip]::after, .kq-cell.sp-tip-open[data-tip]::after{ display:block; }
+.kq-cell{ position:relative; cursor:help; }
+/* smooth number-settle underline instead of the old color flash */
+.summary-kpi-value.sp-flash{ animation:none; }
+.summary-kpi-value{ position:relative; }
+.summary-kpi-value.sp-settle::after{ content:''; position:absolute; left:0; right:0; bottom:-3px; height:2px; background:var(--sp-primary); border-radius:2px; transform-origin:left; animation:sp-settle-sweep .5s cubic-bezier(.22,.61,.36,1); }
+@keyframes sp-settle-sweep{ 0%{ transform:scaleX(0); opacity:.9; } 100%{ transform:scaleX(1); opacity:0; } }
+/* status color on KPI values */
+.summary-kpi-value.st-red{ color:var(--sp-red)!important; } .summary-kpi-value.st-amber{ color:var(--sp-amber)!important; } .summary-kpi-value.st-green{ color:var(--sp-green)!important; }
 .sp-heat-axis{ display:flex; justify-content:space-between; font-size:.62rem; color:var(--sp-muted); margin-top:.4rem; }
 .sp-qa{ width:100%; justify-content:center; text-align:center; margin-top:.4rem; }
 .sp-qa:first-of-type{ margin-top:0; }
@@ -1451,7 +1464,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
 
     <div class="sp-setup-sec sp-scenario">
       <div class="sp-scenario-top"><span class="sp-scenario-pill"><span class="dot"></span> Active</span></div>
-      <button class="sp-run-btn sp-run-full" onclick="recalcAll();spRailMarkRun();"><i class="fas fa-play"></i> Run Analysis</button>
+      <button class="sp-run-btn sp-run-full" id="spRunBtn" onclick="spRunAnalysis(this)"><i class="fas fa-play"></i> Run Analysis</button>
       <div class="sp-lastrun" id="sp_lastrun">Last run — not yet</div>
     </div>
   </aside>
@@ -2540,10 +2553,10 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
               <span>← Low Spend Impact</span><span>High Spend Impact →</span>
             </div>
             <div class="kraljic-grid" id="kq_matrix">
-              <div class="kq-cell kq-strategic" id="kq-strategic"><div class="kq-cell-title" style="color:#ef4444;">Strategic</div><div>High spend · High risk</div></div>
-              <div class="kq-cell kq-bottleneck" id="kq-bottleneck"><div class="kq-cell-title" style="color:#d97706;">Bottleneck</div><div>Low spend · High risk</div></div>
-              <div class="kq-cell kq-leverage" id="kq-leverage"><div class="kq-cell-title" style="color:#3b82f6;">Leverage</div><div>High spend · Low risk</div></div>
-              <div class="kq-cell kq-noncritical" id="kq-noncritical"><div class="kq-cell-title" style="color:#059669;">Non-Critical</div><div>Low spend · Low risk</div></div>
+              <div class="kq-cell kq-strategic" id="kq-strategic" tabindex="0" data-tip="STRATEGIC (high spend × high supply risk): partner closely, dual-source, hold safety stock, long-term agreements. These parts justify the most inventory + supplier development."><div class="kq-cell-title" style="color:#ef4444;">Strategic</div><div>High spend · High risk</div></div>
+              <div class="kq-cell kq-bottleneck" id="kq-bottleneck" tabindex="0" data-tip="BOTTLENECK (low spend × high supply risk): secure supply — buffer stock, qualify alternates, consider last-time-buy. Small $ but a stockout stops the line."><div class="kq-cell-title" style="color:#d97706;">Bottleneck</div><div>Low spend · High risk</div></div>
+              <div class="kq-cell kq-leverage" id="kq-leverage" tabindex="0" data-tip="LEVERAGE (high spend × low supply risk): competitive bidding, volume discounts, spot-buy. Many sources → push price, hold little stock."><div class="kq-cell-title" style="color:#3b82f6;">Leverage</div><div>High spend · Low risk</div></div>
+              <div class="kq-cell kq-noncritical" id="kq-noncritical" tabindex="0" data-tip="NON-CRITICAL (low spend × low supply risk): minimise effort — catalog/consignment stock, automate reordering. Don't over-manage."><div class="kq-cell-title" style="color:#059669;">Non-Critical</div><div>Low spend · Low risk</div></div>
             </div>
             <div style="font-size:0.68rem;color:var(--text-muted);margin-top:4px;text-align:center;">← Low Supply Risk / High Supply Risk →</div>
           </div>
@@ -11250,12 +11263,54 @@ if(window.MutationObserver)new MutationObserver(m).observe(document.documentElem
     window.switchTab = function(name){ var r=_orig.apply(this, arguments); syncActiveKpi(name); return r; };
   }
 
-  // Count-up flash: when a summary KPI value changes, briefly tint it (visual only)
+  // Smooth count-up: tween the numeric part of a KPI from its previous value to the new one.
+  function parseNum(s){ var m=(s||'').replace(/,/g,'').match(/-?\d+(\.\d+)?/); return m?parseFloat(m[0]):null; }
+  function fmtLike(sample, n){
+    // rebuild the string: prefix + formatted number + suffix, matching the sample's shape
+    var m=(sample||'').match(/^(\D*?)(-?[\d,]+(?:\.\d+)?)(\D*)$/);
+    if(!m) return sample;
+    var dec=(m[2].indexOf('.')>=0)?(m[2].split('.')[1].length):0;
+    var grouped=m[2].indexOf(',')>=0;
+    var num = dec>0 ? n.toFixed(dec) : String(Math.round(n));
+    if(grouped) num = (dec>0?parseFloat(num):Math.round(n)).toLocaleString(undefined,{minimumFractionDigits:dec,maximumFractionDigits:dec});
+    return m[1]+num+m[3];
+  }
+  function countUp(el, toStr){
+    var to=parseNum(toStr); var from=parseNum(el.getAttribute('data-sp-prev'));
+    el.setAttribute('data-sp-prev', toStr);
+    if(reduce || to===null || from===null || from===to){ return; }
+    var t0=null, dur=460;
+    el.__spAnim = (el.__spAnim||0)+1; var mine=el.__spAnim;
+    el.__spCounting = true;
+    function step(t){ if(el.__spAnim!==mine){ return; } if(!t0)t0=t; var k=Math.min(1,(t-t0)/dur);
+      var e=1-Math.pow(1-k,3); var v=from+(to-from)*e;
+      el.textContent = fmtLike(toStr, v);
+      if(k<1) requestAnimationFrame(step); else { el.textContent = toStr; el.__spCounting=false; }
+    }
+    requestAnimationFrame(step);
+  }
+  // status color: readiness %, P(stockout) %, tier text
+  function statusColor(id, txt){
+    var el=document.getElementById(id); if(!el) return;
+    el.classList.remove('st-red','st-amber','st-green');
+    var n=parseNum(txt), t=(txt||'').toUpperCase();
+    if(id==='sum_readiness'||id==='sum_hub_read'){ if(n!==null) el.classList.add(n>=95?'st-green':(n>=80?'st-amber':'st-red')); }
+    else if(id==='sum_pstockout'){ if(n!==null) el.classList.add(n<5?'st-green':(n<15?'st-amber':'st-red')); }
+    else if(id==='sum_tier'){ if(t.indexOf('VITAL')>=0) el.classList.add('st-red'); else if(t.indexOf('ESSENTIAL')>=0) el.classList.add('st-amber'); else if(t.indexOf('DESIR')>=0) el.classList.add('st-green'); }
+  }
   function watchKpis(){
-    if (reduce) return;
     ['sum_tier','sum_readiness','sum_qstar','sum_hub_read','sum_supplier','sum_ltb','sum_kraljic','sum_pstockout'].forEach(function(id){
       var el=document.getElementById(id); if(!el) return;
-      var mo=new MutationObserver(function(){ el.classList.remove('sp-flash'); void el.offsetWidth; el.classList.add('sp-flash'); });
+      el.setAttribute('data-sp-prev', el.textContent);
+      statusColor(id, el.textContent);                 // colorize the initial value
+      var mo=new MutationObserver(function(){
+        if(el.__spCounting){ return; }                 // ignore textContent writes from countUp itself
+        var nv=el.textContent;
+        if(nv===el.getAttribute('data-sp-prev')){ return; } // already settled on this value
+        statusColor(id, nv);
+        if(!reduce){ el.classList.remove('sp-settle'); void el.offsetWidth; el.classList.add('sp-settle'); }
+        countUp(el, nv);
+      });
       mo.observe(el,{childList:true,characterData:true,subtree:true});
     });
   }
@@ -11321,6 +11376,20 @@ if(window.MutationObserver)new MutationObserver(m).observe(document.documentElem
     renderSpRails();
   };
 
+  // Run Analysis with a loading→done state (Monte-Carlo runs sync — yield a frame so the spinner paints).
+  window.spRunAnalysis = function(btn){
+    btn = btn || document.getElementById('spRunBtn'); if(!btn) { if(window.recalcAll) recalcAll(); spRailMarkRun(); return; }
+    if(btn.__spRunning) return; btn.__spRunning = true;
+    var html = btn.innerHTML;
+    btn.disabled = true; btn.style.opacity='.8';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running…';
+    setTimeout(function(){
+      try{ if(window.recalcAll) recalcAll(); spRailMarkRun(); }catch(e){}
+      btn.innerHTML = '<i class="fas fa-check"></i> Updated';
+      setTimeout(function(){ btn.innerHTML = html; btn.disabled=false; btn.style.opacity=''; btn.__spRunning=false; }, 900);
+    }, 60);
+  };
+
   function txt(id, fb){ var e=document.getElementById(id); return e ? (e.textContent||'').trim() : (fb||'—'); }
   function num(id){ var e=document.getElementById(id); return e ? (parseFloat(e.value)||0) : 0; }
 
@@ -11349,20 +11418,44 @@ if(window.MutationObserver)new MutationObserver(m).observe(document.documentElem
       document.getElementById('sp_pf_shortage').textContent = (expDown && expDown!=='—') ? expDown : ('$'+Math.round(num('s_understk_cost')).toLocaleString()+' / event');
       document.getElementById('sp_pf_service').textContent = (num('s_fill_rate')||0)+'%';
 
-      // ----- Heat map: RPN band (x) × supply-risk band (y) -----
+      // ----- Heat map: RPN band (x) × supply-risk band (y) — now with value-on-hover -----
       var rpn = parseFloat(txt('c1_rpn','0')) || 0;
       var alts = num('rail_alternates') || num('c1_alternates');
-      // column: RPN band → 0 low / 1 mid / 2 high
-      var col = rpn>=200 ? 2 : (rpn>=80 ? 1 : 0);
-      // row: supply risk from alternates → 0 alts = high risk (top), 2+ = low risk (bottom)
-      var risk = alts<=0 ? 2 : (alts===1 ? 1 : 0); // 2=high,1=med,0=low
-      var row = 2 - risk; // top row (0) = highest risk
+      var col = rpn>=200 ? 2 : (rpn>=80 ? 1 : 0);            // 0 low / 1 mid / 2 high RPN
+      var risk = alts<=0 ? 2 : (alts===1 ? 1 : 0);           // 2 high / 1 med / 0 low supply-risk
+      var row = 2 - risk;                                    // top row = highest risk
       var idx = row*3 + col;
+      var RPN_BAND=['Low RPN (<80)','Mid RPN (80–200)','High RPN (≥200)'];
+      var RISK_BAND=['High supply risk','Medium supply risk','Low supply risk']; // by row 0,1,2
+      // verdict per (riskRow, rpnCol): worst = high-risk × high-RPN
+      var VERDICT=[
+        ['Watch — single-source but low impact','Qualify a 2nd source','STRATEGIC — stock + dual-source now'],
+        ['Low priority','Manageable — monitor','Bottleneck — secure supply / buffer'],
+        ['Non-critical','Leverage — competitive bidding','Leverage — high impact, many sources']
+      ];
       var cells = document.querySelectorAll('#sp_heat .sp-heat-cell');
-      [].forEach.call(cells, function(c){ c.classList.remove('sp-heat-on'); });
-      if(cells[idx]) cells[idx].classList.add('sp-heat-on');
+      [].forEach.call(cells, function(c,i){
+        c.classList.remove('sp-heat-on');
+        var r=Math.floor(i/3), cc=i%3;
+        c.setAttribute('tabindex','0');
+        c.setAttribute('data-tip', RISK_BAND[r]+' × '+RPN_BAND[cc]+' — '+VERDICT[r][cc]);
+        c.setAttribute('aria-label', RISK_BAND[r]+', '+RPN_BAND[cc]+': '+VERDICT[r][cc]);
+      });
+      if(cells[idx]){
+        cells[idx].classList.add('sp-heat-on');
+        cells[idx].setAttribute('data-tip','◀ THIS PART  ·  RPN '+Math.round(rpn)+' ('+RPN_BAND[col].replace(/ \(.*/,'')+')  ·  '+alts+' qualified alt'+(alts===1?'':'s')+' → '+RISK_BAND[row]+'.  '+VERDICT[row][col]+'.');
+      }
     }catch(e){ /* non-fatal */ }
   };
+
+  // Tap-to-toggle tooltips on touch devices (hover doesn't exist there)
+  document.addEventListener('click', function(ev){
+    var cell = ev.target.closest && ev.target.closest('.sp-heat-cell[data-tip], .kq-cell[data-tip]');
+    if(!cell) { [].forEach.call(document.querySelectorAll('.sp-tip-open'), function(c){c.classList.remove('sp-tip-open');}); return; }
+    var was = cell.classList.contains('sp-tip-open');
+    [].forEach.call(document.querySelectorAll('.sp-tip-open'), function(c){c.classList.remove('sp-tip-open');});
+    if(!was) cell.classList.add('sp-tip-open');
+  });
 
   // Append renderSpRails to recalcAll without rewriting its body.
   function wrapRecalc(){
