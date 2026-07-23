@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.21 — 2026-07-23 (TCO — flatten the saturated results panel)
+
+### Changed
+- **TCO Comparison results panel de-slopped**: the right-hand results panel was a saturated indigo gradient (`#312e81→#4338ca`, CLAUDE.md rejected-pattern #7). Flattened to a clean flat instrument surface (`#0e1626` + hairline border) so it matches the site's flat aesthetic + the spares dashboard; inner KPI cards / chart / white text unchanged.
+
 ## v1.115.20 — 2026-07-23 (LTC — coolant thermophysical properties surfaced from the shared engine)
 
 ### Added
