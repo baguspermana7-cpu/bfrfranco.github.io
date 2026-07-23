@@ -6320,6 +6320,51 @@
                     /* Fixed display proportions (grand-total split — realistic cost weights). */
                     levelProportions: {l0:0.03,l1:0.04,l2:0.10,l3:0.22,l4:0.20,l5:0.32,l6:0.09},
                     levelLabels: {l0:'L0 Design & Cx Prep',l1:'L1 Factory Witness',l2:'L2 Standalone Functional',l3:'L3 System Functional',l4:'L4 Subsystem Integration',l5:'L5 Integrated Systems Test',l6:'L6 Closeout & Turnover'},
+                    /* ── Per-level sub-activities (Workstream E2) — 3-5 each, ASHRAE Gl.0 /
+                     * BCxA practice. w = share of the level window; basis = duration basis
+                     * (drivers substituted at compute time: equipment counts, IST scenarios,
+                     * redundancy). dep = predecessor inside the level. ── */
+                    subActivities: {
+                        l0: [
+                            { n: 'Cx plan, BOD & OPR review', w: 0.35, basis: 'Commissioning plan + owner-project-requirements alignment; scope grows with MW + BMS complexity' },
+                            { n: 'Submittal & factory-test review', w: 0.3, basis: 'Vendor drawing/datasheet review against specs', dep: 'Cx plan, BOD & OPR review' },
+                            { n: 'Checklists & test-script authoring', w: 0.35, basis: 'Pre-functional checklists + L3-L5 scripts per system class', dep: 'Submittal & factory-test review' }
+                        ],
+                        l1: [
+                            { n: 'FAT scheduling & witness plan', w: 0.25, basis: 'Factory slots for transformers/switchgear/UPS/gensets/chillers' },
+                            { n: 'Factory witness tests', w: 0.55, basis: 'Per-unit FATs at OEM works — travel-heavy, unit-count-driven', dep: 'FAT scheduling & witness plan' },
+                            { n: 'FAT punch & release-to-ship', w: 0.2, basis: 'FAT deviations closed before shipment release', dep: 'Factory witness tests' }
+                        ],
+                        l2: [
+                            { n: 'Delivery inspection & storage QA', w: 0.25, basis: 'Receipt inspection, damage claims, storage regime per unit' },
+                            { n: 'Pre-functional checklists (static)', w: 0.45, basis: 'Installation verification per system — torque/IR/alignment/labels', dep: 'Delivery inspection & storage QA' },
+                            { n: 'Energization readiness reviews', w: 0.3, basis: 'Safe-to-energize gates per electrical section', dep: 'Pre-functional checklists (static)' }
+                        ],
+                        l3: [
+                            { n: 'Electrical system startups', w: 0.3, basis: 'Transformer/switchgear/UPS/genset startups + protection proving' },
+                            { n: 'Mechanical system startups', w: 0.3, basis: 'Chiller/CDU/CRAH startups, flushing complete, flow balancing', dep: 'Electrical system startups' },
+                            { n: 'Controls point-to-point', w: 0.25, basis: 'BMS/EPMS every point proven — pacing item at high point counts', dep: 'Electrical system startups' },
+                            { n: 'Functional performance tests', w: 0.15, basis: 'Per-system capacity + sequence proof', dep: 'Mechanical system startups' }
+                        ],
+                        l4: [
+                            { n: 'Power-path integration tests', w: 0.3, basis: 'Utility→UPS→PDU transfer chains per A/B path' },
+                            { n: 'Cooling-chain integration tests', w: 0.25, basis: 'Plant→distribution→terminal response as one system', dep: 'Power-path integration tests' },
+                            { n: 'Load-bank staged tests', w: 0.3, basis: 'Stepped load 25/50/75/100% with thermal soak', dep: 'Cooling-chain integration tests' },
+                            { n: 'Failure & restore drills', w: 0.15, basis: 'Single-failure injections with recovery-time capture', dep: 'Load-bank staged tests' }
+                        ],
+                        l5: [
+                            { n: 'IST scenario matrix execution', w: 0.45, basis: 'Full pull-the-plug scenario set — count scales with redundancy class' },
+                            { n: 'Concurrent-maintenance demonstrations', w: 0.25, basis: 'Path isolation with design load held (tier evidence)', dep: 'IST scenario matrix execution' },
+                            { n: 'Endurance burn-in', w: 0.2, basis: '24-72 h sustained design-load run — hard calendar floor', dep: 'Concurrent-maintenance demonstrations' },
+                            { n: 'IST report & witness sign-off', w: 0.1, basis: 'Owner/CxA/AHJ witness closure', dep: 'Endurance burn-in' }
+                        ],
+                        l6: [
+                            { n: 'Punch closeout & re-tests', w: 0.3, basis: 'A/B items closed with re-test evidence' },
+                            { n: 'O&M, as-builts & CMMS load', w: 0.35, basis: 'Documentation set + asset register + spares load', dep: 'Punch closeout & re-tests' },
+                            { n: 'Operator training & drills', w: 0.2, basis: 'Shift-team training + emergency drills', dep: 'O&M, as-builts & CMMS load' },
+                            { n: 'Turnover dossier & RFS', w: 0.15, basis: 'Turnover package + ready-for-service certificate', dep: 'Operator training & drills' }
+                        ]
+                    },
                     disciplineShare: {electrical:0.40,mechanical:0.24,fire:0.09,security:0.04,it:0.07,controls:0.08,building:0.04,management:0.04},
                     capexPerKw: {standard:10500,high:13000,ai_hpc:16000},
                     normExp: 0.45, contingency: 0.15,
@@ -11340,6 +11385,60 @@
                         input: inp
                     };
                 },
+                /** Cx program WBS (Workstream E2): expands the rich program into a
+                 *  2-tier tree — L0..L6 level (CALENDAR window from programSchedule
+                 *  weights, labor-days effort attached) → 3-5 sub-activities each
+                 *  (DATA.commissioning.cx.rich.subActivities), serial-with-overlap
+                 *  inside the level window, drivers substituted (equipment counts,
+                 *  IST scenario count, redundancy). Returns { tree, totalMonths,
+                 *  calendarMonths, laborDays } for the shared recursive Gantt. */
+                programWbs: function (input) {
+                    var C = RZEngine.models.commissioning, R = DATA.commissioning.cx.rich;
+                    var rich = C.programRich(input);
+                    var subs = R.subActivities || {};
+                    var rd = R.redundancy[rich.input.redundancy] || R.redundancy['N+1'];
+                    var eq = rich.equip;
+                    var fatUnits = (eq.switchgear || 0) + (eq.transformers || 0) + (eq.generators || 0) + (eq.chillers || 0) + Math.ceil((eq.ups_modules || 0) / 4);
+                    var colors = { L0: '#64748b', L1: '#0ea5e9', L2: '#14b8a6', L3: '#10b981', L4: '#f59e0b', L5: '#8b5cf6', L6: '#ec4899' };
+                    var sched = rich.schedule || [];
+                    var ovl = DATA.construction.wbsFastTrackOverlap;
+                    function distribute(tpl, s, e, color) {
+                        if (!tpl || !tpl.length || e <= s) return [];
+                        var T = e - s, wSum = 0, i;
+                        for (i = 0; i < tpl.length; i++) wSum += tpl[i].w;
+                        var raw = [], cursor = 0;
+                        for (i = 0; i < tpl.length; i++) {
+                            var d = (tpl[i].w / wSum) * T;
+                            raw.push({ st: cursor, en: cursor + d });
+                            cursor += d * (1 - (i < tpl.length - 1 ? ovl : 0));
+                        }
+                        var span = raw[raw.length - 1].en, k = span > 0 ? T / span : 1;
+                        var out = [];
+                        for (i = 0; i < tpl.length; i++) {
+                            var t = tpl[i], basis = t.basis;
+                            if (t.n === 'Factory witness tests') basis += ' — ~' + fatUnits + ' witnessed units (screening)';
+                            if (t.n === 'IST scenario matrix execution') basis += ' — ' + rd.scenarios + ' scenarios · ' + rd.istHrs + ' IST hrs (' + rich.input.redundancy + ')';
+                            if (t.n === 'Controls point-to-point') basis += ' — point count scales with BMS complexity + IT kW';
+                            out.push({ id: '2:' + t.n, name: t.n, level: 2, start: +(s + raw[i].st * k).toFixed(1), end: +(s + raw[i].en * k).toFixed(1), months: +((raw[i].en - raw[i].st) * k).toFixed(1), color: color, basis: basis, dependsOn: t.dep || null, critical: false, risk: null, children: [] });
+                        }
+                        return out;
+                    }
+                    var tree = [];
+                    for (var i2 = 0; i2 < sched.length; i2++) {
+                        var lv = sched[i2];
+                        var key = lv.level.toLowerCase();
+                        var laborForLevel = null;
+                        for (var li = 0; li < rich.levels.length; li++) if (rich.levels[li].id === lv.level) laborForLevel = rich.levels[li].days;
+                        var color = colors[lv.level] || '#64748b';
+                        tree.push({
+                            id: '1:' + lv.level, name: lv.label, level: 1, start: lv.start, end: lv.end, months: lv.months, color: color,
+                            basis: 'Calendar window from the log-damped program schedule (level weight ' + Math.round((lv.months / (rich.calendarMonths || 1)) * 100) + '%)' + (laborForLevel != null ? ' — ' + laborForLevel + ' crew-days effort in this level' : ''),
+                            dependsOn: i2 > 0 ? sched[i2 - 1].label : null, critical: lv.level === 'L5', risk: lv.level === 'L5' ? 'IST endurance runs are a hard calendar floor — crews cannot compress a 72 h burn-in' : null,
+                            children: distribute(subs[key], lv.start, lv.end, color)
+                        });
+                    }
+                    return { tree: tree, totalMonths: rich.calendarMonths, calendarMonths: rich.calendarMonths, laborDays: rich.laborDays, crewEquivalent: rich.crewEquivalent };
+                },
 
                 /** Normal deviate (Box-Muller). rng defaults to Math.random; pass a
                  *  seeded rng for a deterministic path (tests). */
@@ -13681,7 +13780,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-23-e0"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-24-e2"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

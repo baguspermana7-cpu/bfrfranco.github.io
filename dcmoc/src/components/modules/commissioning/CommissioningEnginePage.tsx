@@ -16,6 +16,7 @@ import { useSimulationStore } from '@/store/simulation';
 import { useRequirementsStore } from '@/store/requirements';
 import { densityToEngineBucket } from '@/lib/requirementsMappings';
 import { useCxTracking, cxPlanMode, checklistDerivedCompletion, type CxCheckValue } from '@/store/cxTracking';
+import GanttChart from '@/components/visualizations/GanttChart';
 import { rzModels, rzData } from '@/lib/rz-engine';
 import { CX_CHECKLIST, resolveProc, type ReadinessKey, type ChecklistItem } from '@/lib/cx-procedures';
 import { CommissioningDashboard } from '@/components/modules/NewEngineDashboards';
@@ -74,6 +75,8 @@ export function CommissioningEnginePage() {
         const m = rzModels()?.commissioning;
         if (!m?.programRich) return null;
         const rich = m.programRich({ itLoadKw: inputs.itLoad, coolingType: inputs.coolingType, powerRedundancy: inputs.powerRedundancy, countryId: country?.id, rackDensity: densityToEngineBucket(rackKw) });
+        /* Workstream E2: L0-L6 x 3-5 sub-activity WBS on the recursive Gantt */
+        const wbs = m.programWbs ? m.programWbs({ itLoadKw: inputs.itLoad, coolingType: inputs.coolingType, powerRedundancy: inputs.powerRedundancy, countryId: country?.id, rackDensity: densityToEngineBucket(rackKw) }) : null;
         const eq = rich.equip as Record<string, number>;
         /* Per-readiness-key checklist stats — items filtered to systems that
          * actually EXIST at the current config (live equipScale counts). */
@@ -108,11 +111,11 @@ export function CommissioningEnginePage() {
         const anyTicks = KEYS.some((k) => checklistStats[k].ticked > 0);
         const passTotal = anyTicks ? KEYS.reduce((s, k) => s + checklistStats[k].pass, 0) : t.testsPassed;
         const failTotal = anyTicks ? KEYS.reduce((s, k) => s + checklistStats[k].fail, 0) : t.testsFailed;
-        return { rich, readiness, systems, testsTotal, checklistStats, anyTicks, passTotal, failTotal };
+        return { rich, wbs, readiness, systems, testsTotal, checklistStats, anyTicks, passTotal, failTotal };
     }, [inputs, country, rackKw, t]);
 
     if (!model) return <div className="p-8 text-center text-sm text-slate-500">Engine loading…</div>;
-    const { rich, readiness, systems, testsTotal, checklistStats, anyTicks, passTotal, failTotal } = model;
+    const { rich, wbs, readiness, systems, testsTotal, checklistStats, anyTicks, passTotal, failTotal } = model;
     const planMode = cxPlanMode(t);
     const overall = readiness ? readiness.index : 0;
     const openIssues = t.issues.filter((x) => x.open && x.kind === 'issue');
@@ -401,25 +404,29 @@ export function CommissioningEnginePage() {
                     <div className="grid gap-4 xl:grid-cols-2">
                         {/* level timeline */}
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Commissioning Timeline (L0–L6 · engine staffed durations)</h2>
-                            <div className="space-y-1.5">
-                                {(() => {
-                                    let cursor = 0;
-                                    const total = rich.durationDays || 1;
-                                    return rich.levels.map((l: { id: string; label: string; days: number; cost: number }, idx: number) => {
-                                        const left = (cursor / total) * 100; cursor += l.days;
-                                        return (
-                                            <div key={l.id} className="flex items-center gap-2 text-[11px]">
-                                                <span className="w-40 truncate text-slate-600 dark:text-slate-300">{l.label}</span>
-                                                <div className="relative h-3 flex-1 rounded bg-slate-100 dark:bg-slate-800">
-                                                    <div className="absolute h-3 rounded" style={{ left: `${left}%`, width: `${(l.days / total) * 100}%`, background: LEVEL_COLORS[idx] }} />
+                            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Commissioning WBS (L0–L6 · calendar windows · expand levels for sub-activities)</h2>
+                            {wbs?.tree ? (
+                                <GanttChart tree={wbs.tree} totalMonths={Math.max(1, Math.ceil(wbs.totalMonths))} />
+                            ) : (
+                                <div className="space-y-1.5">
+                                    {(() => {
+                                        let cursor = 0;
+                                        const total = rich.durationDays || 1;
+                                        return rich.levels.map((l: { id: string; label: string; days: number; cost: number }, idx: number) => {
+                                            const left = (cursor / total) * 100; cursor += l.days;
+                                            return (
+                                                <div key={l.id} className="flex items-center gap-2 text-[11px]">
+                                                    <span className="w-40 truncate text-slate-600 dark:text-slate-300">{l.label}</span>
+                                                    <div className="relative h-3 flex-1 rounded bg-slate-100 dark:bg-slate-800">
+                                                        <div className="absolute h-3 rounded" style={{ left: `${left}%`, width: `${(l.days / total) * 100}%`, background: LEVEL_COLORS[idx] }} />
+                                                    </div>
+                                                    <span className="w-12 text-right tabular-nums text-slate-500">{l.days}d</span>
                                                 </div>
-                                                <span className="w-12 text-right tabular-nums text-slate-500">{l.days}d</span>
-                                            </div>
-                                        );
-                                    });
-                                })()}
-                            </div>
+                                            );
+                                        });
+                                    })()}
+                                </div>
+                            )}
                         </div>
 
                         {/* readiness completion input */}

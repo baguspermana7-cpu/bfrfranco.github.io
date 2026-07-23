@@ -13,6 +13,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.31 — 2026-07-24 (DCMOC — Commissioning WBS: L0–L6 × 3–5 sub-activities on the recursive Gantt)
+
+### Added
+- **Commissioning WBS (Workstream E2)**: new `DATA.commissioning.cx.rich.subActivities` (25 sub-activities across L0–L6, ASHRAE Gl.0/BCxA practice — FAT witness, pre-functional checklists, startups, point-to-point, power-path/cooling-chain integration, load-bank stages, IST scenario matrix, burn-in, punch/turnover) + `models.commissioning.programWbs` — levels get CALENDAR windows from the log-damped program schedule with crew-days effort attached; sub-activities distribute serial-with-overlap; drivers substituted live (witnessed-unit counts, IST scenario count per redundancy class, BMS point-count note). L5 flagged critical (endurance burn-ins are a hard calendar floor).
+- The Commissioning page timeline is now the shared **recursive Gantt** (expand a level → its sub-activities, per-bar diagnosis tooltip), replacing the flat 7-bar strip; legacy strip kept as engine-absent fallback.
+
+
 ## v1.115.30 — 2026-07-24 (DCMOC — Auto/Manual Optimizer + Capacity At-Risk diagnostic modal)
 
 ### Added
