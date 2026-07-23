@@ -10253,6 +10253,23 @@
                 document.getElementById('inCarbonIntensity').value = profile.carbonIntensity;
                 document.getElementById('inUpsEff').value = profile.upsEff;
                 document.getElementById('inDistLoss').value = profile.distLoss;
+                /* Single-source override: when the shared engine carries the crawled,
+                   provenance-tagged tariffs (DATA.electricityTariffs / waterTariffs —
+                   EIA/Eurostat/PLN/EMA/Ember/PUB…), prefer them over this page's older
+                   inline profile numbers. Deliberate, disclosed re-baseline; inline
+                   values remain the offline fallback. */
+                try {
+                    var ISO = { sg: 'SG', us_va: 'US', nl: 'NL', id_jkt: 'ID', in_mum: 'IN', ie: 'IE' };
+                    var eng = window.RZEngine && window.RZEngine.data;
+                    var iso = ISO[key];
+                    if (eng && iso) {
+                        var et = eng.electricityTariffs && eng.electricityTariffs[iso];
+                        var wt = eng.waterTariffs && eng.waterTariffs[iso];
+                        if (et && isFinite(et.rateUsdPerKwh)) document.getElementById('inElecPrice').value = et.rateUsdPerKwh;
+                        if (et && isFinite(et.gridCarbonKgCo2PerKwh)) document.getElementById('inCarbonIntensity').value = et.gridCarbonKgCo2PerKwh;
+                        if (wt && isFinite(wt.rateUsdPerM3)) document.getElementById('inWaterTariff').value = wt.rateUsdPerM3;
+                    }
+                } catch (e) {}
                 requestModelRun(true, false);
             }
 

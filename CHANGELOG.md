@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.35 — 2026-07-24 (LTC — country presets now pull the crawled, sourced tariffs from the shared engine)
+
+### Changed
+- **Country profile selection re-baselined to the sourced engine data** (deliberate + disclosed): picking a country in the LTC lab now fills electricity price, grid-carbon intensity and water tariff from the shared `DATA.electricityTariffs` / `DATA.waterTariffs` (EIA/Eurostat/PLN/EMA/Ember/PUB…, each with `DATA.sources` provenance) instead of the page's older inline numbers — e.g. Indonesia: 0.08→0.082 $/kWh (PLN B3 2024), carbon 0.73→0.726 kgCO2e/kWh (Ember). Inline profile values remain the offline fallback; `computeModel` formulas untouched (parity 15,750/0).
+
 ## v1.115.34 — 2026-07-24 (DCMOC — Workstream H: Asset · Reliability · Sustainability · Financial deepened)
 
 ### Added
