@@ -18,7 +18,9 @@ import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
 import { useSimulationStore } from '@/store/simulation';
 import { useRequirementsStore } from '@/store/requirements';
 import { useOpsLog } from '@/store/opsLog';
+import { useCapexStore } from '@/store/capex';
 import { rzModels, rzData } from '@/lib/rz-engine';
+import { fmtMoney } from '@/lib/format';
 import { densityToEngineBucket } from '@/lib/requirementsMappings';
 import { REDUNDANCY_KEY } from '@/state/registry';
 import { ReliabilityDashboard } from '@/components/modules/ReliabilityDashboard';
@@ -39,6 +41,8 @@ import {
 } from '@/components/modules/reliability/availabilityChain';
 
 interface ComponentRow { key: string; label: string; mtbf: number; mttr: number; lambdaMyr: number; count: number | null; availability: number; contribPct: number }
+/* Workstream H — redundancy what-if row (engine kOutOfN at N / N+1 / 2N) */
+interface WhatIfRow { cls: string; label: string; a: number; k: number; kAssumed: boolean; aN: number; aN1: number; aN2: number; unitCostUsd: number | null }
 
 /* engine component class → equipScale fleet-count key */
 const EQ_KEY: Record<string, string> = {
@@ -52,6 +56,7 @@ export function ReliabilityEnginePage() {
     const country = useSimulationStore((s) => s.selectedCountry);
     const req = useRequirementsStore();
     const log = useOpsLog();
+    const capexResults = useCapexStore((s) => s.results);
     const [tab, setTab] = React.useState<'overview' | 'ram' | 'tier'>('overview');
     const [busy, setBusy] = React.useState(false);
 
@@ -122,8 +127,60 @@ export function ReliabilityEnginePage() {
          * bisection below never re-implements or fabricates the model. */
         const recompute = (mods: { mttrFactor?: number; paths?: number }): number =>
             ccOverall(mods.mttrFactor ?? 1, mods.paths ?? paths);
-        return { systems, overall, tierTargetFrac, downtimeMin, budgetMin, mtbfAll, mttrAvg, spof, score, paths, comps, componentRows, sensitivity, hasFleet: !!eq, recompute };
-    }, [inputs.powerRedundancy, inputs.tierLevel, inputs.itLoad, req.workload.avgRackDensityKw]);
+
+        /* ── Workstream H · Redundancy What-If — SURFACES the existing engine
+         * kOutOfN (exact Σ C(n,i)aⁱ(1−a)ⁿ⁻ⁱ): UPS + genset availability at
+         * N / N+1 / 2N, where k = units required to carry the load. k is taken
+         * from the engine equipScale fleet (screening — the installed count is
+         * used as the required-unit count; fallback k=2, flagged). Per-unit
+         * CAPEX share from the capex result gives the $ cost of each step. ── */
+        let whatIf: WhatIfRow[] | null = null;
+        if (typeof m.kOutOfN === 'function') {
+            const mk = (cls: string, eqKey: string, costKey: string): WhatIfRow | null => {
+                const c = comps[cls];
+                if (!c) return null;
+                const a = m.availability(c.mtbf, c.mttr);
+                const fleet = eq?.[eqKey];
+                const k = Math.max(1, fleet ?? 2);
+                const catCost = capexResults?.costs?.[costKey];
+                return {
+                    cls, label: c.label ?? cls, a, k, kAssumed: fleet == null,
+                    aN: m.kOutOfN(a, k, k), aN1: m.kOutOfN(a, k, k + 1), aN2: m.kOutOfN(a, k, 2 * k),
+                    unitCostUsd: catCost != null && fleet ? catCost / fleet : null,
+                };
+            };
+            const rows = [mk('ups', 'ups_modules', 'ups'), mk('generator', 'generators', 'generator')].filter((r): r is WhatIfRow => r != null);
+            whatIf = rows.length ? rows : null;
+        }
+
+        /* ── Workstream H · Chain-derived SPOF — any series element of the
+         * composed chain with a single path at this config, with its downtime
+         * contribution (derived from the SAME chain rows rendered above). ── */
+        const chainSpof = systems
+            .filter((sy) => !sy.redundant)
+            .map((sy) => ({ label: sy.label, chain: sy.chain, dtMin: (1 - sy.availability) * MIN_PER_YEAR }));
+
+        /* ── Workstream H · Monte-Carlo availability band — 200 deterministic
+         * re-runs of the SAME β-adjusted chain with each component's MTBF/MTTR
+         * jittered ±20% via a seeded LCG (no Math.random — reproducible).
+         * Screening: uniform jitter is a data-uncertainty band, not a fitted
+         * distribution. ── */
+        let mc: { p10: number; p50: number; p90: number } | null = null;
+        try {
+            let s = 42;
+            const rnd = () => ((s = (s * 1664525 + 1013904223) | 0) >>> 0) / 4294967296;
+            const runs: number[] = [];
+            for (let i = 0; i < 200; i++) {
+                const jit: Record<string, RelComponent> = {};
+                for (const [k, c] of Object.entries(comps)) jit[k] = { ...c, mtbf: c.mtbf * (0.8 + 0.4 * rnd()), mttr: c.mttr * (0.8 + 0.4 * rnd()) };
+                runs.push(ccOverallShared(m, jit, 1, paths));
+            }
+            runs.sort((a, b) => a - b);
+            mc = { p10: runs[19], p50: runs[99], p90: runs[179] };
+        } catch { /* chain jitter failed — band hidden, base model unaffected */ }
+
+        return { systems, overall, tierTargetFrac, downtimeMin, budgetMin, mtbfAll, mttrAvg, spof, score, paths, comps, componentRows, sensitivity, hasFleet: !!eq, recompute, whatIf, chainSpof, mc };
+    }, [inputs.powerRedundancy, inputs.tierLevel, inputs.itLoad, req.workload.avgRackDensityKw, capexResults]);
 
     /* ── Owner-mandate explain: availability below tier target ───────────────
      * (1) computed reason: nines gap + biggest downtime contributors from the
@@ -441,6 +498,27 @@ export function ReliabilityEnginePage() {
                                         })}
                                     </ul>
                                 )}
+                                {/* Workstream H — chain-derived single-path elements */}
+                                <div className="mt-2 border-t border-slate-100 dark:border-slate-800/60 pt-2">
+                                    <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                                        Chain-derived single-path elements <InfoTip content="Series elements of the composed availability chain above that run on a SINGLE path at the current redundancy config — derived directly from the same chain rows, so this list can never disagree with the table. Each entry shows its unplanned-downtime contribution (1 − availability) × minutes/yr. Remediation is always the same lever: add a parallel path (raise redundancy) or cut that element's MTTR." />
+                                    </h3>
+                                    {model.chainSpof.length === 0 ? (
+                                        <p className="text-[10.5px] text-slate-500">None — every series element of the chain has ≥2 paths at {inputs.powerRedundancy}.</p>
+                                    ) : (
+                                        <ul className="space-y-1">
+                                            {model.chainSpof.map((cs) => (
+                                                <li key={cs.label} className="flex items-center gap-2 text-[10.5px]">
+                                                    <span className="rounded bg-rose-500/15 px-1 py-0.5 text-[8px] font-bold text-rose-500">1 PATH</span>
+                                                    <span className="text-slate-700 dark:text-slate-200">{cs.label}</span>
+                                                    <span className="text-[9px] text-slate-400">{cs.chain}</span>
+                                                    <span className="ml-auto tabular-nums text-slate-500">{fmtDowntime(cs.dtMin)}</span>
+                                                    <button onClick={() => setActiveTab('sim')} className="shrink-0 rounded border border-slate-300 dark:border-slate-700 px-1.5 py-0.5 text-[9px] text-slate-500 hover:border-rz-mint">+1 path →</button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
                             </div>
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                                 <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Sensitivity <span className="text-[9px] normal-case text-slate-400">vs base (β-adjusted)</span></h2>
@@ -473,6 +551,86 @@ export function ReliabilityEnginePage() {
                                 )}
                                 <button onClick={() => setActiveTab('ops')} className="mt-1.5 text-[10px] font-medium text-rz-mint">Open Operations log →</button>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* ── Workstream H · Redundancy What-If (engine kOutOfN) + MC band ── */}
+                    <div className="grid gap-4 xl:grid-cols-[1.5fr_1fr]">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                                Redundancy What-If <InfoTip content="Exact k-of-n redundancy math from the engine (kOutOfN: system up if ≥k of n identical units are up, at each unit's IEEE-493 availability) — compared at N (no spare unit), N+1 (one spare) and 2N (full duplication) for the UPS and generator systems. k = units required to carry the load, taken from the engine equipment-scaling fleet (screening assumption). Cost side: each added unit ≈ the per-unit CAPEX share of that category from the CAPEX result. Read it as technology-vs-economics: if the availability gain from N+1 → 2N is a rounding error, the simpler (cheaper) N+1 wins — spend the difference on MTTR instead." />
+                                <span className="ml-1 text-[9px] normal-case text-slate-400">engine kOutOfN · k = required units (equipScale) · screening</span>
+                            </h2>
+                            {!model.whatIf ? (
+                                <p className="text-[11px] text-slate-500">Engine kOutOfN model unavailable — no redundancy comparison to show.</p>
+                            ) : (
+                                <>
+                                    <table className="w-full text-[11px]">
+                                        <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">System</th><th className="text-right">k req.</th><th className="text-right">N (k of k)</th><th className="text-right">N+1</th><th className="text-right">2N</th><th className="text-right">+1 unit ≈</th></tr></thead>
+                                        <tbody>
+                                            {model.whatIf.map((w) => (
+                                                <tr key={w.cls} className="border-b border-slate-100 dark:border-slate-800/60">
+                                                    <td className="py-1 text-slate-700 dark:text-slate-200">{w.label}</td>
+                                                    <td className="text-right tabular-nums text-slate-500">{w.k}{w.kAssumed && <span className="ml-0.5 text-[8px] text-amber-500">assumed</span>}</td>
+                                                    <td className="text-right tabular-nums text-slate-600 dark:text-slate-300">{fmtAvail(w.aN)}</td>
+                                                    <td className="text-right tabular-nums text-slate-600 dark:text-slate-300">{fmtAvail(w.aN1)}</td>
+                                                    <td className="text-right tabular-nums text-slate-600 dark:text-slate-300">{fmtAvail(w.aN2)}</td>
+                                                    <td className="text-right tabular-nums text-slate-500">{w.unitCostUsd != null ? fmtMoney(w.unitCostUsd) : 'n/a — qualitative'}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                    <div className="mt-2 space-y-1">
+                                        {model.whatIf.map((w) => {
+                                            const dN1 = (ninesOf(w.aN1) - ninesOf(w.aN));
+                                            const dt1 = ((1 - w.aN) - (1 - w.aN1)) * MIN_PER_YEAR;
+                                            const dt2 = ((1 - w.aN1) - (1 - w.aN2)) * MIN_PER_YEAR;
+                                            const extra2N = Math.max(0, w.k - 1);
+                                            const cost2N = w.unitCostUsd != null ? w.unitCostUsd * extra2N : null;
+                                            const negligible = dt2 < 0.5; // <30 s/yr gained
+                                            return (
+                                                <p key={w.cls} className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 px-2 py-1.5 text-[10px] leading-relaxed text-slate-600 dark:text-slate-300">
+                                                    <span className="font-semibold text-slate-700 dark:text-slate-200">{w.label}:</span>{' '}
+                                                    N → N+1 buys ~{dN1 >= 1 ? `+${dN1} nine${dN1 > 1 ? 's' : ''}` : `−${fmtDowntime(dt1)}`} for {w.unitCostUsd != null ? `~${fmtMoney(w.unitCostUsd)}` : 'one extra unit'} — usually the best $/nine on the board.{' '}
+                                                    N+1 → 2N ({extra2N} more unit{extra2N === 1 ? '' : 's'}{cost2N != null ? `, ~${fmtMoney(cost2N)}` : ''}) gains only −{fmtDowntime(dt2)}{negligible
+                                                        ? ' — negligible at this unit availability: the simpler N+1 option wins unless a common-cause / maintenance-isolation requirement (not modeled here) mandates 2N.'
+                                                        : ` — worth it only if a downtime-minute costs you more than ${cost2N != null ? `~${fmtMoney(cost2N / 10 / Math.max(dt2, 0.01))}/min (unit cost amortized 10 yr ÷ minutes saved)` : 'the amortized extra-unit cost per minute saved'}.`}
+                                                </p>
+                                            );
+                                        })}
+                                        <p className="text-[9px] text-slate-400">Screening: independent identical units, no common-cause inside the k-of-n block (the headline availability above DOES carry the β=5% factor), per-unit cost = CAPEX category ÷ installed fleet. Not a substitute for a maintenance-isolation (concurrent maintainability) study.</p>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                                Availability Uncertainty Band <InfoTip content="200 deterministic re-runs of the SAME β-adjusted availability chain with every component's MTBF and MTTR jittered ±20% (seeded LCG — reproducible, no randomness between renders). P10/P50/P90 show how sensitive the headline availability is to the IEEE-493 data uncertainty: a narrow band means the design verdict is robust to the input data; a P10 that falls below the tier target means the 'meets target' conclusion depends on optimistic component data — harden MTTR (contracts, spares) before trusting it. Screening band, not a fitted distribution." />
+                                <span className="ml-1 text-[9px] normal-case text-slate-400">±20% MTBF/MTTR jitter · seeded · screening</span>
+                            </h2>
+                            {!model.mc ? (
+                                <p className="text-[11px] text-slate-500">Band unavailable.</p>
+                            ) : (
+                                <>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {([['P10 (pessimistic)', model.mc.p10], ['P50 (median)', model.mc.p50], ['P90 (optimistic)', model.mc.p90]] as const).map(([lbl, v]) => (
+                                            <div key={lbl} className="rounded-lg border border-slate-200 dark:border-slate-800 p-2 text-center">
+                                                <div className="text-[9px] uppercase text-slate-500">{lbl}</div>
+                                                <div className={`text-[13px] font-bold tabular-nums ${v >= model.tierTargetFrac ? 'text-rz-data' : 'text-rose-500'}`}>{fmtAvail(v)}</div>
+                                                <div className="text-[9px] tabular-nums text-slate-500">{fmtDowntime((1 - v) * MIN_PER_YEAR)}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <p className="mt-2 text-[10px] leading-relaxed text-slate-600 dark:text-slate-300">
+                                        {model.mc.p10 >= model.tierTargetFrac
+                                            ? `Robust: even the pessimistic P10 stays above the Tier ${inputs.tierLevel} target — the verdict does not hinge on optimistic component data.`
+                                            : model.mc.p50 >= model.tierTargetFrac
+                                                ? `Fragile: the median meets the Tier ${inputs.tierLevel} target but the pessimistic P10 breaches it — the conclusion depends on the component data being right. Cheapest hardening is MTTR (response contracts + on-site spares), not more redundancy.`
+                                                : `Below target across the band — this is a design gap, not data noise. See the remediation levers above.`}
+                                    </p>
+                                </>
+                            )}
                         </div>
                     </div>
 

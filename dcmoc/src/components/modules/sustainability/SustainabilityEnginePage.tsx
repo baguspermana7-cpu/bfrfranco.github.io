@@ -27,6 +27,9 @@ import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 
 const SCOPE_COLORS = ['#f59e0b', '#00DDFF', '#64748b'];
 const MIX_COLORS = ['#34d399', '#22d3ee', '#64748b'];
+/* Workstream H — DCMOC coolingType → engine facilityFootprint cooling key
+ * (labeled screening map; the footprint model's WUE bins are coarser). */
+const FOOTPRINT_COOL_MAP: Record<string, string> = { air: 'evaporative', inrow: 'hybrid', rdhx: 'hybrid', liquid: 'dlc' };
 
 export function SustainabilityEnginePage() {
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
@@ -114,6 +117,30 @@ export function SustainabilityEnginePage() {
         }));
         return { cid, cname, climate, climateMult, waterM3, kgal, waterRate, waterCost, deepSea, scope2, hasScheme, carbonRate, carbonCost, developed, genRate, genTonnes, eKg, eRate, wasteCost, total, forecast };
     }, [model, country, capexInputs.deepSea, waterSource, inputs.occupancyRamp]);
+
+    /* ── Workstream H · Facility-level water footprint — SURFACES the existing
+     * engine models.water.facilityFootprint (facility kWh = IT × PUE, WUE ×
+     * climate, + upstream-power water on the non-renewable share). The Water
+     * KPI above is IT-only direct draw; this table is the full-facility view.
+     * DCMOC cooling → engine footprint cooling key is a labeled screening map. */
+    const facWater = React.useMemo(() => {
+        const m = rzModels();
+        if (!m?.water?.facilityFootprint) return null;
+        try {
+            const coolKey = FOOTPRINT_COOL_MAP[inputs.coolingType] ?? 'evaporative';
+            const f = m.water.facilityFootprint({
+                itLoadMw: model.mw, pue: model.pue, cooling: coolKey,
+                climate: env?.climate ?? 'temperate', renewablePct: model.renewablePct,
+                sourceType: waterSource,
+            });
+            return f ? { ...f, coolKey } : null;
+        } catch { return null; }
+    }, [model, env?.climate, inputs.coolingType, waterSource]);
+
+    /* ── Workstream H · CUE + ERF — CUE from the scopes result already rendered
+     * above (t CO₂e ÷ IT MWh ≡ kg/kWh, Green Grid definition); ERF is honestly
+     * 0 — no heat-reuse path is modeled in this design. ── */
+    const cue = model.scopes ? model.scopes.totalAnnual / (model.mw * 8760) : null;
 
     const scopeDonut = model.scopes ? [
         { name: 'Scope 1', v: model.scopes.scope1 }, { name: 'Scope 2 (location-based)', v: model.scopes.scope2 }, { name: 'Scope 3 (annualized)', v: model.scopes.scope3Annual },
@@ -302,6 +329,75 @@ export function SustainabilityEnginePage() {
                                     onChange={(e) => sus.actions.set({ wasteDiversionPct: Number(e.target.value) })} className="flex-1 accent-rz-mint" />
                                 <span className="w-9 text-right tabular-nums text-slate-500">{sus.wasteDiversionPct != null ? `${sus.wasteDiversionPct}%` : '—'}</span>
                             </div>
+                            {/* Workstream H — CUE + ERF rows (Green Grid metrics) */}
+                            <div className="mt-2 space-y-1 border-t border-slate-100 dark:border-slate-800/60 pt-2">
+                                <div className="flex items-center gap-2 text-[11px]">
+                                    <span className="w-40 truncate text-slate-600 dark:text-slate-300">CUE (carbon usage eff.) <InfoTip content="Carbon Usage Effectiveness (Green Grid) = total annual CO₂e ÷ IT energy, in kg CO₂e per IT kWh — computed from the SAME GHG-scopes result rendered above (no separate model). Bands (screening): < 0.2 = clean-grid / high-renewable operation; 0.2–0.5 = typical mixed grid; > 0.5 = carbon-intensive grid — site selection and PPAs move this metric far more than PUE tuning. A breach of your ESG target here usually means the grid factor, not the design, is the problem." /></span>
+                                    <span className="ml-auto tabular-nums font-semibold text-slate-700 dark:text-slate-200">{cue != null ? `${cue.toFixed(3)} kg/kWh` : '—'}</span>
+                                    {cue != null && <span className={`rounded px-1.5 py-0.5 text-[9px] font-semibold ${cue < 0.2 ? 'bg-rz-data/15 text-rz-data' : cue < 0.5 ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{cue < 0.2 ? 'clean' : cue < 0.5 ? 'mixed grid' : 'carbon-intensive'}</span>}
+                                </div>
+                                <div className="flex items-center gap-2 text-[11px]">
+                                    <span className="w-40 truncate text-slate-600 dark:text-slate-300">ERF (energy reuse) <InfoTip content="Energy Reuse Factor (Green Grid) = reused energy ÷ total facility energy. Honestly 0 here — no heat-reuse path (district heating, adjacent industrial offtake, greenhouse) is modeled in this design. District-heating integration would move it: waste heat is low-grade (~30-45 °C air / ~50-60 °C liquid-cooling return), so economic reuse needs a heat customer within a few km and usually a heat pump — a real cost-benefit case only in cold climates with district networks. No number is shown because none exists in the model." /></span>
+                                    <span className="ml-auto tabular-nums font-semibold text-slate-700 dark:text-slate-200">0</span>
+                                    <span className="rounded bg-slate-500/10 px-1.5 py-0.5 text-[9px] text-slate-500">no heat reuse modeled</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ── Workstream H · Facility water footprint + 24/7 CFE note ── */}
+                    <div className="grid gap-4 xl:grid-cols-[1.6fr_1fr]">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                                Facility Water Footprint <InfoTip content="Full-facility water view from the engine footprint model (models.water.facilityFootprint): facility kWh = IT × PUE, WUE base × climate multiplier, PLUS the upstream water embedded in non-renewable grid power (screening factor per non-renewable kWh). The Water KPI above is the IT-only direct draw — this table is the honest total a water-permit or ESG report would ask about, and upstream is usually the larger share on a thermal grid. Cooling type is mapped to the footprint model's coarser bins (labeled below). Screening-grade, not a metered figure." />
+                                <span className="ml-1 text-[9px] normal-case text-slate-400">engine facilityFootprint · direct + upstream · screening</span>
+                            </h2>
+                            {!facWater ? (
+                                <p className="text-[11px] text-slate-500">Engine facility-footprint model unavailable — only the IT-only Water KPI above is shown.</p>
+                            ) : (
+                                <>
+                                    <table className="w-full text-[11px]">
+                                        <tbody>
+                                            {([
+                                                ['WUE (climate-adjusted)', `${Number(facWater.wue).toFixed(2)} L/kWh`, `${facWater.coolKey} basis × ${env?.climate ?? 'temperate'} climate`],
+                                                ['Direct draw (facility, on-site)', `${Math.round(facWater.annualDirectL / 1000).toLocaleString()} m³/yr`, 'facility kWh × WUE — cooling towers / humidification'],
+                                                ['Incl. upstream power water', `${Math.round(facWater.annualL / 1000).toLocaleString()} m³/yr`, `+ water embedded in the ${100 - model.renewablePct}% non-renewable grid share`],
+                                                ['Daily total', `${Math.round(facWater.dailyL / 1000).toLocaleString()} m³/day`, `≈ ${Number(facWater.householdsEquiv).toLocaleString()} households' daily use`],
+                                                ['Intensity', `${Math.round(facWater.perMwYrL / 1e6).toLocaleString()} ML/MW·yr`, 'vs hyperscaler benchmarks in the engine data'],
+                                                ['Water cost (screening)', fmtMoney(facWater.annualCostUsd), `${waterSource} rate — full-facility basis`],
+                                            ] as const).map(([lbl, v, sub]) => (
+                                                <tr key={lbl} className="border-b border-slate-100 dark:border-slate-800/60">
+                                                    <td className="py-1 text-slate-600 dark:text-slate-300">{lbl}</td>
+                                                    <td className="text-right tabular-nums font-semibold text-slate-700 dark:text-slate-200">{v}</td>
+                                                    <td className="pl-3 text-right text-[9px] text-slate-400">{sub}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                    <p className="mt-1.5 text-[9px] text-slate-400">
+                                        Cooling map (screening): {inputs.coolingType} → {facWater.coolKey}. Cost-benefit: a low-water cooling choice (dlc/immersion) cuts direct draw ~10-30×, but on a fossil grid the UPSTREAM share dominates — renewables move total water more than the cooling tech. If the direct-draw line is already small, spending CAPEX on drier cooling buys little water benefit here.
+                                    </p>
+                                </>
+                            )}
+                        </div>
+
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                                24/7 CFE Note <InfoTip content="Annual renewable matching (the % shown here and in the Energy Mix) counts renewable MWh bought over a YEAR against consumption — it says nothing about the 3 a.m. hours when solar produces nothing and the load runs on grid power. Hourly-matched CFE (24/7 carbon-free energy, the Google/UN definition) is strictly harder and NOT modeled here: it would need an hourly load profile, hourly generation profiles for each PPA resource, and grid-mix time series. Typical result: a 100% annually-matched portfolio is only ~40-70% hourly-matched. No hourly number is invented — this card only states the gap." />
+                            </h2>
+                            <div className="space-y-1.5 text-[11px]">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-slate-600 dark:text-slate-300">Annual renewable matching</span>
+                                    <span className="tabular-nums font-semibold text-slate-700 dark:text-slate-200">{model.renewablePct}%</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-slate-600 dark:text-slate-300">Hourly-matched CFE (24/7)</span>
+                                    <span className="rounded bg-slate-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-slate-500">not modeled hourly</span>
+                                </div>
+                            </div>
+                            <p className="mt-2 text-[10px] leading-relaxed text-slate-600 dark:text-slate-300">
+                                The {model.renewablePct}% figure is annual-volume matching (derived from the CAPEX renewable/cert inputs). Hourly 24/7 CFE is always lower and would require an hourly load + generation + grid-mix model — typically firming (storage, geothermal, or clean firm PPAs) at a real cost premium. Decide with economics: if the goal is reported Scope 2, annual PPAs are the cheaper instrument; hourly CFE only pays where a customer or regulator demands it.
+                            </p>
                         </div>
                     </div>
 

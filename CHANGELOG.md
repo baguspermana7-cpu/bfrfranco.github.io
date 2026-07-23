@@ -13,6 +13,15 @@ release sections rather than semver.
 
 ---
 
+## v1.115.34 — 2026-07-24 (DCMOC — Workstream H: Asset · Reliability · Sustainability · Financial deepened)
+
+### Added
+- **Asset Intelligence**: Replacement CAPEX Schedule (engine `asset.replacementSchedule` over the 7 lifecycle classes, 15-yr horizon, per-year bars; Li-ion flagged ALT, no double count), screening FMEA criticality ranking (Weibull CDF × MTTR × units, top-3 FOCUS), at-risk → spares newsvendor link.
+- **Reliability**: Redundancy What-If via engine `reliability.kOutOfN` — UPS + genset at N/N+1/2N with per-step cost and the technology-economics verdict incl. the explicit "negligible — the simpler N+1 option wins" branch + $/downtime-minute break-even; chain-derived SPOF list (single-path series elements + remediation); Monte-Carlo availability band (200 seeded-LCG re-runs, MTBF/MTTR ±20% → P10/P50/P90 vs tier target).
+- **Sustainability**: facility-level water table via engine `water.facilityFootprint` (climate-adjusted WUE, upstream-power water — with the honest note that on fossil grids the upstream share dominates), CUE row + ERF rendered honestly as 0 (no heat reuse modeled), 24/7 CFE note card (annual % vs not-modeled-hourly, no fake numbers).
+- **Financial**: WACC basis + scenario NPV table (base / rate+200bp / rev−15% / capex+10% via engine roi, NOT-ROBUST banner), break-even occupancy (bisection on the page's own cashflow), TCO $/kW·mo KPI benchmarked against the market colo price — replacing a mislabeled `DATA.decision.revenuePerKwMonth` fallback (key never existed; $280 always fired while labeled "engine") with the real `DATA.markets` colo price or an honestly-labeled screening default.
+
+
 ## v1.115.33 — 2026-07-24 (DCMOC MEGA-SLICE — Operations accuracy program (G) · Delivery-Governance Dossier (I) · Energy Audit + Renewable Economics (J) · Capacity tabs deepened (L))
 
 ### Added

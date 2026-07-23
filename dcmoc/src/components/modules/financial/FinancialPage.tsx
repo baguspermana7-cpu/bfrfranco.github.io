@@ -21,6 +21,7 @@ import FinancialDashboard from '@/components/modules/FinancialDashboard';
 import MonteCarloDashboard from '@/components/modules/MonteCarloDashboard';
 import { fmtMoney } from '@/lib/format';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
 import { TrendingUp, ChevronRight, FileDown } from 'lucide-react';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
@@ -34,6 +35,7 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
     const country = useSimulationStore((s) => s.selectedCountry);
     const results = useCapexStore((s) => s.results);
     const runCalculation = useCapexStore((s) => s.runCalculation);
+    const cityMarket = useCapexStore((s) => s.inputs.cityMarket);
     const fin = useFinancialTracking();
     const ct = useConstructionTracking();
     const [tab, setTab] = React.useState<'overview' | 'ledger' | 'proforma' | 'montecarlo'>(initialTab ?? 'overview');
@@ -78,6 +80,60 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
         const grade = health >= 85 ? 'A' : health >= 70 ? 'B' : health >= 55 ? 'C' : health >= 40 ? 'D' : 'E';
         return { baseline, approvedRev, revised, committed, paid, cpi, spi, fac, curve, opex, opexDonut, health, grade, planMode: e?.planMode ?? true };
     }, [results, fin.transactions, fin.revisions, ct.statusMonth, ct.phaseActualPct, ct.acSpentUsd, inputs, country]);
+
+    /* ── Workstream H · WACC build-up + scenario NPV + break-even occupancy +
+     * TCO $/kW·mo — SAME cashflow construction as this page's PDF pro-forma
+     * (engine reference revenue × IT kW vs the dcContract OPEX, 15-yr flat),
+     * re-run through engine roi.npv/irr under scenario conditions. WACC basis
+     * = engine DATA.discountDefaults (Damodaran regional + country risk). ── */
+    const proforma = React.useMemo(() => {
+        if (!model) return null;
+        const m = rzModels();
+        if (!m?.roi?.npv || !m?.roi?.irr) return null;
+        const D = rzData();
+        const YEARS = 15;
+        const cid = (country?.id ?? '').toUpperCase();
+        const countryWacc: number | undefined = D?.discountDefaults?.[cid];
+        const wacc: number = countryWacc ?? D?.discountDefaults?.global ?? 0.09;
+        /* revenue reference: engine market coloPrice ($/kW·mo) when a city
+         * market is selected; else the page's screening default (the engine
+         * has no global revenue key — labeled honestly, never called engine) */
+        const MARKET_ALIAS: Record<string, string> = { virginia: 'n-virginia', malaysia: 'kuala-lumpur' };
+        const marketKey = MARKET_ALIAS[cityMarket ?? ''] ?? (cityMarket ?? 'none').replace(/_/g, '-');
+        const marketColo: number | undefined = marketKey !== 'none' ? D?.markets?.[marketKey]?.coloPrice : undefined;
+        const revRef: number = marketColo ?? 280;
+        const revSrc = marketColo != null ? `engine market coloPrice · ${marketKey}` : 'screening default $280/kW·mo (no market selected)';
+        const revenueYr = revRef * inputs.itLoad * 12;
+        const opexYr: number = model.opex ? (model.opex.totalExtended ?? model.opex.total) : revenueYr * 0.4;
+        const npvAt = (capex: number, rev: number, rate: number): number =>
+            m.roi.npv(Array.from({ length: YEARS }, () => rev - opexYr), rate) - capex;
+        const irrAt = (capex: number, rev: number): number | null => {
+            try {
+                const r = m.roi.irr([-capex, ...Array.from({ length: YEARS }, () => rev - opexYr)]);
+                return Number.isFinite(r) ? r : null;
+            } catch { return null; }
+        };
+        const baseIrr = irrAt(model.baseline, revenueYr);
+        const scenarios = [
+            { label: 'Base', npv: npvAt(model.baseline, revenueYr, wacc), irr: baseIrr, note: `WACC ${(wacc * 100).toFixed(1)}%` },
+            { label: 'Rate +200 bp', npv: npvAt(model.baseline, revenueYr, wacc + 0.02), irr: baseIrr, note: `discount ${((wacc + 0.02) * 100).toFixed(1)}% — IRR unchanged by definition` },
+            { label: 'Revenue −15%', npv: npvAt(model.baseline, revenueYr * 0.85, wacc), irr: irrAt(model.baseline, revenueYr * 0.85), note: 'occupancy / pricing stress' },
+            { label: 'CAPEX +10%', npv: npvAt(model.baseline * 1.1, revenueYr, wacc), irr: irrAt(model.baseline * 1.1, revenueYr), note: 'overrun stress' },
+        ];
+        /* break-even occupancy — bisection on the SAME cashflow fn (revenue
+         * scales with occupancy, OPEX held constant = conservative screening) */
+        const f = (occ: number): number => npvAt(model.baseline, revenueYr * occ, wacc);
+        let breakEven: number | null = null;
+        const reachable = f(1) > 0;
+        if (reachable && f(0) < 0) {
+            let lo = 0, hi = 1;
+            for (let i = 0; i < 40; i++) { const mid = (lo + hi) / 2; if (f(mid) > 0) hi = mid; else lo = mid; }
+            breakEven = (lo + hi) / 2;
+        }
+        const tcoPerKwMo = inputs.itLoad > 0 ? (model.baseline / YEARS + opexYr) / (inputs.itLoad * 12) : 0;
+        const stressedNegative = scenarios.filter((sc) => sc.npv < 0).length;
+        return { wacc, countryWacc, cid, revRef, revSrc, revenueYr, opexYr, years: YEARS, scenarios, breakEven, reachable, tcoPerKwMo, stressedNegative };
+    }, [model, country, inputs.itLoad, cityMarket]);
 
     if (!results || !model) return <div className="p-8 text-center text-sm text-slate-500">Calculating…</div>;
 
@@ -173,7 +229,64 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                 </div>
             </div>
 
-            {tab === 'proforma' ? <FinancialDashboard /> : tab === 'montecarlo' ? <MonteCarloDashboard /> : tab === 'ledger' ? (
+            {tab === 'proforma' ? (
+                <div className="space-y-4">
+                    {/* ── Workstream H · WACC build-up + scenario NPV (screening) ── */}
+                    {!proforma ? (
+                        <p className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 px-3 py-2 text-[11px] text-slate-500">Engine roi model unavailable — scenario NPV / break-even screening hidden (full pro-forma below unaffected).</p>
+                    ) : (
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                                WACC Basis & Scenario NPV <InfoTip content="Screening scenario layer over the same cashflow construction as this page's PDF pro-forma: reference revenue ($/kW·mo × IT kW × 12; engine market coloPrice when a city market is selected) minus the engine dcContract annual OPEX, 15 years flat, discounted through engine roi.npv/irr. The discount basis is the engine's regional WACC table (Damodaran regional cost of capital + country risk) — country-specific where the table has the selected country, else the global default. Scenario conditions replace point estimates: a project that only clears its hurdle in the Base row is not robust — if mild stress (rate +200 bp, revenue −15%, CAPEX +10%) flips NPV negative, the smaller/simpler build or a later phase-in wins. The detailed year-by-year pro-forma below remains the full model; this card is the stress screen." />
+                                <span className="ml-1 text-[9px] normal-case text-slate-400">engine roi.npv/irr · same cashflow as the PDF pro-forma · screening</span>
+                            </h2>
+                            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                                <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+                                    <div className="text-[10px] uppercase tracking-wide text-slate-500">WACC (discount basis) <InfoTip content={`Weighted average cost of capital used as the discount rate: ${proforma.countryWacc != null ? `country-specific rate for ${country?.name ?? proforma.cid} from the engine regional WACC table` : `no country-specific entry for ${country?.name ?? 'the selected country'} in the engine table — global default applied`} (Damodaran regional WACC + country risk, 2026). Band: developed markets ~7-9%, emerging ~11-13%. A higher-WACC country needs proportionally stronger cashflows for the same NPV — the same design can be bankable in one country and not in another.`} /></div>
+                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{(proforma.wacc * 100).toFixed(1)}%</div>
+                                    <div className="truncate text-[10px] text-slate-500">{proforma.countryWacc != null ? `country rate · ${proforma.cid}` : 'global default (no country entry)'}</div>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+                                    <div className="text-[10px] uppercase tracking-wide text-slate-500">TCO $/kW·mo <InfoTip content={`Total cost of ownership per kW of IT per month: (CAPEX amortized straight-line over ${proforma.years} yr + annual OPEX) ÷ (IT kW × 12). Benchmark against the reference revenue of $${proforma.revRef}/kW·mo (${proforma.revSrc}): TCO at or above the revenue line is structurally loss-making before financing costs; healthy colo/wholesale economics usually want TCO comfortably below ~70-80% of achievable revenue. Screening amortization — no cost of capital inside this KPI (that's what the NPV rows are for).`} /></div>
+                                    <div className={`text-lg font-bold tabular-nums ${proforma.tcoPerKwMo < proforma.revRef ? 'text-slate-900 dark:text-white' : 'text-rose-500'}`}>${proforma.tcoPerKwMo.toFixed(0)}</div>
+                                    <div className="truncate text-[10px] text-slate-500">vs revenue ref ${proforma.revRef}/kW·mo</div>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+                                    <div className="text-[10px] uppercase tracking-wide text-slate-500">Break-even Occupancy <InfoTip content="Occupancy at which NPV = 0, solved by deterministic bisection (≤40 iterations) on the same cashflow function — revenue scales with occupancy while OPEX is held constant, which is conservative (real OPEX falls somewhat at low occupancy). Band: a break-even below ~60% leaves healthy leasing headroom; 60-80% is normal; above ~85% means the business case only works nearly full — one anchor-tenant delay breaches it. 'Not reachable' means NPV stays negative even at 100% occupancy: the problem is cost or rate, not leasing." /></div>
+                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{proforma.breakEven != null ? `${(proforma.breakEven * 100).toFixed(0)}%` : proforma.reachable ? '<1%' : 'not reachable'}</div>
+                                    <div className="truncate text-[10px] text-slate-500">{proforma.reachable ? (proforma.breakEven != null && proforma.breakEven > 0.85 ? 'thin — breach on one tenant delay' : 'NPV=0 · revenue-scaling, OPEX held') : 'NPV < 0 even at 100% — cost/rate problem'}</div>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+                                    <div className="text-[10px] uppercase tracking-wide text-slate-500">Annual Cashflow (base) <InfoTip content={`Reference revenue ${fmtMoney(proforma.revenueYr)} ($${proforma.revRef}/kW·mo × IT kW × 12 — ${proforma.revSrc}) minus annual OPEX ${fmtMoney(proforma.opexYr)} (engine dcContract basis) = the flat annual net cashflow the NPV/IRR rows discount over ${proforma.years} years. Flat-line screening — no escalation, no ramp; the full pro-forma below models the year-by-year detail.`} /></div>
+                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{fmtMoney(proforma.revenueYr - proforma.opexYr)}</div>
+                                    <div className="truncate text-[10px] text-slate-500">rev {fmtMoney(proforma.revenueYr)} − opex {fmtMoney(proforma.opexYr)}</div>
+                                </div>
+                            </div>
+                            <table className="mt-3 w-full text-[11px]">
+                                <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Scenario</th><th className="text-right">NPV</th><th className="text-right">IRR</th><th className="text-left pl-4">Condition</th></tr></thead>
+                                <tbody>
+                                    {proforma.scenarios.map((sc) => (
+                                        <tr key={sc.label} className="border-b border-slate-100 dark:border-slate-800/60">
+                                            <td className="py-1 text-slate-700 dark:text-slate-200">{sc.label}</td>
+                                            <td className={`text-right tabular-nums font-semibold ${sc.npv >= 0 ? 'text-rz-data' : 'text-rose-500'}`}>{fmtMoney(sc.npv)}</td>
+                                            <td className="text-right tabular-nums text-slate-600 dark:text-slate-300">{sc.irr != null ? `${(sc.irr * 100).toFixed(1)}%` : '—'}</td>
+                                            <td className="pl-4 text-[9px] text-slate-400">{sc.note}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            {proforma.stressedNegative >= 2 && (
+                                <p className="mt-2 rounded-lg border border-amber-500/30 bg-amber-500/5 px-2 py-1.5 text-[10.5px] text-slate-600 dark:text-slate-300">
+                                    <span className="mr-1.5 rounded bg-amber-500/15 px-1.5 py-0.5 text-[8.5px] font-bold text-amber-600 dark:text-amber-400">NOT ROBUST</span>
+                                    {proforma.stressedNegative} of 4 scenarios go NPV-negative — the case depends on everything going right. The simpler option (smaller first phase, less speculative capacity, or waiting for an anchor tenant) likely wins over building the full design now.
+                                </p>
+                            )}
+                            <p className="mt-1.5 text-[9px] text-slate-400">Screening: flat {proforma.years}-yr cashflow at 100% utilization reference revenue — no escalation, ramp, debt structure or tax. The pro-forma below is the detailed model; this card only stress-tests its headline.</p>
+                        </div>
+                    )}
+                    <FinancialDashboard />
+                </div>
+            ) : tab === 'montecarlo' ? <MonteCarloDashboard /> : tab === 'ledger' ? (
                 <div className="grid gap-4 xl:grid-cols-2">
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Recent Financial Transactions {fin.touched ? '' : <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">EXAMPLE LEDGER</span>}</h2>

@@ -22,11 +22,15 @@ import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { fmtMoney } from '@/lib/format';
 import { Activity, ChevronRight, FileDown } from 'lucide-react';
 
 const CAT_COLORS = ['#3b82f6', '#06b6d4', '#7DDDB4', '#f59e0b', '#ef4444', '#64748b'];
 
 interface ClassRow { cls: string; label: string; category: string; count: number; health: number; status: string; mtbfHrs: number | null; mttrHrs: number | null; fpPct: number }
+/* Workstream H — engine models.asset.replacementSchedule return shape */
+interface ReplRow { component: string; label: string; intervalYears: number; costPerKw: number; eventCostUsd: number; replacementYears: number[]; events: number; totalNominalUsd: number; alt?: boolean }
+interface CritRow extends ClassRow { crit: number }
 
 const CLASS_MAP: { cls: string; eqKey: string; label: string; category: string }[] = [
     { cls: 'switchgear', eqKey: 'switchgear', label: 'MV Switchgear', category: 'Power Infrastructure' },
@@ -82,7 +86,43 @@ export function AssetIntelligencePage() {
             critical: rows.filter((r) => r.health < 30).reduce((s, r) => s + r.count, 0),
         };
         const atRisk = rows.filter((r) => r.fpPct >= 25).reduce((s, r) => s + r.count, 0);
-        return { rows, total, catDonut, avgHealth, buckets, atRisk };
+
+        /* ── Workstream H · Replacement CAPEX Schedule — SURFACES the existing
+         * engine models.asset.replacementSchedule (DATA.asset.lifecycle intervals
+         * × $/kW × IT kW) over a 15-yr horizon. upsLiIon is an ALTERNATIVE to
+         * upsVrla (same duty) — shown for the cost-vs-refresh-cadence trade but
+         * EXCLUDED from the aggregate totals so nothing is double-counted. ── */
+        const REPL_HORIZON = 15;
+        let replacement: { rows: ReplRow[]; byYear: { year: string; cost: number }[]; total: number; horizon: number } | null = null;
+        try {
+            const lifecycleKeys: string[] = Object.keys(rzData()?.asset?.lifecycle ?? {});
+            if (m?.asset?.replacementSchedule && lifecycleKeys.length) {
+                const rrows: ReplRow[] = lifecycleKeys
+                    .map((k) => { try { const r = m.asset.replacementSchedule(k, inputs.itLoad, REPL_HORIZON); return r ? { ...r, alt: k === 'upsLiIon' } : null; } catch { return null; } })
+                    .filter((r): r is ReplRow => r != null);
+                if (rrows.length) {
+                    const byYearMap = new Map<number, number>();
+                    rrows.filter((r) => !r.alt).forEach((r) => r.replacementYears.forEach((y) => byYearMap.set(y, (byYearMap.get(y) ?? 0) + r.eventCostUsd)));
+                    replacement = {
+                        rows: rrows,
+                        byYear: Array.from({ length: REPL_HORIZON }, (_, i) => ({ year: `Y${i + 1}`, cost: byYearMap.get(i + 1) ?? 0 })),
+                        total: rrows.filter((r) => !r.alt).reduce((s, r) => s + r.totalNominalUsd, 0),
+                        horizon: REPL_HORIZON,
+                    };
+                }
+            }
+        } catch { /* engine absent — section renders an honest unavailable line */ }
+
+        /* ── Workstream H · Criticality ranking — screening FMEA-style priority:
+         * score = Weibull failure probability × MTTR (h) × unit count. Pure
+         * re-use of numbers already computed on this page + engine IEEE-493
+         * MTTR — no new model. ── */
+        const criticality: CritRow[] = rows
+            .filter((r) => r.mttrHrs != null)
+            .map((r) => ({ ...r, crit: (r.fpPct / 100) * (r.mttrHrs ?? 0) * r.count }))
+            .sort((a, b) => b.crit - a.crit);
+
+        return { rows, total, catDonut, avgHealth, buckets, atRisk, replacement, criticality };
     }, [inputs.itLoad, req.workload.avgRackDensityKw, ageYears, condition]);
 
     const [busy, setBusy] = React.useState(false);
@@ -265,6 +305,82 @@ export function AssetIntelligencePage() {
                                     </Bar>
                                 </BarChart>
                             </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    {/* ── Workstream H · Criticality ranking (screening FMEA) ── */}
+                    <div className="grid gap-4 xl:grid-cols-[1.2fr_1fr]">
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                                Criticality Ranking <InfoTip content="Screening FMEA-style prioritization: score = Weibull failure probability (at the set fleet age) × MTTR hours × unit count. It ranks WHERE maintenance money buys the most risk reduction — a class with modest failure probability but long repair time and many units can outrank a rarer, fast-to-fix failure. Bands: top-3 = focus PM/spares budget here; mid = routine CBM; low = run standard PM. It is a screening rank, not a quantified FMECA — severity/detection are not modeled." />
+                                <span className="ml-1 text-[9px] normal-case text-slate-400">score = failure prob × MTTR × units · screening</span>
+                            </h2>
+                            {model.criticality.length === 0 ? (
+                                <p className="text-[11px] text-slate-500">No classes with engine MTTR data at this configuration.</p>
+                            ) : (
+                                <table className="w-full text-[11px]">
+                                    <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">#</th><th className="text-left">Class</th><th className="text-right">Weibull CDF</th><th className="text-right">MTTR</th><th className="text-right">Units</th><th className="text-right">Score</th></tr></thead>
+                                    <tbody>
+                                        {model.criticality.map((r, i) => (
+                                            <tr key={r.cls + r.label} className="border-b border-slate-100 dark:border-slate-800/60">
+                                                <td className="py-1 tabular-nums text-slate-500">{i + 1}{i < 3 && <span className="ml-1 rounded bg-rose-500/15 px-1 py-0.5 text-[8px] font-bold text-rose-500">FOCUS</span>}</td>
+                                                <td className="text-slate-700 dark:text-slate-200">{r.label}</td>
+                                                <td className="text-right tabular-nums text-slate-500">{r.fpPct}%</td>
+                                                <td className="text-right tabular-nums text-slate-500">{r.mttrHrs} h</td>
+                                                <td className="text-right tabular-nums text-slate-500">{r.count.toLocaleString()}</td>
+                                                <td className="text-right"><span className={`tabular-nums font-semibold ${i < 3 ? 'text-rose-500' : 'text-slate-600 dark:text-slate-300'}`}>{r.crit.toFixed(1)}</span></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+                            {model.criticality.some((r) => r.fpPct >= 25) && (
+                                <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 px-2 py-1.5 text-[10.5px] text-slate-600 dark:text-slate-300">
+                                    <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[8.5px] font-bold text-amber-600 dark:text-amber-400">≥25% CDF</span>
+                                    <span className="min-w-0 flex-1">{model.criticality.filter((r) => r.fpPct >= 25).map((r) => r.label).join(', ')} — at wear-out risk; stock per newsvendor — see Spares Optimization.</span>
+                                    <button onClick={() => setActiveTab('spares')} className="shrink-0 rounded-lg border border-amber-500/40 px-2 py-1 text-[10px] font-medium text-amber-600 dark:text-amber-400 hover:border-rz-mint">Spares Optimization →</button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* ── Workstream H · Replacement CAPEX Schedule (engine) ── */}
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                                Replacement CAPEX Schedule <InfoTip content={`Depreciation / refresh-planning view from the engine lifecycle model (models.asset.replacementSchedule): each class's replacement interval × $/kW × IT kW over a ${model.replacement?.horizon ?? 15}-yr horizon, nominal dollars (no escalation/discounting). Cost-vs-risk balance: deferring a replacement past its interval saves CAPEX today but pushes the class into the Weibull wear-out zone (see the CDF column above) — cheap only until failures cluster. UPS Li-Ion is shown as an alternative to VRLA (longer interval, higher $/kW); it is excluded from the totals so nothing is double-counted.`} />
+                                <span className="ml-1 text-[9px] normal-case text-slate-400">engine lifecycle model · nominal $</span>
+                            </h2>
+                            {!model.replacement ? (
+                                <p className="text-[11px] text-slate-500">Engine lifecycle model unavailable — no replacement schedule to show.</p>
+                            ) : (
+                                <>
+                                    <table className="w-full text-[11px]">
+                                        <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Component</th><th className="text-right">Interval</th><th className="text-right">Per Event</th><th className="text-right">Years</th><th className="text-right">{model.replacement.horizon}-yr Total</th></tr></thead>
+                                        <tbody>
+                                            {model.replacement.rows.map((r) => (
+                                                <tr key={r.component} className={`border-b border-slate-100 dark:border-slate-800/60 ${r.alt ? 'opacity-60' : ''}`}>
+                                                    <td className="py-1 text-slate-700 dark:text-slate-200">{r.label}{r.alt && <span className="ml-1 rounded bg-slate-500/10 px-1 py-0.5 text-[8px] text-slate-500">ALT — excl. totals</span>}</td>
+                                                    <td className="text-right tabular-nums text-slate-500">{r.intervalYears} yr</td>
+                                                    <td className="text-right tabular-nums text-slate-500">{fmtMoney(r.eventCostUsd)}</td>
+                                                    <td className="text-right tabular-nums text-slate-500">{r.replacementYears.length ? r.replacementYears.join(', ') : '— beyond horizon'}</td>
+                                                    <td className="text-right tabular-nums font-semibold text-slate-600 dark:text-slate-300">{fmtMoney(r.totalNominalUsd)}</td>
+                                                </tr>
+                                            ))}
+                                            <tr><td className="py-1 font-semibold text-slate-700 dark:text-slate-200">Total (excl. ALT)</td><td colSpan={3} /><td className="text-right tabular-nums font-bold text-slate-900 dark:text-white">{fmtMoney(model.replacement.total)}</td></tr>
+                                        </tbody>
+                                    </table>
+                                    <div className="mt-2 h-24">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={model.replacement.byYear} margin={{ top: 2, right: 4, left: 4, bottom: 0 }}>
+                                                <XAxis dataKey="year" tick={{ fontSize: 8 }} interval={1} />
+                                                <YAxis tick={{ fontSize: 8 }} tickFormatter={(v) => `$${(Number(v) / 1e6).toFixed(1)}M`} width={40} />
+                                                <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 10, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8, color: '#f1f5f9' }} />
+                                                <Bar dataKey="cost" name="Replacement CAPEX" fill="#f59e0b" radius={[2, 2, 0, 0]} />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                    <p className="mt-1 text-[9px] text-slate-400">Nominal $, no escalation/discounting — a budgeting cadence, not a financed plan. A class past its interval isn&apos;t an automatic replace: if its Weibull CDF is still low, running it on condition monitoring is the cheaper option.</p>
+                                </>
+                            )}
                         </div>
                     </div>
 
