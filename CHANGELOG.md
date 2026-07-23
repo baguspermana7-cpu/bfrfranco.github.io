@@ -13,6 +13,14 @@ release sections rather than semver.
 
 ---
 
+## v1.115.30 — 2026-07-24 (DCMOC — Auto/Manual Optimizer + Capacity At-Risk diagnostic modal)
+
+### Added
+- **Auto/Manual Optimizer (Workstream D)**: `lib/optimizer/tunables.ts` — the reviewable ALLOWLIST of fine-tune parameters Auto may move (revenue $/kW·mo band 100–300, CAPEX contingency 5–15%, design margin 5–30%, maintenance in-house share), with `LOCKED_FIELDS` (IT MW, tier, cooling, redundancy, country, workload, phases) asserted before every Apply. `lib/optimizer/optimize.ts` — deterministic bisection over the page's OWN verdict model (capex-weighted phase IRR), honest infeasibility (band edge can't clear → "nothing applied" verdict). Phased-Finance red IRR/NPV/PI modals now carry **Auto-optimize** → proposal preview (from→to, IRR/NPV deltas, guard note) → explicit **Apply** writes only `revenuePerKwMonth` (new persisted sim tunable; all revenue math now derives from it).
+- **Capacity Planning At-Risk/Watch chips → shared DiagnosticModal**: the inline expansion is replaced by the Workstream-C modal (reason + bisection-solved levers + jump-to-tab), consistent with Phased-Finance.
+- **Permanent gate `tools/_dcmoc_optimizer_probe.mjs`** (8 assertions): red IRR → modal → Auto-optimize → feasible proposal → Apply clears the NO-GO → requirement base data byte-identical. 8/8 green.
+
+
 ## v1.115.29 — 2026-07-24 (article-28 — hero image + fixed card thumbnail)
 
 ### Added

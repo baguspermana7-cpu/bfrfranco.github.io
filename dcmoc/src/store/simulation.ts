@@ -21,6 +21,9 @@ export interface SimulationState {
         maintenanceStrategy: 'reactive' | 'planned' | 'predictive';
         maintenanceModel: 'in-house' | 'vendor' | 'hybrid';
         hybridRatio: number;
+        /** Optimizer tunable (Workstream D): colo revenue price $/kW-mo — a commercial
+         *  fine-tune the Auto-optimizer may move inside its band; default 150. */
+        revenuePerKwMonth?: number;
         headcount_ShiftLead: number;
         headcount_Engineer: number;
         headcount_Technician: number;
@@ -90,6 +93,7 @@ export const useSimulationStore = create<SimulationState>()(persist((set) => ({
         // Phase 16 Add
         maintenanceModel: 'hybrid', // Default to Hybrid for demo
         hybridRatio: 0.3, // 30% In-house / 70% Vendor
+        revenuePerKwMonth: 150,
         // Default Headcounts (Standard Site)
         headcount_ShiftLead: 4, // 4 Team Leaders on 4on/4off rotation
         headcount_Engineer: 5,  // 4 on shift + 1 floating/relief

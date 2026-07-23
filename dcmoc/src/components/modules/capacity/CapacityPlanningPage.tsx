@@ -23,6 +23,7 @@ import {
 import { explainThresholdMetric, type ThresholdLeverSpec, type ThresholdMetricExplain } from '@/lib/decision-explain';
 import { Layers, ChevronRight, Zap, Snowflake, Boxes, Network, FileDown } from 'lucide-react';
 import { rzData } from '@/lib/rz-engine';
+import { DiagnosticModal } from '@/components/ui/RedValue';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
@@ -346,22 +347,21 @@ export function CapacityPlanningPage() {
                                                 })()}
                                             </div>
                                             {utilEx && utilEx.row.key === u.key && (
-                                                <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2">
-                                                    <p className="text-[10px] leading-relaxed text-slate-600 dark:text-slate-300">{utilEx.ex.reason}</p>
-                                                    <div className="mt-1 space-y-1">
-                                                        {utilEx.ex.levers.map((l, idx) => (
-                                                            <div key={idx} className="flex items-start gap-1.5 text-[10px] text-slate-600 dark:text-slate-300">
-                                                                <span className={`shrink-0 rounded px-1 py-0.5 text-[8px] font-bold text-white ${l.priority === 'HIGH' ? 'bg-rz-data' : 'bg-slate-500'}`}>{l.priority === 'HIGH' ? 'LEVER' : 'NOTE'}</span>
-                                                                <span><b>{l.label}</b> — {l.detail}
-                                                                    <button onClick={() => leverNav(l.targetTab)} className="ml-1 font-medium text-rz-mint hover:text-rz-mint/80">
-                                                                        {l.targetTab === 'phases-local' ? 'Buka Phase Plan →' : l.targetTab === 'sim' ? 'Buka Simulation →' : 'Buka Requirements →'}
-                                                                    </button>
-                                                                </span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                    <p className="mt-1 text-[8.5px] text-slate-400">Angka lever di-solve dari rantai adapter kapasitas live (bukan estimasi statis).</p>
-                                                </div>
+                                                <DiagnosticModal
+                                                    onClose={() => setUtilExplain(null)}
+                                                    diagnosis={{
+                                                        title: `${utilEx.row.label} utilization`,
+                                                        reason: utilEx.ex.reason,
+                                                        actual: `${(u.forecastPct ?? u.pct)}% (forecast peak)`,
+                                                        threshold: (u.forecastPct ?? u.pct) >= 85 ? '<85% exits At-Risk' : '<70% OK band',
+                                                        levers: utilEx.ex.levers.map((l) => ({
+                                                            label: l.label,
+                                                            detail: `${l.detail}${l.priority !== 'HIGH' ? ' (note — quantified bound, not a direct lever)' : ''}`,
+                                                            tab: l.targetTab === 'phases-local' ? undefined : l.targetTab,
+                                                        })),
+                                                        note: 'Lever magnitudes are SOLVED by bisection over the live capacity adapter chain — not static estimates. Phase-plan levers: use the Phase Plan tab on this page.',
+                                                    }}
+                                                />
                                             )}
                                         </React.Fragment>
                                     ))}

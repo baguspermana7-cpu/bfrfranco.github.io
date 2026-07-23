@@ -12,6 +12,7 @@ import { calculateTalentAvailability } from '@/modules/staffing/TalentAvailabili
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { RedValue } from '@/components/ui/RedValue';
+import { optimizeRevenueForHurdle, proposalToPatch, type OptimizeProposal } from '@/lib/optimizer/optimize';
 import { Calculator, DollarSign, TrendingUp, Target, Percent, CheckCircle2, XCircle, FileText, AlertTriangle, ChevronDown, ArrowUpRight } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer,
@@ -42,9 +43,26 @@ const PhasedFinancialDashboard = () => {
     const [isExporting, setIsExporting] = useState(false);
     const [openPhase, setOpenPhase] = useState<number | null>(null);
     const decisionRef = useRef<HTMLDivElement>(null);
+    /* Workstream D — Auto-optimize: deterministic bisection over the SAME verdict
+     * model; preview-then-Apply; only allowlisted tunables, base data locked. */
+    const [optProposal, setOptProposal] = useState<OptimizeProposal | null>(null);
+    const runAutoOptimize = () => {
+        if (!optimizeAtRev) return;
+        setOptProposal(optimizeRevenueForHurdle({
+            baseRev, hurdlePct: 12,
+            computeIrrAt: (rev) => optimizeAtRev(rev).irr,
+            computeNpvAt: (rev) => optimizeAtRev(rev).npv,
+        }));
+    };
+    const applyProposal = () => {
+        if (!optProposal?.feasible) { setOptProposal(null); return; }
+        const patch = proposalToPatch(optProposal);
+        useSimulationStore.getState().actions.setInputs(patch);
+        setOptProposal(null);
+    };
 
-    const { capacityResult, phaseFinancials, blendedIrr, blendedNpv, blendedPayback, totalInvestment, profitabilityIndex, cashflowData, adjustments, scenarios, drawSchedule, totalIDC, constructionMonths, narrative, overallExplain } = useMemo(() => {
-        if (!selectedCountry) return { capacityResult: null, phaseFinancials: [] as PhaseFinancialResult[], blendedIrr: 0, blendedNpv: 0, blendedPayback: 0, totalInvestment: 0, profitabilityIndex: 0, cashflowData: [], adjustments: { tax: 0, disaster: 0, grid: 0, talent: 0 }, scenarios: [], drawSchedule: [], totalIDC: 0, constructionMonths: 0, narrative: '', overallExplain: null as DecisionExplain | null };
+    const { capacityResult, phaseFinancials, blendedIrr, blendedNpv, blendedPayback, totalInvestment, profitabilityIndex, cashflowData, adjustments, scenarios, drawSchedule, totalIDC, constructionMonths, narrative, overallExplain, baseRev, optimizeAtRev } = useMemo(() => {
+        if (!selectedCountry) return { capacityResult: null, phaseFinancials: [] as PhaseFinancialResult[], blendedIrr: 0, blendedNpv: 0, blendedPayback: 0, totalInvestment: 0, profitabilityIndex: 0, cashflowData: [], adjustments: { tax: 0, disaster: 0, grid: 0, talent: 0 }, scenarios: [], drawSchedule: [], totalIDC: 0, constructionMonths: 0, narrative: '', overallExplain: null as DecisionExplain | null, baseRev: 150, optimizeAtRev: null as null | ((rev: number) => { irr: number; npv: number }) };
 
         // 1. Get capacity plan
         const capPlan = calculateCapacityPlan({
@@ -57,11 +75,12 @@ const PhasedFinancialDashboard = () => {
             hybridRatio: inputs.hybridRatio,
         });
 
+        const baseRev = inputs.revenuePerKwMonth ?? 150; // optimizer tunable (Workstream D)
         // 2. Cross-module adjustments
         const taxResult = calculateTaxIncentives({
             country: selectedCountry,
             totalCapex: capPlan.totalCapex,
-            annualRevenue: capPlan.totalItLoadKw * 150 * 12,
+            annualRevenue: capPlan.totalItLoadKw * baseRev * 12,
             annualOpex: capPlan.totalItLoadKw * 50 * 12,
             projectLifeYears: 20,
             discountRate: 0.10,
@@ -72,7 +91,7 @@ const PhasedFinancialDashboard = () => {
             country: selectedCountry,
             totalCapex: capPlan.totalCapex,
             itLoadKw: capPlan.totalItLoadKw,
-            annualRevenue: capPlan.totalItLoadKw * 150 * 12,
+            annualRevenue: capPlan.totalItLoadKw * baseRev * 12,
         });
 
         const gridResult = calculateGridReliability({
@@ -105,13 +124,16 @@ const PhasedFinancialDashboard = () => {
         const hurdleRate = 12; // 12% IRR hurdle
         const phaseResults: PhaseFinancialResult[] = [];
         const allPhaseCashflows: number[][] = [];
+        /* Workstream D: keep each phase's model closure so the Auto-optimizer can
+         * re-run the EXACT verdict math (capex-weighted IRR) at a candidate revenue. */
+        const phaseRunners: { capex: number; run: (mods: { revMult?: number }) => { irr: number; npv: number } }[] = [];
 
         for (let pi = 0; pi < capPlan.phases.length; pi++) {
             const phase = capPlan.phases[pi];
             const inputPhase = inputs.capacityPhases[pi];
             const phaseOccRamp = inputPhase?.occupancyRamp ?? [0.3, 0.6, 0.85, 0.95];
             const phaseCapex = phase.capex + (disasterResult.structuralCostAdder * (phase.itLoadKw / capPlan.totalItLoadKw));
-            const phaseRevenue = phase.itLoadKw * 150 * 12;
+            const phaseRevenue = phase.itLoadKw * baseRev * 12;
             const phaseOpex = phase.itLoadKw * 50 * 12 + (gridOpexAdder + insuranceOpex + talentCostAdder) * (phase.itLoadKw / capPlan.totalItLoadKw);
 
             // ONE cashflow model for verdict AND explain — the lever bisection in
@@ -119,7 +141,7 @@ const PhasedFinancialDashboard = () => {
             const runPhaseModel = (mods: { revMult?: number; capexMult?: number } = {}) => calculateFinancials({
                 totalCapex: phaseCapex * (mods.capexMult ?? 1),
                 annualOpex: phaseOpex,
-                revenuePerKwMonth: 150 * (mods.revMult ?? 1),
+                revenuePerKwMonth: baseRev * (mods.revMult ?? 1),
                 itLoadKw: phase.itLoadKw,
                 discountRate: adjustedDiscount,
                 projectLifeYears: 20,
@@ -130,6 +152,7 @@ const PhasedFinancialDashboard = () => {
                 depreciationYears: 20,
             });
             const financials = runPhaseModel();
+            phaseRunners.push({ capex: phaseCapex, run: (mods) => { const f = runPhaseModel(mods); return { irr: f.irr, npv: f.npv }; } });
 
             phaseResults.push({
                 phaseLabel: phase.label,
@@ -144,7 +167,7 @@ const PhasedFinancialDashboard = () => {
                     npv: financials.npv,
                     capex: phaseCapex,
                     payback: financials.paybackPeriodYears,
-                    revenuePerKwMonth: 150,
+                    revenuePerKwMonth: baseRev,
                     recompute: (mods) => {
                         const f = runPhaseModel(mods);
                         return { irrPct: f.irr, npv: f.npv };
@@ -168,7 +191,7 @@ const PhasedFinancialDashboard = () => {
         const runBlendedModel = (mods: { revMult?: number; capexMult?: number } = {}) => calculateFinancials({
             totalCapex: totalCapex * (mods.capexMult ?? 1),
             annualOpex: capPlan.totalItLoadKw * 50 * 12 + gridOpexAdder + insuranceOpex + talentCostAdder,
-            revenuePerKwMonth: 150 * (mods.revMult ?? 1),
+            revenuePerKwMonth: baseRev * (mods.revMult ?? 1),
             itLoadKw: capPlan.totalItLoadKw,
             discountRate: adjustedDiscount,
             projectLifeYears: 20,
@@ -186,7 +209,7 @@ const PhasedFinancialDashboard = () => {
             npv: totalNpv,
             capex: totalCapex,
             payback: avgPayback,
-            revenuePerKwMonth: 150,
+            revenuePerKwMonth: baseRev,
             recompute: (mods) => {
                 const f = runBlendedModel(mods);
                 return { irrPct: f.irr, npv: f.npv };
@@ -210,7 +233,7 @@ const PhasedFinancialDashboard = () => {
             const scenFinancials = calculateFinancials({
                 totalCapex: totalCapex * capexMult,
                 annualOpex: capPlan.totalItLoadKw * 50 * 12 + gridOpexAdder + insuranceOpex + talentCostAdder,
-                revenuePerKwMonth: 150 * revMult,
+                revenuePerKwMonth: baseRev * revMult,
                 itLoadKw: capPlan.totalItLoadKw,
                 discountRate: adjustedDiscount,
                 projectLifeYears: 20,
@@ -258,6 +281,17 @@ const PhasedFinancialDashboard = () => {
             `The profitability index of ${pi.toFixed(2)}x indicates ${pi > 1.5 ? 'strong value creation' : pi > 1 ? 'positive but modest returns' : 'value destruction'}. ` +
             `Assessment: ${overallExplain.reason}${overallExplain.levers.length > 0 ? ` ${overallExplain.levers[0].detail}` : ''}`;
 
+        /* Workstream D: verdict-faithful recompute at a candidate revenue $/kW-mo. */
+        const optimizeAtRev = (rev: number) => {
+            const mult = rev / baseRev;
+            let wIrr = 0, nSum = 0;
+            for (const pr of phaseRunners) {
+                const f = pr.run({ revMult: mult });
+                wIrr += f.irr * (pr.capex / totalCapex);
+                nSum += f.npv;
+            }
+            return { irr: wIrr, npv: nSum };
+        };
         return {
             capacityResult: capPlan,
             phaseFinancials: phaseResults,
@@ -279,6 +313,8 @@ const PhasedFinancialDashboard = () => {
             constructionMonths,
             narrative,
             overallExplain,
+            baseRev,
+            optimizeAtRev,
         };
     }, [selectedCountry, inputs]);
 
@@ -363,7 +399,7 @@ const PhasedFinancialDashboard = () => {
                             {blendedIrr >= 12 ? (
                                 <div className="text-2xl font-bold text-rz-data">{blendedIrr.toFixed(1)}%</div>
                             ) : (
-                                <RedValue className="text-2xl font-bold" diagnosis={{
+                                <RedValue className="text-2xl font-bold" onOptimize={runAutoOptimize} diagnosis={{
                                     title: 'Blended IRR', reason: overallExplain?.reason ?? 'Blended IRR is below the 12% hurdle rate.',
                                     actual: `${blendedIrr.toFixed(1)}%`, threshold: '12% hurdle', gap: `${(blendedIrr - 12).toFixed(1)} pp`,
                                     levers: (overallExplain?.levers ?? []).map((l) => ({ label: l.label, detail: l.detail, tab: l.targetTab })),
@@ -386,7 +422,7 @@ const PhasedFinancialDashboard = () => {
                             {blendedNpv >= 0 ? (
                                 <div className="text-2xl font-bold text-rz-data">{fmtMoney(blendedNpv)}</div>
                             ) : (
-                                <RedValue className="text-2xl font-bold" diagnosis={{
+                                <RedValue className="text-2xl font-bold" onOptimize={runAutoOptimize} diagnosis={{
                                     title: 'Total NPV', reason: `NPV is negative (${fmtMoney(blendedNpv)}) at the risk-adjusted discount rate — the discounted lifetime cash flows do not recover the invested capital. ${overallExplain?.reason ?? ''}`,
                                     actual: fmtMoney(blendedNpv), threshold: '≥ $0',
                                     levers: (overallExplain?.levers ?? []).map((l) => ({ label: l.label, detail: l.detail, tab: l.targetTab })),
@@ -435,7 +471,7 @@ const PhasedFinancialDashboard = () => {
                             {profitabilityIndex >= 1 ? (
                                 <div className="text-2xl font-bold text-slate-900 dark:text-white">{profitabilityIndex}x</div>
                             ) : (
-                                <RedValue className="text-2xl font-bold" diagnosis={{
+                                <RedValue className="text-2xl font-bold" onOptimize={runAutoOptimize} diagnosis={{
                                     title: 'Profitability Index', reason: `PI ${profitabilityIndex}x < 1.0 — the present value of benefits is smaller than the invested capital, so every dollar in returns less than a dollar of value. ${overallExplain?.reason ?? ''}`,
                                     actual: `${profitabilityIndex}x`, threshold: '≥ 1.0x',
                                     levers: (overallExplain?.levers ?? []).map((l) => ({ label: l.label, detail: l.detail, tab: l.targetTab })),
@@ -678,6 +714,42 @@ const PhasedFinancialDashboard = () => {
                     </CardContent>
                 </Card>
             </div>
+            {/* Workstream D — Auto-optimize preview (explicit Apply; nothing silent) */}
+            {optProposal && (
+                <div className="fixed inset-0 z-[130] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Auto-optimize proposal">
+                    <div className="absolute inset-0 bg-black/60" onClick={() => setOptProposal(null)} />
+                    <div className="relative w-full max-w-md rounded-xl border border-rz-signal/50 bg-white dark:bg-rz-elevated shadow-2xl p-4">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-rz-signal">Auto-optimize — proposal preview</div>
+                        <div className="mt-1 text-sm font-bold text-slate-900 dark:text-white">Objective: {optProposal.objective}</div>
+                        <p className="mt-2 text-xs leading-relaxed text-slate-700 dark:text-slate-300">{optProposal.narrative}</p>
+                        <div className="mt-3 space-y-1.5">
+                            {optProposal.items.map((it) => (
+                                <div key={it.key} className="flex items-center justify-between rounded border border-slate-200 dark:border-rz-2 bg-slate-50 dark:bg-slate-900/40 px-2.5 py-1.5 text-xs">
+                                    <span className="font-semibold text-slate-800 dark:text-slate-200">{it.label}</span>
+                                    <span className="font-mono tabular-nums text-slate-600 dark:text-slate-300">{it.from} → <b className="text-rz-data">{it.to}</b> {it.unit}</span>
+                                </div>
+                            ))}
+                            <div className="flex items-center justify-between px-2.5 py-1 text-[11px] text-slate-500">
+                                <span>Blended IRR</span>
+                                <span className="font-mono tabular-nums">{optProposal.before.blendedIrrPct}% → <b className={optProposal.feasible ? 'text-rz-data' : 'text-rz-alert'}>{optProposal.after.blendedIrrPct}%</b></span>
+                            </div>
+                            {optProposal.before.npvUsd != null && (
+                                <div className="flex items-center justify-between px-2.5 py-1 text-[11px] text-slate-500">
+                                    <span>Portfolio NPV</span>
+                                    <span className="font-mono tabular-nums">{fmtMoney(optProposal.before.npvUsd)} → <b className="text-rz-data">{fmtMoney(optProposal.after.npvUsd)}</b></span>
+                                </div>
+                            )}
+                        </div>
+                        <p className="mt-2 text-[10px] text-slate-400">Only allowlisted fine-tune parameters move (pricing band $100–300/kW·mo). Requirement base data — IT MW, tier, cooling, country, redundancy — is locked by the optimizer guard.</p>
+                        <div className="mt-3 flex items-center justify-end gap-2">
+                            <button onClick={() => setOptProposal(null)} className="rounded border border-slate-300 dark:border-rz-2 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">Cancel</button>
+                            {optProposal.feasible && (
+                                <button onClick={applyProposal} className="rounded bg-rz-signal px-3 py-1.5 text-xs font-bold text-rz-base hover:brightness-110">Apply</button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
