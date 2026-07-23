@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.5 — 2026-07-23 (LTC Modelling Lab — TEMPERATURE PROFILE chart to match reference)
+
+### Changed
+- **TEMPERATURE PROFILE (LIQUID LOOP)** rebuilt to the reference: two dot-marked line series (Supply blue / Return red) on a fixed 20–40–60 °C axis with 0–100% loop-length X labels, a top-right legend, and colored endpoint value pills — replacing the thin two-line sketch (odd 18/28/39 ticks, leftover monospace label font, no markers/legend/axis). Still live-wired to `model.input.supplyTemp/returnTemp`.
+
 ## v1.115.4 — 2026-07-23 (TCO Calculator — Region→Country cascade + empty-area fix; spares hero de-boxed)
 
 ### Changed

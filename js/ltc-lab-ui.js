@@ -967,43 +967,58 @@
     function tempProfileCard(model) {
         var supplyT = model.input.supplyTemp || 20;
         var returnT = model.input.returnTemp || 40;
-        var w = 340, h = 120;
-        var padL = 30, padR = 10, padT = 10, padB = 25;
+        var w = 520, h = 172;
+        var padL = 34, padR = 58, padT = 14, padB = 28;
         var plotW = w - padL - padR;
         var plotH = h - padT - padB;
-        var minT = Math.min(supplyT, 18);
-        var maxT = Math.max(returnT, supplyT + 5);
-        var tRange = maxT - minT;
+        var minT = 20, maxT = 60;               // reference fixed axis 20–60 °C
 
-        function fy(t) { return padT + plotH - ((t - minT) / tRange) * plotH; }
-        function fx(i, n) { return padL + (i / (n - 1)) * plotW; }
+        function fy(t) { return padT + plotH - ((t - minT) / (maxT - minT)) * plotH; }
+        function fx(i) { return padL + (i / 4) * plotW; }
 
-        // Supply line: flat at supplyT
-        var supplyPts = [0,1,2,3,4].map(function (i) { return fx(i,5) + ',' + fy(supplyT).toFixed(1); }).join(' ');
-        // Return line: rising from supplyT to returnT
-        var returnPts = [0,1,2,3,4].map(function (i) {
-            var t = supplyT + (returnT - supplyT) * (i / 4);
-            return fx(i,5) + ',' + fy(t).toFixed(1);
-        }).join(' ');
+        var supPts = [], retPts = [], dots = '';
+        for (var i = 0; i < 5; i++) {
+            var sy = fy(supplyT);
+            var rt = supplyT + (returnT - supplyT) * (i / 4);
+            var ry = fy(rt);
+            supPts.push(fx(i).toFixed(1) + ',' + sy.toFixed(1));
+            retPts.push(fx(i).toFixed(1) + ',' + ry.toFixed(1));
+            dots += '<circle cx="' + fx(i).toFixed(1) + '" cy="' + ry.toFixed(1) + '" r="3.4" fill="#e5484d"/>' +
+                    '<circle cx="' + fx(i).toFixed(1) + '" cy="' + sy.toFixed(1) + '" r="3.4" fill="#337eea"/>';
+        }
 
-        var yLabels = [minT, (minT + maxT)/2, maxT].map(function (t, i) {
+        var grid = '', yl = '';
+        [20, 40, 60].forEach(function (t) {
             var y = fy(t);
-            return '<text x="' + (padL - 4) + '" y="' + y.toFixed(1) + '" text-anchor="end" font-size="7" fill="currentColor" opacity="0.55">' + t.toFixed(0) + '</text>';
-        }).join('');
+            grid += '<line x1="' + padL + '" y1="' + y.toFixed(1) + '" x2="' + (padL + plotW) + '" y2="' + y.toFixed(1) + '" stroke="currentColor" stroke-width="0.6" opacity="0.10"/>';
+            yl += '<text x="' + (padL - 6) + '" y="' + (y + 3).toFixed(1) + '" text-anchor="end" font-size="10" fill="currentColor" opacity="0.5">' + t + ' °C</text>';
+        });
+        var xl = '';
+        ['0%', '25%', '50%', '75%', '100%'].forEach(function (lab, i) {
+            xl += '<text x="' + fx(i).toFixed(1) + '" y="' + (padT + plotH + 16) + '" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.5">' + lab + '</text>';
+        });
+        // endpoint value pills
+        function pill(t, color) {
+            var y = fy(t);
+            return '<rect x="' + (padL + plotW + 5) + '" y="' + (y - 8).toFixed(1) + '" width="48" height="16" rx="8" fill="' + color + '"/>' +
+                   '<text x="' + (padL + plotW + 29) + '" y="' + (y + 3.5).toFixed(1) + '" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">' + t.toFixed(1) + '°C</text>';
+        }
 
-        var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" class="ltc-temp-profile-svg" style="font-family:JetBrains Mono,monospace">' +
-            '<line x1="' + padL + '" y1="' + padT + '" x2="' + padL + '" y2="' + (padT + plotH) + '" stroke="currentColor" stroke-width="0.7" opacity="0.2"/>' +
-            '<line x1="' + padL + '" y1="' + (padT + plotH) + '" x2="' + (padL + plotW) + '" y2="' + (padT + plotH) + '" stroke="currentColor" stroke-width="0.7" opacity="0.2"/>' +
-            yLabels +
-            '<polyline points="' + supplyPts + '" fill="none" stroke="#337eea" stroke-width="2" stroke-linejoin="round"/>' +
-            '<polyline points="' + returnPts + '" fill="none" stroke="#e5484d" stroke-width="2" stroke-linejoin="round"/>' +
-            '<text x="' + (padL + plotW) + '" y="' + (fy(supplyT) - 4) + '" font-size="7" fill="#337eea" text-anchor="end">Supply ' + supplyT.toFixed(1) + '°C</text>' +
-            '<text x="' + (padL + plotW) + '" y="' + (fy(returnT) + 10) + '" font-size="7" fill="#e5484d" text-anchor="end">Return ' + returnT.toFixed(1) + '°C</text>' +
+        var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" class="ltc-temp-profile-svg">' +
+            grid + yl + xl +
+            '<polyline points="' + retPts.join(' ') + '" fill="none" stroke="#e5484d" stroke-width="2.2" stroke-linejoin="round"/>' +
+            '<polyline points="' + supPts.join(' ') + '" fill="none" stroke="#337eea" stroke-width="2.2" stroke-linejoin="round"/>' +
+            dots + pill(returnT, '#e5484d') + pill(supplyT, '#337eea') +
             '</svg>';
 
         return '<div class="ltc-temp-profile-card">' +
-            '<div class="ltc-res-card-title">TEMPERATURE PROFILE</div>' +
-            svg +
+            '<div class="ltc-tp-head">' +
+                '<div class="ltc-res-card-title">TEMPERATURE PROFILE (LIQUID LOOP)</div>' +
+                '<div class="ltc-tp-legend">' +
+                    '<span class="ltc-tp-leg ltc-tp-sup">Supply Temp (°C)</span>' +
+                    '<span class="ltc-tp-leg ltc-tp-ret">Return Temp (°C)</span>' +
+                '</div>' +
+            '</div>' + svg +
             '</div>';
     }
 
