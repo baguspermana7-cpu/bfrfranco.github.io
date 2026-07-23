@@ -13,6 +13,16 @@ release sections rather than semver.
 
 ---
 
+## v1.115.36 — 2026-07-24 (DCMOC polish — red-value diagnostics sitewide + Cx WBS full-width + hygiene)
+
+### Added
+- **Red-value diagnostic adoption widened** (owner: "tidak hanya ini tapi semua"): Construction EVM SPI/CPI < 1 (live EV/PV/AC, behind-plan phases, forecast slip + quantified levers), Financial health grade D/E + CPI/SPI passthrough (composite formula with live terms), Reliability composed availability below tier target (reuses the page's own availExplain — modal can never disagree with the panel), Sustainability overall grade C/D + every pillar score < 50 (thresholds SOLVED from the pillar formulas: score ≥ 50 ⇔ PUE ≤ 1.35 / grid share ≤ ⌊45/gi⌋% / WUE ≤ 1.1). Investment & Maintenance SLA skipped honestly — rich inline diagnostics already exist there (no double-diagnosis).
+
+### Changed
+- Commissioning WBS card now full-width (a 7-level WBS with sub-activities was cramped in a half column).
+- Dead code removed: `openWorstPhase` (superseded by the diagnostic modal) + unused `leverNav`.
+
+
 ## v1.115.35 — 2026-07-24 (LTC — country presets now pull the crawled, sourced tariffs from the shared engine)
 
 ### Changed

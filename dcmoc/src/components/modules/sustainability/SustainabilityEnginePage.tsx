@@ -21,6 +21,7 @@ import { Leaf, ChevronRight, FileDown } from 'lucide-react';
 import { Explain } from '@/components/ui/Explain';
 import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { RedValue, type Diagnosis } from '@/components/ui/RedValue';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
@@ -142,6 +143,71 @@ export function SustainabilityEnginePage() {
      * 0 — no heat-reuse path is modeled in this design. ── */
     const cue = model.scopes ? model.scopes.totalAnnual / (model.mw * 8760) : null;
 
+    /* ── Owner-mandate red-value diagnostics (shared RedValue modal) ─────────
+     * Pillar scores < 50 + overall grade C/D become clickable red values. Each
+     * diagnosis restates the pillar's OWN documented formula with the live
+     * numbers from the memo above — thresholds are solved from the same
+     * formulas (score ≥ 50 ⇔ PUE ≤ 1.35 · grid-intensity product ≤ 0.45 ·
+     * WUE ≤ 1.1), never invented. */
+    const gi = country?.environment?.gridCarbonIntensity ?? 0.7;
+    const gridShare = 100 - model.renewablePct;
+    const coolingLever = {
+        label: 'Cooling technology',
+        detail: `PUE ${model.pue} (${inputs.coolingType}, Tier ${inputs.tierLevel}) sets both the energy score and the ${model.monthlyMwh.toLocaleString()} MWh/mo facility draw — liquid/immersion options in the CAPEX cooling picker carry lower engine PUE; score ≥ 50 needs PUE ≤ 1.35 (from the same band formula).`,
+        tab: 'capex',
+    };
+    const renewableLever = {
+        label: 'Renewable option / PPA',
+        detail: `Renewable share is ${model.renewablePct}% (derived from the CAPEX renewable/cert inputs) leaving ${gridShare}% grid at ${gi} kgCO₂/kWh — carbon score ≥ 50 needs the grid share ≤ ${Math.max(0, Math.floor(45 / gi))}% at this grid factor (solved from the same formula).`,
+        tab: 'renewable-economics',
+    };
+    const pillarDiags: Record<'energy' | 'carbon' | 'water' | 'waste', Diagnosis> = {
+        energy: {
+            title: 'Energy Efficiency (PUE band)',
+            reason: `Score = (1.6 − PUE) ÷ 0.5 × 100 with design PUE ${model.pue} (${inputs.coolingType}, Tier ${inputs.tierLevel}) → ${model.energyScore}/100. Monthly energy ${model.monthlyMwh.toLocaleString()} MWh scales directly with PUE.`,
+            actual: `${model.energyScore}/100`, threshold: '≥ 50 (⇔ PUE ≤ 1.35)',
+            levers: [coolingLever],
+            tab: 'carbon',
+        },
+        carbon: {
+            title: 'Carbon Management (grid × mix)',
+            reason: `Score = (0.9 − grid intensity × grid share) ÷ 0.9 × 100 = (0.9 − ${gi} × ${gridShare}%) ÷ 0.9 → ${model.carbonScore}/100. The ${country?.name ?? 'selected country'} grid factor (${gi} kgCO₂/kWh) on a ${gridShare}% grid share dominates — site/grid and PPAs move this more than PUE tuning.`,
+            actual: `${model.carbonScore}/100`, threshold: `≥ 50 (⇔ grid share ≤ ${Math.max(0, Math.floor(45 / gi))}% at ${gi})`,
+            levers: [renewableLever],
+            tab: 'carbon',
+        },
+        water: {
+            title: 'Water Stewardship (WUE band)',
+            reason: `Score = (2.2 − WUE) ÷ 2.2 × 100 with WUE ${model.wue} L/kWh (${inputs.coolingType}, engine) → ${model.waterScore}/100${model.waterM3Yr != null ? ` — annual draw ${model.waterM3Yr.toLocaleString()} m³` : ''}.`,
+            actual: `${model.waterScore}/100`, threshold: '≥ 50 (⇔ WUE ≤ 1.1 L/kWh)',
+            levers: [
+                { label: 'Cooling technology', detail: `WUE follows the cooling choice — low-water cooling (liquid/DLC) lowers the engine WUE from ${model.wue} L/kWh; the ${model.waterM3Yr != null ? `${model.waterM3Yr.toLocaleString()} m³/yr` : 'annual'} draw scales with it.`, tab: 'capex' },
+                { label: 'Water source', detail: 'Honest note: switching source (reclaimed/river) changes the environmental COST below, not this WUE-based score — only the cooling technology moves the score.' },
+            ],
+            tab: 'carbon',
+        },
+        waste: {
+            title: 'Waste Management',
+            reason: `Score = the attested waste-diversion percentage (${sus.wasteDiversionPct ?? '—'}%) — a user-entered figure, not an engine derivation (a screening default of 60 is used in the overall composite when unset).`,
+            actual: `${model.wasteScore ?? '—'}/100`, threshold: '≥ 50% diversion',
+            levers: [
+                { label: 'Raise waste diversion', detail: 'Use the waste-diversion slider on this page (recycling + certified ITAD program) — ≥ 50% clears the band; the cost side is in the Environmental Costs card below.' },
+            ],
+            tab: 'carbon',
+        },
+    };
+    const weakest = ([['energy', model.energyScore], ['carbon', model.carbonScore], ['water', model.waterScore], ['waste', model.wasteScore ?? 60]] as const)
+        .reduce((a, b) => (b[1] < a[1] ? b : a));
+    const gradeDiag: Diagnosis | null = model.grade === 'C' || model.grade === 'D' ? {
+        title: 'Sustainability Score',
+        reason: `Overall ${model.overall}/100 = mean of energy ${model.energyScore} + carbon ${model.carbonScore} + water ${model.waterScore} + waste ${model.wasteScore ?? 60}${model.wasteScore == null ? ' (screening default — diversion unset)' : ''}. Weakest pillar: ${pillarDiags[weakest[0]].title} at ${weakest[1]}/100. Grade bands: A ≥ 85 · B ≥ 70 · C ≥ 55 · else D.`,
+        actual: `${model.grade} (${model.overall}/100)`, threshold: '≥ B (70/100)',
+        gap: `${model.overall - 70} pts`,
+        levers: [coolingLever, renewableLever, ...(pillarDiags.waste.levers ?? [])],
+        tab: 'carbon',
+        note: 'Documented composite — identical formulas to the scorecard rows below; each red pillar score is clickable for its own diagnosis.',
+    } : null;
+
     const scopeDonut = model.scopes ? [
         { name: 'Scope 1', v: model.scopes.scope1 }, { name: 'Scope 2 (location-based)', v: model.scopes.scope2 }, { name: 'Scope 3 (annualized)', v: model.scopes.scope3Annual },
     ] : [];
@@ -238,13 +304,17 @@ export function SustainabilityEnginePage() {
                             { label: 'Carbon (Annual)', value: model.scopes ? `${Math.round(model.scopes.totalAnnual).toLocaleString()} tCO₂e` : '—', sub: 'GHG Protocol scopes (engine)', trace: 'carbon.annualEmissions', tip: 'Annual greenhouse-gas emissions by GHG Protocol scope: Scope 1 (generator fuel), Scope 2 (grid electricity × the country grid-carbon factor) and a Scope 3 screening slice. The grid carbon intensity of the selected country dominates — renewables, PPAs and site selection are the real levers, not small PUE tweaks.' },
                             { label: 'Water (Annual)', value: model.waterM3Yr != null ? `${model.waterM3Yr.toLocaleString()} m³` : '—', sub: `WUE ${model.wue} L/kWh (engine) · pre-climate basis${env ? ` — env cost ×${env.climateMult} climate` : ''}`, explain: 'wue', trace: 'sus.waterAnnualM3' },
                             { label: 'Renewable Energy', value: `${model.renewablePct}%`, sub: 'derived from capex renewable/cert inputs', trace: 'sus.renewablePct', tip: 'Share of facility energy attributed to renewables, derived from the CAPEX renewable/certification inputs (solar PV, solar+BESS, green certification level) — not a separately entered figure. Raising it cuts Scope 2 carbon and lifts the sustainability score; change it via the CAPEX sustainability options.' },
-                            { label: 'Sustainability Score', value: model.grade, sub: `${model.overall}/100 · documented composite`, trace: 'sus.overallScore', tip: 'Documented composite grade (0-100 → letter) across PUE, WUE, carbon intensity, renewable share and certifications. A screening indicator of ESG-reporting readiness for comparing configurations — it is not a certification and carries no compliance weight on its own.' },
+                            { label: 'Sustainability Score', value: model.grade, sub: `${model.overall}/100 · documented composite`, trace: 'sus.overallScore', red: gradeDiag, tip: 'Documented composite grade (0-100 → letter) across PUE, WUE, carbon intensity, renewable share and certifications. A screening indicator of ESG-reporting readiness for comparing configurations — it is not a certification and carries no compliance weight on its own.' },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { tip?: string }).tip && <InfoTip content={(k as { tip?: string }).tip!} />}{(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>
                                 {(k as { trace?: string }).trace ? (
                                     <TraceValue traceId={(k as { trace?: string }).trace!}>
-                                        <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                        {(k as { red?: Diagnosis | null }).red ? (
+                                            <RedValue className="text-lg font-bold tabular-nums" diagnosis={(k as { red?: Diagnosis | null }).red!}>{k.value}</RedValue>
+                                        ) : (
+                                            <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                        )}
                                     </TraceValue>
                                 ) : (
                                     <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
@@ -308,18 +378,23 @@ export function SustainabilityEnginePage() {
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Sustainability Scorecard <span className="text-[9px] normal-case text-slate-400">documented composites</span></h2>
                             <div className="space-y-1.5">
-                                {[
-                                    ['Energy Efficiency (PUE band)', model.energyScore],
-                                    ['Carbon Management (grid × mix)', model.carbonScore],
-                                    ['Water Stewardship (WUE band)', model.waterScore],
-                                    ['Waste Management', model.wasteScore],
-                                ].map(([label, v]) => (
-                                    <div key={label as string} className="flex items-center gap-2 text-[11px]">
+                                {([
+                                    ['Energy Efficiency (PUE band)', model.energyScore, 'energy'],
+                                    ['Carbon Management (grid × mix)', model.carbonScore, 'carbon'],
+                                    ['Water Stewardship (WUE band)', model.waterScore, 'water'],
+                                    ['Waste Management', model.wasteScore, 'waste'],
+                                ] as const).map(([label, v, pk]) => (
+                                    <div key={label} className="flex items-center gap-2 text-[11px]">
                                         <span className="w-40 truncate text-slate-600 dark:text-slate-300">{label}</span>
                                         <div className="h-1.5 flex-1 rounded bg-slate-100 dark:bg-slate-800">
-                                            {v != null && <div className={`h-1.5 rounded ${(v as number) >= 70 ? 'bg-rz-data' : (v as number) >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`} style={{ width: `${v}%` }} />}
+                                            {v != null && <div className={`h-1.5 rounded ${v >= 70 ? 'bg-rz-data' : v >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`} style={{ width: `${v}%` }} />}
                                         </div>
-                                        <span className="w-9 text-right tabular-nums text-slate-500">{v != null ? `${v}` : '—'}</span>
+                                        {v != null && v < 50 ? (
+                                            /* owner mandate: a red pillar score opens its formula diagnosis */
+                                            <RedValue className="w-9 text-right tabular-nums" diagnosis={pillarDiags[pk]}>{v}</RedValue>
+                                        ) : (
+                                            <span className="w-9 text-right tabular-nums text-slate-500">{v != null ? `${v}` : '—'}</span>
+                                        )}
                                     </div>
                                 ))}
                             </div>

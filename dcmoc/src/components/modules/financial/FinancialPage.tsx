@@ -21,6 +21,7 @@ import FinancialDashboard from '@/components/modules/FinancialDashboard';
 import MonteCarloDashboard from '@/components/modules/MonteCarloDashboard';
 import { fmtMoney } from '@/lib/format';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { RedValue, type Diagnosis } from '@/components/ui/RedValue';
 import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
 import { TrendingUp, ChevronRight, FileDown } from 'lucide-react';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
@@ -136,6 +137,41 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
     }, [model, country, inputs.itLoad, cityMarket]);
 
     if (!results || !model) return <div className="p-8 text-center text-sm text-slate-500">Calculating…</div>;
+
+    /* ── Owner-mandate red-value diagnostics (shared RedValue modal) ─────────
+     * CPI/SPI here are a PASSTHROUGH from the Construction EVM (single source)
+     * and the health grade is the documented 0.3/0.35/0.35 composite — the
+     * diagnosis restates exactly those formulas with the live numbers. */
+    const bvScore = model.revised > 0 ? Math.max(0, 1 - Math.abs(model.fac - model.revised) / model.revised * 5) : 1;
+    const evmLevers: Diagnosis['levers'] = [
+        {
+            label: 'Fix at source — construction tracking',
+            detail: `CPI ${model.cpi} / SPI ${model.spi} derive from the per-phase actuals + AC entered on the Construction Engine (single source — never recomputed here); recovery (crew-up, re-sequencing, procurement) happens there.`,
+            tab: 'construction',
+        },
+        {
+            label: 'Revisions ledger (re-baseline)',
+            detail: `If the variance is scope, approve a budget revision: ${fmtMoney(model.approvedRev)} already approved on baseline ${fmtMoney(model.baseline)} → revised ${fmtMoney(model.revised)} — an approved change moves the baseline instead of dragging CPI.`,
+            tab: 'finance',
+        },
+    ];
+    const evmDiag: Diagnosis | null = !model.planMode && (model.cpi < 1 || model.spi < 1) ? {
+        title: 'CPI / SPI (Construction EVM passthrough)',
+        reason: `${model.cpi < 1 ? `CPI ${model.cpi} < 1.00 — over budget: each dollar spent earns only ${Math.round(model.cpi * 100)}¢ of planned work. ` : ''}${model.spi < 1 ? `SPI ${model.spi} < 1.00 — behind schedule. ` : ''}Against the revised budget ${fmtMoney(model.revised)} this drives FAC ${fmtMoney(model.fac)} (variance ${fmtMoney(model.fac - model.revised)}; FAC = AC + (revised − EV) ÷ CPI).`,
+        actual: `${model.cpi} / ${model.spi}`, threshold: '≥ 1.00 / ≥ 1.00',
+        levers: evmLevers,
+        tab: 'construction',
+        note: 'Passthrough from the Construction EVM tracking store — this page never recomputes the indices.',
+    } : null;
+    const gradeDiag: Diagnosis | null = model.grade === 'D' || model.grade === 'E' ? {
+        title: 'Financial Health Grade',
+        reason: `Health ${model.health}/100 = 0.3 × budget-variance score (${bvScore.toFixed(2)}) + 0.35 × CPI (${model.cpi}) + 0.35 × SPI (${model.spi}). FAC ${fmtMoney(model.fac)} vs revised budget ${fmtMoney(model.revised)} = ${((model.fac - model.revised) / model.revised * 100).toFixed(1)}% variance. Grade bands: A ≥ 85 · B ≥ 70 · C ≥ 55 · D ≥ 40 · else E.`,
+        actual: `${model.grade} (${model.health}/100)`, threshold: '≥ C (55/100)',
+        gap: `${model.health - 55} pts`,
+        levers: evmLevers,
+        tab: 'finance',
+        note: 'Documented composite — same formula as the on-card caption (0.3 budget-var + 0.35 CPI + 0.35 SPI).',
+    } : null;
 
     const insights = [
         `Budget baseline ${fmtMoney(model.baseline)} + approved changes ${fmtMoney(model.approvedRev)} → revised ${fmtMoney(model.revised)}.`,
@@ -348,13 +384,17 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                             { label: 'Total Committed', value: fmtMoney(model.committed), sub: `${Math.round((model.committed / model.revised) * 100)}% of revised`, trace: 'fin.committed' },
                             { label: 'Total Actual (Paid)', value: fmtMoney(model.paid), sub: `${Math.round((model.paid / model.revised) * 100)}% of revised`, trace: 'fin.paid' },
                             { label: 'Forecast at Completion', value: fmtMoney(model.fac), sub: model.planMode ? 'Plan Mode ≡ revised' : `variance ${fmtMoney(model.fac - model.revised)}`, trace: 'fin.fac' },
-                            { label: 'CPI / SPI', value: `${model.cpi} / ${model.spi}`, sub: 'from Construction EVM (single source)', trace: 'constr.cpi' },
+                            { label: 'CPI / SPI', value: `${model.cpi} / ${model.spi}`, sub: 'from Construction EVM (single source)', trace: 'constr.cpi', red: evmDiag },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
                                 {(k as { trace?: string }).trace ? (
                                     <TraceValue traceId={(k as { trace?: string }).trace!}>
-                                        <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                        {(k as { red?: Diagnosis | null }).red ? (
+                                            <RedValue className="text-lg font-bold tabular-nums" diagnosis={(k as { red?: Diagnosis | null }).red!}>{k.value}</RedValue>
+                                        ) : (
+                                            <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                        )}
                                     </TraceValue>
                                 ) : (
                                     <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
@@ -422,9 +462,13 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 text-center">
                                 <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Financial Health</h3>
                                 <TraceValue traceId="fin.healthScore">
-                                    <div className={`text-4xl font-bold ${model.grade === 'A' ? 'text-rz-data' : model.grade === 'B' ? 'text-lime-500' : model.grade === 'C' ? 'text-amber-500' : 'text-rose-500'}`}>
-                                        {model.grade}{model.planMode && <span className="text-base font-semibold text-slate-400"> (baseline)</span>}
-                                    </div>
+                                    {gradeDiag ? (
+                                        <RedValue className="text-4xl font-bold" diagnosis={gradeDiag}>{model.grade}</RedValue>
+                                    ) : (
+                                        <div className={`text-4xl font-bold ${model.grade === 'A' ? 'text-rz-data' : model.grade === 'B' ? 'text-lime-500' : model.grade === 'C' ? 'text-amber-500' : 'text-rose-500'}`}>
+                                            {model.grade}{model.planMode && <span className="text-base font-semibold text-slate-400"> (baseline)</span>}
+                                        </div>
+                                    )}
                                 </TraceValue>
                                 <div className="text-[10px] text-slate-500">{model.health}/100 · 0.3 budget-var + 0.35 CPI + 0.35 SPI</div>
                                 {/* audit #8: in Plan Mode the composite is DEFINITIONAL (CPI/SPI≡1, FAC≡revised

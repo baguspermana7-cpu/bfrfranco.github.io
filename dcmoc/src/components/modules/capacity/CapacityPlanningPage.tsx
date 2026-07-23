@@ -205,11 +205,6 @@ export function CapacityPlanningPage() {
         const u = util.rows.find((r) => r.key === utilExplain);
         return u ? { row: u, ex: explainUtilRow(i, u) } : null;
     }, [utilExplain, util.rows, i]);
-    const leverNav = (targetTab: string) => {
-        if (targetTab === 'phases-local') setTab('phases');
-        else setActiveTab(targetTab as never);
-    };
-
     const exportPdf = async () => {
         setBusy(true);
         try {

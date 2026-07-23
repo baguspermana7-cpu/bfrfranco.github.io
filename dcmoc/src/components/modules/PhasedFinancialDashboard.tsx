@@ -318,15 +318,6 @@ const PhasedFinancialDashboard = () => {
         };
     }, [selectedCountry, inputs]);
 
-    /** Open + scroll to the decision panel of the worst (lowest-IRR) phase. */
-    const openWorstPhase = () => {
-        if (phaseFinancials.length === 0) return;
-        let worst = 0;
-        phaseFinancials.forEach((p, i) => { if (p.irr < phaseFinancials[worst].irr) worst = i; });
-        setOpenPhase(worst);
-        decisionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
-
     if (!selectedCountry || !capacityResult) {
         return <div className="p-8 text-center text-slate-500">Select a country and configure capacity phases to view phased financial analysis.</div>;
     }

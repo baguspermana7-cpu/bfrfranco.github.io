@@ -24,6 +24,7 @@ import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNar
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { fmtMoney } from '@/lib/format';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { RedValue, type Diagnosis } from '@/components/ui/RedValue';
 import { HardHat, ChevronRight, FileDown, ClipboardList, ShieldCheck } from 'lucide-react';
 import { buildBoqModel, openBoqDossier, withProjectMeta } from '@/modules/reporting/boq/BoqDossier';
 import { buildDeliveryGovernanceModel, openDeliveryGovernanceDossier } from '@/modules/reporting/dossier/DeliveryGovernanceDossier';
@@ -74,6 +75,53 @@ export function ConstructionEngine() {
     }
 
     const statusVal: ComboValue<number> | null = t.statusMonth == null ? null : { value: t.statusMonth, isCustom: true };
+
+    /* ── Owner-mandate red-value diagnostics (shared RedValue modal) ─────────
+     * SPI/CPI < 1 only in tracking mode (Plan Mode values are definitional
+     * 1.00). Reason + levers embed the LIVE EV/PV/AC numbers from this page's
+     * own EVM — never a separate estimate. */
+    const behindLabels = e.behindKeys.map((k) => sched.rows.find((r) => r.key === k)?.label ?? k);
+    const spiDiag: Diagnosis | null = !planMode && e.spi < 1 ? {
+        title: 'SPI (Schedule Performance Index)',
+        reason: `Behind plan: earned value ${fmtMoney(e.evUsd)} vs planned value ${fmtMoney(e.pvUsd)} at status month M${t.statusMonth ?? '—'} — the site has earned only ${Math.round(e.spi * 100)}¢ of every planned dollar of work.${behindLabels.length ? ` Behind-plan phases (>5 pp under plan): ${behindLabels.join(', ')}.` : ''} Forecast completion M${e.forecastTotalMonths}${e.delayMonths > 0 ? ` (+${e.delayMonths} mo vs plan M${sched.totalMonths})` : ''}.`,
+        actual: String(e.spi), threshold: '≥ 1.00',
+        gap: `EV −${fmtMoney(e.pvUsd - e.evUsd)} vs PV`,
+        levers: [
+            {
+                label: 'Re-sequence / crew-up',
+                detail: `Recover the ${fmtMoney(e.pvUsd - e.evUsd)} earned-value shortfall on ${behindLabels.length ? behindLabels.join(', ') : 'the tracked phases'} — planned peak crew is ${t.peakManpowerPlanned}${t.manpowerOnSite != null ? ` (${t.manpowerOnSite} on site)` : ''}; sustained SPI < 0.9 warrants acceleration or a formal re-baseline.`,
+                tab: 'construction',
+            },
+            {
+                label: 'Scope / variation review',
+                detail: 'If the slip is scope growth, capture it as a change order in the Financial revisions ledger — an approved revision re-baselines PV instead of dragging SPI.',
+                tab: 'finance',
+            },
+        ],
+        tab: 'construction',
+        note: 'EVM from this page\'s tracking store: EV = Σ phase actual % × phase weight × budget; PV from the engine CPM schedule.',
+    } : null;
+    const cpiDiag: Diagnosis | null = !planMode && e.cpi < 1 ? {
+        title: 'CPI (Cost Performance Index)',
+        reason: `Over budget: earned value ${fmtMoney(e.evUsd)} vs actual cost ${fmtMoney(e.acUsd)} — every dollar spent is earning only ${Math.round(e.cpi * 100)}¢ of planned work (overrun to date ${fmtMoney(e.acUsd - e.evUsd)} against budget ${fmtMoney(budget)}). Industry experience: CPI rarely recovers once it drops below ~0.9 — act early.`,
+        actual: String(e.cpi), threshold: '≥ 1.00',
+        gap: `AC exceeds EV by ${fmtMoney(e.acUsd - e.evUsd)}`,
+        levers: [
+            {
+                label: 'Scope / variation review',
+                detail: `Review change orders in the Financial revisions ledger: the ${fmtMoney(e.acUsd - e.evUsd)} overrun either becomes an approved revision (re-baseline) or a recovery target on the remaining ${fmtMoney(Math.max(0, budget - e.acUsd))} of budget.`,
+                tab: 'finance',
+            },
+            {
+                label: 'Verify phase actuals & AC',
+                detail: `AC is user-entered (${fmtMoney(e.acUsd)}); confirm the per-phase actual % in the tracking panel — under-reported progress reads as cost overrun.`,
+                tab: 'construction',
+            },
+        ],
+        tab: 'construction',
+        note: 'CPI = EV ÷ AC on this page\'s tracking store — the Financial Engine consumes this same figure (single source).',
+    } : null;
+
     const exportPdf = async () => {
         setBusy(true);
         try {
@@ -203,14 +251,18 @@ export function ConstructionEngine() {
                     { label: 'Planned Completion', value: `M${sched.totalMonths}`, sub: `${Math.round(sched.totalMonths / 12 * 10) / 10} years`, tip: 'Baseline construction duration in months from NTP (M0), from the engine CPM schedule derived from the CAPEX timeline (L2 phase detail). Long-lead equipment — transformers, gensets, switchgear — usually sets the critical path, so procurement dates matter more than site pace.' },
                     { label: 'Forecast Completion', value: `M${e.forecastTotalMonths}`, sub: e.delayMonths > 0 ? `+${e.delayMonths} mo delay` : 'on plan', trace: 'constr.forecastMonths', tip: 'Schedule-performance-adjusted finish month: planned duration stretched by the current SPI. SPI below 1.0 pushes this out and shows as "+N mo delay". Only meaningful once actuals are entered — in Plan Mode it equals the planned completion by definition.' },
                     { label: 'Budget (Cumulative)', value: fmtMoney(budget), sub: `AC ${fmtMoney(e.acUsd)} (${budget > 0 ? Math.round((e.acUsd / budget) * 100) : 0}%)`, trace: 'capex.total', baselineChip: planMode, explain: 'total-capex', tip: 'Budget at Completion = the total CAPEX from the CAPEX engine — the cost baseline CPI measures performance against. AC is the actual cost spent to date (user-entered); the percentage is spend against budget. Re-running CAPEX with different inputs re-baselines this figure.' },
-                    { label: 'SPI', value: String(e.spi), sub: planMode ? 'baseline' : e.spi >= 1 ? 'on/ahead' : 'behind', trace: 'constr.spi', baselineChip: planMode, explain: 'spi', tip: 'Schedule Performance Index = EV ÷ PV. 1.0 = on plan, below 1.0 = behind schedule, above = ahead. In Plan Mode it is 1.00 by definition. Sustained SPI under ~0.9 usually warrants acceleration measures or a formal re-baseline — it also drives the forecast completion above.' },
-                    { label: 'CPI', value: String(e.cpi), sub: planMode ? 'baseline' : e.cpi >= 1 ? 'under budget' : 'over budget', trace: 'constr.cpi', baselineChip: planMode, explain: 'cpi', tip: 'Cost Performance Index = EV ÷ AC. 1.0 = on budget; below 1.0 means each dollar spent is earning less than a dollar of planned work (over budget). In Plan Mode it is 1.00 by definition. Industry experience: CPI rarely recovers once it drops below ~0.9 — act early.' },
+                    { label: 'SPI', value: String(e.spi), sub: planMode ? 'baseline' : e.spi >= 1 ? 'on/ahead' : 'behind', trace: 'constr.spi', baselineChip: planMode, explain: 'spi', red: spiDiag, tip: 'Schedule Performance Index = EV ÷ PV. 1.0 = on plan, below 1.0 = behind schedule, above = ahead. In Plan Mode it is 1.00 by definition. Sustained SPI under ~0.9 usually warrants acceleration measures or a formal re-baseline — it also drives the forecast completion above.' },
+                    { label: 'CPI', value: String(e.cpi), sub: planMode ? 'baseline' : e.cpi >= 1 ? 'under budget' : 'over budget', trace: 'constr.cpi', baselineChip: planMode, explain: 'cpi', red: cpiDiag, tip: 'Cost Performance Index = EV ÷ AC. 1.0 = on budget; below 1.0 means each dollar spent is earning less than a dollar of planned work (over budget). In Plan Mode it is 1.00 by definition. Industry experience: CPI rarely recovers once it drops below ~0.9 — act early.' },
                 ].map((k) => (
                     <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}${(k as { baselineChip?: boolean }).baselineChip ? ' — Plan Mode: definitional baseline values, no actuals yet' : ''}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                         <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { tip?: string }).tip && <InfoTip content={(k as { tip?: string }).tip!} />}{(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>
                         {(k as { trace?: string }).trace ? (
                             <TraceValue traceId={(k as { trace?: string }).trace!}>
-                                <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                {(k as { red?: Diagnosis | null }).red ? (
+                                    <RedValue className="text-lg font-bold tabular-nums" diagnosis={(k as { red?: Diagnosis | null }).red!}>{k.value}</RedValue>
+                                ) : (
+                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                )}
                             </TraceValue>
                         ) : (
                             <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>

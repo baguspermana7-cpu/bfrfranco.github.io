@@ -31,6 +31,7 @@ import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { ShieldCheck, ChevronRight, FileDown, ArrowUpRight } from 'lucide-react';
 import { Explain } from '@/components/ui/Explain';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { RedValue, type Diagnosis } from '@/components/ui/RedValue';
 import { explainThresholdMetric, DecisionLever } from '@/lib/decision-explain';
 /* single source of truth for the β-adjusted chain + nines formatters —
  * shared with the RAM Detail tab so both tabs show the SAME headline */
@@ -256,6 +257,21 @@ export function ReliabilityEnginePage() {
     const failures = log.alarms.filter((a) => a.status !== 'Cleared');
     const meetsTier = model.overall >= model.tierTargetFrac;
 
+    /* ── Owner-mandate red-value diagnostic (shared RedValue modal) ──────────
+     * The composed-availability VALUE itself becomes clickable when below the
+     * tier target — same computed reason + measured levers as the remediation
+     * panel (availExplain), so the modal can never disagree with the page. */
+    const availDiag: Diagnosis | null = !meetsTier && availExplain ? {
+        title: 'Composed Availability',
+        reason: availExplain.reason,
+        actual: fmtAvail(model.overall),
+        threshold: `${fmtAvail(model.tierTargetFrac)} (Tier ${inputs.tierLevel})`,
+        gap: `+${fmtDowntime(Math.max(0, model.downtimeMin - model.budgetMin))}/yr over the ${fmtDowntime(model.budgetMin)} budget (−${availExplain.gapNines.toFixed(2)} nines)`,
+        levers: availExplain.levers.map((lv) => ({ label: lv.label, detail: lv.detail, tab: lv.targetTab })),
+        tab: 'reliability',
+        note: 'Levers computed on this page\'s own β=5% common-cause-adjusted chain (direct re-run / bisection) — identical numbers to the remediation panel below, no separate estimate.',
+    } : null;
+
     /* status vs tier unavailability budget (not a flat 0.9999) */
     const statusOf = (a: number): 'meets' | 'within' | 'below' =>
         a >= model.tierTargetFrac ? 'meets' : (1 - a) <= 10 * (1 - model.tierTargetFrac) ? 'within' : 'below';
@@ -402,7 +418,7 @@ export function ReliabilityEnginePage() {
                     )}
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'Composed Availability', value: fmtAvail(model.overall), sub: meetsTier ? `meets Tier ${inputs.tierLevel} target` : `BELOW Tier ${inputs.tierLevel} target`, chip: `${ninesOf(model.overall)} nines`, title: 'β=5% common-cause screening (assumption)', trace: 'rel.composedAvailability', explain: 'availability', tip: 'System availability composed across the documented power and cooling chains, including a β=5% common-cause screening factor (redundant paths are never perfectly independent). Compared against the Uptime tier target — the chip shows the result in "nines". Redundancy depth (N+1 → 2N) and MTTR are the strongest levers; see the remediation panel when below target.' },
+                            { label: 'Composed Availability', value: fmtAvail(model.overall), sub: meetsTier ? `meets Tier ${inputs.tierLevel} target` : `BELOW Tier ${inputs.tierLevel} target`, chip: `${ninesOf(model.overall)} nines`, title: 'β=5% common-cause screening (assumption)', trace: 'rel.composedAvailability', explain: 'availability', red: availDiag, tip: 'System availability composed across the documented power and cooling chains, including a β=5% common-cause screening factor (redundant paths are never perfectly independent). Compared against the Uptime tier target — the chip shows the result in "nines". Redundancy depth (N+1 → 2N) and MTTR are the strongest levers; see the remediation panel when below target.' },
                             { label: 'Tier Target', value: fmtAvail(model.tierTargetFrac), sub: `Tier ${inputs.tierLevel} (Uptime)`, trace: 'rel.tierTarget', explain: 'tier-class', tip: 'The Uptime Institute availability expectation for the selected tier (e.g. Tier III ≈ 99.982%, Tier IV ≈ 99.995%). It is a design expectation, not a certified guarantee — the engine flags the gap whenever the composed model falls below it. Change the tier in Requirements to move this target.' },
                             { label: 'Downtime (unplanned)', value: fmtDowntime(model.downtimeMin), sub: `budget ${fmtDowntime(model.budgetMin)}`, trace: 'rel.downtimeMin', tip: 'Expected unplanned downtime per year = (1 − composed availability) × 525,600 min, shown against the tier downtime budget. Exceeding the budget usually traces to a SPOF or a long-MTTR component — the SPOF list and sensitivity table below identify which. Planned maintenance windows are excluded.' },
                             { label: 'MTBF (series composite)', value: `≈ ${(model.mtbfAll / 1000).toFixed(0)}k h`, sub: '1/Σλ serial — excl. redundancy', explain: 'mtbf', trace: 'rel.mtbfComposite' },
@@ -414,7 +430,11 @@ export function ReliabilityEnginePage() {
                                 <div className="flex items-baseline gap-1.5">
                                     {(k as { trace?: string }).trace ? (
                                         <TraceValue traceId={(k as { trace?: string }).trace!}>
-                                            <div className="text-base font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                            {(k as { red?: Diagnosis | null }).red ? (
+                                                <RedValue className="text-base font-bold tabular-nums" diagnosis={(k as { red?: Diagnosis | null }).red!}>{k.value}</RedValue>
+                                            ) : (
+                                                <div className="text-base font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                            )}
                                         </TraceValue>
                                     ) : (
                                         <div className="text-base font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>

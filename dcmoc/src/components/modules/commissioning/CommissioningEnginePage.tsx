@@ -402,8 +402,8 @@ export function CommissioningEnginePage() {
                     </div>
 
                     <div className="grid gap-4 xl:grid-cols-2">
-                        {/* level timeline */}
-                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                        {/* level timeline — full-width: a 7-level WBS with sub-activities needs the room */}
+                        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 xl:col-span-2">
                             <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Commissioning WBS (L0–L6 · calendar windows · expand levels for sub-activities)</h2>
                             {wbs?.tree ? (
                                 <GanttChart tree={wbs.tree} totalMonths={Math.max(1, Math.ceil(wbs.totalMonths))} />
