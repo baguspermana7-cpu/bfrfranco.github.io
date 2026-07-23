@@ -13,6 +13,14 @@ release sections rather than semver.
 
 ---
 
+## v1.115.23 — 2026-07-23 (DCMOC — SLD empty cooling box + Staff Model Config dead-gap → tabs)
+
+### Fixed
+- **DCMOC Architecture · Single-Line Diagram**: the cooling/BMS lanes are hidden in SLD view, but their labeled group frames (`COOLING PLANT` / `NETWORK & CONTROL`) were still drawn — leaving empty boxes. The group loop now applies the same lane guard, so an empty frame is never rendered in SLD. Logical view unchanged (`DiagramSvg.tsx`).
+
+### Changed
+- **DCMOC Operations · Staff Model Config**: the controls+results block was locked to full viewport height (`h-[calc(100vh-140px)]`), so the shorter right panel left a large dead gap and the below-fold sections (Cause-Effect Lever Map, Environmental Impact) were undiscoverable. The right panel is now an in-page **tab menu** (Overview · Environment & Risk · Power & Cooling · Cause-Effect Map); forced height dropped so height follows content. No dead gap; every section reachable (`SimulationDashboard.tsx`).
+
 ## v1.115.22 — 2026-07-23 (TCO — replace stretched market cards with a rate-outlook chart)
 
 ### Changed

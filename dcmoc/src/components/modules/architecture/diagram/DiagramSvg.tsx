@@ -115,6 +115,8 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
                 <g transform={`translate(${panX},${panY}) scale(${zoom})`} style={{ transformOrigin: 'center' }}>
                     {/* labelled group containment boxes (under everything) */}
                     {model.groups?.map((gr, i) => {
+                        // SLD hides cooling/bms NODES; drop their group frame too so no empty box remains
+                        if (sld && (gr.lane === 'cooling' || gr.lane === 'bms')) return null;
                         const accent = LANE_STROKE[gr.lane];
                         return (
                             <g key={'grp' + i}>

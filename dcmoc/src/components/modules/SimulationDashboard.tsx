@@ -41,6 +41,7 @@ export function SimulationDashboard() {
     const [aqiTouched, setAqiTouched] = useState(inputs.aqiOverride != null && inputs.aqiOverride !== baselineAqi);
     const [turnoverTouched, setTurnoverTouched] = useState(false);
     const [showLossDetail, setShowLossDetail] = useState(false);
+    const [vizTab, setVizTab] = useState<'overview' | 'environment' | 'power' | 'cause'>('overview');
     useEffect(() => {
         if (!aqiTouched) setScenarioAQI(baselineAqi);
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -194,7 +195,7 @@ export function SimulationDashboard() {
     return (
         <>
             {showWizard && <ConfigWizard onComplete={() => setShowWizard(false)} />}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:h-[calc(100vh-140px)]">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:min-h-[calc(100vh-140px)]">
 
                 {/* LEFT PANEL: CONTROLS */}
                 <div className="lg:col-span-4 bg-slate-100 dark:bg-slate-900/50 border-b lg:border-b-0 lg:border-r border-slate-300 dark:border-slate-800 p-4 lg:p-6 overflow-y-auto">
@@ -418,6 +419,25 @@ export function SimulationDashboard() {
                 {/* RIGHT PANEL: VISUALIZATION */}
                 <div className="lg:col-span-8 p-4 lg:p-8 overflow-y-auto">
 
+                    {/* section tabs — avoid a long dead-scroll; every panel reachable here */}
+                    <div className="flex flex-wrap gap-1.5 mb-6 border-b border-slate-200 dark:border-slate-800 pb-2">
+                        {([
+                            ['overview', 'Overview'],
+                            ['environment', 'Environment & Risk'],
+                            ['power', 'Power & Cooling'],
+                            ['cause', 'Cause-Effect Map'],
+                        ] as const).map(([id, label]) => (
+                            <button key={id} onClick={() => setVizTab(id)}
+                                className={clsx('rounded-md px-3 py-1.5 text-xs font-semibold transition-colors',
+                                    vizTab === id
+                                        ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300'
+                                        : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200')}>
+                                {label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {vizTab === 'overview' && (<>
                     {/* --- KPI CARDS ROW --- */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                         {/* Internal Staff Cost */}
@@ -521,6 +541,9 @@ export function SimulationDashboard() {
                         </div>
                     </div>
 
+                    </>)}
+
+                    {vizTab === 'environment' && (<>
                     {/* --- ENVIRONMENTAL PHYSICS --- */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div className="bg-slate-200 dark:bg-slate-700/50 rounded-xl p-6 border border-slate-300 dark:border-slate-600">
@@ -564,6 +587,43 @@ export function SimulationDashboard() {
                         </div>
                     </div>
 
+                    {/* Environmental Impact (relocated into Environment tab) */}
+                    <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-6 mb-6">
+                        <h3 className="text-md font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                            <CloudFog className="w-4 h-4 text-rz-data" />
+                            Environmental Impact
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            {(() => {
+                                const gridCarbonIntensity = selectedCountry!.environment?.gridCarbonIntensity ?? 0.50;
+                                const envPue = getPUE(inputs.coolingType);
+                                const annualMWh = (inputs.itLoad * envPue * 8760) / 1000;
+                                const annualCO2Tonnes = annualMWh * gridCarbonIntensity;
+                                return (
+                                    <>
+                                        <div className="bg-white dark:bg-black/30 p-3 rounded-lg text-center border border-slate-200 dark:border-slate-800/50">
+                                            <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Grid Carbon <Tooltip content="Carbon intensity of the local electricity grid in kgCO2 per kWh consumed." /></div>
+                                            <div className="text-xl font-bold text-amber-500 dark:text-amber-400">{gridCarbonIntensity.toFixed(2)}</div>
+                                            <div className="text-[10px] text-slate-500">kgCO₂/kWh</div>
+                                        </div>
+                                        <div className="bg-white dark:bg-black/30 p-3 rounded-lg text-center border border-slate-200 dark:border-slate-800/50">
+                                            <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Annual CO₂ <Tooltip content="Total Scope 2 carbon emissions from grid electricity consumption." /></div>
+                                            <div className="text-xl font-bold text-orange-500 dark:text-orange-400">{(annualCO2Tonnes / 1000).toFixed(1)}k</div>
+                                            <div className="text-[10px] text-slate-500">tonnes/year</div>
+                                        </div>
+                                        <div className="bg-white dark:bg-black/30 p-3 rounded-lg text-center border border-slate-200 dark:border-slate-800/50">
+                                            <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">WUE (est.) <Tooltip content="Water Usage Effectiveness — liters of water consumed per kWh of IT energy. Lower is better." /></div>
+                                            <div className="text-xl font-bold text-blue-500 dark:text-blue-400">{(selectedCountry!.environment?.baselineAQI ?? 50) > 80 ? '1.8' : '1.2'}</div>
+                                            <div className="text-[10px] text-slate-500">L/kWh</div>
+                                        </div>
+                                    </>
+                                );
+                            })()}
+                        </div>
+                    </div>
+                    </>)}
+
+                    {vizTab === 'power' && (<>
                     {/* --- POWER & COOLING ANALYTICS --- */}
                     <div className="bg-slate-200 dark:bg-slate-700/50 rounded-xl p-6 border border-slate-300 dark:border-slate-600 mb-6">
                         <div className="flex items-center gap-2 mb-4">
@@ -620,10 +680,11 @@ export function SimulationDashboard() {
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            {/* Cause-Effect Lever Map */}
-            <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-6 mt-6">
+                    </>)}
+
+                    {vizTab === 'cause' && (<>
+                    {/* Cause-Effect Lever Map */}
+                    <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-6">
                 <h3 className="text-md font-semibold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
                     <ArrowRight className="w-4 h-4 text-cyan-500" />
                     Cause-Effect Lever Map
@@ -698,39 +759,8 @@ export function SimulationDashboard() {
                     <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rz-data inline-block" /> Reduces cost</span>
                 </div>
             </div>
+                    </>)}
 
-            {/* Environmental Impact */}
-            <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-6 mt-6">
-                <h3 className="text-md font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                    <CloudFog className="w-4 h-4 text-rz-data" />
-                    Environmental Impact
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {(() => {
-                        const gridCarbonIntensity = selectedCountry!.environment?.gridCarbonIntensity ?? 0.50;
-                        const envPue = getPUE(inputs.coolingType);
-                        const annualMWh = (inputs.itLoad * envPue * 8760) / 1000;
-                        const annualCO2Tonnes = annualMWh * gridCarbonIntensity;
-                        return (
-                            <>
-                                <div className="bg-white dark:bg-black/30 p-3 rounded-lg text-center border border-slate-200 dark:border-slate-800/50">
-                                    <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Grid Carbon <Tooltip content="Carbon intensity of the local electricity grid in kgCO2 per kWh consumed." /></div>
-                                    <div className="text-xl font-bold text-amber-500 dark:text-amber-400">{gridCarbonIntensity.toFixed(2)}</div>
-                                    <div className="text-[10px] text-slate-500">kgCO₂/kWh</div>
-                                </div>
-                                <div className="bg-white dark:bg-black/30 p-3 rounded-lg text-center border border-slate-200 dark:border-slate-800/50">
-                                    <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">Annual CO₂ <Tooltip content="Total Scope 2 carbon emissions from grid electricity consumption." /></div>
-                                    <div className="text-xl font-bold text-orange-500 dark:text-orange-400">{(annualCO2Tonnes / 1000).toFixed(1)}k</div>
-                                    <div className="text-[10px] text-slate-500">tonnes/year</div>
-                                </div>
-                                <div className="bg-white dark:bg-black/30 p-3 rounded-lg text-center border border-slate-200 dark:border-slate-800/50">
-                                    <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1">WUE (est.) <Tooltip content="Water Usage Effectiveness — liters of water consumed per kWh of IT energy. Lower is better." /></div>
-                                    <div className="text-xl font-bold text-blue-500 dark:text-blue-400">{(selectedCountry!.environment?.baselineAQI ?? 50) > 80 ? '1.8' : '1.2'}</div>
-                                    <div className="text-[10px] text-slate-500">L/kWh</div>
-                                </div>
-                            </>
-                        );
-                    })()}
                 </div>
             </div>
         </>
