@@ -399,6 +399,11 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
 /* Commodity hint note */
 .commodity-hint { font-size: 0.68rem; color: var(--text-muted); font-style: italic; margin-top: 3px; line-height: 1.4; }
+.prov-chip { display: inline-block; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 5px; border-radius: 3px; font-style: normal; font-family: 'IBM Plex Mono', monospace; vertical-align: baseline; }
+.prov-chip.prov-screening { background: rgba(148,163,184,0.18); color: #64748b; border: 1px solid rgba(148,163,184,0.35); }
+.prov-chip.prov-catalog { background: rgba(8,145,178,0.16); color: #0e7490; border: 1px solid rgba(8,145,178,0.4); }
+[data-theme="dark"] .prov-chip.prov-screening { background: rgba(148,163,184,0.16); color: #94a3b8; }
+[data-theme="dark"] .prov-chip.prov-catalog { background: rgba(34,211,238,0.14); color: #67e8f9; border-color: rgba(34,211,238,0.4); }
 
 /* Operating Engine tab divider */
 .tab-divider { display: flex; align-items: center; color: var(--text-muted); font-size: 0.9rem; opacity: 0.4; padding: 0 2px; align-self: center; }
@@ -1751,6 +1756,13 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
               <option value="other">Other</option>
             </select>
             <div class="commodity-hint" id="c1_commodity_hint">These are typical industry defaults — adjust to your fleet's actual failure history.</div>
+            <div class="input-group" id="c1_catalog_pick_wrap" style="margin-top:8px;display:none;">
+              <label class="input-label" for="c1_catalog_part" style="font-size:0.72rem;">Pick a real catalog part <span style="font-weight:400;color:var(--text-muted);">(drives inputs from the 445-part DB)</span></label>
+              <select id="c1_catalog_part" class="input-field" onchange="catUsePartFromPicker(this.value)" aria-label="Pick a real catalog part for this commodity">
+                <option value="">— screening defaults (no specific part) —</option>
+              </select>
+            </div>
+            <div class="commodity-hint" id="c1_prov_note" style="margin-top:4px;"></div>
           </div>
           <div class="input-row">
             <div class="input-group">
@@ -4843,7 +4855,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
 
 <!-- Scripts -->
 <script src="auth.js?v=2026-07-23" defer></script>
-<script src="rz-engine.min.js?v=2026-07-21-o" defer></script>
+<script src="rz-engine.min.js?v=2026-07-23-cat" defer></script>
 <script src="script.min.js?v=2026-07-04-a11y2" defer></script>
 
 <script>
@@ -5063,11 +5075,73 @@ function applyCommodityDefaults(commodity, sourceModule) {
       }
     }
   }
+  // ── Catalog wiring (v2.5.3): populate the "pick a real part" picker filtered
+  // by this commodity + set provenance note. Screening defaults remain the base
+  // fill above (provenance=screening) until a specific part is picked. ──
+  populateCatalogPicker(commodity);
+  var provEl = document.getElementById('c1_prov_note');
+  if (provEl) {
+    var eng = _sp_eng();
+    var aggAvail = eng && eng.catalog && eng.catalog.byCommodity && eng.catalog.byCommodity(commodity);
+    provEl.innerHTML = '<span class="prov-chip prov-screening">screening</span> inputs prefilled from industry defaults'
+      + (aggAvail ? ' · <span class="prov-chip prov-catalog">catalog</span> p50 available (' + aggAvail.n + ' parts): MTBF ' + aggAvail.mtbf + ' yr · LT ' + aggAvail.leadWk + ' wk · $' + aggAvail.costUsd.toLocaleString() + ' · pick a part to drive real values' : '');
+  }
   // Update part description placeholder if currently at default
   var descEl = document.getElementById('c1_partDesc');
   if (descEl && descEl.value === 'Chiller Compressor Seal Kit') {
     var descMap = { chiller: 'Chiller Compressor Seal Kit', crac: 'CRAC Fan / Compressor Module', ups: 'UPS Battery Module', switchgear: 'MV Switchgear Circuit Breaker', transformer: 'Distribution Transformer', generator: 'Generator AVR / Control Module', pump: 'Chilled Water Pump Assembly', valve: 'Butterfly Isolation Valve', hx: 'Plate Heat Exchanger Gasket Kit', 'cooling-tower': 'Cooling Tower Fan Drive', bms: 'BMS Controller Board', fuel: 'Fuel Transfer Pump', fire: 'Fire Suppression Agent Bottle', other: 'Critical Spare Part' };
     if (descMap[commodity]) descEl.value = descMap[commodity];
+  }
+}
+
+/* ── Catalog picker (v2.5.3): map a commodity → its catalog subsystem(s), list
+ * the matching real parts in the "pick a real part" select. Mirrors the engine
+ * aggregate's COMMODITY_SUBS + the browse-tab commToSub mapping. ── */
+var COMMODITY_CATALOG_SUBS = {
+  chiller:['chiller','refrigerant-circuit'], crac:['CRAC-CRAH','AHU','dry-cooler','adiabatic-cooling'],
+  ups:['UPS','battery-system'], switchgear:['switchgear','busway','dc-busway','capacitor-bank','ATS','STS'],
+  transformer:['transformer'], generator:['diesel-generator','exhaust-system'], pump:['pump','fire-pump'],
+  valve:['valve'], hx:['heat-exchanger','CDU-coolant-distribution','cooling-manifold'], 'cooling-tower':['cooling-tower'],
+  bms:['DDC-PLC-controller','BACnet-gateway','SCADA-RTU','sensor','actuator','DCIM-sensor','power-meter'],
+  fuel:['fuel-system'], fire:['clean-agent','gas-suppression','VESDA','detection','fire-panel','sprinkler']
+};
+function populateCatalogPicker(commodity) {
+  var wrap = document.getElementById('c1_catalog_pick_wrap');
+  var sel = document.getElementById('c1_catalog_part');
+  if (!wrap || !sel) return;
+  var CAT = window.SPARES_CATALOG || null;
+  var subs = COMMODITY_CATALOG_SUBS[commodity];
+  if (!CAT || !CAT.parts || !subs) { wrap.style.display = 'none'; return; }
+  var set = {}; subs.forEach(function(s){ set[s] = 1; });
+  var parts = CAT.parts.filter(function(p){ return set[p.sub]; })
+    .sort(function(a,b){ return (b.crit||0) - (a.crit||0); });
+  if (!parts.length) { wrap.style.display = 'none'; return; }
+  var oemMap = {}; if (CAT.oems) CAT.oems.forEach(function(o){ oemMap[o.id] = o.name; });
+  var html = '<option value="">— screening defaults (no specific part) —</option>';
+  parts.forEach(function(p){
+    var oem = oemMap[p.oem] || p.oem;
+    var lbl = p.pn + ' · ' + oem + ' — $' + (p.cTyp ? p.cTyp.toLocaleString(undefined,{maximumFractionDigits:0}) : '?')
+      + ' · MTBF ' + (p.mtbf ? p.mtbf.toFixed(1) : '?') + 'yr · LT ' + (p.ltTyp || '?') + 'wk';
+    html += '<option value="' + p.id + '">' + lbl.replace(/</g,'&lt;') + '</option>';
+  });
+  sel.innerHTML = html;
+  sel.value = (window._catLoadedPartId && parts.some(function(p){ return p.id === window._catLoadedPartId; })) ? window._catLoadedPartId : '';
+  wrap.style.display = '';
+}
+/* Pick handler: '' → re-apply screening defaults (provenance=screening);
+ * a part id → route through the shared catUsePart (provenance=catalog). */
+function catUsePartFromPicker(partId) {
+  if (!partId) {
+    window._catLoadedPartId = null;
+    var commEl = document.getElementById('c1_commodity');
+    if (commEl) applyCommodityDefaults(commEl.value, 'picker');
+    if (typeof recalcAll === 'function') recalcAll();
+    return;
+  }
+  if (typeof window.catUsePart === 'function') {
+    window.catUsePart(partId);
+    var provEl = document.getElementById('c1_prov_note');
+    if (provEl) provEl.innerHTML = '<span class="prov-chip prov-catalog">catalog</span> inputs driven by real part ' + String(partId) + ' — MTBF/cost/lead/alts/severity from the 445-part DB';
   }
 }
 
@@ -8702,6 +8776,11 @@ faqData.push(
 
     // Store catalog part id in a session field so save/load can preserve it
     window._catLoadedPartId = partId;
+    // Sync the commodity-tab picker + provenance chip (v2.5.3 catalog wiring)
+    var pickSel = document.getElementById('c1_catalog_part');
+    if (pickSel) { var hasOpt = false; for (var pi = 0; pi < pickSel.options.length; pi++) { if (pickSel.options[pi].value === partId) { hasOpt = true; break; } } if (hasOpt) pickSel.value = partId; }
+    var provNote = document.getElementById('c1_prov_note');
+    if (provNote) provNote.innerHTML = '<span class="prov-chip prov-catalog">catalog</span> inputs driven by real part ' + catEsc(p.pn) + ' (' + catEsc(oemName) + ') — MTBF/cost/lead/alts/severity from the 445-part DB';
 
     // Show loaded banner
     var banner = document.getElementById('cat_loaded_banner');
@@ -11185,6 +11264,8 @@ try {
   window.calcSensitivity       = (typeof calcSensitivity       !== 'undefined') ? calcSensitivity       : null;
   window.calcProjection        = (typeof calcProjection        !== 'undefined') ? calcProjection        : null;
   window.applyCommodityDefaults = (typeof applyCommodityDefaults !== 'undefined') ? applyCommodityDefaults : null;
+  window.catUsePartFromPicker = (typeof catUsePartFromPicker !== 'undefined') ? catUsePartFromPicker : null;
+  window.populateCatalogPicker = (typeof populateCatalogPicker !== 'undefined') ? populateCatalogPicker : null;
   window.loadPreset            = (typeof loadPreset            !== 'undefined') ? loadPreset            : null;
   window.updateMCLabels        = (typeof updateMCLabels        !== 'undefined') ? updateMCLabels        : null;
   window.fleetUpdateVal        = (typeof fleetUpdateVal        !== 'undefined') ? fleetUpdateVal        : null;

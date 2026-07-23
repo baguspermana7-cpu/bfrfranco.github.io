@@ -11,6 +11,12 @@ release sections rather than semver.
 
 ---
 
+## v1.115.6 — 2026-07-23 (Spares: interactive heatmaps + count-up + 445-part catalog wired into the engine, calc & DCMOC)
+
+### Changed
+- **Spares interaction layer** (`spares-readiness-calculator.html`): the Supply-Risk × RPN and Kraljic heat-maps now show **real values on hover / focus / tap** (band × band + the current part's RPN + alternates + the recommended action) via a reusable cell tooltip — fixing the "colored boxes with no value" complaint. Replaced the cheap `sp-num` color-flash with a smooth rAF **count-up** + underline-settle on KPI/result numbers (prefers-reduced-motion safe). Added semantic **status colors** on readiness/hub % (green ≥95 / amber ≥80 / red), P(stockout), and tier (VITAL red / ESSENTIAL amber / DESIRABLE green), and a **Run-Analysis loading→done** state.
+- **445-part catalog wired as a shared engine data source** (was browse-only). New `tools/build-spares-catalog-aggregate.mjs` distils the curated 445-part catalog (`js/spares-parts-catalog.js`) into a compact per-commodity **`DATA.sparesCatalog`** aggregate (p50 MTBF/MTTR/lead-weeks/cost/alts/crit/EOL + part count) in `rz-engine.js`, exposed via **`models.spares.catalog.{commodities,byCommodity,classAggregate}`** with a `DATA.sources.sparesCatalog` provenance entry. The spares page gains a "**Pick a real catalog part**" searchable picker (filtered by commodity) that drives the real inputs (cost←cTyp, lead←ltTyp, alternates←alts, severity←crit, demand←MTBF, LTB←life/eol) with **catalog vs screening provenance chips**; screening defaults remain the fallback. DCMOC `spares-adapter.ts` layers the same catalog aggregate over its 6-class screening table into the shared `models.spares.newsvendor`. Golden-compare: the default screening path is **unchanged**; picking a real part deliberately shifts to catalog values. Engine chain green (test-rz-engine 747/0, dc-corpus 2700/0, value-bindings 85/0, calibration 19/0); `rz-engine.min.js?v` → `2026-07-23-cat`. (Deep-research crawl-enrich of the KB follows in a later ship.)
+
 ## v1.115.5 — 2026-07-23 (LTC Modelling Lab — TEMPERATURE PROFILE chart to match reference)
 
 ### Changed

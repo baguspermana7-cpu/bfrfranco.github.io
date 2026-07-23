@@ -2,9 +2,9 @@
  "generator": "tools/build-engine-catalog.mjs",
  "note": "AUTO-GENERATED from rz-engine.js — do not hand-edit. Consumers are grep-derived from real usage.",
  "dataVersion": "2.5.1",
- "modelCount": 52,
- "functionCount": 221,
- "sourceCount": 123,
+ "modelCount": 53,
+ "functionCount": 222,
+ "sourceCount": 130,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -955,6 +955,18 @@
    ]
   },
   {
+   "name": "ltc",
+   "functions": [
+    {
+     "name": "compute",
+     "params": [
+      "input"
+     ]
+    }
+   ],
+   "consumers": []
+  },
+  {
    "name": "maintCompliance",
    "functions": [
     {
@@ -1139,7 +1151,8 @@
     "dcmoc/src/components/modules/financial/FinancialPage.tsx",
     "dcmoc/src/lib/screening.ts",
     "dcmoc/src/lib/value-bindings.ts",
-    "dcmoc/src/lib/value-trace.ts"
+    "dcmoc/src/lib/value-trace.ts",
+    "tco-calculator.html"
    ]
   },
   {
@@ -1647,7 +1660,8 @@
    "consumers": [
     "dcmoc/src/components/modules/DesignToolsDashboards.tsx",
     "dcmoc/src/lib/value-bindings.ts",
-    "dcmoc/src/state/adapters/spares-adapter.ts"
+    "dcmoc/src/state/adapters/spares-adapter.ts",
+    "spares-readiness-calculator.html"
    ]
   },
   {
@@ -1785,7 +1799,8 @@
    ],
    "consumers": [
     "dcmoc/src/components/dashboard/useDashboardData.ts",
-    "dcmoc/src/lib/value-trace.ts"
+    "dcmoc/src/lib/value-trace.ts",
+    "tco-calculator.html"
    ]
   },
   {
@@ -2230,6 +2245,18 @@
    "asOf": "2026"
   },
   {
+   "key": "coolants",
+   "source": "LTC System Modelling Lab COOLANTS (ltc-system-modelling-lab.js, v2026-Q2). cp/rho verbatim. Water: IAPWS-IF97 at ~20-35 deg-C typical DC supply range. PG20/PG30: ASHRAE HoF 2021 ch.31 propylene-glycol tables at representative DC operating temperature (~25 deg-C); additional viscosity/k from /data/cdu/coolant-fluid-properties.csv (IAPWS/ASHRAE).",
+   "asOf": "2026",
+   "method": "STANDARD thermophysical properties at representative DC operating temperature"
+  },
+  {
+   "key": "coolingArchProfiles",
+   "source": "LTC System Modelling Lab COOLING_ARCH_PROFILES (ltc-system-modelling-lab.js, v2026-Q2). Architecture presets calibrated to OCP DLC reference (direct_liquid), Uptime hybrid-cooling survey benchmarks (hybrid), and ASHRAE TC9.9 close-coupled air guidelines (air_inrow_dahu). Supply/return temps: OCP/NVIDIA warm-water DLC basis + ASHRAE A3/H1 envelopes.",
+   "asOf": "2026",
+   "method": "model-calibration vs OCP/ASHRAE/Uptime reference baselines"
+  },
+  {
    "key": "coolingClimate",
    "source": "ASHRAE TC9.9 + engine internal model",
    "asOf": "2026",
@@ -2390,6 +2417,24 @@
    "asOf": "2026"
   },
   {
+   "key": "ltcCalibration",
+   "source": "LTC System Modelling Lab model calibration constants (ltc-system-modelling-lab.js computeModel, v2026-Q2). copBase 6.1 and climate/supply/control bonuses: calibrated to ASHRAE HoF 2021 ch.39 liquid-cooled chiller COP ranges for representative DC conditions (warm-water DLC 28-35 deg-C supply; temperate climate COP bias +0.38 consistent with Uptime 2026 survey DLC cohort). pumpDensityStress 0.22: hydraulic sensitivity to rack power density per CDU sizing practice. heatReuseCredit 0.62: economic credit fraction for recovered heat (LTC model convention). Score weights (ASHRAE 0.24 / ANSI 0.16 / ISO 0.16 / NFPA 0.20 / Uptime 0.24) and score-function thresholds: LTC engineering heuristic rubric, NOT a certified compliance assessment.",
+   "asOf": "2026",
+   "method": "model-calibration — review before using for a certified compliance assessment"
+  },
+  {
+   "key": "ltcClimate",
+   "source": "LTC System Modelling Lab internal climate-zone model (ltc-system-modelling-lab.js CLIMATE_FACTORS, v2026-Q2). Wet-bulb and base WUE bands calibrated to ASHRAE 169-2021 climate zones; climateCopBias from LTC model calibration vs published tropical/temperate air-cooled COP surveys (ASHRAE HoF 2021 ch.39).",
+   "asOf": "2026",
+   "method": "model-calibration against ASHRAE HoF + LTC lab empirical"
+  },
+  {
+   "key": "ltcCountryProfiles",
+   "source": "LTC System Modelling Lab country profiles (ltc-system-modelling-lab.js COUNTRY_PROFILES, v2026-Q2). Electricity prices: IEA 2025 / PLN / EMA / utility filings; water tariffs: public utility schedules; carbon intensity: Ember grid-intensity 2025; COP/PUE targets from Uptime Global Survey 2026 cohort by climate zone.",
+   "asOf": "2026",
+   "method": "SCREENING aggregate; replace with site-specific tariffs for a project"
+  },
+  {
    "key": "maintCompliance",
    "source": "Article-3 maintenance-compliance capacity model: friction factors (High .55/Med .70/Low .85 productive-time share), CMMS maturity multipliers (.70-.100), evidence multipliers (.85-.98), backlog aging weight (0.3 + 0.02/month, cap 0.5) — industry screening estimates",
    "asOf": "2026",
@@ -2488,6 +2533,12 @@
    "key": "pueMatrix.rdhx",
    "source": "Uptime Institute Global Survey 2026 rear-door cohort",
    "asOf": "2026"
+  },
+  {
+   "key": "rackProfiles",
+   "source": "LTC System Modelling Lab RACK_PROFILES (ltc-system-modelling-lab.js, v2026-Q2). Density/bias factors calibrated against OCP High Power Rack (HPR) spec, NVIDIA GB200 NVL72 reference architecture, ASHRAE TC9.9 5th Ed. rack-power envelopes, and LTC model fitting. futureBias represents projected efficiency trajectory.",
+   "asOf": "2026",
+   "method": "model-calibration vs OCP/NVIDIA/ASHRAE reference architectures"
   },
   {
    "key": "rcaScore",
@@ -2606,6 +2657,12 @@
    "source": "P. J. Acklam (2003) rational approximation to the inverse normal CDF",
    "asOf": "2026",
    "method": "numerical approximation; |relative error| < 1.15e-9 (upgraded from BSM 1977, |e|<4.5e-4, in the M2b precision pass)"
+  },
+  {
+   "key": "sparesCatalog",
+   "source": "COMPACT per-commodity p50 (median) aggregate of the curated 445-part DC spare-parts catalog (js/spares-parts-catalog.js), itself generated from the gitignored master DB data/spares-parts.sqlite by tools/build-spares-db.py (curated subset — real OEM part numbers, MTBF/MTTR, lead-time bands, list-price bands, qualified alternates, criticality, lifecycle state, EOL horizon). The engine aggregate is produced by tools/build-spares-catalog-aggregate.mjs: for each of 12 spares commodities it takes the median mtbf(yr)/mttr(hr)/ltTyp(wk)/cTyp(USD)/alts/crit/eol(months) + lifecycle mix over the parts in that commodity's catalog subsystem(s). Read via models.spares.catalog.* — feeds the newsvendor as a first-class SHARED data source (spares page real-part pick + DCMOC fleet part-mix), layered over the DATA.reliability + DATA.sparesPricing screening tables.",
+   "asOf": "2026-07",
+   "method": "median over curated catalog parts per commodity; SCREENING — a curated subset, not an OEM RCM study; regenerate when the catalog changes"
   },
   {
    "key": "sparesPricing",
