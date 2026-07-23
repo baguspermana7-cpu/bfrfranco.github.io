@@ -13,6 +13,15 @@ release sections rather than semver.
 
 ---
 
+## v1.115.24 — 2026-07-23 (DCMOC tooltips — double-title fix + Phased-Financial KPI tooltips + KpiCard explainKey)
+
+### Fixed
+- **Double tooltip** (owner screenshot): Requirements `Field` labels set a native browser `title` even when the field also renders a rich RZExplain panel — the black native box covered the panel header. Native `title` now renders ONLY when there is no `explainKey` (`requirements/ui.tsx`).
+
+### Added
+- **Phased-Financial KPI tooltips**: Total NPV, Payback, and Investment cards (previously bare) now carry detailed tooltips — definition + formula basis + what moves them + decision caveats (e.g. payback ignores time-value; NPV can be positive while IRR misses hurdle).
+- **`KpiCard.explainKey`**: KPI cards can now bind the shared RZ_EXPLAIN_DB (rich Explain tooltip) instead of a hardcoded `tip` — the enabler for the universal-tooltip sweep.
+
 ## v1.115.23 — 2026-07-23 (DCMOC — SLD empty cooling box + Staff Model Config dead-gap → tabs)
 
 ### Fixed

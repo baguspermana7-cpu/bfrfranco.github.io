@@ -3,6 +3,7 @@
 import React from 'react';
 import { Sparkline } from './Sparkline';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { Explain } from '@/components/ui/Explain';
 import { TraceValue } from '@/components/ui/TraceValue';
 
 export interface KpiCardProps {
@@ -14,6 +15,9 @@ export interface KpiCardProps {
     series?: number[];
     onClick?: () => void;
     tip?: string;
+    /** RZ_EXPLAIN_DB key — renders the shared rich Explain tooltip in the header
+     *  (preferred over `tip`; falls back to `tip`, then nothing). */
+    explainKey?: string;
     valueFormat?: (n: number) => string;
     seriesLabel?: string;
     /** value-trace id — wraps the value in the ƒx TraceValue popover */
@@ -41,7 +45,7 @@ const ACCENTS: Record<string, { text: string; iconBg: string; spark: string }> =
 
 /** DC-OS KPI card: dark panel + accent-glow + icon + big value + sub + real sparkline.
  *  Root is a <div role="button"> to allow nesting the ui/Tooltip (which contains a <button>). */
-export function KpiCard({ label, value, sub, icon: Icon, accent = 'info', series, onClick, tip, valueFormat, seriesLabel, trace }: KpiCardProps) {
+export function KpiCard({ label, value, sub, icon: Icon, accent = 'info', series, onClick, tip, explainKey, valueFormat, seriesLabel, trace }: KpiCardProps) {
     const a = ACCENTS[accent] ?? ACCENTS.info;
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -62,11 +66,15 @@ export function KpiCard({ label, value, sub, icon: Icon, accent = 'info', series
             <div className="relative flex items-start justify-between mb-1.5">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 leading-tight pr-1">{label}</span>
                 <div className="shrink-0 flex items-center gap-0.5">
-                    {tip && (
+                    {explainKey ? (
+                        <div onClick={(e) => e.stopPropagation()}>
+                            <Explain k={explainKey} />
+                        </div>
+                    ) : tip ? (
                         <div onClick={(e) => e.stopPropagation()}>
                             <Tooltip content={tip} />
                         </div>
-                    )}
+                    ) : null}
                     <span className={`w-6 h-6 rounded flex items-center justify-center ${a.iconBg}`}>
                         <Icon className={`w-3.5 h-3.5 ${a.text}`} aria-hidden="true" />
                     </span>

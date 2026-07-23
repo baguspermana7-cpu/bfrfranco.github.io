@@ -34,7 +34,9 @@ export function Field({ label, required, children, hint, explainKey }: {
      * CC cascade: EVERY Field label is hoverable — explainKey → RZExplain panel;
      * else the hint doubles as the hover title; else a generated fallback. */
     return (
-        <label className="block" title={hint ?? `${label} — parameter input`}>
+        // native `title` ONLY when there's no rich Explain panel — else the browser
+        // title tooltip renders on top of the RZExplain panel (owner: double tooltip)
+        <label className="block" title={explainKey ? undefined : (hint ?? `${label} — parameter input`)}>
             <span className="mb-1 flex items-center gap-1 border-l-2 border-rz-mint pl-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500 cursor-help">
                 {label}{required && <span className="text-rz-mint ml-0.5">*</span>}
                 {explainKey && <Explain k={explainKey} />}

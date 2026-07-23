@@ -375,6 +375,7 @@ const PhasedFinancialDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <DollarSign className="w-4 h-4 text-rz-data" />
                             <span className="text-xs text-slate-500 uppercase">Total NPV</span>
+                            <Tooltip content="Total NPV — sum of every phase's discounted net cash flows over the analysis horizon, at the risk-adjusted discount rate (WACC + risk premium). Positive = the project creates value above its cost of capital; the magnitude is how much. Moves with revenue $/kW·mo, OPEX, the discount rate, and phase timing. NPV can be positive while IRR is still below the hurdle." />
                         </div>
                         <TraceValue traceId="pf.totalNpv">
                             <div
@@ -393,6 +394,7 @@ const PhasedFinancialDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <Target className="w-4 h-4 text-amber-500" />
                             <span className="text-xs text-slate-500 uppercase">Payback</span>
+                            <Tooltip content="Payback — years until cumulative net cash flow first turns positive (nominal, simple). A screening metric only: it ignores the time value of money and any cash flows after payback — use NPV/IRR for the decision. Shorter with higher revenue or lower CAPEX/OPEX." />
                         </div>
                         <TraceValue traceId="pf.payback">
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">{blendedPayback} yr</div>
@@ -405,6 +407,7 @@ const PhasedFinancialDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <DollarSign className="w-4 h-4 text-blue-500" />
                             <span className="text-xs text-slate-500 uppercase">Investment</span>
+                            <Tooltip content="Investment — total capital across all phases (Σ phase CAPEX) including interest-during-construction (IDC). This is the denominator for IRR and PI and the amount to be financed. Driven by IT MW, tier/redundancy, cooling type, and the region cost index." />
                         </div>
                         <TraceValue traceId="pf.totalCapex">
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(totalInvestment)}</div>
