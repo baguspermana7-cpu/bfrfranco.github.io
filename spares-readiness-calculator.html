@@ -1164,15 +1164,18 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
 /* ---------- KPI STRIP -> reference 8-module cards ---------- */
 .summary-strip{ background:transparent!important; border:none!important; box-shadow:none!important; padding:1.4rem 2rem .4rem!important; max-width:1360px; margin:0 auto!important; }
 .summary-strip-title{ font-size:.72rem!important; letter-spacing:.06em; text-transform:uppercase; color:var(--sp-muted)!important; font-weight:700!important; margin-bottom:.8rem!important; }
-.summary-kpi-grid-8{ display:grid!important; grid-template-columns:repeat(8,1fr)!important; gap:.7rem!important; }
-@media(max-width:1200px){ .summary-kpi-grid-8{ grid-template-columns:repeat(4,1fr)!important; } }
+/* 4×2 so each card is wide enough for one-line values (ESSENTIAL/STRATEGIC/CRITICAL); 8-across only on very wide viewports */
+.summary-kpi-grid-8{ display:grid!important; grid-template-columns:repeat(4,1fr)!important; gap:.7rem!important; }
+@media(min-width:1650px){ .summary-kpi-grid-8{ grid-template-columns:repeat(8,1fr)!important; } }
 @media(max-width:640px){ .summary-kpi-grid-8{ grid-template-columns:repeat(2,1fr)!important; } }
 .summary-kpi{ background:var(--sp-surface)!important; border:1px solid var(--sp-line)!important; border-radius:var(--sp-radius)!important;
   padding:.85rem .8rem!important; box-shadow:var(--sp-shadow)!important; transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; position:relative; overflow:hidden; }
 .summary-kpi:hover{ transform:translateY(-2px); box-shadow:var(--sp-shadow-hover)!important; border-color:var(--sp-line-strong)!important; }
 .summary-kpi.sp-active{ border-color:var(--sp-primary)!important; box-shadow:0 0 0 1px var(--sp-primary)!important; }
 .summary-kpi-label{ font-size:.68rem!important; color:var(--sp-muted)!important; font-weight:600!important; display:flex; align-items:center; gap:4px; margin-bottom:.35rem; }
-.summary-kpi-value{ font-size:1.5rem!important; font-weight:800!important; color:var(--sp-text)!important; line-height:1.05; font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+.summary-kpi-value{ font-size:1.5rem!important; font-weight:800!important; color:var(--sp-text)!important; line-height:1.08; font-variant-numeric:tabular-nums; letter-spacing:-.02em; white-space:nowrap; }
+/* text values (tier/quadrant/status words) sit a touch smaller so long words fit one line in the 4-wide cards */
+.summary-kpi-value.sp-kpi-txt{ font-size:1.15rem!important; letter-spacing:0; }
 .summary-kpi-module{ font-size:.64rem!important; color:var(--sp-primary)!important; font-weight:700!important; margin-top:.3rem; letter-spacing:.02em; }
 
 /* ---------- TABS -> clean reference tabs ---------- */
@@ -11375,6 +11378,9 @@ if(window.MutationObserver)new MutationObserver(m).observe(document.documentElem
     var el=document.getElementById(id); if(!el) return;
     el.classList.remove('st-red','st-amber','st-green');
     var n=parseNum(txt), t=(txt||'').toUpperCase();
+    // word-only values (tier/quadrant/status) get the smaller text size so they never truncate
+    var isWord = !!(txt||'').trim() && !/\d/.test(txt||'') && (txt||'').trim()!=='—' && (txt||'').trim()!=='Run →';
+    el.classList.toggle('sp-kpi-txt', isWord);
     if(id==='sum_readiness'||id==='sum_hub_read'){ if(n!==null) el.classList.add(n>=95?'st-green':(n>=80?'st-amber':'st-red')); }
     else if(id==='sum_pstockout'){ if(n!==null) el.classList.add(n<5?'st-green':(n<15?'st-amber':'st-red')); }
     else if(id==='sum_tier'){ if(t.indexOf('VITAL')>=0) el.classList.add('st-red'); else if(t.indexOf('ESSENTIAL')>=0) el.classList.add('st-amber'); else if(t.indexOf('DESIR')>=0) el.classList.add('st-green'); }

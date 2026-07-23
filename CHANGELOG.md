@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.17 — 2026-07-23 (Spares — KPI strip tidy: no truncation, one-line values)
+
+### Fixed
+- **Spares 8-module KPI strip readability**: the single-row 8-across layout squeezed each card so word values truncated ("ESSEN…", "CRITI…", "Strat…") and labels clipped. Reworked to a **4×2 grid** (8-across only ≥1650px) so every card is wide enough for one-line values; text values (tier/quadrant/status words) use a slightly smaller size via a JS-set `.sp-kpi-txt` class, numbers stay large, `white-space:nowrap` prevents mid-word breaks. Full labels + status colors + count-up preserved.
+
 ## v1.115.16 — 2026-07-23 (LTC — REPORT A/B scenario compare)
 
 ### Added
