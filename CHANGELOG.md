@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.4 — 2026-07-23 (TCO Calculator — Region→Country cascade + empty-area fix; spares hero de-boxed)
+
+### Changed
+- **`tco-calculator.html` — Region → Country cascade** (owner: "region dulu baru negara", like DCMOC). Replaced the flat 12-metro dropdown with two selects: **Region** (Americas / Asia Pacific / Europe / MENA / Africa / LATAM) → **Country / Location** filtered by region, built on load from `RZEngine.data.countries` (40 countries) grouped by `.region`, with every existing rich US/global **metro kept** under its matching region (no metro lost). A metro selection uses the unchanged `MARKET_DATA` record (**golden-compare: N. Virginia / Dallas / Singapore TCO identical to before**); a country selection derives a market record from the engine — `power = economy.electricityRate`, `staff = baseSalary_Engineer×12` (fallback `85k×constructionIndex`), `buildCost = 12.0×constructionIndex`, tax = `economy.taxRate` (wired to the WACC tax-shield), with per-region **screening estimates** for colo/land/CAGR (seeded from regional metro averages) and projection curves escalated via the country's `inflationRate`/`laborEscalation`. Snapshot card gains Corp-Tax + Currency cells + a provenance note ("engine: power/tax/labor/build-index; screening: colo/land/cagr"). Default stays Americas / N. Virginia (unchanged view). Verified: Indonesia → power $0.090, buildCost $7.8M/MW (12×0.65); UAE → $10.2M/MW (12×0.85), tax 9%.
+- **`tco-calculator.html` — empty bottom-left area fixed**: the left `.tco-simulator-inputs` column stretched to the grid cell but the market-data card's content ended ~1332px short, leaving a dead band. Gave the inputs column `height:100%` and made the snapshot grid `flex:1` with `grid-auto-rows:minmax(44px,1fr)` so the KPI cells consume the height — dead space 1332px → 21px (padding only).
+- **`spares-readiness-calculator.html` — hero banner de-boxed**: the `data-rz-hero` + `rz-hero-fit` blur-letterbox rendered a black box when the cover image was absent. The banner is now default-hidden and reveals ONLY on a successful image load (`assets/spares-readiness-calculator-hero.webp`); onerror removes it — no dark void until the owner supplies the image.
+
 ## v1.115.3 — 2026-07-23 (LTC Modelling Lab — topbar brand + design-status radial to match reference)
 
 ### Changed

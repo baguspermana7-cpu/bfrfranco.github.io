@@ -546,6 +546,9 @@
             flex-direction: column;
             gap: 1.5rem;
             min-height: 0;
+            /* stretch to the full grid-cell height (grid default is align-items:stretch;
+               the snapshot below takes flex:1 so the left column fills the cell — no dead area) */
+            height: 100%;
         }
 
         /* Region Snapshot filler card */
@@ -576,6 +579,10 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0.5rem;
+            /* grow to consume the card's flex height so the KPI cells fill the column
+               (no dead whitespace band); rows share the remaining height evenly */
+            flex: 1;
+            grid-auto-rows: minmax(44px, 1fr);
         }
 
         .tco-snapshot-item {
@@ -585,6 +592,7 @@
             padding: 0.6rem 0.75rem;
             display: flex;
             flex-direction: column;
+            justify-content: center;
             gap: 2px;
         }
 
@@ -601,6 +609,18 @@
             color: var(--text-primary);
             font-family: 'JetBrains Mono', monospace;
         }
+
+        /* Provenance chip — shown for engine-derived (country:XX) records; pinned toward
+           the bottom of the card via margin-top:auto so the snapshot fills the flex:1
+           height with no dead whitespace band. */
+        .tco-snapshot-provenance {
+            font-size: 0.64rem;
+            color: var(--tco-primary);
+            line-height: 1.45;
+            border-top: 1px dashed rgba(79,70,229,0.2);
+            padding-top: 0.6rem;
+        }
+        .tco-snapshot-provenance:empty { display: none; }
 
         .tco-snapshot-note {
             font-size: 0.68rem;
@@ -621,6 +641,10 @@
 
         [data-theme="dark"] .tco-snapshot-value { color: #f1f5f9; }
         [data-theme="dark"] .tco-snapshot-label { color: #64748b; }
+        [data-theme="dark"] .tco-snapshot-provenance {
+            color: #a5b4fc;
+            border-top-color: rgba(99,102,241,0.28);
+        }
 
         .tco-input-row {
             display: grid;
@@ -2194,23 +2218,30 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                     <div class="tco-input-row">
                         <div class="tco-input-group">
                             <label class="tco-input-label" data-explain="tco-deployment-region">
-                                <i class="fas fa-globe-americas"></i> Deployment Region
+                                <i class="fas fa-globe-americas"></i> Region
                             </label>
+                            <!-- Region → Country cascade (region dulu baru negara). Options populated on load
+                                 from RZEngine.data.countries grouped by .region; #tcoCountry filtered per region. -->
                             <select class="tco-input-field" id="tcoRegion" aria-label="TCO Region">
-                                <option value="n-virginia" selected>N. Virginia (US)</option>
-                                <option value="dallas">Dallas (US)</option>
-                                <option value="phoenix">Phoenix (US)</option>
-                                <option value="chicago">Chicago (US)</option>
-                                <option value="singapore">Singapore</option>
-                                <option value="frankfurt">Frankfurt (DE)</option>
-                                <option value="tokyo">Tokyo (JP)</option>
-                                <option value="jakarta">Jakarta (ID)</option>
-                                <option value="sydney">Sydney (AU)</option>
-                                <option value="london">London (UK)</option>
-                                <option value="mumbai">Mumbai (IN)</option>
-                                <option value="sao-paulo">S&atilde;o Paulo (BR)</option>
+                                <option value="AMER">Americas</option>
+                                <option value="APAC">Asia Pacific</option>
+                                <option value="EMEA">Europe</option>
+                                <option value="MENA">Middle East &amp; N. Africa</option>
+                                <option value="AFR">Africa</option>
+                                <option value="LATAM">Latin America</option>
                             </select>
                         </div>
+                        <div class="tco-input-group">
+                            <label class="tco-input-label" data-explain="tco-deployment-region">
+                                <i class="fas fa-map-marker-alt"></i> Country / Location
+                            </label>
+                            <select class="tco-input-field" id="tcoCountry" aria-label="TCO Country / Location">
+                                <!-- populated by populateCountrySelect() on load -->
+                            </select>
+                        </div>
+                    </div>
+                    <!-- IT Load spans full width (its former row-mate, Region, is now paired with Country) -->
+                    <div class="tco-input-row" style="grid-template-columns:1fr;">
                         <div class="tco-input-group">
                             <label class="tco-input-label" data-explain="it-load">
                                 <i class="fas fa-bolt"></i> IT Load (MW)
@@ -2365,7 +2396,16 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                                 <span class="tco-snapshot-label"><i class="fas fa-chart-line" style="margin-right:3px;"></i>DC CAGR</span>
                                 <span class="tco-snapshot-value" id="snapshotCagr">--</span>
                             </div>
+                            <div class="tco-snapshot-item">
+                                <span class="tco-snapshot-label"><i class="fas fa-percent" style="margin-right:3px;"></i>Corp. Tax</span>
+                                <span class="tco-snapshot-value" id="snapshotTax">--</span>
+                            </div>
+                            <div class="tco-snapshot-item">
+                                <span class="tco-snapshot-label"><i class="fas fa-coins" style="margin-right:3px;"></i>Currency</span>
+                                <span class="tco-snapshot-value" id="snapshotCurrency">--</span>
+                            </div>
                         </div>
+                        <div class="tco-snapshot-provenance" id="snapshotProvenance"></div>
                         <div class="tco-snapshot-note" id="snapshotNote">
                             Source: Turner &amp; Townsend DCCI 2025, CBRE H1 2025, IEA Electricity 2025
                         </div>
@@ -2910,6 +2950,154 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             }
         };
 
+        /* ─────────── REGION → COUNTRY CASCADE (region dulu baru negara) ───────────
+         * Two-select cascade like DCMOC. #tcoRegion picks a region; #tcoCountry lists
+         * the existing rich MARKET_DATA metros for that region PLUS every
+         * RZEngine.data.countries entry in that region (value "country:XX"). Selecting a
+         * metro key uses MARKET_DATA[key] UNCHANGED (golden — identical numbers to before);
+         * selecting a country builds a MARKET_DATA-compatible record from engine data. */
+
+        /* Friendly region labels (value = engine .region code). */
+        var REGION_LABELS = { AMER: 'Americas', APAC: 'Asia Pacific', EMEA: 'Europe', MENA: 'Middle East & N. Africa', AFR: 'Africa', LATAM: 'Latin America' };
+        var REGION_ORDER = ['AMER', 'APAC', 'EMEA', 'MENA', 'AFR', 'LATAM'];
+
+        /* Which region each existing MARKET_DATA metro belongs to (so metros are grouped
+         * under the right region and none is lost). */
+        var METRO_REGION = {
+            'n-virginia': 'AMER', 'dallas': 'AMER', 'phoenix': 'AMER', 'chicago': 'AMER',
+            'singapore': 'APAC', 'tokyo': 'APAC', 'jakarta': 'APAC', 'sydney': 'APAC', 'mumbai': 'APAC',
+            'frankfurt': 'EMEA', 'london': 'EMEA',
+            'sao-paulo': 'LATAM'
+        };
+
+        /* Per-region SCREENING ESTIMATES for the three fields NOT present in engine
+         * country data (colo $/kW/mo, land $/sqft, DC CAGR). Seeded from the average of
+         * the MARKET_DATA metros already in that region; MENA/AFR have no metros so they
+         * use defensible emerging-market screening figures. Screening only — not a quote. */
+        var REGION_DEFAULTS = {
+            AMER:  { coloKW: 175, land: 31, cagr: 0.205 }, // avg of n-virginia/dallas/phoenix/chicago
+            APAC:  { coloKW: 225, land: 71, cagr: 0.144 }, // avg of singapore/tokyo/jakarta/sydney/mumbai
+            EMEA:  { coloKW: 198, land: 68, cagr: 0.100 }, // avg of frankfurt/london
+            LATAM: { coloKW: 165, land: 20, cagr: 0.160 }, // sao-paulo
+            MENA:  { coloKW: 180, land: 15, cagr: 0.180 }, // screening estimate — no metro in region
+            AFR:   { coloKW: 150, land: 12, cagr: 0.200 }  // screening estimate — no metro in region
+        };
+
+        /* US=1.0 construction base: N. Virginia's 12.0 $/MW is the anchor for
+         * constructionIndex scaling (engine US constructionIndex === 1.0). */
+        var US_BASE_BUILD = 12.0;
+
+        /* Cache of engine-derived country records (built lazily, keyed "country:XX"). */
+        var COUNTRY_RECORDS = {};
+
+        /* Build a MARKET_DATA-compatible record from RZEngine.data.countries[code]. */
+        function buildCountryRecord(code) {
+            var C = window.RZEngine && window.RZEngine.data && window.RZEngine.data.countries;
+            var c = C && C[code];
+            if (!c) return null;
+            var eco = c.economy || {};
+            var region = c.region || 'AMER';
+            var rd = REGION_DEFAULTS[region] || REGION_DEFAULTS.AMER;
+            var ci = (typeof c.constructionIndex === 'number') ? c.constructionIndex : 1.0;
+
+            var power = (eco.electricityRate != null) ? eco.electricityRate : 0.10;
+            /* staff = engine-sourced annual salary. baseSalary_Engineer is MONTHLY (e.g.
+             * US $8,500/mo ≈ $102k/yr, close to metro convention); ×12 = annual. Most
+             * defensible: real engine labor number. Fallback: scale US metro staff by index. */
+            var staff = (c.labor && c.labor.baseSalary_Engineer != null)
+                ? Math.round(c.labor.baseSalary_Engineer * 12)
+                : Math.round(85000 * ci);
+            var buildCost = +(US_BASE_BUILD * ci).toFixed(2);
+            var taxRate = (eco.taxRate != null) ? eco.taxRate : null;
+            var infl = (eco.inflationRate != null) ? eco.inflationRate : 0.03;
+            var laborEsc = (eco.laborEscalation != null) ? eco.laborEscalation : 0.05;
+            var cagr = rd.cagr;
+
+            /* Build the projection curves the calc's multi-year loop reads, escalating from
+             * the base rates (mirrors how metros carry a *ByYear array): construction/land
+             * escalate by inflationRate, colo by inflation, power by inflation, staff by
+             * laborEscalation. 6 points = 2025..2030. */
+            function ramp(base, rate) {
+                var arr = [];
+                for (var y = 0; y < 6; y++) arr.push(+(base * Math.pow(1 + rate, y)).toFixed(6));
+                return arr;
+            }
+            var rec = {
+                buildCost: buildCost, coloKW: rd.coloKW, power: power, staff: staff,
+                land: rd.land, vacancy: 3.0, cagr: cagr, label: c.name || code,
+                operationalMW: 0, constructionMW: 0, plannedMW: 0,
+                avgRackDensity: 8, renewablePercent: 30, fiberLatencyMs: 2.0,
+                taxIncentives: false, moratorium: false, taxRate: taxRate,
+                currencySymbol: c.currencySymbol || '$',
+                capexBreakdown: { electrical: 0.41, mechanical: 0.18, shell: 0.18, fitout: 0.16, softCost: 0.07 },
+                projections: {
+                    buildCostByYear: ramp(buildCost, infl),
+                    coloPriceByYear: ramp(rd.coloKW, infl),
+                    powerCostByYear: ramp(power, infl),
+                    vacancyByYear:   [3.0, 3.0, 3.0, 3.0, 3.0, 3.0],
+                    staffCostByYear: ramp(staff, laborEsc)
+                },
+                marketNotes: (c.name || code) + ' — engine reference profile.',
+                maxCapacityMW: 4000, equilibriumColoPrice: Math.round(rd.coloKW * 0.85), variance: 0.18,
+                /* provenance note surfaced in the snapshot */
+                provenance: 'engine: power/tax/labor/build-index; screening: colo/land/cagr'
+            };
+            return rec;
+        }
+
+        /* Resolve a #tcoCountry value → market record. Metro key → MARKET_DATA (golden);
+         * "country:XX" → engine-derived record (cached). */
+        function resolveMarket(val) {
+            if (!val) return MARKET_DATA['n-virginia'];
+            if (val.indexOf('country:') === 0) {
+                var code = val.slice(8);
+                if (!COUNTRY_RECORDS[val]) COUNTRY_RECORDS[val] = buildCountryRecord(code) || MARKET_DATA['n-virginia'];
+                return COUNTRY_RECORDS[val];
+            }
+            return MARKET_DATA[val] || MARKET_DATA['n-virginia'];
+        }
+
+        /* Populate #tcoCountry for the currently-selected region. Metros first, then
+         * engine countries (alpha by name). Returns nothing; caller triggers change. */
+        function populateCountrySelect(region, preferVal) {
+            var country = el('tcoCountry');
+            if (!country) return;
+            var C = window.RZEngine && window.RZEngine.data && window.RZEngine.data.countries;
+            var html = '';
+            /* metros in this region (keep the rich DC-market cards) */
+            Object.keys(MARKET_DATA).forEach(function(k) {
+                if (METRO_REGION[k] === region) {
+                    html += '<option value="' + k + '">' + MARKET_DATA[k].label + ' (metro)</option>';
+                }
+            });
+            /* engine countries in this region */
+            if (C) {
+                var codes = Object.keys(C).filter(function(code) { return C[code].region === region; });
+                codes.sort(function(a, b) { return (C[a].name || a).localeCompare(C[b].name || b); });
+                codes.forEach(function(code) {
+                    html += '<option value="country:' + code + '">' + (C[code].name || code) + '</option>';
+                });
+            }
+            country.innerHTML = html;
+            if (preferVal) {
+                var has = Array.prototype.some.call(country.options, function(o) { return o.value === preferVal; });
+                if (has) country.value = preferVal;
+            }
+        }
+
+        /* On region change → repopulate countries, select first, run calc. */
+        function onRegionChange() {
+            var region = el('tcoRegion').value;
+            populateCountrySelect(region);
+            if (el('tcoCountry').options.length) el('tcoCountry').selectedIndex = 0;
+            onCountryChange();
+        }
+
+        /* On country change → recalc (calculate() re-resolves the record + repaints snapshot). */
+        function onCountryChange() {
+            calculate();
+        }
+
         var TIER_MULT = { 'tier-2': 0.85, 'tier-3': 1.0, 'tier-4': 1.35 };
         var TIER_STAFF_PER_MW = { 'tier-2': 3, 'tier-3': 5, 'tier-4': 8 };
         var COOLING_PUE = { 'air': 1.4, 'chilled-water': 1.25, 'evaporative': 1.15, 'dlc': 1.08 };
@@ -3068,6 +3256,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             function sel(id) { var e = document.getElementById(id); return e && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : (e ? e.value : ''); }
             var rows = [
                 ['Input', 'Region', sel('tcoRegion'), '', ''],
+                ['Input', 'Country / Location', sel('tcoCountry'), '', ''],
                 ['Input', 'IT load', txt('tcoItLoad'), 'MW', ''],
                 ['Input', 'Period', sel('tcoPeriod'), 'years', ''],
                 ['Input', 'Tier', sel('tcoTier'), '', ''],
@@ -3160,8 +3349,9 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                 ]);
                 RZCalc.showErrors('tcoValidation', _vr.errors);
             }
-            var region = getSelect('tcoRegion');
-            var mkt = MARKET_DATA[region];
+            /* Resolve the selected COUNTRY/LOCATION → market record (metro key = golden
+             * MARKET_DATA; "country:XX" = engine-derived record). Region select only filters. */
+            var mkt = resolveMarket(getSelect('tcoCountry'));
             var itMW = getVal('tcoItLoad', 5);
             var years = parseInt(getSelect('tcoPeriod'));
             var tier = getSelect('tcoTier');
@@ -3321,7 +3511,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
             /* ── STORE RESULTS ── */
             lastResults = {
-                region: region, mkt: mkt, itMW: itMW, years: years, tier: tier,
+                region: getSelect('tcoCountry'), mkt: mkt, itMW: itMW, years: years, tier: tier,
                 pue: pue, util: util, cooling: cooling, growthRate: growthRate,
                 powerRate: powerRate, coloEsc: coloEsc, cloudDiscount: cloudDiscount,
                 debtEquity: debtEquity, tierMult: tierMult, staffPerMW: staffPerMW,
@@ -3368,6 +3558,9 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             if (el('snapshotStaff')) el('snapshotStaff').textContent = '$' + (r.mkt.staff / 1000).toFixed(0) + 'K/yr';
             if (el('snapshotLand')) el('snapshotLand').textContent = '$' + r.mkt.land + '/sqft';
             if (el('snapshotCagr')) el('snapshotCagr').textContent = (r.mkt.cagr * 100).toFixed(0) + '% CAGR';
+            if (el('snapshotTax')) el('snapshotTax').textContent = (r.mkt.taxRate != null) ? (r.mkt.taxRate * 100).toFixed(0) + '%' : 'n/a';
+            if (el('snapshotCurrency')) el('snapshotCurrency').textContent = r.mkt.currencySymbol || '$';
+            if (el('snapshotProvenance')) el('snapshotProvenance').textContent = r.mkt.provenance || '';
         }
 
         /* ─────────── COMPARISON TABLE ─────────── */
@@ -3842,7 +4035,8 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             // WACC-adjusted NPV calculation (proper tax-shield)
             var costOfDebt = 0.06;
             var costOfEquity = 0.12;
-            var taxRate = 0.25;
+            // Country records carry an engine tax rate; metros keep the 0.25 default (golden).
+            var taxRate = (r.mkt && r.mkt.taxRate != null) ? r.mkt.taxRate : 0.25;
             var de = r.debtEquity;
             var wacc = calculateWACC(de, costOfDebt, costOfEquity, taxRate);
             // Default: 60% debt at 6%, 40% equity at 12%, 25% tax = ~7.2% WACC
@@ -4216,7 +4410,9 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
         /* ─────────── RESET ─────────── */
         function resetInputs() {
-            el('tcoRegion').value = 'n-virginia';
+            el('tcoRegion').value = 'AMER';
+            populateCountrySelect('AMER', 'n-virginia');
+            el('tcoCountry').value = 'n-virginia';
             el('tcoItLoad').value = '5';
             el('tcoPeriod').value = '5';
             el('tcoTier').value = 'tier-3';
@@ -4526,7 +4722,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
         }
 
         /* ─────────── EVENT LISTENERS ─────────── */
-        var inputIds = ['tcoRegion', 'tcoItLoad', 'tcoPeriod', 'tcoTier', 'tcoPue', 'tcoUtil', 'tcoCooling', 'tcoGrowth',
+        var inputIds = ['tcoItLoad', 'tcoPeriod', 'tcoTier', 'tcoPue', 'tcoUtil', 'tcoCooling', 'tcoGrowth',
             'tcoLandOverride', 'tcoPowerOverride', 'tcoStaffOverride', 'tcoColoEsc', 'tcoCloudDiscount', 'tcoDebtEquity'];
 
         inputIds.forEach(function(id) {
@@ -4536,6 +4732,9 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                 elem.addEventListener('change', calculate);
             }
         });
+        /* Cascade: region change repopulates the country list; country change recalcs. */
+        if (el('tcoRegion')) el('tcoRegion').addEventListener('change', onRegionChange);
+        if (el('tcoCountry')) el('tcoCountry').addEventListener('change', onCountryChange);
 
         function debounce(fn, ms) {
             var timer;
@@ -4546,10 +4745,21 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
         }
 
         /* ─────────── INIT ─────────── */
+        var _initTries = 0;
         function initWhenReady() {
-            if (typeof Chart === 'undefined') {
+            var engineReady = window.RZEngine && window.RZEngine.data && window.RZEngine.data.countries;
+            // Wait for Chart AND the engine (for the country cascade), but don't hang forever:
+            // after ~4.5s fall back to metros-only so the page always renders.
+            if ((typeof Chart === 'undefined' || !engineReady) && _initTries++ < 30) {
                 setTimeout(initWhenReady, 150);
                 return;
+            }
+            /* Build the Region → Country cascade before the first calc.
+             * Default = Americas / N. Virginia (view + numbers unchanged from before). */
+            if (el('tcoCountry') && !el('tcoCountry').options.length) {
+                el('tcoRegion').value = 'AMER';
+                populateCountrySelect('AMER', 'n-virginia');
+                el('tcoCountry').value = 'n-virginia';
             }
             calculate();
             updateNavbarAuthUI();
