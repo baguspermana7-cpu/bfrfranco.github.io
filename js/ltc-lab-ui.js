@@ -40,6 +40,7 @@
         bindArchPresets();
         bindTabs();
         bindRunBtn();
+        bindFlowScenarios();
         buildTopbar();
         // Swap the P&ID render (day/night) whenever the theme attribute changes.
         try {
@@ -194,6 +195,16 @@
 
         // Hosts for other tabs
         panelDetailed.appendChild(el('div', { id: 'ltcDetailedHost' }));
+        // Living FLOW: scenario replay — drives the engine's real failureMode recompute.
+        var scen = el('div', { className: 'ltc-overview-card ltc-scenario-card' });
+        scen.innerHTML = '<div class="ltc-overview-label">● OPERATING SCENARIO <span class="ltc-muted">— engine recomputes the whole model under fault stress</span></div>' +
+            '<div class="ltc-scenario-btns" id="ltcScenarioBtns">' +
+            [['normal','Normal'],['pump_degraded','Pump Degraded'],['sensor_degraded','Sensor Degraded'],
+             ['heatwave','Heatwave'],['grid_stress','Grid Stress'],['redundancy_degraded','Redundancy Degraded']]
+             .map(function (s) { return '<button type="button" class="ltc-scenario-btn" data-scen="' + s[0] + '">' + s[1] + '</button>'; }).join('') +
+            '</div>' +
+            '<div class="ltc-scenario-readout" id="ltcScenarioReadout"></div>';
+        panelFlow.appendChild(scen);
         panelFlow.appendChild(el('div', { id: 'ltcFlowHost' }));
         // Sensitivity TORNADO (two-directional, engine-computed) — comprehensiveness add
         var tornadoCard = el('div', { className: 'ltc-overview-card ltc-tornado-card' });
@@ -651,6 +662,7 @@
         renderDesignStatus(model);
         renderSensitivity(model);
         renderTornado(model);
+        renderScenarioReadout(model);
         renderScenarioInfo(model);
         renderResultsTab(model);
     }
@@ -911,6 +923,35 @@
                 '<span class="ltc-tor-val">' + (hi >= 0 ? '+' : '') + hi.toFixed(3) + ' / ' + (lo >= 0 ? '+' : '') + lo.toFixed(3) + '</span>' +
                 '</div>';
         }).join('') || '<div class="ltc-muted" style="padding:10px">No sensitivity range at current inputs.</div>';
+    }
+
+    function bindFlowScenarios() {
+        var host = document.getElementById('ltcScenarioBtns');
+        var sel = document.getElementById('inFailureMode');
+        if (!host || !sel) return;
+        host.addEventListener('click', function (e) {
+            var btn = e.target.closest ? e.target.closest('.ltc-scenario-btn') : null;
+            if (!btn) return;
+            sel.value = btn.getAttribute('data-scen');
+            sel.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+    }
+    // FLOW scenario readout — current model + Δ vs a normal-mode engine recompute.
+    function renderScenarioReadout(model) {
+        var host = document.getElementById('ltcScenarioReadout');
+        if (!host || !model || !model.input) return;
+        var cur = model.input.failureMode || 'normal';
+        var btns = document.querySelectorAll('#ltcScenarioBtns .ltc-scenario-btn');
+        for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('active', btns[i].getAttribute('data-scen') === cur);
+        var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.ltc;
+        var norm = null;
+        if (eng && cur !== 'normal') { var ni = Object.assign({}, model.input); ni.failureMode = 'normal'; norm = eng.compute(ni); }
+        function d(v, dec) { return norm == null ? '' : ' <span class="ltc-scenario-delta ' + (v > 0 ? 'up' : (v < 0 ? 'down' : '')) + '">' + (v >= 0 ? '+' : '') + v.toFixed(dec) + '</span>'; }
+        host.innerHTML =
+            '<div class="ltc-scenario-metric"><span>PUE</span><b>' + fmt(model.pue, 3) + '</b>' + (norm ? d(model.pue - norm.pue, 3) : '') + '</div>' +
+            '<div class="ltc-scenario-metric"><span>System COP</span><b>' + fmt(model.systemCop, 2) + '</b>' + (norm ? d(model.systemCop - norm.systemCop, 2) : '') + '</div>' +
+            '<div class="ltc-scenario-metric"><span>Risk Index</span><b>' + fmt(model.riskIndex, 1) + '</b>' + (norm ? d(model.riskIndex - norm.riskIndex, 1) : '') + '</div>' +
+            '<div class="ltc-scenario-metric"><span>Pump Power</span><b>' + fmt(model.pumpPowerKw, 1) + ' kW</b>' + (norm ? d(model.pumpPowerKw - norm.pumpPowerKw, 1) : '') + '</div>';
     }
 
     function renderScenarioInfo(model) {
