@@ -8,7 +8,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type DesignStandard = 'uptime-t3' | 'uptime-t4' | 'tia-r3' | 'tia-r4';
-export type DiagramView = 'logical' | 'sld';
+export type DiagramView = 'logical' | 'sld' | 'mech';
 
 export const DESIGN_STANDARDS: { id: DesignStandard; label: string; tier: 3 | 4 }[] = [
     { id: 'uptime-t3', label: 'Uptime Institute TIER III+', tier: 3 },

@@ -26,7 +26,11 @@ export type GenSymbolKind =
     | 'breaker'
     | 'disconnect'
     | 'ats'
-    | 'dryCooler';
+    | 'dryCooler'
+    | 'solarArray'
+    | 'inverter'
+    | 'pump'
+    | 'heatExchanger';
 
 export interface GenSymbolMeta { label: string; category: string }
 
@@ -51,6 +55,10 @@ export const SYMBOL_META: Record<GenSymbolKind, GenSymbolMeta> = {
     disconnect: { label: "Disconnect Switch", category: "power" },
     ats: { label: "Transfer Switch", category: "power" },
     dryCooler: { label: "Dry Cooler", category: "cooling" },
+    solarArray: { label: "Solar PV Array", category: "renewable" },
+    inverter: { label: "PCS / Inverter", category: "renewable" },
+    pump: { label: "Pump", category: "cooling" },
+    heatExchanger: { label: "Heat Exchanger", category: "cooling" },
 };
 
 /** Inner SVG markup per kind (paths/shapes only; currentColor strokes). */
@@ -75,4 +83,8 @@ export const SYMBOL_MARKUP: Record<GenSymbolKind, string> = {
     disconnect: "<path d=\"M24 4 V15 M24 33 V44\" stroke-width=\"1.8\" /><circle cx=\"24\" cy=\"16\" r=\"2.4\" fill=\"currentColor\" stroke=\"none\" /><circle cx=\"24\" cy=\"32\" r=\"2.4\" fill=\"currentColor\" stroke=\"none\" /><path d=\"M24 32 L34 16\" stroke-width=\"1.8\" /><path d=\"M15 24 H21\" stroke-width=\"1.2\" stroke-dasharray=\"2 2\" />",
     ats: "<path d=\"M14 4 V12 M34 4 V12\" stroke-width=\"1.6\" /><circle cx=\"14\" cy=\"14\" r=\"2.2\" fill=\"currentColor\" stroke=\"none\" /><circle cx=\"34\" cy=\"14\" r=\"2.2\" fill=\"currentColor\" stroke=\"none\" /><circle cx=\"24\" cy=\"34\" r=\"2.2\" fill=\"currentColor\" stroke=\"none\" /><path d=\"M24 34 L14 14\" stroke-width=\"1.8\" /><path d=\"M24 34 V44\" stroke-width=\"1.6\" /><path d=\"M20 22 a5 5 0 0 0 8 0\" stroke-width=\"1.2\" stroke-dasharray=\"2 2\" />",
     dryCooler: "<rect x=\"5\" y=\"12\" width=\"38\" height=\"24\" rx=\"2\" /><circle cx=\"16\" cy=\"24\" r=\"7\" stroke-width=\"1.4\" /><path d=\"M16 24 L16 17 M16 24 L22 27 M16 24 L10 27\" stroke-width=\"1.2\" /><circle cx=\"32\" cy=\"24\" r=\"7\" stroke-width=\"1.4\" /><path d=\"M32 24 L32 17 M32 24 L38 27 M32 24 L26 27\" stroke-width=\"1.2\" />",
+    solarArray: "<path d=\"M10 34 L18 16 H40 L32 34 Z\" /><path d=\"M14.7 28 H36.7 M17.3 22 H39.3 M25 16 L17 34 M32 16 L24 34\" stroke-width=\"1.2\" /><path d=\"M8 10 v4 M14 8 l2 3.5 M4.5 15.5 l3.5 2\" stroke-width=\"1.6\" /><path d=\"M16 34 v6 M34 34 v6\" stroke-width=\"1.6\" />",
+    inverter: "<rect x=\"8\" y=\"10\" width=\"32\" height=\"28\" rx=\"2\" /><path d=\"M8 38 L40 10\" stroke-width=\"1.4\" /><path d=\"M13 17 h8 M13 21 h8\" stroke-width=\"1.6\" stroke-dasharray=\"0\" /><path d=\"M13 21 h8\" stroke-width=\"1.6\" stroke-dasharray=\"2 2\" /><path d=\"M26 30 q3 -6 6 0 t6 0\" stroke-width=\"1.6\" />",
+    pump: "<circle cx=\"24\" cy=\"26\" r=\"12\" /><path d=\"M24 14 V8 H36\" stroke-width=\"1.6\" /><path d=\"M18 26 h9 M24 20.5 l6 5.5 -6 5.5\" stroke-width=\"1.8\" /><path d=\"M12 40 h24\" stroke-width=\"1.4\" />",
+    heatExchanger: "<rect x=\"10\" y=\"10\" width=\"28\" height=\"28\" rx=\"2\" /><path d=\"M10 24 h6 l4 -8 4 16 4 -16 4 16 4 -8 h2\" stroke-width=\"1.6\" /><path d=\"M4 16 h6 M44 32 h-6\" stroke-width=\"1.6\" /><path d=\"M7 13 l3 3 -3 3 M41 29 l-3 3 3 3\" stroke-width=\"1.3\" />",
 };

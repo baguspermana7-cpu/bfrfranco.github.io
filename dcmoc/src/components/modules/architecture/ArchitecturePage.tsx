@@ -15,7 +15,7 @@ import { useArchitectureStore, DESIGN_STANDARDS, type DesignStandard } from '@/s
 import { ARCH_PROFILES, applyProfile } from '@/state/presets';
 import { rzModels } from '@/lib/rz-engine';
 import { readArchInputs, computeFacility, computeEquipCounts, computeValidation, computeDensityCheck } from '@/state/adapters/arch-adapter';
-import { computeLayout } from './diagram/layout';
+import { computeLayout, computeCoolingLayout } from './diagram/layout';
 import { DiagramSvg } from './diagram/DiagramSvg';
 import { ArchRail } from './ArchRail';
 import { ThermalTopologyRow, BomSection, BottomCards } from './ArchSections';
@@ -67,15 +67,29 @@ export function ArchitecturePage() {
             mw: (p.mw ?? ((p.itLoadKw ?? p.kw ?? 0) / 1000)) || 0,
             future: idx > 0,
         })).filter((p) => p.mw > 0);
-        return computeLayout(i, eq, f, {
+        const extras = {
             utilityProvider: req.overview.utilityProvider,
             mix: req.workload.workloadMix,
             phases,
             marginPct: req.business.designMarginPct,
             slaPct: req.availability.slaTargetPct,
             useCaseLabel: req.overview.useCase.toUpperCase(),
-        });
-    }, [i, eq, f, simInputs.capacityPhases, req.overview.utilityProvider, req.overview.useCase, req.workload.workloadMix, req.business.designMarginPct, req.availability.slaTargetPct]);
+            /* K1 — renewables from the CAPEX selection (BESS must SHOW when selected) */
+            renewables: {
+                option: capexInputs.renewableOption ?? 'none',
+                solarMwp: capexInputs.renewSolarMwp ?? 0,
+                bessMwh: capexInputs.renewBessMwh ?? 0,
+            },
+            /* K2 — deep-sea study inputs for the mechanical view */
+            deepSea: {
+                enabled: !!capexInputs.deepSea,
+                depthM: capexInputs.dsDepthM ?? 800,
+                pipelineKm: capexInputs.dsPipelineKm ?? 4,
+                deltaTK: capexInputs.dsDeltaTC ?? 5,
+            },
+        };
+        return arch.diagramView === 'mech' ? computeCoolingLayout(i, eq, f, extras) : computeLayout(i, eq, f, extras);
+    }, [i, eq, f, simInputs.capacityPhases, req.overview.utilityProvider, req.overview.useCase, req.workload.workloadMix, req.business.designMarginPct, req.availability.slaTargetPct, capexInputs, arch.diagramView]);
 
     const m = rzModels()?.architecture;
     let complexity: { index: number; band: string } | null = null;
@@ -265,10 +279,10 @@ export function ArchitecturePage() {
                         <div className="mb-2 flex items-center justify-between">
                             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">System Architecture Diagram <span className="ml-1 text-[9px] normal-case text-rz-mint">live — recomputed from requirements</span></h2>
                             <div className="flex gap-1">
-                                {(['logical', 'sld'] as const).map((v) => (
+                                {(['logical', 'sld', 'mech'] as const).map((v) => (
                                     <button key={v} onClick={() => arch.actions.set({ diagramView: v })}
                                         className={`rounded px-2 py-0.5 text-[10px] font-medium ${arch.diagramView === v ? 'bg-rz-signal text-rz-base' : 'text-slate-500 hover:bg-rz-signal/10'}`}>
-                                        {v === 'logical' ? 'Logical View' : 'Single Line Diagram'}
+                                        {v === 'logical' ? 'Logical View' : v === 'sld' ? 'Single Line Diagram' : 'Mechanical & Cooling'}
                                     </button>
                                 ))}
                                 <span className="rounded px-2 py-0.5 text-[10px] text-slate-400" title="Planned">Physical · 3D — coming soon</span>

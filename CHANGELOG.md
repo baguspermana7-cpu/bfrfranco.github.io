@@ -13,6 +13,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.32 — 2026-07-24 (DCMOC Architecture — BESS/PV in the diagram + Mechanical & Cooling view)
+
+### Added
+- **On-site renewables drawn (Workstream K1)**: when the CAPEX questionnaire selects Solar/Solar+BESS, the Architecture diagram now renders a **Solar PV Array** + **BESS + PCS** (sizing badges from `renewSolarMwp`/`renewBessMwh`) in an ON-SITE RENEWABLES group, tied to the MV bus — the owner-reported missing BESS. New vendored IEC-style symbols: `solarArray`, `inverter`, `pump`, `heatExchanger` (assets/engineering → 24 symbols).
+- **Mechanical & Cooling view (Workstream K2)**: third Architecture diagram view — a dedicated cooling schematic via `computeCoolingLayout`, fully dynamic on the set parameters: air → cooling towers · chillers · CHW pumps · CRAH/in-row; liquid/RDHx → dry coolers · plate-HX (FWS/TCS) · primary/secondary pumps · CDU loops; deep-sea → intake (depth) · titanium plate-HX (loop ΔT) · seawater pumps (pipeline km), chiller-less. Unit counts from equipScale, duty = IT heat (not IT×PUE), supply/return loop edges, per-node hover detail.
+
+
 ## v1.115.31 — 2026-07-24 (DCMOC — Commissioning WBS: L0–L6 × 3–5 sub-activities on the recursive Gantt)
 
 ### Added

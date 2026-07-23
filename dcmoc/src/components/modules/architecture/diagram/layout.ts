@@ -52,6 +52,10 @@ export interface LayoutExtras {
     marginPct?: number;
     slaPct?: number | null;
     useCaseLabel?: string;
+    /** Workstream K1 — CAPEX renewable selection: PV + BESS drawn when set. */
+    renewables?: { option: string; solarMwp: number; bessMwh: number };
+    /** Workstream K2 — deep-sea water cooling (CAPEX study inputs). */
+    deepSea?: { enabled: boolean; depthM: number; pipelineKm: number; deltaTK: number };
 }
 
 /* Larger geometry: nodes are now symbols (~44px) + a two-line label below,
@@ -221,9 +225,11 @@ export function computeLayout(a: ArchInputs, eq: EquipCounts, f: FacilityCalc, e
 
     /* ── phase boxes (capacity growth) — dashed future phases under the diagram ── */
     let extraH = 0;
-    if (ex.phases && ex.phases.length > 1) {
-        const py2 = GY + BH + 40;
-        ex.phases.slice(0, 4).forEach((p, i) => {
+    const hasPhases = !!(ex.phases && ex.phases.length > 1);
+    const hasRenew = !!(ex.renewables && ex.renewables.option && ex.renewables.option !== 'none');
+    const py2 = GY + BH + 40;
+    if (hasPhases) {
+        ex.phases!.slice(0, 4).forEach((p, i) => {
             blocks.push({
                 id: `phase${i}`, x: COL_X(2 + i), y: py2, w: BW, h: 44,
                 title: p.label, sub: `${p.mw.toFixed(1)} MW${p.future ? ' · future' : ''}`,
@@ -231,9 +237,108 @@ export function computeLayout(a: ArchInputs, eq: EquipCounts, f: FacilityCalc, e
                 badge: p.future ? 'PLAN' : 'NOW',
             });
         });
-        groups.push({ x: COL_X(2) - 12, y: py2 - 22, w: COL_W * Math.min(4, ex.phases.length) - 10, h: 72, title: 'GROWTH PHASES (capacity plan)', lane: 'it' });
+        groups.push({ x: COL_X(2) - 12, y: py2 - 22, w: COL_W * Math.min(4, ex.phases!.length) - 10, h: 72, title: 'GROWTH PHASES (capacity plan)', lane: 'it' });
         extraH = 84;
+    }
+    /* ── on-site renewables (Workstream K1) — PV array + BESS/PCS tie into the
+     * MV bus. Drawn from the CAPEX renewable selection; owner: BESS must SHOW
+     * when selected. Occupies the row under GENERATION (coexists with phases). ── */
+    if (hasRenew) {
+        const rn = ex.renewables!;
+        const hasPv = rn.option.includes('solar');
+        if (hasPv) {
+            blocks.push({
+                id: 'pv', x: COL_X(0), y: py2, w: BW, h: BH, title: 'Solar PV Array', sub: `${rn.solarMwp || '—'} MWp on-site`,
+                badge: `${rn.solarMwp || '?'} MWp`, lane: 'gen', kind: 'solarArray',
+                hover: `On-site solar PV — ${rn.solarMwp || 'unsized'} MWp (CAPEX renewable option: ${rn.option})`,
+            });
+        }
+        blocks.push({
+            id: 'bess', x: COL_X(1), y: py2, w: BW, h: BH, title: 'BESS + PCS', sub: `${rn.bessMwh || '—'} MWh storage`,
+            badge: `${rn.bessMwh || '?'} MWh`, lane: 'gen', kind: 'battery',
+            hover: `Battery energy storage — ${rn.bessMwh || 'unsized'} MWh with power conversion system (PCS), grid-tied at the MV bus`,
+        });
+        if (hasPv) edges.push({ from: 'pv', to: 'bess', kind: 'normal', offset: 0 });
+        edges.push({ from: 'bess', to: 'mvA', kind: 'backup', offset: 12 });
+        groups.push({ x: COL_X(0) - 12, y: py2 - 22, w: COL_W * 2 - 18, h: BH + 28, title: `ON-SITE RENEWABLES — ${hasPv ? `${rn.solarMwp || '?'} MWp PV · ` : ''}${rn.bessMwh || '?'} MWh BESS`, lane: 'gen' });
+        extraH = Math.max(extraH, BH + 44);
     }
 
     return { blocks, edges, groups, buses, viewBox: [0, 0, 20 + 7 * COL_W + 12, GY + BH + 40 + extraH] };
+}
+
+/* ═══ Workstream K2 — Mechanical & Cooling schematic ═════════════════════════
+ * A dedicated cooling/mechanical diagram (third Architecture view). Left→right
+ * heat flow: HEAT REJECTION → PLANT/EXCHANGE → DISTRIBUTION → IT HEAT LOAD,
+ * with supply (solid teal) and return (dashed teal) loop edges. Fully dynamic:
+ * cooling technology picks the chain (chiller/CRAH vs CDU loops vs deep-sea
+ * chiller-less), unit counts from equipScale, duty from the facility calc. ═══ */
+export function computeCoolingLayout(a: ArchInputs, eq: EquipCounts, f: FacilityCalc, ex: LayoutExtras = {}): DiagramModel {
+    const blocks: DiagBlock[] = [];
+    const edges: DiagEdge[] = [];
+    const groups: DiagGroup[] = [];
+    const liquid = a.coolingType === 'liquid' || a.coolingType === 'rdhx';
+    const deep = !!ex.deepSea?.enabled;
+    const itMw = f.itMw;
+    const paths = f.paths;
+    const RY = 60;                    // main loop row
+    const RY2 = RY + BH + 34;         // pumps row
+    const loops = Math.max(1, paths);
+    const dutyPerLoop = (itMw / loops).toFixed(1);
+
+    if (deep) {
+        const ds = ex.deepSea!;
+        blocks.push({ id: 'intake', x: COL_X(0), y: RY, w: BW, h: BH, title: 'Seawater Intake', sub: `${ds.depthM} m depth · cold source`, badge: `${ds.depthM} m`, lane: 'cooling', kind: 'pump', hover: `Deep-sea intake at ${ds.depthM} m — naturally cold seawater, chiller-less basis (PUE ≤ 1.15)` });
+        blocks.push({ id: 'hx', x: COL_X(1), y: RY, w: BW, h: BH, title: 'Titanium Plate HX', sub: `ΔT ${ds.deltaTK} K · seawater/coolant`, lane: 'cooling', kind: 'heatExchanger', hover: `Seawater-to-coolant plate heat exchanger — loop ΔT ${ds.deltaTK} K, isolates the marine loop from the IT loop` });
+        blocks.push({ id: 'cdu', x: COL_X(2), y: RY, w: BW, h: BH, title: 'CDU Loops', sub: `${loops}× loops · ${dutyPerLoop} MW/loop`, units: loops, lane: 'cooling', kind: 'cdu', hover: `Coolant distribution — ${loops} loops, ${dutyPerLoop} MW heat each` });
+        blocks.push({ id: 'pumps', x: COL_X(1), y: RY2, w: BW, h: BH, title: 'Seawater Pumps', sub: `${Math.max(2, eq.pumps)}× · pipeline ${ds.pipelineKm} km`, units: Math.max(2, eq.pumps), lane: 'cooling', kind: 'pump', hover: `Seawater circulation pumps — ${ds.pipelineKm} km intake/outfall pipeline` });
+        blocks.push({ id: 'itheat', x: COL_X(4), y: RY, w: BW, h: BH, title: 'IT Heat Load', sub: `${itMw.toFixed(1)} MW heat @ ${a.rackDensityKw} kW/rack`, badge: `${itMw.toFixed(1)} MW`, lane: 'it', kind: 'itload', hover: `IT heat rejected to the loop — ${itMw.toFixed(1)} MW (heat = IT power, not IT × PUE)` });
+        edges.push({ from: 'intake', to: 'hx', kind: 'coolSupply' });
+        edges.push({ from: 'hx', to: 'cdu', kind: 'coolSupply' });
+        edges.push({ from: 'cdu', to: 'itheat', kind: 'coolSupply' });
+        edges.push({ from: 'itheat', to: 'cdu', kind: 'coolReturn', offset: 10 });
+        edges.push({ from: 'cdu', to: 'hx', kind: 'coolReturn', offset: 10 });
+        edges.push({ from: 'hx', to: 'intake', kind: 'coolReturn', offset: 10 });
+        edges.push({ from: 'pumps', to: 'hx', kind: 'control' });
+        groups.push({ x: COL_X(0) - 12, y: RY - 22, w: COL_W * 2 - 18, h: (BH + 34) * 2, title: `MARINE LOOP — ${ds.depthM} m · ${ds.pipelineKm} km pipeline`, lane: 'cooling' });
+        groups.push({ x: COL_X(2) - 12, y: RY - 22, w: COL_W * 2 - 18, h: BH + 30, title: `DISTRIBUTION — ${loops} CDU loops`, lane: 'cooling' });
+        groups.push({ x: COL_X(4) - 12, y: RY - 22, w: COL_W * 2 - 10, h: BH + 30, title: `IT HEAT LOAD — ${itMw.toFixed(1)} MW`, lane: 'it' });
+    } else if (liquid) {
+        blocks.push({ id: 'heatrej', x: COL_X(0), y: RY, w: BW, h: BH, title: 'Dry Coolers', sub: `${eq.chillers}× units · heat rejection`, units: eq.chillers, lane: 'cooling', kind: 'dryCooler', hover: `Heat rejection — ${eq.chillers} dry coolers dissipating ${itMw.toFixed(1)} MW to ambient` });
+        blocks.push({ id: 'hx', x: COL_X(1), y: RY, w: BW, h: BH, title: 'Plate HX / TCS', sub: 'facility ↔ technology loop', lane: 'cooling', kind: 'heatExchanger', hover: 'Facility-water to technology-coolant exchange (FWS/TCS separation)' });
+        blocks.push({ id: 'ppumps', x: COL_X(0), y: RY2, w: BW, h: BH, title: 'Primary Pumps', sub: `${Math.max(2, Math.ceil(eq.pumps / 2))}× facility loop`, units: Math.max(2, Math.ceil(eq.pumps / 2)), lane: 'cooling', kind: 'pump', hover: 'Facility-water loop circulation (N+1 pump sets)' });
+        blocks.push({ id: 'cdu', x: COL_X(2), y: RY, w: BW, h: BH, title: a.coolingType === 'rdhx' ? 'RDHx Doors' : 'CDU Loops', sub: `${loops}× loops · ${dutyPerLoop} MW/loop`, units: loops, lane: 'cooling', kind: 'cdu', hover: `${a.coolingType === 'rdhx' ? 'Rear-door heat exchangers' : 'Coolant distribution units'} — ${loops} loops × ${dutyPerLoop} MW` });
+        blocks.push({ id: 'spumps', x: COL_X(2), y: RY2, w: BW, h: BH, title: 'Secondary Pumps', sub: `${Math.max(2, Math.floor(eq.pumps / 2))}× technology loop`, units: Math.max(2, Math.floor(eq.pumps / 2)), lane: 'cooling', kind: 'pump', hover: 'Technology-coolant loop circulation to the racks' });
+        blocks.push({ id: 'itheat', x: COL_X(4), y: RY, w: BW, h: BH, title: 'IT Heat Load', sub: `${itMw.toFixed(1)} MW @ ${a.rackDensityKw} kW/rack · ${a.supplyTempC}°C supply`, badge: `${itMw.toFixed(1)} MW`, lane: 'it', kind: 'itload', hover: `Direct-to-chip heat capture — ${itMw.toFixed(1)} MW at ${a.supplyTempC}°C supply, ΔT ${a.deltaTK ?? 12} K` });
+        edges.push({ from: 'heatrej', to: 'hx', kind: 'coolSupply' });
+        edges.push({ from: 'hx', to: 'cdu', kind: 'coolSupply' });
+        edges.push({ from: 'cdu', to: 'itheat', kind: 'coolSupply' });
+        edges.push({ from: 'itheat', to: 'cdu', kind: 'coolReturn', offset: 10 });
+        edges.push({ from: 'cdu', to: 'hx', kind: 'coolReturn', offset: 10 });
+        edges.push({ from: 'hx', to: 'heatrej', kind: 'coolReturn', offset: 10 });
+        edges.push({ from: 'ppumps', to: 'hx', kind: 'control' });
+        edges.push({ from: 'spumps', to: 'cdu', kind: 'control' });
+        groups.push({ x: COL_X(0) - 12, y: RY - 22, w: COL_W * 2 - 18, h: (BH + 34) * 2, title: `FACILITY LOOP — ${eq.chillers}× dry coolers`, lane: 'cooling' });
+        groups.push({ x: COL_X(2) - 12, y: RY - 22, w: COL_W * 2 - 18, h: (BH + 34) * 2, title: `TECHNOLOGY LOOP — ${loops} loops · ${dutyPerLoop} MW each`, lane: 'cooling' });
+        groups.push({ x: COL_X(4) - 12, y: RY - 22, w: COL_W * 2 - 10, h: BH + 30, title: `IT HEAT LOAD — ${itMw.toFixed(1)} MW`, lane: 'it' });
+    } else {
+        const crahN = eq.ahu + eq.cooling_units;
+        blocks.push({ id: 'tower', x: COL_X(0), y: RY, w: BW, h: BH, title: 'Cooling Towers', sub: `condenser water loop`, units: Math.max(2, Math.ceil(eq.chillers / 2)), lane: 'cooling', kind: 'coolingTower', hover: 'Condenser-water heat rejection to ambient (evaporative)' });
+        blocks.push({ id: 'chiller', x: COL_X(1), y: RY, w: BW, h: BH, title: 'Chillers', sub: `${eq.chillers}× · ${a.redundancy}`, units: eq.chillers, lane: 'cooling', kind: 'chiller', hover: `Water-cooled chillers — ${eq.chillers} units at ${a.redundancy}, duty ${itMw.toFixed(1)} MW` });
+        blocks.push({ id: 'chwpumps', x: COL_X(1), y: RY2, w: BW, h: BH, title: 'CHW Pumps', sub: `${Math.max(2, eq.pumps)}× chilled water`, units: Math.max(2, eq.pumps), lane: 'cooling', kind: 'pump', hover: 'Chilled-water circulation (primary/secondary, N+1)' });
+        blocks.push({ id: 'crah', x: COL_X(2), y: RY, w: BW, h: BH, title: a.coolingType === 'inrow' ? 'In-Row Coolers' : 'CRAH Units', sub: `${crahN}× hall units`, units: crahN, lane: 'cooling', kind: 'crah', hover: `${a.coolingType === 'inrow' ? 'In-row cooling units' : 'Computer-room air handlers'} — ${crahN} units serving the halls` });
+        blocks.push({ id: 'itheat', x: COL_X(4), y: RY, w: BW, h: BH, title: 'IT Heat Load', sub: `${itMw.toFixed(1)} MW @ ${a.rackDensityKw} kW/rack · ${a.supplyTempC}°C air`, badge: `${itMw.toFixed(1)} MW`, lane: 'it', kind: 'itload', hover: `Hall air heat — ${itMw.toFixed(1)} MW, ${a.supplyTempC}°C supply air (ASHRAE class)` });
+        edges.push({ from: 'tower', to: 'chiller', kind: 'coolSupply' });
+        edges.push({ from: 'chiller', to: 'tower', kind: 'coolReturn', offset: 10 });
+        edges.push({ from: 'chiller', to: 'crah', kind: 'coolSupply' });
+        edges.push({ from: 'crah', to: 'chiller', kind: 'coolReturn', offset: 10 });
+        edges.push({ from: 'crah', to: 'itheat', kind: 'coolSupply' });
+        edges.push({ from: 'itheat', to: 'crah', kind: 'coolReturn', offset: 10 });
+        edges.push({ from: 'chwpumps', to: 'chiller', kind: 'control' });
+        groups.push({ x: COL_X(0) - 12, y: RY - 22, w: COL_W * 2 - 18, h: (BH + 34) * 2, title: `CHILLER PLANT — ${eq.chillers}× chillers · ${a.redundancy}`, lane: 'cooling' });
+        groups.push({ x: COL_X(2) - 12, y: RY - 22, w: COL_W * 2 - 18, h: BH + 30, title: `AIR DISTRIBUTION — ${crahN}× units`, lane: 'cooling' });
+        groups.push({ x: COL_X(4) - 12, y: RY - 22, w: COL_W * 2 - 10, h: BH + 30, title: `IT HEAT LOAD — ${itMw.toFixed(1)} MW`, lane: 'it' });
+    }
+
+    return { blocks, edges, groups, buses: [], viewBox: [0, 0, 20 + 7 * COL_W + 12, RY2 + BH + 50] };
 }
