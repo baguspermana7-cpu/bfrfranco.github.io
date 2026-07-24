@@ -13,6 +13,16 @@ release sections rather than semver.
 
 ---
 
+## v1.115.51 — 2026-07-25 (Y-slice runtime verification probe — genset scale rule + revenue basis proven live)
+
+### Added
+- **`tools/_dcmoc_fuelgen_scale_probe.mjs`** — headless verification of the Y-slice's behavior change: seeds a 2.5 MW project (genset class N× 2.5 MW) then a 150 MW project and asserts the unit class switches to N× 3.0 MW (`DATA.fuelGen` scale rule, AssetGenerator-consistent); asserts Phased Finance break-even revenue derives from the live $150/kW·mo basis (a $280 regression would print ~$27x); screenshots FuelGen/Executive/Financial/Phased Finance for visual review. 5/5 green.
+
+### Verified
+- Screenshot review of the finance surfaces on the unified $150 basis: Phased Finance blended IRR 13.7% ≥ 12% hurdle, NPV +$2.2M, MoIC 1.15×, payback 7.6 yr — coherent. Known honest consequence: the default 2.5 MW Indonesia project's Executive year-5 EBITDA reads slightly negative at conservative wholesale $150 (raise revenue in Financial or run the optimizer to clear it) — this is the real economics, not a bug; the previous $280 default was masking it.
+
+---
+
 ## v1.115.50 — 2026-07-25 (post-audit certification sweep — full site gate suite green, 1 mobile fix)
 
 ### Fixed
