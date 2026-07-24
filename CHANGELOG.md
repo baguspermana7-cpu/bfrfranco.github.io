@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.45 — 2026-07-24 (LTC — clickable engine-verified fix suggestions on out-of-band metrics)
+
+### Added
+- **Every out-of-band MODEL VALIDATION metric now tells you how to fix it.** Under an amber row, up to two suggestion chips appear (e.g. PUE → "Economizer ↑", Flow intensity → "Supply Temp ↓"), computed by perturbing each impact parameter ±1 step through the REAL `models.ltc.compute` and ranking which moves pull the metric back toward its band — no heuristics, no hardcode. **Chips are clickable**: one click applies that ±1 step to the actual input (sliders sync, auto-run recomputes, the band marker moves live). Verified: six clicks walked PUE 1.28 → 1.26 toward the design band; 0 console errors; parity 15,750/0; calibration gate 38/0.
+
 ## v1.115.44 — 2026-07-24 (DCMOC Y-SLICE — X-audit deferred violations: fuel/gen sizing to DATA, grid economics sourced, one depreciation convention, portfolio on live revenue)
 
 ### Fixed

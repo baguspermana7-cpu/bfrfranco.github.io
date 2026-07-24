@@ -1129,6 +1129,48 @@
         }).join('');
     }
 
+    // impactParam engine-key → page input id (for clickable fix suggestions)
+    var INPUT_ID_BY_KEY = {
+        itLoadMw:'inItLoad', liquidCapture:'inLiquidCapture', rackDensityTarget:'inRackDensityTarget',
+        supplyTemp:'inSupplyTemp', pumpEff:'inPumpEff', airCop:'inAirCop',
+        economizerHours:'inEconomizerHours', controlQuality:'inControlQuality',
+        predictiveGain:'inPredictiveGain', coefHeatTransfer:'inCoefHeatTransfer',
+        coefPipeLoss:'inCoefPipeLoss', coefFutureTech:'inCoefFutureTech'
+    };
+    // For an out-of-band metric, find the input moves (±1 step through the REAL
+    // engine) that pull it back toward the band. Engine-computed — no heuristics.
+    function suggestFixes(model, row) {
+        var eng = window.RZEngine, d = eng && eng.data, ml = eng && eng.models && eng.models.ltc;
+        if (!ml || !d || !d.ltcCalibration || !d.ltcCalibration.impactParams) return [];
+        function metricOf(m) {
+            switch (row.key) {
+                case 'pue': return m.pue;
+                case 'wue': return m.wue;
+                case 'deltaT': return m.deltaT;
+                case 'supplyTemp': return m.input && m.input.supplyTemp;
+                case 'flowIntensity': return m.liquidKw > 0 ? m.flowLpm / m.liquidKw : NaN;
+                case 'pumpPct': return m.itKw > 0 ? (m.pumpPowerKw / m.itKw) * 100 : NaN;
+            }
+            return NaN;
+        }
+        var base = metricOf(model);
+        var target = base > row.hi ? row.hi : row.lo;      // pull toward the violated edge
+        var out = [];
+        d.ltcCalibration.impactParams.forEach(function (cfg) {
+            [1, -1].forEach(function (dir) {
+                var inp = Object.assign({}, model.input);
+                var nv = (inp[cfg.key] || 0) + dir * cfg.step;
+                if (nv < cfg.min || nv > cfg.max) return;
+                inp[cfg.key] = nv;
+                var alt = metricOf(ml.compute(inp));
+                var gain = Math.abs(base - target) - Math.abs(alt - target);
+                if (gain > 1e-9) out.push({ key: cfg.key, label: cfg.label, dir: dir, gain: gain });
+            });
+        });
+        out.sort(function (a, b) { return b.gain - a.gain; });
+        return out.slice(0, 2);
+    }
+
     // MODEL VALIDATION — render engine validation rows as band bars with a
     // value marker; green in-band, amber out. Single source: models.ltc.validation.
     function renderValidation(model) {
@@ -1159,8 +1201,37 @@
                 (pos === null ? '' : '<span class="ltc-valid-marker ' + (r.inBand ? 'ok' : 'warn') + '" style="left:' + pos.toFixed(1) + '%"></span>') +
                 '</div>' +
                 '<div class="ltc-valid-range"><span>' + r.lo + '</span><span>' + r.hi + (r.unit ? ' ' + r.unit : '') + '</span></div>' +
+                (r.inBand ? '' :
+                    '<div class="ltc-valid-fix" data-vkey="' + r.key + '">' +
+                    suggestFixes(model, r).map(function (f) {
+                        return '<button type="button" class="ltc-fix-chip" data-fkey="' + f.key + '" data-fdir="' + f.dir + '" ' +
+                            'title="One engine-verified step that moves ' + r.label + ' toward its band">' +
+                            f.label + ' ' + (f.dir > 0 ? '↑' : '↓') + '</button>';
+                    }).join('') + '</div>') +
                 '</div>';
         }).join('');
+        // Clickable fixes: apply ±1 step to the real input → live recompute.
+        host.querySelectorAll('.ltc-fix-chip').forEach(function (chip) {
+            chip.addEventListener('click', function () {
+                var eng = window.RZEngine && window.RZEngine.data;
+                var cfg = eng && eng.ltcCalibration.impactParams.filter(function (c) { return c.key === chip.dataset.fkey; })[0];
+                var input = document.getElementById(INPUT_ID_BY_KEY[chip.dataset.fkey]);
+                if (!cfg || !input) return;
+                var nv = (parseFloat(input.value) || 0) + Number(chip.dataset.fdir) * cfg.step;
+                nv = Math.round((Math.max(cfg.min, Math.min(cfg.max, nv))) * 1000) / 1000;
+                var num = document.getElementById('ltcNum_' + INPUT_ID_BY_KEY[chip.dataset.fkey]);
+                if (num) {
+                    // primary slider: drive the numbox — its handler syncs range,
+                    // fill, and the original input (auto-run fires from there).
+                    num.value = nv;
+                    num.dispatchEvent(new Event('input', { bubbles: true }));
+                } else {
+                    input.value = nv;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+        });
     }
 
     function gradeWord(s) {
