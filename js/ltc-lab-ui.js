@@ -162,14 +162,15 @@
         // Tabs bar
         var tabsBar = el('div', { className: 'ltc-tabs-bar' });
         var tabDefs = [
-            { key: 'results',   label: 'RESULTS' },
-            { key: 'detailed',  label: 'DETAILED CALCULATION' },
-            { key: 'flow',      label: 'FLOW DIAGRAM' },
-            { key: 'charts',    label: 'CHARTS' },
-            { key: 'report',    label: 'REPORT' }
+            { key: 'results',   label: 'RESULTS',              icon: 'fa-table-cells-large' },
+            { key: 'detailed',  label: 'DETAILED CALCULATION', icon: 'fa-square-root-variable' },
+            { key: 'flow',      label: 'FLOW DIAGRAM',         icon: 'fa-diagram-project' },
+            { key: 'charts',    label: 'CHARTS',               icon: 'fa-chart-line' },
+            { key: 'report',    label: 'REPORT',               icon: 'fa-file-lines' }
         ];
         tabDefs.forEach(function (t, i) {
-            var btn = el('button', { className: 'ltc-tab-btn' + (i === 0 ? ' ltc-tab-active' : ''), textContent: t.label });
+            var btn = el('button', { className: 'ltc-tab-btn' + (i === 0 ? ' ltc-tab-active' : '') });
+            btn.innerHTML = '<i class="fas ' + t.icon + '" aria-hidden="true"></i> ' + t.label;
             btn.dataset.tab = t.key;
             tabsBar.appendChild(btn);
         });
@@ -202,6 +203,16 @@
             '<div class="ltc-scenario-readout" id="ltcScenarioReadout"></div>';
         panelFlow.appendChild(scen);
         panelFlow.appendChild(el('div', { id: 'ltcFlowHost' }));
+        // One-line guide per tab (intuitiveness: tell the user what lives here).
+        // Prepended so the lead always sits at the very top of its panel.
+        [[panelDetailed, 'Full engineering output — every computed parameter, the model & control diagrams, calibration and self-test tools. Expand a section to dive in.'],
+         [panelFlow, 'How energy and variables move through the system — replay fault scenarios and trace each processing stage.'],
+         [panelCharts, 'Optimization & uncertainty — sensitivity tornado, target guidance, Pareto frontier, Monte-Carlo and the energy Sankey.'],
+         [panelReport, 'Compare designs, manage saved scenarios, and export CSV / executive & engineering report packs.']
+        ].forEach(function (pair) {
+            pair[0].insertBefore(el('p', { className: 'ltc-tab-lead', textContent: pair[1] }), pair[0].firstChild);
+        });
+
         // Sensitivity TORNADO (two-directional, engine-computed) — comprehensiveness add
         var tornadoCard = el('div', { className: 'ltc-overview-card ltc-tornado-card' });
         tornadoCard.innerHTML = '<div class="ltc-overview-label">● SENSITIVITY TORNADO <span class="ltc-muted">— ΔPUE for ±1 step per input (engine-computed)</span></div>' +
@@ -365,10 +376,55 @@
                 if (cnt) cnt.textContent = inPanel.querySelectorAll('input, select').length + ' settings';
             }
 
+            // FLOW: lead with the visual Energy + Loss Breakdown, not the raw
+            // variable dump (the open-by-default block should be the intuitive one).
+            var fb = flowHost.querySelector(':scope > .flow-block');
+            if (fb) flowHost.insertBefore(fb, flowHost.firstChild);
+            accordionizeHosts();
             document.body.classList.add('ltc-consolidated');
         } catch (e) {
             try { if (window.console) console.warn('LTC consolidation skipped:', e); } catch (_) {}
         }
+    }
+
+    // ════════════════════════════════════════════════════════
+    // accordionizeHosts — intuitiveness: the relocated legacy blocks are dense
+    // engineering dumps; shown all-expanded they read as a wall. Wrap each in a
+    // titled collapsible card (first one per tab open), so every tab becomes a
+    // scannable index the user expands on demand. Element ids untouched.
+    // ════════════════════════════════════════════════════════
+    function accordionizeHosts() {
+        ['ltcDetailedHost', 'ltcFlowHost', 'ltcChartsHost', 'ltcReportHost'].forEach(function (hostId) {
+            var host = document.getElementById(hostId);
+            if (!host) return;
+            var blocks = Array.prototype.slice.call(host.children).filter(function (n) {
+                return !n.classList.contains('ltc-overview-card') &&
+                       !n.classList.contains('output-quickbar') &&
+                       !n.classList.contains('result-grid') &&
+                       !n.classList.contains('ltc-acc');
+            });
+            blocks.forEach(function (block, idx) {
+                var heading = block.querySelector('h4, h3');
+                var title = heading ? heading.textContent.replace(/\s+/g, ' ').trim() : 'Details';
+                var open = idx === 0;
+                var wrap = el('section', { className: 'ltc-acc' + (open ? ' open' : '') });
+                var btn = el('button', { type: 'button', className: 'ltc-acc-head' });
+                btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                btn.innerHTML = '<span class="ltc-acc-title">' + title + '</span><span class="ltc-acc-chev" aria-hidden="true">▾</span>';
+                var body = el('div', { className: 'ltc-acc-body' });
+                if (!open) body.style.display = 'none';
+                host.insertBefore(wrap, block);
+                wrap.appendChild(btn);
+                wrap.appendChild(body);
+                body.appendChild(block);
+                if (heading) heading.style.display = 'none';
+                btn.addEventListener('click', function () {
+                    var isOpen = wrap.classList.toggle('open');
+                    body.style.display = isOpen ? '' : 'none';
+                    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                });
+            });
+        });
     }
 
     // ════════════════════════════════════════════════════════

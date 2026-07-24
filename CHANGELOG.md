@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.38 — 2026-07-24 (LTC — intuitiveness pass: accordion sections, tab guides, iconized tabs)
+
+### Changed
+- **The dense legacy blocks no longer render as an all-expanded wall.** Every relocated analytical block (24 across the four tabs) is now a titled collapsible card — collapsed by default, the most useful one per tab open (FLOW leads with the visual Energy + Loss Breakdown instead of the raw variable dump). Each tab opens with a one-line guide of what lives inside; tab buttons gain icons. Accordion heads are keyboard-accessible (`aria-expanded`, focus-visible) and the titles carry the existing hover-explanations. All element ids/bindings untouched; charts and controls fully functional when expanded (verified: Pareto expands + renders, scenario replay, 0 console errors).
+
 ## v1.115.37 — 2026-07-24 (DCMOC — rack-density dropdown scroll fix + AI-era presets)
 
 ### Fixed
