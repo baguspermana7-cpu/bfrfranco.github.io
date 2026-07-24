@@ -22,6 +22,7 @@ import {
 } from 'recharts';
 import clsx from 'clsx';
 import { fmt, fmtMoney, fmtPct } from '@/lib/format';
+import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 import { TraceValue } from '@/components/ui/TraceValue';
 
@@ -66,7 +67,9 @@ const InvestmentDashboard = () => {
         exitEbitdaMultiple: 18,
         terminalCapRate: 0.065,
         controlPremiumPct: 0.25,
-        revenuePerKwMonth: 150,
+        /* seeded from the sim-store tunable (live SSOT) so this page opens on
+         * the same revenue basis as every other surface; user-editable after */
+        revenuePerKwMonth: inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH,
         opexEscalation: 0.035,
         escalationRate: 0.03,
         taxRate: 0.25,

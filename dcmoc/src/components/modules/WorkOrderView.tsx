@@ -55,40 +55,14 @@ export function WorkOrderView() {
         return { assignments, profiles, staffList, schedule, staffResults };
     }, [selectedCountry, inputs, capexInputs]);
 
-    if (!selectedCountry || !data) return <div className="text-slate-400 p-8">Select a country to view work orders.</div>;
-
-    const { profiles, staffList, assignments, schedule } = data;
-
-    // Filter profiles
-    const filteredProfiles = selectedPerson === 'all'
-        ? profiles
-        : profiles.filter(p => p.personId === selectedPerson);
-
-    // Get weekly data for selected person
-    const getPersonWeekData = (personId: string, weekNum: number) => {
-        return assignments.filter(a => a.personId === personId && a.weekNumber === weekNum);
-    };
-
-    // Load distribution data (hours per person across all weeks)
-    const loadDistribution = profiles.map(p => ({
-        personId: p.personId,
-        personName: p.personName,
-        role: p.role,
-        team: p.team,
-        totalHours: p.annualStats.totalWOHours,
-        totalWOs: p.annualStats.totalWOCount,
-        avgWeekly: p.annualStats.avgWeeklyWOHours,
-        busiestWeek: p.annualStats.busiestWeek,
-        workWeeks: p.annualStats.workWeeks,
-    })).sort((a, b) => b.totalHours - a.totalHours);
-
-    const maxTotalHours = Math.max(...loadDistribution.map(d => d.totalHours), 1);
-
-    // B19: Calculate consecutive weeks with >80% utilization for overload alerts
+    /* B19 overload alerts — MUST be declared before the early return below
+     * (Rules of Hooks: hook count may never change between renders; this
+     * useMemo previously sat after the null-country return — audit X fix). */
     const overloadAlerts = useMemo(() => {
         const alerts: { personName: string; personId: string; consecutiveWeeks: number; startWeek: number }[] = [];
-        for (const profile of profiles) {
-            const personAssignments = assignments.filter(a => a.personId === profile.personId);
+        if (!data) return alerts;
+        for (const profile of data.profiles) {
+            const personAssignments = data.assignments.filter(a => a.personId === profile.personId);
             // Build a map of week -> utilization
             const weekUtils: Record<number, number> = {};
             for (const a of personAssignments) {
@@ -121,7 +95,36 @@ export function WorkOrderView() {
             }
         }
         return alerts.sort((a, b) => b.consecutiveWeeks - a.consecutiveWeeks);
-    }, [profiles, assignments]);
+    }, [data]);
+
+    if (!selectedCountry || !data) return <div className="text-slate-400 p-8">Select a country to view work orders.</div>;
+
+    const { profiles, staffList, assignments, schedule } = data;
+
+    // Filter profiles
+    const filteredProfiles = selectedPerson === 'all'
+        ? profiles
+        : profiles.filter(p => p.personId === selectedPerson);
+
+    // Get weekly data for selected person
+    const getPersonWeekData = (personId: string, weekNum: number) => {
+        return assignments.filter(a => a.personId === personId && a.weekNumber === weekNum);
+    };
+
+    // Load distribution data (hours per person across all weeks)
+    const loadDistribution = profiles.map(p => ({
+        personId: p.personId,
+        personName: p.personName,
+        role: p.role,
+        team: p.team,
+        totalHours: p.annualStats.totalWOHours,
+        totalWOs: p.annualStats.totalWOCount,
+        avgWeekly: p.annualStats.avgWeeklyWOHours,
+        busiestWeek: p.annualStats.busiestWeek,
+        workWeeks: p.annualStats.workWeeks,
+    })).sort((a, b) => b.totalHours - a.totalHours);
+
+    const maxTotalHours = Math.max(...loadDistribution.map(d => d.totalHours), 1);
 
     return (
         <div className="space-y-6">

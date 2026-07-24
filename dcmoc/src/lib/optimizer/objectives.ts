@@ -20,6 +20,7 @@ import { calculateDisasterRisk } from '@/modules/risk/DisasterRiskEngine';
 import { calculateGridReliability } from '@/modules/infrastructure/GridReliabilityEngine';
 import { calculateTalentAvailability } from '@/modules/staffing/TalentAvailabilityEngine';
 import type { CountryProfile } from '@/constants/countries';
+import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 
 export interface BlendedPhase {
     id: string;
@@ -67,7 +68,7 @@ export function buildBlendedIrrClosure(country: CountryProfile | null, sim: Blen
     });
     if (capPlan.phases.length === 0 || capPlan.totalItLoadKw <= 0) return null;
 
-    const baseRev = sim.revenuePerKwMonth ?? 150;
+    const baseRev = sim.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH;
 
     // 2. Cross-module adjustments feeding the cash flows (mirrors the page;
     //    the tax-incentive engine call is narrative-only there and omitted).

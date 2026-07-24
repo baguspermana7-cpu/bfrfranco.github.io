@@ -60,6 +60,10 @@ export function ExecutiveDashboard() {
     const d = useDashboardData();
     const tab = 'Executive Overview' as const;   // DI3 — single full view (tabs deleted; VIEW_PANELS retained only as the full row list)
     const projName = useRequirementsStore((s2) => s2.overview.projectName);
+    // Design headroom for the top-bar "design MW" — the SAME store field the
+    // optimizer/CAPEX contingency read (req.business.designMarginPct), not a
+    // hardcoded margin, so the header can't disagree with the model.
+    const designMarginPct = useRequirementsStore((s2) => s2.business.designMarginPct);
     const [optNonce, setOptNonce] = React.useState(0);
     const [busy, setBusy] = React.useState<string | null>(null);
     /* Workstream U — REAL optimizer results (deterministic bisection over the
@@ -211,7 +215,7 @@ export function ExecutiveDashboard() {
 
     return (
         <div className="space-y-4 dark:text-slate-100">
-            <DashTopBar project={`${projName || d.country + ' DC'} — ${d.itLoadMw.toFixed(1)} MW IT · design ${(d.itLoadMw * 1.2).toFixed(1)} MW`} />
+            <DashTopBar project={`${projName || d.country + ' DC'} — ${d.itLoadMw.toFixed(1)} MW IT · design ${(d.itLoadMw * (1 + (designMarginPct ?? 0) / 100)).toFixed(1)} MW`} />
 
             {/* Reports view — a launcher into the full Reports module */}
             {has('reports') && (

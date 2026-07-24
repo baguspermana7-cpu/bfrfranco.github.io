@@ -13,6 +13,20 @@ release sections rather than semver.
 
 ---
 
+## v1.115.42 — 2026-07-24 (DCMOC X-AUDIT — total wiring audit: 35 fixes, fabricated-PDF financials killed, ONE revenue basis everywhere)
+
+### Fixed
+- **Report/PDF fabricated financials (worst find)**: ReportDashboard's PDF export hardcoded NPV $15M / IRR 18.5% / payback 3.2 yr while the screen showed the real engine numbers — the exported document now uses the SAME live `financialResult` as the page (audit X, 3 opus agents over all 33 modules).
+- **ONE revenue basis app-wide**: `DEFAULT_REVENUE_PER_KW_MONTH` aligned to the sim-store optimizer tunable ($150 — the constant said $280 while PhasedFin read the store's 150, so the same project showed two different IRRs). Every surface (Executive, Financial, Investment, Report, Benchmark, Monte-Carlo, Scenario Comparison, dashboard DCF, ƒx trace) now reads the LIVE store value with the constant as fallback — an optimizer Apply that raises revenue now moves every IRR on every page, not just Phased Finance.
+- **Executive design margin wired**: hardcoded ×1.2 provisioning margin now reads `designMarginPct` (the Requirements slider actually moves the Executive capacity KPI).
+- **Carbon tooltip prices matched to engine** ($25 vs $35, $50 vs $68 contradictions), Benchmark depreciation aligned, ~30 more magic literals moved to constants/DATA or labeled screening across CarbonEngine, CBMEngine, BenchmarkEngine, AssetLifecycleEngine, CapacityPlanningEngine, Reliability, DesignTools.
+- **WorkOrderView Rules-of-Hooks bug**: `overloadAlerts` useMemo sat AFTER the null-country early return (hook count could change between renders) — moved above the guard, null-safe.
+
+### Added
+- **`tools/audit-dcmoc-hardcodes.mjs`** — permanent WARN-level heuristic gate scanning module render paths for unexplained numeric literals (225 advisory findings baseline; violations get fixed or annotated, the gate keeps new ones visible).
+
+---
+
 ## v1.115.41 — 2026-07-24 (DCMOC MEGA-SLICE 2 — 100% ScoreValue · diagnosis+articles · capacity coherence · P&ID+node modal · tax regulations · fund-grade strategic · real optimizer · FAQ glossary)
 
 ### Fixed

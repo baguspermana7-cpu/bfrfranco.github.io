@@ -174,7 +174,12 @@ export function collectDesignToolsDiagnostics(model: DesignToolsDiagnosticsModel
     return findings;
 }
 
-/* ── Tier classification (models.tier) ── */
+/* ── Tier classification (models.tier) ──
+ * NOTE: the tier CLASSIFICATION is the engine (models.tier.classify). The five
+ * 0-100 SUB-SCORES fed into it are SCREENING heuristics mapped from the project
+ * config (cooling method / redundancy tier / target tier) — not sourced engine
+ * data. They are surfaced with a "screening inputs" label so the engine output
+ * is not mistaken for a fully-sourced derivation. */
 const COOL_SCORE: Record<string, number> = { air: 60, inrow: 72, rdhx: 82, liquid: 92, immersion: 96 };
 const RED_SCORE: Record<string, number> = { n: 50, n1: 75, '2n': 92, '2n1': 98 };
 export function TierDashboard() {
@@ -200,7 +205,7 @@ export function TierDashboard() {
                 <Metric label="Target Tier" value={`Tier ${inputs.tierLevel}`} sub={r.tier >= inputs.tierLevel ? 'met' : 'gap'} />
             </div>
             <Card>
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Sub-scores (from project config)</h2>
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Sub-scores <span className="normal-case text-[9px] text-amber-500">screening inputs mapped from project config → engine classify()</span></h2>
                 <div className="space-y-1.5">
                     {(['power', 'cooling', 'network', 'physical', 'monitoring'] as const).map((k) => (
                         <div key={k} className="flex items-center gap-2 text-xs">

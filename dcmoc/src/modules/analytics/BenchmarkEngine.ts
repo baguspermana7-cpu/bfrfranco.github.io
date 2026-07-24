@@ -59,7 +59,10 @@ export function calculateBenchmark(inputs: BenchmarkInputs): BenchmarkResult {
     const annualEnergyKwh = itLoadKw * effectivePue * 8760;
     const energyCostPerKw = annualOpex > 0 ? (annualOpex * 0.6) / itLoadKw : 1500; // ~60% of OPEX is energy
 
-    // Map user values to benchmark metric IDs
+    // Map user values to benchmark metric IDs.
+    // screening: the `|| <n>` tails are neutral fallbacks used only when an
+    // upstream input is absent (e.g. staff_per_mw→7, capex_per_kw→12000); the
+    // uptime/mttr constants are Uptime Institute tier-standard reference points.
     const userValues: Record<string, number> = {
         pue: effectivePue,
         wue: effectivePue <= 1.15 ? 0.3 : effectivePue <= 1.3 ? 1.0 : 1.5, // Estimate from cooling type

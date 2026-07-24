@@ -1535,10 +1535,11 @@ function dashFinancial(): FinancialResult | null {
         const i = sim().inputs;
         const taxRate = sim().selectedCountry?.economy?.taxRate ?? 0.22;
         const annualOpex = dashOpexAnnual() ?? Math.round(capexTotal * 0.06);
-        const key = [capexTotal, i.itLoad, taxRate, annualOpex, (i.occupancyRamp ?? []).join(',')].join('|');
+        const rev = i.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH; // live SSOT (optimizer tunable)
+        const key = [capexTotal, i.itLoad, taxRate, annualOpex, rev, (i.occupancyRamp ?? []).join(',')].join('|');
         if (_finCache?.key === key) return _finCache.fin;
         const fin = calculateFinancials({
-            totalCapex: capexTotal, annualOpex, revenuePerKwMonth: DEFAULT_REVENUE_PER_KW_MONTH,
+            totalCapex: capexTotal, annualOpex, revenuePerKwMonth: rev,
             itLoadKw: i.itLoad, discountRate: 0.10, projectLifeYears: 15, escalationRate: 0.03,
             opexEscalation: 0.03, occupancyRamp: i.occupancyRamp?.length ? i.occupancyRamp : defaultOccupancyRamp(15),
             taxRate, depreciationYears: 15,

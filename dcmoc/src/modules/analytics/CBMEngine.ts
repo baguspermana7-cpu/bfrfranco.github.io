@@ -84,7 +84,7 @@ export function calculateCBM(input: CBMInput): CBMResult {
     const { country, itLoadKw, tierLevel, coolingType, coolingTopology, powerRedundancy, enabledCategories, dcimTier } = input;
     const selectedTier = dcimTier ?? 'standard';
 
-    // Estimate rack count
+    // Estimate rack count — screening: 8 kW/rack avg (typical enterprise mixed-density; high-density AI racks run far higher)
     const avgKwPerRack = 8;
     const rackCount = Math.ceil(itLoadKw / avgKwPerRack);
 
@@ -102,7 +102,10 @@ export function calculateCBM(input: CBMInput): CBMResult {
     const allCategories: SensorCategory[] = ['temperature', 'humidity', 'power-quality', 'vibration', 'fluid-leak', 'airflow', 'door-access'];
     const enabled = enabledCategories ?? allCategories;
 
-    // Define sensor specifications
+    // Define sensor specifications.
+    // screening: unitCost = vendor list-price estimates; failureDetectionRate /
+    // energySavingsPercent are planning-grade CBM effectiveness assumptions (not
+    // field-measured) — they drive the ROI/payback below, so treat as indicative.
     const sensorDefs: Omit<SensorSpec, 'enabled'>[] = [
         {
             category: 'temperature',

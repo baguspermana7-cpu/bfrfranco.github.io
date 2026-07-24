@@ -108,7 +108,7 @@ export function useDashboardData(): DashboardData {
             const years = 15;
             const annualOpex = opexAnnual ?? Math.round(capex.total * 0.06);
             financial = calculateFinancials({
-                totalCapex: capex.total, annualOpex, revenuePerKwMonth: DEFAULT_REVENUE_PER_KW_MONTH,
+                totalCapex: capex.total, annualOpex, revenuePerKwMonth: inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH,
                 itLoadKw, discountRate: 0.10, projectLifeYears: years, escalationRate: 0.03,
                 opexEscalation: 0.03, occupancyRamp: inputs.occupancyRamp?.length ? inputs.occupancyRamp : defaultOccupancyRamp(years),
                 taxRate, depreciationYears: years,

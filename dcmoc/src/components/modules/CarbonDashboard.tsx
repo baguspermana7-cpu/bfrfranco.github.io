@@ -152,20 +152,20 @@ const CarbonDashboard = () => {
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-2 mb-1">
                             <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                            <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Offset Cost</span><Tooltip content="Cost to offset remaining carbon emissions through voluntary carbon credits at current market rate ($25/tCO2)." />
+                            <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Offset Cost</span><Tooltip content="Cost to offset remaining carbon emissions through voluntary carbon credits at the engine market rate (DATA.carbon.offsetPrice, $35/tCO2 2026 voluntary blend; $45/tCO2 local fallback when the engine is not loaded)." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.carbonOffsetCostUSD)}</div>
-                        <div className="text-xs text-slate-500 mt-1">@ $25/tCO₂ voluntary market</div>
+                        <div className="text-xs text-slate-500 mt-1">@ $35/tCO₂ voluntary market</div>
                     </CardContent>
                 </Card>
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-2 mb-1">
                             <AlertTriangle className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                            <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Carbon Tax Risk</span><Tooltip content="Potential annual carbon tax liability based on EU ETS-equivalent rate ($50/tCO2). Risk increases with stricter regulations." />
+                            <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Carbon Tax Risk</span><Tooltip content="Potential annual carbon tax liability based on the EU ETS-equivalent rate the engine uses ($68/tCO2, 2025-2026 EUR 63 avg → ~$68). Risk increases with stricter regulations." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.carbonTaxExposureUSD)}</div>
-                        <div className="text-xs text-slate-500 mt-1">@ $50/tCO₂ (EU ETS rate)</div>
+                        <div className="text-xs text-slate-500 mt-1">@ $68/tCO₂ (EU ETS rate)</div>
                     </CardContent>
                 </Card>
             </div>
@@ -381,7 +381,7 @@ const CarbonDashboard = () => {
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
                                 <Target className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
-                                Carbon Net-Zero Trajectory ({currentYear} - 2050)<Tooltip content="Projected emissions reduction pathway assuming accelerating renewable energy adoption over time. Uses a logistic curve model from current renewable offset to full net-zero by 2050, aligned with Paris Agreement targets." />
+                                Carbon Net-Zero Trajectory ({currentYear} - 2050)<Tooltip content="Screening illustration, not an engine projection: a decarbonisation pathway assuming accelerating renewable adoption from the current renewable offset to net-zero by 2050 (Paris-aligned). Shape is a fixed power-law ease-out (exponent 2.5) — indicative curve for planning, no site-specific abatement model behind it." />
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-4">

@@ -129,11 +129,11 @@ export function ReportDashboard() {
                         inputs: inputs,
                         capex: fullData.capex,
                         financial: {
-                            npv: (fullData as any).financialNPV || 15000000,
-                            irr: 18.5,
-                            paybackPeriodYears: 3.2,
+                            npv: fullData.financialResult.npv,
+                            irr: fullData.financialResult.irr,
+                            paybackPeriodYears: fullData.financialResult.paybackPeriodYears,
                             cashflows: fullData.fiveYearProjection.map((y, idx) => {
-                                const revenue = inputs.itLoad * 150 * 12 * Math.pow(1.02, idx);
+                                const revenue = inputs.itLoad * (inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH) * 12 * Math.pow(1.02, idx);
                                 const fcf = revenue - y.totalAnnualCost;
                                 return {
                                     year: y.year,
@@ -286,7 +286,7 @@ export function ReportDashboard() {
         const financialResult = calculateFinancials({
             totalCapex: capexResults.total,
             annualOpex: opexAnnual,
-            revenuePerKwMonth: DEFAULT_REVENUE_PER_KW_MONTH,
+            revenuePerKwMonth: inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH, // live SSOT (optimizer tunable)
             itLoadKw: inputs.itLoad,
             discountRate: 0.08,
             projectLifeYears,
@@ -337,7 +337,7 @@ export function ReportDashboard() {
                     recommendation: 'Review CAPEX basis (CAPEX Engine) and the revenue assumption (Requirements) before proceeding.',
                     detail: `Root cause (live figures): CAPEX ${fmtMoney(capexResults.total)} + annual OPEX ${fmtMoney(opexAnnual)} ` +
                         `(labor ${fmtMoney(totalMonthlyLabor * 12)} + maintenance ${fmtMoney(stratCost)}) vs revenue basis ` +
-                        `$${DEFAULT_REVENUE_PER_KW_MONTH}/kW·mo @ IT load ${inputs.itLoad.toLocaleString()} kW, discount 8%, ${projectLifeYears} yr → NPV ${fmtMoney(npvLive)}.`,
+                        `$${inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH}/kW·mo @ IT load ${inputs.itLoad.toLocaleString()} kW, discount 8%, ${projectLifeYears} yr → NPV ${fmtMoney(npvLive)}.`,
                     rule: 'Rule: NPV ≤ $0 → high severity.',
                 };
         const baseInsights: RichInsight[] = [
@@ -390,7 +390,7 @@ export function ReportDashboard() {
         const taxResult = selectedCountry.taxIncentives ? calculateTaxIncentives({
             country: selectedCountry,
             totalCapex: capexResults.total,
-            annualRevenue: inputs.itLoad * 150 * 12,
+            annualRevenue: inputs.itLoad * (inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH) * 12,
             annualOpex: opexAnnual,
             projectLifeYears: 10,
             discountRate: 0.08,
@@ -401,7 +401,7 @@ export function ReportDashboard() {
             country: selectedCountry,
             totalCapex: capexResults.total,
             itLoadKw: inputs.itLoad,
-            annualRevenue: inputs.itLoad * 150 * 12,
+            annualRevenue: inputs.itLoad * (inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH) * 12,
         }) : null;
 
         const gridResult = selectedCountry.gridReliability ? calculateGridReliability({
@@ -443,6 +443,7 @@ export function ReportDashboard() {
         return {
             allStaff, tlResults, engResults, techResults, supResults, janResults,
             totalMonthlyLabor, totalHeadcount,
+            financialResult,
             capex: capexResults,
             assets, schedule, roster, riskData: risk,
             insights: baseInsights,
@@ -1134,7 +1135,7 @@ export function ReportDashboard() {
                         buildingSize: inputs.buildingSize,
                     },
                     selectedCountry.labor.baseSalary_Engineer,
-                    12000,
+                    fullData.capex.metrics?.perKw ?? 12000,
                     0.20,
                     selectedCountry
                 ) : [];

@@ -194,11 +194,14 @@ export const calculateCarbonFootprint = (inputs: CarbonInputs): CarbonResult => 
         return Math.round((investment / savings) * 10) / 10;
     };
 
+    // screening: sizing fractions (solar 0.3× IT kW, BESS 0.1×), energy-savings
+    // shares (0.15/0.08/0.3) and the $80/MWh avoided-energy price are planning
+    // assumptions; only the $/kWp and $/kWh unit costs are sourced (IRENA/BNEF).
     const solarInvestment = itLoadKw * 0.3 * 900;  // $900/kWp (IRENA 2024 utility-scale avg)
     const solarSavings = totalEnergyMWh * 0.15 * 80;
     const bessInvestment = itLoadKw * 0.1 * 300;  // $300/kWh (BNEF 2025 utility-scale avg)
     const bessSavings = totalEnergyMWh * 0.08 * 80;
-    const liquidInvestment = itLoadKw * 300;
+    const liquidInvestment = itLoadKw * 300;  // screening: ~$300/kW DLC retrofit
     const liquidSavings = coolingEnergyMWh * 0.3 * 80;
 
     const reductionScenarios: CarbonReductionScenario[] = [

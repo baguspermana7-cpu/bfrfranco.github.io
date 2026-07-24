@@ -19,6 +19,7 @@ import {
     ComposedChart, Line, Area, Cell, ReferenceLine, LineChart,
 } from 'recharts';
 import { fmt, fmtMoney, fmtPct } from '@/lib/format';
+import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 import { TraceValue } from '@/components/ui/TraceValue';
 
@@ -62,7 +63,7 @@ const PhasedFinancialDashboard = () => {
     };
 
     const { capacityResult, phaseFinancials, blendedIrr, blendedNpv, blendedPayback, totalInvestment, profitabilityIndex, cashflowData, adjustments, scenarios, drawSchedule, totalIDC, constructionMonths, narrative, overallExplain, baseRev, optimizeAtRev } = useMemo(() => {
-        if (!selectedCountry) return { capacityResult: null, phaseFinancials: [] as PhaseFinancialResult[], blendedIrr: 0, blendedNpv: 0, blendedPayback: 0, totalInvestment: 0, profitabilityIndex: 0, cashflowData: [], adjustments: { tax: 0, disaster: 0, grid: 0, talent: 0 }, scenarios: [], drawSchedule: [], totalIDC: 0, constructionMonths: 0, narrative: '', overallExplain: null as DecisionExplain | null, baseRev: 150, optimizeAtRev: null as null | ((rev: number) => { irr: number; npv: number }) };
+        if (!selectedCountry) return { capacityResult: null, phaseFinancials: [] as PhaseFinancialResult[], blendedIrr: 0, blendedNpv: 0, blendedPayback: 0, totalInvestment: 0, profitabilityIndex: 0, cashflowData: [], adjustments: { tax: 0, disaster: 0, grid: 0, talent: 0 }, scenarios: [], drawSchedule: [], totalIDC: 0, constructionMonths: 0, narrative: '', overallExplain: null as DecisionExplain | null, baseRev: DEFAULT_REVENUE_PER_KW_MONTH, optimizeAtRev: null as null | ((rev: number) => { irr: number; npv: number }) };
 
         // 1. Get capacity plan
         const capPlan = calculateCapacityPlan({
@@ -75,7 +76,7 @@ const PhasedFinancialDashboard = () => {
             hybridRatio: inputs.hybridRatio,
         });
 
-        const baseRev = inputs.revenuePerKwMonth ?? 150; // optimizer tunable (Workstream D)
+        const baseRev = inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH; // optimizer tunable (Workstream D)
         // 2. Cross-module adjustments
         const taxResult = calculateTaxIncentives({
             country: selectedCountry,

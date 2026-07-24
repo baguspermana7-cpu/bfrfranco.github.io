@@ -81,10 +81,10 @@ export function ScenarioComparisonPanel() {
             const financialResult = calculateFinancials({
                 totalCapex: capexResult.total,
                 annualOpex,
-                /* #333 dedup — basis revenue SATU SUMBER (constants/finance).
-                 * Dulu hardcode 120 → IRR/NPV komparasi diverge dari MC dan
-                 * surface finansial lain yang pakai $280/kW·mo. */
-                revenuePerKwMonth: DEFAULT_REVENUE_PER_KW_MONTH,
+                /* #333 dedup — basis revenue SATU SUMBER: sim-store tunable
+                 * (optimizer bisa geser), fallback konstanta. Dulu hardcode
+                 * 120 → IRR/NPV komparasi diverge dari surface lain. */
+                revenuePerKwMonth: simInputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH,
                 itLoadKw: itLoad,
                 discountRate: 0.10,
                 projectLifeYears: 10,

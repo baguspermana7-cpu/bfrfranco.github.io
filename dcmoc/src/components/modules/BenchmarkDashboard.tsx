@@ -17,6 +17,7 @@ import { Tooltip as InfoTooltip } from '@/components/ui/Tooltip';
 import { computeCalibration, pctileLabelOf, type CalibrationResult } from '@/lib/calibration';
 import { explainThresholdMetric } from '@/lib/decision-explain';
 import { PUE_BY_COOLING } from '@/constants/pue';
+import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 import { TraceValue } from '@/components/ui/TraceValue';
 import clsx from 'clsx';
 
@@ -348,7 +349,7 @@ export default function BenchmarkDashboard() {
         const financialInputs = {
             totalCapex: capexResult.total,
             annualOpex,
-            revenuePerKwMonth: 120,
+            revenuePerKwMonth: inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH, // live SSOT (sim-store tunable, constant fallback) — was hardcoded 120
             itLoadKw: inputs.itLoad,
             discountRate: 0.10,
             projectLifeYears: 10,

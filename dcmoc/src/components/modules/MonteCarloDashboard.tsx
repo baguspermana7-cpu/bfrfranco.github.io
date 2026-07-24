@@ -112,9 +112,10 @@ export default function MonteCarloDashboard() {
         return {
             totalCapex: capexResult.total,
             annualOpex,
-            /* #333 dedup — basis revenue SATU SUMBER (constants/finance). Dulu
-             * hardcode 120 di sini → MC diverge dari surface lain ($280). */
-            revenuePerKwMonth: DEFAULT_REVENUE_PER_KW_MONTH,
+            /* #333 dedup — basis revenue SATU SUMBER: sim-store tunable
+             * (optimizer bisa geser), fallback konstanta. Dulu hardcode 120
+             * di sini → MC diverge dari surface lain. */
+            revenuePerKwMonth: inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH,
             itLoadKw: inputs.itLoad,
             discountRate: 0.10,
             projectLifeYears: 10,
@@ -217,7 +218,7 @@ export default function MonteCarloDashboard() {
                             {selectedCountry.name} · {(inputs.itLoad / 1000).toFixed(1)} MW · Tier {inputs.tierLevel} · ${selectedCountry.economy.electricityRate.toFixed(2)}/kWh
                             <span className="ml-1.5 rounded bg-rz-data/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-rz-data">project</span>
                         </div>
-                        <div className="text-[10px] text-slate-500 dark:text-slate-400">Revenue basis ${DEFAULT_REVENUE_PER_KW_MONTH}/kW·mo (illustrative, single-source)</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400">Revenue basis ${inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH}/kW·mo (illustrative, single-source)</div>
                         <button onClick={() => simActions.setActiveTab('requirements')}
                             className="mt-0.5 text-[10px] text-rz-mint hover:underline">Edit in Requirements ↗</button>
                     </div>

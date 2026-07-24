@@ -148,7 +148,9 @@ const FinancialDashboard = () => {
 
     // ─── Combined Financial + Revenue Inputs ────────────
     const [finInputs, setFinInputs] = useState({
-        revenuePerKwMonth: DEFAULT_REVENUE_PER_KW_MONTH,
+        /* seeded from the sim-store tunable (live SSOT) — same opening basis
+         * as Executive/Phased/MC/Report; user-editable after */
+        revenuePerKwMonth: inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH,
         discountRate: 0.10,
         projectLifeYears: 10,
         escalationRate: 0.03,
@@ -1220,8 +1222,8 @@ const FinancialDashboard = () => {
                     /* unit fix: kW × PUE × h × $/kWh = $ (no /1000 — see annualOpex) */
                     const energyCost = effectiveInputs.itLoad * ((rzData().pueMatrix as Record<string, Record<string, number>> | undefined)?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? 1.4) * 8760 * (selectedCountry?.economy.electricityRate ?? 0.10);
                     const maintenanceCost = effectiveInputs.itLoad * MAINT_PER_KW_YR;
-                    const insuranceCost = capexResults.total * 0.003; // 0.3% of CAPEX
-                    const overheadCost = annualOpex * 0.05; // 5% overhead
+                    const insuranceCost = capexResults.total * 0.003; // 0.3% of CAPEX — screening ratio (illustrative OPEX split, not engine-sourced)
+                    const overheadCost = annualOpex * 0.05; // 5% overhead — screening ratio (illustrative OPEX split, not engine-sourced)
 
                     const opexBreakdown = [
                         { category: 'Energy', value: energyCost, color: '#f59e0b' },

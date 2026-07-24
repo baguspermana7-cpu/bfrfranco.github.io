@@ -292,14 +292,14 @@ export function calculateAssetLifecycle(input: AssetLifecycleInput): AssetLifecy
     // Annual average CAPEX refresh
     const annualCapexRefresh = totalReplacementCost / projectionYears;
 
-    // NPV of replacements at 8% discount rate
+    // NPV of replacements — screening: 8% real discount rate (typical infra WACC assumption, not country-sourced)
     const discountRate = 0.08;
     const npvOfReplacements = replacements.reduce((npv, r) => {
         return npv + r.cost / Math.pow(1 + discountRate, r.year);
     }, 0);
 
     // --- Health Scores ---
-    const assumedAvgAge = 5; // assume assets are ~5 years old on average
+    const assumedAvgAge = 5; // screening: assume assets ~5 yr old on average (no per-unit as-built registry in a planning tool)
     const healthScores: AssetHealthScore[] = assets.map(a => {
         const ageYears = assumedAvgAge;
         // Engine healthIndex — provides health + remainingYears when model is present
@@ -313,6 +313,7 @@ export function calculateAssetLifecycle(input: AssetLifecycleInput): AssetLifecy
             ? Math.round(engineHealth.remainingYears)
             : Math.max(0, a.usefulLifeYears - ageYears);
         const ageRatio = Math.min(1, ageYears / a.usefulLifeYears);
+        // screening: exponential hazard proxy — 2% base × e^(1.5·ageRatio), capped 95% (bathtub wear-out shape, not a fitted Weibull)
         const failureProbability = Math.min(0.95, 0.02 * Math.exp(0.3 * ageRatio * 5));
         const riskLevel: AssetHealthScore['riskLevel'] =
             healthPct > 75 ? 'low' : healthPct > 50 ? 'medium' : healthPct > 25 ? 'high' : 'critical';

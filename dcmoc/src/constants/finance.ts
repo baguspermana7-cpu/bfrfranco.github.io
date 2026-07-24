@@ -6,7 +6,9 @@
  * in the Financial engine; this is only the labeled illustrative default.
  * ──────────────────────────────────────────────────────────────────────────── */
 
-/** Illustrative colocation revenue — $/kW·month. Mid-market rate that keeps the
- *  default project cash-positive (Executive IRR ~17%). Labeled "illustrative"
- *  wherever shown; the Financial module lets users override it. */
-export const DEFAULT_REVENUE_PER_KW_MONTH = 280;
+/** Illustrative colocation revenue — $/kW·month. MUST match the sim-store
+ *  optimizer-tunable default (`store/simulation.ts inputs.revenuePerKwMonth`)
+ *  — the store value is the live SSOT; this constant is only the fallback when
+ *  the store field is absent. 150 = conservative wholesale colo rate; the
+ *  optimizer / Financial module raise it explicitly (visible, never silent). */
+export const DEFAULT_REVENUE_PER_KW_MONTH = 150;

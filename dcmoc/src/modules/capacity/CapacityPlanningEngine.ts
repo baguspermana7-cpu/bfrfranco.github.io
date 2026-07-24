@@ -165,6 +165,7 @@ export const calculateCapacityPlan = (input: CapacityPlanInput): CapacityPlanRes
         const operationalMonth = phase.startMonth + phase.buildMonths;
 
         // Economy of scale: later phases get slightly cheaper per kW
+        // screening heuristic: −3%/phase learning-curve discount, floored at 0.9 (−10% max); not a sourced index
         const phaseIndex = phases.indexOf(phase);
         const phaseScaleDiscount = Math.max(0.9, 1 - phaseIndex * 0.03);
         const phaseCapexPerKw = Math.round(effectiveCpkw * scaleDiscount * phaseScaleDiscount);
@@ -181,6 +182,7 @@ export const calculateCapacityPlan = (input: CapacityPlanInput): CapacityPlanRes
         );
 
         // PUE improves slightly with scale
+        // screening heuristic: −0.02 PUE per later phase (bigger blocks tune better), capped at −0.08; directional, not sourced
         const pueImprovement = Math.min(0.08, phaseIndex * 0.02);
         const phasePue = Math.round((basePue - pueImprovement) * 100) / 100;
 
@@ -246,6 +248,7 @@ export const calculateCapacityPlan = (input: CapacityPlanInput): CapacityPlanRes
     for (let m = 0; m < totalMonths; m += 6) {
         const loadAtMonth = cumulativeItLoad[m];
         if (loadAtMonth > 0) {
+            // screening heuristic: PUE tunes down toward −0.08 as load approaches 50 MW; directional, not sourced
             const scaleEffect = Math.min(0.08, (loadAtMonth / 50000) * 0.08);
             pueEvolution.push({ month: m, pue: Math.round((basePue - scaleEffect) * 100) / 100 });
         } else {
@@ -260,12 +263,14 @@ export const calculateCapacityPlan = (input: CapacityPlanInput): CapacityPlanRes
         : phaseResults.reduce((s, p) => s + p.itLoadKw, 0);
     const totalItLoadKw = Math.round(engineTotalMw);
 
-    // Scalability score
+    // Scalability score (screening composite, 0-100 — weights below are heuristic, not sourced)
     const avgCapexPerKw = totalCapex / totalItLoadKw;
+    // screening: $/kW mapped to 0-100 via ÷200 (≈$20k/kW → 0, ≈$10k/kW → 50); arbitrary display scale, not a benchmark
     const capexEfficiency = Math.max(0, 100 - (avgCapexPerKw / 200)); // Lower $/kW = better
     const phaseSpacing = phases.length > 1
         ? Math.min(100, (phases[phases.length - 1].startMonth - phases[0].startMonth) / (phases.length - 1) / 24 * 100)
         : 50;
+    // screening weights: 50% capex-efficiency + 30% phase-spacing + 20% phase-count (×25/phase); heuristic composite, not a standard
     const scalabilityScore = Math.round(capexEfficiency * 0.5 + phaseSpacing * 0.3 + Math.min(100, phases.length * 25) * 0.2);
 
     // Phase efficiency (average utilization across operational phases)
@@ -314,6 +319,7 @@ export const calculateCapacityPlan = (input: CapacityPlanInput): CapacityPlanRes
         if (tierLevel === 4) risks.push('Tier IV concurrent maintainability requirements');
         if (risks.length === 0) risks.push('Standard construction risk profile');
 
+        // screening FMEA-style risk points (0-100): scale/timeline/overlap/cooling/tier additive weights — heuristic, not a quantified FMECA
         const riskScore = Math.min(100, Math.round(
             (pr.itLoadKw >= 20000 ? 25 : 10) +
             (pr.buildMonths > 18 ? 20 : 5) +
