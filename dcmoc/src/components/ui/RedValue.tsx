@@ -14,13 +14,18 @@
 
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { X, ArrowRight, Wrench, Activity } from 'lucide-react';
+import { X, ArrowRight, Wrench, Activity, BookOpen, ExternalLink } from 'lucide-react';
 import { useSimulationStore } from '@/store/simulation';
 
 export interface DiagnosisLever {
     label: string;                 // e.g. "Raise revenue to $166/kW·mo"
     detail?: string;               // quantified effect: "+1.2pp IRR — clears the 12% hurdle"
     tab?: string;                  // DCMOC tab id to jump to (manual revise path)
+}
+
+export interface DiagnosisReference {
+    title: string;                 // article title as published on resistancezero.com
+    href: string;                  // absolute URL, e.g. https://resistancezero.com/article-25.html
 }
 
 export interface Diagnosis {
@@ -32,6 +37,8 @@ export interface Diagnosis {
     levers?: DiagnosisLever[];     // quantified levers (manual path)
     tab?: string;                  // owning tab (Open in tab)
     note?: string;                 // basis/assumption footnote
+    /** Workstream N — related resistancezero.com articles (external reading list) */
+    references?: DiagnosisReference[];
 }
 
 export function RedValue({ value, diagnosis, className = '', onOptimize, children }: {
@@ -124,6 +131,29 @@ export function DiagnosticModal({ diagnosis: d, onClose, onOptimize }: {
                                                 Revise <ArrowRight className="h-3 w-3" />
                                             </button>
                                         )}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                    {/* related reading — external resistancezero.com articles (Workstream N) */}
+                    {d.references && d.references.length > 0 && (
+                        <div>
+                            <div className="mb-1 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                                <BookOpen className="h-3 w-3" /> Related reading — resistancezero.com
+                            </div>
+                            <ul className="space-y-1">
+                                {d.references.map((ref) => (
+                                    <li key={ref.href}>
+                                        <a
+                                            href={ref.href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="group inline-flex items-start gap-1.5 text-[11px] font-medium leading-snug text-cyan-700 dark:text-rz-info hover:underline"
+                                        >
+                                            <span>{ref.title}</span>
+                                            <ExternalLink className="mt-0.5 h-2.5 w-2.5 shrink-0 opacity-50 group-hover:opacity-100" />
+                                        </a>
                                     </li>
                                 ))}
                             </ul>

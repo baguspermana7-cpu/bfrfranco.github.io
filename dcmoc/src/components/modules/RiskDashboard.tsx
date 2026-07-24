@@ -13,6 +13,7 @@ import {
     Droplets, Truck, FileCheck, Server
 } from 'lucide-react';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { ScoreValue } from '@/components/ui/ScoreValue';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
 
 export default function RiskDashboard() {
@@ -111,7 +112,8 @@ export default function RiskDashboard() {
                     <div className="text-slate-500 dark:text-slate-400 text-xs uppercase mb-1 flex items-center gap-1">
                         <ShieldAlert className="w-3 h-3" /> Risk Score <Tooltip content="Aggregated risk score across all categories. Higher = more risk. Normalized to % of maximum possible score." />
                     </div>
-                    <div className="text-3xl font-bold text-slate-900 dark:text-white">{totalScore}</div>
+                    {/* Workstream M — ScoreValue: composite risk is LOWER-better; color keyed to the normalized (0-100) score */}
+                    <div><ScoreValue value={normalizedScore} direction="lower" max={100} display={totalScore} className="text-3xl" /></div>
                     <div className={`text-xs mt-1 ${normalizedScore > 60 ? 'text-red-600 dark:text-red-400' : normalizedScore > 35 ? 'text-amber-600 dark:text-amber-400' : 'text-rz-data'}`}>
                         {normalizedScore}% of maximum • {risks.length} risks
                     </div>
@@ -282,8 +284,9 @@ export default function RiskDashboard() {
                                         {getIcon(risk.category)}
                                         <span className="text-sm font-medium text-slate-900 dark:text-white">{risk.title}</span>
                                     </div>
-                                    <div className="text-xs font-mono text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-transparent">
-                                        {risk.score}
+                                    <div className="text-xs font-mono bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-transparent">
+                                        {/* Workstream M — ScoreValue: scenario score P×I on a /20 scale, lower-better */}
+                                        <ScoreValue value={risk.score} direction="lower" max={20} />
                                     </div>
                                 </div>
                                 <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 ml-6">{risk.description}</p>

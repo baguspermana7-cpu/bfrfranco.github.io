@@ -24,6 +24,7 @@ import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { ScoreValue } from '@/components/ui/ScoreValue';
 import { CheckCircle2, ChevronRight, ChevronDown, FileDown, ListChecks } from 'lucide-react';
 
 const WITNESS_STYLE: Record<string, { label: string; cls: string }> = {
@@ -377,7 +378,7 @@ export function CommissioningEnginePage() {
 
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'Readiness Index', value: readiness ? `${overall}%` : '—', sub: readiness ? `${readiness.status} (engine)` : 'enter completion below', trace: 'cx.readiness', tip: 'Weighted go-live readiness composite across the commissioning levels (weights are engine-real, heavier on L4/L5). Fed by the per-level completion you enter in the Readiness Completion panel below — shows "—" until progress is entered. Aim for ≥95% with zero open critical issues before scheduling IST.' },
+                            { label: 'Readiness Index', value: readiness ? `${overall}%` : '—', sub: readiness ? `${readiness.status} (engine)` : 'enter completion below', trace: 'cx.readiness', score: readiness ? overall : undefined, tip: 'Weighted go-live readiness composite across the commissioning levels (weights are engine-real, heavier on L4/L5). Fed by the per-level completion you enter in the Readiness Completion panel below — shows "—" until progress is entered. Aim for ≥95% with zero open critical issues before scheduling IST.' },
                             { label: 'Program Duration', value: `${rich.calendarDays ?? rich.durationDays} d`, sub: `~${rich.calendarMonths ?? rich.durationMonths} mo calendar · ${rich.laborDays ?? rich.durationDays} crew-days (≈${rich.crewEquivalent ?? 1} crews) · L0→L6`, tip: 'CALENDAR wall-time of the Cx program — the log-damped, capped program schedule with crews working levels in parallel; it can never exceed the single-crew serial total. The crew-days figure is the EFFORT (staffed labor across all levels, equipment-count-driven); dividing effort by calendar gives the implied parallel crew count. More crews compress calendar time, but test sequences (24h burn-ins, IST scenarios) set a hard floor.' },
                             { label: 'Systems in Scope', value: String(systems.length), sub: 'from equipment scaling', tip: 'Number of commissionable system classes derived from the engine equipment scaling (UPS, generators, chillers/CRAH, switchgear, fire, controls…). Each system adds L2-L4 test scope, program hours and cost — it grows with IT load and redundancy level, not by manual entry.' },
                             { label: 'Tests (screening)', value: testsTotal.toLocaleString(), sub: t.testsPassed != null ? `${t.testsPassed} passed · ${t.testsFailed ?? 0} failed` : 'counts × tests-per-unit', trace: 'cx.testsTotal', tip: 'Screening estimate of the total test count = engine unit counts × tests-per-unit for each system class. Use it for budgeting and duration sanity checks — it is not a Cx-agent test matrix, so do not treat it as the contractual deliverable list. Pass/fail figures appear once you log results.' },
@@ -390,9 +391,15 @@ export function CommissioningEnginePage() {
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { tip?: string }).tip && <InfoTip content={(k as { tip?: string }).tip!} />}</div>
                                 {(k as { trace?: string }).trace ? (
-                                    <TraceValue traceId={(k as { trace?: string }).trace!}>
-                                        <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
-                                    </TraceValue>
+                                    (k as { score?: number }).score != null ? (
+                                        /* Workstream M — ScoreValue: gradient color + ƒx trace (readiness, higher-better /100) */
+                                        <ScoreValue value={(k as { score?: number }).score!} display={k.value}
+                                            traceId={(k as { trace?: string }).trace!} className="text-lg" />
+                                    ) : (
+                                        <TraceValue traceId={(k as { trace?: string }).trace!}>
+                                            <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                        </TraceValue>
+                                    )
                                 ) : (
                                     <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
                                 )}

@@ -43,7 +43,7 @@ export default function RootLayout({
         {/* Shared RZExplain knowledge DB (window.RZ_EXPLAIN_DB, 802 entries) —
             consumed via src/lib/explain.ts + <Explain k="..."/> (SSR-guarded,
             renders nothing when absent). */}
-        <script src="/js/rz-explain-db.js?v=2026-07-23-b2" defer></script>
+        <script src="/js/rz-explain-db.js?v=2026-07-24-w" defer></script>
       </head>
       <body
         className={`${ibmPlexSans.variable} ${jetbrainsMono.variable} antialiased`}

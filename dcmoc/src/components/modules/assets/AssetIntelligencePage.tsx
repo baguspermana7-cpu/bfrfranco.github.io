@@ -22,6 +22,7 @@ import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { ScoreValue } from '@/components/ui/ScoreValue';
 import { fmtMoney } from '@/lib/format';
 import { Activity, ChevronRight, FileDown } from 'lucide-react';
 
@@ -213,7 +214,7 @@ export function AssetIntelligencePage() {
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
                             { label: 'Total Tracked Units', value: model.total.toLocaleString(), sub: 'engine equipment scaling', trace: 'asset.fleetUnits', tip: 'Fleet size from the engine equipment-scaling model — UPS modules, generators, cooling units, switchgear, batteries etc. sized from the IT load and redundancy config. Not a manually entered register: it re-scales when Requirements change, so treat it as the design fleet, not an as-built inventory.' },
-                            { label: 'Avg Health', value: `${model.avgHealth}/100`, sub: `age ${ageYears} yr · condition ${Math.round(condition * 100)}%`, trace: 'asset.avgHealth', tip: 'Fleet-average health index (0-100) computed from the fleet-age and condition assumptions set in the header controls, degraded per class by Weibull ageing on IEEE-493 life data. Move the fleet-age slider to explore how health decays; below ~60 average, replacement planning should already be underway.' },
+                            { label: 'Avg Health', value: `${model.avgHealth}/100`, sub: `age ${ageYears} yr · condition ${Math.round(condition * 100)}%`, trace: 'asset.avgHealth', score: model.avgHealth, tip: 'Fleet-average health index (0-100) computed from the fleet-age and condition assumptions set in the header controls, degraded per class by Weibull ageing on IEEE-493 life data. Move the fleet-age slider to explore how health decays; below ~60 average, replacement planning should already be underway.' },
                             { label: 'Excellent / Good', value: (model.buckets.excellent + model.buckets.good).toLocaleString(), sub: `${model.buckets.excellent.toLocaleString()} excellent`, trace: 'asset.healthExcellentGood', tip: 'Units in the top two health bands — operating within normal parameters with no near-term action needed beyond routine PM. The share here shrinks as the fleet-age assumption grows; a healthy mature fleet keeps most units in these bands through mid-life refreshes.' },
                             { label: 'Fair', value: model.buckets.fair.toLocaleString(), sub: 'monitor', trace: 'asset.healthFair', tip: 'Units in the middle health band — serviceable but trending down. These are the condition-monitoring priority: catching them here (oil analysis, thermography, battery impedance) is far cheaper than letting them slide into the poor/critical bands.' },
                             { label: 'Poor / Critical', value: (model.buckets.poor + model.buckets.critical).toLocaleString(), sub: 'plan replacement', trace: 'asset.healthPoorCritical', tip: 'Units in the bottom health bands where failure risk is materially elevated — budget and schedule replacement or major overhaul. Cross-check against the Class Health table: if a critical class (e.g. UPS batteries) dominates this bucket, it is also a reliability/SPOF concern, not just a maintenance line.' },
@@ -222,9 +223,15 @@ export function AssetIntelligencePage() {
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { tip?: string }).tip && <InfoTip content={(k as { tip?: string }).tip!} />}</div>
                                 {(k as { trace?: string }).trace ? (
-                                    <TraceValue traceId={(k as { trace?: string }).trace!}>
-                                        <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
-                                    </TraceValue>
+                                    (k as { score?: number }).score != null ? (
+                                        /* Workstream M — ScoreValue: gradient color + ƒx trace (fleet health, higher-better /100) */
+                                        <ScoreValue value={(k as { score?: number }).score!} display={k.value}
+                                            traceId={(k as { trace?: string }).trace!} className="text-lg" />
+                                    ) : (
+                                        <TraceValue traceId={(k as { trace?: string }).trace!}>
+                                            <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
+                                        </TraceValue>
+                                    )
                                 ) : (
                                     <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
                                 )}
@@ -280,7 +287,7 @@ export function AssetIntelligencePage() {
                                         <tr key={r.cls + r.label} className="border-b border-slate-100 dark:border-slate-800/60">
                                             <td className="py-1 text-slate-700 dark:text-slate-200">{r.label} <span className="text-[9px] text-slate-400">· {r.status}</span></td>
                                             <td className="text-right tabular-nums text-slate-500">{r.count.toLocaleString()}</td>
-                                            <td className="text-right"><span className={`tabular-nums font-semibold ${r.health >= 70 ? 'text-rz-data' : r.health >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{r.health}</span></td>
+                                            <td className="text-right"><ScoreValue value={r.health} direction="higher" /></td>
                                             <td className="text-right tabular-nums text-slate-500">{r.fpPct}%</td>
                                             <td className="text-right tabular-nums text-slate-500">{r.mtbfHrs ? `${(r.mtbfHrs / 1000).toFixed(0)}k h` : '—'}</td>
                                             <td className="text-right tabular-nums text-slate-500">{r.mttrHrs ? `${r.mttrHrs} h` : '—'}</td>
@@ -328,7 +335,8 @@ export function AssetIntelligencePage() {
                                                 <td className="text-right tabular-nums text-slate-500">{r.fpPct}%</td>
                                                 <td className="text-right tabular-nums text-slate-500">{r.mttrHrs} h</td>
                                                 <td className="text-right tabular-nums text-slate-500">{r.count.toLocaleString()}</td>
-                                                <td className="text-right"><span className={`tabular-nums font-semibold ${i < 3 ? 'text-rose-500' : 'text-slate-600 dark:text-slate-300'}`}>{r.crit.toFixed(1)}</span></td>
+                                                {/* Workstream M — ScoreValue: criticality is lower-better, scaled to the top-ranked score (top rank reads red) */}
+                                                <td className="text-right"><ScoreValue value={r.crit} display={r.crit.toFixed(1)} direction="lower" max={model.criticality[0]?.crit || 1} /></td>
                                             </tr>
                                         ))}
                                     </tbody>

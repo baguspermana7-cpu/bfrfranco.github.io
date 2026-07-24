@@ -8,6 +8,8 @@ import { ClipboardCheck, Shield, DollarSign, AlertTriangle, CheckCircle2, BarCha
 import clsx from 'clsx';
 import { fmtMoney, fmtMoneyFull } from '@/lib/format';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { ScoreValue } from '@/components/ui/ScoreValue';
+import { TraceValue } from '@/components/ui/TraceValue';
 
 /* ─── Score thresholds — SINGLE source for colouring, click-gating, and the
  * diagnostics collector. Mirrors the colour bands that were previously
@@ -205,13 +207,15 @@ export default function ComplianceDashboard() {
                 <p className="text-sm text-slate-500 mt-1">Module 41 — Auto-generated regulatory requirements per country</p>
             </div>
 
-            {/* KPIs */}
+            {/* KPIs — per-card node: score cells through ScoreValue (semantic
+              * color), money cells through TraceValue (ƒx lineage, no bogus
+              * color scale on money). */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                    { label: 'Total Requirements', value: result.totalCount, icon: ClipboardCheck, color: 'cyan', tip: 'Total number of regulatory and certification requirements applicable to this country, including fire, electrical, environmental, building, data-protection, and telecom categories.' },
-                    { label: 'Mandatory', value: result.mandatoryCount, icon: AlertTriangle, color: 'amber', tip: 'Requirements that are legally mandatory — non-compliance may result in fines, operational shutdowns, or license revocations.' },
-                    { label: 'Initial Cost', value: fmtMoney(result.totalInitialCost), icon: DollarSign, color: 'blue', tip: 'One-time compliance cost for certifications, inspections, equipment upgrades, and initial filing fees.' },
-                    { label: 'Annual Cost', value: fmtMoney(result.totalAnnualCost), icon: BarChart3, color: 'green', tip: 'Recurring annual cost for license renewals, periodic inspections, audits, and ongoing compliance monitoring.' },
+                    { label: 'Total Requirements', node: <ScoreValue value={result.totalCount} direction="higher" max={SCORE_MAX_ITEMS} className="text-2xl" />, icon: ClipboardCheck, color: 'cyan', tip: 'Total number of regulatory and certification requirements applicable to this country, including fire, electrical, environmental, building, data-protection, and telecom categories.' },
+                    { label: 'Mandatory', node: <ScoreValue value={result.mandatoryCount} direction="higher" max={result.totalCount} traceId="site.compMandatory" className="text-2xl" />, icon: AlertTriangle, color: 'amber', tip: 'Requirements that are legally mandatory — non-compliance may result in fines, operational shutdowns, or license revocations.' },
+                    { label: 'Initial Cost', node: <span className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue traceId="site.compInitialCost">{fmtMoney(result.totalInitialCost)}</TraceValue></span>, icon: DollarSign, color: 'blue', tip: 'One-time compliance cost for certifications, inspections, equipment upgrades, and initial filing fees.' },
+                    { label: 'Annual Cost', node: <span className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue traceId="site.compAnnualCost">{fmtMoney(result.totalAnnualCost)}</TraceValue></span>, icon: BarChart3, color: 'green', tip: 'Recurring annual cost for license renewals, periodic inspections, audits, and ongoing compliance monitoring.' },
                 ].map((kpi, i) => (
                     <div key={i} className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                         <div className="flex items-center gap-2 mb-2">
@@ -219,7 +223,7 @@ export default function ComplianceDashboard() {
                             <span className="text-xs text-slate-500">{kpi.label}</span>
                             <Tooltip content={kpi.tip} />
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white">{kpi.value}</div>
+                        <div>{kpi.node}</div>
                     </div>
                 ))}
             </div>
@@ -228,20 +232,21 @@ export default function ComplianceDashboard() {
             <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                 <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">Compliance Coverage Score <Tooltip content={`Weighted score (0-100): framework coverage (items/${SCORE_MAX_ITEMS}, weight 60) + mandatory ratio (weight 40). Score ≥${SCORE_GOOD} is good, ${SCORE_CRITICAL}-${SCORE_GOOD - 1} needs attention, <${SCORE_CRITICAL} is critical risk.`} /></h3>
-                    {result.complianceScore < SCORE_GOOD ? (
-                        <button
-                            onClick={() => setShowScorePanel(v => !v)}
-                            title={`Score ${result.complianceScore} below ${result.complianceScore < SCORE_CRITICAL ? SCORE_CRITICAL : SCORE_GOOD}. Click for the formula breakdown + uncovered mandatory items + measured levers.`}
-                            className={clsx(
-                                "text-2xl font-bold cursor-pointer underline decoration-dotted underline-offset-4",
-                                result.complianceScore >= SCORE_CRITICAL ? "text-amber-500" : "text-red-500"
-                            )}
-                        >
-                            {result.complianceScore}/100
-                        </button>
-                    ) : (
-                        <span className="text-2xl font-bold text-emerald-500">{result.complianceScore}/100</span>
-                    )}
+                    {/* Score renders through ScoreValue (ƒx trace + Explain +
+                      * semantic color). TraceValue is a REAL button, so the
+                      * breakdown-panel toggle is a SIBLING "why? ▾" button
+                      * (never nested) shown only when the score is below good. */}
+                    <div className="flex items-center gap-2">
+                        <ScoreValue value={result.complianceScore} unit="/100" direction="higher" max={100} traceId="site.compScore" explainKey="compliance-score" className="text-2xl" />
+                        {result.complianceScore < SCORE_GOOD && (
+                            <button
+                                onClick={() => setShowScorePanel(v => !v)}
+                                aria-expanded={showScorePanel}
+                                className="text-[10px] text-slate-500 underline decoration-dotted underline-offset-2 hover:text-slate-700 dark:hover:text-slate-300">
+                                why? {showScorePanel ? '▴' : '▾'}
+                            </button>
+                        )}
+                    </div>
                 </div>
                 <div className="h-3 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                     <div className={clsx(

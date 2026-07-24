@@ -10,6 +10,7 @@ import {
 import clsx from 'clsx';
 import { fmt, fmtMoney } from '@/lib/format';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { ScoreValue } from '@/components/ui/ScoreValue';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -471,7 +472,8 @@ export default function AssetLifecycleDashboard() {
                                         <div className={clsx("h-full rounded-full", HEALTH_COLORS[h.riskLevel])} style={{ width: `${h.healthPct}%` }} />
                                     </div>
                                     <div className="flex justify-between text-[10px]">
-                                        <span className="text-slate-600 dark:text-slate-400">{h.healthPct}% health</span>
+                                        {/* Workstream M — ScoreValue: gradient health color (higher-better /100) */}
+                                        <span className="text-slate-600 dark:text-slate-400"><ScoreValue value={h.healthPct} display={`${h.healthPct}%`} direction="higher" /> health</span>
                                         <span className="text-slate-600 dark:text-slate-400 flex items-center gap-0.5">{h.remainingLife}yr left <Tooltip content="Estimated years of useful life remaining based on age, condition, and maintenance history." /></span>
                                     </div>
                                     <div className="text-[10px] text-slate-500 dark:text-slate-500 mt-1 flex items-center gap-0.5">
@@ -598,7 +600,7 @@ export default function AssetLifecycleDashboard() {
                                                     {health && (
                                                         <div className="flex items-center justify-center gap-1">
                                                             <div className={clsx("w-2 h-2 rounded-full", HEALTH_COLORS[health.riskLevel])} />
-                                                            <span className="text-[10px] font-mono">{health.healthPct}%</span>
+                                                            <span className="text-[10px] font-mono"><ScoreValue value={health.healthPct} display={`${health.healthPct}%`} direction="higher" /></span>
                                                         </div>
                                                     )}
                                                 </td>

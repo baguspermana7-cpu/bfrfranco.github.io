@@ -10,6 +10,7 @@
 
 import React from 'react';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { ScoreValue } from '@/components/ui/ScoreValue';
 import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
 import { Explain } from '@/components/ui/Explain';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
@@ -17,7 +18,7 @@ import { useSimulationStore } from '@/store/simulation';
 import { useRequirementsStore } from '@/store/requirements';
 import CapacityDashboardMod from '@/components/modules/CapacityDashboard';
 import {
-    sanitizeCap, facilitySnapshot, overheadDonut, forecastSeries, utilization,
+    sanitizeCap, facilitySnapshot, overheadDonut, forecastSeries, utilization, utilBands, autoWhiteSpaceM2,
     equipmentTable, capRecommendations, capKeyInsights, type CapInputs, type UtilRow,
     coolingEquipmentTable, rackSpaceTable, networkTable, type ComponentRow,
 } from '@/state/adapters/capacity-adapter';
@@ -89,9 +90,10 @@ function explainUtilRow(i: CapInputs, u: UtilRow): ThresholdMetricExplain {
      * Watch solves back to OK (<70). NOTE: current power/cooling utilization is
      * structurally ≈ 1/(1+margin) in the adapter, so <70% is often unreachable
      * in-bounds — the honest quantified note renders instead. */
-    const atRisk = u.pct >= 85;
-    const target = atRisk ? 84 : OK_UTIL_PCT - 1;
-    const targetLabel = atRisk ? '<85% keluar At Risk' : `<${OK_UTIL_PCT}% OK`;
+    const bands = utilBands(i);
+    const atRisk = u.pct >= bands.watchMax;
+    const target = atRisk ? bands.watchMax - 1 : bands.okMax;
+    const targetLabel = atRisk ? `<${bands.watchMax}% keluar At Risk` : `≤${bands.okMax}% OK (margin-aware band)`;
     const specs: ThresholdLeverSpec[] = (UTIL_LEVERS[u.key] ?? []).map((kind): ThresholdLeverSpec => {
         if (kind === 'margin') return {
             lo: i.designMarginPct, hi: 30,
@@ -101,24 +103,27 @@ function explainUtilRow(i: CapInputs, u: UtilRow): ThresholdMetricExplain {
                 detail: `Raise design margin ${i.designMarginPct}% → ${x.toFixed(1)}% so ${u.label} utilization drops to ${Math.round(achieved)}% (${targetLabel}) — parameter in Requirements → Business (design margin).`,
             }),
             unreachable: (atHi) => ({
-                label: 'Design margin max 30% not enough',
-                detail: `Even a 30% margin only lowers ${u.label} utilization to ${Math.round(atHi)}% — combine with load deferral in the phase plan.`,
+                label: 'Margin moves the floor, not the distance',
+                detail: `Without a committed phase plan, capacity scales WITH the load, so utilization sits at the structural floor ≈ 100/(1+margin): margin 30% ⇒ ~77% by construction — that is NOT "margin kurang". Even 30% margin reads ${Math.round(atHi)}%. The real lever is PHASING: commit build phases larger than today's load and utilization drops genuinely.`,
             }),
             targetTab: 'requirements',
         };
-        if (kind === 'space') return {
-            lo: i.whiteFloorM2, hi: Math.min(200_000, i.whiteFloorM2 * 3),
-            metricAt: (x) => pctAt({ whiteFloorM2: x }),
-            render: (x, achieved) => ({
-                label: `White space ${i.whiteFloorM2.toLocaleString()} → ${Math.ceil(x).toLocaleString()} m²`,
-                detail: `Add white space to ${Math.ceil(x).toLocaleString()} m² (+${Math.ceil(x - i.whiteFloorM2).toLocaleString()} m²) → ${u.label} utilization ${Math.round(achieved)}% (${targetLabel}) — building-size parameter in Simulation setup.`,
-            }),
-            unreachable: (atHi) => ({
-                label: 'White space ×3 not enough',
-                detail: `Bahkan ${(i.whiteFloorM2 * 3).toLocaleString()} m² hanya mencapai ${Math.round(atHi)}% — konstrain lain yang mengikat (cek binding constraint / rack density).`,
-            }),
-            targetTab: 'sim',
-        };
+        if (kind === 'space') {
+            const autoM2 = autoWhiteSpaceM2(i);
+            return {
+                lo: Math.max(i.whiteFloorM2, autoM2), hi: Math.min(200_000, Math.max(i.whiteFloorM2, autoM2) * 3),
+                metricAt: (x) => pctAt({ whiteFloorM2: x }),
+                render: (x, achieved) => ({
+                    label: `Reserve area → ${Math.ceil(x).toLocaleString()} m²`,
+                    detail: `White space is AUTO-derived from the design rack count (racks × 0.72 m² ÷ 35% gross-up ≈ ${autoM2.toLocaleString()} m²) — you don't invent it. To reach ${u.label} ${Math.round(achieved)}% (${targetLabel}), reserve ≈${Math.ceil(x).toLocaleString()} m² in the building program via the phase plan (or lower density in Requirements).`,
+                }),
+                unreachable: (atHi) => ({
+                    label: 'Area alone not enough',
+                    detail: `Even ×3 area only reaches ${Math.round(atHi)}% — another constraint binds (check the binding-constraint row / rack density).`,
+                }),
+                targetTab: 'phases-local',
+            };
+        }
         return {  // 'itload' — defer/shift phases
             lo: i.itLoadKw, hi: i.itLoadKw * 0.4,
             metricAt: (x) => pctAt({ itLoadKw: x }),
@@ -166,6 +171,7 @@ export function CapacityPlanningPage() {
 
     const snap = React.useMemo(() => facilitySnapshot(i), [i]);
     const util = React.useMemo(() => utilization(i, snap.facilityMw), [i, snap.facilityMw]);
+    const bands = React.useMemo(() => utilBands(i), [i]);
     const designPowerMw = (util.rows.find((r) => r.key === 'power')?.capacity ?? 0) * 0.9;
     const forecast = React.useMemo(() => forecastSeries(i, +designPowerMw.toFixed(0)), [i, designPowerMw]);
     const donut = React.useMemo(() => overheadDonut(i, snap.facilityMw), [i, snap.facilityMw]);
@@ -371,17 +377,20 @@ export function CapacityPlanningPage() {
                                                     <div className={`h-2 rounded ${u.pct >= 85 ? 'bg-rose-500' : u.pct >= 70 ? 'bg-amber-500' : 'bg-rz-data'}`} style={{ width: `${Math.min(100, u.pct)}%` }} />
                                                 </div>
                                                 <span className="w-24 text-right tabular-nums text-slate-500">{u.used.toLocaleString()}/{u.capacity.toLocaleString()} {u.unit}</span>
-                                                <span className="w-9 text-right tabular-nums font-semibold text-slate-700 dark:text-slate-300"
-                                                    title={u.forecastPct != null ? `Now ${u.pct}% · forecast peak ${u.forecastPct}%${u.exhaustYear ? ` · exhaust ~${u.exhaustYear}` : ''}` : undefined}>{u.pct}%</span>
+                                                {/* Workstream M — ScoreValue: utilization is LOWER-better (low util = headroom = green) */}
+                                                <span className="w-9 text-right tabular-nums font-semibold"
+                                                    title={u.forecastPct != null ? `Now ${u.pct}% · forecast peak ${u.forecastPct}%${u.exhaustYear ? ` · exhaust ~${u.exhaustYear}` : ''}` : undefined}><ScoreValue value={u.pct} direction="lower" max={100} display={`${u.pct}%`} /></span>
                                                 {(() => {
-                                                    /* Banding forecast-aware (keputusan owner): status dari tekanan pertumbuhan */
+                                                    /* Banding forecast-aware + MARGIN-AWARE (Workstream R): without a phase
+                                                     * plan utilization sits at the 1/(1+margin) structural floor, so OK
+                                                     * starts just above it — margin 30% no longer reads "Watch forever". */
                                                     const bandPct = u.forecastPct ?? u.pct;
-                                                    const chipTitle = `Band from FORECAST peak ${bandPct}% (now ${u.pct}%)${u.exhaustYear ? ` — capacity exhausted ~${u.exhaustYear} without new phases` : ''} · click for quantified levers`;
-                                                    return bandPct >= 70 ? (
+                                                    const chipTitle = `Band from FORECAST peak ${bandPct}% (now ${u.pct}%) · OK ≤${bands.okMax}%${bands.hasPhasePlan ? '' : ` (margin floor ≈${bands.floorPct}%)`}${u.exhaustYear ? ` — capacity exhausted ~${u.exhaustYear} without new phases` : ''} · click for quantified levers`;
+                                                    return bandPct > bands.okMax ? (
                                                         <button onClick={() => setUtilExplain(utilExplain === u.key ? null : u.key)}
                                                             title={chipTitle}
-                                                            className={`w-auto min-w-14 shrink-0 rounded px-1 py-0.5 text-[9px] font-semibold ${bandPct >= 85 ? 'bg-rose-500/15 text-rose-500' : 'bg-amber-500/15 text-amber-500'} ${utilExplain === u.key ? 'ring-1 ring-amber-400' : ''}`}>
-                                                            {bandPct >= 85 ? 'At Risk' : 'Watch'}{u.exhaustYear ? ` ·~${u.exhaustYear}` : ''} ⓘ
+                                                            className={`w-auto min-w-14 shrink-0 rounded px-1 py-0.5 text-[9px] font-semibold ${bandPct >= bands.watchMax ? 'bg-rose-500/15 text-rose-500' : 'bg-amber-500/15 text-amber-500'} ${utilExplain === u.key ? 'ring-1 ring-amber-400' : ''}`}>
+                                                            {bandPct >= bands.watchMax ? 'At Risk' : 'Watch'}{u.exhaustYear ? ` ·~${u.exhaustYear}` : ''} ⓘ
                                                         </button>
                                                     ) : <span title={chipTitle} className="w-14 shrink-0 cursor-help rounded px-1 py-0.5 text-center text-[9px] font-semibold bg-rz-data/15 text-rz-data">OK</span>;
                                                 })()}
@@ -430,7 +439,7 @@ export function CapacityPlanningPage() {
                                             <tr key={r.label} className="border-b border-slate-100 dark:border-slate-800/60">
                                                 <td className="py-1.5 text-slate-700 dark:text-slate-200">{r.label}</td>
                                                 <td className="text-right tabular-nums text-slate-500">{r.config}</td>
-                                                <td className="text-right tabular-nums text-slate-500">{r.utilPct}%</td>
+                                                <td className="text-right"><ScoreValue value={r.utilPct} direction="lower" max={100} display={`${r.utilPct}%`} /></td>
                                                 <td className="text-right"><span title={r.remediation ?? 'Healthy utilization (<70%)'} className={`cursor-help rounded px-1.5 py-0.5 text-[9px] font-semibold ${r.status === 'OK' ? 'bg-rz-data/15 text-rz-data' : r.status === 'Watch' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{r.status}{r.remediation ? ' ⓘ' : ''}</span></td>
                                             </tr>
                                         ))}
@@ -517,7 +526,7 @@ function DetailTable({ table, headTips, footnote, onPhase, onReq }: {
                         <tr key={r.label} className="border-b border-slate-100 dark:border-slate-800/60">
                             <td className="py-1.5 text-slate-700 dark:text-slate-200">{r.label}{r.tip && <InfoTip content={r.tip} />}</td>
                             <td className="text-right tabular-nums text-slate-500">{r.config}</td>
-                            <td className="text-right tabular-nums text-slate-500">{r.utilPct}%</td>
+                            <td className="text-right"><ScoreValue value={r.utilPct} direction="lower" max={100} display={`${r.utilPct}%`} /></td>
                             <td className="text-right"><span className={`rounded px-1.5 py-0.5 text-[9px] font-semibold ${r.status === 'OK' ? 'bg-rz-data/15 text-rz-data' : r.status === 'Watch' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{r.status}{r.remediation ? ' ⓘ' : ''}</span></td>
                         </tr>
                     ))}

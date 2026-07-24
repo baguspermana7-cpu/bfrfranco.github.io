@@ -13,6 +13,7 @@ import React from 'react';
 import { useArchitectureStore } from '@/store/architecture';
 import type { DiagramModel, DiagBlock, DiagEdge, EdgeKind } from './layout';
 import { SymbolGlyph } from './palette';
+import { NodeDetailModal } from './NodeDetailModal';
 import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 
 const EDGE_STYLE: Record<EdgeKind, { stroke: string; dash?: string; label: string }> = {
@@ -57,7 +58,21 @@ function edgePath(from: DiagBlock, to: DiagBlock, offset = 0): string {
     return `M${a.x},${a.y + offset} H${midX} V${b.y + offset} H${b.x}`;
 }
 
-export function DiagramSvg({ model }: { model: DiagramModel }) {
+/** Midpoint for an engineering edge label — mirrors edgePath routing: same-row
+ *  → above the horizontal run; different rows → at the elbow midpoint;
+ *  feedback (target left of source) → above the drop segment. */
+function edgeLabelPos(from: DiagBlock, to: DiagBlock, offset = 0): { x: number; y: number } {
+    const a = anchor(from, 'r'); const b = anchor(to, 'l');
+    if (b.x <= a.x) {
+        const dropY = Math.max(from.y + from.h, to.y + to.h) + 16 + Math.abs(offset);
+        return { x: (a.x + b.x) / 2, y: dropY - 3 };
+    }
+    if (Math.abs(a.y - b.y) < 1) return { x: (a.x + b.x) / 2, y: a.y + offset - 4 };
+    const midX = (a.x + b.x) / 2 + offset;
+    return { x: midX, y: (a.y + b.y) / 2 };
+}
+
+export function DiagramSvg({ model, onNodeClick }: { model: DiagramModel; onNodeClick?: (b: DiagBlock) => void }) {
     const view = useArchitectureStore((s) => s.diagramView);
     const zoom = useArchitectureStore((s) => s.zoom);
     const panX = useArchitectureStore((s) => s.panX);
@@ -72,7 +87,10 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
         e.preventDefault();
         set({ zoom: Math.min(3, Math.max(0.5, zoom * (e.deltaY > 0 ? 0.9 : 1.1))) });
     };
-    const onDown = (e: React.PointerEvent) => { drag.current = { x: e.clientX, y: e.clientY, px: panX, py: panY }; };
+    const onDown = (e: React.PointerEvent) => {
+        drag.current = { x: e.clientX, y: e.clientY, px: panX, py: panY };
+        downPt.current = { x: e.clientX, y: e.clientY };
+    };
     const onMove = (e: React.PointerEvent) => {
         if (!drag.current) return;
         set({ panX: drag.current.px + (e.clientX - drag.current.x) / zoom, panY: drag.current.py + (e.clientY - drag.current.y) / zoom });
@@ -102,6 +120,18 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
         setTip({ x: e.clientX - (r?.left ?? 0), y: e.clientY - (r?.top ?? 0), b });
     };
     const leaveNode = () => { setHover(null); setTip(null); };
+
+    /* click → subsystem detail modal — opens only on a true click (pointer
+     * travelled < 5px between down and up), so a pan-drag never triggers it */
+    const downPt = React.useRef<{ x: number; y: number } | null>(null);
+    const [detail, setDetail] = React.useState<DiagBlock | null>(null);
+    const clickNode = (b: DiagBlock) => (e: React.PointerEvent) => {
+        const d = downPt.current;
+        if (d && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 5) {
+            setDetail(b);
+            onNodeClick?.(b);
+        }
+    };
 
     return (
         <div className="relative" ref={wrapRef}>
@@ -157,11 +187,20 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
                         const hidden = sld && (e.kind === 'coolSupply' || e.kind === 'coolReturn' || e.kind === 'control');
                         if (hidden) return null;
                         const on = !hover || e.from === hover || e.to === hover;
-                        return <path key={i} d={edgePath(from, to, e.offset ?? 0)} fill="none"
-                            stroke={sld ? (e.kind === 'backup' ? '#f97316' : '#94a3b8') : s.stroke}
-                            strokeWidth={on && hover ? (sld ? 2.2 : 2.6) : (sld ? 1.4 : 1.6)} strokeDasharray={s.dash}
-                            opacity={on ? (hover ? 1 : 0.85) : 0.1}
-                            style={{ transition: 'opacity .15s, stroke-width .15s' }} />;
+                        const stroke = sld ? (e.kind === 'backup' ? '#f97316' : '#94a3b8') : s.stroke;
+                        const lp = e.label && !sld ? edgeLabelPos(from, to, e.offset ?? 0) : null;
+                        return (
+                            <g key={i} opacity={on ? (hover ? 1 : 0.85) : 0.1} style={{ transition: 'opacity .15s' }}>
+                                <path d={edgePath(from, to, e.offset ?? 0)} fill="none"
+                                    stroke={stroke}
+                                    strokeWidth={on && hover ? (sld ? 2.2 : 2.6) : (sld ? 1.4 : 1.6)} strokeDasharray={s.dash}
+                                    style={{ transition: 'stroke-width .15s' }} />
+                                {/* engineering edge label — supply/return °C + screening flow */}
+                                {lp && (
+                                    <text x={lp.x} y={lp.y} fontSize="6.5" fontWeight={700} textAnchor="middle" fill={stroke}>{e.label}</text>
+                                )}
+                            </g>
+                        );
                     })}
                     {/* NODES: the engineering symbol IS the node, label BELOW it */}
                     {model.blocks.map((b) => {
@@ -176,11 +215,13 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
                         const dim = !!connected && !connected.has(b.id);
                         return (
                             <g key={b.id} onPointerEnter={enterNode(b)} onPointerMove={moveNode(b)} onPointerLeave={leaveNode}
+                                onPointerUp={clickNode(b)}
                                 style={{ opacity: dim ? 0.32 : 1, transition: 'opacity .15s', cursor: 'pointer' }}>
-                                {/* hittable cell — faint hairline; lights up on hover */}
+                                {/* hittable cell — faint hairline (dashed = standby unit); lights up on hover */}
                                 <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={6}
                                     fill={isHover ? accent : 'transparent'} fillOpacity={isHover ? 0.08 : 0}
                                     stroke={isHover ? accent : CELL_STROKE} strokeWidth={isHover ? 1.3 : 0.7} strokeOpacity={isHover ? 0.9 : 0.5}
+                                    strokeDasharray={b.standby ? '4 3' : undefined}
                                     style={{ transition: 'fill-opacity .15s, stroke .15s' }}>
                                     <title>{b.hover ?? `${b.title}${b.sub ? ` — ${b.sub}` : ''}`}</title>
                                 </rect>
@@ -230,6 +271,8 @@ export function DiagramSvg({ model }: { model: DiagramModel }) {
                     {tip.b.hover && tip.b.hover !== tip.b.sub && <div className="mt-1 leading-snug text-slate-300">{tip.b.hover}</div>}
                 </div>
             )}
+            {/* node-click subsystem detail modal (portal) */}
+            {detail && <NodeDetailModal block={detail} model={model} onClose={() => setDetail(null)} />}
             {/* legend */}
             <div className="mt-2 flex flex-wrap items-center gap-3 rounded-lg border border-slate-200 dark:border-slate-800 px-2 py-1.5 text-[9px] text-slate-500">
                 <span className="font-semibold uppercase">Legend:</span>

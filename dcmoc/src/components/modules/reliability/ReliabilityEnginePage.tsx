@@ -31,6 +31,7 @@ import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { ShieldCheck, ChevronRight, FileDown, ArrowUpRight } from 'lucide-react';
 import { Explain } from '@/components/ui/Explain';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { ScoreValue } from '@/components/ui/ScoreValue';
 import { RedValue, type Diagnosis } from '@/components/ui/RedValue';
 import { explainThresholdMetric, DecisionLever } from '@/lib/decision-explain';
 /* single source of truth for the β-adjusted chain + nines formatters —
@@ -418,24 +419,30 @@ export function ReliabilityEnginePage() {
                     )}
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'Composed Availability', value: fmtAvail(model.overall), sub: meetsTier ? `meets Tier ${inputs.tierLevel} target` : `BELOW Tier ${inputs.tierLevel} target`, chip: `${ninesOf(model.overall)} nines`, title: 'β=5% common-cause screening (assumption)', trace: 'rel.composedAvailability', explain: 'availability', red: availDiag, tip: 'System availability composed across the documented power and cooling chains, including a β=5% common-cause screening factor (redundant paths are never perfectly independent). Compared against the Uptime tier target — the chip shows the result in "nines". Redundancy depth (N+1 → 2N) and MTTR are the strongest levers; see the remediation panel when below target.' },
+                            { label: 'Composed Availability', value: fmtAvail(model.overall), sub: meetsTier ? `meets Tier ${inputs.tierLevel} target` : `BELOW Tier ${inputs.tierLevel} target`, chip: `${ninesOf(model.overall)} nines`, title: 'β=5% common-cause screening (assumption)', trace: 'rel.composedAvailability', explain: 'availability', red: availDiag, score: model.overall * 100, tip: 'System availability composed across the documented power and cooling chains, including a β=5% common-cause screening factor (redundant paths are never perfectly independent). Compared against the Uptime tier target — the chip shows the result in "nines". Redundancy depth (N+1 → 2N) and MTTR are the strongest levers; see the remediation panel when below target.' },
                             { label: 'Tier Target', value: fmtAvail(model.tierTargetFrac), sub: `Tier ${inputs.tierLevel} (Uptime)`, trace: 'rel.tierTarget', explain: 'tier-class', tip: 'The Uptime Institute availability expectation for the selected tier (e.g. Tier III ≈ 99.982%, Tier IV ≈ 99.995%). It is a design expectation, not a certified guarantee — the engine flags the gap whenever the composed model falls below it. Change the tier in Requirements to move this target.' },
                             { label: 'Downtime (unplanned)', value: fmtDowntime(model.downtimeMin), sub: `budget ${fmtDowntime(model.budgetMin)}`, trace: 'rel.downtimeMin', tip: 'Expected unplanned downtime per year = (1 − composed availability) × 525,600 min, shown against the tier downtime budget. Exceeding the budget usually traces to a SPOF or a long-MTTR component — the SPOF list and sensitivity table below identify which. Planned maintenance windows are excluded.' },
                             { label: 'MTBF (series composite)', value: `≈ ${(model.mtbfAll / 1000).toFixed(0)}k h`, sub: '1/Σλ serial — excl. redundancy', explain: 'mtbf', trace: 'rel.mtbfComposite' },
                             { label: 'MTTR (avg)', value: `${model.mttrAvg} h`, sub: 'component average', explain: 'mttr', trace: 'rel.mttrAvg' },
-                            { label: 'Reliability Score', value: `${model.score}/100`, sub: 'documented composite', trace: 'rel.score', tip: 'Documented composite score (0-100) combining availability vs. the tier target, SPOF count and redundancy depth. A screening indicator for comparing design configurations against each other — not a certified rating. Removing SPOFs and adding path redundancy move it the most.' },
+                            { label: 'Reliability Score', value: `${model.score}/100`, sub: 'documented composite', trace: 'rel.score', score: model.score, tip: 'Documented composite score (0-100) combining availability vs. the tier target, SPOF count and redundancy depth. A screening indicator for comparing design configurations against each other — not a certified rating. Removing SPOFs and adding path redundancy move it the most.' },
                         ].map((k) => (
                             <div key={k.label} title={(k as { title?: string }).title} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { tip?: string }).tip && <InfoTip content={(k as { tip?: string }).tip!} />}{(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>
                                 <div className="flex items-baseline gap-1.5">
                                     {(k as { trace?: string }).trace ? (
-                                        <TraceValue traceId={(k as { trace?: string }).trace!}>
-                                            {(k as { red?: Diagnosis | null }).red ? (
+                                        (k as { red?: Diagnosis | null }).red ? (
+                                            <TraceValue traceId={(k as { trace?: string }).trace!}>
                                                 <RedValue className="text-base font-bold tabular-nums" diagnosis={(k as { red?: Diagnosis | null }).red!}>{k.value}</RedValue>
-                                            ) : (
+                                            </TraceValue>
+                                        ) : (k as { score?: number }).score != null ? (
+                                            /* Workstream M — ScoreValue: gradient color + ƒx trace on the non-red (green) path */
+                                            <ScoreValue value={(k as { score?: number }).score!} display={k.value} direction="higher"
+                                                traceId={(k as { trace?: string }).trace!} className="text-base" />
+                                        ) : (
+                                            <TraceValue traceId={(k as { trace?: string }).trace!}>
                                                 <div className="text-base font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
-                                            )}
-                                        </TraceValue>
+                                            </TraceValue>
+                                        )
                                     ) : (
                                         <div className="text-base font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
                                     )}

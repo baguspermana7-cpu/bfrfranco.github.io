@@ -8,11 +8,16 @@ import { useEffectiveInputs } from '@/store/useEffectiveInputs';
 import { COUNTRIES, CountryProfile } from '@/constants/countries';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { ScoreValue } from '@/components/ui/ScoreValue';
+import { TraceValue } from '@/components/ui/TraceValue';
+import { RedValue, type Diagnosis } from '@/components/ui/RedValue';
+import { RELATED_ARTICLES } from '@/lib/related-articles';
 import { GraduationCap, Users, DollarSign, Clock, TrendingUp, Award } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer, Cell,
 } from 'recharts';
 import { fmt, fmtMoney } from '@/lib/format';
+import { topNWithSelected } from '@/lib/chart-utils';
 
 /* ── Difficulty banding constants (single source: pewarnaan + gate panel + collector).
  * Band OWNER is TalentAvailabilityEngine (talentScore ≥75 Easy · ≥55 Moderate ·
@@ -157,6 +162,28 @@ const TalentDashboard = () => {
         return <div className="p-8 text-center text-slate-500">Select a country to view talent analysis.</div>;
     }
 
+    /* ── RedValue diagnosis (Workstream C/N) — every figure comes from the SAME
+     * engine run as the KPIs; banding thresholds are the parity-checked mirrors. */
+    const premiumPct = (result.adjustedSalaryMultiplier - 1) * 100;
+    const depressingFactors = result.talentBreakdown.filter(b => isNegativeImpact(b.impact)).map(b => `${b.metric} (${b.value})`).join(' · ')
+        || 'mixed factor profile — no single factor is red';
+    const talentDiagnosis: Diagnosis | null = difficultyIsBad ? {
+        title: `Hiring Difficulty — ${result.hiringDifficulty} (${selectedCountry.name})`,
+        actual: `talent score ${result.talentScore}/100`,
+        threshold: `Moderate band requires ≥ ${TALENT_DIFFICULT_THRESHOLD}`,
+        gap: `${Math.max(0, TALENT_DIFFICULT_THRESHOLD - result.talentScore)} pts below the Moderate band`,
+        reason: `TalentAvailabilityEngine bands the ${selectedCountry.name} talent score ${result.talentScore} as ${result.hiringDifficulty} (band ${result.hiringDifficulty === HIRING_RED_DIFFICULTY ? `< ${TALENT_VERY_DIFFICULT_THRESHOLD}` : `${TALENT_VERY_DIFFICULT_THRESHOLD}–${TALENT_DIFFICULT_THRESHOLD - 1}`}). Live effects on this project: salary premium +${premiumPct.toFixed(0)}%, average hiring ${selectedCountry.talentPool?.avgHiringDays ?? 40} days/hire, ${result.timeToFullStaff} months to staff the ${totalFTE} FTE team. Depressing factors: ${depressingFactors}.`,
+        levers: [
+            { label: 'Re-select country / site', detail: 'Talent score is a country attribute — compare candidate locations in Site Intelligence before committing.', tab: 'site' },
+            { label: 'Vendor / outsourced O&M sourcing', detail: 'Shift scarce roles to a maintenance vendor contract instead of direct hires — reduces the FTE pipeline the local market must supply.', tab: 'maint' },
+            { label: 'Adjust the shift model', detail: 'A leaner shift pattern lowers total FTE, shortening the hiring pipeline the time-to-staff figure depends on.', tab: 'sim' },
+            { label: 'Train-to-hire pipeline + remote NOC', detail: 'Grow junior talent through a training pipeline and centralize L1 monitoring in a remote NOC — offsets a shallow senior pool (no single tab owns this lever).' },
+        ],
+        tab: 'talent',
+        references: RELATED_ARTICLES.talent,
+        note: 'Banding mirrors TalentAvailabilityEngine (≥75 Easy · ≥55 Moderate · ≥35 Difficult · else Very Difficult); the inline trade-off panel parity-checks this mirror against the engine every render ("≡ engine" chip).',
+    } : null;
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -179,14 +206,23 @@ const TalentDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">Talent Score</span>
                             <Tooltip content="Composite talent availability score (0-100) based on engineer pool, university pipeline, hyperscaler competition, hiring speed, and certifications." />
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white">{result.talentScore}</div>
-                        {difficultyIsBad ? (
-                            <button
-                                onClick={() => setShowDifficultyPanel(v => !v)}
-                                title={`${result.hiringDifficulty}: talent score ${result.talentScore} — click for the measured trade-off (live engine) + levers`}
-                                className={`text-xs mt-1 px-2 py-0.5 rounded border w-fit cursor-pointer hover:brightness-125 ${difficultyColors[result.hiringDifficulty]}`}>
-                                {result.hiringDifficulty} {showDifficultyPanel ? '▲' : '▼'}
-                            </button>
+                        <div><ScoreValue value={result.talentScore} direction="higher" max={100} traceId="site.talentScore" explainKey="talent-index" className="text-2xl" /></div>
+                        {difficultyIsBad && talentDiagnosis ? (
+                            /* RedValue chip (diagnostic modal) + SIBLING panel toggle —
+                             * TraceValue/toggles are real buttons, never nested. */
+                            <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                                <RedValue diagnosis={talentDiagnosis} className="w-fit">
+                                    <span className={`text-xs px-2 py-0.5 rounded border inline-flex items-center gap-1 ${difficultyColors[result.hiringDifficulty]}`}>
+                                        {result.hiringDifficulty} — why?
+                                    </span>
+                                </RedValue>
+                                <button
+                                    onClick={() => setShowDifficultyPanel(v => !v)}
+                                    aria-expanded={showDifficultyPanel}
+                                    className="text-[10px] text-slate-500 underline decoration-dotted underline-offset-2 hover:text-slate-700 dark:hover:text-slate-300">
+                                    trade-off matrix {showDifficultyPanel ? '▴' : '▾'}
+                                </button>
+                            </div>
                         ) : (
                             <div className={`text-xs mt-1 px-2 py-0.5 rounded border w-fit ${difficultyColors[result.hiringDifficulty]}`}>
                                 {result.hiringDifficulty}
@@ -202,7 +238,7 @@ const TalentDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">Salary Premium</span>
                             <Tooltip content="How facility pay compares to local market rates. Below 90% increases attrition risk." />
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white">+{((result.adjustedSalaryMultiplier - 1) * 100).toFixed(0)}%</div>
+                        <div><ScoreValue value={premiumPct} display={`+${premiumPct.toFixed(0)}%`} direction="lower" max={30} className="text-2xl" tip="Premium over local market pay the model prices in to attract scarce DC talent. Color scale 0–30% (the engine's premium range): near 0% green (buyer's market), 30%+ red (severe competition). The premium compounds every year of the staff cost line — it is not a one-time signing cost." /></div>
                         <div className="text-xs text-slate-500 mt-1">{fmtMoney(result.adjustedAnnualStaffCost - annualStaffCost)}/yr extra</div>
                     </CardContent>
                 </Card>
@@ -214,7 +250,7 @@ const TalentDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">Time to Staff</span>
                             <Tooltip content="Estimated months to recruit and onboard the full operations team based on local talent pool depth and competition." />
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white">{result.timeToFullStaff}</div>
+                        <div><ScoreValue value={result.timeToFullStaff} direction="lower" max={24} traceId="site.talentTimeToStaff" className="text-2xl" /></div>
                         <div className="text-xs text-slate-500 mt-1">months to full team</div>
                     </CardContent>
                 </Card>
@@ -226,7 +262,7 @@ const TalentDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">Turnover</span>
                             <Tooltip content="Annual percentage of staff departing. Data center industry average is 10-15%. Higher rates increase recruitment costs." />
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white">{(result.adjustedTurnoverRate * 100).toFixed(0)}%</div>
+                        <div><ScoreValue value={result.adjustedTurnoverRate * 100} display={`${(result.adjustedTurnoverRate * 100).toFixed(0)}%`} direction="lower" max={30} traceId="site.talentTurnover" className="text-2xl" /></div>
                         <div className="text-xs text-slate-500 mt-1">{fmtMoney(result.annualTurnoverCost)}/yr cost</div>
                     </CardContent>
                 </Card>
@@ -238,7 +274,7 @@ const TalentDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">Training/Yr</span>
                             <Tooltip content="Annual training hours per employee. Critical for maintaining certifications and operational competency." />
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.annualTrainingCost)}</div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue traceId="site.talentTraining">{fmtMoney(result.annualTrainingCost)}</TraceValue></div>
                     </CardContent>
                 </Card>
 
@@ -249,7 +285,7 @@ const TalentDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">Recruit Cost</span>
                             <Tooltip content="Total one-time recruitment expenditure for staffing the facility. Includes agency fees, relocation, and onboarding costs." />
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white">{fmtMoney(result.totalRecruitmentCost)}</div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue traceId="site.talentRecruitCost">{fmtMoney(result.totalRecruitmentCost)}</TraceValue></div>
                         <div className="text-xs text-slate-500 mt-1">{fmtMoney(result.recruitmentCostPerHire)}/hire</div>
                     </CardContent>
                 </Card>
@@ -396,7 +432,7 @@ const TalentDashboard = () => {
                     <CardContent className="pt-6">
                         <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Talent Score by Country</h3>
                         <ResponsiveContainer width="100%" height={400}>
-                            <BarChart data={countryComparison.slice(0, 15)} layout="vertical" margin={{ left: 70 }}>
+                            <BarChart data={topNWithSelected(countryComparison, selectedCountry?.id)} layout="vertical" margin={{ left: 70 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
                                 <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11, fill: '#94a3b8' }} />
                                 <YAxis dataKey="country" type="category" width={80} tick={{ fontSize: 10, fill: '#94a3b8' }} />
@@ -406,7 +442,7 @@ const TalentDashboard = () => {
                                     formatter={(v: any, name: any) => [name === 'score' ? `${v}/100` : `+${v?.toFixed?.(0) ?? v}%`, name === 'score' ? 'Talent Score' : 'Salary Premium']}
                                 />
                                 <Bar dataKey="score" radius={[0, 4, 4, 0]}>
-                                    {countryComparison.slice(0, 15).map((entry) => (
+                                    {topNWithSelected(countryComparison, selectedCountry?.id).map((entry) => (
                                         <Cell
                                             key={entry.code}
                                             fill={entry.code === selectedCountry.id ? '#FFAA00' : entry.score >= 70 ? '#00FF88' : entry.score >= 45 ? '#f59e0b' : '#ef4444'}

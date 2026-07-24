@@ -12,6 +12,7 @@ import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import type { CandidateSite, SiteScoreResult, AxisKey } from '@/types/site-intel';
 import { AXIS_LABELS, AXIS_EXPLAIN, axisBand } from '@/types/site-intel';
 import { AxisExplainPanel } from './AxisExplainPanel';
+import { ScoreValue } from '@/components/ui/ScoreValue';
 import { Play, FileDown, ChevronRight } from 'lucide-react';
 
 /** Poor/Fair axis chip → opens the explain panel (owner mandate: no naked bad chips). */
@@ -45,7 +46,14 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById, 
                             {sites.map((s) => {
                                 const r = bySite(s.id);
                                 const vals = results.map((x) => x.engine.score);
-                                return <td key={s.id} className={`px-2 py-1.5 text-right font-bold tabular-nums ${r && best(vals, r.engine.score) ? 'text-rz-signal' : 'text-slate-700 dark:text-slate-300'}`}>{r?.engine.score ?? '—'}</td>;
+                                /* Score cells render through ScoreValue (semantic color);
+                                 * best-of-row keeps a ★ marker (color is now the score scale).
+                                 * NO traceId here — site.* trace nodes resolve via the
+                                 * SELECTED site and would lie on the other columns. */
+                                return <td key={s.id} className="px-2 py-1.5 text-right tabular-nums">
+                                    {r ? <ScoreValue value={r.engine.score} direction="higher" max={100} /> : '—'}
+                                    {r && best(vals, r.engine.score) && <span className="ml-0.5 text-[9px] text-rz-signal" aria-label="best of row">★</span>}
+                                </td>;
                             })}
                         </tr>
                         {axes.map((k) => (
@@ -59,8 +67,10 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById, 
                                     const band = raw != null ? axisBand(raw, k === 'naturalRisks') : null;
                                     const isBad = band != null && (band.label === 'Poor' || band.label === 'Fair');
                                     const isOpen = axisExplain?.siteId === s.id && axisExplain?.axis === k;
-                                    return <td key={s.id} className={`px-2 py-1.5 text-right tabular-nums ${r && best(goodVals, good) ? 'text-rz-signal font-semibold' : 'text-slate-600 dark:text-slate-400'}`}>
-                                        {raw ?? '—'}{band && (isBad && onExplainAxis ? (
+                                    return <td key={s.id} className="px-2 py-1.5 text-right tabular-nums text-slate-600 dark:text-slate-400">
+                                        {raw != null ? <ScoreValue value={raw} direction={k === 'naturalRisks' ? 'lower' : 'higher'} max={100} /> : '—'}
+                                        {raw != null && r && best(goodVals, good) && <span className="ml-0.5 text-[9px] text-rz-signal" aria-label="best of row">★</span>}
+                                        {band && (isBad && onExplainAxis ? (
                                             <button onClick={() => onExplainAxis(isOpen ? null : { siteId: s.id, axis: k })}
                                                 title={`Kenapa ${band.label}? Klik untuk alasan + lever terukur`}
                                                 className={`ml-1 rounded px-1 text-[9px] font-semibold underline decoration-dotted underline-offset-2 ${band.cls} ${isOpen ? 'bg-amber-500/15' : 'hover:bg-amber-500/10'}`}>
@@ -71,16 +81,19 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById, 
                                 })}
                             </tr>
                         ))}
-                        {/* PHASE V — integrated sibling-engine rows */}
+                        {/* PHASE V — integrated sibling-engine rows. 0–100 score rows
+                          * carry ScoreValue metadata (direction per metric; risk =
+                          * lower); money/minutes rows stay plain (no bogus color
+                          * scale on unbounded units). */}
                         {analysesById && ([
-                            { label: 'Grid reliability (engine)', get: (a: SiteAnalyses) => a.grid ? { v: `${Math.round(a.grid.reliabilityScore)} · ${a.grid.reliabilityGrade}`, good: a.grid.reliabilityScore } : null },
+                            { label: 'Grid reliability (engine)', get: (a: SiteAnalyses) => a.grid ? { v: `${Math.round(a.grid.reliabilityScore)} · ${a.grid.reliabilityGrade}`, good: a.grid.reliabilityScore, score: Math.round(a.grid.reliabilityScore), dir: 'higher' as const } : null },
                             { label: 'Outage minutes /yr', get: (a: SiteAnalyses) => a.grid ? { v: `${Math.round(a.grid.annualOutageMinutes)}`, good: -a.grid.annualOutageMinutes } : null },
-                            { label: 'Disaster composite (lower better)', get: (a: SiteAnalyses) => a.disaster ? { v: `${Math.round(a.disaster.compositeScore)} · ${a.disaster.riskCategory}`, good: -a.disaster.compositeScore } : null },
+                            { label: 'Disaster composite (lower better)', get: (a: SiteAnalyses) => a.disaster ? { v: `${Math.round(a.disaster.compositeScore)} · ${a.disaster.riskCategory}`, good: -a.disaster.compositeScore, score: Math.round(a.disaster.compositeScore), dir: 'lower' as const } : null },
                             { label: 'Insurance $/yr', get: (a: SiteAnalyses) => a.disaster ? { v: `$${(a.disaster.annualInsuranceCost / 1e3).toFixed(0)}K`, good: -a.disaster.annualInsuranceCost } : null },
                             { label: 'Tax incentive value (15y)', get: (a: SiteAnalyses) => a.tax ? { v: `$${(a.tax.totalIncentiveValue / 1e6).toFixed(1)}M`, good: a.tax.totalIncentiveValue } : null },
-                            { label: 'Talent score', get: (a: SiteAnalyses) => a.talent ? { v: `${Math.round(a.talent.talentScore)} · ${a.talent.hiringDifficulty}`, good: a.talent.talentScore } : null },
-                            { label: 'Compliance score', get: (a: SiteAnalyses) => a.compliance ? { v: `${Math.round(a.compliance.complianceScore)}`, good: a.compliance.complianceScore } : null },
-                        ] as { label: string; get: (a: SiteAnalyses) => { v: string; good: number } | null }[]).map((rowDef) => {
+                            { label: 'Talent score', get: (a: SiteAnalyses) => a.talent ? { v: `${Math.round(a.talent.talentScore)} · ${a.talent.hiringDifficulty}`, good: a.talent.talentScore, score: Math.round(a.talent.talentScore), dir: 'higher' as const } : null },
+                            { label: 'Compliance score', get: (a: SiteAnalyses) => a.compliance ? { v: `${Math.round(a.compliance.complianceScore)}`, good: a.compliance.complianceScore, score: Math.round(a.compliance.complianceScore), dir: 'higher' as const } : null },
+                        ] as { label: string; get: (a: SiteAnalyses) => { v: string; good: number; score?: number; dir?: 'higher' | 'lower' } | null }[]).map((rowDef) => {
                             const cells = sites.map((s) => { const a = analysesById.get(s.id); return a ? rowDef.get(a) : null; });
                             if (cells.every((c) => c == null)) return null;
                             const goods = cells.filter((c): c is { v: string; good: number } => c != null).map((c) => c.good);
@@ -91,8 +104,14 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById, 
                                     </td>
                                     {sites.map((s, i) => {
                                         const c = cells[i];
+                                        const isBest = c != null && goods.length > 1 && c.good === Math.max(...goods);
                                         return <td key={s.id} title={c ? `${rowDef.label}: ${c.v}` : undefined}
-                                            className={`px-2 py-1.5 text-right tabular-nums ${c && goods.length > 1 && c.good === Math.max(...goods) ? 'text-rz-signal font-semibold' : 'text-slate-600 dark:text-slate-400'}`}>{c?.v ?? '—'}</td>;
+                                            className={`px-2 py-1.5 text-right tabular-nums ${!c || c.score == null ? (isBest ? 'text-rz-signal font-semibold' : 'text-slate-600 dark:text-slate-400') : ''}`}>
+                                            {c ? (c.score != null
+                                                ? <ScoreValue value={c.score} display={c.v} direction={c.dir ?? 'higher'} max={100} />
+                                                : c.v) : '—'}
+                                            {c && c.score != null && isBest && <span className="ml-0.5 text-[9px] text-rz-signal" aria-label="best of row">★</span>}
+                                        </td>;
                                     })}
                                 </tr>
                             );

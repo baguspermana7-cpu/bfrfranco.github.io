@@ -7,9 +7,10 @@ import { useSitesStore } from '@/store/sites';
 import { useRequirementsStore } from '@/store/requirements';
 import { cagr5 } from '@/lib/requirementsMappings';
 import { getPUE } from '@/constants/pue';
-import { rzModels } from '@/lib/rz-engine';
+import { rzModels, rzData } from '@/lib/rz-engine';
 import { fmtMoney, fmtUnit } from '@/lib/format';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { ScoreValue } from '@/components/ui/ScoreValue';
 import {
     MapPin, Zap, Building, TrendingUp, DollarSign,
     BarChart3, Target, ArrowRight, AlertTriangle, CheckCircle,
@@ -33,6 +34,11 @@ interface AcquisitionInputs {
     comparableC: number;
     riskMultiplier: number;
     targetReturnYears: number;
+    /** null → market-derived default (engine coloPrice) or the 150 screening default. */
+    revenueOverride: number | null;
+    /** PPA mode: $/MWh converted to a $/kW·mo equivalent at 90% load factor (screening). */
+    usePpa: boolean;
+    ppaUsdPerMwh: number;
 }
 
 interface ExpansionInputs {
@@ -146,6 +152,112 @@ export function collectStrategicDiagnostics(model: StrategicDiagnosticsModel): F
     }];
 }
 
+/* ── Workstream U · Acquisition fund-grade model (screening) ─────────────────
+ * 10-yr cash flow per bid scenario: revenue at the chosen basis with a
+ * 60/80/95% lease-up ramp (yrs 1-3, then steady 95%), OPEX from the SAME
+ * engine call this page already makes → NPV @ regional WACC (engine
+ * discountDefaults), IRR, MoIC (undiscounted total return ÷ equity), payback.
+ * NPV/IRR delegate to RZEngine models.roi (parity with the Financial engine);
+ * local closed-form fallbacks keep the page working when the engine is
+ * absent. This is a SCREENING model — no debt, no exit value, no capex
+ * maintenance — labeled as such everywhere it renders. ── */
+const ACQ_HORIZON_YEARS = 10;
+const ACQ_LEASE_UP = [0.60, 0.80, 0.95];   // lease-up ramp, then steady 0.95
+const ACQ_STEADY_OCC = 0.95;
+const PPA_LOAD_FACTOR = 0.90;              // screening PPA→colo-equivalent conversion
+
+/** $/MWh PPA → $/kW·mo equivalent at the screening load factor. */
+export function ppaToKwMonth(usdPerMwh: number, loadFactor = PPA_LOAD_FACTOR): number {
+    return (usdPerMwh * loadFactor * 8760) / 1000 / 12;
+}
+
+/** NPV with cash[0] at t=0 (undiscounted) — engine models.roi.npv semantics. */
+function npvOf(cash: number[], rate: number): number {
+    try {
+        const roi = rzModels()?.roi;
+        if (roi?.npv) { const v = roi.npv(cash, rate); if (Number.isFinite(v)) return v; }
+    } catch { /* fallback */ }
+    return cash.reduce((s, c, t) => s + c / Math.pow(1 + rate, t), 0);
+}
+
+/** IRR as a FRACTION (engine models.roi.irr; bisection fallback), or null. */
+function irrOf(cash: number[]): number | null {
+    if (!cash.some((c) => c > 0) || !cash.some((c) => c < 0)) return null;
+    try {
+        const roi = rzModels()?.roi;
+        if (roi?.irr) { const v = roi.irr(cash); if (v != null && Number.isFinite(v)) return v; }
+    } catch { /* fallback */ }
+    const f = (r: number) => cash.reduce((s, c, t) => s + c / Math.pow(1 + r, t), 0);
+    let lo = -0.95, hi = 5;
+    if (f(lo) * f(hi) > 0) return null;
+    for (let i = 0; i < 100; i++) {
+        const mid = (lo + hi) / 2;
+        if (Math.sign(f(mid)) === Math.sign(f(lo))) lo = mid; else hi = mid;
+    }
+    return (lo + hi) / 2;
+}
+
+export type BidVerdict = 'BANKABLE' | 'MARGINAL' | 'PASS';
+
+export interface BidEconomics {
+    bidPerMw: number;
+    investment: number;
+    npv: number;
+    irrPct: number | null;
+    moic: number;
+    paybackYears: number | null;
+    verdict: BidVerdict;
+}
+
+/** One bid scenario through the 10-yr screening cash flow (pure — reused by
+ *  the sensitivity strip with shifted rate/revenue: 4 deterministic re-runs). */
+export function computeBidEconomics(o: {
+    bidPerMw: number; itLoadKw: number; revPerKwMo: number; annualOpex: number; waccPct: number;
+}): BidEconomics {
+    const investment = o.bidPerMw * (o.itLoadKw / 1000);
+    const cash: number[] = [-investment];
+    let cum = -investment, totalNet = 0;
+    let paybackYears: number | null = null;
+    for (let y = 1; y <= ACQ_HORIZON_YEARS; y++) {
+        const occ = ACQ_LEASE_UP[y - 1] ?? ACQ_STEADY_OCC;
+        const net = o.itLoadKw * o.revPerKwMo * 12 * occ - o.annualOpex;
+        cash.push(net);
+        totalNet += net;
+        const prev = cum;
+        cum += net;
+        if (paybackYears == null && cum >= 0 && net > 0) paybackYears = (y - 1) + (prev < 0 ? -prev / net : 0);
+    }
+    const wacc = o.waccPct / 100;
+    const npv = npvOf(cash, wacc);
+    const irrFrac = irrOf(cash);
+    const irrPct = irrFrac != null ? irrFrac * 100 : null;
+    const moic = investment > 0 ? totalNet / investment : 0;
+    /* Committee discipline: BANKABLE only when NPV > 0 AND IRR clears the cost
+     * of capital; MARGINAL inside 150 bp of WACC; PASS = walk away (the honest
+     * verdict must be render-able, not hidden). */
+    const verdict: BidVerdict =
+        irrPct != null && npv > 0 && irrPct > o.waccPct ? 'BANKABLE'
+            : irrPct != null && irrPct >= o.waccPct - 1.5 ? 'MARGINAL'
+                : 'PASS';
+    return { bidPerMw: o.bidPerMw, investment, npv, irrPct, moic, paybackYears, verdict };
+}
+
+const VERDICT_CHIP: Record<BidVerdict, { cls: string; note: string }> = {
+    BANKABLE: { cls: 'bg-rz-data/10 text-rz-data border-rz-data/40', note: 'NPV > 0 and IRR > WACC' },
+    MARGINAL: { cls: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/40', note: 'IRR within 150 bp of WACC — negotiate or de-risk' },
+    PASS: { cls: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/40', note: 'Below cost of capital — walk away' },
+};
+
+/** Derived-input chip → jump to the owning page (module-scope: stable identity,
+ *  not re-created per render — react-hooks/static-components). */
+const SourceChip = ({ from, tab }: { from: string; tab: string }) => (
+    <button onClick={() => useSimulationStore.getState().actions.setActiveTab(tab as never)}
+        title={`Derived from ${from} — click to edit at the source`}
+        className="ml-1 rounded bg-rz-data/10 px-1.5 py-0.5 text-[8.5px] font-semibold uppercase text-rz-data hover:bg-rz-data/20">
+        {from} ↗
+    </button>
+);
+
 const CLIMATE_LABELS: Record<FeasibilityInputs['climateZone'], string> = {
     polar: 'Polar / Sub-arctic (Free-cooling advantage)',
     arid: 'Arid / Desert (High cooling load)',
@@ -173,6 +285,9 @@ export default function StrategicPlanningDashboard() {
         comparableC: 8_500_000,
         riskMultiplier: 1.15,
         targetReturnYears: 7,
+        revenueOverride: null,
+        usePpa: false,
+        ppaUsdPerMwh: 80,
     });
 
     const [expansion, setExpansion] = useState<ExpansionInputs>({
@@ -229,13 +344,6 @@ export default function StrategicPlanningDashboard() {
             capexPerMW: capexResults ? (capexResults.total / (inputs.itLoad / 1000)) : x.capexPerMW,
         }));
     }, [derivedExp, inputs.itLoad, capexResults]);
-    const SourceChip = ({ from, tab }: { from: string; tab: string }) => (
-        <button onClick={() => useSimulationStore.getState().actions.setActiveTab(tab as never)}
-            title={`Derived from ${from} — click to edit at the source`}
-            className="ml-1 rounded bg-rz-data/10 px-1.5 py-0.5 text-[8.5px] font-semibold uppercase text-rz-data hover:bg-rz-data/20">
-            {from} ↗
-        </button>
-    );
 
     // --- Feasibility Calculations (delegates to the pure model shared with the
     //     bottleneck guidance panel + collectStrategicDiagnostics — one formula) ---
@@ -275,7 +383,32 @@ export default function StrategicPlanningDashboard() {
         return { kind: 'land' as const, deltaLandM2, deltaAcres, itPerAcre };
     }, [feasibilityResults, feasibilityModelInput]);
 
-    // --- Acquisition Calculations ---
+    /* ── Acquisition revenue basis (Workstream U) — market-derived default:
+     * the engine coloPrice for the CAPEX city market when one is mapped,
+     * else the honest 150 screening default. PPA toggle converts $/MWh to a
+     * $/kW·mo equivalent at 90% load factor (screening). ── */
+    const cityMarket = useCapexStore((s) => s.inputs.cityMarket);
+    const marketBasis = useMemo(() => {
+        const MARKET_ALIAS: Record<string, string> = { virginia: 'n-virginia', malaysia: 'kuala-lumpur' };
+        const key = MARKET_ALIAS[cityMarket ?? ''] ?? (cityMarket ?? 'none').replace(/_/g, '-');
+        const colo: number | undefined = key !== 'none' ? rzData()?.markets?.[key]?.coloPrice : undefined;
+        return colo != null
+            ? { value: colo, label: `engine coloPrice · ${key}`, mapped: true }
+            : { value: 150, label: 'screening default (no market mapped)', mapped: false };
+    }, [cityMarket]);
+    const ppaEquiv = ppaToKwMonth(acquisition.ppaUsdPerMwh);
+    const revBasis = acquisition.usePpa ? ppaEquiv : (acquisition.revenueOverride ?? marketBasis.value);
+    const revBasisLabel = acquisition.usePpa
+        ? `PPA $${acquisition.ppaUsdPerMwh}/MWh @ ${(PPA_LOAD_FACTOR * 100).toFixed(0)}% LF (screening)`
+        : acquisition.revenueOverride != null ? 'manual override' : marketBasis.label;
+    /* Regional WACC — engine discountDefaults (Damodaran regional + country risk). */
+    const waccPct = useMemo(() => {
+        const D = rzData();
+        const cid = (selectedCountry?.id ?? '').toUpperCase();
+        return ((D?.discountDefaults?.[cid] ?? D?.discountDefaults?.global ?? 0.09) as number) * 100;
+    }, [selectedCountry]);
+
+    // --- Acquisition Calculations (fund-grade, Workstream U) ---
     const acquisitionResults = useMemo(() => {
         const comps = [acquisition.comparableA, acquisition.comparableB, acquisition.comparableC];
         const avgComp = comps.reduce((a, b) => a + b, 0) / comps.length;
@@ -284,11 +417,11 @@ export default function StrategicPlanningDashboard() {
         const fairValue = avgComp;
         const premiumPct = ((acquisition.targetSiteDollarPerMW - fairValue) / fairValue) * 100;
 
-        // ROI horizon: DC revenue at $150/kW-month colocation rate (illustrative)
+        // Revenue at the chosen basis (market colo / manual / PPA-equivalent)
         const itCapacityKW = inputs.itLoad; // real project IT load
-        const annualRevenue = itCapacityKW * 150 * 12;
+        const annualRevenue = itCapacityKW * revBasis * 12;
         const totalInvestment = acquisition.targetSiteDollarPerMW * (itCapacityKW / 1000);
-        // Engine-real annual OPEX (models.opex) for the 5 MW site; falls back to an
+        // Engine-real annual OPEX (models.opex); falls back to an
         // 8%-of-CAPEX heuristic if the engine is unavailable (SSR / not loaded).
         const sitePue = getPUE(inputs.coolingType);
         let opexEstimate = totalInvestment * 0.08;
@@ -303,6 +436,52 @@ export default function StrategicPlanningDashboard() {
         const simpleROIYears = totalInvestment / annualNOI;
         const capRate = (annualNOI / totalInvestment) * 100;
 
+        /* Per-scenario 10-yr economics for the ask / fair-value / ceiling bids
+         * (committee decision table — same closure, three capital bases). */
+        const econFor = (bidPerMw: number, revMo = revBasis, wacc = waccPct) =>
+            computeBidEconomics({ bidPerMw, itLoadKw: itCapacityKW, revPerKwMo: revMo, annualOpex: opexEstimate, waccPct: wacc });
+        const bidScenarios = [
+            { label: 'Ask Price', bid: acquisition.targetSiteDollarPerMW, econ: econFor(acquisition.targetSiteDollarPerMW) },
+            { label: 'Fair Value', bid: fairValue, econ: econFor(fairValue) },
+            { label: 'Ceiling', bid: bidCeiling, econ: econFor(bidCeiling) },
+        ];
+
+        /* Sensitivity strip — 4 deterministic re-runs of the SAME closure for
+         * the fair-value bid: base, rate +200 bp, revenue −15%, combined. */
+        const sensitivity = [
+            { label: 'Base', npv: bidScenarios[1].econ.npv },
+            { label: 'Rate +200 bp', npv: econFor(fairValue, revBasis, waccPct + 2).npv },
+            { label: 'Revenue −15%', npv: econFor(fairValue, revBasis * 0.85).npv },
+            { label: 'Both stresses', npv: econFor(fairValue, revBasis * 0.85, waccPct + 2).npv },
+        ];
+
+        /* Portfolio note — this acquisition (fair-value equity) vs the current
+         * project (CAPEX engine total at the sim revenue tunable). Blended IRR
+         * is capital-weighted; concentration flag at >40% of combined capital. */
+        const projCapex = capexResults?.total ?? null;
+        let portfolio: null | {
+            projCapex: number; projIrrPct: number | null; acqInvestment: number; acqIrrPct: number | null;
+            combined: number; blendedIrrPct: number | null; acqSharePct: number; concentrated: boolean;
+        } = null;
+        if (projCapex != null && projCapex > 0 && itCapacityKW > 0) {
+            const simRev = inputs.revenuePerKwMonth ?? 150;
+            const projEcon = computeBidEconomics({
+                bidPerMw: projCapex / (itCapacityKW / 1000), itLoadKw: itCapacityKW,
+                revPerKwMo: simRev, annualOpex: opexEstimate, waccPct,
+            });
+            const acqInvestment = bidScenarios[1].econ.investment;
+            const combined = projCapex + acqInvestment;
+            const acqIrr = bidScenarios[1].econ.irrPct;
+            const blendedIrrPct = projEcon.irrPct != null && acqIrr != null
+                ? (projEcon.irrPct * projCapex + acqIrr * acqInvestment) / combined
+                : null;
+            const acqSharePct = (acqInvestment / combined) * 100;
+            portfolio = {
+                projCapex, projIrrPct: projEcon.irrPct, acqInvestment, acqIrrPct: acqIrr,
+                combined, blendedIrrPct, acqSharePct, concentrated: acqSharePct > 40,
+            };
+        }
+
         return {
             avgComp,
             bidFloor,
@@ -314,8 +493,12 @@ export default function StrategicPlanningDashboard() {
             annualRevenue,
             annualNOI,
             totalInvestment,
+            opexEstimate,
+            bidScenarios,
+            sensitivity,
+            portfolio,
         };
-    }, [acquisition, inputs.coolingType, inputs.itLoad, selectedCountry]);
+    }, [acquisition, inputs.coolingType, inputs.itLoad, inputs.revenuePerKwMonth, selectedCountry, revBasis, waccPct, capexResults]);
 
     // --- Expansion Calculations ---
     const expansionResults = useMemo(() => {
@@ -350,6 +533,42 @@ export default function StrategicPlanningDashboard() {
 
         return { demandTimeline, triggerYear, expansionNeededMW, totalCapexRequired, phases };
     }, [expansion]);
+
+    /* ── Expansion J-curve (Workstream U, screening) — per year: phase CAPEX
+     * outflow (schedule above), EBITDA proxy = revenue basis × built MW ×
+     * 12 × utilization − OPEX (engine models.opex per built MW, 8%-of-CAPEX
+     * fallback), cumulative net cash, breakeven year. Phase capacity treated
+     * as online from its start year (screening — no partial-year proration). ── */
+    const jCurve = useMemo(() => {
+        const pue = getPUE(inputs.coolingType);
+        const opexFor = (builtMW: number): number => {
+            let est = 0.08 * builtMW * expansion.capexPerMW;
+            try {
+                const om = rzModels().opex;
+                if (om?.totalAnnual) {
+                    const r = om.totalAnnual(builtMW, pue, selectedCountry?.id || 'US', 15);
+                    est = typeof r === 'number' ? r : (r?.total ?? est);
+                }
+            } catch { /* fallback heuristic */ }
+            return est;
+        };
+        let cumulative = 0;
+        let breakevenYear: number | null = null;
+        const rows: { year: number; builtMW: number; utilPct: number; capexOut: number; ebitda: number; cumulative: number }[] = [];
+        for (const d of expansionResults.demandTimeline) {
+            const builtMW = expansion.currentFootprintMW +
+                expansionResults.phases.filter((p) => p.startYear <= d.year).reduce((s, p) => s + p.capacityMW, 0);
+            const capexOut = expansionResults.phases.filter((p) => p.startYear === d.year).reduce((s, p) => s + p.capex, 0);
+            const util = builtMW > 0 ? Math.min(0.95, d.demandMW / builtMW) : 0;
+            const revenue = revBasis * builtMW * 1000 * 12 * util;
+            const opex = opexFor(builtMW);
+            const ebitda = revenue - opex;
+            cumulative += ebitda - capexOut;
+            if (breakevenYear == null && cumulative >= 0 && ebitda > 0) breakevenYear = d.year;
+            rows.push({ year: d.year, builtMW, utilPct: util * 100, capexOut, ebitda, cumulative });
+        }
+        return { rows, breakevenYear };
+    }, [expansionResults, expansion.currentFootprintMW, expansion.capexPerMW, inputs.coolingType, selectedCountry, revBasis]);
 
     const MODES: { id: PlanningMode; label: string; icon: React.ReactNode; desc: string }[] = [
         { id: 'feasibility', label: 'Feasibility Mode', icon: <MapPin className="w-4 h-4" />, desc: 'Land + grid to buildable IT load' },
@@ -634,6 +853,60 @@ export default function StrategicPlanningDashboard() {
                                 <span>1.5x (High risk)</span>
                             </div>
                         </div>
+
+                        {/* ── Revenue basis (Workstream U) — replaces the old hardcoded $150 ── */}
+                        <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1 mb-1.5">
+                                Revenue Basis ($/kW·mo)
+                                <Tooltip content="Colocation revenue per kW of IT load per month used in every cash-flow line on this page. Default derives from the engine's market coloPrice for the CAPEX city market when one is mapped; otherwise a $150 screening default is honestly labeled. Type a value to override; the PPA toggle switches the basis to a $/MWh power-purchase equivalent." />
+                                <span
+                                    className={clsx('ml-1 rounded px-1.5 py-0.5 text-[8.5px] font-semibold uppercase',
+                                        acquisition.usePpa ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                            : marketBasis.mapped && acquisition.revenueOverride == null ? 'bg-rz-data/10 text-rz-data'
+                                                : 'bg-slate-500/10 text-slate-500')}
+                                    title={revBasisLabel}>
+                                    {revBasisLabel}
+                                </span>
+                            </label>
+                            <input
+                                type="number" min={0} step={5}
+                                className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700 disabled:opacity-50"
+                                value={acquisition.usePpa ? +ppaEquiv.toFixed(1) : (acquisition.revenueOverride ?? marketBasis.value)}
+                                disabled={acquisition.usePpa}
+                                title={acquisition.usePpa ? 'PPA mode active — basis comes from the $/MWh input below' : undefined}
+                                onChange={e => setAcquisition(a => ({ ...a, revenueOverride: e.target.value === '' ? null : Number(e.target.value) }))}
+                            />
+                            {!acquisition.usePpa && acquisition.revenueOverride != null && (
+                                <button
+                                    onClick={() => setAcquisition(a => ({ ...a, revenueOverride: null }))}
+                                    className="mt-1 text-[9px] font-semibold uppercase text-cyan-600 dark:text-cyan-400 hover:underline">
+                                    Reset to {marketBasis.mapped ? 'market default' : 'screening default'} (${marketBasis.value}/kW·mo)
+                                </button>
+                            )}
+                            <div className="mt-3 flex items-center gap-2">
+                                <button
+                                    onClick={() => setAcquisition(a => ({ ...a, usePpa: !a.usePpa }))}
+                                    className={clsx('rounded px-2 py-1 text-[10px] font-bold uppercase border transition-colors',
+                                        acquisition.usePpa
+                                            ? 'bg-amber-500/10 border-amber-500/40 text-amber-600 dark:text-amber-400'
+                                            : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-500 hover:border-amber-400')}>
+                                    PPA mode {acquisition.usePpa ? 'ON' : 'OFF'}
+                                </button>
+                                <Tooltip content={`Screening conversion: $/MWh × ${(PPA_LOAD_FACTOR * 100).toFixed(0)}% load factor × 8,760 h ÷ 1,000 ÷ 12 → $/kW·mo equivalent. A real PPA has shape, escalators and curtailment terms this screen ignores — labeled screening, not a contract model.`} />
+                            </div>
+                            {acquisition.usePpa && (
+                                <div className="mt-2">
+                                    <label className="text-[10px] font-semibold text-slate-500 uppercase">PPA price ($/MWh)</label>
+                                    <input
+                                        type="number" min={0} step={1}
+                                        className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
+                                        value={acquisition.ppaUsdPerMwh}
+                                        onChange={e => setAcquisition(a => ({ ...a, ppaUsdPerMwh: Number(e.target.value) }))}
+                                    />
+                                    <div className="text-[10px] text-slate-400 mt-0.5">≈ ${ppaEquiv.toFixed(1)}/kW·mo at {(PPA_LOAD_FACTOR * 100).toFixed(0)}% load factor (screening)</div>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <div className="space-y-4">
@@ -659,16 +932,131 @@ export default function StrategicPlanningDashboard() {
 
                         <div className="grid grid-cols-2 gap-3">
                             <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-                                <div className="text-[10px] text-slate-500 uppercase font-bold mb-1">Cap Rate</div>
+                                <div className="text-[10px] text-slate-500 uppercase font-bold mb-1 flex items-center gap-1">Cap Rate <Tooltip content="Stabilized net operating income ÷ total investment at the ask price — the real-estate screening yield. NOI = revenue at the chosen basis (full occupancy) minus the engine annual OPEX. Compare against the regional WACC: a cap rate below the cost of capital needs growth or repricing to justify the bid." /></div>
                                 <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">{acquisitionResults.capRate.toFixed(1)}%</div>
                                 <div className="text-[10px] text-slate-400">NOI / Total Investment</div>
                             </div>
                             <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-                                <div className="text-[10px] text-slate-500 uppercase font-bold mb-1">Simple Payback</div>
+                                <div className="text-[10px] text-slate-500 uppercase font-bold mb-1 flex items-center gap-1">Simple Payback <Tooltip content="Total investment ÷ stabilized annual NOI — a screening metric that ignores lease-up, the time value of money and post-payback cash flows. Use the NPV/IRR decision table below for the committee call." /></div>
                                 <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{acquisitionResults.simpleROIYears.toFixed(1)} yr</div>
-                                <div className="text-[10px] text-slate-400">At $150/kW-mo colo rate</div>
+                                <div className="text-[10px] text-slate-400">At ${revBasis.toFixed(0)}/kW·mo basis</div>
                             </div>
                         </div>
+
+                        {/* ── Committee decision table (Workstream U) ── */}
+                        <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
+                            <h4 className="text-xs font-bold uppercase text-slate-500 mb-1 flex items-center gap-1">
+                                Investment Committee — 10-yr Economics
+                                <Tooltip content={`Each bid scenario runs the SAME 10-year screening cash flow: revenue at the chosen basis with a 60/80/95% lease-up ramp (then 95% steady), engine annual OPEX, NPV discounted at the regional WACC ${waccPct.toFixed(1)}% (engine discountDefaults), IRR, MoIC (undiscounted total return ÷ equity) and payback. Verdicts: BANKABLE = NPV > 0 and IRR > WACC · MARGINAL = IRR within 150 bp of WACC · PASS = below cost of capital, walk away. Screening only — no debt, exit value or capex maintenance.`} />
+                            </h4>
+                            <p className="text-[10px] text-slate-400 mb-3">WACC {waccPct.toFixed(1)}% (regional) · lease-up 60/80/95% yrs 1-3 · OPEX {fmtMoney(acquisitionResults.opexEstimate)}/yr · screening</p>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-xs">
+                                    <thead>
+                                        <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500">
+                                            <th className="text-left py-2 pr-2">Bid</th>
+                                            <th className="text-right py-2 px-2">NPV</th>
+                                            <th className="text-right py-2 px-2">IRR</th>
+                                            <th className="text-right py-2 px-2">MoIC</th>
+                                            <th className="text-right py-2 px-2">Payback</th>
+                                            <th className="text-center py-2 pl-2">Verdict</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {acquisitionResults.bidScenarios.map(s => (
+                                            <tr key={s.label} className="border-b border-slate-100 dark:border-slate-800 last:border-0">
+                                                <td className="py-2 pr-2">
+                                                    <div className="font-semibold text-slate-800 dark:text-slate-200">{s.label}</div>
+                                                    <div className="text-[10px] text-slate-400">{fmtMoney(s.bid)}/MW · {fmtMoney(s.econ.investment)} equity</div>
+                                                </td>
+                                                <td className={`text-right py-2 px-2 font-semibold tabular-nums ${s.econ.npv >= 0 ? 'text-rz-data' : 'text-rose-500'}`}>{fmtMoney(s.econ.npv)}</td>
+                                                <td className="text-right py-2 px-2">
+                                                    <ScoreValue
+                                                        value={s.econ.irrPct ?? 0}
+                                                        display={s.econ.irrPct != null ? `${s.econ.irrPct.toFixed(1)}%` : '—'}
+                                                        direction="higher" max={30}
+                                                        tip={`Internal rate of return of the 10-yr screening cash flow at the ${s.label} bid — the discount rate at which NPV = 0. Committee test: must exceed the regional WACC ${waccPct.toFixed(1)}% to create value. Color scale 0–30%.`}
+                                                    />
+                                                </td>
+                                                <td className="text-right py-2 px-2">
+                                                    <ScoreValue
+                                                        value={s.econ.moic}
+                                                        display={`${s.econ.moic.toFixed(2)}x`}
+                                                        direction="higher" max={4}
+                                                        tip={`Multiple on invested capital — UNDISCOUNTED total 10-yr net cash flow ÷ equity at the ${s.label} bid. A time-blind sanity check alongside IRR (a 2.0x over 10 years is far weaker than 2.0x over 4). Color scale 0–4x.`}
+                                                    />
+                                                </td>
+                                                <td className="text-right py-2 px-2 tabular-nums text-slate-700 dark:text-slate-300">{s.econ.paybackYears != null ? `${s.econ.paybackYears.toFixed(1)} yr` : '>10 yr'}</td>
+                                                <td className="text-center py-2 pl-2">
+                                                    <span
+                                                        className={`inline-block rounded border px-1.5 py-0.5 text-[9px] font-bold ${VERDICT_CHIP[s.econ.verdict].cls}`}
+                                                        title={VERDICT_CHIP[s.econ.verdict].note}>
+                                                        {s.econ.verdict}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {/* ── Sensitivity strip — fair-value bid, 4 deterministic re-runs ── */}
+                        <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+                            <h4 className="text-xs font-bold uppercase text-slate-500 mb-2 flex items-center gap-1">
+                                NPV Sensitivity — Fair-Value Bid
+                                <Tooltip content="Four deterministic re-runs of the same 10-yr cash-flow closure at the fair-value bid: base case, discount rate +200 bp, revenue −15%, and both stresses combined. A deal that only clears in the base row is not robust — if mild stress flips NPV negative, negotiate the price down or walk." />
+                            </h4>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                {acquisitionResults.sensitivity.map(s => (
+                                    <div key={s.label} className={clsx('rounded-lg border p-2', s.npv >= 0 ? 'border-rz-data/30 bg-rz-data/5' : 'border-rose-500/30 bg-rose-500/5')}>
+                                        <div className="text-[9px] font-semibold uppercase text-slate-500">{s.label}</div>
+                                        <div className={`text-sm font-bold tabular-nums ${s.npv >= 0 ? 'text-rz-data' : 'text-rose-500'}`}>{fmtMoney(s.npv)}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* ── Portfolio note — acquisition vs current project ── */}
+                        {acquisitionResults.portfolio && (
+                            <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+                                <h4 className="text-xs font-bold uppercase text-slate-500 mb-2 flex items-center gap-1">
+                                    Portfolio Note — vs Current Project
+                                    <Tooltip content={`This acquisition (fair-value equity) alongside the current project (CAPEX engine total, screened through the same 10-yr closure at the sim revenue tunable $${(inputs.revenuePerKwMonth ?? 150).toFixed(0)}/kW·mo). Blended IRR is capital-weighted. Single-asset concentration above 40% of combined capital is flagged — diversification discipline, not a hard veto.`} />
+                                </h4>
+                                <div className="grid grid-cols-3 gap-2 text-center mb-2">
+                                    <div>
+                                        <div className="text-[9px] font-semibold uppercase text-slate-500">Combined Capital</div>
+                                        <div className="text-sm font-bold text-slate-800 dark:text-slate-200 tabular-nums">{fmtMoney(acquisitionResults.portfolio.combined)}</div>
+                                        <div className="text-[9px] text-slate-400">{fmtMoney(acquisitionResults.portfolio.projCapex)} + {fmtMoney(acquisitionResults.portfolio.acqInvestment)}</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-[9px] font-semibold uppercase text-slate-500">Blended IRR</div>
+                                        <div className="text-sm font-bold tabular-nums">
+                                            <ScoreValue
+                                                value={acquisitionResults.portfolio.blendedIrrPct ?? 0}
+                                                display={acquisitionResults.portfolio.blendedIrrPct != null ? `${acquisitionResults.portfolio.blendedIrrPct.toFixed(1)}%` : '—'}
+                                                direction="higher" max={30}
+                                                tip="Capital-weighted IRR across the current project and the fair-value acquisition — both through the identical 10-yr screening closure. Weighting by committed capital, not by asset count."
+                                            />
+                                        </div>
+                                        <div className="text-[9px] text-slate-400">proj {acquisitionResults.portfolio.projIrrPct?.toFixed(1) ?? '—'}% · acq {acquisitionResults.portfolio.acqIrrPct?.toFixed(1) ?? '—'}%</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-[9px] font-semibold uppercase text-slate-500">Acq. Share</div>
+                                        <div className={`text-sm font-bold tabular-nums ${acquisitionResults.portfolio.concentrated ? 'text-amber-600 dark:text-amber-400' : 'text-slate-800 dark:text-slate-200'}`}>
+                                            {acquisitionResults.portfolio.acqSharePct.toFixed(0)}%
+                                        </div>
+                                        <div className="text-[9px] text-slate-400">of combined capital</div>
+                                    </div>
+                                </div>
+                                {acquisitionResults.portfolio.concentrated && (
+                                    <p className="rounded border border-amber-500/30 bg-amber-500/5 px-2 py-1.5 text-[10px] text-amber-700 dark:text-amber-300">
+                                        <b>Concentration warning:</b> this single acquisition is {acquisitionResults.portfolio.acqSharePct.toFixed(0)}% of combined capital (&gt;40%) — one asset&apos;s grid tenure, permitting or tenant risk dominates the book. Consider phasing the acquisition or partnering the equity.
+                                    </p>
+                                )}
+                            </div>
+                        )}
 
                         <div className={clsx(
                             'p-4 rounded-xl border text-sm',
@@ -840,6 +1228,52 @@ export default function StrategicPlanningDashboard() {
                                 </span>
                             </div>
                         </div>
+
+                        {/* ── J-curve (Workstream U) — program cash profile per year ── */}
+                        <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
+                            <h4 className="text-xs font-bold uppercase text-slate-500 mb-1 flex items-center gap-1">
+                                Expansion J-Curve — Cumulative Net Cash
+                                <Tooltip content={`Per-year cash profile of the expansion program: phase CAPEX outflows from the schedule above, against an EBITDA proxy = revenue basis $${revBasis.toFixed(0)}/kW·mo × built MW × 12 × utilization − annual OPEX (engine models.opex per built MW, 8%-of-CAPEX fallback). Utilization = demand ÷ built capacity, capped at 95%. Phase capacity counts from its start year (screening — no partial-year proration, no financing costs). The highlighted row is the program breakeven year — cumulative net cash first turns positive.`} />
+                            </h4>
+                            <p className="text-[10px] text-slate-400 mb-3">Revenue basis ${revBasis.toFixed(0)}/kW·mo ({revBasisLabel}) · screening</p>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-xs">
+                                    <thead>
+                                        <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500">
+                                            <th className="text-left py-1.5 pr-2">Year</th>
+                                            <th className="text-right py-1.5 px-2">Built MW</th>
+                                            <th className="text-right py-1.5 px-2">Util.</th>
+                                            <th className="text-right py-1.5 px-2">CAPEX Out</th>
+                                            <th className="text-right py-1.5 px-2">EBITDA Proxy</th>
+                                            <th className="text-right py-1.5 pl-2">Cumulative Net</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {jCurve.rows.map(r => (
+                                            <tr key={r.year}
+                                                className={clsx('border-b border-slate-100 dark:border-slate-800 last:border-0',
+                                                    r.year === jCurve.breakevenYear && 'bg-rz-data/10 dark:bg-rz-data/10')}
+                                                title={r.year === jCurve.breakevenYear ? 'Breakeven year — cumulative net cash first turns positive' : undefined}>
+                                                <td className="py-1.5 pr-2 font-medium text-slate-800 dark:text-slate-200">
+                                                    Y{r.year}{r.year === jCurve.breakevenYear && <span className="ml-1 rounded bg-rz-data/20 px-1 py-0.5 text-[8px] font-bold uppercase text-rz-data">breakeven</span>}
+                                                </td>
+                                                <td className="text-right py-1.5 px-2 tabular-nums text-slate-700 dark:text-slate-300">{r.builtMW.toFixed(1)}</td>
+                                                <td className="text-right py-1.5 px-2 tabular-nums text-slate-500">{r.utilPct.toFixed(0)}%</td>
+                                                <td className={`text-right py-1.5 px-2 tabular-nums ${r.capexOut > 0 ? 'text-amber-600 dark:text-amber-400 font-medium' : 'text-slate-400'}`}>{r.capexOut > 0 ? `−${fmtMoney(r.capexOut)}` : '—'}</td>
+                                                <td className={`text-right py-1.5 px-2 tabular-nums ${r.ebitda >= 0 ? 'text-slate-700 dark:text-slate-300' : 'text-rose-500'}`}>{fmtMoney(r.ebitda)}</td>
+                                                <td className={`text-right py-1.5 pl-2 font-semibold tabular-nums ${r.cumulative >= 0 ? 'text-rz-data' : 'text-rose-500'}`}>{fmtMoney(r.cumulative)}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {jCurve.breakevenYear == null && (
+                                <p className="mt-2 text-[10px] text-rose-500">Program does not reach cumulative breakeven inside the {expansion.planningHorizonYears}-yr horizon at this revenue basis — honest verdict; test a longer horizon or a stronger basis.</p>
+                            )}
+                            <p className="mt-2 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/40 px-2 py-1.5 text-[10px] text-slate-500 dark:text-slate-400">
+                                <b>Option value:</b> deferring a later phase preserves its CAPEX as optionality (spend only if demand materializes) at the cost of grid-queue position — the {expansion.gridReservationLeadMonths}-month reservation lead means a deferred phase re-enters the interconnection queue behind competing loads (screening note, not a priced real-option model).
+                            </p>
+                        </div>
                     </div>
                 </div>
             )}
@@ -860,12 +1294,12 @@ export default function StrategicPlanningDashboard() {
                         {
                             title: 'Acquisition Assessment',
                             when: 'Due diligence on a target site with a quoted ask price. Benchmark against recent market comps to determine bid range and walk-away threshold.',
-                            output: 'Fair value, bid floor/ceiling, cap rate, simple payback',
+                            output: 'Fair value, bid floor/ceiling, 10-yr NPV/IRR/MoIC per bid, committee verdict, sensitivity, portfolio note',
                         },
                         {
                             title: 'Expansion Scenario',
                             when: 'Existing facility approaching capacity. Model demand growth to determine when and how large to expand, and when to place grid reservation orders.',
-                            output: 'Phase trigger year, CAPEX schedule, grid reservation timeline',
+                            output: 'Phase trigger year, CAPEX schedule, grid reservation timeline, J-curve breakeven',
                         },
                     ].map(item => (
                         <div key={item.title} className="space-y-1">

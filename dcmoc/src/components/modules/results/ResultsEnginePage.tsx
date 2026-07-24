@@ -22,6 +22,7 @@ import { getPUE } from '@/constants/pue';
 import { ReportDashboard } from '@/components/modules/ReportDashboard';
 import { fmtMoney } from '@/lib/format';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { ScoreValue } from '@/components/ui/ScoreValue';
 import { Trophy, ChevronRight, FileDown } from 'lucide-react';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
@@ -278,9 +279,8 @@ export function ResultsEnginePage() {
                         {/* overall */}
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 text-center">
                             <h2 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Overall Score (Weighted)</h2>
-                            <TraceValue traceId="results.score">
-                                <div className="text-5xl font-bold tabular-nums text-rz-mint">{model.overall}<span className="text-lg text-slate-400">/100</span></div>
-                            </TraceValue>
+                            <ScoreValue value={model.overall} display={model.overall} unit="/100" direction="higher"
+                                traceId="results.score" explainKey="results-overall-score" className="text-5xl" />
                             <div className={`mt-1 text-sm font-semibold ${model.overall >= 85 ? 'text-rz-data' : model.overall >= 70 ? 'text-rz-info' : 'text-rz-signal'}`}>{model.grade}</div>
                             {baselineDimKeys.length > 0 && (
                                 <p className="mt-1 text-[9px] leading-snug text-slate-400">
@@ -292,7 +292,7 @@ export function ResultsEnginePage() {
                                     <div key={d.key} className="flex items-center gap-2 text-[11px]">
                                         <span className="w-4 text-center text-[9px] font-bold text-slate-400">{idx + 1}</span>
                                         <span className="flex-1 truncate text-slate-600 dark:text-slate-300">{d.label}</span>
-                                        <span className="tabular-nums font-semibold text-slate-800 dark:text-slate-200">{d.score}</span>
+                                        <ScoreValue value={d.score} direction="higher" />
                                     </div>
                                 ))}
                             </div>
@@ -366,8 +366,12 @@ export function ResultsEnginePage() {
                             <tbody>
                                 {model.dims.map((d) => {
                                     const dimTrace: Record<string, string> = { capex: 'results.capexScore', sus: 'results.susScore', fin: 'results.finScore', constr: 'results.constrScore' };
+                                    const dimExplain: Record<string, string> = { capex: 'capex-efficiency-score', sus: 'sustainability-score' };
                                     const tr = dimTrace[d.key];
-                                    const scoreEl = <span className={`tabular-nums font-semibold ${d.score >= 70 ? 'text-rz-data' : d.score >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{d.score}</span>;
+                                    /* Workstream M — shared ScoreValue: gradient value color + ƒx trace + explain/tip */
+                                    const scoreEl = <ScoreValue value={d.score} direction="higher" traceId={tr}
+                                        explainKey={dimExplain[d.key]}
+                                        tip={dimExplain[d.key] ? undefined : `${d.label} dimension score (0–100, higher is better) — documented deterministic composite: ${d.basis}. Weighted ${Math.round(d.weight * 100)}% in the overall score.`} />;
                                     const low = d.score < DIM_CHIP_FLOOR;
                                     return (
                                     <React.Fragment key={d.key}>
@@ -379,7 +383,7 @@ export function ResultsEnginePage() {
                                             )}
                                         </td>
                                         <td className="text-right whitespace-nowrap">
-                                            {tr ? <TraceValue traceId={tr}>{scoreEl}</TraceValue> : scoreEl}
+                                            {scoreEl}
                                             {low && (
                                                 <button onClick={() => setDimOpen(dimOpen === d.key ? null : d.key)}
                                                     title="Klik untuk alasan + lever terukur (di-solve dari formula dimensi yang sama)"

@@ -18,6 +18,7 @@ import { SiteMapPanel, SiteRadarPanel } from './SiteMapRadar';
 import { SiteCards, SiteDetailPanels, IntegratedAnalysesPanels } from './SiteCardsPanels';
 import { SiteComparisonTable, SiteRightRail, type AxisExplainSel } from './SiteComparisonRail';
 import { SiteEditorDrawer } from './SiteEditorDrawer';
+import { ScoreValue } from '@/components/ui/ScoreValue';
 import { MapPin, Loader2 } from 'lucide-react';
 
 const STRIP = [
@@ -106,23 +107,36 @@ export function SiteIntelligencePage() {
 
             <div className="grid gap-4 lg:grid-cols-[1fr_300px]">
                 <div className="min-w-0 space-y-4">
-                    {/* KPI row */}
+                    {/* KPI row — best-site card + 5 score cards through the shared
+                      * ScoreValue primitive (Workstream M: semantic score color +
+                      * Explain tooltip replaces the native title attr). */}
                     <div id="sec-overview" className="grid scroll-mt-24 grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-                        {[
+                        {(() => {
                             /* "Overall Best" is comparative — with a single site there is no
                              * comparison basis, so the card degrades to a neutral label. */
-                            sites.length > 1
-                                ? { label: 'Overall Best Site', value: bestSite ? `Site ${bestSite.label}` : '—', sub: bestSite?.name ?? '', hi: true }
-                                : { label: 'Candidate Site', value: bestSite ? `Site ${bestSite.label}` : '—', sub: `${bestSite?.name ?? ''} · single site — add another to compare`, hi: true },
-                            { label: 'Total Score', value: `${kpi.engine.score}`, sub: `${kpi.engine.grade} · ${kpi.engine.label}` },
-                            { label: 'Availability Score', value: `${kpi.availabilityScore}`, sub: 'power + grid' },
-                            { label: 'Connectivity Score', value: `${kpi.connectivityScore}`, sub: 'latency + cables' },
-                            { label: 'Water & Cooling', value: `${kpi.waterCoolingScore}`, sub: 'water + climate' },
-                            { label: 'Risk Score', value: `${kpi.riskScore}`, sub: 'lower is better' },
-                        ].map((k) => (
-                            <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className={`rounded-xl border p-3 ${k.hi ? 'border-rz-signal/50 bg-rz-signal/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50'}`}>
+                            const bestCard = sites.length > 1
+                                ? { label: 'Overall Best Site', value: bestSite ? `Site ${bestSite.label}` : '—', sub: bestSite?.name ?? '' }
+                                : { label: 'Candidate Site', value: bestSite ? `Site ${bestSite.label}` : '—', sub: `${bestSite?.name ?? ''} · single site — add another to compare` };
+                            return (
+                                <div title={`${bestCard.label}: ${bestCard.value}${bestCard.sub ? ' — ' + bestCard.sub : ''}`} className="rounded-xl border border-rz-signal/50 bg-rz-signal/10 p-3">
+                                    <div className="text-[10px] uppercase tracking-wide text-slate-500">{bestCard.label}</div>
+                                    <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{bestCard.value}</div>
+                                    <div className="truncate text-[10px] text-slate-500">{bestCard.sub}</div>
+                                </div>
+                            );
+                        })()}
+                        {([
+                            { label: 'Total Score', value: kpi.engine.score, direction: 'higher', explainKey: 'site-overall-score', grade: kpi.engine.grade, sub: `${kpi.engine.grade} · ${kpi.engine.label}`, tip: 'Weighted composite of all 10 site factors (models.site.score) on a 0–100 scale — higher is better. The grade chip applies the shared score bands (good ≥70 · watch ≥40 · bad below).' },
+                            { label: 'Availability Score', value: kpi.availabilityScore, direction: 'higher', explainKey: 'availability-score', sub: 'power + grid', tip: 'Power-availability sub-score (0–100, higher is better) combining grid reliability and power-infrastructure factors for this site. Weak grids drag the score down and usually demand more on-site generation or storage.' },
+                            { label: 'Connectivity Score', value: kpi.connectivityScore, direction: 'higher', explainKey: 'connectivity-score', sub: 'latency + cables', tip: 'Network sub-score (0–100, higher is better) from latency to major hubs and subsea/terrestrial cable diversity. Poor connectivity limits the workloads the site can serve.' },
+                            { label: 'Water & Cooling', value: kpi.waterCoolingScore, direction: 'higher', explainKey: 'water-cooling-score', sub: 'water + climate', tip: 'Cooling-feasibility sub-score (0–100, higher is better) from water availability/stress and the local climate’s suitability for free cooling. Low scores push designs toward dry coolers or immersion at higher cost.' },
+                            { label: 'Risk Score', value: kpi.riskScore, direction: 'lower', explainKey: 'site-risk-score', sub: 'lower is better', tip: 'Composite natural-hazard risk (0–100) — LOWER is better, and the color scale is inverted accordingly. Driven by seismic, flood, typhoon and related country hazard attributes.' },
+                        ] as { label: string; value: number; direction: 'higher' | 'lower'; explainKey: string; grade?: string; sub: string; tip: string }[]).map((k) => (
+                            <div key={k.label} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
-                                <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}<span className="text-[10px] text-slate-400">{k.hi ? '' : '/100'}</span></div>
+                                <div>
+                                    <ScoreValue value={k.value} unit="/100" direction={k.direction} max={100} explainKey={k.explainKey} tip={k.tip} grade={k.grade} className="text-lg" />
+                                </div>
                                 <div className="truncate text-[10px] text-slate-500">{k.sub}</div>
                             </div>
                         ))}

@@ -21,6 +21,7 @@ import { Leaf, ChevronRight, FileDown } from 'lucide-react';
 import { Explain } from '@/components/ui/Explain';
 import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { ScoreValue } from '@/components/ui/ScoreValue';
 import { RedValue, type Diagnosis } from '@/components/ui/RedValue';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
@@ -304,18 +305,24 @@ export function SustainabilityEnginePage() {
                             { label: 'Carbon (Annual)', value: model.scopes ? `${Math.round(model.scopes.totalAnnual).toLocaleString()} tCO₂e` : '—', sub: 'GHG Protocol scopes (engine)', trace: 'carbon.annualEmissions', tip: 'Annual greenhouse-gas emissions by GHG Protocol scope: Scope 1 (generator fuel), Scope 2 (grid electricity × the country grid-carbon factor) and a Scope 3 screening slice. The grid carbon intensity of the selected country dominates — renewables, PPAs and site selection are the real levers, not small PUE tweaks.' },
                             { label: 'Water (Annual)', value: model.waterM3Yr != null ? `${model.waterM3Yr.toLocaleString()} m³` : '—', sub: `WUE ${model.wue} L/kWh (engine) · pre-climate basis${env ? ` — env cost ×${env.climateMult} climate` : ''}`, explain: 'wue', trace: 'sus.waterAnnualM3' },
                             { label: 'Renewable Energy', value: `${model.renewablePct}%`, sub: 'derived from capex renewable/cert inputs', trace: 'sus.renewablePct', tip: 'Share of facility energy attributed to renewables, derived from the CAPEX renewable/certification inputs (solar PV, solar+BESS, green certification level) — not a separately entered figure. Raising it cuts Scope 2 carbon and lifts the sustainability score; change it via the CAPEX sustainability options.' },
-                            { label: 'Sustainability Score', value: model.grade, sub: `${model.overall}/100 · documented composite`, trace: 'sus.overallScore', red: gradeDiag, tip: 'Documented composite grade (0-100 → letter) across PUE, WUE, carbon intensity, renewable share and certifications. A screening indicator of ESG-reporting readiness for comparing configurations — it is not a certification and carries no compliance weight on its own.' },
+                            { label: 'Sustainability Score', value: model.grade, sub: `${model.overall}/100 · documented composite`, trace: 'sus.overallScore', red: gradeDiag, score: model.overall, tip: 'Documented composite grade (0-100 → letter) across PUE, WUE, carbon intensity, renewable share and certifications. A screening indicator of ESG-reporting readiness for comparing configurations — it is not a certification and carries no compliance weight on its own.' },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { tip?: string }).tip && <InfoTip content={(k as { tip?: string }).tip!} />}{(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>
                                 {(k as { trace?: string }).trace ? (
-                                    <TraceValue traceId={(k as { trace?: string }).trace!}>
-                                        {(k as { red?: Diagnosis | null }).red ? (
+                                    (k as { red?: Diagnosis | null }).red ? (
+                                        <TraceValue traceId={(k as { trace?: string }).trace!}>
                                             <RedValue className="text-lg font-bold tabular-nums" diagnosis={(k as { red?: Diagnosis | null }).red!}>{k.value}</RedValue>
-                                        ) : (
+                                        </TraceValue>
+                                    ) : (k as { score?: number }).score != null ? (
+                                        /* Workstream M — ScoreValue: gradient color + ƒx trace on the non-red path */
+                                        <ScoreValue value={(k as { score?: number }).score!} display={k.value} direction="higher"
+                                            traceId={(k as { trace?: string }).trace!} className="text-lg" />
+                                    ) : (
+                                        <TraceValue traceId={(k as { trace?: string }).trace!}>
                                             <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
-                                        )}
-                                    </TraceValue>
+                                        </TraceValue>
+                                    )
                                 ) : (
                                     <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
                                 )}
@@ -392,8 +399,11 @@ export function SustainabilityEnginePage() {
                                         {v != null && v < 50 ? (
                                             /* owner mandate: a red pillar score opens its formula diagnosis */
                                             <RedValue className="w-9 text-right tabular-nums" diagnosis={pillarDiags[pk]}>{v}</RedValue>
+                                        ) : v != null ? (
+                                            /* Workstream M — ScoreValue: gradient color + ƒx trace + explain on the non-red path */
+                                            <ScoreValue value={v} direction="higher" traceId={`sus.${pk}Score`} explainKey={`${pk}-score`} />
                                         ) : (
-                                            <span className="w-9 text-right tabular-nums text-slate-500">{v != null ? `${v}` : '—'}</span>
+                                            <span className="w-9 text-right tabular-nums text-slate-500">—</span>
                                         )}
                                     </div>
                                 ))}

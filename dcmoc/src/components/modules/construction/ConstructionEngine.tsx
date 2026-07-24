@@ -24,6 +24,7 @@ import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNar
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { fmtMoney } from '@/lib/format';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { ScoreValue } from '@/components/ui/ScoreValue';
 import { RedValue, type Diagnosis } from '@/components/ui/RedValue';
 import { HardHat, ChevronRight, FileDown, ClipboardList, ShieldCheck } from 'lucide-react';
 import { buildBoqModel, openBoqDossier, withProjectMeta } from '@/modules/reporting/boq/BoqDossier';
@@ -247,23 +248,29 @@ export function ConstructionEngine() {
                     /* audit #8: `baselineChip` marks KPIs that are DEFINITIONAL in Plan Mode
                      * (EV≡PV → 100% progress, AC≡PV → 100% spend, SPI/CPI≡1.00) — a grey chip
                      * keeps the perfect-looking figures honest. Presentation only, no math change. */
-                    { label: 'Overall Progress', value: `${e.overallPct}%`, sub: planMode ? 'baseline' : `PV ${e.pvPct}%`, trace: 'constr.progressPct', baselineChip: planMode, tip: 'Percent complete = Earned Value ÷ Budget at Completion (standard EVM). In Plan Mode (no actuals entered) EV ≡ PV, so this shows the baseline plan percentage — set a status month and per-phase actual % to make it a measured figure. Moves with real site progress entered in the tracking panel.' },
+                    { label: 'Overall Progress', value: `${e.overallPct}%`, sub: planMode ? 'baseline' : `PV ${e.pvPct}%`, trace: 'constr.progressPct', baselineChip: planMode, score: e.overallPct, tip: 'Percent complete = Earned Value ÷ Budget at Completion (standard EVM). In Plan Mode (no actuals entered) EV ≡ PV, so this shows the baseline plan percentage — set a status month and per-phase actual % to make it a measured figure. Moves with real site progress entered in the tracking panel.' },
                     { label: 'Planned Completion', value: `M${sched.totalMonths}`, sub: `${Math.round(sched.totalMonths / 12 * 10) / 10} years`, tip: 'Baseline construction duration in months from NTP (M0), from the engine CPM schedule derived from the CAPEX timeline (L2 phase detail). Long-lead equipment — transformers, gensets, switchgear — usually sets the critical path, so procurement dates matter more than site pace.' },
                     { label: 'Forecast Completion', value: `M${e.forecastTotalMonths}`, sub: e.delayMonths > 0 ? `+${e.delayMonths} mo delay` : 'on plan', trace: 'constr.forecastMonths', tip: 'Schedule-performance-adjusted finish month: planned duration stretched by the current SPI. SPI below 1.0 pushes this out and shows as "+N mo delay". Only meaningful once actuals are entered — in Plan Mode it equals the planned completion by definition.' },
                     { label: 'Budget (Cumulative)', value: fmtMoney(budget), sub: `AC ${fmtMoney(e.acUsd)} (${budget > 0 ? Math.round((e.acUsd / budget) * 100) : 0}%)`, trace: 'capex.total', baselineChip: planMode, explain: 'total-capex', tip: 'Budget at Completion = the total CAPEX from the CAPEX engine — the cost baseline CPI measures performance against. AC is the actual cost spent to date (user-entered); the percentage is spend against budget. Re-running CAPEX with different inputs re-baselines this figure.' },
-                    { label: 'SPI', value: String(e.spi), sub: planMode ? 'baseline' : e.spi >= 1 ? 'on/ahead' : 'behind', trace: 'constr.spi', baselineChip: planMode, explain: 'spi', red: spiDiag, tip: 'Schedule Performance Index = EV ÷ PV. 1.0 = on plan, below 1.0 = behind schedule, above = ahead. In Plan Mode it is 1.00 by definition. Sustained SPI under ~0.9 usually warrants acceleration measures or a formal re-baseline — it also drives the forecast completion above.' },
-                    { label: 'CPI', value: String(e.cpi), sub: planMode ? 'baseline' : e.cpi >= 1 ? 'under budget' : 'over budget', trace: 'constr.cpi', baselineChip: planMode, explain: 'cpi', red: cpiDiag, tip: 'Cost Performance Index = EV ÷ AC. 1.0 = on budget; below 1.0 means each dollar spent is earning less than a dollar of planned work (over budget). In Plan Mode it is 1.00 by definition. Industry experience: CPI rarely recovers once it drops below ~0.9 — act early.' },
+                    { label: 'SPI', value: String(e.spi), sub: planMode ? 'baseline' : e.spi >= 1 ? 'on/ahead' : 'behind', trace: 'constr.spi', baselineChip: planMode, explain: 'spi', red: spiDiag, score: e.spi, scoreMax: 1.2, tip: 'Schedule Performance Index = EV ÷ PV. 1.0 = on plan, below 1.0 = behind schedule, above = ahead. In Plan Mode it is 1.00 by definition. Sustained SPI under ~0.9 usually warrants acceleration measures or a formal re-baseline — it also drives the forecast completion above.' },
+                    { label: 'CPI', value: String(e.cpi), sub: planMode ? 'baseline' : e.cpi >= 1 ? 'under budget' : 'over budget', trace: 'constr.cpi', baselineChip: planMode, explain: 'cpi', red: cpiDiag, score: e.cpi, scoreMax: 1.2, tip: 'Cost Performance Index = EV ÷ AC. 1.0 = on budget; below 1.0 means each dollar spent is earning less than a dollar of planned work (over budget). In Plan Mode it is 1.00 by definition. Industry experience: CPI rarely recovers once it drops below ~0.9 — act early.' },
                 ].map((k) => (
                     <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}${(k as { baselineChip?: boolean }).baselineChip ? ' — Plan Mode: definitional baseline values, no actuals yet' : ''}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                         <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { tip?: string }).tip && <InfoTip content={(k as { tip?: string }).tip!} />}{(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>
                         {(k as { trace?: string }).trace ? (
-                            <TraceValue traceId={(k as { trace?: string }).trace!}>
-                                {(k as { red?: Diagnosis | null }).red ? (
+                            (k as { red?: Diagnosis | null }).red ? (
+                                <TraceValue traceId={(k as { trace?: string }).trace!}>
                                     <RedValue className="text-lg font-bold tabular-nums" diagnosis={(k as { red?: Diagnosis | null }).red!}>{k.value}</RedValue>
-                                ) : (
+                                </TraceValue>
+                            ) : (k as { score?: number }).score != null ? (
+                                /* Workstream M — ScoreValue: gradient color + ƒx trace on the non-red path */
+                                <ScoreValue value={(k as { score?: number }).score!} max={(k as { scoreMax?: number }).scoreMax ?? 100}
+                                    display={k.value} traceId={(k as { trace?: string }).trace!} className="text-lg" />
+                            ) : (
+                                <TraceValue traceId={(k as { trace?: string }).trace!}>
                                     <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
-                                )}
-                            </TraceValue>
+                                </TraceValue>
+                            )
                         ) : (
                             <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
                         )}
@@ -374,7 +381,8 @@ export function ConstructionEngine() {
                     {health && (
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 text-center">
                             <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Health Score <InfoTip content="Composite construction health 0-100: SPI contributes 40 pts, CPI 30, schedule position 15, open issues 15. ≥85 = healthy, 65-84 = watch, <65 = intervene. In Plan Mode SPI/CPI are definitional 1.00, so the score only becomes meaningful once site actuals are entered." /></h3>
-                            <div className={`text-3xl font-bold tabular-nums ${health.score >= 85 ? 'text-rz-data' : health.score >= 65 ? 'text-amber-500' : 'text-rose-500'}`}>{health.score}<span className="text-sm text-slate-400">/100</span></div>
+                            {/* Workstream M — ScoreValue: continuous gradient color (no trace node exists; label InfoTip explains) */}
+                            <div><ScoreValue value={health.score} unit="/100" className="text-3xl" /></div>
                             <div className="text-[10px] text-slate-500">{health.band} · SPI 40 + CPI 30 + schedule 15 + issues 15</div>
                             {planMode && (
                                 <span className="mt-1 inline-block rounded bg-slate-400/15 px-1 py-0.5 text-[8px] font-semibold text-slate-500">Plan Mode — baseline (belum ada actuals)</span>

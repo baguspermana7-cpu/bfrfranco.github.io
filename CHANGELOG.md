@@ -13,6 +13,27 @@ release sections rather than semver.
 
 ---
 
+## v1.115.41 — 2026-07-24 (DCMOC MEGA-SLICE 2 — 100% ScoreValue · diagnosis+articles · capacity coherence · P&ID+node modal · tax regulations · fund-grade strategic · real optimizer · FAQ glossary)
+
+### Fixed
+- **Comparison charts wired to the site (Q)**: Talent/Grid/Disaster/Tax country charts always include the Requirements country (Oman-class bug — top-15 slice dropped it); selected bar highlighted.
+- **Capacity margin coherence (R)**: utilization ≡ 1/(1+margin) structural floor exposed — margin-aware bands (OK starts above the floor; "margin 30% = Watch forever" absurdity gone), built-capacity denominator from the committed phase plan, white space AUTO-derived (racks × 0.72 m² ÷ 35% gross-up) instead of guesswork, space lever no longer jumps to Staff Model Config.
+
+### Added
+- **ScoreValue 100% (M)**: shared gradient primitive (green→amber→red, direction-aware: risk/utilization lower-better) + ƒx trace + explain tooltip — adopted across Site-Intelligence (5 children + comparison matrix), Results, Sustainability pillars (4 new trace ids), Reliability, Financial, Construction (SPI/CPI 1.2-scale), Commissioning, Assets, Risk, Capacity. 20 new per-score explain keys (838-entry DB).
+- **Diagnosis with mitigation + related reading (N)**: DiagnosticModal gains "Related reading — resistancezero.com"; qualitative bad values clickable (Talent Very-Difficult, Grid D/F, Disaster High/Extreme, Tax bottom-quartile) with live-parity reasons + levers + verified article links (talent 24/27/4 · grid 25/13/11 · disaster 7/19/10/14 · tax 17/21).
+- **Tax & Incentives regulation depth (O)**: `TaxProgram{name,cite,url,benefit,eligibility}` on 10 priority countries (PMK 130/2020 · PP 78/2019 · IKN PP 12/2023 · IRC §48 IRA · §168(k) TCJA · Va. Code §58.1-609.3(18) · Tex. §151.359 · PIA 1986 · MD/MDEC · GITA · ITA 1947 · IMDA DC-CFA · FD-L 47/2022 QFZP · MISA RHQ · ECZA SEZ · QFZ Law 34/2005 · QFC Law 7/2005 · RD 119/2011 Duqm · RD 56/2002 · GX Act · SEZ Act 2005 §10AA…) — 5 official sources crawled into dc-corpus; sub-tabs Overview | **Components & Regulations** | Timeline + a new Tier-2 savings decomposition with parity chip.
+- **Disaster + Grid breakdown tabs (P)**: Hazard Breakdown with per-hazard **design-standard column** (USGS NSHM 2023/ASCE 7 + SNI 1726/BSL/IBC by country, FEMA/NFIP, WUI) + Munich Re/Swiss Re/Marsh insurance-basis chip; Grid Components & Standards table (weights + IEEE 1366 SAIDI chip, NFPA 110, IEC 61000) + Backup Economics tab; mitigation/guidance panels always reachable + article reading lists.
+- **Architecture P&ID + subsystem modal (S)**: duty/standby split on every mech stage (dashed STANDBY units), liquid residual-air CRAH loop (~25% heat), supply/return °C + ~m³/h flow edge labels, deep-sea outfall, ATS between gens and bus, 2N bus-tie breaker, transformer primary-disconnect notation — and **click any node → NodeDetailModal** (24-kind engineering registry + standards chips + live spec + connections).
+- **Fuel & Generator wiring visible (T)**: 5 new trace ids (`fuelgen.*` re-running the SAME engine call) + TraceValue on spec cells + derived-from chips (IT × PUE × redundancy × tier/grid).
+- **Strategic Planning fund-grade (U)**: revenue basis from engine markets (bare $150 gone) + PPA toggle; ask/fair/ceiling committee table with NPV @ regional WACC / IRR / MoIC / payback + BANKABLE/MARGINAL/**PASS ("walk away")** verdicts; sensitivity (rate+200bp, rev−15%); portfolio concentration warning (>40% single asset); Expansion J-curve with breakeven year + option-value note.
+- **Run Optimization is now a real solver (U)**: 3 objectives (blended IRR ≥ hurdle via a page-parity closure + 40-iteration bisection with residual line; capacity margin-aware band check; budget vs CAPEX P80 AACE band) → per-objective status + preview-then-Apply through the tunables allowlist guard. Project Status derived from lifecycle (was hardcoded "Design").
+- **FAQ → glossary with analogies (W)**: 41 analogies (Lightbulb callouts) + 39 new entries (incl. Delivery & PM category: RFI/Submittal/ITP/NCR/punch/turnover/DoA/decision velocity) + **auto Engine Glossary** rendering all 838 explain-DB entries with combined search; 25 core DB entries now carry analogies site-wide.
+
+### Gates
+walk 31/0 · trace-parity 117/117 · optimizer 8/8 · synergy 6/6 · export 44/44 · arch 7/7 · explain-db 10/10 · corpus 2847/0 · reference-parity 155/0 · script-tags/js-syntax CLEAN · tsc 0.
+
+
 ## v1.115.40 — 2026-07-24 (LTC — micro-polish: live run stamp, preset dots, hover/edit feedback)
 
 ### Changed

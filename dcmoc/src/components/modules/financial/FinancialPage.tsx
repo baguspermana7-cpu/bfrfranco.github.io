@@ -21,6 +21,7 @@ import FinancialDashboard from '@/components/modules/FinancialDashboard';
 import MonteCarloDashboard from '@/components/modules/MonteCarloDashboard';
 import { fmtMoney } from '@/lib/format';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { ScoreValue } from '@/components/ui/ScoreValue';
 import { RedValue, type Diagnosis } from '@/components/ui/RedValue';
 import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
 import { TrendingUp, ChevronRight, FileDown } from 'lucide-react';
@@ -461,15 +462,16 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                         <aside className="space-y-4 lg:sticky lg:top-4 self-start">
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 text-center">
                                 <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Financial Health</h3>
-                                <TraceValue traceId="fin.healthScore">
-                                    {gradeDiag ? (
+                                {gradeDiag ? (
+                                    <TraceValue traceId="fin.healthScore">
                                         <RedValue className="text-4xl font-bold" diagnosis={gradeDiag}>{model.grade}</RedValue>
-                                    ) : (
-                                        <div className={`text-4xl font-bold ${model.grade === 'A' ? 'text-rz-data' : model.grade === 'B' ? 'text-lime-500' : model.grade === 'C' ? 'text-amber-500' : 'text-rose-500'}`}>
-                                            {model.grade}{model.planMode && <span className="text-base font-semibold text-slate-400"> (baseline)</span>}
-                                        </div>
-                                    )}
-                                </TraceValue>
+                                    </TraceValue>
+                                ) : (
+                                    /* Workstream M — ScoreValue: gradient color + ƒx trace + explain on the non-red path */
+                                    <ScoreValue value={model.health} direction="higher" traceId="fin.healthScore" explainKey="financial-health-score"
+                                        display={<>{model.grade}{model.planMode && <span className="text-base font-semibold text-slate-400"> (baseline)</span>}</>}
+                                        className="text-4xl" />
+                                )}
                                 <div className="text-[10px] text-slate-500">{model.health}/100 · 0.3 budget-var + 0.35 CPI + 0.35 SPI</div>
                                 {/* audit #8: in Plan Mode the composite is DEFINITIONAL (CPI/SPI≡1, FAC≡revised
                                   * → budget-var 0) — grey chip keeps the perfect grade honest. Math unchanged. */}

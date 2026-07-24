@@ -99,11 +99,40 @@ export interface UtilRow {
     exhaustYear?: number | null;
 }
 
+/* ── Workstream R — capacity-model coherence ─────────────────────────────────
+ * Best-practice white-space NEED: design racks × footprint ÷ 35% utilization
+ * factor (gross-up). The building input should not be guesswork — this is the
+ * auto basis; a larger user-entered building simply adds headroom. */
+export function autoWhiteSpaceM2(i: CapInputs): number {
+    const rackFootprint: number = rzData()?.capacity?.rackFootprintM2 ?? 0.72;
+    const phaseKw = i.phases.reduce((s, p) => s + (p.itLoadKw || 0), 0);
+    const designKw = Math.max(i.itLoadKw, phaseKw);
+    return Math.ceil((designKw / Math.max(1, i.rackKw)) * rackFootprint / 0.35);
+}
+
+/* Margin-aware utilization bands. WITHOUT a phase plan, capacity scales WITH
+ * the load, so steady-state utilization ≡ 1/(1+margin) — a STRUCTURAL FLOOR
+ * the old fixed 70/85 bands ignored (margin 30% ⇒ 76.9% = "Watch" forever,
+ * which read as "margin not enough"). OK now starts just above the floor;
+ * with a committed phase plan the denominator is the BUILT program, real
+ * absolute bands apply, and margin + phasing genuinely move utilization. */
+export function utilBands(i: CapInputs): { okMax: number; watchMax: number; floorPct: number; hasPhasePlan: boolean } {
+    const floorPct = Math.round(100 / (1 + i.designMarginPct / 100));
+    const phaseKw = i.phases.reduce((s, p) => s + (p.itLoadKw || 0), 0);
+    const hasPhasePlan = phaseKw > i.itLoadKw;
+    return { floorPct, hasPhasePlan, okMax: hasPhasePlan ? 70 : Math.min(84, floorPct + 3), watchMax: 85 };
+}
+
 export function utilization(i: CapInputs, facilityMw: number): { rows: UtilRow[]; binding: string | null; stranded: { strandedKw: number; fraction: number; isStranded: boolean } | null } {
     const m = rzModels()?.capacity;
     const margin = 1 + i.designMarginPct / 100;
-    const designPowerMva = +((facilityMw * margin) / 0.9).toFixed(0);
-    const designCoolingMw = +((facilityMw - i.itLoadKw / 1000) * margin + (i.itLoadKw / 1000)).toFixed(0);
+    /* R: design denominator = the BUILT program (committed phase plan) when one
+     * exists — phasing + margin then genuinely move utilization; without a plan
+     * capacity tracks the load and utilization sits at the 1/(1+m) floor. */
+    const phasePlanKw = i.phases.reduce((s, p) => s + (p.itLoadKw || 0), 0);
+    const builtScale = Math.max(1, phasePlanKw / Math.max(1, i.itLoadKw));
+    const designPowerMva = +((facilityMw * builtScale * margin) / 0.9).toFixed(0);
+    const designCoolingMw = +(((facilityMw - i.itLoadKw / 1000) * builtScale * margin) + (i.itLoadKw / 1000) * builtScale).toFixed(0);
     let binding: string | null = null; let maxRacksBySpace = 0; let racks = Math.ceil(i.itLoadKw / i.rackKw);
     try {
         if (m?.bindingConstraint) {
@@ -119,14 +148,19 @@ export function utilization(i: CapInputs, facilityMw: number): { rows: UtilRow[]
             stranded = { strandedKw: s?.strandedKw ?? 0, fraction: s?.strandedFraction ?? 0, isStranded: !!s?.isStranded };
         }
     } catch { /* */ }
-    const designRacks = Math.max(racks, maxRacksBySpace || racks);
+    const designRacks = Math.max(Math.ceil((i.itLoadKw * builtScale) / Math.max(1, i.rackKw)), maxRacksBySpace || 0, racks);
     const rackFootprint: number = rzData()?.capacity?.rackFootprintM2 ?? 0.72;
     const usedSpace = Math.round(racks * rackFootprint / 0.35); // gross-up: white space ≈ rack footprint / 35% utilization factor (screening)
+    /* R: white space is AUTO-derived from the design rack count (best practice);
+     * a user-entered building only matters when LARGER than the need. */
+    const autoSpace = Math.ceil(autoWhiteSpaceM2(i) * margin);
+    const spaceCapacity = Math.max(i.whiteFloorM2, autoSpace);
+    const spaceBasis: UtilRow['basis'] = autoSpace >= i.whiteFloorM2 ? 'engine' : 'derived';
     const rows: UtilRow[] = [
         { key: 'power', label: 'Power Capacity', used: +(facilityMw / 0.9).toFixed(0), capacity: designPowerMva, pct: Math.round((facilityMw / 0.9 / Math.max(1, designPowerMva)) * 100), unit: 'MVA', basis: 'derived' },
         { key: 'cooling', label: 'Cooling Capacity', used: +(facilityMw - i.itLoadKw / 1000 + i.itLoadKw / 1000 * 0.95).toFixed(0), capacity: designCoolingMw, pct: Math.round(((facilityMw) / Math.max(1, designCoolingMw)) * 100), unit: 'MW', basis: 'derived' },
         { key: 'rack', label: 'Rack Capacity', used: racks, capacity: designRacks, pct: Math.round((racks / Math.max(1, designRacks)) * 100), unit: 'racks', basis: 'engine' },
-        { key: 'space', label: 'Space Capacity', used: usedSpace, capacity: i.whiteFloorM2, pct: Math.round((usedSpace / Math.max(1, i.whiteFloorM2)) * 100), unit: 'm²', basis: 'engine' },
+        { key: 'space', label: 'Space Capacity', used: usedSpace, capacity: spaceCapacity, pct: Math.round((usedSpace / Math.max(1, spaceCapacity)) * 100), unit: 'm²', basis: spaceBasis },
         { key: 'network', label: 'Network Capacity', used: +(racks * 0.0015).toFixed(1), capacity: +(designRacks * 0.0015 * margin).toFixed(1), pct: Math.round((racks / Math.max(1, designRacks * margin)) * 100), unit: 'Tbps', basis: 'assumption' },
     ];
     /* Forecast overlay: scale each row's utilization by growth (all rows scale ∝ IT MW

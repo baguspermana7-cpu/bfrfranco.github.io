@@ -272,7 +272,33 @@
                     ],
                     "importDutyExemption": true,
                     "landSubsidy": true,
-                    "effectiveTaxRate": 0
+                    "effectiveTaxRate": 0,
+                    "programs": [
+                        {
+                            "name": "Tax Holiday (pioneer industries)",
+                            "cite": "PMK 130/PMK.010/2020",
+                            "benefit": "100% CIT reduction 5–20 yrs (investment ≥ IDR 500bn; DC infrastructure qualifies as pioneer)",
+                            "eligibility": "New capital investment in pioneer sectors",
+                            "note": "Successor to PMK 150/2018; apply via OSS before commercial operation"
+                        },
+                        {
+                            "name": "Tax Allowance",
+                            "cite": "PP 78/2019",
+                            "benefit": "30% net-income deduction over 6 yrs + accelerated depreciation + 10% WHT on dividends",
+                            "eligibility": "Listed business fields/regions outside tax-holiday scope"
+                        },
+                        {
+                            "name": "IKN Nusantara package",
+                            "cite": "PP 12/2023",
+                            "benefit": "Up to 30-yr tax holiday + super deductions for IKN investments",
+                            "note": "Strongest package; location-bound to the new capital"
+                        },
+                        {
+                            "name": "Vocational/R&D super deduction",
+                            "cite": "PMK 128/2019 · PMK 153/2020",
+                            "benefit": "Up to 200% (vocational) / 300% (R&D) deduction"
+                        }
+                    ]
                 },
                 "naturalDisaster": {
                     "seismicZone": 3,
@@ -398,7 +424,26 @@
                     ],
                     "importDutyExemption": true,
                     "landSubsidy": false,
-                    "effectiveTaxRate": 0.05
+                    "effectiveTaxRate": 0.05,
+                    "programs": [
+                        {
+                            "name": "Pioneer Certificate / DEI",
+                            "cite": "Income Tax Act 1947 (EDB-administered)",
+                            "benefit": "CIT exemption or concessionary 5–10% on qualifying activities 5–10 yrs",
+                            "eligibility": "Substantive economic commitments (headcount, spend)"
+                        },
+                        {
+                            "name": "DC Call-for-Application (capacity award)",
+                            "cite": "IMDA/EDB DC-CFA 2023",
+                            "benefit": "Access to new DC capacity allocation (power) with green conditions (PUE ≤ 1.3)",
+                            "note": "Capacity permission, not a tax break — the binding constraint in SG"
+                        },
+                        {
+                            "name": "Investment Allowance",
+                            "cite": "Economic Expansion Incentives Act",
+                            "benefit": "Allowance % of qualifying fixed capital expenditure"
+                        }
+                    ]
                 },
                 "naturalDisaster": {
                     "seismicZone": 0,
@@ -525,7 +570,26 @@
                     ],
                     "importDutyExemption": true,
                     "landSubsidy": true,
-                    "effectiveTaxRate": 0
+                    "effectiveTaxRate": 0,
+                    "programs": [
+                        {
+                            "name": "Pioneer Status / Investment Tax Allowance",
+                            "cite": "Promotion of Investments Act 1986",
+                            "benefit": "PS: 70–100% statutory-income exemption 5–10 yrs · ITA: 60–100% allowance on qualifying capex",
+                            "eligibility": "Promoted activities incl. DC/cloud services"
+                        },
+                        {
+                            "name": "Malaysia Digital (MD) status",
+                            "cite": "MDEC MD Bill of Guarantees (2022, ex-MSC)",
+                            "benefit": "Income-tax exemption or ITA + foreign-ownership/knowledge-worker guarantees",
+                            "note": "Applies to qualifying digital activities incl. DCs"
+                        },
+                        {
+                            "name": "Green Investment Tax Allowance",
+                            "cite": "GITA (MyHIJAU, Budget provisions)",
+                            "benefit": "100% allowance on green capex (efficient cooling qualifies) offset vs 70% statutory income"
+                        }
+                    ]
                 },
                 "naturalDisaster": {
                     "seismicZone": 1,
@@ -650,7 +714,33 @@
                     ],
                     "importDutyExemption": false,
                     "landSubsidy": false,
-                    "effectiveTaxRate": 0.21
+                    "effectiveTaxRate": 0.21,
+                    "programs": [
+                        {
+                            "name": "Clean-energy ITC (on-site solar/BESS)",
+                            "cite": "IRC §48 — IRA 2022 (P.L. 117-169)",
+                            "benefit": "30% investment tax credit + 10% domestic content + 10% energy community adders",
+                            "eligibility": "On-site solar/storage at the DC"
+                        },
+                        {
+                            "name": "Bonus depreciation",
+                            "cite": "IRC §168(k) — TCJA (P.L. 115-97)",
+                            "benefit": "Accelerated first-year depreciation (phase-down: 20% in 2026)",
+                            "note": "Congressional restoration proposals pending — verify current-year %"
+                        },
+                        {
+                            "name": "Virginia DC sales-tax exemption",
+                            "cite": "Va. Code §58.1-609.3(18)",
+                            "benefit": "Sales/use-tax exemption on DC equipment (the flagship state program)",
+                            "eligibility": "$150M investment + 50 jobs (reduced in distressed localities)"
+                        },
+                        {
+                            "name": "Texas DC exemption",
+                            "cite": "Tex. Tax Code §151.359",
+                            "benefit": "100% sales-tax exemption on qualifying DC equipment 10–15 yrs",
+                            "eligibility": "$200M investment, 20 jobs, 100k sqft"
+                        }
+                    ]
                 },
                 "naturalDisaster": {
                     "seismicZone": 2,
@@ -776,7 +866,20 @@
                     ],
                     "importDutyExemption": false,
                     "landSubsidy": false,
-                    "effectiveTaxRate": 0.2304
+                    "effectiveTaxRate": 0.2304,
+                    "programs": [
+                        {
+                            "name": "GX transition support",
+                            "cite": "GX Promotion Act (2023)",
+                            "benefit": "Green-transformation subsidies applicable to efficient DC builds (screening)",
+                            "note": "Japan has no blanket DC tax holiday — support is subsidy/grant-based"
+                        },
+                        {
+                            "name": "Regional DC promotion",
+                            "cite": "METI regional DC subsidy program (2021–)",
+                            "benefit": "Capex subsidies for DCs sited outside Tokyo/Osaka (grid + resilience policy)"
+                        }
+                    ]
                 },
                 "naturalDisaster": {
                     "seismicZone": 4,
@@ -1030,7 +1133,25 @@
                     ],
                     "importDutyExemption": true,
                     "landSubsidy": true,
-                    "effectiveTaxRate": 0
+                    "effectiveTaxRate": 0,
+                    "programs": [
+                        {
+                            "name": "Free-zone 0% (QFZP)",
+                            "cite": "Federal Decree-Law 47/2022 + Cabinet Decision 100/2023",
+                            "benefit": "0% CIT on qualifying free-zone income (9% mainland/non-qualifying)",
+                            "eligibility": "Qualifying Free Zone Person with substance in-zone"
+                        },
+                        {
+                            "name": "Dubai D33 / DEZ incentives",
+                            "cite": "Dubai D33 Agenda (2023)",
+                            "benefit": "Digital-economy programs, land + power facilitation for DC/AI campuses"
+                        },
+                        {
+                            "name": "ADIO innovation incentives",
+                            "cite": "ADIO DC scheme (2025)",
+                            "benefit": "Abu Dhabi grants/cost rebates for qualifying tech infrastructure"
+                        }
+                    ]
                 },
                 "naturalDisaster": {
                     "seismicZone": 1,
@@ -1158,7 +1279,21 @@
                     ],
                     "importDutyExemption": true,
                     "landSubsidy": true,
-                    "effectiveTaxRate": 0
+                    "effectiveTaxRate": 0,
+                    "programs": [
+                        {
+                            "name": "Regional HQ (RHQ) package",
+                            "cite": "MISA RHQ Program (2024) + ZATCA rules",
+                            "benefit": "30-yr 0% CIT + 0% WHT on RHQ activities",
+                            "eligibility": "Regional headquarters entities"
+                        },
+                        {
+                            "name": "Special Economic Zones",
+                            "cite": "ECZA SEZ framework (2023)",
+                            "benefit": "5% CIT up to 20 yrs + 0% customs in-zone + expat levy relief",
+                            "note": "Cloud Computing SEZ (KACST) explicitly targets DC/cloud"
+                        }
+                    ]
                 },
                 "naturalDisaster": {
                     "seismicZone": 1,
@@ -1284,7 +1419,20 @@
                     ],
                     "importDutyExemption": true,
                     "landSubsidy": true,
-                    "effectiveTaxRate": 0
+                    "effectiveTaxRate": 0,
+                    "programs": [
+                        {
+                            "name": "Qatar Free Zones",
+                            "cite": "Law No. 34 of 2005 (QFZA)",
+                            "benefit": "20-yr renewable tax holiday + 0% customs + 100% foreign ownership",
+                            "eligibility": "Ras Bufontas / Umm Alhoul free-zone entities"
+                        },
+                        {
+                            "name": "Qatar Financial Centre",
+                            "cite": "QFC Law No. 7 of 2005",
+                            "benefit": "10% CIT on local-source profits + full repatriation"
+                        }
+                    ]
                 },
                 "naturalDisaster": {
                     "seismicZone": 0,
@@ -2299,7 +2447,25 @@
                     ],
                     "importDutyExemption": true,
                     "landSubsidy": true,
-                    "effectiveTaxRate": 0.15
+                    "effectiveTaxRate": 0.15,
+                    "programs": [
+                        {
+                            "name": "DC infrastructure status",
+                            "cite": "Harmonized Master List (DEA notification 2022)",
+                            "benefit": "Infrastructure lending status — cheaper long-tenor debt (not a tax break)"
+                        },
+                        {
+                            "name": "State DC policies",
+                            "cite": "UP Data Centre Policy 2021 · Maharashtra IT/ITES Policy 2023",
+                            "benefit": "Land/stamp-duty/electricity-duty exemptions + capex subsidies (state-level)"
+                        },
+                        {
+                            "name": "SEZ regime (legacy)",
+                            "cite": "SEZ Act 2005 §10AA",
+                            "benefit": "Phased income-tax holiday — SUNSET for new units (post-2020); relevant to existing zones only",
+                            "note": "DESH bill (replacement) pending — verify status"
+                        }
+                    ]
                 },
                 "naturalDisaster": {
                     "seismicZone": 3,
@@ -4316,7 +4482,25 @@
                     ],
                     "importDutyExemption": true,
                     "landSubsidy": true,
-                    "effectiveTaxRate": 0
+                    "effectiveTaxRate": 0,
+                    "programs": [
+                        {
+                            "name": "Duqm SEZ (SEZAD)",
+                            "cite": "Royal Decree 119/2011",
+                            "benefit": "Up to 30-yr income-tax exemption + 0% customs + 100% foreign ownership",
+                            "eligibility": "Entities operating in the Duqm zone"
+                        },
+                        {
+                            "name": "Free zones (Salalah/Sohar)",
+                            "cite": "Free Zones Law — Royal Decree 56/2002",
+                            "benefit": "10–25 yr tax exemptions + duty-free + low Omanisation floors"
+                        },
+                        {
+                            "name": "Standard CIT baseline",
+                            "cite": "Income Tax Law — RD 28/2009 (as amended RD 9/2017)",
+                            "benefit": "15% standard CIT outside zones (reference rate)"
+                        }
+                    ]
                 },
                 "naturalDisaster": {
                     "seismicZone": 1,

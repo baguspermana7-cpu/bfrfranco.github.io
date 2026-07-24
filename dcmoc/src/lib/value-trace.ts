@@ -14,6 +14,7 @@ import { useSitesStore } from '@/store/sites';
 import { COUNTRIES } from '@/constants/countries';
 import { buildAnalysisCtx, analyzeSite, scoreAllSites, type SiteAnalyses } from '@/lib/site-adapter';
 import { calculateAutoHeadcount, calculateStaffing, type StaffRole } from '@/modules/staffing/ShiftEngine';
+import { calculateFuelGen } from '@/modules/infrastructure/FuelGenEngine';
 import { rzData, rzModels } from '@/lib/rz-engine';
 /* EB wave (Staffing/Construction/Commissioning/Results/Asset) — live readers */
 import { useConstructionTracking } from '@/store/constructionTracking';
@@ -80,6 +81,18 @@ const siteSel = () => {
 const siteCountry = () => { const s = siteSel(); return s ? COUNTRIES[s.countryId] : undefined; };
 
 let _siteAnCache: { key: string; an: SiteAnalyses } | null = null;
+const fuelGenRes = () => {
+    try {
+        const st = useSimulationStore.getState();
+        if (!st.selectedCountry) return null;
+        return calculateFuelGen({
+            country: st.selectedCountry, itLoadKw: st.inputs.itLoad, tierLevel: st.inputs.tierLevel,
+            coolingType: st.inputs.coolingType, coolingTopology: st.inputs.coolingTopology,
+            powerRedundancy: st.inputs.powerRedundancy, testingRegime: 'minimal',
+        });
+    } catch { return null; }
+};
+
 const siteAn = (): SiteAnalyses | null => {
     const site = siteSel();
     if (!site) return null;
@@ -337,6 +350,33 @@ export const TRACE: Record<string, TraceNode> = {
         get: () => { const t = siteAn()?.tax; return t ? +t.irrWithIncentives.toFixed(1) : null;  /* engine already returns percent */ },
     },
     /* Talent Availability card (TalentAvailabilityEngine) */
+    /* ── Workstream T — Fuel & Generator wiring visibility. get() re-runs the
+     * SAME calculateFuelGen the page renders from (no second estimate). ── */
+    'fuelgen.gensetCount': {
+        label: 'Generator Count', page: 'fuel-gen', unit: 'units', provenance: 'engine',
+        formulaTemplate: 'ceil(facility kW ÷ unit rating) + redundancy adder — facility kW = IT load × PUE; N+1 adds 1, 2N doubles (calculateFuelGen)',
+        get: () => fuelGenRes()?.generator.count ?? null,
+    },
+    'fuelgen.capacityKw': {
+        label: 'Generator Unit Rating', page: 'fuel-gen', unit: 'kW', provenance: 'engine',
+        formulaTemplate: 'standard genset frame size selected so N units cover facility kW (IT × PUE) with headroom (calculateFuelGen)',
+        get: () => fuelGenRes()?.generator.capacityKw ?? null,
+    },
+    'fuelgen.tankLiters': {
+        label: 'Fuel Storage', page: 'fuel-gen', unit: 'L', provenance: 'engine',
+        formulaTemplate: 'gen kW × consumption L/kWh × autonomy hours (tier/grid-driven: recommendedGenHours) × units (calculateFuelGen)',
+        get: () => fuelGenRes()?.storage.totalLiters ?? null,
+    },
+    'fuelgen.autonomyDays': {
+        label: 'Fuel Autonomy', page: 'fuel-gen', unit: 'days', provenance: 'engine',
+        formulaTemplate: 'stored liters ÷ full-load burn per day — floor from country gridReliability.recommendedGenHours',
+        get: () => fuelGenRes()?.storage.daysOfAutonomy ?? null,
+    },
+    'fuelgen.annualLiters': {
+        label: 'Annual Fuel Consumption', page: 'fuel-gen', unit: 'L/yr', provenance: 'engine',
+        formulaTemplate: 'testing regime hours × burn rate + expected outage hours (SAIDI blend) × full-load burn (calculateFuelGen)',
+        get: () => fuelGenRes()?.consumption.totalLitersPerYear ?? null,
+    },
     'site.talentScore': {
         label: 'Talent Score', page: 'talent', unit: '/100', provenance: 'engine',
         formulaTemplate: 'DC engineer pool 30% + university pipeline 20% + hyperscaler competition 25% + hiring speed 15% + professional certification 10% — site country talentPool baseline',
@@ -857,6 +897,33 @@ export const TRACE: Record<string, TraceNode> = {
         formulaTemplate: 'average of 4 documented scores: energy (engine.pueMatrix band 1.10–1.60) + carbon (country grid intensity × grid share from sus.renewablePct) + water (sus.wue band 0–2.2) + waste (diversion slider, default 60)',
         deps: ['engine.pueMatrix', 'sus.renewablePct', 'sus.wue'],
         get: () => susOverallScore(),
+    },
+    /* ── Workstream M (ScoreValue adoption sweep): sustainability pillar
+     * scores — ADDITIVE. Each get() mirrors ONE pillar of the page scorecard
+     * EXACTLY (same formulas as susOverallScore / SustainabilityEnginePage
+     * model memo — energy/carbon/water bands + attested waste diversion). */
+    'sus.energyScore': {
+        label: 'Energy Efficiency Score (PUE band)', page: 'carbon', unit: '/100', provenance: 'derived',
+        formulaTemplate: 'clamp((1.60 − engine.pueMatrix) ÷ 0.50 × 100, 0–100) — design PUE position on the 1.10–1.60 band',
+        deps: ['engine.pueMatrix'],
+        get: () => susPillarScores()?.energy ?? null,
+    },
+    'sus.carbonScore': {
+        label: 'Carbon Management Score (grid × mix)', page: 'carbon', unit: '/100', provenance: 'derived',
+        formulaTemplate: 'clamp((0.9 − country grid carbon intensity × grid share) ÷ 0.9 × 100, 0–100); grid share = 100 − sus.renewablePct',
+        deps: ['sus.renewablePct'],
+        get: () => susPillarScores()?.carbon ?? null,
+    },
+    'sus.waterScore': {
+        label: 'Water Stewardship Score (WUE band)', page: 'carbon', unit: '/100', provenance: 'derived',
+        formulaTemplate: 'clamp((2.2 − sus.wue) ÷ 2.2 × 100, 0–100) — engine WUE position on the 0–2.2 L/kWh band',
+        deps: ['sus.wue'],
+        get: () => susPillarScores()?.water ?? null,
+    },
+    'sus.wasteScore': {
+        label: 'Waste Management Score (diversion)', page: 'carbon', unit: '/100', provenance: 'input',
+        formulaTemplate: 'attested waste-diversion % (page slider) — user input, not an engine derivation; null until set (the overall composite falls back to a screening default of 60)',
+        get: () => susPillarScores()?.waste ?? null,
     },
     'sus.waterCost': {
         label: 'Water Cost /yr', page: 'carbon', unit: '$/yr', provenance: 'derived',
@@ -1620,6 +1687,25 @@ function susOverallScore(): number | null {
         const wd = useSustainability.getState().wasteDiversionPct;
         const wasteScore = wd != null ? Math.round(wd) : null;
         return Math.round((energyScore + carbonScore + waterScore + (wasteScore ?? 60)) / 4);
+    } catch { return null; }
+}
+
+/** Workstream M — per-pillar sustainability scores; mirrors the
+ *  SustainabilityEnginePage scorecard / susOverallScore formulas EXACTLY,
+ *  pillar-by-pillar (waste = attested slider, null until set). */
+function susPillarScores(): { energy: number; carbon: number; water: number; waste: number | null } | null {
+    try {
+        const pue = susPueLive();
+        if (pue == null) return null;
+        const energy = Math.round(Math.max(0, Math.min(100, ((1.6 - pue) / 0.5) * 100)));
+        const gi = sim().selectedCountry?.environment?.gridCarbonIntensity ?? 0.7;
+        const grid = Math.max(0, 100 - (susRenewablePct() ?? 0));
+        const carbon = Math.round(Math.max(0, Math.min(100, ((0.9 - gi * (grid / 100)) / 0.9) * 100)));
+        const m = (rzModels() as { water?: { wue?: (c: string) => number } }).water;
+        const wue = m?.wue ? m.wue(sim().inputs.coolingType) : 1.8;
+        const water = Math.round(Math.max(0, Math.min(100, ((2.2 - wue) / 2.2) * 100)));
+        const wd = useSustainability.getState().wasteDiversionPct;
+        return { energy, carbon, water, waste: wd != null ? Math.round(wd) : null };
     } catch { return null; }
 }
 

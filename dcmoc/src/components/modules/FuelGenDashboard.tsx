@@ -12,6 +12,7 @@ import {
 import clsx from 'clsx';
 import { fmtCompact, fmtMoney } from '@/lib/format';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { TraceValue } from '@/components/ui/TraceValue';
 
 const paramTooltips: Record<string, string> = {
     dieselPricePerLiter: "Local diesel fuel price before tax. Varies significantly by country and is a primary driver of annual generator operating cost.",
@@ -282,8 +283,15 @@ export default function FuelGenDashboard() {
                             Generator Specification
                             <Tooltip content="Backup diesel generator configuration sized for total facility load including IT and cooling. Count and redundancy determined by tier level and power redundancy model." />
                         </h3>
+                        {/* Workstream T — the wiring made visible: spec derives from requirements */}
+                        <div className="mb-2 flex flex-wrap gap-1 text-[9px]">
+                            <span className="rounded bg-rz-mint/10 px-1.5 py-0.5 text-rz-mint" title="From Requirements — IT load drives facility kW via PUE">IT {(result ? (result.generator.totalCapacityKw / Math.max(1, result.generator.count)) : 0) >= 0 ? `${(inputs.itLoad / 1000).toFixed(1)} MW` : ''}</span>
+                            <span className="rounded bg-rz-info/10 px-1.5 py-0.5 text-cyan-600 dark:text-rz-info" title="Cooling type sets PUE — facility kW = IT × PUE">× PUE ({inputs.coolingType})</span>
+                            <span className="rounded bg-rz-signal/10 px-1.5 py-0.5 text-amber-600 dark:text-rz-signal" title="Redundancy model adds standby units">{inputs.powerRedundancy} redundancy</span>
+                            <span className="rounded bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 text-slate-500" title="Tier + country grid reliability set the autonomy floor">Tier {inputs.tierLevel} · {selectedCountry?.id} grid</span>
+                        </div>
                         <div className="space-y-2 text-sm">
-                            <div className="flex justify-between"><span className="text-slate-500 flex items-center gap-1">Units<Tooltip content="Number and rating of individual generator sets. Each unit is a standalone diesel genset with its own fuel system and controls." /></span><span className="font-semibold text-slate-900 dark:text-white">{result.generator.count}x {(result.generator.capacityKw / 1000).toFixed(1)}MW</span></div>
+                            <div className="flex justify-between"><span className="text-slate-500 flex items-center gap-1">Units<Tooltip content="Number and rating of individual generator sets. Each unit is a standalone diesel genset with its own fuel system and controls." /></span><TraceValue traceId="fuelgen.gensetCount"><span className="font-semibold text-slate-900 dark:text-white">{result.generator.count}x {(result.generator.capacityKw / 1000).toFixed(1)}MW</span></TraceValue></div>
                             <div className="flex justify-between"><span className="text-slate-500 flex items-center gap-1">Redundancy<Tooltip content="Power redundancy model. N+1 adds one spare unit. 2N doubles the entire generator plant. 2N+1 doubles plus one spare for maximum resilience." /></span><span className="font-semibold text-slate-900 dark:text-white">{result.generator.redundancyModel}</span></div>
                             <div className="flex justify-between"><span className="text-slate-500 flex items-center gap-1">Total Capacity<Tooltip content="Combined nameplate capacity of all generators including redundant units. This is the maximum power available during a complete utility outage." /></span><span className="font-semibold text-slate-900 dark:text-white">{(result.generator.totalCapacityKw / 1000).toFixed(1)} MW</span></div>
                         </div>
@@ -297,9 +305,9 @@ export default function FuelGenDashboard() {
                             <Tooltip content="On-site diesel fuel storage infrastructure. Sized based on fuel storage hours parameter and total facility load. Subject to local environmental regulations and containment requirements." />
                         </h3>
                         <div className="space-y-2 text-sm">
-                            <div className="flex justify-between"><span className="text-slate-500 flex items-center gap-1">Total Storage<Tooltip content="Total diesel fuel volume stored on-site in liters. Calculated from fuel consumption rate multiplied by required storage hours, capped by local storage limits." /></span><span className="font-semibold text-slate-900 dark:text-white">{fmtCompact(result.storage.totalLiters)} L</span></div>
+                            <div className="flex justify-between"><span className="text-slate-500 flex items-center gap-1">Total Storage<Tooltip content="Total diesel fuel volume stored on-site in liters. Calculated from fuel consumption rate multiplied by required storage hours, capped by local storage limits." /></span><TraceValue traceId="fuelgen.tankLiters"><span className="font-semibold text-slate-900 dark:text-white">{fmtCompact(result.storage.totalLiters)} L</span></TraceValue></div>
                             <div className="flex justify-between"><span className="text-slate-500 flex items-center gap-1">Tank Count<Tooltip content="Number of 20,000-liter bulk storage tanks required. Tanks are typically double-walled steel with leak detection, bunded containment, and automatic fuel transfer systems." /></span><span className="font-semibold text-slate-900 dark:text-white">{result.storage.tankCount}x 20,000L</span></div>
-                            <div className="flex justify-between"><span className="text-slate-500 flex items-center gap-1">Autonomy<Tooltip content="Days of continuous generator operation supported by on-site fuel reserves at full facility load. Critical metric for disaster preparedness and SLA compliance." /></span><span className="font-semibold text-slate-900 dark:text-white">{result.storage.daysOfAutonomy} days</span></div>
+                            <div className="flex justify-between"><span className="text-slate-500 flex items-center gap-1">Autonomy<Tooltip content="Days of continuous generator operation supported by on-site fuel reserves at full facility load. Critical metric for disaster preparedness and SLA compliance." /></span><TraceValue traceId="fuelgen.autonomyDays"><span className="font-semibold text-slate-900 dark:text-white">{result.storage.daysOfAutonomy} days</span></TraceValue></div>
                         </div>
                     </div>
                 </div>
