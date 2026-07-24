@@ -13,6 +13,15 @@ release sections rather than semver.
 
 ---
 
+## v1.115.37 — 2026-07-24 (DCMOC — rack-density dropdown scroll fix + AI-era presets)
+
+### Fixed
+- **Requirements · Average Rack Density dropdown vanished on scroll** (owner, Android): options committed on `pointerdown`, so on touch a scroll gesture's first contact instantly selected an option and closed the list. Selection moved to `click` (the standard pattern — a real swipe never synthesizes a click), plus `touch-pan-y overscroll-contain` on the list, `max-h-56 → max-h-72` (the old height also hid the last rows — why it looked like options stopped at 75 kW), and a label-forwarding guard on the combobox root (Fields wrap controls in a `<label>`; clicks on non-labelable descendants were re-dispatched to the button). Fix lives in the shared `CreatableCombobox` — every dropdown in the app benefits.
+
+### Added
+- **AI-era density presets** (engine-true nominals from `DATA.requirements.archProfiles`): 120 kW GB200 NVL72 / OCP ORV3 · 140 kW GB300 NVL72 · 200 kW Rubin VR200 class (analyst est.) — average density takes the NOMINAL rack kW; peak (EDPp, e.g. GB300 192 kW) is the CAPEX power-provisioning side. Target Rack Density max raised 250 → 300.
+
+
 ## v1.115.36 — 2026-07-24 (DCMOC polish — red-value diagnostics sitewide + Cx WBS full-width + hygiene)
 
 ### Added

@@ -31,6 +31,12 @@ const DENSITY_PRESETS = [
     { value: 60, label: '60 kW/rack — AI/HPC (50-100 kW)' },
     { value: 75, label: '75 kW/rack — AI/HPC (50-100 kW)' },
     { value: 100, label: '100 kW/rack — AI/HPC (50-100 kW)' },
+    /* AI-era arch nominals from engine DATA.requirements.archProfiles — AVERAGE
+     * density takes the NOMINAL rack kW; peak (EDPp, e.g. GB300 192 kW) is the
+     * power-provisioning side handled by the CAPEX uplift, not this input. */
+    { value: 120, label: '120 kW/rack — GB200 NVL72 / OCP ORV3 (liquid)' },
+    { value: 140, label: '140 kW/rack — GB300 NVL72 (liquid)' },
+    { value: 200, label: '200 kW/rack — Rubin VR200 class (analyst est.)' },
 ];
 /* Guided sub-labels per use case (engine useCaseProfiles values). */
 const USE_CASE_SUBS: Record<UseCase, string> = {
@@ -208,7 +214,7 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                             onChange={(v) => writeSharedRackDensity(v == null ? 12 : v.value)} />
                     </Field>
                     <Field label="Target Rack Density (Max)" explainKey="rack-density">
-                        <NumInput value={w.maxRackDensityKw} min={1} max={250} unit="kW/rack"
+                        <NumInput value={w.maxRackDensityKw} min={1} max={300} unit="kW/rack"
                             onChange={(v) => set({ maxRackDensityKw: v })} />
                     </Field>
                     <Field label="Total Racks (Estimated)" explainKey="total-racks" hint="ceil(IT load ÷ density) — override to match the actual count">

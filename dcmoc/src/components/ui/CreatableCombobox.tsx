@@ -105,7 +105,12 @@ export function CreatableCombobox<T extends string | number = number>({
     }
 
     return (
-        <div ref={rootRef} className={`relative ${className}`}>
+        /* onClick preventDefault: Fields wrap controls in a <label>; the browser
+         * forwards clicks on non-labelable descendants (the dropdown list, its
+         * scrollbar, padding) as a SYNTHETIC click to the labelable button —
+         * which toggled the open list closed ("scroll → dropdown hilang").
+         * Cancelling the default stops the label forwarding; React handlers run. */
+        <div ref={rootRef} className={`relative ${className}`} onClick={(e) => e.preventDefault()}>
             {/* select-style button — the familiar simple dropdown */}
             <button type="button" disabled={disabled} onClick={() => setOpen((o) => !o)}
                 className={`flex w-full items-center gap-1 rounded-lg border bg-white dark:bg-slate-900/60 border-slate-300 dark:border-slate-700 px-2 py-1.5 text-left text-xs ${disabled ? 'opacity-50' : 'hover:border-rz-mint'}`}>
@@ -121,22 +126,28 @@ export function CreatableCombobox<T extends string | number = number>({
             </button>
             {hint && <div className="absolute z-40 mt-0.5 text-[10px] text-amber-500">{hint}</div>}
             {open && (
-                <ul role="listbox" className="absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl text-xs">
+                <ul role="listbox" className="absolute z-30 mt-1 max-h-72 w-full touch-pan-y overflow-auto overscroll-contain rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl text-xs">
                     {options.map((o) => (
                         <li key={String(o.value)} role="option" aria-selected={value != null && !value.isCustom && value.value === o.value}
                             className={`cursor-pointer px-2 py-1.5 ${value != null && !value.isCustom && value.value === o.value ? 'bg-rz-mint/15 text-rz-mint' : 'text-slate-700 dark:text-slate-200 hover:bg-rz-mint/10'}`}
-                            onPointerDown={(e) => { e.preventDefault(); onChange({ value: o.value, isCustom: false }); setOpen(false); }}>
+                            /* select on CLICK, not pointerdown — on touch, a scroll gesture
+                               begins with pointerdown on an option, which used to instantly
+                               select + close ("coba scroll → dropdown hilang" on Android) */
+                            onPointerDown={(e) => e.preventDefault()}
+                            onClick={() => { onChange({ value: o.value, isCustom: false }); setOpen(false); }}>
                             {o.label}
                         </li>
                     ))}
                     {value != null && (
                         <li className="cursor-pointer border-t border-slate-200 dark:border-slate-800 px-2 py-1.5 text-slate-400 hover:bg-slate-500/10"
-                            onPointerDown={(e) => { e.preventDefault(); onChange(null); setOpen(false); }}>
+                            onPointerDown={(e) => e.preventDefault()}
+                            onClick={() => { onChange(null); setOpen(false); }}>
                             Use default
                         </li>
                     )}
                     <li className="cursor-pointer border-t border-slate-200 dark:border-slate-800 px-2 py-1.5 font-medium text-rz-mint hover:bg-rz-mint/10"
-                        onPointerDown={(e) => { e.preventDefault(); setOpen(false); setCustomMode(true); setText(value?.isCustom ? String(value.value) : ''); }}>
+                        onPointerDown={(e) => e.preventDefault()}
+                        onClick={() => { setOpen(false); setCustomMode(true); setText(value?.isCustom ? String(value.value) : ''); }}>
                         <Pencil className="mr-1 inline h-3 w-3" /> Custom value…
                     </li>
                 </ul>
