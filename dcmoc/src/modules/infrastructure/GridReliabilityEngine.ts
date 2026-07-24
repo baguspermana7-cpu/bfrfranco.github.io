@@ -3,7 +3,21 @@
 
 import { CountryProfile } from '@/constants/countries';
 import { getPUE } from '@/constants/pue';
-import { rzModels } from '@/lib/rz-engine';
+import { rzData, rzModels } from '@/lib/rz-engine';
+
+/* ─── Backup-economics constants (sourced, screening) — X-audit Y-slice hoist.
+ * One place instead of inline literals scattered through the calc:
+ *  · diesel $/L    — IEA 2025 commercial/industrial band $1.10-1.40, 2026 midpoint
+ *  · UPS $/kW·yr   — blended VRLA $26-30 / Li-ion $18-22 at the ~60/40 fleet
+ *                    mix shift (Uptime 2025)
+ *  · dual-feed     — second utility feed annualized $/kW (screening)
+ *  · BESS $/kWh    — BloombergNEF 2026 C&I benchmark (down from ~$400 in 2023)
+ * Fuel rate itself comes from DATA.fuelGen.genEfficiencyLPerKwh (EPA Tier 4
+ * Final, same source FuelGenEngine uses) with a parity fallback.            */
+const DIESEL_PRICE_USD_PER_L = 1.25;
+const UPS_REPLACEMENT_USD_PER_KW_YR = 27;
+const DUAL_FEED_USD_PER_KW_YR = 50;
+const BESS_USD_PER_KWH = 300;
 
 export interface GridReliabilityInput {
     country: CountryProfile;
@@ -100,28 +114,25 @@ export const calculateGridReliability = (input: GridReliabilityInput): GridRelia
     const recommendedFuelHours = Math.max(recommendedGenHoursBase, gridTier === 3 ? 168 : gridTier === 2 ? 72 : 48);
 
     // --- Cost Calculations ---
-    // Fuel cost: diesel generator at 0.27-0.30 L/kWh (modern Tier 4 engines ~0.27 L/kWh)
-    // Global diesel (IEA 2025): ~$1.10-$1.40/L for commercial/industrial
-    // Using $1.25/L as 2026 global commercial baseline
-    const fuelConsumptionRate = 0.27; // L/kWh (Tier 4 Final engines, 2026 standard)
-    const fuelPricePerLiter = 1.25;   // USD/L (2026 global commercial diesel benchmark)
+    // Fuel rate: DATA.fuelGen (EPA Tier 4 Final ~0.27 L/kWh @ 75% load) — same
+    // single source FuelGenEngine reads; diesel price from the sourced constant.
+    const fuelConsumptionRate = (rzData().fuelGen as { genEfficiencyLPerKwh?: number } | undefined)?.genEfficiencyLPerKwh ?? 0.27; // L/kWh
+    const fuelPricePerLiter = DIESEL_PRICE_USD_PER_L;
     const expectedRunHoursPerYear = (annualOutageMinutes / 60) + (recommendedFuelHours * 0.12); // runtime + monthly/quarterly tests
     const annualFuelCost = Math.round(
         requiredGenCapacity * expectedRunHoursPerYear * fuelConsumptionRate * fuelPricePerLiter * (1 + backupFuelPremium)
     );
 
-    // UPS battery stress from brownouts
-    // 2026: VRLA replacement cost $26-$30/kW/yr; Li-ion (now common) $18-$22/kW/yr
-    // Using $27/kW/yr blended (60% VRLA, 40% Li-ion market shift per Uptime 2025)
+    // UPS battery stress from brownouts (blended $/kW·yr sourced constant above)
     const brownoutStressFactor = Math.min(2.0, 1.0 + brownoutFreq * 0.02);
-    const baseUpsReplacementCost = itLoadKw * 27; // $27/kW/year blended (2026)
+    const baseUpsReplacementCost = itLoadKw * UPS_REPLACEMENT_USD_PER_KW_YR;
     const annualUpsReplacementCost = Math.round(baseUpsReplacementCost * brownoutStressFactor);
 
     // Dual feed recommendation
     const dualFeedRecommendation = gridTier >= 2 || reliabilityScore < 70 || tierLevel >= 3;
 
     // Dual feed cost (if recommended)
-    const dualFeedCost = dualFeedRecommendation ? Math.round(itLoadKw * 50) : 0; // $50/kW annualized
+    const dualFeedCost = dualFeedRecommendation ? Math.round(itLoadKw * DUAL_FEED_USD_PER_KW_YR) : 0; // annualized second-feed
 
     // Total grid risk adjusted OPEX
     const gridRiskAdjustedOpex = annualFuelCost + annualUpsReplacementCost + dualFeedCost;
@@ -136,10 +147,8 @@ export const calculateGridReliability = (input: GridReliabilityInput): GridRelia
     // Solar viability
     const solarViabilityScore = renewableReadiness;
 
-    // Battery storage ROI (years to payback)
-    // BNEF 2025/2026: utility-scale BESS ~$220-$270/kWh; commercial/industrial ~$300-$380/kWh
-    // Using $300/kWh for DC application (2026 C&I BESS benchmark, BloombergNEF)
-    const bessCostPerKwh = 300; // $/kWh (2026 C&I BESS, down from $400 in 2023)
+    // Battery storage ROI (years to payback) — BESS $/kWh sourced constant above
+    const bessCostPerKwh = BESS_USD_PER_KWH;
     const bessCapacity = itLoadKw * 0.5; // 30 mins of storage at full IT load
     const bessTotalCost = bessCapacity * bessCostPerKwh;
     const annualBessSavings = annualFuelCost * 0.45 + annualUpsReplacementCost * 0.25; // improved savings with lower BESS cost

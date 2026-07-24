@@ -6,7 +6,7 @@ import { COUNTRIES } from '@/constants/countries';
 import { calculateCapex } from '@/lib/CapexEngine';
 import { calculateFinancials, defaultOccupancyRamp } from '@/modules/analytics/FinancialEngine';
 import { calculateStaffing } from '@/modules/staffing/ShiftEngine';
-import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
+import { DEFAULT_REVENUE_PER_KW_MONTH, DEFAULT_DEPRECIATION_YEARS } from '@/constants/finance';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
 import { GitCompare, X, ArrowLeftRight } from 'lucide-react';
 import clsx from 'clsx';
@@ -92,7 +92,7 @@ export function ScenarioComparisonPanel() {
                 opexEscalation: country.economy.inflationRate,
                 occupancyRamp,
                 taxRate: country.economy.taxRate,
-                depreciationYears: 7,
+                depreciationYears: DEFAULT_DEPRECIATION_YEARS,
             });
 
             return {

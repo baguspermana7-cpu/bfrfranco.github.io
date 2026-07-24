@@ -4,7 +4,7 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
-import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
+import { DEFAULT_REVENUE_PER_KW_MONTH, DEFAULT_DEPRECIATION_YEARS } from '@/constants/finance';
 import { calculateFinancials, defaultOccupancyRamp, FinancialInputs } from '@/modules/analytics/FinancialEngine';
 import { calculateCapex } from '@/lib/CapexEngine';
 import { calculateStaffing } from '@/modules/staffing/ShiftEngine';
@@ -123,7 +123,7 @@ export default function MonteCarloDashboard() {
             opexEscalation: selectedCountry.economy.inflationRate,
             occupancyRamp: inputs.occupancyRamp.length > 0 ? inputs.occupancyRamp : defaultOccupancyRamp(10),
             taxRate: selectedCountry.economy.taxRate,
-            depreciationYears: 7,
+            depreciationYears: DEFAULT_DEPRECIATION_YEARS,
         };
     }, [selectedCountry, inputs, capexStore.inputs, effectiveInputs]);
 

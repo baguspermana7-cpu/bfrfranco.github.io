@@ -8162,7 +8162,16 @@
             dieselPriceDefaultPerLiter: 1.05,
             fuelTaxRateDefault: 0.05,
             storageLimitLitersDefault: 50000,
-            test: { monthlyTestHours: 2, annualFullLoadTestHours: 4 }
+            test: { monthlyTestHours: 2, annualFullLoadTestHours: 4 },
+            /* Genset unit sizing + O&M economics (X-audit Y-slice promotion from
+             * DCMOC FuelGenEngine inline literals — screening class sizes). */
+            genUnitKwSmall: 2500,        /* per-genset kW, campus ≤100 MW (CAT 3512E / Cummins QSK78 class) */
+            genUnitKwLarge: 3000,        /* per-genset kW, >100 MW hyperscale (CAT 3516E / MTU 20V4000 class) */
+            genUnitScaleMw: 100,         /* IT-MW breakpoint between the two unit classes (mirrors AssetGenerator) */
+            tankSizeLiters: 20000,       /* bulk diesel tank module (UL-142 class typical) */
+            maintPerGenUsd: 18000,       /* annual PM per genset — CBRE FM benchmark 2025: Tier-4 $16-22k/unit */
+            maintPerKwUsd: 5,            /* capacity-variable PM adder $/kW·yr */
+            envCompliancePerGenUsd: 2500 /* per-genset air-permit/stack-test admin, when permits required */
         },
         /* ══ v2.4.0 — DATA.capacity: multi-phase build-out presets (Group-2 promotion
          * from DCMOC CapacityPlanningEngine). Occupancy ramp + phase templates. ══ */
@@ -8616,7 +8625,7 @@
             'requirements':           { source: 'DC project brief required-field set + workload density/cooling profiles (AI/HPC/cloud/colo/enterprise/edge) — engine intake heuristic informed by Uptime/OCP rack-density guidance', asOf: '2026', unit: 'field list + kW/rack + cooling/tier defaults', method: 'completeness + profile defaults; not a design basis' },
             'architecture':           { source: 'Canonical DC design disciplines (electrical/mechanical/cooling/fire/security/network/building/structural/BMS) + relative design-complexity multipliers by cooling/tier/redundancy — engine heuristic', asOf: '2026', unit: 'discipline list + complexity multipliers → 0-100 index', method: 'normalized complexity screen; NOT a design deliverable' },
             'maintenance':            { source: 'DC O&M strategy economics — reactive/planned/predictive failure + downtime multipliers + in-house/hybrid/vendor labor blend; lifted from DCMOC MaintenanceStrategyEngine (RCM/CBM industry conventions)', asOf: '2026', unit: 'multipliers + minutes + $/part', method: 'screening O&M cost model; NOT a vendor quote' },
-            'fuelGen':                { source: 'EPA Tier 4 Final diesel genset fuel rate (~0.27 L/kWh @ 75%) + Uptime backup-autonomy hours by tier (48/72/96h); lifted from DCMOC FuelGenEngine', asOf: '2026', unit: 'L/kWh + hours + $/L', method: 'screening sizing; NOT a genset selection' },
+            'fuelGen':                { source: 'EPA Tier 4 Final diesel genset fuel rate (~0.27 L/kWh @ 75%) + Uptime backup-autonomy hours by tier (48/72/96h) + genset unit classes 2.5MW≤100MW-IT/3MW above (CAT 3512E-3516E / Cummins QSK78 / MTU 20V4000 class) + CBRE FM 2025 PM benchmark $16-22k/unit·yr (+$5/kW variable) + UL-142-class 20kL tank modules; lifted from DCMOC FuelGenEngine', asOf: '2026', unit: 'L/kWh + hours + $/L + kW + USD', method: 'screening sizing; NOT a genset selection' },
             'capacity':               { source: 'Multi-phase DC build-out templates (small/medium/large) + occupancy ramp; lifted from DCMOC CapacityPlanningEngine', asOf: '2026', unit: 'kW per phase + months + occupancy fraction', method: 'planning templates; adjust per project' },
             'gridReliability':        { source: 'Utility grid reliability bands (SAIDI-informed uptime tiers) + 0-1 grid score mapping; lifted from DCMOC GridReliabilityEngine — per-country uptime stays in the country profiles', asOf: '2026', unit: 'uptime % + outage hours + 0-1 score', method: 'screening; NOT a utility interconnection study' },
             'tax':                    { source: 'US TCJA bonus depreciation (20% 2026 phase-down) + IRA §48 solar ITC (30% + 10% domestic-content) + state DC sales-tax exemptions (VA/TX/NV/OH/AZ) + representative import duty; lifted from DCMOC TaxIncentiveEngine', asOf: '2026', unit: 'fractions (rates)', method: 'US-federal + state incentives; NOT tax advice; per-country corporate tax in country profiles' },
@@ -14414,7 +14423,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-24-gj"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-24-y"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

@@ -24,15 +24,17 @@ export default function PortfolioDashboard() {
     /* DA3 honest snapshot — pembanding live sim untuk badge amber per entry */
     const liveCountryId = useSimulationStore((s) => s.selectedCountry?.id);
     const liveItLoad = useSimulationStore((s) => s.inputs.itLoad);
+    /* same-basis rule — portfolio valued on the live revenue tunable (SSOT) */
+    const liveRevenue = useSimulationStore((s) => s.inputs.revenuePerKwMonth);
 
     const result = useMemo(() => {
         if (store.sites.length < 2) return null;
         try {
-            return calculatePortfolio(store.sites);
+            return calculatePortfolio(store.sites, { revenuePerKwMonth: liveRevenue });
         } catch {
             return null;
         }
-    }, [store.sites]);
+    }, [store.sites, liveRevenue]);
 
     const countryOptions = Object.values(COUNTRIES).map(c => ({ id: c.id, name: c.name }));
 

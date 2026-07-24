@@ -23,6 +23,14 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsToolti
 import { PageTransition, CardMotion } from '@/components/ui/MotionWrapper';
 import { motion, AnimatePresence } from 'framer-motion';
 
+/* ─── Hazard-pay screening constants (X-audit Y-slice hoist) — AQI-driven O&M
+ * labor premium. Threshold = US EPA AQI 100 ("unhealthy for sensitive groups");
+ * ramp +0.15%/point (AQI 300 ⇒ +30%); +10% step in the hazardous band. ─── */
+const HAZARD_AQI_THRESHOLD = 100;
+const HAZARD_PAY_PER_AQI_POINT = 0.0015;
+const HAZARD_ZONE_AQI = 250;
+const HAZARD_ZONE_EXTRA = 0.10;
+
 export function SimulationDashboard() {
     const { selectedCountry, inputs, actions, isLoading } = useSimulationStore();
     const effectiveInputs = useEffectiveInputs();
@@ -130,19 +138,15 @@ export function SimulationDashboard() {
         const extraSwapsPerYear = Math.max(0, (12 / actualLife) - 4);
         const maintenanceLaborPunishment = ((extraSwapsPerYear * 240) / 12) * laborMultiplier;
 
-        // NEW: Hazard Pay / Efficiency Loss Multiplier
-        // Logic: AQI > 100 starts adding 5% per 50 points roughly. 
-        // AQI 150 = +5%
-        // AQI 300 = +20%
-        const hazardThreshold = 100;
+        // Hazard-pay / efficiency-loss multiplier (SCREENING) — outdoor air
+        // quality drives an O&M labor premium: linear ramp above the AQI-100
+        // "unhealthy for sensitive groups" boundary (US EPA AQI bands) at
+        // +0.15%/point (AQI 300 ⇒ +30%), plus a +10% step inside the
+        // hazardous band (>250). Screening heuristic, not a labor-law rate.
         let hazardMultiplier = 0;
-        if (scenarioAQI > hazardThreshold) {
-            hazardMultiplier = Math.pow((scenarioAQI - hazardThreshold) / 200, 1.2);
-            // 200/200 = 1.0 (100% Increase at 300 AQI? No, too high.)
-            // Let's cap it or scale it.
-            // (300-100)/500 = 0.4 -> 40%.
-            hazardMultiplier = (scenarioAQI - hazardThreshold) * 0.0015; // 0.0015 * 200 = 0.30 (30%)
-            if (scenarioAQI > 250) hazardMultiplier += 0.10; // Extra penalty for hazardous zone
+        if (scenarioAQI > HAZARD_AQI_THRESHOLD) {
+            hazardMultiplier = (scenarioAQI - HAZARD_AQI_THRESHOLD) * HAZARD_PAY_PER_AQI_POINT;
+            if (scenarioAQI > HAZARD_ZONE_AQI) hazardMultiplier += HAZARD_ZONE_EXTRA;
         }
 
         // 3. Risk Calculation — G-avail: COMPUTED availability (engine

@@ -12,3 +12,11 @@
  *  the store field is absent. 150 = conservative wholesale colo rate; the
  *  optimizer / Financial module raise it explicitly (visible, never silent). */
 export const DEFAULT_REVENUE_PER_KW_MONTH = 150;
+
+/** Illustrative straight-line depreciation horizon — years. One convention for
+ *  every DCF surface: blended facility M&E (MACRS-class equipment 7-15 yr,
+ *  building shell far longer) → 15-yr screening blend. Surfaces previously
+ *  diverged (7 in Benchmark/MC/Scenario/Portfolio, 20 in Report, 15 in
+ *  Financial/Investment/trace) so the SAME project tax-shielded differently
+ *  per page. Financial module lets users override. */
+export const DEFAULT_DEPRECIATION_YEARS = 15;

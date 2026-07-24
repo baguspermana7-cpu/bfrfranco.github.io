@@ -7,7 +7,7 @@ import { useCapexStore } from '@/store/capex';
 import { useScenarioStore } from '@/store/scenario';
 import { runSensitivityAnalysis } from '@/modules/analytics/SensitivityEngine';
 import { calculateFinancials, defaultOccupancyRamp } from '@/modules/analytics/FinancialEngine';
-import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
+import { DEFAULT_REVENUE_PER_KW_MONTH, DEFAULT_DEPRECIATION_YEARS } from '@/constants/finance';
 import TornadoChart from '@/components/visualizations/TornadoChart';
 import SankeyDiagram from '@/components/visualizations/SankeyDiagram';
 import type { SankeyNode, SankeyLink } from '@/components/visualizations/SankeyDiagram';
@@ -294,7 +294,7 @@ export function ReportDashboard() {
             opexEscalation: selectedCountry?.economy?.inflationRate ?? 0.03,
             occupancyRamp,
             taxRate,
-            depreciationYears: 20,
+            depreciationYears: DEFAULT_DEPRECIATION_YEARS,
         });
 
         // Insights / Executive Summary

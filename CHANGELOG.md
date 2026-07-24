@@ -13,6 +13,17 @@ release sections rather than semver.
 
 ---
 
+## v1.115.44 — 2026-07-24 (DCMOC Y-SLICE — X-audit deferred violations: fuel/gen sizing to DATA, grid economics sourced, one depreciation convention, portfolio on live revenue)
+
+### Fixed
+- **Fuel & Generator sizing single-sourced + scale bug**: `DATA.fuelGen` gains genset unit classes (2.5 MW ≤100 MW-IT / 3 MW above — CAT 3512E-3516E / MTU 20V4000 class), tank module 20 kL (UL-142 class), PM economics ($18k/unit + $5/kW, CBRE FM 2025) and per-genset environmental-compliance admin; FuelGenEngine reads them with parity fallbacks. Also fixes a real inconsistency: the engine displayed flat 2,500 kW units at every scale while AssetGenerator switches to 3,000 kW above 100 MW — spec and quantity now agree.
+- **Grid Reliability economics sourced**: diesel $1.25/L (IEA 2025 C&I band), UPS $27/kW·yr (blended VRLA/Li-ion, Uptime 2025), dual-feed $50/kW·yr, BESS $300/kWh (BNEF 2026 C&I) hoisted to one sourced constant block; fuel burn rate now reads `DATA.fuelGen.genEfficiencyLPerKwh` — the same EPA Tier 4 source FuelGenEngine uses.
+- **ONE depreciation convention**: new `DEFAULT_DEPRECIATION_YEARS = 15` — Benchmark/Monte-Carlo/Scenario/Portfolio used 7 and Report used 20 while Financial/Investment/trace used 15, so the same project tax-shielded differently per page.
+- **Portfolio on the live revenue basis**: `calculatePortfolio` no longer hardcodes $120/kW·mo — the dashboard passes the sim-store revenue tunable, making portfolio IRRs comparable with every other surface.
+- **Hazard-pay screening constants**: AQI-driven O&M labor premium (0.15%/point above AQI 100, +10% hazardous step) hoisted with the EPA-band rationale; dead first-assignment code removed.
+
+---
+
 ## v1.115.43 — 2026-07-24 (LTC — MODEL VALIDATION: the model now shows its receipts vs ASHRAE/OCP/Uptime bands)
 
 ### Added

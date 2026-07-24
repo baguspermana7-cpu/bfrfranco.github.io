@@ -3,6 +3,7 @@
 
 import { SiteConfig } from '@/store/portfolio';
 import { COUNTRIES } from '@/constants/countries';
+import { DEFAULT_REVENUE_PER_KW_MONTH, DEFAULT_DEPRECIATION_YEARS } from '@/constants/finance';
 import { calculateCapex, CapexInput, CapexResult } from '@/lib/CapexEngine';
 import { calculateFinancials, defaultOccupancyRamp, FinancialResult } from './FinancialEngine';
 import { calculateCarbonFootprint, CarbonResult } from './CarbonEngine';
@@ -41,7 +42,11 @@ export interface PortfolioResult {
     lowestRisk: string;         // site with best uptime tier
 }
 
-export function calculatePortfolio(sites: SiteConfig[]): PortfolioResult {
+export function calculatePortfolio(sites: SiteConfig[], opts?: { revenuePerKwMonth?: number }): PortfolioResult {
+    /* Same-basis rule: portfolio sites are valued on the project's live revenue
+     * assumption (caller passes the sim-store tunable) — was a hardcoded 120
+     * that made portfolio IRRs incomparable to every other surface. */
+    const revenuePerKwMonth = opts?.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH;
     const siteResults: SiteResult[] = sites.map(site => {
         const country = COUNTRIES[site.countryId];
         if (!country) {
@@ -112,7 +117,7 @@ export function calculatePortfolio(sites: SiteConfig[]): PortfolioResult {
         const financialResult = calculateFinancials({
             totalCapex: capexResult.total,
             annualOpex,
-            revenuePerKwMonth: 120,
+            revenuePerKwMonth,
             itLoadKw: site.itLoad,
             discountRate: 0.10,
             projectLifeYears: 10,
@@ -120,7 +125,7 @@ export function calculatePortfolio(sites: SiteConfig[]): PortfolioResult {
             opexEscalation: country.economy.inflationRate,
             occupancyRamp: defaultOccupancyRamp(10),
             taxRate: country.economy.taxRate,
-            depreciationYears: 7,
+            depreciationYears: DEFAULT_DEPRECIATION_YEARS,
         });
 
         // Carbon

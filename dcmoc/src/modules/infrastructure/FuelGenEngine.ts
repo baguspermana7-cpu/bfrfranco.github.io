@@ -130,7 +130,12 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
     // Previous default was 0.27; keeping at 0.27 as conservative (matches EPA Tier 4 benchmark)
     // Engine-sourced fuel/gen economics (RZEngine DATA.fuelGen) with local fallbacks
     // parity-identical to the former inline literals.
-    const FG = (rzData().fuelGen || {}) as { genEfficiencyLPerKwh?: number; fuelStorageHoursByTier?: Record<number, number> };
+    const FG = (rzData().fuelGen || {}) as {
+        genEfficiencyLPerKwh?: number; fuelStorageHoursByTier?: Record<number, number>;
+        genUnitKwSmall?: number; genUnitKwLarge?: number; genUnitScaleMw?: number;
+        tankSizeLiters?: number; maintPerGenUsd?: number; maintPerKwUsd?: number;
+        envCompliancePerGenUsd?: number;
+    };
     const genEfficiency = overrides?.genEfficiency ?? FG.genEfficiencyLPerKwh ?? 0.27; // L/kWh (EPA Tier 4 Final, 75% load)
     const fuelStorageHours = overrides?.fuelStorageHours ?? FG.fuelStorageHoursByTier?.[tierLevel] ?? (tierLevel === 4 ? 96 : tierLevel === 3 ? 72 : 48);
     const monthlyTestHours = overrides?.monthlyTestHours ?? 2;
@@ -140,8 +145,12 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
     const pueFactor = getPUE(coolingType);
     const totalFacilityLoadKw = itLoadKw * pueFactor;
 
-    // Generator sizing — sync with AssetGenerator for consistency with Maintenance module
-    const genUnitCapacity = 2500; // kW per generator
+    // Generator sizing — DATA.fuelGen unit classes, same ≤100MW/>100MW breakpoint
+    // as AssetGenerator gensetKw (was a flat 2500 that contradicted AssetGenerator's
+    // 3000 kW units above 100 MW — spec/qty now agree at every scale)
+    const genUnitCapacity = (itLoadKw / 1000) <= (FG.genUnitScaleMw ?? 100)
+        ? (FG.genUnitKwSmall ?? 2500)
+        : (FG.genUnitKwLarge ?? 3000); // kW per generator
     const effectiveTier: 3 | 4 = tierLevel === 2 ? 3 : tierLevel as 3 | 4;
     const coolingMap: 'air' | 'pumped' = coolingType === 'liquid' || coolingType === 'rdhx' ? 'pumped' : 'air';
     const effectiveCoolingTopology = coolingTopology ?? 'perimeter';
@@ -173,7 +182,7 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
         engineStorageLiters ?? (fuelPerHour * fuelStorageHours),
         storageLimitLiters * 2
     );
-    const tankSize = 20000; // liters per tank
+    const tankSize = FG.tankSizeLiters ?? 20000; // liters per tank (DATA.fuelGen, UL-142-class module)
     const tankCount = Math.ceil(storageLiters / tankSize);
     const daysOfAutonomy = storageLiters / fuelPerHour / 24;
 
@@ -258,13 +267,13 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
     const fuelQualityMaintMult =
         fuel?.fuelQualityRating === 'low' ? 1.15 :
         fuel?.fuelQualityRating === 'moderate' ? 1.05 : 1.00;
-    const annualMaintenanceUsd = (genCount * 18000 + (totalGenCapacity * 5)) * fuelQualityMaintMult;
+    const annualMaintenanceUsd = (genCount * (FG.maintPerGenUsd ?? 18000) + (totalGenCapacity * (FG.maintPerKwUsd ?? 5))) * fuelQualityMaintMult;
 
     // Environmental compliance — DM audit: country-specific annual permitting cost
     // (countries.ts compliance.environmentalPermitCostPerYear, screening band US $8k /
     // JP $15k / EU ~$4.5-6.5k / emerging $2-3.5k); fallback = legacy flat $5,000 site fee.
     const envPermitSiteFee = country.compliance.environmentalPermitCostPerYear ?? 5000;
-    const annualEnvCompliance = envPermitRequired ? (genCount * 2500 + envPermitSiteFee) : 0;
+    const annualEnvCompliance = envPermitRequired ? (genCount * (FG.envCompliancePerGenUsd ?? 2500) + envPermitSiteFee) : 0;
 
     const totalAnnualGenOpex = annualFuelCost + annualMaintenanceUsd + annualEnvCompliance;
 

@@ -17,7 +17,7 @@ import { Tooltip as InfoTooltip } from '@/components/ui/Tooltip';
 import { computeCalibration, pctileLabelOf, type CalibrationResult } from '@/lib/calibration';
 import { explainThresholdMetric } from '@/lib/decision-explain';
 import { PUE_BY_COOLING } from '@/constants/pue';
-import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
+import { DEFAULT_REVENUE_PER_KW_MONTH, DEFAULT_DEPRECIATION_YEARS } from '@/constants/finance';
 import { TraceValue } from '@/components/ui/TraceValue';
 import clsx from 'clsx';
 
@@ -357,7 +357,7 @@ export default function BenchmarkDashboard() {
             opexEscalation: selectedCountry.economy.inflationRate,
             occupancyRamp: inputs.occupancyRamp.length > 0 ? inputs.occupancyRamp : defaultOccupancyRamp(10),
             taxRate: selectedCountry.economy.taxRate,
-            depreciationYears: 7,
+            depreciationYears: DEFAULT_DEPRECIATION_YEARS,
         };
         const financialResult = calculateFinancials(financialInputs);
 
