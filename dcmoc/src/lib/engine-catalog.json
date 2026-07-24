@@ -3,8 +3,8 @@
  "note": "AUTO-GENERATED from rz-engine.js — do not hand-edit. Consumers are grep-derived from real usage.",
  "dataVersion": "2.5.1",
  "modelCount": 53,
- "functionCount": 232,
- "sourceCount": 153,
+ "functionCount": 233,
+ "sourceCount": 154,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -1016,6 +1016,12 @@
      "params": [
       "input"
      ]
+    },
+    {
+     "name": "validation",
+     "params": [
+      "model"
+     ]
     }
    ],
    "consumers": []
@@ -1580,6 +1586,7 @@
     }
    ],
    "consumers": [
+    "dcmoc/src/components/modules/StrategicPlanningDashboard.tsx",
     "dcmoc/src/lib/provenance/moduleSources.ts",
     "dcmoc/src/lib/value-trace.ts",
     "dcmoc/src/modules/analytics/FinancialEngine.ts",
@@ -2584,6 +2591,12 @@
    "source": "Verbatim copy of IMPACT_PARAMS from ltc-system-modelling-lab.js (same file, same version) — 12 parameters with key/label/step/min/max/unit for sensitivity perturbation. Single source of truth shared between models.ltc.sensitivity() and the page UI.",
    "asOf": "2026",
    "method": "model-calibration"
+  },
+  {
+   "key": "ltcCalibration.validationBands",
+   "source": "Model-validation benchmark bands: PUE band = DATA.pueMatrix.liquid tier4–tier2 (Uptime Institute survey 2026), fleet reference DATA.benchmarksCorpus.pue.hyperscale p10/p50; WUE envelope = DATA.water.wueByType immersion…rear-door (ASHRAE screening); ΔT / supply-temp / flow-intensity = DATA.cdu.bands (ASHRAE TC9.9 W-classes + OCP cold-plate); pump-fraction ≤3% IT = OCP cold-plate hydraulic guidance (mirrors lab conPumpPctMax default). Consumed by models.ltc.validation() — drift is reported, bands never silently loosened.",
+   "asOf": "2026",
+   "method": "model-calibration report (MODEL_CALIBRATION_STANDARD)"
   },
   {
    "key": "ltcClimate",

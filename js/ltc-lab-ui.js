@@ -280,6 +280,18 @@
         dsCard.appendChild(dsBody);
         rightRail.appendChild(dsCard);
 
+        // MODEL VALIDATION — the model's receipts: live values vs sourced
+        // benchmark bands (ASHRAE / OCP / Uptime / corpus) from the engine.
+        var mvCard = el('div', { className: 'ltc-rail-card' });
+        var mvHeader = el('div', { className: 'ltc-rail-header' });
+        mvHeader.appendChild(el('span', { className: 'ltc-rail-title', textContent: 'MODEL VALIDATION' }));
+        var mvPill = el('span', { className: 'ltc-comp-pill', id: 'ltcValidPill', textContent: '—' });
+        mvHeader.appendChild(mvPill);
+        mvCard.appendChild(mvHeader);
+        mvCard.appendChild(el('div', { className: 'ltc-valid-list', id: 'ltcValidList' }));
+        mvCard.appendChild(el('p', { className: 'ltc-scenario-note', textContent: 'Live check vs ASHRAE TC9.9 / OCP cold-plate / Uptime bands from the shared engine. Out-of-band = review that aspect of the design.' }));
+        rightRail.appendChild(mvCard);
+
         // Sensitivity card
         var sensCard = el('div', { className: 'ltc-rail-card' });
         var sensHeader = el('div', { className: 'ltc-rail-header' });
@@ -946,6 +958,7 @@
         renderCompliance(model);
         renderDesignStatus(model);
         renderSensitivity(model);
+        renderValidation(model);
         renderTornado(model);
         renderScenarioReadout(model);
         renderReportCompare(model);
@@ -1112,6 +1125,40 @@
                 '<div class="ltc-sub-bar-track">' +
                 '<div class="ltc-sub-bar-fill" style="width:' + r.val.toFixed(0) + '%"></div>' +
                 '</div>' +
+                '</div>';
+        }).join('');
+    }
+
+    // MODEL VALIDATION — render engine validation rows as band bars with a
+    // value marker; green in-band, amber out. Single source: models.ltc.validation.
+    function renderValidation(model) {
+        var host = document.getElementById('ltcValidList');
+        if (!host || !model) return;
+        var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.ltc;
+        if (!eng || typeof eng.validation !== 'function') { host.innerHTML = ''; return; }
+        var rows = eng.validation(model);
+        var inCount = rows.filter(function (r) { return r.inBand; }).length;
+        var pill = document.getElementById('ltcValidPill');
+        if (pill) {
+            pill.textContent = inCount + '/' + rows.length + ' in band';
+            pill.className = 'ltc-comp-pill' + (inCount === rows.length ? '' : ' ltc-fail');
+        }
+        host.innerHTML = rows.map(function (r) {
+            var span = r.hi - r.lo;
+            var pad = span * 0.35;                       // visual margin beyond the band
+            var min = r.lo - pad, max = r.hi + pad;
+            var pos = r.value === null ? null : Math.max(0, Math.min(100, (r.value - min) / (max - min) * 100));
+            var loPct = (r.lo - min) / (max - min) * 100, hiPct = (r.hi - min) / (max - min) * 100;
+            var dec = span < 2 ? 2 : (span < 20 ? 1 : 0);
+            return '<div class="ltc-valid-row" title="' + (r.source || '').replace(/"/g, '&quot;') + '">' +
+                '<div class="ltc-valid-head"><span class="ltc-valid-lbl">' + r.label + '</span>' +
+                '<span class="ltc-valid-val ' + (r.inBand ? 'ok' : 'warn') + '">' +
+                (r.value === null ? '—' : r.value.toFixed(dec) + (r.unit ? ' ' + r.unit : '')) + '</span></div>' +
+                '<div class="ltc-valid-track">' +
+                '<span class="ltc-valid-band" style="left:' + loPct.toFixed(1) + '%;width:' + (hiPct - loPct).toFixed(1) + '%"></span>' +
+                (pos === null ? '' : '<span class="ltc-valid-marker ' + (r.inBand ? 'ok' : 'warn') + '" style="left:' + pos.toFixed(1) + '%"></span>') +
+                '</div>' +
+                '<div class="ltc-valid-range"><span>' + r.lo + '</span><span>' + r.hi + (r.unit ? ' ' + r.unit : '') + '</span></div>' +
                 '</div>';
         }).join('');
     }

@@ -13,6 +13,16 @@ release sections rather than semver.
 
 ---
 
+## v1.115.43 — 2026-07-24 (LTC — MODEL VALIDATION: the model now shows its receipts vs ASHRAE/OCP/Uptime bands)
+
+### Added
+- **`models.ltc.validation(model)`** in the shared engine + **`DATA.ltcCalibration.validationBands`** — six benchmark bands, each MIRRORING its DATA anchor (PUE = `pueMatrix.liquid` tier4–tier2 [Uptime 2026, corpus hyperscale p10/p50 as fleet ref]; WUE = `water.wueByType` immersion…rear-door envelope; loop ΔT, supply temperature and flow intensity = `DATA.cdu.bands` [ASHRAE TC9.9 W-classes + OCP cold-plate]; pump fraction ≤3% IT [OCP hydraulic guidance]) with a `DATA.sources` provenance entry.
+- **MODEL VALIDATION card** in the LTC right rail: live band bars with a value marker per metric, green in-band / amber out, an "N/6 in band" pill, and the source citation on hover. Honest by design — the default config correctly reports PUE 1.28 above the 1.10–1.22 design band and flow intensity 2.0 above the OCP 1.0–1.5 LPM/kW band (redundancy + hydraulic margin inflate design flow), pointing the user at exactly what to tune. Updates on every recompute.
+- **Permanent gate `tools/test-ltc-calibration.mjs`** (38 checks): bands finite + sourced + mirrored to their DATA anchors (a divergent copy fails), validation structure, and the default-config findings LOCKED — a future shift in what the model reports is a visible gate failure, never a silent change (MODEL_CALIBRATION_STANDARD).
+
+### Notes
+- Engine chain green: parity 15,750/0 (compute untouched — validation is read-only), test-rz-engine 747/0, value-bindings 85/0, catalog regenerated (233 fns · 154 sources); min rebuilt.
+
 ## v1.115.42 — 2026-07-24 (DCMOC X-AUDIT — total wiring audit: 35 fixes, fabricated-PDF financials killed, ONE revenue basis everywhere)
 
 ### Fixed

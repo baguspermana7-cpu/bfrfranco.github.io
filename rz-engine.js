@@ -8498,6 +8498,17 @@
                 sustainFloor: 30,    /* floor % when avoidedCarbonTons ≤ 0 */
                 /* Operability: confidence field (already 0-99 range). */
                 operMaxConf:  99
+            },
+            /* Benchmark bands the model is validated against (models.ltc.validation).
+             * Each band cites its anchor; drift is REPORTED, never silently loosened
+             * (MODEL_CALIBRATION_STANDARD). */
+            validationBands: {
+                pue:        { lo: 1.10, hi: 1.22, unit: '',      label: 'PUE (design band)',   source: 'DATA.pueMatrix.liquid tier4–tier2 (Uptime Institute survey 2026); fleet ref: corpus hyperscale p10 1.07 / p50 1.12' },
+                wue:        { lo: 0.10, hi: 1.10, unit: 'L/kWh', label: 'WUE',                 source: 'DATA.water.wueByType — immersion 0.10 … rear-door 1.10; direct-to-chip mid 0.50 (ASHRAE screening)' },
+                deltaT:     { lo: 8,    hi: 12,   unit: 'K',     label: 'Loop ΔT',             source: 'DATA.cdu.bands.deltaTK (ASHRAE TC9.9 / OCP cold-plate)' },
+                supplyTemp: { lo: 17,   hi: 45,   unit: '°C',    label: 'Supply temperature',  source: 'DATA.cdu.bands.supplyC — ASHRAE W17–W45 liquid classes' },
+                flowIntensity: { lo: 1.0, hi: 1.5, unit: 'LPM/kW', label: 'Flow intensity',    source: 'DATA.cdu.bands.flowLpmPerKw (OCP cold-plate flow guidance, per kW of liquid heat)' },
+                pumpPct:    { lo: 0,    hi: 3.0,  unit: '% IT',  label: 'Pump power fraction', source: 'OCP cold-plate hydraulic guidance; mirrors the lab default hard-constraint conPumpPctMax' }
             }
         },
 
@@ -8651,6 +8662,7 @@
             'ltcCalibration':      { source: 'LTC System Modelling Lab model calibration constants (ltc-system-modelling-lab.js computeModel, v2026-Q2). copBase 6.1 and climate/supply/control bonuses: calibrated to ASHRAE HoF 2021 ch.39 liquid-cooled chiller COP ranges for representative DC conditions (warm-water DLC 28-35 deg-C supply; temperate climate COP bias +0.38 consistent with Uptime 2026 survey DLC cohort). pumpDensityStress 0.22: hydraulic sensitivity to rack power density per CDU sizing practice. heatReuseCredit 0.62: economic credit fraction for recovered heat (LTC model convention). Score weights (ASHRAE 0.24 / ANSI 0.16 / ISO 0.16 / NFPA 0.20 / Uptime 0.24) and score-function thresholds: LTC engineering heuristic rubric, NOT a certified compliance assessment.', asOf: '2026', unit: 'dimensionless coefficients + score weights', method: 'model-calibration — review before using for a certified compliance assessment' },
             'ltcCalibration.impactParams': { source: 'Verbatim copy of IMPACT_PARAMS from ltc-system-modelling-lab.js (same file, same version) — 12 parameters with key/label/step/min/max/unit for sensitivity perturbation. Single source of truth shared between models.ltc.sensitivity() and the page UI.', asOf: '2026', unit: 'param metadata array', method: 'model-calibration' },
             'ltcCalibration.designSubScores': { source: 'Design sub-score band thresholds derived from the LTC compute model output fields: Efficiency band effPueBest/Worst from ASHRAE TC9.9 + Uptime Survey 2026 DLC PUE range; sustainRef 400 tCO2e/GWh = global average grid intensity (IEA 2026); sustainFloor 30 = model convention matching legacy UI floor; Operability = confidence field range (0-99 from LTC calibration).', asOf: '2026', unit: 'threshold constants for 0-100 sub-score mapping', method: 'model-calibration' },
+            'ltcCalibration.validationBands': { source: 'Model-validation benchmark bands: PUE band = DATA.pueMatrix.liquid tier4–tier2 (Uptime Institute survey 2026), fleet reference DATA.benchmarksCorpus.pue.hyperscale p10/p50; WUE envelope = DATA.water.wueByType immersion…rear-door (ASHRAE screening); ΔT / supply-temp / flow-intensity = DATA.cdu.bands (ASHRAE TC9.9 W-classes + OCP cold-plate); pump-fraction ≤3% IT = OCP cold-plate hydraulic guidance (mirrors lab conPumpPctMax default). Consumed by models.ltc.validation() — drift is reported, bands never silently loosened.', asOf: '2026', unit: 'per-metric lo/hi + anchor citation', method: 'model-calibration report (MODEL_CALIBRATION_STANDARD)' },
             /* ── W3 provenance entries ── */
             'coolants.extended':    { source: 'W3-D1 coolant extension: pg40 + dielectric_1p/2p added. pg40: ASHRAE HoF 2021 ch.31 propylene glycol tables (cp 3.58 kJ/kg·K, rho 1050 kg/m³, freeze −23 °C). dielectric_1p: OCP Immersion Fluid Base Specification Rev 2022 (cp ~1.5 kJ/kg·K, rho 1600 kg/m³, viscosity ~3.5 mPa·s). dielectric_2p: OCP Immersion Fluid Base Spec (fluorocarbon class, boiling 49-60 °C, cp ~1.1 kJ/kg·K). viscosityMpas + thermalCondWmk added to all entries from /data/cdu/coolant-properties-extended.csv (IAPWS-IF97 for water; ASHRAE HoF 2021 for PG; OCP spec for dielectrics).', asOf: '2025', unit: 'kJ/kg·K (cp), kg/m³ (rho), mPa·s (viscosity), W/m·K (k)', method: 'STANDARD thermophysical properties; curated CSV /data/cdu/coolant-properties-extended.csv' },
             'cduVendors':           { source: 'W3-D1 CDU vendor specs — vendor datasheets 2024-25: CoolIT Systems RACK CDU datasheet (200 kW, 340 Lpm); Asetek RackCDU D2C product page 2025 (250 kW); Vertiv Liebert XDU specification 2025 (150 kW, 265 Lpm); Boyd Technologies thermal datasheet 2024 (300 kW); Airedale product range 2025 (120 kW); Schneider Electric data center cooling portfolio 2025 (180 kW). costUsdPerKw = budgetary installed estimate. Curated /data/cdu/cdu-vendor-specs.csv.', asOf: '2025', unit: 'kW (capacity), Lpm (flow), bar (dP), weeks (lead), USD/kW (budgetary cost)', method: 'SCREENING — vendor published capability; verify with current quote for project procurement' },
@@ -14265,6 +14277,32 @@
                     sustainability: sustainability,
                     operability:    operability
                 };
+            },
+            /* Model validation vs sourced benchmark bands (DATA.ltcCalibration.validationBands).
+             * Returns one row per metric: { key, label, value, unit, lo, hi, source, inBand }.
+             * Pure report — no clamping, no silent loosening (MODEL_CALIBRATION_STANDARD). */
+            validation: function (model) {
+                var B = DATA.ltcCalibration.validationBands;
+                if (!model || !B) return [];
+                var flowIntensity = (model.liquidKw > 0) ? (model.flowLpm / model.liquidKw) : NaN;
+                var pumpPct = (model.itKw > 0) ? (model.pumpPowerKw / model.itKw) * 100 : NaN;
+                var vals = {
+                    pue: model.pue,
+                    wue: model.wue,
+                    deltaT: model.deltaT,
+                    supplyTemp: model.input && model.input.supplyTemp,
+                    flowIntensity: flowIntensity,
+                    pumpPct: pumpPct
+                };
+                return Object.keys(B).map(function (k) {
+                    var b = B[k], v = vals[k];
+                    var finite = typeof v === 'number' && isFinite(v);
+                    return {
+                        key: k, label: b.label, unit: b.unit, source: b.source,
+                        value: finite ? v : null, lo: b.lo, hi: b.hi,
+                        inBand: finite ? (v >= b.lo && v <= b.hi) : false
+                    };
+                });
             }
         }
         },
