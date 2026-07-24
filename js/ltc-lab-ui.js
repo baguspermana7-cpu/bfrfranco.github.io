@@ -82,6 +82,13 @@
         railHeader.appendChild(resetBtn);
         leftCard.appendChild(railHeader);
 
+        // Guided flow: how to use the lab, in one glance.
+        var guide = el('div', { className: 'ltc-flow-guide' });
+        guide.innerHTML = '<span><b>1</b> Set design</span><span class="ltc-fg-sep">→</span>' +
+            '<span><b>2</b> Review auto-filled</span><span class="ltc-fg-sep">→</span>' +
+            '<span><b>3</b> Tune &amp; optimize</span>';
+        leftCard.appendChild(guide);
+
         // Primary sliders section
         var sliderSection = el('div', { className: 'ltc-primary-sliders' });
         var sliderSectionLbl = el('div', { className: 'ltc-section-label' });
@@ -381,10 +388,136 @@
             var fb = flowHost.querySelector(':scope > .flow-block');
             if (fb) flowHost.insertBefore(fb, flowHost.firstChild);
             accordionizeHosts();
+            tierizeInputs();
             document.body.classList.add('ltc-consolidated');
         } catch (e) {
             try { if (window.console) console.warn('LTC consolidation skipped:', e); } catch (_) {}
         }
+    }
+
+    // ════════════════════════════════════════════════════════
+    // Input taxonomy — DESIGN (your decisions) / AUTO (preset-filled, override
+    // anytime) / TUNE (optimization & calibration knobs). Answers the owner's
+    // "mana input awal, mana auto-fill, mana untuk optimalisasi".
+    // ════════════════════════════════════════════════════════
+    var TIER_BY_INPUT = {
+        inItLoad:'design', inRackCount:'design', inRackType:'design', inRackDensityTarget:'design',
+        inHighDensityShare:'design', inModelYear:'design', inCountryProfile:'design',
+        inCoolingArchitecture:'design', inCoolant:'design', inSupplyTemp:'design', inReturnTemp:'design',
+        inPumpHead:'design', inPumpEff:'design', inLiquidCapture:'design', inHydraulicMargin:'design',
+        inCduUnit:'design', inRedundancy:'design', inFireType:'design', inMonitoring:'design',
+        inHeatReuse:'design', inFailureMode:'design',
+        inClimate:['auto','country'], inElecPrice:['auto','country'], inWaterTariff:['auto','country'],
+        inCarbonIntensity:['auto','country'], inUpsEff:['auto','country'], inDistLoss:['auto','country'],
+        inAirCop:['auto','preset'], inEconomizerHours:['auto','preset'], inFanPower:['auto','preset'],
+        inCoefHeatTransfer:['auto','preset'], inCoefPipeLoss:['auto','preset'],
+        inTargetPue:'tune', inTargetCop:'tune', inControlQuality:'tune', inPredictiveGain:'tune',
+        inCoefCduLoss:'tune', inCoefFutureTech:'tune'
+    };
+    var _autoSnap = {};
+
+    function tierizeInputs() {
+        var panel = document.querySelector('#ltcOtherParamsBody .calc-input-panel');
+        var grid = panel && panel.querySelector('.input-grid');
+        if (!grid || grid.dataset.tierized) return;
+        grid.dataset.tierized = '1';
+
+        function mkSec(cls, num, title, desc) {
+            var wrap = el('div', { className: 'ltc-tier-sec ltc-tier-' + cls });
+            wrap.innerHTML = '<div class="ltc-tier-head"><span class="ltc-tier-num">' + num + '</span>' +
+                '<span class="ltc-tier-title">' + title + '</span></div>' +
+                '<p class="ltc-tier-desc">' + desc + '</p>';
+            // Keep the input-grid class so the page's advanced-mode selector
+            // ('.input-grid .input-group.advanced-param') still matches.
+            var g = el('div', { className: 'input-grid ltc-tier-grid' });
+            wrap.appendChild(g);
+            return { wrap: wrap, grid: g };
+        }
+        var secs = {
+            design: mkSec('design', '1', 'Design inputs', 'Your decisions — set these first.'),
+            auto:   mkSec('auto',   '2', 'Auto-filled', 'Filled from the country & architecture presets (sourced engine data). Override anytime — ↺ restores the preset value.'),
+            tune:   mkSec('tune',   '3', 'Optimization & calibration', 'Targets and model-tuning knobs — adjust these when optimizing the design.')
+        };
+        grid.parentNode.insertBefore(secs.design.wrap, grid);
+        grid.parentNode.insertBefore(secs.auto.wrap, grid);
+        grid.parentNode.insertBefore(secs.tune.wrap, grid);
+
+        Array.prototype.slice.call(grid.querySelectorAll('.input-group')).forEach(function (group) {
+            var field = group.querySelector('input, select');
+            if (!field) return;
+            var spec = TIER_BY_INPUT[field.id];
+            var tier = spec ? (typeof spec === 'string' ? spec : spec[0]) : 'tune';
+            var src = (spec && spec[1]) || '';
+            var label = group.querySelector('label');
+            if (label) {
+                var chip = el('span', { className: 'ltc-tier-chip ltc-chip-' + tier });
+                chip.textContent = tier === 'auto' ? ('AUTO · ' + (src === 'country' ? 'country' : 'architecture')) :
+                                   tier === 'design' ? 'DESIGN' : 'TUNE';
+                chip.id = 'chip_' + field.id;
+                label.appendChild(chip);
+                if (tier === 'auto') {
+                    var rb = el('button', { type: 'button', className: 'ltc-auto-reset', title: 'Reset to preset value', textContent: '↺' });
+                    rb.id = 'reset_' + field.id;
+                    rb.style.display = 'none';
+                    rb.addEventListener('click', function () {
+                        if (_autoSnap[field.id] !== undefined) {
+                            field.value = _autoSnap[field.id];
+                            field.dispatchEvent(new Event('input', { bubbles: true }));
+                            field.dispatchEvent(new Event('change', { bubbles: true }));
+                            setChipState(field.id, 'auto');
+                        }
+                    });
+                    label.appendChild(rb);
+                    field.addEventListener('input', function () {
+                        setChipState(field.id, String(field.value) === String(_autoSnap[field.id]) ? 'auto' : 'overridden');
+                    });
+                }
+            }
+            secs[tier].grid.appendChild(group);
+        });
+        grid.style.display = 'none';
+
+        snapshotAuto();
+        ['inCountryProfile', 'inCoolingArchitecture'].forEach(function (id) {
+            var s = document.getElementById(id);
+            if (s) s.addEventListener('change', function () { setTimeout(snapshotAuto, 60); });
+        });
+    }
+    function setChipState(fieldId, state) {
+        var chip = document.getElementById('chip_' + fieldId);
+        var rb = document.getElementById('reset_' + fieldId);
+        if (chip) {
+            chip.classList.toggle('ltc-chip-overridden', state === 'overridden');
+            if (state === 'overridden') chip.textContent = 'OVERRIDDEN';
+            else {
+                var spec = TIER_BY_INPUT[fieldId];
+                chip.textContent = 'AUTO · ' + ((spec && spec[1]) === 'country' ? 'country' : 'architecture');
+            }
+        }
+        if (rb) rb.style.display = state === 'overridden' ? '' : 'none';
+    }
+    function snapshotAuto() {
+        Object.keys(TIER_BY_INPUT).forEach(function (id) {
+            var spec = TIER_BY_INPUT[id];
+            if (typeof spec === 'string' || spec[0] !== 'auto') return;
+            var f = document.getElementById(id);
+            if (f) { _autoSnap[id] = f.value; setChipState(id, 'auto'); }
+        });
+    }
+
+    // Firm-precision polish: thousand separators on ≥4-digit integers in the
+    // high-visibility value nodes + ΔT glyph in diagram strings. Display only.
+    function polishNumbers() {
+        var sels = ['#ltcDetailedHost .result-card .value', '.model-block .diag-value',
+                    '#ltcFlowHost .flow-row', '#ltcDetailedHost .quick-kpi .v'];
+        document.querySelectorAll(sels.join(', ')).forEach(function (n) {
+            var t = n.textContent;
+            if (!t || t.indexOf('—') !== -1) return;
+            var out = t.replace(/\bdT\b/g, 'ΔT').replace(/(^|[^\d.,])(\d{4,})(?=([^\d.]|$))/g, function (m, pre, num, post) {
+                return pre + Number(num).toLocaleString('en-US');
+            });
+            if (out !== t) n.textContent = out;
+        });
     }
 
     // ════════════════════════════════════════════════════════
@@ -812,6 +945,7 @@
         renderReportCompare(model);
         renderScenarioInfo(model);
         renderResultsTab(model);
+        polishNumbers();
     }
 
     // ── ltcUiRenderFromDom — fallback reading existing DOM ──

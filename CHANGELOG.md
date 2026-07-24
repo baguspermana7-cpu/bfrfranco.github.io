@@ -13,6 +13,12 @@ release sections rather than semver.
 
 ---
 
+## v1.115.39 — 2026-07-24 (LTC — input taxonomy DESIGN / AUTO / TUNE + firm-precision pass)
+
+### Changed
+- **Every input is now classified, ending the "which is which" confusion**: OTHER PARAMETERS regroups into three numbered sections — **1 · Design inputs** (20 — your decisions), **2 · Auto-filled** (11 — filled from the country & architecture presets with sourced engine data; chip shows `AUTO · country`/`AUTO · architecture`, flips to **OVERRIDDEN** the moment you edit, with a per-field ↺ that restores the preset value and recomputes), **3 · Optimization & calibration** (6 — targets and tuning knobs). A 3-step guide strip (`1 Set design → 2 Review auto-filled → 3 Tune & optimize`) sits under the INPUTS header; single-column readable layout in the rail. All element ids/bindings untouched; the page's advanced-mode toggle still works (tier grids keep the `input-grid` class).
+- **Firm-precision pass**: thousand separators on all ≥4-digit values in the result cards, quick-KPI snapshot and model diagrams ("23,312 LPM"), `dT`→`ΔT`, `tabular-nums` on numeric columns so figures align. Display only — engine math untouched (parity 15,750/0).
+
 ## v1.115.38 — 2026-07-24 (LTC — intuitiveness pass: accordion sections, tab guides, iconized tabs)
 
 ### Changed
