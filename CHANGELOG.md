@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.48 — 2026-07-24 (LTC — trace indicators now VISIBLE + RESULTS values traceable)
+
+### Fixed
+- **The v1.115.47 trace indicators never rendered** (owner: "belum ada tracenya"): the `ltc-traceable` class was applied to the KPI value element while the CSS targeted the card — so no ƒx badge or dotted underline appeared anywhere. The whole KPI card is now the trace target (badge + underline render, keyboard-focusable), 12 RESULTS-card values gained inline ƒx chips (Supply/Return temp, ΔT, Flow, Capture, CDU count, Pump Power, System COP, PUE, WUE, Total Facility, Annual Energy), and the SYSTEM OVERVIEW label carries the hint "klik equipment / angka ƒx untuk trace perhitungan". Verified: 6 ƒx cards + 12 traceable rows render, card click opens the trace, 0 console errors.
+
 ## v1.115.47 — 2026-07-24 (LTC — click-to-trace engine (DCMOC pattern), information-rich P&ID, clean steppers)
 
 ### Added

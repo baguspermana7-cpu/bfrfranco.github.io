@@ -49,8 +49,18 @@
                           kpiPump: 'pumpPowerKw', kpiPue: 'pue', kpiCop: 'systemCop' };
         Object.keys(KPI_TRACE).forEach(function (id) {
             var n = document.getElementById(id);
-            if (n) { n.setAttribute('data-ltc-trace', KPI_TRACE[id]); n.classList.add('ltc-traceable'); n.setAttribute('role', 'button'); n.setAttribute('tabindex', '0'); }
+            var card = n && n.closest ? n.closest('.ltc-kpi-card') : null;
+            var target = card || n;
+            if (target) {
+                target.setAttribute('data-ltc-trace', KPI_TRACE[id]);
+                target.classList.add('ltc-traceable');
+                target.setAttribute('role', 'button');
+                target.setAttribute('tabindex', '0');
+            }
         });
+        // Affordance hint on the schematic
+        var ovLbl = document.querySelector('.ltc-overview-label');
+        if (ovLbl) ovLbl.innerHTML += ' <span class="ltc-muted" style="letter-spacing:0;text-transform:none;font-weight:500">— klik equipment / angka ƒx untuk trace perhitungan</span>';
         patchApplyModelToUI();
         // Initial paint: the engine's first applyModelToUI runs BEFORE this scaffold
         // exists (both scripts are `defer`; the engine's DOMContentLoaded handler is
@@ -1636,24 +1646,24 @@
         var coolLabel = ({ water: 'Water', pg20: '20% PG', pg30: '30% PG', pg40: '40% PG',
                            dielectric_1p: 'Dielectric 1P', dielectric_2p: 'Dielectric 2P' })[inp.coolantKey] || (inp.coolantKey || '—');
         var c1rows = [
-            { lbl: 'Supply Temperature',  val: fmt(inp.supplyTemp, 1) + ' °C' },
-            { lbl: 'Return Temperature',  val: fmt(inp.returnTemp, 1) + ' °C' },
-            { lbl: 'ΔT',                  val: fmt(model.deltaT, 1) + ' K' },
+            { lbl: 'Supply Temperature',  val: fmt(inp.supplyTemp, 1) + ' °C', key: 'supplyTemp' },
+            { lbl: 'Return Temperature',  val: fmt(inp.returnTemp, 1) + ' °C', key: 'returnTemp' },
+            { lbl: 'ΔT',                  val: fmt(model.deltaT, 1) + ' K', key: 'deltaT' },
             { lbl: 'Coolant',             val: coolLabel },
             { lbl: 'Cp',                  val: cool.cp != null ? fmt(cool.cp, 3) + ' kJ/kg·K' : '—' },
             { lbl: 'Density',             val: cool.rho != null ? fmt(cool.rho, 0) + ' kg/m³' : '—' }
         ];
         if (cool.viscosityMpas != null) c1rows.push({ lbl: 'Viscosity', val: fmt(cool.viscosityMpas, 3) + ' mPa·s' });
         if (cool.thermalCondWmk != null) c1rows.push({ lbl: 'Thermal Cond.', val: fmt(cool.thermalCondWmk, 3) + ' W/m·K' });
-        c1rows.push({ lbl: 'Volumetric Flow',   val: fmt(model.flowLpm, 0) + ' LPM' });
-        c1rows.push({ lbl: 'Effective Capture', val: fmt(model.effectiveCapture, 1) + '%' });
-        c1rows.push({ lbl: 'CDU Count',         val: model.cduCount + ' units' });
+        c1rows.push({ lbl: 'Volumetric Flow',   val: fmt(model.flowLpm, 0) + ' LPM', key: 'flowLpm' });
+        c1rows.push({ lbl: 'Effective Capture', val: fmt(model.effectiveCapture, 1) + '%', key: 'effectiveCapture' });
+        c1rows.push({ lbl: 'CDU Count',         val: model.cduCount + ' units', key: 'cduCount' });
         var c1 = resCard('FLOW & TEMPERATURE', c1rows);
 
         // Card 2: Pump & Hydraulic
         var c2 = resCard('PUMP & HYDRAULIC', [
             { lbl: 'Pump Head',           val: fmt(inp.pumpHead, 1) + ' m' },
-            { lbl: 'Pump Power',          val: fmt(model.pumpPowerKw, 2) + ' kW' },
+            { lbl: 'Pump Power',          val: fmt(model.pumpPowerKw, 2) + ' kW', key: 'pumpPowerKw' },
             { lbl: 'Pump Efficiency',     val: fmt(inp.pumpEff, 1) + '%' },
             { lbl: 'Pipe Loss Factor',    val: fmt(inp.coefPipeLoss, 3) + 'x' },
             { lbl: 'Hydraulic Margin',    val: fmt(inp.hydraulicMargin, 0) + '%' },
@@ -1662,11 +1672,11 @@
 
         // Card 3: Performance
         var c3 = resCard('PERFORMANCE', [
-            { lbl: 'System COP',          val: fmt(model.systemCop, 2) },
-            { lbl: 'PUE',                 val: fmt(model.pue, 4) },
-            { lbl: 'WUE',                 val: fmt(model.wue, 3) + ' L/kWh' },
-            { lbl: 'Total Facility',      val: fmt(model.totalFacilityKw, 0) + ' kW' },
-            { lbl: 'Annual Energy',       val: fmt(model.annualGwh, 2) + ' GWh/yr' },
+            { lbl: 'System COP',          val: fmt(model.systemCop, 2), key: 'systemCop' },
+            { lbl: 'PUE',                 val: fmt(model.pue, 4), key: 'pue' },
+            { lbl: 'WUE',                 val: fmt(model.wue, 3) + ' L/kWh', key: 'wue' },
+            { lbl: 'Total Facility',      val: fmt(model.totalFacilityKw, 0) + ' kW', key: 'totalFacilityKw' },
+            { lbl: 'Annual Energy',       val: fmt(model.annualGwh, 2) + ' GWh/yr', key: 'annualGwh' },
             { lbl: 'Economizer %',        val: fmt((intern.economizerFraction || 0) * 100, 1) + '%' }
         ]);
 
@@ -1686,9 +1696,11 @@
         return '<div class="ltc-res-card">' +
             '<div class="ltc-res-card-title">' + title + '</div>' +
             rows.map(function (r) {
+                var tr = r.key && LTC_TRACE[r.key];
                 return '<div class="ltc-res-row">' +
                     '<span class="ltc-res-lbl">' + r.lbl + '</span>' +
-                    '<span class="ltc-res-val">' + r.val + '</span>' +
+                    (tr ? '<span class="ltc-res-val ltc-traceable" data-ltc-trace="' + r.key + '" role="button" tabindex="0">' + r.val + '<i class="ltc-fx">ƒx</i></span>'
+                        : '<span class="ltc-res-val">' + r.val + '</span>') +
                     '</div>';
             }).join('') +
             '</div>';
