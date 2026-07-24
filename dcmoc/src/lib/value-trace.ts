@@ -1409,7 +1409,8 @@ function resultsDims(): { capexScore: number; susScore: number; finScore: number
         // Construction: SPI/CPI blend (Plan Mode → 100)
         const cp = constrPlan();
         const constrScore = cp ? Math.min(100, Math.round(50 * Math.min(1.2, cp.e.spi) + 50 * Math.min(1.2, cp.e.cpi))) : 100;
-        // Ops readiness: tier availability positioning
+        // Ops readiness: tier availability positioned on the Uptime Institute
+        // band 99.700–99.995% (parity pair with dimension-explain opsScoreOf)
         const tierAvail = D.reliability?.tierAvailability ?? {};
         const opsScore = Math.max(0, Math.min(100, Math.round((((tierAvail[String(i.tierLevel)] ?? 0.9998) - 0.997) / (0.99995 - 0.997)) * 100)));
         // Sustainability: PUE band 1.10–1.60

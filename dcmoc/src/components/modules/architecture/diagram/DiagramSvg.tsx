@@ -231,6 +231,7 @@ export function DiagramSvg({ model, onNodeClick }: { model: DiagramModel; onNode
                                 {/* real unit count badge (×N) when a stage aggregates many units */}
                                 {b.units != null && b.units > 1 && (
                                     <g>
+                                        {/* audit-ok: SVG chip geometry + label baseline px */}
                                         <rect x={b.x + b.w - 26} y={b.y + 5} width={22} height={13} rx={6}
                                             fill={BG} stroke={accent} strokeWidth={0.7} opacity={0.95} />
                                         <text x={b.x + b.w - 15} y={b.y + 14.5} fontSize="8" fontWeight={700} textAnchor="middle" fill={accent}>×{b.units}</text>

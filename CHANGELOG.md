@@ -13,6 +13,15 @@ release sections rather than semver.
 
 ---
 
+## v1.115.46 — 2026-07-24 (DCMOC Z-SLICE — hardcode audit FINISHED: 227 → 0 WARN, every number carries a documented basis)
+
+### Fixed
+- **Hardcode gate v2 (string/comment-blind)**: the v1 scanner flagged ~140 false positives — numbers inside STRING literals (regulation cites like "PP 35/2021" parse as division) and comments. Scanner now blanks string/comment spans before token matching, adds calendar/physical conversions to the ignore set (365 d/yr, 4.33 wk/mo, 4046.86 m²/acre, 255 RGB, 2^32 LCG divisor, 168 h/wk) and recognizes more provenance keywords (EPA/CBRE/BNEF/IEA/Uptime/JLL/USGS/ASCE/DEFRA/World Bank/`audit-ok`).
+- **All 45 real findings triaged to zero**: RevenueEngine guard fallbacks ($185 MRC / $280 NRC) now single-source from the JLL/CBRE-cited `defaultRevenueInputs` (were duplicate literals that could drift); every remaining screening constant honestly annotated at the point of use — vendor-labor ×1.30 premium (Simulation ↔ Sensitivity parity pair), labor 4% / maintenance-CPI 3% escalators (Report/TaxIncentive/MaintenanceStrategy), diesel CO₂ 2.68 kg/L (EPA/DEFRA) + HVO +3% volumetric / −90% lifecycle, Uptime tier availability band 99.700–99.995% (dimension-explain ↔ value-trace parity pair), rack density classes 6/12.5/25/75 kW, NFPA 2001 clean-agent options, forecast-vs-budget skews, Numerical-Recipes LCG constants, PDF/SVG layout offsets (`audit-ok`).
+- Gate result: **227 WARN → 0 WARN** across 227 scanned files — "jangan ada angka yang muncul tiba-tiba" now holds mechanically, and the gate stays in the ship suite to keep it that way.
+
+---
+
 ## v1.115.45 — 2026-07-24 (LTC — clickable engine-verified fix suggestions on out-of-band metrics)
 
 ### Added

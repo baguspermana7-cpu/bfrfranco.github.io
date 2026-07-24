@@ -297,7 +297,7 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
     let hvo: HvoComparison | null = null;
     if (fuel?.hvoAvailable && fuel.hvoPricePerLiter > 0) {
         const hvoPriceWithTax = fuel.hvoPricePerLiter * (1 + fuelTaxRate);
-        const hvoLiters = totalLitersPerYear * 1.03;
+        const hvoLiters = totalLitersPerYear * 1.03; // HVO ~3% higher volumetric burn (lower energy density, screening)
         const hvoAnnualCost = hvoLiters * hvoPriceWithTax;
         hvo = {
             hvoPricePerLiter: fuel.hvoPricePerLiter,
@@ -305,11 +305,12 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
             annualLiters: Math.round(hvoLiters),
             annualFuelCostUsd: Math.round(hvoAnnualCost),
             annualDeltaVsDieselUsd: Math.round(hvoAnnualCost - annualFuelCost),
+            // 2.68 kgCO2/L diesel (EPA/DEFRA factor) × ~90% HVO lifecycle reduction
             co2SavingsTonsPerYear: Math.round((totalLitersPerYear * 2.68 * 0.90) / 1000 * 10) / 10,
         };
     }
 
-    // CO2 emissions: 2.68 kgCO2 per liter of diesel
+    // CO2 emissions: 2.68 kgCO2 per liter of diesel (EPA/DEFRA emission factor)
     const co2Kg = totalLitersPerYear * 2.68;
 
     // Country comparison (sorted by diesel price)

@@ -165,10 +165,13 @@ export function SimulationDashboard() {
         const baseStaffCost = eng.monthlyCost;
 
         // Strategy Multiplier
+        // screening vendor-labor premium: full vendor ×1.35, hybrid blends
+        // in-house ×1.0 with vendored share ×1.30 (SensitivityEngine parity pair)
         let strategyMultiplier = 1.0;
         if (inputs.maintenanceModel === 'vendor') strategyMultiplier = 1.35;
         if (inputs.maintenanceModel === 'hybrid') {
             const ratio = inputs.hybridRatio || 0.3;
+            // screening: vendored share carries the ×1.30 premium
             strategyMultiplier = (ratio * 1.0) + ((1 - ratio) * 1.30);
         }
 
@@ -317,6 +320,7 @@ export function SimulationDashboard() {
                         {inputs.shiftModel === '12h' && selectedCountry.id === 'ID' && (
                             <div className="mt-2 text-xs text-amber-400 flex items-start gap-1 p-2 bg-amber-950/30 rounded">
                                 <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                                {/* Indonesia labor-regulation cite (PP 35/2021 overtime rules) */}
                                 <span>PP 35/2021 Warning: Requires "Long Shift Permit" or pays 14h OT/week.</span>
                             </div>
                         )}
@@ -526,6 +530,7 @@ export function SimulationDashboard() {
                     <div className="bg-slate-200 dark:bg-slate-700/50 rounded-xl p-6 border border-slate-300 dark:border-slate-600 mb-6">
                         <div className="flex items-center gap-2 mb-4">
                             <TrendingUp className="w-4 h-4 text-rz-data" />
+                            {/* Indonesia labor-regulation cite (PP 35/2021) */}
                             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">Overtime & Regulatory Analysis (PP 35/2021) <Tooltip content="Overtime cost calculation based on local labor law multipliers. First 1-2 hours typically at 1.5x, subsequent hours at 2x base rate." /></h3>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

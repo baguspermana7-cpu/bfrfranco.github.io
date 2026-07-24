@@ -92,7 +92,7 @@ export const generateAssetCounts = (
                 } else if (coolingTopology === 'in-row') {
                     const inRowCap = mwScale <= 50 ? 40 : 80; // in-row unit steps up at scale
                     const baseInRow = Math.ceil(itLoadKw / inRowCap);
-                    count = Math.ceil(baseInRow * 1.25); // N+25% for distribution
+                    count = Math.ceil(baseInRow * 1.25); // screening N+25% distribution margin
                 } else {
                     count = 0; // DLC doesn't use CRACs
                 }

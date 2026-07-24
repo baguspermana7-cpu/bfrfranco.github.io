@@ -112,6 +112,7 @@ export const calculateStrategyComparison = (
     const npv = (annual: number, capex: number = 0) => {
         let total = capex;
         for (let y = 0; y < 5; y++) {
+            // screening 3%/yr cost escalation inside the 5-yr NPV
             total += annual * Math.pow(1.03, y) / Math.pow(1 + discountRate, y + 1);
         }
         return total;

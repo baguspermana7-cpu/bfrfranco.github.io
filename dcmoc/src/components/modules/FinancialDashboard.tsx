@@ -458,6 +458,7 @@ const FinancialDashboard = () => {
         const esc = 1 + (finInputs.opexEscalation || 0.035);
         return [
             { category: 'Labor', budget: laborBudget, forecast: laborBudget * esc },
+            // screening forecast-vs-budget skews: maintenance +5% (scope creep), energy −2% (efficiency drift)
             { category: 'Maintenance', budget: maintenanceBudget, forecast: maintenanceBudget * (esc * 1.05) },
             { category: 'Energy', budget: energyBudget, forecast: energyBudget * (esc * 0.98) },
             { category: 'Vendor', budget: vendorBudget, forecast: vendorBudget * esc },

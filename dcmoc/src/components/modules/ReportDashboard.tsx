@@ -364,6 +364,7 @@ export function ReportDashboard() {
 
         // 5-Year Projection (Local calculation since generate5YearProjection is only for Staffing)
         const fiveYearProjection = Array.from({ length: 6 }).map((_, i) => {
+            // screening escalators: labor 4%/yr (wage inflation), maintenance 3%/yr (CPI-class)
             const inflationLabor = Math.pow(1.04, i);
             const inflationMaint = Math.pow(1.03, i);
             const laborCost = (totalMonthlyLabor * 12) * inflationLabor;

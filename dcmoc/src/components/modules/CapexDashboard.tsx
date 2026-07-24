@@ -313,6 +313,7 @@ const CapexDashboard = () => {
                                     <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Suppression <Tooltip content="Novec 1230: clean agent, zero ODP, safe for occupied spaces. FM-200: proven clean agent (being phased out in EU). Inert Gas (IG-541): nitrogen/argon blend, zero GWP, larger cylinder storage. Wet Pipe: cheapest but risks water damage to equipment." /></div>
                                     <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.fireType}
                                         onChange={(e) => handleChange('fireType', e.target.value)}>
+                                        {/* clean-agent classes per NFPA 2001 (IG-541 = inert blend) */}
                                         <option value="novec">Novec 1230</option>
                                         <option value="fm200">FM-200</option>
                                         <option value="inert">Inert Gas (IG-541)</option>

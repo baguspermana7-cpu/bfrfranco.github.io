@@ -43,6 +43,14 @@
         bindFlowScenarios();
         bindReportCompare();
         buildTopbar();
+        bindTraceDelegation();
+        // Headline KPI cards become trace targets (DCMOC-style ƒx indicator)
+        var KPI_TRACE = { kpiItLoad: 'itKw', kpiLiquid: 'liquidKw', kpiFlow: 'flowLpm',
+                          kpiPump: 'pumpPowerKw', kpiPue: 'pue', kpiCop: 'systemCop' };
+        Object.keys(KPI_TRACE).forEach(function (id) {
+            var n = document.getElementById(id);
+            if (n) { n.setAttribute('data-ltc-trace', KPI_TRACE[id]); n.classList.add('ltc-traceable'); n.setAttribute('role', 'button'); n.setAttribute('tabindex', '0'); }
+        });
         patchApplyModelToUI();
         // Initial paint: the engine's first applyModelToUI runs BEFORE this scaffold
         // exists (both scripts are `defer`; the engine's DOMContentLoaded handler is
@@ -592,8 +600,9 @@
         var eq = 'opacity=".8"';                       // equipment tone
         var lbl = 'font-size="11" font-weight="600" fill="currentColor" opacity=".55" text-anchor="middle" letter-spacing=".06em"';
         var val = 'font-size="12" font-weight="700" text-anchor="middle"';
+        var chip = 'font-size="11.5" font-weight="700" text-anchor="middle" fill="currentColor"';
         var s = [];
-        s.push('<svg class="ltc-pid-svg" viewBox="0 0 1000 235" role="img" aria-label="Liquid-to-chip cooling loop: dry cooler, pump, plate heat exchanger, IT racks">');
+        s.push('<svg class="ltc-pid-svg" viewBox="0 0 1000 252" role="img" aria-label="Liquid-to-chip cooling loop: dry cooler, pump, plate heat exchanger, IT racks">');
         s.push('<defs>',
             '<marker id="pidArrS" markerWidth="9" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" class="ltc-pid-fill-supply"/></marker>',
             '<marker id="pidArrR" markerWidth="9" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" class="ltc-pid-fill-return"/></marker>',
@@ -1127,6 +1136,137 @@
                 '</div>' +
                 '</div>';
         }).join('');
+    }
+
+    // ════════════════════════════════════════════════════════
+    // RZ TRACE — DCMOC-style click-to-trace on headline values.
+    // Content = the page's own PARAM_TOOLTIPS metadata (via window.__ltcTermMeta)
+    // + live model values; only the dependency map below is newly authored.
+    // ════════════════════════════════════════════════════════
+    var LTC_TRACE = {
+        itKw:            { deps: ['itLoadMw'] },
+        liquidKw:        { deps: ['itKw', 'effectiveCapture'] },
+        airKw:           { deps: ['itKw', 'liquidKw'] },
+        effectiveCapture:{ deps: ['liquidCapture', 'coefHeatTransfer', 'controlIndex'] },
+        deltaT:          { deps: ['supplyTemp', 'returnTemp'] },
+        flowLpm:         { deps: ['liquidKw', 'deltaT', 'coolantKey'] },
+        pumpPowerKw:     { deps: ['pumpHead', 'flowLpm', 'pumpEff'] },
+        cduCount:        { deps: ['liquidKw', 'cduUnit', 'redundancy'] },
+        totalCoolingKw:  { deps: ['liquidKw', 'airKw', 'pumpPowerKw', 'fanPower'] },
+        totalFacilityKw: { deps: ['itKw', 'totalCoolingKw', 'upsEff', 'distLoss'] },
+        pue:             { deps: ['totalFacilityKw', 'itKw'] },
+        systemCop:       { deps: ['itKw', 'totalCoolingKw'] },
+        wue:             { deps: ['climate', 'economizerHours', 'effectiveCapture'] },
+        annualGwh:       { deps: ['totalFacilityKw'] },
+        annualOpex:      { deps: ['annualGwh', 'elecPrice', 'waterTariff'] },
+        netOpex:         { deps: ['annualOpex', 'heatReuseCredit'] },
+        netCarbonTons:   { deps: ['annualGwh', 'carbonIntensity', 'avoidedCarbonTons'] },
+        riskIndex:       { deps: ['redundancy', 'monitoring', 'controlIndex', 'failureMode'] },
+        controlIndex:    { deps: ['controlQuality', 'predictiveGain', 'monitoring'] },
+        supplyTemp:      { deps: [] }, returnTemp: { deps: [] },
+        heatReuseCredit: { deps: ['heatReuse', 'elecPrice'] },
+        avoidedCarbonTons:{ deps: ['heatReuse', 'carbonIntensity'] }
+    };
+    var TRACE_UNITS = { itKw:'kW', liquidKw:'kW', airKw:'kW', totalCoolingKw:'kW', totalFacilityKw:'kW',
+        pumpPowerKw:'kW', flowLpm:'LPM', deltaT:'K', supplyTemp:'°C', returnTemp:'°C', effectiveCapture:'%',
+        wue:'L/kWh', annualGwh:'GWh/yr', annualOpex:'$/yr', netOpex:'$/yr', netCarbonTons:'tCO2e/yr',
+        avoidedCarbonTons:'tCO2e/yr', heatReuseCredit:'$/yr', itLoadMw:'MW', liquidCapture:'%',
+        coefHeatTransfer:'%', pumpHead:'m', pumpEff:'%', cduUnit:'kW', fanPower:'% IT', upsEff:'%',
+        distLoss:'%', elecPrice:'$/kWh', waterTariff:'$/m³', carbonIntensity:'kgCO2e/kWh',
+        economizerHours:'%', monitoring:'%', controlQuality:'%', predictiveGain:'%', heatReuse:'%',
+        controlIndex:'/100', riskIndex:'/100', cduCount:'units' };
+    function traceValueOf(key, m) {
+        if (!m) return null;
+        if (m[key] !== undefined) return m[key];
+        if (m.input && m.input[key] !== undefined) return m.input[key];
+        if (m.internals && m.internals[key] !== undefined) return m.internals[key];
+        return null;
+    }
+    function traceFmt(key, v) {
+        if (v === null || v === undefined) return '—';
+        if (typeof v !== 'number') return String(v);
+        var u = TRACE_UNITS[key] || '';
+        var dec = Math.abs(v) >= 1000 ? 0 : (Math.abs(v) >= 10 ? 1 : (Math.abs(v) >= 1 ? 2 : 3));
+        return v.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: dec }) + (u ? ' ' + u : '');
+    }
+    function traceProvenance(key, m) {
+        if (m && m.input && m.input[key] !== undefined) return { cls: 'input', label: 'INPUT' };
+        if (LTC_TRACE[key] && LTC_TRACE[key].deps.length) return { cls: 'engine', label: 'ENGINE · models.ltc.compute' };
+        return { cls: 'derived', label: 'MODEL' };
+    }
+    function openTrace(key, crumbs) {
+        var m = window.__ltcLastModel;
+        if (!m) return;
+        crumbs = crumbs || [];
+        var meta = (typeof window.__ltcTermMeta === 'function') ? window.__ltcTermMeta(key) : null;
+        var spec = LTC_TRACE[key] || { deps: [] };
+        var prov = traceProvenance(key, m);
+        var pop = document.getElementById('ltcTracePop');
+        if (!pop) {
+            pop = el('div', { id: 'ltcTracePop', className: 'ltc-trace-pop' });
+            document.body.appendChild(pop);
+            document.addEventListener('click', function (e) {
+                if (!pop.contains(e.target) && !e.target.closest('[data-ltc-trace]')) pop.classList.remove('open');
+            });
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape') pop.classList.remove('open'); });
+        }
+        var crumbHtml = crumbs.length ?
+            '<div class="ltc-trace-crumbs">' + crumbs.map(function (c, i) {
+                return '<button type="button" class="ltc-trace-crumb" data-ckey="' + c + '" data-cidx="' + i + '">' +
+                    ((window.__ltcTermMeta && window.__ltcTermMeta(c).title) || c) + '</button>';
+            }).join(' › ') + ' › <b>' + (meta ? meta.title : key) + '</b></div>' : '';
+        var pills = spec.deps.map(function (d) {
+            var dm = window.__ltcTermMeta ? window.__ltcTermMeta(d) : null;
+            return '<button type="button" class="ltc-trace-pill" data-tkey="' + d + '" title="' + (dm ? dm.title : d) + ' — klik untuk trace">' +
+                '<b>' + traceFmt(d, traceValueOf(d, m)) + '</b><span>' + (dm ? dm.title : d) + '</span></button>';
+        }).join('');
+        pop.innerHTML =
+            '<div class="ltc-trace-head">' +
+            '<div><div class="ltc-trace-val">' + traceFmt(key, traceValueOf(key, m)) + '</div>' +
+            '<div class="ltc-trace-lbl">' + (meta ? meta.title : key) + '</div></div>' +
+            '<span class="ltc-trace-prov ' + prov.cls + '">' + prov.label + '</span>' +
+            '<button type="button" class="ltc-trace-x" aria-label="Close">×</button></div>' +
+            crumbHtml +
+            (meta ? '<p class="ltc-trace-desc">' + meta.desc + '</p>' : '') +
+            (meta && meta.formula ? '<div class="ltc-trace-formula">' + meta.formula + '</div>' : '') +
+            (pills ? '<div class="ltc-trace-deps-lbl">DIHITUNG DARI — klik untuk telusuri:</div><div class="ltc-trace-deps">' + pills + '</div>' : '') +
+            (meta && meta.impact ? '<p class="ltc-trace-impact">' + meta.impact + '</p>' : '') +
+            '<div class="ltc-trace-actions">' +
+            '<button type="button" class="ltc-trace-open-detail">Open in DETAILED tab</button>' +
+            '<button type="button" class="ltc-trace-copy">Copy trace</button></div>';
+        pop.classList.add('open');
+        pop.querySelector('.ltc-trace-x').addEventListener('click', function () { pop.classList.remove('open'); });
+        pop.querySelectorAll('.ltc-trace-pill').forEach(function (b) {
+            b.addEventListener('click', function () { openTrace(b.dataset.tkey, crumbs.concat([key])); });
+        });
+        pop.querySelectorAll('.ltc-trace-crumb').forEach(function (b) {
+            b.addEventListener('click', function () { openTrace(b.dataset.ckey, crumbs.slice(0, Number(b.dataset.cidx))); });
+        });
+        pop.querySelector('.ltc-trace-open-detail').addEventListener('click', function () {
+            pop.classList.remove('open');
+            var t = document.querySelector('.ltc-tab-btn[data-tab="detailed"]'); if (t) t.click();
+            var eq = document.getElementById('equationList');
+            var acc = eq && eq.closest('.ltc-acc');
+            if (acc && !acc.classList.contains('open')) acc.querySelector('.ltc-acc-head').click();
+            if (acc) acc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        pop.querySelector('.ltc-trace-copy').addEventListener('click', function () {
+            var txt = (meta ? meta.title : key) + ' = ' + traceFmt(key, traceValueOf(key, m)) + '\n' +
+                (meta ? meta.formula + '\n' : '') +
+                spec.deps.map(function (d) {
+                    var dm = window.__ltcTermMeta ? window.__ltcTermMeta(d) : null;
+                    return '  • ' + (dm ? dm.title : d) + ' = ' + traceFmt(d, traceValueOf(d, m));
+                }).join('\n') + '\nSource: LTC lab · models.ltc.compute (shared RZ engine)';
+            try { navigator.clipboard.writeText(txt); } catch (e) {}
+        });
+    }
+    function bindTraceDelegation() {
+        document.addEventListener('click', function (e) {
+            var t = e.target.closest ? e.target.closest('[data-ltc-trace]') : null;
+            if (!t) return;
+            e.preventDefault();
+            openTrace(t.getAttribute('data-ltc-trace'), []);
+        });
     }
 
     // impactParam engine-key → page input id (for clickable fix suggestions)

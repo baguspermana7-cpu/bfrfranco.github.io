@@ -90,10 +90,12 @@ export const defaultRevenueInputs: RevenueInputs = {
 export const calculateRevenue = (inputs: RevenueInputs): RevenueResult => {
     // Input guards — prevent NaN/negative propagation
     const itLoadKw = Math.max(1, inputs.itLoadKw || 1000);
-    const nrcPerKw = Math.max(0, inputs.nrcPerKw || 280);
+    // Guard fallbacks single-source from defaultRevenueInputs (JLL/CBRE sourced
+    // above) — were duplicate literals that could drift from the defaults block.
+    const nrcPerKw = Math.max(0, inputs.nrcPerKw || defaultRevenueInputs.nrcPerKw);
     const nrcCustomFitout = Math.max(0, inputs.nrcCustomFitout || 0);
     const nrcCrossConnect = Math.max(0, inputs.nrcCrossConnect || 0);
-    const mrcPerKwMonth = Math.max(0, inputs.mrcPerKwMonth || 185);
+    const mrcPerKwMonth = Math.max(0, inputs.mrcPerKwMonth || defaultRevenueInputs.mrcPerKwMonth);
     const mrcEscalation = Math.max(0, Math.min(0.20, inputs.mrcEscalation || 0.035));
     const mrcCrossConnectMonthly = Math.max(0, inputs.mrcCrossConnectMonthly || 0);
     const contractYears = Math.max(1, Math.min(30, inputs.contractYears || 10));

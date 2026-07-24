@@ -100,6 +100,7 @@ export const calculateTaxIncentives = (input: TaxIncentiveInput): TaxIncentiveRe
     let totalTaxWithout = 0;
 
     for (let y = 0; y < safeYears; y++) {
+        // screening escalators: revenue 3%/yr, opex 4%/yr (labor-heavy)
         const yearRevenue = safeRevenue * Math.pow(1.03, y); // 3% escalation
         const yearOpex = safeOpex * Math.pow(1.04, y);
         const taxableIncome = Math.max(0, yearRevenue - yearOpex - depreciation);

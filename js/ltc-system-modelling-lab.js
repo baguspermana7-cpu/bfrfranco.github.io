@@ -1928,6 +1928,9 @@
                 }
                 return normalize({ title: title, desc: desc, formula: formula, impact: impact });
             }
+            /* Additive: expose term metadata for the dashboard's click-to-trace popover
+               (ltc-lab-ui.js). Read-only lookup — no model behavior change. */
+            window.__ltcTermMeta = function (key, layer) { return resolveTooltipMeta(key, layer || 'output'); };
 
             function tooltipText(meta) {
                 return meta.title + ': ' + meta.desc + ' ' + meta.formula + ' ' + (meta.impact || '');

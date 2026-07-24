@@ -51,6 +51,7 @@ const estimateTCO = (inputs: SensitivityInputs, baseSalaryAvg: number, capexPerK
     // hybridRatio=1.0 (fully in-house) → 1.0x, hybridRatio=0 (fully vendor) → 1.30x
     const maintModel = inputs.maintenanceModel || 'hybrid';
     const hr = inputs.hybridRatio ?? 0.5;
+    // screening vendor-labor premium ×1.30 (SimulationDashboard parity pair)
     const maintCostMult = maintModel === 'in-house' ? 1.0
         : maintModel === 'vendor' ? 1.30
         : (hr * 1.0) + ((1 - hr) * 1.30); // blend

@@ -218,6 +218,7 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
     }
 
     // Fixed Costs (PDU, Cabling - Simplified for MVP)
+    // rack density classes (screening): standard 6 / medium 12.5 / high 25 / extreme 75 kW·rack
     const racks = Math.ceil(itLoad / (rackType === 'standard' ? 6 : rackType === 'medium' ? 12.5 : rackType === 'high' ? 25 : 75));
 
     /* Ship-A — GB300 (any arch carrying coolingKitUsdPerRack) adds a real infra

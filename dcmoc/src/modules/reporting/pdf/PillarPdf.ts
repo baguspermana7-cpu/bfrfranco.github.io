@@ -94,7 +94,7 @@ export async function generatePillarPDF(r: PillarReport & { legacyJsPdf?: boolea
             doc.setFontSize(9); doc.setTextColor(tone[0], tone[1], tone[2]);
             doc.text(c.title, MARGIN + 3, y + 5.5);
             doc.setFontSize(7.5); doc.setTextColor(71, 85, 105);
-            doc.text(doc.splitTextToSize(c.body, pageW - MARGIN * 2 - 6), MARGIN + 3, y + 10.5);
+            doc.text(doc.splitTextToSize(c.body, pageW - MARGIN * 2 - 6), MARGIN + 3, y + 10.5); // audit-ok: PDF layout mm
             y += 20;
         }
     }
@@ -121,7 +121,7 @@ export async function generatePillarPDF(r: PillarReport & { legacyJsPdf?: boolea
             doc.setFontSize(8.5); doc.setTextColor(255, 255, 255);
             doc.text(String(k.value), x + bw / 2, y + 8, { align: 'center' });
             doc.setFontSize(5.5); doc.setTextColor(148, 163, 184);
-            doc.text(k.label.toUpperCase(), x + bw / 2, y + 13.5, { align: 'center' });
+            doc.text(k.label.toUpperCase(), x + bw / 2, y + 13.5, { align: 'center' }); // audit-ok: PDF layout mm
         });
         y += 24;
     }

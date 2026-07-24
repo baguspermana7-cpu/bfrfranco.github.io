@@ -70,7 +70,7 @@ export interface SweepRow { itMw: number; p10: number; p50: number; p90: number 
 export function sweepItLoad(base: CapexInput, points = 9): SweepRow[] {
     const out: SweepRow[] = [];
     for (let k = 0; k < points; k++) {
-        const frac = 0.25 + (k / (points - 1)) * 1.75;   // 0.25x .. 2x
+        const frac = 0.25 + (k / (points - 1)) * 1.75;   // audit-ok: sweep range 0.25x .. 2x
         const itLoad = Math.round(base.itLoad * frac);
         try {
             const r = calculateCapex({ ...base, itLoad });

@@ -44,11 +44,16 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO = join(__dirname, '..');
 const SRC = join(REPO, 'dcmoc', 'src');
 
-const PROV_RE = /screening|source|DATA\.|engine|SFG20|IEEE|ASHRAE|NFPA|benchmark/i;
-/** Round unit scalers that are never "magic" — ignore even if 3+ digits. */
+const PROV_RE = /screening|source|DATA\.|engine|SFG20|IEEE|ASHRAE|NFPA|benchmark|EPA|CBRE|BNEF|IEA\b|Uptime|JLL|MACRS|USGS|ASCE|IRC\b|OSHA|NEC\b|Munich Re|BloombergNEF|z-score|percentile|AACE|audit-ok|Numerical Recipes|LCG\b|World Bank|OECD|DEFRA|regulation|cite/i;
+/** Round unit scalers + universal conversions that are never "magic" — ignore
+ *  even if 3+ digits. Calendar/physical conversions (365 d/yr, 4.33 wk/mo,
+ *  4046.86 m²/acre, 255 RGB max, 2^32 LCG divisor, 168 h/wk) are facts of
+ *  arithmetic, not economics. */
 const UNIT_SCALERS = new Set([
     '100', '1000', '10000', '100000', '1000000', '1e3', '1e6', '1e9',
     '1024', '360', '3600', '8760', '525600', '1440',
+    '365', '365.25', '4.33', '4.345', '52', '168', '255', '4046.86',
+    '4294967296', '60', '24', '12',
 ]);
 
 /** True when a numeric token carries ≥ 3 significant digits. */
@@ -96,10 +101,20 @@ for (const file of files) {
     const rel = relative(REPO, file);
     const lines = readFileSync(file, 'utf8').split('\n');
     for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+        const rawLine = lines[i];
         // Skip pure comment / import / type-only lines quickly.
-        const trimmed = line.trim();
-        if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('import ')) continue;
+        const trimmed = rawLine.trim();
+        if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*') || trimmed.startsWith('import ')) continue;
+
+        /* String/comment-blind scan (v2 — audit Z-slice): numbers inside string
+         * literals (regulation cites "PP 35/2021", NFPA/SNI ids, UI label text)
+         * and trailing comments are DATA/prose, not formulas — the v1 scanner
+         * flagged ~140 of them ("35/2021" parses as division). Blank them out
+         * (same length, so column indices survive) before token matching. */
+        const line = rawLine
+            .replace(/'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`(?:[^`\\]|\\.)*`/g, (s) => ' '.repeat(s.length))
+            .replace(/\/\/.*$/, (s) => ' '.repeat(s.length))
+            .replace(/\/\*.*?\*\//g, (s) => ' '.repeat(s.length));
 
         // Provenance window: this line ± 3 lines.
         let hasProv = false;

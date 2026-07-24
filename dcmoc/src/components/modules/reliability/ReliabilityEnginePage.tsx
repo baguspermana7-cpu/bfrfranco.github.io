@@ -170,6 +170,7 @@ export function ReliabilityEnginePage() {
         let mc: { p10: number; p50: number; p90: number } | null = null;
         try {
             let s = 42;
+            // Numerical Recipes LCG (seeded → deterministic MC band across renders)
             const rnd = () => ((s = (s * 1664525 + 1013904223) | 0) >>> 0) / 4294967296;
             const runs: number[] = [];
             for (let i = 0; i < 200; i++) {

@@ -43,7 +43,9 @@ export const finScoreOf = (irr: number | null): number =>
 export const constrScoreOf = (spi: number, cpi: number): number =>
     Math.min(100, Math.round(50 * Math.min(1.2, spi) + 50 * Math.min(1.2, cpi)));
 
-/** Operational Readiness: tier design availability positioned on 99.700–99.995%. */
+/** Operational Readiness: tier design availability positioned on 99.700–99.995%
+ *  (Uptime Institute band: floor just under Tier II 99.741%, ceiling Tier IV
+ *  99.995% — parity pair with value-trace opsScore, keep in sync). */
 export const opsScoreOf = (avail: number): number =>
     Math.max(0, Math.min(100, Math.round((avail - 0.997) / (0.99995 - 0.997) * 100)));
 

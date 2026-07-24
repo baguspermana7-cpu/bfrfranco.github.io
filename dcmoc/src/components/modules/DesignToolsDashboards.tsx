@@ -240,6 +240,7 @@ export function FireDashboard() {
             <div className="flex items-center gap-2 text-xs">
                 <span className="text-slate-500">Agent</span>
                 <select value={agent} onChange={(e) => setAgent(e.target.value)} className="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-slate-700 dark:text-slate-200">
+                    {/* clean-agent classes per NFPA 2001 (IG-541 = inert blend) */}
                     <option value="novec1230">Novec 1230</option>
                     <option value="fm200">FM-200</option>
                     <option value="ig541">Inert Gas IG-541</option>
