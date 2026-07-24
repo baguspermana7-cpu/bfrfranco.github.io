@@ -40,6 +40,12 @@
     .val { display:flex; align-items:center; gap:10px; background:#0b1220; border:1px solid #334155; border-radius:9px; padding:9px 12px; margin:8px 0; font-family:ui-monospace,monospace; font-size:0.82rem; }
     .val code { flex:1; word-break:break-all; }
     .val button { background:#334155; color:#e2e8f0; border:none; border-radius:6px; padding:5px 11px; font-size:0.72rem; cursor:pointer; font-weight:700; }
+    /* mobile overflow guard — injected step <li>/<span> tokens (URLs, keys)
+     * exceeded the 390px viewport by ~20px (responsive-layout gate) */
+    @media (max-width: 768px) {
+      html, body { overflow-x: hidden; max-width: 100vw; }
+      li, span, code { word-break: break-word; overflow-wrap: anywhere; }
+    }
   </style>
 </head>
 <body>

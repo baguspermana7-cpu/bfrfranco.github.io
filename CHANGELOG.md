@@ -13,6 +13,16 @@ release sections rather than semver.
 
 ---
 
+## v1.115.50 — 2026-07-25 (post-audit certification sweep — full site gate suite green, 1 mobile fix)
+
+### Fixed
+- **setup-supabase.html mobile overflow (+20px @390px)**: injected step-list `<li>`/`<span>` tokens (URLs, keys) pushed past the viewport — mobile guard added (`overflow-x: hidden` + `overflow-wrap: anywhere` on li/span/code). Responsive-layout render gate back to CLEAN 116/116.
+
+### Verified (certification, no changes needed)
+- Full remaining gate suite after the X/Y/Z audit ships: dark-coverage CLEAN (117 pages × both themes) · responsive-layout CLEAN · mobile-responsive strict pass · interactions CLEAN (palette/diagrams/scrolly real-input) · a11y CLEAN (0 critical/serious × 2 themes) · page-gates CLEAN · hero-images CLEAN · article-charts provenance CLEAN (29) · explain-db ALL GREEN · dc-corpus ALL GREEN.
+
+---
+
 ## v1.115.49 — 2026-07-25 (LTC — trace coverage completed: 48 traceable values across every surface)
 
 ### Added
