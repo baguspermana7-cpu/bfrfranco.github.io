@@ -13,6 +13,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.40 — 2026-07-24 (LTC — micro-polish: live run stamp, preset dots, hover/edit feedback)
+
+### Changed
+- **Live run stamp**: "Last run HH:MM:SS ✓ Completed" now updates on every recompute (auto-run included), not only on the manual button.
+- **Preset dots** on the three architecture-filled primary sliders (Liquid Capture, Supply/Return Temperature) — green dot with "Auto-set by the architecture preset — adjust freely" tooltip, mirroring the AUTO taxonomy.
+- **Feedback**: KPI cards get a subtle hover lift; the slider value box pulses on drag (both `prefers-reduced-motion` aware).
+
 ## v1.115.39 — 2026-07-24 (LTC — input taxonomy DESIGN / AUTO / TUNE + firm-precision pass)
 
 ### Changed

@@ -13,9 +13,9 @@
     // ── Slider config ────────────────────────────────────────
     var SLIDERS = [
         { id: 'inItLoad',        label: 'IT Load',            min: 0.5, max: 80,  step: 0.5, unit: 'MW' },
-        { id: 'inLiquidCapture', label: 'Liquid Capture',     min: 0,   max: 100, step: 1,   unit: '%' },
-        { id: 'inSupplyTemp',    label: 'Supply Temperature', min: 16,  max: 42,  step: 0.1, unit: '°C' },
-        { id: 'inReturnTemp',    label: 'Return Temperature', min: 16,  max: 60,  step: 0.1, unit: '°C' },
+        { id: 'inLiquidCapture', label: 'Liquid Capture',     min: 0,   max: 100, step: 1,   unit: '%', preset: true },
+        { id: 'inSupplyTemp',    label: 'Supply Temperature', min: 16,  max: 42,  step: 0.1, unit: '°C', preset: true },
+        { id: 'inReturnTemp',    label: 'Return Temperature', min: 16,  max: 60,  step: 0.1, unit: '°C', preset: true },
         { id: 'inPumpHead',      label: 'Pump Head',          min: 5,   max: 90,  step: 0.5, unit: 'm' },
         { id: 'inPumpEff',       label: 'Pump Efficiency',    min: 35,  max: 95,  step: 1,   unit: '%' }
     ];
@@ -647,7 +647,9 @@
             var row = el('div', { className: 'ltc-slider-row' });
             var header = el('div', { className: 'ltc-slider-header' });
 
-            var lbl = el('span', { className: 'ltc-slider-label', textContent: cfg.label + ' ⓘ' });
+            var lbl = el('span', { className: 'ltc-slider-label' });
+            lbl.innerHTML = cfg.label + ' ⓘ' + (cfg.preset ?
+                ' <span class="ltc-preset-dot" title="Auto-set by the architecture preset — adjust freely"></span>' : '');
             var valBox = el('div', { className: 'ltc-slider-value-box' });
             var numbox = el('input', {
                 type: 'number',
@@ -690,6 +692,10 @@
                 var v = parseFloat(range.value);
                 numbox.value = v;
                 updateRangeFill(v);
+                // brief edit-feedback pulse on the paired value box
+                numbox.classList.add('ltc-just-edited');
+                clearTimeout(numbox.__pulseT);
+                numbox.__pulseT = setTimeout(function () { numbox.classList.remove('ltc-just-edited'); }, 550);
                 if (origInput) {
                     origInput.value = v;
                     origInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -946,6 +952,13 @@
         renderScenarioInfo(model);
         renderResultsTab(model);
         polishNumbers();
+        // Live run stamp — auto-run recomputes constantly; show it.
+        var lr = document.getElementById('ltcLastRun');
+        if (lr) {
+            var now = new Date();
+            lr.innerHTML = 'Last run: ' + now.getHours() + ':' + ('0' + now.getMinutes()).slice(-2) + ':' +
+                ('0' + now.getSeconds()).slice(-2) + ' <span class="ltc-run-ok">✓ Completed</span>';
+        }
     }
 
     // ── ltcUiRenderFromDom — fallback reading existing DOM ──
