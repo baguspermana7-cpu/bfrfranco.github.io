@@ -420,6 +420,7 @@
             accordionizeHosts();
             tierizeInputs();
             addSteppersToPanel();
+            traceifyDetailedGrid();
             document.body.classList.add('ltc-consolidated');
         } catch (e) {
             try { if (window.console) console.warn('LTC consolidation skipped:', e); } catch (_) {}
@@ -1184,6 +1185,26 @@
         b.addEventListener('click', function () { stepField(input, dir); });
         return b;
     }
+    // Make the DETAILED tab's 23-card output grid traceable (id → model key,
+    // mirroring the page's OUTPUT_KEY_BY_ID subset that LTC_TRACE covers).
+    var DETAILED_TRACE = { outLiquidLoad:'liquidKw', outAirLoad:'airKw', outFlow:'flowLpm',
+        outPump:'pumpPowerKw', outCdu:'cduCount', outPue:'pue', outCop:'systemCop', outWue:'wue',
+        outEnergy:'annualGwh', outOpex:'annualOpex', outHeatCredit:'heatReuseCredit',
+        outNetOpex:'netOpex', outCarbon:'netCarbonTons', outCarbonAvoided:'avoidedCarbonTons',
+        outDesignDensity:'designDensity', outControlIndex:'controlIndex', outFutureFactor:'futureFactor',
+        outRackDensity:'rackDensity', outRisk:'riskIndex', outConfidence:'confidence' };
+    function traceifyDetailedGrid() {
+        Object.keys(DETAILED_TRACE).forEach(function (id) {
+            var n = document.getElementById(id);
+            if (!n || n.getAttribute('data-ltc-trace')) return;
+            n.setAttribute('data-ltc-trace', DETAILED_TRACE[id]);
+            n.classList.add('ltc-traceable', 'ltc-res-val');
+            n.setAttribute('role', 'button'); n.setAttribute('tabindex', '0');
+            /* ƒx badge via CSS ::after — the engine's setText() replaces
+               textContent every render and would wipe an injected child. */
+        });
+    }
+
     function addSteppersToPanel() {
         document.querySelectorAll('#ltcOtherParamsBody .input-group input[type="number"]').forEach(function (input) {
             if (input.parentNode.classList && input.parentNode.classList.contains('ltc-step-wrap')) return;
@@ -1222,7 +1243,12 @@
         controlIndex:    { deps: ['controlQuality', 'predictiveGain', 'monitoring'] },
         supplyTemp:      { deps: [] }, returnTemp: { deps: [] },
         heatReuseCredit: { deps: ['heatReuse', 'elecPrice'] },
-        avoidedCarbonTons:{ deps: ['heatReuse', 'carbonIntensity'] }
+        avoidedCarbonTons:{ deps: ['heatReuse', 'carbonIntensity'] },
+        futureFactor:    { deps: ['coefFutureTech', 'modelYear'] },
+        confidence:      { deps: ['monitoring', 'hydraulicMargin', 'coefPipeLoss'] },
+        rackDensity:     { deps: ['itLoadMw', 'rackCount'] },
+        designDensity:   { deps: ['rackDensityTarget', 'highDensityShare'] },
+        annualKwh:       { deps: ['totalFacilityKw'] }
     };
     var TRACE_UNITS = { itKw:'kW', liquidKw:'kW', airKw:'kW', totalCoolingKw:'kW', totalFacilityKw:'kW',
         pumpPowerKw:'kW', flowLpm:'LPM', deltaT:'K', supplyTemp:'°C', returnTemp:'°C', effectiveCapture:'%',
@@ -1391,7 +1417,9 @@
             var dec = span < 2 ? 2 : (span < 20 ? 1 : 0);
             return '<div class="ltc-valid-row" title="' + (r.source || '').replace(/"/g, '&quot;') + '">' +
                 '<div class="ltc-valid-head"><span class="ltc-valid-lbl">' + r.label + '</span>' +
-                '<span class="ltc-valid-val ' + (r.inBand ? 'ok' : 'warn') + '">' +
+                '<span class="ltc-valid-val ltc-traceable ' + (r.inBand ? 'ok' : 'warn') + '" data-ltc-trace="' +
+                ({ pue:'pue', wue:'wue', deltaT:'deltaT', supplyTemp:'supplyTemp', flowIntensity:'flowLpm', pumpPct:'pumpPowerKw' }[r.key] || r.key) +
+                '" role="button" tabindex="0">' +
                 (r.value === null ? '—' : r.value.toFixed(dec) + (r.unit ? ' ' + r.unit : '')) + '</span></div>' +
                 '<div class="ltc-valid-track">' +
                 '<span class="ltc-valid-band" style="left:' + loPct.toFixed(1) + '%;width:' + (hiPct - loPct).toFixed(1) + '%"></span>' +

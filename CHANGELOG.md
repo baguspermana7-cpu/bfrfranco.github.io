@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.49 — 2026-07-25 (LTC — trace coverage completed: 48 traceable values across every surface)
+
+### Added
+- **Trace everywhere**: the DETAILED tab's full output grid (20 values — liquid/air heat, flow, pump, CDU, PUE, COP, WUE, energy, OPEX gross/credit/net, carbon ±, densities, control index, future factor, risk, confidence) and all 6 MODEL VALIDATION values are now click-to-trace targets, joining the KPI strip, RESULTS cards and P&ID equipment — **48 traceable values total**. New dependency entries (futureFactor, confidence, rack/design density) mirror the compute chain. DETAILED-grid ƒx badges render via CSS `::after` so the engine's per-render `setText()` cannot wipe them (verified surviving recompute).
+
 ## v1.115.48 — 2026-07-24 (LTC — trace indicators now VISIBLE + RESULTS values traceable)
 
 ### Fixed
