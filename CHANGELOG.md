@@ -13,6 +13,16 @@ release sections rather than semver.
 
 ---
 
+## v1.115.47 — 2026-07-24 (LTC — click-to-trace engine (DCMOC pattern), information-rich P&ID, clean steppers)
+
+### Added
+- **RZ Trace — the DCMOC trace-engine indicator, adopted into the LTC lab.** Headline values (KPI strip, P&ID equipment) carry a dotted-amber underline + ƒx chip; **click opens a trace popover**: big live value + label + provenance chip (ENGINE · models.ltc.compute / INPUT), description + formula from the page's own 95-key parameter metadata, and **clickable dependency pills** (each dep's live value — click to drill deeper, with a breadcrumb back). Footer: "Open in DETAILED tab" (jumps to the live equation inspector) + "Copy trace" audit text. Content 100% sourced from the existing PARAM_TOOLTIPS metadata + live model — only the ~22-KPI dependency map is new, and it mirrors the compute chain.
+- **Information-rich SYSTEM OVERVIEW** (owner: values were being overlooked): every equipment now shows its live headline value inside the diagram — Dry cooler "2,244 kW rejected", Pump "124.1 kW · 28 m head · η 78%", CDU "10 CDU · ΔT 8.1 K", IT racks "12.00 MW IT · 97.1% captured" — plus the loop labels. Equipment groups are clickable (hover highlight) → their trace.
+- **Clean − / + steppers** replacing the ugly native number-input spinners (hidden page-wide): on all 6 primary-slider value boxes and every number input in OTHER PARAMETERS (84 steppers), stepping by each input's real step/min/max and firing the live recompute; 32px touch targets on mobile.
+
+### Changed
+- **Modelling block diagrams — essentials first, nothing removed**: dense sub-value lines are de-emphasized (dimmed) and light up on hover; every block keeps its existing click-to-detail popup (the detail layer is one click away, per "yang utama aja, detailnya klw di klik — jangan dihilangkan").
+
 ## v1.115.46 — 2026-07-24 (DCMOC Z-SLICE — hardcode audit FINISHED: 227 → 0 WARN, every number carries a documented basis)
 
 ### Fixed

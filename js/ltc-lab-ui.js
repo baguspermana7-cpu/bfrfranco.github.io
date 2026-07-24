@@ -409,6 +409,7 @@
             if (fb) flowHost.insertBefore(fb, flowHost.firstChild);
             accordionizeHosts();
             tierizeInputs();
+            addSteppersToPanel();
             document.body.classList.add('ltc-consolidated');
         } catch (e) {
             try { if (window.console) console.warn('LTC consolidation skipped:', e); } catch (_) {}
@@ -608,33 +609,38 @@
             '<marker id="pidArrR" markerWidth="9" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" class="ltc-pid-fill-return"/></marker>',
             '</defs>');
 
-        // ── DRY COOLER (heat rejection) ──
-        s.push('<g ' + eq + '>',
+        // ── DRY COOLER (heat rejection) — clickable trace group ──
+        s.push('<g class="ltc-pid-node" data-ltc-trace="totalCoolingKw" ' + eq + '>',
             '<rect x="38" y="72" width="150" height="92" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>',
             sym('fan', 56, 82, 44, 44, '0 0 24 24'), sym('fan', 122, 82, 44, 44, '0 0 24 24'),
             '<line x1="50" y1="140" x2="176" y2="140" stroke="currentColor" stroke-width="1.2" opacity=".5"/>',
             '<line x1="50" y1="150" x2="176" y2="150" stroke="currentColor" stroke-width="1.2" opacity=".5"/>',
+            '<rect x="38" y="72" width="150" height="92" rx="8" fill="transparent"/>',
             '</g>');
         s.push('<text x="113" y="185" ' + lbl + '>DRY COOLER</text>');
+        s.push('<text x="113" y="204" ' + chip + ' class="ltc-pid-chipval" id="schCoolerKw">— kW rejected</text>');
 
         // ── facility loop: dry cooler → valve → pump → HEX (hot to cooler on top, cooled back on bottom) ──
         s.push('<path d="M188 96 H 420" class="ltc-pid-return ltc-flow-return" marker-end="url(#pidArrR)" transform="rotate(180 304 96)"/>'); // HEX→cooler (hot)
         s.push('<path d="M188 140 H 236" class="ltc-pid-supply ltc-flow-supply"/>');
         s.push(sym('valve', 238, 131, 36, 18, '0 0 48 24'));
         s.push('<path d="M274 140 H 300" class="ltc-pid-supply ltc-flow-supply"/>');
-        s.push(sym('pump', 298, 96, 64, 64, '0 0 96 96'));
+        s.push('<g class="ltc-pid-node" data-ltc-trace="pumpPowerKw">' + sym('pump', 298, 96, 64, 64, '0 0 96 96') +
+               '<rect x="296" y="94" width="68" height="68" fill="transparent"/></g>');
         s.push('<text x="330" y="185" ' + lbl + '>PUMP</text>');
-        s.push('<text x="330" y="205" ' + val + ' fill="currentColor" opacity=".8" id="schPumpKw">— kW</text>');
+        s.push('<text x="330" y="204" ' + chip + ' class="ltc-pid-chipval" id="schPumpKw">— kW</text>');
+        s.push('<text x="330" y="221" font-size="10" text-anchor="middle" fill="currentColor" opacity=".55" id="schPumpHead">— m head · η —%</text>');
         s.push('<path d="M362 140 H 396" class="ltc-pid-supply ltc-flow-supply"/>');
         s.push(sym('valve', 396, 131, 36, 18, '0 0 48 24'));
         s.push('<path d="M432 140 H 470" class="ltc-pid-supply ltc-flow-supply" marker-end="url(#pidArrS)"/>');
 
-        // ── CDU / PLATE HEX ──
-        s.push('<g ' + eq + '><rect x="472" y="66" width="118" height="104" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>');
+        // ── CDU / PLATE HEX — clickable trace group ──
+        s.push('<g class="ltc-pid-node" data-ltc-trace="cduCount" ' + eq + '><rect x="472" y="66" width="118" height="104" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>');
         for (var i = 0; i < 6; i++) s.push('<line x1="' + (492 + i * 16) + '" y1="80" x2="' + (492 + i * 16) + '" y2="156" stroke="currentColor" stroke-width="2" opacity=".55"/>');
-        s.push('</g>');
+        s.push('<rect x="472" y="66" width="118" height="104" rx="8" fill="transparent"/></g>');
         s.push('<text x="531" y="185" ' + lbl + '>CDU / PLATE HEX</text>');
-        s.push('<text x="531" y="205" ' + val + ' fill="currentColor" opacity=".8" id="schCduN">— CDU</text>');
+        s.push('<text x="531" y="204" ' + chip + ' class="ltc-pid-chipval" id="schCduN">— CDU</text>');
+        s.push('<text x="531" y="221" font-size="10" text-anchor="middle" fill="currentColor" opacity=".55" id="schCduDt">ΔT — K</text>');
 
         // ── technology loop: HEX ⇄ IT racks (blue supply top, red return bottom) ──
         s.push('<path d="M590 92 H 790" class="ltc-pid-supply ltc-flow-supply" marker-end="url(#pidArrS)"/>');
@@ -643,12 +649,14 @@
         s.push('<text x="690" y="170" ' + val + ' class="ltc-pid-fill-return" id="schReturnT">Return — °C</text>');
         s.push('<text x="690" y="126" font-size="11" font-weight="600" text-anchor="middle" fill="currentColor" opacity=".6" id="schFlowLpm">— LPM</text>');
 
-        // ── IT RACKS (cold plates) ──
-        s.push('<g ' + eq + '><rect x="792" y="60" width="170" height="116" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>',
+        // ── IT RACKS (cold plates) — clickable trace group ──
+        s.push('<g class="ltc-pid-node" data-ltc-trace="liquidKw" ' + eq + '><rect x="792" y="60" width="170" height="116" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>',
             sym('server', 812, 76, 40, 40, '0 0 24 24'), sym('server', 866, 76, 40, 40, '0 0 24 24'), sym('server', 920, 76, 40, 40, '0 0 24 24'),
             sym('server', 812, 122, 40, 40, '0 0 24 24'), sym('server', 866, 122, 40, 40, '0 0 24 24'), sym('server', 920, 122, 40, 40, '0 0 24 24'),
-            '</g>');
+            '<rect x="792" y="60" width="170" height="116" rx="8" fill="transparent"/></g>');
         s.push('<text x="877" y="196" ' + lbl + '>IT RACKS · LIQUID COLD PLATES</text>');
+        s.push('<text x="877" y="215" ' + chip + ' class="ltc-pid-chipval" id="schItMw">— MW IT</text>');
+        s.push('<text x="877" y="232" font-size="10" text-anchor="middle" fill="currentColor" opacity=".55" id="schCapturePct">— % captured to liquid</text>');
         s.push('</svg>');
         return '<div class="ltc-pid">' + s.join('') + '</div>';
     }
@@ -682,7 +690,9 @@
                 value: initVal
             });
             var unit = el('span', { className: 'ltc-slider-unit', textContent: cfg.unit });
+            valBox.appendChild(mkStepBtn(numbox, -1));
             valBox.appendChild(numbox);
+            valBox.appendChild(mkStepBtn(numbox, 1));
             valBox.appendChild(unit);
             header.appendChild(lbl);
             header.appendChild(valBox);
@@ -1048,7 +1058,12 @@
         setText2('schReturnT', 'Return ' + fmt(model.input.returnTemp, 1) + ' °C');
         setText2('schFlowLpm', _fmtNum(model.flowLpm, 0, true) + ' LPM');
         setText2('schPumpKw', fmt(model.pumpPowerKw, 1) + ' kW');
+        setText2('schPumpHead', fmt(model.input.pumpHead, 0) + ' m head · η ' + fmt(model.input.pumpEff, 0) + '%');
         setText2('schCduN', model.cduCount + ' CDU');
+        setText2('schCduDt', 'ΔT ' + fmt(model.deltaT, 1) + ' K');
+        setText2('schCoolerKw', _fmtNum(model.internals && model.internals.totalCoolingKw != null ? model.internals.totalCoolingKw : (model.totalFacilityKw - model.itKw), 0, true) + ' kW rejected');
+        setText2('schItMw', fmt(model.itKw / 1000, 2) + ' MW IT');
+        setText2('schCapturePct', fmt(model.effectiveCapture, 1) + ' % captured to liquid');
     }
 
     // ════════════════════════════════════════════════════════
@@ -1136,6 +1151,38 @@
                 '</div>' +
                 '</div>';
         }).join('');
+    }
+
+    // ════════════════════════════════════════════════════════
+    // Custom − / + steppers (native number-input spinners are hidden by CSS —
+    // owner: "button up dan button down jelek"). Steps by the input's real
+    // step/min/max and dispatches input+change so bindings + auto-run fire.
+    // ════════════════════════════════════════════════════════
+    function stepField(input, dir) {
+        var step = parseFloat(input.step) || 1;
+        var min = input.min !== '' ? parseFloat(input.min) : -Infinity;
+        var max = input.max !== '' ? parseFloat(input.max) : Infinity;
+        var v = (parseFloat(input.value) || 0) + dir * step;
+        v = Math.max(min, Math.min(max, Math.round(v * 1000) / 1000));
+        input.value = v;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    function mkStepBtn(input, dir) {
+        var b = el('button', { type: 'button', className: 'ltc-step-btn', textContent: dir > 0 ? '+' : '−' });
+        b.setAttribute('aria-label', (dir > 0 ? 'Increase' : 'Decrease') + ' value');
+        b.addEventListener('click', function () { stepField(input, dir); });
+        return b;
+    }
+    function addSteppersToPanel() {
+        document.querySelectorAll('#ltcOtherParamsBody .input-group input[type="number"]').forEach(function (input) {
+            if (input.parentNode.classList && input.parentNode.classList.contains('ltc-step-wrap')) return;
+            var wrap = el('span', { className: 'ltc-step-wrap' });
+            input.parentNode.insertBefore(wrap, input);
+            wrap.appendChild(mkStepBtn(input, -1));
+            wrap.appendChild(input);
+            wrap.appendChild(mkStepBtn(input, 1));
+        });
     }
 
     // ════════════════════════════════════════════════════════

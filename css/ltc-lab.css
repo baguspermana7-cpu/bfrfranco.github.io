@@ -1490,3 +1490,78 @@ body.ltc-revamp .ltc-fix-chip {
 [data-theme="dark"] body.ltc-revamp .ltc-fix-chip { color: #fbbf24; }
 body.ltc-revamp .ltc-fix-chip:hover { background: rgba(245,158,11,.2); }
 body.ltc-revamp .ltc-fix-chip:focus-visible { outline: 2px solid var(--ltc-accent); outline-offset: 1px; }
+
+/* ── RZ TRACE: indicator + popover (DCMOC pattern, LTC palette) ─────────── */
+body.ltc-revamp .ltc-traceable { cursor: pointer; position: relative; }
+body.ltc-revamp .ltc-traceable .ltc-kpi-value,
+body.ltc-revamp .ltc-kpi-card.ltc-traceable .ltc-kpi-value {
+    text-decoration: underline dotted rgba(245,158,11,.7) 1.5px; text-underline-offset: 3px;
+}
+body.ltc-revamp .ltc-kpi-card.ltc-traceable::after {
+    content: "ƒx"; position: absolute; top: 6px; right: 8px;
+    font-size: 8.5px; font-weight: 700; padding: 1px 4px; border-radius: 4px;
+    background: rgba(245,158,11,.14); color: #b45309;
+}
+[data-theme="dark"] body.ltc-revamp .ltc-kpi-card.ltc-traceable::after { color: #fbbf24; }
+body.ltc-revamp .ltc-pid-node { cursor: pointer; }
+body.ltc-revamp .ltc-pid-node:hover rect[stroke] { stroke: var(--ltc-accent); stroke-width: 2.2; }
+body.ltc-revamp .ltc-pid-chipval { fill: var(--ltc-accent); }
+body.ltc-revamp .ltc-trace-pop {
+    position: fixed; top: 84px; right: 24px; width: 380px; max-width: calc(100vw - 32px);
+    max-height: 72vh; overflow: auto; z-index: 100050; display: none;
+    background: var(--ltc-card-bg); border: 1px solid var(--ltc-hairline); border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.28); padding: 14px 16px;
+}
+body.ltc-revamp .ltc-trace-pop.open { display: block; animation: ltc-tab-in .18s ease; }
+body.ltc-revamp .ltc-trace-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+body.ltc-revamp .ltc-trace-val { font-size: 22px; font-weight: 800; color: var(--ltc-text); line-height: 1.1; font-variant-numeric: tabular-nums; }
+body.ltc-revamp .ltc-trace-lbl { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ltc-muted); margin-top: 2px; }
+body.ltc-revamp .ltc-trace-prov { margin-left: auto; font-size: 8.5px; font-weight: 700; letter-spacing: .04em; padding: 3px 7px; border-radius: 5px; white-space: nowrap; }
+body.ltc-revamp .ltc-trace-prov.engine { background: var(--ltc-kpi-good-bg); color: var(--ltc-green); }
+body.ltc-revamp .ltc-trace-prov.input { background: var(--ltc-badge-bg); color: var(--ltc-accent); }
+body.ltc-revamp .ltc-trace-prov.derived { background: var(--ltc-tile-bg); color: var(--ltc-muted); }
+body.ltc-revamp .ltc-trace-x { background: none; border: none; font-size: 18px; color: var(--ltc-muted); cursor: pointer; line-height: 1; padding: 0 2px; }
+body.ltc-revamp .ltc-trace-crumbs { font-size: 10.5px; color: var(--ltc-muted); margin-bottom: 8px; }
+body.ltc-revamp .ltc-trace-crumb { background: none; border: none; color: var(--ltc-accent); cursor: pointer; font-size: 10.5px; padding: 0; text-decoration: underline dotted; }
+body.ltc-revamp .ltc-trace-desc { font-size: 12px; color: var(--ltc-text); line-height: 1.5; margin: 0 0 8px; }
+body.ltc-revamp .ltc-trace-formula { font-size: 11px; color: var(--ltc-muted); background: var(--ltc-tile-bg); border: 1px solid var(--ltc-hairline); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; line-height: 1.5; }
+body.ltc-revamp .ltc-trace-deps-lbl { font-size: 9px; font-weight: 700; letter-spacing: .08em; color: var(--ltc-muted); margin-bottom: 6px; }
+body.ltc-revamp .ltc-trace-deps { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+body.ltc-revamp .ltc-trace-pill {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 1px; cursor: pointer;
+    background: var(--ltc-tile-bg); border: 1px solid var(--ltc-hairline); border-radius: 8px; padding: 6px 10px;
+    transition: border-color .15s, background .15s;
+}
+body.ltc-revamp .ltc-trace-pill:hover { border-color: var(--ltc-accent); }
+body.ltc-revamp .ltc-trace-pill b { font-size: 12px; color: var(--ltc-text); font-variant-numeric: tabular-nums; }
+body.ltc-revamp .ltc-trace-pill span { font-size: 9.5px; color: var(--ltc-muted); }
+body.ltc-revamp .ltc-trace-impact { font-size: 10.5px; color: var(--ltc-muted); font-style: italic; margin: 0 0 10px; }
+body.ltc-revamp .ltc-trace-actions { display: flex; gap: 8px; }
+body.ltc-revamp .ltc-trace-actions button {
+    font-size: 11px; font-weight: 600; padding: 6px 10px; border-radius: 7px; cursor: pointer;
+    border: 1px solid var(--ltc-hairline); background: var(--ltc-card-bg); color: var(--ltc-text);
+}
+body.ltc-revamp .ltc-trace-actions button:hover { border-color: var(--ltc-accent); color: var(--ltc-accent); }
+
+/* ── Custom steppers; hide ugly native spinners ─────────────────────────── */
+body.ltc-revamp input[type="number"]::-webkit-inner-spin-button,
+body.ltc-revamp input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+body.ltc-revamp input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+body.ltc-revamp .ltc-step-btn {
+    width: 22px; height: 24px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+    background: var(--ltc-tile-bg); border: 1px solid var(--ltc-hairline); border-radius: 6px;
+    color: var(--ltc-muted); font-size: 13px; font-weight: 700; cursor: pointer; line-height: 1;
+    transition: color .12s, border-color .12s, background .12s;
+}
+body.ltc-revamp .ltc-step-btn:hover { color: var(--ltc-accent); border-color: var(--ltc-accent); }
+body.ltc-revamp .ltc-step-btn:active { background: var(--ltc-badge-bg); }
+body.ltc-revamp .ltc-step-wrap { display: flex; align-items: center; gap: 5px; }
+body.ltc-revamp .ltc-step-wrap input { flex: 1; min-width: 0; }
+@media (max-width: 768px) { body.ltc-revamp .ltc-step-btn { width: 32px; height: 32px; } }
+
+/* ── Modelling diagrams: essentials first — sub-lines de-emphasized, detail on click ── */
+body.ltc-revamp .model-block text[id$="Sub"],
+body.ltc-revamp .control-block text[id$="Sub"] { opacity: .45; font-size: 90%; }
+body.ltc-revamp [data-block-popup] { cursor: pointer; }
+body.ltc-revamp .model-block text[data-block-popup]:hover,
+body.ltc-revamp .control-block text[data-block-popup]:hover { opacity: 1; fill: var(--ltc-accent); }
