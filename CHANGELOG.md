@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.52 — 2026-07-25 (SecondBrain — OmniRoute portal pill)
+
+### Added
+- **OmniRoute pill** in the SecondBrain nav, third portal beside Vector Index and Sessions (rose→violet CTA): one click opens the locally-installed **OmniRoute** dashboard (`http://localhost:20128/`) — the MIT free AI gateway (250 providers, 90+ free tiers, one OpenAI-compatible endpoint at `/v1`). OmniRoute v3.8.48 installed globally via npm and persisted as a `systemd --user` service (`omniroute.service`, auto-restart, boots with login). Local-app pattern identical to the Sessions pill.
+
 ## v1.115.51 — 2026-07-25 (Y-slice runtime verification probe — genset scale rule + revenue basis proven live)
 
 ### Added
