@@ -208,6 +208,9 @@ export function CapacityPlanningPage() {
 
     /* Watch/At-Risk chip → solved remediation panel (explainThresholdMetric over the adapter) */
     const [utilExplain, setUtilExplain] = React.useState<string | null>(null);
+    /* Power component-table At-Risk chip → shared DiagnosticModal (owner: every red value clickable) */
+    const [powerRow, setPowerRow] = React.useState<string | null>(null);
+    const powerActive = equip.rows.find((r) => r.label === powerRow && r.status !== 'OK');
     const utilEx = React.useMemo(() => {
         if (!utilExplain) return null;
         const u = util.rows.find((r) => r.key === utilExplain);
@@ -443,11 +446,32 @@ export function CapacityPlanningPage() {
                                                 <td className="py-1.5 text-slate-700 dark:text-slate-200">{r.label}</td>
                                                 <td className="text-right tabular-nums text-slate-500">{r.config}</td>
                                                 <td className="text-right"><ScoreValue value={r.utilPct} direction="lower" max={100} display={`${r.utilPct}%`} /></td>
-                                                <td className="text-right"><span title={r.remediation ?? 'Healthy utilization (<70%)'} className={`cursor-help rounded px-1.5 py-0.5 text-[9px] font-semibold ${r.status === 'OK' ? 'bg-rz-data/15 text-rz-data' : r.status === 'Watch' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{r.status}{r.remediation ? ' ⓘ' : ''}</span></td>
+                                                <td className="text-right">{r.status === 'OK'
+                                                    ? <span className="rounded px-1.5 py-0.5 text-[9px] font-semibold bg-rz-data/15 text-rz-data">OK</span>
+                                                    : <button onClick={() => setPowerRow(r.label)} title="Click for the diagnosis" className={`rounded px-1.5 py-0.5 text-[9px] font-semibold cursor-pointer hover:brightness-110 ${r.status === 'Watch' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{r.status} ⓘ</button>}
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
+                                {powerActive && (
+                                    <DiagnosticModal
+                                        diagnosis={{
+                                            title: `${powerActive.label} — utilization ${powerActive.utilPct}%`,
+                                            reason: powerActive.remediation ?? `Utilization ${powerActive.utilPct}% exceeds the ${powerActive.status === 'At Risk' ? '85% At-Risk' : '70% Watch'} threshold — little headroom for growth or concurrent maintenance.`,
+                                            actual: `${powerActive.utilPct}%`,
+                                            threshold: '≤ 85% (OK ≤ 70%)',
+                                            gap: powerActive.utilPct > 85 ? `+${powerActive.utilPct - 85} pp over` : `${85 - powerActive.utilPct} pp to At-Risk`,
+                                            levers: [
+                                                { label: 'Defer load / re-phase', detail: 'Lower the load or move capacity to a later phase in the Phase Plan.', tab: 'capacity' },
+                                                { label: 'Raise the design basis', detail: 'Adjust IT load / density / redundancy in Requirements — the unit count re-derives.', tab: 'requirements' },
+                                            ],
+                                            tab: 'requirements',
+                                            note: equip.source,
+                                        }}
+                                        onClose={() => setPowerRow(null)}
+                                    />
+                                )}
                                         {equip.rows.some((r) => r.remediation) && (
                                             <div className="mt-2 space-y-1">
                                                 {equip.rows.filter((r) => r.remediation).map((r) => (
@@ -520,6 +544,11 @@ function DetailTable({ table, headTips, footnote, onPhase, onReq }: {
     onPhase: () => void;
     onReq: () => void;
 }) {
+    /* Owner mandate — every red value is clickable → diagnosis modal (not just the
+     * Power table). The remediation is already computed per row; open it in the
+     * shared DiagnosticModal with quantified levers. */
+    const [openRow, setOpenRow] = React.useState<string | null>(null);
+    const active = table.rows.find((r) => r.label === openRow && r.status !== 'OK');
     return (
         <div>
             <table className="w-full text-xs">
@@ -530,11 +559,32 @@ function DetailTable({ table, headTips, footnote, onPhase, onReq }: {
                             <td className="py-1.5 text-slate-700 dark:text-slate-200">{r.label}{r.tip && <InfoTip content={r.tip} />}</td>
                             <td className="text-right tabular-nums text-slate-500">{r.config}</td>
                             <td className="text-right"><ScoreValue value={r.utilPct} direction="lower" max={100} display={`${r.utilPct}%`} /></td>
-                            <td className="text-right"><span className={`rounded px-1.5 py-0.5 text-[9px] font-semibold ${r.status === 'OK' ? 'bg-rz-data/15 text-rz-data' : r.status === 'Watch' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{r.status}{r.remediation ? ' ⓘ' : ''}</span></td>
+                            <td className="text-right">{r.status === 'OK'
+                                ? <span className="rounded px-1.5 py-0.5 text-[9px] font-semibold bg-rz-data/15 text-rz-data">OK</span>
+                                : <button onClick={() => setOpenRow(r.label)} title="Click for the diagnosis" className={`rounded px-1.5 py-0.5 text-[9px] font-semibold cursor-pointer hover:brightness-110 ${r.status === 'Watch' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{r.status} ⓘ</button>}
+                            </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+            {active && (
+                <DiagnosticModal
+                    diagnosis={{
+                        title: `${active.label} — utilization ${active.utilPct}%`,
+                        reason: active.remediation ?? `Utilization ${active.utilPct}% exceeds the ${active.status === 'At Risk' ? '85% At-Risk' : '70% Watch'} threshold — the installed ${active.label.toLowerCase()} capacity has little headroom for growth or concurrent maintenance.`,
+                        actual: `${active.utilPct}%`,
+                        threshold: '≤ 85% (OK ≤ 70%)',
+                        gap: active.utilPct > 85 ? `+${active.utilPct - 85} pp over` : `${85 - active.utilPct} pp to At-Risk`,
+                        levers: [
+                            { label: 'Defer load / re-phase', detail: 'Lower this component\'s load or move capacity to a later phase in the Phase Plan.', tab: 'capacity' },
+                            { label: 'Raise the design basis', detail: 'Adjust IT load, rack density, cooling or redundancy in Requirements — the unit count re-derives.', tab: 'requirements' },
+                        ],
+                        tab: 'requirements',
+                        note: `${table.source}`,
+                    }}
+                    onClose={() => setOpenRow(null)}
+                />
+            )}
             {table.rows.some((r) => r.remediation) && (
                 <div className="mt-2 space-y-1">
                     {table.rows.filter((r) => r.remediation).map((r) => (

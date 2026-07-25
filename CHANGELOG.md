@@ -13,6 +13,16 @@ release sections rather than semver.
 
 ---
 
+## v1.115.68 — 2026-07-25 (DCMOC — Capacity utilization > 100% fixed + at-risk rows now clickable)
+
+### Fixed
+- **Generators showed 115% utilization — impossible for a self-sized component.** Root cause: the capacity component table counted gensets from IT load (`ceil(IT/2000)`, engine equipScale) but divided FACILITY load (IT × PUE) by that capacity → utilization = PUE ≈ 115–127%. Generators back the WHOLE facility (IT + cooling + losses), so they must be sized on facility load — this was a genuinely under-sized genset plant, not just a display glitch. Now `capacity-adapter.ts equipmentTable()` derives the genset count from facility kW, so utilization can never exceed 100% (verified: Generators 115% → 94% at 110 MW IT).
+- **At-Risk / Watch rows are now clickable → diagnosis modal** on ALL four capacity system tables (Power + Cooling + Rack & Space + Network), not just the power utilization bars. The status chip opens the shared `DiagnosticModal` with the already-computed remediation (add N units / shed X MW / raise rating) + quantified levers + jump-to-Requirements/Phase-Plan. Closes the "every red value clickable" mandate for the capacity page.
+
+Gates: walk 31/0 · trace-parity 116/116. No engine change.
+
+---
+
 ## v1.115.67 — 2026-07-25 (DCMOC — futureExpansionMw wired: Architecture reserve now shown as capacity headroom)
 
 ### Fixed

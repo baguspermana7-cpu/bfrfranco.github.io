@@ -209,11 +209,19 @@ export function equipmentTable(i: CapInputs): { rows: ComponentRow[]; source: st
         }
         return { label, config: `${count}× ${(ratingKw / 1000).toFixed(1)} MW`, utilPct: pct, status, remediation };
     };
+    /* Generators back the WHOLE FACILITY (IT + cooling + losses = facilityKw),
+     * so their count must be sized from facilityKw — not IT load. The engine
+     * equipScale.generators counts from IT load (ceil(itLoad/2000)), which under
+     * the facility-load divisor produced utilization = facility/IT ≈ PUE > 100%
+     * (the reported "115%" bug — a genuinely under-sized genset plant, not just a
+     * display glitch). Re-derive the genset count on the facility basis so a
+     * self-sized component can never exceed 100%. */
+    const genCountFacility = Math.ceil(facilityKw / 2000);
     return {
-        source: 'engine equipScale · ratings = scaling divisors (screening)',
+        source: 'engine equipScale · ratings = scaling divisors · gensets sized on facility load (screening)',
         rows: [
             mk('Utility Intake', 2, facilityKw / 1.6, facilityKw),
-            mk('Generators', eq.generators, 2000, facilityKw),
+            mk('Generators', genCountFacility, 2000, facilityKw),
             mk('UPS Modules', eq.ups_modules, 500, i.itLoadKw),
             mk('PDUs', eq.pdus, 100, i.itLoadKw),
             mk('Busway', eq.busway ?? Math.ceil(i.itLoadKw / 2000) + 1, 2000, i.itLoadKw),
