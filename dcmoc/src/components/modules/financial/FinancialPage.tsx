@@ -17,6 +17,7 @@ import { useFinancialTracking } from '@/store/financialTracking';
 import { useConstructionTracking } from '@/store/constructionTracking';
 import { plannedSchedule, evm, pvCurve } from '@/state/adapters/construction-adapter';
 import { rzModels, rzData } from '@/lib/rz-engine';
+import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 import FinancialDashboard from '@/components/modules/FinancialDashboard';
 import MonteCarloDashboard from '@/components/modules/MonteCarloDashboard';
 import { fmtMoney } from '@/lib/format';
@@ -103,8 +104,10 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
         const MARKET_ALIAS: Record<string, string> = { virginia: 'n-virginia', malaysia: 'kuala-lumpur' };
         const marketKey = MARKET_ALIAS[cityMarket ?? ''] ?? (cityMarket ?? 'none').replace(/_/g, '-');
         const marketColo: number | undefined = marketKey !== 'none' ? D?.markets?.[marketKey]?.coloPrice : undefined;
-        const revRef: number = marketColo ?? 280;
-        const revSrc = marketColo != null ? `engine market coloPrice · ${marketKey}` : 'screening default $280/kW·mo (no market selected)';
+        /* fallback = the LIVE app-wide basis (sim tunable), never a divergent
+         * literal — this page's Pro Forma runs on the same number */
+        const revRef: number = marketColo ?? inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH;
+        const revSrc = marketColo != null ? `engine market coloPrice · ${marketKey}` : `live revenue basis $${inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH}/kW·mo (no market selected)`;
         const revenueYr = revRef * inputs.itLoad * 12;
         const opexYr: number = model.opex ? (model.opex.totalExtended ?? model.opex.total) : revenueYr * 0.4;
         const npvAt = (capex: number, rev: number, rate: number): number =>

@@ -13,6 +13,14 @@ release sections rather than semver.
 
 ---
 
+## v1.115.56 — 2026-07-25 (DCMOC — honest IRR "n/a" + last stale-basis strings unified)
+
+### Fixed
+- **IRR no longer fabricates "0.0%"**: when the DCF never turns cash-positive (NPV < 0 and the solver pins ≤ 0) there is NO positive root — the Executive card now shows **n/a** ("no positive root (cash-negative)"), the diagnosis modal explains it, and the ƒx trace node returns null to match (trace-parity baseline 117→116 while the default project is cash-negative — the node honestly has no number to compare).
+- **Stale revenue-basis strings unified**: `lib/screening.ts REVENUE_PER_KW_MONTH` was a duplicate 150 literal — now re-exports `DEFAULT_REVENUE_PER_KW_MONTH` so the two names can never drift; Financial overview stress-test fallback used $280 while its own Pro Forma ran $150 (same page, two bases) — now falls back to the live store basis with an honest label; `fin.ebitdaY5` trace template and the `site.ctx` binding formula no longer cite the dead $280.
+
+---
+
 ## v1.115.55 — 2026-07-25 (DCMOC — below-hurdle IRR diagnosis on the Executive KPI, Auto-optimize wired to the real solver)
 
 ### Added

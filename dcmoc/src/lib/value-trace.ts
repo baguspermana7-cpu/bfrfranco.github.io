@@ -718,7 +718,7 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'fin.ebitdaY5': {
         label: 'EBITDA (year 5)', page: 'finance', unit: '$', provenance: 'derived',
-        formulaTemplate: '15-yr DCF: revenue (sim.itLoad × $280/kW·mo illustrative × occupancy ramp, 3% escalation) − opex.dashboardAnnual — year-5 EBITDA; initial capital capex.total',
+        formulaTemplate: '15-yr DCF: revenue (sim.itLoad × sim.revenuePerKwMonth live basis (default $150/kW·mo) × occupancy ramp, 3% escalation) − opex.dashboardAnnual — year-5 EBITDA; initial capital capex.total',
         deps: ['capex.total', 'opex.dashboardAnnual', 'sim.itLoad'],
         get: () => { const cf = dashFinancial()?.cashflows?.[4]; return cf ? Math.round(cf.ebitda) : null; },
     },
@@ -726,7 +726,9 @@ export const TRACE: Record<string, TraceNode> = {
         label: 'IRR (15-yr project)', page: 'finance', unit: '%', provenance: 'derived',
         formulaTemplate: 'IRR of 15-yr DCF cashflow — year-0 = −capex.total; annual flow = illustrative revenue sim.itLoad − opex.dashboardAnnual − tax',
         deps: ['capex.total', 'opex.dashboardAnnual', 'sim.itLoad'],
-        get: () => { const f = dashFinancial(); return f ? +f.irr.toFixed(1) : null; },
+        /* null when the DCF never turns cash-positive (npv<0 AND irr≤0) — mirrors
+         * the Executive card's honest "n/a": no positive root, no fabricated 0%. */
+        get: () => { const f = dashFinancial(); if (!f) return null; return (f.npv < 0 && f.irr <= 0) ? null : +f.irr.toFixed(1); },
     },
     'capex.racks': {
         label: 'Rack Count (CAPEX metrics)', page: 'capex', provenance: 'derived',

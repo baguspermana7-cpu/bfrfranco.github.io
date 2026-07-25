@@ -5,7 +5,9 @@
  * ranges); $150 = mid-band screening. Maintenance $50/kW/yr = planned-PM
  * screening share consistent with models.opex maintenance line order.
  * These are SCREENING numbers — every consumer must label them as such. */
-export const REVENUE_PER_KW_MONTH = 150;   // $/kW/month — blended colo screening (JLL/CBRE 2025 mid-band)
+/* single value with constants/finance DEFAULT_REVENUE_PER_KW_MONTH (the sim-store
+ * tunable default) — re-exported so the two names can never drift apart. */
+export { DEFAULT_REVENUE_PER_KW_MONTH as REVENUE_PER_KW_MONTH } from '@/constants/finance';
 export const MAINT_PER_KW_YR = 50;         // $/kW/yr — maintenance screening share
 
 /* Screening split of (PUE−1) overhead energy — ONE source (audit: capacity used

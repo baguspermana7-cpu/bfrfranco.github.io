@@ -106,6 +106,10 @@ export function ExecutiveDashboard() {
     const IRR_HURDLE_PCT = 12;
     const [irrDiag, setIrrDiag] = React.useState(false);
     const irrBelowHurdle = d.financial != null && d.financial.irr < IRR_HURDLE_PCT;
+    /* IRR has no meaningful positive root when the DCF never turns cash-positive
+     * (NPV < 0 AND solver pinned ≤ 0) — "0.0%" would be a fabricated number, so
+     * display n/a and let the red diagnosis explain. */
+    const irrUndefined = d.financial != null && d.financial.npv < 0 && d.financial.irr <= 0;
 
     // real sparkline series
     const cf = d.financial?.cashflows ?? [];
@@ -259,7 +263,7 @@ export function ExecutiveDashboard() {
                 <KpiCard label="Total CAPEX" value={fmtUsd(d.capexTotal)} sub={d.perKw ? `${fmtUsd(d.perKw)}/kW` : 'Open CAPEX'} icon={Building} accent="emerald" onClick={() => go('capex')} trace="capex.total" tip="Total design CAPEX from the CAPEX engine, including civil, M&E, IT, and contingency. Click to open the full CAPEX breakdown." />
                 <KpiCard label="Total OPEX / yr" value={fmtUsd(d.opexAnnual)} sub="DC-contract rate · 100% util" icon={Repeat} accent="blue" series={opexSeries} seriesLabel="Annual OPEX" valueFormat={(n) => `$${(n / 1e6).toFixed(1)}M`} trace="opex.dashboardAnnual" tip="Annualised operating expenditure modelled by the Operations engine: power, staffing, maintenance, licensing. Power is costed at the DC-contract (wholesale/PPA) rate at 100% utilization — this can differ from the standalone OPEX calculator, which uses the retail tariff and a partial utilization factor." />
                 <KpiCard label="EBITDA (Yr 5)" value={fmtUsd(d.ebitda)} sub={ebitdaNegative ? 'NEGATIVE — click for diagnosis' : (d.financialIllustrative ? 'illustrative revenue' : '')} icon={Gauge} accent={ebitdaNegative ? 'alert' : 'amber'} onClick={ebitdaNegative ? () => setEbitdaDiag(true) : undefined} series={ebitdaSeries} seriesLabel="EBITDA" valueFormat={(n) => `$${(n / 1e6).toFixed(1)}M`} trace="fin.ebitdaY5" tip="Earnings Before Interest, Taxes, Depreciation & Amortisation at Year 5, from the Financial engine DCF model. Trend shows EBITDA trajectory across the project horizon." />
-                <KpiCard label="IRR" value={d.financial ? `${d.financial.irr.toFixed(1)}%` : '—'} sub={irrBelowHurdle ? `BELOW ${IRR_HURDLE_PCT}% HURDLE — click for diagnosis` : (d.financial ? `Payback ${d.financial.paybackPeriodYears.toFixed(1)} yr` : 'Open Financial')} icon={TrendingUp} accent={irrBelowHurdle ? 'alert' : 'emerald'} series={fcfSeries} seriesLabel="Cumulative Cash Flow" valueFormat={(n) => `$${(n / 1e6).toFixed(1)}M`} onClick={irrBelowHurdle ? () => setIrrDiag(true) : () => go('finance')} trace="fin.irrProject" tip="Internal Rate of Return from the Financial engine DCF over the full project horizon. Trend shows cumulative free cash flow; hover for year-by-year value. Click to open Financial engine." />
+                <KpiCard label="IRR" value={d.financial ? (irrUndefined ? 'n/a' : `${d.financial.irr.toFixed(1)}%`) : '—'} sub={irrUndefined ? 'no positive root (cash-negative) — click for diagnosis' : irrBelowHurdle ? `BELOW ${IRR_HURDLE_PCT}% HURDLE — click for diagnosis` : (d.financial ? `Payback ${d.financial.paybackPeriodYears.toFixed(1)} yr` : 'Open Financial')} icon={TrendingUp} accent={irrBelowHurdle ? 'alert' : 'emerald'} series={fcfSeries} seriesLabel="Cumulative Cash Flow" valueFormat={(n) => `$${(n / 1e6).toFixed(1)}M`} onClick={irrBelowHurdle ? () => setIrrDiag(true) : () => go('finance')} trace="fin.irrProject" tip="Internal Rate of Return from the Financial engine DCF over the full project horizon. Trend shows cumulative free cash flow; hover for year-by-year value. Click to open Financial engine." />
                 <KpiCard label="Project Status" value={projectStatus.phase} sub={projectStatus.sub} icon={CircleDot} accent="cyan" tip="Current project lifecycle phase DERIVED from real tracking state (not a label): Design while Construction tracking has no NTP status month; Construction while the status month sits inside the CAPEX engine build schedule; Commissioning once the schedule completes or any Cx checklist/level tick is recorded. Update it in Construction (status month) and Commissioning (checklist)." />
             </div>
             )}
@@ -415,11 +419,13 @@ export function ExecutiveDashboard() {
             {irrDiag && d.financial != null && (
                 <DiagnosticModal
                     diagnosis={{
-                        title: `IRR below the ${IRR_HURDLE_PCT}% hurdle`,
-                        reason: `Project IRR ${d.financial.irr.toFixed(1)}% at the $${revBasis}/kW·mo screening basis sits under the ${IRR_HURDLE_PCT}% institutional hurdle — the equity case does not clear a typical DC fund's cost of capital at this rate.`,
-                        actual: `${d.financial.irr.toFixed(1)}%`,
+                        title: irrUndefined ? 'IRR undefined — project never turns cash-positive' : `IRR below the ${IRR_HURDLE_PCT}% hurdle`,
+                        reason: irrUndefined
+                            ? `At the $${revBasis}/kW·mo screening basis the DCF never turns cash-positive, so no IRR exists (displaying 0% would be fabricated). Revenue must rise or costs fall before a return can be computed at all.`
+                            : `Project IRR ${d.financial.irr.toFixed(1)}% at the $${revBasis}/kW·mo screening basis sits under the ${IRR_HURDLE_PCT}% institutional hurdle — the equity case does not clear a typical DC fund's cost of capital at this rate.`,
+                        actual: irrUndefined ? 'n/a (no positive root)' : `${d.financial.irr.toFixed(1)}%`,
                         threshold: `≥ ${IRR_HURDLE_PCT}%`,
-                        gap: `${(d.financial.irr - IRR_HURDLE_PCT).toFixed(1)} pp`,
+                        gap: irrUndefined ? 'not computable' : `${(d.financial.irr - IRR_HURDLE_PCT).toFixed(1)} pp`,
                         levers: [
                             { label: `Raise the revenue basis (now $${revBasis}/kW·mo)`, detail: 'Set the contracted rate in Financial → Pro Forma — the edit writes through to every DCF surface.', tab: 'finance' },
                             { label: 'Re-phase the build', detail: 'Smaller first phase + later capacity moves capex right and lifts blended IRR — see Phased Finance.', tab: 'phased-finance' },
