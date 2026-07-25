@@ -189,6 +189,11 @@ export const useSimulationStore = create<SimulationState>()(persist((set) => ({
             set((state) => {
                 const validated = { ...newInputs };
                 if (validated.itLoad !== undefined) validated.itLoad = Math.max(100, Math.min(500000, validated.itLoad));
+                /* revenue basis (app-wide SSOT tunable) — clamp to a sane band
+                 * ($50-500/kW·mo spans retail→AI-premium; JLL 2026 wholesale
+                 * $140-230) so a typo in the Financial field can't poison
+                 * every DCF surface. */
+                if (validated.revenuePerKwMonth !== undefined) validated.revenuePerKwMonth = Math.max(50, Math.min(500, validated.revenuePerKwMonth));
                 /* Workstream G — discrete strategy buttons are PRESETS of the %
                  * mix: clicking one also writes the matching pure mix (unless a
                  * caller passed an explicit mix in the same update). */

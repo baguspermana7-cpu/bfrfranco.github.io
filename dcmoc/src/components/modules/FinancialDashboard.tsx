@@ -254,7 +254,23 @@ const FinancialDashboard = () => {
     const handleChange = (key: string, value: number) => {
         userEditedFin.current = true;
         setFinInputs(prev => ({ ...prev, [key]: value }));
+        /* revenue basis is the app-wide SSOT (sim-store tunable) — this page is
+         * the single edit surface, so the edit must WRITE THROUGH or Executive/
+         * MC/Report/PhasedFin keep the old basis (the diagnosis lever "raise
+         * the basis in Financial" would silently do nothing app-wide). */
+        if (key === 'revenuePerKwMonth' && Number.isFinite(value)) {
+            simActions.setInputs({ revenuePerKwMonth: value });
+        }
     };
+
+    /* Reverse sync: optimizer Apply (or another surface) moves the store value
+     * while this page is mounted — reflect it here so the field never lies. */
+    React.useEffect(() => {
+        const v = inputs.revenuePerKwMonth;
+        if (v != null && Number.isFinite(v)) {
+            setFinInputs((prev) => (prev.revenuePerKwMonth === v ? prev : { ...prev, revenuePerKwMonth: v }));
+        }
+    }, [inputs.revenuePerKwMonth]);
 
     const handleRevChange = (key: string, value: number) => {
         userEditedRev.current = true;

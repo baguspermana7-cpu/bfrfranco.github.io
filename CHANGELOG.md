@@ -13,6 +13,14 @@ release sections rather than semver.
 
 ---
 
+## v1.115.54 — 2026-07-25 (DCMOC — revenue basis edit WRITES THROUGH: Financial field → sim-store SSOT → every DCF surface)
+
+### Fixed
+- **Financial revenue field was local-only**: the "Revenue per kW/month" input (Financial → Pro Forma) edited only this page's state — Executive/Monte-Carlo/Report/Phased-Finance kept the old basis, so the EBITDA-diagnosis lever "raise the basis in Financial" silently did nothing app-wide. The edit now writes through to the sim-store tunable (the same one the optimizer moves), with reverse sync so an optimizer Apply refreshes the field while the page is open. Store clamps the tunable to $50-500/kW·mo (a typo can no longer poison every DCF).
+- Verified headless end-to-end: set $200 in Financial → store reads 200 → Executive negative-EBITDA chip clears. Probes: walk 31/0 · trace-parity 117/117 · optimizer 8/8 · fuelgen-scale 5/5.
+
+---
+
 ## v1.115.53 — 2026-07-25 (DCMOC — negative-EBITDA diagnosis on the Executive KPI)
 
 ### Added
