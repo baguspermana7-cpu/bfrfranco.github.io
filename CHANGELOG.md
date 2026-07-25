@@ -13,6 +13,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.71 — 2026-07-25 (DCMOC — CAPEX-total trace now decomposes the real cost stack)
+
+### Fixed
+- **The CAPEX-total trace was inaccurate** — it showed the total as computed from just "IT Load + Contingency %", as if CAPEX were a contingency assumption rather than a calculation. It now decomposes into the REAL components that sum to the total: **Hard Cost (Σ all disciplines — electrical/cooling/UPS/building/generator/network/fire/seismic/security/commissioning/testing/permits × their multipliers) + Soft Costs (design + PM) + Contingency + Front-of-Meter (substation/grid/switchgear)**. Four new drill-down trace nodes (`capex.hardTotal` / `capex.softTotal` / `capex.contingencyAmt` / `capex.fomAmt`) read the engine's own `costs`/`softCosts`/`contingency`/`fomTotal`, so clicking through the trace reaches the actual cost calculation. Value-bindings + trace-parity 116/116 green.
+
+---
+
 ## v1.115.70 — 2026-07-25 (DCMOC — Trace popover Collapse/Expand-all fixed + made reusable)
 
 ### Fixed

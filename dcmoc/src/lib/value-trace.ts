@@ -162,10 +162,38 @@ export const TRACE: Record<string, TraceNode> = {
             return e && r ? +(e * 1000 * r).toFixed(0) : null;
         },
     },
+    /* CAPEX total is NOT "IT load × contingency" — it is the SUM of the real
+     * cost stack: hard disciplines + soft costs + contingency + front-of-meter.
+     * Trace decomposes into those actual components (owner: "harus dari
+     * calculation, bukan contingency assumption"). */
+    'capex.hardTotal': {
+        label: 'Hard Cost (Σ disciplines)', page: 'capex', unit: '$', provenance: 'derived',
+        formulaTemplate: 'Σ CapexEngine.costs — electrical + cooling + ups + building + generator + network + fire + seismic + security + commissioning + testing + permits (all disciplines × their multipliers)',
+        deps: ['sim.itLoad'],
+        get: () => { const c = cap().results?.costs; return c ? Math.round(Object.values(c).reduce((a, b) => a + b, 0)) : null; },
+    },
+    'capex.softTotal': {
+        label: 'Soft Costs (design + PM)', page: 'capex', unit: '$', provenance: 'derived',
+        formulaTemplate: 'design fee + project-management fee (% of direct cost)',
+        deps: ['capex.hardTotal'],
+        get: () => { const s = cap().results?.softCosts; return s ? Math.round((s.design ?? 0) + (s.pm ?? 0)) : null; },
+    },
+    'capex.contingencyAmt': {
+        label: 'Contingency', page: 'capex', unit: '$', provenance: 'derived',
+        formulaTemplate: '(hard + soft) × capex.contingencyPct',
+        deps: ['capex.hardTotal', 'capex.softTotal', 'capex.contingencyPct'],
+        get: () => cap().results?.contingency ?? null,
+    },
+    'capex.fomAmt': {
+        label: 'Front-of-Meter (grid / substation)', page: 'capex', unit: '$', provenance: 'derived',
+        formulaTemplate: 'substation + grid connection + switchgear (utility interconnect)',
+        deps: ['sim.itLoad'],
+        get: () => cap().results?.fomTotal ?? null,
+    },
     'capex.total': {
         label: 'CAPEX Total (P50)', page: 'capex', unit: '$', provenance: 'engine',
-        formulaTemplate: 'CapexEngine.calculateCapex(sim.itLoad, capex.contingencyPct, …all CAPEX assumptions)',
-        deps: ['sim.itLoad', 'capex.contingencyPct'],
+        formulaTemplate: 'hard cost (Σ disciplines) + soft costs + contingency + front-of-meter — CapexEngine.calculateCapex',
+        deps: ['capex.hardTotal', 'capex.softTotal', 'capex.contingencyAmt', 'capex.fomAmt'],
         get: () => cap().results?.total ?? null,
     },
     'capex.perKw': {
