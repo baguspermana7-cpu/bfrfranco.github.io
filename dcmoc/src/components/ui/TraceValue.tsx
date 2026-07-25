@@ -14,6 +14,8 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { resolveTrace, type ResolvedTrace } from '@/lib/value-trace';
+import { useCollapsibleTree } from '@/hooks/useCollapsibleTree';
+import { CollapsibleTree } from '@/components/ui/CollapsibleTree';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useRequirementsStore } from '@/store/requirements';
@@ -106,7 +108,10 @@ function traceToText(root: ResolvedTrace, depth = 0): string {
 function Panel({ root }: { root: ResolvedTrace }) {
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
     const [path, setPath] = React.useState<ResolvedTrace[]>([root]);
-    const [expanded, setExpanded] = React.useState(false);
+    const [showTree, setShowTree] = React.useState(false);
+    /* reusable per-node collapse state — the header Expand-all/Collapse-all and
+     * each node's chevron share one api (fixes the dead collapse-all button). */
+    const treeApi = useCollapsibleTree(root.children, false);
     const [filter, setFilter] = React.useState('');
     const [copied, setCopied] = React.useState(false);
     const node = path[path.length - 1];
@@ -186,11 +191,11 @@ function Panel({ root }: { root: ResolvedTrace }) {
                 <>
                     <div className="mb-1.5 flex items-center gap-2">
                         <div className="text-[10px] font-medium text-slate-500">This number is computed from:</div>
-                        <button onClick={() => setExpanded((e) => !e)}
-                            aria-label={expanded ? 'Collapse the full dependency tree' : 'Expand the full dependency tree down to the leaves'}
-                            aria-expanded={expanded}
+                        <button onClick={() => { if (!showTree) { setShowTree(true); treeApi.expandAll(); } else if (treeApi.allExpanded) { treeApi.collapseAll(); } else { treeApi.expandAll(); } }}
+                            aria-label={treeApi.allExpanded ? 'Collapse the dependency tree' : 'Expand the dependency tree down to the leaves'}
+                            aria-expanded={showTree && treeApi.allExpanded}
                             className="ml-auto rounded-md border border-slate-300 dark:border-slate-600 px-1.5 py-0.5 text-[9px] font-semibold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
-                            {expanded ? '▾ Collapse all' : '▸ Expand all'}
+                            {showTree && treeApi.allExpanded ? '▾ Collapse all' : '▸ Expand all'}
                         </button>
                         <button onClick={copyChain}
                             aria-label="Copy the whole trace chain (formula, values, sources) to the clipboard"
@@ -218,8 +223,9 @@ function Panel({ root }: { root: ResolvedTrace }) {
                     </div>
                     <p className="mt-1.5 text-[9px] text-slate-400">Click a colored box to see where that number comes from — you can keep going all the way to the furthest endpoint.</p>
 
-                    {/* full-chain expand — flat indented tree down to the leaves */}
-                    {expanded && (
+                    {/* dependency tree — nested, per-node collapsible (reusable CollapsibleTree);
+                        filtering falls back to a flat matched list. */}
+                    {showTree && (
                         <div className="mt-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 p-2">
                             {flatTree.length > 6 && (
                                 <input value={filter} onChange={(e) => setFilter(e.target.value)}
@@ -228,18 +234,30 @@ function Panel({ root }: { root: ResolvedTrace }) {
                                     className="mb-1.5 w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-2 py-1 text-[10px] text-slate-700 dark:text-slate-200" />
                             )}
                             <div className="max-h-52 overflow-y-auto">
-                                {flatTree
-                                    .filter(({ node: n }) => !filter.trim() || n.label.toLowerCase().includes(filter.trim().toLowerCase()) || n.id.toLowerCase().includes(filter.trim().toLowerCase()))
-                                    .map(({ node: n, depth }, i) => (
-                                        <button key={`${n.id}-${i}`} onClick={() => setPath([root, n])}
-                                            className="flex w-full items-center gap-1.5 rounded px-1 py-0.5 text-left hover:bg-slate-100 dark:hover:bg-slate-700/60"
-                                            style={{ paddingLeft: `${depth * 12 + 4}px` }}
-                                            aria-label={`Trace ${n.label}`}>
+                                {filter.trim() ? (
+                                    flatTree
+                                        .filter(({ node: n }) => n.label.toLowerCase().includes(filter.trim().toLowerCase()) || n.id.toLowerCase().includes(filter.trim().toLowerCase()))
+                                        .map(({ node: n, depth }, i) => (
+                                            <button key={`${n.id}-${i}`} onClick={() => setPath([root, n])}
+                                                className="flex w-full items-center gap-1.5 rounded px-1 py-0.5 text-left hover:bg-slate-100 dark:hover:bg-slate-700/60"
+                                                style={{ paddingLeft: `${depth * 12 + 4}px` }} aria-label={`Trace ${n.label}`}>
+                                                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${PROV_STYLE[n.provenance].chip}`} aria-hidden />
+                                                <span className="min-w-0 flex-1 truncate text-[10px] text-slate-600 dark:text-slate-300">{n.label}</span>
+                                                <span className="shrink-0 text-[10px] font-bold tabular-nums text-slate-800 dark:text-white">{fmtNum(n.value)}{n.unit ? ` ${n.unit}` : ''}</span>
+                                            </button>
+                                        ))
+                                ) : (
+                                    <CollapsibleTree roots={root.children} api={treeApi} renderNode={(n, ctx) => (
+                                        <div className="flex items-center gap-1 rounded px-1 py-0.5 hover:bg-slate-100 dark:hover:bg-slate-700/60" style={{ paddingLeft: `${ctx.depth * 12 + 2}px` }}>
+                                            {ctx.hasChildren
+                                                ? <button onClick={ctx.toggle} aria-label={ctx.isExpanded ? 'Collapse' : 'Expand'} className="shrink-0 w-3 text-[9px] text-slate-400 hover:text-slate-600">{ctx.isExpanded ? '▾' : '▸'}</button>
+                                                : <span className="shrink-0 w-3" />}
                                             <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${PROV_STYLE[n.provenance].chip}`} aria-hidden />
-                                            <span className="min-w-0 flex-1 truncate text-[10px] text-slate-600 dark:text-slate-300">{n.label}</span>
+                                            <button onClick={() => setPath([root, n as ResolvedTrace])} className="min-w-0 flex-1 truncate text-left text-[10px] text-slate-600 dark:text-slate-300 hover:text-rz-mint" aria-label={`Trace ${n.label}`}>{n.label}</button>
                                             <span className="shrink-0 text-[10px] font-bold tabular-nums text-slate-800 dark:text-white">{fmtNum(n.value)}{n.unit ? ` ${n.unit}` : ''}</span>
-                                        </button>
-                                    ))}
+                                        </div>
+                                    )} />
+                                )}
                             </div>
                         </div>
                     )}

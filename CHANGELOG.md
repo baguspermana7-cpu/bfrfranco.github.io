@@ -13,6 +13,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.70 — 2026-07-25 (DCMOC — Trace popover Collapse/Expand-all fixed + made reusable)
+
+### Fixed
+- **The Trace-Number popover "Collapse all / Expand all" toggle now actually works per node.** It previously flipped a single boolean that showed/hid one flat list (owner: "no effect"). Replaced with a reusable per-node collapsible tree: new `hooks/useCollapsibleTree.ts` (tracks expanded ids, `toggle`/`expandAll`/`collapseAll`/`allExpanded`) + `components/ui/CollapsibleTree.tsx` (nested renderer with per-node chevrons + a `renderNode` callback). The popover's dependency tree is now genuinely expandable node-by-node, Expand-all/Collapse-all act on every node, and filtering still falls back to a flat matched list. The primitive is reusable by any tree UI (owner: not hardcoded per-use). Trace-parity 116/116 unaffected.
+
+---
+
 ## v1.115.69 — 2026-07-25 (DCMOC — dedup: CAPEX shared canonicals read-only + Setup Wizard removed)
 
 ### Changed
