@@ -151,81 +151,35 @@ const CapexDashboard = () => {
                         />
                     </CardHeader>
                     <CardContent className="space-y-5">
-                        {/* ─── REGION & COUNTRY ─── */}
-                        <div className="space-y-2">
-                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">
-                                <Globe2 className="w-3 h-3" /> Region & Country
-                                <Tooltip content="Syncs with Global Simulation Settings. Construction costs vary by region." />
-                            </label>
-                            <select
-                                className="w-full p-2 border rounded-md text-sm text-slate-900 bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700"
-                                value={selectedCountry?.id || 'ID'}
-                                onChange={(e) => actions.selectCountry(e.target.value)}
-                            >
-                                {Object.entries(REGIONS).sort().map(([region, countries]) => (
-                                    <optgroup key={region} label={REGION_LABELS[region] || region}>
-                                        {countries.map(c => (
-                                            <option key={c.id} value={c.id}>
-                                                {c.name} ({c.id})
-                                            </option>
-                                        ))}
-                                    </optgroup>
-                                ))}
-                            </select>
-                            <div className="text-xs text-slate-400 dark:text-slate-500">
-                                Construction Index: <span className="font-mono text-slate-600 dark:text-slate-400">{selectedCountry?.constructionIndex?.toFixed(2) || '1.0'}x</span> (vs US Baseline)
-                            </div>
-                        </div>
+                        {/* ─── SHARED CANONICALS (owned by Requirements — read-only here to
+                             kill the duplicate edit surface; owner: "jangan ada duplicate") ─── */}
+                        {(() => {
+                            const RED = ({ icon: Ic, label, value, tip }: { icon: typeof Globe2; label: string; value: string; tip: string }) => (
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1"><Ic className="w-3 h-3" /> {label} <Tooltip content={tip} /></label>
+                                    <div className="rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-2.5 py-1.5 flex items-center justify-between gap-2">
+                                        <span className="text-sm font-semibold tabular-nums text-slate-800 dark:text-slate-200">{value}<span className="ml-1.5 rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-emerald-500">requirements</span></span>
+                                        <button onClick={() => actions.setActiveTab('requirements')} className="shrink-0 text-[10px] font-medium text-rz-mint hover:underline">Edit ↗</button>
+                                    </div>
+                                </div>
+                            );
+                            const redLabel = inputs.redundancy === 'n' ? 'N (Basic)' : inputs.redundancy === 'n1' ? 'N+1 (Tier III)' : inputs.redundancy === '2n' ? '2N (Tier IV)' : '2N+1';
+                            const coolLabel = inputs.coolingType === 'air' ? 'Air (CRAC/CRAH)' : inputs.coolingType === 'inrow' ? 'In-Row' : inputs.coolingType === 'rdhx' ? 'Rear-Door HX' : 'Direct Liquid';
+                            const rackLabel = inputs.rackType === 'standard' ? 'Standard ≤6 kW' : inputs.rackType === 'medium' ? 'Medium 12.5 kW' : inputs.rackType === 'high' ? 'High 25 kW' : 'Ultra 75 kW';
+                            return (
+                                <div className="space-y-3 rounded-lg border border-emerald-200/40 dark:border-emerald-900/30 bg-emerald-50/30 dark:bg-emerald-950/10 p-2.5">
+                                    <p className="text-[9px] text-emerald-700 dark:text-emerald-400">Shared canonicals — one source in <b>Requirements</b>. Read-only here (no duplicate).</p>
+                                    <RED icon={Globe2} label="Region & Country" value={`${selectedCountry?.name ?? '—'} (${selectedCountry?.id ?? '—'}) · idx ${selectedCountry?.constructionIndex?.toFixed(2) ?? '1.0'}x`} tip="Owned by Requirements (country). Construction index scales CAPEX by region." />
+                                    <RED icon={Zap} label="IT Capacity" value={`${inputs.itLoad.toLocaleString()} kW`} tip="Owned by Requirements 1.1 — total critical IT load; drives power/cooling/rack sizing." />
+                                    <RED icon={Server} label="Redundancy Tier" value={redLabel} tip="Owned by Requirements — Uptime tier / N-model." />
+                                    <RED icon={Activity} label="Cooling Strategy" value={coolLabel} tip="Owned by Requirements — cooling methodology + PUE." />
+                                    <RED icon={Server} label="Rack Density" value={rackLabel} tip="Owned by Requirements — power/rack, drives rack count + floor space." />
+                                </div>
+                            );
+                        })()}
 
-                        {/* ─── IT CAPACITY ─── */}
+                        {/* ─── COOLING add-on (CAPEX-only deep-sea study) ─── */}
                         <div className="space-y-2">
-                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center">
-                                <Zap className="w-3 h-3 mr-1" /> IT Capacity <Tooltip content="Total critical IT load in kW. Drives cooling, power, and rack sizing." />
-                            </label>
-                            <div className="flex gap-2">
-                                <input
-                                    type="number"
-                                    className="w-full p-2 border rounded-md text-sm text-slate-700 bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700"
-                                    value={inputs.itLoad}
-                                    onChange={(e) => handleChange('itLoad', Number(e.target.value))}
-                                />
-                                <span className="p-2 bg-slate-100 dark:bg-slate-700 rounded-md text-sm font-medium text-slate-600 dark:text-slate-400">kW</span>
-                            </div>
-                        </div>
-
-                        {/* ─── REDUNDANCY ─── */}
-                        <div className="space-y-2">
-                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center">
-                                Redundancy Tier <Tooltip content="Uptime Institute Standard. N+1 = Tier III (Concurrently Maintainable), 2N = Tier IV (Fault Tolerant)." />
-                            </label>
-                            <div className="grid grid-cols-2 gap-2">
-                                {['n', 'n1', '2n', '2n1'].map((tier) => (
-                                    <button
-                                        key={tier}
-                                        onClick={() => handleChange('redundancy', tier)}
-                                        className={`p-2 text-xs font-medium rounded-md border transition-all ${inputs.redundancy === tier
-                                            ? 'bg-indigo-50 border-indigo-500 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-300 dark:border-indigo-500'
-                                            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-700'
-                                            }`}
-                                    >
-                                        {tier === 'n' ? 'N (Basic)' : tier === 'n1' ? 'N+1 (Tier III)' : tier === '2n' ? '2N (Tier IV)' : '2N+1'}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* ─── COOLING ─── */}
-                        <div className="space-y-2">
-                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center">
-                                <Activity className="w-3 h-3 mr-1" /> Cooling Strategy <Tooltip content="Determines cooling methodology and PUE target. Air-cooled is simplest. Direct Liquid Cooling achieves lowest PUE (~1.2)." />
-                            </label>
-                            <select className="w-full p-2 border rounded-md text-sm text-slate-700 bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.coolingType}
-                                onChange={(e) => handleChange('coolingType', e.target.value)}>
-                                <option value="air">Air Cooled (CRAC/CRAH)</option>
-                                <option value="inrow">In-Row Precision</option>
-                                <option value="rdhx">Rear Door Heat Exchanger</option>
-                                <option value="liquid">Direct Liquid Cooling</option>
-                            </select>
                             {typeof deepSeaModel === 'function' && (
                                 <div className="flex items-center gap-2 pt-1">
                                     <input type="checkbox" id="capex-deepsea" checked={deepSea}
@@ -252,19 +206,7 @@ const CapexDashboard = () => {
                             </select>
                         </div>
 
-                        {/* ─── RACK TYPE ─── */}
-                        <div className="space-y-2">
-                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center">
-                                <Server className="w-3 h-3 mr-1" /> Rack Density <Tooltip content="Power per rack determines rack count and floor space. Ultra-high density (75kW) requires liquid cooling." />
-                            </label>
-                            <select className="w-full p-2 border rounded-md text-sm text-slate-700 bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.rackType}
-                                onChange={(e) => handleChange('rackType', e.target.value)}>
-                                <option value="standard">Standard (≤6kW/rack)</option>
-                                <option value="medium">Medium (12.5kW/rack)</option>
-                                <option value="high">High Density (25kW/rack)</option>
-                                <option value="ultra">Ultra (75kW/rack)</option>
-                            </select>
-                        </div>
+                        {/* Rack Density is a shared canonical — shown read-only above (Requirements). */}
 
                         {/* ─── POWER BACKUP ─── */}
                         <div className="pt-3 border-t dark:border-slate-700 space-y-3">

@@ -13,6 +13,16 @@ release sections rather than semver.
 
 ---
 
+## v1.115.69 — 2026-07-25 (DCMOC — dedup: CAPEX shared canonicals read-only + Setup Wizard removed)
+
+### Changed
+- **CAPEX Engine no longer duplicates Requirements inputs.** The Project-Parameters panel had editable Region/Country, IT Capacity, Redundancy, Cooling, and Rack Density selects — the exact shared canonicals a banner already said Requirements owns, so the page could fork them (two owners of one value). They're now READ-ONLY derived cards (value + "requirements" chip + "Edit ↗" jump to Requirements); only CAPEX-only assumptions (building type, UPS/generator, fuel storage, utility rate, green cert, contingency, fees, FOM quality selects, substation) stay editable here. One source of truth (owner: "jangan ada duplicate").
+- **Setup Wizard removed** — the Scenario-Controls "Wizard" modal (Region / Reliability Tier / Technical Systems / Maint. Strategy) duplicated Requirements configuration; deleted the trigger + mount so there's a single configuration path.
+
+Gates: walk 31/0 · trace-parity 116/116. No engine change.
+
+---
+
 ## v1.115.68 — 2026-07-25 (DCMOC — Capacity utilization > 100% fixed + at-risk rows now clickable)
 
 ### Fixed

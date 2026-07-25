@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import clsx from 'clsx';
 import { fmtMoney, fmtMoneyFull, fmtCompact, fmtUnit } from '@/lib/format';
-import { ConfigWizard } from '@/components/ui/ConfigWizard';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { PageTransition, CardMotion } from '@/components/ui/MotionWrapper';
@@ -39,7 +38,6 @@ export function SimulationDashboard() {
     // Scenario State (Local override for "What-If")
     const [scenarioAQI, setScenarioAQI] = useState(inputs.aqiOverride ?? 50);
     const [scenarioTurnover, setScenarioTurnover] = useState(inputs.turnoverRate ?? 0.09);
-    const [showWizard, setShowWizard] = useState(false);
     const [simYear, setSimYear] = useState(new Date().getFullYear());
     /* PREDEFINED sliders (owner): AQI baseline = country environment table;
      * turnover baseline = engine attrition avg. Manual slide = override (touched);
@@ -222,7 +220,6 @@ export function SimulationDashboard() {
 
     return (
         <>
-            {showWizard && <ConfigWizard onComplete={() => setShowWizard(false)} />}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:min-h-[calc(100vh-140px)]">
 
                 {/* LEFT PANEL: CONTROLS */}
@@ -256,12 +253,8 @@ export function SimulationDashboard() {
                             >
                                 <Users className="w-3 h-3" /> Export PDF
                             </button>
-                            <button
-                                onClick={() => setShowWizard(true)}
-                                className="text-xs bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-1 rounded hover:bg-slate-300 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white transition-colors"
-                            >
-                                Wizard
-                            </button>
+                            {/* Setup Wizard removed — it duplicated Requirements inputs (region/tier/
+                                cooling/maintenance are owned there). Configure in Requirements. */}
                         </div>
                     </h2>
 
