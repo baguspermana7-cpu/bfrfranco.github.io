@@ -13,6 +13,17 @@ release sections rather than semver.
 
 ---
 
+## v1.115.60 — 2026-07-25 (DCMOC Financial — AUTO-by-default with per-field manual override)
+
+### Changed
+- **Financial Pro-Forma is now AUTO-first.** Owner: "masih banyak data manual — saya mau auto, tapi bisa manual override klw di tick, se akurat dan optimum." All 15 parameters (revenue, discount/WACC, project life, escalations, tax, depreciation, NRC/MRC, contract, take-or-pay) default to an accurate value derived from REAL data — market colo rate (`DATA.markets[market].coloPrice`, e.g. N.Virginia $215) else the JLL/CBRE 2026 band × tier; Damodaran regional WACC (`DATA.discountDefaults`); country economy (tax / inflation / wage growth); design CAPEX/kW for NRC; Contract Duration (Requirements). Each field shows a green **AUTO** chip whose tooltip names the exact source.
+- **Per-field override.** A tick on any field flips just that one to **OVERRIDE** (editable, amber chip); the rest stay AUTO. Un-tick returns it to live AUTO. Replaces the old single all-or-nothing `userEdited` boolean that froze the entire block on any edit, and removes the un-sourced `120 + electricityRate×500` / `0.06 + riskPremium` magic formulas (last holdout of the number-provenance audit).
+- **Revenue write-through preserved.** The effective revenue (auto market colo OR manual override) writes through to the sim-store SSOT, so Executive / Monte Carlo / Report / Phased Finance all compute on the same basis. Store clamps 50–500/kW·mo. Opening Financial applies the market-accurate basis app-wide (honest consequence: the default with no market selected is the JLL mid-band $185, more defensible than the prior conservative $150 seed).
+
+Shared `AutoField` wrapper (AUTO chip + source + tick + conditional input) drives every field. New gate `tools/_dcmoc_financial_auto_probe.mjs` (7/7): all-AUTO default, revenue write-through, tick→single-field-override, un-tick→AUTO. Gates: walk 31/0 · trace-parity 116/116 · optimizer 8/8 · export 44/44 · hardcode 0 WARN (auto values carry sources).
+
+---
+
 ## v1.115.59 — 2026-07-25 (DCMOC — honest payback propagated to comparison/phased surfaces + PDFs)
 
 ### Fixed

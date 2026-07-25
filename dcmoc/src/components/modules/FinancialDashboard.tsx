@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { useRequirementsStore } from '@/store/requirements';
 import { MAINT_PER_KW_YR } from '@/lib/screening';
 import { rzData } from '@/lib/rz-engine';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
-import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
+import { DEFAULT_REVENUE_PER_KW_MONTH, DEFAULT_DEPRECIATION_YEARS } from '@/constants/finance';
 import { calculateFinancials, defaultOccupancyRamp, FinancialResult } from '@/modules/analytics/FinancialEngine';
-import { calculateRevenue, defaultRevenueOccupancy, RevenueResult } from '@/modules/analytics/RevenueEngine';
+import { calculateRevenue, defaultRevenueOccupancy, defaultRevenueInputs, RevenueResult } from '@/modules/analytics/RevenueEngine';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { Explain } from '@/components/ui/Explain';
@@ -132,6 +132,48 @@ const EditableCell = ({ value, onChange, className = '' }: {
     );
 };
 
+/* ─── AutoField — per-field AUTO/OVERRIDE wrapper (owner mandate) ─────────────
+ * AUTO (default): read-only value + green AUTO chip whose tooltip names the real
+ * source. Tick the lock → OVERRIDE: the value becomes an editable input (amber
+ * chip). Un-tick → back to live AUTO. `display`/`parse` handle unit scaling
+ * (e.g. percent fields store a fraction but show/edit whole %). */
+function AutoField({ label, tip, auto, override, value, source, onToggle, onChange, display, parse, suffix, min, max }: {
+    label: string; tip?: string; auto: boolean; override: boolean;
+    value: number; source: string;
+    onToggle: (on: boolean) => void; onChange: (v: number) => void;
+    display?: (v: number) => string; parse?: (s: string) => number;
+    suffix?: string; min?: number; max?: number;
+}) {
+    const inpCls = "w-full p-1.5 text-sm text-slate-900 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded outline-none focus:ring-1 focus:ring-cyan-500";
+    const shown = display ? display(value) : String(value);
+    return (
+        <div className="space-y-1">
+            <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">
+                {label}{suffix ? ` ${suffix}` : ''}
+                {tip && <Tooltip content={tip} />}
+                <span className="ml-auto flex items-center gap-1">
+                    <span title={source} className={`rounded px-1 py-0.5 text-[8px] font-bold uppercase cursor-help ${override ? 'bg-rz-signal/15 text-rz-signal' : 'bg-rz-data/15 text-rz-data'}`}>
+                        {override ? 'override' : 'auto'}
+                    </span>
+                    <button type="button" onClick={() => onToggle(!override)}
+                        title={override ? 'Return to AUTO' : 'Override manually'}
+                        className={`rounded border px-1 py-0.5 text-[8px] font-semibold ${override ? 'border-rz-signal/40 text-rz-signal' : 'border-slate-300 dark:border-slate-600 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}>
+                        {override ? '✓ manual' : 'tick to edit'}
+                    </button>
+                </span>
+            </label>
+            {override ? (
+                <input type="number" className={inpCls} value={shown} min={min} max={max}
+                    onChange={e => onChange(parse ? parse(e.target.value) : Number(e.target.value))} />
+            ) : (
+                <div className="rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-2 py-1.5 text-sm font-semibold tabular-nums text-slate-700 dark:text-slate-200">
+                    {shown}
+                </div>
+            )}
+        </div>
+    );
+}
+
 const FinancialDashboard = () => {
     const { selectedCountry, inputs, actions: simActions } = useSimulationStore();
     const effectiveInputs = useEffectiveInputs();
@@ -170,110 +212,111 @@ const FinancialDashboard = () => {
         takeOrPayPct: 70,
     });
 
-    // Track whether user has manually edited (don't overwrite manual edits)
-    const userEditedFin = useRef(false);
-    const userEditedRev = useRef(false);
+    /* ─── AUTO / per-field OVERRIDE (owner: "auto tapi bisa manual override klw
+     * di tick, se akurat dan optimum") ────────────────────────────────────────
+     * Each field defaults to an AUTO value derived from the BEST real source
+     * (engine DATA.markets coloPrice / DATA.discountDefaults WACC / country
+     * economy / contract). A per-field tick flips just that field to OVERRIDE.
+     * finInputs/revInputs hold the EFFECTIVE value (auto-synced when not
+     * overridden), so every downstream calc keeps reading them unchanged. */
+    const [overrides, setOverrides] = useState<Record<string, boolean>>({});
+    const isAuto = (k: string) => !overrides[k];
+    const setOverride = (k: string, on: boolean) => setOverrides(o => ({ ...o, [k]: on }));
 
-    // Reset manual edit flags when country changes (re-enable auto-calc)
-    useEffect(() => {
-        userEditedFin.current = false;
-        userEditedRev.current = false;
-    }, [selectedCountry?.id]);
+    const cityMarket = useCapexStore((s) => s.inputs.cityMarket);
 
-    // Auto-derive financial parameters from country/tier/capex when they change
-    useEffect(() => {
-        if (!selectedCountry || userEditedFin.current) return;
-        const eco = selectedCountry.economy;
-        const tier = inputs.tierLevel ?? 3;
-
-        // Revenue per kW: tier 4 premium, tier 2 economy, adjusted by electricity cost
-        const tierRevMult = tier === 4 ? 1.4 : tier === 3 ? 1.0 : 0.75;
-        const baseRevPerKw = 120 + (eco.electricityRate * 500); // Higher electricity → higher colocation price
-        const autoRevPerKw = Math.round(baseRevPerKw * tierRevMult);
-
-        // Discount rate: risk-free proxy + country risk premium
-        const riskPremium = eco.inflationRate > 0.05 ? 0.04 : eco.inflationRate > 0.03 ? 0.02 : 0.01;
-        const autoDiscount = Math.round((0.06 + riskPremium + eco.inflationRate) * 100) / 100; // 6% base + risk + inflation
-
-        setFinInputs({
-            revenuePerKwMonth: autoRevPerKw,
-            discountRate: Math.min(0.18, autoDiscount),
-            projectLifeYears: 10,
-            escalationRate: Math.round(eco.inflationRate * 1000) / 1000,
-            opexEscalation: Math.round(eco.laborEscalation * 1000) / 1000,
-            taxRate: Math.round(eco.taxRate * 1000) / 1000,
-            depreciationYears: 15,
-        });
-    }, [selectedCountry?.id, inputs.tierLevel]);
-
-    useEffect(() => {
-        if (!selectedCountry || userEditedRev.current) return;
-        const eco = selectedCountry.economy;
+    /* One derivation for every field → { value, source } from real data. */
+    const autoValues = useMemo(() => {
+        const D = rzData();
+        const eco = selectedCountry?.economy;
         const tier = inputs.tierLevel ?? 3;
         const itLoad = inputs.itLoad ?? 1000;
+        const cid = (selectedCountry?.id ?? '').toUpperCase();
+        const MARKET_ALIAS: Record<string, string> = { virginia: 'n-virginia', malaysia: 'kuala-lumpur' };
+        const marketKey = MARKET_ALIAS[cityMarket ?? ''] ?? (cityMarket ?? 'none').replace(/_/g, '-');
+        const marketColo: number | undefined = marketKey !== 'none' ? D?.markets?.[marketKey]?.coloPrice : undefined;
+        const marketName: string | undefined = marketKey !== 'none' ? D?.markets?.[marketKey]?.name : undefined;
 
-        // NRC per kW: derive from capex if available, otherwise estimate from tier
+        // Revenue $/kW·mo — real market colo when a market is selected, else the
+        // JLL/CBRE band default × tier multiplier (never the old 120+rate×500).
+        const tierRevMult = tier === 4 ? 1.15 : tier === 3 ? 1.0 : 0.85;
+        const bandBase = defaultRevenueInputs.mrcPerKwMonth; // JLL/CBRE $185 mid-band
+        const revValue = marketColo != null ? marketColo : Math.round(bandBase * tierRevMult);
+        const revSource = marketColo != null
+            ? `DATA.markets ${marketName} colo rate $${marketColo}/kW·mo (JLL/CBRE 2026)`
+            : `JLL/CBRE 2026 wholesale band $${bandBase}/kW·mo × Tier-${tier} multiplier ${tierRevMult}`;
+
+        // Discount / WACC — Damodaran regional WACC + country risk (engine).
+        const countryWacc = D?.discountDefaults?.[cid];
+        const discValue = countryWacc ?? D?.discountDefaults?.global ?? 0.09;
+        const discSource = countryWacc != null
+            ? `DATA.discountDefaults ${cid} WACC (Damodaran regional + country risk 2026)`
+            : `DATA.discountDefaults global WACC (Damodaran 2026)`;
+
+        // NRC per kW — fit-out share of the design CAPEX per kW (real capex).
         const capexPerKw = capexResults ? Math.round(capexResults.total / Math.max(1, itLoad)) : 0;
-        const autoNrcPerKw = capexPerKw > 0 ? Math.round(capexPerKw * 0.02) : (tier === 4 ? 350 : tier === 3 ? 250 : 150);
+        const nrcValue = capexPerKw > 0 ? Math.max(100, Math.round(capexPerKw * 0.02)) : (tier === 4 ? 350 : tier === 3 ? 250 : 150);
+        const nrcSource = capexPerKw > 0
+            ? `2% of design CAPEX/kW ($${capexPerKw.toLocaleString()}/kW from CAPEX Engine)`
+            : `Tier-${tier} screening fit-out fee`;
 
-        // MRC per kW: mirrors revenue logic
-        const tierMrcMult = tier === 4 ? 1.4 : tier === 3 ? 1.0 : 0.75;
-        const baseMrc = 120 + (eco.electricityRate * 500);
-        const autoMrcPerKw = Math.round(baseMrc * tierMrcMult);
+        return {
+            revenuePerKwMonth: { value: revValue, source: revSource },
+            discountRate: { value: Math.round(discValue * 1000) / 1000, source: discSource },
+            projectLifeYears: { value: contractYearsDerived, source: 'Contract Duration (Requirements 1.1)' },
+            escalationRate: { value: eco ? Math.round(eco.inflationRate * 1000) / 1000 : 0.03, source: 'Country inflation rate (economy.inflationRate)' },
+            opexEscalation: { value: eco ? Math.round(eco.laborEscalation * 1000) / 1000 : 0.035, source: 'Country wage growth (economy.laborEscalation)' },
+            taxRate: { value: eco ? Math.round(eco.taxRate * 1000) / 1000 : 0.25, source: 'Country corporate tax (economy.taxRate)' },
+            depreciationYears: { value: DEFAULT_DEPRECIATION_YEARS, source: 'MACRS-class blended straight-line (constants/finance)' },
+            nrcPerKw: { value: nrcValue, source: nrcSource },
+            nrcCustomFitout: { value: Math.round(50000 * (tier === 4 ? 1.5 : tier === 3 ? 1.0 : 0.7)), source: `Tier-${tier} bespoke cage buildout (screening)` },
+            nrcCrossConnect: { value: 15000, source: 'Cross-connect install (screening)' },
+            mrcPerKwMonth: { value: revValue, source: revSource },
+            mrcEscalation: { value: eco ? Math.round(eco.inflationRate * 100) : 3, source: 'Country inflation (economy.inflationRate)' },
+            mrcCrossConnectMonthly: { value: 5000, source: 'X-connect port maintenance (screening)' },
+            contractYears: { value: contractYearsDerived, source: 'Contract Duration (Requirements 1.1)' },
+            takeOrPayPct: { value: 70, source: 'Standard colo minimum commit (screening)' },
+        } as const;
+    }, [selectedCountry?.id, inputs.tierLevel, inputs.itLoad, capexResults?.total, cityMarket, contractYearsDerived]);
 
-        setRevInputs({
-            nrcPerKw: Math.max(100, autoNrcPerKw),
-            nrcCustomFitout: Math.round(50000 * (tier === 4 ? 1.5 : tier === 3 ? 1.0 : 0.7)),
-            nrcCrossConnect: 15000,
-            mrcPerKwMonth: autoMrcPerKw,
-            mrcEscalation: Math.round(eco.inflationRate * 100),
-            mrcCrossConnectMonthly: 5000,
-            /* #333 dedup — lease term ikut Contract Duration di Requirements 1.1 (satu sumber) */
-            contractYears: contractYearsDerived,
-            takeOrPayPct: 70,
+    /* Sync AUTO values into the effective input state for every non-overridden
+     * field. Overridden fields keep the user's manual value. Downstream calc +
+     * render read finInputs/revInputs, which therefore always hold the effective
+     * value. */
+    useEffect(() => {
+        setFinInputs(prev => {
+            const next = { ...prev };
+            (['revenuePerKwMonth', 'discountRate', 'projectLifeYears', 'escalationRate', 'opexEscalation', 'taxRate', 'depreciationYears'] as const)
+                .forEach(k => { if (isAuto(k)) (next as Record<string, number>)[k] = autoValues[k].value; });
+            return next;
         });
-    }, [selectedCountry?.id, inputs.tierLevel, inputs.itLoad, capexResults?.total, contractYearsDerived]);
+        setRevInputs(prev => {
+            const next = { ...prev };
+            (['nrcPerKw', 'nrcCustomFitout', 'nrcCrossConnect', 'mrcPerKwMonth', 'mrcEscalation', 'mrcCrossConnectMonthly', 'contractYears', 'takeOrPayPct'] as const)
+                .forEach(k => { if (isAuto(k)) (next as Record<string, number>)[k] = autoValues[k].value; });
+            return next;
+        });
+    }, [autoValues, overrides]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    /* #333 dedup — Contract Duration berubah di Requirements → lease term ikut
-     * LANGSUNG (bukan input; sinkron reaktif, override manual tidak berlaku). */
+    /* Revenue basis is the app-wide SSOT — whenever the EFFECTIVE revenue (auto
+     * market colo OR manual override) changes, write it through to the store so
+     * Executive/MC/Report/PhasedFin agree (clamped 50-500 in the store). */
+    const effectiveRevenue = isAuto('revenuePerKwMonth') ? autoValues.revenuePerKwMonth.value : finInputs.revenuePerKwMonth;
     useEffect(() => {
-        setRevInputs(prev => prev.contractYears === contractYearsDerived ? prev : { ...prev, contractYears: contractYearsDerived });
-    }, [contractYearsDerived]);
-
-    /* #333 dedup — Tax Rate SELALU ikut negara project (chip "country" harus
-     * jujur, termasuk setelah user override parameter lain → country berganti). */
-    useEffect(() => {
-        if (!selectedCountry) return;
-        const t = Math.round(selectedCountry.economy.taxRate * 1000) / 1000;
-        setFinInputs(prev => prev.taxRate === t ? prev : { ...prev, taxRate: t });
-    }, [selectedCountry?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+        if (Number.isFinite(effectiveRevenue)) simActions.setInputs({ revenuePerKwMonth: effectiveRevenue });
+    }, [effectiveRevenue]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Year-level overrides for the combined table
     const [yearOverrides, setYearOverrides] = useState<Record<number, Record<string, number>>>({});
 
+    /* Editing is only reachable when a field is in OVERRIDE mode — just store the
+     * manual value; the revenue write-through is handled by the effectiveRevenue
+     * effect above (covers both auto and override). */
     const handleChange = (key: string, value: number) => {
-        userEditedFin.current = true;
         setFinInputs(prev => ({ ...prev, [key]: value }));
-        /* revenue basis is the app-wide SSOT (sim-store tunable) — this page is
-         * the single edit surface, so the edit must WRITE THROUGH or Executive/
-         * MC/Report/PhasedFin keep the old basis (the diagnosis lever "raise
-         * the basis in Financial" would silently do nothing app-wide). */
-        if (key === 'revenuePerKwMonth' && Number.isFinite(value)) {
-            simActions.setInputs({ revenuePerKwMonth: value });
-        }
     };
 
-    /* Reverse sync: optimizer Apply (or another surface) moves the store value
-     * while this page is mounted — reflect it here so the field never lies. */
-    React.useEffect(() => {
-        const v = inputs.revenuePerKwMonth;
-        if (v != null && Number.isFinite(v)) {
-            setFinInputs((prev) => (prev.revenuePerKwMonth === v ? prev : { ...prev, revenuePerKwMonth: v }));
-        }
-    }, [inputs.revenuePerKwMonth]);
-
     const handleRevChange = (key: string, value: number) => {
-        userEditedRev.current = true;
         setRevInputs(prev => ({ ...prev, [key]: value }));
     };
 
@@ -569,61 +612,37 @@ const FinancialDashboard = () => {
                         {/* ── Financial Section ───────────── */}
                         <div className="text-[10px] uppercase text-indigo-600 dark:text-indigo-400 font-semibold tracking-wider border-b border-indigo-200 dark:border-indigo-800/40 pb-1">
                             Financial Analysis
-                        <p className="mt-1 rounded bg-rz-info/10 px-2 py-1 text-[9px] text-rz-info">All parameters in this panel are PREDEFINED from data (country · tier · CAPEX · requirements) — you may override them; manual edits are preserved. The remaining inputs are this page's analysis controls (not duplicates of requirements); canonical values (Tax Rate, Lease Term) are shown derived + with an Edit link in Requirements.</p></div>
-                        <div className="space-y-1">
-                            <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Revenue per kW/month ($) <Tooltip content="Monthly colocation rate charged per kW of IT power. Industry range: $100-250/kW/month depending on market and tier. This page's analysis control — the real revenue figure is set HERE (single edit surface); the illustrative default is derived from country + tier." /></label>
-                            <input type="number" className={inpCls}
-                                value={finInputs.revenuePerKwMonth}
-                                onChange={e => handleChange('revenuePerKwMonth', Number(e.target.value))} />
+                        <p className="mt-1 rounded bg-rz-data/10 px-2 py-1 text-[9px] text-rz-data">Every parameter is <b>AUTO</b> by default — derived from real data (market colo rates · Damodaran WACC · country economy · CAPEX · Requirements). Hover the AUTO chip for the source. Tick a field to override just that one manually; the rest stay auto. Revenue writes through app-wide (Executive / Monte Carlo / Report / Phased Finance).</p></div>
+                        <AutoField label="Revenue per kW/month ($)" tip="Monthly colocation rate per kW of IT power. AUTO = the selected market's real colo rate (DATA.markets), else the JLL/CBRE band × tier. This is the app-wide revenue basis (single edit surface)."
+                            auto={isAuto('revenuePerKwMonth')} override={!isAuto('revenuePerKwMonth')} value={finInputs.revenuePerKwMonth} source={autoValues.revenuePerKwMonth.source}
+                            onToggle={(on) => setOverride('revenuePerKwMonth', on)} onChange={(v) => handleChange('revenuePerKwMonth', v)} />
+                        <div className="grid grid-cols-2 gap-3">
+                            <AutoField label="Discount Rate" suffix="(%)" tip="WACC used to discount cashflows. AUTO = Damodaran regional WACC + country risk (DATA.discountDefaults)."
+                                auto={isAuto('discountRate')} override={!isAuto('discountRate')} value={finInputs.discountRate} source={autoValues.discountRate.source}
+                                display={(v) => (v * 100).toFixed(1)} parse={(s) => Number(s) / 100}
+                                onToggle={(on) => setOverride('discountRate', on)} onChange={(v) => handleChange('discountRate', v)} />
+                            <AutoField label="Project Life" suffix="(yrs)" tip="Economic life for the DCF. AUTO = Contract Duration (Requirements 1.1)." min={5} max={25}
+                                auto={isAuto('projectLifeYears')} override={!isAuto('projectLifeYears')} value={finInputs.projectLifeYears} source={autoValues.projectLifeYears.source}
+                                onToggle={(on) => setOverride('projectLifeYears', on)} onChange={(v) => handleChange('projectLifeYears', v)} />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Discount Rate (%) <Tooltip content="Weighted Average Cost of Capital (WACC). Used to discount future cashflows to present value. Typical DC range: 8-12%. This page's analysis control (not a duplicate of requirements)." /></label>
-                                <input type="number" className={inpCls}
-                                    value={(finInputs.discountRate * 100).toFixed(0)}
-                                    onChange={e => handleChange('discountRate', Number(e.target.value) / 100)} />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Project Life (yrs) <Tooltip content="Economic useful life of the facility for financial modeling. Typically 10-25 years for data centers. This page's analysis control." /></label>
-                                <input type="number" className={inpCls}
-                                    value={finInputs.projectLifeYears}
-                                    onChange={e => handleChange('projectLifeYears', Number(e.target.value))}
-                                    min={5} max={25} />
-                            </div>
+                            <AutoField label="Rev. Escalation" suffix="(%)" tip="Annual revenue price escalation. AUTO = country inflation (economy.inflationRate)."
+                                auto={isAuto('escalationRate')} override={!isAuto('escalationRate')} value={finInputs.escalationRate} source={autoValues.escalationRate.source}
+                                display={(v) => (v * 100).toFixed(1)} parse={(s) => Number(s) / 100}
+                                onToggle={(on) => setOverride('escalationRate', on)} onChange={(v) => handleChange('escalationRate', v)} />
+                            <AutoField label="OPEX Escalation" suffix="(%)" tip="Annual OPEX escalation. AUTO = country wage growth (economy.laborEscalation)."
+                                auto={isAuto('opexEscalation')} override={!isAuto('opexEscalation')} value={finInputs.opexEscalation} source={autoValues.opexEscalation.source}
+                                display={(v) => (v * 100).toFixed(1)} parse={(s) => Number(s) / 100}
+                                onToggle={(on) => setOverride('opexEscalation', on)} onChange={(v) => handleChange('opexEscalation', v)} />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Rev. Escalation (%) <Tooltip content="Annual revenue price escalation applied year-over-year. Default derived from country inflation — this page's analysis control, may be overridden." /></label>
-                                <input type="number" className={inpCls}
-                                    value={(finInputs.escalationRate * 100).toFixed(0)}
-                                    onChange={e => handleChange('escalationRate', Number(e.target.value) / 100)} />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">OPEX Escalation (%) <Tooltip content="Annual OPEX cost escalation applied year-over-year. Default derived from country labor escalation — this page's analysis control, may be overridden." /></label>
-                                <input type="number" className={inpCls}
-                                    value={(finInputs.opexEscalation * 100).toFixed(1)}
-                                    onChange={e => handleChange('opexEscalation', Number(e.target.value) / 100)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Tax Rate (%) <Tooltip content="DERIVED from the project's country profile (economy.taxRate) — single source, edit via Country selection in Requirements. (#333 dedup: duplicate input removed)" /></label>
-                                <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-2 py-1.5">
-                                    <div className="text-sm font-bold tabular-nums text-emerald-500">
-                                        {(finInputs.taxRate * 100).toFixed(1)}%
-                                        <span className="ml-1.5 rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-emerald-500">country</span>
-                                    </div>
-                                    <button onClick={() => simActions.setActiveTab('requirements')}
-                                        className="text-[9px] text-rz-mint hover:underline">Edit in Requirements ↗</button>
-                                </div>
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Depreciation (yrs) <Tooltip content="Straight-line depreciation period for CAPEX assets. Affects taxable income. Building: 20-25 yrs, MEP: 15-20 yrs. This page's analysis control." /></label>
-                                <input type="number" className={inpCls}
-                                    value={finInputs.depreciationYears}
-                                    onChange={e => handleChange('depreciationYears', Number(e.target.value))}
-                                    min={5} max={25} />
-                            </div>
+                            <AutoField label="Tax Rate" suffix="(%)" tip="Corporate tax on taxable income. AUTO = the project country's rate (economy.taxRate) — set the country in Requirements."
+                                auto={isAuto('taxRate')} override={!isAuto('taxRate')} value={finInputs.taxRate} source={autoValues.taxRate.source}
+                                display={(v) => (v * 100).toFixed(1)} parse={(s) => Number(s) / 100}
+                                onToggle={(on) => setOverride('taxRate', on)} onChange={(v) => handleChange('taxRate', v)} />
+                            <AutoField label="Depreciation" suffix="(yrs)" tip="Straight-line depreciation of CAPEX. AUTO = MACRS-class blended 15 yr (constants/finance)." min={5} max={30}
+                                auto={isAuto('depreciationYears')} override={!isAuto('depreciationYears')} value={finInputs.depreciationYears} source={autoValues.depreciationYears.source}
+                                onToggle={(on) => setOverride('depreciationYears', on)} onChange={(v) => handleChange('depreciationYears', v)} />
                         </div>
 
                         {/* ── Divider ─────────────────────── */}
@@ -636,66 +655,44 @@ const FinancialDashboard = () => {
                             NRC (Non-Recurring Charges)
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-1">
-                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">Setup Fee ($/kW) <Tooltip content="Non-Recurring Charge per kW of contracted IT power. Covers initial provisioning, rack setup, and commissioning. Typically 2-5% of CAPEX per kW." /></label>
-                                <input type="number" className={inpCls}
-                                    value={revInputs.nrcPerKw} onChange={e => handleRevChange('nrcPerKw', Number(e.target.value))} />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">X-Connect Setup ($) <Tooltip content="One-time cross-connect installation fee. Covers physical cabling between customer cage and meet-me room or carrier demarcation point." /></label>
-                                <input type="number" className={inpCls}
-                                    value={revInputs.nrcCrossConnect} onChange={e => handleRevChange('nrcCrossConnect', Number(e.target.value))} />
-                            </div>
+                            <AutoField label="Setup Fee" suffix="($/kW)" tip="Non-Recurring Charge per kW. AUTO = 2% of the design CAPEX/kW (from the CAPEX Engine)."
+                                auto={isAuto('nrcPerKw')} override={!isAuto('nrcPerKw')} value={revInputs.nrcPerKw} source={autoValues.nrcPerKw.source}
+                                onToggle={(on) => setOverride('nrcPerKw', on)} onChange={(v) => handleRevChange('nrcPerKw', v)} />
+                            <AutoField label="X-Connect Setup" suffix="($)" tip="One-time cross-connect install fee (screening default)."
+                                auto={isAuto('nrcCrossConnect')} override={!isAuto('nrcCrossConnect')} value={revInputs.nrcCrossConnect} source={autoValues.nrcCrossConnect.source}
+                                onToggle={(on) => setOverride('nrcCrossConnect', on)} onChange={(v) => handleRevChange('nrcCrossConnect', v)} />
                         </div>
-                        <div className="space-y-1">
-                            <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">Custom Fit-out ($) <Tooltip content="Non-recurring charge for bespoke cage or suite buildout. Includes custom power distribution, containment, security cages, and tenant-specific infrastructure." /></label>
-                            <input type="number" className={inpCls}
-                                value={revInputs.nrcCustomFitout} onChange={e => handleRevChange('nrcCustomFitout', Number(e.target.value))} />
-                        </div>
+                        <AutoField label="Custom Fit-out" suffix="($)" tip="Bespoke cage/suite buildout. AUTO = tier-scaled screening estimate."
+                            auto={isAuto('nrcCustomFitout')} override={!isAuto('nrcCustomFitout')} value={revInputs.nrcCustomFitout} source={autoValues.nrcCustomFitout.source}
+                            onToggle={(on) => setOverride('nrcCustomFitout', on)} onChange={(v) => handleRevChange('nrcCustomFitout', v)} />
 
                         {/* ── MRC Section ──────────────────── */}
                         <div className="text-[10px] uppercase text-emerald-600 dark:text-emerald-400 font-semibold tracking-wider border-b border-emerald-200 dark:border-emerald-800/40 pb-1">
                             MRC (Monthly Recurring)
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-1">
-                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">MRC $/kW/mo <Tooltip content="Monthly Recurring Charge per kW of IT power. The core colocation fee covering power delivery, cooling, and facility access. Typically the largest revenue component." /></label>
-                                <input type="number" className={inpCls}
-                                    value={revInputs.mrcPerKwMonth} onChange={e => handleRevChange('mrcPerKwMonth', Number(e.target.value))} />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">Escalation (%/yr) <Tooltip content="Annual MRC price escalation rate written into the contract. Typically tied to CPI or a fixed percentage (2-5%/yr) to offset rising energy and labor costs." /></label>
-                                <input type="number" className={inpCls}
-                                    value={revInputs.mrcEscalation} onChange={e => handleRevChange('mrcEscalation', Number(e.target.value))} />
-                            </div>
+                            <AutoField label="MRC" suffix="$/kW/mo" tip="Monthly Recurring Charge per kW — the core colo fee. AUTO mirrors the revenue basis (market colo)."
+                                auto={isAuto('mrcPerKwMonth')} override={!isAuto('mrcPerKwMonth')} value={revInputs.mrcPerKwMonth} source={autoValues.mrcPerKwMonth.source}
+                                onToggle={(on) => setOverride('mrcPerKwMonth', on)} onChange={(v) => handleRevChange('mrcPerKwMonth', v)} />
+                            <AutoField label="Escalation" suffix="(%/yr)" tip="Annual MRC escalation. AUTO = country inflation (economy.inflationRate)."
+                                auto={isAuto('mrcEscalation')} override={!isAuto('mrcEscalation')} value={revInputs.mrcEscalation} source={autoValues.mrcEscalation.source}
+                                onToggle={(on) => setOverride('mrcEscalation', on)} onChange={(v) => handleRevChange('mrcEscalation', v)} />
                         </div>
-                        <div className="space-y-1">
-                            <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">X-Connect MRC ($/mo) <Tooltip content="Monthly recurring fee for cross-connect port maintenance. Covers fiber/copper patching, monitoring, and meet-me room access. Charged per active cross-connect." /></label>
-                            <input type="number" className={inpCls}
-                                value={revInputs.mrcCrossConnectMonthly} onChange={e => handleRevChange('mrcCrossConnectMonthly', Number(e.target.value))} />
-                        </div>
+                        <AutoField label="X-Connect MRC" suffix="($/mo)" tip="Monthly cross-connect port maintenance (screening default)."
+                            auto={isAuto('mrcCrossConnectMonthly')} override={!isAuto('mrcCrossConnectMonthly')} value={revInputs.mrcCrossConnectMonthly} source={autoValues.mrcCrossConnectMonthly.source}
+                            onToggle={(on) => setOverride('mrcCrossConnectMonthly', on)} onChange={(v) => handleRevChange('mrcCrossConnectMonthly', v)} />
 
                         {/* ── Contract Terms ───────────────── */}
                         <div className="text-[10px] uppercase text-amber-600 dark:text-amber-400 font-semibold tracking-wider border-b border-amber-200 dark:border-amber-800/40 pb-1">
                             Contract Terms
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-1">
-                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">Lease Term (yrs) <Tooltip content="DERIVED from Contract Duration in Requirements 1.1 — single source. (#333 dedup: duplicate input removed; edit in Requirements)" /></label>
-                                <div className="rounded border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-2 py-1.5">
-                                    <div className="text-sm font-bold tabular-nums text-slate-900 dark:text-white">
-                                        {contractYearsDerived}
-                                        <span className="ml-1.5 rounded bg-emerald-500/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-emerald-500">requirements</span>
-                                    </div>
-                                    <button onClick={() => simActions.setActiveTab('requirements')}
-                                        className="text-[9px] text-rz-mint hover:underline">Edit in Requirements ↗</button>
-                                </div>
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[10px] text-slate-600 dark:text-slate-500 flex items-center gap-1">Take-or-Pay (%) <Tooltip content="Minimum committed power/space usage regardless of actual consumption. Protects the provider's revenue baseline. Typically 70-100% of contracted capacity." /></label>
-                                <input type="number" className={inpCls}
-                                    value={revInputs.takeOrPayPct} onChange={e => handleRevChange('takeOrPayPct', Number(e.target.value))} min={0} max={100} />
-                            </div>
+                            <AutoField label="Lease Term" suffix="(yrs)" tip="Contract length. AUTO = Contract Duration (Requirements 1.1) — edit the canonical value there, or tick to override just this analysis."
+                                auto={isAuto('contractYears')} override={!isAuto('contractYears')} value={revInputs.contractYears} source={autoValues.contractYears.source} min={1} max={30}
+                                onToggle={(on) => setOverride('contractYears', on)} onChange={(v) => handleRevChange('contractYears', v)} />
+                            <AutoField label="Take-or-Pay" suffix="(%)" tip="Minimum committed usage regardless of consumption. AUTO = standard colo minimum commit." min={0} max={100}
+                                auto={isAuto('takeOrPayPct')} override={!isAuto('takeOrPayPct')} value={revInputs.takeOrPayPct} source={autoValues.takeOrPayPct.source}
+                                onToggle={(on) => setOverride('takeOrPayPct', on)} onChange={(v) => handleRevChange('takeOrPayPct', v)} />
                         </div>
                         <div className="p-2 bg-cyan-50 dark:bg-cyan-950/30 rounded border border-cyan-200 dark:border-cyan-900/40">
                             <div className="text-[9px] text-cyan-700 dark:text-cyan-400 uppercase mb-1 flex items-center gap-1">Take-or-Pay Summary <Tooltip content="Computed minimum billing floor: take-or-pay % × contracted IT load = the kW billed every month regardless of the customer's actual draw. This is the revenue baseline that de-risks the P&L — lenders and underwriters price against it, so a low take-or-pay % directly weakens bankability." /></div>
