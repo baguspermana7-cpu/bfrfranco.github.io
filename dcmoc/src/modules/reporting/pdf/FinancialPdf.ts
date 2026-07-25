@@ -290,7 +290,8 @@ export const generateFinancialPDF = async (
         const annualRev = finInputs.revenuePerKwMonth * 12 * itLoadKw * (occ / 100);
         const netCF = annualRev - annualOpex;
         const roughNPV = netCF * finInputs.projectLifeYears * 0.7 - capexTotal;
-        const isBreakEven = occ === financials.breakEvenOccupancy;
+        // no "← Break-Even" marker when unreachable — the clamped 100% row would lie
+        const isBreakEven = financials.breakEvenReachable && occ === financials.breakEvenOccupancy;
         return [
             `${occ}%`,
             fmtMoney(annualRev),

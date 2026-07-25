@@ -53,7 +53,8 @@ export interface FinancialResult {
     totalProfit: number;
     cashflows: YearCashflow[];
     annualDepreciation: number;
-    breakEvenOccupancy: number;         // Min occupancy % to break even annually
+    breakEvenOccupancy: number;         // Min occupancy % to break even annually (clamped 100 — check breakEvenReachable)
+    breakEvenReachable: boolean;        // false = OPEX exceeds revenue even at 100% occupancy ("100%" would lie)
 }
 
 /** Honest payback display — "> 15 yr (not reached)" instead of a fabricated
@@ -229,12 +230,13 @@ export const calculateFinancials = (inputs: FinancialInputs): FinancialResult =>
     // Profitability Index — guard against zero capex
     const pi = totalCapex > 0 ? (npv + totalCapex) / totalCapex : 1;
 
-    // Break-even occupancy (find min occupancy where annual revenue > opex)
+    // Break-even occupancy (find min occupancy where annual revenue > opex).
+    // The clamp keeps the % displayable, but when opex/revenue > 1 break-even
+    // is NOT reachable at any occupancy — expose the flag so surfaces never
+    // print a fabricated "100%".
     const baseAnnualRevenue = revenuePerKwMonth * 12 * itLoadKw;
-    // Guard: avoid NaN/Infinity when revenue is zero
-    const breakEvenOccupancy = baseAnnualRevenue > 0
-        ? Math.min(1, annualOpex / baseAnnualRevenue)
-        : 1;
+    const breakEvenRatio = baseAnnualRevenue > 0 ? annualOpex / baseAnnualRevenue : Infinity;
+    const breakEvenOccupancy = Math.min(1, breakEvenRatio);
 
     return {
         npv,
@@ -250,5 +252,6 @@ export const calculateFinancials = (inputs: FinancialInputs): FinancialResult =>
         cashflows,
         annualDepreciation,
         breakEvenOccupancy: Math.round(breakEvenOccupancy * 100),
+        breakEvenReachable: breakEvenRatio <= 1,
     };
 };

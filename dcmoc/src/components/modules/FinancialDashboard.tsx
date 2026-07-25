@@ -720,7 +720,7 @@ const FinancialDashboard = () => {
                             </div>
                             <div className="flex justify-between text-xs">
                                 <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1">Break-even Occupancy <Tooltip content="Occupancy level at which revenue exactly covers annual OPEX (operating break-even, excluding capital recovery). Below this, every month burns cash operationally. Healthy projects break even at 40-60% occupancy — a high figure means thin margin per kW or heavy fixed costs." /></span>
-                                <span className="text-amber-600 dark:text-amber-400 font-medium">{result.breakEvenOccupancy}%</span>
+                                <span className={result.breakEvenReachable ? 'text-amber-600 dark:text-amber-400 font-medium' : 'text-rz-alert font-medium'}>{result.breakEvenReachable ? `${result.breakEvenOccupancy}%` : 'not reachable — OPEX > revenue @100%'}</span>
                             </div>
                             {revResult && (
                                 <>

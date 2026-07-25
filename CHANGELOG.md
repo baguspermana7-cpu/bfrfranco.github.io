@@ -13,6 +13,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.58 — 2026-07-25 (DCMOC — honest break-even occupancy: "not reachable" instead of a clamped "100%")
+
+### Fixed
+- **Break-even occupancy no longer lies at the clamp**: `calculateFinancials` clamped `min(1, opex/revenue)` — when OPEX exceeds revenue even at FULL occupancy the card printed "100%" as if break-even existed there. `FinancialResult` gains `breakEvenReachable`; the Financial card now prints fault-red "not reachable — OPEX > revenue @100%", and the Financial PDF's occupancy table no longer places its "← Break-Even" marker on the fabricated 100% row. (FinancialPage's overview stress card already handled this honestly with its own bisection — the engine + card + PDF now match.) Completes the honest-metrics family: revenue SSOT → EBITDA/IRR diagnosis → IRR n/a → payback not-reached → break-even not-reachable.
+
+---
+
 ## v1.115.57 — 2026-07-25 (DCMOC — honest payback: "> 15 yr (not reached)" instead of a fabricated "15.0 yr")
 
 ### Fixed
