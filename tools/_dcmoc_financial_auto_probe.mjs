@@ -79,6 +79,21 @@ await new Promise((r) => setTimeout(r, 600));
 const overrideEnd = await countText('override');
 ok('un-tick returns the field to AUTO', overrideEnd === overrideBefore, `(${overrideEnd})`);
 
+/* 5 · AUTO reacts to the country — discount = Damodaran WACC, tax = country
+ *     corporate rate. Switch to Singapore (WACC 7.0% / tax 17.0%). */
+const readDiscTax = () => page.evaluate(() => {
+    const lbls = [...document.querySelectorAll('label')];
+    const get = (name) => { const l = lbls.find(x => x.textContent.includes(name)); if (!l) return null; const box = l.parentElement.querySelector('div.rounded'); return box ? box.textContent.trim() : null; };
+    return { disc: get('Discount Rate'), tax: get('Tax Rate') };
+});
+await page.evaluate(() => { const raw = JSON.parse(localStorage.getItem('dcmoc-simulation')); raw.state.selectedCountry = { id: 'SG' }; localStorage.setItem('dcmoc-simulation', JSON.stringify(raw)); });
+await page.reload({ waitUntil: 'networkidle2' });
+await new Promise((r) => setTimeout(r, 2500));
+await toFinancialProForma();
+const sg = await readDiscTax();
+ok('discount AUTO = country WACC (SG 7.0%)', sg.disc === '7.0', `(${sg.disc})`);
+ok('tax AUTO = country corporate rate (SG 17.0%)', sg.tax === '17.0', `(${sg.tax})`);
+
 ok('0 page errors', errors.length === 0, errors[0] || '');
 console.log(`\nFINANCIAL-AUTO PROBE: ${pass} pass / ${fail} fail`);
 await browser.close();

@@ -5583,12 +5583,16 @@
             },
             redundancyMult: { n: 1.0, n1: 1.25, '2n': 1.85, '2n1': 2.1 },
             coolingMult: { air: 1.0, inrow: 1.2, rdhx: 1.35, liquid: 1.6, immersion_1p: 1.8, immersion_2p: 2.0, microfluidic: 2.2 },
-            rackMult: { standard: 1.0, medium: 1.1, high: 1.3, ai: 1.9 },
-            rackKw: { standard: 6, medium: 12.5, high: 25, ai: 75 },
+            /* `ultra`/`inert`/`sprinkler`/`beam` are the DCMOC UI option values —
+             * aliased to their engineering-equivalent keys (ai / inergen IG-541 /
+             * wet-pipe water) + `beam` aspirating-detection premium so a UI select
+             * never silently falls back to a 1.0 multiplier (audit fix). */
+            rackMult: { standard: 1.0, medium: 1.1, high: 1.3, ai: 1.9, ultra: 1.9 },
+            rackKw: { standard: 6, medium: 12.5, high: 25, ai: 75, ultra: 75 },
             buildingMult: { warehouse: 0.7, modular: 0.85, purpose: 1.0, highrise: 1.4 },
             seismicMult: { zone0: 0.2, zone1: 1.0, zone2: 2.5, zone3: 5.0, zone4: 8.0 },
-            fireSuppressionMult: { fm200: 1.0, novec: 1.3, inergen: 1.2, n2: 1.8, water: 0.6 },
-            fireAlarmMult: { conventional: 0.6, addressable: 1.0, vesda: 1.8, hybrid: 2.2 },
+            fireSuppressionMult: { fm200: 1.0, novec: 1.3, inergen: 1.2, n2: 1.8, water: 0.6, inert: 1.2, sprinkler: 0.6 },
+            fireAlarmMult: { conventional: 0.6, addressable: 1.0, vesda: 1.8, hybrid: 2.2, beam: 1.2 },
             upsMult: { standalone: 0.9, modular: 1.0, distributed: 1.2, rotary: 1.5 },
             genMult: { diesel: 1.0, gas: 1.15, dualfuel: 1.3, hvo: 1.2 },
             locationMult: { sea: 0.65, india: 0.55, china: 0.7, japan: 1.1, australia: 1.05, europe: 1.15, usa: 1.0, mena: 0.90 },
@@ -5669,7 +5673,10 @@
                 bucharest: { perW: 8.60, region: 'europe', label: 'Bucharest, Romania' }
             },
             yearEscalation: { 2025: 1.000, 2026: 1.060, 2027: 1.115, 2028: 1.165, 2029: 1.210, 2030: 1.250 },
-            substationCosts: { shared: 1000000, dedicated_33kv: 4000000, dedicated_132kv: 7500000 },
+            /* pad_mounted_11kv (compact MV pad-mount) + dedicated_66kv (between
+             * 33kV and 132kV) added so the DCMOC substation select resolves —
+             * were silently falling back to the $1M shared cost (audit fix). */
+            substationCosts: { shared: 1000000, pad_mounted_11kv: 2000000, dedicated_33kv: 4000000, dedicated_66kv: 5500000, dedicated_132kv: 7500000 },
             fom: { gridConnectionPerMw: 500000, switchgearPerMw: 300000,
                    transformerLeadMult: { standard: 1.0, extended: 1.15, emergency: 1.30 } },
             marketConditionMult: { buyer: 0.95, balanced: 1.0, seller: 1.10 },
@@ -14423,7 +14430,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-24-y"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-25-z"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

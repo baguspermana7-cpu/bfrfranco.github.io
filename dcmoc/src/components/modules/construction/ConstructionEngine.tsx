@@ -47,16 +47,17 @@ export function ConstructionEngine() {
     /* 4-level WBS (Workstream E1): engine detailedSchedule expands the CAPEX timeline
      * into phase → sub-phase → task → work-package, each with a duration basis +
      * procurement critical-path flag. Legacy 2-level fallback when engine absent. */
+    const itLoadKw = useSimulationStore((s) => s.inputs.itLoad); // subscribe so the tree re-derives when IT load changes
     const wbsTree = React.useMemo(() => {
         if (!results?.timeline) return null;
         try {
             const m = rzModels();
             if (m?.construction?.detailedSchedule) {
-                return m.construction.detailedSchedule(results.timeline, { itLoadKw: useSimulationStore.getState().inputs.itLoad }).tree;
+                return m.construction.detailedSchedule(results.timeline, { itLoadKw }).tree;
             }
         } catch { /* engine still loading */ }
         return null;
-    }, [results]);
+    }, [results, itLoadKw]);
     const budget = results?.total ?? 0;
     const e = React.useMemo(() => sched ? evm(sched, budget, t.statusMonth, t.phaseActualPct, t.acSpentUsd) : null, [sched, budget, t.statusMonth, t.phaseActualPct, t.acSpentUsd]);
     const curve = React.useMemo(() => sched ? pvCurve(sched, budget) : [], [sched, budget]);

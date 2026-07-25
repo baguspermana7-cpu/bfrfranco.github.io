@@ -13,6 +13,23 @@ release sections rather than semver.
 
 ---
 
+## v1.115.62 — 2026-07-25 (DCMOC — CAPEX select options that silently fell back to default cost, now resolve to real values)
+
+### Fixed
+- **Four CAPEX selects had UI option values with no matching engine DATA key → silent fallback** (same bug class as the Northern Virginia market fix; found by an audit sweep). Every one under-/over-costed a real design choice with no warning:
+  - **Rack density** `ultra` (75 kW/rack) had no `rackMult` key → used 1.0× instead of 1.9× (electrical/building CAPEX **understated ~47%** on the highest-density option).
+  - **Fire suppression** `inert` (IG-541) and `sprinkler` (wet-pipe) had no keys → both 1.0× instead of inergen 1.2× / water 0.6×.
+  - **Fire alarm** `beam` (beam/aspirating detection) had no key → 1.0× (added a real 1.2× premium).
+  - **Substation** `pad_mounted_11kv` and `dedicated_66kv` had no keys → both fell to the $1M shared cost instead of ~$2M / ~$5.5M (front-of-meter CAPEX **understated 50–80%**).
+  - Fix: completed `DATA.capexDetail` (`rackMult`/`rackKw`/`fireSuppressionMult`/`fireAlarmMult`/`substationCosts`) in the engine + the `capex-data.ts` fallback twin with every UI option value as a real, sourced key. Additive — no rename, no persisted-value migration.
+
+### Changed
+- **Two stale-memo wiring fixes** (audit): Construction Engine's WBS/Gantt tree now re-derives when IT load changes (was missing `itLoad` from its `useMemo` deps — read via `getState()`); Executive capacity sparkline now subscribes to `occupancyRamp` instead of reading `getState()` outside the memo, so it updates when the ramp changes in isolation.
+
+Engine chain: test-rz-engine 762/0 · calibration green · terser + engine-catalog + value-bindings · `?v` 2026-07-25-z. Gates: walk 31/0 · trace 116/116 · optimizer 8/8 · financial-auto 9/9 · export 44/44 · reference-parity 155/0 · hardcode 0 WARN.
+
+---
+
 ## v1.115.61 — 2026-07-25 (DCMOC — fix Northern Virginia market → real $215 colo rate, not the fallback band)
 
 ### Fixed

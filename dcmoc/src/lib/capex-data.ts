@@ -32,11 +32,15 @@ export const costFactors = {
 
 export const redundancyMultipliers: Record<string, number> = { n: 1.0, n1: 1.25, '2n': 1.85, '2n1': 2.1 };
 export const coolingMultipliers: Record<string, number> = { air: 1.0, inrow: 1.2, rdhx: 1.35, liquid: 1.6, immersion_1p: 1.8, immersion_2p: 2.0, microfluidic: 2.2 };
-export const rackMultipliers: Record<string, number> = { standard: 1.0, medium: 1.1, high: 1.3, ai: 1.6 };
+/* `ultra`/`inert`/`sprinkler`/`beam` = DCMOC UI option values aliased to their
+ * engineering equivalents (ai / inergen IG-541 / wet-pipe water) + beam premium
+ * so a select never silently falls back to 1.0 (audit fix — mirrors engine
+ * DATA.capexDetail; DCMOC reads the engine map first, this is the fallback twin). */
+export const rackMultipliers: Record<string, number> = { standard: 1.0, medium: 1.1, high: 1.3, ai: 1.6, ultra: 1.9 };
 export const buildingMultipliers: Record<string, number> = { warehouse: 0.7, modular: 0.85, purpose: 1.0, highrise: 1.4 };
 export const seismicMultipliers: Record<string, number> = { zone0: 0.2, zone1: 1.0, zone2: 2.5, zone3: 5.0, zone4: 8.0 };
-export const fireSuppressionMultipliers: Record<string, number> = { fm200: 1.0, novec: 1.3, inergen: 1.2, n2: 1.8, water: 0.6 };
-export const fireAlarmMultipliers: Record<string, number> = { conventional: 0.6, addressable: 1.0, vesda: 1.8, hybrid: 2.2 };
+export const fireSuppressionMultipliers: Record<string, number> = { fm200: 1.0, novec: 1.3, inergen: 1.2, n2: 1.8, water: 0.6, inert: 1.2, sprinkler: 0.6 };
+export const fireAlarmMultipliers: Record<string, number> = { conventional: 0.6, addressable: 1.0, vesda: 1.8, hybrid: 2.2, beam: 1.2 };
 export const upsMultipliers: Record<string, number> = { standalone: 0.9, modular: 1.0, distributed: 1.2, rotary: 1.5 };
 export const genMultipliers: Record<string, number> = { diesel: 1.0, gas: 1.15, dualfuel: 1.3, hvo: 1.2 };
 // DM audit: legacy coarse REGION map — FALLBACK ONLY. CapexEngine location priority is
@@ -119,7 +123,9 @@ export const yearEscalation: Record<string, { mult: number; note: string }> = {
 
 export const substationCosts: Record<string, { base: number; label: string }> = {
     shared: { base: 1000000, label: 'Shared Utility' },
+    pad_mounted_11kv: { base: 2000000, label: 'Pad-Mounted 11kV' },
     dedicated_33kv: { base: 4000000, label: 'Dedicated 33kV' },
+    dedicated_66kv: { base: 5500000, label: 'Dedicated 66kV' },
     dedicated_132kv: { base: 7500000, label: 'Dedicated 132kV+' }
 };
 

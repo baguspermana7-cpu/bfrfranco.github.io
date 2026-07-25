@@ -117,7 +117,9 @@ export function ExecutiveDashboard() {
     const opexSeries = cf.map((c) => c.opex);
     const ebitdaSeries = cf.map((c) => c.ebitda);
     const fcfSeries = cf.map((c) => c.cumulativeCashflow);
-    const capacitySeries = (d.itLoadMw ? (useSimulationStore.getState().inputs.occupancyRamp || []) : []).map((o) => o * d.itLoadMw);
+    // subscribe to occupancyRamp (not getState) so the sparkline re-renders when the ramp changes in isolation
+    const occupancyRamp = useSimulationStore((s) => s.inputs.occupancyRamp);
+    const capacitySeries = (d.itLoadMw ? (occupancyRamp || []) : []).map((o) => o * d.itLoadMw);
 
     // Engine-derived risks + alerts (rule-based on real outputs, not fabricated)
     const risks: RiskItem[] = [];
