@@ -54,6 +54,9 @@ export const securityMultipliers: Record<string, number> = { basic: 0.97, standa
 export const fiberEntryMultipliers: Record<string, number> = { single: 1.0, dual: 1.02, mmr: 1.03 };
 export const siteConditionMultipliers: Record<string, number> = { greenfield: 1.0, brownfield: 1.05, retrofit: 1.08 };
 export const marketConditionMultipliers: Record<string, number> = { favorable: 0.95, normal: 1.0, tight: 1.06, overheated: 1.12 };
+export const txLeadMultipliers: Record<string, number> = { standard: 1.0, expedited: 1.03, long_lead: 1.0 };
+export const txTypeMultipliers: Record<string, number> = { dry: 1.0, oil: 0.95 };
+export const deliveryMethodMultipliers: Record<string, number> = { design_build: 1.0, design_bid_build: 1.02, epc: 1.04 };
 // DM audit: legacy coarse REGION map — FALLBACK ONLY. CapexEngine location priority is
 // COUNTRIES[id].constructionIndex (now filled 40/40 in constants/countries.ts, T&T ICMS/RLB
 // screening rel. US=1.0) > cityData perW > this map (CapexEngine.ts:131-143).

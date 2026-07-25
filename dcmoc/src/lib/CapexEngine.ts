@@ -36,7 +36,10 @@ import {
     securityMultipliers,
     fiberEntryMultipliers,
     siteConditionMultipliers,
-    marketConditionMultipliers
+    marketConditionMultipliers,
+    txLeadMultipliers,
+    txTypeMultipliers,
+    deliveryMethodMultipliers
 } from './capex-data';
 import { CountryProfile } from '@/constants/countries';
 import { getPUE } from '@/constants/pue';
@@ -275,7 +278,10 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
         qm(securityMultipliers, cd.fomSecurityMult, input.securityLevel, 'standard') *
         qm(fiberEntryMultipliers, cd.fomFiberEntryMult, input.fiberEntry, 'single') *
         qm(siteConditionMultipliers, cd.fomSiteMult, input.siteCondition, 'greenfield') *
-        qm(marketConditionMultipliers, cd.fomMarketMult, input.marketCondition, 'normal');
+        qm(marketConditionMultipliers, cd.fomMarketMult, input.marketCondition, 'normal') *
+        qm(txLeadMultipliers, cd.fomTxLeadMult, input.transformerLead, 'standard') *
+        qm(txTypeMultipliers, cd.fomTxTypeMult, input.transformerType, 'dry') *
+        qm(deliveryMethodMultipliers, cd.fomDeliveryMult, input.deliveryMethod, 'design_build');
     if (qualityM !== 1.0) {
         currentTotal *= qualityM;
     }

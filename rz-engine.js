@@ -5610,6 +5610,9 @@
             fomFiberEntryMult: { single: 1.0, dual: 1.02, mmr: 1.03 },                           /* carrier entry redundancy / meet-me room */
             fomSiteMult: { greenfield: 1.0, brownfield: 1.05, retrofit: 1.08 },                  /* site remediation / demolition */
             fomMarketMult: { favorable: 0.95, normal: 1.0, tight: 1.06, overheated: 1.12 },      /* labor+material market heat */
+            fomTxLeadMult: { standard: 1.0, expedited: 1.03, long_lead: 1.0 },                   /* Requirements transformer-lead select (was dead) — expedited rush premium */
+            fomTxTypeMult: { dry: 1.0, oil: 0.95 },                                              /* transformer type (dry premium indoor vs oil) */
+            fomDeliveryMult: { design_build: 1.0, design_bid_build: 1.02, epc: 1.04 },           /* project delivery method (EPC turnkey premium) */
             locationMult: { sea: 0.65, india: 0.55, china: 0.7, japan: 1.1, australia: 1.05, europe: 1.15, usa: 1.0, mena: 0.90 },
             regionGroupDefaults: {
                 americas: { internalRegion: 'usa', multiplier: 1.00 },
@@ -14445,7 +14448,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-25-z2"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-25-z3"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

@@ -13,6 +13,16 @@ release sections rather than semver.
 
 ---
 
+## v1.115.65 — 2026-07-25 (DCMOC — 3 more dead controls wired: transformer lead/type + delivery method)
+
+### Fixed
+- **Three more dead controls** (same class as v1.115.64, found by continuing the sweep): the Requirements → Infrastructure **Transformer Lead**, **Transformer Type**, and **Delivery Method** selects were declared in `CapexInput` and written to the CAPEX store, but `calculateCapex` never read them — picking Expedited transformer, Oil-filled, or EPC/Turnkey moved CAPEX by $0. Now wired to real screening multipliers (`DATA.capexDetail.fomTxLeadMult`/`fomTxTypeMult`/`fomDeliveryMult` + `capex-data.ts` twin), default option = 1.0 (baseline unchanged). Deliberately NOT reused the engine advanced-model's `transformerLeadMult`/`deliveryMethodMult` — their enum domains differ (standard/extended/emergency vs the UI's standard/expedited/long_lead; dbb/db vs design_build/design_bid_build), which would have silently fallen back. `contractorAvail` left alone — it's an unused interface field with no UI control (nothing to wire).
+- `tools/audit-dcmoc-enum-coverage.mjs` extended to the 3 → **22/22 clean**.
+
+Engine chain: test-rz-engine 762/0 · calibration · terser · engine-catalog · value-bindings · `?v` 2026-07-25-z3. Gates: walk 31/0 · trace 116/116 · optimizer 8/8 · export 44/44 · enum-coverage 22/22 · reference-parity 155/0.
+
+---
+
 ## v1.115.64 — 2026-07-25 (DCMOC — 8 dead CAPEX controls now actually affect cost)
 
 ### Fixed

@@ -107,6 +107,10 @@ const registry = [
     { field: 'fiberEntry',     label: 'capexDetail.fomFiberEntryMult',     options: capexEnums.fiberEntry,     keys: keysOf(CD.fomFiberEntryMult) },
     { field: 'siteCondition',  label: 'capexDetail.fomSiteMult',           options: capexEnums.siteCondition,  keys: keysOf(CD.fomSiteMult) },
     { field: 'marketCondition', label: 'capexDetail.fomMarketMult',        options: capexEnums.marketCondition, keys: keysOf(CD.fomMarketMult) },
+    // Requirements InfrastructureOptionsSection selects (array-style; curated), wired v1.115.65:
+    { field: 'transformerLead', label: 'capexDetail.fomTxLeadMult',        options: ['standard', 'expedited', 'long_lead'],       keys: keysOf(CD.fomTxLeadMult), note: 'Requirements transformer-lead Segmented' },
+    { field: 'transformerType', label: 'capexDetail.fomTxTypeMult',        options: ['dry', 'oil'],                                keys: keysOf(CD.fomTxTypeMult), note: 'Requirements transformer-type Segmented' },
+    { field: 'deliveryMethod', label: 'capexDetail.fomDeliveryMult',       options: ['design_build', 'design_bid_build', 'epc'],   keys: keysOf(CD.fomDeliveryMult), note: 'Requirements delivery-method Select' },
 ];
 
 let gaps = 0;
