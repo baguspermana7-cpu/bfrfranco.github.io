@@ -787,8 +787,8 @@ const FinancialDashboard = () => {
                                 <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                                 <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Payback</span><Tooltip content="Simple payback period — years until cumulative net cashflow turns positive. Discounted payback accounts for time value of money." /><Explain k="payback-period" />
                             </div>
-                            <div className="text-2xl font-bold text-slate-900 dark:text-white">{result.paybackPeriodYears} <span className="text-sm text-slate-500 dark:text-slate-400">yrs</span></div>
-                            <div className="text-xs text-slate-500 mt-1">Discounted: {result.discountedPaybackYears} yrs</div>
+                            <div className="text-2xl font-bold text-slate-900 dark:text-white">{result.paybackReached ? result.paybackPeriodYears : `> ${Math.round(result.paybackPeriodYears)}`} <span className="text-sm text-slate-500 dark:text-slate-400">{result.paybackReached ? 'yrs' : 'yrs (not reached)'}</span></div>
+                            <div className="text-xs text-slate-500 mt-1">Discounted: {result.discountedPaybackReached ? `${result.discountedPaybackYears} yrs` : `> ${Math.round(result.discountedPaybackYears)} yrs (not reached)`}</div>
                         </CardContent>
                     </Card>
                     <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">

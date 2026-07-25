@@ -44,8 +44,10 @@ export interface FinancialResult {
     npv: number;                        // Net Present Value
     irr: number;                        // Internal Rate of Return (%)
     roiPercent: number;                 // Simple ROI %
-    paybackPeriodYears: number;         // Simple payback
+    paybackPeriodYears: number;         // Simple payback (== projectLifeYears when never reached — check paybackReached)
+    paybackReached: boolean;            // false = cumulative cash never turns positive in project life ("15.0 yr" would lie)
     discountedPaybackYears: number;     // Discounted payback
+    discountedPaybackReached: boolean;
     profitabilityIndex: number;         // NPV / Investment
     totalRevenue: number;
     totalProfit: number;
@@ -53,6 +55,12 @@ export interface FinancialResult {
     annualDepreciation: number;
     breakEvenOccupancy: number;         // Min occupancy % to break even annually
 }
+
+/** Honest payback display — "> 15 yr (not reached)" instead of a fabricated
+ *  "15.0 yr" when cumulative cash never turns positive. ONE formatter, every
+ *  surface. */
+export const fmtPayback = (r: Pick<FinancialResult, 'paybackPeriodYears' | 'paybackReached'>): string =>
+    r.paybackReached ? `${r.paybackPeriodYears.toFixed(1)} yr` : `> ${Math.round(r.paybackPeriodYears)} yr (not reached)`;
 
 // ─── IRR CALCULATION (Newton-Raphson with bisection fallback) ────
 export const calculateIRR = (cashflows: number[], guess: number = 0.10, maxIter: number = 200, tolerance: number = 1e-7): number => {
@@ -233,7 +241,9 @@ export const calculateFinancials = (inputs: FinancialInputs): FinancialResult =>
         irr,
         roiPercent: roi,
         paybackPeriodYears: Math.round(paybackPeriod * 10) / 10,
+        paybackReached: paybackFound,
         discountedPaybackYears: Math.round(discPayback * 10) / 10,
+        discountedPaybackReached: discPaybackFound,
         profitabilityIndex: Math.round(pi * 100) / 100,
         totalRevenue,
         totalProfit,

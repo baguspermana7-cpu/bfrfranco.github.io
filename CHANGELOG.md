@@ -13,6 +13,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.57 — 2026-07-25 (DCMOC — honest payback: "> 15 yr (not reached)" instead of a fabricated "15.0 yr")
+
+### Fixed
+- **Payback no longer fabricates a year**: `calculateFinancials` fell back to `paybackPeriodYears = projectLifeYears` when cumulative cash never turns positive — every surface then printed "15.0 yr" as if capital were recovered in year 15. `FinancialResult` gains `paybackReached` / `discountedPaybackReached` flags + one shared `fmtPayback()` formatter ("> 15 yr (not reached)"); adopted on the Executive IRR-card sub, Financial engine payback card (simple + discounted), Portfolio comparison row, and the Cash-Flow chart no longer draws a payback marker on a curve that never crosses zero. Same honesty class as the IRR "n/a" fix (v1.115.56).
+
+---
+
 ## v1.115.56 — 2026-07-25 (DCMOC — honest IRR "n/a" + last stale-basis strings unified)
 
 ### Fixed

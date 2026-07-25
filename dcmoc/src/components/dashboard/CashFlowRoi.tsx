@@ -39,7 +39,9 @@ export function CashFlowRoi({ financial }: { financial: FinancialResult | null }
                         <XAxis dataKey="year" tick={{ fontSize: 9, fill: '#64748b' }} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fontSize: 9, fill: '#64748b' }} axisLine={false} tickLine={false} tickFormatter={(v) => fmtUsd(v)} width={40} />
                         <ReferenceLine y={0} stroke="#475569" strokeDasharray="3 3" />
-                        {isFinite(payback) && payback > 0 && <ReferenceLine x={Math.round(payback)} stroke="#22d3ee" strokeDasharray="3 3" label={{ value: `Payback ${payback.toFixed(1)}y`, fontSize: 9, fill: '#22d3ee', position: 'insideTopRight' }} />}
+                        {/* payback marker only when actually reached — a marker at year 15
+                          * on a curve that never crosses zero would fabricate a payback */}
+                        {financial.paybackReached && isFinite(payback) && payback > 0 && <ReferenceLine x={Math.round(payback)} stroke="#22d3ee" strokeDasharray="3 3" label={{ value: `Payback ${payback.toFixed(1)}y`, fontSize: 9, fill: '#22d3ee', position: 'insideTopRight' }} />}
                         <Tooltip formatter={((v: number) => [fmtUsd(v), 'Cumulative']) as never} labelFormatter={(l) => `Year ${l}`}
                             contentStyle={{ background: '#0f1424', border: '1px solid rgba(255,255,255,0.15)', fontSize: 11, borderRadius: 8 }}
                             labelStyle={{ color: '#e2e8f0', fontWeight: 600 }} itemStyle={{ color: '#34d399' }} cursor={{ stroke: '#22d3ee', strokeWidth: 1, strokeDasharray: '3 3' }} />

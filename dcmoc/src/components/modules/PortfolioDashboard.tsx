@@ -5,6 +5,7 @@ import { usePortfolioStore, SiteConfig } from '@/store/portfolio';
 import { useSimulationStore } from '@/store/simulation';
 import { COUNTRIES } from '@/constants/countries';
 import { calculatePortfolio, SiteResult } from '@/modules/analytics/PortfolioEngine';
+import { fmtPayback } from '@/modules/analytics/FinancialEngine';
 import {
     BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Legend, Cell,
     RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -398,7 +399,7 @@ function FinancialTab({ result }: { result: ReturnType<typeof calculatePortfolio
                             { label: 'OPEX/kW/yr', get: (s: SiteResult) => `$${Math.round(s.opexPerKw).toLocaleString()}`, tooltip: 'Annual operating cost per kilowatt of IT capacity. Includes energy, staffing, and maintenance.' },
                             { label: 'IRR', get: (s: SiteResult) => `${s.financial.irr.toFixed(1)}%`, tooltip: 'Internal Rate of Return — the discount rate at which the project NPV equals zero. Higher is better.' },
                             { label: 'NPV', get: (s: SiteResult) => fmtMoney(s.financial.npv), tooltip: 'Net Present Value — the present value of all future cash flows minus initial investment. Positive means value creation.' },
-                            { label: 'Payback', get: (s: SiteResult) => `${s.financial.paybackPeriodYears.toFixed(1)} yr`, tooltip: 'Time in years to recover the initial capital investment from operating cash flows.' },
+                            { label: 'Payback', get: (s: SiteResult) => fmtPayback(s.financial), tooltip: 'Time in years to recover the initial capital investment from operating cash flows. "> N yr (not reached)" = cumulative cash never turns positive within the project life.' },
                             { label: 'ROI', get: (s: SiteResult) => `${s.financial.roiPercent.toFixed(1)}%`, tooltip: 'Return on Investment — total net profit as a percentage of initial capital expenditure over the project lifetime.' },
                         ].map(row => (
                             <tr key={row.label} className="border-b border-slate-100 dark:border-slate-800">
