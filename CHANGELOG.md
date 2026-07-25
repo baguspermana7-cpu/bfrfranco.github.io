@@ -13,6 +13,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.53 — 2026-07-25 (DCMOC — negative-EBITDA diagnosis on the Executive KPI)
+
+### Added
+- **Executive EBITDA card now diagnoses itself when negative**: at the honest $150/kW·mo screening basis a small project can run operating-cash-negative (the old $280 default masked it) — the card turns fault-red ("NEGATIVE — click for diagnosis") and opens the shared DiagnosticModal: why (year-5 revenue vs OPEX, live figures), levers with jump-to-tab (raise the revenue basis in Financial — JLL 2026 $140-230 band; Run Optimization to bisect revenue to the 12% hurdle; cut OPEX drivers in Operations), and the honest note that this is real screening economics, not a bug. Closes the "every red value clickable" mandate for the Executive KPI row. Verified headless: card renders red, modal opens with levers (screenshot).
+
+---
+
 ## v1.115.52 — 2026-07-25 (SecondBrain — OmniRoute portal pill)
 
 ### Added

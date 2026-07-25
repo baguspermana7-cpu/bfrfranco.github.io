@@ -27,6 +27,8 @@ import { KpiEfficiencyRow } from '@/components/dashboard/KpiEfficiencyRow';
 import { DataFlowRail, QuickActions, AlertsPanel, type Alert } from '@/components/dashboard/DashboardExtras';
 import { ScheduleTimeline } from '@/components/dashboard/ScheduleTimeline';
 import { generateDashboardPDF } from '@/modules/reporting/pdf/DashboardPdf';
+import { DiagnosticModal } from '@/components/ui/RedValue';
+import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 import { decide, type DecisionContext, type DecisionResult } from '@/lib/decision';
 import { useConstructionTracking } from '@/store/constructionTracking';
 import { useCxTracking } from '@/store/cxTracking';
@@ -89,6 +91,14 @@ export function ExecutiveDashboard() {
                 : { phase: 'Commissioning', sub: buildMonths != null ? `Build schedule complete (${buildMonths} mo)` : `Month ${ctStatusMonth} since NTP` };
     const go = (t?: string) => { if (t) actions.setActiveTab(t as TabId); };
     const has = (k: RowKey) => (VIEW_PANELS[tab] || VIEW_PANELS['Executive Overview']).includes(k);
+
+    /* Negative-EBITDA diagnosis (owner mandate: every red value clickable) —
+     * at the conservative $150/kW·mo wholesale basis a small project can run
+     * operating-cash-negative; the old $280 default MASKED this. Card goes
+     * alert-red + click opens the shared DiagnosticModal with real levers. */
+    const [ebitdaDiag, setEbitdaDiag] = React.useState(false);
+    const ebitdaNegative = d.ebitda != null && d.ebitda < 0;
+    const revBasis = inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH;
 
     // real sparkline series
     const cf = d.financial?.cashflows ?? [];
@@ -241,7 +251,7 @@ export function ExecutiveDashboard() {
                 <KpiCard label="Tier Design" value={`Tier ${d.tier}`} sub={d.availabilityTarget ? `Target ${d.availabilityTarget}%` : d.redundancy} icon={Server} accent="info" trace="sim.tierLevel" tip="Uptime Institute Tier classification (II–IV) set in the Requirements engine. Determines redundancy architecture, availability target, and CAPEX uplift." />
                 <KpiCard label="Total CAPEX" value={fmtUsd(d.capexTotal)} sub={d.perKw ? `${fmtUsd(d.perKw)}/kW` : 'Open CAPEX'} icon={Building} accent="emerald" onClick={() => go('capex')} trace="capex.total" tip="Total design CAPEX from the CAPEX engine, including civil, M&E, IT, and contingency. Click to open the full CAPEX breakdown." />
                 <KpiCard label="Total OPEX / yr" value={fmtUsd(d.opexAnnual)} sub="DC-contract rate · 100% util" icon={Repeat} accent="blue" series={opexSeries} seriesLabel="Annual OPEX" valueFormat={(n) => `$${(n / 1e6).toFixed(1)}M`} trace="opex.dashboardAnnual" tip="Annualised operating expenditure modelled by the Operations engine: power, staffing, maintenance, licensing. Power is costed at the DC-contract (wholesale/PPA) rate at 100% utilization — this can differ from the standalone OPEX calculator, which uses the retail tariff and a partial utilization factor." />
-                <KpiCard label="EBITDA (Yr 5)" value={fmtUsd(d.ebitda)} sub={d.financialIllustrative ? 'illustrative revenue' : ''} icon={Gauge} accent="amber" series={ebitdaSeries} seriesLabel="EBITDA" valueFormat={(n) => `$${(n / 1e6).toFixed(1)}M`} trace="fin.ebitdaY5" tip="Earnings Before Interest, Taxes, Depreciation & Amortisation at Year 5, from the Financial engine DCF model. Trend shows EBITDA trajectory across the project horizon." />
+                <KpiCard label="EBITDA (Yr 5)" value={fmtUsd(d.ebitda)} sub={ebitdaNegative ? 'NEGATIVE — click for diagnosis' : (d.financialIllustrative ? 'illustrative revenue' : '')} icon={Gauge} accent={ebitdaNegative ? 'alert' : 'amber'} onClick={ebitdaNegative ? () => setEbitdaDiag(true) : undefined} series={ebitdaSeries} seriesLabel="EBITDA" valueFormat={(n) => `$${(n / 1e6).toFixed(1)}M`} trace="fin.ebitdaY5" tip="Earnings Before Interest, Taxes, Depreciation & Amortisation at Year 5, from the Financial engine DCF model. Trend shows EBITDA trajectory across the project horizon." />
                 <KpiCard label="IRR" value={d.financial ? `${d.financial.irr.toFixed(1)}%` : '—'} sub={d.financial ? `Payback ${d.financial.paybackPeriodYears.toFixed(1)} yr` : 'Open Financial'} icon={TrendingUp} accent="emerald" series={fcfSeries} seriesLabel="Cumulative Cash Flow" valueFormat={(n) => `$${(n / 1e6).toFixed(1)}M`} onClick={() => go('finance')} trace="fin.irrProject" tip="Internal Rate of Return from the Financial engine DCF over the full project horizon. Trend shows cumulative free cash flow; hover for year-by-year value. Click to open Financial engine." />
                 <KpiCard label="Project Status" value={projectStatus.phase} sub={projectStatus.sub} icon={CircleDot} accent="cyan" tip="Current project lifecycle phase DERIVED from real tracking state (not a label): Design while Construction tracking has no NTP status month; Construction while the status month sits inside the CAPEX engine build schedule; Commissioning once the schedule completes or any Cx checklist/level tick is recorded. Update it in Construction (status month) and Commissioning (checklist)." />
             </div>
@@ -392,6 +402,26 @@ export function ExecutiveDashboard() {
                 <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 px-4 py-2 rounded-lg bg-[#0f1424] border border-white/15 text-xs text-slate-200 shadow-xl">
                     {busy === 'Invite Stakeholder' ? 'Stakeholder invites — coming soon.' : `${busy}…`}
                 </div>
+            )}
+
+            {/* negative-EBITDA diagnosis modal */}
+            {ebitdaDiag && d.ebitda != null && (
+                <DiagnosticModal
+                    diagnosis={{
+                        title: 'EBITDA (Yr 5) negative',
+                        reason: `Year-5 revenue at the $${revBasis}/kW·mo screening basis does not cover annual OPEX ${fmtUsd(d.opexAnnual)} — the project is operating-cash-negative at this rate. Energy and staffing dominate the cost side; small projects in high-tariff markets breach first.`,
+                        actual: fmtUsd(d.ebitda),
+                        threshold: '≥ $0',
+                        levers: [
+                            { label: `Raise the revenue basis (now $${revBasis}/kW·mo)`, detail: 'Set the contracted rate in the Financial engine — 2026 wholesale colo $140-230/kW·mo (JLL); AI-capable capacity commands +20%.', tab: 'finance' },
+                            { label: 'Run Optimization (IRR objective)', detail: 'The solver bisects revenue to the 12% hurdle and previews the required rate before you Apply.', tab: 'dashboard' },
+                            { label: 'Cut the OPEX drivers', detail: 'Review staffing model, maintenance strategy mix and cooling PUE in Operations — the OPEX card above traces each component.', tab: 'ops' },
+                        ],
+                        tab: 'finance',
+                        note: `Illustrative DCF at $${revBasis}/kW·mo. The previous $280 default masked negative operating cash on small projects — this is the honest screening economics, not a bug.`,
+                    }}
+                    onClose={() => setEbitdaDiag(false)}
+                />
             )}
         </div>
     );
