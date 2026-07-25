@@ -16,6 +16,7 @@ import { Explain } from '@/components/ui/Explain';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { useSimulationStore } from '@/store/simulation';
 import { useRequirementsStore } from '@/store/requirements';
+import { useArchitectureStore } from '@/store/architecture';
 import CapacityDashboardMod from '@/components/modules/CapacityDashboard';
 import {
     sanitizeCap, facilitySnapshot, overheadDonut, forecastSeries, utilization, utilBands, autoWhiteSpaceM2,
@@ -153,6 +154,7 @@ export function CapacityPlanningPage() {
     const simInputs = useSimulationStore((s) => s.inputs);
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
     const req = useRequirementsStore();
+    const futureExpansionMw = useArchitectureStore((s) => s.futureExpansionMw); // Architecture reserve (was a dead control) → shown as reserved headroom
     const [tab, setTab] = React.useState<'overview' | 'phases'>('overview');
     const [sysTab, setSysTab] = React.useState<'power' | 'cooling' | 'rack' | 'network'>('power');
 
@@ -300,6 +302,7 @@ export function CapacityPlanningPage() {
                             { label: 'Peak Forecast', value: `${peak.toFixed(0)} MW`, sub: 'growth plan', trace: 'cap.peakForecastMw', tip: 'Highest forecast IT load across the Requirements growth plan (Y0→Y10). Compare it against the design-capacity line in the forecast chart — if peak approaches design, plan the next build phase or slow the commit ramp. Driven entirely by the per-year MW entries in Requirements.' },
                             { label: 'Total Facility Load', value: `${snap.facilityMw} MW`, sub: `PUE ${snap.pue} (${snap.source})`, trace: 'arch.facilityMw', tip: 'Total facility power draw = IT load × PUE (engine pueMatrix for the selected cooling and tier). This is what the utility connection and substation must supply — not just the IT load. Improving PUE via the cooling choice reduces it without giving up IT capacity.' },
                             ...util.rows.slice(0, 3).map((u) => ({ label: u.label, value: `${u.capacity.toLocaleString()} ${u.unit}`, sub: `${u.pct}% utilized${u.basis === 'assumption' ? ' · assumption' : ''}`, trace: UTIL_TRACE[u.key], tip: UTIL_TIPS[u.key] ?? `Installed ${u.label.toLowerCase()} capacity vs. current usage (${u.pct}% utilized), computed by the capacity adapter from the IT load profile.` })),
+                            ...(futureExpansionMw && futureExpansionMw > 0 ? [{ label: 'Expansion Reserve', value: `${futureExpansionMw} MW`, sub: `≈${(futureExpansionMw * snap.pue).toFixed(1)} MW facility headroom`, tip: 'Future expansion capacity reserved beyond the committed phase plan, set in the Architecture rail. Reserve this much additional IT MW (≈ that × PUE of facility power, plus the land/substation to match) so the site can grow without re-permitting — size the utility feed and footprint for it now.' }] : []),
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
                                 <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { tip?: string }).tip && <InfoTip content={(k as { tip?: string }).tip!} />}{(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>

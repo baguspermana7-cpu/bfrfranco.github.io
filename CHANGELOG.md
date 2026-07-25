@@ -13,6 +13,15 @@ release sections rather than semver.
 
 ---
 
+## v1.115.67 — 2026-07-25 (DCMOC — futureExpansionMw wired: Architecture reserve now shown as capacity headroom)
+
+### Fixed
+- **`futureExpansionMw` (Architecture rail) was a dead control** — set by the user, drove nothing. It now surfaces on the Capacity Planning page as an "Expansion Reserve" KPI (reserved IT MW + the implied ≈MW facility-power headroom at the current PUE), so the declared future growth visibly reserves capacity the utility feed and footprint should be sized for. Display-only wire — deliberately does NOT alter the utilization/forecast math (kept the sensitive capacity model untouched). Last of the store-wide dead-control sweep.
+
+Gates: walk 31/0 · trace 116/116. No engine change.
+
+---
+
 ## v1.115.66 — 2026-07-25 (DCMOC — dead-control resolution: remove 2 redundant, wire the long-shift permit)
 
 Found by a store-wide dead-control audit (agent), directions confirmed with the owner:
