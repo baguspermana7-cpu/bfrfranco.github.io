@@ -29,6 +29,7 @@ interface PhaseFinancialResult {
     irr: number;
     npv: number;
     payback: number;
+    paybackReached: boolean;
     goNoGo: boolean;
     explain: DecisionExplain;
 }
@@ -62,8 +63,8 @@ const PhasedFinancialDashboard = () => {
         setOptProposal(null);
     };
 
-    const { capacityResult, phaseFinancials, blendedIrr, blendedNpv, blendedPayback, totalInvestment, profitabilityIndex, cashflowData, adjustments, scenarios, drawSchedule, totalIDC, constructionMonths, narrative, overallExplain, baseRev, optimizeAtRev } = useMemo(() => {
-        if (!selectedCountry) return { capacityResult: null, phaseFinancials: [] as PhaseFinancialResult[], blendedIrr: 0, blendedNpv: 0, blendedPayback: 0, totalInvestment: 0, profitabilityIndex: 0, cashflowData: [], adjustments: { tax: 0, disaster: 0, grid: 0, talent: 0 }, scenarios: [], drawSchedule: [], totalIDC: 0, constructionMonths: 0, narrative: '', overallExplain: null as DecisionExplain | null, baseRev: DEFAULT_REVENUE_PER_KW_MONTH, optimizeAtRev: null as null | ((rev: number) => { irr: number; npv: number }) };
+    const { capacityResult, phaseFinancials, blendedIrr, blendedNpv, blendedPayback, blendedPaybackReached, totalInvestment, profitabilityIndex, cashflowData, adjustments, scenarios, drawSchedule, totalIDC, constructionMonths, narrative, overallExplain, baseRev, optimizeAtRev } = useMemo(() => {
+        if (!selectedCountry) return { capacityResult: null, phaseFinancials: [] as PhaseFinancialResult[], blendedIrr: 0, blendedNpv: 0, blendedPayback: 0, blendedPaybackReached: false, totalInvestment: 0, profitabilityIndex: 0, cashflowData: [], adjustments: { tax: 0, disaster: 0, grid: 0, talent: 0 }, scenarios: [], drawSchedule: [], totalIDC: 0, constructionMonths: 0, narrative: '', overallExplain: null as DecisionExplain | null, baseRev: DEFAULT_REVENUE_PER_KW_MONTH, optimizeAtRev: null as null | ((rev: number) => { irr: number; npv: number }) };
 
         // 1. Get capacity plan
         const capPlan = calculateCapacityPlan({
@@ -161,6 +162,7 @@ const PhasedFinancialDashboard = () => {
                 irr: financials.irr,
                 npv: financials.npv,
                 payback: financials.paybackPeriodYears,
+                paybackReached: financials.paybackReached,
                 goNoGo: financials.irr >= hurdleRate,
                 explain: explainPhaseDecision({
                     irrPct: financials.irr,
@@ -252,6 +254,7 @@ const PhasedFinancialDashboard = () => {
                 irr: scenFinancials.irr,
                 npv: scenFinancials.npv,
                 payback: scenFinancials.paybackPeriodYears,
+                paybackReached: scenFinancials.paybackReached,
                 capex: Math.round(totalCapex * capexMult),
             };
         });
@@ -299,6 +302,10 @@ const PhasedFinancialDashboard = () => {
             blendedIrr: Math.round(weightedIrr * 10) / 10,
             blendedNpv: Math.round(totalNpv),
             blendedPayback: Math.round(avgPayback * 10) / 10,
+            /* the weighted-average payback is only a real payback when EVERY
+             * phase actually recovers — one never-paying phase makes the blend a
+             * fabricated number */
+            blendedPaybackReached: phaseResults.length > 0 && phaseResults.every((p) => p.paybackReached),
             totalInvestment: Math.round(totalCapex),
             profitabilityIndex: Math.round(pi * 100) / 100,
             cashflowData: cfData,
@@ -349,10 +356,12 @@ const PhasedFinancialDashboard = () => {
                                     irr: pf.irr,
                                     npv: pf.npv,
                                     payback: pf.payback,
+                                    paybackReached: pf.paybackReached,
                                 })),
                                 blendedIRR: blendedIrr,
                                 totalNPV: blendedNpv,
                                 weightedPayback: blendedPayback,
+                                weightedPaybackReached: blendedPaybackReached,
                                 totalInvestment,
                                 profitabilityIndex,
                                 scenarios,
@@ -434,7 +443,7 @@ const PhasedFinancialDashboard = () => {
                             <Tooltip content="Payback — years until cumulative net cash flow first turns positive (nominal, simple). A screening metric only: it ignores the time value of money and any cash flows after payback — use NPV/IRR for the decision. Shorter with higher revenue or lower CAPEX/OPEX." />
                         </div>
                         <TraceValue traceId="pf.payback">
-                            <div className="text-2xl font-bold text-slate-900 dark:text-white">{blendedPayback} yr</div>
+                            <div className="text-2xl font-bold text-slate-900 dark:text-white">{blendedPaybackReached ? `${blendedPayback} yr` : <span className="text-rz-alert">&gt; {Math.round(blendedPayback)} yr</span>}</div>
                         </TraceValue>
                     </CardContent>
                 </Card>
@@ -519,7 +528,7 @@ const PhasedFinancialDashboard = () => {
                                                 <td className={`text-right py-2 px-2 ${pf.npv >= 0 ? 'text-rz-data' : 'text-red-500 underline decoration-dotted underline-offset-2'}`}>
                                                     {fmtMoney(pf.npv)}
                                                 </td>
-                                                <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{pf.payback} yr</td>
+                                                <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{pf.paybackReached ? `${pf.payback} yr` : `> ${Math.round(pf.payback)} yr`}</td>
                                                 <td className="text-center py-2 px-2">
                                                     <span className={`inline-flex items-center gap-1 font-semibold ${pf.goNoGo ? 'text-rz-data' : 'text-red-500'}`}>
                                                         {pf.goNoGo ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
@@ -652,7 +661,7 @@ const PhasedFinancialDashboard = () => {
                                             <td className={`text-right py-2 px-2 ${s.npv >= 0 ? 'text-rz-data' : 'text-red-500'}`}>
                                                 {fmtMoney(s.npv)}
                                             </td>
-                                            <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{s.payback} yr</td>
+                                            <td className="text-right py-2 px-2 text-slate-700 dark:text-slate-300">{s.paybackReached ? `${s.payback} yr` : `> ${Math.round(s.payback)} yr`}</td>
                                         </tr>
                                     ))}
                                 </tbody>

@@ -333,7 +333,7 @@ export function ReportDashboard() {
                 : {
                     title: 'Negative NPV', category: 'Financial', severity: 'high',
                     description: `Project NPV ${fmtMoney(npvLive)} is negative — IRR ${financialResult.irr.toFixed(1)}% is below the 8% discount rate` +
-                        `${Number.isFinite(paybackLive) && paybackLive > 0 && paybackLive <= projectLifeYears ? `; payback ${paybackLive.toFixed(1)} yr` : '; payback beyond project life'}.`,
+                        `${financialResult.paybackReached ? `; payback ${paybackLive.toFixed(1)} yr` : '; payback beyond project life'}.`,
                     recommendation: 'Review CAPEX basis (CAPEX Engine) and the revenue assumption (Requirements) before proceeding.',
                     detail: `Root cause (live figures): CAPEX ${fmtMoney(capexResults.total)} + annual OPEX ${fmtMoney(opexAnnual)} ` +
                         `(labor ${fmtMoney(totalMonthlyLabor * 12)} + maintenance ${fmtMoney(stratCost)}) vs revenue basis ` +

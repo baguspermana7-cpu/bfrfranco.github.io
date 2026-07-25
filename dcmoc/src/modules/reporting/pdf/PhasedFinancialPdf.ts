@@ -20,6 +20,7 @@ export const generatePhasedFinancialPDF = async (
         blendedIRR: number;
         totalNPV: number;
         weightedPayback: number;
+        weightedPaybackReached?: boolean;
         totalInvestment: number;
         profitabilityIndex: number;
         scenarios?: any[];
@@ -53,7 +54,7 @@ export const generatePhasedFinancialPDF = async (
     const irrColor: [number, number, number] = pd.blendedIRR > 15 ? PDF_COLORS.secondary : pd.blendedIRR > 8 ? PDF_COLORS.warning : PDF_COLORS.danger;
     drawKpiCard(doc, 14, y, 35, 24, 'Blended IRR', `${pd.blendedIRR?.toFixed(1) || 'N/A'}%`, 'Weighted by CAPEX', irrColor);
     drawKpiCard(doc, 53, y, 35, 24, 'Total NPV', fmtMoney(pd.totalNPV || 0), 'Combined phases', pd.totalNPV > 0 ? PDF_COLORS.secondary : PDF_COLORS.danger);
-    drawKpiCard(doc, 92, y, 35, 24, 'Payback', `${pd.weightedPayback?.toFixed(1) || 'N/A'} yr`, 'Weighted average');
+    drawKpiCard(doc, 92, y, 35, 24, 'Payback', pd.weightedPaybackReached === false ? `> ${Math.round(pd.weightedPayback)} yr` : `${pd.weightedPayback?.toFixed(1) || 'N/A'} yr`, 'Weighted average');
     drawKpiCard(doc, 131, y, 30, 24, 'Investment', fmt(pd.totalInvestment), 'Total CAPEX');
     drawKpiCard(doc, 165, y, 29, 24, 'PI', `${pd.profitabilityIndex?.toFixed(2) || 'N/A'}x`, 'Profitability');
     y += 35;
@@ -83,7 +84,7 @@ export const generatePhasedFinancialPDF = async (
                 fmtMoney(pr.capex || 0),
                 `${pr.irr?.toFixed(1) || 'N/A'}%`,
                 fmtMoney(pr.npv || 0),
-                `${pr.payback?.toFixed(1) || 'N/A'} yr`,
+                pr.paybackReached === false ? `> ${Math.round(pr.payback || 0)} yr` : `${pr.payback?.toFixed(1) || 'N/A'} yr`,
                 decision,
             ];
         });
@@ -210,7 +211,7 @@ export const generatePhasedFinancialPDF = async (
             s.name || s.label || 'N/A',
             `${s.irr?.toFixed(1) || 'N/A'}%`,
             fmtMoney(s.npv || 0),
-            `${s.payback?.toFixed(1) || 'N/A'} yr`,
+            s.paybackReached === false ? `> ${Math.round(s.payback || 0)} yr` : `${s.payback?.toFixed(1) || 'N/A'} yr`,
             fmtMoney(s.capex || pd.totalInvestment || 0),
         ]);
 

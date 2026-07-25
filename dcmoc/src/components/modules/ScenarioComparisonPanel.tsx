@@ -26,6 +26,7 @@ interface ScenarioMetrics {
     irr: number;
     npv: number;
     paybackYears: number;
+    paybackReached: boolean;
 }
 
 export function ScenarioComparisonPanel() {
@@ -52,6 +53,7 @@ export function ScenarioComparisonPanel() {
                     irr: sc.summary.irr || 0,
                     npv: sc.summary.npv || 0,
                     paybackYears: sc.summary.paybackYears || 0,
+                    paybackReached: (sc.summary.paybackYears || 0) > 0,
                 };
             }
 
@@ -106,6 +108,7 @@ export function ScenarioComparisonPanel() {
                 irr: financialResult.irr,
                 npv: financialResult.npv,
                 paybackYears: financialResult.paybackPeriodYears,
+                paybackReached: financialResult.paybackReached,
             };
         });
     }, [compared]);
@@ -214,7 +217,8 @@ export function ScenarioComparisonPanel() {
                             <KpiCell label="PUE" value={m.pue.toFixed(2)} delta={i > 0 ? fmtPct(delta(m.pue, baseline.pue)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${Math.abs(m.pue - baseline.pue).toFixed(2)} PUE`, m.scenario) : undefined} />
                             <KpiCell label="Staff" value={String(m.totalStaff)} delta={i > 0 ? fmtPct(delta(m.totalStaff, baseline.totalStaff)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${Math.abs(m.totalStaff - baseline.totalStaff)} staff`, m.scenario) : undefined} />
                             <KpiCell label="IRR" value={`${m.irr.toFixed(1)}%`} delta={i > 0 ? fmtPct(delta(m.irr, baseline.irr)) : undefined} worseTitle={i > 0 ? worseTitle(`${Math.abs(m.irr - baseline.irr).toFixed(1)} pp IRR`, m.scenario) : undefined} />
-                            <KpiCell label="Payback" value={`${m.paybackYears.toFixed(1)} yr`} delta={i > 0 ? fmtPct(delta(m.paybackYears, baseline.paybackYears)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${Math.abs(m.paybackYears - baseline.paybackYears).toFixed(1)} yr payback`, m.scenario) : undefined} />
+                            {/* honest: unreached payback shows "> N yr" and skips the delta (a clamped value would distort the comparison) */}
+                            <KpiCell label="Payback" value={m.paybackReached ? `${m.paybackYears.toFixed(1)} yr` : `> ${Math.round(m.paybackYears)} yr`} delta={i > 0 && m.paybackReached && baseline.paybackReached ? fmtPct(delta(m.paybackYears, baseline.paybackYears)) : undefined} invertDelta worseTitle={i > 0 && m.paybackReached && baseline.paybackReached ? worseTitle(`${Math.abs(m.paybackYears - baseline.paybackYears).toFixed(1)} yr payback`, m.scenario) : undefined} />
                         </div>
                     </div>
                 ))}
@@ -272,21 +276,23 @@ export function ScenarioComparisonPanel() {
                             { label: 'PUE', get: (m: ScenarioMetrics) => m.pue, fmt: (n: number) => n.toFixed(2) },
                             { label: 'IRR', get: (m: ScenarioMetrics) => m.irr, fmt: (n: number) => `${n.toFixed(1)}%`, higherIsBetter: true },
                             { label: 'NPV', get: (m: ScenarioMetrics) => m.npv, fmt: fmtMoney, higherIsBetter: true },
-                            { label: 'Payback', get: (m: ScenarioMetrics) => m.paybackYears, fmt: (n: number) => `${n.toFixed(1)} yr` },
-                        ].map((row: { label: string; get: (m: ScenarioMetrics) => number; fmt: (n: number) => string; higherIsBetter?: boolean }) => (
+                            /* fmtM: unreached payback → "> N yr"; unreached() suppresses the delta so a clamped value never distorts the % */
+                            { label: 'Payback', get: (m: ScenarioMetrics) => m.paybackYears, fmt: (n: number) => `${n.toFixed(1)} yr`, fmtM: (m: ScenarioMetrics) => m.paybackReached ? `${m.paybackYears.toFixed(1)} yr` : `> ${Math.round(m.paybackYears)} yr`, unreached: (m: ScenarioMetrics) => !m.paybackReached },
+                        ].map((row: { label: string; get: (m: ScenarioMetrics) => number; fmt: (n: number) => string; higherIsBetter?: boolean; fmtM?: (m: ScenarioMetrics) => string; unreached?: (m: ScenarioMetrics) => boolean }) => (
                             <tr key={row.label} className="border-b border-slate-100 dark:border-slate-800">
                                 <td className="px-4 py-2 text-slate-700 dark:text-slate-300 font-medium">{row.label}</td>
                                 {metricsData.map((m, i) => {
                                     const val = row.get(m);
                                     const baseVal = row.get(baseline);
+                                    const skipDelta = !!row.unreached && (row.unreached(m) || row.unreached(baseline));
                                     const d = i > 0 && baseVal !== 0 ? ((val - baseVal) / Math.abs(baseVal)) * 100 : 0;
                                     /* Merah = LEBIH BURUK (IRR/NPV: turun buruk; sisanya: naik buruk) */
                                     const isWorse = row.higherIsBetter ? d < 0 : d > 0;
                                     const isBetter = row.higherIsBetter ? d > 0 : d < 0;
                                     return (
                                         <td key={i} className="text-center px-3 py-2">
-                                            <span className="text-slate-900 dark:text-white font-mono">{row.fmt(val)}</span>
-                                            {i > 0 && (
+                                            <span className="text-slate-900 dark:text-white font-mono">{row.fmtM ? row.fmtM(m) : row.fmt(val)}</span>
+                                            {i > 0 && !skipDelta && (
                                                 <span
                                                     className={clsx('ml-1', isWorse ? 'text-rz-alert' : isBetter ? 'text-rz-data' : 'text-slate-400')}
                                                     title={isWorse ? worseTitle(row.fmt(Math.abs(val - baseVal)), m.scenario) : undefined}

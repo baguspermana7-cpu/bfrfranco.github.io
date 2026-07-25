@@ -13,6 +13,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.59 — 2026-07-25 (DCMOC — honest payback propagated to comparison/phased surfaces + PDFs)
+
+### Fixed
+- **Payback honesty reached the remaining surfaces**: ReportDashboard's negative-NPV narrative used a `paybackLive <= projectLifeYears` heuristic that printed "payback 15.0 yr" for a never-reached payback (clamp == life) → now reads the `paybackReached` flag. Scenario Comparison (KpiCell + matrix row) and Phased Financial (headline + per-phase table + scenario table) now show "> N yr" for unreached payback and suppress the distorting delta; the Phased Financial PDF (weighted, per-phase, scenario rows) matches. Extends the v1.115.57 fix so no surface — screen or export — prints a fabricated payback year.
+
+---
+
 ## v1.115.58 — 2026-07-25 (DCMOC — honest break-even occupancy: "not reachable" instead of a clamped "100%")
 
 ### Fixed
