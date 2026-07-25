@@ -13,14 +13,10 @@ import {
 } from '@/lib/requirementsMappings';
 import { CreatableCombobox, type ComboValue } from '@/components/ui/CreatableCombobox';
 import { SectionCard, Field, Select, Segmented, RadioList, SliderRow, NumInput } from '../ui';
-import type { UseCase, RackForm, AiChip } from '@/store/requirements';
+import type { UseCase, RackForm } from '@/store/requirements';
 
 const RACK_FORMS: { value: RackForm; label: string }[] = [
     { value: 'std42u', label: 'Standard 42U' }, { value: 'tall48u', label: 'Tall 48U' }, { value: 'ocp', label: 'OCP / Open Rack' },
-];
-const CHIPS: { value: AiChip; label: string }[] = [
-    { value: 'h100', label: 'NVIDIA H100' }, { value: 'h200', label: 'NVIDIA H200' }, { value: 'gb200', label: 'NVIDIA GB200' },
-    { value: 'mi300x', label: 'AMD MI300X' }, { value: 'tpu', label: 'Google TPU' }, { value: 'none', label: 'None / Mixed' },
 ];
 /* Rack classes mirror the capex-calculator guided questionnaire (Standard 5-7 /
  * Medium 10-15 / High 20-30 / AI 50-100 kW). */
@@ -268,7 +264,9 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                     </div>
                 </div>
                 <div className="space-y-3">
-                    <Field label="AI Chip Type (Primary)" explainKey="gpu"><Select value={w.aiChipType} onChange={(v) => set({ aiChipType: v })} options={CHIPS} /></Field>
+                    {/* aiChipType select removed — the ArchProfilePicker above is the real
+                       AI-hardware selector (applies density/cooling/tier/archKey); a
+                       second free-standing chip dropdown drove nothing (dead control). */}
                     <Field label="Cooling Approach (Preferred)" explainKey="cooling-type" hint="Writes the shared cooling type (CAPEX + all engines)">
                         <Select<CoolingKey> value={capexCooling} onChange={(v) => writeSharedCooling(v)}
                             options={COOLING_UI.map((c) => ({

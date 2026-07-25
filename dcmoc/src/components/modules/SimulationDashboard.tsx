@@ -178,7 +178,15 @@ export function SimulationDashboard() {
         // Apply Labor Multiplier to Base Staff Cost
         const aqiLaborPunishment = maintenanceLaborPunishment + (baseStaffCost * hazardMultiplier * laborMultiplier);
 
-        const finalMonthlyStaffCost = (baseStaffCost * strategyMultiplier * laborMultiplier) + turnoverAmortizedMonthly + aqiLaborPunishment;
+        /* PP 35/2021 long-shift permit — a 12h shift in Indonesia is legal only
+         * with a "Long Shift Permit"; WITHOUT one the operator pays 14h OT/week
+         * per person. Screening uplift on base labor (~14h/40h of hours at a
+         * 1.5× OT premium ≈ +10% blended). Applies ONLY when 12h + ID + no permit;
+         * holding the permit removes it. Wires the previously-dead permit flag. */
+        const longShiftUnpermitted = inputs.shiftModel === '12h' && selectedCountry?.id === 'ID' && !inputs.includeLongShiftPermit;
+        const longShiftOtPenalty = longShiftUnpermitted ? baseStaffCost * laborMultiplier * 0.10 : 0;
+
+        const finalMonthlyStaffCost = (baseStaffCost * strategyMultiplier * laborMultiplier) + turnoverAmortizedMonthly + aqiLaborPunishment + longShiftOtPenalty;
 
         const monthlyInternalCost = baseStaffCost * laborMultiplier;
         const monthlyVendorCost = finalMonthlyStaffCost - monthlyInternalCost - aqiLaborPunishment - turnoverAmortizedMonthly;
@@ -194,6 +202,7 @@ export function SimulationDashboard() {
             totalMonthlyConsumables: partsCost,
             turnoverCost: turnoverAmortizedMonthly,
             aqiImpact: scenarioAQI / 50,
+            longShiftOtPenalty,
             overtimeHours: eng.metrics.overtimeHoursPerPerson,
             availability: risk.availability,
             downtimeMinutes: risk.expectedDowntimeMinutes,
@@ -201,7 +210,7 @@ export function SimulationDashboard() {
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedCountry, inputs.shiftModel, scenarioAQI, scenarioTurnover, inputs.tierLevel, inputs.maintenanceModel, inputs.hybridRatio, simYear, baselineTurnover,
-        inputs.strategyMix, inputs.slaKey, engineReady]);
+        inputs.strategyMix, inputs.slaKey, inputs.includeLongShiftPermit, engineReady]);
 
     if (!selectedCountry || !results) return null;
 
@@ -318,10 +327,22 @@ export function SimulationDashboard() {
                             </button>
                         </div>
                         {inputs.shiftModel === '12h' && selectedCountry.id === 'ID' && (
-                            <div className="mt-2 text-xs text-amber-400 flex items-start gap-1 p-2 bg-amber-950/30 rounded">
-                                <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                                {/* Indonesia labor-regulation cite (PP 35/2021 overtime rules) */}
-                                <span>PP 35/2021 Warning: Requires "Long Shift Permit" or pays 14h OT/week.</span>
+                            <div className="mt-2 space-y-1.5">
+                                <div className="text-xs text-amber-400 flex items-start gap-1 p-2 bg-amber-950/30 rounded">
+                                    <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                                    {/* Indonesia labor-regulation cite (PP 35/2021 overtime rules) */}
+                                    <span>PP 35/2021: a 12h shift needs a Long-Shift Permit — without it, +14h OT/week (~+10% labor).</span>
+                                </div>
+                                {/* toggle wires the previously-dead includeLongShiftPermit flag → OT penalty */}
+                                <label className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 cursor-pointer px-2">
+                                    <input type="checkbox" checked={inputs.includeLongShiftPermit}
+                                        onChange={() => actions.toggleLongShiftPermit()}
+                                        className="h-3.5 w-3.5 accent-cyan-600" />
+                                    Long-Shift Permit obtained
+                                    <span className={`ml-auto rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase ${inputs.includeLongShiftPermit ? 'bg-rz-data/15 text-rz-data' : 'bg-rz-alert/15 text-rz-alert'}`}>
+                                        {inputs.includeLongShiftPermit ? 'no OT penalty' : '+10% labor OT'}
+                                    </span>
+                                </label>
                             </div>
                         )}
                     </div>

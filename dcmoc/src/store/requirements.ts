@@ -18,7 +18,6 @@ export type GridVoltage = '11kV' | '20kV' | '33kV' | '132kV' | '220kV';
 export type ProjectType = 'new_build' | 'expansion' | 'retrofit' | 'colocation';
 export type UseCase = 'ai' | 'cloud' | 'hpc' | 'enterprise' | 'network' | 'dr';
 export type RackForm = 'std42u' | 'tall48u' | 'ocp';
-export type AiChip = 'h100' | 'h200' | 'gb200' | 'mi300x' | 'tpu' | 'none';
 export type GrowthType = 'linear' | 'step' | 'custom';
 export type PriorityKey = 'reliability' | 'performance' | 'cost' | 'sustainability' | 'speed';
 
@@ -49,7 +48,6 @@ export interface ReqWorkload {
     maxRackDensityKw: number | null;
     rackForm: RackForm;
     workloadMix: { aiGpu: number; storage: number; general: number; network: number }; // sums to 100
-    aiChipType: AiChip;
     /** Owner: computed rack count must be adjustable (e.g. 500 → actual 480). null = auto. */
     totalRacksOverride: number | null;
     /** Owner: mix is predefined from the use-case profile; sliders unlock via this tick. */
@@ -110,7 +108,6 @@ const DEFAULTS: Omit<RequirementsState, 'actions'> = {
         itLoadUnit: 'MW', peakItLoadKw: null, avgItLoadKw: null,
         avgRackDensityKw: 60, maxRackDensityKw: 80, rackForm: 'std42u',
         workloadMix: { aiGpu: 70, storage: 15, general: 10, network: 5 },
-        aiChipType: 'h100',
         totalRacksOverride: null, mixManual: false,
         archKey: null,
     },

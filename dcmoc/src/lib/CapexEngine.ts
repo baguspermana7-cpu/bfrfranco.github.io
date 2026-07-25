@@ -72,7 +72,6 @@ export interface CapexInput {
     // ... add more as needed for advanced mode logic if fully implementing
     deliveryMethod?: string;
     marketCondition?: string;
-    contractorAvail?: string;
     powerDistribution?: string;
     transformerType?: string;
     pduType?: string;

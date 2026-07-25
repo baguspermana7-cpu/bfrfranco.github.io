@@ -69,7 +69,6 @@ export function SummarySection({ derived }: { derived: ReqDerived }) {
                     ['Max Rack Density', req.workload.maxRackDensityKw != null ? `${req.workload.maxRackDensityKw} kW` : '—'],
                     ['Rack Form', req.workload.rackForm],
                     ['Workload Mix', `AI ${req.workload.workloadMix.aiGpu}% · Sto ${req.workload.workloadMix.storage}% · Gen ${req.workload.workloadMix.general}% · Net ${req.workload.workloadMix.network}%`],
-                    ['AI Chip', req.workload.aiChipType.toUpperCase()],
                     ['Growth Type', req.growth.growthType],
                     ['Growth (Y0→Y5)', derived.growthYearsMw.slice(0, 6).map((g) => `${g.mw}`).join(' → ') + ' MW'],
                     ['5-yr CAGR', `${derived.cagrPct}%`],

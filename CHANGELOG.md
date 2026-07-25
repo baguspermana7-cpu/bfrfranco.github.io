@@ -13,6 +13,22 @@ release sections rather than semver.
 
 ---
 
+## v1.115.66 — 2026-07-25 (DCMOC — dead-control resolution: remove 2 redundant, wire the long-shift permit)
+
+Found by a store-wide dead-control audit (agent), directions confirmed with the owner:
+
+### Removed
+- **AI Chip Type (Primary) select** (Requirements → Workload) — a dead control redundant with the Arch Profile Picker right above it, which is the real AI-hardware selector (applies density / cooling / tier / archKey). The chip dropdown set a store field that drove nothing. Removed the select, the `aiChipType`/`AiChip` store field + type, and its Summary row.
+- **`contractorAvail`** — a `CapexInput` interface field with no UI control and no reader; removed.
+
+### Fixed
+- **Long-Shift Permit is now a real control with a cost effect.** The PP 35/2021 warning (12h shift in Indonesia) was shown but the `includeLongShiftPermit` flag was orphaned — no toggle, no effect. Added a permit checkbox under the warning; **without** the permit a 12h ID shift now carries a screening +10% labor OT penalty (≈14h OT/week per PP 35/2021), **with** it the penalty is removed. The flag flows into the staffing cost memo (and its deps), so the toggle visibly moves monthly labor cost.
+- `rackForm` (42U/48U/OCP) left as-is — it's a documented design spec shown in the Summary/dossier, not a misleading cost control.
+
+No engine change. Gates: walk 31/0 · trace 116/116 · optimizer 8/8 · financial-auto 9/9 · enum-coverage 22/22 · hardcode 0 WARN.
+
+---
+
 ## v1.115.65 — 2026-07-25 (DCMOC — 3 more dead controls wired: transformer lead/type + delivery method)
 
 ### Fixed
