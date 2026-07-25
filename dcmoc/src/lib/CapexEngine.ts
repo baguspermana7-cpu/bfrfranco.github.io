@@ -28,7 +28,15 @@ import {
     yearEscalation,
     substationCosts,
     permitRegionMult,
-    testingRedundancyMult
+    testingRedundancyMult,
+    distributionMultipliers,
+    pduMultipliers,
+    cablingMultipliers,
+    floorMultipliers,
+    securityMultipliers,
+    fiberEntryMultipliers,
+    siteConditionMultipliers,
+    marketConditionMultipliers
 } from './capex-data';
 import { CountryProfile } from '@/constants/countries';
 import { getPUE } from '@/constants/pue';
@@ -250,6 +258,26 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
     if (greenM > 1.0) {
         const greenPremium = currentTotal * (greenM - 1.0);
         currentTotal += greenPremium;
+    }
+
+    /* Quality / site / market factors — wire the CapexDashboard FOM selects that
+     * were declared-but-unused (dead controls: user picked them, they did nothing).
+     * Each defaults to 1.0 at the UI default option so baseline projects are
+     * unchanged; only non-default picks move CAPEX. Screening ±% per DATA.capexDetail
+     * (engine-primary, capex-data twin fallback). */
+    const qm = (map: Record<string, number>, engineMap: Record<string, number> | undefined, val: string | undefined, def: string): number =>
+        ((engineMap ?? map)[val ?? def]) || 1.0;
+    const qualityM =
+        qm(distributionMultipliers, cd.fomDistMult, input.powerDistribution, 'busway') *
+        qm(pduMultipliers, cd.fomPduMult, input.pduType, 'monitored') *
+        qm(cablingMultipliers, cd.fomCablingMult, input.cablingType, 'cat6a') *
+        qm(floorMultipliers, cd.fomFloorMult, input.floorType, 'raised') *
+        qm(securityMultipliers, cd.fomSecurityMult, input.securityLevel, 'standard') *
+        qm(fiberEntryMultipliers, cd.fomFiberEntryMult, input.fiberEntry, 'single') *
+        qm(siteConditionMultipliers, cd.fomSiteMult, input.siteCondition, 'greenfield') *
+        qm(marketConditionMultipliers, cd.fomMarketMult, input.marketCondition, 'normal');
+    if (qualityM !== 1.0) {
+        currentTotal *= qualityM;
     }
 
     const contingencyVal = currentTotal * (contingency / 100);

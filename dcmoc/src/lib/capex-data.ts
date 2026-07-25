@@ -43,6 +43,17 @@ export const fireSuppressionMultipliers: Record<string, number> = { fm200: 1.0, 
 export const fireAlarmMultipliers: Record<string, number> = { conventional: 0.6, addressable: 1.0, vesda: 1.8, hybrid: 2.2, beam: 1.2 };
 export const upsMultipliers: Record<string, number> = { standalone: 0.9, modular: 1.0, distributed: 1.2, rotary: 1.5 };
 export const genMultipliers: Record<string, number> = { diesel: 1.0, gas: 1.15, dualfuel: 1.3, hvo: 1.2 };
+/* Quality/site/market factors (screening) — wire the previously-dead FOM selects.
+ * Each defaults to 1.0 at the UI default option (baseline unchanged); mirrors
+ * engine DATA.capexDetail. DCMOC reads the engine map first, this is the twin. */
+export const distributionMultipliers: Record<string, number> = { busway: 1.0, cable_tray: 0.97, overhead: 0.94, underfloor: 1.0 };
+export const pduMultipliers: Record<string, number> = { basic: 0.97, monitored: 1.0, switched: 1.02, intelligent: 1.05 };
+export const cablingMultipliers: Record<string, number> = { cat6a: 1.0, cat8: 1.03, fiber_om4: 1.05, fiber_sm: 1.07 };
+export const floorMultipliers: Record<string, number> = { raised: 1.0, slab: 0.96, raised_600: 1.0, raised_1000: 1.03 };
+export const securityMultipliers: Record<string, number> = { basic: 0.97, standard: 1.0, enhanced: 1.04, military: 1.10 };
+export const fiberEntryMultipliers: Record<string, number> = { single: 1.0, dual: 1.02, mmr: 1.03 };
+export const siteConditionMultipliers: Record<string, number> = { greenfield: 1.0, brownfield: 1.05, retrofit: 1.08 };
+export const marketConditionMultipliers: Record<string, number> = { favorable: 0.95, normal: 1.0, tight: 1.06, overheated: 1.12 };
 // DM audit: legacy coarse REGION map — FALLBACK ONLY. CapexEngine location priority is
 // COUNTRIES[id].constructionIndex (now filled 40/40 in constants/countries.ts, T&T ICMS/RLB
 // screening rel. US=1.0) > cityData perW > this map (CapexEngine.ts:131-143).

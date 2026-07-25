@@ -13,6 +13,19 @@ release sections rather than semver.
 
 ---
 
+## v1.115.64 — 2026-07-25 (DCMOC — 8 dead CAPEX controls now actually affect cost)
+
+### Fixed
+- **Eight CapexDashboard FOM selects were dead controls** — declared in `CapexInput` but never read by `calculateCapex`, so the user could pick Power Distribution, PDU type, Cabling, Floor, Security level, Fiber entry, Site condition, and Market condition and CAPEX would not move at all (a "control that does nothing"). Each is now wired to a real screening multiplier (`DATA.capexDetail.fom*Mult` + `capex-data.ts` twin), combined into the cost stack. Every one **defaults to 1.0 at its UI default option** so baseline projects are unchanged — only non-default picks move CAPEX (verified: default $60M → retrofit + military security + overheated market + intelligent PDU ≈ 1.40× → $80M).
+- The new `fom*Mult` maps are deliberately DCMOC-specific names: the audit gate (below) caught that the engine's own advanced capex model already had a `marketConditionMult`/`siteConditionMult` with DIFFERENT enum domains (buyer/balanced/seller), which a naive add would have silently collided with — so the DCMOC maps are namespaced to avoid it.
+
+### Changed
+- `tools/audit-dcmoc-enum-coverage.mjs` extended to cover the 8 newly-wired selects — **19/19 mappings clean**; it's what surfaced the naming collision during development.
+
+Engine chain: test-rz-engine 762/0 · calibration · terser · engine-catalog · value-bindings · `?v` 2026-07-25-z2. Gates: walk 31/0 · trace 116/116 · optimizer 8/8 · financial-auto 9/9 · export 44/44 · enum-coverage 19/19 · reference-parity 155/0 · hardcode 0 WARN.
+
+---
+
 ## v1.115.63 — 2026-07-25 (DCMOC — permanent gate against the silent enum→DATA-key fallback bug class)
 
 ### Added

@@ -5595,6 +5595,21 @@
             fireAlarmMult: { conventional: 0.6, addressable: 1.0, vesda: 1.8, hybrid: 2.2, beam: 1.2 },
             upsMult: { standalone: 0.9, modular: 1.0, distributed: 1.2, rotary: 1.5 },
             genMult: { diesel: 1.0, gas: 1.15, dualfuel: 1.3, hvo: 1.2 },
+            /* ── DCMOC FOM quality/site/market factors (screening) — wire the
+             * CapexDashboard FOM selects that were declared-but-unused (dead
+             * controls). `fom*Mult` NAMES are DCMOC-specific to avoid colliding
+             * with the engine advanced-model's own marketConditionMult/etc.
+             * (different enum domains, line ~5695). Each DEFAULTS to 1.0 at the UI
+             * default option so baseline projects are unchanged; only non-default
+             * picks move CAPEX. Screening ±% per industry-practice cost deltas. */
+            fomDistMult: { busway: 1.0, cable_tray: 0.97, overhead: 0.94, underfloor: 1.0 },     /* busway premium vs tray/overhead */
+            fomPduMult: { basic: 0.97, monitored: 1.0, switched: 1.02, intelligent: 1.05 },      /* intelligent PDU metering premium */
+            fomCablingMult: { cat6a: 1.0, cat8: 1.03, fiber_om4: 1.05, fiber_sm: 1.07 },         /* structured-cabling grade */
+            fomFloorMult: { raised: 1.0, slab: 0.96, raised_600: 1.0, raised_1000: 1.03 },       /* raised-floor height/none */
+            fomSecurityMult: { basic: 0.97, standard: 1.0, enhanced: 1.04, military: 1.10 },     /* physical-security tier */
+            fomFiberEntryMult: { single: 1.0, dual: 1.02, mmr: 1.03 },                           /* carrier entry redundancy / meet-me room */
+            fomSiteMult: { greenfield: 1.0, brownfield: 1.05, retrofit: 1.08 },                  /* site remediation / demolition */
+            fomMarketMult: { favorable: 0.95, normal: 1.0, tight: 1.06, overheated: 1.12 },      /* labor+material market heat */
             locationMult: { sea: 0.65, india: 0.55, china: 0.7, japan: 1.1, australia: 1.05, europe: 1.15, usa: 1.0, mena: 0.90 },
             regionGroupDefaults: {
                 americas: { internalRegion: 'usa', multiplier: 1.00 },
@@ -14430,7 +14445,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-25-z"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-25-z2"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

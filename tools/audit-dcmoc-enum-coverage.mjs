@@ -98,6 +98,15 @@ const registry = [
     { field: 'seismicZone',    label: 'capexDetail.seismicMult',        options: ['zone0', 'zone1', 'zone2', 'zone3', 'zone4'],   keys: keysOf(CD.seismicMult), note: 'Requirements InfrastructureOptionsSection SEISMIC' },
     // market colo (alias-aware): every CapexDashboard cityMarket option must resolve to a DATA.markets key
     { field: 'cityMarket',     label: 'DATA.markets (via resolveMarketKey)', options: capexEnums.cityMarket, keys: keysOf(MARKETS), resolve: resolveMarketKey },
+    // FOM quality/site/market factors (wired v1.115.64 — were dead controls):
+    { field: 'powerDistribution', label: 'capexDetail.fomDistMult',        options: capexEnums.powerDistribution, keys: keysOf(CD.fomDistMult) },
+    { field: 'pduType',        label: 'capexDetail.fomPduMult',            options: capexEnums.pduType,        keys: keysOf(CD.fomPduMult) },
+    { field: 'cablingType',    label: 'capexDetail.fomCablingMult',        options: capexEnums.cablingType,    keys: keysOf(CD.fomCablingMult) },
+    { field: 'floorType',      label: 'capexDetail.fomFloorMult',          options: capexEnums.floorType,      keys: keysOf(CD.fomFloorMult) },
+    { field: 'securityLevel',  label: 'capexDetail.fomSecurityMult',       options: capexEnums.securityLevel,  keys: keysOf(CD.fomSecurityMult) },
+    { field: 'fiberEntry',     label: 'capexDetail.fomFiberEntryMult',     options: capexEnums.fiberEntry,     keys: keysOf(CD.fomFiberEntryMult) },
+    { field: 'siteCondition',  label: 'capexDetail.fomSiteMult',           options: capexEnums.siteCondition,  keys: keysOf(CD.fomSiteMult) },
+    { field: 'marketCondition', label: 'capexDetail.fomMarketMult',        options: capexEnums.marketCondition, keys: keysOf(CD.fomMarketMult) },
 ];
 
 let gaps = 0;
