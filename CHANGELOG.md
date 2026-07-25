@@ -13,6 +13,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.63 — 2026-07-25 (DCMOC — permanent gate against the silent enum→DATA-key fallback bug class)
+
+### Added
+- **`tools/audit-dcmoc-enum-coverage.mjs` (STRICT ship gate).** The same bug class bit us twice (v1.115.61 market `northern_virginia`, v1.115.62 four CAPEX selects) — a UI `<select>` value used as a key into an engine DATA map that has no such key, silently falling back to a neutral 1.0 multiplier / $1M cost and mis-costing a real design choice with no warning. Rather than keep finding these by hand, this gate mechanically verifies every cost/value UI option resolves to a real key: it loads the engine DATA (vm sandbox), extracts each select's option domain from `CapexDashboard.tsx` (+ curated array-selects for redundancy/seismic), and asserts membership against `DATA.capexDetail.*` / `DATA.markets` (cityMarket alias-aware via `resolveMarketKey`). **11/11 mappings clean** (rack/cooling/building/fire/alarm/ups/gen/substation/redundancy/seismic/market); exit 1 on any gap. Self-tested: removing a key makes it fail with the exact `field "value" → map has no key`. Wired into the DCMOC ship-gate list (CLAUDE.md) so a new option or renamed key can never silently regress this class again.
+
+---
+
 ## v1.115.62 — 2026-07-25 (DCMOC — CAPEX select options that silently fell back to default cost, now resolve to real values)
 
 ### Fixed
