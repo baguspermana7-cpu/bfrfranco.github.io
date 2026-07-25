@@ -13,6 +13,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.55 — 2026-07-25 (DCMOC — below-hurdle IRR diagnosis on the Executive KPI, Auto-optimize wired to the real solver)
+
+### Added
+- **Executive IRR card diagnoses itself below the 12% hurdle**: fault-red + "BELOW 12% HURDLE — click for diagnosis"; the DiagnosticModal explains the equity case vs a DC fund's cost of capital and offers levers (raise the write-through revenue basis, re-phase the build via Phased Finance, cut OPEX drivers) — and its **Auto-optimize button invokes the page's real 3-objective solver** (bisects revenue to the hurdle, preview-then-Apply). Verified headless end-to-end: red card → modal → Auto-optimize → "3 objectives evaluated" results panel, 0 errors. Completes the mandate pair with the negative-EBITDA card (v1.115.53).
+
+---
+
 ## v1.115.54 — 2026-07-25 (DCMOC — revenue basis edit WRITES THROUGH: Financial field → sim-store SSOT → every DCF surface)
 
 ### Fixed
