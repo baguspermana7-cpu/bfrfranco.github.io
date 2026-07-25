@@ -13,6 +13,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.61 — 2026-07-25 (DCMOC — fix Northern Virginia market → real $215 colo rate, not the fallback band)
+
+### Fixed
+- **City-market → colo-rate resolution was broken for Northern Virginia.** The `<select>` emits `northern_virginia`, but the alias map only had `virginia → n-virginia`, so `northern_virginia` resolved to the non-existent key `northern-virginia` and the flagship market silently fell back to the JLL band ($185) instead of its real $215/kW·mo rate — directly undercutting the "se akurat" AUTO revenue. Extracted the duplicated (and broken) alias into one `resolveMarketKey()` (`lib/market-key.ts`), fixed the alias, and adopted it in all three surfaces that map city → `DATA.markets` (Financial AUTO, FinancialPage pro-forma, Strategic Planning). Verified: selecting Northern Virginia now sets revenue AUTO = $215 and writes it through app-wide. Probe `_dcmoc_financial_auto_probe` strengthened with the market-resolution assertion (regression guard).
+
+---
+
 ## v1.115.60 — 2026-07-25 (DCMOC Financial — AUTO-by-default with per-field manual override)
 
 ### Changed

@@ -4,6 +4,7 @@ import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { useRequirementsStore } from '@/store/requirements';
 import { MAINT_PER_KW_YR } from '@/lib/screening';
 import { rzData } from '@/lib/rz-engine';
+import { resolveMarketKey } from '@/lib/market-key';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
@@ -232,8 +233,7 @@ const FinancialDashboard = () => {
         const tier = inputs.tierLevel ?? 3;
         const itLoad = inputs.itLoad ?? 1000;
         const cid = (selectedCountry?.id ?? '').toUpperCase();
-        const MARKET_ALIAS: Record<string, string> = { virginia: 'n-virginia', malaysia: 'kuala-lumpur' };
-        const marketKey = MARKET_ALIAS[cityMarket ?? ''] ?? (cityMarket ?? 'none').replace(/_/g, '-');
+        const marketKey = resolveMarketKey(cityMarket);
         const marketColo: number | undefined = marketKey !== 'none' ? D?.markets?.[marketKey]?.coloPrice : undefined;
         const marketName: string | undefined = marketKey !== 'none' ? D?.markets?.[marketKey]?.name : undefined;
 

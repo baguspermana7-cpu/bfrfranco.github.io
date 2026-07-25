@@ -17,6 +17,7 @@ import { useFinancialTracking } from '@/store/financialTracking';
 import { useConstructionTracking } from '@/store/constructionTracking';
 import { plannedSchedule, evm, pvCurve } from '@/state/adapters/construction-adapter';
 import { rzModels, rzData } from '@/lib/rz-engine';
+import { resolveMarketKey } from '@/lib/market-key';
 import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 import FinancialDashboard from '@/components/modules/FinancialDashboard';
 import MonteCarloDashboard from '@/components/modules/MonteCarloDashboard';
@@ -101,8 +102,7 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
         /* revenue reference: engine market coloPrice ($/kW·mo) when a city
          * market is selected; else the page's screening default (the engine
          * has no global revenue key — labeled honestly, never called engine) */
-        const MARKET_ALIAS: Record<string, string> = { virginia: 'n-virginia', malaysia: 'kuala-lumpur' };
-        const marketKey = MARKET_ALIAS[cityMarket ?? ''] ?? (cityMarket ?? 'none').replace(/_/g, '-');
+        const marketKey = resolveMarketKey(cityMarket);
         const marketColo: number | undefined = marketKey !== 'none' ? D?.markets?.[marketKey]?.coloPrice : undefined;
         /* fallback = the LIVE app-wide basis (sim tunable), never a divergent
          * literal — this page's Pro Forma runs on the same number */

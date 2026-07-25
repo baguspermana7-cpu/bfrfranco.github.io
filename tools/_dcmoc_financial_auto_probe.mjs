@@ -30,6 +30,8 @@ page.on('pageerror', (e) => errors.push(String(e).slice(0, 200)));
 await page.evaluateOnNewDocument(() => {
     localStorage.setItem('dcmoc.tour.v1', 'seen');
     localStorage.setItem('dcmoc-auth', JSON.stringify({ state: { user: { email: 'b@r.com', role: 'root' } }, version: 0 }));
+    // seed a real market (Northern Virginia) — capex store persist version MUST be 1
+    localStorage.setItem('dcmoc-capex', JSON.stringify({ state: { inputs: { cityMarket: 'northern_virginia' } }, version: 1 }));
 });
 await page.goto(`http://localhost:${PORT}/dcmoc/`, { waitUntil: 'networkidle2', timeout: 60000 });
 await new Promise((r) => setTimeout(r, 3000));
@@ -56,9 +58,11 @@ ok('all fields default to AUTO (chips)', autoChips >= 15, `(${autoChips})`);
 ok('every field has a tick-to-override control', ticks >= 15, `(${ticks})`);
 await page.screenshot({ path: join(SHOTS, 'financial-auto.png') });
 
-/* 2 · revenue AUTO wrote through to the sim-store SSOT (JLL band w/ no market) */
+/* 2 · revenue AUTO = the selected market's real colo rate, written through to
+ *     the sim-store SSOT (N.Virginia coloPrice $215 — regression guard for the
+ *     broken northern_virginia→n-virginia alias that fell back to the band). */
 const storeRev = await page.evaluate(() => JSON.parse(localStorage.getItem('dcmoc-simulation')).state.inputs.revenuePerKwMonth);
-ok('revenue AUTO wrote through to the store SSOT', storeRev > 0, `($${storeRev})`);
+ok('revenue AUTO resolves the market colo rate + writes through (N.Virginia $215)', storeRev === 215, `($${storeRev})`);
 
 /* 3 · tick a field → OVERRIDE appears; the rest stay AUTO */
 const overrideBefore = await countText('override');

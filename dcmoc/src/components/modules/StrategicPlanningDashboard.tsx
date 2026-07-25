@@ -8,6 +8,7 @@ import { useRequirementsStore } from '@/store/requirements';
 import { cagr5 } from '@/lib/requirementsMappings';
 import { getPUE } from '@/constants/pue';
 import { rzModels, rzData } from '@/lib/rz-engine';
+import { resolveMarketKey } from '@/lib/market-key';
 import { fmtMoney, fmtUnit } from '@/lib/format';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { ScoreValue } from '@/components/ui/ScoreValue';
@@ -389,8 +390,7 @@ export default function StrategicPlanningDashboard() {
      * $/kW·mo equivalent at 90% load factor (screening). ── */
     const cityMarket = useCapexStore((s) => s.inputs.cityMarket);
     const marketBasis = useMemo(() => {
-        const MARKET_ALIAS: Record<string, string> = { virginia: 'n-virginia', malaysia: 'kuala-lumpur' };
-        const key = MARKET_ALIAS[cityMarket ?? ''] ?? (cityMarket ?? 'none').replace(/_/g, '-');
+        const key = resolveMarketKey(cityMarket);
         const colo: number | undefined = key !== 'none' ? rzData()?.markets?.[key]?.coloPrice : undefined;
         return colo != null
             ? { value: colo, label: `engine coloPrice · ${key}`, mapped: true }
