@@ -15,6 +15,7 @@ import { rzData, rzModels } from '@/lib/rz-engine';
 import { REC, recMatches, type RecCtx, type RecValue } from '@/lib/recommended';
 import type { CapexInput } from '@/lib/CapexEngine';
 import { SectionCard, Field, Select, Segmented, NumInput } from '../ui';
+import { AutoField } from '@/components/ui/AutoField';
 import { ChevronDown } from 'lucide-react';
 
 const SUBSTATIONS = [
@@ -85,6 +86,11 @@ export function InfrastructureOptionsSection() {
     const useCase = useRequirementsStore((s) => s.overview.useCase);
     const designMarginPct = useRequirementsStore((s) => s.business.designMarginPct);
     const deepSeaAvailable = typeof rzModels()?.cooling?.deepSea === 'function';
+    /* Workstream C — Fuel Autonomy AUTO from the tier's Uptime backup band (moved
+     * here as the canonical owner; CAPEX shows it read-only). */
+    const [fuelOverride, setFuelOverride] = React.useState(false);
+    const autoFuelHours = ((rzData()?.fuelGen as { fuelStorageHoursByTier?: Record<number, number> } | undefined)?.fuelStorageHoursByTier?.[simInputs.tierLevel]) ?? 48;
+    React.useEffect(() => { if (!fuelOverride && inputs.fuelHours !== autoFuelHours) setInputs({ fuelHours: autoFuelHours }); }, [fuelOverride, autoFuelHours]); // eslint-disable-line react-hooks/exhaustive-deps
     const refOpts = React.useMemo(() => {
         const db = rzData()?.refrigerants as Record<string, { label: string }> | undefined;
         return db ? Object.entries(db).map(([value, r]) => ({ value, label: r.label })) : FALLBACK_REFRIGERANTS;
@@ -203,10 +209,12 @@ export function InfrastructureOptionsSection() {
                         <Select value={inputs.genType} onChange={(v) => setInputs({ genType: v })}
                             options={[{ value: 'diesel', label: 'Diesel Gen' }, { value: 'gas', label: 'Gas Engine' }, { value: 'hvo', label: 'HVO / Renewable' }]} />
                     </Field>
-                    <Field label="Fuel Autonomy" hint="on-site fuel at full generator load">
-                        <NumInput value={inputs.fuelHours} min={12} max={168} unit="h" onChange={(v) => setInputs({ fuelHours: v ?? 48 })} />
-                        {chip('fuelHours', inputs.fuelHours, (v) => `${v} h`)}
-                    </Field>
+                    <AutoField label="Fuel Autonomy" suffix="(h)" min={12} max={168}
+                        tip="On-site fuel reserve in hours of full-load generator runtime. Auto follows the tier's Uptime backup-autonomy band (Tier II 48h · III 72h · IV 96h); override for remote/hurricane-prone sites (up to 168h)."
+                        override={fuelOverride} value={inputs.fuelHours}
+                        source={`Tier ${simInputs.tierLevel} backup autonomy — ${autoFuelHours}h (Uptime / NFPA 110)`}
+                        onToggle={(on) => setFuelOverride(on)}
+                        onChange={(v) => setInputs({ fuelHours: Math.min(168, Math.max(12, v)) })} />
                     <Field label="Fire Suppression" explainKey="fire-suppression">
                         <Select value={inputs.fireType} onChange={(v) => setInputs({ fireType: v })} options={FIRE_OPTS} />
                         {chip('fireType', inputs.fireType, (v) => labelIn(FIRE_OPTS, v))}

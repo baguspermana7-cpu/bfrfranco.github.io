@@ -3,8 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useCapexStore } from '@/store/capex';
 import { useSimulationStore } from '@/store/simulation';
 import { COUNTRIES } from '@/constants/countries';
-import { rzModels, rzData } from '@/lib/rz-engine';
-import { AutoField } from '@/components/ui/AutoField';
+import { rzModels } from '@/lib/rz-engine';
 import {
     Calculator, Building, Zap, Server, BarChart3,
     Settings, Calendar, MapPin, DollarSign, Activity, TrendingUp,
@@ -42,11 +41,6 @@ const CapexDashboard = () => {
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const [heroBusy, setHeroBusy] = useState(false);
-    /* Workstream C — AutoField: fuel storage hours default AUTO from the tier's
-     * Uptime backup-autonomy band; tick to override. */
-    const [fuelOverride, setFuelOverride] = useState(false);
-    const autoFuelHours = ((rzData()?.fuelGen as { fuelStorageHoursByTier?: Record<number, number> } | undefined)?.fuelStorageHoursByTier?.[simInputs.tierLevel]) ?? 48;
-    useEffect(() => { if (!fuelOverride && inputs.fuelHours !== autoFuelHours) setInputs({ fuelHours: autoFuelHours }); }, [fuelOverride, autoFuelHours]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Hero image upload → client-side WebP compression → store (shown on the
     // Executive Dashboard Project Summary). Default is /dcmoc/hero-default.webp.
@@ -224,38 +218,20 @@ const CapexDashboard = () => {
                         {/* Rack Density is a shared canonical — shown read-only above (Requirements). */}
 
                         {/* ─── POWER BACKUP ─── */}
-                        <div className="pt-3 border-t dark:border-slate-700 space-y-3">
-                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center">
-                                <Zap className="w-3 h-3 mr-1" /> Power Backup <Tooltip content="UPS provides instant battery backup. Generator provides extended runtime. Both are critical for Tier III+ facilities." />
-                            </label>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">UPS System <Tooltip content="Standalone: traditional double-conversion online UPS. Modular: scalable hot-swap frames (Vertiv/Eaton). Distributed: rack-level lithium-ion units. Rotary/DRUPS: diesel rotary flywheel — no battery needed." /></div>
-                                    <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.upsType}
-                                        onChange={(e) => handleChange('upsType', e.target.value)}>
-                                        <option value="standalone">Standalone UPS</option>
-                                        <option value="modular">Modular UPS</option>
-                                        <option value="distributed">Distributed</option>
-                                        <option value="rotary">Rotary/DRUPS</option>
-                                    </select>
+                        {/* ─── POWER BACKUP — canonical home Requirements (dedup) ─── */}
+                        {(() => {
+                            const ups = inputs.upsType;
+                            const upsLabel = ups === 'standalone' ? 'Standalone UPS' : ups === 'distributed' ? 'Distributed' : ups === 'rotary' ? 'Rotary/DRUPS' : 'Modular UPS';
+                            const gen = inputs.genType;
+                            const genLabel = gen === 'gas' ? 'Gas Engine' : gen === 'hvo' ? 'HVO/Renewable' : 'Diesel Gen';
+                            return (
+                                <div className="pt-3 border-t dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <RedMirror icon={Zap} label="UPS System" value={upsLabel} tip="Owned by Requirements (Infrastructure - Systems). Edit it there." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
+                                    <RedMirror icon={Zap} label="Generator" value={genLabel} tip="Owned by Requirements (Infrastructure - Systems). Edit it there." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
+                                    <RedMirror icon={Fuel} label="Fuel Autonomy" value={`${inputs.fuelHours} h`} tip="Owned by Requirements (Infrastructure - Systems) - AUTO from the tier's Uptime backup band, override there." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
                                 </div>
-                                <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Generator <Tooltip content="Diesel: most common, fast start, high energy density. Gas Engine: lower emissions, requires gas supply. HVO/Renewable: hydrotreated vegetable oil — drop-in diesel replacement with 90% lower CO2." /></div>
-                                    <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.genType}
-                                        onChange={(e) => handleChange('genType', e.target.value)}>
-                                        <option value="diesel">Diesel Gen</option>
-                                        <option value="gas">Gas Engine</option>
-                                        <option value="hvo">HVO/Renewable</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <AutoField label="Fuel Storage" suffix="(h)" min={12} max={168}
-                                tip="On-site fuel reserve in hours of full-load generator runtime. Auto follows the Uptime backup-autonomy band for the tier (Tier II 48h · III 72h · IV 96h); override for remote or hurricane-prone sites (up to 168h / 7d)."
-                                override={fuelOverride} value={inputs.fuelHours}
-                                source={`Tier ${simInputs.tierLevel} backup autonomy — ${autoFuelHours}h (Uptime / NFPA 110)`}
-                                onToggle={(on) => setFuelOverride(on)}
-                                onChange={(v) => handleChange('fuelHours', Math.min(168, Math.max(12, v)))} />
-                        </div>
+                            );
+                        })()}
 
                         {/* ─── FIRE PROTECTION — canonical home Requirements (dedup) ─── */}
                         {(() => {

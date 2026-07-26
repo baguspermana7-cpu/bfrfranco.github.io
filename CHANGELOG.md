@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.94 — 2026-07-26 (DCMOC — CAPEX infra dedup complete: Power Backup single-owner + fuel AutoField at its home)
+
+### Changed
+- **Finishes the CAPEX Assumptions dedup.** The Power Backup block (UPS / generator / fuel autonomy) was the last section editable in both the CAPEX Assumptions tab and Requirements → Infrastructure. It's now read-only mirrors on the CAPEX page, and the **fuel-autonomy AUTO/override field moved to its canonical home** in Requirements → Infrastructure → Systems (AUTO from the tier's Uptime backup band; tick to override) — so the auto-with-override lives where the field is owned, with exactly one editor. No CAPEX infrastructure parameter is editable in two places anymore. walk 31/0, trace-parity 116/116.
+
 ## v1.115.93 — 2026-07-26 (DCMOC — CAPEX infra dedup, cont.: Fire + Substation now read-only mirrors)
 
 ### Changed
