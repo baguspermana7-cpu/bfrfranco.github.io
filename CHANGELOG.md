@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.75 — 2026-07-26 (DCMOC — per-page "what this page is for" descriptions, site-wide)
+
+### Added
+- **Every DCMOC page now explains itself.** A single registry-driven `PageDescription` component is injected once in the Shell, above every tab's content, and renders a one-line "what this page shows + when to use it" note keyed by the active tab. Covers all ~48 tabs (Requirements, Capacity, Fuel & Generator, CDU, Architecture, CAPEX, Financial, Reliability, Operations/Staff/Maintenance, Carbon, Commissioning, Scenarios, Diagnostics, and the rest). No more guessing what a page is for. One component + one registry — not a per-page copy; adding a tab is a one-line registry entry. Gates green (walk 31/0); no engine change.
+
 ## v1.115.74 — 2026-07-26 (DCMOC — Simulation KPIs + Cause-Effect levers get trace/diagnostic modals)
 
 ### Added

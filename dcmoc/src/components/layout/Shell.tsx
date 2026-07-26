@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useFx } from '@/lib/fx';
+import { PageDescription } from '@/components/layout/PageDescription';
 import { useSimulationStore } from '@/store/simulation';
 import { useRequirementsStore } from '@/store/requirements';
 import { useScenarioStore, SavedScenario } from '@/store/scenario';
@@ -828,6 +829,8 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
                         </button>
                     </div>
                 )}
+                {/* Workstream H — per-page "what this page is for" description (single injection, registry-driven) */}
+                <PageDescription tabId={activeTab} />
                 <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {children}
                 </div>
