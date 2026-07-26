@@ -13,6 +13,16 @@ release sections rather than semver.
 
 ---
 
+## v1.115.79 — 2026-07-26 (DCMOC — review-hardening of the power-source / fuel / water batch)
+
+### Fixed
+- **Carbon Scope-1 now uses the selected fuel's consumption rate** (`fuelTypeModel.effLPerKwh`), not a fixed diesel 0.3 L/kWh. Previously fuel-cell (0.20) and biogas (0.32) selections computed their fuel volume — and therefore Scope-1 CO₂ — on diesel efficiency, giving a wrong carbon number.
+- **The HVO cost/CO₂ comparison panel is now gated to `fuelType === 'diesel'`.** HVO is a diesel substitute, and the panel's baseline is the diesel 2.68 kgCO₂/L factor — showing it for a gas/biogas selection produced a nonsensical saving computed against a non-diesel fuel volume.
+- **Prime (off-grid, continuous) power no longer double-counts test fuel.** With gensets running 8760 × utilisation, the periodic test schedule is a subset of continuous operation; the separate test-fuel line is now zeroed for prime (standby/hybrid keep it). Prime CO₂ corrects slightly (e.g. 20,236 → 20,207 t/yr at 2.5 MW).
+- Guarded the generator OPEX-breakdown percentage divisor against a zero total; removed a dead/misleadingly-named `annualGlycolMakeupPlusWaterM3` field from `models.water.coolingLoop`; the IST scenario tab now renders unordered lists as `<ul>` (was `<ol>`) and guards the risk-badge style lookup.
+
+All from an adversarial review of v1.115.72–.78. Engine chain rebuilt (762/0, bindings 85/0); gates green (walk 31/0, trace-parity 116/116, enum 25, fuel-gen probe 5/5).
+
 ## v1.115.78 — 2026-07-26 (DCMOC — Commissioning Integrated Systems Test (IST) scenario deep-dive)
 
 ### Added

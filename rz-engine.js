@@ -11670,7 +11670,6 @@
                         driftL: Math.round(driftL), driftM3: toM3(driftL),
                         towerMakeupM3: toM3(towerMakeupL),
                         annualWaterL: Math.round(annualWaterL), annualWaterM3: toM3(annualWaterL),
-                        annualGlycolMakeupPlusWaterM3: toM3(annualWaterL + annualGlycolMakeupL),
                         wue: Math.round(wue * 1000) / 1000,
                         method: 'screening water balance: closed-loop makeup (' + (C.loopMakeupPerYear * 100) + '%/yr of ' + C.loopVolumeLPerKwIt + ' L/kW charge) + tower evaporation (' + C.evapLPerKwhThermal + ' L/kWh_th × wet-fraction ' + wetFrac + ') + blowdown (CoC ' + coc + ') + drift — not a site water balance'
                     };
@@ -14661,7 +14660,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-26-d"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-26-e"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

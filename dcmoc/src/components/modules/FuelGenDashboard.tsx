@@ -409,11 +409,11 @@ export default function FuelGenDashboard() {
                                     <Tooltip content="Breakdown of total annual generator operating expenditure into fuel, maintenance, and environmental compliance categories." />
                                 </h4>
                                 <div className="space-y-2">
-                                    {[
-                                        { label: 'Annual Fuel', value: result.cost.annualFuelCostUsd, pct: result.cost.annualFuelCostUsd / result.cost.totalAnnualGenOpex * 100, color: 'bg-amber-500', tip: 'Total diesel fuel cost per year from testing, outage runtime, and fuel polishing operations.' },
-                                        { label: 'Maintenance', value: result.cost.annualMaintenanceUsd, pct: result.cost.annualMaintenanceUsd / result.cost.totalAnnualGenOpex * 100, color: 'bg-cyan-500', tip: 'Annual preventive and corrective maintenance cost per generator unit, including oil changes, filter replacements, and coolant service.' },
-                                        { label: 'Environmental', value: result.cost.annualEnvironmentalComplianceUsd, pct: result.cost.annualEnvironmentalComplianceUsd / result.cost.totalAnnualGenOpex * 100, color: 'bg-rz-mint', tip: 'Annual environmental permit fees, emission testing, and regulatory compliance costs. Zero if no environmental permits required in selected country.' },
-                                    ].map((item, i) => (
+                                    {(() => { const opexDen = result.cost.totalAnnualGenOpex || 1; return [
+                                        { label: 'Annual Fuel', value: result.cost.annualFuelCostUsd, pct: result.cost.annualFuelCostUsd / opexDen * 100, color: 'bg-amber-500', tip: 'Total diesel fuel cost per year from testing, outage runtime, and fuel polishing operations.' },
+                                        { label: 'Maintenance', value: result.cost.annualMaintenanceUsd, pct: result.cost.annualMaintenanceUsd / opexDen * 100, color: 'bg-cyan-500', tip: 'Annual preventive and corrective maintenance cost per generator unit, including oil changes, filter replacements, and coolant service.' },
+                                        { label: 'Environmental', value: result.cost.annualEnvironmentalComplianceUsd, pct: result.cost.annualEnvironmentalComplianceUsd / opexDen * 100, color: 'bg-rz-mint', tip: 'Annual environmental permit fees, emission testing, and regulatory compliance costs. Zero if no environmental permits required in selected country.' },
+                                    ]; })().map((item, i) => (
                                         <div key={i}>
                                             <div className="flex justify-between text-sm mb-1">
                                                 <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1">{item.label}<Tooltip content={item.tip} /></span>

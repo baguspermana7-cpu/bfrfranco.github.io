@@ -97,7 +97,7 @@ function IstScenariosTab({ redundancy, openIst, setOpenIst }: { redundancy: stri
                             <div className="min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap mb-0.5">
                                     <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${CAT_STYLE[s.category] ?? CAT_STYLE.integrated}`}>{s.category}</span>
-                                    <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${RISK_STYLE[s.risk]}`}>{s.risk} risk</span>
+                                    <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${RISK_STYLE[s.risk] ?? RISK_STYLE.low}`}>{s.risk} risk</span>
                                     <span className="text-[9px] font-mono text-slate-400">{s.durationHrs}h · {s.appliesFrom}+</span>
                                 </div>
                                 <div className="text-sm font-bold text-slate-900 dark:text-white">{s.name}</div>
@@ -136,12 +136,13 @@ function IstScenariosTab({ redundancy, openIst, setOpenIst }: { redundancy: stri
     );
 }
 function IstBlock({ title, items, ordered }: { title: string; items: string[]; ordered?: boolean }) {
+    const items2 = items.map((it, i) => <li key={i} className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">{it}</li>);
     return (
         <div>
             <div className="text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">{title}</div>
-            <ol className={`space-y-1 ${ordered ? 'list-decimal' : 'list-disc'} pl-4`}>
-                {items.map((it, i) => <li key={i} className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">{it}</li>)}
-            </ol>
+            {ordered
+                ? <ol className="space-y-1 list-decimal pl-4">{items2}</ol>
+                : <ul className="space-y-1 list-disc pl-4">{items2}</ul>}
         </div>
     );
 }

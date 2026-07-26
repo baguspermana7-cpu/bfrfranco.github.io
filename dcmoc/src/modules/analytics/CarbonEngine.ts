@@ -157,11 +157,15 @@ export const calculateCarbonFootprint = (inputs: CarbonInputs): CarbonResult => 
         psModel?.runHoursMode === 'continuous' ? 8760 * (psModel.utilisation ?? 0.85)
         : psModel?.runHoursMode === 'fraction' ? 8760 * (psModel.yearFraction ?? 0.55)
         : STANDBY_GEN_HOURS;
-    // Fuel CO₂ factor per liter — engine fuelTypeModel first, HVO 0.2× / diesel 1× fallback.
+    // Fuel CO₂ factor per unit — engine fuelTypeModel first, HVO 0.2× / diesel 1× fallback.
     const fuelCo2PerL: number = fuelSpec?.co2PerUnit ?? (fuelType === 'hvo' ? DIESEL_EMISSION_FACTOR * 0.2 : DIESEL_EMISSION_FACTOR);
     const runHoursMult: number = fuelSpec?.runHoursMult ?? 1; // solar-hybrid shaves ~30% run-hours
-    const dieselLiters = itLoadKw * DIESEL_CONSUMPTION_RATE * annualGenHours * runHoursMult;
-    const scope1Generators = (dieselLiters * fuelCo2PerL) / 1000; // tCO₂/yr
+    // Review-fix: use the SELECTED fuel's consumption rate (fuelSpec.effLPerKwh),
+    // not the fixed diesel 0.3 L/kWh — else fuel-cell (0.20) / biogas (0.32) volumes
+    // (and their Scope-1 CO₂) were computed on diesel efficiency. Falls back to diesel.
+    const fuelUnitPerKwh: number = fuelSpec?.effLPerKwh ?? DIESEL_CONSUMPTION_RATE;
+    const fuelUnitsPerYear = itLoadKw * fuelUnitPerKwh * annualGenHours * runHoursMult;
+    const scope1Generators = (fuelUnitsPerYear * fuelCo2PerL) / 1000; // tCO₂/yr
 
     // A15: Refrigerant leakage Scope 1 (engine DATA.refrigerants, local fallback)
     const refData = getRefrigerantData(coolingType);

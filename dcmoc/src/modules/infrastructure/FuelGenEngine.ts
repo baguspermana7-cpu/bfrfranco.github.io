@@ -264,12 +264,16 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
     // Fuel polishing: recirculate 10% of total storage monthly
     const annualPolishingLiters = storageLiters * 0.10 * 12 * 0.01; // Small consumption during polishing
 
-    const totalLitersPerYear = annualTestLiters + annualOutageLiters + annualPolishingLiters;
+    // Review-fix: in prime (continuous) mode the gensets already run 8760×util, so
+    // the periodic test schedule is a SUBSET of continuous operation — counting test
+    // fuel on top would double-count. Standby/hybrid keep the separate test line.
+    const effectiveTestLiters = srcModel.runHoursMode === 'continuous' ? 0 : annualTestLiters;
+    const totalLitersPerYear = effectiveTestLiters + annualOutageLiters + annualPolishingLiters;
     const totalLitersPerMonth = totalLitersPerYear / 12;
 
     const consumption: FuelConsumption = {
-        monthlyTestLiters: Math.round(monthlyTestLiters),
-        annualTestLiters: Math.round(annualTestLiters),
+        monthlyTestLiters: Math.round(srcModel.runHoursMode === 'continuous' ? 0 : monthlyTestLiters),
+        annualTestLiters: Math.round(effectiveTestLiters),
         annualOutageLiters: Math.round(annualOutageLiters),
         annualPolishingLiters: Math.round(annualPolishingLiters),
         totalLitersPerYear: Math.round(totalLitersPerYear),
@@ -321,8 +325,11 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
     //   price ×(1 + fuelTaxRate) — same tax treatment as diesel (screening)
     //   CO2 savings = diesel lifecycle CO2 × 90% (HVO ~90% lifecycle reduction, screening)
     // Fallback: null when fuelDiesel absent, hvoAvailable false, or price 0 — result unchanged.
+    // Review-fix: HVO is a DIESEL substitute — the diesel→HVO delta (and the 2.68
+    // diesel-baseline CO2 saving) is only meaningful when the selected fuel IS diesel.
+    // For gas/biogas/fuel-cell the comparison is nonsensical, so gate it off.
     let hvo: HvoComparison | null = null;
-    if (fuel?.hvoAvailable && fuel.hvoPricePerLiter > 0) {
+    if (fuelType === 'diesel' && fuel?.hvoAvailable && fuel.hvoPricePerLiter > 0) {
         const hvoPriceWithTax = fuel.hvoPricePerLiter * (1 + fuelTaxRate);
         const hvoLiters = totalLitersPerYear * 1.03; // HVO ~3% higher volumetric burn (lower energy density, screening)
         const hvoAnnualCost = hvoLiters * hvoPriceWithTax;

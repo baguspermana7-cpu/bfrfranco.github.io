@@ -79,7 +79,7 @@ interface WaterLoopResult {
     annualGlycolMakeupL: number; annualGlycolMakeupM3: number; annualLoopWaterMakeupL: number;
     evaporationL: number; evaporationM3: number; blowdownL: number; blowdownM3: number;
     driftL: number; driftM3: number; towerMakeupM3: number;
-    annualWaterL: number; annualWaterM3: number; annualGlycolMakeupPlusWaterM3: number;
+    annualWaterL: number; annualWaterM3: number;
     wue: number; method: string;
 }
 
