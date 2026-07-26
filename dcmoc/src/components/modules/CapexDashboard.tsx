@@ -257,34 +257,19 @@ const CapexDashboard = () => {
                                 onChange={(v) => handleChange('fuelHours', Math.min(168, Math.max(12, v)))} />
                         </div>
 
-                        {/* ─── FIRE PROTECTION ─── */}
-                        <div className="pt-3 border-t dark:border-slate-700 space-y-3">
-                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center">
-                                <Flame className="w-3 h-3 mr-1" /> Fire Protection <Tooltip content="Novec 1230 and FM-200 are clean-agent systems safe for electronics. Inert gas is greener but requires larger storage." />
-                            </label>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Suppression <Tooltip content="Novec 1230: clean agent, zero ODP, safe for occupied spaces. FM-200: proven clean agent (being phased out in EU). Inert Gas (IG-541): nitrogen/argon blend, zero GWP, larger cylinder storage. Wet Pipe: cheapest but risks water damage to equipment." /></div>
-                                    <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.fireType}
-                                        onChange={(e) => handleChange('fireType', e.target.value)}>
-                                        {/* clean-agent classes per NFPA 2001 (IG-541 = inert blend) */}
-                                        <option value="novec">Novec 1230</option>
-                                        <option value="fm200">FM-200</option>
-                                        <option value="inert">Inert Gas (IG-541)</option>
-                                        <option value="sprinkler">Wet Pipe Sprinkler</option>
-                                    </select>
+                        {/* ─── FIRE PROTECTION — canonical home Requirements (dedup) ─── */}
+                        {(() => {
+                            const ft = inputs.fireType;
+                            const ftLabel = ft === 'fm200' ? 'FM-200' : ft === 'inert' ? 'Inert Gas (IG-541)' : ft === 'sprinkler' ? 'Wet Pipe Sprinkler' : 'Novec 1230';
+                            const at = inputs.alarmType;
+                            const atLabel = at === 'vesda' ? 'VESDA (Aspirating)' : at === 'beam' ? 'Beam Detection' : 'Addressable';
+                            return (
+                                <div className="pt-3 border-t dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <RedMirror icon={Flame} label="Fire Suppression" value={ftLabel} tip="Owned by Requirements (Infrastructure → Systems) — clean-agent choice (NFPA 2001). Edit it there." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
+                                    <RedMirror icon={Flame} label="Fire Alarm" value={atLabel} tip="Owned by Requirements (Infrastructure → Systems) — detection method. Edit it there." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
                                 </div>
-                                <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Fire Alarm <Tooltip content="Addressable: point-type detectors with exact zone identification. VESDA (Aspirating): air-sampling system that detects smoke at earliest stages — gold standard for data centers. Beam Detection: infrared beam across large open spaces." /></div>
-                                    <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.alarmType}
-                                        onChange={(e) => handleChange('alarmType', e.target.value)}>
-                                        <option value="addressable">Addressable</option>
-                                        <option value="vesda">VESDA (Aspirating)</option>
-                                        <option value="beam">Beam Detection</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+                            );
+                        })()}
 
                         {/* ─── SUSTAINABILITY ─── */}
                         <div className="pt-3 border-t dark:border-slate-700 space-y-3">
@@ -319,32 +304,16 @@ const CapexDashboard = () => {
                             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center">
                                 <Zap className="w-3 h-3 mr-1" /> Substation & Grid <Tooltip content="Front-of-meter infrastructure includes HV/MV substation, grid connection, and utility metering. Required for builds >5MW or greenfield sites without existing power feed." />
                             </label>
-                            <div className="flex items-center gap-2 mb-2">
-                                <input type="checkbox" checked={inputs.includeFOM} onChange={() => handleChange('includeFOM', !inputs.includeFOM)} className="accent-indigo-500" />
-                                <span className="text-xs text-slate-600 dark:text-slate-400">Include Front-of-Meter Infrastructure <Tooltip content="Toggle to include substation, HV switchgear, transformers, and grid connection costs. Typically $2-8M+ depending on voltage and capacity." /></span>
-                            </div>
-                            {inputs.includeFOM && (
-                                <div className="grid grid-cols-2 gap-2">
-                                    <div className="space-y-1">
-                                        <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Substation <Tooltip content="Pad Mount 11kV: compact, low-cost, suits <5MW loads. Dedicated 20\u201333kV: standard for 5-20MW campuses (PLN 20kV MV / 33kV band, same cost basis). 66kV/132kV: transmission-level for hyperscale 50MW+ sites with direct grid tap." /></div>
-                                        <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.substationType}
-                                            onChange={(e) => handleChange('substationType', e.target.value)}>
-                                            <option value="pad_mounted_11kv">Pad Mount 11kV</option>
-                                            <option value="dedicated_33kv">Dedicated 20\u201333kV</option>
-                                            <option value="dedicated_66kv">Dedicated 66kV</option>
-                                            <option value="dedicated_132kv">Dedicated 132kV</option>
-                                        </select>
+                            {(() => {
+                                const st = inputs.substationType;
+                                const stLabel = st === 'pad_mounted_11kv' ? 'Pad Mount 11kV' : st === 'dedicated_66kv' ? 'Dedicated 66kV' : st === 'dedicated_132kv' ? 'Dedicated 132kV' : 'Dedicated 20-33kV';
+                                return (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        <RedMirror icon={Zap} label="Front-of-Meter" value={inputs.includeFOM ? `On - ${stLabel}` : 'Off'} tip="Owned by Requirements (Infrastructure) - substation / grid-connection scope + voltage. Edit it there." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
+                                        <RedMirror icon={Zap} label="Utility Rate" value={`${inputs.utilityRate}%`} tip="Owned by Requirements (Infrastructure) - utility connection rate. Edit it there." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
                                     </div>
-                                    <div className="space-y-1">
-                                        <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Utility Rate <Tooltip content="Local electricity tariff in $/kWh. Affects OPEX projections and payback calculations. Typical range: $0.05-$0.20/kWh depending on market." /></div>
-                                        <div className="flex items-center gap-1">
-                                            <input type="number" className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.utilityRate}
-                                                onChange={(e) => handleChange('utilityRate', Number(e.target.value))} />
-                                            <span className="text-xs text-slate-400 dark:text-slate-500">%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
+                                );
+                            })()}
                         </div>
 
                         {/* ─── SOFT COSTS ─── */}

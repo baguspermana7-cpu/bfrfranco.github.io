@@ -13,6 +13,13 @@ release sections rather than semver.
 
 ---
 
+## v1.115.93 — 2026-07-26 (DCMOC — CAPEX infra dedup, cont.: Fire + Substation now read-only mirrors)
+
+### Changed
+- **Continuing the CAPEX Assumptions dedup** — the **Fire Protection** (suppression + alarm) and **Substation & Grid** (front-of-meter scope + utility rate) sections were editable in both the CAPEX Assumptions tab and Requirements → Infrastructure, writing the same store. They're now read-only mirrors on the CAPEX page (value + "Edit in Requirements ↗"), so each has one owner. Editing them in Requirements still flows to the CAPEX total. walk 31/0, trace-parity 116/116, enum 25.
+
+> Still remaining: the Power Backup block (UPS / generator / fuel) is dual-editable — its dedup also moves the fuel AUTO/override field to Requirements, so it's a careful follow-up.
+
 ## v1.115.92 — 2026-07-26 (DCMOC — rack-form is now a real cost driver + AutoField extracted & rolled to CAPEX)
 
 ### Added
