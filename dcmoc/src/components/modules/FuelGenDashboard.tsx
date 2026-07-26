@@ -12,6 +12,7 @@ import {
 import { StatusChip } from '@/components/ui/StatusChip';
 import clsx from 'clsx';
 import { fmtCompact, fmtMoney } from '@/lib/format';
+import { getPUE } from '@/constants/pue';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { TraceValue } from '@/components/ui/TraceValue';
 
@@ -35,6 +36,7 @@ const FUEL_TO_ALT: Record<string, string> = {
 /* v1.115.80 — engine DATA.fuelGen.altPowerTech row (alternative on-site power tech). */
 interface AltPowerTechRow {
     key: string; name: string; role: string; elecEffPct: number | null; co2KgPerKwh: number;
+    capexUsdPerKw: number; lcoeUsdPerKwh: number;
     trl: number; maturity: string; deploy: string; powerDensityMwAcre: number; dispatchable: boolean; h2Ready: string; note: string;
 }
 
@@ -750,56 +752,78 @@ export default function FuelGenDashboard() {
                 </div>
             </div>
 
-            {/* v1.115.80 — Alternative on-site power technologies reference (owner: "deep
-              * research cari alternative tech lain"). Sourced screening comparison, engine
-              * DATA.fuelGen.altPowerTech — reference/education, not wired into the cost model. */}
+            {/* v1.115.87 — Alternative on-site power technologies: techno-economic comparison
+              * (owner: wire into a real CAPEX/OPEX/CO₂ delta). Per-tech CAPEX/OPEX/CO₂ at THIS
+              * project's facility load (prime, continuous) + delta vs the diesel baseline.
+              * Engine DATA.fuelGen.altPowerTech (capexUsdPerKw / lcoeUsdPerKwh / co2). Screening. */}
             {(() => {
-                const alt = (rzData()?.fuelGen as { altPowerTech?: AltPowerTechRow[] } | undefined)?.altPowerTech ?? [];
+                const fg = rzData()?.fuelGen as { altPowerTech?: AltPowerTechRow[]; altPowerBaselineKey?: string } | undefined;
+                const alt = fg?.altPowerTech ?? [];
                 if (!alt.length) return null;
+                const baseKey = fg?.altPowerBaselineKey ?? 'diesel-backup';
+                const utilisation = 0.85; // prime continuous basis
+                const facilityKw = inputs.itLoad * getPUE(inputs.coolingType);
+                const annualKwh = facilityKw * 8760 * utilisation;
+                const econ = (r: AltPowerTechRow) => ({
+                    capexUsd: facilityKw * r.capexUsdPerKw,
+                    opexUsd: annualKwh * r.lcoeUsdPerKwh,
+                    co2Tons: annualKwh * r.co2KgPerKwh / 1000,
+                });
+                const base = alt.find((r) => r.key === baseKey);
+                const baseEcon = base ? econ(base) : null;
+                const dArrow = (v: number) => v < -0.001 ? '▼' : v > 0.001 ? '▲' : '·';
+                const dTone = (v: number): 'data' | 'alert' | 'neutral' => v < -0.001 ? 'data' : v > 0.001 ? 'alert' : 'neutral';
                 return (
                     <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                         <button onClick={() => setShowAltTech(o => !o)} className="w-full flex items-center justify-between gap-2 text-left">
                             <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                                 <Zap className="w-4 h-4 text-amber-500" />
-                                Alternative On-Site Power Technologies
-                                <span className="text-[10px] font-normal text-slate-400">research reference · not in the cost model</span>
+                                Alternative Power — Techno-Economic Comparison
+                                <span className="text-[10px] font-normal text-slate-400">CAPEX / OPEX / CO₂ at {(inputs.itLoad / 1000).toFixed(1)} MW IT · Δ vs diesel</span>
                             </h3>
                             <ChevronDown className={`w-4 h-4 shrink-0 text-slate-400 transition-transform ${showAltTech ? 'rotate-180' : ''}`} />
                         </button>
                         {showAltTech && (
                             <div className="mt-3">
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3 leading-relaxed">
-                                    The credible behind-the-meter options beyond the reciprocating genset, for an off-grid / prime-power site. Screening figures from 2025-26 industry reporting (Goldman Sachs, DataCenterDynamics, Bloom Energy, GE). <strong>Fuel cells</strong> lead on efficiency + power density and deploy fast; <strong>SMR/nuclear</strong> is near-zero-carbon baseload but ~2028-2030 for first DC units; <strong>solar+BESS</strong> is clean but intermittent + land-heavy.
+                                    CAPEX (overnight installed), annual OPEX (all-in fuel + O&amp;M) and operating CO₂ for each option sized to this project&apos;s <strong>facility load</strong> ({(facilityKw / 1000).toFixed(1)} MW at PUE {getPUE(inputs.coolingType)}, continuous prime), with the <strong>Δ vs the diesel baseline</strong>. Cost/CO₂ factors: Lazard LCOE+ 2024/25 + NREL ATB + vendor reporting (Bloom, GE, NuScale). Screening — not a procurement basis.
                                 </p>
                                 <div className="overflow-x-auto">
-                                    <table className="w-full text-[11px] min-w-[720px]">
+                                    <table className="w-full text-[11px] min-w-[760px]">
                                         <thead>
                                             <tr className="border-b border-slate-200 dark:border-slate-700 text-[9px] uppercase text-slate-400">
                                                 <th className="text-left py-1.5 pr-2">Technology</th>
-                                                <th className="text-left py-1.5 px-2">Role</th>
-                                                <th className="text-right py-1.5 px-2">Elec. eff</th>
-                                                <th className="text-right py-1.5 px-2">CO₂ kg/kWh</th>
+                                                <th className="text-right py-1.5 px-2">CAPEX</th>
+                                                <th className="text-right py-1.5 px-2">OPEX/yr</th>
+                                                <th className="text-right py-1.5 px-2">CO₂/yr</th>
+                                                <th className="text-right py-1.5 px-2">Δ CAPEX</th>
+                                                <th className="text-right py-1.5 px-2">Δ OPEX/yr</th>
+                                                <th className="text-right py-1.5 px-2">Δ CO₂/yr</th>
                                                 <th className="text-center py-1.5 px-2">TRL</th>
-                                                <th className="text-right py-1.5 px-2">MW/acre</th>
-                                                <th className="text-left py-1.5 px-2">Deploy</th>
                                                 <th className="text-left py-1.5 pl-2">Maturity</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {alt.map((r) => {
                                                 const isCurrent = r.key === FUEL_TO_ALT[fuelType];
+                                                const isBase = r.key === baseKey;
+                                                const e = econ(r);
+                                                const dC = baseEcon ? e.capexUsd - baseEcon.capexUsd : 0;
+                                                const dO = baseEcon ? e.opexUsd - baseEcon.opexUsd : 0;
+                                                const dCo2 = baseEcon ? e.co2Tons - baseEcon.co2Tons : 0;
                                                 return (
                                                 <tr key={r.key} className={`border-b border-slate-100 dark:border-slate-800/60 align-top ${isCurrent ? 'bg-rz-info/5' : ''}`}>
                                                     <td className="py-1.5 pr-2">
-                                                        <div className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">{r.name}{isCurrent && <StatusChip tone="info">your selection</StatusChip>}</div>
-                                                        <div className="text-[10px] text-slate-400 leading-snug max-w-[280px]">{r.note}</div>
+                                                        <div className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 flex-wrap">{r.name}{isCurrent && <StatusChip tone="info">your selection</StatusChip>}{isBase && <StatusChip tone="neutral">baseline</StatusChip>}</div>
+                                                        <div className="text-[10px] text-slate-400 leading-snug max-w-[260px]">{r.note}</div>
                                                     </td>
-                                                    <td className="py-1.5 px-2 text-slate-500 whitespace-nowrap">{r.role}</td>
-                                                    <td className="py-1.5 px-2 text-right font-mono text-slate-600 dark:text-slate-300">{r.elecEffPct == null ? '—' : `${r.elecEffPct}%`}</td>
-                                                    <td className="py-1.5 px-2 text-right font-mono text-slate-600 dark:text-slate-300">{r.co2KgPerKwh}</td>
+                                                    <td className="py-1.5 px-2 text-right font-mono text-slate-600 dark:text-slate-300">{fmtMoney(e.capexUsd)}</td>
+                                                    <td className="py-1.5 px-2 text-right font-mono text-slate-600 dark:text-slate-300">{fmtMoney(e.opexUsd)}</td>
+                                                    <td className="py-1.5 px-2 text-right font-mono text-slate-600 dark:text-slate-300">{fmtCompact(e.co2Tons)} t</td>
+                                                    <td className={`py-1.5 px-2 text-right font-mono ${dTone(dC) === 'data' ? 'text-rz-data' : dTone(dC) === 'alert' ? 'text-rz-alert' : 'text-slate-400'}`}>{isBase ? '—' : `${dArrow(dC)} ${fmtMoney(Math.abs(dC))}`}</td>
+                                                    <td className={`py-1.5 px-2 text-right font-mono ${dTone(dO) === 'data' ? 'text-rz-data' : dTone(dO) === 'alert' ? 'text-rz-alert' : 'text-slate-400'}`}>{isBase ? '—' : `${dArrow(dO)} ${fmtMoney(Math.abs(dO))}`}</td>
+                                                    <td className={`py-1.5 px-2 text-right font-mono ${dTone(dCo2) === 'data' ? 'text-rz-data' : dTone(dCo2) === 'alert' ? 'text-rz-alert' : 'text-slate-400'}`}>{isBase ? '—' : `${dArrow(dCo2)} ${fmtCompact(Math.abs(dCo2))} t`}</td>
                                                     <td className="py-1.5 px-2 text-center font-mono text-slate-500">{r.trl}</td>
-                                                    <td className="py-1.5 px-2 text-right font-mono text-slate-500">{r.powerDensityMwAcre}</td>
-                                                    <td className="py-1.5 px-2 text-slate-500 whitespace-nowrap">{r.deploy}</td>
                                                     <td className="py-1.5 pl-2">
                                                         <StatusChip tone={r.maturity === 'commercial' ? 'data' : r.maturity === 'emerging' ? 'signal' : 'neutral'}>{r.maturity}</StatusChip>
                                                     </td>
@@ -808,7 +832,7 @@ export default function FuelGenDashboard() {
                                         </tbody>
                                     </table>
                                 </div>
-                                <p className="text-[9px] text-slate-400 mt-2">CO₂ = operating emissions (kg/kWh); TRL = technology readiness level; H₂-ready per each vendor. Screening comparison, engine DATA.fuelGen.altPowerTech — not a procurement basis.</p>
+                                <p className="text-[9px] text-slate-400 mt-2">Δ green = lower than diesel, red = higher. CAPEX = facility kW × $/kW; OPEX = facility kWh/yr × all-in $/kWh; CO₂ = kWh/yr × kg/kWh. Engine DATA.fuelGen.altPowerTech (capexUsdPerKw / lcoeUsdPerKwh / co2KgPerKwh). Screening at continuous-prime {Math.round(utilisation * 100)}% utilisation — not a procurement basis.</p>
                             </div>
                         )}
                     </div>

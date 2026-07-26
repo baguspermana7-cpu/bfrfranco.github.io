@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.87 — 2026-07-26 (DCMOC — alternative power tech wired into a real CAPEX/OPEX/CO₂ delta)
+
+### Changed
+- **The Alternative Power section is now a techno-economic comparison, not just a reference table.** Each on-site power option (reciprocating engine, open/combined-cycle turbine, SOFC, SMR, geothermal, solar+BESS, diesel) now shows its **CAPEX, annual OPEX and annual CO₂ sized to this project's facility load** (IT × PUE, continuous prime) plus the **Δ vs the diesel baseline** — green when lower, red when higher. Backed by new engine `DATA.fuelGen.altPowerTech.capexUsdPerKw` + `lcoeUsdPerKwh` (Lazard LCOE+ 2024/25: gas-CC ~$76/MWh, nuclear ~$182/MWh; + NREL ATB + vendor est) with a `DATA.sources` entry. Example at 2.5 MW IT: SMR carries ~+$25M CAPEX but ~−$3M/yr OPEX and ~−19 kt/yr CO₂ vs diesel — the real high-capex/low-carbon-and-fuel tradeoff. Screening, not a procurement basis. Engine chain rebuilt (762/0, 158 sources); walk 31/0.
+
 ## v1.115.86 — 2026-07-26 (DCMOC — polish round 3: card-consistency capstone)
 
 ### Changed
