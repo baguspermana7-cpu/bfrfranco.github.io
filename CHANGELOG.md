@@ -13,6 +13,15 @@ release sections rather than semver.
 
 ---
 
+## v1.115.74 — 2026-07-26 (DCMOC — Simulation KPIs + Cause-Effect levers get trace/diagnostic modals)
+
+### Added
+- **Click-to-trace diagnostics on the Simulation (Staff Model Config) KPIs.** The four KPI cards — Internal Staff Cost, Vendor Labor Cost, Parts & Consumables, Hidden Turnover Loss — are now clickable and open a diagnostic modal that explains, from the SAME live model the card renders, how the number is built (headcount × labor multiplier, the vendor-premium strategy multiplier, the AQI consumables multiplier + filter-life, the turnover amortisation) plus quantified levers with jump-to-tab.
+- **Cause-Effect Lever Map is now interactive and honest.** Each lever row is clickable → the same diagnostic modal with its direction (raises/reduces/mixed) and effect. Fixed a real bug: the "Air → Direct Liquid Cooling" lever displayed a literal unfilled **`~$X/yr`** placeholder — it now computes the actual annual energy saving from the live IT load at the PUE delta ($0.10/kWh screening) and shows the real PUE figures from the engine.
+
+### Changed
+- The shared `DiagnosticModal` gained an `explain` variant — a neutral cyan "Trace — how this is calculated" framing (vs the red "threshold breached" framing) so a healthy KPI breakdown isn't mislabelled as a fault. Reused, not re-implemented per card. Gates green (walk 31/0, trace-parity 116/116); no engine change.
+
 ## v1.115.73 — 2026-07-26 (DCMOC — CDU liquid-cooling water & glycol consumption model)
 
 ### Added

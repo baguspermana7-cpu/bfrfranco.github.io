@@ -71,9 +71,13 @@ export function RedValue({ value, diagnosis, className = '', onOptimize, childre
     );
 }
 
-export function DiagnosticModal({ diagnosis: d, onClose, onOptimize }: {
+export function DiagnosticModal({ diagnosis: d, onClose, onOptimize, variant = 'breach' }: {
     diagnosis: Diagnosis; onClose: () => void; onOptimize?: () => void;
+    /** 'breach' = red threshold-breach framing (default); 'explain' = neutral
+     *  cyan "how this is calculated" framing for a healthy KPI trace/breakdown. */
+    variant?: 'breach' | 'explain';
 }) {
+    const explain = variant === 'explain';
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
     React.useEffect(() => {
         const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -87,12 +91,12 @@ export function DiagnosticModal({ diagnosis: d, onClose, onOptimize }: {
     return createPortal(
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label={`${d.title} diagnosis`}>
             <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-            <div className="relative w-full max-w-lg rounded-xl border border-rz-alert/40 bg-white dark:bg-rz-elevated shadow-2xl">
+            <div className={`relative w-full max-w-lg rounded-xl border ${explain ? 'border-rz-info/40' : 'border-rz-alert/40'} bg-white dark:bg-rz-elevated shadow-2xl`}>
                 {/* header */}
                 <div className="flex items-start justify-between gap-3 border-b border-slate-200 dark:border-rz-2 px-4 py-3">
                     <div>
-                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-rz-alert">
-                            <Activity className="h-3.5 w-3.5" /> Diagnostic — threshold breached
+                        <div className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider ${explain ? 'text-cyan-700 dark:text-rz-info' : 'text-rz-alert'}`}>
+                            <Activity className="h-3.5 w-3.5" /> {explain ? 'Trace — how this is calculated' : 'Diagnostic — threshold breached'}
                         </div>
                         <div className="mt-0.5 text-sm font-bold text-slate-900 dark:text-white">{d.title}</div>
                     </div>
@@ -104,14 +108,14 @@ export function DiagnosticModal({ diagnosis: d, onClose, onOptimize }: {
                     {/* threshold vs actual */}
                     {(d.actual || d.threshold) && (
                         <div className="flex flex-wrap gap-2">
-                            {d.actual && <span className="rounded bg-rz-alert/10 px-2 py-1 font-mono font-bold text-rz-alert">actual {d.actual}</span>}
-                            {d.threshold && <span className="rounded bg-slate-100 dark:bg-slate-800 px-2 py-1 font-mono text-slate-600 dark:text-slate-300">target {d.threshold}</span>}
+                            {d.actual && <span className={`rounded px-2 py-1 font-mono font-bold ${explain ? 'bg-rz-info/10 text-cyan-700 dark:text-rz-info' : 'bg-rz-alert/10 text-rz-alert'}`}>{explain ? 'value' : 'actual'} {d.actual}</span>}
+                            {d.threshold && <span className="rounded bg-slate-100 dark:bg-slate-800 px-2 py-1 font-mono text-slate-600 dark:text-slate-300">{explain ? 'basis' : 'target'} {d.threshold}</span>}
                             {d.gap && <span className="rounded bg-rz-signal/10 px-2 py-1 font-mono text-amber-600 dark:text-rz-signal">gap {d.gap}</span>}
                         </div>
                     )}
-                    {/* why */}
+                    {/* why / how */}
                     <div>
-                        <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">Why it is red</div>
+                        <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">{explain ? 'How it is calculated' : 'Why it is red'}</div>
                         <p className="leading-relaxed text-slate-700 dark:text-slate-300">{d.reason}</p>
                     </div>
                     {/* levers */}

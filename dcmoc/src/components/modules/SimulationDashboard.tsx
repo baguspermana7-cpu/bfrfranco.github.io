@@ -18,6 +18,7 @@ import {
 import clsx from 'clsx';
 import { fmtMoney, fmtMoneyFull, fmtCompact, fmtUnit } from '@/lib/format';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { DiagnosticModal, type Diagnosis } from '@/components/ui/RedValue';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { PageTransition, CardMotion } from '@/components/ui/MotionWrapper';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -49,6 +50,9 @@ export function SimulationDashboard() {
     const [showLossDetail, setShowLossDetail] = useState(false);
     const engineReady = useEngineReady(); // computedDowntime re-runs once rz-engine.min.js lands
     const [vizTab, setVizTab] = useState<'overview' | 'environment' | 'power' | 'cause'>('overview');
+    /* Workstream 12 — click-to-trace diagnostic on the Simulation KPIs + Cause-Effect
+     * levers (reuses the shared DiagnosticModal 'explain' variant, not a per-card copy). */
+    const [simDiag, setSimDiag] = useState<Diagnosis | null>(null);
     useEffect(() => {
         if (!aqiTouched) setScenarioAQI(baselineAqi);
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -217,6 +221,58 @@ export function SimulationDashboard() {
         aqiLaborPunishment, turnoverAmortizedMonthly, strategyMultiplier,
         partsCost, aqiConsumablePenalty, laborMultiplier, lossSavedAtBaseline
     } = results;
+
+    /* Workstream 12 — per-KPI trace diagnoses computed from the SAME results model
+     * the cards render (no fabricated numbers). Opened via the shared DiagnosticModal
+     * 'explain' variant. Keys map 1:1 to the four KPI cards + cause-effect levers. */
+    const modelLabel = inputs.maintenanceModel === 'vendor' ? 'Full vendor (×1.35)'
+        : inputs.maintenanceModel === 'hybrid' ? `Hybrid (${Math.round((inputs.hybridRatio || 0.3) * 100)}% in-house)` : 'In-house (×1.0)';
+    const kpiDiag: Record<string, Diagnosis> = {
+        internal: {
+            title: 'Internal Staff Cost (monthly)',
+            actual: fmtMoney(results.monthlyInternalCost),
+            reason: `Base staff cost from the Shift Engine (${eng.headcount} FTEs on a ${inputs.shiftModel} rotation) × the country labor multiplier (${laborMultiplier.toFixed(2)}). This is the pure in-house salary + allowances line, before any vendor premium, AQI hazard pay, or turnover amortisation — those are shown as separate KPIs.`,
+            threshold: `${eng.headcount} FTE × ${inputs.shiftModel} × labor ${laborMultiplier.toFixed(2)}`,
+            levers: [
+                { label: 'Shift model 8h → 12h', detail: 'Fewer teams → ~25% fewer FTEs, but raises per-person overtime exposure (and needs a long-shift permit in Indonesia).', tab: 'sim' },
+                { label: 'Staffing automation', detail: 'Higher automation lowers the required headcount at a given tier/availability.', tab: 'staff' },
+            ],
+            note: 'Screening staffing model — the Staff Model Config tab owns the headcount build-up.',
+        },
+        vendor: {
+            title: 'Vendor Labor Cost (monthly)',
+            actual: fmtMoney(results.monthlyVendorCost),
+            reason: `The delta between the total blended staff cost and the in-house line, driven by the maintenance model: ${modelLabel}. A full-vendor model carries a ~35% premium on all labor; hybrid blends the in-house rate with a ×1.30 vendored share. It buys on-demand specialist expertise and can cut MTTR ~40% on complex M&E.`,
+            threshold: `strategy ×${strategyMultiplier.toFixed(2)}`,
+            levers: [
+                { label: 'Shift more work in-house', detail: 'Lowers the vendor premium but requires hiring + retaining the specialist skills.', tab: 'maint' },
+                { label: 'Negotiate vendor SLA class', detail: 'A tighter response SLA costs more retainer but reduces downtime risk.', tab: 'maint' },
+            ],
+            note: 'Vendor premium is a screening multiplier (SensitivityEngine parity pair).',
+        },
+        parts: {
+            title: 'Parts & Consumables (monthly)',
+            actual: fmtMoney(results.totalMonthlyConsumables),
+            reason: `Monthly maintenance consumables scaled by air quality. At AQI ${scenarioAQI} the filter/coil fouling multiplier is ${results.aqiImpact.toFixed(2)}× the baseline (AQI 50) — dirtier air shortens filter life (${typeof filterLife?.adjustedLifeMonths === 'number' ? filterLife.adjustedLifeMonths.toFixed(1) : '—'} months) and adds cleaning cycles.`,
+            threshold: `AQI ${scenarioAQI} → ×${results.aqiImpact.toFixed(2)}`,
+            levers: [
+                { label: 'Better filtration / positive pressure', detail: 'Cuts coil fouling and filter change frequency in high-AQI locations — a CAPEX-vs-OPEX trade.', tab: 'cdu' },
+                { label: 'Site selection', detail: 'A lower-AQI location structurally reduces consumables + hazard pay.', tab: 'site' },
+            ],
+            note: 'Consumables scale with the AQI slider on this page.',
+        },
+        turnover: {
+            title: 'Hidden Turnover Loss (monthly)',
+            actual: fmtMoney(results.turnoverCost),
+            reason: `Amortised cost of staff churn at ${(scenarioTurnover * 100).toFixed(0)}%/yr: recruitment + onboarding + the ramp-up productivity gap. A single FTE replacement costs ≈1.5× annual salary; across ${eng.headcount} FTEs that is ≈${Math.ceil(eng.headcount * scenarioTurnover)} replacements/yr, spread monthly.`,
+            threshold: `${(scenarioTurnover * 100).toFixed(0)}%/yr × ${eng.headcount} FTE`,
+            levers: [
+                { label: 'Retention (pay/roster/career)', detail: 'Each point of turnover reduction removes a share of this hidden loss — often the cheapest OPEX lever.', tab: 'talent' },
+                { label: '12h roster (fewer heads)', detail: 'A smaller team shrinks the absolute turnover exposure, at higher OT risk.', tab: 'sim' },
+            ],
+            note: 'Turnover rate is set by the slider on this page; talent tab models the drivers.',
+        },
+    };
 
     return (
         <>
@@ -482,9 +538,11 @@ export function SimulationDashboard() {
                                     <Tooltip content="Monthly base salary + allowances for FTEs" />
                                 </div>
                             </div>
-                            <div className="text-2xl font-bold text-slate-900 dark:text-white truncate" title={fmtMoneyFull(results.monthlyInternalCost)}>
+                            <button type="button" onClick={() => setSimDiag(kpiDiag.internal)}
+                                className="text-2xl font-bold text-slate-900 dark:text-white truncate text-left underline decoration-dotted decoration-slate-300 dark:decoration-slate-600 underline-offset-4 hover:decoration-cyan-500"
+                                title="Click to trace how Internal Staff Cost is calculated">
                                 {fmtMoney(results.monthlyInternalCost)}
-                            </div>
+                            </button>
                             <div className="text-[10px] text-rz-data mt-1 flex items-center gap-1">
                                 <Users className="w-3 h-3" />
                                 {results.headcount} Internal FTEs
@@ -499,9 +557,11 @@ export function SimulationDashboard() {
                                     <Tooltip content="Outsourced specialist services (Security, Cleaning, MEP)" />
                                 </div>
                             </div>
-                            <div className="text-2xl font-bold text-amber-500 dark:text-amber-400 truncate" title={fmtMoneyFull(results.monthlyVendorCost)}>
+                            <button type="button" onClick={() => setSimDiag(kpiDiag.vendor)}
+                                className="text-2xl font-bold text-amber-500 dark:text-amber-400 truncate text-left underline decoration-dotted decoration-amber-300/60 underline-offset-4 hover:decoration-amber-500"
+                                title="Click to trace how Vendor Labor Cost is calculated">
                                 {fmtMoney(results.monthlyVendorCost)}
-                            </div>
+                            </button>
                             <div className="text-[10px] text-slate-500 mt-1">
                                 Includes 35% Vendor Premium
                             </div>
@@ -515,9 +575,11 @@ export function SimulationDashboard() {
                                     <Tooltip content="Monthly maintenance consumables based on AQI impact" />
                                 </div>
                             </div>
-                            <div className="text-2xl font-bold text-cyan-500 dark:text-cyan-400 truncate" title={fmtMoneyFull(results.totalMonthlyConsumables)}>
+                            <button type="button" onClick={() => setSimDiag(kpiDiag.parts)}
+                                className="text-2xl font-bold text-cyan-500 dark:text-cyan-400 truncate text-left underline decoration-dotted decoration-cyan-300/60 underline-offset-4 hover:decoration-cyan-500"
+                                title="Click to trace how Parts & Consumables is calculated">
                                 {fmtMoney(results.totalMonthlyConsumables)}
-                            </div>
+                            </button>
                             <div className="text-[10px] text-slate-500 mt-1">
                                 AQI Impact: {results.aqiImpact > 1 ? 'High' : 'None'}
                             </div>
@@ -531,9 +593,11 @@ export function SimulationDashboard() {
                                     <Tooltip content="Recruitment + Training + Lost Productivity" />
                                 </div>
                             </div>
-                            <div className="text-2xl font-bold text-rose-500 dark:text-rose-400 truncate" title={fmtMoneyFull(results.turnoverCost)}>
+                            <button type="button" onClick={() => setSimDiag(kpiDiag.turnover)}
+                                className="text-2xl font-bold text-rose-500 dark:text-rose-400 truncate text-left underline decoration-dotted decoration-rose-300/60 underline-offset-4 hover:decoration-rose-500"
+                                title="Click to trace how Hidden Turnover Loss is calculated">
                                 {fmtMoney(results.turnoverCost)}
-                            </div>
+                            </button>
                             <div className="text-[10px] text-slate-500 mt-1">
                                 Rate: {(scenarioTurnover * 100).toFixed(0)}% / Year
                             </div>
@@ -732,9 +796,14 @@ export function SimulationDashboard() {
                     <ArrowRight className="w-4 h-4 text-cyan-500" />
                     Cause-Effect Lever Map
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">How each input parameter ripples through to cost and risk outputs</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">How each input parameter ripples through to cost and risk outputs — click any lever for the computed effect</p>
                 <div className="space-y-3">
-                    {[
+                    {(() => {
+                        /* Fix the hardcoded "$X/yr" placeholder — compute the real DLC energy
+                         * saving from the live IT load at the PUE delta (screening $0.10/kWh). */
+                        const dlcSaveYr = inputs.itLoad * (getPUE('air') - getPUE('liquid')) * 8760 * 0.10;
+                        const dlcSaveTxt = fmtMoney(dlcSaveYr);
+                        return [
                         {
                             lever: 'Rack Density 10kW to 20kW',
                             effect: 'Floor space requirement halved, but cooling delta-T compression adds ~18% to PUE',
@@ -773,12 +842,20 @@ export function SimulationDashboard() {
                         },
                         {
                             lever: 'Air cooling to Direct Liquid Cooling',
-                            effect: 'PUE drops from ~1.50 to ~1.15, saving ~$X/yr in energy. CAPEX premium of $200-500K per MW for liquid distribution. Break-even typically 3-5 years at $0.10/kWh',
+                            effect: `PUE drops from ~${getPUE('air')} to ~${getPUE('liquid')}, saving ≈${dlcSaveTxt}/yr in energy at this IT load ($0.10/kWh). CAPEX premium of $200-500K per MW for liquid distribution. Break-even typically 3-5 years.`,
                             impact: 'high',
                             direction: 'mixed',
                         },
                     ].map((row, i) => (
-                        <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                        <button key={i} type="button"
+                            onClick={() => setSimDiag({
+                                title: row.lever,
+                                actual: row.impact === 'high' ? 'High impact' : 'Medium impact',
+                                reason: row.effect,
+                                threshold: row.direction === 'cost-up' ? 'raises cost' : row.direction === 'mixed' ? 'mixed (cost + benefit)' : 'reduces cost',
+                                note: 'Cause-effect screening — the effect is directional at the current project configuration, not a committed number. Change the driver above to see the KPIs move.',
+                            })}
+                            className="w-full text-left flex items-start gap-3 p-3 rounded-lg bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:border-cyan-400 dark:hover:border-cyan-500 transition-colors">
                             <div className={`shrink-0 w-2 h-2 rounded-full mt-1.5 ${
                                 row.direction === 'cost-up' ? 'bg-rose-400' :
                                 row.direction === 'mixed' ? 'bg-amber-400' : 'bg-rz-data'
@@ -793,8 +870,8 @@ export function SimulationDashboard() {
                             }`}>
                                 {row.impact}
                             </div>
-                        </div>
-                    ))}
+                        </button>
+                    )); })()}
                 </div>
                 <div className="mt-3 flex items-center gap-4 text-[10px] text-slate-500">
                     <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-400 inline-block" /> Increases cost</span>
@@ -806,6 +883,7 @@ export function SimulationDashboard() {
 
                 </div>
             </div>
+            {simDiag && <DiagnosticModal diagnosis={simDiag} variant="explain" onClose={() => setSimDiag(null)} />}
         </>
     );
 }
