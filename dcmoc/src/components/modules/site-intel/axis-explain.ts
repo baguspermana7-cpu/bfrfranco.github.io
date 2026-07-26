@@ -288,3 +288,46 @@ export function explainAxis(site: CandidateSite, result: SiteScoreResult, axis: 
 
     return { axis, goodness, band, reason, baselineNote, levers: levers.slice(0, 4) };
 }
+
+/* ─── Workstream B — Auto-optimize a site's criteria ──────────────────────────
+ * For every weak axis (goodness < GOOD_TARGET) push each of its drivers to the
+ * best realistic value (NUM_LEVERS `hi` targets + ENUM_BEST for categoricals),
+ * recompute the REAL score via scoreSite(), and return the moves + which attrs
+ * changed. Never regresses (returns a no-op if the total score would drop). */
+const ENUM_BEST: Partial<Record<keyof SiteAttributes, string>> = {
+    floodRisk: 'low', cycloneRisk: 'low', coastalRisk: 'low', landslideRisk: 'low', earthquakeRisk: 'low',
+    roadAccess: 'excellent', waterQuality: 'excellent', topography: 'flat',
+    constructionLabor: 'abundant', govSupport: 'strong', fuelAvailability: 'good',
+};
+
+const ALL_AXES: AxisKey[] = ['powerAvailability', 'connectivity', 'waterCooling', 'landInfra', 'environmental', 'naturalRisks', 'costIncentives', 'marketProximity'];
+
+export interface AutoOptimizeResult {
+    moves: Partial<SiteAttributes>;
+    changed: (keyof SiteAttributes)[];
+    beforeScore: number;
+    afterScore: number;
+    weakAxesFixed: number;
+}
+
+export function autoOptimizeSite(site: CandidateSite, result: SiteScoreResult): AutoOptimizeResult {
+    const before = result.engine.score;
+    const candidate: Partial<SiteAttributes> = {};
+    for (const axis of ALL_AXES) {
+        if ((result.axes[axis] ?? 100) >= GOOD_TARGET) continue; // only lift the weak axes
+        for (const lv of (NUM_LEVERS[axis] ?? [])) {
+            (candidate as Record<string, unknown>)[lv.attr] = lv.hi;
+        }
+        for (const a of AXIS_ATTRS[axis]) {
+            if (ENUM_BEST[a.key] != null && typeof site.attributes[a.key] !== 'number') {
+                (candidate as Record<string, unknown>)[a.key] = ENUM_BEST[a.key];
+            }
+        }
+    }
+    const applied = scoreSite({ ...site, attributes: { ...site.attributes, ...candidate } });
+    const afterScore = applied ? applied.engine.score : before;
+    if (!applied || afterScore < before) return { moves: {}, changed: [], beforeScore: before, afterScore: before, weakAxesFixed: 0 };
+    const changed = (Object.keys(candidate) as (keyof SiteAttributes)[]).filter((k) => String(site.attributes[k] ?? '') !== String(candidate[k]));
+    const weakAxesFixed = ALL_AXES.filter((a) => (result.axes[a] ?? 100) < GOOD_TARGET && (applied.axes[a] ?? 0) >= GOOD_TARGET).length;
+    return { moves: candidate, changed, beforeScore: before, afterScore, weakAxesFixed };
+}

@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.90 — 2026-07-26 (DCMOC — Site Intelligence: guided Auto-optimize + blink-highlight what to edit)
+
+### Added
+- **The Edit-Criteria drawer now shows you what to fix and can fix it.** On open, the parameters that are dragging the site's score down (the drivers of every weak axis) **pulse** — so you're not guessing which of 36 fields to touch. A new **"Auto-optimize criteria → best score"** button solves each weak-axis driver to its best realistic value on the *real* score model (`autoOptimizeSite`, reusing the axis-lever bisection), applies them, highlights exactly what it changed, and reports the score move (e.g. *42 → 57 · 2 weak axes lifted · 6 criteria set to best*). It never regresses, and is honest that some axes can't reach "Good" by criteria alone. Pure frontend (reuses the site scoring + lever solver); walk 31/0, site page 0 errors.
+
 ## v1.115.89 — 2026-07-26 (DCMOC — Site Intelligence edit-criteria: per-parameter help + country auto-derive)
 
 ### Added

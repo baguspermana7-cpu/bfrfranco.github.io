@@ -9,9 +9,10 @@ import { COUNTRIES } from '@/constants/countries';
 import { CountrySelect } from '@/components/ui/CountrySelect';
 import { CreatableCombobox, type ComboValue } from '@/components/ui/CreatableCombobox';
 import { ATTR_BOUNDS, type CandidateSite, type SiteAttributes } from '@/types/site-intel';
-import { countryBaselineAttributes, countryBaselineEnums, SCREENING_ATTR_DEFAULTS } from '@/lib/site-adapter';
+import { countryBaselineAttributes, countryBaselineEnums, SCREENING_ATTR_DEFAULTS, scoreSite } from '@/lib/site-adapter';
+import { autoOptimizeSite } from '@/components/modules/site-intel/axis-explain';
 import { Tooltip } from '@/components/ui/Tooltip';
-import { X, Plus, Trash2 } from 'lucide-react';
+import { X, Plus, Trash2, Wand2 } from 'lucide-react';
 
 type NumKey = keyof typeof ATTR_BOUNDS;
 
@@ -107,7 +108,28 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
     const { sites, selectedSiteId, updateAttributes, updateSite, addSite, removeSite, resetToDefaults, selectSite } = useSitesStore();
     const baseCountry = useSimulationStore((s) => s.selectedCountry);
     const site: CandidateSite | undefined = sites.find((s) => s.id === selectedSiteId) ?? sites[0];
+    /* Workstream B — guided optimize: score the site, solve the best-realistic
+     * criteria for its weak axes, highlight the params to edit, one-click apply. */
+    const [highlighted, setHighlighted] = React.useState<Set<string>>(new Set());
+    const [optMsg, setOptMsg] = React.useState<string | null>(null);
+    const opt = React.useMemo(() => {
+        if (!site) return null;
+        const r = scoreSite(site);
+        return r ? autoOptimizeSite(site, r) : null;
+    }, [site]);
+    // On open / site change, pulse-highlight the weak-axis drivers (what to edit).
+    React.useEffect(() => {
+        if (open && opt) { setHighlighted(new Set(Object.keys(opt.moves))); setOptMsg(null); }
+    }, [open, site?.id]); // eslint-disable-line react-hooks/exhaustive-deps
     if (!open || !site) return null;
+
+    const runAutoOptimize = () => {
+        if (!opt || Object.keys(opt.moves).length === 0) { setOptMsg('This site already scores well — no weak criteria to improve.'); return; }
+        updateAttributes(site.id, opt.moves);
+        setHighlighted(new Set(opt.changed));
+        setOptMsg(`Optimized: score ${Math.round(opt.beforeScore)} → ${Math.round(opt.afterScore)} · ${opt.weakAxesFixed} weak ${opt.weakAxesFixed === 1 ? 'axis' : 'axes'} lifted · ${opt.changed.length} criteria set to best-realistic (highlighted). Reset any you can't achieve.`);
+    };
+    const hl = (k: string) => highlighted.has(k) ? ' rounded ring-2 ring-rz-signal ring-offset-1 dark:ring-offset-slate-950 animate-pulse' : '';
 
     /* PREFILL (owner): unset fields show the EFFECTIVE value — country baseline
      * (cyan) else screening typical (amber) — as placeholder; store stays unset
@@ -160,6 +182,17 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
                         className="inline-flex items-center gap-0.5 rounded-full border border-rose-400/50 px-2 py-1 text-[11px] text-rose-400 disabled:opacity-40"><Trash2 className="h-3 w-3" />Remove</button>
                 </div>
 
+                {/* Workstream B — Auto-optimize criteria (guided) */}
+                <div className="mb-3 space-y-1.5">
+                    <button onClick={runAutoOptimize}
+                        className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-rz-signal px-3 py-2 text-xs font-bold text-rz-base hover:brightness-110">
+                        <Wand2 className="h-3.5 w-3.5" /> Auto-optimize criteria → best score
+                    </button>
+                    <p className="text-[10px] leading-snug text-slate-500 dark:text-slate-400">
+                        {optMsg ?? 'Sets each weak-axis driver to its best realistic value (solved on the real score model) and highlights what changed. The pulsing fields below are the ones dragging this site down — edit those first.'}
+                    </p>
+                </div>
+
                 <div className="mb-3 grid grid-cols-2 gap-2">
                     <label className="block">
                         <span className="text-[10px] font-semibold uppercase text-slate-500">Name</span>
@@ -177,7 +210,7 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
                     {NUM_FIELDS.map((f) => {
                         const b = ATTR_BOUNDS[f.key]!;
                         return (
-                            <label key={f.key} className="block">
+                            <label key={f.key} className={`block${hl(f.key)}`}>
                                 <span className="text-[9px] font-medium uppercase text-slate-500 inline-flex items-center gap-0.5">{f.label}{helpTip(f.key)}{srcChip(f.key)}</span>
                                 <CreatableCombobox<number>
                                     options={f.presets.map((p) => ({ value: p, label: `${p}${b.unit ? ' ' + b.unit : ''}` }))}
@@ -192,7 +225,7 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
                 <h3 className="mb-1 mt-3 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Categorical attributes</h3>
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
                     {ENUM_FIELDS.map((f) => (
-                        <label key={String(f.key)} className="block">
+                        <label key={String(f.key)} className={`block${hl(String(f.key))}`}>
                             <span className="text-[9px] font-medium uppercase text-slate-500 inline-flex items-center gap-0.5">{f.label}{helpTip(String(f.key))}{enumSrcChip(f.key)}</span>
                             <select className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-rz-mint text-slate-900 dark:text-slate-100"
                                 value={(site.attributes[f.key] as string | undefined) ?? ''}
