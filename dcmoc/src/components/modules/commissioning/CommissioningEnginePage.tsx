@@ -47,6 +47,105 @@ function itemsFor(key: ReadinessKey, coolingType: string, equip?: Record<string,
 
 const LEVEL_COLORS = ['#64748b', '#22d3ee', '#3b82f6', '#7DDDB4', '#f59e0b', '#f43f5e', '#00FF88'];
 
+/* Workstream G — Level-5 Integrated Systems Test scenario library (engine
+ * DATA.commissioning.istScenarios). Renders the scripted failure scenarios the
+ * CxA runs — source transfers, bus-tie, black-building, and the mechanical N+2→N
+ * degradation hotspot + cooling ramp-up test the owner asked for. `appliesFrom`
+ * gates each scenario to the project's redundancy class. */
+interface IstScenario {
+    id: string; name: string; category: string; appliesFrom: 'N' | 'N+1' | '2N';
+    purpose: string; preconditions: string[]; method: string[]; acceptance: string; observe: string;
+    systems: string[]; durationHrs: number; risk: 'low' | 'med' | 'high'; standard: string;
+}
+const REDUNDANCY_RANK: Record<string, number> = { N: 0, 'N+1': 1, '2N': 2 };
+const uiRedToClass = (r: string): 'N' | 'N+1' | '2N' => (r === '2N' || r === '2N+1') ? '2N' : (r === 'N+1' ? 'N+1' : 'N');
+const CAT_STYLE: Record<string, string> = {
+    electrical: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
+    mechanical: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400',
+    integrated: 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400',
+};
+const RISK_STYLE: Record<string, string> = {
+    high: 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400',
+    med: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
+    low: 'bg-slate-100 dark:bg-slate-800 text-slate-500',
+};
+
+function IstScenariosTab({ redundancy, openIst, setOpenIst }: { redundancy: string; openIst: string | null; setOpenIst: (id: string | null) => void }) {
+    const all = (rzData()?.commissioning?.istScenarios ?? []) as IstScenario[];
+    if (!all.length) return <div className="text-sm text-slate-500 py-10 text-center">Engine loading…</div>;
+    const projClass = uiRedToClass(redundancy);
+    const projRank = REDUNDANCY_RANK[projClass];
+    const applicable = all.filter((s) => REDUNDANCY_RANK[s.appliesFrom] <= projRank);
+    const gated = all.filter((s) => REDUNDANCY_RANK[s.appliesFrom] > projRank);
+    const totalHrs = applicable.reduce((s, x) => s + x.durationHrs, 0);
+    return (
+        <div className="space-y-3">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 px-3 py-2 text-[11px] text-slate-500">
+                <ListChecks className="mr-1 inline h-3.5 w-3.5 text-rz-mint" />
+                Level-5 Integrated Systems Test (IST) — the scripted failure scenarios that prove fault tolerance end-to-end: source transfers, bus-tie, black-building ride-through, and the mechanical <strong>N+2 → N degradation</strong> hotspot test with the cooling ramp-up response. Scenarios are gated to this project&apos;s redundancy ({projClass}); the dual-path transfers unlock at 2N. Each shows purpose, scripted method, acceptance, and <em>what to observe</em> during the transient. Source: engine <code>DATA.commissioning.istScenarios</code> (Uptime IST / NFPA 110 / ASHRAE TC9.9).
+            </div>
+            <div className="flex flex-wrap gap-2 text-[11px]">
+                <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-1 font-semibold text-slate-600 dark:text-slate-300">{applicable.length} scenarios in scope</span>
+                <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-1 font-mono text-slate-500">≈ {totalHrs} test-hours</span>
+                <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-slate-500">redundancy {projClass}</span>
+            </div>
+            {applicable.map((s) => {
+                const open = openIst === s.id;
+                return (
+                    <div key={s.id} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 overflow-hidden">
+                        <button onClick={() => setOpenIst(open ? null : s.id)} className="w-full flex items-start justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                            <div className="min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                                    <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${CAT_STYLE[s.category] ?? CAT_STYLE.integrated}`}>{s.category}</span>
+                                    <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${RISK_STYLE[s.risk]}`}>{s.risk} risk</span>
+                                    <span className="text-[9px] font-mono text-slate-400">{s.durationHrs}h · {s.appliesFrom}+</span>
+                                </div>
+                                <div className="text-sm font-bold text-slate-900 dark:text-white">{s.name}</div>
+                                <div className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">{s.purpose}</div>
+                            </div>
+                            <ChevronDown className={`w-4 h-4 shrink-0 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+                        </button>
+                        {open && (
+                            <div className="px-4 pb-4 pt-1 space-y-3 border-t border-slate-100 dark:border-slate-800/60">
+                                <IstBlock title="Pre-conditions" items={s.preconditions} />
+                                <IstBlock title="Method (scripted steps)" items={s.method} ordered />
+                                <div>
+                                    <div className="text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Acceptance criteria</div>
+                                    <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">{s.acceptance}</p>
+                                </div>
+                                <div className="rounded-lg border border-cyan-200 dark:border-cyan-900/40 bg-cyan-50/50 dark:bg-cyan-900/10 p-2.5">
+                                    <div className="text-[10px] font-bold uppercase tracking-wide text-cyan-700 dark:text-cyan-400 mb-1">What to observe (the transient)</div>
+                                    <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">{s.observe}</p>
+                                </div>
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                    <span className="text-[10px] text-slate-400 mr-1">Systems:</span>
+                                    {s.systems.map((sy) => <span key={sy} className="text-[9px] font-mono rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-slate-500">{sy}</span>)}
+                                    <span className="text-[10px] text-slate-400 ml-2">· {s.standard}</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
+            {gated.length > 0 && (
+                <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-700 px-4 py-3 text-[11px] text-slate-400">
+                    {gated.length} additional scenario{gated.length > 1 ? 's' : ''} ({gated.map((g) => g.name.split('(')[0].trim()).join(', ')}) unlock at higher redundancy (2N dual-path). They are not applicable to a {projClass} design.
+                </div>
+            )}
+        </div>
+    );
+}
+function IstBlock({ title, items, ordered }: { title: string; items: string[]; ordered?: boolean }) {
+    return (
+        <div>
+            <div className="text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">{title}</div>
+            <ol className={`space-y-1 ${ordered ? 'list-decimal' : 'list-disc'} pl-4`}>
+                {items.map((it, i) => <li key={i} className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">{it}</li>)}
+            </ol>
+        </div>
+    );
+}
+
 /** tests-per-unit screening table (labeled on the card). */
 const TESTS_PER: Record<string, { label: string; key: string; per: number }> = {
     switchgear: { label: 'Power Distribution', key: 'switchgear', per: 12 },
@@ -67,7 +166,8 @@ export function CommissioningEnginePage() {
      * = 417 while the whole app (Requirements 60 kW/rack) shows 42. */
     const rackKw = useRequirementsStore((s) => s.workload.avgRackDensityKw);
     const t = useCxTracking();
-    const [tab, setTab] = React.useState<'overview' | 'checklist' | 'cost'>('overview');
+    const [tab, setTab] = React.useState<'overview' | 'checklist' | 'ist' | 'cost'>('overview');
+    const [openIst, setOpenIst] = React.useState<string | null>(null);
     const [openLevel, setOpenLevel] = React.useState<ReadinessKey | null>('L3');
     const [openItem, setOpenItem] = React.useState<string | null>(null);
     const [busy, setBusy] = React.useState(false);
@@ -156,7 +256,7 @@ export function CommissioningEnginePage() {
                 </div>
                 <div className="flex items-center gap-2">
                     <div className="flex rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden">
-                        {([['overview', 'Progress & Systems'], ['checklist', 'Cx Checklist'], ['cost', 'Program Cost & Risk']] as const).map(([k, l]) => (
+                        {([['overview', 'Progress & Systems'], ['checklist', 'Cx Checklist'], ['ist', 'IST Scenarios'], ['cost', 'Program Cost & Risk']] as const).map(([k, l]) => (
                             <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-xs font-medium ${tab === k ? 'bg-rz-signal text-rz-base' : 'text-slate-600 dark:text-slate-300'}`}>{l}</button>
                         ))}
                     </div>
@@ -343,6 +443,8 @@ export function CommissioningEnginePage() {
                         );
                     })}
                 </div>
+            ) : tab === 'ist' ? (
+                <IstScenariosTab redundancy={inputs.powerRedundancy} openIst={openIst} setOpenIst={setOpenIst} />
             ) : (
                 <div className="space-y-4">
                     {/* #328 — on-page readiness guidance (same rubric as the PDF). */}

@@ -13,6 +13,16 @@ release sections rather than semver.
 
 ---
 
+## v1.115.78 — 2026-07-26 (DCMOC — Commissioning Integrated Systems Test (IST) scenario deep-dive)
+
+### Added
+- **A new "IST Scenarios" tab on the Commissioning page** with the scripted Level-5 integrated-systems-test procedures the checklist was missing. Backed by engine `DATA.commissioning.istScenarios` (sourced: Uptime Tier Certification IST practice + NFPA 110/72/75, ISO 8528, IEC 62040-3, ASHRAE TC9.9). Ten scenarios, each with purpose, pre-conditions, scripted method steps, acceptance criteria, **what to observe during the transient**, the systems involved, duration, risk and the governing standard — specifically covering the tests requested:
+  - **Dual-source (A/B feed) transfer** — either feed carries 100% with no IT drop.
+  - **Bus-tie breaker & interlock** — tie closes on a source loss under a valid sync-check permissive; interlock blocks an unsafe close.
+  - **Mechanical redundancy degradation (N+2 → N) hotspot test** — deliberately shed cooling units step-by-step to N, map where rack-inlet **hotspots** form, and observe the surviving plant's **ramp-up response** (fan/valve/flow) to hold setpoint. This is the headline test the owner asked for.
+  - **Cooling unit failover & ramp-up**, **black-building / pull-the-plug**, **generator step-load + fuel endurance**, **UPS transfer & autonomy**, **fire/EPO cause-and-effect**, and **BMS/network failover**.
+- Scenarios are **gated to the project's redundancy** (`appliesFrom`): a N+1 design sees the single-path tests; the dual-source and N+2→N degradation tests unlock at 2N. The tab shows the in-scope count and estimated test-hours, and lists what unlocks at higher redundancy. Engine chain rebuilt (762/0, catalog 234 fns / 157 sources); gates green (walk 31/0, trace-parity 116/116, enum 25).
+
 ## v1.115.77 — 2026-07-26 (DCMOC — Phased Financial Improvement Recommendations panel)
 
 ### Added

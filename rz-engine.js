@@ -6532,6 +6532,109 @@
                 { min: 80, status: 'Conditional', label: 'Conditionally ready — open items' },
                 { min: 0,  status: 'Not Ready', label: 'Not ready' }
             ],
+            /* ══ Workstream G — INTEGRATED SYSTEMS TEST (Level-5 IST) scenario library.
+             * The scripted failure scenarios a CxA runs to prove the design's fault
+             * tolerance end-to-end: source transfers, bus-tie operation, black-building
+             * ride-through, and mechanical redundancy DEGRADATION (drop units to N and
+             * watch rack-inlet hotspots + the cooling system's ramp-up response). Each
+             * scenario carries purpose, pre-conditions, scripted method steps, pass
+             * criteria, WHAT TO OBSERVE (the transient behaviour), systems, duration and
+             * the governing standard. `appliesFrom` gates a scenario to a redundancy
+             * class (N applies to all; 2N/2N+1 add the dual-path transfers). Screening —
+             * Uptime Tier Certification of Constructed Facility + NFPA 110 + ASHRAE TC9.9;
+             * a project IST script is authored by the CxA, this is the planning template. */
+            istScenarios: [
+                {
+                    id: 'ist-blackbuilding', name: 'Black-building test (full utility loss / pull-the-plug)', category: 'integrated', appliesFrom: 'N',
+                    purpose: 'Prove the whole facility rides through a total loss of utility on stored energy and restores on generator with zero IT load drop.',
+                    preconditions: ['All L4 subsystem tests closed', 'Fuel tanks ≥ 90%', 'Load banks set to design IT load (or live load with owner sign-off)', 'Thermal + power quality logging armed'],
+                    method: ['Open the utility incomer(s) to simulate a grid blackout', 'Confirm UPS carries the critical bus with no output interruption', 'Confirm generators auto-start and reach voltage/frequency within NFPA 110 window', 'Confirm ATS/paralleling transfers the load to generation', 'Hold on generation for the endurance interval, then restore utility and observe retransfer'],
+                    acceptance: 'Zero IT load drop throughout. UPS ride-through > genset start+transfer time. Generators accept full step load within the genset performance class (voltage ±10%, frequency recovery per ISO 8528). Retransfer closed-transition or within tolerance. No thermal excursion beyond ASHRAE allowable during the transient.',
+                    observe: 'UPS DC bus sag + battery time used before genset pickup; genset frequency/voltage recovery curve on step load; the cooling gap while chillers restart (chilled-water temperature rise + rack-inlet spike) — this is the tightest thermal moment of the whole program.',
+                    systems: ['utility', 'ups_modules', 'generators', 'switchgear', 'chillers', 'bms'], durationHrs: 8, risk: 'high', standard: 'Uptime IST / NFPA 110 / ASHRAE TC9.9'
+                },
+                {
+                    id: 'ist-genstep-loadbank', name: 'Generator step-load & endurance run (load bank)', category: 'electrical', appliesFrom: 'N',
+                    purpose: 'Prove the generator plant accepts the design block loads and holds them for the fuel-endurance interval without thermal or fuel faults.',
+                    preconditions: ['Load banks connected at the generator or downstream bus', 'Coolant + fuel systems verified', 'Exhaust + emissions monitoring ready'],
+                    method: ['Start plant and apply load in the design steps (e.g. 0→25→50→75→100%)', 'At each step record voltage/frequency recovery, exhaust + coolant temperature', 'Run at 100% (or 75% per rating) for the endurance interval', 'Perform a block-load pick-up to prove the largest single step'],
+                    acceptance: 'Frequency recovery within the genset performance class at each step. Coolant + exhaust temperatures below OEM limits at steady state. No derate/trip over the endurance run. Fuel burn matches the sizing model.',
+                    observe: 'Frequency dip depth + recovery time on the largest block step; coolant temperature trend over the endurance run (wet-stacking risk if under-loaded).',
+                    systems: ['generators', 'switchgear', 'fuel'], durationHrs: 6, risk: 'med', standard: 'NFPA 110 / ISO 8528'
+                },
+                {
+                    id: 'ist-ups-transfer', name: 'UPS transfer & battery autonomy test', category: 'electrical', appliesFrom: 'N',
+                    purpose: 'Prove seamless UPS transfer to battery on input loss and clean return, with the rated autonomy at design load.',
+                    preconditions: ['UPS at design load', 'Battery fully charged', 'Power-quality analyzer on the output'],
+                    method: ['Open UPS input to force battery operation', 'Capture the output transfer waveform', 'Discharge to the rated autonomy point (or a safe partial with owner sign-off)', 'Restore input and confirm retransfer + recharge', 'Test static-bypass transfer both directions'],
+                    acceptance: 'Output transfer within IEC 62040-3 class (no load drop). Autonomy ≥ rated minutes at design load. Static bypass transfer seamless.',
+                    observe: 'Output voltage notch depth/width at transfer; battery voltage knee vs the rated-autonomy curve (early knee = weak string).',
+                    systems: ['ups_modules', 'switchgear'], durationHrs: 4, risk: 'med', standard: 'IEC 62040-3'
+                },
+                {
+                    id: 'ist-dualsource-transfer', name: 'Dual-source (A/B feed) transfer test', category: 'electrical', appliesFrom: '2N',
+                    purpose: 'Prove a 2N power topology carries the full load on either source independently and transfers between diverse feeds without interrupting the IT bus.',
+                    preconditions: ['Both A and B feeds energized + metered', 'Load on the common bus at design', 'Interlock/protection scheme proven at L4'],
+                    method: ['Confirm the load is shared/served per design on A + B', 'Open Feed A — confirm Feed B (or its train) carries 100% with no IT drop', 'Restore A, rebalance, then open Feed B — confirm Feed A carries 100%', 'Where closed-transition is designed, verify make-before-break; else confirm the open-transition ride-through on UPS'],
+                    acceptance: 'Either feed independently serves 100% of the load. No IT load drop on transfer (closed transition) or ride-through covers the open-transition gap. No protection mis-operation.',
+                    observe: 'Which elements briefly see the full load (thermal margin on the surviving train); on open transition, the UPS gap coverage.',
+                    systems: ['utility', 'switchgear', 'ups_modules'], durationHrs: 5, risk: 'high', standard: 'Uptime Tier IV Fault Tolerance'
+                },
+                {
+                    id: 'ist-tiebreaker', name: 'Bus-tie breaker & interlock test', category: 'electrical', appliesFrom: 'N+1',
+                    purpose: 'Prove the bus-tie closes to maintain supply when a source/board is lost, and that the interlock prevents paralleling out-of-spec sources.',
+                    preconditions: ['Both boards energized', 'Tie in the designed normal position (usually open)', 'Sync-check / interlock relays proven'],
+                    method: ['Simulate loss of one board’s source', 'Confirm the tie closes per the transfer scheme (auto or supervised) and the healthy board picks up both loads', 'Verify sync-check permits closing only within voltage/phase/frequency window', 'Attempt an out-of-window close and confirm the interlock BLOCKS it', 'Restore and return the tie to normal'],
+                    acceptance: 'Tie closes only under a valid permissive; healthy board carries both loads within rating; interlock blocks any unsafe close; no nuisance trips.',
+                    observe: 'Load on the surviving board vs its rating (over-duty if the tie backfeeds too much); sync-check window behaviour.',
+                    systems: ['switchgear'], durationHrs: 4, risk: 'high', standard: 'IEEE C37 / Uptime IST'
+                },
+                {
+                    id: 'ist-cooling-failover', name: 'Cooling unit failover & ramp-up response', category: 'mechanical', appliesFrom: 'N+1',
+                    purpose: 'Prove a single chiller/CDU/CRAH trip triggers standby auto-start fast enough to hold rack-inlet temperature within ASHRAE allowable.',
+                    preconditions: ['Cooling at design heat load (load banks in the halls)', 'BMS trend logging at rack-inlet granularity', 'Standby units in auto'],
+                    method: ['Trip one duty cooling unit (chiller / CDU / CRAH per loop)', 'Time the standby auto-start + valve/pump sequencing to full duty', 'Record chilled-water and rack-inlet temperature transient', 'Confirm setpoint recovery, then restore the tripped unit'],
+                    acceptance: 'Standby reaches full duty before rack-inlet exceeds ASHRAE A1 allowable. Chilled-water temperature returns to setpoint within the design recovery window. No cascade trips.',
+                    observe: 'The ramp-up curve — dead time before the standby contributes cooling, the rack-inlet overshoot peak, and time-to-recover setpoint. Slow valve/pump sequencing shows here.',
+                    systems: ['chillers', 'cooling_units', 'bms'], durationHrs: 5, risk: 'med', standard: 'ASHRAE TC9.9 / Uptime IST'
+                },
+                {
+                    id: 'ist-mech-degradation', name: 'Mechanical redundancy degradation (N+2 → N) hotspot test', category: 'mechanical', appliesFrom: '2N',
+                    purpose: 'Deliberately shed redundant cooling units step-by-step down to N and map where rack-inlet HOTSPOTS form and whether the remaining plant + air/water management hold the halls at setpoint.',
+                    preconditions: ['Full design heat load in the halls (load banks distributed to mimic the real rack map)', 'Dense rack-inlet + hot-aisle thermal logging (or CFD-validated sensor grid)', 'Containment closed as designed'],
+                    method: ['Establish steady state at full redundancy (e.g. N+2)', 'Trip ONE unit → N+1; hold and log until temperatures re-stabilise', 'Trip a second unit → N; hold and log', 'At each step map rack-inlet temperatures across the floor and note the highest-rising zones', 'Observe the surviving units + CDUs/CRAHs ramping (fan speed, valve position, chilled-water flow) to absorb the lost capacity', 'Restore units one at a time and confirm recovery'],
+                    acceptance: 'At N, every rack inlet stays within ASHRAE A1 allowable at design load; no zone exceeds the high-limit; the plant ramps to hold setpoint without tripping; recovery is clean on restoration.',
+                    observe: 'WHERE the hotspots appear (typically the end-of-row / top-of-rack farthest from the surviving units, or a poorly-contained zone) and HOW the remaining cooling ramps — fan/valve/flow response time and whether it is enough. This is the test that reveals air-management and control-tuning weaknesses a paper redundancy count hides.',
+                    systems: ['chillers', 'cooling_units', 'bms'], durationHrs: 8, risk: 'high', standard: 'ASHRAE TC9.9 thermal / Uptime IST'
+                },
+                {
+                    id: 'ist-fuel-endurance', name: 'Full-load fuel endurance run', category: 'integrated', appliesFrom: 'N+1',
+                    purpose: 'Prove the site runs on generation at full load for the design autonomy without fuel, cooling, or exhaust faults, including fuel polishing / transfer.',
+                    preconditions: ['Black-building or dual-source test passed', 'Bulk + day tanks per design', 'Fuel-transfer + polishing in auto'],
+                    method: ['Run the facility on generation at full load for the autonomy interval', 'Confirm day-tank refill from bulk on low-level', 'Monitor coolant, exhaust, oil and load sharing across paralleled sets', 'Confirm fuel burn tracks the sizing model'],
+                    acceptance: 'Sustained full-load run for the design hours with automatic fuel transfer; no thermal/fuel derate; load sharing balanced across sets.',
+                    observe: 'Day-tank level cycling + transfer pump behaviour; coolant temperature stability over hours; measured vs modelled fuel burn.',
+                    systems: ['generators', 'fuel', 'switchgear', 'chillers'], durationHrs: 12, risk: 'med', standard: 'NFPA 110 / Uptime IST'
+                },
+                {
+                    id: 'ist-firetrip', name: 'Fire alarm / EPO integrated shutdown & recovery', category: 'integrated', appliesFrom: 'N',
+                    purpose: 'Prove the fire-alarm matrix, damper/AHU shutdown, and EPO behave per the cause-and-effect matrix and the facility recovers cleanly.',
+                    preconditions: ['Fire cause-and-effect matrix approved', 'Suppression in test/isolated per procedure', 'AHU/damper interlocks proven at L4'],
+                    method: ['Initiate a zone alarm and verify the programmed cause-and-effect (AHU/damper, containment, notification)', 'Verify EPO drops only the intended scope', 'Confirm no unintended cooling or power loss to adjacent zones', 'Reset and confirm orderly restart'],
+                    acceptance: 'Cause-and-effect matches the approved matrix exactly; EPO scope correct; clean recovery with no latent lockouts.',
+                    observe: 'Any collateral cooling loss to adjacent zones during the alarm sequence (a common integrated-test surprise).',
+                    systems: ['fireZones', 'cooling_units', 'bms'], durationHrs: 4, risk: 'high', standard: 'NFPA 72 / NFPA 75'
+                },
+                {
+                    id: 'ist-bms-failover', name: 'BMS / controls & network failover test', category: 'integrated', appliesFrom: 'N+1',
+                    purpose: 'Prove the control system rides through a controller/network failure holding the last-good state and that alarms/trends survive.',
+                    preconditions: ['Redundant controllers/network proven at L4', 'Trend + alarm archiving on'],
+                    method: ['Fail a primary controller / network path', 'Confirm failover to the redundant path with plant holding setpoint', 'Confirm no spurious equipment commands during failover', 'Restore and confirm sync'],
+                    acceptance: 'Plant holds setpoint through the failover; no spurious commands; alarms/trends continuous; clean resync.',
+                    observe: 'Any control bump (setpoint/valve step) at the moment of failover; alarm-flood behaviour.',
+                    systems: ['bms'], durationHrs: 3, risk: 'med', standard: 'Uptime IST'
+                }
+            ],
             /* Cx PROGRAM cost + schedule model (promoted from cx-calculator.html so
              * DCMOC + the calculator share one source). base = $/kW per discipline;
              * levels L0-L6 with cost share + schedule-weight; discipline split of
@@ -8698,6 +8801,7 @@
             'reliability':            { source: 'IEEE 493 (Gold Book) typical component MTBF/MTTR + Uptime Institute Tier Standard availability targets', asOf: '2026', unit: 'hours (MTBF/MTTR) + availability fraction', method: 'screening-grade RAM inputs; NOT a certified reliability/FMEA study' },
             'site':                   { source: 'DC site-selection factor weighting (power + grid + seismic + talent + tax + carbon + flood + latency + water) — engine heuristic informed by 451/CBRE/Uptime site-selection criteria', asOf: '2026', unit: 'weights (fraction, sum=1) + grade bands', method: 'transparent weighted-factor screen; factor inputs are caller-supplied 0-1 goodness scores' },
             'commissioning':          { source: 'Standard DC commissioning sequence (ASHRAE Guideline 0 / BCxA + Uptime Cx) — L1–L5 levels + IST/SAT/FAT + punchlist; weights are an engine readiness heuristic', asOf: '2026', unit: 'weights (fraction, sum=1) + readiness %', method: 'weighted completion index; NOT a Cx authority sign-off' },
+            'commissioning.istScenarios': { source: 'Workstream G — Level-5 Integrated Systems Test scenario library: scripted failure scenarios (black-building/pull-the-plug, generator step-load + fuel endurance, UPS transfer + autonomy, dual A/B source transfer, bus-tie + interlock, cooling failover + ramp-up, mechanical N+2→N degradation hotspot map, fire/EPO cause-and-effect, BMS/network failover). Purpose + preconditions + scripted method + acceptance + what-to-observe + systems + duration + governing standard. Uptime Tier Certification of Constructed Facility IST practice + NFPA 110/72/75 + ISO 8528 + IEC 62040-3 + ASHRAE TC9.9', asOf: '2026', unit: 'scenario procedures (qualitative) + duration hrs + appliesFrom redundancy gate', method: 'IST planning template — the project IST script is authored by the CxA' },
             'asset':                  { source: 'ASHRAE Equipment Life Expectancy + manufacturer service-life data (design lives); health-index weighting is an engine asset-management heuristic; lifecycle replacement intervals + $/kW lifted from DCMOC CapexEngine (UPS/gen/CRAC/PDU/BMS/fire)', asOf: '2026', unit: 'years + weights (sum=1) + health % + $/kW replacement', method: 'screening health + lifecycle model; NOT a condition survey' },
             'construction':           { source: 'Canonical DC build phase sequence (design→permit→procurement→civil→MEP→commissioning) + typical fast-track overlap factors — engine scheduling heuristic', asOf: '2026', unit: 'months (durations) + overlap fractions', method: 'CPM-style forward pass with per-phase overlap; screening schedule, NOT a resource-loaded programme' },
             'requirements':           { source: 'DC project brief required-field set + workload density/cooling profiles (AI/HPC/cloud/colo/enterprise/edge) — engine intake heuristic informed by Uptime/OCP rack-density guidance', asOf: '2026', unit: 'field list + kW/rack + cooling/tier defaults', method: 'completeness + profile defaults; not a design basis' },
@@ -14557,7 +14661,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-26-c"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-26-d"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string
