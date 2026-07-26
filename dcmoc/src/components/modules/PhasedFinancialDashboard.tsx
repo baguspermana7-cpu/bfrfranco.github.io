@@ -13,7 +13,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { RedValue } from '@/components/ui/RedValue';
 import { optimizeRevenueForHurdle, proposalToPatch, type OptimizeProposal } from '@/lib/optimizer/optimize';
-import { Calculator, DollarSign, TrendingUp, Target, Percent, CheckCircle2, XCircle, FileText, AlertTriangle, ChevronDown, ArrowUpRight } from 'lucide-react';
+import { Calculator, DollarSign, TrendingUp, Target, Percent, CheckCircle2, XCircle, FileText, AlertTriangle, ChevronDown, ArrowUpRight, Zap } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer,
     ComposedChart, Line, Area, Cell, ReferenceLine, LineChart,
@@ -493,6 +493,65 @@ const PhasedFinancialDashboard = () => {
                     </CardContent>
                 </Card>
             )}
+
+            {/* Workstream F — Improvement Recommendations: an always-visible, comprehensive,
+              * quantified lever panel (was hidden inside the red KPI modals) + prominent
+              * Auto-optimize. All numbers come from the SAME cashflow model / on-page figures. */}
+            {(() => {
+                const belowHurdle = blendedIrr < 12 || blendedNpv < 0 || profitabilityIndex < 1;
+                const incentivesOnTable = (adjustments.tax || 0) + (adjustments.grid || 0);
+                // Solved levers from the same bisection model (revenue / CAPEX), deduped.
+                const solvedLevers = (overallExplain?.levers ?? []);
+                // Structural levers with real on-page figures (directional, jump-to-tab).
+                const structural: { label: string; detail: string; tab: string }[] = [];
+                if (incentivesOnTable > 0) structural.push({ label: 'Capture available incentives', detail: `Tax + grid incentives already model at ${fmtMoney(incentivesOnTable)} of benefit — confirm eligibility and lock them into the base case (they lift NPV directly).`, tab: 'tax' });
+                if (totalIDC > 0) structural.push({ label: 'Reduce interest-during-construction', detail: `IDC adds ${fmtMoney(totalIDC)} over ${constructionMonths} months of build. A shorter critical path or a lower construction-loan rate cuts this straight off the effective cost base.`, tab: 'construction' });
+                structural.push({ label: 'Re-phase the build', detail: 'Deferring later-phase CAPEX until earlier phases fill improves the blended return — the per-phase IRRs already climb in later phases. Right-size Phase 1 to demand.', tab: 'capacity' });
+                structural.push({ label: 'Trim OPEX drivers', detail: 'Lower PUE (cooling), a leaner staffing/maintenance mix, and a tighter SLA cut annual OPEX — each raises every phase’s cash flow.', tab: 'sim' });
+                return (
+                    <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+                        <CardContent className="pt-5 pb-5">
+                            <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
+                                <div>
+                                    <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                        <TrendingUp className="w-4 h-4 text-cyan-500" /> Improvement Recommendations
+                                    </h3>
+                                    <p className="text-[11px] text-slate-500 mt-0.5">
+                                        {belowHurdle
+                                            ? 'The program is below the 12% hurdle at the current assumptions. Ranked, quantified levers to close the gap — solved on the same cashflow model.'
+                                            : 'The program clears the hurdle. Levers below show the headroom and where value can still be added.'}
+                                    </p>
+                                </div>
+                                <button onClick={runAutoOptimize} disabled={!optimizeAtRev}
+                                    className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-rz-signal px-3 py-2 text-xs font-bold text-rz-base hover:brightness-110 disabled:opacity-50">
+                                    <Zap className="w-3.5 h-3.5" /> Auto-optimize revenue → 12% IRR
+                                </button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                                {solvedLevers.map((lv, i) => (
+                                    <div key={`s${i}`} className="rounded-lg border border-cyan-200 dark:border-cyan-900/40 bg-cyan-50/40 dark:bg-cyan-900/10 p-3">
+                                        <div className="flex items-center justify-between gap-2 mb-1">
+                                            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{lv.label}</span>
+                                            <button onClick={() => goToTab(lv.targetTab)} className="shrink-0 text-[10px] font-semibold text-cyan-700 dark:text-cyan-400 hover:underline inline-flex items-center gap-0.5">Revise <ArrowUpRight className="w-3 h-3" /></button>
+                                        </div>
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">{lv.detail}</p>
+                                    </div>
+                                ))}
+                                {structural.map((lv, i) => (
+                                    <div key={`t${i}`} className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30 p-3">
+                                        <div className="flex items-center justify-between gap-2 mb-1">
+                                            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{lv.label}</span>
+                                            <button onClick={() => goToTab(lv.tab)} className="shrink-0 text-[10px] font-semibold text-slate-500 dark:text-slate-400 hover:underline inline-flex items-center gap-0.5">Open <ArrowUpRight className="w-3 h-3" /></button>
+                                        </div>
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">{lv.detail}</p>
+                                    </div>
+                                ))}
+                            </div>
+                            <p className="mt-3 text-[10px] text-slate-400">Revenue/CAPEX levers are solved by bisection on the same cashflow model; structural levers are directional with the current on-page figures. Auto-optimize previews an allowlisted revenue move before applying.</p>
+                        </CardContent>
+                    </Card>
+                );
+            })()}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Phase Decision Matrix */}

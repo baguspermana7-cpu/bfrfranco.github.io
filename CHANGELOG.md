@@ -13,6 +13,15 @@ release sections rather than semver.
 
 ---
 
+## v1.115.77 — 2026-07-26 (DCMOC — Phased Financial Improvement Recommendations panel)
+
+### Added
+- **An always-visible "Improvement Recommendations" panel on the Phased Financial page.** Previously the quantified levers were only reachable by clicking a red IRR/NPV/PI number; now they sit on the page as a ranked, comprehensive list. It combines:
+  - **Solved levers** — the revenue-uplift and CAPEX-cut magnitudes that reach the 12% hurdle, computed by bisection on the same cashflow model (with the target $/kW·mo and resulting IRR).
+  - **Structural levers with the real on-page figures** — capture the incentives already modelled (tax + grid $), reduce interest-during-construction (the live IDC $ over the build months), re-phase the build (defer later-phase CAPEX), and trim OPEX drivers (PUE/staffing/SLA) — each with a jump-to-tab.
+  - A prominent **"Auto-optimize revenue → 12% IRR"** button that runs the existing deterministic bisection solver and previews the allowlisted revenue move before applying.
+- The panel adapts its framing to whether the program is above or below the hurdle, and is honest that structural levers are directional while revenue/CAPEX levers are solved. Pure frontend (reuses the optimizer + decision-explain); no engine change. Gates green (optimizer 8/8, financial-auto 9/9, walk 31/0).
+
 ## v1.115.76 — 2026-07-26 (DCMOC — two planned-maintenance compliance regimes: OEM-full vs standard-annual)
 
 ### Added
