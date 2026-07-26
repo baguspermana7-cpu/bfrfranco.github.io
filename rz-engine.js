@@ -7690,6 +7690,20 @@
             /* Physical constants (cdu-model.js / Alduchov-Eskridge 2006). */
             phys: { absRoughnessMm: 0.045, barToPa: 100000, dewMagnusA: 17.625, dewMagnusB: 243.04 }
         },
+        /* ── v1.115.73 — LIQUID-COOLING WATER BALANCE (CDU technical loop makeup +
+         * heat-rejection cooling-tower losses). Screening factors, ASHRAE TC9.9 /
+         * cooling-tower practice (evaporation ≈ latent-heat of rejected duty;
+         * blowdown from cycles-of-concentration; drift from modern eliminators). */
+        coolingWater: {
+            loopVolumeLPerKwIt: 8,          // technical coolant loop volume (BOQ glycol-charge basis ~8 L/kW IT)
+            glycolFractionDefault: 0.30,    // 20–35% inhibited propylene/ethylene glycol
+            loopMakeupPerYear: 0.15,        // annual coolant makeup (leaks / drain-refill / service) as fraction of charge
+            evapLPerKwhThermal: 1.4,        // cooling-tower evaporation per kWh heat rejected (latent-heat 3600/2260≈1.59 at full evaporative, derated for sensible share)
+            cyclesOfConcentrationDefault: 5, // tower CoC (make-up:blowdown ratio) — typical 3–7
+            driftFractionOfEvap: 0.005,     // drift loss ≈ 0.2% circ ≈ 0.5% of evaporation (modern drift eliminators, CTI)
+            hybridWetFraction: 0.5,         // hybrid (adiabatic/wet-dry) tower rejects ~half its annual duty via evaporation
+            rejectionWetFraction: { evaporative: 1.0, hybrid: 0.5, dry: 0.0 }  // fraction of rejected heat sent through a wet/evaporative stage
+        },
         spares: {
             /* BSM rational approximation coefficients for inverse normal CDF.
              * Source: Beasley-Springer-Moro (1977). Used in newsvendor Q* calculation. */
@@ -8687,6 +8701,7 @@
             'cdu.bands':              { source: 'cdu-model.js BANDS — OCP cold-plate + ASHRAE TC9.9 CDU operational bounds (supply temp, ΔT, flow, dP, dew margin, pipe velocity)', asOf: '2026', unit: '°C / K / Lpm/kW / bar / m/s' },
             'cdu.pump':               { source: 'cdu-model.js PUMP — typical seal-less CDU pump (η=0.70) + IE3 motor (η=0.92) + 600 Lpm duty pump; ILLUSTRATIVE', asOf: '2026', unit: 'efficiency fraction + Lpm' },
             'cdu.phys':               { source: 'cdu-model.js PHYS — commercial-steel absolute roughness (Moody/Colebrook), barToPa, Magnus dew-point coefficients (Alduchov-Eskridge 2006)', asOf: '2026', unit: 'mm / Pa/bar / dimensionless' },
+            'coolingWater':           { source: 'Liquid-cooling water balance (CDU technical loop + heat-rejection tower): loop volume ~8 L/kW IT (BOQ glycol charge) + 20–35% inhibited glycol; makeup ~15%/yr (leaks/service); tower evaporation ≈ latent-heat of rejected duty (3600/2260≈1.59 L/kWh_th, derated to 1.4 for sensible share); blowdown from cycles-of-concentration 3–7; drift ~0.5% of evaporation (modern eliminators, CTI). ASHRAE TC9.9 + cooling-tower practice', asOf: '2026', unit: 'L/kW · fraction/yr · L/kWh_th · dimensionless CoC', method: 'screening water balance — not a site water balance' },
             'mttrResponse':           { source: 'Article-4 vendor-vs-inhouse MTTR model: per-category phase durations (Electrical/Mechanical/Controls/Fire — field screening), skill multipliers 1.5..0.55, coverage mobilization hours (24x7 0.25h / 16x7 0.8h / 12x5 2.1h), 55% retainer recovery, 30% non-critical downtime cost weight', asOf: '2026', method: 'phase-sum MTTR + annual downtime-delta economics; deterministic (page Monte Carlo stays page-side)' },
             'techDebt':               { source: 'Article-5 technical-debt risk model: criticality weights 10/5/1, Weibull screening (beta 2.5 base, eta 60 months, facility-age adjustments), 15%/yr risk growth, 8% discount, escalation 1+(age/24)x0.5, inaction 30% factor, SLA 0.1% revenue factor, insurance bands 1-8% by risk score', asOf: '2026', method: 'hazard-weighted composite scaled to 100; Lanczos gamma for MTTF; screening-grade' },
             'rcaScore':               { source: 'Article-6 RCA program effectiveness rubric: completion 20% + implementation 25% + recurrence 20% + time-to-close 15% (90-day target) + design-authority involvement 10% + verification 10%', asOf: '2026', method: 'weighted 6-component composite 0-100' },
@@ -11492,6 +11507,55 @@
                     var hrs = hoursPerYear || DATA.hoursPerYear;
                     var itKwh = (mw || 0) * 1000 * hrs;
                     return Math.round(RZEngine.models.water.wue(cooling) * itKwh / 1000);
+                },
+                /** Liquid-cooling water balance — CDU technical loop makeup (water +
+                 *  glycol) + heat-rejection cooling-tower losses (evaporation +
+                 *  blowdown + drift). input {itLoadMw, pue, hours?, glycolPct?,
+                 *  cyclesOfConcentration?, rejectionType(evaporative|hybrid|dry)?}.
+                 *  Returns annual m³ split by source + WUE. Screening (DATA.coolingWater). */
+                coolingLoop: function (input) {
+                    input = input || {};
+                    var C = DATA.coolingWater;
+                    var itKw = (input.itLoadMw != null ? input.itLoadMw : 2.5) * 1000;
+                    var pue = input.pue != null ? input.pue : 1.3;
+                    var hours = input.hours != null ? input.hours : DATA.hoursPerYear;
+                    var glycolPct = input.glycolPct != null ? input.glycolPct : C.glycolFractionDefault;
+                    var coc = input.cyclesOfConcentration != null ? input.cyclesOfConcentration : C.cyclesOfConcentrationDefault;
+                    var rejection = input.rejectionType || 'evaporative';
+                    var wetFrac = C.rejectionWetFraction[rejection] != null ? C.rejectionWetFraction[rejection] : 1.0;
+                    /* (1) technical coolant loop — closed loop, makeup only on leaks/service. */
+                    var loopVolumeL = itKw * C.loopVolumeLPerKwIt;
+                    var glycolChargeL = loopVolumeL * glycolPct;
+                    var waterChargeL = loopVolumeL * (1 - glycolPct);
+                    var annualLoopMakeupL = loopVolumeL * C.loopMakeupPerYear;
+                    var annualGlycolMakeupL = annualLoopMakeupL * glycolPct;
+                    var annualLoopWaterMakeupL = annualLoopMakeupL * (1 - glycolPct);
+                    /* (2) heat rejection — all facility electrical energy ends as heat
+                     * (≈ IT × PUE). A wet/evaporative stage loses water to evaporation. */
+                    var facilityKwhThermal = itKw * pue * hours;
+                    var evaporationL = facilityKwhThermal * C.evapLPerKwhThermal * wetFrac;
+                    var blowdownL = coc > 1 ? evaporationL / (coc - 1) : 0;
+                    var driftL = evaporationL * C.driftFractionOfEvap;
+                    var towerMakeupL = evaporationL + blowdownL + driftL;
+                    /* (3) totals + WUE (per IT kWh, industry convention). */
+                    var annualWaterL = towerMakeupL + annualLoopWaterMakeupL;
+                    var itKwh = itKw * hours;
+                    var wue = itKwh > 0 ? annualWaterL / itKwh : 0;
+                    var toM3 = function (l) { return Math.round(l / 1000); };
+                    return {
+                        loopVolumeL: Math.round(loopVolumeL), glycolChargeL: Math.round(glycolChargeL), waterChargeL: Math.round(waterChargeL),
+                        glycolPct: glycolPct, cyclesOfConcentration: coc, rejectionType: rejection, wetFraction: wetFrac,
+                        annualGlycolMakeupL: Math.round(annualGlycolMakeupL), annualGlycolMakeupM3: toM3(annualGlycolMakeupL),
+                        annualLoopWaterMakeupL: Math.round(annualLoopWaterMakeupL),
+                        evaporationL: Math.round(evaporationL), evaporationM3: toM3(evaporationL),
+                        blowdownL: Math.round(blowdownL), blowdownM3: toM3(blowdownL),
+                        driftL: Math.round(driftL), driftM3: toM3(driftL),
+                        towerMakeupM3: toM3(towerMakeupL),
+                        annualWaterL: Math.round(annualWaterL), annualWaterM3: toM3(annualWaterL),
+                        annualGlycolMakeupPlusWaterM3: toM3(annualWaterL + annualGlycolMakeupL),
+                        wue: Math.round(wue * 1000) / 1000,
+                        method: 'screening water balance: closed-loop makeup (' + (C.loopMakeupPerYear * 100) + '%/yr of ' + C.loopVolumeLPerKwIt + ' L/kW charge) + tower evaporation (' + C.evapLPerKwhThermal + ' L/kWh_th × wet-fraction ' + wetFrac + ') + blowdown (CoC ' + coc + ') + drift — not a site water balance'
+                    };
                 },
                 /** Annual water cost ($) at the regional water price. */
                 annualCost: function (mw, cooling, region, hoursPerYear) {
@@ -14473,7 +14537,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-26-a"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-26-b"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

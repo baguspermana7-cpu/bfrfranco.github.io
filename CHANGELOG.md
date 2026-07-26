@@ -13,6 +13,16 @@ release sections rather than semver.
 
 ---
 
+## v1.115.73 — 2026-07-26 (DCMOC — CDU liquid-cooling water & glycol consumption model)
+
+### Added
+- **Water & Glycol Balance section on the CDU / Liquid-Cooling page** — liquid cooling was modelled for hydraulics and refrigerant but not for water use, which for an evaporative-tower site is the dominant sustainability cost. New engine model `models.water.coolingLoop` (backed by `DATA.coolingWater`, ASHRAE TC9.9 + cooling-tower practice, sourced) computes the full balance:
+  - **Technical coolant loop** — closed water + glycol loop (~8 L/kW IT charge), user-set glycol fraction (20–35%), and annual makeup (~15%/yr of charge from leaks/drain-refill/service), split into water vs glycol.
+  - **Heat-rejection tower losses** — **evaporation** (≈ latent heat of the rejected duty, IT×PUE × 1.4 L/kWh_th × wet-fraction), **blowdown** (evaporation ÷ (cycles-of-concentration − 1)), and **drift** (~0.5% of evaporation with modern eliminators).
+  - **Heat-rejection selector** — Evaporative tower (max water) / Hybrid-adiabatic (~half) / Dry cooler (no tower water, but higher fan energy/PUE), plus glycol-% and cycles-of-concentration sliders.
+  - Outputs annual m³ by stream, glycol makeup (flagged as chemical, not water), and **WUE (L/kWh)**. Verified live: a 2.5 MW evaporative site ≈ 2.64 L/kWh WUE; switching to a dry cooler drops tower water to zero. The balance is also written into the CDU PDF export.
+- Engine chain rebuilt (terser + catalog 234 fns / 155 sources + value-bindings 85/0 + test-rz-engine 762/0); gates green (walk 31/0, trace-parity 116/116, enum-coverage 24). `DATA.sources.coolingWater` entry added (no economically-material literal left in the model body).
+
 ## v1.115.72 — 2026-07-26 (DCMOC — power-source topology + fuel-type modelling, end-to-end)
 
 ### Added

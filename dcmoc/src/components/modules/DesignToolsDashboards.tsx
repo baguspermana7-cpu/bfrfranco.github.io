@@ -72,6 +72,17 @@ interface CoolingTechRow {
     coolant?: string; wueBasis?: string; confidence?: 'commercial' | 'emerging'; ref?: string; source?: string;
 }
 
+/* Workstream D — models.water.coolingLoop result (liquid-cooling water balance). */
+interface WaterLoopResult {
+    loopVolumeL: number; glycolChargeL: number; waterChargeL: number;
+    glycolPct: number; cyclesOfConcentration: number; rejectionType: string; wetFraction: number;
+    annualGlycolMakeupL: number; annualGlycolMakeupM3: number; annualLoopWaterMakeupL: number;
+    evaporationL: number; evaporationM3: number; blowdownL: number; blowdownM3: number;
+    driftL: number; driftM3: number; towerMakeupM3: number;
+    annualWaterL: number; annualWaterM3: number; annualGlycolMakeupPlusWaterM3: number;
+    wue: number; method: string;
+}
+
 /** ASHRAE-34 / application-envelope compatibility note for a low-GWP swap —
  *  derived from the live DATA.refrigerants apps + safety fields. */
 function refCompatNote(cur: RefrigerantRow, alt: RefrigerantRow): string {
@@ -330,6 +341,10 @@ export function CduDashboard() {
     const [busy, setBusy] = React.useState(false);
     /* GWP diagnostics panel — key of the refrigerant whose rose GWP cell was clicked */
     const [gwpDiag, setGwpDiag] = React.useState<string | null>(null);
+    /* (d) Water & glycol balance controls — Workstream D */
+    const [glycolPct, setGlycolPct] = React.useState(30);
+    const [coc, setCoc] = React.useState(5);
+    const [rejectionType, setRejectionType] = React.useState<'evaporative' | 'hybrid' | 'dry'>('evaporative');
     const m = rzModels().cdu;
     const engineReadyCdu = useEngineReady();
     const dsModel = engineReadyCdu ? rzModels().cooling?.deepSea : undefined;
@@ -364,6 +379,12 @@ export function CduDashboard() {
     const refKey = capexInputs.refrigerantType ?? data.refrigerantAutoByCooling?.[inputs.coolingType] ?? 'R134a';
     const refDb = data.refrigerants ?? {};
 
+    /* (d) Water & glycol balance — engine models.water.coolingLoop (Workstream D) */
+    const waterModel = rzModels().water as { coolingLoop?: (i: unknown) => WaterLoopResult } | undefined;
+    const water: WaterLoopResult | null = (engineReadyCdu && typeof waterModel?.coolingLoop === 'function')
+        ? waterModel.coolingLoop({ itLoadMw: inputs.itLoad / 1000, pue: pueCurrent, glycolPct: glycolPct / 100, cyclesOfConcentration: coc, rejectionType })
+        : null;
+
     const exportPdf = async () => {
         setBusy(true);
         try {
@@ -390,6 +411,19 @@ export function CduDashboard() {
                         title: 'Refrigerant Database (engine)', head: ['Refrigerant', 'GWP', 'Safety', 'COP idx', 'CAPEX ×', 'Apps'],
                         rows: Object.entries(refDb).map(([k, v]) => [`${v.label}${k === refKey ? ' ◀ selected' : ''}`, v.gwp, v.safety, v.copIndex, v.capexMult, v.apps.join('/')]),
                     },
+                    ...(water ? [{
+                        title: 'Water & Glycol Balance (models.water.coolingLoop)', head: ['Water stream', 'Value'],
+                        rows: [
+                            ['Heat rejection', `${water.rejectionType} (wet fraction ${water.wetFraction})`],
+                            ['Technical loop', `${(water.loopVolumeL / 1000).toLocaleString()} m³ charge · ${water.glycolPct * 100}% glycol`],
+                            ['Tower evaporation', `${water.evaporationM3.toLocaleString()} m³/yr`],
+                            ['Blowdown', `${water.blowdownM3.toLocaleString()} m³/yr (CoC ${water.cyclesOfConcentration}×)`],
+                            ['Drift', `${water.driftM3.toLocaleString()} m³/yr`],
+                            ['Loop water makeup', `${Math.round(water.annualLoopWaterMakeupL / 1000).toLocaleString()} m³/yr`],
+                            ['Total site water', `${water.annualWaterM3.toLocaleString()} m³/yr (WUE ${water.wue} L/kWh)`],
+                            ['Glycol makeup', `${water.annualGlycolMakeupM3.toLocaleString()} m³/yr (chemical)`],
+                        ] as [string, string][],
+                    }] : []),
                     ...(ds ? [{
                         title: 'Deep-Sea Water Cooling (engine models.cooling.deepSea)', head: ['Metric', 'Value'],
                         rows: [
@@ -481,6 +515,76 @@ export function CduDashboard() {
                     </table>
                 </Card>
             )}
+
+            {/* (d) Water & Glycol balance — CDU technical loop makeup + heat-rejection tower losses */}
+            <Card>
+                <h3 className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                    Water &amp; Glycol Balance <EngChip src="models.water.coolingLoop" />
+                    <span className="text-[9px] normal-case text-slate-400">closed loop + evaporation + blowdown + drift</span>
+                </h3>
+                {!water ? (
+                    <p className="text-[11px] text-slate-400">Engine loading…</p>
+                ) : (
+                    <>
+                        <p className="mb-3 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                            Liquid cooling carries heat in a closed <strong>water + {water.glycolPct * 100}% glycol</strong> technical loop (makeup only on leaks/service),
+                            then rejects it to atmosphere. A wet/evaporative tower loses water to <strong>evaporation</strong> (≈ latent heat of the rejected duty),
+                            <strong> blowdown</strong> (to control mineral concentration) and <strong>drift</strong>. Dry coolers use no tower water but cost more fan energy (higher PUE).
+                        </p>
+                        {/* controls */}
+                        <div className="mb-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
+                            <label className="flex flex-col gap-1">
+                                <span className="text-slate-500">Heat rejection</span>
+                                <select value={rejectionType} onChange={(e) => setRejectionType(e.target.value as 'evaporative' | 'hybrid' | 'dry')}
+                                    className="rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-1 text-slate-700 dark:text-slate-200">
+                                    <option value="evaporative">Evaporative tower (max water)</option>
+                                    <option value="hybrid">Hybrid / adiabatic (~half)</option>
+                                    <option value="dry">Dry cooler (no tower water)</option>
+                                </select>
+                            </label>
+                            <label className="flex flex-col gap-1">
+                                <span className="text-slate-500">Glycol %: <span className="tabular-nums text-slate-600 dark:text-slate-300">{glycolPct}%</span></span>
+                                <input type="range" min={20} max={35} value={glycolPct} onChange={(e) => setGlycolPct(Number(e.target.value))} className="accent-cyan-500" title={`Inhibited glycol fraction: ${glycolPct}% (20–35% typical)`} />
+                            </label>
+                            <label className="flex flex-col gap-1">
+                                <span className="text-slate-500">Cycles of conc.: <span className="tabular-nums text-slate-600 dark:text-slate-300">{coc}×</span></span>
+                                <input type="range" min={3} max={7} value={coc} onChange={(e) => setCoc(Number(e.target.value))} className="accent-cyan-500" title={`Tower cycles-of-concentration: ${coc} (higher = less blowdown, more scaling risk)`} />
+                            </label>
+                        </div>
+                        {/* KPI band */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <Metric label="Annual Water" value={`${water.annualWaterM3.toLocaleString()} m³`} sub={`WUE ${water.wue} L/kWh`} />
+                            <Metric label="Evaporation" value={`${water.evaporationM3.toLocaleString()} m³`} sub={rejectionType === 'dry' ? 'no wet stage' : `${Math.round(water.wetFraction * 100)}% wet reject`} />
+                            <Metric label="Blowdown + Drift" value={`${(water.blowdownM3 + water.driftM3).toLocaleString()} m³`} sub={`CoC ${water.cyclesOfConcentration}× · drift`} />
+                            <Metric label="Glycol Makeup" value={`${water.annualGlycolMakeupM3.toLocaleString()} m³/yr`} sub={`charge ${(water.glycolChargeL / 1000).toLocaleString()} m³`} />
+                        </div>
+                        {/* balance table */}
+                        <table className="mt-3 w-full text-[10.5px]">
+                            <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Water stream</th><th className="text-right">m³/yr</th><th className="pl-3 text-left">Basis</th></tr></thead>
+                            <tbody>
+                                {([
+                                    ['Tower evaporation', water.evaporationM3, `IT×PUE heat × ${1.4} L/kWh_th × wet ${water.wetFraction}`],
+                                    ['Blowdown', water.blowdownM3, `evaporation ÷ (CoC ${water.cyclesOfConcentration} − 1)`],
+                                    ['Drift', water.driftM3, '≈0.5% of evaporation (eliminators)'],
+                                    ['Loop water makeup', Math.round(water.annualLoopWaterMakeupL / 1000), `15%/yr of ${(water.waterChargeL / 1000).toLocaleString()} m³ water charge`],
+                                ] as [string, number, string][]).map(([lbl, val, basis]) => (
+                                    <tr key={lbl} className="border-b border-slate-100 dark:border-slate-800/60">
+                                        <td className="py-1 text-slate-700 dark:text-slate-200">{lbl}</td>
+                                        <td className="text-right tabular-nums text-slate-600 dark:text-slate-300">{val.toLocaleString()}</td>
+                                        <td className="pl-3 text-[9px] text-slate-400">{basis}</td>
+                                    </tr>
+                                ))}
+                                <tr className="font-bold">
+                                    <td className="py-1 text-slate-800 dark:text-white">Total site water</td>
+                                    <td className="text-right tabular-nums text-cyan-600 dark:text-cyan-400">{water.annualWaterM3.toLocaleString()}</td>
+                                    <td className="pl-3 text-[9px] text-slate-400">+ {water.annualGlycolMakeupM3.toLocaleString()} m³ glycol makeup (chemical, not water)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p className="mt-2 text-[9px] text-slate-400">{water.method}</p>
+                    </>
+                )}
+            </Card>
 
             {/* (c) Cooling Efficiency — PUE mini-bars, liquid vs air delta */}
             <Card>
