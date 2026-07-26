@@ -25,6 +25,13 @@ const paramTooltips: Record<string, string> = {
 
 type TabId = 'overview' | 'consumption' | 'testing' | 'comparison' | 'environmental';
 
+/* Maps the modelled fuel-type selector to its closest row in the alt-power-tech
+ * reference, so the table highlights the technology behind the current choice. */
+const FUEL_TO_ALT: Record<string, string> = {
+    diesel: 'diesel-backup', hvo: 'diesel-backup', 'natural-gas': 'recip-gas',
+    'solar-hybrid': 'solar-bess', 'fuel-cell': 'sofc', biogas: 'recip-gas',
+};
+
 /* v1.115.80 — engine DATA.fuelGen.altPowerTech row (alternative on-site power tech). */
 interface AltPowerTechRow {
     key: string; name: string; role: string; elecEffPct: number | null; co2KgPerKwh: number;
@@ -779,10 +786,12 @@ export default function FuelGenDashboard() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {alt.map((r) => (
-                                                <tr key={r.key} className="border-b border-slate-100 dark:border-slate-800/60 align-top">
+                                            {alt.map((r) => {
+                                                const isCurrent = r.key === FUEL_TO_ALT[fuelType];
+                                                return (
+                                                <tr key={r.key} className={`border-b border-slate-100 dark:border-slate-800/60 align-top ${isCurrent ? 'bg-rz-info/5' : ''}`}>
                                                     <td className="py-1.5 pr-2">
-                                                        <div className="font-semibold text-slate-800 dark:text-slate-200">{r.name}</div>
+                                                        <div className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">{r.name}{isCurrent && <StatusChip tone="info">your selection</StatusChip>}</div>
                                                         <div className="text-[10px] text-slate-400 leading-snug max-w-[280px]">{r.note}</div>
                                                     </td>
                                                     <td className="py-1.5 px-2 text-slate-500 whitespace-nowrap">{r.role}</td>
@@ -795,7 +804,7 @@ export default function FuelGenDashboard() {
                                                         <StatusChip tone={r.maturity === 'commercial' ? 'data' : r.maturity === 'emerging' ? 'signal' : 'neutral'}>{r.maturity}</StatusChip>
                                                     </td>
                                                 </tr>
-                                            ))}
+                                            ); })}
                                         </tbody>
                                     </table>
                                 </div>

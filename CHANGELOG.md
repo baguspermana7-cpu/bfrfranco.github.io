@@ -13,6 +13,14 @@ release sections rather than semver.
 
 ---
 
+## v1.115.85 — 2026-07-26 (DCMOC — polish round 2: finish token discipline + alt-power "your selection")
+
+### Changed
+- Completed the rz-* token sweep on the remaining session components: the Phased Financial **Improvement Recommendations** cards + icon (`cyan`→`rz-info`), and the CDU water-balance range sliders (`accent-cyan-500`→ the `--rz-accent-info` var) — the new UI now sits entirely on the token palette.
+
+### Added
+- **The Alternative On-Site Power Technologies table highlights the row matching your current fuel-type selection** ("your selection" chip + subtle tint), connecting the modelled choice to the broader technology landscape. Verified: selecting Fuel cell tags the SOFC row. No engine change; walk 31/0.
+
 ## v1.115.84 — 2026-07-26 (DCMOC — IST fail→issue loop + UIUX token polish of the session's new components)
 
 ### Added

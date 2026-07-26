@@ -544,11 +544,11 @@ export function CduDashboard() {
                             </label>
                             <label className="flex flex-col gap-1">
                                 <span className="text-slate-500">Glycol %: <span className="tabular-nums text-slate-600 dark:text-slate-300">{glycolPct}%</span></span>
-                                <input type="range" min={20} max={35} value={glycolPct} onChange={(e) => setGlycolPct(Number(e.target.value))} className="accent-cyan-500" title={`Inhibited glycol fraction: ${glycolPct}% (20–35% typical)`} />
+                                <input type="range" min={20} max={35} value={glycolPct} onChange={(e) => setGlycolPct(Number(e.target.value))} className="accent-[color:var(--rz-accent-info)]" title={`Inhibited glycol fraction: ${glycolPct}% (20–35% typical)`} />
                             </label>
                             <label className="flex flex-col gap-1">
                                 <span className="text-slate-500">Cycles of conc.: <span className="tabular-nums text-slate-600 dark:text-slate-300">{coc}×</span></span>
-                                <input type="range" min={3} max={7} value={coc} onChange={(e) => setCoc(Number(e.target.value))} className="accent-cyan-500" title={`Tower cycles-of-concentration: ${coc} (higher = less blowdown, more scaling risk)`} />
+                                <input type="range" min={3} max={7} value={coc} onChange={(e) => setCoc(Number(e.target.value))} className="accent-[color:var(--rz-accent-info)]" title={`Tower cycles-of-concentration: ${coc} (higher = less blowdown, more scaling risk)`} />
                             </label>
                         </div>
                         {/* KPI band */}

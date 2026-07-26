@@ -514,7 +514,7 @@ const PhasedFinancialDashboard = () => {
                             <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
                                 <div>
                                     <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                        <TrendingUp className="w-4 h-4 text-cyan-500" /> Improvement Recommendations
+                                        <TrendingUp className="w-4 h-4 text-rz-info" /> Improvement Recommendations
                                     </h3>
                                     <p className="text-[11px] text-slate-500 mt-0.5">
                                         {belowHurdle
@@ -529,10 +529,10 @@ const PhasedFinancialDashboard = () => {
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                                 {solvedLevers.map((lv, i) => (
-                                    <div key={`s${i}`} className="rounded-lg border border-cyan-200 dark:border-cyan-900/40 bg-cyan-50/40 dark:bg-cyan-900/10 p-3">
+                                    <div key={`s${i}`} className="rounded-lg border border-rz-info/30 bg-rz-info/10 p-3">
                                         <div className="flex items-center justify-between gap-2 mb-1">
                                             <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{lv.label}</span>
-                                            <button onClick={() => goToTab(lv.targetTab)} className="shrink-0 text-[10px] font-semibold text-cyan-700 dark:text-cyan-400 hover:underline inline-flex items-center gap-0.5">Revise <ArrowUpRight className="w-3 h-3" /></button>
+                                            <button onClick={() => goToTab(lv.targetTab)} className="shrink-0 text-[10px] font-semibold text-cyan-700 dark:text-rz-info hover:underline inline-flex items-center gap-0.5">Revise <ArrowUpRight className="w-3 h-3" /></button>
                                         </div>
                                         <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">{lv.detail}</p>
                                     </div>
