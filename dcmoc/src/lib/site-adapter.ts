@@ -384,6 +384,33 @@ export function countryBaselineAttributes(countryId: string): Partial<Record<key
     return out;
 }
 
+/* Workstream B — enum criteria auto-derived from the per-country research tables
+ * (naturalDisaster / talentPool / fuelDiesel / taxIncentives), so the drawer shows
+ * a researched baseline for the categorical fields instead of blanks. Display-only
+ * (same semantics as the numeric baseline). */
+export function countryBaselineEnums(countryId: string): Partial<Record<keyof SiteAttributes, string>> {
+    const c = COUNTRIES[countryId] as unknown as {
+        naturalDisaster?: { floodRisk?: string; seismicZone?: number; typhoonRisk?: string; tsunamiRisk?: string };
+        talentPool?: { dcEngineerPool?: string };
+        fuelDiesel?: { dieselAvailability?: string };
+        taxIncentives?: { taxHolidayYears?: number; programs?: unknown[] };
+    } | undefined;
+    if (!c) return {};
+    const out: Partial<Record<keyof SiteAttributes, string>> = {};
+    const nd = c.naturalDisaster;
+    if (nd?.floodRisk) out.floodRisk = nd.floodRisk;
+    if (nd?.seismicZone != null) out.earthquakeRisk = nd.seismicZone >= 4 ? 'extreme' : nd.seismicZone === 3 ? 'high' : nd.seismicZone === 2 ? 'moderate' : 'low';
+    if (nd?.typhoonRisk) out.cycloneRisk = nd.typhoonRisk === 'none' ? 'low' : nd.typhoonRisk;
+    if (nd?.tsunamiRisk) out.coastalRisk = nd.tsunamiRisk === 'none' ? 'low' : nd.tsunamiRisk;
+    const pool = c.talentPool?.dcEngineerPool;
+    if (pool) out.constructionLabor = pool === 'abundant' ? 'abundant' : pool === 'moderate' ? 'moderate' : 'scarce';
+    const fuel = c.fuelDiesel?.dieselAvailability;
+    if (fuel) out.fuelAvailability = fuel === 'abundant' ? 'good' : fuel === 'moderate' ? 'moderate' : 'limited';
+    const ti = c.taxIncentives;
+    if (ti) out.govSupport = (ti.taxHolidayYears ?? 0) >= 5 || (ti.programs?.length ?? 0) > 0 ? 'strong' : (ti.taxHolidayYears ?? 0) > 0 ? 'moderate' : 'weak';
+    return out;
+}
+
 /** SCREENING typicals for attributes with no country table (labeled amber in
  *  the drawer; mid-band values for a 5-20 MW AI-DC greenfield screening). */
 export const SCREENING_ATTR_DEFAULTS: Partial<Record<keyof SiteAttributes, number>> = {

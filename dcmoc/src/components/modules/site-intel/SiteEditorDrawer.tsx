@@ -9,10 +9,54 @@ import { COUNTRIES } from '@/constants/countries';
 import { CountrySelect } from '@/components/ui/CountrySelect';
 import { CreatableCombobox, type ComboValue } from '@/components/ui/CreatableCombobox';
 import { ATTR_BOUNDS, type CandidateSite, type SiteAttributes } from '@/types/site-intel';
-import { countryBaselineAttributes, SCREENING_ATTR_DEFAULTS } from '@/lib/site-adapter';
+import { countryBaselineAttributes, countryBaselineEnums, SCREENING_ATTR_DEFAULTS } from '@/lib/site-adapter';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { X, Plus, Trash2 } from 'lucide-react';
 
 type NumKey = keyof typeof ATTR_BOUNDS;
+
+/* Workstream B — plain-language "what is this + example" per site criterion, so
+ * the parameters aren't a wall of unexplained numbers (owner: "cable landing itu
+ * apa, angka 1,2,3 itu apa"). Rendered as a Tooltip beside each field label. */
+const SITE_PARAM_HELP: Record<string, string> = {
+    availableCapacityMw: 'Utility power the site can actually deliver to the data center (MW) — must exceed the facility load + headroom. e.g. a 100 MW-ready substation.',
+    gridVoltageKv: 'Incoming utility voltage (kV). Higher moves large loads more cheaply. e.g. 132 kV transmission vs 20 kV distribution.',
+    saidiMinYr: 'Grid outage minutes per year (IEEE 1366 SAIDI). Lower = more reliable → fewer genset runs. e.g. Singapore ~2, a weak grid ~600.',
+    powerCostKwh: 'Industrial electricity price ($/kWh) — the single biggest OPEX driver. e.g. US ~$0.07, Europe ~$0.15.',
+    submarineCableLandings: 'Number of submarine-cable landing stations serving the region — more = diverse international connectivity + lower latency. e.g. Singapore ~4, an inland/remote site 0.',
+    distanceToCableLandingKm: 'Distance from the site to the nearest cable landing (km) — shorter = lower latency + cheaper backhaul. e.g. coastal 5, inland 150.',
+    avgAmbientC: 'Average outdoor air temperature (°C). Hotter = more cooling energy (higher PUE). e.g. temperate 12, tropical 28.',
+    coolingDegreeDays: 'Cooling-degree-days per year (heat accumulated above ~18 °C). Higher = more cooling load. e.g. cool climate 800, tropical 3500.',
+    airQualityIndex: 'Typical air-quality index. Higher (dirtier) = more filter changes + hazard pay. e.g. clean 20, polluted 150.',
+    waterStress0to5: 'WRI Aqueduct water-stress score, 0–5. Higher = scarcer water for evaporative cooling. e.g. 1 low, 4 extremely high.',
+    pgaPct2in50yr: 'Seismic peak ground acceleration (%g, 2%-in-50-yr, USGS). Higher = more structural reinforcement cost. e.g. stable 5, active fault 40.',
+    totalAcres: 'Total land area of the parcel (acres). e.g. 100.',
+    usableAcres: 'Buildable land after setbacks/easements (acres) — usually < total. e.g. 80 of 100.',
+    distHighwayKm: 'Distance to the nearest highway (km) — equipment logistics. Shorter = easier. e.g. 5.',
+    distPortKm: 'Distance to the nearest seaport (km) — for imported gear. e.g. 30.',
+    distAirportKm: 'Distance to the nearest airport (km). e.g. 25.',
+    permitMonths: 'Months to obtain construction permits — longer delays COD. e.g. fast-track 6, complex 18.',
+    landCostPerM2: 'Land price ($/m²). e.g. rural $40, prime metro $400.',
+    waterCostPerM3: 'Water tariff ($/m³) — drives cooling OPEX. e.g. $0.5–$2.',
+    effectiveTaxRate: 'Corporate income tax after incentives (decimal). e.g. 0.22 = 22%; a free-zone might be 0.10.',
+    fuelAvailability: 'Diesel/gas supply for generators. good / moderate / limited.',
+    waterQuality: 'Source-water quality for cooling makeup. excellent → poor (poor needs treatment).',
+    earthquakeRisk: 'Seismic hazard exposure. low → extreme (higher = more reinforcement + insurance).',
+    floodRisk: 'Flood exposure. low → extreme (higher = platform elevation / flood defence cost).',
+    cycloneRisk: 'Cyclone/typhoon exposure. low → extreme.',
+    landslideRisk: 'Landslide exposure. low → extreme.',
+    coastalRisk: 'Coastal / storm-surge / tsunami exposure. low → extreme.',
+    topography: 'Terrain. flat (cheap) → steep (costly earthworks).',
+    roadAccess: 'Quality of road access to the site. excellent → poor.',
+    constructionLabor: 'Availability of skilled construction labor. abundant → scarce (scarce raises cost + schedule).',
+    govSupport: 'Government / incentive support for the project. strong → weak.',
+    powerSource: 'Utility or scheme name (e.g. "PLN 150 kV", "on-site gas plant").',
+    waterSource: 'Where cooling water comes from (municipal / river / seawater / recycled).',
+    soil: 'Soil-bearing condition (e.g. rock, clay, reclaimed) — affects foundation cost.',
+    taxIncentives: 'Any tax holidays / free-zone status / credits (free text).',
+    renewableIncentives: 'Green-power incentives / PPAs available (free text).',
+};
+const helpTip = (k: string) => SITE_PARAM_HELP[k] ? <Tooltip content={SITE_PARAM_HELP[k]} /> : null;
 
 const NUM_FIELDS: { key: NumKey; label: string; presets: number[] }[] = [
     { key: 'availableCapacityMw', label: 'Available Capacity', presets: [50, 100, 200, 300] },
@@ -69,6 +113,13 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
      * (cyan) else screening typical (amber) — as placeholder; store stays unset
      * (= baseline semantics) until the user picks/enters a value (mint custom). */
     const baseline = countryBaselineAttributes(site.countryId);
+    const enumBase = countryBaselineEnums(site.countryId);
+    const enumBaseline = (k: keyof SiteAttributes): string | null => enumBase[k] ?? null;
+    const enumSrcChip = (k: keyof SiteAttributes) => {
+        if ((site.attributes[k] as string | undefined)) return <span className="ml-1 rounded bg-rz-mint/15 px-1 text-[8px] font-bold text-rz-mint">custom</span>;
+        if (enumBase[k]) return <span className="ml-1 rounded bg-cyan-500/15 px-1 text-[8px] font-bold text-cyan-500" title={`Baseline ${COUNTRIES[site.countryId]?.name ?? site.countryId} — from per-country research`}>baseline</span>;
+        return null;
+    };
     const numVal = (k: NumKey): ComboValue<number> | null => {
         const v = site.attributes[k] as number | undefined;
         return v == null ? null : { value: v, isCustom: true };
@@ -127,7 +178,7 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
                         const b = ATTR_BOUNDS[f.key]!;
                         return (
                             <label key={f.key} className="block">
-                                <span className="text-[9px] font-medium uppercase text-slate-500">{f.label}{srcChip(f.key)}</span>
+                                <span className="text-[9px] font-medium uppercase text-slate-500 inline-flex items-center gap-0.5">{f.label}{helpTip(f.key)}{srcChip(f.key)}</span>
                                 <CreatableCombobox<number>
                                     options={f.presets.map((p) => ({ value: p, label: `${p}${b.unit ? ' ' + b.unit : ''}` }))}
                                     value={numVal(f.key)} min={b.min} max={b.max} unit={b.unit}
@@ -142,11 +193,11 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
                     {ENUM_FIELDS.map((f) => (
                         <label key={String(f.key)} className="block">
-                            <span className="text-[9px] font-medium uppercase text-slate-500">{f.label}</span>
+                            <span className="text-[9px] font-medium uppercase text-slate-500 inline-flex items-center gap-0.5">{f.label}{helpTip(String(f.key))}{enumSrcChip(f.key)}</span>
                             <select className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-rz-mint text-slate-900 dark:text-slate-100"
                                 value={(site.attributes[f.key] as string | undefined) ?? ''}
                                 onChange={(e) => updateAttributes(site.id, { [f.key]: e.target.value || undefined } as Partial<SiteAttributes>)}>
-                                <option value="">— country baseline —</option>
+                                <option value="">{enumBaseline(f.key) ? `— baseline: ${enumBaseline(f.key)} —` : '— country baseline —'}</option>
                                 {f.options.map((o) => <option key={o} value={o}>{o}</option>)}
                             </select>
                         </label>
@@ -157,7 +208,7 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
                 <div className="grid grid-cols-1 gap-1.5">
                     {TEXT_FIELDS.map((f) => (
                         <label key={String(f.key)} className="block">
-                            <span className="text-[9px] font-medium uppercase text-slate-500">{f.label}</span>
+                            <span className="text-[9px] font-medium uppercase text-slate-500 inline-flex items-center gap-0.5">{f.label}{helpTip(String(f.key))}</span>
                             <input className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-rz-mint text-slate-900 dark:text-slate-100"
                                 value={(site.attributes[f.key] as string | undefined) ?? ''}
                                 onChange={(e) => updateAttributes(site.id, { [f.key]: e.target.value || undefined } as Partial<SiteAttributes>)} />

@@ -13,6 +13,12 @@ release sections rather than semver.
 
 ---
 
+## v1.115.89 — 2026-07-26 (DCMOC — Site Intelligence edit-criteria: per-parameter help + country auto-derive)
+
+### Added
+- **Every site criterion now explains itself.** The Edit-Criteria drawer's 36 parameters each carry a plain-language "what it is + a worked example" tooltip (e.g. *Cable Landings — number of submarine-cable landing stations serving the region; more = diverse international connectivity + lower latency. e.g. Singapore ~4, an inland site 0*) — so the numbers and scales aren't a wall of unexplained values.
+- **The categorical criteria now auto-derive from the per-country research tables** (`countryBaselineEnums`): earthquake risk from the seismic zone, flood/cyclone/coastal risk from the natural-disaster table, construction-labor from the talent pool, fuel availability from the diesel table, and government support from the tax-incentive programs — shown as a cyan "baseline" chip (and named in the select placeholder) so far fewer fields sit blank. Editing still overrides to a "custom" value; the store stays unset (= engine baseline) until you do. Pure frontend; walk 31/0.
+
 ## v1.115.88 — 2026-07-26 (DCMOC — CAPEX "Assumptions & Config" dedup: one owner per field)
 
 ### Changed
