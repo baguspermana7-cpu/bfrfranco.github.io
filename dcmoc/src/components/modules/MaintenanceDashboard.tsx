@@ -539,7 +539,7 @@ export function MaintenanceDashboard() {
             {activeTab === 'assets' && <AssetsTab assets={activeAssets} assetCounts={assetCounts} isPencilMode={isPencilMode} handleCountChange={handleCountChange} selectedCountry={selectedCountry} currentAQI={currentAQI} />}
             {activeTab === 'schedule' && <ScheduleTab assetCounts={assetCounts} schedule={schedule} weeks={weeks} />}
             {activeTab === 'strategy' && (
-                <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-5 mb-6">
+                <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-5 mb-6 shadow-sm dark:shadow-none">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-1">
                         <Wrench className="w-4 h-4 text-rz-info" />
                         Planned-Maintenance Compliance Regime <Tooltip content="Two ways to run a planned program. OEM-compliant executes every OEM PM task at the manufacturer's interval — maximum reliability and warranty compliance, maximum manpower. Standard consolidates most tasks to annual and keeps only 1-2 critical systems (UPS batteries, gensets) at OEM frequency — far fewer labor-hours, but ~12% higher failure exposure from deferred servicing." />

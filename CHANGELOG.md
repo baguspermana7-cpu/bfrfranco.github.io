@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.86 — 2026-07-26 (DCMOC — polish round 3: card-consistency capstone)
+
+### Changed
+- Aligned the Planned-Maintenance Compliance Regime card to its page's card idiom (added the `shadow-sm dark:shadow-none` its sibling cards use) — the last real in-page consistency gap on the session's new components. (Cross-page card differences are a pre-existing DCMOC pattern, not introduced here, and consolidating onto the shadcn `<Card>` would move against the dominant slate-card idiom, so left as-is.) walk 31/0; no engine change.
+
 ## v1.115.85 — 2026-07-26 (DCMOC — polish round 2: finish token discipline + alt-power "your selection")
 
 ### Changed
