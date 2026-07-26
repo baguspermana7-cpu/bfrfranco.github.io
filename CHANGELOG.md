@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.80 — 2026-07-26 (DCMOC — alternative on-site power technology research reference)
+
+### Added
+- **An "Alternative On-Site Power Technologies" reference on the Fuel & Generator page** — closing out the A-slice ask ("deep research cari alternative tech lain"). A sourced screening comparison of the credible behind-the-meter options for an off-grid / prime-power data center beyond the reciprocating genset: reciprocating gas engine, open- and combined-cycle gas turbine, solid-oxide fuel cell (SOFC), small modular reactor (SMR), geothermal/EGS, solar+BESS, and diesel backup — each with electrical efficiency, operating CO₂ (kg/kWh), TRL, power density (MW/acre), deploy window, H₂-readiness, maturity, and a note. Backed by engine `DATA.fuelGen.altPowerTech` with a `DATA.sources` entry citing 2025-26 industry reporting (Goldman Sachs, DataCenterDynamics, Bloom Energy, GE; NuScale's 77 MWe NRC Standard Design Approval, May 2025). Reference/education only — collapsible, and explicitly not wired into the cost model (the fuel-type selector remains the modelled path). Engine chain rebuilt (762/0, 158 sources); walk 31/0.
+
 ## v1.115.79 — 2026-07-26 (DCMOC — review-hardening of the power-source / fuel / water batch)
 
 ### Fixed

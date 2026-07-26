@@ -8351,7 +8351,25 @@
                 'solar-hybrid': { effLPerKwh: 0.27,  co2PerUnit: 2.68,  costMult: 1.0,  runHoursMult: 0.70, label: 'Solar + BESS hybrid (shaves genset run-hours ~30%)' },
                 'fuel-cell':    { effLPerKwh: 0.20,  co2PerUnit: 1.90,  costMult: 1.6,  runHoursMult: 1.0,  label: 'Fuel cell (SOFC on gas, very low local emissions)' },
                 'biogas':       { effLPerKwh: 0.32,  co2PerUnit: 0.30,  costMult: 1.1,  runHoursMult: 1.0,  label: 'Biogas / RNG (near carbon-neutral, supply-limited)' }
-            }
+            },
+            /* ── v1.115.80 — ALTERNATIVE ON-SITE POWER TECHNOLOGY landscape (owner:
+             * "deep research cari alternative tech lain"). A sourced screening
+             * comparison of the credible behind-the-meter options for a data center
+             * beyond the reciprocating genset: turbines, fuel cells, SMR/nuclear,
+             * geothermal, solar+BESS. Reference/education — NOT wired into the cost
+             * model (the fuel-type selector above is the modelled path). Figures are
+             * order-of-magnitude screening from 2025-26 industry reporting. See
+             * DATA.sources['fuelGen.altPowerTech']. co2 = kg CO2/kWh (operating). */
+            altPowerTech: [
+                { key: 'recip-gas',      name: 'Reciprocating gas engine',                role: 'prime / hybrid', elecEffPct: 42,   co2KgPerKwh: 0.50,  trl: 9, maturity: 'commercial',     deploy: '6-12 mo',    powerDensityMwAcre: 45,  dispatchable: true,  h2Ready: 'blend',      note: 'Fast-start dispatchable prime power — the current off-grid workhorse. Lower efficiency than turbines/fuel cells; moderate NOx.' },
+                { key: 'gt-open',        name: 'Open-cycle gas turbine (aeroderivative)',  role: 'prime',          elecEffPct: 40,   co2KgPerKwh: 0.55,  trl: 9, maturity: 'commercial',     deploy: '12-24 mo',   powerDensityMwAcre: 50,  dispatchable: true,  h2Ready: 'up to 100%', note: 'Large single-unit output, fast start, hydrogen-capable variants (e.g. LM6000 PF+). Lower open-cycle efficiency, higher NOx than fuel cells.' },
+                { key: 'gt-combined',    name: 'Combined-cycle gas turbine',               role: 'prime',          elecEffPct: 55,   co2KgPerKwh: 0.37,  trl: 9, maturity: 'commercial',     deploy: '24-36 mo',   powerDensityMwAcre: 40,  dispatchable: true,  h2Ready: 'blend',      note: 'Highest combustion efficiency (54-57%, e.g. GE 7HA) but large footprint + long build; suits campus-scale baseload.' },
+                { key: 'sofc',           name: 'Solid-oxide fuel cell (SOFC)',             role: 'prime / hybrid', elecEffPct: 55,   co2KgPerKwh: 0.34,  trl: 9, maturity: 'commercial',     deploy: '< 12 mo',    powerDensityMwAcre: 100, dispatchable: true,  h2Ready: 'up to 100%', note: 'Electrochemical, 54-60% electrical efficiency, ~680-830 lb CO2/MWh, very low local NOx/PM, ~2x turbine power density, quick to deploy (e.g. Bloom). Higher $/kW.' },
+                { key: 'smr',            name: 'Small modular reactor (SMR)',              role: 'prime',          elecEffPct: 33,   co2KgPerKwh: 0.012, trl: 6, maturity: 'emerging',       deploy: '2028-2030+', powerDensityMwAcre: 30,  dispatchable: true,  h2Ready: 'n/a',        note: 'Near-zero operating CO2 baseload; NRC Standard Design Approval for the 77 MWe NuScale module (May 2025) but first DC units ~2028-2030 — too late for near-term builds. Up to 300 MWe; microreactor 1-20 MWe.' },
+                { key: 'geothermal',     name: 'Geothermal (incl. enhanced / EGS)',        role: 'prime',          elecEffPct: 15,   co2KgPerKwh: 0.03,  trl: 8, maturity: 'site-dependent', deploy: '24-48 mo',   powerDensityMwAcre: 20,  dispatchable: true,  h2Ready: 'n/a',        note: '24/7 near-zero-carbon baseload where the resource exists; enhanced geothermal (EGS) expands the geography but is early-commercial.' },
+                { key: 'solar-bess',     name: 'Solar PV + battery storage',               role: 'hybrid',         elecEffPct: null, co2KgPerKwh: 0.04,  trl: 9, maturity: 'commercial',     deploy: '12-24 mo',   powerDensityMwAcre: 0.4, dispatchable: false, h2Ready: 'n/a',        note: 'Near-zero-carbon but intermittent and very land-heavy (~0.4 MW/acre); shaves genset run-hours, not a standalone 24/7 prime source.' },
+                { key: 'diesel-backup',  name: 'Diesel genset (emergency backup)',         role: 'backup',         elecEffPct: 40,   co2KgPerKwh: 0.70,  trl: 9, maturity: 'commercial',     deploy: '6-12 mo',    powerDensityMwAcre: 45,  dispatchable: true,  h2Ready: 'HVO drop-in', note: 'The last line of defense — near-instant start, unmatched for emergency backup. Highest CO2; HVO cuts lifecycle ~90%.' }
+            ]
         },
         /* ══ v2.4.0 — DATA.capacity: multi-phase build-out presets (Group-2 promotion
          * from DCMOC CapacityPlanningEngine). Occupancy ramp + phase templates. ══ */
@@ -8819,6 +8837,7 @@
             'cdu.bands':              { source: 'cdu-model.js BANDS — OCP cold-plate + ASHRAE TC9.9 CDU operational bounds (supply temp, ΔT, flow, dP, dew margin, pipe velocity)', asOf: '2026', unit: '°C / K / Lpm/kW / bar / m/s' },
             'cdu.pump':               { source: 'cdu-model.js PUMP — typical seal-less CDU pump (η=0.70) + IE3 motor (η=0.92) + 600 Lpm duty pump; ILLUSTRATIVE', asOf: '2026', unit: 'efficiency fraction + Lpm' },
             'cdu.phys':               { source: 'cdu-model.js PHYS — commercial-steel absolute roughness (Moody/Colebrook), barToPa, Magnus dew-point coefficients (Alduchov-Eskridge 2006)', asOf: '2026', unit: 'mm / Pa/bar / dimensionless' },
+            'fuelGen.altPowerTech':   { source: 'Alternative on-site (behind-the-meter) power technology landscape for data centers, 2025-26 industry reporting: Goldman Sachs (fuel cells 10-30% more efficient than gas turbines, 6-15% of incremental DC demand), DataCenterDynamics + WWT + Orrick (SMR/nuclear — NuScale 77 MWe NRC Standard Design Approval May 2025, first DC units ~2028-2030; up to 300 MWe, microreactor 1-20 MWe), Bloom Energy SOFC (54-60% electrical eff, 679-833 lb CO2/MWh, ~100 MW/acre), GE 7HA combined-cycle 54-57% + LM6000 open-cycle aeroderivative (H2-capable). Efficiencies/CO2/TRL/deploy are order-of-magnitude SCREENING for comparison — not a procurement basis; reference-only, not wired into the cost model', asOf: '2026', unit: 'electrical eff % · kg CO2/kWh operating · TRL · MW/acre · deploy window', method: 'screening technology comparison from public 2025-26 reporting' },
             'coolingWater':           { source: 'Liquid-cooling water balance (CDU technical loop + heat-rejection tower): loop volume ~8 L/kW IT (BOQ glycol charge) + 20–35% inhibited glycol; makeup ~15%/yr (leaks/service); tower evaporation ≈ latent-heat of rejected duty (3600/2260≈1.59 L/kWh_th, derated to 1.4 for sensible share); blowdown from cycles-of-concentration 3–7; drift ~0.5% of evaporation (modern eliminators, CTI). ASHRAE TC9.9 + cooling-tower practice', asOf: '2026', unit: 'L/kW · fraction/yr · L/kWh_th · dimensionless CoC', method: 'screening water balance — not a site water balance' },
             'mttrResponse':           { source: 'Article-4 vendor-vs-inhouse MTTR model: per-category phase durations (Electrical/Mechanical/Controls/Fire — field screening), skill multipliers 1.5..0.55, coverage mobilization hours (24x7 0.25h / 16x7 0.8h / 12x5 2.1h), 55% retainer recovery, 30% non-critical downtime cost weight', asOf: '2026', method: 'phase-sum MTTR + annual downtime-delta economics; deterministic (page Monte Carlo stays page-side)' },
             'techDebt':               { source: 'Article-5 technical-debt risk model: criticality weights 10/5/1, Weibull screening (beta 2.5 base, eta 60 months, facility-age adjustments), 15%/yr risk growth, 8% discount, escalation 1+(age/24)x0.5, inaction 30% factor, SLA 0.1% revenue factor, insurance bands 1-8% by risk score', asOf: '2026', method: 'hazard-weighted composite scaled to 100; Lanczos gamma for MTTF; screening-grade' },
@@ -14660,7 +14679,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-26-e"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-26-f"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

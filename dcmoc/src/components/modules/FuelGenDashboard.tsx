@@ -24,6 +24,12 @@ const paramTooltips: Record<string, string> = {
 
 type TabId = 'overview' | 'consumption' | 'testing' | 'comparison' | 'environmental';
 
+/* v1.115.80 — engine DATA.fuelGen.altPowerTech row (alternative on-site power tech). */
+interface AltPowerTechRow {
+    key: string; name: string; role: string; elecEffPct: number | null; co2KgPerKwh: number;
+    trl: number; maturity: string; deploy: string; powerDensityMwAcre: number; dispatchable: boolean; h2Ready: string; note: string;
+}
+
 /* ─── Diagnostics Tier-2: genset CO₂ (DIAGNOSTICS_STANDARD.md) ───────────────
  * SINGLE SOURCE for (a) the environmental CO₂ card red coloring, (b) the
  * click-to-explain panel gating, and (c) collectFuelGenDiagnostics — never
@@ -82,6 +88,7 @@ export default function FuelGenDashboard() {
     const fuelType: FuelType = inputs.fuelType ?? 'diesel';
     const setPowerSource = (v: PowerSource) => actions.setInputs({ powerSource: v });
     const setFuelType = (v: FuelType) => actions.setInputs({ fuelType: v });
+    const [showAltTech, setShowAltTech] = useState(false);
 
     const result = useMemo<FuelGenResult | null>(() => {
         if (!selectedCountry) return null;
@@ -734,6 +741,68 @@ export default function FuelGenDashboard() {
                     </div>
                 </div>
             </div>
+
+            {/* v1.115.80 — Alternative on-site power technologies reference (owner: "deep
+              * research cari alternative tech lain"). Sourced screening comparison, engine
+              * DATA.fuelGen.altPowerTech — reference/education, not wired into the cost model. */}
+            {(() => {
+                const alt = (rzData()?.fuelGen as { altPowerTech?: AltPowerTechRow[] } | undefined)?.altPowerTech ?? [];
+                if (!alt.length) return null;
+                return (
+                    <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
+                        <button onClick={() => setShowAltTech(o => !o)} className="w-full flex items-center justify-between gap-2 text-left">
+                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                <Zap className="w-4 h-4 text-amber-500" />
+                                Alternative On-Site Power Technologies
+                                <span className="text-[10px] font-normal text-slate-400">research reference · not in the cost model</span>
+                            </h3>
+                            <ArrowUpRight className={`w-4 h-4 shrink-0 text-slate-400 transition-transform ${showAltTech ? 'rotate-90' : ''}`} />
+                        </button>
+                        {showAltTech && (
+                            <div className="mt-3">
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3 leading-relaxed">
+                                    The credible behind-the-meter options beyond the reciprocating genset, for an off-grid / prime-power site. Screening figures from 2025-26 industry reporting (Goldman Sachs, DataCenterDynamics, Bloom Energy, GE). <strong>Fuel cells</strong> lead on efficiency + power density and deploy fast; <strong>SMR/nuclear</strong> is near-zero-carbon baseload but ~2028-2030 for first DC units; <strong>solar+BESS</strong> is clean but intermittent + land-heavy.
+                                </p>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-[11px] min-w-[720px]">
+                                        <thead>
+                                            <tr className="border-b border-slate-200 dark:border-slate-700 text-[9px] uppercase text-slate-400">
+                                                <th className="text-left py-1.5 pr-2">Technology</th>
+                                                <th className="text-left py-1.5 px-2">Role</th>
+                                                <th className="text-right py-1.5 px-2">Elec. eff</th>
+                                                <th className="text-right py-1.5 px-2">CO₂ kg/kWh</th>
+                                                <th className="text-center py-1.5 px-2">TRL</th>
+                                                <th className="text-right py-1.5 px-2">MW/acre</th>
+                                                <th className="text-left py-1.5 px-2">Deploy</th>
+                                                <th className="text-left py-1.5 pl-2">Maturity</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {alt.map((r) => (
+                                                <tr key={r.key} className="border-b border-slate-100 dark:border-slate-800/60 align-top">
+                                                    <td className="py-1.5 pr-2">
+                                                        <div className="font-semibold text-slate-800 dark:text-slate-200">{r.name}</div>
+                                                        <div className="text-[10px] text-slate-400 leading-snug max-w-[280px]">{r.note}</div>
+                                                    </td>
+                                                    <td className="py-1.5 px-2 text-slate-500 whitespace-nowrap">{r.role}</td>
+                                                    <td className="py-1.5 px-2 text-right font-mono text-slate-600 dark:text-slate-300">{r.elecEffPct == null ? '—' : `${r.elecEffPct}%`}</td>
+                                                    <td className="py-1.5 px-2 text-right font-mono text-slate-600 dark:text-slate-300">{r.co2KgPerKwh}</td>
+                                                    <td className="py-1.5 px-2 text-center font-mono text-slate-500">{r.trl}</td>
+                                                    <td className="py-1.5 px-2 text-right font-mono text-slate-500">{r.powerDensityMwAcre}</td>
+                                                    <td className="py-1.5 px-2 text-slate-500 whitespace-nowrap">{r.deploy}</td>
+                                                    <td className="py-1.5 pl-2">
+                                                        <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${r.maturity === 'commercial' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : r.maturity === 'emerging' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>{r.maturity}</span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p className="text-[9px] text-slate-400 mt-2">CO₂ = operating emissions (kg/kWh); TRL = technology readiness level; H₂-ready per each vendor. Screening comparison, engine DATA.fuelGen.altPowerTech — not a procurement basis.</p>
+                            </div>
+                        )}
+                    </div>
+            )})()}
         </div>
     );
 }
