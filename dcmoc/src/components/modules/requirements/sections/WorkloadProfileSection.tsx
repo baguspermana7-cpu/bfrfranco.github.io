@@ -209,10 +209,26 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                             options={DENSITY_PRESETS} value={densityValue} min={1} max={200} unit="kW/rack"
                             onChange={(v) => writeSharedRackDensity(v == null ? 12 : v.value)} />
                     </Field>
-                    <Field label="Target Rack Density (Max)" explainKey="rack-density">
-                        <NumInput value={w.maxRackDensityKw} min={1} max={300} unit="kW/rack"
-                            onChange={(v) => set({ maxRackDensityKw: v })} />
-                    </Field>
+                    {(() => {
+                        /* Workstream C — Target Rack Density (Max) auto-derives from the
+                         * selected AI architecture's peak rack power (GB200 ≈ 132 kW, …);
+                         * manual override allowed. Owner: "target rack density bukannya
+                         * auto dari architecture rack". */
+                        const archPeak = w.archKey ? (archProfileLive(w.archKey)?.rackKwPeak ?? null) : null;
+                        const archLabel = w.archKey ? (archProfileLive(w.archKey)?.label ?? w.archKey) : null;
+                        const isAuto = archPeak != null && Math.abs((w.maxRackDensityKw ?? 0) - archPeak) < 0.5;
+                        return (
+                            <Field label="Target Rack Density (Max)" explainKey="rack-density"
+                                hint={archPeak != null ? (isAuto ? `AUTO from ${archLabel} architecture (${archPeak} kW/rack peak). Override to plan a different ceiling.` : `Overridden — ${archLabel} architecture peaks at ${archPeak} kW/rack.`) : 'Set the maximum per-rack power the design must support. Pick an AI architecture above to auto-fill it.'}>
+                                <div className="flex items-center gap-1.5">
+                                    <div className="flex-1"><NumInput value={w.maxRackDensityKw} min={1} max={300} unit="kW/rack" onChange={(v) => set({ maxRackDensityKw: v })} /></div>
+                                    {archPeak != null && (isAuto
+                                        ? <span className="shrink-0 rounded bg-rz-data/15 px-1.5 py-0.5 text-[8px] font-bold uppercase text-rz-data" title={`Auto from ${archLabel}`}>auto</span>
+                                        : <button onClick={() => set({ maxRackDensityKw: archPeak })} className="shrink-0 rounded bg-rz-signal/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-600 dark:text-rz-signal hover:brightness-110" title={`Match ${archLabel} peak`}>↺ {archPeak}</button>)}
+                                </div>
+                            </Field>
+                        );
+                    })()}
                     <Field label="Total Racks (Estimated)" explainKey="total-racks" hint="ceil(IT load ÷ density) — override to match the actual count">
                         {editRacks || w.totalRacksOverride != null ? (
                             <div className="flex items-center gap-1.5">

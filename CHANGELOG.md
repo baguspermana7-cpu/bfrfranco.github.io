@@ -13,6 +13,14 @@ release sections rather than semver.
 
 ---
 
+## v1.115.91 — 2026-07-26 (DCMOC — Time-to-COD tooltip + Target Rack Density auto-derives from architecture)
+
+### Added
+- **"Time to COD" now explains itself** — a hint on the Requirements field: *months from today to the Commercial Operation Date (the date the facility starts revenue service), derived from Target COD in Project Overview; drives schedule pressure, phasing + interest-during-construction.*
+- **Target Rack Density (Max) auto-derives from the selected AI architecture** — picking an architecture (GB200 ≈ 132 kW/rack peak, etc.) auto-fills the target ceiling; the field shows an **AUTO** chip when it matches the architecture, or a one-click **"↺ match"** button + "overridden" note when you've changed it. Owner: "target rack density bukannya auto dari architecture rack." Manual override still allowed. Pure frontend; walk 31/0.
+
+> Note: rack-form (42U/48U/OCP) wired as a real cost driver + the AutoField roll-out to more CAPEX inputs are a follow-up (Workstream C, part 2).
+
 ## v1.115.90 — 2026-07-26 (DCMOC — Site Intelligence: guided Auto-optimize + blink-highlight what to edit)
 
 ### Added

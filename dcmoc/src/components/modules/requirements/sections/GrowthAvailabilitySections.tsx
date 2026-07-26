@@ -125,7 +125,7 @@ export function BusinessPrioritySection({ derived }: { derived: ReqDerived }) {
                     <CreatableCombobox<number> options={MARGIN_PRESETS} value={marginValue} min={0} max={30} unit="%"
                         onChange={(v) => setParam('req.designMarginPct', v == null ? 10 : v.value)} />
                 </Field>
-                <Field label="Time to COD">
+                <Field label="Time to COD" hint="Months from today to the Commercial Operation Date (COD) — the date the facility starts revenue service. Derived from Target COD (set in Project Overview 1.1); drives schedule pressure, phasing + interest-during-construction.">
                     <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 px-2 py-1.5 text-sm font-bold tabular-nums text-slate-900 dark:text-white">{derived.deadlineMonths} months</div>
                 </Field>
             </div>

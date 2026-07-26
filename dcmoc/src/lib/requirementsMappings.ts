@@ -292,7 +292,8 @@ export function applyArchProfile(key: ArchKey | null): string {
     }
     const p = archProfileLive(key);
     // Record the arch key on both stores regardless (capex uplift keys off it).
-    useRequirementsStore.getState().actions.setWorkload({ archKey: key });
+    // Workstream C — also auto-fill Target Rack Density (Max) from the profile peak.
+    useRequirementsStore.getState().actions.setWorkload({ archKey: key, ...(p ? { maxRackDensityKw: p.rackKwPeak } : {}) });
     useCapexStore.getState().setInputs({ archKey: key });
     if (!p) return `${key} selected`;
 
