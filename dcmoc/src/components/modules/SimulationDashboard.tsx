@@ -160,7 +160,8 @@ export function SimulationDashboard() {
             effectiveInHouseFrac(inputs),
             inputs.slaKey ?? '4hr',
             undefined,
-            selectedCountry ?? undefined
+            selectedCountry ?? undefined,
+            inputs.pmRegime ?? 'oem-full'
         );
 
         // 4. Total Monthly Staff Cost (Full Logic)
@@ -212,7 +213,7 @@ export function SimulationDashboard() {
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedCountry, inputs.shiftModel, scenarioAQI, scenarioTurnover, inputs.tierLevel, inputs.maintenanceModel, inputs.hybridRatio, simYear, baselineTurnover,
-        inputs.strategyMix, inputs.slaKey, inputs.includeLongShiftPermit, engineReady]);
+        inputs.strategyMix, inputs.slaKey, inputs.includeLongShiftPermit, inputs.pmRegime, engineReady]);
 
     if (!selectedCountry || !results) return null;
 

@@ -24,6 +24,11 @@ export interface SimulationState {
         fuelType: 'diesel' | 'hvo' | 'natural-gas' | 'solar-hybrid' | 'fuel-cell' | 'biogas';
 
         maintenanceStrategy: 'reactive' | 'planned' | 'predictive';
+        /** Workstream 10 — planned-maintenance compliance regime. 'oem-full' = every
+         *  OEM PM task at OEM interval (max manpower); 'standard-annual' = most tasks
+         *  consolidated to annual, only 1-2 critical systems at OEM frequency (far
+         *  fewer labor-hours, marginally higher failure exposure). */
+        pmRegime: 'oem-full' | 'standard-annual';
         /** Workstream G — strategy as a % MIX (fractions summing 1). The legacy
          *  discrete `maintenanceStrategy` buttons act as pure-mix presets; the
          *  mix drives the engine's opsHeadcount + availabilityImpact models. */
@@ -133,6 +138,7 @@ export const useSimulationStore = create<SimulationState>()(persist((set) => ({
         powerSource: 'utility-backup',
         fuelType: 'diesel',
         maintenanceStrategy: 'planned',
+        pmRegime: 'oem-full',
         strategyMix: { reactive: 0, planned: 1, predictive: 0 },
         slaKey: '4hr',
         // Phase 16 Add

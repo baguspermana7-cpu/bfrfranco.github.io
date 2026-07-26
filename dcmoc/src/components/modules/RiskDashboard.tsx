@@ -39,12 +39,13 @@ export default function RiskDashboard() {
             effectiveInHouseFrac(inputs),
             inputs.slaKey ?? '4hr',
             undefined,
-            selectedCountry ?? undefined
+            selectedCountry ?? undefined,
+            inputs.pmRegime ?? 'oem-full'
         );
         return { risks, aggregation, downtime };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedCountry, tierLevel, inputs.itLoad, inputs.coolingType, inputs.coolingTopology, inputs.powerRedundancy, inputs.headcount_Engineer,
-        inputs.strategyMix, inputs.maintenanceModel, inputs.hybridRatio, inputs.slaKey, engineReady]);
+        inputs.strategyMix, inputs.maintenanceModel, inputs.hybridRatio, inputs.slaKey, inputs.pmRegime, engineReady]);
 
     if (!selectedCountry || !analysis) {
         return <div className="p-8 text-center text-slate-500">Select a country to view risk analysis.</div>;

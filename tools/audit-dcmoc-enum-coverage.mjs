@@ -115,6 +115,7 @@ const registry = [
     // Workstream A — FuelGenDashboard power-source + fuel-type selects (CapexEngine/CarbonEngine/FuelGenEngine index fuelGen maps; missing key → silent 1.0):
     { field: 'powerSource',    label: 'fuelGen.powerSourceModel',          options: ['utility-backup', 'prime', 'hybrid'],         keys: keysOf(FG.powerSourceModel), note: 'FuelGenDashboard Power Source select' },
     { field: 'fuelType',       label: 'fuelGen.fuelTypeModel',             options: ['diesel', 'hvo', 'natural-gas', 'solar-hybrid', 'fuel-cell', 'biogas'], keys: keysOf(FG.fuelTypeModel), note: 'FuelGenDashboard Fuel/Generation Type select' },
+    { field: 'pmRegime',       label: 'maintenance.ops.pmRegime',          options: ['oem-full', 'standard-annual'], keys: keysOf(DATA.maintenance?.ops?.pmRegime), note: 'MaintenanceDashboard Planned-Maintenance Compliance Regime select' },
 ];
 
 let gaps = 0;

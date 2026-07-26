@@ -8189,7 +8189,20 @@
                  * predictive avoids 70% of failures. In-house 24/7 crews repair at the
                  * base MTTR; vendor-dependent repair waits for the SLA response. */
                 strategyFailureMult: { reactive: 3.5, planned: 1.0, predictive: 0.3 },
-                strategyMttrMult: { reactive: 2.0, planned: 1.0, predictive: 0.85 }
+                strategyMttrMult: { reactive: 2.0, planned: 1.0, predictive: 0.85 },
+                /* ── Workstream 10 — PLANNED-maintenance compliance regime. Two ways
+                 * to run a "planned" program: full OEM-compliant (every OEM PM task at
+                 * the OEM interval — max manpower, max warranty/reliability) vs a
+                 * standard consolidated-annual program (most tasks pulled to annual,
+                 * only 1-2 critical systems — UPS batteries, gensets — kept at OEM
+                 * frequency → far fewer labor-hours, marginally higher failure
+                 * exposure from deferred servicing). pmHoursMult scales the PM labor
+                 * demand; failureMult scales the failure rate in availabilityImpact.
+                 * Screening — SFG20 vs OEM RCM practice; validate against the OEM RCM. */
+                pmRegime: {
+                    'oem-full':        { label: 'OEM-compliant (full PM at manufacturer intervals)', pmHoursMult: 1.0,  failureMult: 1.0,  note: 'Every OEM PM task at its OEM interval — maximises warranty compliance + reliability; maximum manpower.' },
+                    'standard-annual': { label: 'Standard (annual PM, critical items only more frequent)', pmHoursMult: 0.55, failureMult: 1.12, note: 'Most tasks consolidated to annual; only 1-2 critical systems (UPS batteries, gensets) keep OEM frequency → far less manpower, ~12% higher failure exposure from deferred servicing.' }
+                }
             }
         },
         /* ══ v2.4.0 — DATA.fuelGen: backup generator + diesel economics (Group-2
@@ -8605,6 +8618,7 @@
             'energy.renewableProject': { source: 'models.energy.renewableProject — hybridScreen coverage → CAPEX (regional $/MWp + $/kWh) → avoided energy cost (covered MWh × tariff) + avoided carbon (offset × regional carbon price) + grid-services mid-band → lifetime cash flows → NPV at regional WACC + IRR + payback → BANKABILITY screening gate (NPV>0 & IRR>WACC) with an explicit GRID-ONLY-WINS verdict when it fails (technology-economics balance, not technology enthusiasm)', asOf: '2026', unit: '$ NPV/IRR/payback + bankability verdict', method: 'screening project finance — PPA structuring + interconnection study supersede' },
             'maintenance.ops': { source: 'Workstream-G end-to-end operations staffing constants — SFG20-informed PM task-hours (~420 h/MW·yr planned regime, screening), CBM analysis overhead 60 h/MW·yr, productive-hours convention (1800 payable h/FTE·yr × 55% wrench-time — maintenance-productivity literature), campus topology ~35 MW per data hall/building (hyperscale build practice), per-DC emergency-response shift floors (skeleton 1 vs standard 2 per shift), per-campus shared roles (network/IT, DCO ops, security lead, facility mgmt — counted once per campus), SLA response classes (2hr/4hr/NBD windows + effective-MTTR adders + $/MW·yr contract bands), strategy failure/MTTR multipliers consistent with DATA.maintenance (reactive 3.5×, predictive 0.3× failures)', asOf: '2026', unit: 'hours/FTE/topology/SLA screening constants', method: 'SCREENING — org- and contract-specific values supersede' },
             'maintenance.opsHeadcount': { source: 'models.maintenance.opsHeadcount — labor-hours-driven onsite technicians (PM+CBM+emergency hours × in-house share ÷ productive hours), shift-floor minimum per DC (emergency response, skeleton when vendor+reactive), Uptime 4.2 FTE/position shift operations scaled by campus DC count, per-campus shared roles. Replaces the per-MW×multiplier heuristic as the accuracy basis.', asOf: '2026', unit: 'FTE by role + labor-hours breakdown + basis strings', method: 'labor-demand screening model' },
+            'maintenance.ops.pmRegime': { source: 'Workstream 10 — planned-maintenance compliance regime: OEM-compliant (full PM at OEM intervals) vs standard consolidated-annual (most tasks annual, only 1-2 critical systems at OEM frequency). pmHoursMult 1.0 vs 0.55 (labor-hours), failureMult 1.0 vs 1.12 (deferred-servicing failure exposure). SFG20 vs OEM RCM practice', asOf: '2026', unit: 'labor-hours multiplier + failure-rate multiplier', method: 'screening — validate against the OEM reliability-centered-maintenance plan + warranty terms' },
             'maintenance.availabilityImpact': { source: 'models.maintenance.availabilityImpact — strategy-mix ⇒ failure-rate factor, sourcing+SLA ⇒ effective MTTR (vendor-dependent repairs wait for the response window), composed as a delta on the Uptime tier design availability, bounded [0.5×, 20×] design unavailability. Couples Maintenance/Staffing/SLA choices to availability + downtime financial exposure (previously hardcoded per tier).', asOf: '2026', unit: 'availability % + downtime min/yr + $ exposure', method: 'screening anchor-and-factor model — an RBD/RAM study supersedes' },
             'dossier.deliverables': { source: 'STANDARD-PRACTICE construction delivery-governance playbooks (Workstream I) — IFC (ISO 19650 C-series), RFI (AIA/FIDIC practice), Submittal (CSI review codes A-D), ITP hold/witness/surveillance points (ISO 9001), NCR disposition (ISO 9001 8.7), 3-week look-ahead (Last Planner / lean), Variation/Change Order (FIDIC cl.13), Punch A/B items + Turnover dossier (substantial-completion + Cx turnover practice). Cycle-times are typical bands; validate per contract.', asOf: '2026', unit: 'deliverable playbook (purpose/trigger/owner/approver/cycle/hold-impact) × 9', method: 'STANDARD-PRACTICE reference — contract terms supersede' },
             'dossier.pmFramework': { source: 'Advanced PM working framework (Workstream I) — control-account structure (EVM practice), decision-velocity delegation-of-authority bands (steering-committee governance practice), reporting rhythm (daily/weekly/monthly/stage-gate), stakeholder-pressure response patterns (compression re-pricing, authority front-loading, long-lead recovery ladder, variation discipline), security-minded information management (ISO 19650-5), senior vs intermediate PM role charters. Screening reference bands.', asOf: '2026', unit: 'governance framework (bands/rhythm/scenarios/roles)', method: 'STANDARD-PRACTICE reference — org delegation matrix supersedes' },
@@ -12529,7 +12543,10 @@
                      *    planned share carries the PM program; predictive share cuts
                      *    task hours (CBM) but adds analysis; reactive share drops PM
                      *    but pays failure-driven emergency hours. */
-                    var pmHours = O.pmHoursPerMwYr * mw * (pl + pd * (1 - M.predictiveTaskReduction));
+                    /* Workstream 10 — planned-maintenance compliance regime scales the
+                     * PM labor demand (standard-annual pulls most tasks to annual). */
+                    var pmReg = (O.pmRegime && O.pmRegime[input.pmRegime]) || O.pmRegime['oem-full'];
+                    var pmHours = O.pmHoursPerMwYr * mw * (pl + pd * (1 - M.predictiveTaskReduction)) * pmReg.pmHoursMult;
                     var cbmHours = O.cbmAnalysisHoursPerMwYr * mw * pd;
                     var baseFailures = (tier === 4 ? M.expectedFailuresPerYear.tier4 : M.expectedFailuresPerYear['default']) * mw / 10; /* per-10MW basis */
                     var failures = baseFailures * (rx * O.strategyFailureMult.reactive + pl * O.strategyFailureMult.planned + pd * O.strategyFailureMult.predictive);
@@ -12590,8 +12607,11 @@
                     var rx = (mix.reactive || 0) / mixSum, pl = (mix.planned || 0) / mixSum, pd = (mix.predictive || 0) / mixSum;
                     var inHouse = input.inHouseFrac != null ? Math.max(0, Math.min(1, +input.inHouseFrac)) : 0.6;
                     var sla = O.sla[input.slaKey] || O.sla['4hr'];
-                    /* failure-rate factor from the strategy mix (1.0 at fully planned) */
-                    var failF = rx * O.strategyFailureMult.reactive + pl * 1 + pd * O.strategyFailureMult.predictive;
+                    /* failure-rate factor from the strategy mix (1.0 at fully planned) —
+                     * scaled by the planned-maintenance compliance regime (Workstream 10:
+                     * standard-annual defers servicing → marginally higher failures). */
+                    var pmReg = (O.pmRegime && O.pmRegime[input.pmRegime]) || O.pmRegime['oem-full'];
+                    var failF = (rx * O.strategyFailureMult.reactive + pl * 1 + pd * O.strategyFailureMult.predictive) * pmReg.failureMult;
                     /* MTTR factor: strategy repair speed × response dependence — the
                      * vendor-dependent share of repairs waits for the SLA response. */
                     var mttrStrategy = rx * O.strategyMttrMult.reactive + pl * 1 + pd * O.strategyMttrMult.predictive;
@@ -14537,7 +14557,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-26-b"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-26-c"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

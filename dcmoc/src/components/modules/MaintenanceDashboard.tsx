@@ -2,7 +2,8 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { useSimulationStore, normalizeStrategyMix, STRATEGY_MIX_PRESETS, StrategyMix } from '@/store/simulation';
+import { useSimulationStore, normalizeStrategyMix, STRATEGY_MIX_PRESETS, StrategyMix, effectiveInHouseFrac } from '@/store/simulation';
+import { rzModels } from '@/lib/rz-engine';
 import { useCapexStore } from '@/store/capex';
 import { ASSETS } from '@/constants/assets';
 import { calculateEnvironmentalDegradation } from '@/modules/maintenance/EnvironmentalLogic';
@@ -210,6 +211,26 @@ export function MaintenanceDashboard() {
     const [slaThirdParty, setSlaThirdParty] = useState(false);   // third-party vs OEM contract (×0.65)
     const [slaFacilityAged, setSlaFacilityAged] = useState(false); // facility >10yr (×1.5)
     const engineReady = useEngineReady(); // re-run engine-bound memos once rz-engine.min.js lands
+
+    /* Workstream 10 — planned-maintenance compliance regime: OEM-full vs standard-
+     * annual. Compute the ops headcount under BOTH so the UI shows the manpower delta
+     * (standard-annual pulls most PM to annual → far fewer labor-hours). */
+    const pmRegimeCompare = useMemo(() => {
+        const fn = rzModels().maintenance?.opsHeadcount;
+        if (typeof fn !== 'function') return null;
+        const common = {
+            itLoadKw: inputs.itLoad,
+            tier: inputs.tierLevel,
+            mix: inputs.strategyMix ?? STRATEGY_MIX_PRESETS[inputs.maintenanceStrategy || 'planned'],
+            inHouseFrac: effectiveInHouseFrac(inputs),
+        };
+        try {
+            const oem = fn({ ...common, pmRegime: 'oem-full' }) as { totalFte: number; laborHours: { pm: number; total: number } };
+            const std = fn({ ...common, pmRegime: 'standard-annual' }) as { totalFte: number; laborHours: { pm: number; total: number } };
+            return { oem, std };
+        } catch { return null; }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [inputs.itLoad, inputs.tierLevel, inputs.strategyMix, inputs.maintenanceStrategy, inputs.maintenanceModel, inputs.hybridRatio, engineReady]);
 
     const schedule = useMemo(() => {
         return generateMaintenanceSchedule(assetCounts);
@@ -516,6 +537,56 @@ export function MaintenanceDashboard() {
             {/* ═══ TAB CONTENT ═══ */}
             {activeTab === 'assets' && <AssetsTab assets={activeAssets} assetCounts={assetCounts} isPencilMode={isPencilMode} handleCountChange={handleCountChange} selectedCountry={selectedCountry} currentAQI={currentAQI} />}
             {activeTab === 'schedule' && <ScheduleTab assetCounts={assetCounts} schedule={schedule} weeks={weeks} />}
+            {activeTab === 'strategy' && (
+                <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-5 mb-6">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-1">
+                        <Wrench className="w-4 h-4 text-cyan-500" />
+                        Planned-Maintenance Compliance Regime <Tooltip content="Two ways to run a planned program. OEM-compliant executes every OEM PM task at the manufacturer's interval — maximum reliability and warranty compliance, maximum manpower. Standard consolidates most tasks to annual and keeps only 1-2 critical systems (UPS batteries, gensets) at OEM frequency — far fewer labor-hours, but ~12% higher failure exposure from deferred servicing." />
+                    </h3>
+                    <p className="text-xs text-slate-500 mb-3">Applies to the planned share of the strategy mix. Standard-annual trades a small reliability margin for a large manpower reduction.</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {([
+                            { id: 'oem-full', title: 'OEM-Compliant (Full)', desc: 'Every OEM PM task at its OEM interval. Max reliability + warranty compliance.', fte: pmRegimeCompare?.oem.totalFte, pmH: pmRegimeCompare?.oem.laborHours.pm },
+                            { id: 'standard-annual', title: 'Standard (Annual)', desc: 'Most tasks consolidated to annual; only 1-2 critical systems keep OEM frequency. Far less manpower, ~12% higher failure exposure.', fte: pmRegimeCompare?.std.totalFte, pmH: pmRegimeCompare?.std.laborHours.pm },
+                        ] as const).map((opt) => {
+                            const active = (inputs.pmRegime ?? 'oem-full') === opt.id;
+                            return (
+                                <button key={opt.id} type="button" onClick={() => actions.setInputs({ pmRegime: opt.id })}
+                                    className={clsx(
+                                        "text-left p-4 rounded-lg border transition-all",
+                                        active ? "border-cyan-500 ring-2 ring-cyan-500/30 bg-cyan-50/50 dark:bg-cyan-900/10" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                                    )}>
+                                    <div className="flex items-center justify-between mb-1">
+                                        <span className="text-sm font-bold text-slate-900 dark:text-white">{opt.title}</span>
+                                        {active && <span className="text-[9px] font-bold uppercase text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded">Selected</span>}
+                                    </div>
+                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-2">{opt.desc}</p>
+                                    {opt.fte != null && (
+                                        <div className="flex items-center gap-3 text-[11px]">
+                                            <span className="font-mono font-bold text-slate-700 dark:text-slate-200">{opt.fte} FTE</span>
+                                            <span className="text-slate-400">·</span>
+                                            <span className="font-mono text-slate-500">{opt.pmH?.toLocaleString()} PM h/yr</span>
+                                        </div>
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    {pmRegimeCompare && (() => {
+                        const fteSaved = Math.max(0, pmRegimeCompare.oem.totalFte - pmRegimeCompare.std.totalFte);
+                        const pmHSaved = pmRegimeCompare.oem.laborHours.pm - pmRegimeCompare.std.laborHours.pm;
+                        return (
+                            <p className="mt-3 text-[11px] text-cyan-700 dark:text-cyan-400">
+                                Switching OEM-full → standard-annual cuts <strong>{pmHSaved.toLocaleString()} PM labor-hours/yr</strong>
+                                {fteSaved > 0
+                                    ? <> ≈ <strong>{fteSaved} fewer FTE</strong></>
+                                    : <> — at this size the headcount stays <strong>floor-bound</strong> by 24/7 emergency-response coverage (the saving lands on vendor/overtime labor cost, and the FTE drop appears at larger campuses)</>}
+                                . The trade is ~12% higher failure exposure, reflected in Reliability/Risk availability.
+                            </p>
+                        );
+                    })()}
+                </div>
+            )}
             {activeTab === 'strategy' && strategyData && <StrategyTab data={strategyData} fmt={fmtMoney} activeStrat={inputs.maintenanceStrategy || 'planned'} onSelect={(s) => actions.setInputs({ maintenanceStrategy: s as any })} />}
             {activeTab === 'sla' && slaData && (
                 <SLATab

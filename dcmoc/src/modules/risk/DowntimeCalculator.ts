@@ -118,7 +118,8 @@ export const computedDowntime = (
     inHouseFrac: number,
     slaKey: '2hr' | '4hr' | 'nbd',
     costPerMin?: number,
-    country?: CountryProfile
+    country?: CountryProfile,
+    pmRegime?: 'oem-full' | 'standard-annual'
 ): ComputedDowntime => {
     // Design reference + country/tier cost-per-minute resolution (single source)
     const base = calculateDowntimeRisk(tier, costPerMin, 4, country);
@@ -137,6 +138,7 @@ export const computedDowntime = (
             mix: strategyMix,
             inHouseFrac,
             slaKey,
+            pmRegime: pmRegime ?? 'oem-full',
             downtimeCostPerMin: base.costPerMinute,
         });
         if (!r || !Number.isFinite(r.availabilityPct)) return fallback;

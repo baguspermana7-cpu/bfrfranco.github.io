@@ -13,6 +13,15 @@ release sections rather than semver.
 
 ---
 
+## v1.115.76 — 2026-07-26 (DCMOC — two planned-maintenance compliance regimes: OEM-full vs standard-annual)
+
+### Added
+- **Planned maintenance now has two compliance regimes** on the Maintenance → Strategy tab, wired end-to-end:
+  - **OEM-compliant (full)** — every OEM PM task at the manufacturer's interval: maximum reliability and warranty compliance, maximum manpower.
+  - **Standard (annual)** — most tasks consolidated to annual, with only 1–2 critical systems (UPS batteries, gensets) kept at OEM frequency: far fewer PM labor-hours, at a ~12% higher failure exposure from deferred servicing.
+- Backed by engine `DATA.maintenance.ops.pmRegime` (pmHoursMult 1.0 vs 0.55, failureMult 1.0 vs 1.12, sourced). `models.maintenance.opsHeadcount` scales PM labor demand by the regime, and `models.maintenance.availabilityImpact` scales the failure rate — so choosing standard-annual honestly lowers labor-hours in Staffing while nudging the computed availability in Reliability/Risk. The selector shows the live delta and, importantly, is honest that at a small single-DC site the total headcount stays **floor-bound** by 24/7 emergency-response coverage (the saving lands on vendor/overtime labor cost; the FTE drop appears at larger campuses).
+- Held in the sim store `inputs.pmRegime` (default oem-full). Enum-coverage gate extended to `pmRegime` (2/2). Engine chain rebuilt (762/0, bindings 85/0, catalog 234 fns / 156 sources); gates green (walk 31/0, trace-parity 116/116, enum 25).
+
 ## v1.115.75 — 2026-07-26 (DCMOC — per-page "what this page is for" descriptions, site-wide)
 
 ### Added

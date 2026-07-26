@@ -61,12 +61,13 @@ export function StaffingDashboard() {
                 tier: inputs.tierLevel,
                 mix: inputs.strategyMix ?? STRATEGY_MIX_PRESETS[inputs.maintenanceStrategy || 'planned'],
                 inHouseFrac: effectiveInHouseFrac(inputs),
+                pmRegime: inputs.pmRegime ?? 'oem-full',
             }) as EngineOpsModel;
         } catch {
             return null;
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inputs.itLoad, inputs.tierLevel, inputs.strategyMix, inputs.maintenanceStrategy, inputs.maintenanceModel, inputs.hybridRatio, engineReady]);
+    }, [inputs.itLoad, inputs.tierLevel, inputs.strategyMix, inputs.maintenanceStrategy, inputs.maintenanceModel, inputs.hybridRatio, inputs.pmRegime, engineReady]);
 
     // Auto headcount calculation for rationale display
     const autoResult = useMemo(() => {
