@@ -8196,7 +8196,32 @@
             tankSizeLiters: 20000,       /* bulk diesel tank module (UL-142 class typical) */
             maintPerGenUsd: 18000,       /* annual PM per genset — CBRE FM benchmark 2025: Tier-4 $16-22k/unit */
             maintPerKwUsd: 5,            /* capacity-variable PM adder $/kW·yr */
-            envCompliancePerGenUsd: 2500 /* per-genset air-permit/stack-test admin, when permits required */
+            envCompliancePerGenUsd: 2500, /* per-genset air-permit/stack-test admin, when permits required */
+            /* ── v1.115.72 — POWER SOURCE model. Backup (grid primary, gensets run
+             * outage+test hours only) vs PRIME (off-grid, gensets = primary power,
+             * run continuously ~8760 h/yr) vs HYBRID (grid + on-site generation).
+             * Prime inverts the economics: fuel/emissions explode, maintenance
+             * intervals shorten, no grid substation. runHoursMode: 'outage' uses
+             * the grid outage estimate; 'continuous' = 8760×utilisation; 'fraction'
+             * = share×8760. Sources: ISO 8528 genset duty ratings; O&M practice. */
+            powerSourceModel: {
+                'utility-backup': { runHoursMode: 'outage',     maintMult: 1.0, gensetCapMult: 1.0, gridCapexMult: 1.0, label: 'Utility grid + standby gensets' },
+                'prime':          { runHoursMode: 'continuous', utilisation: 0.85, maintMult: 2.5, gensetCapMult: 1.5, gridCapexMult: 0.0, label: 'Prime power (off-grid, gensets run continuously)' },
+                'hybrid':         { runHoursMode: 'fraction',   yearFraction: 0.55, maintMult: 1.4, gensetCapMult: 1.2, gridCapexMult: 0.5, label: 'Hybrid (grid + on-site generation)' }
+            },
+            /* ── v1.115.72 — FUEL TYPE model. effLPerKwh (L or m³-equiv per kWh),
+             * co2PerUnit (kg per L or m³), costMult vs diesel, runHoursMult (solar
+             * shaves run-hours). HVO ≈ −90% lifecycle CO2 (EN 15940); natural gas
+             * via reciprocating gas engine; fuel cell (SOFC) very low local
+             * emissions; biogas/RNG ≈ carbon-neutral. Screening — DATA.sources. */
+            fuelTypeModel: {
+                'diesel':       { effLPerKwh: 0.27,  co2PerUnit: 2.68,  costMult: 1.0,  runHoursMult: 1.0,  label: 'Diesel (EN590 / ULSD, EPA Tier 4)' },
+                'hvo':          { effLPerKwh: 0.275, co2PerUnit: 0.268, costMult: 1.15, runHoursMult: 1.0,  label: 'HVO-100 (renewable diesel, -90% lifecycle CO2)' },
+                'natural-gas':  { effLPerKwh: 0.30,  co2PerUnit: 2.04,  costMult: 0.75, runHoursMult: 1.0,  label: 'Natural gas (reciprocating gas engine)' },
+                'solar-hybrid': { effLPerKwh: 0.27,  co2PerUnit: 2.68,  costMult: 1.0,  runHoursMult: 0.70, label: 'Solar + BESS hybrid (shaves genset run-hours ~30%)' },
+                'fuel-cell':    { effLPerKwh: 0.20,  co2PerUnit: 1.90,  costMult: 1.6,  runHoursMult: 1.0,  label: 'Fuel cell (SOFC on gas, very low local emissions)' },
+                'biogas':       { effLPerKwh: 0.32,  co2PerUnit: 0.30,  costMult: 1.1,  runHoursMult: 1.0,  label: 'Biogas / RNG (near carbon-neutral, supply-limited)' }
+            }
         },
         /* ══ v2.4.0 — DATA.capacity: multi-phase build-out presets (Group-2 promotion
          * from DCMOC CapacityPlanningEngine). Occupancy ramp + phase templates. ══ */
@@ -8650,7 +8675,7 @@
             'requirements':           { source: 'DC project brief required-field set + workload density/cooling profiles (AI/HPC/cloud/colo/enterprise/edge) — engine intake heuristic informed by Uptime/OCP rack-density guidance', asOf: '2026', unit: 'field list + kW/rack + cooling/tier defaults', method: 'completeness + profile defaults; not a design basis' },
             'architecture':           { source: 'Canonical DC design disciplines (electrical/mechanical/cooling/fire/security/network/building/structural/BMS) + relative design-complexity multipliers by cooling/tier/redundancy — engine heuristic', asOf: '2026', unit: 'discipline list + complexity multipliers → 0-100 index', method: 'normalized complexity screen; NOT a design deliverable' },
             'maintenance':            { source: 'DC O&M strategy economics — reactive/planned/predictive failure + downtime multipliers + in-house/hybrid/vendor labor blend; lifted from DCMOC MaintenanceStrategyEngine (RCM/CBM industry conventions)', asOf: '2026', unit: 'multipliers + minutes + $/part', method: 'screening O&M cost model; NOT a vendor quote' },
-            'fuelGen':                { source: 'EPA Tier 4 Final diesel genset fuel rate (~0.27 L/kWh @ 75%) + Uptime backup-autonomy hours by tier (48/72/96h) + genset unit classes 2.5MW≤100MW-IT/3MW above (CAT 3512E-3516E / Cummins QSK78 / MTU 20V4000 class) + CBRE FM 2025 PM benchmark $16-22k/unit·yr (+$5/kW variable) + UL-142-class 20kL tank modules; lifted from DCMOC FuelGenEngine', asOf: '2026', unit: 'L/kWh + hours + $/L + kW + USD', method: 'screening sizing; NOT a genset selection' },
+            'fuelGen':                { source: 'EPA Tier 4 Final diesel genset fuel rate (~0.27 L/kWh @ 75%) + Uptime backup-autonomy hours by tier (48/72/96h) + genset unit classes 2.5MW≤100MW-IT/3MW above (CAT 3512E-3516E / Cummins QSK78 / MTU 20V4000 class) + CBRE FM 2025 PM benchmark $16-22k/unit·yr (+$5/kW variable) + UL-142-class 20kL tank modules; POWER-SOURCE model (backup/prime/hybrid) per ISO 8528 duty ratings (standby/prime/continuous) + industry O&M-interval practice; FUEL-TYPE model diesel/HVO(EN 15940 -90% lifecycle)/natural-gas(recip gas engine)/solar-BESS/fuel-cell(SOFC)/biogas-RNG CO2 + efficiency factors; lifted from DCMOC FuelGenEngine', asOf: '2026', unit: 'L/kWh + hours + $/L + kW + USD + mult', method: 'screening sizing; NOT a genset selection' },
             'capacity':               { source: 'Multi-phase DC build-out templates (small/medium/large) + occupancy ramp; lifted from DCMOC CapacityPlanningEngine', asOf: '2026', unit: 'kW per phase + months + occupancy fraction', method: 'planning templates; adjust per project' },
             'gridReliability':        { source: 'Utility grid reliability bands (SAIDI-informed uptime tiers) + 0-1 grid score mapping; lifted from DCMOC GridReliabilityEngine — per-country uptime stays in the country profiles', asOf: '2026', unit: 'uptime % + outage hours + 0-1 score', method: 'screening; NOT a utility interconnection study' },
             'tax':                    { source: 'US TCJA bonus depreciation (20% 2026 phase-down) + IRA §48 solar ITC (30% + 10% domestic-content) + state DC sales-tax exemptions (VA/TX/NV/OH/AZ) + representative import duty; lifted from DCMOC TaxIncentiveEngine', asOf: '2026', unit: 'fractions (rates)', method: 'US-federal + state incentives; NOT tax advice; per-country corporate tax in country profiles' },
@@ -14448,7 +14473,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-25-z3"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-26-a"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

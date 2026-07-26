@@ -57,6 +57,9 @@ export interface LayoutExtras {
     renewables?: { option: string; solarMwp: number; bessMwh: number };
     /** Workstream K2 — deep-sea water cooling (CAPEX study inputs). */
     deepSea?: { enabled: boolean; depthM: number; pipelineKm: number; deltaTK: number };
+    /** Workstream A — power topology. 'prime' = off-grid (no utility incomer;
+     *  gensets are the primary continuous supply). 'hybrid' = grid + on-site. */
+    powerSource?: 'utility-backup' | 'prime' | 'hybrid';
 }
 
 /* Larger geometry: nodes are now symbols (~44px) + a two-line label below,
@@ -97,9 +100,19 @@ export function computeLayout(a: ArchInputs, eq: EquipCounts, f: FacilityCalc, e
     const single = PY + (ROW2) / 2; // single-feed centred between the A/B rows
 
     /* ── power lane — 7 stages: utility → MV → TX → UPS(+batt) → PDU → cells → IT ── */
-    // stage 0 — utility (named from Requirements 1.1)
-    const utilName = ex.utilityProvider?.trim() ? ex.utilityProvider.trim().slice(0, 16) : 'Utility';
-    if (dual) {
+    // stage 0 — utility (named from Requirements 1.1). Workstream A: prime power is
+    // off-grid — the MV bus is fed by the on-site generation plant, NOT a DNO
+    // incomer, so the intake node is relabelled + dashed (standby style).
+    const prime = ex.powerSource === 'prime';
+    const utilName = prime ? 'Off-Grid' : (ex.utilityProvider?.trim() ? ex.utilityProvider.trim().slice(0, 16) : 'Utility');
+    const utilSub = prime ? 'no DNO — prime' : a.gridVoltage;
+    const primeHover = 'Off-grid site (no distribution-network supply, e.g. Ireland where the DNO has no grid capacity) — the on-site prime-power generation plant feeds the MV bus continuously; there is no utility incomer';
+    if (prime && dual) {
+        blocks.push({ id: 'utilA', x: COL_X(0), y: PY, w: BW, h: BH, title: 'On-Site Plant A', sub: utilSub, badge: 'PRIME', standby: true, lane: 'power', kind: 'utility', hover: primeHover });
+        blocks.push({ id: 'utilB', x: COL_X(0), y: PY + ROW2, w: BW, h: BH, title: 'On-Site Plant B', sub: utilSub, badge: 'PRIME', standby: true, lane: 'power', kind: 'utility', hover: primeHover });
+    } else if (prime) {
+        blocks.push({ id: 'utilA', x: COL_X(0), y: single, w: BW, h: BH, title: 'On-Site Plant', sub: utilSub, badge: 'PRIME', standby: true, lane: 'power', kind: 'utility', hover: primeHover });
+    } else if (dual) {
         blocks.push({ id: 'utilA', x: COL_X(0), y: PY, w: BW, h: BH, title: `${utilName} A`, sub: a.gridVoltage, lane: 'power', kind: 'utility', hover: `Utility feed A — ${a.gridVoltage} incomer (${ex.utilityProvider || 'grid utility'})` });
         blocks.push({ id: 'utilB', x: COL_X(0), y: PY + ROW2, w: BW, h: BH, title: `${utilName} B`, sub: a.gridVoltage, lane: 'power', kind: 'utility', hover: `Utility feed B — ${a.gridVoltage} diverse incomer` });
     } else {
@@ -198,8 +211,9 @@ export function computeLayout(a: ArchInputs, eq: EquipCounts, f: FacilityCalc, e
     /* ── generation lane — gens → ATS → MV boards (fuel farm feeds back) ── */
     const itHallH = cells.length * (BH + 10);
     const GY = PY + Math.max(2 * ROW2, itHallH) + 40;   // lower lanes clear BOTH the power rows and the IT-HALL cells above
-    blocks.push({ id: 'gens', x: COL_X(0), y: GY, w: BW, h: BH, title: 'Generation', sub: `${eq.generators}× gensets ${spare ? '(dual+spare)' : a.redundancy}`, badge: 'STANDBY', units: eq.generators, glyphs: glyphCap(eq.generators), lane: 'gen', kind: 'genset', hover: `Standby generation — ${eq.generators} gensets, ${a.redundancy}. Off-line in normal operation; on utility outage the ATS starts the plant and transfers the load` });
-    blocks.push({ id: 'ats', x: COL_X(1), y: GY, w: BW, h: BH, title: 'ATS', sub: 'auto transfer · utility ↔ gen', badge: a.redundancy, lane: 'gen', kind: 'ats', hover: 'Automatic transfer switch — senses utility loss, signals genset start and transfers the MV boards to generation (NFPA 110 / UL 1008); retransfers on stable utility' });
+    // Workstream A — prime power: gensets are the PRIMARY continuous supply, not standby.
+    blocks.push({ id: 'gens', x: COL_X(0), y: GY, w: BW, h: BH, title: 'Generation', sub: `${eq.generators}× gensets ${spare ? '(dual+spare)' : a.redundancy}`, badge: prime ? 'PRIME' : 'STANDBY', units: eq.generators, glyphs: glyphCap(eq.generators), lane: 'gen', kind: 'genset', hover: prime ? `Prime power — ${eq.generators} gensets, ${a.redundancy}. OFF-GRID primary supply running continuously (~8760h × utilisation); the fuel farm is the site's only energy source` : `Standby generation — ${eq.generators} gensets, ${a.redundancy}. Off-line in normal operation; on utility outage the ATS starts the plant and transfers the load` });
+    blocks.push({ id: 'ats', x: COL_X(1), y: GY, w: BW, h: BH, title: prime ? 'Paralleling Swgr' : 'ATS', sub: prime ? 'gen paralleling · MV boards' : 'auto transfer · utility ↔ gen', badge: a.redundancy, lane: 'gen', kind: 'ats', hover: prime ? 'Generator paralleling switchgear — synchronises the prime-power gensets and feeds the MV boards continuously (there is no utility to transfer from)' : 'Automatic transfer switch — senses utility loss, signals genset start and transfers the MV boards to generation (NFPA 110 / UL 1008); retransfers on stable utility' });
     blocks.push({ id: 'fuel', x: COL_X(2), y: GY, w: BW, h: BH, title: 'Fuel Farm', sub: `${a.fuelHours} h autonomy`, lane: 'gen', kind: 'fuel', hover: `Fuel storage — ${a.fuelHours} hours full-load autonomy` });
     edges.push({ from: 'fuel', to: 'gens', kind: 'backup' });
     edges.push({ from: 'gens', to: 'ats', kind: 'backup' });
@@ -241,7 +255,7 @@ export function computeLayout(a: ArchInputs, eq: EquipCounts, f: FacilityCalc, e
     groups.push({ x: COL_X(0) - 12, y: PY - 22, w: COL_W * 5 - 18, h: powerH, title: `POWER TRAIN — ${a.redundancy} · ${paths} path${paths > 1 ? 's' : ''}`, lane: 'power' });
     groups.push({ x: COL_X(5) - 12, y: PY - 22, w: COL_W * 2 - 10, h: Math.max(powerH, itHallH + 4), title: `IT HALL — ${cells.length} cell${cells.length > 1 ? 's' : ''} · ${eq.racks.toLocaleString()} racks`, lane: 'it' });
     const lowerH = BH + 26;
-    groups.push({ x: COL_X(0) - 12, y: GY - 22, w: COL_W * 3 - 18, h: lowerH, title: `GENERATION — ${eq.generators}× · ${a.fuelHours}h fuel`, lane: 'gen' });
+    groups.push({ x: COL_X(0) - 12, y: GY - 22, w: COL_W * 3 - 18, h: lowerH, title: `${prime ? 'PRIME POWER PLANT' : 'GENERATION'} — ${eq.generators}× · ${a.fuelHours}h fuel`, lane: 'gen' });
     groups.push({ x: COL_X(3) - 12, y: CY - 22, w: COL_W * 2 - 18, h: lowerH, title: liquid ? `COOLING PLANT — ${Math.max(1, paths)} CDU loops` : `COOLING PLANT — ${eq.chillers} chillers`, lane: 'cooling' });
     groups.push({ x: COL_X(5) - 12, y: CY - 22, w: COL_W * 2 - 10, h: lowerH, title: 'NETWORK & CONTROL', lane: 'bms' });
 

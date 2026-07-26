@@ -39,6 +39,8 @@ const CarbonDashboard = () => {
             fuelHours: capexStore.inputs.fuelHours || 48,
             genType: capexStore.inputs.genType || 'diesel',
             countryName: selectedCountry.name,
+            powerSource: inputs.powerSource ?? 'utility-backup',
+            fuelType: inputs.fuelType ?? 'diesel',
         });
     }, [selectedCountry, inputs, capexStore.inputs]);
 

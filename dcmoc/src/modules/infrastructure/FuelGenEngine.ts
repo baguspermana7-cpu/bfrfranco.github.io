@@ -17,6 +17,10 @@ export interface FuelGenInput {
     coolingTopology?: 'in-row' | 'perimeter' | 'dlc';
     powerRedundancy?: 'N+1' | '2N' | '2N+1';
     testingRegime?: TestingRegime;
+    /** v1.115.72 — power delivery model: grid+backup (default), prime off-grid, or hybrid */
+    powerSource?: 'utility-backup' | 'prime' | 'hybrid';
+    /** v1.115.72 — genset fuel: diesel (default), hvo, natural-gas, solar-hybrid, fuel-cell, biogas */
+    fuelType?: 'diesel' | 'hvo' | 'natural-gas' | 'solar-hybrid' | 'fuel-cell' | 'biogas';
     overrides?: {
         dieselPricePerLiter?: number;
         genEfficiency?: number;
@@ -110,6 +114,12 @@ export interface FuelGenResult {
     hvo: HvoComparison | null;
     countryComparison: CountryFuelComparison[];
     editableParams: EditableParam[];
+    /** v1.115.72 — power-source + fuel-type context for the dashboard */
+    powerSource: 'utility-backup' | 'prime' | 'hybrid';
+    fuelType: 'diesel' | 'hvo' | 'natural-gas' | 'solar-hybrid' | 'fuel-cell' | 'biogas';
+    powerSourceLabel: string;
+    fuelTypeLabel: string;
+    runHoursPerYear: number;
 }
 
 export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
@@ -130,13 +140,21 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
     // Previous default was 0.27; keeping at 0.27 as conservative (matches EPA Tier 4 benchmark)
     // Engine-sourced fuel/gen economics (RZEngine DATA.fuelGen) with local fallbacks
     // parity-identical to the former inline literals.
+    type SourceModel = { runHoursMode: 'outage' | 'continuous' | 'fraction'; utilisation?: number; yearFraction?: number; maintMult: number; gensetCapMult: number; gridCapexMult: number; label: string };
+    type FuelModel = { effLPerKwh: number; co2PerUnit: number; costMult: number; runHoursMult: number; label: string };
     const FG = (rzData().fuelGen || {}) as {
         genEfficiencyLPerKwh?: number; fuelStorageHoursByTier?: Record<number, number>;
         genUnitKwSmall?: number; genUnitKwLarge?: number; genUnitScaleMw?: number;
         tankSizeLiters?: number; maintPerGenUsd?: number; maintPerKwUsd?: number;
         envCompliancePerGenUsd?: number;
+        powerSourceModel?: Record<string, SourceModel>; fuelTypeModel?: Record<string, FuelModel>;
     };
-    const genEfficiency = overrides?.genEfficiency ?? FG.genEfficiencyLPerKwh ?? 0.27; // L/kWh (EPA Tier 4 Final, 75% load)
+    // v1.115.72 — resolve power-source + fuel-type models (default = backup/diesel)
+    const powerSource = input.powerSource ?? 'utility-backup';
+    const fuelType = input.fuelType ?? 'diesel';
+    const srcModel: SourceModel = FG.powerSourceModel?.[powerSource] ?? { runHoursMode: 'outage', maintMult: 1, gensetCapMult: 1, gridCapexMult: 1, label: 'Utility grid + standby gensets' };
+    const fuelSpec: FuelModel = FG.fuelTypeModel?.[fuelType] ?? { effLPerKwh: FG.genEfficiencyLPerKwh ?? 0.27, co2PerUnit: 2.68, costMult: 1, runHoursMult: 1, label: 'Diesel' };
+    const genEfficiency = overrides?.genEfficiency ?? fuelSpec.effLPerKwh; // L/kWh — from the selected fuel type
     const fuelStorageHours = overrides?.fuelStorageHours ?? FG.fuelStorageHoursByTier?.[tierLevel] ?? (tierLevel === 4 ? 96 : tierLevel === 3 ? 72 : 48);
     const monthlyTestHours = overrides?.monthlyTestHours ?? 2;
     const annualFullLoadTestHours = overrides?.annualFullLoadTestHours ?? 4;
@@ -232,9 +250,16 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
         monthlyTestLiters = monthlyLoadBankFuel;
     }
 
-    // Outage consumption: based on grid reliability
-    const outageHoursPerYear = grid ? (grid.brownoutFrequency * grid.averageOutageDuration / 60) : 24;
-    const annualOutageLiters = outageHoursPerYear * totalFacilityLoadKw * genEfficiency;
+    // Run-hours by POWER SOURCE (v1.115.72): backup = grid outage hours only;
+    // prime = 8760 × utilisation (gensets ARE the primary power, off-grid);
+    // hybrid = yearFraction × 8760. Solar-hybrid fuel shaves run-hours ×runHoursMult.
+    const gridOutageHours = grid ? (grid.brownoutFrequency * grid.averageOutageDuration / 60) : 24;
+    const runHoursBase =
+        srcModel.runHoursMode === 'continuous' ? 8760 * (srcModel.utilisation ?? 0.85)
+        : srcModel.runHoursMode === 'fraction' ? 8760 * (srcModel.yearFraction ?? 0.55)
+        : gridOutageHours;
+    const runHoursPerYear = runHoursBase * fuelSpec.runHoursMult;
+    const annualOutageLiters = runHoursPerYear * totalFacilityLoadKw * genEfficiency;
 
     // Fuel polishing: recirculate 10% of total storage monthly
     const annualPolishingLiters = storageLiters * 0.10 * 12 * 0.01; // Small consumption during polishing
@@ -251,8 +276,9 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
         totalLitersPerMonth: Math.round(totalLitersPerMonth),
     };
 
-    // Costs
-    const dieselPriceWithTax = dieselPrice * (1 + fuelTaxRate);
+    // Costs — fuel price scaled by the selected fuel type's cost multiplier
+    // (HVO +15%, natural gas −25%, biogas +10%, fuel cell +60% vs diesel).
+    const dieselPriceWithTax = dieselPrice * (1 + fuelTaxRate) * fuelSpec.costMult;
     const annualFuelCost = totalLitersPerYear * dieselPriceWithTax;
     const monthlyFuelCost = annualFuelCost / 12;
 
@@ -267,7 +293,8 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
     const fuelQualityMaintMult =
         fuel?.fuelQualityRating === 'low' ? 1.15 :
         fuel?.fuelQualityRating === 'moderate' ? 1.05 : 1.00;
-    const annualMaintenanceUsd = (genCount * (FG.maintPerGenUsd ?? 18000) + (totalGenCapacity * (FG.maintPerKwUsd ?? 5))) * fuelQualityMaintMult;
+    // × power-source maintenance multiplier (prime/continuous duty ≈ 2.5×, hybrid ≈ 1.4×)
+    const annualMaintenanceUsd = (genCount * (FG.maintPerGenUsd ?? 18000) + (totalGenCapacity * (FG.maintPerKwUsd ?? 5))) * fuelQualityMaintMult * srcModel.maintMult;
 
     // Environmental compliance — DM audit: country-specific annual permitting cost
     // (countries.ts compliance.environmentalPermitCostPerYear, screening band US $8k /
@@ -310,8 +337,9 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
         };
     }
 
-    // CO2 emissions: 2.68 kgCO2 per liter of diesel (EPA/DEFRA emission factor)
-    const co2Kg = totalLitersPerYear * 2.68;
+    // CO2 emissions — per-unit factor from the selected fuel type (diesel 2.68,
+    // HVO 0.268 = −90% lifecycle, natural gas 2.04, biogas 0.30 near-neutral).
+    const co2Kg = totalLitersPerYear * fuelSpec.co2PerUnit;
 
     // Country comparison (sorted by diesel price)
     const comparisonCountries = Object.values(COUNTRIES)
@@ -348,5 +376,10 @@ export function calculateFuelGen(input: FuelGenInput): FuelGenResult {
         hvo,
         countryComparison: comparisonCountries,
         editableParams,
+        powerSource,
+        fuelType,
+        powerSourceLabel: srcModel.label,
+        fuelTypeLabel: fuelSpec.label,
+        runHoursPerYear: Math.round(runHoursPerYear),
     };
 }

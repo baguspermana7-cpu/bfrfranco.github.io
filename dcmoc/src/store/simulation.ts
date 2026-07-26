@@ -17,6 +17,11 @@ export interface SimulationState {
         coolingType: 'air' | 'inrow' | 'rdhx' | 'liquid';
         coolingTopology: 'in-row' | 'perimeter' | 'dlc';
         powerRedundancy: 'N+1' | '2N' | '2N+1';
+        /** Workstream A — power topology + fuel. Drives genset run-hours (standby
+         *  vs continuous prime), grid substation CAPEX (0 for off-grid prime),
+         *  genset CAPEX multiplier, and fuel CO₂/cost. Ireland off-grid case. */
+        powerSource: 'utility-backup' | 'prime' | 'hybrid';
+        fuelType: 'diesel' | 'hvo' | 'natural-gas' | 'solar-hybrid' | 'fuel-cell' | 'biogas';
 
         maintenanceStrategy: 'reactive' | 'planned' | 'predictive';
         /** Workstream G — strategy as a % MIX (fractions summing 1). The legacy
@@ -125,6 +130,8 @@ export const useSimulationStore = create<SimulationState>()(persist((set) => ({
         coolingType: 'air', // Default CRAC
         coolingTopology: 'perimeter',
         powerRedundancy: '2N',
+        powerSource: 'utility-backup',
+        fuelType: 'diesel',
         maintenanceStrategy: 'planned',
         strategyMix: { reactive: 0, planned: 1, predictive: 0 },
         slaKey: '4hr',

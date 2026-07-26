@@ -7,7 +7,7 @@ import { calculateGridReliability } from '@/modules/infrastructure/GridReliabili
 import { rzData, useEngineReady } from '@/lib/rz-engine';
 import {
     Fuel, Pencil, Check, X, Gauge, Droplets, Calendar, DollarSign,
-    BarChart3, AlertTriangle, Flame, Clock, Truck, ArrowUpRight
+    BarChart3, AlertTriangle, Flame, Clock, Truck, ArrowUpRight, Zap
 } from 'lucide-react';
 import clsx from 'clsx';
 import { fmtCompact, fmtMoney } from '@/lib/format';
@@ -73,6 +73,15 @@ export default function FuelGenDashboard() {
     const [testingRegime, setTestingRegime] = useState<TestingRegime>('minimal');
     const [co2Open, setCo2Open] = useState(false);
     const engineReady = useEngineReady(); // re-run envCosts memo once rz-engine.min.js lands
+    /* v1.115.72 — power source + fuel type (Ireland/off-grid case: prime power).
+     * Held in the sim store (not local) so CAPEX grid/genset cost, Carbon CO₂ and
+     * the Architecture SLD all read the SAME selection. */
+    type PowerSource = NonNullable<FuelGenInput['powerSource']>;
+    type FuelType = NonNullable<FuelGenInput['fuelType']>;
+    const powerSource: PowerSource = inputs.powerSource ?? 'utility-backup';
+    const fuelType: FuelType = inputs.fuelType ?? 'diesel';
+    const setPowerSource = (v: PowerSource) => actions.setInputs({ powerSource: v });
+    const setFuelType = (v: FuelType) => actions.setInputs({ fuelType: v });
 
     const result = useMemo<FuelGenResult | null>(() => {
         if (!selectedCountry) return null;
@@ -84,9 +93,11 @@ export default function FuelGenDashboard() {
             coolingTopology: inputs.coolingTopology,
             powerRedundancy: inputs.powerRedundancy,
             testingRegime,
+            powerSource,
+            fuelType,
             overrides: Object.keys(overrides).length > 0 ? overrides as FuelGenInput['overrides'] : undefined,
         });
-    }, [selectedCountry, inputs.itLoad, inputs.tierLevel, inputs.coolingType, inputs.coolingTopology, inputs.powerRedundancy, testingRegime, overrides]);
+    }, [selectedCountry, inputs.itLoad, inputs.tierLevel, inputs.coolingType, inputs.coolingTopology, inputs.powerRedundancy, testingRegime, powerSource, fuelType, overrides]);
 
     /* ── Diagnostics Tier-2 models (all levers = measured re-runs / engine data,
      * never fabricated numbers) ────────────────────────────────────────────── */
@@ -251,6 +262,45 @@ export default function FuelGenDashboard() {
                                     </div>
                                 );
                             })}
+                        </div>
+                    </div>
+
+                    {/* Power Source + Fuel Type — Ireland/off-grid case: prime power, gensets run continuously */}
+                    <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
+                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
+                            <Zap className="w-4 h-4 text-amber-500" />
+                            Power Source &amp; Fuel
+                            <Tooltip content="Power topology drives generator run-hours. Utility+backup: gensets are standby (~grid-outage hours only). Prime power (off-grid, e.g. Ireland where the DNO has no grid capacity): gensets are the primary supply and run continuously (~8760h × utilisation). Hybrid: grid + on-site generation share the year. Fuel type sets efficiency, CO₂ factor and cost premium." />
+                        </h3>
+                        <label className="block text-[10px] font-medium text-slate-500 uppercase mb-1">Power Source</label>
+                        <select
+                            value={powerSource}
+                            onChange={e => setPowerSource(e.target.value as PowerSource)}
+                            className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 mb-3"
+                        >
+                            <option value="utility-backup">Utility grid + standby gensets</option>
+                            <option value="prime">Prime power (off-grid, gensets run continuously)</option>
+                            <option value="hybrid">Hybrid (grid + on-site generation)</option>
+                        </select>
+                        <label className="block text-[10px] font-medium text-slate-500 uppercase mb-1">Fuel / Generation Type</label>
+                        <select
+                            value={fuelType}
+                            onChange={e => setFuelType(e.target.value as FuelType)}
+                            className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        >
+                            <option value="diesel">Diesel (EN590 / ULSD, EPA Tier 4)</option>
+                            <option value="hvo">HVO-100 (renewable diesel, −90% lifecycle CO₂)</option>
+                            <option value="natural-gas">Natural gas (reciprocating gas engine)</option>
+                            <option value="solar-hybrid">Solar + BESS hybrid (−30% genset run-hours)</option>
+                            <option value="fuel-cell">Fuel cell (SOFC on gas, low local emissions)</option>
+                            <option value="biogas">Biogas / RNG (near carbon-neutral)</option>
+                        </select>
+                        <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 space-y-1.5 text-xs">
+                            <div className="flex justify-between"><span className="text-slate-500">Mode</span><span className="font-medium text-slate-900 dark:text-white text-right">{result.powerSourceLabel}</span></div>
+                            <div className="flex justify-between"><span className="text-slate-500 flex items-center gap-1">Genset run-hours<Tooltip content="Annual generator running hours implied by the power source. Standby ≈ grid-outage hours; prime ≈ 8760h × utilisation (continuous); hybrid ≈ year fraction. Fuel/CO₂ scale directly with this." /></span><span className="font-mono font-semibold text-amber-600 dark:text-amber-400">{fmtCompact(result.runHoursPerYear)} h/yr</span></div>
+                            {powerSource === 'prime' && (
+                                <p className="text-[10px] text-amber-600 dark:text-amber-400 leading-snug">Off-grid: no utility substation — gensets are the primary supply. Fuel &amp; CO₂ rise ~50× vs standby.</p>
+                            )}
                         </div>
                     </div>
 

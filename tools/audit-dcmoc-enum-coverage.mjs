@@ -48,6 +48,7 @@ const E = loadEngine();
 const DATA = E?.data ?? E?.DATA ?? {};   // engine exposes `.data` (lowercase)
 const CD = DATA.capexDetail ?? {};
 const MARKETS = DATA.markets ?? {};
+const FG = DATA.fuelGen ?? {};   // Workstream A — power-source + fuel-type models
 
 /* ── resolveMarketKey (mirror of dcmoc/src/lib/market-key.ts) — the gate applies
  *    the same alias so aliased cityMarket values count as covered. ── */
@@ -111,6 +112,9 @@ const registry = [
     { field: 'transformerLead', label: 'capexDetail.fomTxLeadMult',        options: ['standard', 'expedited', 'long_lead'],       keys: keysOf(CD.fomTxLeadMult), note: 'Requirements transformer-lead Segmented' },
     { field: 'transformerType', label: 'capexDetail.fomTxTypeMult',        options: ['dry', 'oil'],                                keys: keysOf(CD.fomTxTypeMult), note: 'Requirements transformer-type Segmented' },
     { field: 'deliveryMethod', label: 'capexDetail.fomDeliveryMult',       options: ['design_build', 'design_bid_build', 'epc'],   keys: keysOf(CD.fomDeliveryMult), note: 'Requirements delivery-method Select' },
+    // Workstream A — FuelGenDashboard power-source + fuel-type selects (CapexEngine/CarbonEngine/FuelGenEngine index fuelGen maps; missing key → silent 1.0):
+    { field: 'powerSource',    label: 'fuelGen.powerSourceModel',          options: ['utility-backup', 'prime', 'hybrid'],         keys: keysOf(FG.powerSourceModel), note: 'FuelGenDashboard Power Source select' },
+    { field: 'fuelType',       label: 'fuelGen.fuelTypeModel',             options: ['diesel', 'hvo', 'natural-gas', 'solar-hybrid', 'fuel-cell', 'biogas'], keys: keysOf(FG.fuelTypeModel), note: 'FuelGenDashboard Fuel/Generation Type select' },
 ];
 
 let gaps = 0;

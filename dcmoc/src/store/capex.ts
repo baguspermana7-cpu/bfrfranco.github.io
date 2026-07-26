@@ -60,7 +60,8 @@ const defaultInputs: CapexInput = {
     transformerLead: 'standard',
     utilityRate: 9,
     greenCert: 'none',
-    renewableOption: 'none'
+    renewableOption: 'none',
+    powerSource: 'utility-backup'   // Workstream A — shared canonical, reconciled from sim (FuelGen page owns the selector)
 };
 
 /* DF1 — inputs PERSIST (audit-critical: reload used to wipe every capex
@@ -118,8 +119,21 @@ export const useCapexStore = create<CapexStore>()(persist((set, get) => ({
             const cid = sim.selectedCountry?.id;
             state.setInputs({
                 itLoad: sim.inputs.itLoad,
+                powerSource: sim.inputs.powerSource ?? 'utility-backup',
                 ...(cid && COUNTRIES[cid] ? { location: cid, country: COUNTRIES[cid] } : {}),
             });
         } catch { /* engine absent */ }
     },
 }));
+
+/* Workstream A — the FuelGen page owns the power-source selector (writes the sim
+ * store). CAPEX reads its OWN store for grid/genset cost, so mirror the sim value
+ * live. Guarded (no recompute unless it actually changed) → no feedback loop. */
+if (typeof window !== 'undefined') {
+    useSimulationStore.subscribe((s) => {
+        const ps = s.inputs.powerSource;
+        if (ps && useCapexStore.getState().inputs.powerSource !== ps) {
+            useCapexStore.getState().setInputs({ powerSource: ps });
+        }
+    });
+}

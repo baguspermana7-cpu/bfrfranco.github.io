@@ -66,6 +66,11 @@ export interface CarbonInputs {
     fuelHours: number;  // diesel generator fuel storage
     genType: string;
     countryName: string;
+    /* Workstream A — power topology + fuel. Prime (off-grid) runs gensets
+     * continuously (~8760h × utilisation) not ~200h testing, so Scope-1 rises
+     * ~40×; fuelType sets the CO₂/L factor (HVO −90%, gas −24%, biogas −89%). */
+    powerSource?: 'utility-backup' | 'prime' | 'hybrid';
+    fuelType?: 'diesel' | 'hvo' | 'natural-gas' | 'solar-hybrid' | 'fuel-cell' | 'biogas';
 }
 
 // ─── CONSTANTS ──────────────────────────────────────────────
@@ -136,12 +141,27 @@ export const calculateCarbonFootprint = (inputs: CarbonInputs): CarbonResult => 
         ? (localScope2 + engineAnnualTonnes) / 2
         : localScope2;
 
-    // Scope 1: Direct emissions (generator testing, ~200h/yr testing + emergency)
-    const annualGenTestHours = 200;
-    // A9: HVO shows 80% reduction (0.2x factor), not 90% (was 0.1x)
-    const hvoFactor = genType === 'hvo' ? 0.2 : 1;
-    const dieselLiters = itLoadKw * DIESEL_CONSUMPTION_RATE * annualGenTestHours * hvoFactor;
-    const scope1Generators = (dieselLiters * DIESEL_EMISSION_FACTOR) / 1000; // tCO₂/yr
+    // Scope 1: Direct emissions from on-site generation. Run-hours depend on the
+    // power topology (Workstream A): standby gensets run ~200h/yr (testing +
+    // emergency); PRIME power (off-grid) runs them continuously (8760h × utilisation);
+    // hybrid a year fraction. The fuel-type CO₂/L factor comes from engine
+    // DATA.fuelGen.fuelTypeModel (single source shared with FuelGenEngine).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fgData = (rzData() as any)?.fuelGen;
+    const powerSource = inputs.powerSource ?? 'utility-backup';
+    const fuelType = inputs.fuelType ?? (genType === 'hvo' ? 'hvo' : 'diesel');
+    const psModel = fgData?.powerSourceModel?.[powerSource];
+    const fuelSpec = fgData?.fuelTypeModel?.[fuelType];
+    const STANDBY_GEN_HOURS = 200;
+    const annualGenHours =
+        psModel?.runHoursMode === 'continuous' ? 8760 * (psModel.utilisation ?? 0.85)
+        : psModel?.runHoursMode === 'fraction' ? 8760 * (psModel.yearFraction ?? 0.55)
+        : STANDBY_GEN_HOURS;
+    // Fuel CO₂ factor per liter — engine fuelTypeModel first, HVO 0.2× / diesel 1× fallback.
+    const fuelCo2PerL: number = fuelSpec?.co2PerUnit ?? (fuelType === 'hvo' ? DIESEL_EMISSION_FACTOR * 0.2 : DIESEL_EMISSION_FACTOR);
+    const runHoursMult: number = fuelSpec?.runHoursMult ?? 1; // solar-hybrid shaves ~30% run-hours
+    const dieselLiters = itLoadKw * DIESEL_CONSUMPTION_RATE * annualGenHours * runHoursMult;
+    const scope1Generators = (dieselLiters * fuelCo2PerL) / 1000; // tCO₂/yr
 
     // A15: Refrigerant leakage Scope 1 (engine DATA.refrigerants, local fallback)
     const refData = getRefrigerantData(coolingType);

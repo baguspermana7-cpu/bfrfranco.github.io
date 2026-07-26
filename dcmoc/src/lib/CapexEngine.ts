@@ -95,6 +95,11 @@ export interface CapexInput {
      * (peak-sized power plant) + an optional GB300 cooling-kit line + interconnect
      * estimates. Consumed via the shared engine (models.requirements.*). */
     archKey?: ArchKey;
+    /* Workstream A — power topology. 'prime' = off-grid (Ireland DNO-less case):
+     * NO utility substation/grid-connection front-of-meter cost, oversized gensets
+     * (prime-rated). 'hybrid' = partial grid. Drives genset CAPEX × gensetCapMult
+     * and front-of-meter grid infra × gridCapexMult from engine DATA.fuelGen. */
+    powerSource?: 'utility-backup' | 'prime' | 'hybrid';
 }
 
 /** Ship-A — analyst interconnect fabric estimates, EXCLUDED from the infra total. */
@@ -135,6 +140,15 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
         projYear, designFee, pmFee, contingency, includeFOM,
         substationType, utilityRate, greenCert, renewableOption, archKey
     } = input;
+
+    /* Workstream A — power-source multipliers from engine DATA.fuelGen.powerSourceModel
+     * (single source shared with FuelGenEngine). Prime power: gensets oversized
+     * (gensetCapMult ~1.5×) and grid infra = 0 (gridCapexMult 0). Hybrid: partial. */
+    const powerSource = input.powerSource ?? 'utility-backup';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const psModel = (rzData() as any)?.fuelGen?.powerSourceModel?.[powerSource];
+    const gensetCapMult: number = psModel?.gensetCapMult ?? 1.0;
+    const gridCapexMult: number = psModel?.gridCapexMult ?? 1.0;
 
     /* Ship-A — arch-aware MARGINAL power-provisioning uplift (electrical/UPS/gen
      * only). The engine's powerProvisionUplift already divides peak/nominal by
@@ -209,7 +223,7 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
         else if (key === 'seismic') multiplier *= seismicMult * buildMult;
         else if (key === 'electrical') multiplier *= redMult * rackMult * upsMult * powerUplift;
         else if (key === 'ups') multiplier *= redMult * rackMult * upsMult * powerUplift;
-        else if (key === 'generator') multiplier *= redMult * fuelMult * genMult * powerUplift;
+        else if (key === 'generator') multiplier *= redMult * fuelMult * genMult * powerUplift * gensetCapMult;
         else if (key === 'cooling') multiplier *= coolMult * rackMult;
         else if (key === 'fireSuppression') multiplier *= fireSupMult;
         else if (key === 'fireAlarm') multiplier *= alarmMult;
@@ -292,8 +306,11 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
     let fomTotal = 0;
     if (includeFOM) {
         // Shape-adapted: engine substationCosts is a plain number, local is {base,label}
-        const subCost = cd.substationCosts?.[substationType] ?? substationCosts[substationType]?.base ?? 1000000;
-        const gridConnection = itLoad * 0.001 * 500000;
+        // Front-of-meter grid infra (substation + utility connection) scales with the
+        // power source: prime power is off-grid → gridCapexMult 0 removes it entirely;
+        // hybrid ~0.5. Switchgear stays (needed to distribute genset power off-grid too).
+        const subCost = (cd.substationCosts?.[substationType] ?? substationCosts[substationType]?.base ?? 1000000) * gridCapexMult;
+        const gridConnection = itLoad * 0.001 * 500000 * gridCapexMult;
         const switchgear = itLoad * 0.001 * 300000;
         const utilRateVal = utilityRate / 100;
         fomTotal = (subCost + gridConnection + switchgear) * (1 + utilRateVal) * yearMult;

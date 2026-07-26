@@ -13,6 +13,19 @@ release sections rather than semver.
 
 ---
 
+## v1.115.72 — 2026-07-26 (DCMOC — power-source topology + fuel-type modelling, end-to-end)
+
+### Added
+- **Power source + fuel type on the Fuel & Generator page** — the model now covers three power topologies and six fuel/generation types, and they drive the whole app (not just a label):
+  - **Power source** — *Utility grid + standby gensets* (gensets run ~grid-outage hours only), *Prime power (off-grid)* for sites like Ireland where the DNO has no grid capacity so on-site generation is the primary continuous supply (gensets run 8760h × 0.85 utilisation), and *Hybrid* (grid + on-site sharing ~55% of the year).
+  - **Fuel / generation type** — Diesel (EN590/ULSD), HVO-100 (renewable diesel, −90% lifecycle CO₂ per EN 15940), Natural gas (reciprocating gas engine, −24% CO₂), Solar + BESS hybrid (shaves genset run-hours ~30%), Fuel cell (SOFC on gas), and Biogas/RNG (near carbon-neutral). Each carries efficiency, CO₂/unit, cost premium and run-hours factors from engine `DATA.fuelGen.powerSourceModel` / `fuelTypeModel` (ISO 8528 duty ratings; EN 15940; DATA.sources).
+- The selection is held in the simulation store so every related surface reacts:
+  - **Fuel & Generator** — annual fuel, consumption, and CO₂ scale with the run-hours implied by the topology (verified live: standby ≈ 14 h/yr → prime ≈ 7,446 h/yr; prime CO₂ ≈ 20,236 t/yr, prime + HVO ≈ 2,061 t/yr = −90%).
+  - **CAPEX** — prime removes the utility substation + grid-connection front-of-meter cost entirely (off-grid) and oversizes the gensets (prime-rated); hybrid at ~half grid cost.
+  - **Carbon & ESG** — Scope-1 generator emissions now use the topology run-hours and the fuel-type CO₂ factor instead of a fixed 200h diesel approximation.
+  - **Architecture SLD** — prime power relabels the utility intake to an off-grid *On-Site Plant* node and the generation lane from *STANDBY* to *PRIME POWER PLANT* (continuous), with a paralleling-switchgear stage in place of the ATS.
+- `audit-dcmoc-enum-coverage` extended to gate `powerSource` (3/3) and `fuelType` (6/6) against their engine DATA maps (their keys live in JS, so tsc can't catch drift). Engine chain rebuilt (terser + catalog + value-bindings 85/0 + test-rz-engine 762/0); gates green (walk 31/0, trace-parity 116/116, arch-diagram 7/7, reference-parity 155/0).
+
 ## v1.115.71 — 2026-07-25 (DCMOC — CAPEX-total trace now decomposes the real cost stack)
 
 ### Fixed

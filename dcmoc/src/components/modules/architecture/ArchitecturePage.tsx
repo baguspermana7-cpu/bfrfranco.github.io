@@ -74,6 +74,9 @@ export function ArchitecturePage() {
             marginPct: req.business.designMarginPct,
             slaPct: req.availability.slaTargetPct,
             useCaseLabel: req.overview.useCase.toUpperCase(),
+            /* Workstream A — power topology: prime (off-grid) removes the utility
+             * feed from the SLD and relabels gensets STANDBY → PRIME (continuous). */
+            powerSource: simInputs.powerSource ?? 'utility-backup',
             /* K1 — renewables from the CAPEX selection (BESS must SHOW when selected) */
             renewables: {
                 option: capexInputs.renewableOption ?? 'none',
@@ -89,7 +92,7 @@ export function ArchitecturePage() {
             },
         };
         return arch.diagramView === 'mech' ? computeCoolingLayout(i, eq, f, extras) : computeLayout(i, eq, f, extras);
-    }, [i, eq, f, simInputs.capacityPhases, req.overview.utilityProvider, req.overview.useCase, req.workload.workloadMix, req.business.designMarginPct, req.availability.slaTargetPct, capexInputs, arch.diagramView]);
+    }, [i, eq, f, simInputs.capacityPhases, simInputs.powerSource, req.overview.utilityProvider, req.overview.useCase, req.workload.workloadMix, req.business.designMarginPct, req.availability.slaTargetPct, capexInputs, arch.diagramView]);
 
     const m = rzModels()?.architecture;
     let complexity: { index: number; band: string } | null = null;
