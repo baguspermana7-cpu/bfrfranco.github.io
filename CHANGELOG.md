@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.83 — 2026-07-26 (DCMOC — IST scenarios in the Commissioning PDF export)
+
+### Added
+- **The Commissioning PDF now includes an "Integrated Systems Tests (L5)" section** — each applicable IST scenario (redundancy-filtered) with its category, duration and Pass/Fail/pending status. Closes the gap where the IST scenarios drove the on-screen readiness but were absent from the exported report. Export probe 44/44, walk 31/0; no engine change.
+
 ## v1.115.82 — 2026-07-26 (DCMOC — IST scenario pass/fail now drives the commissioning readiness index)
 
 ### Changed

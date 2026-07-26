@@ -322,6 +322,13 @@ export function CommissioningEnginePage() {
                                     if (v) tickedRows.push([label, i.label, resolveProc(i.templateKey, i.params)?.witness ?? 'R', v.toUpperCase()]);
                                 }));
                             });
+                            /* IST scenario pass/fail (rich L5 scenarios drive the ist key) */
+                            const istAllPdf = (rzData()?.commissioning?.istScenarios ?? []) as { id: string; name: string; category: string; durationHrs: number; appliesFrom: 'N' | 'N+1' | '2N' }[];
+                            const istRankPdf = REDUNDANCY_RANK[uiRedToClass(inputs.powerRedundancy)];
+                            const istRows = istAllPdf.filter((s) => REDUNDANCY_RANK[s.appliesFrom] <= istRankPdf).map((s) => {
+                                const v = t.checklist[`${IST_PREFIX}${s.id}`];
+                                return [s.name, s.category, `${s.durationHrs}h`, v ? v.toUpperCase() : 'pending'];
+                            });
                             const cxMetrics = { readinessPct: overall, testsFailed: failTotal, openIssues: openIssues.length };
                             await generatePillarPDF({
                                 title: 'Commissioning Program', layer: 'Commissioning Engine', project: country?.name ?? 'DC-OS Project',
@@ -349,6 +356,7 @@ export function CommissioningEnginePage() {
                                         }),
                                     },
                                     { title: 'Systems in Scope', head: ['System', 'Units', 'Tests (screening)'], rows: systems.map((s) => [s.label, s.count, s.tests]) },
+                                    ...(istRows.length ? [{ title: 'Integrated Systems Tests (L5)', head: ['Scenario', 'Category', 'Duration', 'Status'], rows: istRows }] : []),
                                     ...(tickedRows.length ? [{ title: 'Checklist Status', head: ['Level', 'Activity', 'Witness', 'Status'], rows: tickedRows }] : []),
                                     { title: 'Issues & Punch', head: ['Severity', 'Item', 'Kind', 'Status'], rows: t.issues.map((x) => [x.sev, x.title, x.kind, x.open ? 'OPEN' : 'closed']) },
                                 ],
