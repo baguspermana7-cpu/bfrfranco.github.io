@@ -70,7 +70,17 @@ const RISK_STYLE: Record<string, string> = {
     low: 'bg-slate-100 dark:bg-slate-800 text-slate-500',
 };
 
+const IST_PREFIX = 'ist-scn:';
+const IST_STATUS_STYLE: Record<string, string> = {
+    pass: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+    fail: 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400',
+    pending: 'bg-slate-100 dark:bg-slate-800 text-slate-500',
+};
+
 function IstScenariosTab({ redundancy, openIst, setOpenIst }: { redundancy: string; openIst: string | null; setOpenIst: (id: string | null) => void }) {
+    const track = useCxTracking();
+    const setCheck = track.actions.setCheck;
+    const statusOf = (id: string): CxCheckValue => track.checklist[IST_PREFIX + id] ?? null;
     const all = (rzData()?.commissioning?.istScenarios ?? []) as IstScenario[];
     if (!all.length) return <div className="text-sm text-slate-500 py-10 text-center">Engine loading…</div>;
     const projClass = uiRedToClass(redundancy);
@@ -78,19 +88,34 @@ function IstScenariosTab({ redundancy, openIst, setOpenIst }: { redundancy: stri
     const applicable = all.filter((s) => REDUNDANCY_RANK[s.appliesFrom] <= projRank);
     const gated = all.filter((s) => REDUNDANCY_RANK[s.appliesFrom] > projRank);
     const totalHrs = applicable.reduce((s, x) => s + x.durationHrs, 0);
+    /* Editable pass/fail tracking (mirrors the Cx checklist) — persisted in the
+     * shared cxTracking store under an `ist-scn:` namespace (no readiness collision). */
+    const passed = applicable.filter((s) => statusOf(s.id) === 'pass').length;
+    const failed = applicable.filter((s) => statusOf(s.id) === 'fail').length;
+    const pending = applicable.length - passed - failed;
+    const pct = applicable.length ? Math.round((passed / applicable.length) * 100) : 0;
+    const setStatus = (id: string, v: CxCheckValue) => setCheck(IST_PREFIX + id, v);
     return (
         <div className="space-y-3">
             <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 px-3 py-2 text-[11px] text-slate-500">
                 <ListChecks className="mr-1 inline h-3.5 w-3.5 text-rz-mint" />
-                Level-5 Integrated Systems Test (IST) — the scripted failure scenarios that prove fault tolerance end-to-end: source transfers, bus-tie, black-building ride-through, and the mechanical <strong>N+2 → N degradation</strong> hotspot test with the cooling ramp-up response. Scenarios are gated to this project&apos;s redundancy ({projClass}); the dual-path transfers unlock at 2N. Each shows purpose, scripted method, acceptance, and <em>what to observe</em> during the transient. Source: engine <code>DATA.commissioning.istScenarios</code> (Uptime IST / NFPA 110 / ASHRAE TC9.9).
+                Level-5 Integrated Systems Test (IST) — the scripted failure scenarios that prove fault tolerance end-to-end: source transfers, bus-tie, black-building ride-through, and the mechanical <strong>N+2 → N degradation</strong> hotspot test with the cooling ramp-up response. Scenarios are gated to this project&apos;s redundancy ({projClass}); the dual-path transfers unlock at 2N. Mark each <strong>Pass/Fail</strong> as you witness it — the tally persists locally. Source: engine <code>DATA.commissioning.istScenarios</code> (Uptime IST / NFPA 110 / ASHRAE TC9.9).
             </div>
-            <div className="flex flex-wrap gap-2 text-[11px]">
-                <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-1 font-semibold text-slate-600 dark:text-slate-300">{applicable.length} scenarios in scope</span>
+            <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-1 font-semibold text-slate-600 dark:text-slate-300">{applicable.length} in scope</span>
+                <span className="rounded-lg bg-emerald-100 dark:bg-emerald-900/30 px-2.5 py-1 font-semibold text-emerald-700 dark:text-emerald-400">{passed} passed</span>
+                <span className="rounded-lg bg-rose-100 dark:bg-rose-900/30 px-2.5 py-1 font-semibold text-rose-700 dark:text-rose-400">{failed} failed</span>
+                <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-slate-500">{pending} pending</span>
                 <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-1 font-mono text-slate-500">≈ {totalHrs} test-hours</span>
-                <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-slate-500">redundancy {projClass}</span>
+                <div className="flex-1 min-w-[120px] h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                    <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                </div>
+                <span className="font-mono text-slate-500">{pct}% pass</span>
             </div>
             {applicable.map((s) => {
                 const open = openIst === s.id;
+                const status = statusOf(s.id);
+                const statusKey = status ?? 'pending';
                 return (
                     <div key={s.id} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 overflow-hidden">
                         <button onClick={() => setOpenIst(open ? null : s.id)} className="w-full flex items-start justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800/40">
@@ -98,6 +123,7 @@ function IstScenariosTab({ redundancy, openIst, setOpenIst }: { redundancy: stri
                                 <div className="flex items-center gap-2 flex-wrap mb-0.5">
                                     <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${CAT_STYLE[s.category] ?? CAT_STYLE.integrated}`}>{s.category}</span>
                                     <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${RISK_STYLE[s.risk] ?? RISK_STYLE.low}`}>{s.risk} risk</span>
+                                    <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${IST_STATUS_STYLE[statusKey]}`}>{status ?? 'pending'}</span>
                                     <span className="text-[9px] font-mono text-slate-400">{s.durationHrs}h · {s.appliesFrom}+</span>
                                 </div>
                                 <div className="text-sm font-bold text-slate-900 dark:text-white">{s.name}</div>
@@ -107,6 +133,15 @@ function IstScenariosTab({ redundancy, openIst, setOpenIst }: { redundancy: stri
                         </button>
                         {open && (
                             <div className="px-4 pb-4 pt-1 space-y-3 border-t border-slate-100 dark:border-slate-800/60">
+                                {/* Editable result — persisted, mirrors the Cx checklist ticks */}
+                                <div className="flex items-center gap-2 pt-2">
+                                    <span className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Result:</span>
+                                    <button onClick={() => setStatus(s.id, status === 'pass' ? null : 'pass')}
+                                        className={`text-[11px] font-semibold px-2.5 py-1 rounded border transition-colors ${status === 'pass' ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-emerald-400'}`}>Pass</button>
+                                    <button onClick={() => setStatus(s.id, status === 'fail' ? null : 'fail')}
+                                        className={`text-[11px] font-semibold px-2.5 py-1 rounded border transition-colors ${status === 'fail' ? 'bg-rose-500 border-rose-500 text-white' : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-rose-400'}`}>Fail</button>
+                                    {status && <button onClick={() => setStatus(s.id, null)} className="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 underline">clear</button>}
+                                </div>
                                 <IstBlock title="Pre-conditions" items={s.preconditions} />
                                 <IstBlock title="Method (scripted steps)" items={s.method} ordered />
                                 <div>

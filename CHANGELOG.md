@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.81 — 2026-07-26 (DCMOC — editable pass/fail tracking on the IST scenarios)
+
+### Added
+- **The IST Scenarios now carry editable Pass/Fail tracking, like the Cx checklist.** Each integrated-systems-test scenario has a Pass / Fail / clear control (in its expanded body) and a status badge in the header; the tab shows a live tally — passed / failed / pending + a % pass progress bar. State persists in the shared `cxTracking` store under an `ist-scn:` namespace (no collision with the readiness-driving checklist ticks), survives reload, and is plan-mode-clean until touched. Pure frontend reuse of the existing tracking store; no engine change. Verified: marking Pass updates the tally and persists across reload. Walk 31/0.
+
 ## v1.115.80 — 2026-07-26 (DCMOC — alternative on-site power technology research reference)
 
 ### Added
