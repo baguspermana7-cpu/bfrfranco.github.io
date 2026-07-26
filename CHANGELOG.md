@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.115.82 — 2026-07-26 (DCMOC — IST scenario pass/fail now drives the commissioning readiness index)
+
+### Changed
+- **The rich IST scenarios are now the single source for the `ist` readiness key.** Marking scenarios Pass/Fail in the IST Scenarios tab feeds the engine `readinessIndex` (via `checklistStats['ist']` = passed ÷ applicable, redundancy-filtered) and the overview per-level readiness bar + the Tests-passed tally — so the integrated-systems tests actually move operational readiness, not just a local count. The old shallow `CX_CHECKLIST['ist']` accordion is removed from the Cx Checklist tab (replaced by a pointer to the IST Scenarios tab) so there is exactly one IST source — no double-count. Verified: a Pass on the IST tab shows "1/10 passed" on the checklist pointer and lifts the `ist` readiness. Pure frontend; gates green (walk 31/0, trace-parity 116/116).
+
 ## v1.115.81 — 2026-07-26 (DCMOC — editable pass/fail tracking on the IST scenarios)
 
 ### Added

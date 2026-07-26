@@ -229,6 +229,16 @@ export function CommissioningEnginePage() {
             });
             checklistStats[k] = { total: items.length, pass, fail, ticked: pass + fail, derived };
         });
+        /* Unify: the 'ist' readiness key is now driven by the RICH IST scenarios
+         * (IST Scenarios tab), not the old shallow CX_CHECKLIST['ist'] items — a
+         * single source, no double-count. Filtered to the project redundancy. */
+        const istAll = (rzData()?.commissioning?.istScenarios ?? []) as { id: string; appliesFrom: 'N' | 'N+1' | '2N' }[];
+        const istProjRank = REDUNDANCY_RANK[uiRedToClass(inputs.powerRedundancy)];
+        const istApplicable = istAll.filter((s) => REDUNDANCY_RANK[s.appliesFrom] <= istProjRank);
+        let istPass = 0, istFail = 0;
+        istApplicable.forEach((s) => { const v = t.checklist[`${IST_PREFIX}${s.id}`]; if (v === 'pass') istPass++; else if (v === 'fail') istFail++; });
+        const istTicked = istPass + istFail;
+        checklistStats['ist'] = { total: istApplicable.length, pass: istPass, fail: istFail, ticked: istTicked, derived: (istApplicable.length > 0 && istTicked > 0) ? istPass / istApplicable.length : null };
         // readiness from tracking (ENGINE readinessIndex — real linkage).
         // Checklist-derived completion WINS over the coarse slider per key.
         let readiness: { index: number; status: string; label: string } | null = null;
@@ -373,7 +383,12 @@ export function CommissioningEnginePage() {
                         from this config are not rendered. Level names anchor to engine DATA.commissioning.labels; hover definitions are a labeled
                         local map (ASHRAE Guideline 0 / BCxA basis).
                     </div>
-                    {READY_KEYS.map((rk) => {
+                    {/* IST readiness is now tracked in the dedicated IST Scenarios tab (rich scenarios) — not here. */}
+                    <div className="rounded-lg border border-cyan-200 dark:border-cyan-900/40 bg-cyan-50/40 dark:bg-cyan-900/10 px-3 py-2 text-[11px] text-slate-500">
+                        <ListChecks className="mr-1 inline h-3.5 w-3.5 text-cyan-500" />
+                        Integrated Systems Test (IST) pass/fail moved to the <button onClick={() => setTab('ist')} className="font-semibold text-cyan-700 dark:text-cyan-400 hover:underline">IST Scenarios tab</button> — those scripted scenarios now drive the <code>ist</code> readiness key ({checklistStats['ist']?.pass ?? 0}/{checklistStats['ist']?.total ?? 0} passed).
+                    </div>
+                    {READY_KEYS.filter((rk) => rk.key !== 'ist').map((rk) => {
                         const key = rk.key as ReadinessKey;
                         const groups = itemsFor(key, inputs.coolingType, rich.equip as Record<string, number>);
                         const st = checklistStats[key];
