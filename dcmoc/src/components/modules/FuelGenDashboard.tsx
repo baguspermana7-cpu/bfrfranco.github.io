@@ -7,8 +7,9 @@ import { calculateGridReliability } from '@/modules/infrastructure/GridReliabili
 import { rzData, useEngineReady } from '@/lib/rz-engine';
 import {
     Fuel, Pencil, Check, X, Gauge, Droplets, Calendar, DollarSign,
-    BarChart3, AlertTriangle, Flame, Clock, Truck, ArrowUpRight, Zap
+    BarChart3, AlertTriangle, Flame, Clock, Truck, ArrowUpRight, Zap, ChevronDown
 } from 'lucide-react';
+import { StatusChip } from '@/components/ui/StatusChip';
 import clsx from 'clsx';
 import { fmtCompact, fmtMoney } from '@/lib/format';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -756,7 +757,7 @@ export default function FuelGenDashboard() {
                                 Alternative On-Site Power Technologies
                                 <span className="text-[10px] font-normal text-slate-400">research reference · not in the cost model</span>
                             </h3>
-                            <ArrowUpRight className={`w-4 h-4 shrink-0 text-slate-400 transition-transform ${showAltTech ? 'rotate-90' : ''}`} />
+                            <ChevronDown className={`w-4 h-4 shrink-0 text-slate-400 transition-transform ${showAltTech ? 'rotate-180' : ''}`} />
                         </button>
                         {showAltTech && (
                             <div className="mt-3">
@@ -791,7 +792,7 @@ export default function FuelGenDashboard() {
                                                     <td className="py-1.5 px-2 text-right font-mono text-slate-500">{r.powerDensityMwAcre}</td>
                                                     <td className="py-1.5 px-2 text-slate-500 whitespace-nowrap">{r.deploy}</td>
                                                     <td className="py-1.5 pl-2">
-                                                        <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${r.maturity === 'commercial' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : r.maturity === 'emerging' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>{r.maturity}</span>
+                                                        <StatusChip tone={r.maturity === 'commercial' ? 'data' : r.maturity === 'emerging' ? 'signal' : 'neutral'}>{r.maturity}</StatusChip>
                                                     </td>
                                                 </tr>
                                             ))}

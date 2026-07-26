@@ -16,6 +16,7 @@ import { useSimulationStore } from '@/store/simulation';
 import { useRequirementsStore } from '@/store/requirements';
 import { densityToEngineBucket } from '@/lib/requirementsMappings';
 import { useCxTracking, cxPlanMode, checklistDerivedCompletion, type CxCheckValue } from '@/store/cxTracking';
+import { StatusChip, type ChipTone } from '@/components/ui/StatusChip';
 import GanttChart from '@/components/visualizations/GanttChart';
 import { rzModels, rzData } from '@/lib/rz-engine';
 import { CX_CHECKLIST, resolveProc, type ReadinessKey, type ChecklistItem } from '@/lib/cx-procedures';
@@ -59,23 +60,14 @@ interface IstScenario {
 }
 const REDUNDANCY_RANK: Record<string, number> = { N: 0, 'N+1': 1, '2N': 2 };
 const uiRedToClass = (r: string): 'N' | 'N+1' | '2N' => (r === '2N' || r === '2N+1') ? '2N' : (r === 'N+1' ? 'N+1' : 'N');
-const CAT_STYLE: Record<string, string> = {
-    electrical: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
-    mechanical: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400',
-    integrated: 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400',
-};
-const RISK_STYLE: Record<string, string> = {
-    high: 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400',
-    med: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
-    low: 'bg-slate-100 dark:bg-slate-800 text-slate-500',
-};
+/* Polish — single rz-* token family (via StatusChip). category: electrical=signal,
+ * mechanical=info, integrated=neutral; risk: high=alert/med=signal/low=neutral;
+ * status: pass=data/fail=alert/pending=neutral — "pass" is rz-data everywhere. */
+const CAT_TONE: Record<string, ChipTone> = { electrical: 'signal', mechanical: 'info', integrated: 'neutral' };
+const RISK_TONE: Record<string, ChipTone> = { high: 'alert', med: 'signal', low: 'neutral' };
+const IST_STATUS_TONE: Record<string, ChipTone> = { pass: 'data', fail: 'alert', pending: 'neutral' };
 
 const IST_PREFIX = 'ist-scn:';
-const IST_STATUS_STYLE: Record<string, string> = {
-    pass: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
-    fail: 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400',
-    pending: 'bg-slate-100 dark:bg-slate-800 text-slate-500',
-};
 
 function IstScenariosTab({ redundancy, openIst, setOpenIst }: { redundancy: string; openIst: string | null; setOpenIst: (id: string | null) => void }) {
     const track = useCxTracking();
@@ -94,7 +86,19 @@ function IstScenariosTab({ redundancy, openIst, setOpenIst }: { redundancy: stri
     const failed = applicable.filter((s) => statusOf(s.id) === 'fail').length;
     const pending = applicable.length - passed - failed;
     const pct = applicable.length ? Math.round((passed / applicable.length) * 100) : 0;
-    const setStatus = (id: string, v: CxCheckValue) => setCheck(IST_PREFIX + id, v);
+    /* Polish — close the loop: a FAILED IST scenario auto-raises a linked open Cx
+     * issue (High), so a failed integrated test surfaces in the Issues & Punch list,
+     * the readiness guidance and the PDF. Passing or clearing closes the issue. */
+    const setStatus = (id: string, v: CxCheckValue, name: string) => {
+        setCheck(IST_PREFIX + id, v);
+        const issueId = `ist-fail:${id}`;
+        const existing = track.issues.find((x) => x.id === issueId);
+        if (v === 'fail') {
+            track.actions.upsertIssue({ id: issueId, title: `IST failed — ${name}`, sev: 'High', kind: 'issue', open: true });
+        } else if (existing && existing.open) {
+            track.actions.toggleIssue(issueId); // pass/clear → close the linked issue
+        }
+    };
     return (
         <div className="space-y-3">
             <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 px-3 py-2 text-[11px] text-slate-500">
@@ -103,12 +107,12 @@ function IstScenariosTab({ redundancy, openIst, setOpenIst }: { redundancy: stri
             </div>
             <div className="flex flex-wrap items-center gap-2 text-[11px]">
                 <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-1 font-semibold text-slate-600 dark:text-slate-300">{applicable.length} in scope</span>
-                <span className="rounded-lg bg-emerald-100 dark:bg-emerald-900/30 px-2.5 py-1 font-semibold text-emerald-700 dark:text-emerald-400">{passed} passed</span>
-                <span className="rounded-lg bg-rose-100 dark:bg-rose-900/30 px-2.5 py-1 font-semibold text-rose-700 dark:text-rose-400">{failed} failed</span>
+                <span className="rounded-lg bg-rz-data/10 px-2.5 py-1 font-semibold text-rz-data">{passed} passed</span>
+                <span className="rounded-lg bg-rz-alert/10 px-2.5 py-1 font-semibold text-rz-alert">{failed} failed</span>
                 <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-slate-500">{pending} pending</span>
                 <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2.5 py-1 font-mono text-slate-500">≈ {totalHrs} test-hours</span>
                 <div className="flex-1 min-w-[120px] h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                    <div className="h-full bg-rz-data rounded-full transition-all" style={{ width: `${pct}%` }} />
                 </div>
                 <span className="font-mono text-slate-500">{pct}% pass</span>
             </div>
@@ -121,9 +125,9 @@ function IstScenariosTab({ redundancy, openIst, setOpenIst }: { redundancy: stri
                         <button onClick={() => setOpenIst(open ? null : s.id)} className="w-full flex items-start justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800/40">
                             <div className="min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                                    <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${CAT_STYLE[s.category] ?? CAT_STYLE.integrated}`}>{s.category}</span>
-                                    <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${RISK_STYLE[s.risk] ?? RISK_STYLE.low}`}>{s.risk} risk</span>
-                                    <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${IST_STATUS_STYLE[statusKey]}`}>{status ?? 'pending'}</span>
+                                    <StatusChip tone={CAT_TONE[s.category] ?? 'neutral'}>{s.category}</StatusChip>
+                                    <StatusChip tone={RISK_TONE[s.risk] ?? 'neutral'}>{s.risk} risk</StatusChip>
+                                    <StatusChip tone={IST_STATUS_TONE[statusKey] ?? 'neutral'}>{status ?? 'pending'}</StatusChip>
                                     <span className="text-[9px] font-mono text-slate-400">{s.durationHrs}h · {s.appliesFrom}+</span>
                                 </div>
                                 <div className="text-sm font-bold text-slate-900 dark:text-white">{s.name}</div>
@@ -136,11 +140,12 @@ function IstScenariosTab({ redundancy, openIst, setOpenIst }: { redundancy: stri
                                 {/* Editable result — persisted, mirrors the Cx checklist ticks */}
                                 <div className="flex items-center gap-2 pt-2">
                                     <span className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Result:</span>
-                                    <button onClick={() => setStatus(s.id, status === 'pass' ? null : 'pass')}
-                                        className={`text-[11px] font-semibold px-2.5 py-1 rounded border transition-colors ${status === 'pass' ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-emerald-400'}`}>Pass</button>
-                                    <button onClick={() => setStatus(s.id, status === 'fail' ? null : 'fail')}
-                                        className={`text-[11px] font-semibold px-2.5 py-1 rounded border transition-colors ${status === 'fail' ? 'bg-rose-500 border-rose-500 text-white' : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-rose-400'}`}>Fail</button>
-                                    {status && <button onClick={() => setStatus(s.id, null)} className="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 underline">clear</button>}
+                                    <button onClick={() => setStatus(s.id, status === 'pass' ? null : 'pass', s.name)}
+                                        className={`text-[11px] font-semibold px-2.5 min-h-[32px] rounded border transition-colors ${status === 'pass' ? 'bg-rz-data border-rz-data text-white' : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-rz-data'}`}>Pass</button>
+                                    <button onClick={() => setStatus(s.id, status === 'fail' ? null : 'fail', s.name)}
+                                        className={`text-[11px] font-semibold px-2.5 min-h-[32px] rounded border transition-colors ${status === 'fail' ? 'bg-rz-alert border-rz-alert text-white' : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-rz-alert'}`}>Fail</button>
+                                    {status && <button onClick={() => setStatus(s.id, null, s.name)} className="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 underline min-h-[32px]">clear</button>}
+                                    {status === 'fail' && <span className="text-[10px] text-rz-alert">↳ raised a High issue</span>}
                                 </div>
                                 <IstBlock title="Pre-conditions" items={s.preconditions} />
                                 <IstBlock title="Method (scripted steps)" items={s.method} ordered />
@@ -148,8 +153,8 @@ function IstScenariosTab({ redundancy, openIst, setOpenIst }: { redundancy: stri
                                     <div className="text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Acceptance criteria</div>
                                     <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">{s.acceptance}</p>
                                 </div>
-                                <div className="rounded-lg border border-cyan-200 dark:border-cyan-900/40 bg-cyan-50/50 dark:bg-cyan-900/10 p-2.5">
-                                    <div className="text-[10px] font-bold uppercase tracking-wide text-cyan-700 dark:text-cyan-400 mb-1">What to observe (the transient)</div>
+                                <div className="rounded-lg border border-rz-info/30 bg-rz-info/10 p-2.5">
+                                    <div className="text-[10px] font-bold uppercase tracking-wide text-cyan-700 dark:text-rz-info mb-1">What to observe (the transient)</div>
                                     <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">{s.observe}</p>
                                 </div>
                                 <div className="flex flex-wrap items-center gap-1.5">
@@ -392,9 +397,9 @@ export function CommissioningEnginePage() {
                         local map (ASHRAE Guideline 0 / BCxA basis).
                     </div>
                     {/* IST readiness is now tracked in the dedicated IST Scenarios tab (rich scenarios) — not here. */}
-                    <div className="rounded-lg border border-cyan-200 dark:border-cyan-900/40 bg-cyan-50/40 dark:bg-cyan-900/10 px-3 py-2 text-[11px] text-slate-500">
-                        <ListChecks className="mr-1 inline h-3.5 w-3.5 text-cyan-500" />
-                        Integrated Systems Test (IST) pass/fail moved to the <button onClick={() => setTab('ist')} className="font-semibold text-cyan-700 dark:text-cyan-400 hover:underline">IST Scenarios tab</button> — those scripted scenarios now drive the <code>ist</code> readiness key ({checklistStats['ist']?.pass ?? 0}/{checklistStats['ist']?.total ?? 0} passed).
+                    <div className="rounded-lg border border-rz-info/30 bg-rz-info/10 px-3 py-2 text-[11px] text-slate-500">
+                        <ListChecks className="mr-1 inline h-3.5 w-3.5 text-rz-info" />
+                        Integrated Systems Test (IST) pass/fail moved to the <button onClick={() => setTab('ist')} className="font-semibold text-cyan-700 dark:text-rz-info hover:underline">IST Scenarios tab</button> — those scripted scenarios now drive the <code>ist</code> readiness key ({checklistStats['ist']?.pass ?? 0}/{checklistStats['ist']?.total ?? 0} passed).
                     </div>
                     {READY_KEYS.filter((rk) => rk.key !== 'ist').map((rk) => {
                         const key = rk.key as ReadinessKey;

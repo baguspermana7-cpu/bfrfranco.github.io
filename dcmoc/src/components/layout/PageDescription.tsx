@@ -71,7 +71,7 @@ export function PageDescription({ tabId }: { tabId: string }) {
     return (
         <div className="mx-4 sm:mx-6 lg:mx-8 mt-4 flex items-start gap-2.5 rounded-lg border border-slate-200 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/40 px-3.5 py-2.5"
             role="note" aria-label={`About the ${entry.title} page`}>
-            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cyan-500" />
+            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-rz-info" />
             <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
                 <span className="font-semibold text-slate-700 dark:text-slate-300">{entry.title}.</span>{' '}
                 {entry.what}

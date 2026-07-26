@@ -4,6 +4,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSimulationStore, normalizeStrategyMix, STRATEGY_MIX_PRESETS, StrategyMix, effectiveInHouseFrac } from '@/store/simulation';
 import { rzModels } from '@/lib/rz-engine';
+import { StatusChip } from '@/components/ui/StatusChip';
 import { useCapexStore } from '@/store/capex';
 import { ASSETS } from '@/constants/assets';
 import { calculateEnvironmentalDegradation } from '@/modules/maintenance/EnvironmentalLogic';
@@ -540,7 +541,7 @@ export function MaintenanceDashboard() {
             {activeTab === 'strategy' && (
                 <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-5 mb-6">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-1">
-                        <Wrench className="w-4 h-4 text-cyan-500" />
+                        <Wrench className="w-4 h-4 text-rz-info" />
                         Planned-Maintenance Compliance Regime <Tooltip content="Two ways to run a planned program. OEM-compliant executes every OEM PM task at the manufacturer's interval — maximum reliability and warranty compliance, maximum manpower. Standard consolidates most tasks to annual and keeps only 1-2 critical systems (UPS batteries, gensets) at OEM frequency — far fewer labor-hours, but ~12% higher failure exposure from deferred servicing." />
                     </h3>
                     <p className="text-xs text-slate-500 mb-3">Applies to the planned share of the strategy mix. Standard-annual trades a small reliability margin for a large manpower reduction.</p>
@@ -554,11 +555,11 @@ export function MaintenanceDashboard() {
                                 <button key={opt.id} type="button" onClick={() => actions.setInputs({ pmRegime: opt.id })}
                                     className={clsx(
                                         "text-left p-4 rounded-lg border transition-all",
-                                        active ? "border-cyan-500 ring-2 ring-cyan-500/30 bg-cyan-50/50 dark:bg-cyan-900/10" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                                        active ? "border-rz-info ring-2 ring-rz-info/30 bg-rz-info/5" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
                                     )}>
                                     <div className="flex items-center justify-between mb-1">
                                         <span className="text-sm font-bold text-slate-900 dark:text-white">{opt.title}</span>
-                                        {active && <span className="text-[9px] font-bold uppercase text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded">Selected</span>}
+                                        {active && <StatusChip tone="info">Selected</StatusChip>}
                                     </div>
                                     <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-2">{opt.desc}</p>
                                     {opt.fte != null && (
@@ -576,7 +577,7 @@ export function MaintenanceDashboard() {
                         const fteSaved = Math.max(0, pmRegimeCompare.oem.totalFte - pmRegimeCompare.std.totalFte);
                         const pmHSaved = pmRegimeCompare.oem.laborHours.pm - pmRegimeCompare.std.laborHours.pm;
                         return (
-                            <p className="mt-3 text-[11px] text-cyan-700 dark:text-cyan-400">
+                            <p className="mt-3 text-[11px] text-cyan-700 dark:text-rz-info">
                                 Switching OEM-full → standard-annual cuts <strong>{pmHSaved.toLocaleString()} PM labor-hours/yr</strong>
                                 {fteSaved > 0
                                     ? <> ≈ <strong>{fteSaved} fewer FTE</strong></>

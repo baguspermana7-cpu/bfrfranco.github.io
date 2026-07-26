@@ -563,7 +563,7 @@ export function CduDashboard() {
                             <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Water stream</th><th className="text-right">m³/yr</th><th className="pl-3 text-left">Basis</th></tr></thead>
                             <tbody>
                                 {([
-                                    ['Tower evaporation', water.evaporationM3, `IT×PUE heat × ${1.4} L/kWh_th × wet ${water.wetFraction}`],
+                                    ['Tower evaporation', water.evaporationM3, `IT×PUE heat × 1.4 L/kWh_th × wet ${water.wetFraction}`],
                                     ['Blowdown', water.blowdownM3, `evaporation ÷ (CoC ${water.cyclesOfConcentration} − 1)`],
                                     ['Drift', water.driftM3, '≈0.5% of evaporation (eliminators)'],
                                     ['Loop water makeup', Math.round(water.annualLoopWaterMakeupL / 1000), `15%/yr of ${(water.waterChargeL / 1000).toLocaleString()} m³ water charge`],
@@ -576,7 +576,7 @@ export function CduDashboard() {
                                 ))}
                                 <tr className="font-bold">
                                     <td className="py-1 text-slate-800 dark:text-white">Total site water</td>
-                                    <td className="text-right tabular-nums text-cyan-600 dark:text-cyan-400">{water.annualWaterM3.toLocaleString()}</td>
+                                    <td className="text-right tabular-nums text-cyan-700 dark:text-rz-info">{water.annualWaterM3.toLocaleString()}</td>
                                     <td className="pl-3 text-[9px] text-slate-400">+ {water.annualGlycolMakeupM3.toLocaleString()} m³ glycol makeup (chemical, not water)</td>
                                 </tr>
                             </tbody>

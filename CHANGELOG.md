@@ -13,6 +13,14 @@ release sections rather than semver.
 
 ---
 
+## v1.115.84 — 2026-07-26 (DCMOC — IST fail→issue loop + UIUX token polish of the session's new components)
+
+### Added
+- **A failed IST scenario now auto-raises a linked open Cx issue** (High severity), so a failed integrated test surfaces in the Issues & Punch list, the readiness guidance and the PDF — passing or clearing it closes the linked issue. Closes the loop from "test failed" to "tracked remediation."
+
+### Changed
+- **Design-token polish across the session's new components** (from a UIUX review). Introduced a shared `StatusChip` (rz-* semantic tokens) and routed every status/label badge through it so "pass" is `rz-data`, "fail" is `rz-alert`, and measured/info accents are `rz-info` site-wide — the IST tab, alt-power-tech maturity chips, and the pmRegime "Selected" pill were using raw `emerald`/`rose`/`cyan`/`violet` families that fought the palette. Also: PhasedFinancial negative states `red-500`→`rz-alert`; PageDescription + CDU + commissioning info accents →`rz-info`; the two new accordions standardized on `ChevronDown`; IST Pass/Fail tap targets raised to `min-h-[32px]`; and the one real a11y gap — the Phased Financial phase row (`<tr onClick>`) — is now keyboard-operable (`role="button"`, `tabIndex`, Enter/Space handler, focus ring). No engine change; gates green (walk 31/0), no new console errors.
+
 ## v1.115.83 — 2026-07-26 (DCMOC — IST scenarios in the Commissioning PDF export)
 
 ### Added
