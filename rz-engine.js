@@ -8152,6 +8152,12 @@
          * set for a fundable brief + use-case density/cooling profiles. Drives the
          * intake completeness score + sensible defaults per workload. ══ */
         requirements: {
+            /* Workstream C — rack FORM factor → floor-space (m²/rack) multiplier.
+             * 48U tall racks pack ~14% more usable U in the same footprint → higher
+             * compute density per m² → less floor space (0.90×). OCP Open Rack is
+             * 21-inch wide (vs 19") + open cold-aisle busbar → ~15% more footprint
+             * (1.15×). Screening — OCP OpenRack v3 21" spec; 48U vs 42U EIA-310. */
+            rackFormFactor: { std42u: 1.0, tall48u: 0.90, ocp: 1.15 },
             /* Fields a complete, fundable project brief must carry. */
             required: ['itLoadKw', 'targetTier', 'region', 'useCase', 'budgetUsd', 'deadlineMonths'],
             optional: ['customer', 'contractType', 'landAreaM2', 'codDate', 'utilityPartner'],
@@ -8826,6 +8832,7 @@
             'asset':                  { source: 'ASHRAE Equipment Life Expectancy + manufacturer service-life data (design lives); health-index weighting is an engine asset-management heuristic; lifecycle replacement intervals + $/kW lifted from DCMOC CapexEngine (UPS/gen/CRAC/PDU/BMS/fire)', asOf: '2026', unit: 'years + weights (sum=1) + health % + $/kW replacement', method: 'screening health + lifecycle model; NOT a condition survey' },
             'construction':           { source: 'Canonical DC build phase sequence (design→permit→procurement→civil→MEP→commissioning) + typical fast-track overlap factors — engine scheduling heuristic', asOf: '2026', unit: 'months (durations) + overlap fractions', method: 'CPM-style forward pass with per-phase overlap; screening schedule, NOT a resource-loaded programme' },
             'requirements':           { source: 'DC project brief required-field set + workload density/cooling profiles (AI/HPC/cloud/colo/enterprise/edge) — engine intake heuristic informed by Uptime/OCP rack-density guidance', asOf: '2026', unit: 'field list + kW/rack + cooling/tier defaults', method: 'completeness + profile defaults; not a design basis' },
+            'requirements.rackFormFactor': { source: 'Rack form-factor floor-space multiplier: 48U tall packs ~14% more usable U in the same footprint (EIA-310 48U vs 42U) → 0.90× floor; OCP Open Rack v3 is 21-inch wide + open busbar aisle → ~1.15× footprint vs 19-inch. Screening', asOf: '2026', unit: 'm²/rack multiplier', method: 'screening geometry factor — not a floor-plan layout' },
             'architecture':           { source: 'Canonical DC design disciplines (electrical/mechanical/cooling/fire/security/network/building/structural/BMS) + relative design-complexity multipliers by cooling/tier/redundancy — engine heuristic', asOf: '2026', unit: 'discipline list + complexity multipliers → 0-100 index', method: 'normalized complexity screen; NOT a design deliverable' },
             'maintenance':            { source: 'DC O&M strategy economics — reactive/planned/predictive failure + downtime multipliers + in-house/hybrid/vendor labor blend; lifted from DCMOC MaintenanceStrategyEngine (RCM/CBM industry conventions)', asOf: '2026', unit: 'multipliers + minutes + $/part', method: 'screening O&M cost model; NOT a vendor quote' },
             'fuelGen':                { source: 'EPA Tier 4 Final diesel genset fuel rate (~0.27 L/kWh @ 75%) + Uptime backup-autonomy hours by tier (48/72/96h) + genset unit classes 2.5MW≤100MW-IT/3MW above (CAT 3512E-3516E / Cummins QSK78 / MTU 20V4000 class) + CBRE FM 2025 PM benchmark $16-22k/unit·yr (+$5/kW variable) + UL-142-class 20kL tank modules; POWER-SOURCE model (backup/prime/hybrid) per ISO 8528 duty ratings (standby/prime/continuous) + industry O&M-interval practice; FUEL-TYPE model diesel/HVO(EN 15940 -90% lifecycle)/natural-gas(recip gas engine)/solar-BESS/fuel-cell(SOFC)/biogas-RNG CO2 + efficiency factors; lifted from DCMOC FuelGenEngine', asOf: '2026', unit: 'L/kWh + hours + $/L + kW + USD + mult', method: 'screening sizing; NOT a genset selection' },
@@ -14682,7 +14689,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-26-g"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-26-h"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

@@ -53,6 +53,7 @@ export interface CapexInput {
     coolingType: string;
     redundancy: string;
     rackType: string;
+    rackForm?: string;   // Workstream C — 'std42u'|'tall48u'|'ocp'; floor-space m²/rack factor
     upsType: string;
     genType: string;
     fuelHours: number;
@@ -327,7 +328,11 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
     // A8: PUE from shared constants (modern 2025 standards)
     const pue = getPUE(coolingType);
     const annualEnergy = itLoad * pue * 8760 * 0.10; // Global avg estimate; country-specific rate used in SensitivityEngine
-    const floorSpace = Math.ceil(racks * 2.5); // 2.5 m2 per rack
+    // Workstream C — rack form factor drives floor-space m²/rack (48U tall packs
+    // denser → 0.90×; OCP 21" open rack → 1.15×). Engine DATA.requirements.rackFormFactor.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rackFormFactor: number = ((rzData() as any)?.requirements?.rackFormFactor?.[input.rackForm ?? 'std42u']) ?? 1.0;
+    const floorSpace = Math.ceil(racks * 2.5 * rackFormFactor); // 2.5 m2 per rack × form factor
 
     // Compute Timeline
     const timeline = computeTimeline(redundancy, buildingType, coolingType, effectiveRegion);

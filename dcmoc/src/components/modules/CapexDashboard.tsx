@@ -3,7 +3,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useCapexStore } from '@/store/capex';
 import { useSimulationStore } from '@/store/simulation';
 import { COUNTRIES } from '@/constants/countries';
-import { rzModels } from '@/lib/rz-engine';
+import { rzModels, rzData } from '@/lib/rz-engine';
+import { AutoField } from '@/components/ui/AutoField';
 import {
     Calculator, Building, Zap, Server, BarChart3,
     Settings, Calendar, MapPin, DollarSign, Activity, TrendingUp,
@@ -41,6 +42,11 @@ const CapexDashboard = () => {
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const [heroBusy, setHeroBusy] = useState(false);
+    /* Workstream C — AutoField: fuel storage hours default AUTO from the tier's
+     * Uptime backup-autonomy band; tick to override. */
+    const [fuelOverride, setFuelOverride] = useState(false);
+    const autoFuelHours = ((rzData()?.fuelGen as { fuelStorageHoursByTier?: Record<number, number> } | undefined)?.fuelStorageHoursByTier?.[simInputs.tierLevel]) ?? 48;
+    useEffect(() => { if (!fuelOverride && inputs.fuelHours !== autoFuelHours) setInputs({ fuelHours: autoFuelHours }); }, [fuelOverride, autoFuelHours]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Hero image upload → client-side WebP compression → store (shown on the
     // Executive Dashboard Project Summary). Default is /dcmoc/hero-default.webp.
@@ -243,15 +249,12 @@ const CapexDashboard = () => {
                                     </select>
                                 </div>
                             </div>
-                            <div className="space-y-1">
-                                <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Fuel Storage: {inputs.fuelHours}h <Tooltip content="On-site fuel reserve in hours of full-load runtime. 48h is typical for Tier III. 72-168h for remote or hurricane-prone sites." /></div>
-                                <input type="range" min={12} max={168} step={12} value={inputs.fuelHours}
-                                    onChange={(e) => handleChange('fuelHours', Number(e.target.value))}
-                                    className="w-full accent-indigo-500" />
-                                <div className="flex justify-between text-[10px] text-slate-400 dark:text-slate-500">
-                                    <span>12h</span><span>72h</span><span>168h (7d)</span>
-                                </div>
-                            </div>
+                            <AutoField label="Fuel Storage" suffix="(h)" min={12} max={168}
+                                tip="On-site fuel reserve in hours of full-load generator runtime. Auto follows the Uptime backup-autonomy band for the tier (Tier II 48h · III 72h · IV 96h); override for remote or hurricane-prone sites (up to 168h / 7d)."
+                                override={fuelOverride} value={inputs.fuelHours}
+                                source={`Tier ${simInputs.tierLevel} backup autonomy — ${autoFuelHours}h (Uptime / NFPA 110)`}
+                                onToggle={(on) => setFuelOverride(on)}
+                                onChange={(v) => handleChange('fuelHours', Math.min(168, Math.max(12, v)))} />
                         </div>
 
                         {/* ─── FIRE PROTECTION ─── */}

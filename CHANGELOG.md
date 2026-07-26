@@ -13,6 +13,15 @@ release sections rather than semver.
 
 ---
 
+## v1.115.92 — 2026-07-26 (DCMOC — rack-form is now a real cost driver + AutoField extracted & rolled to CAPEX)
+
+### Added
+- **Rack Type (42U / 48U tall / OCP) now drives floor space** — previously an inert control. Backed by engine `DATA.requirements.rackFormFactor` (48U tall packs ~14% more usable U in the same footprint → 0.90× floor; OCP Open Rack is 21″ wide + open busbar aisle → 1.15×), wired into the CAPEX floor-space calc. Picking a rack form now moves floor space (and its building cost) + shows a hint of the effect. Sourced (OCP OpenRack v3 21″; EIA-310 48U vs 42U).
+- **CAPEX "Fuel Storage" now auto-derives with override** — the AUTO/OVERRIDE field primitive (previously embedded in the Financial page) is extracted to a shared `components/ui/AutoField.tsx` and applied to fuel-storage hours: AUTO follows the Uptime backup-autonomy band for the tier (II 48h · III 72h · IV 96h); tick to override for remote/hurricane sites. "Auto tapi bisa override."
+
+### Changed
+- Engine chain rebuilt (762/0, catalog 234 fns / 159 sources); gates green (walk 31/0, trace-parity 116/116, enum 25, reference-parity 155/0). Completes Workstream C of the IA/auto-derive program.
+
 ## v1.115.91 — 2026-07-26 (DCMOC — Time-to-COD tooltip + Target Rack Density auto-derives from architecture)
 
 ### Added

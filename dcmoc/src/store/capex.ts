@@ -44,6 +44,7 @@ const defaultInputs: CapexInput = {
     coolingType: 'air',
     redundancy: 'n1',
     rackType: 'standard',
+    rackForm: 'std42u',
     upsType: 'modular',
     genType: 'diesel',
     fuelHours: 48,

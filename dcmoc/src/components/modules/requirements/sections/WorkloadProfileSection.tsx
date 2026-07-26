@@ -249,7 +249,9 @@ export function WorkloadProfileSection({ totalRacks }: { totalRacks: number }) {
                             <p className="mt-0.5 text-[9px] text-amber-500">manual override — auto = {totalRacks.toLocaleString()}</p>
                         )}
                     </Field>
-                    <Field label="Rack Type" explainKey="rack"><Select value={w.rackForm} onChange={(v) => set({ rackForm: v })} options={RACK_FORMS} /></Field>
+                    <Field label="Rack Type" explainKey="rack" hint={w.rackForm === 'tall48u' ? '48U tall — packs denser: ~10% less floor space.' : w.rackForm === 'ocp' ? 'OCP Open Rack (21″, busbar) — ~15% more footprint; the AI-hardware standard.' : '19″ 42U standard — baseline floor footprint.'}>
+                        <Select value={w.rackForm} onChange={(v) => { set({ rackForm: v }); useCapexStore.getState().setInputs({ rackForm: v }); }} options={RACK_FORMS} />
+                    </Field>
                 </div>
             </div>
 
