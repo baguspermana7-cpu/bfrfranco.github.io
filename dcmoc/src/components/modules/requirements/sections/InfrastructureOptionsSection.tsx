@@ -184,6 +184,10 @@ export function InfrastructureOptionsSection() {
                         <Segmented<string> value={inputs.siteCondition ?? 'greenfield'} onChange={(v) => setInputs({ siteCondition: v })}
                             options={[{ value: 'greenfield', label: 'Greenfield' }, { value: 'brownfield', label: 'Brownfield' }]} />
                     </Field>
+                    <Field label="Market Condition" explainKey="market-condition">
+                        <Select value={inputs.marketCondition ?? 'normal'} onChange={(v) => setInputs({ marketCondition: v })}
+                            options={[{ value: 'favorable', label: 'Favorable (Low Labor)' }, { value: 'normal', label: 'Normal' }, { value: 'tight', label: 'Tight (Premium)' }, { value: 'overheated', label: 'Overheated (+15%)' }]} />
+                    </Field>
                     <Field label="Floor System" explainKey="raised-floor">
                         <Segmented<string> value={inputs.floorType ?? 'slab'} onChange={(v) => setInputs({ floorType: v })}
                             options={[{ value: 'slab', label: 'Slab (overhead)' }, { value: 'raised', label: 'Raised Floor' }]} />

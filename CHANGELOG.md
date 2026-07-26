@@ -13,6 +13,16 @@ release sections rather than semver.
 
 ---
 
+## v1.115.88 — 2026-07-26 (DCMOC — CAPEX "Assumptions & Config" dedup: one owner per field)
+
+### Changed
+- **Removed the duplicated content from the CAPEX Assumptions & Config sub-tab** so each thing has a single edit home and the wiring can't diverge:
+  - The **project-timeline Gantt** (which the Construction page already owns, with the 4-level WBS + planned-vs-actual EVM) is gone from CAPEX — replaced by a compact "Construction timeline: N mo (L2 cost basis)" line + an **"Open full schedule & EVM in Construction ↗"** jump.
+  - **Building Type**, **Site Condition** and **Market Condition** — which are (or now are) owned by Requirements → Infrastructure — are read-only mirrors on the CAPEX page (value + "Edit in Requirements ↗"), matching the existing shared-canonicals pattern. Market Condition was added to Requirements → Infrastructure so all three sit together.
+- Net: no field is editable in two places. Editing them in Requirements still flows through to the CAPEX total (same store). Pure frontend; walk 31/0, trace-parity 116/116.
+
+> Note: several other infrastructure parameters (substation / UPS / generator / fuel / fire / floor / seismic) are still editable in both the CAPEX Assumptions tab and Requirements → Infrastructure — a broader dedup pass for a follow-up.
+
 ## v1.115.87 — 2026-07-26 (DCMOC — alternative power tech wired into a real CAPEX/OPEX/CO₂ delta)
 
 ### Changed

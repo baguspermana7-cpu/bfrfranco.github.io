@@ -10,7 +10,6 @@ import {
     Flame, Fuel, Leaf, Shield, Cable, Layers, HardDrive, Lock, Globe2, Waves,
     Image as ImageIcon, Upload, RotateCcw
 } from 'lucide-react';
-import GanttChart from '@/components/visualizations/GanttChart';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
@@ -18,6 +17,23 @@ import { fmtMoney, fmt } from '@/lib/format';
 import { compressToWebp, dataUrlBytes } from '@/lib/imageCompress';
 
 import { REGIONS, REGION_LABELS } from '@/lib/regions';
+
+/* Workstream A — read-only mirror of a field whose canonical edit home is another
+ * page (Requirements / Construction). Same idiom as the shared-canonicals block;
+ * kills the duplicate edit surface so the wiring has one owner. */
+function RedMirror({ icon: Ic, label, value, tip, homeLabel, onJump }: {
+    icon: React.ComponentType<{ className?: string }>; label: string; value: string; tip: string; homeLabel: string; onJump: () => void;
+}) {
+    return (
+        <div className="space-y-1">
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1"><Ic className="w-3 h-3" /> {label} <Tooltip content={tip} /></label>
+            <div className="rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-2.5 py-1.5 flex items-center justify-between gap-2">
+                <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{value}<span className="ml-1.5 rounded bg-rz-info/15 px-1 py-0.5 text-[8px] font-semibold uppercase text-cyan-700 dark:text-rz-info">{homeLabel}</span></span>
+                <button onClick={onJump} className="shrink-0 text-[10px] font-medium text-rz-mint hover:underline">Edit ↗</button>
+            </div>
+        </div>
+    );
+}
 
 const CapexDashboard = () => {
     const { inputs, results, setInputs, runCalculation, narrative, heroImage, setHeroImage } = useCapexStore();
@@ -192,19 +208,12 @@ const CapexDashboard = () => {
                             )}
                         </div>
 
-                        {/* ─── BUILDING ─── */}
-                        <div className="space-y-2">
-                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center">
-                                <Building className="w-3 h-3 mr-1" /> Building Type <Tooltip content="Construction type affects cost/m². Purpose-built is standard. Modular/prefab can reduce timeline by 40%." />
-                            </label>
-                            <select className="w-full p-2 border rounded-md text-sm text-slate-700 bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.buildingType}
-                                onChange={(e) => handleChange('buildingType', e.target.value)}>
-                                <option value="purpose">Purpose Built (Standard)</option>
-                                <option value="warehouse">Warehouse Conversion</option>
-                                <option value="modular">Modular / Prefab</option>
-                                <option value="highrise">Vertical High-Rise</option>
-                            </select>
-                        </div>
+                        {/* ─── BUILDING — canonical home Requirements (Workstream A dedup) ─── */}
+                        {(() => {
+                            const bt = inputs.buildingType;
+                            const btLabel = bt === 'warehouse' ? 'Warehouse Conversion' : bt === 'modular' ? 'Modular / Prefab' : bt === 'highrise' ? 'Vertical High-Rise' : 'Purpose Built (Standard)';
+                            return <RedMirror icon={Building} label="Building Type" value={btLabel} tip="Owned by Requirements (Infrastructure) — the facility design basis; affects cost/m² + construction method. Edit it there so power/cooling/CAPEX share one value." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />;
+                        })()}
 
                         {/* Rack Density is a shared canonical — shown read-only above (Requirements). */}
 
@@ -491,31 +500,19 @@ const CapexDashboard = () => {
                                     </div>
                                 </div>
 
-                                {/* Site & Market */}
-                                <div className="space-y-2">
-                                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1">Site & Market Conditions <Tooltip content="Site preparation and labor market conditions that affect construction cost and timeline. Brownfield and overheated markets can add 10-20% to baseline costs." /></label>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="space-y-1">
-                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Site Condition <Tooltip content="Greenfield: undeveloped land, clean build but needs full site works. Brownfield: previously developed land, may require demolition or remediation. Retrofit: converting an existing building — saves on shell but limits design flexibility." /></div>
-                                            <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.siteCondition || 'greenfield'}
-                                                onChange={(e) => handleChange('siteCondition', e.target.value)}>
-                                                <option value="greenfield">Greenfield</option>
-                                                <option value="brownfield">Brownfield</option>
-                                                <option value="retrofit">Retrofit / Existing</option>
-                                            </select>
+                                {/* Site & Market — canonical home Construction (Workstream A dedup) */}
+                                {(() => {
+                                    const sc = inputs.siteCondition || 'greenfield';
+                                    const scLabel = sc === 'brownfield' ? 'Brownfield' : sc === 'retrofit' ? 'Retrofit / Existing' : 'Greenfield';
+                                    const mc = inputs.marketCondition || 'normal';
+                                    const mcLabel = mc === 'favorable' ? 'Favorable (Low Labor)' : mc === 'tight' ? 'Tight (Premium)' : mc === 'overheated' ? 'Overheated (+15%)' : 'Normal';
+                                    return (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            <RedMirror icon={HardDrive} label="Site Condition" value={scLabel} tip="Owned by Requirements (Infrastructure) — greenfield/brownfield/retrofit drives demolition/remediation + schedule risk. Edit it there so it's one value." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
+                                            <RedMirror icon={TrendingUp} label="Market Condition" value={mcLabel} tip="Owned by Requirements (Infrastructure) — labor-market tightness drives crew, lead times + a construction cost premium. Edit it there." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
                                         </div>
-                                        <div className="space-y-1">
-                                            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Market Condition <Tooltip content="Favorable: low labor demand, competitive bidding — cost savings. Normal: standard market pricing. Tight: skilled labor shortage, longer lead times. Overheated: extreme demand (e.g., NoVA 2024), adds ~15% premium with extended schedules." /></div>
-                                            <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.marketCondition || 'normal'}
-                                                onChange={(e) => handleChange('marketCondition', e.target.value)}>
-                                                <option value="favorable">Favorable (Low Labor)</option>
-                                                <option value="normal">Normal</option>
-                                                <option value="tight">Tight (Premium)</option>
-                                                <option value="overheated">Overheated (+15%)</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
+                                    );
+                                })()}
                             </div>
                         )}
                     </CardContent>
@@ -701,23 +698,23 @@ const CapexDashboard = () => {
                     </CardContent>
                 </Card>
 
-                {/* L2 Gantt Chart - Project Timeline */}
+                {/* Project timeline — canonical home Construction (Workstream A dedup: the
+                    Gantt + plan/actuals/EVM live on the Construction page; CAPEX shows only
+                    the derived cost-basis duration + a jump, no duplicate Gantt). */}
                 <Card>
-                    <CardHeader>
-                        <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                            <Calendar className="w-4 h-4" /> Project Timeline — L2 Schedule
-                            <Tooltip content="Interactive Gantt chart showing L1 phase groups and L2 sub-activities. Click phase headers to expand/collapse. Bars are positioned by actual start month with overlapping activities shown accurately." />
-                        </CardTitle>
-                        <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
-                            Click phase headers to expand/collapse L2 sub-phases. Hover bars for duration details.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <GanttChart
-                            phases={timeline.phases}
-                            subPhases={timeline.subPhases || []}
-                            totalMonths={timeline.totalMonths}
-                        />
+                    <CardContent className="pt-5">
+                        <div className="flex items-center justify-between gap-3 flex-wrap">
+                            <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-slate-400" />
+                                <div>
+                                    <div className="text-sm font-semibold text-slate-700 dark:text-slate-300">Construction timeline: {timeline.totalMonths} mo <span className="text-[10px] font-normal text-slate-400">(L2 cost basis)</span></div>
+                                    <div className="text-[11px] text-slate-500 dark:text-slate-400">The full Gantt, 4-level WBS and planned-vs-actual EVM live on the Construction page — one owner, no duplicate.</div>
+                                </div>
+                            </div>
+                            <button onClick={() => actions.setActiveTab('construction')} className="shrink-0 inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-rz-mint">
+                                Open full schedule & EVM in Construction ↗
+                            </button>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
