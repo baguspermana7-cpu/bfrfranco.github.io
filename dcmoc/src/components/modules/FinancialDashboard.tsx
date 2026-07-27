@@ -25,6 +25,7 @@ import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 import html2canvas from 'html2canvas';
 import { fmt, fmtMoney, fmtPct } from '@/lib/format';
 import { explainThresholdMetric, ThresholdLeverSpec, ThresholdMetricExplain } from '@/lib/decision-explain';
+import { FinancialStatements } from '@/components/modules/finance/FinancialStatements';
 
 /* ─── Diagnostics Tier-1: NPV / ROI thresholds ───────────────────────────────
  * SINGLE SOURCE for (a) KPI red/green coloring, (b) the click-to-explain
@@ -1131,6 +1132,21 @@ const FinancialDashboard = () => {
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* ═══ Financial Statements — P&L · Balance Sheet · Sankey (WS2) ═══ */}
+                {result && capexResults && (
+                    <FinancialStatements
+                        cashflows={result.cashflows}
+                        capex={capexResults.total}
+                        taxRate={finInputs.taxRate}
+                        depreciationYears={finInputs.depreciationYears}
+                        projectLifeYears={finInputs.projectLifeYears}
+                        countryCode={selectedCountry?.id ?? 'US'}
+                        itLoadKw={inputs.itLoad}
+                        pue={(rzData().pueMatrix as Record<string, Record<string, number>> | undefined)?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? 1.4}
+                        cooling={inputs.coolingType}
+                    />
+                )}
 
                 {/* ═══ B11: OCCUPANCY IMPACT CHART ═══ */}
                 {(() => {

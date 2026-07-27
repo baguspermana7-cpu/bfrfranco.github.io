@@ -13,6 +13,17 @@ release sections rather than semver.
 
 ---
 
+## v1.117.0 — 2026-07-27 (DCMOC — Financial Statements: P&L · Balance Sheet · Sankey)
+
+### Added
+- **Detailed project financial statements** on the Financial → Pro Forma (Full) tab, driven by the same engine cashflows the KPIs use (no re-computed or fabricated financials):
+  - **Income Statement (P&L)** — per-year Revenue → OPEX → EBITDA → Depreciation (tax shield) → Taxable Income → Tax → **Net Cash Flow (after-tax)**, with EBITDA/net margins. Labelled to match the engine's convention exactly (`taxableIncome = max(0, EBITDA − depreciation)`, `netIncome = EBITDA − tax` = unlevered FCF; depreciation is a non-cash tax shield added back), so the statement reconciles line-to-line.
+  - **Balance Sheet** — assets (net PP&E + cash) = liabilities (debt schedule from an adjustable debt-ratio + debt-rate) + equity (paid-in + retained earnings). Cash is the accounting identity plug (cumulative net income + D&A − principal), so the sheet **balances by construction** — a live check asserts a < $1 residual every year. Operating P&L is unlevered (project basis, matches NPV/IRR); interest is a financing memo.
+  - **Sankey** — the actual money distribution for a stabilized year: Revenue → each OPEX group (from the WS1 per-country breakdown, scaled to the P&L OPEX) + EBITDA → Tax / Net Cash Flow. Depreciation (non-cash) is correctly excluded; renders only when the cash chain is positive, else an honest note.
+
+### Changed
+- Guarded the OPEX-breakdown call against the deferred-engine race (persisted CAPEX can mount the statements before `window.RZEngine` loads) with an engine-readiness tick, so the Sankey populates deterministically. DCMOC build green; walk 31/0, trace-parity 116/116.
+
 ## v1.116.0 — 2026-07-27 (DCMOC — complete per-country OPEX model + maintenance-strategy taxonomy)
 
 ### Added
