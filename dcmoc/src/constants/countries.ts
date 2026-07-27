@@ -154,12 +154,34 @@ export interface CountryProfile {
         storageLimitLiters: number;
         fuelQualityRating: 'high' | 'moderate' | 'low';
     };
+    /* ── WS0 OPEX research pass (2026-07-27, 3-agent sourced): per-country
+     * location-variant annual operating-cost factors that are NOT already
+     * derivable from labor/electricity/tax fields. Every value has a
+     * corpus row in tools/dc-corpus/opex-research/facts.jsonl (source_url +
+     * quote + confidence). Screening-confidence cells (no direct primary
+     * citation, extrapolated from a benchmark) are logged there.
+     *   waterTariffPerM3 — industrial/commercial water tariff, USD/m3.
+     *   landLeasePerM2Yr — industrial/DC land lease/ground rent, USD/m2/yr.
+     *   propertyTaxRatePct — recurring property/local tax, % of asset value/yr.
+     *   corpInternetPerMbpsMo — enterprise DIA/IP-transit, USD/Mbps/mo (~1Gbps tier).
+     *   cleaningCostPerM2Yr — outsourced janitorial, USD/m2 gross floor/yr.
+     *   securityGuardCostPerGuardYr — fully-loaded cost of ONE guard, USD/yr
+     *     (a 24/7 post needs ~4.5 such guards). */
+    opex?: {
+        waterTariffPerM3: number;
+        landLeasePerM2Yr: number;
+        propertyTaxRatePct: number;
+        corpInternetPerMbpsMo: number;
+        cleaningCostPerM2Yr: number;
+        securityGuardCostPerGuardYr: number;
+    };
     lastUpdated: string; // Data freshness indicator e.g. '2025-Q1'
 }
 
 export const COUNTRIES: Record<string, CountryProfile> = {
     ID: {
         id: 'ID',
+        opex: { waterTariffPerM3: 1.35, landLeasePerM2Yr: 42, propertyTaxRatePct: 0.2, corpInternetPerMbpsMo: 3.5, cleaningCostPerM2Yr: 9, securityGuardCostPerGuardYr: 6800 },
         region: 'APAC',
         name: 'Indonesia',
         currency: 'USD',
@@ -266,6 +288,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     SG: {
         id: 'SG',
+        opex: { waterTariffPerM3: 2.4, landLeasePerM2Yr: 55, propertyTaxRatePct: 1, corpInternetPerMbpsMo: 0.6, cleaningCostPerM2Yr: 19, securityGuardCostPerGuardYr: 42000 },
         region: 'APAC',
         name: 'Singapore',
         currency: 'SGD',
@@ -370,6 +393,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     MY: {
         id: 'MY',
+        opex: { waterTariffPerM3: 0.83, landLeasePerM2Yr: 46, propertyTaxRatePct: 0.5, corpInternetPerMbpsMo: 2.5, cleaningCostPerM2Yr: 8, securityGuardCostPerGuardYr: 9500 },
         region: 'APAC',
         name: 'Malaysia',
         currency: 'MYR',
@@ -474,6 +498,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     US: {
         id: 'US',
+        opex: { waterTariffPerM3: 2.5, landLeasePerM2Yr: 108, propertyTaxRatePct: 1.82, corpInternetPerMbpsMo: 1, cleaningCostPerM2Yr: 18.8, securityGuardCostPerGuardYr: 56160 },
         region: 'AMER',
         name: 'United States',
         currency: 'USD',
@@ -579,6 +604,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     JP: {
         id: 'JP',
+        opex: { waterTariffPerM3: 0.91, landLeasePerM2Yr: 113, propertyTaxRatePct: 1.4, corpInternetPerMbpsMo: 1.5, cleaningCostPerM2Yr: 30, securityGuardCostPerGuardYr: 22600 },
         region: 'APAC',
         name: 'Japan',
         currency: 'JPY',
@@ -681,6 +707,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     AU: {
         id: 'AU',
+        opex: { waterTariffPerM3: 2.49, landLeasePerM2Yr: 102, propertyTaxRatePct: 2, corpInternetPerMbpsMo: 0.33, cleaningCostPerM2Yr: 30, securityGuardCostPerGuardYr: 52000 },
         region: 'APAC',
         name: 'Australia',
         currency: 'AUD',
@@ -779,6 +806,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     // ─── MENA ───────────────────────────────────────────────
     AE: {
+        opex: { waterTariffPerM3: 2.4, landLeasePerM2Yr: 118, propertyTaxRatePct: 0.4, corpInternetPerMbpsMo: 3.5, cleaningCostPerM2Yr: 40, securityGuardCostPerGuardYr: 21000 },
         id: 'AE', region: 'MENA', name: 'UAE', currency: 'USD', currencySymbol: '$',
         // 2026: UAE Corp Tax 9% (since Jun 2023, free zones still 0% qualifying income)
         // Electricity: ~$0.09/kWh for industrial (DEWA tariff band E 2025)
@@ -859,6 +887,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     SA: {
+        opex: { waterTariffPerM3: 2.14, landLeasePerM2Yr: 55, propertyTaxRatePct: 0.25, corpInternetPerMbpsMo: 3.5, cleaningCostPerM2Yr: 32, securityGuardCostPerGuardYr: 22000 },
         id: 'SA', region: 'MENA', name: 'Saudi Arabia', currency: 'SAR', currencySymbol: '﷼',
         economy: { inflationRate: 0.02, laborEscalation: 0.035, taxRate: 0.20, electricityRate: 0.05 },
         constructionIndex: 0.8, // SA rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
@@ -936,6 +965,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     QA: {
+        opex: { waterTariffPerM3: 1.79, landLeasePerM2Yr: 62, propertyTaxRatePct: 0.2, corpInternetPerMbpsMo: 4, cleaningCostPerM2Yr: 42, securityGuardCostPerGuardYr: 22000 },
         id: 'QA', region: 'MENA', name: 'Qatar', currency: 'QAR', currencySymbol: 'QR',
         economy: { inflationRate: 0.02, laborEscalation: 0.03, taxRate: 0.10, electricityRate: 0.04 },
         constructionIndex: 0.85, // QA rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
@@ -1014,6 +1044,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     // ─── AFRICA ─────────────────────────────────────────────
     ZA: {
+        opex: { waterTariffPerM3: 3.71, landLeasePerM2Yr: 39, propertyTaxRatePct: 2, corpInternetPerMbpsMo: 1, cleaningCostPerM2Yr: 8, securityGuardCostPerGuardYr: 10000 },
         id: 'ZA', region: 'AFR', name: 'South Africa', currency: 'ZAR', currencySymbol: 'R',
         economy: { inflationRate: 0.05, laborEscalation: 0.06, taxRate: 0.27, electricityRate: 0.10 },
         constructionIndex: 0.55, // ZA rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
@@ -1087,6 +1118,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     NG: {
+        opex: { waterTariffPerM3: 0.5, landLeasePerM2Yr: 40, propertyTaxRatePct: 0.39, corpInternetPerMbpsMo: 8, cleaningCostPerM2Yr: 6, securityGuardCostPerGuardYr: 3000 },
         id: 'NG', region: 'AFR', name: 'Nigeria', currency: 'USD', currencySymbol: '$',
         economy: { inflationRate: 0.14, laborEscalation: 0.08, taxRate: 0.30, electricityRate: 0.12 },
         constructionIndex: 0.75, // NG rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
@@ -1160,6 +1192,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     KE: {
+        opex: { waterTariffPerM3: 0.9, landLeasePerM2Yr: 60, propertyTaxRatePct: 0.35, corpInternetPerMbpsMo: 1.5, cleaningCostPerM2Yr: 6, securityGuardCostPerGuardYr: 5000 },
         id: 'KE', region: 'AFR', name: 'Kenya', currency: 'KES', currencySymbol: 'KSh',
         economy: { inflationRate: 0.07, laborEscalation: 0.06, taxRate: 0.30, electricityRate: 0.15 },
         constructionIndex: 0.6, // KE rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
@@ -1234,6 +1267,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     // ─── LATIN AMERICA ──────────────────────────────────────
     BR: {
+        opex: { waterTariffPerM3: 3.4, landLeasePerM2Yr: 78.5, propertyTaxRatePct: 1.5, corpInternetPerMbpsMo: 2.5, cleaningCostPerM2Yr: 28, securityGuardCostPerGuardYr: 20000 },
         id: 'BR', region: 'LATAM', name: 'Brazil', currency: 'BRL', currencySymbol: 'R$',
         economy: { inflationRate: 0.045, laborEscalation: 0.05, taxRate: 0.34, electricityRate: 0.10 },
         constructionIndex: 0.6, // BR rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
@@ -1307,6 +1341,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     CL: {
+        opex: { waterTariffPerM3: 2, landLeasePerM2Yr: 76, propertyTaxRatePct: 1.2, corpInternetPerMbpsMo: 3, cleaningCostPerM2Yr: 13, securityGuardCostPerGuardYr: 27800 },
         id: 'CL', region: 'LATAM', name: 'Chile', currency: 'CLP', currencySymbol: 'CL$',
         economy: { inflationRate: 0.04, laborEscalation: 0.04, taxRate: 0.27, electricityRate: 0.12 },
         constructionIndex: 0.65, // CL rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
@@ -1380,6 +1415,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     MX: {
+        opex: { waterTariffPerM3: 1.34, landLeasePerM2Yr: 86, propertyTaxRatePct: 0.3, corpInternetPerMbpsMo: 2.5, cleaningCostPerM2Yr: 8, securityGuardCostPerGuardYr: 18000 },
         id: 'MX', region: 'LATAM', name: 'Mexico', currency: 'MXN', currencySymbol: 'MX$',
         economy: { inflationRate: 0.04, laborEscalation: 0.05, taxRate: 0.30, electricityRate: 0.09 },
         constructionIndex: 0.6, // MX rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
@@ -1453,6 +1489,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     CO: {
+        opex: { waterTariffPerM3: 3.4, landLeasePerM2Yr: 72, propertyTaxRatePct: 1, corpInternetPerMbpsMo: 3, cleaningCostPerM2Yr: 18, securityGuardCostPerGuardYr: 15000 },
         id: 'CO', region: 'LATAM', name: 'Colombia', currency: 'COP', currencySymbol: 'CO$',
         // 2026: Colombia C&I electricity ~COP 700-900/kWh; currency depreciation pushes USD equivalent ~$0.09-0.11
         economy: { inflationRate: 0.06, laborEscalation: 0.055, taxRate: 0.35, electricityRate: 0.10 },
@@ -1528,6 +1565,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     // ─── EXPANDED APAC ──────────────────────────────────────
     IN: {
+        opex: { waterTariffPerM3: 0.6, landLeasePerM2Yr: 33, propertyTaxRatePct: 1.2, corpInternetPerMbpsMo: 1.06, cleaningCostPerM2Yr: 6.5, securityGuardCostPerGuardYr: 4200 },
         id: 'IN', region: 'APAC', name: 'India', currency: 'INR', currencySymbol: '₹',
         economy: { inflationRate: 0.05, laborEscalation: 0.07, taxRate: 0.2517, electricityRate: 0.07 },
         constructionIndex: 0.55, // IN rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
@@ -1606,6 +1644,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     CN: {
+        opex: { waterTariffPerM3: 0.39, landLeasePerM2Yr: 66, propertyTaxRatePct: 1.2, corpInternetPerMbpsMo: 5, cleaningCostPerM2Yr: 12, securityGuardCostPerGuardYr: 20100 },
         id: 'CN', region: 'APAC', name: 'China', currency: 'CNY', currencySymbol: '¥',
         economy: { inflationRate: 0.02, laborEscalation: 0.06, taxRate: 0.25, electricityRate: 0.06 },
         constructionIndex: 0.7, // CN rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
@@ -1682,6 +1721,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     KR: {
+        opex: { waterTariffPerM3: 0.55, landLeasePerM2Yr: 90, propertyTaxRatePct: 0.25, corpInternetPerMbpsMo: 1.3, cleaningCostPerM2Yr: 22, securityGuardCostPerGuardYr: 30900 },
         id: 'KR', region: 'APAC', name: 'South Korea', currency: 'KRW', currencySymbol: '₩',
         // 2026: KEPCO industrial tariff raised 2023-2024; now ~$0.13-0.14/kWh large industrial
         economy: { inflationRate: 0.025, laborEscalation: 0.04, taxRate: 0.22, electricityRate: 0.135 },
@@ -1756,6 +1796,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     TH: {
+        opex: { waterTariffPerM3: 0.42, landLeasePerM2Yr: 48, propertyTaxRatePct: 0.3, corpInternetPerMbpsMo: 3, cleaningCostPerM2Yr: 8, securityGuardCostPerGuardYr: 7500 },
         id: 'TH', region: 'APAC', name: 'Thailand', currency: 'THB', currencySymbol: '฿',
         // 2026: EGAT + MEA raised rates 2023-2024; industrial C&I ~THB 3.5-4.0/kWh = ~$0.09-0.11 USD
         economy: { inflationRate: 0.02, laborEscalation: 0.04, taxRate: 0.20, electricityRate: 0.10 },
@@ -1830,6 +1871,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     VN: {
+        opex: { waterTariffPerM3: 0.85, landLeasePerM2Yr: 60, propertyTaxRatePct: 0.2, corpInternetPerMbpsMo: 3, cleaningCostPerM2Yr: 7, securityGuardCostPerGuardYr: 5500 },
         id: 'VN', region: 'APAC', name: 'Vietnam', currency: 'VND', currencySymbol: '₫',
         // 2026: EVN raised industrial tariffs ~20% in 2023; current C&I ~VND 2,000-2,400/kWh = ~$0.08-0.10
         economy: { inflationRate: 0.035, laborEscalation: 0.07, taxRate: 0.20, electricityRate: 0.09 },
@@ -1904,6 +1946,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     PH: {
+        opex: { waterTariffPerM3: 1.3, landLeasePerM2Yr: 18, propertyTaxRatePct: 0.75, corpInternetPerMbpsMo: 4, cleaningCostPerM2Yr: 8, securityGuardCostPerGuardYr: 6000 },
         id: 'PH', region: 'APAC', name: 'Philippines', currency: 'PHP', currencySymbol: '₱',
         // 2026: Philippines has among highest C&I electricity in SEA; Meralco commercial ~PHP 7.0-8.5/kWh = ~$0.12-0.15
         economy: { inflationRate: 0.05, laborEscalation: 0.05, taxRate: 0.25, electricityRate: 0.13 },
@@ -1978,6 +2021,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     TW: {
+        opex: { waterTariffPerM3: 0.38, landLeasePerM2Yr: 60, propertyTaxRatePct: 1.5, corpInternetPerMbpsMo: 1.8, cleaningCostPerM2Yr: 15, securityGuardCostPerGuardYr: 22700 },
         id: 'TW', region: 'APAC', name: 'Taiwan', currency: 'TWD', currencySymbol: 'NT$',
         // 2026: Taipower raised industrial rates 2023-2024; ~TWD 3.5-4.0/kWh = ~$0.11-0.13 USD
         economy: { inflationRate: 0.02, laborEscalation: 0.03, taxRate: 0.20, electricityRate: 0.12 },
@@ -2052,6 +2096,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     NZ: {
+        opex: { waterTariffPerM3: 1.5, landLeasePerM2Yr: 132, propertyTaxRatePct: 0.6, corpInternetPerMbpsMo: 0.6, cleaningCostPerM2Yr: 28, securityGuardCostPerGuardYr: 40000 },
         id: 'NZ', region: 'APAC', name: 'New Zealand', currency: 'NZD', currencySymbol: 'NZ$',
         economy: { inflationRate: 0.03, laborEscalation: 0.035, taxRate: 0.28, electricityRate: 0.16 },
         constructionIndex: 1.1, // NZ rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
@@ -2126,6 +2171,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     // ─── EXPANDED EMEA ──────────────────────────────────────
     GB: {
+        opex: { waterTariffPerM3: 3.14, landLeasePerM2Yr: 164, propertyTaxRatePct: 1.2, corpInternetPerMbpsMo: 2, cleaningCostPerM2Yr: 30, securityGuardCostPerGuardYr: 44000 },
         id: 'GB', region: 'EMEA', name: 'United Kingdom', currency: 'GBP', currencySymbol: '£',
         // 2026: UK C&I electricity ~£0.18-0.22/kWh; corp tax held at 25%; wage growth moderating
         economy: { inflationRate: 0.027, laborEscalation: 0.035, taxRate: 0.25, electricityRate: 0.22 },
@@ -2200,6 +2246,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     DE: {
+        opex: { waterTariffPerM3: 1.96, landLeasePerM2Yr: 95, propertyTaxRatePct: 0.5, corpInternetPerMbpsMo: 1.5, cleaningCostPerM2Yr: 26, securityGuardCostPerGuardYr: 43000 },
         id: 'DE', region: 'EMEA', name: 'Germany', currency: 'EUR', currencySymbol: '€',
         // 2026: German C&I electricity still ~€0.22-0.28/kWh; slight moderation from 2022 peak
         economy: { inflationRate: 0.023, laborEscalation: 0.03, taxRate: 0.2975, electricityRate: 0.26 },
@@ -2274,6 +2321,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     NL: {
+        opex: { waterTariffPerM3: 1.27, landLeasePerM2Yr: 92, propertyTaxRatePct: 0.4, corpInternetPerMbpsMo: 1.5, cleaningCostPerM2Yr: 27, securityGuardCostPerGuardYr: 45000 },
         id: 'NL', region: 'EMEA', name: 'Netherlands', currency: 'EUR', currencySymbol: '€',
         // 2026: Dutch electricity C&I ~€0.18-0.22/kWh; AMS land moratorium easing slightly
         economy: { inflationRate: 0.023, laborEscalation: 0.03, taxRate: 0.2575, electricityRate: 0.20 },
@@ -2348,6 +2396,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     IE: {
+        opex: { waterTariffPerM3: 2.59, landLeasePerM2Yr: 151, propertyTaxRatePct: 0.6, corpInternetPerMbpsMo: 3, cleaningCostPerM2Yr: 32, securityGuardCostPerGuardYr: 42000 },
         id: 'IE', region: 'EMEA', name: 'Ireland', currency: 'EUR', currencySymbol: '€',
         // 2026: Ireland electricity among highest in EU; large DC density straining grid; corporate tax 15% (pillar-2 compliant)
         economy: { inflationRate: 0.024, laborEscalation: 0.04, taxRate: 0.15, electricityRate: 0.24 },
@@ -2422,6 +2471,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     FR: {
+        opex: { waterTariffPerM3: 4.32, landLeasePerM2Yr: 81, propertyTaxRatePct: 0.8, corpInternetPerMbpsMo: 2.5, cleaningCostPerM2Yr: 28, securityGuardCostPerGuardYr: 34000 },
         id: 'FR', region: 'EMEA', name: 'France', currency: 'EUR', currencySymbol: '€',
         // 2026: EDF tariff bouclier ended 2024; regulated industrial tariff ~€0.14-0.17/kWh post-normalisation
         economy: { inflationRate: 0.025, laborEscalation: 0.03, taxRate: 0.25, electricityRate: 0.15 },
@@ -2496,6 +2546,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     SE: {
+        opex: { waterTariffPerM3: 3.89, landLeasePerM2Yr: 120, propertyTaxRatePct: 1, corpInternetPerMbpsMo: 3, cleaningCostPerM2Yr: 30, securityGuardCostPerGuardYr: 49000 },
         id: 'SE', region: 'EMEA', name: 'Sweden', currency: 'SEK', currencySymbol: 'kr',
         economy: { inflationRate: 0.02, laborEscalation: 0.025, taxRate: 0.206, electricityRate: 0.08 },
         constructionIndex: 1.1, // SE rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
@@ -2569,6 +2620,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         lastUpdated: '2026-Q1',
     },
     PL: {
+        opex: { waterTariffPerM3: 1.53, landLeasePerM2Yr: 62, propertyTaxRatePct: 0.9, corpInternetPerMbpsMo: 2, cleaningCostPerM2Yr: 12, securityGuardCostPerGuardYr: 24000 },
         id: 'PL', region: 'EMEA', name: 'Poland', currency: 'PLN', currencySymbol: 'zł',
         economy: { inflationRate: 0.04, laborEscalation: 0.05, taxRate: 0.19, electricityRate: 0.12 },
         constructionIndex: 0.75, // PL rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
@@ -2643,6 +2695,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
 
     PT: {
+        opex: { waterTariffPerM3: 1.76, landLeasePerM2Yr: 65, propertyTaxRatePct: 0.45, corpInternetPerMbpsMo: 2.5, cleaningCostPerM2Yr: 14, securityGuardCostPerGuardYr: 23000 },
         id: 'PT', region: 'EMEA', name: 'Portugal', currency: 'EUR', currencySymbol: '€',
         economy: { inflationRate: 0.023, laborEscalation: 0.035, taxRate: 0.20, electricityRate: 0.15 },
         constructionIndex: 0.85, // PT rel. US=1.0 — Turner&Townsend ICMS/RLB 2024-25 construction cost screening
@@ -2717,6 +2770,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
 
     OM: {
+        opex: { waterTariffPerM3: 3.87, landLeasePerM2Yr: 15, propertyTaxRatePct: 0.2, corpInternetPerMbpsMo: 4.5, cleaningCostPerM2Yr: 30, securityGuardCostPerGuardYr: 18000 },
         id: 'OM', region: 'MENA', name: 'Oman', currency: 'OMR', currencySymbol: 'ر.ع.',
         // 2026: Oman CIT 15% standard; Duqm SEZ / Salalah / Sohar free zones offer long holidays
         // Electricity: ~$0.07/kWh industrial (subsidized CRT tariff) // screening est. 2026
@@ -2799,6 +2853,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
 
     FI: {
+        opex: { waterTariffPerM3: 2.72, landLeasePerM2Yr: 110, propertyTaxRatePct: 1.3, corpInternetPerMbpsMo: 3, cleaningCostPerM2Yr: 30, securityGuardCostPerGuardYr: 43000 },
         id: 'FI', region: 'EMEA', name: 'Finland', currency: 'EUR', currencySymbol: '€',
         // 2026: Finland CIT 20%; Hamina/Helsinki DC market; cool climate = strong free cooling
         // Electricity: ~$0.09/kWh industrial; grid ~0.08 kgCO2/kWh (nuclear+hydro+wind) // screening est. 2026
@@ -2876,6 +2931,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
 
     ES: {
+        opex: { waterTariffPerM3: 1.78, landLeasePerM2Yr: 78, propertyTaxRatePct: 0.8, corpInternetPerMbpsMo: 2.5, cleaningCostPerM2Yr: 16, securityGuardCostPerGuardYr: 31000 },
         id: 'ES', region: 'EMEA', name: 'Spain', currency: 'EUR', currencySymbol: '€',
         // 2026: Spain CIT 25%; Madrid/Barcelona/Aragón hyperscale boom (AWS, Microsoft, Meta)
         // Electricity: ~$0.13/kWh industrial // screening est. 2026
@@ -2954,6 +3010,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
 
     // ─── AMER (addl) ────────────────────────────────────────
     CA: {
+        opex: { waterTariffPerM3: 2.4, landLeasePerM2Yr: 118, propertyTaxRatePct: 2.28, corpInternetPerMbpsMo: 1.2, cleaningCostPerM2Yr: 18, securityGuardCostPerGuardYr: 45000 },
         id: 'CA', region: 'AMER', name: 'Canada', currency: 'CAD', currencySymbol: 'C$',
         // 2026: combined federal+provincial CIT ~26.5% (ON); Toronto/Montreal hubs
         // Electricity: ~$0.08/kWh industrial; grid ~0.13 kgCO2/kWh national (Québec hydro ~0.03) // screening est. 2026
@@ -3031,6 +3088,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
 
     IT: {
+        opex: { waterTariffPerM3: 1.13, landLeasePerM2Yr: 84, propertyTaxRatePct: 0.86, corpInternetPerMbpsMo: 2.5, cleaningCostPerM2Yr: 16, securityGuardCostPerGuardYr: 24000 },
         id: 'IT', region: 'EMEA', name: 'Italy', currency: 'EUR', currencySymbol: '€',
         // 2026: IRES 24% + IRAP ~3.9% ≈ 27.9% combined; Milan is the FLAP-D+ hub
         // Electricity: ~$0.18/kWh industrial (among highest in EU) // screening est. 2026
@@ -3108,6 +3166,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
 
     NO: {
+        opex: { waterTariffPerM3: 5.95, landLeasePerM2Yr: 200, propertyTaxRatePct: 0.5, corpInternetPerMbpsMo: 3.5, cleaningCostPerM2Yr: 38, securityGuardCostPerGuardYr: 51000 },
         id: 'NO', region: 'EMEA', name: 'Norway', currency: 'NOK', currencySymbol: 'kr',
         // 2026: Norway CIT 22%; ~98% hydro grid — lowest carbon in the set; cool climate free cooling
         // Electricity: ~$0.07/kWh industrial; grid ~0.03 kgCO2/kWh // screening est. 2026
@@ -3185,6 +3244,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
 
     DK: {
+        opex: { waterTariffPerM3: 4.72, landLeasePerM2Yr: 130, propertyTaxRatePct: 0.6, corpInternetPerMbpsMo: 3, cleaningCostPerM2Yr: 36, securityGuardCostPerGuardYr: 63000 },
         id: 'DK', region: 'EMEA', name: 'Denmark', currency: 'DKK', currencySymbol: 'kr',
         // 2026: Denmark CIT 22%; Copenhagen/Odense hyperscale market (Meta, Google, Apple)
         // Electricity: ~$0.12/kWh industrial; grid ~0.12 kgCO2/kWh (wind-heavy) // screening est. 2026
@@ -3262,6 +3322,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
 
     CH: {
+        opex: { waterTariffPerM3: 2.58, landLeasePerM2Yr: 214, propertyTaxRatePct: 0.3, corpInternetPerMbpsMo: 4, cleaningCostPerM2Yr: 45, securityGuardCostPerGuardYr: 80000 },
         id: 'CH', region: 'EMEA', name: 'Switzerland', currency: 'CHF', currencySymbol: 'CHF',
         // 2026: combined effective CIT ~14.9% (federal+cantonal avg); Zurich colocation hub
         // Electricity: ~$0.14/kWh industrial; grid ~0.04 kgCO2/kWh (hydro+nuclear) // screening est. 2026

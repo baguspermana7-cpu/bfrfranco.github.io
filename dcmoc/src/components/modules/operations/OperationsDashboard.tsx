@@ -19,6 +19,7 @@ import { rzModels, rzData } from '@/lib/rz-engine';
 import { getPUE } from '@/constants/pue';
 import { StaffingDashboard } from '@/components/modules/StaffingDashboard';
 import { MaintenanceDashboard } from '@/components/modules/MaintenanceDashboard';
+import { OpexBreakdown } from '@/components/modules/operations/OpexBreakdown';
 import { Wrench, ChevronRight, FileDown } from 'lucide-react';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
@@ -207,6 +208,9 @@ export function OperationsDashboard() {
                             </div>
                         ))}
                     </div>
+
+                    {/* complete per-country OPEX breakdown (WS1) */}
+                    <OpexBreakdown />
 
                     <div className="grid gap-4 lg:grid-cols-[1fr_290px]">
                         <div className="min-w-0 space-y-4">

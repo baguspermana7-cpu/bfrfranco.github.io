@@ -13,6 +13,16 @@ release sections rather than semver.
 
 ---
 
+## v1.116.0 — 2026-07-27 (DCMOC — complete per-country OPEX model + maintenance-strategy taxonomy)
+
+### Added
+- **Complete per-country OPEX model.** The Operations page previously showed only "Energy Cost 24h". It now renders a full annual operating-cost breakdown — grouped Energy / People / Contracts & Maintenance / Security / Compliance & Licenses / Connectivity / Real Estate & Tax / Overhead — with $/yr, % share and a per-line basis. New engine model `models.opex.fullBreakdown` (additive; `totalAnnual` untouched, all existing gates green) covers electricity, water, in-house manpower, outsourced M&E O&M, M&E preventive maintenance, ICT/network maintenance, outsourced cleaning, physical security (guards), security-system maintenance, software/BMS/DCIM licenses, certification renewals, annual permits, corporate internet/bandwidth, land lease, property & local tax, insurance, carbon levy and G&A overhead.
+- **Per-country sourced cost factors (40 countries).** A 3-agent research loop (deep-research → adversarial fact-check → merge) produced sourced values for the six genuinely location-variant factors — water tariff $/m³, industrial land lease $/m²·yr, property-tax %, enterprise DIA $/Mbps·mo, cleaning $/m²·yr and fully-loaded guard $/guard·yr — added to `CountryProfile.opex` and regenerated into `DATA.countries`. Each cell carries a `source_url`+`quote`+`confidence` provenance row in `tools/dc-corpus/opex-research/facts.jsonl`; screening-confidence cells (benchmark-extrapolated) are logged. The fact-checker corrected NZ/CA water (USD conversion), ZA internet and NG/KE/ZA/CO guard clamping.
+- **Worldwide maintenance-strategy taxonomy + selector.** `DATA.opexModel.maintenanceStrategies` (full OEM-compliant · standard annual + compliance-only · reactive/run-to-failure · predictive/CBM · hybrid), each with contract-vs-in-house split, in-house FTE/10MW, availability delta and cost index (SFG20 / OEM RCM / NFPA / Uptime). A dropdown on the Operations OPEX card drives the contract / PM / manpower / availability mix coherently (highest-cost OEM = best availability; reactive = lowest cost, worst availability).
+
+### Changed
+- Every new `DATA` value carries a `DATA.sources` entry (`opexModel`, `opexModel.maintenanceStrategies`, `countries.opex`). Engine 762/0, value-bindings 85/0, reference-parity 155/0, walk 31/0, trace-parity 116/116, enum-coverage 25, model-calibration 19/0.
+
 ## v1.115.94 — 2026-07-26 (DCMOC — CAPEX infra dedup complete: Power Backup single-owner + fuel AutoField at its home)
 
 ### Changed

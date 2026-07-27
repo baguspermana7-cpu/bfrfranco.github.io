@@ -156,6 +156,48 @@
                 retailScreening: { utilization: 0.7,  label: 'Retail tariff screening · 70% utilization' }
             }
         },
+
+        /* ── WS0 (2026-07-27) COMPLETE OPEX MODEL — constants ──
+         * Global US-baseline anchors for the OPEX lines that do NOT vary
+         * materially by country (they scale by IT MW / racks / gross floor /
+         * asset value and inherit country cost through labor/electricity/tax).
+         * The genuinely location-variant factors live per-country in
+         * DATA.countries[code].opex (water tariff, land lease, property-tax %,
+         * corp-internet $/Mbps, cleaning $/m², guard $/guard). Maintenance
+         * strategies are the researched worldwide-applicable taxonomy
+         * (SFG20 / OEM RCM / NFPA / Uptime). Every value is sourced — see
+         * tools/dc-corpus/opex-research/ + DATA.sources['opexModel']. Consumed
+         * by models.opex.fullBreakdown (additive; does not affect totalAnnual). */
+        opexModel: {
+            cleaningPerM2YrDefault: 22,
+            guardPerGuardYrDefault: 45000,
+            guardFtePerPost: 4.5,          // a 24/7 guard post needs ~4.5 rotating guard-FTE
+            guardPostsBase: 2,             // gate + lobby/SOC minimum
+            guardPostsPerMw: 0.08,         // +~1 roving/monitoring post per 12 MW
+            securitySystemPerMwYr: 12000,  // CCTV/access-control/intrusion maintenance
+            mePmPerMwYr: 95000,            // M&E preventive-maintenance parts+labor (self-perform)
+            ictNetworkPerMwYr: 40000,      // switching/cabling/firewall support
+            softwareLicensePerRackYr: 330, // BMS/DCIM/software subscriptions
+            certRenewalPerSiteYr: 60000,   // Uptime M&O / TCOS / ISO surveillance amortized
+            operatingPermitPerSiteYr: 25000, // operating/fire/discharge (env permit is per-country in compliance.*)
+            outsourcedOmPerMwYr: 150000,   // OEM/vendor O&M service contract
+            landLeasePerM2YrDefault: 100,
+            corpInternetPerMbpsMoDefault: 1.5,
+            provisionedMbpsBase: 1000,     // management/corporate connectivity floor
+            provisionedMbpsPerMw: 50,
+            waterTariffPerM3Default: 3.5,
+            propertyTaxRatePctDefault: 1.35,
+            insurancePctOfCapex: 0.005,
+            gaOverheadPct: 0.08,
+            grossM2PerRack: 6.25,          // gross-floor proxy per rack (white+support+admin)
+            maintenanceStrategies: {
+                oem_full:                   { label: 'Full OEM-compliant',                    contractSplitPct: 85, inHouseFtePer10MW: 6,   availabilityDeltaPct: 0,     costIndexVsOemFull: 1.0  },
+                standard_annual_compliance: { label: 'Standard annual + compliance-only',     contractSplitPct: 55, inHouseFtePer10MW: 5,   availabilityDeltaPct: -0.05, costIndexVsOemFull: 0.72 },
+                reactive:                   { label: 'Reactive / run-to-failure',             contractSplitPct: 25, inHouseFtePer10MW: 3,   availabilityDeltaPct: -0.85, costIndexVsOemFull: 0.5  },
+                predictive_cbm:             { label: 'Predictive / condition-based (CBM)',    contractSplitPct: 45, inHouseFtePer10MW: 6.5, availabilityDeltaPct: 0.1,   costIndexVsOemFull: 0.9  },
+                hybrid:                     { label: 'Hybrid (tiered by criticality)',        contractSplitPct: 50, inHouseFtePer10MW: 5.5, availabilityDeltaPct: 0.02,  costIndexVsOemFull: 0.82 }
+            }
+        },
         opexDefaults: { maintenancePct: 0.02, overheadPct: 0.08, contractScope: 'medium' },
 
         // capex.totalCost defaults
@@ -188,6 +230,14 @@
         countries: {
             "ID": {
                 "id": "ID",
+                "opex": {
+                    "waterTariffPerM3": 1.35,
+                    "landLeasePerM2Yr": 42,
+                    "propertyTaxRatePct": 0.2,
+                    "corpInternetPerMbpsMo": 3.5,
+                    "cleaningCostPerM2Yr": 9,
+                    "securityGuardCostPerGuardYr": 6800
+                },
                 "region": "APAC",
                 "name": "Indonesia",
                 "currency": "USD",
@@ -344,6 +394,14 @@
             },
             "SG": {
                 "id": "SG",
+                "opex": {
+                    "waterTariffPerM3": 2.4,
+                    "landLeasePerM2Yr": 55,
+                    "propertyTaxRatePct": 1,
+                    "corpInternetPerMbpsMo": 0.6,
+                    "cleaningCostPerM2Yr": 19,
+                    "securityGuardCostPerGuardYr": 42000
+                },
                 "region": "APAC",
                 "name": "Singapore",
                 "currency": "SGD",
@@ -489,6 +547,14 @@
             },
             "MY": {
                 "id": "MY",
+                "opex": {
+                    "waterTariffPerM3": 0.83,
+                    "landLeasePerM2Yr": 46,
+                    "propertyTaxRatePct": 0.5,
+                    "corpInternetPerMbpsMo": 2.5,
+                    "cleaningCostPerM2Yr": 8,
+                    "securityGuardCostPerGuardYr": 9500
+                },
                 "region": "APAC",
                 "name": "Malaysia",
                 "currency": "MYR",
@@ -635,6 +701,14 @@
             },
             "US": {
                 "id": "US",
+                "opex": {
+                    "waterTariffPerM3": 2.5,
+                    "landLeasePerM2Yr": 108,
+                    "propertyTaxRatePct": 1.82,
+                    "corpInternetPerMbpsMo": 1,
+                    "cleaningCostPerM2Yr": 18.8,
+                    "securityGuardCostPerGuardYr": 56160
+                },
                 "region": "AMER",
                 "name": "United States",
                 "currency": "USD",
@@ -786,6 +860,14 @@
             },
             "JP": {
                 "id": "JP",
+                "opex": {
+                    "waterTariffPerM3": 0.91,
+                    "landLeasePerM2Yr": 113,
+                    "propertyTaxRatePct": 1.4,
+                    "corpInternetPerMbpsMo": 1.5,
+                    "cleaningCostPerM2Yr": 30,
+                    "securityGuardCostPerGuardYr": 22600
+                },
                 "region": "APAC",
                 "name": "Japan",
                 "currency": "JPY",
@@ -925,6 +1007,14 @@
             },
             "AU": {
                 "id": "AU",
+                "opex": {
+                    "waterTariffPerM3": 2.49,
+                    "landLeasePerM2Yr": 102,
+                    "propertyTaxRatePct": 2,
+                    "corpInternetPerMbpsMo": 0.33,
+                    "cleaningCostPerM2Yr": 30,
+                    "securityGuardCostPerGuardYr": 52000
+                },
                 "region": "APAC",
                 "name": "Australia",
                 "currency": "AUD",
@@ -1049,6 +1139,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "AE": {
+                "opex": {
+                    "waterTariffPerM3": 2.4,
+                    "landLeasePerM2Yr": 118,
+                    "propertyTaxRatePct": 0.4,
+                    "corpInternetPerMbpsMo": 3.5,
+                    "cleaningCostPerM2Yr": 40,
+                    "securityGuardCostPerGuardYr": 21000
+                },
                 "id": "AE",
                 "region": "MENA",
                 "name": "UAE",
@@ -1196,6 +1294,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "SA": {
+                "opex": {
+                    "waterTariffPerM3": 2.14,
+                    "landLeasePerM2Yr": 55,
+                    "propertyTaxRatePct": 0.25,
+                    "corpInternetPerMbpsMo": 3.5,
+                    "cleaningCostPerM2Yr": 32,
+                    "securityGuardCostPerGuardYr": 22000
+                },
                 "id": "SA",
                 "region": "MENA",
                 "name": "Saudi Arabia",
@@ -1338,6 +1444,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "QA": {
+                "opex": {
+                    "waterTariffPerM3": 1.79,
+                    "landLeasePerM2Yr": 62,
+                    "propertyTaxRatePct": 0.2,
+                    "corpInternetPerMbpsMo": 4,
+                    "cleaningCostPerM2Yr": 42,
+                    "securityGuardCostPerGuardYr": 22000
+                },
                 "id": "QA",
                 "region": "MENA",
                 "name": "Qatar",
@@ -1477,6 +1591,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "ZA": {
+                "opex": {
+                    "waterTariffPerM3": 3.71,
+                    "landLeasePerM2Yr": 39,
+                    "propertyTaxRatePct": 2,
+                    "corpInternetPerMbpsMo": 1,
+                    "cleaningCostPerM2Yr": 8,
+                    "securityGuardCostPerGuardYr": 10000
+                },
                 "id": "ZA",
                 "region": "AFR",
                 "name": "South Africa",
@@ -1605,6 +1727,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "NG": {
+                "opex": {
+                    "waterTariffPerM3": 0.5,
+                    "landLeasePerM2Yr": 40,
+                    "propertyTaxRatePct": 0.39,
+                    "corpInternetPerMbpsMo": 8,
+                    "cleaningCostPerM2Yr": 6,
+                    "securityGuardCostPerGuardYr": 3000
+                },
                 "id": "NG",
                 "region": "AFR",
                 "name": "Nigeria",
@@ -1733,6 +1863,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "KE": {
+                "opex": {
+                    "waterTariffPerM3": 0.9,
+                    "landLeasePerM2Yr": 60,
+                    "propertyTaxRatePct": 0.35,
+                    "corpInternetPerMbpsMo": 1.5,
+                    "cleaningCostPerM2Yr": 6,
+                    "securityGuardCostPerGuardYr": 5000
+                },
                 "id": "KE",
                 "region": "AFR",
                 "name": "Kenya",
@@ -1859,6 +1997,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "BR": {
+                "opex": {
+                    "waterTariffPerM3": 3.4,
+                    "landLeasePerM2Yr": 78.5,
+                    "propertyTaxRatePct": 1.5,
+                    "corpInternetPerMbpsMo": 2.5,
+                    "cleaningCostPerM2Yr": 28,
+                    "securityGuardCostPerGuardYr": 20000
+                },
                 "id": "BR",
                 "region": "LATAM",
                 "name": "Brazil",
@@ -1986,6 +2132,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "CL": {
+                "opex": {
+                    "waterTariffPerM3": 2,
+                    "landLeasePerM2Yr": 76,
+                    "propertyTaxRatePct": 1.2,
+                    "corpInternetPerMbpsMo": 3,
+                    "cleaningCostPerM2Yr": 13,
+                    "securityGuardCostPerGuardYr": 27800
+                },
                 "id": "CL",
                 "region": "LATAM",
                 "name": "Chile",
@@ -2112,6 +2266,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "MX": {
+                "opex": {
+                    "waterTariffPerM3": 1.34,
+                    "landLeasePerM2Yr": 86,
+                    "propertyTaxRatePct": 0.3,
+                    "corpInternetPerMbpsMo": 2.5,
+                    "cleaningCostPerM2Yr": 8,
+                    "securityGuardCostPerGuardYr": 18000
+                },
                 "id": "MX",
                 "region": "LATAM",
                 "name": "Mexico",
@@ -2238,6 +2400,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "CO": {
+                "opex": {
+                    "waterTariffPerM3": 3.4,
+                    "landLeasePerM2Yr": 72,
+                    "propertyTaxRatePct": 1,
+                    "corpInternetPerMbpsMo": 3,
+                    "cleaningCostPerM2Yr": 18,
+                    "securityGuardCostPerGuardYr": 15000
+                },
                 "id": "CO",
                 "region": "LATAM",
                 "name": "Colombia",
@@ -2364,6 +2534,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "IN": {
+                "opex": {
+                    "waterTariffPerM3": 0.6,
+                    "landLeasePerM2Yr": 33,
+                    "propertyTaxRatePct": 1.2,
+                    "corpInternetPerMbpsMo": 1.06,
+                    "cleaningCostPerM2Yr": 6.5,
+                    "securityGuardCostPerGuardYr": 4200
+                },
                 "id": "IN",
                 "region": "APAC",
                 "name": "India",
@@ -2510,6 +2688,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "CN": {
+                "opex": {
+                    "waterTariffPerM3": 0.39,
+                    "landLeasePerM2Yr": 66,
+                    "propertyTaxRatePct": 1.2,
+                    "corpInternetPerMbpsMo": 5,
+                    "cleaningCostPerM2Yr": 12,
+                    "securityGuardCostPerGuardYr": 20100
+                },
                 "id": "CN",
                 "region": "APAC",
                 "name": "China",
@@ -2638,6 +2824,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "KR": {
+                "opex": {
+                    "waterTariffPerM3": 0.55,
+                    "landLeasePerM2Yr": 90,
+                    "propertyTaxRatePct": 0.25,
+                    "corpInternetPerMbpsMo": 1.3,
+                    "cleaningCostPerM2Yr": 22,
+                    "securityGuardCostPerGuardYr": 30900
+                },
                 "id": "KR",
                 "region": "APAC",
                 "name": "South Korea",
@@ -2765,6 +2959,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "TH": {
+                "opex": {
+                    "waterTariffPerM3": 0.42,
+                    "landLeasePerM2Yr": 48,
+                    "propertyTaxRatePct": 0.3,
+                    "corpInternetPerMbpsMo": 3,
+                    "cleaningCostPerM2Yr": 8,
+                    "securityGuardCostPerGuardYr": 7500
+                },
                 "id": "TH",
                 "region": "APAC",
                 "name": "Thailand",
@@ -2892,6 +3094,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "VN": {
+                "opex": {
+                    "waterTariffPerM3": 0.85,
+                    "landLeasePerM2Yr": 60,
+                    "propertyTaxRatePct": 0.2,
+                    "corpInternetPerMbpsMo": 3,
+                    "cleaningCostPerM2Yr": 7,
+                    "securityGuardCostPerGuardYr": 5500
+                },
                 "id": "VN",
                 "region": "APAC",
                 "name": "Vietnam",
@@ -3019,6 +3229,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "PH": {
+                "opex": {
+                    "waterTariffPerM3": 1.3,
+                    "landLeasePerM2Yr": 18,
+                    "propertyTaxRatePct": 0.75,
+                    "corpInternetPerMbpsMo": 4,
+                    "cleaningCostPerM2Yr": 8,
+                    "securityGuardCostPerGuardYr": 6000
+                },
                 "id": "PH",
                 "region": "APAC",
                 "name": "Philippines",
@@ -3146,6 +3364,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "TW": {
+                "opex": {
+                    "waterTariffPerM3": 0.38,
+                    "landLeasePerM2Yr": 60,
+                    "propertyTaxRatePct": 1.5,
+                    "corpInternetPerMbpsMo": 1.8,
+                    "cleaningCostPerM2Yr": 15,
+                    "securityGuardCostPerGuardYr": 22700
+                },
                 "id": "TW",
                 "region": "APAC",
                 "name": "Taiwan",
@@ -3272,6 +3498,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "NZ": {
+                "opex": {
+                    "waterTariffPerM3": 1.5,
+                    "landLeasePerM2Yr": 132,
+                    "propertyTaxRatePct": 0.6,
+                    "corpInternetPerMbpsMo": 0.6,
+                    "cleaningCostPerM2Yr": 28,
+                    "securityGuardCostPerGuardYr": 40000
+                },
                 "id": "NZ",
                 "region": "APAC",
                 "name": "New Zealand",
@@ -3394,6 +3628,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "GB": {
+                "opex": {
+                    "waterTariffPerM3": 3.14,
+                    "landLeasePerM2Yr": 164,
+                    "propertyTaxRatePct": 1.2,
+                    "corpInternetPerMbpsMo": 2,
+                    "cleaningCostPerM2Yr": 30,
+                    "securityGuardCostPerGuardYr": 44000
+                },
                 "id": "GB",
                 "region": "EMEA",
                 "name": "United Kingdom",
@@ -3520,6 +3762,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "DE": {
+                "opex": {
+                    "waterTariffPerM3": 1.96,
+                    "landLeasePerM2Yr": 95,
+                    "propertyTaxRatePct": 0.5,
+                    "corpInternetPerMbpsMo": 1.5,
+                    "cleaningCostPerM2Yr": 26,
+                    "securityGuardCostPerGuardYr": 43000
+                },
                 "id": "DE",
                 "region": "EMEA",
                 "name": "Germany",
@@ -3644,6 +3894,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "NL": {
+                "opex": {
+                    "waterTariffPerM3": 1.27,
+                    "landLeasePerM2Yr": 92,
+                    "propertyTaxRatePct": 0.4,
+                    "corpInternetPerMbpsMo": 1.5,
+                    "cleaningCostPerM2Yr": 27,
+                    "securityGuardCostPerGuardYr": 45000
+                },
                 "id": "NL",
                 "region": "EMEA",
                 "name": "Netherlands",
@@ -3769,6 +4027,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "IE": {
+                "opex": {
+                    "waterTariffPerM3": 2.59,
+                    "landLeasePerM2Yr": 151,
+                    "propertyTaxRatePct": 0.6,
+                    "corpInternetPerMbpsMo": 3,
+                    "cleaningCostPerM2Yr": 32,
+                    "securityGuardCostPerGuardYr": 42000
+                },
                 "id": "IE",
                 "region": "EMEA",
                 "name": "Ireland",
@@ -3896,6 +4162,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "FR": {
+                "opex": {
+                    "waterTariffPerM3": 4.32,
+                    "landLeasePerM2Yr": 81,
+                    "propertyTaxRatePct": 0.8,
+                    "corpInternetPerMbpsMo": 2.5,
+                    "cleaningCostPerM2Yr": 28,
+                    "securityGuardCostPerGuardYr": 34000
+                },
                 "id": "FR",
                 "region": "EMEA",
                 "name": "France",
@@ -4019,6 +4293,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "SE": {
+                "opex": {
+                    "waterTariffPerM3": 3.89,
+                    "landLeasePerM2Yr": 120,
+                    "propertyTaxRatePct": 1,
+                    "corpInternetPerMbpsMo": 3,
+                    "cleaningCostPerM2Yr": 30,
+                    "securityGuardCostPerGuardYr": 49000
+                },
                 "id": "SE",
                 "region": "EMEA",
                 "name": "Sweden",
@@ -4144,6 +4426,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "PL": {
+                "opex": {
+                    "waterTariffPerM3": 1.53,
+                    "landLeasePerM2Yr": 62,
+                    "propertyTaxRatePct": 0.9,
+                    "corpInternetPerMbpsMo": 2,
+                    "cleaningCostPerM2Yr": 12,
+                    "securityGuardCostPerGuardYr": 24000
+                },
                 "id": "PL",
                 "region": "EMEA",
                 "name": "Poland",
@@ -4271,6 +4561,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "PT": {
+                "opex": {
+                    "waterTariffPerM3": 1.76,
+                    "landLeasePerM2Yr": 65,
+                    "propertyTaxRatePct": 0.45,
+                    "corpInternetPerMbpsMo": 2.5,
+                    "cleaningCostPerM2Yr": 14,
+                    "securityGuardCostPerGuardYr": 23000
+                },
                 "id": "PT",
                 "region": "EMEA",
                 "name": "Portugal",
@@ -4399,6 +4697,14 @@
                 "lastUpdated": "2026-Q1"
             },
             "OM": {
+                "opex": {
+                    "waterTariffPerM3": 3.87,
+                    "landLeasePerM2Yr": 15,
+                    "propertyTaxRatePct": 0.2,
+                    "corpInternetPerMbpsMo": 4.5,
+                    "cleaningCostPerM2Yr": 30,
+                    "securityGuardCostPerGuardYr": 18000
+                },
                 "id": "OM",
                 "region": "MENA",
                 "name": "Oman",
@@ -4545,6 +4851,14 @@
                 "lastUpdated": "2026-Q3"
             },
             "FI": {
+                "opex": {
+                    "waterTariffPerM3": 2.72,
+                    "landLeasePerM2Yr": 110,
+                    "propertyTaxRatePct": 1.3,
+                    "corpInternetPerMbpsMo": 3,
+                    "cleaningCostPerM2Yr": 30,
+                    "securityGuardCostPerGuardYr": 43000
+                },
                 "id": "FI",
                 "region": "EMEA",
                 "name": "Finland",
@@ -4671,6 +4985,14 @@
                 "lastUpdated": "2026-Q3"
             },
             "ES": {
+                "opex": {
+                    "waterTariffPerM3": 1.78,
+                    "landLeasePerM2Yr": 78,
+                    "propertyTaxRatePct": 0.8,
+                    "corpInternetPerMbpsMo": 2.5,
+                    "cleaningCostPerM2Yr": 16,
+                    "securityGuardCostPerGuardYr": 31000
+                },
                 "id": "ES",
                 "region": "EMEA",
                 "name": "Spain",
@@ -4799,6 +5121,14 @@
                 "lastUpdated": "2026-Q3"
             },
             "CA": {
+                "opex": {
+                    "waterTariffPerM3": 2.4,
+                    "landLeasePerM2Yr": 118,
+                    "propertyTaxRatePct": 2.28,
+                    "corpInternetPerMbpsMo": 1.2,
+                    "cleaningCostPerM2Yr": 18,
+                    "securityGuardCostPerGuardYr": 45000
+                },
                 "id": "CA",
                 "region": "AMER",
                 "name": "Canada",
@@ -4926,6 +5256,14 @@
                 "lastUpdated": "2026-Q3"
             },
             "IT": {
+                "opex": {
+                    "waterTariffPerM3": 1.13,
+                    "landLeasePerM2Yr": 84,
+                    "propertyTaxRatePct": 0.86,
+                    "corpInternetPerMbpsMo": 2.5,
+                    "cleaningCostPerM2Yr": 16,
+                    "securityGuardCostPerGuardYr": 24000
+                },
                 "id": "IT",
                 "region": "EMEA",
                 "name": "Italy",
@@ -5053,6 +5391,14 @@
                 "lastUpdated": "2026-Q3"
             },
             "NO": {
+                "opex": {
+                    "waterTariffPerM3": 5.95,
+                    "landLeasePerM2Yr": 200,
+                    "propertyTaxRatePct": 0.5,
+                    "corpInternetPerMbpsMo": 3.5,
+                    "cleaningCostPerM2Yr": 38,
+                    "securityGuardCostPerGuardYr": 51000
+                },
                 "id": "NO",
                 "region": "EMEA",
                 "name": "Norway",
@@ -5179,6 +5525,14 @@
                 "lastUpdated": "2026-Q3"
             },
             "DK": {
+                "opex": {
+                    "waterTariffPerM3": 4.72,
+                    "landLeasePerM2Yr": 130,
+                    "propertyTaxRatePct": 0.6,
+                    "corpInternetPerMbpsMo": 3,
+                    "cleaningCostPerM2Yr": 36,
+                    "securityGuardCostPerGuardYr": 63000
+                },
                 "id": "DK",
                 "region": "EMEA",
                 "name": "Denmark",
@@ -5305,6 +5659,14 @@
                 "lastUpdated": "2026-Q3"
             },
             "CH": {
+                "opex": {
+                    "waterTariffPerM3": 2.58,
+                    "landLeasePerM2Yr": 214,
+                    "propertyTaxRatePct": 0.3,
+                    "corpInternetPerMbpsMo": 4,
+                    "cleaningCostPerM2Yr": 45,
+                    "securityGuardCostPerGuardYr": 80000
+                },
                 "id": "CH",
                 "region": "EMEA",
                 "name": "Switzerland",
@@ -8776,6 +9138,9 @@
             'regionsCountry':         { source: 'PLN/EMA/TEPCO/CEA/TNB tariff filings + national statistics', asOf: '2026', unit: 'mixed (see fields)' },
             'countries':              { source: 'DCMOC country reference 2026-Q1 (per-country economy/labor/environment/gridReliability/naturalDisaster/talentPool/fuelDiesel/taxIncentives/compliance/constructionIndex); PLN/EMA/TEPCO/national tariff filings + IMF WEO + Ember grid-intensity + national labor statistics. GENERATED from dcmoc/src/constants/countries.ts — single source of truth for the site + DCMOC.', asOf: '2026-Q1', unit: 'mixed (see per-country fields)' },
             'opex.basisPresets':      { source: 'Phase-Q shared-engine alignment: utilization presets parameterize the documented opex-calculator (retail 0.7 util) vs DCMOC (DC-contract 1.0 util) basis divergence', asOf: '2026', method: 'multiplier on energy-driven lines (power/water/carbon); default 1.0 = legacy-identical' },
+            'opexModel':              { source: 'WS0 3-agent OPEX research (2026-07): US-baseline anchors — cleaning $14.4-30/m²·yr (Ziva commercial-cleaning), Uptime Tier-cert/ISO surveillance amortized, Sunbird DCIM $330/rack·yr, US industrial DIA ~$1-1.5/Mbps·mo (Meter), 53-city industrial property tax 1.35% (Lincoln Institute), US industrial rent ~$97/m²·yr (Statista); guard $/guard·yr per-country. Global-uniform lines scale by IT MW/racks/gross-floor/asset-value and inherit country cost via labor/electricity/tax.', asOf: '2025', method: 'US-baseline anchors; per-country location-variant factors in countries[code].opex; full provenance rows in tools/dc-corpus/opex-research/facts.jsonl' },
+            'opexModel.maintenanceStrategies': { source: 'WS0 maintenance-strategy taxonomy (SFG20 · OEM RCM · NFPA 25/70B · Uptime O&M): full-OEM=cost-index 1.0 + best availability; standard-annual+compliance 0.72; reactive/run-to-failure 0.5 + worst availability; predictive/CBM 0.9 + best-availability uplift; hybrid 0.82. contractSplit%, in-house FTE/10MW, availability delta (pp) per strategy.', asOf: '2025', method: 'reviewer-verified internal coherence (highest cost = lowest downtime); costIndex scales M&E PM + O&M contract; FTE scales manpower; availabilityDelta feeds reliability' },
+            'countries.opex':         { source: 'WS0 per-country OPEX research (2026-07, 3-agent research→adversarial fact-check, 40 countries × 6 fields): water tariff (national utility filings), industrial land lease (JLL/CBRE/Cushman), property-tax % (national valuation authorities), enterprise DIA $/Mbps (carrier pricing), commercial cleaning $/m² (facilities benchmarks), fully-loaded guard $/guard·yr (national security-wage + statutory loading).', asOf: '2025', method: 'each cell has source_url+quote+confidence in tools/dc-corpus/opex-research/facts.jsonl; 90/240 cells screening-confidence (benchmark-extrapolated, logged); fact-checker corrected NZ/CA water (USD conversion), ZA internet, and NG/KE/ZA/CO guard clamping' },
             'commissioning.cx':       { source: 'Commissioning program cost/schedule methodology promoted from cx-calculator.html. RICH engine (cx.rich): equipment quantities scaled from IT load + rack density → per-level (L0-L6) staffed durations at 30 regional day-rate cards ($/day cxDay/fieldDay/oemDay/witnessDay + per-diem + diesel $/L + cost mult), gm-normalized (^0.45) base blend vs level-sum, Monte-Carlo (N=10000) band + 7-param sensitivity tornado. Base rates + multipliers calibrated to DC Cx budgetary practice (ASHRAE Guideline 0 / BCxA / NETA ECS scope, Uptime IST scenario counts). Compact cx.* kept for back-compat.', asOf: '2026', method: 'budgetary estimate-grade Cx program model; NOT a detailed Cx plan' },
             'requirements.baselinePeakRatio': { source: 'ANALYST — CPU-era enterprise DC power-chain design headroom (sustained peak ≈ 1.2× nominal/design IT) already embedded in the T&T/C&W/JLL 2025 base $/kW; used to make the AI-rack power-provisioning uplift MARGINAL (peak÷nominal ÷ this), preventing double-count.', asOf: '2026-07', unit: 'ratio (peak/nominal already in base cost)' },
             'requirements.archProfiles':      { source: 'OFFICIAL where confidence=official (NVIDIA GB200/GB300 NVL72 reference architectures + DGX H100 SuperPOD RA + OCP ORV3 HPR spec) — rackKw nominal/TDP/peak(EDPp ~1.5x); ANALYST for rubin_vr200 (NVIDIA has NOT published Rubin rack-kW; only NVLink6/45C warm-water DLC/800VDC are official — kW is analyst 190-230 est). IT/GPU hardware cost EXCLUDED from capex.', asOf: '2026-07', unit: 'kW/rack per architecture' },
@@ -11250,6 +11615,147 @@
                         connectivity: connectivity,
                         overhead:     overhead,
                         warning:      warning
+                    };
+                },
+
+                /**
+                 * WS0 (2026-07-27): COMPLETE per-country annual OPEX with a grouped,
+                 * fully-sourced breakdown. Self-contained + ADDITIVE — does NOT touch
+                 * totalAnnual/total (existing callers unchanged). Every line traces to a
+                 * DATA.opexModel anchor or a DATA.countries[code].opex location-variant
+                 * factor. Maintenance strategy scales manpower FTE, contract spend, M&E PM
+                 * cost and availability coherently.
+                 * input: { itMw, pue, countryCode, capex, racks, grossFloorM2, headcount,
+                 *          cooling, maintenanceStrategy, hoursPerYear }
+                 */
+                fullBreakdown: function (input) {
+                    input = input || {};
+                    var M = DATA.opexModel;
+                    var mw = input.itMw || 0;
+                    var code = (input.countryCode || 'US').toUpperCase();
+                    var country = DATA.countries[code] || DATA.countries.US || {};
+                    var cOpex = country.opex || {};
+                    var econ = country.economy || {};
+                    var hrs = input.hoursPerYear || DATA.hoursPerYear;
+                    var pueVal = input.pue || DATA.pueDefaults.airCooledTier3;
+                    var capex = input.capex || 0;
+                    var racks = input.racks || Math.ceil((mw * 1000) / 15);   // ~15kW/rack fallback
+                    var grossM2 = input.grossFloorM2 || Math.ceil(racks * M.grossM2PerRack);
+                    var strat = M.maintenanceStrategies[input.maintenanceStrategy] || M.maintenanceStrategies.standard_annual_compliance;
+                    var warnings = [];
+
+                    // ── Energy
+                    var itKwh = mw * 1000 * hrs;
+                    var facilityKwh = itKwh * pueVal;
+                    var powerRate = econ.electricityRate != null ? econ.electricityRate
+                                  : (DATA.regions[code] ? DATA.regions[code].powerKwh : DATA.regions.US.powerKwh);
+                    var electricity = Math.round(facilityKwh * powerRate);
+                    var wue = DATA.water.wueByType[input.cooling] != null ? DATA.water.wueByType[input.cooling] : DATA.water.wueByType.air;
+                    var waterM3 = (wue * itKwh) / 1000;
+                    var waterTariff = cOpex.waterTariffPerM3 != null ? cOpex.waterTariffPerM3 : M.waterTariffPerM3Default;
+                    var water = Math.round(waterM3 * waterTariff);
+                    var carbonTonnes = (facilityKwh * (DATA.carbon.gridFactor[code] || DATA.carbon.gridFactor.US)) / 1000;
+                    var carbon = Math.round(carbonTonnes * (DATA.carbon.carbonPrice[code] || DATA.carbon.carbonPrice.US));
+
+                    // ── People (in-house manpower from strategy FTE demand × loaded local salary)
+                    var fte = input.headcount != null ? input.headcount : Math.max(2, Math.round(strat.inHouseFtePer10MW * mw / 10));
+                    var manpower = RZEngine.models.opex.staffingCostAnnual(fte, code);
+
+                    // ── Contracts & maintenance (strategy-scaled)
+                    var outsourcedOm = Math.round(mw * M.outsourcedOmPerMwYr * strat.costIndexVsOemFull * (strat.contractSplitPct / 100));
+                    var mePm = Math.round(mw * M.mePmPerMwYr * strat.costIndexVsOemFull);
+                    var ictMaint = Math.round(mw * M.ictNetworkPerMwYr);
+                    var cleanRate = cOpex.cleaningCostPerM2Yr != null ? cOpex.cleaningCostPerM2Yr : M.cleaningPerM2YrDefault;
+                    var cleaning = Math.round(grossM2 * cleanRate);
+
+                    // ── Security
+                    var guardPosts = Math.max(1, Math.round(M.guardPostsBase + mw * M.guardPostsPerMw));
+                    var guardPerGuard = cOpex.securityGuardCostPerGuardYr != null ? cOpex.securityGuardCostPerGuardYr : M.guardPerGuardYrDefault;
+                    var security = Math.round(guardPosts * M.guardFtePerPost * guardPerGuard);
+                    var securitySystem = Math.round(mw * M.securitySystemPerMwYr);
+
+                    // ── Compliance & licenses
+                    var licenses = Math.round(racks * M.softwareLicensePerRackYr);
+                    var certRenewal = M.certRenewalPerSiteYr;
+                    var envPermit = (country.compliance && country.compliance.environmentalPermitCostPerYear) || 0;
+                    var permits = M.operatingPermitPerSiteYr + envPermit;
+
+                    // ── Connectivity (corporate internet / bandwidth)
+                    var provMbps = M.provisionedMbpsBase + mw * M.provisionedMbpsPerMw;
+                    var corpRate = cOpex.corpInternetPerMbpsMo != null ? cOpex.corpInternetPerMbpsMo : M.corpInternetPerMbpsMoDefault;
+                    var connectivity = Math.round(provMbps * corpRate * 12);
+
+                    // ── Real estate & tax
+                    var landRate = cOpex.landLeasePerM2Yr != null ? cOpex.landLeasePerM2Yr : M.landLeasePerM2YrDefault;
+                    var landLease = Math.round(grossM2 * landRate);
+                    var propTaxPct = cOpex.propertyTaxRatePct != null ? cOpex.propertyTaxRatePct : M.propertyTaxRatePctDefault;
+                    var propertyTax = Math.round(capex * (propTaxPct / 100));
+                    var insurance = Math.round(capex * M.insurancePctOfCapex);
+                    if (!capex) warnings.push('propertyTax=0 & insurance=0: no opts.capex basis provided');
+
+                    function line(id, label, annual, unit, basis, perCountry) {
+                        return { id: id, label: label, annual: Math.round(annual || 0), unit: unit, basis: basis, perCountry: !!perCountry };
+                    }
+                    var groups = [
+                        { group: 'Energy', lines: [
+                            line('electricity', 'Grid Electricity', electricity, 'USD/yr', mw + 'MW × PUE ' + pueVal.toFixed(2) + ' × ' + hrs + 'h × $' + powerRate + '/kWh', true),
+                            line('water', 'Water (cooling makeup)', water, 'USD/yr', Math.round(waterM3) + ' m³ × $' + waterTariff + '/m³', true),
+                            line('carbon', 'Carbon Levy', carbon, 'USD/yr', Math.round(carbonTonnes) + ' tCO₂ × grid price', true)
+                        ]},
+                        { group: 'People', lines: [
+                            line('manpower', 'In-house Manpower', manpower, 'USD/yr', fte + ' FTE × loaded local salary', true)
+                        ]},
+                        { group: 'Contracts & Maintenance', lines: [
+                            line('outsourcedOm', 'Outsourced M&E O&M', outsourcedOm, 'USD/yr', strat.label + ' · ' + strat.contractSplitPct + '% contract', false),
+                            line('mePm', 'M&E Preventive Maint', mePm, 'USD/yr', mw + 'MW × $' + M.mePmPerMwYr + '/MW × ' + strat.costIndexVsOemFull, false),
+                            line('ictMaint', 'ICT / Network Maint', ictMaint, 'USD/yr', mw + 'MW × $' + M.ictNetworkPerMwYr + '/MW', false),
+                            line('cleaning', 'Outsourced Cleaning', cleaning, 'USD/yr', grossM2 + ' m² × $' + cleanRate + '/m²', true)
+                        ]},
+                        { group: 'Security', lines: [
+                            line('security', 'Physical Security (guards)', security, 'USD/yr', guardPosts + ' posts × 4.5 FTE × $' + guardPerGuard + '/guard', true),
+                            line('securitySystem', 'Security-System Maint', securitySystem, 'USD/yr', mw + 'MW × $' + M.securitySystemPerMwYr + '/MW', false)
+                        ]},
+                        { group: 'Compliance & Licenses', lines: [
+                            line('licenses', 'Software / BMS / DCIM', licenses, 'USD/yr', racks + ' racks × $' + M.softwareLicensePerRackYr + '/rack', false),
+                            line('certRenewal', 'Certification Renewals', certRenewal, 'USD/yr', 'Uptime M&O / ISO amortized', false),
+                            line('permits', 'Annual Permits', permits, 'USD/yr', 'operating/fire + env $' + envPermit, false)
+                        ]},
+                        { group: 'Connectivity', lines: [
+                            line('connectivity', 'Corporate Internet / Bandwidth', connectivity, 'USD/yr', Math.round(provMbps) + ' Mbps × $' + corpRate + '/Mbps/mo', true)
+                        ]},
+                        { group: 'Real Estate & Tax', lines: [
+                            line('landLease', 'Land Lease / Rent', landLease, 'USD/yr', grossM2 + ' m² × $' + landRate + '/m²', true),
+                            line('propertyTax', 'Property & Local Tax', propertyTax, 'USD/yr', propTaxPct + '% × $' + Math.round(capex / 1e6) + 'M asset', true),
+                            line('insurance', 'Insurance', insurance, 'USD/yr', (M.insurancePctOfCapex * 100) + '% of capex', false)
+                        ]}
+                    ];
+                    var lines = [];
+                    groups.forEach(function (g) { g.lines.forEach(function (l) { lines.push(l); }); });
+                    var subtotal = 0; lines.forEach(function (l) { subtotal += l.annual; });
+                    var overhead = Math.round(subtotal * M.gaOverheadPct);
+                    groups.push({ group: 'Overhead', lines: [ line('overhead', 'G&A Overhead', overhead, 'USD/yr', (M.gaOverheadPct * 100) + '% of direct OPEX', false) ] });
+                    lines.push({ id: 'overhead', label: 'G&A Overhead', annual: overhead, unit: 'USD/yr', basis: '', perCountry: false });
+                    var total = subtotal + overhead;
+
+                    return {
+                        total: total,
+                        subtotal: subtotal,
+                        overhead: overhead,
+                        perKwMonth: mw > 0 ? Math.round((total / (mw * 1000) / 12) * 100) / 100 : 0,
+                        groups: groups,
+                        lines: lines,
+                        strategy: {
+                            id: input.maintenanceStrategy || 'standard_annual_compliance',
+                            label: strat.label,
+                            availabilityDeltaPct: strat.availabilityDeltaPct,
+                            inHouseFte: fte,
+                            guardPosts: guardPosts,
+                            contractSplitPct: strat.contractSplitPct
+                        },
+                        countryCode: code,
+                        grossFloorM2: grossM2,
+                        racks: racks,
+                        warnings: warnings
                     };
                 }
             },

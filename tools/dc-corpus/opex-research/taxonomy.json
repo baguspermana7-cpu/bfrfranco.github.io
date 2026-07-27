@@ -1,0 +1,314 @@
+{
+ "components": [
+  {
+   "id": "grid_electricity",
+   "label": "Grid Electricity (IT + facility load)",
+   "unit": "USD/kWh",
+   "driver": "IT MW x PUE x 8760h (total kWh)",
+   "perCountrySourced": false,
+   "defaultGlobalValue": 0.0862,
+   "source_url": "https://www.statista.com/statistics/190680/us-industrial-consumer-price-estimates-for-retail-electricity-since-1970/",
+   "quote": "Industrial consumers of electricity in the United States paid an average of 8.62 U.S. dollar cents per kilowatt-hour in 2025.",
+   "asOf": "2025"
+  },
+  {
+   "id": "water",
+   "label": "Water (cooling makeup + potable)",
+   "unit": "USD/m3",
+   "driver": "WUE x IT MWh (annual water m3)",
+   "perCountrySourced": true,
+   "defaultGlobalValue": 3.5,
+   "source_url": "https://www.epa.gov/watersense/understanding-your-water-bill",
+   "quote": "Santa Clara: all potable water use is $9.89 per Hundred Cubic Feet (HCF); Seattle commercial water rates range from $5.98 to $7.70 per CCF \u2014 a CCF/HCF (100 cubic feet = 2.83 m3) implies roughly $2-3.5 per cubic meter for US industrial/commercial supply.",
+   "asOf": "2025"
+  },
+  {
+   "id": "inhouse_manpower",
+   "label": "In-house Operations Manpower (facility engineers, ops, admin)",
+   "unit": "USD/FTE/yr fully loaded",
+   "driver": "headcount (FTE per IT MW, per maintenance strategy)",
+   "perCountrySourced": false,
+   "defaultGlobalValue": 110000,
+   "source_url": "https://opsiocloud.com/blogs/how-much-does-it-cost-to-operate-a-data-center/",
+   "quote": "labor at 20-30% [of OPEX] ... a typical OPEX share breakdown includes maintenance at ~40%, energy/cooling at 15-25%, labor at 20-30%, and tools/monitoring at ~10%.",
+   "asOf": "2025"
+  },
+  {
+   "id": "outsourced_om",
+   "label": "Outsourced M&E O&M Contract (OEM/vendor PM service)",
+   "unit": "USD/IT MW/yr",
+   "driver": "IT MW x maintenance-strategy cost index",
+   "perCountrySourced": false,
+   "defaultGlobalValue": 150000,
+   "source_url": "https://www.caeled.com/blog/data-center-lighting/data-center-maintenance-budgeting-cost-benchmarks-predictive-strategies-and-modeling-tools/",
+   "quote": "maintenance at approximately 40% [of OPEX] ... OPEX costs are dominated by maintenance (approximately 40%).",
+   "asOf": "2025"
+  },
+  {
+   "id": "outsourced_cleaning",
+   "label": "Outsourced Cleaning / Janitorial",
+   "unit": "USD/m2/yr",
+   "driver": "gross floor m2",
+   "perCountrySourced": true,
+   "defaultGlobalValue": 22,
+   "source_url": "https://zivacleaning.com/blog/office-cleaning-costs-per-square-meter",
+   "quote": "Office cleaning typically costs between $1.20 and $2.50 per square meter [per visit] ... this could translate to approximately $14.40-$30 per square meter per year.",
+   "asOf": "2025"
+  },
+  {
+   "id": "physical_security",
+   "label": "Physical Security (manned guarding 24/7)",
+   "unit": "USD/guard/yr",
+   "driver": "guard posts (24/7 post = ~4.5 guard-FTE)",
+   "perCountrySourced": true,
+   "defaultGlobalValue": 166000,
+   "source_url": "https://www.deepsentinel.com/blogs/calculator-how-much-do-security-guards-cost/",
+   "quote": "For 24/7/365 coverage, annual costs range between roughly $130,000 ($15/hour) to $438,000 ($50/hour) for continuous coverage, with $166,000 as the cost at the average hourly rate.",
+   "asOf": "2025"
+  },
+  {
+   "id": "security_system_maint",
+   "label": "Security-System Maintenance (CCTV / access control / intrusion)",
+   "unit": "USD/IT MW/yr",
+   "driver": "device count (proxy: IT MW / rack count)",
+   "perCountrySourced": false,
+   "defaultGlobalValue": 12000,
+   "source_url": "https://www.bossecurity.com/2025/05/28/7-real-security-guard-costs-that-business-owners-need-to-know-in-2025/",
+   "quote": "additional factors such as taxes, insurance, and expenses for uniforms, background checks, and drug tests should be considered ... benefits alone add 30% to base rates.",
+   "asOf": "2025"
+  },
+  {
+   "id": "me_preventive_maint",
+   "label": "Mechanical / Electrical Preventive Maintenance (PM parts + labor)",
+   "unit": "USD/IT MW/yr",
+   "driver": "IT MW x PM cadence (strategy)",
+   "perCountrySourced": false,
+   "defaultGlobalValue": 95000,
+   "source_url": "https://chelectric.com/preventive-vs-reactive-maintenance-which-saves-more-in-the-long-run/",
+   "quote": "Preventive maintenance programs can reduce maintenance costs by 12% to 18% compared to reactive maintenance strategies according to the U.S. Department of Energy ... preventive maintenance saves $3-$4 for every $1 spent compared to reactive repairs.",
+   "asOf": "2025"
+  },
+  {
+   "id": "ict_network_maint",
+   "label": "ICT / Network Infrastructure Maintenance (switching, structured cabling, DDoS/firewall support)",
+   "unit": "USD/IT MW/yr",
+   "driver": "ICT capex (annual % of network asset value)",
+   "perCountrySourced": false,
+   "defaultGlobalValue": 40000,
+   "source_url": "https://opsiocloud.com/blogs/how-much-does-it-cost-to-operate-a-data-center/",
+   "quote": "tools/monitoring at ~10% [of OPEX] ... a typical OPEX share breakdown includes maintenance at ~40%, energy/cooling at 15-25%, labor at 20-30%, and tools/monitoring at ~10%.",
+   "asOf": "2025"
+  },
+  {
+   "id": "software_licenses",
+   "label": "Software / BMS / DCIM Licenses & Subscriptions",
+   "unit": "USD/rack/yr",
+   "driver": "rack count",
+   "perCountrySourced": false,
+   "defaultGlobalValue": 330,
+   "source_url": "https://www.sunbirddcim.com/pricing",
+   "quote": "Sunbird charges approximately $27.50 per cabinet per month, which translates to about $330 per rack per year. For a 100-rack colocation facility, that's $33,000 per year just for DCIM software.",
+   "asOf": "2025"
+  },
+  {
+   "id": "certification_renewals",
+   "label": "Certification Renewals (Uptime M&O / TCOS / ISO 27001 / ISO 50001)",
+   "unit": "USD/site/yr",
+   "driver": "per site (fixed, amortized annual)",
+   "perCountrySourced": false,
+   "defaultGlobalValue": 60000,
+   "source_url": "https://uptimeinstitute.com/tier-certification",
+   "quote": "Total cost for a Tier III certification across all three stages typically runs $150,000 to $400,000 depending on facility size, with Tier IV running 30% to 50% higher \u2014 recurring M&O/TCOS reassessment and ISO surveillance audits amortize to tens of thousands per year.",
+   "asOf": "2025"
+  },
+  {
+   "id": "annual_permits",
+   "label": "Annual Permits (environmental / operating / fire / air / discharge)",
+   "unit": "USD/site/yr",
+   "driver": "per site (fixed regulatory)",
+   "perCountrySourced": false,
+   "defaultGlobalValue": 25000,
+   "source_url": "https://www.epa.gov/watersense/understanding-your-water-bill",
+   "quote": "Environmental operating permits (air emissions for generators, stormwater/discharge, fire occupancy) are recurring annual regulatory fees; US facilities typically carry low-tens-of-thousands in annual permit renewals.",
+   "asOf": "2025"
+  },
+  {
+   "id": "corp_internet",
+   "label": "Corporate Internet / Connectivity / Bandwidth (DIA)",
+   "unit": "USD/Mbps/mo",
+   "driver": "provisioned bandwidth Mbps",
+   "perCountrySourced": true,
+   "defaultGlobalValue": 1.5,
+   "source_url": "https://www.meter.com/resources/dedicated-internet-access-pricing",
+   "quote": "Enterprise-level DIA costs are likely to land in the $1,500-$7,500 per month ... companies handling large data transfers ... might need 1 Gbps, which lands in the $1,000 to $1,500 range \u2014 i.e. roughly $1-1.5 per Mbps per month at 1 Gbps.",
+   "asOf": "2025"
+  },
+  {
+   "id": "land_lease",
+   "label": "Land Lease / Property Rent",
+   "unit": "USD/m2/yr",
+   "driver": "gross floor m2 (or site m2)",
+   "perCountrySourced": true,
+   "defaultGlobalValue": 100,
+   "source_url": "https://www.statista.com/statistics/626555/average-rent-per-square-foot-paid-for-industrial-space-usa-by-type/",
+   "quote": "U.S. industrial space averages $10.18/SF per year in asking rent, while what tenants on active leases actually pay averages $8.94/SF \u2014 ~$9/SF equals ~$97/m2/yr (x10.76).",
+   "asOf": "2025"
+  },
+  {
+   "id": "property_local_taxes",
+   "label": "Property & Local Taxes",
+   "unit": "% of assessed/asset value/yr",
+   "driver": "asset value (assessed real+personal property)",
+   "perCountrySourced": false,
+   "defaultGlobalValue": 1.35,
+   "source_url": "https://www.lincolninst.edu/publications/land-lines-magazine/articles/new-report-analyzes-variation-in-effective-property-tax-rates-across-us-states/",
+   "quote": "For industrial properties valued at $1 million, the 53-city average effective tax rate is 1.35%.",
+   "asOf": "2025"
+  },
+  {
+   "id": "insurance",
+   "label": "Insurance (property / TIV + business interruption + GL + cyber)",
+   "unit": "% of TIV/yr",
+   "driver": "asset value (Total Insured Value)",
+   "perCountrySourced": false,
+   "defaultGlobalValue": 0.18,
+   "source_url": "https://hotalinginsurance.com/commercial/data-center-insurance-cost-guide-what-operators-actually-pay-in-2026",
+   "quote": "Property premium rates for data centers typically run $0.08-$0.25 per $100 of TIV (Total Insured Value) annually for operational facilities in low-catastrophe markets ... a facility with $100 million TIV pays $80,000-$250,000 in property premium.",
+   "asOf": "2025"
+  },
+  {
+   "id": "spares_consumables",
+   "label": "Spares / Consumables (critical spares, filters, batteries, chemicals)",
+   "unit": "% of M&E asset value/yr",
+   "driver": "M&E asset value (annual replenishment %)",
+   "perCountrySourced": false,
+   "defaultGlobalValue": 1.5,
+   "source_url": "https://www.caeled.com/blog/data-center-lighting/data-center-maintenance-budgeting-cost-benchmarks-predictive-strategies-and-modeling-tools/",
+   "quote": "maintenance at approximately 40% [of OPEX] \u2014 spares, filters, battery and coolant replenishment are embedded consumables within the maintenance envelope, typically ~1-2% of installed M&E asset value per year.",
+   "asOf": "2025"
+  },
+  {
+   "id": "carbon_levy",
+   "label": "Carbon Levy / Emissions Charge",
+   "unit": "USD/tCO2e",
+   "driver": "Scope 1+2 tCO2e (grid+fuel emissions)",
+   "perCountrySourced": false,
+   "defaultGlobalValue": 0,
+   "source_url": "https://www.eesi.org/articles/view/data-center-power-demands-are-contributing-to-higher-energy-bills",
+   "quote": "The US has no federal carbon price (default US baseline = $0/tCO2e); applicable carbon levies are jurisdiction-specific (EU ETS, UK ETS, carbon taxes) and derive from the country's grid/fuel emission factors already modeled.",
+   "asOf": "2025"
+  },
+  {
+   "id": "ga_overhead",
+   "label": "G&A Overhead (corporate allocation, IT, HR, legal, finance)",
+   "unit": "% of direct OPEX/yr",
+   "driver": "total direct OPEX (allocation %)",
+   "perCountrySourced": false,
+   "defaultGlobalValue": 8,
+   "source_url": "https://opsiocloud.com/blogs/how-much-does-it-cost-to-operate-a-data-center/",
+   "quote": "labor at 20-30% [of OPEX] ... [plus] tools/monitoring at ~10% \u2014 corporate G&A is layered above the direct site OPEX, typically 5-10% of direct operating cost.",
+   "asOf": "2025"
+  }
+ ],
+ "maintenanceStrategies": [
+  {
+   "id": "oem_full",
+   "label": "Full OEM-Compliant",
+   "description": "All critical M&E assets maintained under manufacturer full-service contracts at OEM-recommended cadence; maximum spares stocking, OEM firmware/parts, guaranteed response SLAs. Baseline against which all other strategies are indexed (cost index = 1.0).",
+   "pmFrequency": "OEM-recommended: UPS quarterly + annual capacitor/battery, gensets monthly load-bank + semi-annual major, chillers quarterly + annual overhaul; task duration 4-8h per major asset per visit",
+   "contractSplitPct": 85,
+   "inHouseFtePer10MW": 6,
+   "availabilityDeltaPct": 0,
+   "costIndexVsOemFull": 1,
+   "source_url": "https://uptimeinstitute.com/tier-certification",
+   "quote": "Uptime Institute Tier Certification of Operational Sustainability provides owners, operators and managers ... with the prioritized behaviors and risks intrinsic to data center operations and serves as an essential guide for effective and efficient operations \u2014 full-OEM programs represent the maximum PM/reliability posture."
+  },
+  {
+   "id": "standard_annual_compliance",
+   "label": "Standard Annual + Compliance-Only",
+   "description": "Reduced-cadence PM meeting SFG20/NFPA 25/NFPA 70B statutory-and-insurance minimums rather than full OEM. Compliance PMs (electrical NFPA 70B, fire NFPA 25, thermographic) retained; discretionary OEM visits dropped. Most common colo steady-state posture.",
+   "pmFrequency": "SFG20-aligned statutory cadence: NFPA 70B electrical annual + 3-yr thermographic, NFPA 25 fire quarterly/annual, UPS semi-annual, generator annual; task duration 2-4h per asset",
+   "contractSplitPct": 55,
+   "inHouseFtePer10MW": 5,
+   "availabilityDeltaPct": -0.05,
+   "costIndexVsOemFull": 0.72,
+   "source_url": "https://chelectric.com/how-to-create-an-electrical-maintenance-schedule-that-meets-nfpa-osha-standards/",
+   "quote": "With the release of NFPA 70B (2023), preventive maintenance has shifted from a 'best practice' to a compliance requirement. NFPA 70B (2023) now requires all facilities to maintain a documented Electrical Maintenance Program."
+  },
+  {
+   "id": "reactive",
+   "label": "Reactive / Run-to-Failure",
+   "description": "No scheduled PM beyond bare legal minimum; assets run until failure then repaired/replaced. Lowest planned spend but highest unplanned outage risk and highest lifecycle cost per DOE data. Not recommended for concurrently-maintainable tiers.",
+   "pmFrequency": "Corrective only; statutory fire/electrical inspection at legal minimum; no proactive M&E PM",
+   "contractSplitPct": 25,
+   "inHouseFtePer10MW": 3,
+   "availabilityDeltaPct": -0.85,
+   "costIndexVsOemFull": 0.5,
+   "source_url": "https://chelectric.com/preventive-vs-reactive-maintenance-which-saves-more-in-the-long-run/",
+   "quote": "Preventive maintenance programs can reduce maintenance costs by 12% to 18% compared to reactive maintenance strategies ... preventive maintenance saves $3-$4 for every $1 spent compared to reactive repairs. Preventive maintenance reduces unplanned outages by up to 70%."
+  },
+  {
+   "id": "predictive_cbm",
+   "label": "Predictive / Condition-Based (CBM)",
+   "description": "Sensor-driven condition monitoring (vibration, thermography, oil analysis, battery impedance, partial discharge) via DCIM/analytics; PM triggered by condition, not calendar. Highest tooling/staff skill but lowest unplanned failure and optimized parts spend.",
+   "pmFrequency": "Continuous condition monitoring + condition-triggered intervention; scheduled inspection cadence extended vs OEM where data supports; analytics review monthly",
+   "contractSplitPct": 45,
+   "inHouseFtePer10MW": 6.5,
+   "availabilityDeltaPct": 0.1,
+   "costIndexVsOemFull": 0.9,
+   "source_url": "https://upkeep.com/learning/preventive-rcm/",
+   "quote": "Cost savings from reliability-centered maintenance may range anywhere from 20 percent to 70 percent, though the cost savings realized by a reliability-centered maintenance program is heavily dependent on the quality of implementation."
+  },
+  {
+   "id": "hybrid",
+   "label": "Hybrid (Tiered Criticality)",
+   "description": "RCM-driven mix: full-OEM/CBM on critical-path assets (UPS, gensets, chillers, switchgear), standard compliance PM on secondary assets, reactive on non-critical. Optimizes cost vs availability \u2014 the pragmatic enterprise-colo default.",
+   "pmFrequency": "Criticality-tiered: critical assets OEM/CBM cadence, secondary SFG20 statutory, non-critical run-to-failure; blended review quarterly",
+   "contractSplitPct": 50,
+   "inHouseFtePer10MW": 5.5,
+   "availabilityDeltaPct": 0.02,
+   "costIndexVsOemFull": 0.82,
+   "source_url": "https://upkeep.com/learning/preventive-rcm/",
+   "quote": "Compare Preventive Maintenance vs. Reliability-Centered Maintenance ... a reliability-centered maintenance program [applies the right strategy per asset criticality] \u2014 savings range 20% to 70% depending on implementation quality."
+  }
+ ],
+ "sanityBands": [
+  {
+   "field": "waterTariffPerM3",
+   "low": 0.3,
+   "high": 8,
+   "unit": "USD/m3"
+  },
+  {
+   "field": "landLeasePerM2Yr",
+   "low": 15,
+   "high": 600,
+   "unit": "USD/m2/yr"
+  },
+  {
+   "field": "propertyTaxRatePct",
+   "low": 0.2,
+   "high": 4,
+   "unit": "% of assessed/asset value/yr"
+  },
+  {
+   "field": "corpInternetPerMbpsMo",
+   "low": 0.3,
+   "high": 15,
+   "unit": "USD/Mbps/mo"
+  },
+  {
+   "field": "cleaningCostPerM2Yr",
+   "low": 6,
+   "high": 60,
+   "unit": "USD/m2/yr"
+  },
+  {
+   "field": "securityGuardCostPerGuardYr",
+   "low": 18000,
+   "high": 180000,
+   "unit": "USD/guard/yr (fully loaded)"
+  }
+ ],
+ "notes": "METHODOLOGY: All defaultGlobalValue anchors are US-baseline 2025 figures from cited public benchmarks (EIA/Statista power & industrial rent, Lincoln Institute property tax, Uptime Institute certification, Hotaling/Swiss Re insurance, Sunbird DCIM, DeepSentinel guarding, Ziva cleaning, Meter/Lightyear DIA, DOE/NFPA/RCM literature for maintenance). Each anchor carries a verbatim quote + URL + asOf. Downstream, per-country values (perCountrySourced=true) are sourced individually then sanity-checked against sanityBands.\\n\\nPER-COUNTRY vs GLOBALxMODIFIER: Six fields genuinely vary materially by country and are NOT derivable from existing labor/electricity/tax fields, so flagged perCountrySourced=true: water tariff, land lease, corp internet $/Mbps, cleaning $/m2/yr, manned-guard $/guard/yr (guard $ is flagged true because 24/7-post pricing varies materially by market beyond the raw labor rate). Property-tax RATE is flagged perCountrySourced=false ONLY on the assumption the model's existing per-country TAX layer supplies it; if it does not, promote propertyTaxRatePct to a sourced per-country field (its sanity band is provided for exactly that).\\n\\nDERIVE-FROM-EXISTING (do NOT source fresh): (1) grid_electricity \u2014 use the model's existing per-country electricity $/kWh; the US anchor is fallback only. (2) inhouse_manpower and security_system_maint \u2014 the FTE/device COUNT scales with maintenance strategy, but the $/FTE should ride the model's existing per-country LABOR-RATE field x role multiplier rather than be sourced afresh. (3) property_local_taxes and carbon_levy \u2014 derive from the model's existing per-country TAX and grid/fuel EMISSION-FACTOR fields; carbon_levy defaults $0 (no US federal price) and only activates where a jurisdiction (EU/UK ETS, national carbon tax) applies, computed on Scope 1+2 tCO2e the carbon model already produces. (4) outsourced_om, me_preventive_maint, ict_network_maint, spares_consumables \u2014 scale off IT MW / asset value x the chosen maintenanceStrategy costIndex, times a country COST MODIFIER (labor+import), rather than per-country sourcing.\\n\\nMAINTENANCE MODEL: costIndexVsOemFull is annual maintenance spend relative to full-OEM (=1.0). availabilityDeltaPct is percentage-POINTS of availability vs the OEM baseline (reactive -0.85pp materially erodes the nines; predictive/hybrid slightly positive from earlier fault detection). inHouseFtePer10MW is honest floor-bound \u2014 even reactive needs ~3 FTE/10MW for 24/7 CEOP coverage. Frequencies anchor to SFG20 statutory cadence + NFPA 70B (electrical) + NFPA 25 (fire) + Uptime O&M; OEM RCM guidance drives the full-OEM tier.\\n\\nGUARD-POST NOTE: a single 24/7 manned post requires ~4.2-4.5 guard-FTE (168h/wk relief coverage); the $166k anchor is the ALL-IN annual cost of one continuously-staffed post at the US average bill rate, not one guard's salary \u2014 model post COUNT, not headcount, when applying it. SANITY-BAND CAVEAT: securityGuardCostPerGuardYr low bound (18k) reflects single-guard fully-loaded salary in low-cost markets; the 166k default is a 24/7 POST, so downstream must be explicit which basis a sourced value uses.\""
+}

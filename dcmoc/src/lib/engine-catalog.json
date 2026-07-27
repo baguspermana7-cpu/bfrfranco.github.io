@@ -3,8 +3,8 @@
  "note": "AUTO-GENERATED from rz-engine.js — do not hand-edit. Consumers are grep-derived from real usage.",
  "dataVersion": "2.5.1",
  "modelCount": 53,
- "functionCount": 234,
- "sourceCount": 159,
+ "functionCount": 235,
+ "sourceCount": 162,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -1193,6 +1193,12 @@
      "params": [
       "climate",
       "designDeltaT"
+     ]
+    },
+    {
+     "name": "fullBreakdown",
+     "params": [
+      "input"
      ]
     },
     {
@@ -2390,6 +2396,12 @@
    "asOf": "2026-Q1"
   },
   {
+   "key": "countries.opex",
+   "source": "WS0 per-country OPEX research (2026-07, 3-agent research→adversarial fact-check, 40 countries × 6 fields): water tariff (national utility filings), industrial land lease (JLL/CBRE/Cushman), property-tax % (national valuation authorities), enterprise DIA $/Mbps (carrier pricing), commercial cleaning $/m² (facilities benchmarks), fully-loaded guard $/guard·yr (national security-wage + statutory loading).",
+   "asOf": "2025",
+   "method": "each cell has source_url+quote+confidence in tools/dc-corpus/opex-research/facts.jsonl; 90/240 cells screening-confidence (benchmark-extrapolated, logged); fact-checker corrected NZ/CA water (USD conversion), ZA internet, and NG/KE/ZA/CO guard clamping"
+  },
+  {
    "key": "currency",
    "source": "ECB / central-bank reference rates",
    "asOf": "2026-04",
@@ -2720,6 +2732,18 @@
    "key": "opexDefaults",
    "source": "Engine model defaults (industry-typical ranges)",
    "asOf": "2026"
+  },
+  {
+   "key": "opexModel",
+   "source": "WS0 3-agent OPEX research (2026-07): US-baseline anchors — cleaning $14.4-30/m²·yr (Ziva commercial-cleaning), Uptime Tier-cert/ISO surveillance amortized, Sunbird DCIM $330/rack·yr, US industrial DIA ~$1-1.5/Mbps·mo (Meter), 53-city industrial property tax 1.35% (Lincoln Institute), US industrial rent ~$97/m²·yr (Statista); guard $/guard·yr per-country. Global-uniform lines scale by IT MW/racks/gross-floor/asset-value and inherit country cost via labor/electricity/tax.",
+   "asOf": "2025",
+   "method": "US-baseline anchors; per-country location-variant factors in countries[code].opex; full provenance rows in tools/dc-corpus/opex-research/facts.jsonl"
+  },
+  {
+   "key": "opexModel.maintenanceStrategies",
+   "source": "WS0 maintenance-strategy taxonomy (SFG20 · OEM RCM · NFPA 25/70B · Uptime O&M): full-OEM=cost-index 1.0 + best availability; standard-annual+compliance 0.72; reactive/run-to-failure 0.5 + worst availability; predictive/CBM 0.9 + best-availability uplift; hybrid 0.82. contractSplit%, in-house FTE/10MW, availability delta (pp) per strategy.",
+   "asOf": "2025",
+   "method": "reviewer-verified internal coherence (highest cost = lowest downtime); costIndex scales M&E PM + O&M contract; FTE scales manpower; availabilityDelta feeds reliability"
   },
   {
    "key": "opsBudget",
