@@ -13,6 +13,14 @@ release sections rather than semver.
 
 ---
 
+## v1.118.0 — 2026-07-27 (DCMOC — maintenance-strategy deep-dive: 5-strategy taxonomy wired to staffing + availability)
+
+### Added
+- **Maintenance-strategy deep-dive** on Maintenance → Strategy. The planned-maintenance regime expanded from 2 (OEM-full / standard-annual) to the full **5-strategy worldwide taxonomy** — Full OEM-compliant · Predictive/CBM · Hybrid (criticality-tiered) · Standard annual + compliance-only · Reactive/run-to-failure — researched from SFG20 / OEM RCM / NFPA 25/70B / Uptime O&M. A dropdown + per-strategy cards surface each strategy's **PM frequency, task scope, contract-vs-in-house split, indicative in-house FTE/10 MW, availability delta and annual cost index**, alongside the **engine-computed** PM labor-hours, site FTE and availability % for the current project.
+
+### Changed
+- `DATA.maintenance.ops.pmRegime` carries all 5 strategies (aligned key-for-key with `DATA.opexModel.maintenanceStrategies`): `pmHoursMult` scales PM labor demand in `models.maintenance.opsHeadcount`; `failureMult` scales the deferred-servicing failure exposure in `models.maintenance.availabilityImpact` — so the strategy choice flows through to **staffing (Staffing page) and computed availability (Risk page) app-wide** (predictive/CBM gives the best availability 99.982%, reactive the worst 99.968% at the reference 20 MW / Tier III). Store `pmRegime` enum + `DowntimeCalculator` widened to 5. Sourced. Engine 762/0, reference-parity 155/0, walk 31/0, trace-parity 116/116, calibration 19/0.
+
 ## v1.117.0 — 2026-07-27 (DCMOC — Financial Statements: P&L · Balance Sheet · Sankey)
 
 ### Added

@@ -119,7 +119,7 @@ export const computedDowntime = (
     slaKey: '2hr' | '4hr' | 'nbd',
     costPerMin?: number,
     country?: CountryProfile,
-    pmRegime?: 'oem-full' | 'standard-annual'
+    pmRegime?: 'oem-full' | 'standard-annual' | 'predictive-cbm' | 'hybrid' | 'reactive'
 ): ComputedDowntime => {
     // Design reference + country/tier cost-per-minute resolution (single source)
     const base = calculateDowntimeRisk(tier, costPerMin, 4, country);

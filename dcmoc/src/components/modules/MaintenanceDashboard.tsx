@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSimulationStore, normalizeStrategyMix, STRATEGY_MIX_PRESETS, StrategyMix, effectiveInHouseFrac } from '@/store/simulation';
-import { rzModels } from '@/lib/rz-engine';
+import { rzModels, rzData } from '@/lib/rz-engine';
 import { StatusChip } from '@/components/ui/StatusChip';
 import { useCapexStore } from '@/store/capex';
 import { ASSETS } from '@/constants/assets';
@@ -213,23 +213,34 @@ export function MaintenanceDashboard() {
     const [slaFacilityAged, setSlaFacilityAged] = useState(false); // facility >10yr (×1.5)
     const engineReady = useEngineReady(); // re-run engine-bound memos once rz-engine.min.js lands
 
-    /* Workstream 10 — planned-maintenance compliance regime: OEM-full vs standard-
-     * annual. Compute the ops headcount under BOTH so the UI shows the manpower delta
-     * (standard-annual pulls most PM to annual → far fewer labor-hours). */
-    const pmRegimeCompare = useMemo(() => {
-        const fn = rzModels().maintenance?.opsHeadcount;
-        if (typeof fn !== 'function') return null;
+    /* WS3 — maintenance-strategy deep-dive: compute the ops headcount + availability
+     * under ALL 5 strategies (DATA.maintenance.ops.pmRegime) so the picker shows the
+     * real manpower / PM-hours / availability trade per strategy, plus the sourced
+     * deep-dive descriptors (PM frequency, task scope, contract split, cost index). */
+    const pmStrategies = useMemo(() => {
+        const reg = (rzData().maintenance?.ops?.pmRegime ?? {}) as Record<string, {
+            label: string; pmFrequency: string; taskScope: string; note: string;
+            contractSplitPct: number; inHouseFtePer10MW: number; availabilityDeltaPct: number; costIndexVsOemFull: number;
+        }>;
+        const ordered = ['oem-full', 'predictive-cbm', 'hybrid', 'standard-annual', 'reactive'].filter((k) => reg[k]);
+        const hc = rzModels().maintenance?.opsHeadcount;
+        const av = rzModels().maintenance?.availabilityImpact;
         const common = {
-            itLoadKw: inputs.itLoad,
-            tier: inputs.tierLevel,
+            itLoadKw: inputs.itLoad, itLoadMw: inputs.itLoad / 1000, tier: inputs.tierLevel, tierLevel: inputs.tierLevel,
             mix: inputs.strategyMix ?? STRATEGY_MIX_PRESETS[inputs.maintenanceStrategy || 'planned'],
-            inHouseFrac: effectiveInHouseFrac(inputs),
+            strategyMix: inputs.strategyMix ?? STRATEGY_MIX_PRESETS[inputs.maintenanceStrategy || 'planned'],
+            inHouseFrac: effectiveInHouseFrac(inputs), nDc: 1,
         };
-        try {
-            const oem = fn({ ...common, pmRegime: 'oem-full' }) as { totalFte: number; laborHours: { pm: number; total: number } };
-            const std = fn({ ...common, pmRegime: 'standard-annual' }) as { totalFte: number; laborHours: { pm: number; total: number } };
-            return { oem, std };
-        } catch { return null; }
+        return ordered.map((id) => {
+            let fte: number | undefined, pmH: number | undefined, availPct: number | undefined, downtimeMin: number | undefined;
+            try {
+                if (typeof hc === 'function') { const r = hc({ ...common, pmRegime: id }) as { totalFte: number; laborHours: { pm: number } }; fte = r.totalFte; pmH = r.laborHours?.pm; }
+            } catch { /* */ }
+            try {
+                if (typeof av === 'function') { const a = av({ ...common, pmRegime: id }) as { availabilityPct?: number; availability?: number; downtimeMinPerYear?: number }; availPct = a.availabilityPct ?? (a.availability != null ? a.availability * 100 : undefined); downtimeMin = a.downtimeMinPerYear; }
+            } catch { /* */ }
+            return { id, ...reg[id], fte, pmH, availPct, downtimeMin };
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inputs.itLoad, inputs.tierLevel, inputs.strategyMix, inputs.maintenanceStrategy, inputs.maintenanceModel, inputs.hybridRatio, engineReady]);
 
@@ -542,47 +553,79 @@ export function MaintenanceDashboard() {
                 <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-5 mb-6 shadow-sm dark:shadow-none">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-1">
                         <Wrench className="w-4 h-4 text-rz-info" />
-                        Planned-Maintenance Compliance Regime <Tooltip content="Two ways to run a planned program. OEM-compliant executes every OEM PM task at the manufacturer's interval — maximum reliability and warranty compliance, maximum manpower. Standard consolidates most tasks to annual and keeps only 1-2 critical systems (UPS batteries, gensets) at OEM frequency — far fewer labor-hours, but ~12% higher failure exposure from deferred servicing." />
+                        Maintenance Strategy <Tooltip content="The worldwide-applicable maintenance-strategy taxonomy (SFG20 · OEM RCM · NFPA · Uptime). Full OEM-compliant runs every OEM PM task at its interval (max reliability, max manpower + contract). Predictive/CBM uses condition monitoring to cut routine PM while catching faults early (best availability). Hybrid tiers effort by criticality. Standard consolidates most tasks to annual + statutory only. Reactive/run-to-failure does statutory minimum and fixes on fail (lowest cost, worst availability). The choice drives PM labor demand + failure rate → staffing (Staffing page) and computed availability (Risk page) app-wide." />
                     </h3>
-                    <p className="text-xs text-slate-500 mb-3">Applies to the planned share of the strategy mix. Standard-annual trades a small reliability margin for a large manpower reduction.</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {([
-                            { id: 'oem-full', title: 'OEM-Compliant (Full)', desc: 'Every OEM PM task at its OEM interval. Max reliability + warranty compliance.', fte: pmRegimeCompare?.oem.totalFte, pmH: pmRegimeCompare?.oem.laborHours.pm },
-                            { id: 'standard-annual', title: 'Standard (Annual)', desc: 'Most tasks consolidated to annual; only 1-2 critical systems keep OEM frequency. Far less manpower, ~12% higher failure exposure.', fte: pmRegimeCompare?.std.totalFte, pmH: pmRegimeCompare?.std.laborHours.pm },
-                        ] as const).map((opt) => {
-                            const active = (inputs.pmRegime ?? 'oem-full') === opt.id;
+                    <p className="text-xs text-slate-500 mb-3">Applies to the planned share of the strategy mix. Drives PM labor-hours, failure exposure → availability (Risk) and staffing (Staffing) everywhere.</p>
+
+                    {/* dropdown selector */}
+                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                        <label className="text-[11px] uppercase tracking-wide text-slate-500">Selected strategy</label>
+                        <select
+                            value={inputs.pmRegime ?? 'oem-full'}
+                            onChange={(e) => actions.setInputs({ pmRegime: e.target.value as typeof inputs.pmRegime })}
+                            className="rounded border border-slate-300 dark:border-slate-700 bg-transparent px-2.5 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-200"
+                        >
+                            {pmStrategies.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+                        </select>
+                    </div>
+
+                    {/* deep-dive cards */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                        {pmStrategies.map((s) => {
+                            const active = (inputs.pmRegime ?? 'oem-full') === s.id;
                             return (
-                                <button key={opt.id} type="button" onClick={() => actions.setInputs({ pmRegime: opt.id })}
+                                <button key={s.id} type="button" onClick={() => actions.setInputs({ pmRegime: s.id as typeof inputs.pmRegime })}
                                     className={clsx(
-                                        "text-left p-4 rounded-lg border transition-all",
+                                        "text-left p-3.5 rounded-lg border transition-all",
                                         active ? "border-rz-info ring-2 ring-rz-info/30 bg-rz-info/5" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
                                     )}>
-                                    <div className="flex items-center justify-between mb-1">
-                                        <span className="text-sm font-bold text-slate-900 dark:text-white">{opt.title}</span>
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <span className="text-sm font-bold text-slate-900 dark:text-white">{s.label}</span>
                                         {active && <StatusChip tone="info">Selected</StatusChip>}
                                     </div>
-                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-2">{opt.desc}</p>
-                                    {opt.fte != null && (
-                                        <div className="flex items-center gap-3 text-[11px]">
-                                            <span className="font-mono font-bold text-slate-700 dark:text-slate-200">{opt.fte} FTE</span>
-                                            <span className="text-slate-400">·</span>
-                                            <span className="font-mono text-slate-500">{opt.pmH?.toLocaleString()} PM h/yr</span>
+                                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px] text-slate-500 mb-2">
+                                        <div><span className="text-slate-400">PM frequency:</span> <span className="text-slate-600 dark:text-slate-300">{s.pmFrequency}</span></div>
+                                        <div><span className="text-slate-400">Scope:</span> <span className="text-slate-600 dark:text-slate-300">{s.taskScope}</span></div>
+                                    </div>
+                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
+                                        <span className="font-mono text-slate-500" title="Contract vs in-house split">{s.contractSplitPct}% contract</span>
+                                        <span className="text-slate-300 dark:text-slate-600">·</span>
+                                        <span className="font-mono text-slate-500" title="Indicative in-house maintenance FTE per 10 IT MW (taxonomy)">{s.inHouseFtePer10MW} FTE/10MW</span>
+                                        <span className="text-slate-300 dark:text-slate-600">·</span>
+                                        <span className={clsx("font-mono", s.availabilityDeltaPct < 0 ? "text-rz-alert" : s.availabilityDeltaPct > 0 ? "text-rz-data" : "text-slate-500")} title="Availability delta vs OEM-full baseline">
+                                            {s.availabilityDeltaPct > 0 ? '+' : ''}{s.availabilityDeltaPct}pp avail
+                                        </span>
+                                        <span className="text-slate-300 dark:text-slate-600">·</span>
+                                        <span className="font-mono text-slate-500" title="Annual maintenance cost index vs full-OEM (=1.0)">×{s.costIndexVsOemFull} cost</span>
+                                    </div>
+                                    {(s.pmH != null || s.availPct != null) && (
+                                        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-400 border-t border-slate-100 dark:border-slate-800 pt-1.5">
+                                            {s.pmH != null && <span className="font-mono">computed: {Math.round(s.pmH).toLocaleString()} PM h/yr</span>}
+                                            {s.fte != null && <><span>·</span><span className="font-mono">{s.fte} site FTE</span></>}
+                                            {s.availPct != null && <><span>·</span><span className="font-mono">avail {s.availPct.toFixed(4)}%</span></>}
+                                            {s.downtimeMin != null && <><span>·</span><span className="font-mono">{Math.round(s.downtimeMin)} min/yr down</span></>}
                                         </div>
                                     )}
                                 </button>
                             );
                         })}
                     </div>
-                    {pmRegimeCompare && (() => {
-                        const fteSaved = Math.max(0, pmRegimeCompare.oem.totalFte - pmRegimeCompare.std.totalFte);
-                        const pmHSaved = pmRegimeCompare.oem.laborHours.pm - pmRegimeCompare.std.laborHours.pm;
+                    {(() => {
+                        const sel = pmStrategies.find((s) => s.id === (inputs.pmRegime ?? 'oem-full'));
+                        const oem = pmStrategies.find((s) => s.id === 'oem-full');
+                        if (!sel || !oem || sel.id === 'oem-full' || sel.pmH == null || oem.pmH == null) return (
+                            <p className="mt-3 text-[11px] text-cyan-700 dark:text-rz-info">
+                                {sel?.note}
+                            </p>
+                        );
+                        const pmHSaved = oem.pmH - sel.pmH;
+                        const availDelta = (sel.availPct != null && oem.availPct != null) ? (sel.availPct - oem.availPct) : sel.availabilityDeltaPct;
                         return (
                             <p className="mt-3 text-[11px] text-cyan-700 dark:text-rz-info">
-                                Switching OEM-full → standard-annual cuts <strong>{pmHSaved.toLocaleString()} PM labor-hours/yr</strong>
-                                {fteSaved > 0
-                                    ? <> ≈ <strong>{fteSaved} fewer FTE</strong></>
-                                    : <> — at this size the headcount stays <strong>floor-bound</strong> by 24/7 emergency-response coverage (the saving lands on vendor/overtime labor cost, and the FTE drop appears at larger campuses)</>}
-                                . The trade is ~12% higher failure exposure, reflected in Reliability/Risk availability.
+                                <strong>{sel.label}</strong> vs OEM-full: {pmHSaved >= 0 ? 'cuts' : 'adds'} <strong>{Math.abs(Math.round(pmHSaved)).toLocaleString()} PM labor-hours/yr</strong>,
+                                availability {availDelta >= 0 ? '+' : ''}{availDelta.toFixed(4)}pp, annual maintenance cost <strong>×{sel.costIndexVsOemFull}</strong>.
+                                {sel.fte === oem.fte && <> At this size site headcount stays <strong>floor-bound</strong> by 24/7 coverage — the labor saving lands on vendor/overtime cost.</>}
+                                {' '}{sel.note}
                             </p>
                         );
                     })()}
