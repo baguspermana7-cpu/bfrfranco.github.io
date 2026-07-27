@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.119.0 — 2026-07-27 (DCMOC — CAPEX input-dedup: soft-costs / sustainability / deep-sea single-owner)
+
+### Changed
+- **Finishes the CAPEX Assumptions input-dedup (WS4).** Seven fields that were still editable in BOTH the CAPEX Assumptions drawer and Requirements → Infrastructure — **Deep-Sea Water Cooling, Green Certification, Renewable Energy, Design Fee, PM Fee, Contingency, Project Year** — are now **read-only mirrors** on the CAPEX page (Edit ↗ jumps to Requirements), matching the established Building/Fire/Substation/Power-Backup pattern. Requirements → Infrastructure is the sole editor (it already carries the richer editors — sustainability + solar/BESS sizing, the delivery-basis group, and Design Margin ⇄ Contingency binding at Growth & Availability 1.5). No CAPEX cost input is editable in two places anymore; the CAPEX drawer reflects one shared source. Removed the now-dead `setDeepSea` setter. walk 31/0, trace-parity 116/116, enum-coverage 25. **The DCMOC OPEX program (WS0–WS4) is complete.**
+
 ## v1.118.0 — 2026-07-27 (DCMOC — maintenance-strategy deep-dive: 5-strategy taxonomy wired to staffing + availability)
 
 ### Added

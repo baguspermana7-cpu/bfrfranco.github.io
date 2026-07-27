@@ -61,7 +61,6 @@ const CapexDashboard = () => {
     // S9: the tick now lives in the SHARED capex store (inputs.deepSea) so the
     // Requirements 1.6 section, this drawer and the CDU page stay consistent.
     const deepSea = !!inputs.deepSea;
-    const setDeepSea = (v: boolean) => setInputs({ deepSea: v });
     const deepSeaModel = rzModels().cooling?.deepSea;
     const ds = useMemo(() => {
         if (!deepSea || typeof deepSeaModel !== 'function') return null;
@@ -194,19 +193,12 @@ const CapexDashboard = () => {
                             );
                         })()}
 
-                        {/* ─── COOLING add-on (CAPEX-only deep-sea study) ─── */}
-                        <div className="space-y-2">
-                            {typeof deepSeaModel === 'function' && (
-                                <div className="flex items-center gap-2 pt-1">
-                                    <input type="checkbox" id="capex-deepsea" checked={deepSea}
-                                        onChange={() => setDeepSea(!deepSea)} className="accent-cyan-600" />
-                                    <label htmlFor="capex-deepsea" className="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                                        <Waves className="w-3 h-3 text-cyan-600 dark:text-cyan-400" /> Deep Sea Water Cooling
-                                        <Tooltip content="Chiller-less deep-sea water cooling study (shared RZEngine v2.3.0 model): 3-loop seawater heat rejection via titanium PHE, WUE ≈ 0. Display-level add-on — does not alter the base CAPEX calculation." />
-                                    </label>
-                                </div>
-                            )}
-                        </div>
+                        {/* ─── COOLING add-on — canonical home Requirements (WS4 dedup) ─── */}
+                        {typeof deepSeaModel === 'function' && (
+                            <div className="pt-1">
+                                <RedMirror icon={Waves} label="Deep Sea Water Cooling" value={deepSea ? 'On' : 'Off'} tip="Owned by Requirements (Infrastructure → Systems) — chiller-less deep-sea seawater cooling study (WUE ≈ 0). Edit it there so Requirements, this drawer and the CDU page stay consistent." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
+                            </div>
+                        )}
 
                         {/* ─── BUILDING — canonical home Requirements (Workstream A dedup) ─── */}
                         {(() => {
@@ -247,32 +239,23 @@ const CapexDashboard = () => {
                             );
                         })()}
 
-                        {/* ─── SUSTAINABILITY ─── */}
+                        {/* ─── SUSTAINABILITY — canonical home Requirements (WS4 dedup) ─── */}
                         <div className="pt-3 border-t dark:border-slate-700 space-y-3">
                             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center">
                                 <Leaf className="w-3 h-3 mr-1" /> Sustainability <Tooltip content="Green certifications add 2-8% to build cost but reduce operating costs and improve ESG scores for investors." />
                             </label>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Green Certification <Tooltip content="LEED Silver: basic sustainable design (+2% cost). LEED Gold: high-performance building (+4%). LEED Platinum: maximum sustainability standard (+8%). Certification adds upfront cost but improves ESG scores and may unlock tax incentives." /></div>
-                                    <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.greenCert}
-                                        onChange={(e) => handleChange('greenCert', e.target.value)}>
-                                        <option value="none">None</option>
-                                        <option value="silver">LEED Silver (+2%)</option>
-                                        <option value="gold">LEED Gold (+4%)</option>
-                                        <option value="platinum">LEED Platinum (+8%)</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Renewable Energy <Tooltip content="Solar PV: rooftop or carport panels to offset grid consumption. Solar + BESS: solar with Battery Energy Storage System for peak shaving and grid independence. Adds CAPEX but reduces long-term OPEX." /></div>
-                                    <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.renewableOption}
-                                        onChange={(e) => handleChange('renewableOption', e.target.value)}>
-                                        <option value="none">None</option>
-                                        <option value="solar">Solar PV</option>
-                                        <option value="solar_bess">Solar + BESS</option>
-                                    </select>
-                                </div>
-                            </div>
+                            {(() => {
+                                const gc = inputs.greenCert;
+                                const gcLabel = gc === 'silver' ? 'LEED Silver (+2%)' : gc === 'gold' ? 'LEED Gold (+4%)' : gc === 'platinum' ? 'LEED Platinum (+8%)' : 'None';
+                                const ro = inputs.renewableOption;
+                                const roLabel = ro === 'solar' ? 'Solar PV' : ro === 'solar_bess' ? 'Solar + BESS' : 'None';
+                                return (
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <RedMirror icon={Leaf} label="Green Certification" value={gcLabel} tip="Owned by Requirements (Infrastructure → Sustainability & Renewables). Edit it there so build cost + ESG share one value." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
+                                        <RedMirror icon={Leaf} label="Renewable Energy" value={roLabel} tip="Owned by Requirements (Infrastructure → Sustainability & Renewables) — incl. solar / BESS sizing. Edit it there." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
+                                    </div>
+                                );
+                            })()}
                         </div>
 
                         {/* ─── SUBSTATION & GRID ─── */}
@@ -292,36 +275,15 @@ const CapexDashboard = () => {
                             })()}
                         </div>
 
-                        {/* ─── SOFT COSTS ─── */}
+                        {/* ─── SOFT COSTS — canonical home Requirements (WS4 dedup) ─── */}
                         <div className="pt-3 border-t dark:border-slate-700 space-y-3">
                             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase flex items-center">
                                 <Calculator className="w-3 h-3 mr-1" /> Soft Costs & Contingency <Tooltip content="Design fee covers A&E firms. PM fee covers construction oversight. Contingency is a buffer for unforeseen costs (industry standard 10-15%)." />
                             </label>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Design Fee <Tooltip content="Architecture & engineering design fee as a percentage of construction cost — covers A&E firms, MEP design and permitting drawings. Typical data-center range 3-6%; complex or fast-track designs trend higher. Applied to the base estimate before contingency." /></div>
-                                    <div className="flex items-center gap-1">
-                                        <input type="number" className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.designFee}
-                                            onChange={(e) => handleChange('designFee', Number(e.target.value))} min={0} max={20} />
-                                        <span className="text-xs text-slate-400 dark:text-slate-500">%</span>
-                                    </div>
-                                </div>
-                                <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">PM Fee <Tooltip content="Project/construction management fee as a percentage of construction cost — owner's PM team, construction oversight, QA/QC and commissioning coordination. Typical range 2-4%; multi-phase or remote-site builds run higher. Applied to the base estimate before contingency." /></div>
-                                    <div className="flex items-center gap-1">
-                                        <input type="number" className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.pmFee}
-                                            onChange={(e) => handleChange('pmFee', Number(e.target.value))} min={0} max={15} />
-                                        <span className="text-xs text-slate-400 dark:text-slate-500">%</span>
-                                    </div>
-                                </div>
-                                <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Contingency <Tooltip content="Owner's contingency percentage for unforeseen conditions, scope growth and estimating error. Industry standard 10-15% at concept stage (AACE Class 4 estimates often carry more); it is drawn down as design matures, not spent by default. This same value acts as the design margin and feeds the P80 risk band on the CAPEX engine page." /></div>
-                                    <div className="flex items-center gap-1">
-                                        <input type="number" className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.contingency}
-                                            onChange={(e) => handleChange('contingency', Number(e.target.value))} min={0} max={30} />
-                                        <span className="text-xs text-slate-400 dark:text-slate-500">%</span>
-                                    </div>
-                                </div>
+                                <RedMirror icon={Calculator} label="Design Fee" value={`${inputs.designFee}%`} tip="Owned by Requirements (Infrastructure → Delivery Basis) — A&E design fee % of construction. Edit it there." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
+                                <RedMirror icon={Calculator} label="PM Fee" value={`${inputs.pmFee}%`} tip="Owned by Requirements (Infrastructure → Delivery Basis) — project-management fee % of construction. Edit it there." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
+                                <RedMirror icon={Calculator} label="Contingency" value={`${inputs.contingency}%`} tip="Bound to Design Margin — owned by Requirements 1.5 (Growth & Availability). This same value is the design margin + P80 risk band. Edit it there." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
                             </div>
                         </div>
 
@@ -331,16 +293,8 @@ const CapexDashboard = () => {
                                 <Calendar className="w-3 h-3 mr-1" /> Project Year & Market <Tooltip content="Construction year affects material pricing via inflation indices. City market applies local labor and supply-chain cost multipliers." />
                             </label>
                             <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1">
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Project Year <Tooltip content="Construction start year. Applies inflation/deflation adjustment to all cost estimates based on construction cost indices." /></div>
-                                    <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.projYear}
-                                        onChange={(e) => handleChange('projYear', e.target.value)}>
-                                        <option value="2024">2024</option>
-                                        <option value="2025">2025</option>
-                                        <option value="2026">2026</option>
-                                        <option value="2027">2027</option>
-                                    </select>
-                                </div>
+                                <RedMirror icon={Calendar} label="Project Year" value={String(inputs.projYear)} tip="Owned by Requirements (Infrastructure → Delivery Basis) — construction start year (inflation index). Edit it there." homeLabel="requirements" onJump={() => actions.setActiveTab('requirements')} />
+
                                 <div className="space-y-1">
                                     <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">City Market <Tooltip content="City-level cost multiplier based on local labor rates, material costs, and market conditions. Silicon Valley and London are premium; Generic uses the country baseline." /></div>
                                     <select className="w-full p-2 text-sm text-slate-700 border rounded bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" value={inputs.cityMarket}
