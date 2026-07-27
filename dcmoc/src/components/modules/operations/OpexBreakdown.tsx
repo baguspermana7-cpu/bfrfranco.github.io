@@ -11,7 +11,7 @@
  * ──────────────────────────────────────────────────────────────────────────── */
 
 import React from 'react';
-import { rzModels, rzData } from '@/lib/rz-engine';
+import { rzModels, rzData, useEngineReady } from '@/lib/rz-engine';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { getPUE } from '@/constants/pue';
@@ -49,6 +49,7 @@ export function OpexBreakdown() {
     /* OPEX maintenance strategy is its own selection (the store's `maintenanceStrategy`
      * is the staffing-mix preset with a different enum) — kept local here; WS3 unifies. */
     const [strategy, setStrategy] = React.useState<string>('standard_annual_compliance');
+    const engineReady = useEngineReady();   // recompute once the deferred rz-engine.min.js is present
     const strategies = (rzData()?.opexModel?.maintenanceStrategies ?? {}) as Record<string, { label: string; availabilityDeltaPct: number; costIndexVsOemFull: number; contractSplitPct: number; inHouseFtePer10MW: number }>;
 
     const result = React.useMemo<OpexResult | null>(() => {
@@ -66,7 +67,7 @@ export function OpexBreakdown() {
                 maintenanceStrategy: strategy,
             }) as OpexResult;
         } catch { return null; }
-    }, [inputs.itLoad, inputs.coolingType, inputs.tierLevel, country?.id, capexTotal, strategy]);
+    }, [inputs.itLoad, inputs.coolingType, inputs.tierLevel, country?.id, capexTotal, strategy, engineReady]);
 
     if (!result) return null;
 

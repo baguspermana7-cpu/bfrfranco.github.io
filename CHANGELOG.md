@@ -13,6 +13,11 @@ release sections rather than semver.
 
 ---
 
+## v1.119.1 — 2026-07-27 (DCMOC — OPEX-breakdown deferred-engine race hardening)
+
+### Fixed
+- **Operations OPEX breakdown** now recomputes when the deferred `rz-engine.min.js` finishes loading — the `models.opex.fullBreakdown` memo gates on the `useEngineReady()` signal (same class of fix as the WS2 Financial-statements engine tick). Previously, if the Operations page mounted from persisted state before the engine script loaded, the breakdown could stay empty until an input changed. End-to-end verified all four OPEX-program surfaces render with 0 console errors (Operations breakdown · Finance P&L/Balance-Sheet/Sankey · Maintenance 5-strategy deep-dive · CAPEX read-only mirrors).
+
 ## v1.119.0 — 2026-07-27 (DCMOC — CAPEX input-dedup: soft-costs / sustainability / deep-sea single-owner)
 
 ### Changed
