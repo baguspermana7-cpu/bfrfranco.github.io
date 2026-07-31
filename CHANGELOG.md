@@ -13,6 +13,23 @@ release sections rather than semver.
 
 ---
 
+## v1.120.3 — 2026-07-31 (DCMOC owner-comment audit — final 2 programs clean, 1 residual purge)
+
+Audited the last 2 prior owner programs (DCMOC quality v1.110 + CAPEX AI-arch
+v1.100–.106) — **14/14 items genuinely wired** (BOQ 83-leaf reconciliation invariant
+holds, all 8 BOQ params drive quantities, archProfile uplift marginal + category-scoped,
+seismic wired to CAPEX, landedFactor no labor double-discount, dossier engCalcs real).
+**Audit now COMPLETE: ~66 items / 8 programs — 7 real defects found + all fixed, 0 remaining.**
+
+### Fixed
+- **Residual Anthropic-purple purged** — the Finance Sankey "Revenue" series color was a
+  leftover `#a78bfa`; replaced with on-palette teal `#2dd4bf` (rejected-purple stance, per
+  CLAUDE.md § "Rejected patterns").
+
+### Notes
+- `genType` in the BOQ is informational-by-design (fuel volume = diesel-store basis
+  regardless of genset type) — not a defect, disclosed in-code.
+
 ## v1.120.2 — 2026-07-31 (DCMOC owner-comment audit — full sweep, 4 more defects fixed)
 
 Extended the adversarial audit to every remaining prior owner review comment

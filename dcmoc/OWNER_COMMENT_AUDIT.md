@@ -88,10 +88,25 @@ Owner was **right that sloppiness existed** — but it was **2 items**, not ever
 - **v1.120.2**: MX-10(b) revenue hardcodes (280/120→single source) ✅ · AL-03/06 commissioning per-level real levelCosts share ✅ · MX-08 honest relabel ✅.
 - **UX-07 20kV**: NOT a defect (false positive) — substationType drives CAPEX correctly; gridVoltage=SLD only. No change (avoided double-count).
 
-## Grand total: ~52 items across 6 programs (A/B/C/D/E/F+M–X)
-- **48 genuinely engine-wired + working** on first audit.
-- **6 real defects** ("wired-but-degraded" class the owner suspected) — ALL fixed: C-001, C-03, MX-10b, AL-03/06, MX-08. (UX-07 investigated → false positive.)
-- Owner was right that sloppiness existed; it was ~11% of items, now 0.
+## Program H — CAPEX AI-arch (v1.100–.106) — audited 2026-07-31
+7/7 ✅ genuinely wired, all invariants hold:
+- AI-01 archProfiles uplift marginal `(peak/nominal)/1.2` (GB200 1.333×), electrical/ups/gen ONLY, GPU/interconnect excluded ✅
+- AI-02 cooling ladder (pueMatrix immersion 1p/2p/microfluidic + coolingTech DB) changes PUE ✅
+- AI-03 equipment schedule qty from redundancy (n+1/2n) not hardcoded ✅
+- AI-04 BOQ reconcileFactor forces Σlines≡categoryTotal, grandTotal≡CAPEX ✅
+- AI-05 cooling duty = IT heat (not IT×PUE) — v1.103.1 fix present ✅
+- AI-06 landedFactor = 1+duty×equipmentShare, labor share=0 (no double-discount) ✅
+- AI-07 dossier engCalcs are real worked calcs (NEC/transformer/UPS sizing) not stubs ✅
+
+## Program I — Quality program (v1.110.0–.2) — audited 2026-07-31
+7/7 ✅: BOQ exactly 83 leaves/53 subsystems/8 disciplines; all 8 params drive line quantities (seismic/cooling/fire/redundancy/fuel/rack/ups; genType informational-by-design, disclosed); reconcileFactor forces Σlines≡categoryTotal <$1; dossier nested tree render; `--rz-*` tokens + IBM Plex; KPI grid-fill fix; seismicZone wired to CAPEX (zone0 0.2×→zone4 8.0×).
+- ✅ FIXED (residual purple): `#a78bfa` Revenue-series color in FinancialStatements Sankey → `#2dd4bf` teal (rejected Anthropic-purple purged).
+
+## Grand total: ~66 items across 8 programs (A/B/C/D/E/F/H/I + M–X)
+- **59 genuinely engine-wired + working** on first audit.
+- **7 real findings, ALL fixed:** C-001 (lock), C-03 (rackForm), MX-10b (revenue), AL-03/06 (cx per-level), MX-08 (relabel), + Q-05 residual purple hex.
+- **1 false positive** investigated → not a defect (UX-07 20kV; substationType drives CAPEX correctly).
+- Owner was right that sloppiness existed; it was ~11% of items, now **0**. Ships: v1.120.1, v1.120.2, v1.120.3.
 
 ## Audit method (per row)
 1. Open the actual component/engine path.

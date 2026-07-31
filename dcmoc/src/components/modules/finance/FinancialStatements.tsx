@@ -270,7 +270,7 @@ export function FinancialStatements({ cashflows, capex, taxRate, depreciationYea
 function SankeyNode(props: { x?: number; y?: number; width?: number; height?: number; index?: number; payload?: { name: string } }) {
     const { x = 0, y = 0, width = 0, height = 0, payload } = props;
     const name = payload?.name ?? '';
-    const color = GROUP_COLOR[name] ?? (name === 'Revenue' ? '#a78bfa' : name === 'EBITDA' || name === 'Net Income' ? '#10b981' : name === 'Tax' ? '#f43f5e' : '#64748b');
+    const color = GROUP_COLOR[name] ?? (name === 'Revenue' ? '#2dd4bf' : name === 'EBITDA' || name === 'Net Income' ? '#10b981' : name === 'Tax' ? '#f43f5e' : '#64748b');
     return (
         <Layer>
             <Rectangle x={x} y={y} width={width} height={height} fill={color} fillOpacity={0.9} />
