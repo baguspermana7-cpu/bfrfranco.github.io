@@ -275,7 +275,7 @@ export default function RiskDashboard() {
                 {/* Top Risks */}
                 <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-5">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                        <AlertTriangle className="w-4 h-4 text-amber-400" /> Top Risk Scenarios
+                        <AlertTriangle className="w-4 h-4 text-amber-400" /> Top Risk Scenarios <Tooltip content="The highest-scoring risks (likelihood × impact) for this country and design, ranked. Each shows its probability and impact rating plus a P×I score on a /20 scale." />
                     </h3>
                     <div className="space-y-3 max-h-[280px] overflow-y-auto">
                         {topRisks.map((risk, i) => (
@@ -310,7 +310,7 @@ export default function RiskDashboard() {
                 {/* Downtime Analysis */}
                 <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-5">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-rz-mint" /> Downtime Analysis (Tier {tierLevel})
+                        <Clock className="w-4 h-4 text-rz-mint" /> Downtime Analysis (Tier {tierLevel}) <Tooltip content="Expected annual downtime, resulting availability, financial exposure and SLA-breach probability for the selected tier — plus MTTR/MTBF estimates. Adjusted for maintenance strategy, SLA and environmental factors." />
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="bg-white dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
@@ -358,7 +358,7 @@ export default function RiskDashboard() {
                 {/* 5-Year Risk Trend */}
                 <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-5">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-cyan-600 dark:text-cyan-400" /> 5-Year Risk Projection
+                        <TrendingUp className="w-4 h-4 text-cyan-600 dark:text-cyan-400" /> 5-Year Risk Projection <Tooltip content="Projected trajectory of the aggregate risk score over 5 years assuming no new mitigation — risk compounds at ~6%/yr from aging infrastructure." />
                     </h3>
                     <div className="text-[10px] text-slate-500 mb-2">
                         Without mitigation, risk compounds at ~6%/year due to aging infrastructure
@@ -395,7 +395,7 @@ export default function RiskDashboard() {
                 {/* Environmental */}
                 <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-5">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                        <Thermometer className="w-4 h-4 text-orange-500 dark:text-orange-400" /> Environmental Risk
+                        <Thermometer className="w-4 h-4 text-orange-500 dark:text-orange-400" /> Environmental Risk <Tooltip content="Site environmental exposures that affect equipment and operations — local air quality (AQI) and grid carbon intensity for the selected country." />
                     </h3>
                     <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm">
@@ -411,7 +411,7 @@ export default function RiskDashboard() {
                             />
                         </div>
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-600 dark:text-slate-400">Grid Carbon</span>
+                            <span className="text-slate-600 dark:text-slate-400 flex items-center">Grid Carbon <Tooltip content="Carbon intensity of the local electricity grid in kgCO₂ per kWh. Drives the facility's Scope 2 emissions and any carbon-offset cost." /></span>
                             <span className="text-slate-900 dark:text-white font-bold">{selectedCountry.environment?.gridCarbonIntensity ?? 0.5} kgCO₂/kWh</span>
                         </div>
                         <div className="text-[10px] text-slate-600 dark:text-slate-500 mt-2 p-2 bg-white dark:bg-slate-800/50 rounded border border-slate-200 dark:border-transparent">
@@ -423,11 +423,11 @@ export default function RiskDashboard() {
                 {/* Supply Chain */}
                 <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-5">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                        <Truck className="w-4 h-4 text-cyan-600 dark:text-cyan-400" /> Supply Chain Risk
+                        <Truck className="w-4 h-4 text-cyan-600 dark:text-cyan-400" /> Supply Chain Risk <Tooltip content="Procurement and logistics exposure for this country — how hard equipment is to import, critical-spare lead times, and local manufacturing availability." />
                     </h3>
                     <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-600 dark:text-slate-400">Import Difficulty</span>
+                            <span className="text-slate-600 dark:text-slate-400 flex items-center">Import Difficulty <Tooltip content="Relative difficulty of importing data center equipment into this country (customs, duties, bureaucracy). Higher difficulty lengthens procurement and raises landed cost." /></span>
                             <span className={`font-bold ${selectedCountry.id === 'ID' ? 'text-amber-600 dark:text-amber-400' : 'text-rz-data'}`}>
                                 {selectedCountry.id === 'ID' || selectedCountry.id === 'IN' ? 'High' : selectedCountry.id === 'JP' || selectedCountry.id === 'AU' ? 'Low' : 'Medium'}
                             </span>
@@ -439,7 +439,7 @@ export default function RiskDashboard() {
                             </span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-600 dark:text-slate-400">Local MFG Availability</span>
+                            <span className="text-slate-600 dark:text-slate-400 flex items-center">Local MFG Availability <Tooltip content="Whether critical equipment and parts can be sourced from local manufacturing rather than imported. Good local availability shortens lead times and reduces outage risk." /></span>
                             <span className={`font-bold ${selectedCountry.id === 'US' || selectedCountry.id === 'JP' ? 'text-rz-data' : 'text-amber-600 dark:text-amber-400'}`}>
                                 {selectedCountry.id === 'US' || selectedCountry.id === 'JP' || selectedCountry.id === 'DE' ? 'Good' : 'Limited'}
                             </span>
@@ -453,7 +453,7 @@ export default function RiskDashboard() {
                 {/* Compliance */}
                 <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-5">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                        <FileCheck className="w-4 h-4 text-rz-data" /> Compliance Risk
+                        <FileCheck className="w-4 h-4 text-rz-data" /> Compliance Risk <Tooltip content="Regulatory obligations for this jurisdiction — data-sovereignty rules, labor regulations, and the certifications the selected tier requires. Non-compliance can force shutdown or penalties." />
                     </h3>
                     <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm">
@@ -469,7 +469,7 @@ export default function RiskDashboard() {
                             </span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-600 dark:text-slate-400">Certifications Required</span>
+                            <span className="text-slate-600 dark:text-slate-400 flex items-center">Certifications Required <Tooltip content="Certifications the selected tier and jurisdiction demand (e.g. Uptime Tier III/IV, ISO 27001). Required for operation and often a customer contractual precondition." /></span>
                             <span className="text-slate-900 dark:text-white font-bold">
                                 {tierLevel === 4 ? 'Uptime IV, ISO 27001' : 'Uptime III, ISO 27001'}
                             </span>
@@ -484,7 +484,7 @@ export default function RiskDashboard() {
             {/* Mitigation Strategies */}
             <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-5">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                    <Server className="w-4 h-4 text-rz-data" /> Mitigation Strategies
+                    <Server className="w-4 h-4 text-rz-data" /> Mitigation Strategies <Tooltip content="Recommended action to reduce each of the top risks — paired with the specific risk scenario it addresses." />
                 </h3>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                     {topRisks.slice(0, 6).map((risk) => (

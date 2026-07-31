@@ -48,7 +48,13 @@ const UTIL_TIPS: Record<string, string> = {
 /* ─── System-detail table header tooltips (owner mandate: every header/metric
  * explains itself) — one set per system tab, rendered by DetailTable. ─────── */
 type HeadTips = { component: string; capacity: string; utilization: string; status: string };
-const DETAIL_HEAD_TIPS: Record<'cooling' | 'rack' | 'network', HeadTips> = {
+const DETAIL_HEAD_TIPS: Record<'power' | 'cooling' | 'rack' | 'network', HeadTips> = {
+    power: {
+        component: 'Electrical-plant component class (utility feed / transformers, UPS, generators, distribution). Counts and ratings come from the engine equipment schedule sized to the IT load, the N+redundancy scheme and the tier — a screening quantity, not a procured schedule.',
+        capacity: 'Installed units × per-unit rating at the configured redundancy (the engine-sized nameplate each unit serves). This is deliverable capacity after redundancy, not raw sum.',
+        utilization: 'Current load ÷ installed capacity for this component. Because design capacity = IT load + design margin, current utilization sits near 1/(1+margin) by construction — the status band instead uses the forecast growth peak and estimated exhaustion year.',
+        status: 'OK < 70%, Watch 70-85%, At Risk ≥ 85%. Non-OK rows are clickable for a quantified diagnosis with defer/re-phase and design-basis (IT load / density / redundancy) levers.',
+    },
     cooling: {
         component: 'Cooling-plant component class (primary loop, air side, hydronics, heat rejection). Counts come from the engine equipScale divisors where available — screening quantities, not a selected equipment schedule.',
         capacity: 'Installed units × unit rating (MW of thermal duty per unit). Ratings are the engine scaling divisors, i.e. the load slice each unit serves — a screening convention, not vendor nameplate data.',
@@ -439,7 +445,7 @@ export function CapacityPlanningPage() {
                         {sysTab === 'power' && (
                             <div>
                                 <table className="w-full text-xs">
-                                    <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[10px] uppercase text-slate-400"><th className="py-1 text-left">Component</th><th className="text-right">Capacity</th><th className="text-right">Utilization</th><th className="text-right">Status</th></tr></thead>
+                                    <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[10px] uppercase text-slate-400"><th className="py-1 text-left">Component <InfoTip content={DETAIL_HEAD_TIPS.power.component} /></th><th className="text-right">Capacity <InfoTip content={DETAIL_HEAD_TIPS.power.capacity} /></th><th className="text-right">Utilization <InfoTip content={DETAIL_HEAD_TIPS.power.utilization} /></th><th className="text-right">Status <InfoTip content={DETAIL_HEAD_TIPS.power.status} /></th></tr></thead>
                                     <tbody>
                                         {equip.rows.map((r) => (
                                             <tr key={r.label} className="border-b border-slate-100 dark:border-slate-800/60">

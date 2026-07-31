@@ -333,7 +333,7 @@ export function SustainabilityEnginePage() {
 
                     <div className="grid gap-4 xl:grid-cols-3">
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Carbon Footprint (GHG scopes · engine)</h2>
+                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Carbon Footprint (GHG scopes · engine) <InfoTip content="Annual greenhouse-gas emissions split by GHG Protocol scope (engine models.carbon.scopes): Scope 1 = on-site generator fuel, Scope 2 = grid electricity × the country grid-carbon factor, Scope 3 = an annualized screening slice of supply-chain/embodied emissions. The donut and legend show tCO₂e per year per scope — Scope 2 usually dominates and is moved by the grid factor, PPAs and site selection." /></h2>
                             {model.scopes ? (
                                 <div className="flex items-center gap-2">
                                     <div className="h-32 w-32 shrink-0">
@@ -359,7 +359,7 @@ export function SustainabilityEnginePage() {
                             ) : <p className="text-xs text-slate-500">Engine loading…</p>}
                         </div>
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Energy Mix <span className="text-[9px] normal-case text-slate-400">derived from capex renewable + certification inputs</span></h2>
+                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Energy Mix <InfoTip content="How the facility's annual energy is attributed across on-site renewables, off-site renewable PPAs and grid electricity. Derived from the CAPEX renewable + certification inputs (labeled assumption, not separately metered) — it drives the renewable-share KPI and the Scope 2 carbon figure." /> <span className="text-[9px] normal-case text-slate-400">derived from capex renewable + certification inputs</span></h2>
                             <div className="flex items-center gap-2">
                                 <div className="h-32 w-32 shrink-0">
                                     <ResponsiveContainer width="100%" height="100%">
@@ -383,7 +383,7 @@ export function SustainabilityEnginePage() {
                             </div>
                         </div>
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Sustainability Scorecard <span className="text-[9px] normal-case text-slate-400">documented composites</span></h2>
+                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Sustainability Scorecard <InfoTip content="Four documented 0–100 pillar composites — energy (PUE band), carbon (grid intensity × grid share), water (WUE band) and waste (attested diversion) — that roll up into the overall grade. Screening indicators for comparing configurations; a low pillar bar is clickable for its formula and the levers that move it." /> <span className="text-[9px] normal-case text-slate-400">documented composites</span></h2>
                             <div className="space-y-1.5">
                                 {([
                                     ['Energy Efficiency (PUE band)', model.energyScore, 'energy'],
@@ -489,7 +489,7 @@ export function SustainabilityEnginePage() {
                     {env && (
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                             <div className="mb-2 flex flex-wrap items-center gap-2">
-                                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Environmental Costs <span className="text-[9px] normal-case text-slate-400">country-auto rates</span></h2>
+                                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Environmental Costs <InfoTip content="Annual monetary cost of the facility's environmental footprint — water, carbon and waste — priced at rates that auto-switch to the selected country (compliance carbon price where a scheme exists, else a voluntary offset basis). Screening-grade; reuses the same water volume and Scope 2 tCO₂e shown in the KPI row so it can never disagree with them." /> <span className="text-[9px] normal-case text-slate-400">country-auto rates</span></h2>
                                 <span className="rounded bg-rz-mint/15 px-1.5 py-0.5 text-[9px] font-semibold text-rz-mint">{env.cname} · {env.cid}</span>
                                 <span className="rounded bg-rz-data/15 px-1.5 py-0.5 text-[9px] font-semibold text-rz-data">engine DATA.envCosts + waterFootprint</span>
                                 <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-500">screening</span>
@@ -560,7 +560,7 @@ export function SustainabilityEnginePage() {
                     )}
 
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                        <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Initiatives in Progress {sus.touched ? '' : <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">EXAMPLE</span>}</h2>
+                        <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Initiatives in Progress <InfoTip content="User-attested sustainability initiatives and their completion progress (EXAMPLE seeds until you edit them). Tracking only — these do not feed the engine scores or environmental costs above." /> {sus.touched ? '' : <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">EXAMPLE</span>}</h2>
                         <div className="space-y-1.5">
                             {sus.initiatives.map((i) => (
                                 <div key={i.id} className="flex items-center gap-2 text-[11px]">
@@ -576,7 +576,7 @@ export function SustainabilityEnginePage() {
                     </div>
 
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                        <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Compliance & Standards <span className="text-[9px] normal-case text-slate-400">user-attested status</span></h2>
+                        <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Compliance & Standards <InfoTip content="User-attested status of sustainability certifications and standards (e.g. ISO 50001, LEED, Uptime) for this project. Self-reported tracking, not an audited or engine-derived compliance verdict." /> <span className="text-[9px] normal-case text-slate-400">user-attested status</span></h2>
                         <div className="grid gap-1.5 md:grid-cols-3">
                             {sus.certs.map((c) => (
                                 <div key={c.id} className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-800 px-2 py-1.5 text-[11px]">

@@ -9,26 +9,32 @@
     <meta name="ai-content-declaration" content="human-curated, sourced from public post-incident reports">
     <meta name="author" content="Bagus Dwi Permana">
     <link rel="canonical" href="https://resistancezero.com/incident-nirs-daejeon-battery-fire-2025.html">
-    <meta name="theme-color" content="#0b1324">
+    <meta name="theme-color" content="#0c1512">
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
     <style>
+    /* ── Governed Incident Dossier — editorial register (v2): forest-green + warm ivory,
+       serif display, evidence-class provenance. Accent vars remapped so all components
+       re-skin. AA-contrast in both themes. No gradients / glass / dot-grid (anti-slop). */
     :root:not([data-theme="dark"]) {
-        --bg:#f1f5f9; --surface:#ffffff; --surface-2:#f8fafc; --line:rgba(100,116,139,0.28);
-        --text:#0f172a; --text-strong:#0b1324; --text-body:#334155; --muted:#64748b;
-        --cyan:#0e7490; --amber:#b45309; --green:#047857; --red:#b91c1c; --shadow-deep:rgba(2,6,23,0.12);
+        --bg:#f4f1e7; --surface:#fffdf6; --surface-2:#efeadc; --line:rgba(26,45,36,0.16);
+        --text:#1a2d24; --text-strong:#10201a; --text-body:#3b463d; --muted:#6a7367;
+        --cyan:#2f6b4f; --amber:#87671b; --green:#2f7d54; --red:#9c3b32; --gold:#87671b;
+        --hero-ink:#f4f1e7; --hero-bg:#183329; --shadow-deep:rgba(26,45,36,0.10);
     }
     [data-theme="dark"] {
-        --bg:#0b1324; --surface:#0f172a; --surface-2:#111a2e; --line:rgba(148,163,184,0.20);
-        --text:#e5edf7; --text-strong:#f1f5f9; --text-body:#cbd5e1; --muted:#94a3b8;
-        --cyan:#22d3ee; --amber:#f59e0b; --green:#34d399; --red:#f87171; --shadow-deep:rgba(0,0,0,0.5);
+        --bg:#0c1512; --surface:#11201a; --surface-2:#16281f; --line:rgba(233,229,216,0.15);
+        --text:#e9e5d8; --text-strong:#f5f2e9; --text-body:#c6ccbc; --muted:#8b9484;
+        --cyan:#7fd1a8; --amber:#d8b25c; --green:#7fd1a8; --red:#e0917f; --gold:#d8b25c;
+        --hero-ink:#e9e5d8; --hero-bg:#0f221a; --shadow-deep:rgba(0,0,0,0.5);
     }
     * { box-sizing:border-box; }
     html,body { margin:0; padding:0; }
-    body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.6; }
+    body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.62; }
     a { color:var(--cyan); }
+    h1,h2,.serif { font-family:'Fraunces','Newsreader',Georgia,serif; font-weight:600; letter-spacing:-0.01em; }
     .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
     .navbar { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1.1rem; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:50; }
     .nav-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1120px; margin:0 auto; }
@@ -40,8 +46,8 @@
     .nav-right { display:flex; align-items:center; gap:0.6rem; }
     .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:8px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
     .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:999px; padding:0.12rem 0.5rem; }
-    h1 { font-size:1.8rem; color:var(--text-strong); margin:0.2rem 0 0.4rem; line-height:1.2; }
-    h2 { font-size:1.05rem; color:var(--text-strong); margin:1.8rem 0 0.6rem; letter-spacing:0.01em; }
+    h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
+    h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
     .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
@@ -130,7 +136,7 @@
             <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
         </div>
     </div></nav>
-    <main class="wrap" id="main-content">
+    <main class="wrap" id="main-content" data-explain-scan>
         <a class="backlink" href="dc-incidents.html">← All incidents</a>
         <div class="eyebrow">Incident dossier · Rank #3</div>
         <h1>NIRS Daejeon Government Data Center: UPS Lithium-Ion Battery Fire During Relocation Work</h1>
@@ -199,15 +205,18 @@
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=2026-07-31-inc"></script>
-    <script src="js/rz-feature-flags.js?v=2026-07-31-inc" defer></script>
-    <script src="auth.js?v=2026-07-31-inc" defer></script>
-    <script src="js/rz-mobile-nav.js?v=2026-07-31-inc" defer></script>
-    <script src="js/rz-cookie-consent.js?v=2026-07-31-inc" defer></script>
+    <script src="js/rz-version.js?v=2026-07-31-inc2"></script>
+    <script src="js/rz-feature-flags.js?v=2026-07-31-inc2" defer></script>
+    <script src="auth.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-explain.js?v=2026-07-31-inc2" defer></script>
     <script>
-    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0b1324':'#f1f5f9');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
+    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
     (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
     (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    (function(){var n=0;function sc(){if(window.RZExplain&&window.RZExplain.scanText){var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,120);}else if(n++<25){setTimeout(sc,200);}}setTimeout(sc,350);})();
     </script>
 
 </body>

@@ -387,7 +387,7 @@ function FinancialTab({ result }: { result: ReturnType<typeof calculatePortfolio
                 <table className="w-full text-xs">
                     <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30">
-                            <th className="text-left px-4 py-2 font-medium text-slate-500">Metric</th>
+                            <th className="text-left px-4 py-2 font-medium text-slate-500"><span className="inline-flex items-center gap-1">Metric <Tooltip content="Row label — the specific metric compared side-by-side across all portfolio sites in this table." /></span></th>
                             {result.sites.map((s, i) => (
                                 <th key={i} className="text-center px-3 py-2 font-medium" style={{ color: SITE_COLORS[i] }}>{s.site.label}</th>
                             ))}
@@ -446,7 +446,7 @@ function StaffingTab({ result }: { result: ReturnType<typeof calculatePortfolio>
                 <table className="w-full text-xs">
                     <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30">
-                            <th className="text-left px-4 py-2 font-medium text-slate-500">Metric</th>
+                            <th className="text-left px-4 py-2 font-medium text-slate-500"><span className="inline-flex items-center gap-1">Metric <Tooltip content="Row label — the specific metric compared side-by-side across all portfolio sites in this table." /></span></th>
                             {result.sites.map((s, i) => (
                                 <th key={i} className="text-center px-3 py-2 font-medium" style={{ color: SITE_COLORS[i] }}>{s.site.label}</th>
                             ))}
@@ -486,7 +486,7 @@ function RiskTab({ result }: { result: ReturnType<typeof calculatePortfolio> }) 
             <table className="w-full text-xs">
                 <thead>
                     <tr className="border-b border-slate-200 dark:border-slate-700">
-                        <th className="text-left px-4 py-2 font-medium text-slate-500">Risk Factor</th>
+                        <th className="text-left px-4 py-2 font-medium text-slate-500"><span className="inline-flex items-center gap-1">Risk Factor <Tooltip content="Row label — the specific risk-related design choice compared across all portfolio sites." /></span></th>
                         {result.sites.map((s, i) => (
                             <th key={i} className="text-center px-3 py-2 font-medium" style={{ color: SITE_COLORS[i] }}>{s.site.label}</th>
                         ))}
@@ -543,7 +543,7 @@ function CarbonTab({ result }: { result: ReturnType<typeof calculatePortfolio> }
                 <table className="w-full text-xs">
                     <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30">
-                            <th className="text-left px-4 py-2 font-medium text-slate-500">Metric</th>
+                            <th className="text-left px-4 py-2 font-medium text-slate-500"><span className="inline-flex items-center gap-1">Metric <Tooltip content="Row label — the specific metric compared side-by-side across all portfolio sites in this table." /></span></th>
                             {result.sites.map((s, i) => (
                                 <th key={i} className="text-center px-3 py-2 font-medium" style={{ color: SITE_COLORS[i] }}>{s.site.label}</th>
                             ))}

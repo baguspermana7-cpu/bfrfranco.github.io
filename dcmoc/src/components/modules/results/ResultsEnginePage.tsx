@@ -23,6 +23,7 @@ import { ReportDashboard } from '@/components/modules/ReportDashboard';
 import { fmtMoney } from '@/lib/format';
 import { TraceValue } from '@/components/ui/TraceValue';
 import { ScoreValue } from '@/components/ui/ScoreValue';
+import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
 import { Trophy, ChevronRight, FileDown } from 'lucide-react';
 import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
@@ -299,7 +300,7 @@ export function ResultsEnginePage() {
                         </div>
                         {/* radar */}
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Performance Radar</h2>
+                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Performance Radar <InfoTip content="The eight dimension scores (0–100, higher is better) plotted on one axis each — a shape view of where the configuration is strong vs weak. A balanced octagon is a well-rounded design; a dented axis flags the dimension to improve first." /></h2>
                             <div className="h-72">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <RadarChart data={radarData} outerRadius="75%">
@@ -315,7 +316,7 @@ export function ResultsEnginePage() {
                         {/* financial outcomes */}
                         <div className="space-y-4">
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                                <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Key Financial Outcomes</h3>
+                                <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Key Financial Outcomes <InfoTip content="Headline economics for this configuration: total CAPEX (P50) and its $/kW intensity, plus a screening NPV and IRR from the engine roi model (unlevered, flat 15-year flow at a 10% hurdle). Planning screening only — other surfaces use fuller cash-flow bases and legitimately differ; hover each row for its basis." /></h3>
                                 <div className="space-y-1 text-[11px]">
                                     {/* audit #5: screening IRR basis made explicit — this page's IRR is
                                       * unlevered 15y FLAT-flow screening; other surfaces legitimately
@@ -328,7 +329,8 @@ export function ResultsEnginePage() {
                                         ['IRR (screening — unlevered 15y flat)', model.irr != null ? `${(model.irr * 100).toFixed(1)}%` : '—', undefined,
                                             'Basis IRR screening: unlevered, arus kas FLAT 15 thn (revenue referensi × IT load, okupansi penuh, tanpa ramp/pajak/utang).\nHalaman lain memakai basis BERBEDA dan sah (angka tidak harus sama):\n· Dashboard — project IRR unlevered after-tax, ramp okupansi, 15 thn\n· Financial Pro-Forma — aproksimasi model pro-forma sendiri\n· Site w/ incentives — screening + insentif pajak lokasi'],
                                         ['Design PUE', String(model.opexPue), 'engine.pueMatrix'],
-                                        ['Best Site', model.siteBest ? `${model.siteBest.engine.score}/100 (${model.siteBest.engine.grade})` : '—'],
+                                        ['Best Site', model.siteBest ? `${model.siteBest.engine.score}/100 (${model.siteBest.engine.grade})` : '—', undefined,
+                                            'Highest-scoring candidate site from the Site Intelligence engine (score /100 + grade), across all sites entered. Improve it in the Site Intelligence tab by adjusting site attributes or adding alternates.'],
                                     ] as [string, string, string?, string?][]).map(([k, v, tr, tip]) => (
                                         <div key={k} className="flex justify-between" title={tip}>
                                             <span className="text-slate-500">{k}{tip ? ' ⓘ' : ''}</span>
@@ -345,7 +347,7 @@ export function ResultsEnginePage() {
                                 <p className="mt-1.5 text-[9px] text-slate-400">Screening outcomes (engine roi/opex models, dcContract basis) — not investment advice.</p>
                             </div>
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                                <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Result Validation</h3>
+                                <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Result Validation <InfoTip content="Honesty checks that the scorecard was actually computed — engine loaded, CAPEX solved, all dimension composites produced, and financial screening returned a number. These are 'computed successfully' status chips, NOT an external or third-party audit of the results." /></h3>
                                 {validation.map((v) => (
                                     <div key={v.label} className="flex items-center gap-1.5 py-0.5 text-[11px]">
                                         <span className={`h-2 w-2 rounded-full ${v.ok ? 'bg-rz-data' : 'bg-amber-500'}`} />
@@ -360,9 +362,9 @@ export function ResultsEnginePage() {
 
                     {/* dimension table */}
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                        <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Dimension Scores — documented composites</h2>
+                        <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Dimension Scores — documented composites <InfoTip content="The eight scored dimensions with their weights and the exact formula (basis) behind each — every score is a deterministic composite over the live engine/adapters, weighted into the overall grade. A low score carries a Fair/Poor chip that opens the reason plus solved levers." /></h2>
                         <table className="w-full text-[11px]">
-                            <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Dimension</th><th className="text-right">Score</th><th className="text-right">Weight</th><th className="text-left pl-4">Basis (formula)</th></tr></thead>
+                            <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Dimension <InfoTip content="The evaluation axis (Requirements, Site, Architecture, CAPEX, Construction, Operations, Sustainability, Financial)." /></th><th className="text-right">Score <InfoTip content="Dimension score 0–100, higher is better — a documented deterministic composite from the engine/adapters (see Basis)." /></th><th className="text-right">Weight <InfoTip content="This dimension's share of the weighted overall score. Weights sum to 100% across all dimensions." /></th><th className="text-left pl-4">Basis (formula) <InfoTip content="The exact formula and reference band the score is computed from — the auditable derivation, not a black box." /></th></tr></thead>
                             <tbody>
                                 {model.dims.map((d) => {
                                     const dimTrace: Record<string, string> = { capex: 'results.capexScore', sus: 'results.susScore', fin: 'results.finScore', constr: 'results.constrScore' };
@@ -431,7 +433,7 @@ export function ResultsEnginePage() {
                     </div>
 
                     <div className="rounded border border-rz-mint/30 bg-rz-mint/5 p-3">
-                        <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Top Recommendations (deterministic)</h3>
+                        <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Top Recommendations (deterministic) <InfoTip content="Corrective actions auto-generated from the same thresholds that scored the dimensions (e.g. PUE headroom, CAPEX above band, site or requirements gaps) — deterministic rules, not an LLM. An empty list means no dimension breached its flag." /></h3>
                         <ul className="space-y-0.5">
                             {model.recs.length === 0 && <li className="text-[11px] text-rz-data">✓ No corrective actions flagged — configuration performs across all dimensions.</li>}
                             {model.recs.map((r, idx) => <li key={idx} className="flex gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"><span className="text-rz-mint">✓</span>{r}</li>)}

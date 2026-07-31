@@ -319,10 +319,10 @@ const TalentDashboard = () => {
                         <table className="w-full text-[11px]">
                             <thead>
                                 <tr className="text-[9px] uppercase text-slate-500 border-b border-slate-200 dark:border-slate-700">
-                                    <th className="text-left py-1 pr-2 font-semibold">Salary spend scenario</th>
-                                    <th className="text-right py-1 px-2 font-semibold">Adjusted staff cost/yr</th>
-                                    <th className="text-right py-1 px-2 font-semibold">Turnover cost/yr</th>
-                                    <th className="text-right py-1 pl-2 font-semibold">Time to staff</th>
+                                    <th className="text-left py-1 pr-2 font-semibold"><span className="inline-flex items-center gap-1">Salary spend scenario <Tooltip content="The salary-uplift case being tested — base (current country premium) vs +10% / +20% extra salary spend, each re-run through the engine." /></span></th>
+                                    <th className="text-right py-1 px-2 font-semibold"><span className="inline-flex items-center gap-1">Adjusted staff cost/yr <Tooltip content="Fully-loaded annual salary cost under this scenario, including the added salary spend (USD/yr)." /></span></th>
+                                    <th className="text-right py-1 px-2 font-semibold"><span className="inline-flex items-center gap-1">Turnover cost/yr <Tooltip content="Annual attrition cost under this scenario — higher pay typically lowers turnover (USD/yr)." /></span></th>
+                                    <th className="text-right py-1 pl-2 font-semibold"><span className="inline-flex items-center gap-1">Time to staff <Tooltip content="Months to recruit and onboard the full team under this scenario. Driven by FTE count and country hiring speed — not salary — so it may be unchanged across cases." /></span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -377,7 +377,7 @@ const TalentDashboard = () => {
                 {/* Talent Breakdown */}
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-6">
-                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Talent Factor Analysis</h3>
+                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-1">Talent Factor Analysis<Tooltip content="The individual factors feeding the composite Talent Score — engineer pool depth, university pipeline, hyperscaler competition, hiring speed, certifications — each tagged as a positive or negative influence on availability." /></h3>
                         <div className="space-y-3">
                             {result.talentBreakdown.map(item => (
                                 <div key={item.metric} className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-900/30">
@@ -398,26 +398,26 @@ const TalentDashboard = () => {
 
                         {/* Cost Summary */}
                         <div className="mt-6 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
-                            <h4 className="text-xs font-semibold text-slate-500 uppercase mb-3">Annual Staff Cost Impact</h4>
+                            <h4 className="text-xs font-semibold text-slate-500 uppercase mb-3 flex items-center gap-1">Annual Staff Cost Impact<Tooltip content="Build-up from the base annual staff cost to the talent-adjusted total — adding the salary premium, turnover cost and training cost the local talent market imposes (USD/yr)." /></h4>
                             <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-slate-600 dark:text-slate-400">Base Annual Staff Cost</span>
+                                    <span className="text-slate-600 dark:text-slate-400 flex items-center">Base Annual Staff Cost<Tooltip content="Total annual salary cost of the operations team at local market rates before any talent-scarcity premium (USD/yr)." /></span>
                                     <span className="font-medium text-slate-900 dark:text-white">{fmtMoney(annualStaffCost)}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-slate-600 dark:text-slate-400">+ Salary Premium ({((result.adjustedSalaryMultiplier - 1) * 100).toFixed(0)}%)</span>
+                                    <span className="text-slate-600 dark:text-slate-400 flex items-center">+ Salary Premium ({((result.adjustedSalaryMultiplier - 1) * 100).toFixed(0)}%)<Tooltip content="Extra annual pay above base the model adds to attract scarce DC talent in this market (USD/yr). Compounds every year, not a one-time cost." /></span>
                                     <span className="font-medium text-amber-500">+{fmtMoney(result.adjustedAnnualStaffCost - annualStaffCost)}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-slate-600 dark:text-slate-400">+ Turnover Cost</span>
+                                    <span className="text-slate-600 dark:text-slate-400 flex items-center">+ Turnover Cost<Tooltip content="Annual cost of staff attrition — re-recruiting and re-training departing employees at the country's turnover rate (USD/yr)." /></span>
                                     <span className="font-medium text-red-500">+{fmtMoney(result.annualTurnoverCost)}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-slate-600 dark:text-slate-400">+ Training Cost</span>
+                                    <span className="text-slate-600 dark:text-slate-400 flex items-center">+ Training Cost<Tooltip content="Annual spend on training and certification to maintain operational competency across the team (USD/yr)." /></span>
                                     <span className="font-medium text-rz-signal">+{fmtMoney(result.annualTrainingCost)}</span>
                                 </div>
                                 <div className="border-t border-slate-200 dark:border-slate-700 pt-2 flex justify-between">
-                                    <span className="font-bold text-slate-700 dark:text-slate-300">Talent-Adjusted Total</span>
+                                    <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center">Talent-Adjusted Total<Tooltip content="Base staff cost plus salary premium, turnover and training — the true fully-loaded annual staffing cost for this country (USD/yr)." /></span>
                                     <span className="font-bold text-lg text-cyan-600 dark:text-cyan-400">
                                         {fmtMoney(result.adjustedAnnualStaffCost + result.annualTurnoverCost + result.annualTrainingCost)}
                                     </span>
@@ -430,7 +430,7 @@ const TalentDashboard = () => {
                 {/* Country Comparison */}
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-6">
-                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Talent Score by Country</h3>
+                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-1">Talent Score by Country<Tooltip content="Composite talent-availability score (0-100) for every country, ranked. The selected country is highlighted; higher means an easier hiring market." /></h3>
                         <ResponsiveContainer width="100%" height={400}>
                             <BarChart data={topNWithSelected(countryComparison, selectedCountry?.id)} layout="vertical" margin={{ left: 70 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />

@@ -13,6 +13,7 @@ import { useRequirementsStore } from '@/store/requirements';
 import { useSitesStore } from '@/store/sites';
 import { COUNTRIES } from '@/constants/countries';
 import { buildAnalysisCtx, analyzeSite, scoreAllSites, type SiteAnalyses } from '@/lib/site-adapter';
+import type { SiteScoreResult } from '@/types/site-intel';
 import { calculateAutoHeadcount, calculateStaffing, type StaffRole } from '@/modules/staffing/ShiftEngine';
 import { calculateFuelGen } from '@/modules/infrastructure/FuelGenEngine';
 import { rzData, rzModels } from '@/lib/rz-engine';
@@ -90,6 +91,19 @@ const fuelGenRes = () => {
             coolingType: st.inputs.coolingType, coolingTopology: st.inputs.coolingTopology,
             powerRedundancy: st.inputs.powerRedundancy, testingRegime: 'minimal',
         });
+    } catch { return null; }
+};
+
+/* Selected-site SITE SCORE result (models.site.score + presentation axes).
+ * Mirrors SiteIntelligencePage `kpi` EXACTLY: scoreAllSites(sites) →
+ * selectedResult (find by selected/first site id) ?? best (results[0]). */
+const siteScoreRes = (): SiteScoreResult | null => {
+    try {
+        const st = useSitesStore.getState();
+        const sel = st.sites.find((s) => s.id === st.selectedSiteId) ?? st.sites[0] ?? null;
+        const results = scoreAllSites(st.sites);
+        if (results.length === 0) return null;
+        return (sel ? results.find((r) => r.siteId === sel.id) : null) ?? results[0] ?? null;
     } catch { return null; }
 };
 
@@ -286,6 +300,40 @@ export const TRACE: Record<string, TraceNode> = {
                 return Math.round(activeItMw * livePue * 24 * 1000 * rate);
             } catch { return null; }
         },
+    },
+    /* ── SITE INTELLIGENCE — top KPI score cards (selected site) ──────────────
+     * Total Score = models.site.score (weighted composite of 10 factors); the 4
+     * sub-scores are the presentation-axis decomposition in site-adapter.scoreSite
+     * (documented blends of the SAME engine factors — NOT a rival score). Each
+     * get() reads straight off the SiteScoreResult the KPI card renders. */
+    'site.totalScore': {
+        label: 'Total Site Score', page: 'site', unit: '/100', provenance: 'engine', sourceKey: 'site',
+        formulaTemplate: 'models.site.score = 100 × Σ(weight × factor) ÷ Σ(present weights) — weights power 17% + grid 14% + talent 11% + seismic 10% + tax 9% + carbon 9% + water 8% + climate 8% + flood 7% + latency 7%; each factor a 0–1 goodness from the selected-site country baseline (DATA.countries) + any Edit-Criteria overrides, renormalized over present factors',
+        get: () => siteScoreRes()?.engine.score ?? null,
+    },
+    'site.availabilityScore': {
+        label: 'Availability Score', page: 'site', unit: '/100', provenance: 'derived',
+        formulaTemplate: 'round(100 × (0.6 × power factor + 0.4 × grid factor)) — power-availability axis (site-adapter.scoreSite.axes.powerAvailability); power/grid are the models.site engine factors',
+        deps: ['site.totalScore'],
+        get: () => siteScoreRes()?.availabilityScore ?? null,
+    },
+    'site.connectivityScore': {
+        label: 'Connectivity Score', page: 'site', unit: '/100', provenance: 'derived',
+        formulaTemplate: 'round(100 × latency factor) — connectivity axis (site-adapter.scoreSite.axes.connectivity); latency factor = 0.6 × min-latency score + 0.4 × cable-landing score when the site sets them, else the country hyperscaler-presence baseline',
+        deps: ['site.totalScore'],
+        get: () => siteScoreRes()?.connectivityScore ?? null,
+    },
+    'site.waterCoolingScore': {
+        label: 'Water & Cooling Score', page: 'site', unit: '/100', provenance: 'derived',
+        formulaTemplate: 'round(100 × (0.5 × water factor + 0.5 × climate factor)) — water/cooling axis (site-adapter.scoreSite.axes.waterCooling); water = 1 − WRI stress ÷ 5, climate = ASHRAE free-cooling hours ÷ 5800',
+        deps: ['site.totalScore'],
+        get: () => siteScoreRes()?.waterCoolingScore ?? null,
+    },
+    'site.riskScore': {
+        label: 'Risk Score', page: 'site', unit: '/100', provenance: 'derived',
+        formulaTemplate: '100 − round(100 × (0.5 × seismic + 0.3 × flood + 0.2 × cyclone goodness)) — inverse of the natural-risks axis (site-adapter.scoreSite); LOWER is better',
+        deps: ['site.totalScore'],
+        get: () => siteScoreRes()?.riskScore ?? null,
     },
     /* ── SITE INTELLIGENCE — integrated analyses (selected site; 5 sibling engines) ── */
     /* Grid Reliability card (GridReliabilityEngine) */

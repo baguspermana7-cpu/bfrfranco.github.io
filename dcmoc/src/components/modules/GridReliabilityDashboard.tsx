@@ -535,7 +535,7 @@ const GridReliabilityDashboard = () => {
             {/* Country Comparison — scroll target of the diagnostics panel's "↗" nav */}
             <Card ref={comparisonRef} className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                 <CardContent className="pt-6">
-                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Grid Reliability by Country</h3>
+                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-1">Grid Reliability by Country<Tooltip content="Composite grid reliability score (0-100) for every country, ranked. Computed on a normalized basis (1 MW · Tier 3 · air) so grids compare like-for-like; the selected country is highlighted." /></h3>
                     <ResponsiveContainer width="100%" height={350}>
                         <BarChart data={topNWithSelected(countryComparison, selectedCountry?.id)} layout="vertical" margin={{ left: 60 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
@@ -566,7 +566,7 @@ const GridReliabilityDashboard = () => {
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-6">
                         <div className="flex items-start justify-between gap-3 flex-wrap mb-1">
-                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Score Components ({selectedCountry.name})</h3>
+                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">Score Components ({selectedCountry.name})<Tooltip content="Decomposition of the Grid Score into its four weighted inputs (uptime 40%, voltage 20%, brownouts 20%, outage duration 20%), a runtime mirror parity-checked against the engine every render." /></h3>
                             <ParityChip ok={fullDiag.scoreParity} />
                         </div>
                         <p className="text-xs text-slate-500 mb-4">
@@ -647,7 +647,7 @@ const GridReliabilityDashboard = () => {
                     {/* Grid Penalty & Cost Breakdown (moved from Overview) */}
                     <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                         <CardContent className="pt-6">
-                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Annual Grid Risk Cost Breakdown</h3>
+                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-1">Annual Grid Risk Cost Breakdown<Tooltip content="Line-item annual cost of mitigating weak grid reliability — genset fuel, UPS battery replacement, dual-feed annualized, etc. Summed into the Total Grid-Adjusted OPEX below (USD/yr)." /></h3>
                             <div className="space-y-3">
                                 {result.costBreakdown.map(item => (
                                     <div key={item.label} className="flex items-center justify-between">
@@ -656,14 +656,14 @@ const GridReliabilityDashboard = () => {
                                     </div>
                                 ))}
                                 <div className="border-t border-slate-200 dark:border-slate-700 pt-2 flex items-center justify-between">
-                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Total Grid-Adjusted OPEX</span>
+                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">Total Grid-Adjusted OPEX<Tooltip content="Sum of all grid-risk mitigation line items above (USD/yr) — the extra annual operating cost the weak grid imposes on top of the base facility OPEX." /></span>
                                     <span className="text-lg font-bold text-cyan-600 dark:text-cyan-400">{fmtMoney(result.gridRiskAdjustedOpex)}</span>
                                 </div>
                             </div>
 
                             {/* Backup Architecture */}
                             <div className="mt-6 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
-                                <h4 className="text-xs font-semibold text-slate-500 uppercase mb-3">Backup Architecture</h4>
+                                <h4 className="text-xs font-semibold text-slate-500 uppercase mb-3 flex items-center gap-1">Backup Architecture<Tooltip content="Single-line topology of the backup power chain — grid feed → ATS → UPS → generator → battery — with the resulting availability once backup is in place." /></h4>
                                 <div className="text-xs font-mono text-slate-600 dark:text-slate-400 space-y-1">
                                     <div>Grid Feed {result.dualFeedRecommendation ? '(Dual A+B)' : '(Single)'} → ATS → UPS ({fmt(inputs.itLoad)} kW)</div>
                                     <div className="pl-4">├── Generator: {fmt(result.requiredGenCapacity)} kW ({result.recommendedFuelHours}h fuel)</div>

@@ -338,7 +338,7 @@ const TaxIncentiveDashboard = () => {
                 {/* Country Comparison */}
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-6">
-                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Incentive Value Ranking (NPV, Normalized)</h3>
+                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-1">Incentive Value Ranking (NPV, Normalized)<Tooltip content="Present value of each country's tax-incentive package, ranked. Computed on a normalized basis ($10M capex / $3M revenue / $1.2M opex, 20 yr @10% discount) so jurisdictions compare like-for-like; the selected country is highlighted." /></h3>
                         <ResponsiveContainer width="100%" height={420}>
                             <BarChart data={topNWithSelected(countryIncentiveData, selectedCountry?.id)} layout="vertical" margin={{ left: 70 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
@@ -367,7 +367,7 @@ const TaxIncentiveDashboard = () => {
                     <CardContent className="pt-6">
                         {/* Incentive Programs */}
                         <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
-                            <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Available Incentive Programs</h4>
+                            <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2 flex items-center gap-1">Available Incentive Programs<Tooltip content="Plain-language summary of the incentives the engine applied for this country — tax holiday, import-duty exemption, land subsidy and any market-specific credits. Regulation citations per program are on the Components & Regulations tab." /></h4>
                             <ul className="space-y-1">
                                 {result.incentiveSummary.map((item, i) => (
                                     <li key={i} className="text-xs text-slate-600 dark:text-slate-400 flex items-start gap-2">
@@ -380,7 +380,7 @@ const TaxIncentiveDashboard = () => {
                         {/* FTZ List */}
                         {selectedCountry.taxIncentives?.freeTradeZones && selectedCountry.taxIncentives.freeTradeZones.length > 0 && (
                             <div className="mt-3 p-3 bg-cyan-50 dark:bg-cyan-900/10 rounded-lg border border-cyan-200 dark:border-cyan-800/30">
-                                <h4 className="text-xs font-semibold text-cyan-700 dark:text-cyan-400 mb-1">Free Trade Zones</h4>
+                                <h4 className="text-xs font-semibold text-cyan-700 dark:text-cyan-400 mb-1 flex items-center gap-1">Free Trade Zones<Tooltip content="Named zones in this country where the import-duty exemption behind the FTZ Savings KPI applies. The duty saving only materializes for equipment landed through one of these zones." /></h4>
                                 <p className="text-xs text-cyan-600 dark:text-cyan-500">{selectedCountry.taxIncentives.freeTradeZones.join(' · ')}</p>
                             </div>
                         )}
@@ -415,19 +415,19 @@ const TaxIncentiveDashboard = () => {
                         </h3>
                         <div className="flex flex-wrap items-stretch gap-2 text-center">
                             <div className="flex-1 min-w-[140px] p-3 rounded-lg bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-700">
-                                <div className="text-[10px] uppercase text-slate-500">Standard rate</div>
+                                <div className="text-[10px] uppercase text-slate-500 flex items-center justify-center gap-1">Standard rate<Tooltip content="The country's statutory corporate income tax (CIT) rate — the baseline burden before any incentive applies (%)." /></div>
                                 <div className="text-xl font-bold font-mono text-slate-900 dark:text-white">{stdRatePct.toFixed(1)}%</div>
                                 <div className="text-[10px] text-slate-500">statutory CIT</div>
                             </div>
                             <div className="self-center text-slate-400"><ArrowRight className="w-4 h-4" /></div>
                             <div className="flex-1 min-w-[140px] p-3 rounded-lg bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-700">
-                                <div className="text-[10px] uppercase text-slate-500">Holiday rate</div>
+                                <div className="text-[10px] uppercase text-slate-500 flex items-center justify-center gap-1">Holiday rate<Tooltip content="The reduced tax rate applied during the incentive holiday window (%). Shown as — when the jurisdiction offers no tax-holiday program." /></div>
                                 <div className="text-xl font-bold font-mono text-slate-900 dark:text-white">{holidayYears > 0 ? `${holidayRatePct.toFixed(1)}%` : '—'}</div>
                                 <div className="text-[10px] text-slate-500">{holidayYears > 0 ? `years 1–${holidayYears}` : 'no holiday program'}</div>
                             </div>
                             <div className="self-center text-slate-400"><ArrowRight className="w-4 h-4" /></div>
                             <div className="flex-1 min-w-[140px] p-3 rounded-lg bg-cyan-50 dark:bg-cyan-900/10 border border-cyan-200 dark:border-cyan-800/30">
-                                <div className="text-[10px] uppercase text-cyan-700 dark:text-cyan-400">Effective Y1</div>
+                                <div className="text-[10px] uppercase text-cyan-700 dark:text-cyan-400 flex items-center justify-center gap-1">Effective Y1<Tooltip content="The actual Year-1 tax rate the engine timeline reports after applying the holiday and all credits (%) — what the project really pays in its first year." /></div>
                                 <div className="text-xl font-bold font-mono text-cyan-700 dark:text-cyan-400">{effectiveY1Pct.toFixed(1)}%</div>
                                 <div className="text-[10px] text-cyan-600 dark:text-cyan-500">engine timeline year 1</div>
                             </div>
@@ -438,8 +438,9 @@ const TaxIncentiveDashboard = () => {
                 {/* Program table — regulation-cited (10 priority markets) or honest legacy fallback */}
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-5">
-                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-1">
                             Incentive components — {selectedCountry.name}
+                            <Tooltip content="Per-program breakdown with the legal regulation citation, benefit, and eligibility for each incentive. Regulation-cited for 10 priority markets; other countries show program names only." />
                         </h3>
                         {programs && programs.length > 0 ? (
                             <div className="overflow-x-auto">
@@ -527,7 +528,7 @@ const TaxIncentiveDashboard = () => {
             {activeTab === 'timeline' && (
                 <Card className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
                     <CardContent className="pt-6">
-                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Tax Rate Timeline (Standard vs Effective)</h3>
+                        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-1">Tax Rate Timeline (Standard vs Effective)<Tooltip content="Year-by-year tax rate over the project life — the flat statutory rate vs the incentive-adjusted effective rate, with the annual savings (the gap) as bars. The discounted sum of those bars is the holiday component of Total Savings." /></h3>
                         <ResponsiveContainer width="100%" height={280}>
                             <ComposedChart data={timelineData}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />

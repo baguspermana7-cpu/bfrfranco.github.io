@@ -15,7 +15,21 @@ import { rzModels, rzData, useEngineReady } from '@/lib/rz-engine';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { getPUE } from '@/constants/pue';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { Layers } from 'lucide-react';
+
+/* Per-group explanation (owner mandate: every displayed label explains itself).
+ * Keyed by the engine group name; the figure beside each is $/yr and % of total OPEX. */
+const GROUP_TIP: Record<string, string> = {
+    Energy: 'Electricity for the IT load plus cooling and power-conversion overhead (facility MWh at the country tariff). Usually the single largest OPEX line — scales with PUE and the local electricity rate.',
+    People: 'In-house operations, engineering and management payroll (FTE × local loaded salary). Driven by site size and the maintenance strategy\'s in-house-vs-contract split.',
+    'Contracts & Maintenance': 'OEM/vendor service contracts, planned maintenance and spares. Set by the selected maintenance strategy — OEM-full is costliest, reactive cheapest but lower availability.',
+    Security: 'Physical security: guard posts (manned hours × local guard rate) plus electronic surveillance and access control.',
+    'Compliance & Licenses': 'Recurring permits, certifications, audits and regulatory licenses required to operate in the selected country.',
+    Connectivity: 'Corporate internet / cross-connect / transit bandwidth at local circuit pricing — a per-country sourced factor.',
+    'Real Estate & Tax': 'Land lease, property tax (a % of asset value) and building-related charges — per-country sourced; property tax needs the CAPEX asset-value basis.',
+    Overhead: 'General & administrative overhead applied on top of the direct-cost subtotal (insurance, corporate allocation, miscellaneous).',
+};
 
 const GROUP_TONE: Record<string, string> = {
     Energy: 'text-rz-info',
@@ -78,10 +92,11 @@ export function OpexBreakdown() {
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                     <Layers className="h-3.5 w-3.5 text-rz-info" /> Complete Annual OPEX
+                    <Tooltip content="Every annual operating-cost line for the facility, grouped by category, from the engine models.opex.fullBreakdown. Per-country factors (water tariff, land lease, property-tax %, corporate internet, cleaning, guard rate) are sourced from the selected country; global-uniform lines scale by IT MW / racks / gross floor / asset value. Screening-grade — additive, does not change the headline totalAnnual." />
                     <span className="text-[9px] normal-case text-slate-400">per-country sourced · {country?.name ?? '—'}</span>
                 </h2>
                 <div className="flex items-center gap-2">
-                    <label className="text-[10px] uppercase tracking-wide text-slate-500">Maintenance strategy</label>
+                    <label className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-slate-500">Maintenance strategy <Tooltip content="Maintenance regime driving the contract/PM/manpower mix and the resulting availability delta: OEM-full (highest cost, best uptime) → predictive CBM → hybrid → standard annual compliance → reactive (lowest cost, most downtime risk). Changing it re-derives the Contracts, People and Availability Δ figures." /></label>
                     <select
                         value={strategy}
                         onChange={(e) => setStrategy(e.target.value)}
@@ -97,19 +112,19 @@ export function OpexBreakdown() {
             {/* headline */}
             <div className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <div>
-                    <div className="text-[10px] uppercase tracking-wide text-slate-500">Total OPEX / yr</div>
+                    <div className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-slate-500">Total OPEX / yr <Tooltip content="Sum of every annual operating-cost line (all groups) plus the applied overhead — the facility's total yearly running cost at the current IT load, PUE, country and maintenance strategy." /></div>
                     <div className="text-xl font-bold tabular-nums text-slate-900 dark:text-white">{fmt(total)}</div>
                 </div>
                 <div>
-                    <div className="text-[10px] uppercase tracking-wide text-slate-500">$/kW · month</div>
+                    <div className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-slate-500">$/kW · month <Tooltip content="Total annual OPEX normalized to the IT load, expressed per kW of IT capacity per month — the standard unit for benchmarking operating cost against colocation pricing and other facilities." /></div>
                     <div className="text-xl font-bold tabular-nums text-slate-900 dark:text-white">${result.perKwMonth}</div>
                 </div>
                 <div>
-                    <div className="text-[10px] uppercase tracking-wide text-slate-500">In-house FTE</div>
+                    <div className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-slate-500">In-house FTE <Tooltip content="Full-time-equivalent staff employed directly (vs outsourced to service contracts) under the selected maintenance strategy. OEM-full and reactive lean on contractors → fewer in-house FTE; predictive/hybrid keep more capability on site." /></div>
                     <div className="text-xl font-bold tabular-nums text-slate-900 dark:text-white">{result.strategy.inHouseFte}</div>
                 </div>
                 <div>
-                    <div className="text-[10px] uppercase tracking-wide text-slate-500">Availability Δ</div>
+                    <div className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-slate-500">Availability Δ <Tooltip content="Change in facility availability (percentage points) attributable to the selected maintenance strategy vs the reference. Negative = the cheaper regime trades away uptime; positive = the more intensive regime buys uptime. Weigh against the OPEX it costs." /></div>
                     <div className={`text-xl font-bold tabular-nums ${result.strategy.availabilityDeltaPct < 0 ? 'text-rz-alert' : 'text-rz-data'}`}>
                         {result.strategy.availabilityDeltaPct > 0 ? '+' : ''}{result.strategy.availabilityDeltaPct}pp
                     </div>
@@ -124,7 +139,7 @@ export function OpexBreakdown() {
                     return (
                         <div key={g.group}>
                             <div className="mb-0.5 flex items-baseline justify-between">
-                                <span className={`text-[10px] font-semibold uppercase tracking-wide ${GROUP_TONE[g.group] ?? 'text-slate-500'}`}>{g.group}</span>
+                                <span className={`flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide ${GROUP_TONE[g.group] ?? 'text-slate-500'}`}>{g.group}{GROUP_TIP[g.group] && <Tooltip content={GROUP_TIP[g.group]} />}</span>
                                 <span className="text-[10px] tabular-nums text-slate-500">{fmt(gTotal)} · {gShare.toFixed(1)}%</span>
                             </div>
                             <div className="space-y-0.5">
