@@ -13,7 +13,25 @@ release sections rather than semver.
 
 ---
 
-## v1.120.0 — 2026-07-31 (DC Incidents dossier — root-gated case library, Phase A foundation)
+## v1.120.1 — 2026-07-31 (DCMOC owner-comment audit — 2 wired-but-degraded defects fixed)
+
+Adversarial re-audit of every prior owner review comment against the live code
+(owner: "semua comment saya tidak di eksekusi dengan proper"). 17 of 19 items
+verified genuinely engine-wired; **2 real defects** of the "shipped but degraded"
+class were found and fixed. Full ledger: `dcmoc/OWNER_COMMENT_AUDIT.md`.
+
+### Fixed
+- **Strategic Planning — single-source lock was conditional** (`StrategicPlanningDashboard.tsx`).
+  Total Land Area / Grid Capacity / Climate / Target PUE were only `disabled` *when* a
+  site fed them, so with no site selected they degraded to editable phantom inputs showing
+  seed values (10000 m² / 20 MW) — contradicting the page's own "LOCKED (single source)"
+  banner. Now **always read-only mirrors**; with no site the page shows a clear empty state
+  ("Select a site to run feasibility → Site Intelligence") instead of a fake editable seed.
+- **Rack form factor was a fake CAPEX cost driver** (`CapexEngine.ts`). `rackFormFactor`
+  (std42u 1.0 / tall48u 0.90 / OCP 1.15, sourced EIA-310 / OCP Open Rack v3) only fed the
+  reported `floorSpace` metric — switching rack form changed reported m² but **$0 of CAPEX**,
+  though v1.115.92 claimed it a "real cost driver". Now multiplied into the space-driven
+  `building` (shell + civil) category, so 42U/48U/OCP move the CAPEX total as intended.
 
 ### Added
 - **DC Incidents — Case Library** (`dc-incidents.html`), a **root-only** knowledge base of major data-center / cloud incidents worldwide. Ranked hub (transparent magnitude composite: blast radius 35% · users 25% · financial 20% · duration 20%) → each incident opens a dedicated dossier page (`incident-<slug>.html`) with a full **sequence of events (SOE)**, root cause, **correction of errors (COE)**, contributing factors, lessons learnt, engineering improvements, technical deep-dive, and a **provenance-mandatory** reference list (every fact traces to a public post-incident report).

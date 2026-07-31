@@ -14,7 +14,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-  <title>Changelog — Resistance Zero (v1.120.0 latest)</title>
+  <title>Changelog — Resistance Zero (v1.120.1 latest)</title>
   <meta name="description" content="Live release notes for resistancezero.com — every shipped version, Plan v12 → v15+, with Awwwards uplift, dark-mode coverage, and SEO/AI-search work.">
   <meta name="author" content="Bagus Dwi Permana">
   <meta name="robots" content="index, follow">
@@ -75,7 +75,7 @@
         "name": "Release history",
         "numberOfItems": 650,
         "itemListElement": [
-        {"@type":"ListItem","position":1,"name":"v1.120.0 — 2026-07-31","url":"https://resistancezero.com/changelog.html#v1.120.0"},
+        {"@type":"ListItem","position":1,"name":"v1.120.1 — 2026-07-31","url":"https://resistancezero.com/changelog.html#v1.120.1"},
         {"@type":"ListItem","position":2,"name":"v1.119.1 — 2026-07-27","url":"https://resistancezero.com/changelog.html#v1.119.1"},
         {"@type":"ListItem","position":3,"name":"v1.119.0 — 2026-07-27","url":"https://resistancezero.com/changelog.html#v1.119.0"},
         {"@type":"ListItem","position":4,"name":"v1.118.0 — 2026-07-27","url":"https://resistancezero.com/changelog.html#v1.118.0"},
@@ -607,7 +607,7 @@
       <h1 id="cl-heading">Changelog</h1>
       <p class="cl-subtitle">Live release notes &mdash; every shipped version</p>
       <p class="cl-meta">
-        Latest: <strong style="color:#7dd5b4;">v1.120.0</strong>
+        Latest: <strong style="color:#7dd5b4;">v1.120.1</strong>
         &nbsp;&bull;&nbsp;
         <span id="rzVersionAnchor"></span>
         <span class="cl-count-badge">650 releases</span>
@@ -624,15 +624,35 @@
     <!-- ── Entry list ── -->
     <section class="changelog-list" aria-label="Release history">
 
-    <article class="changelog-entry is-current" data-version-tier="minor" data-version="v1.120.0">
+    <article class="changelog-entry is-current" data-version-tier="patch" data-version="v1.120.1">
       <div class="changelog-meta">
-        <span class="changelog-version-badge" style="--tier-color:#06b6d4;">v1.120.0</span>
-        <span class="changelog-tier-pill" style="--tier-color:#06b6d4;background:#06b6d420;color:#06b6d4;border:1px solid #06b6d440;">MINOR</span>
+        <span class="changelog-version-badge" style="--tier-color:#10b981;">v1.120.1</span>
+        <span class="changelog-tier-pill" style="--tier-color:#10b981;background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>
         <time class="changelog-date" datetime="2026-07-31">July 31, 2026</time>
       </div>
-      <p class="changelog-caption">DC Incidents dossier — root-gated case library, Phase A foundation</p>
+      <p class="changelog-caption">DCMOC owner-comment audit — 2 wired-but-degraded defects fixed</p>
       <div class="changelog-body">
-        <h3 class="cl-subhead">Added</h3>
+        <p>Adversarial re-audit of every prior owner review comment against the live code</p>
+<p>(owner: "semua comment saya tidak di eksekusi dengan proper"). 17 of 19 items</p>
+<p>verified genuinely engine-wired; <strong>2 real defects</strong> of the "shipped but degraded"</p>
+<p>class were found and fixed. Full ledger: <code>dcmoc/OWNER_COMMENT_AUDIT.md</code>.</p>
+<h3 class="cl-subhead">Fixed</h3>
+<ul>
+  <li><strong>Strategic Planning — single-source lock was conditional</strong> (<code>StrategicPlanningDashboard.tsx</code>).</li>
+</ul>
+<p>Total Land Area / Grid Capacity / Climate / Target PUE were only <code>disabled</code> <em>when</em> a</p>
+<p>site fed them, so with no site selected they degraded to editable phantom inputs showing</p>
+<p>seed values (10000 m² / 20 MW) — contradicting the page's own "LOCKED (single source)"</p>
+<p>banner. Now <strong>always read-only mirrors</strong>; with no site the page shows a clear empty state</p>
+<p>("Select a site to run feasibility → Site Intelligence") instead of a fake editable seed.</p>
+<ul>
+  <li><strong>Rack form factor was a fake CAPEX cost driver</strong> (<code>CapexEngine.ts</code>). <code>rackFormFactor</code></li>
+</ul>
+<p>(std42u 1.0 / tall48u 0.90 / OCP 1.15, sourced EIA-310 / OCP Open Rack v3) only fed the</p>
+<p>reported <code>floorSpace</code> metric — switching rack form changed reported m² but <strong>$0 of CAPEX</strong>,</p>
+<p>though v1.115.92 claimed it a "real cost driver". Now multiplied into the space-driven</p>
+<p><code>building</code> (shell + civil) category, so 42U/48U/OCP move the CAPEX total as intended.</p>
+<h3 class="cl-subhead">Added</h3>
 <ul>
   <li><strong>DC Incidents — Case Library</strong> (<code>dc-incidents.html</code>), a <strong>root-only</strong> knowledge base of major data-center / cloud incidents worldwide. Ranked hub (transparent magnitude composite: blast radius 35% · users 25% · financial 20% · duration 20%) → each incident opens a dedicated dossier page (<code>incident-&lt;slug&gt;.html</code>) with a full <strong>sequence of events (SOE)</strong>, root cause, <strong>correction of errors (COE)</strong>, contributing factors, lessons learnt, engineering improvements, technical deep-dive, and a <strong>provenance-mandatory</strong> reference list (every fact traces to a public post-incident report).</li>
   <li><strong>Data-driven build:</strong> <code>data/incidents/*.json</code> corpus → <code>tools/build-incidents.py</code> renders the hub + all incident pages from one audit-passing template (gate markup, dark palette, mobile patch, version stamp, cookie consent). New ship gate <code>tools/test-incidents-corpus.mjs</code> rejects any incident missing sourcing/SOE/COE/≥2 references.</li>
