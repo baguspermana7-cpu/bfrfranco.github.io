@@ -13,6 +13,28 @@ release sections rather than semver.
 
 ---
 
+## v1.121.3 — 2026-08-01 (DCMOC tooltip wave 3 + Site-Intelligence ƒx traces — doc catch-up)
+
+Documents DCMOC coverage work that shipped live (swept into an interleaved commit by a
+concurrent session): **tooltip wave 3** (~146 more explanation tooltips across Platform-
+DataLibrary, Report, DesignTools, Executive, NewEngine, Site Editor/Intelligence,
+Construction, Settings, Benchmark, Scenarios, Projects, Portfolio, Grid, Tax, Risk, Talent,
+Sustainability, Capacity, Results, OPEX) — cumulative waves 1–3 ≈ **489 tooltips / ~30 dashboards**;
+and **Site Intelligence ƒx trace indicators** — the 5 top KPI scores (Total/Availability/
+Connectivity/Water & Cooling/Risk) now carry `value-trace` nodes + `traceId` (weighted
+`models.site.score` composite). SEO: added missing twitter/ai-content-declaration meta on
+4 pages (0 SEO errors). All gates green (test-rz-engine 763/0, value-bindings 85/0,
+reference-parity 155/0).
+
+### Known follow-ups (documented, not yet fixed)
+- **trace-parity 114/116** — two PRE-EXISTING drifts on the Results page (`results.score`
+  popover 70 vs display 77; `results.finScore` 50 vs 100). Root cause: `value-trace.ts
+  resultsDims()` re-implements the results model and has drifted from ResultsEnginePage's
+  inline compute — needs a single-source `computeResultsModel` both call. Not my regression
+  (my diff didn't touch `results.*`); deferred to a focused fix.
+- Remaining trace coverage (Financial EVM + other pages) + a `audit-dcmoc-coverage` gate to
+  enforce zero tooltip/trace gaps — next waves.
+
 ## v1.120.5 — 2026-07-31 (DCMOC parameter-tooltip coverage — wave 2, +12 dashboards)
 
 Wave 2 of the every-parameter-explained program — **12 more dashboards, ~267 new
