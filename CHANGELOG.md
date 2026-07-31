@@ -13,6 +13,35 @@ release sections rather than semver.
 
 ---
 
+## v1.120.2 — 2026-07-31 (DCMOC owner-comment audit — full sweep, 4 more defects fixed)
+
+Extended the adversarial audit to every remaining prior owner review comment
+(programs A–L overnight, mega-slice M–X, UIUX 16-keluhan) — ~52 items total across
+6 programs verified against live code. **48 genuinely engine-wired**; the audit
+confirmed the owner's suspicion that a handful were "shipped but degraded". After
+v1.120.1 fixed 2, this ships **4 more**. Full ledger: `dcmoc/OWNER_COMMENT_AUDIT.md`.
+
+### Fixed
+- **Single revenue basis — residual divergent hardcodes removed** (honest-metrics
+  discipline). `value-trace.ts` finance-score screening, `site-adapter.ts` site-cost
+  screening (both `?? 280`) and a `diagnostics.ts` staffing-diagnostic (`120`) now route
+  to the single-source `DEFAULT_REVENUE_PER_KW_MONTH` (150) — the "ONE revenue basis"
+  claim from the X-audit is now actually true across all paths.
+- **Commissioning per-level cost split now reflects real per-level costs** (`rz-engine.js`
+  `models.commissioning.programRich`). The L0–L6 cost bars displayed a *fixed* proportion
+  split (0.03/0.04/0.10/0.22/0.20/0.32/0.09) while the engine already computed the real
+  `levelCosts`; now each level's cost is the real `levelCosts` share of the grand total
+  (which still reconciles to the grand). Engine tests updated + sum-to-grand invariant added.
+- **Run-Optimization label made honest** (`ExecutiveDashboard.tsx`). It advertised a
+  "real 3-objective solver" but only Objective 1 (Blended IRR) is optimized; the other
+  two are feasibility checks. Copy now says so — no more overclaim.
+
+### Notes
+- Audited but **not a defect**: the "20kV" grid option (UX-07) — the CAPEX-driving field
+  is `substationType` (11/33/66/132kV → distinct `substationCosts`, wired correctly); the
+  separate `gridVoltage` field legitimately drives only the single-line diagram. No
+  fabricated cost multiplier was added (would double-count). Documented in the ledger.
+
 ## v1.120.1 — 2026-07-31 (DCMOC owner-comment audit — 2 wired-but-degraded defects fixed)
 
 Adversarial re-audit of every prior owner review comment against the live code

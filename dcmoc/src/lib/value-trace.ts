@@ -1450,7 +1450,7 @@ function resultsDims(): { capexScore: number; susScore: number; finScore: number
         let finScore = 60;
         try {
             if (M.roi?.npv) {
-                const revenue = (D.decision?.revenuePerKwMonth ?? 280) * i.itLoad * 12;
+                const revenue = (D.decision?.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH) * i.itLoad * 12;
                 let opexAnnual = revenue * 0.4;
                 try {
                     if (M.opex?.totalAnnual) opexAnnual = M.opex.totalAnnual(i.itLoad / 1000, pue ?? 1.3, country?.id ?? 'US', 12, { capex: capexRes.total, basisPreset: 'dcContract' }).total;

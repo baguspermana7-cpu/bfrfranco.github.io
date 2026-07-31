@@ -83,11 +83,15 @@ Owner was **right that sloppiness existed** — but it was **2 items**, not ever
 - ⚠️ **MX-10(b)** residual divergent revenue hardcodes despite "ONE revenue basis": **280** in site-adapter.ts:306 + value-trace.ts:1453, **120** in diagnostics.ts:330. Single source = constants/finance.ts:14 (150). Fix: route these to the single source.
 - Nit: analogies grew to 80 (claimed 41) — content growth, no action.
 
-## PENDING FIXES (batch → v1.120.2)
-1. MX-10(b) revenue hardcodes 280/120 → single source
-2. UX-07 20kV → real CAPEX effect
-3. MX-08 → honest relabel
-4. AL-03/06 commissioning per-level bars → real levelCosts
+## FINAL — all fixes SHIPPED
+- **v1.120.1**: C-001 Strategic Planning lock + C-03 rackForm cost driver.
+- **v1.120.2**: MX-10(b) revenue hardcodes (280/120→single source) ✅ · AL-03/06 commissioning per-level real levelCosts share ✅ · MX-08 honest relabel ✅.
+- **UX-07 20kV**: NOT a defect (false positive) — substationType drives CAPEX correctly; gridVoltage=SLD only. No change (avoided double-count).
+
+## Grand total: ~52 items across 6 programs (A/B/C/D/E/F+M–X)
+- **48 genuinely engine-wired + working** on first audit.
+- **6 real defects** ("wired-but-degraded" class the owner suspected) — ALL fixed: C-001, C-03, MX-10b, AL-03/06, MX-08. (UX-07 investigated → false positive.)
+- Owner was right that sloppiness existed; it was ~11% of items, now 0.
 
 ## Audit method (per row)
 1. Open the actual component/engine path.

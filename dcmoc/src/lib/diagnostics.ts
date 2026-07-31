@@ -25,6 +25,7 @@ import { useRequirementsStore } from '@/store/requirements';
 import { useSitesStore } from '@/store/sites';
 
 import { calculateAutoHeadcount } from '@/modules/staffing/ShiftEngine';
+import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 import type { SimulationState } from '@/store/simulation';
 
 // ── Collectors (pure) ──
@@ -327,7 +328,7 @@ export const DIAG_SOURCES: DiagSource[] = [
             const financialResult = calculateFinancials({
                 totalCapex: capexResult.total,
                 annualOpex,
-                revenuePerKwMonth: 120,
+                revenuePerKwMonth: DEFAULT_REVENUE_PER_KW_MONTH,
                 itLoadKw: ctx.inputs.itLoad,
                 discountRate: 0.10,
                 projectLifeYears: 10,

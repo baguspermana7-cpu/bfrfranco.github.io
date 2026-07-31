@@ -762,7 +762,11 @@ if (M.commissioning && M.commissioning.programRich) {
     eq('cx.rich enterprise_2mw racks', e2.equip.racks, 334);
     eq('cx.rich enterprise_2mw generators', e2.equip.generators, 1);
     const e2L2 = e2.levels.find(l => l.id === 'L2');
-    eq('cx.rich enterprise_2mw L2 cost (fixed 10% proportion)', e2L2.cost, 111573);
+    // Per-level cost now reflects the REAL levelCosts distribution (v1.120.2 audit fix),
+    // not a fixed 10% proportion. Assert the real value + the sum-to-grand invariant.
+    eq('cx.rich enterprise_2mw L2 cost (real levelCosts share)', e2L2.cost, 205418);
+    const e2LevelSum = e2.levels.reduce((s, l) => s + l.cost, 0);
+    ok('cx.rich per-level costs sum ≈ grand', Math.abs(e2LevelSum - e2.grand) <= e2.levels.length, `Σlevels=${e2LevelSum} grand=${e2.grand}`);
     // hyperscale_50mw preset — exact grand + equipment scaling
     const h50 = RC.programRich('hyperscale_50mw');
     eq('cx.rich hyperscale_50mw grand', h50.grand, 52746464);

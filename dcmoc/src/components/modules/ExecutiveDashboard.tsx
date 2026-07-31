@@ -435,7 +435,7 @@ export function ExecutiveDashboard() {
                             { label: 'Cut the OPEX drivers', detail: 'Staffing model, maintenance mix and cooling PUE — see Operations.', tab: 'ops' },
                         ],
                         tab: 'finance',
-                        note: `Auto-optimize below runs the page's real 3-objective solver (bisects revenue to the ${IRR_HURDLE_PCT}% hurdle, previews before Apply).`,
+                        note: `Auto-optimize below runs the page's real IRR solver — it bisects revenue to the ${IRR_HURDLE_PCT}% hurdle, then reports capacity-utilization and budget-vs-P80 as feasibility checks alongside. Previews before Apply.`,
                     }}
                     onClose={() => setIrrDiag(false)}
                     onOptimize={() => handleAction('Run Optimization')}

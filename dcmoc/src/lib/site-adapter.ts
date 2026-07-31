@@ -10,6 +10,7 @@
  * ──────────────────────────────────────────────────────────────────────── */
 
 import { rzModels, rzData } from '@/lib/rz-engine';
+import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 import { COUNTRIES } from '@/constants/countries';
 import type { CandidateSite, SiteAttributes, SiteScoreResult, FactorKey, AxisKey, RiskLevel } from '@/types/site-intel';
 import { ATTR_BOUNDS } from '@/types/site-intel';
@@ -297,13 +298,13 @@ export interface SiteAnalyses {
 
 /** Shared project context for the per-site analyses (computed once per render).
  *  Screening bases documented: revenue = engine decision.revenuePerKwMonth
- *  (fallback 280 $/kW·mo), staff cost = headcount × country base salary ×
+ *  (fallback = DEFAULT_REVENUE_PER_KW_MONTH single-source), staff cost = headcount × country base salary ×
  *  (1 + country benefitsOverheadRate; fallback 0.3 = legacy flat ×1.3 burden). */
 export function buildAnalysisCtx(args: {
     itLoadKw: number; tierLevel: 2 | 3 | 4; coolingType: SiteAnalysisCtx['coolingType'];
     capexTotal: number | null; headcounts: number[]; countryId: string; opexAnnual?: number | null;
 }): SiteAnalysisCtx {
-    const revenuePerKwMonth: number = rzData()?.decision?.revenuePerKwMonth ?? 280;
+    const revenuePerKwMonth: number = rzData()?.decision?.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH;
     const annualRevenue = revenuePerKwMonth * args.itLoadKw * 12;
     const totalFTE = Math.max(1, Math.round(args.headcounts.reduce((s, x) => s + (x || 0), 0)));
     const c = COUNTRIES[args.countryId];

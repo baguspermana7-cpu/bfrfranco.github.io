@@ -12586,12 +12586,17 @@
                     if (inp.itLoad >= 100000) subtotal *= 1.05;
                     var contingency = subtotal * R.contingency;
                     var grand = subtotal + contingency;
-                    // Fixed display proportions.
-                    var lp = R.levelProportions, ll = R.levelLabels, order = ['l0', 'l1', 'l2', 'l3', 'l4', 'l5', 'l6'];
+                    // Per-level split from the REAL levelCosts distribution (regional mult on
+                    // L1-L5, matching levelTotal above), scaled to the grand total — NOT a fixed
+                    // proportion. Falls back to R.levelProportions only if levelCosts sum to 0.
+                    var ll = R.levelLabels, order = ['l0', 'l1', 'l2', 'l3', 'l4', 'l5', 'l6'];
+                    var lcAdj = { l0: lc.l0, l1: lc.l1 * rm, l2: lc.l2 * rm, l3: lc.l3 * rm, l4: lc.l4 * rm, l5: lc.l5 * rm, l6: lc.l6 };
+                    var lcSum = lcAdj.l0 + lcAdj.l1 + lcAdj.l2 + lcAdj.l3 + lcAdj.l4 + lcAdj.l5 + lcAdj.l6;
                     var levels = [];
                     for (var i = 0; i < order.length; i++) {
                         var k = order[i];
-                        levels.push({ id: k.toUpperCase(), label: ll[k], cost: Math.round(grand * lp[k]), pct: +(lp[k] * 100).toFixed(1), days: dur[k] });
+                        var share = lcSum > 0 ? lcAdj[k] / lcSum : R.levelProportions[k];
+                        levels.push({ id: k.toUpperCase(), label: ll[k], cost: Math.round(grand * share), pct: +(share * 100).toFixed(1), days: dur[k] });
                     }
                     var ds = R.disciplineShare, disciplines = [];
                     for (var d in ds) { if (ds.hasOwnProperty(d)) disciplines.push({ name: d, cost: Math.round(grand * ds[d]), pct: +(ds[d] * 100).toFixed(1) }); }
